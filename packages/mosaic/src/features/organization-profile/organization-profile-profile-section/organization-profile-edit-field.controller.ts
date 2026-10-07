@@ -29,6 +29,7 @@ function isSaveable(context: OrganizationProfileEditFieldContext): boolean {
   return context.value !== context.savedValue && context.value !== '';
 }
 
+// TODO: Move this dialog onto useForm so Clerk errors are localized by code and an unknown error never shows its message.
 function toFormError(cause: unknown): OrganizationProfileFormError {
   if (cause instanceof OrganizationProfileSaveError) {
     return { message: cause.message, field: cause.field };

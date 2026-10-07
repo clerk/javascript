@@ -6,9 +6,8 @@ import { Field } from '../../components/field';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { fill } from '../../localization/messages';
+import { fill, useMessages } from '../../localization';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 import { styles } from './user-profile-passkeys-section.styles';
 
 export interface UserProfilePasskey {
@@ -33,6 +32,7 @@ export function UserProfilePasskeysSectionView({
   onRename,
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
+  const m = useMessages('userProfilePasskeys');
   const addButton = useRef<HTMLButtonElement>(null);
   const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
@@ -49,7 +49,15 @@ export function UserProfilePasskeysSectionView({
         tabIndex={-1}
       >
         <Section.Header>
-          <Section.Title>{m.label}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.label}</Section.Title>
+            <Field.Message
+              role={addError ? 'alert' : 'status'}
+              xstyle={styles.addError}
+            >
+              <Field.Error>{addError}</Field.Error>
+            </Field.Message>
+          </Section.Content>
           {onAdd ? (
             <Section.Actions>
               <Button
@@ -69,12 +77,6 @@ export function UserProfilePasskeysSectionView({
               </Button>
             </Section.Actions>
           ) : null}
-          <Field.Message
-            role={addError ? 'alert' : 'status'}
-            xstyle={styles.addError}
-          >
-            <Field.Error>{addError}</Field.Error>
-          </Field.Message>
         </Section.Header>
         <Section.Body>
           <Section.Items>

@@ -5,8 +5,8 @@ import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
-import type { FormError } from '../../../utils/form-error';
-import { toFormError } from '../../../utils/form-error';
+import type { FormError } from '../../../utils/errors';
+import { toFormError } from '../../../utils/errors';
 import type { UserProfilePhoneVerifier } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
 

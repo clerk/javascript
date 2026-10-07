@@ -22,6 +22,7 @@ import { userProfileConnectedAccountsMessages } from '../features/user-profile/u
 import { userProfileDangerSectionMessages } from '../features/user-profile/user-profile-danger-section/user-profile-danger-section.messages';
 import { userProfileEnterpriseAccountsMessages } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.messages';
 import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section.messages';
+import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section.messages';
 import { userProfilePasswordSectionMessages } from '../features/user-profile/user-profile-password-section/user-profile-password-section.messages';
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
 import { errorMessages } from './errors.messages';
@@ -52,6 +53,7 @@ export const mosaicMessages = {
   userProfileDangerSection: userProfileDangerSectionMessages,
   userProfileEnterpriseAccountsSection: userProfileEnterpriseAccountsMessages,
   userProfileMfa: userProfileMfaMessages,
+  userProfilePasskeys: userProfilePasskeysMessages,
   userProfilePasswordSection: userProfilePasswordSectionMessages,
   userProfileWeb3Wallets: userProfileWeb3WalletsMessages,
 };

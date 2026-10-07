@@ -2,7 +2,7 @@ import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { PasswordStrength } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { createElement, type ReactNode } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { FormSubmitError } from '../../../components/form';
 import { MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../../localization';
@@ -197,13 +197,15 @@ describe('password error feedback', () => {
     ).toBe('Your password is not strong enough.');
   });
 
-  it('returns form errors for unexpected failures', () => {
+  it('returns the generic form error for unexpected failures, never their message', () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(
       passwordFormError(new Error('Connection interrupted'), true, settings, messages, localization.locale, resolver()),
-    ).toMatchObject({ banner: 'Connection interrupted' });
+    ).toMatchObject({ banner: 'Something went wrong. Please try again.' });
     expect(passwordFormError(undefined, true, settings, messages, localization.locale, resolver())).toBeInstanceOf(
       FormSubmitError,
     );
+    log.mockRestore();
   });
 });
 

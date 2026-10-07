@@ -2,7 +2,7 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SaveError } from '../../../utils/form-error';
+import { SaveError } from '../../../utils/errors';
 import type { UserProfilePictureControllerOptions } from '../user-profile-account-section/user-profile-picture.controller';
 import { useUserProfilePictureController } from '../user-profile-account-section/user-profile-picture.controller';
 
@@ -88,7 +88,7 @@ describe('useUserProfilePictureController', () => {
 
     await act(async () => result.current.onChange?.(file));
     expect(result.current.error).toBe('Something went wrong. Please try again.');
-    expect(log).toHaveBeenCalledWith(failure);
+    expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
     log.mockRestore();
   });
 

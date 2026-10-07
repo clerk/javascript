@@ -1,12 +1,12 @@
-import type { LocalizableError } from '../../localization';
+import type { ErrorDescription } from '../../localization';
 import { useErrorText } from '../../localization';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
-import { toLocalizableError } from '../../utils/form-error';
+import { toLocalizableError } from '../../utils/errors';
 
 export interface ConfirmationContext {
   run: () => Promise<void>;
-  error: LocalizableError | undefined;
+  error: ErrorDescription | undefined;
 }
 
 export type ConfirmationEvent = { type: 'OPEN' } | { type: 'CONFIRM'; run: () => Promise<void> } | { type: 'CANCEL' };
@@ -56,7 +56,14 @@ export interface ConfirmationController {
   errorMessage: string | undefined;
 }
 
-export function useConfirmationController(): ConfirmationController {
+export interface ConfirmationControllerOptions {
+  /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
+  errorFallback?: string;
+}
+
+export function useConfirmationController({
+  errorFallback,
+}: ConfirmationControllerOptions = {}): ConfirmationController {
   const [snapshot, send] = useMachine(confirmationMachine);
   const errorText = useErrorText();
   const { error } = snapshot.context;
@@ -66,6 +73,6 @@ export function useConfirmationController(): ConfirmationController {
     onOpenChange: open => send({ type: open ? 'OPEN' : 'CANCEL' }),
     onConfirm: run => send({ type: 'CONFIRM', run }),
     isConfirming: snapshot.value === 'pending',
-    errorMessage: error ? errorText(error) : undefined,
+    errorMessage: error ? errorText(error, errorFallback) : undefined,
   };
 }

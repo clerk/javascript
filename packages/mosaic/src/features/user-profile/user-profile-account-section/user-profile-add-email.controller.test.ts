@@ -2,7 +2,7 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { SaveError } from '../../../utils/form-error';
+import { SaveError } from '../../../utils/errors';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from './user-profile-account-section.types';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
 
