@@ -184,6 +184,13 @@ describe('password error feedback', () => {
         ?.newPassword,
     ).toBe('Your password is not strong enough.');
     expect(
+      format(
+        JSON.parse(
+          '[{"code":"form_password_not_strong_enough","message":"raw","meta":{"param_name":"new_password","zxcvbn":{}}}]',
+        ),
+      ).fields?.newPassword,
+    ).toBe('Your password is not strong enough.');
+    expect(
       format([
         {
           code: 'form_password_not_strong_enough',
