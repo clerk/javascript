@@ -1,7 +1,6 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ReactNode } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
@@ -13,19 +12,10 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import {
-  UserProfilePasswordSection,
-  useUserProfilePasswordSlot,
-} from '../user-profile-password-section/user-profile-password-section';
-import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
+import { UserProfilePasswordSection } from './user-profile-password-section';
 
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
 const alice = fapiUser({ id: 'user_1', email_addresses: [email] });
-
-function PasswordSecurityPanel({ fallback }: { fallback?: ReactNode }) {
-  const passwordSlot = useUserProfilePasswordSlot({ fallback });
-  return <UserProfileSecurityPanelView passwordSlot={passwordSlot} />;
-}
 
 async function renderPassword(user = alice, environment = fapiEnvironment()) {
   const fapi = serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
@@ -43,35 +33,136 @@ async function fillPassword() {
 }
 
 describe('Changing a password', () => {
-  it('omits Authentication while the only method loads without a fallback', async () => {
+  it('omits a zero loading fallback in the standalone section', async () => {
     serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
-    const loading = renderWithClerk(<PasswordSecurityPanel />);
+    const loading = renderWithClerk(<UserProfilePasswordSection fallback={0} />);
     try {
-      expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
+      const hasFallback = screen.queryByText('0') !== null;
+      expect(hasFallback).toBe(false);
     } finally {
       await loading;
     }
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
+    expect(screen.getByText('Password')).toBeInTheDocument();
   });
 
-  it('keeps Authentication around a visible loading fallback', async () => {
-    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
-    const loading = renderWithClerk(<PasswordSecurityPanel fallback={<div>Loading password section</div>} />);
-    try {
-      expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Loading password section');
-    } finally {
-      await loading;
+  it.each(['sign out', 'switch user', 'switch session'] as const)(
+    'discards the password draft after %s',
+    async change => {
+      const fapi = serveFapi({
+        client: fapiClient([
+          fapiSession({ id: 'sess_1', user: alice }),
+          fapiSession({ id: 'sess_2', user: change === 'switch user' ? fapiUser({ id: 'user_2' }) : alice }),
+        ]),
+      });
+      const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+      const user = await fillPassword();
+
+      await act(() => (change === 'sign out' ? clerk.signOut() : clerk.setActive({ session: 'sess_2' })));
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(fapi.passwordUpdates).toHaveLength(0);
+      if (change === 'sign out') {
+        expect(screen.queryByText('Password')).toBeNull();
+      } else {
+        expect(clerk.session?.id).toBe('sess_2');
+        await user.click(screen.getByRole('button', { name: 'Change password' }));
+        expect(screen.getByLabelText('Current password')).toHaveValue('');
+        expect(screen.getByLabelText('New password')).toHaveValue('');
+        expect(screen.getByLabelText('Confirm password')).toHaveValue('');
+      }
+    },
+  );
+
+  it.each(['password mode', 'enterprise management'] as const)(
+    'rejects saving an open dialog after the %s changes',
+    async change => {
+      const fapi = serveFapi({
+        client: fapiClient([
+          fapiSession({
+            id: 'sess_1',
+            user: fapiUser({
+              ...alice,
+              enterprise_accounts: [fapiEnterpriseAccount({ id: 'ent_1', active: false })],
+            }),
+          }),
+        ]),
+      });
+      const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+      const user = await fillPassword();
+      const dialog = screen.getByRole('dialog');
+      const currentUser = clerk.user;
+      const account = currentUser?.enterpriseAccounts[0];
+      if (!currentUser || !account) {
+        throw new Error('Expected a signed-in user with an enterprise account');
+      }
+      if (change === 'password mode') {
+        currentUser.passwordEnabled = false;
+      } else {
+        account.active = true;
+      }
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Password update is no longer available.'),
+      );
+      expect(screen.getByRole('dialog')).toBe(dialog);
+      expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+      expect(fapi.passwordUpdates).toHaveLength(0);
+    },
+  );
+
+  it('shows an unexpected update failure in the dialog and keeps the draft', async () => {
+    const fapi = serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+    if (!clerk.user) {
+      throw new Error('Expected a signed-in user');
     }
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
-    expect(screen.queryByText('Loading password section')).toBeNull();
+    const update = vi.spyOn(clerk.user, 'updatePassword').mockRejectedValueOnce(new Error('Connection interrupted'));
+    try {
+      const user = await fillPassword();
+      const dialog = screen.getByRole('dialog');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+      );
+      expect(dialog).not.toHaveTextContent('Connection interrupted');
+      expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
+      expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+      expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+      expect(fapi.passwordUpdates).toHaveLength(0);
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(fapi.passwordUpdates).toHaveLength(1);
+    } finally {
+      update.mockRestore();
+    }
   });
 
-  it('shows no password action when nobody is signed in', async () => {
-    serveFapi({ client: fapiClient() });
-    await renderWithClerk(<PasswordSecurityPanel />);
+  it('shows feedback when the password strength checker cannot load', async () => {
+    const environment = fapiEnvironment();
+    environment.user_settings.password_settings.show_zxcvbn = true;
+    serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+    const modules = clerk.__internal_moduleManager;
+    if (!modules) {
+      throw new Error('Expected a module manager');
+    }
+    const load = vi.spyOn(modules, 'import').mockRejectedValue(new Error('Failed to load password strength checker'));
+    try {
+      const user = userEvent.setup();
+      await user.click(screen.getByRole('button', { name: 'Change password' }));
+      await user.type(screen.getByLabelText('New password'), 'new-password-123');
 
-    expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-    expect(screen.queryByText('Password')).toBeNull();
+      await waitFor(() =>
+        expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+          'Something went wrong. Please try again.',
+        ),
+      );
+    } finally {
+      load.mockRestore();
+    }
   });
 
   it('sends the update to Clerk and closes after it succeeds', async () => {
@@ -141,6 +232,26 @@ describe('Changing a password', () => {
     expect(screen.getByRole('alert').textContent).toBe('');
   });
 
+  it('shows an incorrect current password error at the field and keeps the draft', async () => {
+    await renderPassword();
+    const user = await fillPassword();
+    const update = holdRequests('post', '/v1/me/change_password');
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    update.fail('form_password_incorrect', undefined, 'current_password');
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Current password')).toHaveAccessibleDescription(
+        'Your current password is incorrect.',
+      ),
+    );
+    expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+    expect(screen.getByRole('alert').textContent).toBe('');
+  });
+
   it('sets a first password without asking for the current one', async () => {
     const fapi = await renderPassword(fapiUser({ ...alice, password_enabled: false }));
     const user = userEvent.setup();
@@ -155,28 +266,35 @@ describe('Changing a password', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Change password' })).toBeInTheDocument());
   });
 
+  it('hides the section when a loaded user has no active session', async () => {
+    serveFapi({
+      client: fapiClient([
+        fapiSession({
+          id: 'sess_1',
+          user: fapiUser({ ...alice, enterprise_accounts: [fapiEnterpriseAccount({ id: 'ent_1' })] }),
+        }),
+      ]),
+    });
+    const { clerk, rerender } = await renderWithClerk(<UserProfilePasswordSection />);
+    expect(screen.getByText('Managed by Company SSO')).toBeInTheDocument();
+    const resources = clerk.__internal_lastEmittedResources;
+    if (!resources?.user) {
+      throw new Error('Expected a loaded user resource');
+    }
+    clerk.__internal_lastEmittedResources = { ...resources, session: null };
+
+    rerender(<UserProfilePasswordSection />);
+
+    expect(screen.queryByText('Password')).toBeNull();
+    expect(screen.queryByText('Managed by Company SSO')).toBeNull();
+  });
+
   it('hides the section when instance passwords are disabled', async () => {
     const environment = fapiEnvironment();
     environment.user_settings.attributes.password.enabled = false;
     await renderPassword(alice, environment);
 
     expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
-  });
-
-  it.each(['disabled', 'editable', 'managed'])('resolves the Authentication section for %s passwords', async policy => {
-    const environment = fapiEnvironment();
-    environment.user_settings.attributes.password.enabled = policy !== 'disabled';
-    const user = fapiUser({
-      ...alice,
-      enterprise_accounts: policy === 'managed' ? [fapiEnterpriseAccount({ id: 'ent_1' })] : [],
-    });
-    serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
-    await renderWithClerk(<PasswordSecurityPanel />);
-    if (policy === 'disabled') {
-      expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-    } else {
-      expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
-    }
   });
 
   it.each([true, false])('shows the managed view when passwordEnabled is %s', async passwordEnabled => {
@@ -209,6 +327,19 @@ describe('Changing a password', () => {
 
     expect(screen.getByText('Managed by your enterprise connection')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
+  });
+
+  it('shows the generic provider label when the enterprise connection name is blank', async () => {
+    const account = fapiEnterpriseAccount({ id: 'ent_1' });
+    if (!account.enterprise_connection) {
+      throw new Error('Expected an enterprise connection');
+    }
+    account.enterprise_connection.name = '';
+    await renderPassword(fapiUser({ ...alice, enterprise_accounts: [account] }));
+
+    expect(screen.getByText('Managed by your enterprise connection')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Set password' })).toBeNull();
   });
 
   it('focuses the current password and clears the draft after cancellation', async () => {
@@ -338,7 +469,7 @@ describe('Changing a password', () => {
 });
 
 describe('Deferred password behavior', () => {
+  it.todo('shows a password section skeleton while loading without a custom fallback');
   it.todo('reverifies the session and retries the password update when Clerk requires verification');
   it.todo('omits the current password when session reverification is enabled');
-  it.todo('shows a password section skeleton while loading without a custom fallback');
 });
