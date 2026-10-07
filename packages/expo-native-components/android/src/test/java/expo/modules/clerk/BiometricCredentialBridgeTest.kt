@@ -3,11 +3,7 @@ package expo.modules.clerk
 import com.clerk.api.network.model.error.ClerkErrorResponse
 import com.clerk.api.network.model.error.Error as ClerkAPIError
 import com.clerk.api.network.serialization.ClerkResult
-import com.clerk.api.signin.SignIn
-import com.clerk.api.biometriccredential.BiometricCredential
-import com.clerk.api.biometriccredential.BiometricCredentialAvailability
 import com.clerk.api.biometriccredential.BiometricCredentialKeyManagerException
-import com.clerk.api.biometriccredential.BiometricCredentialPolicy
 import com.clerk.api.session.SessionVerification
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
@@ -165,92 +161,6 @@ class BiometricCredentialBridgeTest {
     }
 
     @Test
-    fun `reports unavailable biometric credentials before Clerk initialization`() {
-        assertEquals(
-            mapOf(
-                "isAvailable" to false,
-                "unavailableReason" to "environment_unavailable"
-            ),
-            biometricCredentialEnvironmentAvailabilityPayload(isInitialized = false)
-        )
-        assertNull(biometricCredentialEnvironmentAvailabilityPayload(isInitialized = true))
-    }
-
-    @Test
-    fun `maps biometric-credential availability to the JavaScript contract`() {
-        assertEquals(
-            mapOf("isAvailable" to true, "unavailableReason" to null),
-            biometricCredentialAvailabilityPayload(BiometricCredentialAvailability.Available)
-        )
-        assertEquals(
-            mapOf(
-                "isAvailable" to false,
-                "unavailableReason" to "biometric_authentication_unavailable"
-            ),
-            biometricCredentialAvailabilityPayload(
-                BiometricCredentialAvailability.Unavailable(
-                    BiometricCredentialAvailability.UnavailableReason.BIOMETRIC_AUTHENTICATION_UNAVAILABLE
-                )
-            )
-        )
-    }
-
-    @Test
-    fun `maps biometric-credential resources to the JavaScript contract`() {
-        val payload = biometricCredentialPayload(
-            BiometricCredential(
-                id = "td_123",
-                platform = BiometricCredential.Platform.ANDROID,
-                appIdentifier = "com.example.app",
-                name = "Pixel",
-                status = BiometricCredential.Status.ACTIVE,
-                createdAt = 1_700_000_000_000,
-                updatedAt = 1_700_000_100_000,
-                lastUsedAt = 1_700_000_200_000
-            )
-        )
-
-        assertEquals("trusted_device", payload["object"])
-        assertEquals("android", payload["platform"])
-        assertEquals("active", payload["status"])
-        assertEquals("ES256", payload["algorithm"])
-        assertEquals(1_700_000_200_000, payload["lastUsedAt"])
-        assertNull(payload["revokedAt"])
-    }
-
-    @Test
-    fun `maps every supported authentication policy`() {
-        assertEquals(
-            BiometricCredentialPolicy.BIOMETRY_CURRENT_SET,
-            biometricCredentialPolicy("biometry_current_set")
-        )
-        assertEquals(BiometricCredentialPolicy.BIOMETRY_ANY, biometricCredentialPolicy("biometry_any"))
-        assertEquals(
-            BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE,
-            biometricCredentialPolicy("biometry_or_device_passcode")
-        )
-        assertNull(biometricCredentialPolicy("unsupported"))
-    }
-
-    @Test
-    fun `maps biometric sign-in results`() {
-        assertEquals(
-            mapOf(
-                "id" to "sia_123",
-                "status" to "complete",
-                "createdSessionId" to "sess_123"
-            ),
-            biometricSignInPayload(
-                SignIn(
-                    id = "sia_123",
-                    status = SignIn.Status.COMPLETE,
-                    createdSessionId = "sess_123"
-                )
-            )
-        )
-    }
-
-    @Test
     fun `preserves Clerk API error codes and detailed messages`() {
         val failure = ClerkResult.apiFailure(
             ClerkErrorResponse(
@@ -271,8 +181,8 @@ class BiometricCredentialBridgeTest {
             ),
             biometricCredentialBridgeError(
                 failure = failure,
-                fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
-                fallbackMessage = "Unable to sign in with biometric credential"
+                fallbackCode = "E_BIOMETRIC_REVERIFICATION_FAILED",
+                fallbackMessage = "Unable to reverify with biometrics"
             )
         )
     }
@@ -289,8 +199,8 @@ class BiometricCredentialBridgeTest {
                     BiometricCredentialKeyManagerException.Code.KEY_INVALIDATED,
                     "The biometric credential key was invalidated."
                 ),
-                fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
-                fallbackMessage = "Unable to sign in with biometric credential"
+                fallbackCode = "E_BIOMETRIC_REVERIFICATION_FAILED",
+                fallbackMessage = "Unable to reverify with biometrics"
             )
         )
     }
@@ -299,13 +209,13 @@ class BiometricCredentialBridgeTest {
     fun `uses fallback details for plain bridge exceptions`() {
         assertEquals(
             BiometricCredentialBridgeError(
-                code = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
-                message = "Unable to sign in with biometric credential"
+                code = "E_BIOMETRIC_REVERIFICATION_FAILED",
+                message = "Unable to reverify with biometrics"
             ),
             biometricCredentialBridgeError(
                 throwable = Exception(),
-                fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
-                fallbackMessage = "Unable to sign in with biometric credential"
+                fallbackCode = "E_BIOMETRIC_REVERIFICATION_FAILED",
+                fallbackMessage = "Unable to reverify with biometrics"
             )
         )
     }

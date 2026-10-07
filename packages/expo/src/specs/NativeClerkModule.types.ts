@@ -1,6 +1,4 @@
-import type { SessionVerificationLevel, SessionVerificationStatus, SignInStatus } from '@clerk/shared/types';
-
-import type { BiometricCredentialAvailability, BiometricCredentialPolicy } from '../biometric-credentials/types';
+import type { SessionVerificationLevel, SessionVerificationStatus } from '@clerk/shared/types';
 
 export type NativeAuthFlowState = {
   isLoaded: boolean;
@@ -22,26 +20,6 @@ export type NativeClientSyncModule = {
   refreshClient(): Promise<void>;
 };
 
-export type NativeBiometricCredential = {
-  id: string;
-  object: 'trusted_device';
-  platform: string;
-  appIdentifier: string;
-  name: string | null;
-  algorithm: 'ES256' | (string & {});
-  status: string;
-  createdAt: number;
-  updatedAt: number;
-  lastUsedAt: number | null;
-  revokedAt: number | null;
-};
-
-export type NativeBiometricSignInResult = {
-  id: string;
-  status: SignInStatus | (string & {});
-  createdSessionId: string | null;
-};
-
 export type NativeBiometricReverificationResult = {
   id: string | null;
   status: SessionVerificationStatus | (string & {});
@@ -50,23 +28,6 @@ export type NativeBiometricReverificationResult = {
 };
 
 export type NativeBiometricCredentialModule = {
-  getTrustedDeviceAvailability(
-    id: string | null,
-    identifierHint: string | null,
-  ): Promise<BiometricCredentialAvailability>;
-  listTrustedDevices(): Promise<NativeBiometricCredential[]>;
-  enrollTrustedDevice(
-    deviceName: string | null,
-    identifierHint: string | null,
-    reason: string | null,
-    policy: BiometricCredentialPolicy,
-  ): Promise<NativeBiometricCredential>;
-  revokeTrustedDevice(id: string): Promise<NativeBiometricCredential>;
-  signInWithTrustedDevice(
-    id: string | null,
-    identifierHint: string | null,
-    reason: string | null,
-  ): Promise<NativeBiometricSignInResult>;
   reverifyWithBiometrics(
     sessionId: string,
     level: SessionVerificationLevel,
