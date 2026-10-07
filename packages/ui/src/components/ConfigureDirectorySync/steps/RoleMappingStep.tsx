@@ -24,7 +24,7 @@ import { Switch } from '@/elements/Switch';
 import { ArrowRight, Drag, Globe } from '@/icons';
 import { Alert } from '@/ui/elements/Alert';
 import type { ThemableCssProp } from '@/ui/styledSystem';
-import { handleError } from '@/utils/errorHandler';
+import { getAPIErrorMessage, handleError } from '@/utils/errorHandler';
 
 import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
@@ -435,7 +435,7 @@ const RoleMappingContent = (): JSX.Element => {
       <Alert
         variant='danger'
         title={localizationKeys('configureDirectorySync.roleMappingStep.error__loadMappings')}
-        subtitle={error.message}
+        subtitle={getAPIErrorMessage(error)}
       />
     );
   }

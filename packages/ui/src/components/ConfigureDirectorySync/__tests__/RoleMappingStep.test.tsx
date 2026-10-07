@@ -290,4 +290,29 @@ describe('RoleMappingStep', () => {
     expect(await screen.findByText('No groups provisioned yet')).toBeInTheDocument();
     expect(screen.getByText(/Push groups from Okta Workforce/)).toBeInTheDocument();
   });
+
+  it('shows the API error message when loading the mappings is refused', async () => {
+    const dir = directory();
+    dir.getGroupRoleMappings.mockRejectedValue(
+      new ClerkAPIResponseError('Forbidden', {
+        status: 403,
+        data: [{ code: 'not_allowed', message: 'Not allowed', long_message: 'You cannot view role mappings' }],
+      }),
+    );
+    await renderRolesStep(dir);
+
+    expect(await screen.findByText('Could not load role mappings')).toBeInTheDocument();
+    expect(screen.getByText('You cannot view role mappings')).toBeInTheDocument();
+  });
+
+  it('hides non-API error details when loading the mappings fails', async () => {
+    const dir = directory();
+    dir.getGroupRoleMappings.mockRejectedValue(
+      new SyntaxError('Unexpected non-whitespace character after JSON at position 4'),
+    );
+    await renderRolesStep(dir);
+
+    expect(await screen.findByText('Could not load role mappings')).toBeInTheDocument();
+    expect(screen.queryByText(/Unexpected non-whitespace/)).not.toBeInTheDocument();
+  });
 });

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 import { Badge, Col, descriptors, Flex, localizationKeys, Spinner, Text, useLocalizations } from '@/customizables';
 import { Alert } from '@/ui/elements/Alert';
+import { getAPIErrorMessage } from '@/utils/errorHandler';
 
 import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
@@ -171,7 +172,7 @@ export const TestSyncStep = (): JSX.Element => {
             <Alert
               variant='danger'
               title={localizationKeys('configureDirectorySync.testStep.error__loadUsers')}
-              subtitle={users.error.message}
+              subtitle={getAPIErrorMessage(users.error)}
             />
           ) : rows.length === 0 ? (
             <Flex
