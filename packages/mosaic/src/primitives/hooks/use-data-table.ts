@@ -12,7 +12,7 @@ export type ColumnFiltersState = Array<{ id: string; value: unknown }>;
 export type PaginationState = { pageIndex: number; pageSize: number };
 export type RowSelectionState = Record<string, boolean>;
 
-function functionalUpdate<T>(updater: Updater<T>, old: T): T {
+export function functionalUpdate<T>(updater: Updater<T>, old: T): T {
   return typeof updater === 'function' ? (updater as (old: T) => T)(old) : updater;
 }
 

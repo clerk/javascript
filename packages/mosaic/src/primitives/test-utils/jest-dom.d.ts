@@ -10,8 +10,8 @@ import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers'
 // friends are typed. `import 'vitest'` keeps this file a module augmentation
 // rather than an ambient module declaration that would shadow vitest's own types.
 declare module 'vitest' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Extending vitest's matcher types requires interface merging.
   interface Assertion<R, _T> extends TestingLibraryMatchers<any, R> {}
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Extending vitest's matcher types requires interface merging.
   interface AsymmetricMatchersContaining extends TestingLibraryMatchers<any, any> {}
 }

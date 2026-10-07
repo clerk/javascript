@@ -53,8 +53,7 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       defaultTagName: 'div',
       render,
       enabled: mounted,
-      // `setFloating` is a stable callback that does not use `this`.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
       ref: [refs.setFloating, ref],
       props: mergeProps<'div'>(defaultProps, otherProps),
     });

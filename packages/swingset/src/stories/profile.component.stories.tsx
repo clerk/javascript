@@ -120,7 +120,9 @@ function StubPage({ id, title }: { id: string; title: string }) {
           <Section.Root key={section.title}>
             <Section.Group>
               <Section.Header>
-                <Section.Title>{section.title}</Section.Title>
+                <Section.Content>
+                  <Section.Title>{section.title}</Section.Title>
+                </Section.Content>
               </Section.Header>
               <Section.Body>
                 {section.rows.map(row => (
