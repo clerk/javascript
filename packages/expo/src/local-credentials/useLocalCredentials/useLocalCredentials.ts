@@ -1,5 +1,6 @@
 import { useClerk, useUser } from '@clerk/react';
 import { useSignIn } from '@clerk/react/legacy';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { SignInResource } from '@clerk/shared/types';
 import { AuthenticationType, isEnrolledAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
 import {
@@ -109,8 +110,14 @@ const useUserOwnsCredentials = ({ storeKey }: { storeKey: string }) => {
 /**
  * Exposes utilities that allow for storing and accessing an identifier, and it's password securely on the device.
  * In order to access the stored credentials, the end user will be prompted to verify themselves via biometrics.
+ *
+ * @deprecated Build this flow with `expo-secure-store` instead. See https://clerk.com/docs/guides/development/local-credentials. This hook will be removed in the next major version.
  */
 export const useLocalCredentials = (): LocalCredentialsReturn => {
+  deprecated(
+    'useLocalCredentials',
+    'Build this flow with `expo-secure-store` instead. See https://clerk.com/docs/guides/development/local-credentials',
+  );
   const { isLoaded, signIn } = useSignIn();
   const { publishableKey } = useClerk();
 
