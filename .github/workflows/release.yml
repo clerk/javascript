@@ -83,20 +83,16 @@ jobs:
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Release uses --force, so turbo cache is not needed
-          turbo-team: ""
-          turbo-token: ""
-
-      - name: Upgrade npm for trusted publishing
-        run: npx npm@11 install -g npm@11
+          turbo-team: ''
+          turbo-token: ''
 
       - name: Determine whether electron-passkeys is about to publish
         id: detect-native
         run: node scripts/detect-electron-passkeys-publish.mjs >> "$GITHUB_OUTPUT"
 
-      - name: Build release
-        run: pnpm turbo build $TURBO_ARGS --force
-
       - name: Download electron-passkeys native binaries
+        id: native-binaries
+        background: true
         if: ${{ steps.detect-native.outputs.should-build == 'true' }}
         uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21
         with:
@@ -110,25 +106,40 @@ jobs:
           search_artifacts: true
           allow_forks: false
 
+      - name: Upgrade npm for trusted publishing
+        id: publishing-tools
+        background: true
+        run: npx npm@11 install -g npm@11
+
+      - name: Build release
+        run: pnpm turbo build $TURBO_ARGS --force
+
+      - name: Wait for native binaries
+        wait: native-binaries
+
       - name: Verify electron-passkeys binaries are present
         if: ${{ steps.detect-native.outputs.should-build == 'true' }}
         run: node scripts/check-electron-passkeys-binaries.mjs packages/electron-passkeys/npm
+
+      - name: Wait for publishing tools
+        wait: publishing-tools
 
       - name: Create Release PR
         id: changesets
         uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1
         with:
-          commit: "ci(repo): Version packages"
-          title: "ci(repo): Version packages"
+          commit: 'ci(repo): Version packages'
+          title: 'ci(repo): Version packages'
           publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
-          HUSKY: "0"
+          HUSKY: '0'
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
+        background: true
         if: steps.changesets.outputs.published == 'true'
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
@@ -326,19 +337,24 @@ jobs:
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Remote cache disabled in OIDC publish path.
-          turbo-team: ""
-          turbo-token: ""
-
-      - name: Upgrade npm for trusted publishing
-        run: npx npm@11 install -g npm@11
+          turbo-team: ''
+          turbo-token: ''
 
       - name: Version packages for canary
         id: version-packages
         run: pnpm version-packages:canary | tail -1 >> "$GITHUB_OUTPUT"
 
+      - name: Upgrade npm for trusted publishing
+        id: publishing-tools
+        background: true
+        run: npx npm@11 install -g npm@11
+
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
         run: pnpm turbo build $TURBO_ARGS
+
+      - name: Wait for publishing tools
+        wait: publishing-tools
 
       - name: Canary release
         id: publish
@@ -545,11 +561,8 @@ jobs:
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Remote cache disabled in OIDC publish path.
-          turbo-team: ""
-          turbo-token: ""
-
-      - name: Upgrade npm for trusted publishing
-        run: npx npm@11 install -g npm@11
+          turbo-team: ''
+          turbo-token: ''
 
       - name: Version packages for snapshot
         id: version-packages
@@ -557,9 +570,17 @@ jobs:
           SNAPSHOT_NAME: ${{ inputs.snapshot_name }}
         run: pnpm version-packages:snapshot "$SNAPSHOT_NAME" | tail -1 >> "$GITHUB_OUTPUT"
 
+      - name: Upgrade npm for trusted publishing
+        id: publishing-tools
+        background: true
+        run: npx npm@11 install -g npm@11
+
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
         run: pnpm turbo build $TURBO_ARGS
+
+      - name: Wait for publishing tools
+        wait: publishing-tools
 
       - name: Snapshot release
         if: steps.version-packages.outputs.success == '1'
@@ -671,7 +692,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})
@@ -680,5 +701,5 @@ jobs:
           cache-enabled: true
           node-version: ${{ matrix.version }}
           turbo-enabled: false
-          turbo-team: ""
-          turbo-token: ""
+          turbo-team: ''
+          turbo-token: ''

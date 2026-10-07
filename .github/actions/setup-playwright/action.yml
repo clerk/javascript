@@ -1,0 +1,40 @@
+name: Setup Playwright
+description: Restore or install Chromium after installing repository dependencies
+inputs:
+  cache-enabled:
+    description: Enable the browser cache
+    default: 'false'
+  cache-provider:
+    description: Browser cache provider
+    default: github
+runs:
+  using: composite
+  steps:
+    - name: Get Playwright Version
+      shell: bash
+      id: playwright-version
+      run: |
+        VERSION=$(node -p "require('@playwright/test/package.json').version")
+        echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+    - name: Cache Playwright Binaries
+      if: inputs.cache-enabled == 'true' && inputs.cache-provider == 'github'
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      id: playwright-cache
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}-v2
+
+    - name: Cache Playwright Binaries
+      if: inputs.cache-enabled == 'true' && inputs.cache-provider == 'blacksmith'
+      uses: useblacksmith/cache@71c7c918062ba3861252d84b07fe5ab2a6b467a6 # v5
+      id: playwright-cache-blacksmith
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}-v2
+
+    - name: Install Playwright Browsers
+      if: steps.playwright-cache.outputs.cache-hit != 'true' && steps.playwright-cache-blacksmith.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        pnpm playwright install chromium

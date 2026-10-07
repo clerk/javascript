@@ -132,7 +132,7 @@
       "cache": false
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build", "lint:publint"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/eslint.config.mjs",
@@ -163,6 +163,16 @@
       "dependsOn": ["build"],
       "inputs": ["dist/**", "package.json"],
       "outputs": []
+    },
+    "@clerk/astro#lint:attw": {
+      "dependsOn": ["build", "lint:publint"],
+      "inputs": ["dist/**", "package.json"],
+      "outputs": []
+    },
+    "@clerk/astro#lint:publint": {
+      "dependsOn": ["build"],
+      "inputs": ["dist/**", "package.json", "src/astro-components/**", "src/types.ts"],
+      "outputs": ["components/**", "types.ts"]
     },
     "bundlewatch": {
       "dependsOn": ["build"],
@@ -798,6 +808,21 @@
     "//#test:typedoc": {
       "dependsOn": ["//#typedoc:generate"],
       "inputs": [".typedoc/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:typedoc:ci": {
+      "dependsOn": ["@clerk/backend#build", "@clerk/nextjs#build", "@clerk/react#build", "@clerk/shared#build"],
+      "inputs": [
+        ".typedoc/**",
+        "!.typedoc/docs/**",
+        "!.typedoc/temp-docs/**",
+        "tsconfig.typedoc.json",
+        "typedoc.config.mjs",
+        "packages/*/src/**",
+        "packages/*/*.d.ts",
+        "packages/*/package.json"
+      ],
+      "outputs": [".typedoc/docs/**"],
       "outputLogs": "new-only"
     }
   }

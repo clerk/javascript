@@ -67,6 +67,7 @@
     "test:integration:tanstack-react-start": "E2E_APP_ID=tanstack.react-start* pnpm test:integration:base --grep @tanstack-react-start",
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
     "test:typedoc": "pnpm typedoc:generate && cd ./.typedoc && vitest run",
+    "test:typedoc:ci": "pnpm typedoc:generate:skip-build && cd ./.typedoc && vitest run",
     "turbo:clean": "turbo daemon clean",
     "typedoc:generate": "pnpm build && pnpm typedoc:generate:skip-build",
     "typedoc:generate:skip-build": "typedoc --tsconfig tsconfig.typedoc.json && node .typedoc/extract-returns-and-params.mjs && rimraf .typedoc/docs && cpy '.typedoc/temp-docs/**' '.typedoc/docs' && rimraf .typedoc/temp-docs",

@@ -109,6 +109,24 @@ jobs:
           # Bump the version when native build commands change.
           key: expo-native-build-v1-${{ runner.os }}-${{ matrix.expo-sdk }}-${{ matrix.platform }}-${{ matrix.run-e2e == true && 'e2e' || 'build' }}-${{ env.E2E_INSTANCE_NAME }}-${{ steps.native-build-key.outputs.hash }}
 
+      - name: Set up JDK 17
+        if: matrix.platform == 'android'
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle cache
+        id: gradle-cache
+        background: true
+        if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
+        uses: gradle/actions/setup-gradle@4733eaac7c1b0da527e4206b7671e0061de1ce37 # v6.3.0
+        with:
+          # This workflow never runs on main, so the default (write from main
+          # only) would never seed the cache.
+          cache-read-only: false
+          add-job-summary: on-failure
+
       - if: steps.native-build-cache.outputs.cache-hit != 'true' || matrix.run-e2e == true
         uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
       - if: steps.native-build-cache.outputs.cache-hit != 'true' || matrix.run-e2e == true
@@ -180,6 +198,33 @@ jobs:
           INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
         run: node scripts/resolve-instance-keys.mjs INTEGRATION_STAGING_INSTANCE_KEYS "$E2E_INSTANCE_NAME"
 
+      - name: Boot iOS simulators
+        id: ios-simulators
+        background: true
+        if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
+        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$IOS_SIMULATORS"
+
+      - name: Cache iOS automation runner
+        id: ios-automation-cache
+        background: true
+        if: matrix.platform == 'ios' && steps.keys.outputs.pk != ''
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.agent-device
+          key: agent-device-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: agent-device-${{ runner.os }}-
+
+      - name: AVD cache
+        id: avd-cache
+        background: true
+        if: matrix.platform == 'android' && steps.keys.outputs.sk != ''
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34-google_apis-x86_64-v1
+
       - name: Write fixture .env
         if: steps.native-build-cache.outputs.cache-hit != 'true'
         working-directory: ${{ env.FIXTURE_DIR }}
@@ -188,21 +233,8 @@ jobs:
         run: |
           echo "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=${E2E_PK:-$FIXTURE_PUBLISHABLE_KEY}" > .env
 
-      - name: Set up JDK 17
-        if: matrix.platform == 'android'
-        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Set up Gradle cache
-        if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
-        uses: gradle/actions/setup-gradle@4733eaac7c1b0da527e4206b7671e0061de1ce37 # v6.3.0
-        with:
-          # This workflow never runs on main, so the default (write from main
-          # only) would never seed the cache.
-          cache-read-only: false
-          add-job-summary: on-failure
+      - name: Wait for Gradle setup
+        wait: gradle-cache
 
       - name: Prebuild Android fixture
         if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
@@ -217,6 +249,7 @@ jobs:
       # The module's Robolectric tests need an Expo host project for expo-modules-core, so they run in the fixture.
       # The packed module leaves out its tests, so they are copied in from the repo.
       - name: Test expo-biometrics Android module
+        background: true
         if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
         working-directory: ${{ env.FIXTURE_DIR }}/android
         run: |
@@ -234,23 +267,15 @@ jobs:
         run: pnpm build:ios
 
       - name: Save native build
+        background: true
         if: steps.native-build-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ${{ steps.native-build-key.outputs.artifact }}
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
 
-      - name: Boot iOS simulators
-        if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
-        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$IOS_SIMULATORS"
-
-      - name: Cache iOS automation runner
-        if: matrix.platform == 'ios' && steps.keys.outputs.pk != ''
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ~/.agent-device
-          key: agent-device-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: agent-device-${{ runner.os }}-
+      - name: Wait for iOS test tools
+        wait: [ios-simulators, ios-automation-cache]
 
       - name: Run iOS e2e
         id: run_e2e_ios
@@ -279,15 +304,8 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: AVD cache
-        id: avd-cache
-        if: matrix.platform == 'android' && steps.keys.outputs.sk != ''
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-34-google_apis-x86_64-v1
+      - name: Wait for Android emulator cache
+        wait: avd-cache
 
       - name: Create AVD snapshot
         if: matrix.platform == 'android' && steps.keys.outputs.sk != '' && steps.avd-cache.outputs.cache-hit != 'true'
@@ -324,6 +342,7 @@ jobs:
             pnpm test:integration:expo-native:android --reporter list,junit,markdown
 
       - name: Delete leftover test users
+        background: true
         if: always() && steps.keys.outputs.sk != ''
         env:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
@@ -336,6 +355,7 @@ jobs:
             done
 
       - name: Upload e2e artifacts
+        background: true
         if: always() && steps.keys.outputs.sk != ''
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
