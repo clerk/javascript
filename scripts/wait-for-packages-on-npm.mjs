@@ -8,6 +8,8 @@
   3. Reads each package’s name and current version.
   4. Requests: https://registry.npmjs.org/<package-name>/<version>
   5. Retries only versions that aren’t available yet.
+  6. Once all versions are on npm, does the same for the packages served from jsDelivr by
+     requesting: https://cdn.jsdelivr.net/npm/<package-name>@<version>/package.json
 */
 
 import { readFile } from 'node:fs/promises';
@@ -16,10 +18,23 @@ import { fileURLToPath } from 'node:url';
 
 import { glob } from 'tinyglobby';
 
-// Give npm ~10 minutes after the publish command to make the packages available, fail after that
-// This is an arbitrarily chosen timeframe, we've seen ~6 minute delays, so 10 is just that + leeway
-export const NPM_AVAILABILITY_MAX_ATTEMPTS = 60;
+// Give npm ~25 minutes after the publish command to make the packages available, fail after that
+// This is an arbitrarily chosen timeframe, we've seen ~12 minute delays, so 25 is just that + leeway
+export const NPM_AVAILABILITY_MAX_ATTEMPTS = 150;
 export const NPM_AVAILABILITY_DELAY_MS = 10_000;
+
+export const JSDELIVR_AVAILABILITY_MAX_ATTEMPTS = 30;
+export const JSDELIVR_PACKAGES = ['@clerk/clerk-js', '@clerk/ui'];
+
+export const NPM_REGISTRY = {
+  name: 'npm',
+  getUrl: packageInfo => `https://registry.npmjs.org/${packageInfo.name}/${packageInfo.version}`,
+};
+
+export const JSDELIVR_REGISTRY = {
+  name: 'jsDelivr',
+  getUrl: packageInfo => `https://cdn.jsdelivr.net/npm/${packageInfo.name}@${packageInfo.version}/package.json`,
+};
 
 const PACKAGE_MANIFEST_PATTERNS = ['packages/*/package.json', 'packages/electron-passkeys/npm/*/package.json'];
 
@@ -37,10 +52,10 @@ export async function getPublicPackages(patterns = PACKAGE_MANIFEST_PATTERNS) {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getUnavailablePackages(packages, fetchPackage = fetch) {
+export async function getUnavailablePackages(packages, fetchPackage = fetch, registry = NPM_REGISTRY) {
   const results = await Promise.all(
     packages.map(async packageInfo => {
-      const url = `https://registry.npmjs.org/${packageInfo.name}/${packageInfo.version}`;
+      const url = registry.getUrl(packageInfo);
 
       try {
         const response = await fetchPackage(url);
@@ -55,9 +70,10 @@ export async function getUnavailablePackages(packages, fetchPackage = fetch) {
   return results.filter(Boolean);
 }
 
-export async function waitForPackagesOnNpm(
+export async function waitForPackages(
   packages,
   {
+    registry = NPM_REGISTRY,
     fetchPackage = fetch,
     maxAttempts = NPM_AVAILABILITY_MAX_ATTEMPTS,
     delayMs = NPM_AVAILABILITY_DELAY_MS,
@@ -68,10 +84,10 @@ export async function waitForPackagesOnNpm(
   let unavailable = packages;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    unavailable = await getUnavailablePackages(unavailable, fetchPackage);
+    unavailable = await getUnavailablePackages(unavailable, fetchPackage, registry);
 
     if (unavailable.length === 0) {
-      log(`All ${packages.length} public package versions are available on npm.`);
+      log(`All ${packages.length} public package versions are available on ${registry.name}.`);
       return;
     }
 
@@ -84,12 +100,18 @@ export async function waitForPackagesOnNpm(
   }
 
   const versions = unavailable.map(packageInfo => `${packageInfo.name}@${packageInfo.version}`).join(', ');
-  throw new Error(`Package versions did not become available on npm after ${maxAttempts} attempts: ${versions}`);
+  throw new Error(
+    `Package versions did not become available on ${registry.name} after ${maxAttempts} attempts: ${versions}`,
+  );
 }
 
 async function main() {
   const packages = await getPublicPackages();
-  await waitForPackagesOnNpm(packages);
+  await waitForPackages(packages, { registry: NPM_REGISTRY });
+  await waitForPackages(
+    packages.filter(packageInfo => JSDELIVR_PACKAGES.includes(packageInfo.name)),
+    { registry: JSDELIVR_REGISTRY, maxAttempts: JSDELIVR_AVAILABILITY_MAX_ATTEMPTS },
+  );
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
