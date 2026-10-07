@@ -750,4 +750,10 @@ describe('Web3 wallets', () => {
 
   // TODO: Add session reverification for wallet connection, primary updates, and removal;
   // surface API errors until then.
+  // TODO: Handle wallet registry import rejection and distinguish discovery failure from no installed wallets.
+  // This is separate from wallet connection cancellation; an import catch cannot clear a pending wallet request.
+  // TODO: Add recovery for abandoned MetaMask connections. In Brave, closing the locked wallet prompt
+  // left wallet_requestPermissions pending. Refresh cleared Clerk's error, but a new connection returned -32002.
+  // Clerk cancellation must release the UI and ignore late responses without claiming to cancel the wallet request.
+  // The injected MetaMask API exposes no supported method to cancel that request, and clerk_go cannot clear it.
 });
