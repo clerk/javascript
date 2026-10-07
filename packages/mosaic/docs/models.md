@@ -96,6 +96,19 @@ drops the fallback instead of holding the space open. Keep the two apart.
 - No React state machinery beyond the Clerk hooks themselves; the model is a
   derivation of what Clerk currently says.
 
+## Time-dependent display data
+
+Inspect date-formatting helpers for hidden `Date.now()` or `new Date()` calls.
+Render-time derivation must receive an explicit clock value rather than read
+wall-clock time inside the helper. Check whether a shared clock or provider API
+exists and supports the required contract before adding feature-specific timers.
+
+For server rendering, initialize from a value that can agree between server and
+client. Independent clock reads during initialization can cause hydration
+mismatches. Verify the shared API supports that initial value before claiming
+SSR support. Keep update frequency appropriate to the consuming feature;
+deduplicating all timers is an optimization to justify when needed.
+
 ## Testing
 
 The feature test covers the model by default, running it against a real Clerk

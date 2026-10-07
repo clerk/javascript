@@ -41,6 +41,14 @@ Stop and check the table if you are writing any of these in a feature:
 - `setTimeout` to debounce or to delay a spinner
 - `stylex.create` inside a `.tsx` file
 
+## Readability before complexity scores
+
+Do not extract a helper or introduce a machine only to reduce a lint score.
+Avoid turning a component into a hook solely to work around React's children
+typing. An abstraction must clarify a responsibility or hide useful complexity. When complexity is inherent, keep the relevant logic
+together and explain the tradeoff in review. Follow repository rules for any lint
+exception; this guidance does not authorize a suppression.
+
 ## When nothing fits: ask first
 
 If no row fits, or a shared helper almost fits but would need a change, **stop and ask the user before writing code**. Say:
