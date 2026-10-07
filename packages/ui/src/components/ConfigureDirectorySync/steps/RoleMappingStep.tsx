@@ -6,6 +6,7 @@ import {
   Col,
   descriptors,
   Flex,
+  FormLabel,
   Icon,
   type LocalizationKey,
   localizationKeys,
@@ -480,13 +481,11 @@ export const RoleMappingStep = (): JSX.Element => {
           align='center'
           sx={t => ({ flexShrink: 0, height: `calc(${t.fontSizes.$lg} * ${t.lineHeights.$medium})` })}
         >
-          <Text
-            as='label'
+          <FormLabel
             htmlFor='role-mapping-enabled'
-            variant='subtitle'
-            colorScheme='secondary'
             localizationKey={localizationKeys('configureDirectorySync.roleMappingStep.formFieldLabel__syncRoles')}
             sx={t => ({
+              color: t.colors.$colorMutedForeground,
               paddingInlineEnd: t.sizes.$2,
               cursor: roleMapping.readOnlyReason !== null ? 'not-allowed' : 'pointer',
               userSelect: 'none',
