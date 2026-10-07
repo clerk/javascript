@@ -132,6 +132,26 @@ describe('usePendingAction', () => {
     expect(result.current.error).toBe('Unable to sign out.');
   });
 
+  it.each([
+    [undefined, 'Impossible de créer cette clé.'],
+    ['Action-specific fallback.', 'Action-specific fallback.'],
+  ])('updates the hook fallback after failure while preserving a run override of %s', async (runFallback, expected) => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { result, rerender } = renderHook(({ fallback }) => usePendingAction({ errorFallback: fallback }), {
+      initialProps: { fallback: 'Could not add this passkey.' },
+    });
+
+    await act(() =>
+      result.current.run('add', () => Promise.reject(new Error('Private authenticator details')), {
+        errorFallback: runFallback,
+      }),
+    );
+
+    expect(result.current.error).toBe(runFallback ?? 'Could not add this passkey.');
+    rerender({ fallback: 'Impossible de créer cette clé.' });
+    expect(result.current.error).toBe(expected);
+  });
+
   it('prefers the fallback given to the run over the one given to the hook', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() => usePendingAction({ errorFallback: 'Something went wrong.' }));
