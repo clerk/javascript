@@ -68,20 +68,11 @@ adding a new pattern. Check it before writing any of those by hand.
 
 ## Which reference to read
 
-| You are…                                                                                               | Read                                                                             |
-| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
-| Building on / authoring a headless primitive (`src/primitives/`)                                       | `packages/mosaic/docs/headless.md`                                               |
-| Styling a component (tokens, `stylex.create`, `themeProps`, CSS build)                                 | `packages/mosaic/docs/stylex.md`                                                 |
-| Building an enter/exit transition, a row that expands and collapses, or any motion that reads as wrong | `packages/mosaic/docs/motion.md`                                                 |
-| Writing the model (the Clerk adapter, `status`, permissions)                                           | `packages/mosaic/docs/models.md`                                                 |
-| Writing the controller (local state, pending, action wrapping)                                         | `packages/mosaic/docs/controllers.md`                                            |
-| Authoring or debugging a state machine, or wiring one to React                                         | `packages/mosaic/docs/controllers.md` → "Machines", then `src/machine/README.md` |
-| Writing the view (rendering plain props)                                                               | `packages/mosaic/docs/views.md`                                                  |
-| Testing a feature (feature tests, unit tests)                                                          | `packages/mosaic/docs/testing.md`                                                |
-| Migrating a legacy component into Mosaic (the end-to-end workflow)                                     | `packages/mosaic/docs/migration.md`                                              |
-| Running the parity audit that guards a migration                                                       | `packages/mosaic/docs/parity-audit.md`                                           |
+Use the "Task guides" table in `packages/mosaic/AGENTS.md`. It is the shared
+task index for agents, including those that do not discover this skill. Read
+the guide for the layer or behavior you are changing.
 
-The migration workflow (`migration.md`) ties the flow references together: it
+The migration workflow (`packages/mosaic/docs/migration.md`) ties the flow references together: it
 treats the legacy component as the spec and drives you through the model,
 controller, and view layers, then verifies parity with `parity-audit.md`.
 
@@ -114,8 +105,6 @@ this axis.
 Which surface the dialog holds, and the geometry that comes with it.
 ```
 
-This is the opposite of the rule for **code**, where a comment earns its place by
-explaining what the code cannot say for itself — the cascade fight behind a
-`null`, the measured reason a duration is what it is. Keep that reasoning where a
-future maintainer will hit it, which is the source file. The trade you rejected
-belongs in a code comment or the PR description; the docs get the conclusion.
+Follow the root `AGENTS.md` rule for code comments. Put implementation rationale
+and rejected alternatives in the PR description. Component docs describe the
+resulting API.

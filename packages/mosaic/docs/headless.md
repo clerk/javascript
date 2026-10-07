@@ -46,7 +46,9 @@ params are documented on `UseRenderParams*` in `utils/use-render.tsx`.
 - **`mergeProps(internal, consumer)` — internal first, consumer second.** Event
   handlers chain (internal fires, then consumer), `style` shallow-merges,
   `className` concatenates, everything else the consumer overwrites. This lets
-  consumers extend behavior without breaking ARIA/handlers the primitive owns.
+  consumers extend event handlers while retaining the internal handlers. ARIA
+  attributes can be overwritten. A render function must apply the computed props
+  and ref to preserve the primitive's behavior.
 - **Positioners pass `enabled: mounted`**, so the floating DOM doesn't exist
   until the first frame (`select/select-positioner.tsx`).
 

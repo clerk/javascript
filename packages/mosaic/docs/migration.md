@@ -34,13 +34,14 @@ hit is a row you must consciously place or drop later:
 | `revalidate` / `.reload()`        | cache invalidation timing after a mutation         |
 | `<Protect` / `checkAuthorization` | permission gating and section visibility           |
 | `useCalloutLabel`                 | derived, computed labels / counts                  |
+| `useFetch` / `useOrganization`    | data loading, pagination, loading/empty states     |
+| `useInView`                       | infinite-scroll / intersection triggers            |
 
-Most of these already have a Mosaic home: `packages/mosaic/AGENTS.md` →
-"Reuse before you write" maps each problem to its helper (`handleError` →
-`save`, `useReverification` → `useReverificationFlow`, and so on). Use that
-table when you place a behavior in Phase 2.
-| `useFetch` / `useOrganization` | data loading, pagination, loading/empty states |
-| `useInView` | infinite-scroll / intersection triggers |
+Use `packages/mosaic/AGENTS.md` → "Reuse before you write" for shared helpers
+such as `save` and `useReverificationFlow`. The table does not cover every
+legacy behavior. Place revalidation and loading rules in the model, and inspect
+existing features for pagination and derived callouts before choosing their
+implementation in Phase 2.
 
 ```bash
 rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useInView' \
@@ -70,6 +71,11 @@ Two rows deserve extra care because they have no obvious home:
   the callback — not as a `disabled` prop the view has to interpret.
 - **Pure derivation** (slot layout, ordering a consumer's list) belongs in
   `*.layout.ts` / `*.utils.ts` beside the view, where it gets its own test.
+
+Share business-rule helpers when legacy and Mosaic must keep the same behavior.
+Do not extract similar presentation code solely to remove duplication when the
+designs may diverge. Inspect the existing helper and its callers before deciding
+where shared logic belongs.
 
 ## Phase 3 — Implement and test
 

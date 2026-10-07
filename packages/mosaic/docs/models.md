@@ -96,6 +96,25 @@ drops the fallback instead of holding the space open. Keep the two apart.
 - No React state machinery beyond the Clerk hooks themselves; the model is a
   derivation of what Clerk currently says.
 
+## Time-dependent display data
+
+Use the shared `useNow` hook and `MosaicProvider` clock support introduced in
+[#10098](https://github.com/clerk/javascript/pull/10098). These APIs must be
+available in the consuming branch before following this guidance.
+
+`MosaicProvider` supplies a shared initial `Date`. Read it with `useNow` from
+`src/hooks/use-now.ts` in the consuming component or controller, then pass the
+value to pure formatting helpers. For relative labels that refresh each minute,
+use `useNow({ updateInterval: 60_000 })`. Without an interval, the hook retains
+its initial value. Reuse this API instead of adding a feature-specific clock
+provider or timer.
+
+In tests, supply a fixed `Date` through `MosaicNowProvider`, assert the displayed
+label, then advance fake timers across a label boundary and assert the update.
+If a feature supports SSR, also verify matching initial times during server
+rendering and hydration. Sharing time within one provider tree does not by
+itself guarantee agreement between server and client.
+
 ## Testing
 
 The feature test covers the model by default, running it against a real Clerk
