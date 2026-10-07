@@ -36,34 +36,37 @@ export function useOrganizationProfileGeneralPanelModel(): OrganizationProfileGe
     return current;
   };
 
-  return {
-    status: 'ready',
+  const profile = {
+    status: 'ready' as const,
     organizationId,
     name: organization.name,
     slug: environment.organizationSettings.slug.disabled ? undefined : (organization.slug ?? ''),
     imageUrl: organization.imageUrl,
     hasImage: organization.hasImage,
-    onLogoChange: canManage
-      ? file =>
+  };
+  if (!canManage) {
+    return profile;
+  }
+
+  return {
+    ...profile,
+    onLogoChange: file =>
+      currentOrganization()
+        .setLogo({ file })
+        .then(() => undefined),
+    onRemoveLogo: organization.hasImage
+      ? () =>
           currentOrganization()
-            .setLogo({ file })
+            .setLogo({ file: null })
             .then(() => undefined)
       : undefined,
-    onRemoveLogo:
-      canManage && organization.hasImage
-        ? () =>
-            currentOrganization()
-              .setLogo({ file: null })
-              .then(() => undefined)
-        : undefined,
-    onSubmitName: canManage ? name => save(() => currentOrganization().update({ name }), ['name']) : undefined,
-    onSubmitSlug:
-      canManage && !environment.organizationSettings.slug.disabled
-        ? slug =>
-            save(() => {
-              const current = currentOrganization();
-              return current.update({ name: current.name, slug });
-            }, ['slug'])
-        : undefined,
+    onSubmitName: name => save(() => currentOrganization().update({ name }), ['name']),
+    onSubmitSlug: !environment.organizationSettings.slug.disabled
+      ? slug =>
+          save(() => {
+            const current = currentOrganization();
+            return current.update({ name: current.name, slug });
+          }, ['slug'])
+      : undefined,
   };
 }
