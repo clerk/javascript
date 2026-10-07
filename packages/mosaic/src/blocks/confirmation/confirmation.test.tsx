@@ -1,8 +1,10 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { clerkApiError } from '../../__tests__/clerk-errors';
 import { Button } from '../../components/button';
+import type { MosaicLocalization } from '../../localization';
 import { MosaicProvider } from '../../mosaic-provider';
 import type { ConfirmationControlledProps, ConfirmationHandleProps } from './confirmation';
 import { Confirmation } from './confirmation';
@@ -101,11 +103,15 @@ interface Member {
 
 const preston: Member = { id: 'mem_1', name: 'Preston Booth' };
 
-function renderWithHandle(onConfirm: ConfirmationHandleProps<Member>['onConfirm'] = () => Promise.resolve()) {
+function renderWithHandle(
+  onConfirm: ConfirmationHandleProps<Member>['onConfirm'] = () => Promise.resolve(),
+  { errorFallback, localization }: { errorFallback?: string; localization?: MosaicLocalization } = {},
+) {
   const handle = Confirmation.createHandle<Member>();
   render(
-    <MosaicProvider>
+    <MosaicProvider localization={localization}>
       <Confirmation
+        errorFallback={errorFallback}
         handle={handle}
         title='Remove member'
         description={member => (
@@ -120,6 +126,10 @@ function renderWithHandle(onConfirm: ConfirmationHandleProps<Member>['onConfirm'
   );
   return handle;
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const removeButton = () => screen.getByRole('button', { name: 'Remove Preston Booth' });
 
@@ -175,7 +185,9 @@ describe('Confirmation with a handle', () => {
 
   it('keeps the dialog open and explains a failed attempt', async () => {
     const user = userEvent.setup();
-    const handle = renderWithHandle(() => Promise.reject(new Error('Preston Booth is the last admin.')));
+    const handle = renderWithHandle(() =>
+      Promise.reject(clerkApiError('organization_minimum_permissions_needed', 'Preston Booth is the last admin.')),
+    );
     act(() => {
       handle.open(preston);
     });
@@ -187,14 +199,56 @@ describe('Confirmation with a handle', () => {
     expect(removeButton()).not.toHaveAttribute('aria-busy', 'true');
   });
 
+  it('shows the localized copy for the code a refusal carries', async () => {
+    const user = userEvent.setup();
+    const handle = renderWithHandle(() => Promise.reject(clerkApiError('action_blocked', 'Raw server sentence.')), {
+      localization: { overrides: { 'errors.action_blocked': 'Acción bloqueada.' } },
+    });
+    act(() => {
+      handle.open(preston);
+    });
+
+    await user.click(removeButton());
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Acción bloqueada.'));
+  });
+
+  it('shows the fallback rather than what an unexpected error says', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    const handle = renderWithHandle(() => Promise.reject(new TypeError('Cannot read properties of undefined')), {
+      errorFallback: 'Unable to remove this member.',
+    });
+    act(() => {
+      handle.open(preston);
+    });
+
+    await user.click(removeButton());
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Unable to remove this member.'));
+  });
+
+  it('shows the generic error when no fallback is given', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    const handle = renderWithHandle(() => Promise.reject(new Error('internal')));
+    act(() => {
+      handle.open(preston);
+    });
+
+    await user.click(removeButton());
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+  });
+
   it('starts the next open clean after a failure', async () => {
     const user = userEvent.setup();
-    const handle = renderWithHandle(() => Promise.reject(new Error('nope')));
+    const handle = renderWithHandle(() => Promise.reject(clerkApiError('action_blocked', 'nope')));
     act(() => {
       handle.open(preston);
     });
     await user.click(removeButton());
-    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('alert')).not.toBeEmptyDOMElement());
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());

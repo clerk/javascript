@@ -1,6 +1,6 @@
 import type { UserProfileEditNameValue } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-edit-name.dialog';
-import type { FormError } from '@clerk/mosaic/utils/form-error';
-import { SaveError } from '@clerk/mosaic/utils/form-error';
+import type { FormError } from '@clerk/mosaic/utils/errors';
+import { SaveError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
