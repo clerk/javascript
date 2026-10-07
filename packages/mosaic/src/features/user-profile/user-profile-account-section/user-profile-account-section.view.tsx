@@ -122,7 +122,9 @@ export function UserProfileAccountSectionView({
     <Section.Root aria-label={m.sectionLabel}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>{m.sectionTitle}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.sectionTitle}</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <UserProfilePictureRowView

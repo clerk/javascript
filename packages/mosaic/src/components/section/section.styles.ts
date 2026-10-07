@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
-import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
 
 const compact = '@container cl-section (width < 26rem)';
 
@@ -27,30 +27,27 @@ export const styles = stylex.create({
   header: {
     marginInline: space['4'],
     paddingBlock: space['3'],
-    alignContent: 'center',
     alignItems: 'center',
     columnGap: space['3'],
-    display: 'grid',
-    gridTemplateColumns: 'minmax(50%, 1fr) minmax(0, max-content)',
+    display: 'flex',
+    flexWrap: 'wrap',
+    rowGap: space['3'],
     minHeight: space['13'],
     width: 'auto',
   },
   title: {
-    gridColumn: '1',
     color: colorVars['--cl-color-foreground'],
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
-  headerDescription: {
-    gridColumn: '1',
-    marginTop: space['0.5'],
+  headerContent: {
+    flexBasis: '50%',
+    flexGrow: 9999,
   },
   headerActions: {
-    gridColumn: '2',
-    gridRowEnd: {
-      default: 'auto',
-      [stylex.when.siblingBefore(':where(*)', sectionHeaderDescriptionMarker)]: 'span 2',
-    },
-    gridRowStart: '1',
+    flexBasis: 'auto',
+    flexGrow: 1,
+    flexShrink: 1,
+    justifyContent: 'start',
     maxWidth: 'none',
   },
   body: {
