@@ -1,25 +1,27 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
 
+import { clearFetchCache } from '../../../hooks/useFetch';
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySyncWizard';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
-const withDirectorySyncFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
-  f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
-  f.withEmailAddress();
-  f.withOrganizations();
-  f.withUser({
-    email_addresses: ['test@clerk.com'],
-    organization_memberships: [
-      { name: 'Org1', permissions: ['org:sys_entconns:manage', 'org:sys_memberships:manage'] },
-    ],
-  });
-};
+const FULL_PERMISSIONS = ['org:sys_entconns:manage', 'org:sys_memberships:manage'];
+
+const withDirectorySyncFixtures =
+  (permissions: string[]) => (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
+    f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
+    f.withEmailAddress();
+    f.withOrganizations();
+    f.withUser({
+      email_addresses: ['test@clerk.com'],
+      organization_memberships: [{ name: 'Org1', permissions: permissions as any }],
+    });
+  };
 
 const oktaConnection = {
   id: 'ent_1',
@@ -90,11 +92,18 @@ const directory = ({ groups = GROUPS, mappings = SAVED_MAPPINGS, groupRoleMappin
     replaceGroupRoleMappings: vi.fn().mockResolvedValue({ data: [], defaultRole: ROLES[1] }),
   }) as any;
 
-const renderRolesStep = async (dir = directory()) => {
-  const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+const renderRolesStep = async (
+  dir = directory(),
+  { permissions = FULL_PERMISSIONS, hasRoleSetMigration = false } = {},
+) => {
+  const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures(permissions));
   fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([oktaConnection]);
   fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(dir);
-  fixtures.clerk.organization?.getRoles.mockResolvedValue({ total_count: ROLES.length, data: ROLES } as any);
+  fixtures.clerk.organization?.getRoles.mockResolvedValue({
+    total_count: ROLES.length,
+    data: ROLES,
+    has_role_set_migration: hasRoleSetMigration,
+  } as any);
 
   const result = render(<ConfigureDirectorySyncWizard />, { wrapper });
   await screen.findByDisplayValue('https://api.example.com/scim/v2');
@@ -126,6 +135,10 @@ const selectRole = async (
 };
 
 describe('RoleMappingStep', () => {
+  beforeEach(() => {
+    clearFetchCache();
+  });
+
   it('shows saved mappings by priority, unmapped groups after them, and the default role last', async () => {
     await renderRolesStep();
 
@@ -282,6 +295,36 @@ describe('RoleMappingStep', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
     await screen.findByRole('heading', { name: 'Role mapping' });
     expect(roleIn('dirgrp_contractors')).toHaveTextContent('Admin');
+  });
+
+  it('is read-only without permission to manage members', async () => {
+    const { userEvent, directory: dir } = await renderRolesStep(directory({ groupRoleMappingEnabled: false }), {
+      permissions: ['org:sys_entconns:manage'],
+    });
+    await screen.findByTestId('role-mapping-row-dirgrp_leads');
+
+    expect(screen.getByText('Role mapping is read-only')).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: 'Sync roles' })).toBeDisabled();
+    for (const id of ['dirgrp_leads', 'dirgrp_contractors']) {
+      for (const button of within(screen.getByTestId(`role-mapping-row-${id}`)).getAllByRole('button')) {
+        expect(button).toBeDisabled();
+      }
+    }
+
+    await userEvent.click(screen.getByRole('button', { name: 'Complete' }));
+    await waitFor(() => expect(dir.getGroupRoleMappings).toHaveBeenCalled());
+    expect(dir.update).not.toHaveBeenCalled();
+    expect(dir.replaceGroupRoleMappings).not.toHaveBeenCalled();
+  });
+
+  it('is read-only while the role set is being migrated', async () => {
+    await renderRolesStep(directory(), { hasRoleSetMigration: true });
+    expect(await screen.findByText('Roles are temporarily locked')).toBeInTheDocument();
+
+    expect(screen.getByRole('switch', { name: 'Sync roles' })).toBeDisabled();
+    expect(roleIn('dirgrp_contractors')).toBeDisabled();
+    expect(roleIn('dirgrp_leads')).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Reorder Finance mapping' })).toBeDisabled();
   });
 
   it('shows the empty state when the directory has no groups', async () => {

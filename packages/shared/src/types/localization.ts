@@ -1709,6 +1709,10 @@ export type __internal_LocalizationResource = {
         subtitle: LocalizationValue<'provider'>;
       };
       error__loadMappings: LocalizationValue;
+      alert__missingManageMembersPermission: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
       enableDialog: {
         title: LocalizationValue;
         subtitle: LocalizationValue;

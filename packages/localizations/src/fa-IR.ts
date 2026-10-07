@@ -310,6 +310,10 @@ export const faIR: LocalizationResource = {
     roleMappingStep: {
       actionHint__reorder: undefined,
       actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
       columns: {
         directoryGroup: undefined,
         priority: undefined,

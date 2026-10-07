@@ -132,6 +132,7 @@ const MappedRow = ({
   const { roleMapping } = useConfigureDirectorySync();
   const roleOptions = useGroupRoleOptions();
   const { t } = useLocalizations();
+  const isReadOnly = roleMapping.readOnlyReason !== null;
 
   const onHandleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowUp' && index > 0) {
@@ -147,7 +148,7 @@ const MappedRow = ({
     <Tr
       elementDescriptor={descriptors.configureDirectorySyncRoleMappingRow}
       data-testid={`role-mapping-row-${group.id}`}
-      draggable
+      draggable={!isReadOnly}
       onDragStart={e => {
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', String(index));
@@ -179,12 +180,13 @@ const MappedRow = ({
             localizationKeys('configureDirectorySync.roleMappingStep.actionLabel__reorder', { group: group.name }),
           )}
           title={t(localizationKeys('configureDirectorySync.roleMappingStep.actionHint__reorder'))}
+          isDisabled={isReadOnly}
           onKeyDown={onHandleKeyDown}
           sx={t => ({
             position: 'absolute',
             insetInlineEnd: '100%',
             marginInlineEnd: t.space.$1x5,
-            cursor: 'grab',
+            cursor: isReadOnly ? 'default' : 'grab',
             paddingInline: t.space.$1,
             minHeight: 0,
             color: t.colors.$neutralAlpha300,
@@ -210,6 +212,7 @@ const MappedRow = ({
           showDescriptions
           value={roleKey}
           onChange={key => roleMapping.setRole(group, key)}
+          isDisabled={isReadOnly}
           triggerSx={selectTriggerSx}
         />
       </RoleCell>
@@ -237,6 +240,7 @@ const UnmappedRow = ({ group }: { group: UnmappedGroup }): JSX.Element => {
           showDescriptions
           value={NO_ROLE_KEY}
           onChange={key => roleMapping.setRole(group, key)}
+          isDisabled={roleMapping.readOnlyReason !== null}
           triggerSx={selectTriggerSx}
         />
       </RoleCell>
@@ -482,6 +486,7 @@ export const RoleMappingStep = (): JSX.Element => {
             labelVariant='subtitle'
             labelPosition='start'
             isChecked={roleMapping.enabled}
+            isDisabled={roleMapping.readOnlyReason !== null}
             onChange={enabled => setPendingAction(enabled ? 'enable' : 'disable')}
           />
         </Flex>
@@ -504,6 +509,24 @@ export const RoleMappingStep = (): JSX.Element => {
             <Alert
               variant='danger'
               title={card.error}
+            />
+          )}
+          {roleMapping.readOnlyReason === 'missingPermission' && (
+            <Alert
+              variant='warning'
+              title={localizationKeys(
+                'configureDirectorySync.roleMappingStep.alert__missingManageMembersPermission.title',
+              )}
+              subtitle={localizationKeys(
+                'configureDirectorySync.roleMappingStep.alert__missingManageMembersPermission.subtitle',
+              )}
+            />
+          )}
+          {roleMapping.readOnlyReason === 'roleSetMigration' && (
+            <Alert
+              variant='warning'
+              title={localizationKeys('organizationProfile.membersPage.alerts.roleSetMigrationInProgress.title')}
+              subtitle={localizationKeys('organizationProfile.membersPage.alerts.roleSetMigrationInProgress.subtitle')}
             />
           )}
           <RoleMappingContent />

@@ -307,6 +307,10 @@ export const enUS: LocalizationResource = {
     roleMappingStep: {
       actionHint__reorder: 'Drag to reorder, or use the arrow keys',
       actionLabel__reorder: 'Reorder {{group}} mapping',
+      alert__missingManageMembersPermission: {
+        subtitle: 'Ask someone who can manage members to change role sync or the group role mappings.',
+        title: 'Role mapping is read-only',
+      },
       columns: {
         directoryGroup: 'Directory group',
         priority: 'Priority',

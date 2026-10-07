@@ -12,6 +12,8 @@ import type {
 } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
+import { useProtect } from '@/common';
+
 import { useFetchRoles } from '../../hooks/useFetchRoles';
 import { sortEnterpriseConnections } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import type { DirectorySyncProviderMeta } from './providerMeta';
@@ -26,6 +28,7 @@ import { moveItem, NO_ROLE_KEY } from './roleMapping';
 export interface RoleMappingView {
   isLoading: boolean;
   error: Error | null;
+  readOnlyReason: 'missingPermission' | 'roleSetMigration' | null;
   enabled: boolean;
   setEnabled: (enabled: boolean) => void;
   roles: RoleOption[];
@@ -171,7 +174,9 @@ const useRoleMapping = (
     isLoading: isLoadingMappings,
     replaceGroupRoleMappings,
   } = __internal_useOrganizationDirectorySyncGroupRoleMappings({ directory });
-  const { options: roleOptions, isLoading: isLoadingRoles } = useFetchRoles();
+  const { options: roleOptions, isLoading: isLoadingRoles, hasRoleSetMigration } = useFetchRoles();
+  const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
+  const readOnlyReason = !canManageMemberships ? 'missingPermission' : hasRoleSetMigration ? 'roleSetMigration' : null;
 
   const savedMappings = React.useMemo<GroupRoleMapping[]>(
     () =>
@@ -219,6 +224,11 @@ const useRoleMapping = (
   );
 
   const save = React.useCallback(async () => {
+    if (readOnlyReason) {
+      setDraftMappings(null);
+      setDraftEnabled(null);
+      return;
+    }
     if (draftMappings && !sameMappings(draftMappings, savedMappings)) {
       await replaceGroupRoleMappings({
         mappings: draftMappings.map(m => ({ directoryGroupId: m.groupId, role: m.roleKey })),
@@ -229,7 +239,15 @@ const useRoleMapping = (
       await updateDirectorySync({ groupRoleMappingEnabled: draftEnabled });
     }
     setDraftEnabled(null);
-  }, [draftMappings, savedMappings, draftEnabled, savedEnabled, replaceGroupRoleMappings, updateDirectorySync]);
+  }, [
+    readOnlyReason,
+    draftMappings,
+    savedMappings,
+    draftEnabled,
+    savedEnabled,
+    replaceGroupRoleMappings,
+    updateDirectorySync,
+  ]);
 
   const defaultRole = data?.defaultRole
     ? {
@@ -241,6 +259,7 @@ const useRoleMapping = (
   return {
     isLoading: isLoadingMappings || Boolean(isLoadingRoles),
     error,
+    readOnlyReason,
     enabled,
     setEnabled: setDraftEnabled,
     roles: roleOptions ?? [],
