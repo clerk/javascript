@@ -20,6 +20,7 @@ const PROPERTY = '--_cl-keyboard-inset';
 
 let listeners = 0;
 let detach: (() => void) | null = null;
+let frame = 0;
 
 /**
  * The gap between the bottom of the layout viewport and the bottom of the visual viewport — which
@@ -45,6 +46,16 @@ function publish(): void {
   document.documentElement.style.setProperty(PROPERTY, `${measure()}px`);
 }
 
+function schedulePublish(): void {
+  if (frame) {
+    return;
+  }
+  frame = requestAnimationFrame(() => {
+    frame = 0;
+    publish();
+  });
+}
+
 /**
  * Starts publishing the inset, refcounted so stacked dialogs share one set of listeners and the
  * last one to close tears them down. Returns a no-op where `visualViewport` is unavailable, which
@@ -59,11 +70,13 @@ export function acquireKeyboardInset(): () => void {
   if (listeners === 1) {
     const viewport = window.visualViewport;
     publish();
-    viewport.addEventListener('resize', publish);
-    viewport.addEventListener('scroll', publish);
+    viewport.addEventListener('resize', schedulePublish);
+    viewport.addEventListener('scroll', schedulePublish);
     detach = () => {
-      viewport.removeEventListener('resize', publish);
-      viewport.removeEventListener('scroll', publish);
+      viewport.removeEventListener('resize', schedulePublish);
+      viewport.removeEventListener('scroll', schedulePublish);
+      cancelAnimationFrame(frame);
+      frame = 0;
       document.documentElement.style.removeProperty(PROPERTY);
     };
   }
