@@ -8,7 +8,8 @@ import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../__t
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { mfaSectionNode, UserProfileMfaSection } from '../user-profile-mfa-section/user-profile-mfa-section';
 import { useUserProfileMfaModel } from '../user-profile-mfa-section/user-profile-mfa-section.model';
-import { useUserProfilePasswordSlot } from '../user-profile-password-section/user-profile-password-section';
+import { renderPasswordSection } from '../user-profile-password-section/user-profile-password-section';
+import { useUserProfilePasswordModel } from '../user-profile-password-section/user-profile-password-section.model';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 import { mfaEnvironment, phone, renderMfa } from './mfa-feature-setup';
 
@@ -226,7 +227,7 @@ describe('User profile MFA management', () => {
   it('places a connected MFA slot after password in the security panel', async () => {
     function Panel() {
       const mfaSlot = mfaSectionNode(useUserProfileMfaModel());
-      const passwordSlot = useUserProfilePasswordSlot();
+      const passwordSlot = renderPasswordSection(useUserProfilePasswordModel(), null);
       return (
         <UserProfileSecurityPanelView
           passwordSlot={passwordSlot}
