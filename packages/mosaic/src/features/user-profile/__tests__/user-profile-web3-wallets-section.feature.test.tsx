@@ -688,6 +688,66 @@ describe('Web3 wallets', () => {
       unregister.forEach(remove => remove());
     }
   });
+
+  it.each(['Cancel', 'Close', 'Escape'] as const)(
+    'clears the previous Solana failure when reopened after %s',
+    async dismissal => {
+      const connect = vi.fn(() => Promise.reject(new Error('Wallet rejected connection')));
+      const wallet = {
+        version: '1.0.0' as const,
+        name: 'Test Solana',
+        icon: 'data:image/svg+xml;base64,' as const,
+        chains: ['solana:mainnet' as const],
+        accounts: [],
+        features: {
+          'standard:connect': { version: '1.0.0' as const, connect },
+          'solana:signMessage': {
+            version: '1.0.0' as const,
+            signMessage: () => Promise.resolve([{ signature: new Uint8Array([4, 5, 6]) }]),
+          },
+        },
+      };
+      const unregister: Array<() => void> = [];
+      const register = (api: WindowAppReadyEventAPI) => unregister.push(api.register(wallet));
+      const onAppReady = (event: Event & { detail?: WindowAppReadyEventAPI }) => {
+        if (event.detail) {
+          register(event.detail);
+        }
+      };
+      window.addEventListener('wallet-standard:app-ready', onAppReady);
+      window.dispatchEvent(new CustomEvent('wallet-standard:register-wallet', { detail: register }));
+      try {
+        await renderWeb3();
+        const user = userEvent.setup();
+        await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+        await user.click(await screen.findByRole('button', { name: 'Test Solana' }));
+        expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(
+          'Something went wrong. Please try again.',
+        );
+
+        if (dismissal === 'Escape') {
+          await user.keyboard('{Escape}');
+        } else {
+          await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: dismissal }));
+        }
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+        await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+
+        expect(within(screen.getByRole('dialog')).queryByRole('alert')).toBeNull();
+        expect(screen.getByRole('button', { name: 'Test Solana' })).toBeEnabled();
+        await user.click(screen.getByRole('button', { name: 'Test Solana' }));
+        expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(
+          'Something went wrong. Please try again.',
+        );
+        expect(connect).toHaveBeenCalledTimes(2);
+      } finally {
+        window.removeEventListener('wallet-standard:app-ready', onAppReady);
+        unregister.forEach(remove => remove());
+      }
+    },
+  );
+
   // TODO: Add session reverification for wallet connection, primary updates, and removal;
   // surface API errors until then.
 });
