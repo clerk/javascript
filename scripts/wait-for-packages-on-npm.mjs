@@ -16,9 +16,9 @@ import { fileURLToPath } from 'node:url';
 
 import { glob } from 'tinyglobby';
 
-// Give npm ~10 minutes after the publish command to make the packages available, fail after that
-// This is an arbitrarily chosen timeframe, we've seen ~6 minute delays, so 10 is just that + leeway
-export const NPM_AVAILABILITY_MAX_ATTEMPTS = 60;
+// Give npm ~25 minutes after the publish command to make the packages available, fail after that
+// This is an arbitrarily chosen timeframe, we've seen ~12 minute delays, so 25 is just that + leeway
+export const NPM_AVAILABILITY_MAX_ATTEMPTS = 150;
 export const NPM_AVAILABILITY_DELAY_MS = 10_000;
 
 const PACKAGE_MANIFEST_PATTERNS = ['packages/*/package.json', 'packages/electron-passkeys/npm/*/package.json'];
