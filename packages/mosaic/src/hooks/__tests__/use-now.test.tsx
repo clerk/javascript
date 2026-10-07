@@ -1,7 +1,9 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, render as renderTree, renderHook } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useNow } from '../use-now';
+import { MosaicProvider } from '../../mosaic-provider';
+import { MosaicNowProvider, useNow } from '../use-now';
 
 describe('useNow', () => {
   beforeEach(() => {
@@ -64,5 +66,50 @@ describe('useNow', () => {
     const { unmount } = render(1_000);
     unmount();
     expect(vi.getTimerCount()).toBe(0);
+  });
+  it('starts from the provider time instead of reading the clock', () => {
+    const providerNow = new Date('2025-06-01T00:00:00Z');
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <MosaicNowProvider value={providerNow}>{children}</MosaicNowProvider>
+    );
+
+    const { result } = renderHook(() => useNow(), { wrapper });
+
+    expect(result.current).toBe(providerNow);
+  });
+
+  it('ticks forward from the provider time', async () => {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <MosaicNowProvider value={new Date('2025-06-01T00:00:00Z')}>{children}</MosaicNowProvider>
+    );
+
+    const { result } = renderHook(() => useNow({ updateInterval: 1_000 }), { wrapper });
+    await advance(1_000);
+
+    expect(result.current).toEqual(new Date('2026-01-01T00:00:01Z'));
+  });
+
+  it('gives components mounted later under MosaicProvider the time the provider mounted', () => {
+    const seen: Date[] = [];
+    const Consumer = () => {
+      seen.push(useNow());
+      return null;
+    };
+
+    const { rerender } = renderTree(
+      <MosaicProvider>
+        <Consumer />
+      </MosaicProvider>,
+    );
+    vi.setSystemTime(new Date('2026-01-01T00:05:00Z'));
+    rerender(
+      <MosaicProvider>
+        <Consumer />
+        <Consumer />
+      </MosaicProvider>,
+    );
+
+    expect(seen.at(-1)).toEqual(new Date('2026-01-01T00:00:00Z'));
+    expect(new Set(seen).size).toBe(1);
   });
 });
