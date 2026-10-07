@@ -12,6 +12,7 @@ import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
 import pluginStylex from '@stylexjs/eslint-plugin';
 import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
+import pluginSonarjs from 'eslint-plugin-sonarjs';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import pluginYml from 'eslint-plugin-yml';
@@ -606,8 +607,10 @@ export default tseslint.config([
     ignores: ['packages/mosaic/src/__tests__/**', 'packages/mosaic/src/**/*.test.{ts,tsx}'],
     plugins: {
       '@stylexjs': pluginStylex,
+      sonarjs: pluginSonarjs,
     },
     rules: {
+      'sonarjs/cognitive-complexity': ['error', 15],
       '@stylexjs/enforce-extension': 'error',
       '@stylexjs/no-legacy-contextual-styles': 'error',
       '@stylexjs/no-lookahead-selectors': 'error',
