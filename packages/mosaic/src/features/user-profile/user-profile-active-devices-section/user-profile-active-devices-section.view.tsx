@@ -38,15 +38,18 @@ export function UserProfileActiveDevicesSectionView({
   const currentDevices = devices.filter(device => device.isCurrent);
   const otherDevices = devices.filter(device => !device.isCurrent);
 
-  const openSignOut = onSignOutDevice ? (device: UserProfileDevice) => signOutDevice.open(device) : undefined;
-
   const currentDeviceTrigger = useRef<HTMLButtonElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: otherDevices.map(device => device.id),
     onRemove: onSignOutDevice,
     fallback: () => currentDeviceTrigger.current,
   });
-  const signOutDeviceAt = onSignOutDevice ? (device: UserProfileDevice) => removalFocus.remove(device.id) : undefined;
+  const signOutActions = onSignOutDevice
+    ? {
+        open: (device: UserProfileDevice) => signOutDevice.open(device),
+        remove: (device: UserProfileDevice) => removalFocus.remove(device.id),
+      }
+    : undefined;
 
   const signOutAll = useConfirmationController({ errorFallback: m.signOutAllError });
   const signedOutAll = useRef(false);
@@ -106,7 +109,7 @@ export function UserProfileActiveDevicesSectionView({
                   key={device.id}
                   device={device}
                   triggerRef={removalFocus.registerTrigger(device.id)}
-                  onSignOut={openSignOut}
+                  onSignOut={signOutActions?.open}
                   onViewDetails={device => deviceDetails.open(device)}
                 />
               ))}
@@ -137,7 +140,7 @@ export function UserProfileActiveDevicesSectionView({
       <UserProfileDeviceDetailsDialog
         handle={deviceDetails}
         finalFocus={removalFocus.finalFocus}
-        onSignOut={signOutDeviceAt}
+        onSignOut={signOutActions?.remove}
       />
       {onSignOutDevice ? (
         <Confirmation
@@ -148,7 +151,7 @@ export function UserProfileActiveDevicesSectionView({
           actionLabel={m.signOutDialog.confirm}
           cancelLabel={m.signOutDialog.cancel}
           finalFocus={removalFocus.finalFocus}
-          onConfirm={device => signOutDeviceAt?.(device)}
+          onConfirm={device => signOutActions?.remove(device)}
           errorFallback={m.detailsDialog.signOutError}
         />
       ) : null}
