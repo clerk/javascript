@@ -81,7 +81,7 @@
   },
   "src/machine/create-actor.ts": {
     "@typescript-eslint/consistent-type-assertions": {
-      "count": 9
+      "count": 8
     }
   },
   "src/machine/create-machine.ts": {

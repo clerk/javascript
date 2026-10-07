@@ -111,7 +111,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       }
       return [cfg];
     }
-    return toArr(raw as any).map(e =>
+    return toArr<unknown>(raw).map(e =>
       typeof e === 'string' ? { target: e } : (e as TransitionConfig<TContext, EventObject>),
     );
   }
@@ -174,7 +174,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     // on state entry and typically ignore it. The runtime views events through an
     // event-agnostic lens (line 57) for this reason.
     Promise.resolve(invoke.src(context, event as never)).then(
-      output => {
+      (output: unknown) => {
         if (status !== 'active' || token !== invocationToken) {
           return;
         }

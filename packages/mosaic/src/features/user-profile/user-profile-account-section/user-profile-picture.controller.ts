@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 import type { LocalizableError } from '../../../localization';
 import { FileUpload } from '../../../primitives/file-upload';
-import { toFormError } from '../../../utils/errors';
+import { toGlobalError } from '../../../utils/errors';
 
 export interface UserProfilePictureControllerOptions {
   onChange?: (file: File) => Promise<void>;
@@ -38,7 +38,7 @@ export function useUserProfilePictureController({
       await action();
     } catch (cause) {
       revert?.();
-      setError(toFormError(cause).global);
+      setError(toGlobalError(cause));
     } finally {
       inFlight.current = false;
       setIsPending(false);

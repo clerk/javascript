@@ -31,9 +31,10 @@ export function cssVars(opts?: { sideOffset?: SideOffset }): Middleware {
       const side = parsePlacement(placement).side;
 
       // A middleware that already capped the popup (select alignment) owns the height.
+      const alignedHeight = cappedHeight(middlewareData.alignSelectedItem);
       const availableHeight =
-        typeof middlewareData.alignSelectedItem?.availableHeight === 'number'
-          ? middlewareData.alignSelectedItem.availableHeight
+        alignedHeight !== undefined
+          ? alignedHeight
           : side === 'top'
             ? rects.floating.height - overflow.top
             : side === 'bottom'
@@ -87,4 +88,16 @@ export function cssVars(opts?: { sideOffset?: SideOffset }): Middleware {
       return {};
     },
   };
+}
+
+function cappedHeight(data: unknown): number | undefined {
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'availableHeight' in data &&
+    typeof data.availableHeight === 'number'
+  ) {
+    return data.availableHeight;
+  }
+  return undefined;
 }

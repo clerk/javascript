@@ -1,4 +1,5 @@
 import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
+import type { ClerkAPIError } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
 import type { ErrorDescription, LocalizableError, MessageValues } from '../localization';
@@ -38,7 +39,7 @@ function toClerkErrors(cause: unknown, params?: MessageValues): LocalizableError
   if (!isClerkAPIResponseError(cause)) {
     return undefined;
   }
-  return cause.errors.map(error => {
+  return cause.errors.map((error: ClerkAPIError) => {
     const paramName = error.meta?.paramName;
     return {
       code: error.code,
@@ -108,11 +109,11 @@ export function toLocalizableError(cause: unknown): ErrorDescription {
   return { cause };
 }
 
-/** Reads what a rejected save left for the view. An unrecognized rejection is the generic error. */
-export function toFormError<TField extends string = string>(cause: unknown): FormError<TField> {
+/** Reads the global error a rejected save left for the view. An unrecognized rejection is the generic error. */
+export function toGlobalError(cause: unknown): LocalizableError | undefined {
   if (cause instanceof SaveError) {
-    return cause.formError;
+    return cause.formError.global;
   }
   console.error('[Clerk] Could not localize error', cause);
-  return { global: UNEXPECTED_ERROR };
+  return UNEXPECTED_ERROR;
 }
