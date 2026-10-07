@@ -223,17 +223,11 @@ You've already seen `states`, `on`, `context`, `assign`, and `invoke`. The rest:
 
 ### API at a glance
 
-| Export                                   | What it is                                                                                                                  |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `createMachine(config)`                  | Build the definition. A plain, inert, inspectable object.                                                                   |
-| `setup<TContext, TEvent>()`              | Returns `createMachine`, `assign` and `fromPromise` with both types bound once.                                             |
-| `assign(updater)`                        | A `(context, event) => Partial<context>` context update, used inside `actions`.                                             |
-| `createActor(machine, options?)`         | The running instance: `.start()`, `.send(event)`, `.getSnapshot()`, `.subscribe(fn)`, `.recheck()`, `.setContext(patch)`, … |
-| `mockActor(machine, { value, context })` | An actor teleported straight to any step — render a transient/unreachable state for docs and snapshots.                     |
-| `useMachine(machine, options?)`          | React: own an actor for the component's life → `[snapshot, send, actor]`. `options.context` is re-seated every render.      |
-| `useActor(actor)`                        | React: bind to a **shared** actor → `[snapshot, send]`.                                                                     |
-| `useSelector(actor, selector, equals?)`  | React: subscribe to one **slice** — re-renders only when that slice changes.                                                |
-| `useMachineLogger(label, snapshot)`      | React: log each transition while debugging.                                                                                 |
+The exports live in `create-machine.ts`, `setup.ts`, `assign.ts`, `create-actor.ts` and `use-machine.ts`; their JSDoc is the reference. Which React hook to reach for:
+
+- `useMachine(machine)` when the component owns the actor for its lifetime.
+- `useActor(actor)` when the actor is shared or passed in, including a `mockActor` that renders a step directly.
+- `useSelector(actor, selector)` when a component needs one slice and should re-render only when that slice changes.
 
 ### Two behaviors worth knowing
 

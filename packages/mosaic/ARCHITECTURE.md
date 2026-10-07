@@ -551,34 +551,14 @@ The steps above cover the **styling** migration. For **flow** components — whe
 
 ## Files
 
-| File                                        | Purpose                                                                            |
-| ------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `src/tokens.stylex.ts`                      | `--cl-*` token groups declared with `stylex.defineVars`                            |
-| `src/props.ts`                              | `themeProps`, `mergeStyleProps`, and the `Mosaic*Props` types                      |
-| `src/mosaic-provider.tsx`                   | Provider for the `icons` and `localization` props, and the toast region            |
-| `src/icons/overrides.ts`                    | `MosaicIconOverrides` type + `useMosaicIcons()` context                            |
-| `src/icons/registry.tsx`                    | Built-in glyphs and the `IconName` union                                           |
-| `src/localization/`                         | Message registry, `MosaicCatalog` types, context hooks, and `fill`/`plural`/`rich` |
-| `src/localization/errors.ts`                | Error descriptions and `useErrorText`, which resolves them to copy                 |
-| `src/localization/errors.messages.ts`       | The `errors.*` catalog every user-facing error resolves through                    |
-| `src/components/`                           | One subdirectory per component, and nothing else                                   |
-| `src/blocks/`                               | View fragments that own one piece of state, each with its controller               |
-| `src/styles/*.styles.ts`                    | Atoms shared across components                                                     |
-| `src/styles/index.ts`                       | StyleX-only barrel — the entry the CSS build walks                                 |
-| `src/hooks/`                                | Shared hooks — see the shared-patterns table in `AGENTS.md`                        |
-| `src/utils/`                                | Non-style helpers; `errors.ts` holds `save` and `toLocalizableError`               |
-| `src/machine/`                              | State-machine runtime; see its `README.md`                                         |
-| `src/features/<feature>/*.model.ts(x)`      | Clerk adapter — the only file in a feature that may import Clerk                   |
-| `src/features/<feature>/*.controller.ts(x)` | Local state and action wrapping; holds the feature's machine                       |
-| `src/features/<feature>/*.view.tsx`         | Clerk-free rendering from plain props                                              |
-| `src/features/<feature>/*.types.ts`         | The data contract the model and the view both agree on                             |
-| `src/features/<feature>/*.messages.ts`      | Every string the surface renders; its keys are the `localization` paths            |
-| `src/styles/reset.test.tsx`                 | Reset specs                                                                        |
-| `src/__tests__/mosaic-provider.test.tsx`    | Icon-override and localization context specs                                       |
-| `src/components/button/button.test.tsx`     | Component-level slot/state/variant specs                                           |
-| `src/__tests__/feature/`                    | FAPI builders, the fake FAPI, and `renderWithClerk` for feature tests              |
-| `src/__tests__/async.ts`                    | Helpers for driving async flows in tests                                           |
-| `src/__tests__/clerk-errors.ts`             | `clerkApiError` for asserting catalog error copy                                   |
-| `src/features/user-button/__tests__/`       | `user-button.feature.test.tsx` is the feature test to copy from                    |
+A feature lives in `src/features/<feature>/`, one file per role:
+
+- `*.model.ts(x)`: the Clerk adapter, and the only file in a feature that may import Clerk
+- `*.controller.ts(x)`: local state and action wrapping; holds the feature's machine
+- `*.view.tsx`: Clerk-free rendering from plain props
+- `*.types.ts`: the data contract the model and the view both agree on
+- `*.messages.ts`: every string the surface renders; its keys are the `localization` paths
+
+The other folders under `src/` are named for what they hold, and the folders are the list. For example, `src/components/` has one subdirectory per component and nothing else. Shared helpers are in the table in `AGENTS.md`; test helpers are under `src/__tests__/` (see `docs/testing.md`).
 
 A feature's own machine belongs in its `*.controller.ts(x)`, not in `machine/`.
