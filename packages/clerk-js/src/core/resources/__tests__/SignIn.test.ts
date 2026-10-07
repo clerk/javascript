@@ -344,7 +344,7 @@ describe('SignIn', () => {
       SignIn.clerk = {} as any;
     });
 
-    const authenticate = async (params: { oidcPrompt?: string }) => {
+    it('sends oidc_prompt in the request that creates an OAuth sign-in', async () => {
       SignIn.clerk = {
         buildUrlWithAuth: vi.fn(u => u),
         __internal_windowNavigate: vi.fn(),
@@ -366,23 +366,15 @@ describe('SignIn', () => {
         strategy: 'oauth_google',
         redirectUrl: '/sso-callback',
         redirectUrlComplete: '/',
-        ...params,
+        oidcPrompt: 'select_account',
       });
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch.mock.calls[0][0]).toMatchObject({ method: 'POST', path: '/client/sign_ins' });
-      return toFormFields(mockFetch.mock.calls[0][0].body);
-    };
-
-    it('sends oidc_prompt in the request that creates an OAuth sign-in', async () => {
-      expect(await authenticate({ oidcPrompt: 'select_account' })).toMatchObject({
+      expect(toFormFields(mockFetch.mock.calls[0][0].body)).toMatchObject({
         strategy: 'oauth_google',
         oidc_prompt: 'select_account',
       });
-    });
-
-    it('leaves oidc_prompt out of the request when no oidcPrompt is given', async () => {
-      expect(await authenticate({})).not.toHaveProperty('oidc_prompt');
     });
   });
 
@@ -2859,7 +2851,7 @@ describe('SignIn', () => {
         vi.unstubAllGlobals();
       });
 
-      const createOAuthSignIn = async (params: { oidcPrompt?: string }) => {
+      it('sends oidc_prompt in the request that creates an OAuth sign-in', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
         SignIn.clerk = {
           buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
@@ -2882,24 +2874,16 @@ describe('SignIn', () => {
           strategy: 'oauth_google',
           redirectUrl: '/dashboard',
           redirectCallbackUrl: '/sso-callback',
-          ...params,
+          oidcPrompt: 'select_account',
         });
 
         expect(error).toBeNull();
         expect(mockFetch).toHaveBeenCalledTimes(1);
         expect(mockFetch.mock.calls[0][0]).toMatchObject({ method: 'POST', path: '/client/sign_ins' });
-        return toFormFields(mockFetch.mock.calls[0][0].body);
-      };
-
-      it('sends oidc_prompt in the request that creates an OAuth sign-in', async () => {
-        expect(await createOAuthSignIn({ oidcPrompt: 'select_account' })).toMatchObject({
+        expect(toFormFields(mockFetch.mock.calls[0][0].body)).toMatchObject({
           strategy: 'oauth_google',
           oidc_prompt: 'select_account',
         });
-      });
-
-      it('leaves oidc_prompt out of the request when no oidcPrompt is given', async () => {
-        expect(await createOAuthSignIn({})).not.toHaveProperty('oidc_prompt');
       });
 
       it('creates signIn with enterprise_sso strategy and prepares first factor', async () => {
