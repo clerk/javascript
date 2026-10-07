@@ -88,19 +88,27 @@ import { MosaicProvider } from './mosaic-provider';
 
 Styles are declared once per component with `stylex.create`, keyed off the same axes the component exposes as props, then fused with `themeProps` output and the props the component was called with:
 
-```tsx
-const styles = stylex.create({
+Declare the styles in `src/components/button/button.styles.ts`:
+
+```ts
+export const styles = stylex.create({
   base: { display: 'inline-flex', borderRadius: radiusVars['--cl-radius-md'] },
 });
 
 // `color` and `variant` are independent props, but every pair resolves to one style, so they are
 // keyed compositely rather than merged at render time.
-const variants = stylex.create({
+export const variants = stylex.create({
   'filled-primary': { backgroundColor: colorVars['--cl-color-brand'], borderColor: 'transparent' },
   'filled-negative': { backgroundColor: colorVars['--cl-color-negative'], borderColor: 'transparent' },
   'outline-primary': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-brand'] },
   'outline-negative': { backgroundColor: 'transparent', borderColor: colorVars['--cl-color-negative'] },
 });
+```
+
+Import them in `src/components/button/button.tsx`:
+
+```tsx
+import { styles, variants } from './button.styles';
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { color = 'primary', variant = 'filled', size = 'md', disabled, xstyle, ...rest },
@@ -168,7 +176,7 @@ once the interaction has an async lifecycle or two values that must change
 together. A controller can also do both — a machine for the coordinated subset,
 `useState` for the UI-only flags beside it. The choice is invisible from the
 outside: the controller returns plain props either way, so the view cannot tell
-and neither can its tests. `machine/ADOPTION.md` holds the criteria.
+and neither can its tests. `src/machine/ADOPTION.md` holds the criteria.
 
 ### File shape
 
@@ -450,7 +458,7 @@ export function useUserProfileEditUsernameController({ username = '', required =
 
 Reaching for a machine here would produce a two-state machine with one event,
 which is a boolean spelled long. Reaching for `useState` in `UserButton` would
-produce the flag soup the machine exists to prevent. `machine/ADOPTION.md` has
+produce the flag soup the machine exists to prevent. `src/machine/ADOPTION.md` has
 the criteria and worked before/afters for the calls in between.
 
 ### Views

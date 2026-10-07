@@ -5,6 +5,23 @@ Mosaic is Clerk's next-generation component library. These rules apply to everyt
 - `ARCHITECTURE.md` (this folder) is the contract: tokens, the `.cl-<slot>` + `data-<axis>` styling API, the CSS build, and the model → controller → view split.
 - `docs/` is the how-to, one file per task: StyleX authoring, motion, headless primitives, each flow layer, testing, and migration.
 
+## Task guides
+
+Read the guide for the task you are doing. Paths below are relative to this package.
+
+| Task                                      | Read                                                                              |
+| ----------------------------------------- | --------------------------------------------------------------------------------- |
+| Author a headless primitive               | [Headless primitives](docs/headless.md)                                           |
+| Style a component or change the CSS build | [StyleX](docs/stylex.md)                                                          |
+| Add or debug motion                       | [Motion](docs/motion.md)                                                          |
+| Write a model                             | [Models](docs/models.md)                                                          |
+| Write a controller                        | [Controllers](docs/controllers.md)                                                |
+| Author or debug a state machine           | [Controllers](docs/controllers.md), then [Machine runtime](src/machine/README.md) |
+| Write a view                              | [Views](docs/views.md)                                                            |
+| Test a feature                            | [Testing](docs/testing.md)                                                        |
+| Migrate legacy behavior                   | [Migration](docs/migration.md)                                                    |
+| Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
+
 ## Layers in one paragraph
 
 A flow lives in `src/features/<feature>/`. The **model** (`*.model.ts(x)`) is the only file that reads Clerk hooks or calls Clerk resources, and answers with plain data, plain callbacks and a `status`. The **controller** (`*.controller.ts(x)`) holds local state and wraps the model's callbacks for pending, errors and closing. The **view** (`*.view.tsx`) renders plain props. No Clerk resource reaches the controller and no machine snapshot reaches the view.
@@ -25,6 +42,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Moving focus after a list row is removed                                | `useListRemovalFocus` (`src/hooks/`)                                                                          |
 | A debounced, abortable async check as the user types                    | `useDebouncedAsync` (`src/hooks/`)                                                                            |
 | A spinner that should not flash or flicker                              | `useSpinDelay` (`src/hooks/`)                                                                                 |
+| Current time for display labels                                         | `useNow` + `MosaicProvider` ([#10098](https://github.com/clerk/javascript/pull/10098), once available)        |
 | An inline message row that animates open and closed                     | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `styles/feedback.styles.ts` |
 | A table whose sorting, paging and search are done by the server         | `useServerDataTable` (`src/hooks/`)                                                                           |
 | Siblings that slide when an item is added or removed                    | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                |
@@ -41,6 +59,14 @@ Stop and check the table if you are writing any of these in a feature:
 - a ref map of buttons to restore focus after a removal
 - `setTimeout` to debounce or to delay a spinner
 - `stylex.create` inside a `.tsx` file
+
+## Readability before complexity scores
+
+Do not extract a helper or introduce a machine only to reduce a lint score.
+Avoid turning a component into a hook solely to work around React's children
+typing. An abstraction must clarify a responsibility or hide useful complexity. When complexity is inherent, keep the relevant logic
+together and explain the tradeoff in review. Follow repository rules for any lint
+exception; this guidance does not authorize a suppression.
 
 ## When nothing fits: ask first
 

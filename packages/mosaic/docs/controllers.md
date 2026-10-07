@@ -176,6 +176,31 @@ surface shows no error still logs it, so a failure is never silent
   `useSpinDelay`, a `mode` forced by a capability flag — anything the view would
   otherwise have to re-derive.
 
+## Composition and dialog lifetime
+
+When a wrapper composes the controller above the view, prefer one
+controller-derived contract, forwarding the model's display data through the
+controller when needed. Where practical, mount a
+separate component only once the model is ready, so its controller receives the
+narrowed ready model instead of repeating loading branches. Keep the supported
+injected-effect leaf composition described in `views.md`.
+
+Decide which dialog state survives closing and reopening. Verify that the next
+interaction does not retain an unintended error or draft, and keep reset behavior
+consistent with the pending action's lifetime. Handle rejected dynamic imports
+through an appropriate error owner rather than leaving unhandled rejections.
+
+For a dialog that clears its draft and error on close, test a failed submit,
+close it, and reopen it. Assert that the error is gone and the field has its
+initial value. If the draft is meant to survive, assert the saved draft instead.
+Hold the submit request while dismissing to verify that closing does not unlock
+a second mutation or abandon the first. When a feature uses a dynamic import,
+reject the loader and assert the error UI and recovery behavior it promises.
+
+When introducing lazy loading or Suspense, consider a boundary around dialog
+content that leaves the trigger and parent available. Choose that boundary from
+the feature's loading behavior; it does not require restructuring every dialog.
+
 ## Rules
 
 - **No Clerk imports.** If a controller needs a Clerk fact, the model supplies it
@@ -225,11 +250,16 @@ One path, so every error a user sees goes through the `errors.*` catalog:
   password section maps its own errors (`user-profile-password-errors.ts`).
 - **`errorFallback` is the feature's copy for faults Clerk cannot describe**
   (code bugs, non-Clerk errors). An `UnlocalizableError` renders the fallback,
-  never its cause's `.message`. A network failure has its own catalog entry,
-  `network_error`.
+  never its cause's `.message`. A failure carrying the Clerk code `network_error`
+  has catalog copy, but network failures may also arrive as raw errors and remain
+  unlocalizable. Preserve the cause and check the unknown-error fallback too.
 - In tests, reject with `clerkApiError(code, message, { paramName })` from
   `src/__tests__/clerk-errors.ts` to assert catalog copy. Reject with a plain
   `Error` (silence `console.error`) to assert the fallback.
+  For example, reject with `new Error('socket disconnected')`, assert the
+  feature's fallback is visible, and assert that `socket disconnected` is not
+  rendered. Test `clerkApiError('network_error', 'server detail')` separately
+  to verify catalog copy rather than assuming every network fault has a code.
 
 ## Testing
 

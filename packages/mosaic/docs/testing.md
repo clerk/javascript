@@ -94,6 +94,10 @@ it('makes the selected organization active and closes', async () => {
   await user.click(screen.getByRole('button', { name: /Open account menu/ }));
   await user.click(await screen.findByRole('button', { name: 'Other' }));
   await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+  await user.click(screen.getByRole('button', { name: /Open account menu/ }));
+  expect(await screen.findByRole('button', { name: 'Acme' })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Other' })).toBeNull();
 });
 ```
 
