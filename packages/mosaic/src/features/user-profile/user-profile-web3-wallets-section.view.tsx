@@ -65,7 +65,9 @@ export function UserProfileWeb3WalletsSectionView({
             tabIndex={-1}
           >
             <Section.Header>
-              <Section.Title>{m.title}</Section.Title>
+              <Section.Content>
+                <Section.Title>{m.title}</Section.Title>
+              </Section.Content>
             </Section.Header>
             <Section.Body>
               {wallets.map(wallet => (

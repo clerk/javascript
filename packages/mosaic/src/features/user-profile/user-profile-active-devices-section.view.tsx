@@ -66,7 +66,9 @@ export function UserProfileActiveDevicesSectionView({
       <Section.Root>
         <Section.Group>
           <Section.Header>
-            <Section.Title>{m.title}</Section.Title>
+            <Section.Content>
+              <Section.Title>{m.title}</Section.Title>
+            </Section.Content>
             {onSignOutAllOtherDevices && otherDevices.length > 0 ? (
               <Section.Actions>
                 <Button

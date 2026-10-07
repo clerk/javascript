@@ -49,7 +49,15 @@ export function UserProfilePasskeysSectionView({
         tabIndex={-1}
       >
         <Section.Header>
-          <Section.Title>{m.label}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.label}</Section.Title>
+            <Field.Message
+              role={addError ? 'alert' : 'status'}
+              xstyle={styles.addError}
+            >
+              <Field.Error>{addError}</Field.Error>
+            </Field.Message>
+          </Section.Content>
           {onAdd ? (
             <Section.Actions>
               <Button
@@ -69,12 +77,6 @@ export function UserProfilePasskeysSectionView({
               </Button>
             </Section.Actions>
           ) : null}
-          <Field.Message
-            role={addError ? 'alert' : 'status'}
-            xstyle={styles.addError}
-          >
-            <Field.Error>{addError}</Field.Error>
-          </Field.Message>
         </Section.Header>
         <Section.Body>
           <Section.Items>
