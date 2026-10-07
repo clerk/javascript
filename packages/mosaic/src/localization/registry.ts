@@ -5,7 +5,7 @@ import { membersTableTabMessages } from '../features/organization-profile/member
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
 import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-invite-members.messages';
-import { organizationProfileWorkspaceSectionMessages } from '../features/organization-profile/organization-profile-workspace-section/organization-profile-workspace-section.messages';
+import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
 import { requestsTableTabMessages } from '../features/organization-profile/requests-table-tab.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
@@ -21,9 +21,10 @@ import { userProfileAddSmsMessages } from '../features/user-profile/user-profile
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';
 import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-backup-codes.messages';
 import { userProfileConnectedAccountsMessages } from '../features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.messages';
-import { userProfileDeleteSectionMessages } from '../features/user-profile/user-profile-delete-section/user-profile-delete-section.messages';
+import { userProfileDangerSectionMessages } from '../features/user-profile/user-profile-danger-section/user-profile-danger-section.messages';
 import { userProfileEnterpriseAccountsMessages } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.messages';
 import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section.messages';
+import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section.messages';
 import { userProfilePasswordSectionMessages } from '../features/user-profile/user-profile-password-section/user-profile-password-section.messages';
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
 import { errorMessages } from './errors.messages';
@@ -37,7 +38,7 @@ export const mosaicMessages = {
   requestsTableTab: requestsTableTabMessages,
   organizationProfile: organizationProfileMessages,
   organizationProfileDangerSection: organizationProfileDangerSectionMessages,
-  organizationProfileWorkspaceSection: organizationProfileWorkspaceSectionMessages,
+  organizationProfileProfileSection: organizationProfileProfileSectionMessages,
   organizationProfileInviteMembers: organizationProfileInviteMembersMessages,
   reverification: reverificationMessages,
   userButton: userButtonMessages,
@@ -53,9 +54,10 @@ export const mosaicMessages = {
   userProfileAuthenticatorSetup: userProfileAuthenticatorSetupMessages,
   userProfileBackupCodes: userProfileBackupCodesMessages,
   userProfileConnectedAccounts: userProfileConnectedAccountsMessages,
-  userProfileDeleteSection: userProfileDeleteSectionMessages,
+  userProfileDangerSection: userProfileDangerSectionMessages,
   userProfileEnterpriseAccountsSection: userProfileEnterpriseAccountsMessages,
   userProfileMfa: userProfileMfaMessages,
+  userProfilePasskeys: userProfilePasskeysMessages,
   userProfilePasswordSection: userProfilePasswordSectionMessages,
   userProfileWeb3Wallets: userProfileWeb3WalletsMessages,
 };

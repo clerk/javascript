@@ -267,13 +267,8 @@ export function APIKeysTableView({
           confirmationValue={apiKey => apiKey.name}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onDelete={async apiKey => {
-            try {
-              await removalFocus.remove(apiKey.id);
-            } catch (error) {
-              throw error instanceof Error ? error : new Error(m.revokeError);
-            }
-          }}
+          onDelete={apiKey => removalFocus.remove(apiKey.id)}
+          errorFallback={m.revokeError}
           finalFocus={removalFocus.finalFocus}
         />
       ) : null}

@@ -1,8 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
+import { useConfirmationController } from '../../blocks/confirmation/confirmation.controller';
 import type { ActionMenuAction } from '../../components/action-menu';
 import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
@@ -47,31 +48,9 @@ export function UserProfileActiveDevicesSectionView({
   });
   const signOutDeviceAt = onSignOutDevice ? (device: UserProfileDevice) => removalFocus.remove(device.id) : undefined;
 
-  const [isSignOutAllOpen, setIsSignOutAllOpen] = useState(false);
-  const [isSigningOutAll, setIsSigningOutAll] = useState(false);
-  const [signOutAllError, setSignOutAllError] = useState<string>();
-  const signingOutAll = useRef(false);
+  const signOutAll = useConfirmationController({ errorFallback: m.signOutAllError });
   const signedOutAll = useRef(false);
   const signOutAllTrigger = useRef<HTMLButtonElement>(null);
-
-  const signOutAllOtherDevices = async () => {
-    if (!onSignOutAllOtherDevices || signingOutAll.current) {
-      return;
-    }
-    signingOutAll.current = true;
-    setIsSigningOutAll(true);
-    setSignOutAllError(undefined);
-    try {
-      await onSignOutAllOtherDevices();
-      signedOutAll.current = true;
-      setIsSignOutAllOpen(false);
-    } catch (error) {
-      setSignOutAllError(error instanceof Error ? error.message : m.signOutAllError);
-    } finally {
-      signingOutAll.current = false;
-      setIsSigningOutAll(false);
-    }
-  };
 
   // Confirming removes the other devices and the trigger with them — hence the dialog mounted
   // outside the card, and the current device as the place focus lands. Cancelling keeps the
@@ -87,7 +66,9 @@ export function UserProfileActiveDevicesSectionView({
       <Section.Root>
         <Section.Group>
           <Section.Header>
-            <Section.Title>{m.title}</Section.Title>
+            <Section.Content>
+              <Section.Title>{m.title}</Section.Title>
+            </Section.Content>
             {onSignOutAllOtherDevices && otherDevices.length > 0 ? (
               <Section.Actions>
                 <Button
@@ -95,7 +76,7 @@ export function UserProfileActiveDevicesSectionView({
                   color='neutral'
                   size='sm'
                   variant='outline'
-                  onClick={() => setIsSignOutAllOpen(true)}
+                  onClick={() => signOutAll.onOpenChange(true)}
                 >
                   {m.signOutAll}
                 </Button>
@@ -135,22 +116,22 @@ export function UserProfileActiveDevicesSectionView({
       </Section.Root>
       {onSignOutAllOtherDevices ? (
         <Confirmation
-          open={isSignOutAllOpen}
-          onOpenChange={open => {
-            setIsSignOutAllOpen(open);
-            if (!open) {
-              setSignOutAllError(undefined);
-            }
-          }}
+          open={signOutAll.isOpen}
+          onOpenChange={signOutAll.onOpenChange}
           color='primary'
           finalFocus={focusAfterSignOutAll}
           title={m.signOutAllDialog.title}
           description={plural(m.signOutAllDialog.description, otherDevices.length, locale)}
           actionLabel={m.signOutAllDialog.confirm}
           cancelLabel={m.signOutAllDialog.cancel}
-          onConfirm={() => void signOutAllOtherDevices()}
-          isConfirming={isSigningOutAll}
-          errorMessage={signOutAllError}
+          onConfirm={() =>
+            signOutAll.onConfirm(async () => {
+              await onSignOutAllOtherDevices();
+              signedOutAll.current = true;
+            })
+          }
+          isConfirming={signOutAll.isConfirming}
+          errorMessage={signOutAll.errorMessage}
         />
       ) : null}
       <UserProfileDeviceDetailsDialog
@@ -168,6 +149,7 @@ export function UserProfileActiveDevicesSectionView({
           cancelLabel={m.signOutDialog.cancel}
           finalFocus={removalFocus.finalFocus}
           onConfirm={device => signOutDeviceAt?.(device)}
+          errorFallback={m.detailsDialog.signOutError}
         />
       ) : null}
     </div>

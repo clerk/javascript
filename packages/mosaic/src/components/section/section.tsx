@@ -13,7 +13,7 @@ import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../.
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
-import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
@@ -205,6 +205,7 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
   ref,
 ) {
   const nested = React.useContext(SectionItemsContext);
+  const inHeader = React.useContext(SectionHeaderContext);
 
   return useRender({
     defaultTagName: 'div',
@@ -212,7 +213,7 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
     ref,
     props: mergeStyleProps(
       themeProps('section-content', { nested }),
-      stylex.props(reset.base, styles.content, xstyle),
+      stylex.props(reset.base, styles.content, inHeader && styles.headerContent, xstyle),
       rest,
     ),
   });
@@ -237,21 +238,13 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
   { render, xstyle, ...rest },
   ref,
 ) {
-  const inHeader = React.useContext(SectionHeaderContext);
-
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: mergeStyleProps(
       themeProps('section-description'),
-      stylex.props(
-        reset.base,
-        styles.description,
-        inHeader && styles.headerDescription,
-        inHeader && sectionHeaderDescriptionMarker,
-        xstyle,
-      ),
+      stylex.props(reset.base, styles.description, xstyle),
       rest,
     ),
   });

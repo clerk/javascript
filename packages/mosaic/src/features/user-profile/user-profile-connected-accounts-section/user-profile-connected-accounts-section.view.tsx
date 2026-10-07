@@ -52,7 +52,9 @@ export function UserProfileConnectedAccountsSectionView({
             tabIndex={-1}
           >
             <Section.Header>
-              <Section.Title>{m.title}</Section.Title>
+              <Section.Content>
+                <Section.Title>{m.title}</Section.Title>
+              </Section.Content>
             </Section.Header>
             <Section.Body>
               {accounts.map(account => (

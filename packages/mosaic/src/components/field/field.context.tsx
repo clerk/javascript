@@ -63,7 +63,7 @@ export function FieldProvider({ children, orientation, disabled, required, inval
       ) {
         warnedAboutMultipleControls.current = true;
         console.warn(
-          '[clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
+          '[Clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
         );
       }
 
