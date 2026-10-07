@@ -347,7 +347,7 @@ describe('Mosaic Field', () => {
 
     expect(consoleWarn).toHaveBeenCalledTimes(1);
     expect(consoleWarn).toHaveBeenCalledWith(
-      '[clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
+      '[Clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
     );
     consoleWarn.mockRestore();
   });
@@ -747,7 +747,7 @@ describe('Mosaic Field', () => {
 
     render(<Field.Label render={<div />}>Email</Field.Label>);
 
-    expect(consoleWarn).toHaveBeenCalledWith('[clerk] <Field.Label> must render a native `<label>` element.');
+    expect(consoleWarn).toHaveBeenCalledWith('[Clerk] <Field.Label> must render a native `<label>` element.');
     consoleWarn.mockRestore();
   });
 });

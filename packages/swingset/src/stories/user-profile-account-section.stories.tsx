@@ -7,7 +7,7 @@ import { UserProfileAccountSectionView } from '@clerk/mosaic/features/user-profi
 import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 import { UserProfileVerifyEmailLinkDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
 import { UserProfileVerifyEmailSsoDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
-import type { FormError } from '@clerk/mosaic/utils/form-error';
+import type { FormError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -224,8 +224,10 @@ export function EditNameFails() {
     <AccountSection
       allowMultipleAccounts={false}
       failWith={{
-        global: { message: 'Your name could not be updated.' },
-        fields: { lastName: { message: 'Last name must be 64 characters or fewer.' } },
+        global: { code: 'internal_clerk_error', message: 'Your name could not be updated.' },
+        fields: {
+          lastName: { code: 'form_param_max_length_exceeded', message: 'Last name must be 64 characters or fewer.' },
+        },
       }}
     />
   );
@@ -236,8 +238,8 @@ export function EditUsernameFails() {
     <AccountSection
       allowMultipleAccounts={false}
       usernameFailWith={{
-        global: { message: 'Your username could not be updated.' },
-        fields: { username: { message: 'That username is already taken.' } },
+        global: { code: 'internal_clerk_error', message: 'Your username could not be updated.' },
+        fields: { username: { code: 'form_identifier_exists', message: 'That username is already taken.' } },
       }}
     />
   );

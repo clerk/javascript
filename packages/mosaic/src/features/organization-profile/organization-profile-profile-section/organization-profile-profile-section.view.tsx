@@ -5,7 +5,7 @@ import { OrganizationProfileLogoRowView } from './organization-profile-logo-row.
 import { OrganizationProfileNameRowView } from './organization-profile-name-row.view';
 import { OrganizationProfileSlugRowView } from './organization-profile-slug-row.view';
 
-export interface OrganizationProfileWorkspaceSectionViewProps {
+export interface OrganizationProfileProfileSectionViewProps {
   name: string;
   slug: string;
   imageUrl?: string;
@@ -17,7 +17,7 @@ export interface OrganizationProfileWorkspaceSectionViewProps {
   onSubmitSlug?: (slug: string) => Promise<void>;
 }
 
-export function OrganizationProfileWorkspaceSectionView({
+export function OrganizationProfileProfileSectionView({
   name,
   slug,
   imageUrl,
@@ -27,14 +27,16 @@ export function OrganizationProfileWorkspaceSectionView({
   onRemoveLogo,
   onSubmitName,
   onSubmitSlug,
-}: OrganizationProfileWorkspaceSectionViewProps) {
-  const m = useMessages('organizationProfileWorkspaceSection');
+}: OrganizationProfileProfileSectionViewProps) {
+  const m = useMessages('organizationProfileProfileSection');
 
   return (
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>{m.sectionTitle}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.sectionTitle}</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <OrganizationProfileLogoRowView

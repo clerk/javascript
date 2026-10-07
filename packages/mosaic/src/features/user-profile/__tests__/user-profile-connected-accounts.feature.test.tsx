@@ -272,7 +272,7 @@ describe('connected accounts', () => {
     await renderWithClerk(<UserProfileConnectedAccountsSection />);
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
-    expect(await screen.findByText('OAuth flow did not receive a verification URL.')).toBeInTheDocument();
+    expect(await screen.findByText('The connection could not start. Please try again.')).toBeInTheDocument();
   });
 
   it('preserves modal state when connecting', async () => {

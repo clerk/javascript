@@ -144,8 +144,8 @@ importers:
         specifier: ^20.5.0
         version: 20.5.0
       '@e2e-dev/mobile':
-        specifier: 0.8.1
-        version: 0.8.1(e2e@0.15.1(@cfworker/json-schema@4.1.1))
+        specifier: 0.9.1
+        version: 0.9.1(e2e@0.16.0)
       '@eslint/eslintrc':
         specifier: ^3.3.5
         version: 3.3.5
@@ -216,8 +216,8 @@ importers:
         specifier: ^16.6.1
         version: 16.6.1
       e2e:
-        specifier: 0.15.1
-        version: 0.15.1(@cfworker/json-schema@4.1.1)
+        specifier: 0.16.0
+        version: 0.16.0
       eslint:
         specifier: 9.31.0
         version: 9.31.0(jiti@2.7.0)
@@ -2572,8 +2572,8 @@ packages:
   '@dxup/unimport@0.1.2':
     resolution: {integrity: sha512-/B8YJGPzaYq1NbsQmwgP8EZqg40NpTw4ZB3suuI0TplbxKHeK94jeaawLmVhCv+YwUnOpiWEz9U6SeThku/8JQ==}
 
-  '@e2e-dev/mobile@0.8.1':
-    resolution: {integrity: sha512-aUbqIUxgeyxebNtySH7Cw+IvZPauHqOM5oUBTCzF8YMpInjqs8vi7iiW6eiZsQPxrINTy/3KoSvIAnPU8bXFYg==}
+  '@e2e-dev/mobile@0.9.1':
+    resolution: {integrity: sha512-Uqw14Mha1cTdUaOqy4JqBlEce98Q8SzVMoPN63TlS50xA9BrRFAOBGHEn0SqVFVou52jwLPIPhPLym4QbrnNSg==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       ai: ^7.0.0
@@ -3787,6 +3787,10 @@ packages:
   '@microsoft/tsdoc@0.16.0':
     resolution: {integrity: sha512-xgAyonlVVS+q7Vc7qLW0UrJU7rSFcETRWsqdXZtjzRU8dF+6CkozTK4V4y1LwOX7j8r/vHphjDeMeGI4tNGeGA==}
 
+  '@modelcontextprotocol/core@2.2.0':
+    resolution: {integrity: sha512-iLhmprRmWI8EcosOA3wVvww22z02NkgqhV4fBH6f/odQBsi7xnJc0HGmi21yWO+/iKw2yzqVE127Zhna5/+JXw==}
+    engines: {node: '>=20'}
+
   '@modelcontextprotocol/sdk@1.30.1':
     resolution: {integrity: sha512-H2HxLvC3HDNybePJaLdSrU1hhUK5iQw+WvV1b01myFyI7sdVGe1u/IPTE5D9fGCiJDVtgMV/lmFkQXLmQyIFYA==}
     engines: {node: '>=18'}
@@ -3796,6 +3800,10 @@ packages:
     peerDependenciesMeta:
       '@cfworker/json-schema':
         optional: true
+
+  '@modelcontextprotocol/server@2.2.0':
+    resolution: {integrity: sha512-qFnltjus6Gk8Lx6J1w2RXmr3YPN22MNT6qD6zjAkaiWIlFIFxWClz0rXHNuJF/KSUyn5YGhkSvXkWDbQHVLFEQ==}
+    engines: {node: '>=20'}
 
   '@mswjs/interceptors@0.41.9':
     resolution: {integrity: sha512-VVPPgHyQ6ShqnrmDWuxjmUIsO9gWyOZFmuOfLd9LfBGQJwZfy0gvv9pbHSJuoFNIYC7ZDX9aoFwowjcdSC4E8w==}
@@ -8574,8 +8582,8 @@ packages:
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
 
-  e2e@0.15.1:
-    resolution: {integrity: sha512-HYuc4xFbLqG4TMZkzZEZEoYa20qKvqyZ9nodDOZ8Yo05YlspzC4GV4guEql1pVIdspqj0fDMINx2rsn3REVrHA==}
+  e2e@0.16.0:
+    resolution: {integrity: sha512-KXFks4yu4bCjrVgbebR/eULRzDWTpb3ECqhE+563O92vQwgwJHhIwoAKy7AsJQ5L2/r4qoCF2j5Jn3HW+DHx3A==}
     engines: {node: '>=22.12.0'}
     hasBin: true
     peerDependencies:
@@ -16962,10 +16970,10 @@ snapshots:
 
   '@dxup/unimport@0.1.2': {}
 
-  '@e2e-dev/mobile@0.8.1(e2e@0.15.1(@cfworker/json-schema@4.1.1))':
+  '@e2e-dev/mobile@0.9.1(e2e@0.16.0)':
     dependencies:
       agent-device: 0.21.18
-      e2e: 0.15.1(@cfworker/json-schema@4.1.1)
+      e2e: 0.16.0
       pngjs: 7.0.0
       zod: 4.6.1
 
@@ -18417,6 +18425,10 @@ snapshots:
   '@microsoft/tsdoc@0.16.0':
     optional: true
 
+  '@modelcontextprotocol/core@2.2.0':
+    dependencies:
+      zod: 4.6.5
+
   '@modelcontextprotocol/sdk@1.30.1(@cfworker/json-schema@4.1.1)(zod@3.25.76)':
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.13.4)
@@ -18441,29 +18453,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@modelcontextprotocol/sdk@1.30.1(@cfworker/json-schema@4.1.1)(zod@4.6.1)':
+  '@modelcontextprotocol/server@2.2.0':
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.13.4)
-      ajv: 8.20.0
-      ajv-formats: 3.0.1(ajv@8.20.0)
-      content-type: 1.0.5
-      cors: 2.8.6
-      cross-spawn: 7.0.6
-      eventsource: 3.0.7
-      eventsource-parser: 3.0.8
-      express: 5.2.1
-      express-rate-limit: 8.3.2(express@5.2.1)
-      hono: 4.13.4
-      jose: 6.2.2
-      json-schema-typed: 8.0.2
-      pkce-challenge: 5.0.1
-      raw-body: 3.0.2
-      zod: 4.6.1
-      zod-to-json-schema: 3.25.2(zod@4.6.1)
-    optionalDependencies:
-      '@cfworker/json-schema': 4.1.1
-    transitivePeerDependencies:
-      - supports-color
+      '@modelcontextprotocol/core': 2.2.0
+      zod: 4.6.5
 
   '@mswjs/interceptors@0.41.9':
     dependencies:
@@ -24285,20 +24278,17 @@ snapshots:
 
   duplexer@0.1.2: {}
 
-  e2e@0.15.1(@cfworker/json-schema@4.1.1):
+  e2e@0.16.0:
     dependencies:
       '@ai-sdk/provider': 4.0.18
       '@clack/prompts': 1.8.1
-      '@modelcontextprotocol/sdk': 1.30.1(@cfworker/json-schema@4.1.1)(zod@4.6.1)
+      '@modelcontextprotocol/server': 2.2.0
       '@vitest/expect': 5.0.2
       commander: 15.0.0
       picocolors: 1.1.1
       pngjs: 7.0.0
       tsx: 4.23.14
       zod: 4.6.1
-    transitivePeerDependencies:
-      - '@cfworker/json-schema'
-      - supports-color
 
   eastasianwidth@0.2.0: {}
 
@@ -32707,10 +32697,6 @@ snapshots:
   zod-to-json-schema@3.25.2(zod@3.25.76):
     dependencies:
       zod: 3.25.76
-
-  zod-to-json-schema@3.25.2(zod@4.6.1):
-    dependencies:
-      zod: 4.6.1
 
   zod@3.25.76: {}
 

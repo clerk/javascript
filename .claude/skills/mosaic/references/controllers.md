@@ -28,6 +28,21 @@ complexity calls for:
 | Is a boolean or a controlled value, no async, nothing else depends on it | `useState`                  |
 | Has an async lifecycle, or two values that must change together          | A machine, same file        |
 | Has a coordinated async core plus some UI-only flags beside it           | Both — machine for the core |
+| Is one async action from a button, needing only pending and an error     | `usePendingAction`          |
+
+`usePendingAction(fn, { errorFallback })` covers any single async action a
+button starts: set a default, sign out a device, accept or decline a request. It
+ignores clicks while one is in flight, owns the error
+(see "Errors") and returns `{ run, isPending, errorMessage, reset }`. `run`
+resolves `true` on success, so the caller can close a dialog or move focus. It
+is not for:
+
+- a form → `useForm`
+- a confirm step → `Confirmation` / `Destructive`
+- an action whose result drives other state → a machine
+- per-row pending across a list, or holding pending through a redirect → the
+  connected and enterprise accounts controllers, until `usePendingAction` takes
+  a key
 
 `useUserProfileDeleteSectionController` earns a machine on three counts: the
 delete is async, a failure must land back on the previous step with a reason,
@@ -119,6 +134,36 @@ have a machine.
     invoke: fromPromise(context => context.run(), { /* … */ }),
   }
   ```
+
+## Errors
+
+One path, so every error a user sees goes through the `errors.*` catalog:
+
+- **Owners map, nothing else does.** `toLocalizableError(cause)` from
+  `utils/errors.ts` is called only by the hooks that own a failure: `useForm`,
+  `useConfirmationController`, `useDestructiveController` and
+  `usePendingAction` (inline row actions). Use one of them instead of catching
+  in a feature.
+- **Owners hold an `ErrorDescription`.** It is either a `LocalizableError`
+  (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`, the original
+  failure). `toLocalizableError` logs the second as
+  `[Clerk] Could not localize error`. Branch with `isLocalizableError` only
+  when a feature handles the two differently.
+- **Owners resolve copy at render; views get a string.** Owners return
+  `errorMessage` from `useErrorText()`: the
+  catalog entry for `code__paramName`, then `code`, then Clerk's message, then
+  the feature's `errorFallback`, then the generic error. Views never call
+  `useErrorText` on an error they did not create themselves.
+- Not there yet, each with a follow-up: `useForm` resolves when the save fails
+  and falls back to `form.error` instead of taking an `errorFallback`, and the
+  profile picture row resolves its controller's error in the view.
+- **`errorFallback` is the feature's copy for faults Clerk cannot describe**
+  (code bugs, non-Clerk errors). An `UnlocalizableError` renders the fallback,
+  never its cause's `.message`. A network failure has its own catalog entry,
+  `network_error`.
+- In tests, reject with `clerkApiError(code, message)` from
+  `src/__tests__/clerk-errors.ts` to assert catalog copy. Reject with a plain
+  `Error` (silence `console.error`) to assert the fallback.
 
 ## Testing
 
