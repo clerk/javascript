@@ -9735,10 +9735,6 @@ packages:
     resolution: {integrity: sha512-RwMTC61u7hrG3ZJMkZQOK4JLJrKS8QtoTii63EmWvFXHqycY9FObBJQCbsLxSO8kjKhWE5kV1GC+Vb1g3RI0Zg==}
     engines: {node: '>=18'}
 
-  globals@17.4.0:
-    resolution: {integrity: sha512-hjrNztw/VajQwOLsMNT1cbJiH2muO3OROCHnbehc8eY5JyD2gqz4AcMHPqgaOR59DjgUjYAYLeH699g/eWi2jw==}
-    engines: {node: '>=18'}
-
   globalthis@1.0.4:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
     engines: {node: '>= 0.4'}
@@ -24790,7 +24786,7 @@ snapshots:
   eslint-plugin-playwright@2.10.1(eslint@9.31.0(jiti@2.7.0)):
     dependencies:
       eslint: 9.31.0(jiti@2.7.0)
-      globals: 17.4.0
+      globals: 17.13.0
 
   eslint-plugin-react-hooks@5.2.0(eslint@9.31.0(jiti@2.7.0)):
     dependencies:
@@ -25881,8 +25877,6 @@ snapshots:
   globals@15.15.0: {}
 
   globals@17.13.0: {}
-
-  globals@17.4.0: {}
 
   globalthis@1.0.4:
     dependencies:
