@@ -63,6 +63,17 @@ function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) 
 }
 
 describe('UserProfileSecurityPanelView', () => {
+  it('renders supplied password content without a separate visibility flag', () => {
+    renderView({
+      passwordSlot: <div>Password</div>,
+      passkeys: undefined,
+      mfaMethods: undefined,
+    });
+
+    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
+    expect(screen.getByText('Password')).toBeVisible();
+  });
+
   it('composes authentication, active devices, and the danger zone', () => {
     renderView({ dangerSlot: <DeleteAccount /> });
 
