@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { FormSubmitError } from '../../components/form';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useNow } from '../../hooks/use-now';
 import { useLocale, useMessages } from '../../localization';
 import { formatDate, formatRelativeTime } from './api-keys-table.format';
 import { resolveAPIKeysTableMessages } from './api-keys-table.messages';
@@ -123,7 +124,7 @@ function useDebouncedSearch() {
 
 function useApiKeyLabels(apiKeys: APIKeyResource[]): APIKey[] {
   const locale = useLocale();
-  const now = new Date();
+  const now = useNow({ updateInterval: 60_000 });
 
   return apiKeys.map(key => ({
     id: key.id,

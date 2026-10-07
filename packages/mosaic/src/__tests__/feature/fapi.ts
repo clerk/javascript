@@ -16,6 +16,7 @@ import type {
   OrganizationMembershipJSON,
   OrganizationSettingsJSON,
   OrganizationSuggestionJSON,
+  PasskeyJSON,
   PublicKeyCredentialRequestOptionsJSON,
   PublicOrganizationDataJSON,
   SessionJSON,
@@ -548,4 +549,16 @@ export function fapiApiKey(overrides: Partial<ApiKeyJSON> & Pick<ApiKeyJSON, 'id
 
 export function fapiPage<T>(data: T[], totalCount = data.length): FapiPage<T> {
   return { data, total_count: totalCount };
+}
+
+export function fapiPasskey(overrides: Partial<PasskeyJSON> & Pick<PasskeyJSON, 'id'>): PasskeyJSON {
+  return {
+    object: 'passkey',
+    name: 'Laptop',
+    verification: null,
+    created_at: createdAt,
+    updated_at: createdAt,
+    last_used_at: null,
+    ...overrides,
+  };
 }

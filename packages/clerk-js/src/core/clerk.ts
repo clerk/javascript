@@ -198,6 +198,7 @@ import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
 import { ProtectCheckGate } from './protectCheckGate';
+import type { SignIn, SignUp } from './resources/internal';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -1000,11 +1001,19 @@ export class Clerk implements ClerkInterface {
       return;
     }
     const gate = ProtectCheckGate.getInstance();
+    const resolve = async (resource: SignInResource | SignUpResource) => {
+      try {
+        await gate.resolve(this, resource);
+      } catch (error) {
+        eventBus.emit(events.ResourceError, { resource: resource as SignIn | SignUp, error });
+        throw error;
+      }
+    };
     if (flow !== 'signUp') {
-      await gate.resolve(this, client.signIn);
+      await resolve(client.signIn);
     }
     if (flow !== 'signIn') {
-      await gate.resolve(this, client.signUp);
+      await resolve(client.signUp);
     }
   };
 
