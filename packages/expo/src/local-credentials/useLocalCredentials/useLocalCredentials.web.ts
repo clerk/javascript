@@ -6,7 +6,7 @@ import { LocalCredentialsInitValues } from './shared';
 export const useLocalCredentials = (): LocalCredentialsReturn => {
   deprecated(
     'useLocalCredentials',
-    'Build this flow with `expo-secure-store` instead. See https://clerk.com/docs/guides/development/local-credentials',
+    'Store the credentials with `expo-secure-store` and its `requireAuthentication` option instead, then sign in with the stored identifier and password. See https://docs.expo.dev/versions/latest/sdk/securestore/',
   );
   return LocalCredentialsInitValues;
 };

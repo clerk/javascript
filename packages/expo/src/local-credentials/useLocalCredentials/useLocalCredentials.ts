@@ -111,12 +111,12 @@ const useUserOwnsCredentials = ({ storeKey }: { storeKey: string }) => {
  * Exposes utilities that allow for storing and accessing an identifier, and it's password securely on the device.
  * In order to access the stored credentials, the end user will be prompted to verify themselves via biometrics.
  *
- * @deprecated Build this flow with `expo-secure-store` instead. See https://clerk.com/docs/guides/development/local-credentials. This hook will be removed in the next major version.
+ * @deprecated Store the credentials with `expo-secure-store` and its `requireAuthentication` option instead, then sign in with the stored identifier and password. This hook will be removed in the next major version.
  */
 export const useLocalCredentials = (): LocalCredentialsReturn => {
   deprecated(
     'useLocalCredentials',
-    'Build this flow with `expo-secure-store` instead. See https://clerk.com/docs/guides/development/local-credentials',
+    'Store the credentials with `expo-secure-store` and its `requireAuthentication` option instead, then sign in with the stored identifier and password. See https://docs.expo.dev/versions/latest/sdk/securestore/',
   );
   const { isLoaded, signIn } = useSignIn();
   const { publishableKey } = useClerk();
