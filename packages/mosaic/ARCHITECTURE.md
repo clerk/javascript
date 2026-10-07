@@ -560,7 +560,6 @@ The steps above cover the **styling** migration. For **flow** components — whe
 | `src/hooks/`                                | Shared hooks — see the shared-patterns table in `AGENTS.md`                        |
 | `src/utils/`                                | Non-style helpers; `errors.ts` holds `save` and `toLocalizableError`               |
 | `src/machine/`                              | State-machine runtime; see its `README.md`                                         |
-| `src/machines/`                             | Standalone machines written with the runtime                                       |
 | `src/features/<feature>/*.model.ts(x)`      | Clerk adapter — the only file in a feature that may import Clerk                   |
 | `src/features/<feature>/*.controller.ts(x)` | Local state and action wrapping; holds the feature's machine                       |
 | `src/features/<feature>/*.view.tsx`         | Clerk-free rendering from plain props                                              |
@@ -574,6 +573,4 @@ The steps above cover the **styling** migration. For **flow** components — whe
 | `src/__tests__/clerk-errors.ts`             | `clerkApiError` for asserting catalog error copy                                   |
 | `src/features/user-button/__tests__/`       | `user-button.feature.test.tsx` is the feature test to copy from                    |
 
-`machine/` is the runtime; `machines/` is machines written with it. The one-letter
-difference is easy to misread — a feature's own machine belongs in its
-`*.controller.ts(x)`, not in either directory.
+A feature's own machine belongs in its `*.controller.ts(x)`, not in `machine/`.

@@ -26,6 +26,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | A debounced, abortable async check as the user types                    | `useDebouncedAsync` (`src/hooks/`)                                                                            |
 | A spinner that should not flash or flicker                              | `useSpinDelay` (`src/hooks/`)                                                                                 |
 | An inline message row that animates open and closed                     | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `styles/feedback.styles.ts` |
+| A table whose sorting, paging and search are done by the server         | `useServerDataTable` (`src/hooks/`)                                                                           |
 | Siblings that slide when an item is added or removed                    | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                |
 | An interaction with an async lifecycle or two values that move together | A machine in the controller file, via `setup()` (`src/machine/`)                                              |
 | Styles several components share                                         | `src/styles/*.styles.ts`                                                                                      |
@@ -56,3 +57,21 @@ Do not solve it locally and mention it at the end. A one-off that duplicates a s
 Docs say what the code cannot: rules, reasons, and which tool fits which problem. For facts the code already holds (lists of exports, tokens, builders or files, and signatures), name the file and give one example. Do not copy the list; a copy goes stale and agents trust it.
 
 A PR that adds, renames or changes the signature of a shared helper in `src/hooks/`, `src/utils/`, `src/blocks/`, `src/components/form/` or `src/machine/` updates the table above, and any doc that names it, in the same PR.
+
+## Lint
+
+Mosaic runs stricter lint rules than the rest of the repo (the `packages/mosaic` block in `eslint.config.mjs`).
+
+Every disable directive in `src` needs a `-- reason` (`@eslint-community/eslint-comments/require-description`). The reason is not a code comment under the root no-comments rule. Write why the rule does not apply here, not what the code does; it is what a reviewer judges.
+
+### When `sonarjs/cognitive-complexity` fires
+
+The limit flags code worth a second look. It is not a score to game.
+
+1. Simplify in place first: return early, replace branch chains with a lookup table, remove nesting.
+2. Extract a helper only when it names a real concept a reader would look for. Do not split a function just to lower the score. Logic spread across helpers that only make sense together is harder to follow than one longer function.
+3. If the complexity is inherent and the function reads best as one unit, disable the rule on that function with a reason:
+
+   ```ts
+   // eslint-disable-next-line sonarjs/cognitive-complexity -- One pass over the keyboard event; each branch handles a separate key.
+   ```

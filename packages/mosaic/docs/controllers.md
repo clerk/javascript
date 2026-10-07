@@ -100,8 +100,7 @@ A machine is declared in the controller's own file. There is no
 it. The runtime is documented next to the code:
 `packages/mosaic/src/machine/README.md` covers the mental model, `setup`,
 `createActor` / `useMachine`, and the API at a glance; the files in `machine/`
-are the full API. Two directories one letter apart: `machine/` is the runtime,
-`machines/` holds standalone machines. Shared async test helpers are in
+are the full API. Shared async test helpers are in
 `src/__tests__/async.ts`.
 
 A machine never calls Clerk. The effect it invokes arrives through context as a

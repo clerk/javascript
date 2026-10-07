@@ -102,7 +102,7 @@ is the worked example.
 
 Put a feature test next to the component it renders, and name it after that
 component, as `blocks/destructive/destructive.feature.test.tsx` does.
-`<UserProfilePasswordSection />` would be tested by
+`<UserProfilePasswordSection />` is tested by
 `user-profile-password-section/user-profile-password-section.feature.test.tsx`.
 Vitest finds feature tests by the `.feature.test.tsx` suffix, so a shared
 `__tests__/` folder buys nothing and makes a section's tests harder to find.
