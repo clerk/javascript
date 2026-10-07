@@ -24,6 +24,8 @@ createCredential(windowHandle: Buffer, optionsJson: string): Promise<string>;
 getCredential(windowHandle: Buffer, optionsJson: string): Promise<string>;
 ```
 
+<!-- american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits -->
+
 `createCredential`/`getCredential` take the window handle from `BrowserWindow#getNativeWindowHandle()` (to anchor the OS dialog) and JSON-encoded WebAuthn options with base64url binary fields. They always resolve with a JSON envelope — `{ ok: true, credential }` or `{ ok: false, error: { code, message } }` with `code` one of `cancelled | invalid_rp | not_supported | timeout | unknown` — and never reject for ceremony failures.
 
 ## Building from source

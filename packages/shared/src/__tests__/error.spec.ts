@@ -81,7 +81,7 @@ describe('ClerkRuntimeError', () => {
     expect(clerkRuntimeError.toString()).toMatch(/^\[ClerkRuntimeError\]\nMessage:Clerk: test\n\n\(code="test_code"\)/);
   });
 
-  it('helper recognises error', () => {
+  it('helper recognizes error', () => {
     expect(isClerkRuntimeError(clerkRuntimeError)).toEqual(true);
   });
 });

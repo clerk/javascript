@@ -23,7 +23,7 @@ const BannerColorContext = React.createContext<BannerColor>(DEFAULT_COLOR);
 
 /** Props for the banner surface, including native `div` props and the Mosaic `render` escape hatch. */
 export interface BannerRootProps extends MosaicComponentProps<'div'> {
-  /** Semantic colour of the fill, border, icon, and copy. @default 'neutral' */
+  /** Semantic color of the fill, border, icon, and copy. @default 'neutral' */
   color?: BannerColor;
 }
 

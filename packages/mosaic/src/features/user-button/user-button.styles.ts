@@ -22,7 +22,7 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
-  triggerLabelled: {
+  triggerLabeled: {
     padding: space['1'],
     gap: space['1.5'],
     backgroundColor: {

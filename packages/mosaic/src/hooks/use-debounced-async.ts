@@ -24,7 +24,7 @@ interface Settled<TValue, TData> {
 /**
  * Runs `run(value)` once `value` has stopped changing for `delayMs`, and returns the latest result.
  * The previous result stays visible while the next one is pending. A new value, disabling or
- * unmounting aborts the `signal` and drops any result that arrives afterwards.
+ * unmounting aborts the `signal` and drops any result that arrives afterward.
  *
  * `value` is compared with `Object.is`, so it must be referentially stable across renders. An
  * object or array created during render (such as an un-memoized `[]` or `{}`) counts as a new

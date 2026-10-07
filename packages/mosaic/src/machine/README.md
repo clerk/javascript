@@ -1,6 +1,6 @@
 # Mosaic state machine
 
-A tiny, dependency-free helper for modelling **flows** — anything that moves
+A tiny, dependency-free helper for modeling **flows** — anything that moves
 through a sequence of steps: a delete confirmation, a multi-step wizard, a
 sign-in attempt, a "save" button that goes idle → saving → saved.
 
@@ -400,7 +400,7 @@ actor.recheck(); // external data changed → re-seat off a now-broken step
 | `pendingNextFrom` deferred advance         | **gone** — that race only existed because React owned the state; an actor reads live guards synchronously, so `await mutation; send({ type: 'NEXT' })` just advances |
 | terminal/first bubble detection            | the same same-ref no-op signal (`!actor.can(event)` at a boundary)                                                                                                   |
 
-The reducer modelled a state machine by hand; the seam existed only to paper over
+The reducer modeled a state machine by hand; the seam existed only to paper over
 React owning the state. Moving the state into an actor deletes that second half.
 
 ### Stepper view by introspection

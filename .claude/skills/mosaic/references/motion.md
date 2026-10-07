@@ -60,7 +60,7 @@ symmetric curve slows at both ends of each fade, keeping the reversal smooth.
 Keep the pulse duration on the component and disable the animation under
 `prefers-reduced-motion: reduce`.
 
-## A curve has a direction — don't run the entrance curve backwards
+## A curve has a direction — don't run the entrance curve backward
 
 The single most common motion bug in this codebase. `--cl-ease-default` is
 front-loaded and carries its endpoint ~2% past target before settling: a change
@@ -128,7 +128,7 @@ collapsing a row".
 ## Asymmetry, in three places
 
 **Duration.** Exits are shorter than entrances — an arrival earns a moment to
-settle, a dismissal is an acknowledgement. `--cl-duration-base` in,
+settle, a dismissal is an acknowledgment. `--cl-duration-base` in,
 `--cl-duration-fast` out, a 1.5:1 ratio. Stay on the duration scale; a ratio that
 needs an off-scale value is not worth a new token for one component.
 
@@ -341,7 +341,7 @@ color interpolation is already perceptually non-uniform, an ease on top just dra
 the midpoint, and `--cl-ease-default`'s overshoot would extrapolate past the target
 color. Reserve the curves for geometry.
 
-**The arrival is always `0s`. Only the exit is a judgement call**, and what decides
+**The arrival is always `0s`. Only the exit is a judgment call**, and what decides
 it is whether a pointer traverses the element on its way somewhere else:
 
 | the highlight sits on…                                             | in   | out     |
@@ -482,7 +482,7 @@ An isolated button never fails this visibly, but the arrival is the same rule ei
 way; there is no button-versus-row split on the way in.
 
 The same arithmetic sizes the comet trail: a 0.15s exit is a longer fade than the
-0.1s modelled above, so it strings out proportionally more rows behind the pointer.
+0.1s modeled above, so it strings out proportionally more rows behind the pointer.
 That is why the exit collapses to `0s` here even though it stays at 0.15s on a
 button.
 

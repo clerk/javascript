@@ -144,8 +144,8 @@ export type OneTapSuccessResponse = {
 /**
  * Response when the user cancels the sign-in flow.
  */
-export type CancelledResponse = {
-  type: 'cancelled';
+export type CanceledResponse = {
+  type: 'canceled';
   data: null;
 };
 
@@ -160,7 +160,7 @@ export type NoSavedCredentialFound = {
 /**
  * Union type for all possible One Tap responses.
  */
-export type OneTapResponse = OneTapSuccessResponse | CancelledResponse | NoSavedCredentialFound;
+export type OneTapResponse = OneTapSuccessResponse | CanceledResponse | NoSavedCredentialFound;
 
 /**
  * Error codes that can be thrown by the Google Sign-In module.

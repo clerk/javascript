@@ -66,7 +66,7 @@ describe('confirmationMachine', () => {
     expect(actor.getSnapshot().context.error).toEqual({ cause });
   });
 
-  it('drops the error when cancelled, so the next open starts clean', async () => {
+  it('drops the error when canceled, so the next open starts clean', async () => {
     const actor = start();
     actor.send({ type: 'CONFIRM', run: () => Promise.reject(blocked) });
     await vi.waitFor(() => expect(actor.getSnapshot().context.error).toBeDefined());

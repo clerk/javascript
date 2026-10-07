@@ -46,7 +46,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
             cancel: () => {
               challengeCancel();
               reject(
-                new ClerkRuntimeError('User cancelled attempted verification', {
+                new ClerkRuntimeError('User canceled attempted verification', {
                   code: 'reverification_cancelled',
                 }),
               );
@@ -150,7 +150,7 @@ describe('useReverificationWithState', () => {
     expect(challengeCancel).not.toHaveBeenCalled();
   });
 
-  it('settles immediately when the active challenge is cancelled', async () => {
+  it('settles immediately when the active challenge is canceled', async () => {
     const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: undefined } satisfies Hint);
     const { result } = renderHook(() => useReverificationWithState(fetcher));
 

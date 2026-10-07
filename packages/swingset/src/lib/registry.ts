@@ -58,7 +58,7 @@ import {
 import {
   Default as CopyButtonDefault,
   Inline as CopyButtonInline,
-  Labelled as CopyButtonLabelled,
+  Labeled as CopyButtonLabeled,
   meta as copyButtonMeta,
 } from '../stories/copy-button.stories';
 import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
@@ -463,7 +463,7 @@ const copyButtonModule: StoryModule = {
   meta: copyButtonMeta,
   Default: CopyButtonDefault,
   Inline: CopyButtonInline,
-  Labelled: CopyButtonLabelled,
+  Labeled: CopyButtonLabeled,
 };
 
 const organizationProfileModule: StoryModule = {

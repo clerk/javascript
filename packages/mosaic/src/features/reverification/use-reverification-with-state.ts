@@ -23,7 +23,7 @@ type RuntimeOperation =
       cancel: () => void;
     }
   | { status: 'retrying'; promise: Promise<unknown> }
-  | { status: 'cancelling'; promise: Promise<unknown> };
+  | { status: 'canceling'; promise: Promise<unknown> };
 
 type Runtime = {
   operation: RuntimeOperation;
@@ -92,7 +92,7 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
     if (operation.status !== 'active') {
       return;
     }
-    runtimeRef.current.operation = { status: 'cancelling', promise: operation.promise };
+    runtimeRef.current.operation = { status: 'canceling', promise: operation.promise };
     setReverificationState({ phase: 'settled' });
     operation.cancel();
   }, []);

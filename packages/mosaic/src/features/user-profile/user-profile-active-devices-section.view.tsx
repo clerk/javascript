@@ -53,7 +53,7 @@ export function UserProfileActiveDevicesSectionView({
   const signOutAllTrigger = useRef<HTMLButtonElement>(null);
 
   // Confirming removes the other devices and the trigger with them — hence the dialog mounted
-  // outside the card, and the current device as the place focus lands. Cancelling keeps the
+  // outside the card, and the current device as the place focus lands. Canceling keeps the
   // trigger, so focus goes back to it.
   const focusAfterSignOutAll = () => {
     const signedOut = signedOutAll.current;

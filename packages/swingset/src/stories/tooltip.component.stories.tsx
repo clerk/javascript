@@ -43,7 +43,7 @@ export function Default() {
   );
 }
 
-const labelledTrigger = (label: string) => <Button variant='outline'>{label}</Button>;
+const labeledTrigger = (label: string) => <Button variant='outline'>{label}</Button>;
 
 export function Placement() {
   return (
@@ -57,19 +57,19 @@ export function Placement() {
       }}
     >
       <Tooltip.Root placement='top'>
-        <Tooltip.Trigger render={labelledTrigger('Top')} />
+        <Tooltip.Trigger render={labeledTrigger('Top')} />
         <Tooltip.Popup>Placed above the trigger.</Tooltip.Popup>
       </Tooltip.Root>
       <Tooltip.Root placement='bottom'>
-        <Tooltip.Trigger render={labelledTrigger('Bottom')} />
+        <Tooltip.Trigger render={labeledTrigger('Bottom')} />
         <Tooltip.Popup>Placed below the trigger.</Tooltip.Popup>
       </Tooltip.Root>
       <Tooltip.Root placement='left'>
-        <Tooltip.Trigger render={labelledTrigger('Left')} />
+        <Tooltip.Trigger render={labeledTrigger('Left')} />
         <Tooltip.Popup>Placed to the inline start.</Tooltip.Popup>
       </Tooltip.Root>
       <Tooltip.Root placement='right'>
-        <Tooltip.Trigger render={labelledTrigger('Right')} />
+        <Tooltip.Trigger render={labeledTrigger('Right')} />
         <Tooltip.Popup>Placed to the inline end.</Tooltip.Popup>
       </Tooltip.Root>
     </div>

@@ -34,15 +34,19 @@ describe('ClerkGoogleOneTapSignIn', () => {
   describe.each(methods)('%s', (_name, nativeMethod, call) => {
     // Messages androidx.credentials and Play services emit when the user dismisses the chooser.
     test.each([
+      // american-spelling-ignore-next-line: cancelled -- message the native Google sign-in modules emit
       'User cancelled the sign-in flow',
+      // american-spelling-ignore-next-line: cancelled -- message the native Google sign-in modules emit
       'activity is cancelled by the user.',
+      // american-spelling-ignore-next-line: cancelled -- message the native Google sign-in modules emit
       'User cancelled the selector',
+      // american-spelling-ignore-next-line: cancelled -- message the native Google sign-in modules emit
       '[16] Cancelled by user.',
       '[16] Canceled by user.',
     ])('treats %j as a cancellation', async message => {
       nativeMethod.mockRejectedValue(nativeError(message));
 
-      await expect(call()).resolves.toEqual({ type: 'cancelled', data: null });
+      await expect(call()).resolves.toEqual({ type: 'canceled', data: null });
     });
 
     // Play services reuses status 16 for failures the user did not trigger.

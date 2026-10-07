@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 // Content stays in the accessibility tree — `display: none` and `visibility: hidden` remove it.
 // `clip: rect(...)` rather than `clip-path` because the deprecated property is the one every
-// assistive-tech/browser combination honours.
+// assistive-tech/browser combination honors.
 export const visuallyHidden = stylex.create({
   base: {
     margin: -1,

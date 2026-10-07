@@ -109,7 +109,7 @@ describe('MFA section', () => {
     expect(add).toHaveFocus();
   });
 
-  it('confirms the selected SMS method and restores focus when removal is cancelled', async () => {
+  it('confirms the selected SMS method and restores focus when removal is canceled', async () => {
     const user = userEvent.setup();
     const { props } = renderView({
       methods: [

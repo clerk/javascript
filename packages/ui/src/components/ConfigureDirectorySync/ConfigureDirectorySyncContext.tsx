@@ -59,7 +59,7 @@ export const ConfigureDirectorySyncProvider = ({
   children,
 }: ConfigureDirectorySyncProviderProps): JSX.Element => {
   const { data: connections, isLoading: isLoadingConnections } = __internal_useOrganizationEnterpriseConnections();
-  // Per-connection Directory Sync is not modelled yet, so the directory hangs
+  // Per-connection Directory Sync is not modeled yet, so the directory hangs
   // off the organization's first connection in deterministic order.
   const connection = sortEnterpriseConnections(connections ?? [])[0];
   const enterpriseConnectionId = connection?.id ?? null;

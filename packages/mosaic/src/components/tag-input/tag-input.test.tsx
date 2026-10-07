@@ -230,7 +230,7 @@ describe('Mosaic TagInput', () => {
   });
 
   describe('inside a Field', () => {
-    it('is labelled and described by the field', () => {
+    it('is labeled and described by the field', () => {
       render(
         <Field.Root>
           <Field.Label>Email</Field.Label>

@@ -1,7 +1,7 @@
 /**
  * Corrects a regex in StyleX's dev runtime injector so named container queries survive.
  *
- * `@stylexjs/stylex@0.19.0`'s `getSeenRuleKey` recognises `@container (…)` but not
+ * `@stylexjs/stylex@0.19.0`'s `getSeenRuleKey` recognizes `@container (…)` but not
  * `@container name (…)`. A named query falls through to the plain-selector branch, whose key
  * is the text before the first `{` — the at-rule prelude — so every rule under the same named
  * query shares one key and all but the first are dropped as duplicates. The injected default

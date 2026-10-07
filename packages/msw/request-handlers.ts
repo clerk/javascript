@@ -423,7 +423,7 @@ export function setClerkState(state: {
   if (state.environment) {
     currentEnvironment = state.environment;
   }
-  // Support legacy 'instance' parameter for backwards compatibility
+  // Support legacy 'instance' parameter for backward compatibility
   if (state.instance) {
     currentEnvironment = state.instance;
   }

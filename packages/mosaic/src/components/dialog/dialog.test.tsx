@@ -590,7 +590,7 @@ describe('compactPlacement', () => {
   });
 });
 
-describe('viewport scroll behaviour', () => {
+describe('viewport scroll behavior', () => {
   // The inside/outside scroll split. A pinned `height: 100%` cannot grow, so an over-tall popup
   // spills past the viewport's padding box and loses the bottom inset; `min-height: 100%` lets the
   // box grow with it. Which one applies follows from the variant, so what this pins is that the

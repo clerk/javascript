@@ -94,7 +94,7 @@ export interface ConfirmationControlledProps {
   trigger?: DialogTriggerProps['render'];
   /** Dialog heading */
   title: string;
-  /** What the action does and why it warrants a second look. Takes markup, for a name to emphasise */
+  /** What the action does and why it warrants a second look. Takes markup, for a name to emphasize */
   description: ReactNode;
   /** Text of the confirming button */
   actionLabel: string;
@@ -168,7 +168,7 @@ export interface ConfirmationHandleProps<Payload> {
   finalFocus?: DialogFocusTarget;
   /** Dialog heading, or a function of the payload */
   title: FromPayload<Payload, string>;
-  /** What the action does and why it warrants a second look, or a function of the payload. Takes markup, for a name to emphasise */
+  /** What the action does and why it warrants a second look, or a function of the payload. Takes markup, for a name to emphasize */
   description: FromPayload<Payload, ReactNode>;
   /** Text of the confirming button, or a function of the payload */
   actionLabel: FromPayload<Payload, string>;

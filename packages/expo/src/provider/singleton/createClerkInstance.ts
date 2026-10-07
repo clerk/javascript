@@ -173,13 +173,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
         if (createResourceCache) {
           let resourceRetryTimer: ReturnType<typeof setTimeout> | undefined;
-          let resourceRetryCancelled = false;
+          let resourceRetryCanceled = false;
           let resourceRetryInFlight = false;
           let resourceRetryFailureCount = 0;
           let initialResourcesLoaded = false;
 
           __internal_cancelResourceRetries = () => {
-            resourceRetryCancelled = true;
+            resourceRetryCanceled = true;
             if (resourceRetryTimer !== undefined) {
               clearTimeout(resourceRetryTimer);
               resourceRetryTimer = undefined;
@@ -188,7 +188,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
           const scheduleResourceRetry = (timeout: number) => {
             if (
-              resourceRetryCancelled ||
+              resourceRetryCanceled ||
               initialResourcesLoaded ||
               resourceRetryTimer !== undefined ||
               resourceRetryInFlight
@@ -198,7 +198,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
             resourceRetryTimer = setTimeout(() => {
               resourceRetryTimer = undefined;
-              if (resourceRetryCancelled || initialResourcesLoaded) {
+              if (resourceRetryCanceled || initialResourcesLoaded) {
                 return;
               }
               void retryInitializeResourcesFromFAPI();
@@ -206,7 +206,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           };
 
           const retryInitializeResourcesFromFAPI = async () => {
-            if (resourceRetryCancelled || initialResourcesLoaded || resourceRetryInFlight) {
+            if (resourceRetryCanceled || initialResourcesLoaded || resourceRetryInFlight) {
               return;
             }
 

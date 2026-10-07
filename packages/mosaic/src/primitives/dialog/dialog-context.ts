@@ -22,7 +22,7 @@ export interface DialogContextValue {
    */
   store: DialogHandle;
   modal: boolean;
-  /** The popup's ARIA role, as the root was told. Lets a styled layer branch on alert-dialog behaviour. */
+  /** The popup's ARIA role, as the root was told. Lets a styled layer branch on alert-dialog behavior. */
   role: DialogRole;
   /**
    * Whether this dialog opened from inside another floating element, so a stacked overlay can

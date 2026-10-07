@@ -255,7 +255,7 @@ export function Horizontal() {
 /**
  * Taking `--cl-scrollbar-thumb-idle` to zero alpha removes the bar entirely until the pointer
  * reaches the region. `oklch(from … / 0)` rather than `transparent`, which is transparent BLACK and
- * drags the fade through dark greys.
+ * drags the fade through dark grays.
  */
 export function HoverReveal() {
   const root = stylex.props(scrollAreaRoot);
@@ -283,7 +283,7 @@ export function HoverReveal() {
 }
 
 /**
- * A colour per state, deliberately louder than anything you'd ship. Only amber → teal animates:
+ * A color per state, deliberately louder than anything you'd ship. Only amber → teal animates:
  * it is a change on the SCROLLER, which owns the transition. The duration is stretched well past
  * Mosaic's own `base` step purely so that one step is impossible to miss.
  */

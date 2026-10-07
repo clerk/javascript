@@ -1,6 +1,6 @@
 import NativeClerkGoogleSignIn from '../specs/NativeClerkGoogleSignIn';
 import type {
-  CancelledResponse,
+  CanceledResponse,
   ConfigureParams,
   CreateAccountParams,
   ExplicitSignInParams,
@@ -24,8 +24,8 @@ function getNativeModule(): NonNullable<typeof NativeClerkGoogleSignIn> {
 /**
  * Check if a response indicates the user canceled the sign-in flow.
  */
-export function isCancelledResponse(response: OneTapResponse): response is CancelledResponse {
-  return response.type === 'cancelled';
+export function isCanceledResponse(response: OneTapResponse): response is CanceledResponse {
+  return response.type === 'canceled';
 }
 
 /**
@@ -58,12 +58,13 @@ export function isErrorWithCode(error: unknown): error is { code: string; messag
 
 // Android's Credential Manager reports provider failures through the same cancellation exception it
 // uses for a dismissed chooser. Only Google Play services prefixes its messages with a status code,
+// american-spelling-ignore-next-line: cancelled -- message the native Google sign-in modules emit
 // so a prefixed message that does not say "cancelled by user" is a failure rather than a dismissal.
 const PLAY_SERVICES_STATUS_PREFIX = /^\s*(?:\[\d+]|\d+:)/;
-const CANCELLED_BY_USER = /cancell?ed by user/i;
+const CANCELED_BY_USER = /cancell?ed by user/i;
 
 function rethrowIfProviderFailure(error: { code: string; message: string }): void {
-  if (!PLAY_SERVICES_STATUS_PREFIX.test(error.message) || CANCELLED_BY_USER.test(error.message)) {
+  if (!PLAY_SERVICES_STATUS_PREFIX.test(error.message) || CANCELED_BY_USER.test(error.message)) {
     return;
   }
 
@@ -112,7 +113,7 @@ export const ClerkGoogleOneTapSignIn = {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
           rethrowIfProviderFailure(error);
-          return { type: 'cancelled', data: null };
+          return { type: 'canceled', data: null };
         }
         if (error.code === 'NO_SAVED_CREDENTIAL_FOUND') {
           return { type: 'noSavedCredentialFound', data: null };
@@ -140,7 +141,7 @@ export const ClerkGoogleOneTapSignIn = {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
           rethrowIfProviderFailure(error);
-          return { type: 'cancelled', data: null };
+          return { type: 'canceled', data: null };
         }
         if (error.code === 'NO_SAVED_CREDENTIAL_FOUND') {
           return { type: 'noSavedCredentialFound', data: null };
@@ -168,7 +169,7 @@ export const ClerkGoogleOneTapSignIn = {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
           rethrowIfProviderFailure(error);
-          return { type: 'cancelled', data: null };
+          return { type: 'canceled', data: null };
         }
       }
       throw error;
@@ -192,7 +193,7 @@ export type {
   ExplicitSignInParams,
   OneTapResponse,
   OneTapSuccessResponse,
-  CancelledResponse,
+  CanceledResponse,
   NoSavedCredentialFound,
   GoogleUser,
 } from './types';

@@ -170,7 +170,7 @@ describe('useTransition', () => {
     expect(result.current.mounted).toBe(false);
   });
 
-  it('handles rapid close→open by cancelling exit', async () => {
+  it('handles rapid close→open by canceling exit', async () => {
     const { ref, el, resolveAnim } = createAnimatingRef();
     const { result, rerender } = renderHook(({ open }) => useTransition({ open, ref }), {
       initialProps: { open: true },

@@ -7,7 +7,7 @@ import type { DoneInvokeEvent, ErrorInvokeEvent, StateMachine } from '../types';
  *
  * Today this logic is smeared across four `useState` flags in
  * `sections/organization-profile-delete-section.tsx` + `block/destructive.tsx`
- * (`open`, `isDeleting`, `confirmValue`, and the derived `canSubmit`). Modelling
+ * (`open`, `isDeleting`, `confirmValue`, and the derived `canSubmit`). Modeling
  * it as a machine — `idle → confirming → deleting → deleted`, guarded on the
  * typed name matching, with an error path back to `confirming` — makes every
  * state reachable and testable without rendering a single component.
@@ -76,7 +76,7 @@ export function createDeleteOrgMachine(destroyOrg: DestroyOrg): StateMachine<Del
 
 /**
  * A tiny loader flow used to demonstrate `invoke` landing its resolved output in
- * context. Parameterised by the fetcher so tests can resolve, reject, or hold it.
+ * context. Parameterized by the fetcher so tests can resolve, reject, or hold it.
  */
 export interface LoaderContext {
   data: string | null;

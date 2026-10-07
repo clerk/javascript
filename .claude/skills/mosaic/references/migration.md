@@ -110,5 +110,5 @@ not committed.
 Tests green, then a changeset and a conventional commit. See the `clerk-monorepo`
 skill for the dev loop and the hard rules. In short: `pnpm changeset` describing
 the user-facing change, scope `ui`, and remember non-major `packages/ui` changes
-load into older SDKs in the wild, so keep the public surface backwards
+load into older SDKs in the wild, so keep the public surface backward
 compatible.

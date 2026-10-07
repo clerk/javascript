@@ -10,7 +10,7 @@ feature — and the controller is the only thing that sends to it.
 A flow without those properties does not need one: `useState` in the controller
 is the right answer for a boolean that never touches async, and a controller can
 run a machine for its coordinated core with `useState` flags beside it. The view
-cannot tell the difference either way. `machine/ADOPTION.md` is the judgement
+cannot tell the difference either way. `machine/ADOPTION.md` is the judgment
 call, with real before/after migrations and an "honest boundary" table of what
 stays `useState`.
 

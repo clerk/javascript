@@ -281,7 +281,7 @@ describe('ConfigureSSO wizard navigation (integration)', () => {
     });
   });
 
-  // The labelled steps surface in the stepper under their renamed labels, and an
+  // The labeled steps surface in the stepper under their renamed labels, and an
   // active connection short-circuits to the (reachable) activate step.
   it('renders the renamed stepper labels and reaches the activate step', async () => {
     const { wrapper, fixtures } = await createFixtures(withAdminOrgUser);

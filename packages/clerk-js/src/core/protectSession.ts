@@ -132,8 +132,8 @@ type MintedToken = Omit<StoredToken, 'at' | 'floor'>;
 type LoaderOutcome = 'loaded' | 'error' | 'timeout';
 
 /**
- * Substitutes the closed placeholder set. A recognised placeholder with no value available, and
- * any unrecognised `{…}`, is left verbatim — the server treats an unsubstituted placeholder as
+ * Substitutes the closed placeholder set. A recognized placeholder with no value available, and
+ * any unrecognized `{…}`, is left verbatim — the server treats an unsubstituted placeholder as
  * "no id" and serves normally, which is what keeps older SDK builds working against a templated
  * loader config.
  */
@@ -292,7 +292,7 @@ function normalizeFloor(value: unknown): number {
  * running slow keeps an entry alive long past its real expiry and a clock running fast throws
  * good ones away. Elapsed time since we stored it is measured on one clock, so a constant offset
  * cancels: an entry older than any token we would ever be issued is stale whatever `exp` claims,
- * and one stamped in the future means the clock moved backwards under us.
+ * and one stamped in the future means the clock moved backward under us.
  *
  * This bounds the damage rather than removing it — a fully skew-proof check needs the server to
  * send a relative lifetime instead of an absolute `exp`, which is a wire change.

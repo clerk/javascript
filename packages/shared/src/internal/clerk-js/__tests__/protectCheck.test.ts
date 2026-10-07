@@ -225,7 +225,7 @@ describe('executeProtectCheck', () => {
       await assertion;
     });
 
-    it('honours a per-instance loadTimeoutMs override instead of the default', async () => {
+    it('honors a per-instance loadTimeoutMs override instead of the default', async () => {
       vi.doMock('https://protect.example.com/sdk-hangs-2.js', () => new Promise(() => {}));
 
       // Expressed relative to the default, and LONGER than it, so that outliving the default is

@@ -369,7 +369,7 @@ Sometimes tests are passing locally but not in CI 😢 But there are ways to dig
 
 1. Open the [`ci.yml`](../.github/workflows/ci.yml) file
 1. Inside the **Setup** step (of the `integration-tests` job), add `verbose: true` to the arguments. This will enable more verbose logging from Turborepo and ensure that all logs are flushed the moment they appear.
-1. Playwright will record traces of failed tests and they will be uploaded when the E2E step fails or is cancelled. Click on the **Upload test-results** step and download the archive. It contains Playwright traces.
+1. Playwright will record traces of failed tests and they will be uploaded when the E2E step fails or is canceled. Click on the **Upload test-results** step and download the archive. It contains Playwright traces.
 1. Open https://trace.playwright.dev/ and open your trace file
 
 If these information are not enough, it might be helpful to have a look at the temporary site that was created inside the test run. You'll need to make some adjustments:
@@ -388,6 +388,7 @@ If these information are not enough, it might be helpful to have a look at the t
 
    ```yaml
    - name: Upload app artifacts
+     # american-spelling-ignore-next-line: cancelled -- GitHub Actions status function
      if: ${{ cancelled() || failure() }}
      uses: actions/upload-artifact@v4
      with:

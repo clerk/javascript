@@ -62,7 +62,7 @@ export function useInitialFocus(
  * synchronous `openchange` emit — the root routes every close through
  * `floatingContext.onOpenChange`, and the emit precedes both the state commit and any focus
  * restoration. Only the function's decision is stored; the ref handed to the focus manager
- * materialises it lazily, at restore time, by which point `useReturnFocus` has applied its
+ * materializes it lazily, at restore time, by which point `useReturnFocus` has applied its
  * pointer-close downgrade to the default.
  */
 export function useFinalFocus(

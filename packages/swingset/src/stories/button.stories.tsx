@@ -308,7 +308,7 @@ export function Disabled(props: Record<string, unknown>) {
 }
 
 // Two rows so the difference is reachable from the keyboard: tab through each and watch where
-// focus lands. The neighbours are the point — the middle button is the one that changes.
+// focus lands. The neighbors are the point — the middle button is the one that changes.
 export function FocusableWhenDisabled(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

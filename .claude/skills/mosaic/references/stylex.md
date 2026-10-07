@@ -87,7 +87,7 @@ export const colorVars = stylex.defineVars(colorDefaults);
 - **DO** put light + dark in one token value via `light-dark()`. Never ship a
   second `@media (prefers-color-scheme: dark)` copy of a color.
 - **DO** reserve `--cl-*`-prefixed keys for the public, overridable contract.
-- **DO** derive a gray-backed colour token from `--cl-color-neutral` mixed into
+- **DO** derive a gray-backed color token from `--cl-color-neutral` mixed into
   `--cl-color-background` (`neutralMix(80, 98)` in `tokens.stylex.ts`) rather than
   restating an oklch value. There is no gray scale: retinting neutral retints the ramp.
 - **DO** name internal, non-contract vars with a `--_cl-*` prefix (e.g. a value a
@@ -102,7 +102,7 @@ export const colorVars = stylex.defineVars(colorDefaults);
   `--cl-color-brand-hover-12`.
 - **DON'T** mint a per-step derivative token for something a `calc()`/`color-mix()`
   can express from an existing token.
-- **DON'T** give one value two public names. The focus ring's colour is
+- **DON'T** give one value two public names. The focus ring's color is
   `--cl-color-ring` and nothing else — a `--cl-focus-outline-color` alias beside it
   would let a consumer override one and not the other, and the ring's appearance
   would then depend on which they picked.
@@ -298,7 +298,7 @@ a bare `:active` stays single — and the hover wins while the button is pressed
 }
 ```
 
-The symptom is a hovered button that never shows its pressed colour on a mouse
+The symptom is a hovered button that never shows its pressed color on a mouse
 device, while touch devices look correct.
 
 - **DO** write the hover branch as `':hover:not(:active)'`. It stops the hover rule
@@ -344,7 +344,7 @@ Worked example: `packages/mosaic/src/components/button/button.styles.ts`.
   `styles/focus-outline.styles.ts` into the element's `stylex.props(...)`:
   `focusOutline.visible` for the element's own keyboard focus, `focusOutline.within`
   for a **container** that should ring when a child is focused. The ring is one
-  decision for the whole system — width, style, colour and offset all come from
+  decision for the whole system — width, style, color and offset all come from
   `--cl-focus-outline-*` and `--cl-color-ring`, so a theme retargets every ring at
   once.
 
@@ -362,7 +362,7 @@ Worked example: `packages/mosaic/src/components/button/button.styles.ts`.
   The ring is written as **longhands**, not the `outline` shorthand: StyleX ranks a
   longhand above a shorthand regardless of argument order, so it survives a
   component or consumer style carrying `outline: 'none'`, and a component can
-  re-colour its ring without restating the width and style.
+  re-color its ring without restating the width and style.
 
   `Input` is the deliberate exception — it marks focus with a border and box-shadow
   rather than a ring, and keeps an outline only under `forced-colors`.
@@ -394,7 +394,7 @@ Worked example: `packages/mosaic/src/components/button/button.styles.ts`.
   transform at `--cl-duration-fast` still wants the curve.
 
 - **DON'T** reuse `--cl-ease-default` for something **leaving**. It is an arrival
-  curve; run backwards it stalls for most of its duration and its overshoot
+  curve; run backward it stalls for most of its duration and its overshoot
   becomes a wobble past the target. Departures take `easingVars['--cl-ease-exit']`
   at a shorter duration. See `motion.md` — enter/exit asymmetry has its own
   reference, with the measurements behind these rules.
@@ -447,7 +447,7 @@ triggered by unrelated ancestors:
 // checkbox.markers.stylex.ts — a define-primitive module, its own file
 export const checkboxScope = stylex.defineMarker();
 
-// checkbox.styles.ts — the inner mark reacts to the labelled wrapper's state
+// checkbox.styles.ts — the inner mark reacts to the labeled wrapper's state
 borderColor: {
   default: colorVars['--cl-color-border'],
   [stylex.when.ancestor(':hover', checkboxScope)]: {

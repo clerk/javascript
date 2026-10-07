@@ -16,7 +16,7 @@ export const ConfigureSSOHeader = ({ title }: ConfigureSSOHeaderProps): JSX.Elem
   const { toggle } = useUnsafeModalContext();
   const isModal = Boolean(toggle);
 
-  // Breadcrumb membership = labelled steps. `select-provider` has no label, so
+  // Breadcrumb membership = labeled steps. `select-provider` has no label, so
   // it is absent from the visual stepper while remaining a real navigable step.
   const visibleSteps = activeSteps.filter(step => step.label);
   const currentVisibleIndex = visibleSteps.findIndex(step => activeSteps[currentIndex]?.id === step.id);

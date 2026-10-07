@@ -87,7 +87,7 @@ describe('resolveUserButtonLayout, a combined surface', () => {
 });
 
 describe('resolveUserButtonLayout, how the header carries its actions', () => {
-  it('stacks them wherever a labelled action joins the gear', () => {
+  it('stacks them wherever a labeled action joins the gear', () => {
     expect(resolve('combined').headerLayout).toBe('stacked');
     expect(resolve('organization').headerLayout).toBe('stacked');
   });

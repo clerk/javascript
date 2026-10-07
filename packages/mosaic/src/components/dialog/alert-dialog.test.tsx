@@ -196,7 +196,7 @@ describe('focus', () => {
   });
 });
 
-// The dismissal policy is the behavioural half of what makes this an alert dialog: it cannot be
+// The dismissal policy is the behavioral half of what makes this an alert dialog: it cannot be
 // answered by clicking next to it, but Escape — the keyboard's cancel — still works.
 describe('dismissal', () => {
   it('does not close on an outside press', async () => {

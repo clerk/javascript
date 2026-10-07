@@ -66,7 +66,7 @@ export function useAnimationsFinished(ref: RefObject<HTMLElement | null>, open: 
             if (signal.aborted) {
               return;
             }
-            // An animation was cancelled. If new animations are running, wait
+            // An animation was canceled. If new animations are running, wait
             // for those instead; otherwise we're done.
             const current = element.getAnimations();
             if (current.length > 0) {

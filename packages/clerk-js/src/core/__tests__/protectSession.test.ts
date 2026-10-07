@@ -152,7 +152,7 @@ describe('interpolatePlaceholders', () => {
     ).toBe('1.2.3/c/p/r');
   });
 
-  it('leaves an unrecognised placeholder verbatim', () => {
+  it('leaves an unrecognized placeholder verbatim', () => {
     // `{instance_id}` is not in the set and must not be: the instance id is the server's to place
     // into the config it serves, never something the client interpolates.
     expect(interpolatePlaceholders('{cid}/{nope}/{PID}/{instance_id}', { cid: 'c' })).toBe(
@@ -160,7 +160,7 @@ describe('interpolatePlaceholders', () => {
     );
   });
 
-  it('leaves a recognised placeholder verbatim when there is no value for it', () => {
+  it('leaves a recognized placeholder verbatim when there is no value for it', () => {
     expect(interpolatePlaceholders('{cid}/{sdkver}', { cid: 'c' })).toBe('c/{sdkver}');
   });
 });
@@ -456,7 +456,7 @@ describe('ProtectSession inline token', () => {
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
   });
 
-  it('ignores an entry stamped in the future, which means the clock moved backwards', () => {
+  it('ignores an entry stamped in the future, which means the clock moved backward', () => {
     localStorage.setItem('__clerk_protect_st', storedEntry({ at: Date.now() + 60 * 60 * 1_000 }));
 
     const { session: created } = session([loader()]);
@@ -664,7 +664,7 @@ describe('ProtectSession storage', () => {
 
     // A second session on the same origin reads the same store rather than running its own loader.
     // The token names the instance that minted it and is verified server-side, so an origin serving
-    // two instances costs a rejected token — never a token honoured for the wrong instance.
+    // two instances costs a rejected token — never a token honored for the wrong instance.
     const b = session([loader()]);
     expect(b.session?.hasFreshToken()).toBe(true);
     expect(localStorage.getItem('__clerk_protect_st')).not.toBeNull();
@@ -672,7 +672,7 @@ describe('ProtectSession storage', () => {
 });
 
 describe('ProtectSession deadlines', () => {
-  it('honours a deadline that arrived under its wire name', async () => {
+  it('honors a deadline that arrived under its wire name', async () => {
     // The loaders array is assigned straight out of /v1/environment with no case conversion, so a
     // fixture written as a TS literal agrees with the type by construction and can never catch a
     // key the server does not send. `token_timeout_ms` was read as `tokenTimeoutMs` and was
@@ -743,11 +743,11 @@ describe('ProtectSession deadlines', () => {
 
 describe('ProtectSession cross-tab single flight', () => {
   /**
-   * A serialising Web Locks stand-in. jsdom has no `navigator.locks`, and the `browser-tabs-lock`
+   * A serializing Web Locks stand-in. jsdom has no `navigator.locks`, and the `browser-tabs-lock`
    * fallback is globally mocked to always grant, so without this the double-check inside the lock
    * would never be exercised.
    */
-  const installSerialisingLocks = () => {
+  const installSerializingLocks = () => {
     let tail: Promise<unknown> = Promise.resolve();
     const request = vi.fn((_key: string, _options: unknown, callback: () => Promise<unknown>) => {
       const result = tail.then(() => callback());
@@ -763,7 +763,7 @@ describe('ProtectSession cross-tab single flight', () => {
   });
 
   it('runs the loader once when several tabs start together', async () => {
-    const request = installSerialisingLocks();
+    const request = installSerializingLocks();
 
     const a = session([loader({ token_timeout_ms: 1_000 })]);
     const b = session([loader({ token_timeout_ms: 1_000 })]);
@@ -784,7 +784,7 @@ describe('ProtectSession cross-tab single flight', () => {
   it('uses whatever a leader wrote when the lock is never granted', async () => {
     Object.defineProperty(navigator, 'locks', {
       value: {
-        // Mirrors SafeLock's behaviour when its own AbortSignal fires: the callback never runs.
+        // Mirrors SafeLock's behavior when its own AbortSignal fires: the callback never runs.
         request: vi.fn(() => Promise.reject(new DOMException('aborted', 'AbortError'))),
       },
       configurable: true,

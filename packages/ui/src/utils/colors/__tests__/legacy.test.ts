@@ -112,9 +112,12 @@ describe('Legacy Colors', () => {
         expect(colors.toHslaColor('transparent')).toEqual({ h: 0, s: 0, l: 0, a: 0 });
       });
 
+      // american-spelling-ignore-next-line: grey -- CSS named color apps pass in
       it('should handle gray and grey equivalents', () => {
         const gray = colors.toHslaColor('gray');
+        // american-spelling-ignore-next-line: grey -- CSS named color apps pass in
         const grey = colors.toHslaColor('grey');
+        // american-spelling-ignore-next-line: grey -- CSS named color apps pass in
         expect(gray).toEqual(grey);
         expect(gray).toEqual({ h: 0, s: 0, l: 50, a: 1 });
       });

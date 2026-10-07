@@ -38,7 +38,7 @@ async function resetMockDelete() {
 }
 
 function CardHarness() {
-  const [status, setStatus] = useState<'idle' | 'success' | 'cancelled' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);
   const [requestPending, setRequestPending] = useState(false);
   const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(false));
@@ -69,8 +69,8 @@ function CardHarness() {
                 }
                 await resetMockDelete();
                 if (isReverificationCanceledError(error)) {
-                  setStatus('cancelled');
-                  setMessage('Reverification cancelled.');
+                  setStatus('canceled');
+                  setMessage('Reverification canceled.');
                   return;
                 }
                 setStatus('error');

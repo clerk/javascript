@@ -332,7 +332,7 @@ describe('SelectProviderStep', () => {
       expect(goNext).not.toHaveBeenCalled();
     });
 
-    it('keeps the connection and stays put when the dialog is cancelled', async () => {
+    it('keeps the connection and stays put when the dialog is canceled', async () => {
       resetMocks();
       contextState.provider = 'saml_okta';
       contextState.hasConnection = true;

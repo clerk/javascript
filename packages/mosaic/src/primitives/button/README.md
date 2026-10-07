@@ -1,6 +1,6 @@
 # Button
 
-A button with the disabled behaviour a native `<button>` cannot express: staying focusable while inert, and behaving like a button on elements that aren't one.
+A button with the disabled behavior a native `<button>` cannot express: staying focusable while inert, and behaving like a button on elements that aren't one.
 
 ## When to Use
 

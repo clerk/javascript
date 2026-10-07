@@ -26,13 +26,13 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
   const bounceTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   React.useEffect(() => {
-    let cancelled = false;
+    let canceled = false;
 
     if (__internal_setActiveInProgress !== true) {
       const intent = new URLSearchParams(window.location.search).get('intent');
       const reloadResource = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
       handleRedirectCallback({ ...props, reloadResource }, navigate).catch(e => {
-        if (cancelled) {
+        if (canceled) {
           return;
         }
 
@@ -46,7 +46,7 @@ export const SSOCallbackCard = (props: HandleOAuthCallbackParams | HandleSamlCal
     }
 
     return () => {
-      cancelled = true;
+      canceled = true;
       clearTimeout(bounceTimeoutRef.current);
     };
   }, [handleError, handleRedirectCallback]);

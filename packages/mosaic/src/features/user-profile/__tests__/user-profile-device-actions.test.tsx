@@ -216,7 +216,7 @@ describe('signing out of all other devices', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
-  it('leaves the devices alone when the confirmation is cancelled', async () => {
+  it('leaves the devices alone when the confirmation is canceled', async () => {
     const user = userEvent.setup();
     const onSignOutAllOtherDevices = vi.fn();
     renderAll(onSignOutAllOtherDevices);
@@ -377,7 +377,7 @@ describe('focus after signing a device out', () => {
     expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus();
   });
 
-  it('still returns focus to the row itself when the sign out is cancelled', async () => {
+  it('still returns focus to the row itself when the sign out is canceled', async () => {
     const user = userEvent.setup();
     render(<Example devices={[current, mobile, desktop]} />);
     await openMenu(user, mobile);

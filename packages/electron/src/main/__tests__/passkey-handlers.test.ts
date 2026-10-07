@@ -79,12 +79,14 @@ describe('setupPasskeysMain', () => {
 
   it('relays a native error envelope from get', async () => {
     native.getCredential.mockResolvedValue(
+      // american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits
       JSON.stringify({ ok: false, error: { code: 'cancelled', message: 'user cancelled' } }),
     );
     setupPasskeysMain();
 
     const result = await getHandler(PASSKEY_CHANNELS.get)(event, { challenge: 'abc', rpId: 'example.com' });
 
+    // american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits
     expect(result).toEqual({ ok: false, error: { code: 'cancelled', message: 'user cancelled' } });
   });
 

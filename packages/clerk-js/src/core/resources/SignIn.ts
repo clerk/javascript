@@ -426,7 +426,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     // A pending challenge with nowhere to navigate to. Throw rather than return, so the method still
     // either navigates or throws: a caller that doesn't handle challenges gets an error it can
-    // recognise instead of a silent success. A caller that does runs the challenge and calls back
+    // recognize instead of a silent success. A caller that does runs the challenge and calls back
     // in with `continueSignIn`.
     const throwChallengeRequired = (): never => {
       throw new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {

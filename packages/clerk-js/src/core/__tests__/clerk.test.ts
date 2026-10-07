@@ -2149,7 +2149,7 @@ describe('Clerk singleton', () => {
         );
       });
 
-      it('still honours transferable: false', async () => {
+      it('still honors transferable: false', async () => {
         loadEnvironment();
         mockClientFetch.mockReturnValue(
           Promise.resolve({
@@ -4157,7 +4157,7 @@ describe('Clerk singleton', () => {
       expect(mockClerkUICtor).toHaveBeenCalled();
     });
 
-    it('supports legacy clerkUICtor option for backwards compatibility', async () => {
+    it('supports legacy clerkUICtor option for backward compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(function () {
         return mockClerkUIInstance;
@@ -4172,7 +4172,7 @@ describe('Clerk singleton', () => {
       expect(mockClerkUICtor).toHaveBeenCalled();
     });
 
-    it('supports legacy clerkUiCtor option for backwards compatibility', async () => {
+    it('supports legacy clerkUiCtor option for backward compatibility', async () => {
       const mockClerkUIInstance = { mount: vi.fn() };
       const mockClerkUICtor = vi.fn(function () {
         return mockClerkUIInstance;

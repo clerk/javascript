@@ -20,6 +20,7 @@
     "preinstall": "npx only-allow pnpm",
     "integration:secrets": "node ./scripts/1password-keys.mjs",
     "lint": "node ./scripts/lint.mjs",
+    "lint:american-spelling": "node ./scripts/american-spelling.mjs",
     "lint:attw": "FORCE_COLOR=1 turbo lint:attw",
     "lint:dashboard-links": "node ./scripts/check-dashboard-links.mjs",
     "lint:fix": "FORCE_COLOR=1 turbo lint -- --fix",

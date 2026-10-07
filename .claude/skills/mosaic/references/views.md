@@ -105,7 +105,7 @@ const removed = useRef<number | undefined>(undefined);
 const removeRow = async (row: Row) => {
   const index = rows.findIndex(candidate => candidate.id === row.id);
   await onRemove(row.id);
-  // Only once it is really gone: a cancelled or failed attempt keeps its own trigger.
+  // Only once it is really gone: a canceled or failed attempt keeps its own trigger.
   removed.current = index;
 };
 
@@ -124,7 +124,7 @@ Prefer the row that took the removed one's place, the last row when it was the
 last, and a control that outlives the list once it is empty.
 
 Test the removal, not just the cancel: `toHaveFocus()` on the row that should
-have caught it. A suite that only asserts focus after cancelling passes while
+have caught it. A suite that only asserts focus after canceling passes while
 every successful removal drops focus on the floor.
 
 ## Testing

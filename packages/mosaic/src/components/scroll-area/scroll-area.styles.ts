@@ -16,7 +16,7 @@ const thumbColor = scrollbarThumbVars['--_cl-scrollbar-thumb-color'];
 
 // One animation per edge, each writing its own progress var. The end fade counts DOWN
 // rather than running `animation-direction: reverse`: with `fill-mode: both` the two are
-// equivalent (the backwards fill holds the `from` frame, so the fade reads 1 for the whole
+// equivalent (the backward fill holds the `from` frame, so the fade reads 1 for the whole
 // scroll and only drops across the final `fade-range`), and writing it into the keyframes
 // keeps `animation-direction` off the element entirely.
 // The suppressions work around a gap in StyleX's own types, not a problem with the CSS:
@@ -79,7 +79,7 @@ const styles = stylex.create({
   },
 
   /**
-   * The thumb's colour, produced HERE on the scroller rather than on the pseudo-element that
+   * The thumb's color, produced HERE on the scroller rather than on the pseudo-element that
    * paints it, because Blink does not run transitions declared on `::-webkit-scrollbar-thumb` —
    * verified by hand, and the reason Polaris declares its own on the scroller too. A registered
    * custom property set here animates and inherits into the pseudo-element, which only reads it.
@@ -90,7 +90,7 @@ const styles = stylex.create({
    * the scroller — including a consumer retargeting `--cl-scrollbar-thumb` on the region's
    * `:hover` to fade the bar in — transitions through this declaration.
    *
-   * `linear` because this is a colour: an ease on top of an already perceptually non-uniform
+   * `linear` because this is a color: an ease on top of an already perceptually non-uniform
    * interpolation only makes the midpoint drag.
    */
   thumbColor: {
@@ -122,7 +122,7 @@ const styles = stylex.create({
    * alone, so the thumb reads as floating over the content rather than riding in a rail.
    *
    * Every declaration here repeats `{ default: null, '@media (pointer: fine)': … }`. A touch
-   * platform draws an overlay bar there is no width or colour to apply to, and — the reason the
+   * platform draws an overlay bar there is no width or color to apply to, and — the reason the
    * gate has to reach the SHAPE properties too, not just the visible ones — Blink switches an
    * element to a custom scrollbar the moment ANY `::-webkit-scrollbar*` rule matches it, which
    * would trade that overlay bar for a permanent one. `null` emits no declaration at all, so
@@ -135,7 +135,7 @@ const styles = stylex.create({
    * either makes a UA ignore the `::-webkit-scrollbar*` family entirely, so keeping them would
    * leave every rule here as dead code in exactly the engines that implement it. Firefox
    * implements the pseudo-elements not at all and keeps its platform scrollbar. That is the whole
-   * cost of the trade, and it buys per-state thumb colours and a real pixel width, neither of
+   * cost of the trade, and it buys per-state thumb colors and a real pixel width, neither of
    * which the standard properties can express.
    *
    * The thumb's states are COMBINED keys rather than a `:hover` nested inside the
@@ -170,10 +170,10 @@ const styles = stylex.create({
       backgroundColor: {
         default: null,
         '@media (pointer: fine)': {
-          // eslint-disable-next-line @stylexjs/valid-styles -- valid-styles doesn't resolve a `stylex.types.color()` var to a colour; the compiler does.
+          // eslint-disable-next-line @stylexjs/valid-styles -- valid-styles doesn't resolve a `stylex.types.color()` var to a color; the compiler does.
           default: thumbColor,
           // No `scrollbar-color: auto` lever survives on this path, so forced colors need their
-          // own answer: pin the thumb to a system colour rather than let a themed one lose its
+          // own answer: pin the thumb to a system color rather than let a themed one lose its
           // contrast guarantee against a palette we no longer control. Declared on
           // `background-color` rather than on the var so it holds across all four states at once.
           '@media (forced-colors: active)': 'ButtonBorder',

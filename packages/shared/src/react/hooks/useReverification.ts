@@ -123,7 +123,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 
         const cancel = () => {
           resolvers.reject(
-            new ClerkRuntimeError('User cancelled attempted verification', {
+            new ClerkRuntimeError('User canceled attempted verification', {
               code: 'reverification_cancelled',
             }),
           );

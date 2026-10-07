@@ -13,7 +13,7 @@ import { colorVars, focusVars } from '../tokens.stylex';
 //
 // Written as LONGHANDS, not the `outline` shorthand: StyleX ranks a longhand above a
 // shorthand regardless of argument order, so these survive a component or consumer style
-// that carries `outline: 'none'`, and a component can re-colour its ring without
+// that carries `outline: 'none'`, and a component can re-color its ring without
 // restating the width and style.
 //
 // `Input` is the deliberate exception — it marks focus with a border and box-shadow

@@ -754,7 +754,7 @@ describe('createActor — after (delayed transitions)', () => {
     expect(actor.getSnapshot().value).toBe('first');
 
     vi.advanceTimersByTime(500);
-    expect(actor.getSnapshot().value).toBe('first'); // the 1000ms timer was cancelled
+    expect(actor.getSnapshot().value).toBe('first'); // the 1000ms timer was canceled
   });
 
   it('passes AfterEvent with the correct delay to transition actions', () => {

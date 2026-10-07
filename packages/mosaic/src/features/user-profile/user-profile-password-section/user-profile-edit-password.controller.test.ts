@@ -68,7 +68,7 @@ describe('useUserProfileEditPasswordController timing', () => {
       expect(validatePassword).not.toHaveBeenCalled();
       await act(() => vi.advanceTimersByTimeAsync(1));
       expect(validatePassword).toHaveBeenCalledExactlyOnceWith('latest password');
-      act(() => result.current.form.setValue('newPassword', 'cancelled password'));
+      act(() => result.current.form.setValue('newPassword', 'canceled password'));
       act(() => result.current.onOpenChange(false));
       await act(() => vi.advanceTimersByTimeAsync(350));
       expect(validatePassword).toHaveBeenCalledTimes(1);

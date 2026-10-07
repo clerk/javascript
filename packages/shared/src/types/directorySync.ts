@@ -163,6 +163,7 @@ export type GetDirectorySyncUsersParams = {
 /**
  * The outcome of a directory's last sync run.
  */
+// american-spelling-ignore-next-line: cancelled -- Directory Sync run status the Clerk API returns
 export type DirectorySyncRunStatus = 'running' | 'succeeded' | 'failed' | 'cancelled';
 
 export interface DirectorySyncStatusJSON {

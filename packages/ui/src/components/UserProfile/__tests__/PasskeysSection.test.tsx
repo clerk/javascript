@@ -101,7 +101,7 @@ describe('PasskeySection', () => {
       const { wrapper, fixtures } = await createFixtures(withPasskeys);
 
       fixtures.clerk.user?.createPasskey.mockRejectedValue(
-        new ClerkWebAuthnError('Passkey registration was cancelled or timed out.', {
+        new ClerkWebAuthnError('Passkey registration was canceled or timed out.', {
           code: 'passkey_registration_cancelled',
         }),
       );
@@ -122,7 +122,7 @@ describe('PasskeySection', () => {
       const { wrapper, fixtures } = await createFixtures(withPasskeys);
 
       fixtures.clerk.user?.createPasskey.mockRejectedValueOnce(
-        new ClerkWebAuthnError('Passkey registration was cancelled or timed out.', {
+        new ClerkWebAuthnError('Passkey registration was canceled or timed out.', {
           code: 'passkey_registration_cancelled',
         }),
       );
@@ -137,7 +137,7 @@ describe('PasskeySection', () => {
 
       const button = getByRole('button', { name: 'Add a passkey' });
       await userEvent.click(button);
-      await waitFor(() => expect(getByTestId('card-error')).toHaveTextContent(/cancelled or timed out/i));
+      await waitFor(() => expect(getByTestId('card-error')).toHaveTextContent(/canceled or timed out/i));
 
       fixtures.clerk.user?.createPasskey.mockResolvedValueOnce({} as any);
       await userEvent.click(button);
