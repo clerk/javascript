@@ -445,6 +445,7 @@ export class SignIn extends BaseResource implements SignInResource {
         identifier,
         redirectUrl,
         actionCompleteRedirectUrl,
+        oidcPrompt,
       });
 
       if (isChallengePending()) {
@@ -1355,6 +1356,7 @@ class SignInFuture implements SignInFutureResource {
             strategy,
             ...routes,
             identifier,
+            oidcPrompt,
           },
           { resolveProtectCheck: false },
         );
