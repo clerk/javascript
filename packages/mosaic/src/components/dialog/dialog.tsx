@@ -28,6 +28,7 @@ import {
   viewportCompactPlacements,
   viewportVariants,
 } from './dialog.styles';
+import { guardKeyboardFocus } from './keyboard-focus';
 import { acquireKeyboardInset } from './keyboard-inset';
 import { guardKeyboardTouch } from './keyboard-touch';
 
@@ -280,6 +281,7 @@ function Viewport({
   const trackRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => acquireKeyboardInset(), []);
   React.useEffect(() => (trackRef.current ? guardKeyboardTouch(trackRef.current) : undefined), []);
+  React.useEffect(() => (trackRef.current ? guardKeyboardFocus(trackRef.current) : undefined), []);
   return (
     <Primitive.Viewport
       overlay

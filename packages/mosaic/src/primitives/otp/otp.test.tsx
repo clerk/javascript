@@ -127,6 +127,28 @@ describe('Otp', () => {
     });
   });
 
+  describe('moving between slots', () => {
+    it('focuses each slot without scrolling it into view', async () => {
+      const user = userEvent.setup();
+      render(<Harness length={4} />);
+      await user.click(inputs()[0]);
+      const focus = vi.spyOn(HTMLElement.prototype, 'focus');
+
+      await user.keyboard('12');
+      await user.keyboard('{ArrowLeft}');
+      await user.keyboard('{Backspace}');
+
+      expect(focus.mock.instances).toEqual([inputs()[1], inputs()[2], inputs()[1], inputs()[0]]);
+      for (const args of focus.mock.calls) {
+        expect(args).toEqual([{ preventScroll: true }]);
+      }
+      expect(inputs()[0]).toHaveFocus();
+      expect(inputs()[0].selectionStart).toBe(0);
+      expect(inputs()[0].selectionEnd).toBe(inputs()[0].value.length);
+      focus.mockRestore();
+    });
+  });
+
   describe('keyboard navigation', () => {
     it('deletes the current character on Backspace and moves back when empty', async () => {
       const user = userEvent.setup();

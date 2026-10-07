@@ -108,7 +108,7 @@ export function OtpRoot(props: OtpProps) {
     (index: number) => {
       const clamped = Math.min(Math.max(index, 0), Math.max(length - 1, 0));
       const target = inputRefs.current[clamped];
-      target?.focus();
+      target?.focus({ preventScroll: true });
       target?.select();
     },
     [length],
