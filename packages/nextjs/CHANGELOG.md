@@ -1,5 +1,11 @@
 # Change Log
 
+## 7.9.13
+
+### Patch Changes
+
+- Export `<HandleSSOCallback />` from `@clerk/nextjs`. Previously, importing it from `@clerk/nextjs` failed, so it could not be used on the SSO callback route of a custom flow. ([#10140](https://github.com/clerk/javascript/pull/10140)) by [@manovotny](https://github.com/manovotny)
+
 ## 7.9.12
 
 ### Patch Changes
