@@ -8,6 +8,7 @@ import type {
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
   SessionJSON,
+  SessionWithActivitiesJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
   Web3WalletJSON,
@@ -54,6 +55,16 @@ export interface FakeFapiState {
   passwordUpdates: URLSearchParams[];
   enterpriseConnections: EnterpriseConnectionJSON[];
   enterpriseLinking: FakeEnterpriseLinking;
+  activeDevices?: ActiveDeviceRecord[];
+  deviceTrackingEnabled: boolean;
+}
+
+export interface ActiveDeviceRecord extends SessionWithActivitiesJSON {
+  ownerUserId: string;
+  replacementSessionId?: string;
+  inactivityTimeoutSeconds?: number;
+  touchedAt?: number;
+  tokenIssuedAt?: number;
 }
 
 export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking'>> & {
@@ -156,6 +167,36 @@ function updateWeb3Wallet(state: FakeFapiState, wallet: Web3WalletJSON): void {
   }
 }
 
+function requestingSession(state: FakeFapiState, request: Request): SessionJSON | undefined {
+  const sessionId = new URL(request.url).searchParams.get('_clerk_session_id') ?? state.client.last_active_session_id;
+  return findSession(state, sessionId);
+}
+
+function canRevokeDevice(record: ActiveDeviceRecord): boolean {
+  const now = Date.now();
+  const lastActivity = Math.max(record.touchedAt ?? record.last_active_at, record.tokenIssuedAt ?? 0);
+  return (
+    record.status === 'active' &&
+    !record.replacementSessionId &&
+    record.expire_at > now &&
+    record.abandon_at > now &&
+    (!record.inactivityTimeoutSeconds || now - lastActivity <= record.inactivityTimeoutSeconds * 1000)
+  );
+}
+
+function deviceSessionPayload(record: ActiveDeviceRecord) {
+  const {
+    ownerUserId: _ownerUserId,
+    replacementSessionId: _replacementSessionId,
+    inactivityTimeoutSeconds: _inactivityTimeoutSeconds,
+    touchedAt: _touchedAt,
+    tokenIssuedAt: _tokenIssuedAt,
+    latest_activity: _latestActivity,
+    ...session
+  } = record;
+  return session;
+}
+
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   const { verification, enterpriseLinking, passkeys, ...rest } = seed;
   const state: FakeFapiState = {
@@ -167,6 +208,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     apiKeys: [],
     passwordUpdates: [],
     enterpriseConnections: [],
+    deviceTrackingEnabled: true,
     ...rest,
     verification: createVerificationState(verification),
     enterpriseLinking: {
@@ -392,6 +434,53 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const sessions = state.client.sessions.filter(s => s.id !== session.id);
       state.client = { ...state.client, sessions, last_active_session_id: sessions[0]?.id ?? null };
       return envelope({ ...session, status: 'removed' }, state.client);
+    }),
+    http.get(fapiUrl('/v1/me/sessions/active'), ({ request }) => {
+      if (!state.activeDevices) {
+        return undefined;
+      }
+      const requester = requestingSession(state, request);
+      if (!requester) {
+        return missing();
+      }
+      if (!state.deviceTrackingEnabled) {
+        const { user: _user, ...session } = requester;
+        return HttpResponse.json([{ ...session, user: null }]);
+      }
+      const records = state.activeDevices.filter(
+        item => item.ownerUserId === requester.user.id && canRevokeDevice(item) && (!item.actor || requester.actor),
+      );
+      return HttpResponse.json(
+        records.map(item => ({
+          ...deviceSessionPayload(item),
+          status: item.tasks?.length ? 'pending' : item.status,
+          latest_activity: item.latest_activity,
+        })),
+      );
+    }),
+    http.post(fapiUrl('/v1/me/sessions/:id/revoke'), ({ params, request }) => {
+      if (!state.activeDevices) {
+        return undefined;
+      }
+      const requester = requestingSession(state, request);
+      if (!requester) {
+        return missing();
+      }
+      const target = state.activeDevices.find(item => item.id === params.id);
+      if (target?.id === requester.id) {
+        const code = 'invalid_action_for_session';
+        return HttpResponse.json({ errors: [{ code, message: code }] }, { status: 400 });
+      }
+      if (!target || target.ownerUserId !== requester.user.id) {
+        const code = 'action_for_session_not_authorized';
+        return HttpResponse.json({ errors: [{ code, message: code }] }, { status: 401 });
+      }
+      if (!canRevokeDevice(target)) {
+        const code = 'invalid_action_for_session';
+        return HttpResponse.json({ errors: [{ code, message: code }] }, { status: 400 });
+      }
+      target.status = 'revoked';
+      return envelope({ ...deviceSessionPayload(target), user: requester.user, status: 'revoked' }, state.client);
     }),
     http.post(fapiUrl('/v1/me/change_password'), async ({ request }) => {
       const session = findSession(state, state.client.last_active_session_id);
