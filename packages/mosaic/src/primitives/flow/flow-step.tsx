@@ -98,8 +98,8 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     focusTargetsRef.current.delete(element);
   }, []);
   const stepContext = useMemo<FlowStepContextValue>(
-    () => ({ registerFocusTarget, unregisterFocusTarget }),
-    [registerFocusTarget, unregisterFocusTarget],
+    () => ({ active: open, registerFocusTarget, unregisterFocusTarget }),
+    [open, registerFocusTarget, unregisterFocusTarget],
   );
 
   const effectiveTransitionProps = !hasBeenClosed.current

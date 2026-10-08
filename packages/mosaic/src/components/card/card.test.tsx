@@ -5,6 +5,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../dialog';
+import { Flow } from '../flow';
 import { Card } from './card';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
@@ -39,6 +40,71 @@ function stubPrototype(target: object, name: string, descriptor: PropertyDescrip
       Reflect.deleteProperty(target, name);
     }
   });
+}
+
+function StepCard({ title, description }: { title: string; description: string }) {
+  return (
+    <Card.Root renderBranding={false}>
+      <Card.Header>
+        <Card.Title>{title}</Card.Title>
+        <Card.Description>{description}</Card.Description>
+      </Card.Header>
+    </Card.Root>
+  );
+}
+
+function SteppedDialog({ step }: { step: string }) {
+  return (
+    <Dialog.Root defaultOpen>
+      <Dialog.Popup>
+        <Flow.Root
+          value={step}
+          state={null}
+        >
+          {() => (
+            <>
+              <Flow.Step ids={['create']}>
+                <StepCard
+                  title='Add new API key'
+                  description='Name the key.'
+                />
+              </Flow.Step>
+              <Flow.Step ids={['copy']}>
+                <StepCard
+                  title='Copy your API key'
+                  description='You will not see it again.'
+                />
+              </Flow.Step>
+            </>
+          )}
+        </Flow.Root>
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+function holdExitAnimations() {
+  let finish = () => undefined as void;
+  const finished = new Promise<void>(resolve => {
+    finish = resolve;
+  });
+  const getAnimations = vi.fn(() => [{ finished }]);
+  stubPrototype(Element.prototype, 'getAnimations', { value: getAnimations });
+  return async () => {
+    getAnimations.mockReturnValue([]);
+    await act(async () => {
+      finish();
+      await finished;
+    });
+  };
+}
+
+function expectSingleOwner(popup: HTMLElement) {
+  for (const attribute of ['aria-labelledby', 'aria-describedby']) {
+    const id = popup.getAttribute(attribute);
+    expect(id).toBeTruthy();
+    expect(document.querySelectorAll(`[id="${id}"]`)).toHaveLength(1);
+  }
 }
 
 describe('Mosaic Card', () => {
@@ -471,6 +537,94 @@ describe('Mosaic Card', () => {
     );
 
     expect(screen.getByTestId('title')).toHaveAttribute('id', 'custom-title');
+  });
+
+  it('names the dialog after the entering step while the previous step exits', async () => {
+    const finishExit = holdExitAnimations();
+    const { rerender } = render(<SteppedDialog step='create' />);
+
+    rerender(<SteppedDialog step='copy' />);
+
+    const popup = screen.getByRole('dialog');
+    expect(screen.getByText('Add new API key')).toBeInTheDocument();
+    expect(popup).toHaveAccessibleName('Copy your API key');
+    expect(popup).toHaveAccessibleDescription('You will not see it again.');
+    expectSingleOwner(popup);
+
+    await finishExit();
+    expect(screen.queryByText('Add new API key')).toBeNull();
+    expect(popup).toHaveAccessibleName('Copy your API key');
+  });
+
+  it('names the dialog after the returning step when it comes back mid-exit', async () => {
+    const finishExit = holdExitAnimations();
+    const { rerender } = render(<SteppedDialog step='create' />);
+
+    rerender(<SteppedDialog step='copy' />);
+    rerender(<SteppedDialog step='create' />);
+
+    const popup = screen.getByRole('dialog');
+    expect(popup).toHaveAccessibleName('Add new API key');
+    expect(popup).toHaveAccessibleDescription('Name the key.');
+    expectSingleOwner(popup);
+
+    await finishExit();
+  });
+
+  it('names the dialog after the new step when nothing animates', () => {
+    const { rerender } = render(<SteppedDialog step='create' />);
+
+    rerender(<SteppedDialog step='copy' />);
+
+    const popup = screen.getByRole('dialog');
+    expect(screen.queryByText('Add new API key')).toBeNull();
+    expect(popup).toHaveAccessibleName('Copy your API key');
+    expectSingleOwner(popup);
+  });
+
+  it('leaves the stacked dialog named by its own step while the one beneath it steps', async () => {
+    const finishExit = holdExitAnimations();
+    const outer = (step: string) => (
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <StepCard
+            title='Settings'
+            description='Manage the app.'
+          />
+          <SteppedDialog step={step} />
+        </Dialog.Popup>
+      </Dialog.Root>
+    );
+    const { rerender } = render(outer('create'));
+
+    rerender(outer('copy'));
+
+    const [settings, stepped] = screen.getAllByRole('dialog', { hidden: true });
+    expect(settings).toHaveAccessibleName('Settings');
+    expect(stepped).toHaveAccessibleName('Copy your API key');
+    expectSingleOwner(settings);
+    expectSingleOwner(stepped);
+
+    await finishExit();
+  });
+
+  it('leaves a card in a step outside a dialog unidentified', () => {
+    render(
+      <Flow.Root
+        value='create'
+        state={null}
+      >
+        {() => (
+          <Flow.Step ids={['create']}>
+            <Card.Root>
+              <Card.Title data-testid='title'>Add new API key</Card.Title>
+            </Card.Root>
+          </Flow.Step>
+        )}
+      </Flow.Root>,
+    );
+
+    expect(screen.getByTestId('title')).not.toHaveAttribute('id');
   });
 
   it('carries the dialog dismiss button in the header', async () => {
