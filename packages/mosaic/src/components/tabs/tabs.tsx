@@ -42,10 +42,10 @@ function Root({ xstyle, children, ...rest }: TabsRootProps) {
 function List({ xstyle, children, ...rest }: TabsListProps) {
   return (
     <Primitive.List {...mergeStyleProps(themeProps('tabs-list'), stylex.props(reset.base, styles.list, xstyle), rest)}>
-      {children}
       <Primitive.Indicator
         {...mergeStyleProps(themeProps('tabs-indicator'), stylex.props(reset.base, styles.indicator))}
       />
+      {children}
     </Primitive.List>
   );
 }

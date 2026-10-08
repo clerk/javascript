@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
@@ -13,16 +13,15 @@ export interface TabsTriggerProps extends ComponentProps<'button'> {
 export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(function TabsTrigger(props, ref) {
   const { render, value: tabValue, disabled, ...otherProps } = props;
   const { value: selectedValue, setValue, tabsId, registerTab } = useTabsContext();
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const isSelected = selectedValue === tabValue;
   const tabId = `${tabsId}-tab-${tabValue}`;
   const panelId = `${tabsId}-panel-${tabValue}`;
 
-  useLayoutEffect(() => {
-    registerTab(tabValue, triggerRef.current);
-    return () => registerTab(tabValue, null);
-  }, [tabValue, registerTab]);
+  const register = useCallback(
+    (element: HTMLButtonElement | null) => registerTab(tabValue, element),
+    [registerTab, tabValue],
+  );
 
   const state = {
     selected: isSelected,
@@ -51,7 +50,7 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
   return useRender({
     defaultTagName: 'button',
     render,
-    ref: [triggerRef, ref],
+    ref: [register, ref],
     state,
     stateAttributesMapping: {
       selected: (v: boolean) => (v ? { 'data-selected': '' } : null),

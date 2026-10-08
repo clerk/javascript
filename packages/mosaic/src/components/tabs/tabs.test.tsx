@@ -48,7 +48,7 @@ describe('Mosaic Tabs', () => {
     );
 
     const list = screen.getByRole('tablist');
-    const anchored = list.lastElementChild;
+    const anchored = list.firstElementChild;
     expect(anchored).toHaveClass('cl-tabs-indicator', stylex.props(styles.indicator).className ?? '');
     expect(anchored).toHaveAttribute('aria-hidden', 'true');
 
@@ -70,7 +70,7 @@ describe('Mosaic Tabs', () => {
         </Tabs.List>
       </Tabs.Root>,
     );
-    const indicator = screen.getByRole('tablist').lastElementChild;
+    const indicator = screen.getByRole('tablist').firstElementChild;
 
     await userEvent.click(screen.getByRole('tab', { name: 'Members' }));
     expect(indicator).toHaveAttribute('data-direction', 'backward');
@@ -101,8 +101,8 @@ describe('Mosaic Tabs', () => {
 
     await userEvent.click(screen.getByRole('tab', { name: 'Inner A' }));
 
-    expect(inner.lastElementChild).toHaveAttribute('data-direction', 'backward');
-    expect(outer.lastElementChild).toHaveAttribute('data-direction', 'forward');
+    expect(inner.firstElementChild).toHaveAttribute('data-direction', 'backward');
+    expect(outer.firstElementChild).toHaveAttribute('data-direction', 'forward');
     expect(outer).toHaveClass(stylex.props(styles.list).className ?? '');
     expect(inner).toHaveClass(stylex.props(styles.list).className ?? '');
   });

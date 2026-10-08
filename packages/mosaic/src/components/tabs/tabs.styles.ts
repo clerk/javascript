@@ -69,7 +69,7 @@ export const styles = stylex.create({
   },
   hitArea: {
     '--_cl-tab-hit-end': { default: '0px', ':has(+ [role="tab"])': halfGap },
-    '--_cl-tab-hit-start': { default: halfGap, ':first-child': '0px' },
+    '--_cl-tab-hit-start': { default: halfGap, ':first-of-type': '0px' },
     position: 'relative',
     '::before': {
       insetBlock: 0,
@@ -93,7 +93,7 @@ export const styles = stylex.create({
     // eslint-disable-next-line @stylexjs/valid-styles -- `position-anchor`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
     positionAnchor: activeAnchor,
     display: {
-      [anchors]: { default: 'none', ':where([data-selected] ~ *)': 'block' },
+      [anchors]: { default: 'none', ':has(~ [data-selected])': 'block' },
       default: 'none',
     },
     insetInlineEnd: 'anchor(end)',
