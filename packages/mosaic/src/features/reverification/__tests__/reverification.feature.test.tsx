@@ -931,7 +931,8 @@ describe('Reverification', () => {
       secondPrepare.release();
 
       // The code step opens with an empty field and no error once the code is sent
-      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      await screen.findByRole('group', { name: 'Verification code' });
+      expect(screen.getByText(STEP.emailCode)).toBeVisible();
       await waitFor(() => expect(slotValues()).toEqual(['', '', '', '', '', '']));
       expect(screen.queryByText('Incorrect code')).toBeNull();
 
