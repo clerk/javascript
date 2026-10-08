@@ -361,6 +361,15 @@ jobs:
       - name: Run feature tests
         run: pnpm --filter @clerk/mosaic test:feature
 
+      - name: Upload failure artifacts
+        if: ${{ cancelled() || failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mosaic-feature-failure-artifacts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: packages/mosaic/.vitest/attachments
+          retention-days: 1
+          if-no-files-found: ignore
+
   integration-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
