@@ -277,6 +277,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     biometrics: Biometrics,
     id: string | undefined,
     identifierHint: string | undefined,
+    userId?: string,
   ): Promise<ExpoBiometricsRecord[] | BiometricCredentialUnavailableReason> {
     const unavailableReason = featureUnavailableReason();
     if (unavailableReason) {
@@ -294,6 +295,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
         record =>
           record.appIdentifier === biometrics.appIdentifier &&
           (id === undefined || record.id === id) &&
+          (userId === undefined || record.userId === userId) &&
           matchesIdentifierHint(record),
       )
       .sort(newestFirst);
@@ -326,8 +328,9 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     biometrics: Biometrics,
     id: string | undefined,
     identifierHint: string | undefined,
+    userId?: string,
   ): Promise<LocalCredentialSelection> {
-    const candidates = await localCredentialCandidates(biometrics, id, identifierHint);
+    const candidates = await localCredentialCandidates(biometrics, id, identifierHint, userId);
     if (typeof candidates === 'string') {
       return { unavailableReason: candidates };
     }
@@ -448,6 +451,22 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     }
   }
 
+  async function revokeCredential(
+    biometrics: Biometrics,
+    user: UserResource,
+    id: string,
+  ): Promise<BiometricCredential> {
+    const credential = await callApi(biometrics.fallbackCode, () => user.__experimental_revokeBiometricCredential(id));
+    await ignoreErrors(async () => {
+      const records = await biometrics.module.listRecords();
+      const localKeyIds = new Set(records.filter(record => record.id === id).map(record => record.localKeyId));
+      for (const localKeyId of localKeyIds) {
+        await biometrics.module.deleteRecord(localKeyId);
+      }
+    });
+    return toBiometricCredential(credential);
+  }
+
   return {
     getAvailability: async params => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_AVAILABILITY_FAILED');
@@ -545,18 +564,21 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
     revoke: async id => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_REVOCATION_FAILED');
-      const user = requireUser(biometrics.fallbackCode);
-      const credential = await callApi(biometrics.fallbackCode, () =>
-        user.__experimental_revokeBiometricCredential(id),
-      );
-      await ignoreErrors(async () => {
-        const records = await biometrics.module.listRecords();
-        const localKeyIds = new Set(records.filter(record => record.id === id).map(record => record.localKeyId));
-        for (const localKeyId of localKeyIds) {
-          await biometrics.module.deleteRecord(localKeyId);
-        }
-      });
-      return toBiometricCredential(credential);
+      return revokeCredential(biometrics, requireUser(biometrics.fallbackCode), id);
+    },
+
+    revokeCurrentDeviceCredential: async () => {
+      const biometrics = requireBiometrics('E_TRUSTED_DEVICE_REVOCATION_FAILED');
+      const session = clerk.session;
+      if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
+        throw biometricCredentialError(
+          biometrics.fallbackCode,
+          'Unable to revoke a biometric credential without an active or pending Clerk session.',
+        );
+      }
+      const user = session.user;
+      const selection = await selectLocalCredential(biometrics, undefined, undefined, user.id);
+      return selection.record ? revokeCredential(biometrics, user, selection.record.id) : null;
     },
 
     signIn: async params => {

@@ -90,6 +90,7 @@ export type UseBiometricCredentialsReturn = {
   list: () => Promise<BiometricCredential[]>;
   enroll: (params?: EnrollBiometricCredentialParams) => Promise<BiometricCredential>;
   revoke: (id: string) => Promise<BiometricCredential>;
+  revokeCurrentDeviceCredential: () => Promise<BiometricCredential | null>;
   signIn: (params?: SignInWithBiometricsParams) => Promise<BiometricSignInResult>;
   reverify: (params?: ReverifyWithBiometricsParams) => Promise<BiometricReverificationResult>;
 };
