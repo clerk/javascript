@@ -246,6 +246,38 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Connexion impossible.'));
   });
 
+  it('resolves a missing wallet identifier from the shared error catalog when localization changes', async () => {
+    const request = vi.fn(() => Promise.resolve([]));
+    vi.stubGlobal('ethereum', { request });
+    serveFapi({
+      environment: web3Environment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    const section = <UserProfileWeb3WalletsSection />;
+    const { rerender } = await renderWithClerk(
+      <MosaicProvider localization={{ overrides: { 'errors.web3_missing_identifier': 'Installez un portefeuille.' } }}>
+        {section}
+      </MosaicProvider>,
+    );
+
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Installez un portefeuille.');
+
+    rerender(
+      <MosaicProvider localization={{ overrides: { 'errors.web3_missing_identifier': 'Portefeuille introuvable.' } }}>
+        {section}
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Portefeuille introuvable.');
+    expect(request).toHaveBeenCalledOnce();
+
+    rerender(<MosaicProvider>{section}</MosaicProvider>);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'A Web3 Wallet extension cannot be found. Please install one to continue.',
+    );
+    expect(request).toHaveBeenCalledOnce();
+  });
+
   it('uses the canonical API-code translation for a wallet connection failure', async () => {
     vi.stubGlobal('ethereum', { request: vi.fn(() => Promise.resolve(['0x1234567890abcdef'])) });
     serveFapi({

@@ -63,6 +63,10 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   too_many_unverified_identifications:
     'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
   web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
+  web3_provider_unavailable: 'This wallet provider is unavailable.',
+  web3_wallet_creation_failed: 'The wallet could not be created.',
+  web3_verification_message_unavailable: 'The wallet verification message is unavailable.',
+  web3_signature_unavailable: 'The wallet signature is unavailable.',
   web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
   web3_solana_signature_generation_failed:
     'An error occurred while generating the signature. Please try again to continue.',

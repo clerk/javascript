@@ -16,19 +16,3 @@ export type UserProfileWeb3WalletsModel =
     };
 
 export type ReadyWeb3WalletsModel = Extract<UserProfileWeb3WalletsModel, { status: 'ready' }>;
-
-export class Web3WalletActionError extends Error {
-  constructor(
-    readonly code:
-      | 'providerUnavailable'
-      | 'extensionUnavailable'
-      | 'creationFailed'
-      | 'messageUnavailable'
-      | 'signatureUnavailable',
-    message: string = code,
-    options?: ErrorOptions,
-  ) {
-    super(message, options);
-    this.name = 'Web3WalletActionError';
-  }
-}
