@@ -242,28 +242,28 @@ export function Default(): JSX.Element {
   const [runId, setRunId] = useState(0);
   const [complete, setComplete] = useState(false);
 
-  if (complete) {
-    return (
-      <div>
-        <p>Reverification complete.</p>
-        <Button
-          type='button'
-          onClick={() => {
-            setComplete(false);
-            setRunId(current => current + 1);
-          }}
-        >
-          Restart
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <WorkingExample
-      key={runId}
-      onComplete={() => setComplete(true)}
-    />
+    <div className='min-h-136 grid w-full place-items-center'>
+      {complete ? (
+        <div>
+          <p>Reverification complete.</p>
+          <Button
+            type='button'
+            onClick={() => {
+              setComplete(false);
+              setRunId(current => current + 1);
+            }}
+          >
+            Restart
+          </Button>
+        </div>
+      ) : (
+        <WorkingExample
+          key={runId}
+          onComplete={() => setComplete(true)}
+        />
+      )}
+    </div>
   );
 }
 

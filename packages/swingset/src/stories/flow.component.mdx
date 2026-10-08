@@ -11,6 +11,15 @@ import * as FlowStories from './flow.component.stories';
   storyModule={FlowStories}
 />
 
+## Motion
+
+Steps scale through depth by default. Set `motion='slide'` to move them sideways instead.
+
+<Story
+  name='Slide'
+  storyModule={FlowStories}
+/>
+
 ## Usage
 
 Keep `Card.Root` outside `Flow.Root` so the card remains stable while Flow clips and animates its step viewport.
@@ -43,9 +52,9 @@ import { Flow } from '@clerk/mosaic/components/flow';
 
 | Part        | Class           | Description                                                   |
 | ----------- | --------------- | ------------------------------------------------------------- |
-| `Flow.Root` | `.cl-flow-root` | Receives the controlled value and opaque state.               |
+| `Flow.Root` | `.cl-flow-root` | Receives the controlled value, motion, and opaque state.      |
 | `Flow.Step` | `.cl-flow-step` | Renders when its `ids` include the root's controlled `value`. |
 
 ## Styling
 
-`Flow.Root` reflects its controlled value through `data-value`. The active `Flow.Step` carries `data-open` and reflects the first grouped id through `data-step`; an outgoing step carries `data-closed` until its transition finishes. Both parts accept `className`, `style`, and the Mosaic `render` prop.
+`Flow.Root` reflects its controlled value through `data-value` and its motion through `data-motion`. The active `Flow.Step` carries `data-open` and reflects the first grouped id through `data-step`; an outgoing step carries `data-closed` until its transition finishes. Both parts accept `className`, `style`, and the Mosaic `render` prop.

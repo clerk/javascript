@@ -2,6 +2,7 @@
 
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { useAnimationsFinished } from '../hooks/use-animations-finished';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { autoUpdate, getDimensions } from '../utils/dom';
 import { FlowContext, type FlowContextValue, type FlowDirection } from './flow-context';
@@ -18,6 +19,10 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
   const [measured, setMeasured] = useState(false);
   const [initial, setInitial] = useState(true);
   const [exitingSteps, setExitingSteps] = useState<ReadonlySet<HTMLElement>>(() => new Set());
+  const [settling, setSettling] = useState(false);
+  const stepHeightRef = useRef<number | null>(null);
+  const runOnRootAnimationsFinished = useAnimationsFinished(rootRef, false);
+  const exiting = exitingSteps.size > 0;
 
   const registerActiveStep = useCallback((element: HTMLElement) => {
     setActiveStep(element);
@@ -48,10 +53,28 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     }
 
     return autoUpdate(activeStep, () => {
-      rootRef.current?.style.setProperty('--cl-flow-step-height', `${getDimensions(activeStep).height}px`);
+      const root = rootRef.current;
+      const { height } = getDimensions(activeStep);
+      if (root && stepHeightRef.current !== null && height !== stepHeightRef.current) {
+        root.dataset.heightChange = height < stepHeightRef.current ? 'shrink' : 'grow';
+      }
+      stepHeightRef.current = height;
+      root?.style.setProperty('--cl-flow-step-height', `${height}px`);
       setMeasured(true);
     });
   }, [activeStep]);
+
+  useLayoutEffect(() => {
+    if (exiting) {
+      setSettling(true);
+      return;
+    }
+    if (!settling) {
+      return;
+    }
+
+    return runOnRootAnimationsFinished(() => setSettling(false));
+  }, [exiting, settling, runOnRootAnimationsFinished]);
 
   useLayoutEffect(() => {
     if (!measured || !initial) {
@@ -82,7 +105,7 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     props: mergeProps<'div'>(
       {
         'data-initial': initial ? '' : undefined,
-        'data-transitioning': exitingSteps.size > 0 ? '' : undefined,
+        'data-transitioning': exiting || settling ? '' : undefined,
       },
       otherProps,
     ),

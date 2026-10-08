@@ -1,6 +1,6 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
-import { Flow, type FlowDirection } from '@clerk/mosaic/components/flow';
+import { Flow, type FlowDirection, type FlowMotion } from '@clerk/mosaic/components/flow';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -14,7 +14,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/flow/flow.tsx',
 };
 
-export function Default(): JSX.Element {
+function FlowDemo({ motion }: { motion?: FlowMotion }): JSX.Element {
   const [step, setStep] = useState('details');
   const [direction, setDirection] = useState<FlowDirection>(1);
 
@@ -28,6 +28,7 @@ export function Default(): JSX.Element {
       <Flow.Root
         value={step}
         direction={direction}
+        motion={motion}
         state={{ step }}
       >
         {state => (
@@ -49,7 +50,10 @@ export function Default(): JSX.Element {
             <Flow.Step ids={['confirm']}>
               <Card.Header>
                 <Card.Title>Confirm changes</Card.Title>
-                <Card.Description>Review the final step before submitting.</Card.Description>
+                <Card.Description>
+                  Review the final step before submitting. Changes apply to every session on this account, and members
+                  are notified by email once they take effect.
+                </Card.Description>
               </Card.Header>
               <Card.Footer>
                 <Button
@@ -68,4 +72,12 @@ export function Default(): JSX.Element {
       </Flow.Root>
     </Card.Root>
   );
+}
+
+export function Default(): JSX.Element {
+  return <FlowDemo />;
+}
+
+export function Slide(): JSX.Element {
+  return <FlowDemo motion='slide' />;
 }
