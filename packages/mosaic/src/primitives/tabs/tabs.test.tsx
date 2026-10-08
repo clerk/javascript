@@ -205,6 +205,31 @@ describe('Tabs', () => {
       expect(document.activeElement).toBe(screen.getByText('Billing'));
     });
 
+    it('follows the visual order of arrow keys in RTL', async () => {
+      const user = userEvent.setup();
+      render(
+        <div dir='rtl'>
+          <Tabs.Root defaultValue='tab2'>
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+              <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+            <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
+          </Tabs.Root>
+        </div>,
+      );
+
+      await user.click(screen.getByText('Settings'));
+      await user.keyboard('{ArrowLeft}');
+      expect(document.activeElement).toBe(screen.getByText('Billing'));
+
+      await user.keyboard('{ArrowRight}');
+      expect(document.activeElement).toBe(screen.getByText('Settings'));
+    });
+
     it('uses ArrowDown/ArrowUp for vertical orientation', async () => {
       const user = userEvent.setup();
       renderTabs({ orientation: 'vertical' });

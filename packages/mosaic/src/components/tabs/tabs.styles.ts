@@ -6,6 +6,7 @@ import { colorVars, durationVars, easingVars, fontFamilyVars, space, typeScaleVa
 const anchors = '@supports (anchor-scope: all) and (not (-moz-appearance: none))' as const;
 const noAnchors = '@supports not ((anchor-scope: all) and (not (-moz-appearance: none)))' as const;
 const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
+const forcedColors = '@media (forced-colors: active)' as const;
 const activeAnchor = '--_cl-tabs-active';
 const halfGap = `calc(${space['5']} / -2)`;
 
@@ -13,7 +14,8 @@ const lead = durationVars['--cl-duration-slow'];
 const trail = durationVars['--cl-duration-slower'];
 
 const underline = {
-  backgroundColor: colorVars['--cl-color-foreground'],
+  backgroundColor: { default: colorVars['--cl-color-foreground'], [forcedColors]: 'Highlight' },
+  forcedColorAdjust: 'none',
   pointerEvents: 'none',
   position: 'absolute',
   bottom: '-1px',
