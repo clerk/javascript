@@ -1,4 +1,12 @@
+import type { RoleResource } from '@clerk/shared/types';
 import type { MouseEventHandler } from 'react';
+
+export type MemberRole = Pick<RoleResource, 'key' | 'name'>;
+
+export interface MembersRoles {
+  roles: MemberRole[];
+  hasRoleSetMigration: boolean;
+}
 
 export interface OrganizationProfileMember {
   id: string;
