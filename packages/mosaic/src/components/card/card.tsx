@@ -13,7 +13,7 @@ import { Branding } from '../branding';
 import { Button } from '../button';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Icon } from '../icon';
-import { cardContentMarker } from './card.markers.stylex';
+import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
 
 type CardElevation = 'card' | 'flush' | 'overlay';
@@ -238,7 +238,7 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     props: {
       ...mergeStyleProps(
         themeProps('card-footer', { elevation }),
-        stylex.props(reset.base, slots.footer.base, xstyle),
+        stylex.props(reset.base, slots.footer.base, cardFooterMarker, xstyle),
         rest,
       ),
     },
