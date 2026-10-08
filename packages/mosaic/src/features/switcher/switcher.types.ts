@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 
-import type { UserButtonSlot } from './user-button.layout';
+import type { SwitcherSlot } from './switcher.layout';
 
 // ─── Data contract ──────────────────────────────────────────────────────────
-// Session-backed, discriminated resource rows. 1:1 with `useUserButtonModel()`'s output, so the
+// Session-backed, discriminated resource rows. 1:1 with `useSwitcherModel()`'s output, so the
 // model and the view agree on a shape neither one owns.
 
-export interface UserButtonSession {
+export interface SwitcherSession {
   sessionId: string;
   name: string;
   /** Whatever the account is addressed by: username, email, phone, or wallet. */
@@ -14,7 +14,7 @@ export interface UserButtonSession {
   imageUrl?: string;
 }
 
-export interface UserButtonMembership {
+export interface SwitcherMembership {
   kind: 'membership';
   organizationId: string;
   name: string;
@@ -23,7 +23,7 @@ export interface UserButtonMembership {
   planLabel?: string;
 }
 
-export interface UserButtonSuggestion {
+export interface SwitcherSuggestion {
   kind: 'suggestion';
   id: string;
   organizationId: string;
@@ -33,7 +33,7 @@ export interface UserButtonSuggestion {
   status: 'pending' | 'accepted';
 }
 
-export interface UserButtonInvitation {
+export interface SwitcherInvitation {
   kind: 'invitation';
   id: string;
   organizationId: string;
@@ -44,19 +44,19 @@ export interface UserButtonInvitation {
 }
 
 /** Feeds one more page into a list as its foot scrolls into view. */
-export interface UserButtonPaging {
+export interface SwitcherPaging {
   ref: (element: HTMLElement | null) => void;
   hasMore: boolean;
 }
 
-export interface UserButtonData {
-  activeSession: UserButtonSession;
+export interface SwitcherData {
+  activeSession: SwitcherSession;
   /**
    * The active organization, described whole rather than found in `memberships`, so the surface
    * names it while the list it belongs to is still loading. `null` means none is active: the
    * personal account when one exists, and no selection otherwise.
    */
-  activeOrganization: UserButtonMembership | null;
+  activeOrganization: SwitcherMembership | null;
   /**
    * Explicit; do not derive from `memberships.length`. Answered before the lists are fetched, so
    * the surface knows whether to carry an organization section at all without waiting on them.
@@ -73,19 +73,19 @@ export interface UserButtonData {
    * appearing a list at a time.
    */
   organizationsLoading?: boolean;
-  memberships: UserButtonMembership[];
-  suggestions: UserButtonSuggestion[];
-  invitations: UserButtonInvitation[];
-  paging?: UserButtonPaging;
+  memberships: SwitcherMembership[];
+  suggestions: SwitcherSuggestion[];
+  invitations: SwitcherInvitation[];
+  paging?: SwitcherPaging;
   /**
    * The other signed-in accounts. Only sessions: an account's organizations are scoped to the
    * session that fetches them, so they are unknowable until it is the active one.
    */
-  additionalSessions: UserButtonSession[];
+  additionalSessions: SwitcherSession[];
 }
 
 /** All optional. An unhandled action hides (or de-activates) the affordance it drives. */
-export interface UserButtonCallbacks {
+export interface SwitcherCallbacks {
   /**
    * Acts on the active account; another account's organizations are unreachable until you switch.
    * `null` selects the personal account, which is how an account leaves an organization.
@@ -94,7 +94,7 @@ export interface UserButtonCallbacks {
   onAcceptSuggestion?: (suggestionId: string) => void;
   onAcceptInvitation?: (invitationId: string) => void;
   onSwitchSession?: (sessionId: string) => void;
-  onSignOutSession?: (sessionId: string, from: UserButtonSlot) => void;
+  onSignOutSession?: (sessionId: string, from: SwitcherSlot) => void;
   onSignOutAll?: () => void;
   onManageOrganization?: () => void;
   onInviteMembers?: () => void;
@@ -103,31 +103,16 @@ export interface UserButtonCallbacks {
   onAddAccount?: () => void;
 }
 
-/**
- * Which switchers the surface carries. `combined` is both; `organization` is an organization
- * switcher with no account rows; `user` is an account switcher that never shows an organization,
- * even when one is active.
- */
-export type UserButtonMode = 'combined' | 'organization' | 'user';
+export type SwitcherMode = 'combined' | 'user' | 'organization';
 
 /**
  * How the header carries its actions: `inline` trails the lead with them, the gear as an icon;
  * `stacked` runs them under it as full-width labelled buttons.
  */
-export type UserButtonHeaderLayout = 'inline' | 'stacked';
-
-/** Which switchers the surface carries. */
-export interface UserButtonModeProps {
-  /**
-   * Which switchers the popup carries: both, organizations alone, or accounts alone.
-   *
-   * @default 'combined'
-   */
-  mode?: UserButtonMode;
-}
+export type SwitcherHeaderLayout = 'inline' | 'stacked';
 
 /** Whether the surface signs itself with Clerk's mark. */
-export interface UserButtonBrandingProps {
+export interface SwitcherBrandingProps {
   /**
    * Signs the foot of the popup with "Secured by Clerk". An instance that has paid the branding off
    * carries none of it, so this follows `displayConfig.branded` rather than being on for everyone.
@@ -137,9 +122,9 @@ export interface UserButtonBrandingProps {
   renderBranding?: boolean;
 }
 
-export interface UserButtonBusyState {
+export interface SwitcherBusyState {
   /**
-   * Key of the single in-flight action (see `userButtonBusyKeys`), or `null`/absent when idle. The
+   * Key of the single in-flight action (see `switcherBusyKeys`), or `null`/absent when idle. The
    * affordance that owns it spins; every other one is disabled so a second action cannot start.
    */
   pendingKey?: string | null;
@@ -156,9 +141,9 @@ export interface UserButtonBusyState {
  * where there is more than one, and the row it would have opened onto where there is not. Name both
  * to place that slot whichever way it resolves. `signOut` signs out of the active account.
  */
-export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOut';
+export type SwitcherMenuItemId = 'switchAccount' | 'addAccount' | 'signOut';
 
-interface UserButtonMenuItemBase {
+interface SwitcherMenuItemBase {
   /** Identifies the row, for ordering. */
   id: string;
   /** Names the row. */
@@ -167,28 +152,28 @@ interface UserButtonMenuItemBase {
 }
 
 /** An action of your own at the foot of the popup. */
-export interface UserButtonMenuAction extends UserButtonMenuItemBase {
+export interface SwitcherMenuAction extends SwitcherMenuItemBase {
   onClick: () => void;
   href?: never;
 }
 
 /** A row at the foot of the popup that leaves for somewhere else. */
-export interface UserButtonMenuLink extends UserButtonMenuItemBase {
+export interface SwitcherMenuLink extends SwitcherMenuItemBase {
   /** Where the row goes. */
   href: string;
   onClick?: never;
 }
 
-export type UserButtonMenuItem = UserButtonMenuAction | UserButtonMenuLink;
+export type SwitcherMenuItem = SwitcherMenuAction | SwitcherMenuLink;
 
 /** The app's own actions at the foot of the popup, and the order the foot's rows run in. */
-export interface UserButtonMenuProps {
+export interface SwitcherMenuProps {
   /** Actions and links of your own, added to the foot of the popup ahead of Clerk's own rows. */
-  customMenuItems?: UserButtonMenuItem[];
+  customMenuItems?: SwitcherMenuItem[];
   /**
    * The order the foot's rows run in, by id: a built-in row's id, or a custom item's `id`. Anything
    * left out follows the rows named here. An id the surface does not carry as a row is ignored,
    * since which rows the foot has depends on its mode.
    */
-  menuItemOrder?: (UserButtonMenuItemId | (string & {}))[];
+  menuItemOrder?: (SwitcherMenuItemId | (string & {}))[];
 }

@@ -1,67 +1,29 @@
 'use client';
 
-import type { OrganizationProfileProps, UserProfileProps } from '@clerk/shared/types';
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
-import type { CustomProfileItem, UserProfilePageId } from '../user-profile/user-profile.types';
-import { useUserButtonController } from './user-button.controller';
-import type { UserButtonModelOptions } from './user-button.model';
-import { useUserButtonModel } from './user-button.model';
-import type { OrganizationProfilePageId } from './user-button.pages';
-import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './user-button.pages';
-import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
-import type { UserButtonTriggerProps } from './user-button.view';
-import { UserButtonView } from './user-button.view';
+import type { SwitcherProps } from '../switcher/switcher';
+import { Switcher } from '../switcher/switcher';
+import type { SwitcherMode } from '../switcher/switcher.types';
 
-/** What a profile opened by `<UserButton />` takes beyond the profile component's own props. */
-export interface UserButtonProfilePages<PageId extends string> {
+/**
+ * Which switchers the surface carries. `combined` is both; `user` is an account switcher that never
+ * shows an organization, even when one is active.
+ */
+export type UserButtonMode = Exclude<SwitcherMode, 'organization'>;
+
+/** Which switchers the surface carries. */
+export interface UserButtonModeProps {
   /**
-   * Provide custom pages and links to be rendered inside the profile.
-   */
-  customPages?: CustomProfileItem[];
-  /**
-   * Controls the order of the profile's navigation. Accepts the ids of built-in pages and the
-   * `path` of custom pages. Pages not listed are placed after the listed ones. The first entry is
-   * the page the profile opens on, so it cannot be a link.
+   * Which switchers the popup carries: both, or accounts alone.
    *
-   * @default undefined
+   * @default 'combined'
    */
-  pageOrder?: (PageId | (string & {}))[];
+  mode?: UserButtonMode;
 }
 
-/** Options for the underlying `<UserProfile />` component. */
-export interface UserButtonUserProfileProps
-  extends
-    UserButtonProfilePages<UserProfilePageId>,
-    Pick<UserProfileProps, 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'> {}
-
-/** Options for the underlying `<OrganizationProfile />` component. */
-export interface UserButtonOrganizationProfileProps
-  extends UserButtonProfilePages<OrganizationProfilePageId>, Pick<OrganizationProfileProps, 'appearance'> {}
-
 /** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profiles it opens. */
-export type UserButtonProps = UserButtonModelOptions &
-  UserButtonTriggerProps &
-  UserButtonMenuProps &
-  UserButtonModeProps & {
-    /**
-     * Specify options for the underlying <UserProfile /> component.
-     * e.g., <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
-     */
-    userProfileProps?: UserButtonUserProfileProps;
-    /**
-     * Specify options for the underlying <OrganizationProfile /> component.
-     * e.g., <UserButton organizationProfileProps={{appearance: {...}}} />
-     */
-    organizationProfileProps?: UserButtonOrganizationProfileProps;
-    /**
-     * Fallback while loading.
-     *
-     * Note that the UserButton renders nothing when the user is signed out, so using this on
-     * pages that are reachable while both signed-out and signed-in can result in Fallback->Nothing.
-     */
-    fallback?: ReactNode;
-  };
+export type UserButtonProps = SwitcherProps & UserButtonModeProps;
 
 /**
  * The signed-in user's avatar, and the menu behind it: switch organization, switch or add an account,
@@ -79,9 +41,8 @@ export type UserButtonProps = UserButtonModelOptions &
  * ```
  *
  * @example
- * `mode` narrows the menu to one switcher.
+ * `mode` narrows the menu to the account switcher.
  * ```tsx
- * <UserButton mode='organization' />
  * <UserButton mode='user' />
  * ```
  *
@@ -126,73 +87,11 @@ export type UserButtonProps = UserButtonModelOptions &
  * />
  * ```
  */
-export function UserButton(props: UserButtonProps = {}): ReactElement | null {
-  const {
-    renderTriggerLabel,
-    renderTriggerBadge,
-    mode,
-    userProfileProps,
-    organizationProfileProps,
-    customMenuItems,
-    menuItemOrder,
-    fallback,
-    ...options
-  } = props;
-  // The portals must outlive the popover, so custom pages are bridged here rather than inside it.
-  const userProfile = useCustomPages({
-    items: userProfileProps?.customPages,
-    order: userProfileProps?.pageOrder,
-    builtInPages: useUserProfilePages(),
-  });
-  const organizationProfile = useCustomPages({
-    items: organizationProfileProps?.customPages,
-    order: organizationProfileProps?.pageOrder,
-    builtInPages: useOrganizationProfilePages(),
-  });
-  const portals = (
-    <>
-      {userProfile.portals}
-      {organizationProfile.portals}
-    </>
-  );
-  const model = useUserButtonModel(options, {
-    userProfile: {
-      customPages: userProfile.customPages,
-      additionalOAuthScopes: userProfileProps?.additionalOAuthScopes,
-      apiKeysProps: userProfileProps?.apiKeysProps,
-      appearance: userProfileProps?.appearance,
-    },
-    organizationProfile: {
-      customPages: organizationProfile.customPages,
-      appearance: organizationProfileProps?.appearance,
-    },
-  });
-  const controller = useUserButtonController(model, { mode, customMenuItems, menuItemOrder });
-
-  if (controller.status === 'loading') {
-    return (
-      <>
-        {fallback}
-        {portals}
-      </>
-    );
-  }
-
-  // Signed out is an answer, so the placeholder goes too rather than promising a button.
-  if (controller.status === 'hidden') {
-    return <>{portals}</>;
-  }
-
-  const { status: _status, ...viewController } = controller;
-
+export function UserButton(props: UserButtonProps = {}): ReactElement {
   return (
-    <>
-      <UserButtonView
-        {...viewController}
-        renderTriggerLabel={renderTriggerLabel}
-        renderTriggerBadge={renderTriggerBadge}
-      />
-      {portals}
-    </>
+    <Switcher
+      {...props}
+      mode={props.mode === 'user' ? 'user' : 'combined'}
+    />
   );
 }

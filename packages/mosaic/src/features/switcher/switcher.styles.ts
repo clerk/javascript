@@ -61,7 +61,7 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
-  // Matches `UserButtonItemLabel`, so the trigger names an organization the same way its row does. Capped,
+  // Matches `SwitcherItemLabel`, so the trigger names an organization the same way its row does. Capped,
   // because the trigger sits in a host app's chrome and a long organization name would push it apart.
   triggerName: {
     color: colorVars['--cl-color-foreground'],

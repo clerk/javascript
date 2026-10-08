@@ -13,19 +13,19 @@ import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
-import { useOrganizationListInView } from './use-organization-list-in-view';
 import type {
-  UserButtonBrandingProps,
-  UserButtonCallbacks,
-  UserButtonData,
-  UserButtonInvitation,
-  UserButtonMembership,
-  UserButtonSession,
-  UserButtonSuggestion,
-} from './user-button.types';
+  SwitcherBrandingProps,
+  SwitcherCallbacks,
+  SwitcherData,
+  SwitcherInvitation,
+  SwitcherMembership,
+  SwitcherSession,
+  SwitcherSuggestion,
+} from './switcher.types';
+import { useOrganizationListInView } from './use-organization-list-in-view';
 
 // Promise-returning so the controller can drive busy state. Navigation callbacks stay fire-and-forget.
-interface UserButtonAsyncCallbacks {
+interface SwitcherAsyncCallbacks {
   onSelectOrganization?: (organizationId: string | null) => void | Promise<unknown>;
   onSwitchSession?: (sessionId: string) => void | Promise<unknown>;
   onSignOutSession?: (sessionId: string) => void | Promise<unknown>;
@@ -34,35 +34,67 @@ interface UserButtonAsyncCallbacks {
   onAcceptInvitation?: (invitationId: string) => void | Promise<unknown>;
 }
 
-export type UserButtonModel =
+export type SwitcherModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (UserButtonData &
-      Omit<UserButtonCallbacks, keyof UserButtonAsyncCallbacks> &
-      UserButtonAsyncCallbacks &
-      UserButtonBrandingProps & {
+  | (SwitcherData &
+      Omit<SwitcherCallbacks, keyof SwitcherAsyncCallbacks> &
+      SwitcherAsyncCallbacks &
+      SwitcherBrandingProps & {
         status: 'ready';
-        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode. */
+        /** Whether the instance has organizations turned on at all. False forces the button to `user` mode and hides an organization switcher. */
         organizationsEnabled: boolean;
       });
 
 /** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
 type UserProfileMode =
-  | { userProfileUrl: string; userProfileMode?: 'navigation' }
-  | { userProfileUrl?: never; userProfileMode?: 'modal' };
+  | {
+      /** Full URL or path of your own user profile page. Setting it routes there instead of opening Clerk's modal. */
+      userProfileUrl: string;
+      /** How the user profile opens: `modal` opens Clerk's, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
+      userProfileMode?: 'navigation';
+    }
+  | {
+      /** Full URL or path of your own user profile page. Setting it routes there instead of opening Clerk's modal. */
+      userProfileUrl?: never;
+      /** How the user profile opens: `modal` opens Clerk's, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
+      userProfileMode?: 'modal';
+    };
 
 type OrganizationProfileMode =
-  | { organizationProfileUrl: string; organizationProfileMode?: 'navigation' }
-  | { organizationProfileUrl?: never; organizationProfileMode?: 'modal' };
+  | {
+      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening Clerk's modal. */
+      organizationProfileUrl: string;
+      /** How the organization profile opens: `modal` opens Clerk's, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
+      organizationProfileMode?: 'navigation';
+    }
+  | {
+      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening Clerk's modal. */
+      organizationProfileUrl?: never;
+      /** How the organization profile opens: `modal` opens Clerk's, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
+      organizationProfileMode?: 'modal';
+    };
 
 type CreateOrganizationMode =
-  | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
-  | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
+  | {
+      /** Full URL or path of your own create-organization page. Setting it routes there instead of opening Clerk's modal. */
+      createOrganizationUrl: string;
+      /** How the create-organization flow opens: `modal` opens Clerk's, `navigation` goes to `createOrganizationUrl`. Follows from whether `createOrganizationUrl` is set. */
+      createOrganizationMode?: 'navigation';
+    }
+  | {
+      /** Full URL or path of your own create-organization page. Setting it routes there instead of opening Clerk's modal. */
+      createOrganizationUrl?: never;
+      /** How the create-organization flow opens: `modal` opens Clerk's, `navigation` goes to `createOrganizationUrl`. Follows from whether `createOrganizationUrl` is set. */
+      createOrganizationMode?: 'modal';
+    };
 
-export type UserButtonModelOptions = UserProfileMode &
+export type SwitcherModelOptions = OrganizationSwitcherModelOptions &
+  Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;
+
+export type OrganizationSwitcherModelOptions = UserProfileMode &
   OrganizationProfileMode &
   CreateOrganizationMode &
-  Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'> &
   Pick<
     OrganizationSwitcherProps,
     | 'afterSelectOrganizationUrl'
@@ -74,7 +106,7 @@ export type UserButtonModelOptions = UserProfileMode &
   >;
 
 /** Props forwarded to the profile modals this button opens. */
-export interface UserButtonModalProps {
+export interface SwitcherModalProps {
   userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
   organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
 }
@@ -116,7 +148,7 @@ function displayName(user: UserResource): string {
   return getFullName(user) || getIdentifier(user);
 }
 
-function toMembership(organization: OrganizationResource): UserButtonMembership {
+function toMembership(organization: OrganizationResource): SwitcherMembership {
   return {
     kind: 'membership',
     organizationId: organization.id,
@@ -128,7 +160,7 @@ function toMembership(organization: OrganizationResource): UserButtonMembership 
   };
 }
 
-function toSession(sessionId: string, user: UserResource): UserButtonSession {
+function toSession(sessionId: string, user: UserResource): SwitcherSession {
   return {
     sessionId,
     name: displayName(user),
@@ -141,7 +173,7 @@ function toSession(sessionId: string, user: UserResource): UserButtonSession {
  * @param modals - Props forwarded to the profile modals. Custom pages arrive already bridged, since only
  *   the wrapper can render the portals behind them.
  */
-export function useUserButtonModel(options?: UserButtonModelOptions, modals?: UserButtonModalProps): UserButtonModel {
+export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   // The active org names the trigger. That is not a request to turn Organizations on.
@@ -214,9 +246,9 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
   const suggestionData = userSuggestions.data ?? [];
   const invitationData = userInvitations.data ?? [];
 
-  const memberships: UserButtonMembership[] = membershipData.map(m => toMembership(m.organization));
+  const memberships: SwitcherMembership[] = membershipData.map(m => toMembership(m.organization));
 
-  const suggestions: UserButtonSuggestion[] = suggestionData.map(s => ({
+  const suggestions: SwitcherSuggestion[] = suggestionData.map(s => ({
     kind: 'suggestion',
     id: s.id,
     organizationId: s.publicOrganizationData.id,
@@ -226,7 +258,7 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
   }));
 
   // Accepting is all a row offers, so a revoked or expired invitation has nothing to show.
-  const invitations: UserButtonInvitation[] = invitationData.flatMap(i =>
+  const invitations: SwitcherInvitation[] = invitationData.flatMap(i =>
     i.status === 'pending' || i.status === 'accepted'
       ? [
           {
@@ -242,7 +274,7 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
   );
 
   // Organization requests are scoped to the active session, so another account's organizations are unknowable.
-  const additionalSessions: UserButtonSession[] = (clerk.client?.signedInSessions ?? []).flatMap(s => {
+  const additionalSessions: SwitcherSession[] = (clerk.client?.signedInSessions ?? []).flatMap(s => {
     const sessionUser = s.user;
     if (!sessionUser || s.id === session.id) {
       return [];
