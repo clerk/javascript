@@ -43,6 +43,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | A debounced, abortable async check as the user types                    | `useDebouncedAsync` (`src/hooks/`)                                                                            |
 | A spinner that should not flash or flicker                              | `useSpinDelay` (`src/hooks/`)                                                                                 |
 | Current time for display labels                                         | `useNow` + `MosaicProvider` ([#10098](https://github.com/clerk/javascript/pull/10098), once available)        |
+| Whether enterprise SSO permits adding another identification            | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                |
 | An inline message row that animates open and closed                     | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `styles/feedback.styles.ts` |
 | A table whose sorting, paging and search are done by the server         | `useServerDataTable` (`src/hooks/`)                                                                           |
 | Siblings that slide when an item is added or removed                    | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                |
@@ -86,7 +87,7 @@ A PR that adds, renames or changes the signature of a shared helper in `src/hook
 
 ## Lint
 
-Mosaic runs stricter lint rules than the rest of the repo (the `packages/mosaic` block in `eslint.config.mjs`).
+Mosaic runs stricter lint rules than the rest of the repo: the `packages/mosaic` block in the root `eslint.config.mjs`, plus the layer import guards in `packages/mosaic/eslint/config.mjs`, which only load through `packages/mosaic/eslint.config.mjs`. Lint with `pnpm lint` from `packages/mosaic`. Running `eslint` from the repo root skips the import guards.
 
 Every disable directive in `src` needs a `-- reason` (`@eslint-community/eslint-comments/require-description`). The reason is not a code comment under the root no-comments rule. Write why the rule does not apply here, not what the code does; it is what a reviewer judges.
 

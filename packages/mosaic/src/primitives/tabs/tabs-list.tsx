@@ -25,11 +25,7 @@ export function TabsList(props: TabsListProps) {
             }
             event.preventDefault();
             const items = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])'));
-            if (items.length === 0) {
-              return;
-            }
-            const target = event.key === 'Home' ? items[0] : items[items.length - 1];
-            target.focus();
+            (event.key === 'Home' ? items.at(0) : items.at(-1))?.focus();
           },
         };
 

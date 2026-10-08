@@ -1,7 +1,10 @@
+import type { APIKeyResource } from '@clerk/shared/types';
 import type { MouseEventHandler } from 'react';
 
 import type { MosaicMessages } from '../../localization';
 import type { CreateAPIKeyDialogProps } from './create-api-key.dialog';
+
+export type APIKeyRecord = Pick<APIKeyResource, 'id' | 'name' | 'createdAt' | 'expiration' | 'lastUsedAt'>;
 
 export interface APIKey {
   id: string;

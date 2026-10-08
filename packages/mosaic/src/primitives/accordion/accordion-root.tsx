@@ -65,11 +65,7 @@ export function AccordionRoot(props: AccordionProps) {
               const items = Array.from(
                 event.currentTarget.querySelectorAll<HTMLElement>('[aria-expanded]:not([disabled])'),
               );
-              if (items.length === 0) {
-                return;
-              }
-              const target = event.key === 'Home' ? items[0] : items[items.length - 1];
-              target.focus();
+              (event.key === 'Home' ? items.at(0) : items.at(-1))?.focus();
             },
           };
 

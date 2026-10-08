@@ -6,9 +6,6 @@ import { useClerk, useUser } from '@clerk/shared/react';
 import type {
   ClerkAPIError,
   CustomOauthProvider,
-  EnterpriseAccountConnectionResource,
-  EnterpriseAccountResource,
-  EnterpriseSSOSettings,
   ExternalAccountResource,
   OAuthProvider,
   OAuthProviders,
@@ -20,6 +17,7 @@ import type {
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { getOAuthLogo } from '../../../components/provider-logo/oauth.generated';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { toProviderIcon } from '../user-profile-provider-icon.model';
 import type {
   ConnectedAccountActionResult,
@@ -32,11 +30,6 @@ type AccountData = Pick<ExternalAccountResource, 'id' | 'provider' | 'approvedSc
   verification:
     | (Pick<VerificationResource, 'strategy'> & { error: Pick<ClerkAPIError, 'code' | 'longMessage'> | null })
     | null;
-};
-type EnterpriseUser = {
-  enterpriseAccounts: (Pick<EnterpriseAccountResource, 'active'> & {
-    enterpriseConnection?: Pick<EnterpriseAccountConnectionResource, 'disableAdditionalIdentifications'> | null;
-  })[];
 };
 type ProjectedUser = {
   verifiedExternalAccounts: AccountData[];
@@ -125,18 +118,6 @@ export function createProviderCatalog(
     }),
     ...providers.filter(provider => !provider.enabled),
   ];
-}
-
-export function allowsIdentificationCreation(
-  user: EnterpriseUser,
-  enterpriseSSO: Pick<EnterpriseSSOSettings, 'enabled'>,
-): boolean {
-  if (!enterpriseSSO.enabled) {
-    return true;
-  }
-  return !user.enterpriseAccounts.some(
-    account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
-  );
 }
 
 function findAdditionalScopes(account: AccountData, scopes: AdditionalOAuthScopes | undefined): string[] {

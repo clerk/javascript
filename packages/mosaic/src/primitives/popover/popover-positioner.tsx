@@ -4,6 +4,7 @@ import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { usePopoverContext } from './popover-context';
 
 export interface PopoverPositionerProps extends ComponentProps<'div'> {
@@ -38,7 +39,7 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       return () => refs.setPositionReference(refs.domReference.current);
     }, [anchor, refs]);
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
 
     const ownProps = {
       'data-side': side,

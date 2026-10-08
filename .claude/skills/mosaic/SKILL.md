@@ -58,8 +58,8 @@ is the _how-to_.
 
 `packages/mosaic/src/features/user-button/` is the fullest worked example of the split
 in the repo — model, controller, view, wrapper, types, messages, and a feature
-test. Copy from it. Its feature test sits in `__tests__/` because it predates
-colocating tests (`packages/mosaic/docs/testing.md`).
+test. Copy from it. Tests go in its `__tests__/` folder, as
+`packages/mosaic/docs/testing.md` describes under "Test placement".
 
 `packages/mosaic/AGENTS.md` loads for any work in the package. It maps common
 problems (errors, pending state, focus after removal, debouncing, confirm steps)
