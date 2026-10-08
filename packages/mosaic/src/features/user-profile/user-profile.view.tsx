@@ -56,7 +56,8 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
   if (!firstPage) {
     logger.warnOnce('[Clerk] UserProfile has no pages to show.');
   }
-  const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : (firstPage?.id ?? 'account');
+  const resolvedEntry = entries.find(entry => entry.id === activePage) ?? firstPage;
+  const resolvedPage = resolvedEntry?.id ?? 'account';
 
   return (
     <Profile.Root
@@ -86,7 +87,9 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content
+        pageTitle={resolvedEntry?.custom ? resolvedEntry.custom.label : resolvedEntry && m.pages[resolvedEntry.id]}
+      >
         {entries.map(entry => (
           <Profile.ContentPanel
             key={entry.id}
