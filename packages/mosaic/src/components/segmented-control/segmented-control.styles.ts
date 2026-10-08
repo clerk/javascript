@@ -71,7 +71,7 @@ export const styles = stylex.create({
       ':where([data-direction="backward"])': `${lead}, ${trail}`,
     },
     transitionProperty: 'inset-inline-start, inset-inline-end',
-    transitionTimingFunction: easingVars['--cl-ease-default'],
+    transitionTimingFunction: easingVars['--cl-ease-enter'],
   },
   item: {
     // eslint-disable-next-line @stylexjs/valid-styles -- `anchor-name`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
@@ -118,7 +118,7 @@ export const styles = stylex.create({
     inset: 0,
     animationDuration: durationVars['--cl-duration-slow'],
     animationName: { default: scaleIn, [reduceMotion]: 'none' },
-    animationTimingFunction: easingVars['--cl-ease-default'],
+    animationTimingFunction: easingVars['--cl-ease-enter'],
     display: {
       default: 'none',
       [noAnchors]: { default: 'none', ':where([data-selected] > *)': 'block' },
