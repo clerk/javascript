@@ -4,16 +4,19 @@ import type {
   ClientJSON,
   EnterpriseConnectionJSON,
   OAuthProvider,
+  OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
   SessionJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
 } from '@clerk/shared/types';
-import { http, HttpResponse, type JsonBodyType } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { setupWorker } from 'msw/browser';
 
 import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
+import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
+import { envelope, error, findSession, missing, updateUser } from './fake-fapi/shared';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -54,6 +57,7 @@ export interface FakeFapiState {
 export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking'>> & {
   verification?: FakeVerificationSeed;
   enterpriseLinking?: Partial<FakeEnterpriseLinking>;
+  passkeys?: FakePasskeysSeed;
 };
 
 const unhandled: string[] = [];
@@ -75,10 +79,6 @@ export function takeUnhandledRequests(): string[] {
   return unhandled.splice(0);
 }
 
-function envelope(response: JsonBodyType, client: ClientJSON | null) {
-  return HttpResponse.json({ response, client });
-}
-
 function page<T>(items: T[], url: URL) {
   const offset = Number(url.searchParams.get('offset') ?? 0);
   const limit = Number(url.searchParams.get('limit') ?? items.length);
@@ -90,23 +90,8 @@ function withStatus<T extends { status: string }>(items: T[], url: URL): T[] {
   return statuses.length ? items.filter(item => statuses.includes(item.status)) : items;
 }
 
-function findSession(state: FakeFapiState, id: unknown): SessionJSON | undefined {
-  return state.client.sessions.find(session => session.id === id);
-}
-
-function error(code: string, status = 400) {
-  return HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status });
-}
-
 function activeUser(state: FakeFapiState): UserJSON | undefined {
   return findSession(state, state.client.last_active_session_id)?.user;
-}
-
-function updateUser(state: FakeFapiState, user: UserJSON): void {
-  state.client = {
-    ...state.client,
-    sessions: state.client.sessions.map(session => (session.user.id === user.id ? { ...session, user } : session)),
-  };
 }
 
 function withoutOrganization(session: SessionJSON, organizationId: string): SessionJSON {
@@ -137,12 +122,26 @@ function deleteOrganization(state: FakeFapiState, organizationId: string): void 
   };
 }
 
-function missing() {
-  return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
+function updateOrganization(state: FakeFapiState, organization: OrganizationJSON): void {
+  state.memberships = state.memberships.map(membership =>
+    membership.organization.id === organization.id ? { ...membership, organization } : membership,
+  );
+  state.client = {
+    ...state.client,
+    sessions: state.client.sessions.map(session => ({
+      ...session,
+      user: {
+        ...session.user,
+        organization_memberships: session.user.organization_memberships.map(membership =>
+          membership.organization.id === organization.id ? { ...membership, organization } : membership,
+        ),
+      },
+    })),
+  };
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
-  const { verification, enterpriseLinking, ...rest } = seed;
+  const { verification, enterpriseLinking, passkeys, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
@@ -166,6 +165,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   worker.use(
     ...verificationHandlers(state, fapiUrl),
     ...enterpriseHandlers(state, fapiUrl),
+    ...passkeyHandlers(state, fapiUrl, passkeys),
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
     http.get(fapiUrl('/v1/me'), () => {
@@ -319,8 +319,23 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       leaveOrganization(state, membership.organization.id, user.id);
       return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
     }),
-    http.post(fapiUrl('/v1/organizations/:organizationId'), ({ params, request }) => {
-      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+    http.post(fapiUrl('/v1/organizations/:organizationId'), async ({ params, request }) => {
+      const method = new URL(request.url).searchParams.get('_method');
+      if (method === 'PATCH') {
+        const membership = state.memberships.find(m => m.organization.id === params.organizationId);
+        if (!membership) {
+          return missing();
+        }
+        const body = new URLSearchParams(await request.text());
+        const organization = {
+          ...membership.organization,
+          ...(body.has('name') ? { name: body.get('name') ?? '' } : {}),
+          ...(body.has('slug') ? { slug: body.get('slug') ?? '' } : {}),
+        };
+        updateOrganization(state, organization);
+        return envelope(organization, state.client);
+      }
+      if (method !== 'DELETE') {
         return undefined;
       }
       const membership = state.memberships.find(m => m.organization.id === params.organizationId);
@@ -329,6 +344,26 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       deleteOrganization(state, membership.organization.id);
       return envelope({ object: 'organization', id: membership.organization.id, deleted: true }, state.client);
+    }),
+    http.post(fapiUrl('/v1/organizations/:organizationId/logo'), ({ params, request }) => {
+      const method = new URL(request.url).searchParams.get('_method');
+      if (method !== 'PUT' && method !== 'DELETE') {
+        return undefined;
+      }
+      const membership = state.memberships.find(m => m.organization.id === params.organizationId);
+      if (!membership) {
+        return missing();
+      }
+      const organization = {
+        ...membership.organization,
+        has_image: method === 'PUT',
+        image_url: method === 'PUT' ? `https://example.com/${membership.organization.id}/logo.png` : '',
+      };
+      updateOrganization(state, organization);
+      return envelope(
+        method === 'DELETE' ? { object: 'image', id: `img_${organization.id}`, deleted: true } : organization,
+        state.client,
+      );
     }),
     http.post(fapiUrl('/v1/me/organization_invitations/:id/accept'), ({ params }) => {
       const invitation = state.invitations.find(i => i.id === params.id);

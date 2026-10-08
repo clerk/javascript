@@ -1,5 +1,35 @@
 # @clerk/tanstack-react-start
 
+## 1.7.0
+
+### Minor Changes
+
+- Raise the minimum supported peer dependencies to `@tanstack/react-start@^1.168.10` and `@tanstack/react-router@^1.170.7`. Start 1.168.10 is the first version where importing `createCsrfMiddleware()` works reliably during Vite SSR. ([#10102](https://github.com/clerk/javascript/pull/10102)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+  TanStack Start skips its default CSRF protection for server functions when your app has a `src/start.ts`, which `clerkMiddleware()` requires. Register `createCsrfMiddleware()` before `clerkMiddleware()` to restore it:
+
+  ```ts
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+  import { createCsrfMiddleware, createStart } from '@tanstack/react-start';
+
+  const csrfMiddleware = createCsrfMiddleware({
+    filter: ctx => ctx.handlerType === 'serverFn',
+  });
+
+  export const startInstance = createStart(() => {
+    return {
+      requestMiddleware: [csrfMiddleware, clerkMiddleware()],
+    };
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`fc7d050`](https://github.com/clerk/javascript/commit/fc7d0506c59ca01f7d86bea1a9999a1fe4dd81ff), [`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/react@6.17.7
+  - @clerk/shared@4.39.1
+  - @clerk/backend@3.23.1
+
 ## 1.6.5
 
 ### Patch Changes

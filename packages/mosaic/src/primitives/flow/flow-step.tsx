@@ -110,7 +110,7 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     'aria-hidden': !open ? true : undefined,
     style: {
       ...effectiveTransitionProps.style,
-      ['--cl-flow-transition-direction' as string]: String(direction),
+      '--cl-flow-transition-direction': String(direction),
     },
     children: open ? children : activeChildrenRef.current,
   };

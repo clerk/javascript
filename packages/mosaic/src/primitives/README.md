@@ -6,31 +6,18 @@ This is an internal folder (`src/primitives/`) inside `@clerk/mosaic`, not a sep
 
 ## Primitives
 
-| Primitive    | Location                      | Description                                                   |
-| ------------ | ----------------------------- | ------------------------------------------------------------- |
-| Accordion    | `src/primitives/accordion`    | Expandable content sections with single/multiple mode         |
-| Autocomplete | `src/primitives/autocomplete` | Combobox input with filterable option list                    |
-| Dialog       | `src/primitives/dialog`       | Modal dialog with focus trapping and scroll lock              |
-| FileUpload   | `src/primitives/file-upload`  | File picker + drag-and-drop upload with image previews        |
-| Menu         | `src/primitives/menu`         | Dropdown and nested context menus with safe hover zones       |
-| OTP          | `src/primitives/otp`          | One-time-password / PIN input split into per-character slots  |
-| Popover      | `src/primitives/popover`      | Non-modal floating content triggered by click                 |
-| Select       | `src/primitives/select`       | Dropdown select with typeahead and keyboard navigation        |
-| Tabs         | `src/primitives/tabs`         | Tab navigation with animated indicator                        |
-| TagInput     | `src/primitives/tag-input`    | Text field that turns entries into removable tags             |
-| Toast        | `src/primitives/toast`        | Stacked notifications with timers, a queue, and announcements |
-| Tooltip      | `src/primitives/tooltip`      | Hover/focus tooltip with configurable delay and group support |
+One folder per primitive under `src/primitives/` (Dialog, Menu, Select, …); the folders are the list.
 
 Shared utilities live at `src/primitives/utils` (includes `useRender` and `mergeProps`).
 
-Each primitive has its own README in `src/primitives/<name>/` with full API docs, props tables, keyboard navigation, and data attributes.
+Most primitives have their own README in `src/primitives/<name>/` with full API docs, props tables, keyboard navigation, and data attributes.
 
 ## Usage
 
 ```tsx
 import { Select } from '../../primitives/select';
 
-<Select>
+<Select.Root>
   <Select.Trigger>Choose...</Select.Trigger>
   <Select.Positioner>
     <Select.Popup>
@@ -44,7 +31,7 @@ import { Select } from '../../primitives/select';
       />
     </Select.Popup>
   </Select.Positioner>
-</Select>;
+</Select.Root>;
 ```
 
 All primitives follow the same compound component pattern. They emit zero styles — all visual styling is applied externally via `data-*` attribute selectors.
@@ -151,4 +138,4 @@ pnpm --filter @clerk/mosaic build  # production build
 pnpm --filter @clerk/mosaic test   # run tests
 ```
 
-Tests run under jsdom, via Mosaic's `vitest.config.mts`.
+Tests run under happy-dom, in the `primitives` project of Mosaic's `vitest.config.mts`.
