@@ -14,7 +14,7 @@ markers. Don't leave commented-out code.
 
 ## Verifying changes
 
-Prove every change to `@clerk/expo` or `@clerk/expo-native-components` on a simulator or emulator before calling it done, and put the screenshots or video on the pull request. How you prove it is up to you. The verification skill in this repository is one way. An app of your own that exercises the change is just as good. If you could not run it on a device at all, say so in the pull request.
+Prove every change to `@clerk/expo` or `@clerk/expo-native-components` on a simulator or emulator before calling it done, and put the screenshots or video on the pull request. How you prove it is up to you. The verification skill in this repository is one way, and it also works on a machine with no device. An app of your own that exercises the change is just as good. If you could not run it on a device at all, say so in the pull request.
 
 The skill is `.claude/skills/verify-clerk-expo/`: read its `SKILL.md` first. The tests and the CLI that runs them are in `integration/expo-native/`. The skill needs a Clerk Platform API key, which Clerk team members have.
 

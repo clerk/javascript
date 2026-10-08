@@ -8,3 +8,5 @@ Read this when a local lane fails to lease or boot, or when you need a lane's UD
 - **Android.** A lane boots the `Clerk_Verify_Pixel` AVD with `-read-only -no-window` on port 5558 + 2n, so its serial is `emulator-5560` or `emulator-5562`. `-read-only` lets two lanes share the AVD and throws away their writes. Any other emulator on a lane port is foreign: `doctor` lists it as `lane-ports` and the CLI never kills it.
 - The machine holds four iOS and two Android lanes, across all agents. While `--wait <seconds>` waits, the CLI prints one `wait` line naming the lanes in use.
 - Before leasing, `up` and `run` release lanes whose claiming process is gone and whose worktree no longer exists, and print a `reap` line for each.
+
+A remote device is not a lane: see [remote.md](remote.md).
