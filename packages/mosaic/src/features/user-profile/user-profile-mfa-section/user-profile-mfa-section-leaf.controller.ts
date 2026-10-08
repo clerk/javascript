@@ -1,4 +1,3 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useRef, useState } from 'react';
 
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
@@ -28,13 +27,7 @@ export function useUserProfileMfaSectionLeafController({
     if (!onSetDefault || method?.type !== 'sms' || !method.canSetDefault || method.isDefault) {
       return;
     }
-    void defaultAction.run('default', () =>
-      Promise.resolve(onSetDefault(id)).catch((error: unknown) => {
-        if (!isReverificationCancelledError(error)) {
-          throw error;
-        }
-      }),
-    );
+    void defaultAction.run('default', () => onSetDefault(id));
   };
 
   return {
@@ -50,15 +43,7 @@ export function useUserProfileMfaSectionLeafController({
       defaultAction.reset();
       open();
     },
-    confirmRemoval: async (method: UserProfileMfaMethod) => {
-      try {
-        await removalFocus.remove(method.id);
-      } catch (error: unknown) {
-        if (!isReverificationCancelledError(error)) {
-          throw error;
-        }
-      }
-    },
+    confirmRemoval: (method: UserProfileMfaMethod) => removalFocus.remove(method.id),
     finalRemovalFocus: removalFocus.finalFocus,
     isSettingDefault: defaultAction.isPending,
     defaultError: defaultAction.error,

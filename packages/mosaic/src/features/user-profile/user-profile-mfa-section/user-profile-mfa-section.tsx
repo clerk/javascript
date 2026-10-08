@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { Reverification } from '../../reverification/reverification';
-import { useReverificationModel } from '../../reverification/reverification.model';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { useUserProfileMfaController } from './user-profile-mfa-section.controller';
 import { useUserProfileMfaModel } from './user-profile-mfa-section.model';
@@ -34,36 +32,22 @@ export function mfaSectionNode(model: UserProfileMfaModel, fallback: ReactNode =
 }
 
 function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'ready' }> }) {
-  const reverificationModel = useReverificationModel(model.reverification);
-  const controller = useUserProfileMfaController(model, reverificationModel);
+  const controller = useUserProfileMfaController(model);
 
   return (
-    <>
-      <UserProfileMfaSectionView
-        {...controller.sectionProps}
-        addControl={
-          controller.showAddControl ? (
-            <UserProfileAddMfaDialog
-              open={controller.dialogOpen}
-              onOpenChange={controller.onDialogOpenChange}
-              hideTrigger={!controller.showAddTrigger}
-            >
-              {controller.showReverification ? (
-                <Reverification {...controller.reverificationProps} />
-              ) : (
-                <UserProfileMfaSetupView {...controller.setupProps} />
-              )}
-            </UserProfileAddMfaDialog>
-          ) : undefined
-        }
-      />
-      <UserProfileAddMfaDialog
-        open={controller.separateReverificationOpen}
-        onOpenChange={controller.onSeparateReverificationOpenChange}
-        hideTrigger
-      >
-        <Reverification {...controller.reverificationProps} />
-      </UserProfileAddMfaDialog>
-    </>
+    <UserProfileMfaSectionView
+      {...controller.sectionProps}
+      addControl={
+        controller.showAddControl ? (
+          <UserProfileAddMfaDialog
+            open={controller.dialogOpen}
+            onOpenChange={controller.onDialogOpenChange}
+            hideTrigger={!controller.showAddTrigger}
+          >
+            <UserProfileMfaSetupView {...controller.setupProps} />
+          </UserProfileAddMfaDialog>
+        ) : undefined
+      }
+    />
   );
 }

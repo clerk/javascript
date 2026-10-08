@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useRef } from 'react';
 
 import { useNow } from '../../../hooks/use-now';
@@ -7,8 +7,6 @@ import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import { toLocalizableError } from '../../../utils/errors';
-import { useReverificationController } from '../../reverification/reverification.controller';
-import type { ReverificationModel } from '../../reverification/reverification.model';
 import type { UserProfileMfaAddableMethod, UserProfileMfaModel } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 import type { UserProfileMfaSetupViewProps } from './user-profile-mfa-setup.view';
@@ -206,9 +204,6 @@ const mfaMachine = createMachine({
           actions: [
             (context, event) => context.reject(event.error),
             assign((context, event) => {
-              if (isReverificationCancelledError(event.error)) {
-                return { flow: { kind: 'closed' }, savedSetup: undefined, pending: undefined };
-              }
               const flow = context.flow;
               if (flow.kind !== 'authenticator' && flow.kind !== 'sms' && flow.kind !== 'backup') {
                 return { pending: undefined };
@@ -473,10 +468,9 @@ function useMfaActionRunner(value: string, send: MfaSend) {
   return { run, isLocked: () => locked.current };
 }
 
-export function useUserProfileMfaController(model: ReadyModel, reverificationModel: ReverificationModel) {
+export function useUserProfileMfaController(model: ReadyModel) {
   const errorText = useErrorText();
   const backupCodeMessages = useMessages('userProfileBackupCodes');
-  const reverificationProps = useReverificationController(reverificationModel, model.resetReverification);
   const [{ context, value }, send] = useMachine(mfaMachine);
   const { run, isLocked } = useMfaActionRunner(value, send);
   const now = useNow({ updateInterval: 1000 });
@@ -554,27 +548,12 @@ export function useUserProfileMfaController(model: ReadyModel, reverificationMod
 
   const dialogOpen = flow.kind !== 'closed';
   const showAddTrigger = model.addableMethods.length > 0;
-  const showReverification = model.reverification.phase === 'active' || model.reverification.phase === 'retrying';
 
   return {
     dialogOpen,
     showAddTrigger,
     showAddControl: showAddTrigger || dialogOpen,
-    showReverification,
-    separateReverificationOpen: !dialogOpen && showReverification,
-    onSeparateReverificationOpenChange: (open: boolean) => {
-      if (!open && model.reverification.phase === 'active') {
-        model.reverification.cancel();
-      }
-    },
-    reverificationProps,
-    onDialogOpenChange: (open: boolean) => {
-      if (!open && model.reverification.phase === 'active') {
-        model.reverification.cancel();
-        return;
-      }
-      send({ type: open ? 'OPEN' : 'CLOSE' });
-    },
+    onDialogOpenChange: (open: boolean) => send({ type: open ? 'OPEN' : 'CLOSE' }),
     sectionProps,
     setupProps,
   };
