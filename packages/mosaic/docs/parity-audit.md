@@ -55,7 +55,9 @@ rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protec
 
 ## Worked example — `OrganizationProfileDomainsSection`
 
-The audit run against the finished domains migration surfaced three behaviors
+A historical example: the domains section was migrated before Mosaic became
+its own package, and that code is not in `packages/mosaic` today. The audit
+run against the finished migration surfaced three behaviors
 that the model/controller/view split dropped, each tracked only by a buried
 `// TODO` (i.e. invisible at review time):
 
