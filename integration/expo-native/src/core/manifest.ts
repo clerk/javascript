@@ -37,6 +37,14 @@ export function manifestDrift(): readonly string[] {
   return [...names].filter((name) => committed.get(name) !== actual.get(name)).sort();
 }
 
+export function coreVersion(): string {
+  try {
+    return createHash('sha256').update(readFileSync(MANIFEST_FILE)).digest('hex').slice(0, 12);
+  } catch {
+    return 'unknown';
+  }
+}
+
 if (import.meta.main && process.argv.includes('--write')) {
   writeFileSync(MANIFEST_FILE, computeManifest());
 }
