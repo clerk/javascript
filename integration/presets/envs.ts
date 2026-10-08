@@ -157,6 +157,8 @@ automatedEnvironmentVariables.forEach(name => {
   withKeyless.setEnvVariable('private', name, 'false');
 });
 
+const oauthProvider = await withInstanceKeys('oauth-provider', base.clone().setId('oauthProvider'));
+
 const withEmailCodes = await withInstanceKeys(
   'with-email-codes',
   base
@@ -184,6 +186,10 @@ const withSharedUIVariant = withEmailCodes
   .setEnvVariable('public', 'CLERK_UI_VARIANT', 'shared');
 
 const withEmailLinks = await withInstanceKeys('with-email-links', base.clone().setId('withEmailLinks'));
+
+const sessionsDev1 = await withInstanceKeys('sessions-dev-1', base.clone().setId('sessionsDev1'));
+
+const sessionsDev2 = await withInstanceKeys('sessions-dev-2', base.clone().setId('sessionsDev2'));
 
 const withEnterpriseSso = await withInstanceKeys(
   'with-enterprise-sso',
@@ -323,6 +329,9 @@ const withPasskeys = await withInstanceKeys('with-passkeys', base.clone().setId(
 
 export const envs = {
   base,
+  oauthProvider,
+  sessionsDev1,
+  sessionsDev2,
   sessionsProd1,
   withAPIKeys,
   withAPCore3ClerkLatest,

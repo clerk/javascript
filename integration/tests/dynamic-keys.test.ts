@@ -30,7 +30,7 @@ test.describe('dynamic keys @nextjs', () => {
 
             const count = await client.users?.getCount();
 
-            if (count){
+            if (count !== undefined){
               return NextResponse.redirect(new URL('/users-count', request.url));
             }
           }

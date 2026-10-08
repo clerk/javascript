@@ -55,7 +55,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signUp.goTo();
 
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -74,7 +74,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     await u.po.signIn.goTo();
 
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -98,7 +98,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.po.signIn.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -126,7 +126,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
     });
     await u.po.signIn.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(modalSignUpUser.email);
     await u.po.signIn.continue();
@@ -187,7 +187,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     await u.po.signUp.waitForModal();
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -223,7 +223,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
     // Use OAuth provider
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
     // Sign in with existing account
     await u.po.signIn.setIdentifier(fakeUser.email);
@@ -252,7 +252,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
       const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
       await popupUtils.po.signIn.continue();
@@ -345,7 +345,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
       const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       // Complete OAuth in the popup
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
@@ -402,7 +402,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       const popup = await popupPromise;
       const popupUtils = createTestUtils({ app, page: popup, context });
-      await popupUtils.page.getByText('Sign in to oauth-provider').waitFor();
+      await popupUtils.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       // Complete OAuth in the popup
       await popupUtils.po.signIn.setIdentifier(fakeUser.email);
@@ -460,7 +460,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       await u.po.signIn.goTo();
 
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -488,7 +488,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
       await u.po.signIn.waitForModal();
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
 
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -519,7 +519,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
       // Sign in via OAuth on the first tab
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
       await u.po.signIn.enterTestOtpCode();

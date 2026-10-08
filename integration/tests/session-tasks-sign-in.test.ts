@@ -78,7 +78,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       // Performs sign-in with SSO
       await u.po.signIn.goTo();
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
       await u.po.signIn.setIdentifier(userFromOAuth.email);
       await u.po.signIn.continue();
       await u.po.signIn.enterTestOtpCode();

@@ -86,7 +86,7 @@ test.describe('Custom Flows OAuth @custom', () => {
     expect(secondPost.method()).toBe('POST');
 
     // Complete the OAuth flow end-to-end and assert we're signed in on the app instance.
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();

@@ -1,9 +1,8 @@
+import { createClerkClient } from '@clerk/backend';
 import { parsePublishableKey } from '@clerk/shared/keys';
 
+import { instanceKeys } from '../presets/instanceKeys';
 import { defineConfig } from '../presets/platformApplication.js';
-
-// this is the oauth-provider instance in the integration testing workspace
-const oauthProviderUrl = 'https://honest-wildcat-44.clerk.accounts.dev';
 
 export default defineConfig({
   config: {
@@ -99,54 +98,55 @@ export default defineConfig({
       },
     },
   },
-  setup: async ({ applicationName, clerkClient, publishableKey, patchConfig }) => {
+  setup: async context => {
     // setup allowed origins for the electron tests
-    await clerkClient.instance.update({ allowedOrigins: ['clerk://app'] });
+    await context.clerkClient.instance.update({ allowedOrigins: ['clerk://app'] });
+    await setup(context);
+  },
+});
 
-    const parsedPublishableKey = parsePublishableKey(publishableKey);
-    if (!parsedPublishableKey) {
-      throw new Error('The created application has an invalid publishable key.');
-    }
+export async function setup({ applicationName, publishableKey, patchConfig }, consentScreenEnabled = true) {
+  const parsedPublishableKey = parsePublishableKey(publishableKey);
+  if (!parsedPublishableKey) {
+    throw new Error('The created application has an invalid publishable key.');
+  }
 
-    const registrationResponse = await fetch(`${oauthProviderUrl}/oauth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        client_name: applicationName,
-        redirect_uris: [`https://${parsedPublishableKey.frontendApi}/v1/oauth_callback`],
-      }),
-    });
+  const oauthProviderUrl = `https://${parsePublishableKey(instanceKeys.get('oauth-provider').pk).frontendApi}`;
 
-    if (!registrationResponse.ok) {
-      throw new Error(`OAuth client registration failed: ${await registrationResponse.text()}`);
-    }
+  const client = await createClerkClient({
+    secretKey: instanceKeys.get('oauth-provider').sk,
+  }).oauthApplications.create({
+    name: applicationName,
+    redirectUris: [`https://${parsedPublishableKey.frontendApi}/v1/oauth_callback`],
+    scopes: 'profile email',
+    public: false,
+    consentScreenEnabled,
+  });
 
-    const client = await registrationResponse.json();
-    if (typeof client.client_id !== 'string' || typeof client.client_secret !== 'string') {
-      throw new Error('The OAuth client registration response does not contain a client ID and secret.');
-    }
+  if (typeof client.clientId !== 'string' || typeof client.clientSecret !== 'string') {
+    throw new Error('The OAuth client registration response does not contain a client ID and secret.');
+  }
 
-    await patchConfig({
-      connections_oauth_custom: {
-        e2e_oauth_provider: {
-          auth_url: `${oauthProviderUrl}/oauth/authorize`,
-          authenticatable: true,
-          base_scopes: [],
-          client_id: client.client_id,
-          client_secret: client.client_secret,
-          discovery_url: `${oauthProviderUrl}/.well-known/openid-configuration`,
-          enabled: true,
-          name: 'E2E OAuth Provider',
-          requires_pkce: false,
-          token_url: `${oauthProviderUrl}/oauth/token`,
-          user_info_url: `${oauthProviderUrl}/oauth/userinfo`,
-          user_mapping: {
-            id: {
-              path: 'user_id',
-            },
+  await patchConfig({
+    connections_oauth_custom: {
+      e2e_oauth_provider: {
+        auth_url: `${oauthProviderUrl}/oauth/authorize`,
+        authenticatable: true,
+        base_scopes: [],
+        client_id: client.clientId,
+        client_secret: client.clientSecret,
+        discovery_url: `${oauthProviderUrl}/.well-known/openid-configuration`,
+        enabled: true,
+        name: 'E2E OAuth Provider',
+        requires_pkce: true,
+        token_url: `${oauthProviderUrl}/oauth/token`,
+        user_info_url: `${oauthProviderUrl}/oauth/userinfo`,
+        user_mapping: {
+          id: {
+            path: 'user_id',
           },
         },
       },
-    });
-  },
-});
+    },
+  });
+}
