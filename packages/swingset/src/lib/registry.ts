@@ -183,6 +183,11 @@ import {
   SaveFails as OrganizationProfileProfileSectionSaveFails,
 } from '../stories/organization-profile-profile-section.stories';
 import {
+  Default as OrganizationSwitcherDefault,
+  meta as organizationSwitcherMeta,
+  NoOrganizationSelected as OrganizationSwitcherNoOrganizationSelected,
+} from '../stories/organization-switcher.stories';
+import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
   Error as OtpComponentError,
@@ -316,7 +321,6 @@ import {
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
-  Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
 import {
@@ -623,8 +627,13 @@ const itemModule: StoryModule = {
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
   Combined: UserButtonCombined,
-  Organizations: UserButtonOrganizations,
   User: UserButtonUser,
+};
+
+const organizationSwitcherModule: StoryModule = {
+  meta: organizationSwitcherMeta,
+  Default: OrganizationSwitcherDefault,
+  NoOrganizationSelected: OrganizationSwitcherNoOrganizationSelected,
 };
 
 const headingModule: StoryModule = {
@@ -958,6 +967,8 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
+  // Organization Switcher
+  organizationSwitcherModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels

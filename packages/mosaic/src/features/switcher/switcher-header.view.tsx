@@ -4,25 +4,27 @@ import type { ReactElement, ReactNode } from 'react';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { truncationStyles } from '../../styles/typography.styles';
-import type { UserButtonHeaderLayout } from './user-button.types';
-import { styles } from './user-button-header.styles';
+import type { SwitcherHeaderLayout } from './switcher.types';
+import { styles } from './switcher-header.styles';
+import { useSlot } from './switcher-surface';
 
-export interface UserButtonHeaderProps {
-  layout: UserButtonHeaderLayout;
+export interface SwitcherHeaderProps {
+  layout: SwitcherHeaderLayout;
   avatar: ReactNode;
   title: string;
   description?: string;
   actions?: ReactNode;
 }
 
-export function UserButtonHeader({ layout, avatar, title, description, actions }: UserButtonHeaderProps): ReactElement {
+export function SwitcherHeader({ layout, avatar, title, description, actions }: SwitcherHeaderProps): ReactElement {
+  const slot = useSlot();
   return (
-    <div {...mergeStyleProps(themeProps('user-button-header', { layout }), stylex.props(reset.base, styles.root))}>
+    <div {...mergeStyleProps(themeProps(slot('header'), { layout }), stylex.props(reset.base, styles.root))}>
       {avatar}
-      <div {...mergeStyleProps(themeProps('user-button-header-content'), stylex.props(reset.base, styles.content))}>
+      <div {...mergeStyleProps(themeProps(slot('header-content')), stylex.props(reset.base, styles.content))}>
         <div
           {...mergeStyleProps(
-            themeProps('user-button-header-title'),
+            themeProps(slot('header-title')),
             stylex.props(reset.base, styles.title, truncationStyles.singleLine),
           )}
         >
@@ -31,7 +33,7 @@ export function UserButtonHeader({ layout, avatar, title, description, actions }
         {description ? (
           <div
             {...mergeStyleProps(
-              themeProps('user-button-header-description'),
+              themeProps(slot('header-description')),
               stylex.props(reset.base, styles.description, truncationStyles.singleLine),
             )}
           >
@@ -42,7 +44,7 @@ export function UserButtonHeader({ layout, avatar, title, description, actions }
       {actions ? (
         <div
           {...mergeStyleProps(
-            themeProps('user-button-header-actions'),
+            themeProps(slot('header-actions')),
             stylex.props(reset.base, styles.actions, layout === 'stacked' && styles.actionsStacked),
           )}
         >

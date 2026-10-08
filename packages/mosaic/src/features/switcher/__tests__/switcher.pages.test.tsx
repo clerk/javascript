@@ -4,8 +4,8 @@ import { act, render, renderHook, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { CustomProfileItem } from '../../user-profile/user-profile.types';
-import type { CustomPagesOptions } from '../user-button.pages';
-import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from '../user-button.pages';
+import type { CustomPagesOptions } from '../switcher.pages';
+import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from '../switcher.pages';
 
 let selfServeSSOEnabled: boolean;
 let environment: {
