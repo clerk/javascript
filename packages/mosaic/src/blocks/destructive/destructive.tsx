@@ -149,14 +149,12 @@ function DestructiveCard({
         <>
           <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
           <Flow.Step ids={['verify']}>
-            {reverification ? (
-              <Reverification
-                {...reverification}
-                // This onClose isn't strictly necessary, but make sure we close as soon as possible
-                // instead of after the reverification has been reset
-                onClose={onClose}
-              />
-            ) : null}
+            <Reverification
+              {...reverification}
+              // This onClose isn't strictly necessary, but make sure we close as soon as possible
+              // instead of after the reverification has been reset
+              onClose={onClose}
+            />
           </Flow.Step>
         </>
       )}

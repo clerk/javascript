@@ -40,7 +40,8 @@ function passwordError(
     return undefined;
   }
   if (first.code === 'form_password_not_strong_enough') {
-    return passwordStrengthMessage(first.meta?.zxcvbn?.suggestions?.map(suggestion => suggestion.code) ?? [], messages);
+    const suggestions: { code: string }[] | undefined = first.meta?.zxcvbn?.suggestions;
+    return passwordStrengthMessage(suggestions?.map(suggestion => suggestion.code) ?? [], messages);
   }
   const failures = errors.flatMap(error => {
     const code = passwordComplexityCodes.get(error.code);

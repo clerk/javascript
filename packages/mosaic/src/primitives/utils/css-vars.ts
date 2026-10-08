@@ -1,6 +1,6 @@
-import { detectOverflow, type Middleware } from '@floating-ui/react';
+import { detectOverflow, type Middleware, type Side } from '@floating-ui/react';
 
-import { resolveSideOffset, type SideOffset } from './side-offset';
+import { parsePlacement, resolveSideOffset, type SideOffset } from './side-offset';
 
 /**
  * Positioning middleware that sets CSS custom properties on the floating element:
@@ -28,7 +28,7 @@ export function cssVars(opts?: { sideOffset?: SideOffset }): Middleware {
 
       // Available space
       const overflow = await detectOverflow(state, { padding: 5 });
-      const side = placement.split('-')[0] as 'top' | 'bottom' | 'left' | 'right';
+      const side = parsePlacement(placement).side;
 
       // A middleware that already capped the popup (select alignment) owns the height.
       const availableHeight =
@@ -71,7 +71,7 @@ export function cssVars(opts?: { sideOffset?: SideOffset }): Middleware {
         transformY = anchorY;
       }
 
-      const originMap: Record<string, string> = {
+      const originMap: Record<Side, string> = {
         top: `${transformX}px calc(100% + ${sideOffset}px)`,
         bottom: `${transformX}px ${-sideOffset}px`,
         left: `calc(100% + ${sideOffset}px) ${transformY}px`,

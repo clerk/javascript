@@ -1,3 +1,5 @@
+import { logger } from '@clerk/shared/logger';
+
 import { isAssignAction } from './assign';
 import type {
   Actions,
@@ -46,6 +48,17 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // events aren't part of the user's `TEvent` union, so the config is viewed
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
   const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject>>;
+  const emptyState: StateConfig<TContext, EventObject> = {};
+  const stateOf = (id: string): StateConfig<TContext, EventObject> => {
+    const state = states[id];
+    if (state) {
+      return state;
+    }
+    if (Object.keys(states).length > 0) {
+      logger.warnOnce(`[Clerk] Machine has no state "${id}".`);
+    }
+    return emptyState;
+  };
 
   // Tracks the latest setContext patch so it survives a stop/start cycle.
   let liveContextPatch: Partial<TContext> = options.context ?? {};
@@ -57,7 +70,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // A teleported actor is already "started" and inert: start() must not re-run
   // entry/always/invoke for the state it was dropped into.
   let started = teleport !== undefined;
-  let status: Snapshot<TContext>['status'] = states[value]?.type === 'final' ? 'done' : 'active';
+  let status: Snapshot<TContext>['status'] = stateOf(value).type === 'final' ? 'done' : 'active';
 
   // Bumped whenever we leave an invoking state (or stop), so a stale promise
   // resolving after the fact is ignored — no transition, no setState-after-stop.
@@ -122,7 +135,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   /** Whether a target state's entry guard currently permits landing on it. */
   function canEnter(stateId: string, event: EventObject): boolean {
-    const guard = states[stateId]?.guard;
+    const guard = stateOf(stateId).guard;
     return !guard || guard(context, event);
   }
 
@@ -137,7 +150,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       return false; // entry guard blocks landing → snapshot unchanged, no notify
     }
     if (external) {
-      runActions(states[value].exit, event);
+      runActions(stateOf(value).exit, event);
       invocationToken++; // abandon the invoke of the state we're leaving
       clearAfterTimers();
     }
@@ -150,7 +163,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   }
 
   function startInvoke(event: EventObject): void {
-    const invoke = states[value].invoke;
+    const invoke = stateOf(value).invoke;
     if (!invoke) {
       return;
     }
@@ -198,7 +211,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   }
 
   function startAfterTimers(): void {
-    const afterConfig = states[value].after;
+    const afterConfig = stateOf(value).after;
     if (!afterConfig) {
       return;
     }
@@ -224,10 +237,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   /** Entry side of a state: entry actions, then immediate/invoke resolution. */
   function enterState(event: EventObject): void {
-    const stateConfig = states[value];
-    if (!stateConfig) {
-      return;
-    } // degenerate graph (e.g. empty wizard) — nothing to enter
+    const stateConfig = stateOf(value);
     runActions(stateConfig.entry, event);
 
     if (stateConfig.type === 'final') {
@@ -246,8 +256,14 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   function commit(): void {
     snapshot = { value, context, status };
-    for (let i = listeners.length; i--; ) {
-      listeners[i](snapshot);
+    notifyListeners();
+  }
+
+  function notifyListeners(): void {
+    for (const listener of [...listeners].reverse()) {
+      if (listeners.includes(listener)) {
+        listener(snapshot);
+      }
     }
   }
 
@@ -276,9 +292,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       invocationToken++; // abandon any in-flight invoke
       clearAfterTimers();
       snapshot = { value, context, status };
-      for (let i = listeners.length; i--; ) {
-        listeners[i](snapshot);
-      }
+      notifyListeners();
       listeners.length = 0;
     },
 
@@ -286,7 +300,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       if (!started || status !== 'active') {
         return;
       }
-      const transition = pickTransition(normalizeTransition(states[value]?.on?.[event.type], event), event);
+      const transition = pickTransition(normalizeTransition(stateOf(value).on?.[event.type], event), event);
       if (!transition) {
         return;
       } // event not handled in this state → ignored
@@ -318,7 +332,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       if (!started || status !== 'active') {
         return false;
       }
-      const transition = pickTransition(normalizeTransition(states[value]?.on?.[event.type], event), event);
+      const transition = pickTransition(normalizeTransition(stateOf(value).on?.[event.type], event), event);
       if (!transition) {
         return false;
       }
@@ -344,7 +358,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       if (!canEnter(value, event)) {
         const reseated = resolveInitial();
         if (reseated !== value) {
-          runActions(states[value]?.exit, event);
+          runActions(stateOf(value).exit, event);
           invocationToken++; // abandon the invoke of the state we're leaving
           clearAfterTimers();
           value = reseated;
@@ -354,7 +368,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         return;
       }
 
-      const immediate = pickTransition(normalizeTransition(states[value]?.always, event), event);
+      const immediate = pickTransition(normalizeTransition(stateOf(value).always, event), event);
       if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
         commit(); // nothing applies → no commit, no notify
       }
