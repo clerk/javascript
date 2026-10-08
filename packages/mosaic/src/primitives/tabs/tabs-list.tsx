@@ -3,7 +3,7 @@
 import { Composite } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
 export type TabsListProps = ComponentProps<'div'>;
@@ -25,34 +25,22 @@ export function TabsList(props: TabsListProps) {
             }
             event.preventDefault();
             const items = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])'));
-            if (items.length === 0) {
-              return;
-            }
-            const target = event.key === 'Home' ? items[0] : items[items.length - 1];
-            target.focus();
+            (event.key === 'Home' ? items.at(0) : items.at(-1))?.focus();
           },
         };
 
-        const merged = mergeProps<'div'>(
-          defaultProps,
-          mergeProps<'div'>(otherProps, compositeProps as Record<string, unknown>),
-        );
+        const merged = mergeProps<'div'>(defaultProps, mergeProps<'div'>(otherProps, compositeProps));
 
         // Composite may inject a ref via compositeProps; hand it to useRender's ref
         // param (which owns ref-merging) instead of leaving it in props, where
         // useRender's merged ref would overwrite it.
         const { ref: compositeRef, ...mergedProps } = merged;
 
-        // floating-ui's Composite invokes this render callback synchronously and
-        // unconditionally during its own render (see renderJsx), so useRender runs in a
-        // stable hook position on the Composite fiber. The rule can't see that.
-        // eslint-disable-next-line react-hooks/rules-of-hooks
+        // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
         return useRender({
           defaultTagName: 'div',
           render,
-          // SAFETY: mergeProps returns Record<string, unknown>; a ref Composite injected
-          // is a valid React ref at runtime.
-          ref: compositeRef as React.Ref<unknown>,
+          ref: isRef(compositeRef) ? compositeRef : undefined,
           props: mergedProps,
         });
       }}

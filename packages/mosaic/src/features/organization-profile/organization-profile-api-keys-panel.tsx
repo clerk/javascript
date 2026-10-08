@@ -4,7 +4,8 @@ import type { ReactNode } from 'react';
 import { Panel } from '../../components/panel';
 import { useMessages } from '../../localization';
 import { themeProps } from '../../props';
-import { APIKeysTable, useAPIKeysAccess } from '../api-keys/api-keys-table';
+import { APIKeysTable } from '../api-keys/api-keys-table';
+import { useAPIKeysAccess } from '../api-keys/api-keys-table.model';
 
 export interface OrganizationProfileApiKeysPanelProps {
   fallback?: ReactNode;

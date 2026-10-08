@@ -8,19 +8,18 @@ import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
 import { Spinner } from '../../components/spinner';
-import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill } from '../../localization';
-import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
 import { skeletonStyles } from '../../styles/skeleton.styles';
 import { SkeletonText } from '../../utils/skeleton-text';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
 import { styles } from './api-keys-table.styles';
-import type { APIKey, APIKeysTableMessages, APIKeysTableSort, APIKeysTableViewProps } from './api-keys-table.types';
+import type { APIKey, APIKeysTableMessages, APIKeysTableViewProps } from './api-keys-table.types';
 import { CreateAPIKeyDialog } from './create-api-key.dialog';
 
 const getRowId = (row: APIKey) => row.id;
@@ -32,7 +31,7 @@ const PLACEHOLDER_NAMES = ['Production server', 'CI pipeline', 'Analytics'];
 export function placeholderAPIKeys(count: number): APIKey[] {
   return Array.from({ length: count }, (_, index) => ({
     id: `ak_placeholder${index}`,
-    name: PLACEHOLDER_NAMES[index % PLACEHOLDER_NAMES.length],
+    name: PLACEHOLDER_NAMES[index % PLACEHOLDER_NAMES.length] ?? '',
     createdAtLabel: 'Jan 5, 2026',
     expiresAtLabel: null,
     lastUsedAtLabel: '2 minutes ago',
@@ -71,58 +70,31 @@ export function APIKeysTableView({
     fallback: () => createButton.current ?? searchInput.current,
   });
   const revokeKey = useMemo(() => Destructive.createHandle<APIKey>(), []);
-  const pagination = { pageIndex: page - 1, pageSize };
-  const table = useDataTable({
+  const { table, sortHeader, pagination } = useServerDataTable({
     data: apiKeys,
     totalCount,
     getRowId,
-    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
-    onSortingChange: onSortChange
-      ? update => {
-          const next = typeof update === 'function' ? update(table.sorting) : update;
-          const active = next[0];
+    sortableColumns: ['name', 'createdAt', 'lastUsed'],
+    sort,
+    onSortChange: onSortChange
+      ? next => {
           lastChange.current = 'page';
-          table.setRowSelection({});
-          onSortChange(
-            active && (active.id === 'name' || active.id === 'createdAt' || active.id === 'lastUsed')
-              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
-              : null,
-          );
+          onSortChange(next);
         }
       : undefined,
-    pagination,
-    onPaginationChange: update => {
-      const next = typeof update === 'function' ? update(pagination) : update;
+    page,
+    pageSize,
+    onPageChange: next => {
       lastChange.current = 'page';
-      table.setRowSelection({});
-      if (next.pageSize !== pageSize) {
-        onPageSizeChange?.(next.pageSize);
-      }
-      onPageChange(next.pageIndex + 1);
+      onPageChange(next);
     },
-    globalFilter: searchValue,
-    onGlobalFilterChange: update => {
+    onPageSizeChange,
+    searchValue,
+    onSearchChange: value => {
       lastChange.current = 'search';
-      table.setRowSelection({});
-      onSearchChange(typeof update === 'function' ? update(searchValue) : update);
+      onSearchChange(value);
     },
   });
-  const sortHeader = (column: APIKeysTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
-    const active = table.sorting[0];
-    return {
-      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
-      onSort: onSortChange
-        ? () =>
-            table.setSorting(current => {
-              const active = current[0];
-              if (active?.id !== column) {
-                return [{ id: column, desc: false }];
-              }
-              return active.desc ? [] : [{ id: column, desc: true }];
-            })
-        : undefined,
-    };
-  };
   const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
   const rowsSkeleton = refetchSkeleton && isFetching && !skeleton && !isLoading;
   const remaining = totalCount - (page - 1) * pageSize;
@@ -131,7 +103,6 @@ export function APIKeysTableView({
   );
   const query = searchValue.trim();
   const bones = skeleton || rowsSkeleton;
-  const text = (content: ReactNode) => (bones ? <SkeletonText>{content}</SkeletonText> : content);
   const renderRow = (apiKey: APIKey, row?: (typeof table.rows)[number]) => (
     <Table.Row
       key={apiKey.id}
@@ -145,30 +116,11 @@ export function APIKeysTableView({
         />
       ) : null}
       <Table.Cell skeleton={false}>
-        <div {...stylex.props(styles.metadata)}>
-          <Text xstyle={styles.name}>{text(apiKey.name)}</Text>
-          <Text
-            size='xs'
-            color='foreground-secondary'
-          >
-            {text(
-              <>
-                {truncateWithEndVisible(apiKey.id, 10, 4)} ·{' '}
-                <Text
-                  render={<span />}
-                  size='xs'
-                  color={apiKey.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
-                >
-                  {apiKey.expiresAtLabel === null
-                    ? m.neverExpires
-                    : fill(m.expires, {
-                        expiresDate: apiKey.expiresAtLabel,
-                      })}
-                </Text>
-              </>,
-            )}
-          </Text>
-        </div>
+        <APIKeyMetadata
+          messages={m}
+          apiKey={apiKey}
+          skeleton={bones}
+        />
       </Table.Cell>
       <Table.Cell noWrap>{apiKey.createdAtLabel}</Table.Cell>
       <Table.Cell noWrap>{apiKey.lastUsedAtLabel ?? m.neverUsed}</Table.Cell>
@@ -291,19 +243,13 @@ export function APIKeysTableView({
             )}
           </Table.Body>
         </Table.Root>
-        {!skeleton && (table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange)) ? (
+        {pagination && !skeleton ? (
           <Pagination
-            page={table.pagination.pageIndex + 1}
-            pageSize={table.pagination.pageSize}
-            totalItems={totalCount}
-            onPageSizeChange={
-              onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
-            }
+            {...pagination}
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
             nextPageLabel={m.nextPage}
-            onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
           />
         ) : null}
       </div>
@@ -328,6 +274,44 @@ export function APIKeysTableView({
 
 function Bone({ xstyle }: { xstyle: stylex.StyleXStyles }) {
   return <span {...stylex.props(skeletonStyles.bone, skeletonStyles.shimmer, xstyle)} />;
+}
+
+function APIKeyMetadata({
+  messages: m,
+  apiKey,
+  skeleton,
+}: {
+  messages: APIKeysTableMessages;
+  apiKey: APIKey;
+  skeleton: boolean;
+}) {
+  const text = (content: ReactNode) => (skeleton ? <SkeletonText>{content}</SkeletonText> : content);
+  return (
+    <div {...stylex.props(styles.metadata)}>
+      <Text xstyle={styles.name}>{text(apiKey.name)}</Text>
+      <Text
+        size='xs'
+        color='foreground-secondary'
+      >
+        {text(
+          <>
+            {truncateWithEndVisible(apiKey.id, 10, 4)} ·{' '}
+            <Text
+              render={<span />}
+              size='xs'
+              color={apiKey.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
+            >
+              {apiKey.expiresAtLabel === null
+                ? m.neverExpires
+                : fill(m.expires, {
+                    expiresDate: apiKey.expiresAtLabel,
+                  })}
+            </Text>
+          </>,
+        )}
+      </Text>
+    </div>
+  );
 }
 
 function APIKeyActions({

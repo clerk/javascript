@@ -30,6 +30,7 @@ import {
   CLERK_SYNCED_STATUS,
   ERROR_CODES,
 } from '@clerk/shared/internal/clerk-js/constants';
+import { hasMultipleEnterpriseConnections } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -198,6 +199,7 @@ import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
 import { ProtectCheckGate } from './protectCheckGate';
+import type { SignIn, SignUp } from './resources/internal';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -1000,11 +1002,19 @@ export class Clerk implements ClerkInterface {
       return;
     }
     const gate = ProtectCheckGate.getInstance();
+    const resolve = async (resource: SignInResource | SignUpResource) => {
+      try {
+        await gate.resolve(this, resource);
+      } catch (error) {
+        eventBus.emit(events.ResourceError, { resource: resource as SignIn | SignUp, error });
+        throw error;
+      }
+    };
     if (flow !== 'signUp') {
-      await gate.resolve(this, client.signIn);
+      await resolve(client.signIn);
     }
     if (flow !== 'signIn') {
-      await gate.resolve(this, client.signUp);
+      await resolve(client.signUp);
     }
   };
 
@@ -2710,11 +2720,14 @@ export class Clerk implements ClerkInterface {
     const signUpProtectCheckUrl =
       params.signUpProtectCheckUrl ||
       buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true });
+    const signInUrl = params.signInUrl || displayConfig.signInUrl;
+    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
+    const enterpriseConnectionsUrl =
+      params.enterpriseConnectionsUrl ||
+      buildURL({ base: signUpUrl, hashPath: '/enterprise-connections' }, { stringify: true });
 
     const navigateToSignUpProtectCheck = makeNavigate(signUpProtectCheckUrl);
 
-    const signInUrl = params.signInUrl || displayConfig.signInUrl;
-    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
     const internalNavigateOnSetActive = params.__internal_navigateOnSetActive;
 
     const setActiveNavigate = async ({
@@ -2864,6 +2877,7 @@ export class Clerk implements ClerkInterface {
             verifyEmailAddressUrl,
             verifyPhoneNumberUrl,
             signUpProtectCheckUrl,
+            enterpriseConnectionsUrl,
             navigate,
           });
         default:
@@ -2926,6 +2940,7 @@ export class Clerk implements ClerkInterface {
         verifyEmailAddressUrl,
         verifyPhoneNumberUrl,
         signUpProtectCheckUrl,
+        enterpriseConnectionsUrl,
         navigate,
       });
     }
@@ -2935,6 +2950,15 @@ export class Clerk implements ClerkInterface {
         redirectUrl: this.buildAfterSignInUrl(),
       });
       return;
+    }
+
+    const userMustChooseEnterpriseConnection =
+      params.reloadResource !== 'signUp' &&
+      si.status === 'needs_first_factor' &&
+      hasMultipleEnterpriseConnections(signIn.supportedFirstFactors);
+
+    if (userMustChooseEnterpriseConnection) {
+      return navigateToFactorOne();
     }
 
     return navigateToSignIn();

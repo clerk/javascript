@@ -38,7 +38,7 @@ export function formatDate(date: Date, locale: string): string {
 }
 
 export function formatRelativeTime(date: Date, locale: string, now: Date): string {
-  const seconds = Math.round((date.getTime() - now.getTime()) / 1000);
+  const seconds = Math.min(0, Math.round((date.getTime() - now.getTime()) / 1000));
   const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
   const unit = relativeUnits.find(([, size]) => Math.abs(seconds) >= size);
   return unit ? format.format(Math.round(seconds / unit[1]), unit[0]) : format.format(seconds, 'second');

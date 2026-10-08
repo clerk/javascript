@@ -152,4 +152,13 @@ describe('UserProfileView', () => {
     expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
     expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
   });
+
+  it('warns when there are no pages to show', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    renderView({ pages: {} });
+
+    expect(warn).toHaveBeenCalledWith('[Clerk] UserProfile has no pages to show.');
+    warn.mockRestore();
+  });
 });

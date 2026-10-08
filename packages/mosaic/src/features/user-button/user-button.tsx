@@ -160,10 +160,12 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
       customPages: userProfile.customPages,
       additionalOAuthScopes: userProfileProps?.additionalOAuthScopes,
       apiKeysProps: userProfileProps?.apiKeysProps,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- `@clerk/shared` types `appearance` as an unresolved type until a framework SDK augments `ClerkAppearanceRegistry`; it passes through untouched.
       appearance: userProfileProps?.appearance,
     },
     organizationProfile: {
       customPages: organizationProfile.customPages,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- `@clerk/shared` types `appearance` as an unresolved type until a framework SDK augments `ClerkAppearanceRegistry`; it passes through untouched.
       appearance: organizationProfileProps?.appearance,
     },
   });

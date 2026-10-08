@@ -58,7 +58,9 @@ export function Default() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Profile</Section.Title>
+          <Section.Content>
+            <Section.Title>Profile</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -152,7 +154,9 @@ export function Cards() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Profile</Section.Title>
+          <Section.Content>
+            <Section.Title>Profile</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -197,7 +201,9 @@ export function Cards() {
       ].map(({ label, values }) => (
         <Section.Group key={label}>
           <Section.Header>
-            <Section.Title>{label}</Section.Title>
+            <Section.Content>
+              <Section.Title>{label}</Section.Title>
+            </Section.Content>
             <Section.Actions>
               <Button
                 aria-label={`Add ${label.toLowerCase()}`}
@@ -250,8 +256,10 @@ export function HeaderDescription() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Active devices</Section.Title>
-          <Section.Description>Devices signed in to this account.</Section.Description>
+          <Section.Content>
+            <Section.Title>Active devices</Section.Title>
+            <Section.Description>Devices signed in to this account.</Section.Description>
+          </Section.Content>
           <Section.Actions>
             <Button
               color='neutral'
@@ -295,7 +303,9 @@ export function ConnectedAccounts() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Connected accounts</Section.Title>
+          <Section.Content>
+            <Section.Title>Connected accounts</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -351,7 +361,9 @@ export function IconFrameMedia() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Team</Section.Title>
+          <Section.Content>
+            <Section.Title>Team</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -381,7 +393,9 @@ export function Destructive() {
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Danger zone</Section.Title>
+          <Section.Content>
+            <Section.Title>Danger zone</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -409,39 +423,40 @@ export function Destructive() {
   );
 }
 
-export function Flat() {
+export function ContainedHeader() {
   return (
     <>
       <style>{`
         @scope {
           .cl-section-group {
+            border: 1px solid var(--cl-color-border) !important;
+            border-radius: var(--cl-radius-xl) !important;
+            background: var(--cl-color-background) !important;
+          }
+          .cl-section-header {
+            margin: 0 1rem !important;
+            padding-block: 0.75rem !important;
+            min-height: 3.25rem !important;
+            width: auto !important;
+          }
+          .cl-section-body {
+            margin-inline: 1rem !important;
+            padding-inline: 0 !important;
             border: none !important;
             border-radius: 0 !important;
             background: none !important;
           }
-          .cl-section-header {
-            margin: 0 0 0.75rem !important;
-            padding: 0 !important;
-            min-height: 0 !important;
-          }
-          .cl-section-header .cl-button {
-            padding: 0 !important;
-            border: none !important;
-            background: none !important;
-          }
-          .cl-section-body {
-            margin: 0 !important;
-            padding-inline: 1rem !important;
-            border: 1px solid var(--cl-color-border) !important;
-            border-radius: var(--cl-radius-xl) !important;
-            background: var(--cl-color-background) !important;
+          .cl-section-header + .cl-section-body {
+            border-top: 1px solid var(--cl-color-border) !important;
           }
         }
       `}</style>
       <Section.Root xstyle={styles.rootMax}>
         <Section.Group>
           <Section.Header>
-            <Section.Title>Profile</Section.Title>
+            <Section.Content>
+              <Section.Title>Profile</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body>
             <Section.Row>
@@ -486,7 +501,9 @@ export function Flat() {
         ].map(({ label, values }) => (
           <Section.Group key={label}>
             <Section.Header>
-              <Section.Title>{label}</Section.Title>
+              <Section.Content>
+                <Section.Title>{label}</Section.Title>
+              </Section.Content>
               <Section.Actions>
                 <Button
                   aria-label={`Add ${label.toLowerCase()}`}
