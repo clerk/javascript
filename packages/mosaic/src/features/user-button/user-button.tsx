@@ -91,7 +91,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement {
   return (
     <Switcher
       {...props}
-      mode={props.mode ?? 'combined'}
+      mode={props.mode === 'user' ? 'user' : 'combined'}
     />
   );
 }
