@@ -16,6 +16,7 @@ const liveRoutes = new Map([
   ['/user-profile/user-profile-connected-accounts-section', '/live/connected-accounts'],
   ['/user-profile/user-profile-enterprise-accounts-section', '/live/enterprise-accounts'],
   ['/user-profile/user-profile-danger-section', '/live/user-danger'],
+  ['/organization-profile/organization-profile-general-panel', '/live/organization-general'],
   ['/organization-profile/organization-profile-danger-section', '/live/organization-danger'],
   ['/user-profile/user-profile-passkeys-section', '/live/passkeys'],
   ['/reverification/reverification', '/live/reverification'],
