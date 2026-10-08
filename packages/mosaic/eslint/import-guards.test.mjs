@@ -3,7 +3,7 @@ import path from 'node:path';
 import { ESLint } from 'eslint';
 import { describe, expect, test } from 'vitest';
 
-const root = path.resolve(import.meta.dirname, '..');
+const root = path.resolve(import.meta.dirname, '../../..');
 const eslint = new ESLint({
   cwd: root,
   overrideConfig: {
@@ -110,7 +110,7 @@ describe('Mosaic import boundaries', () => {
   ])('rejects state hooks through the React default binding: %s', async source => {
     const messages = await lint('sample.model.ts', source);
     expect(messages.find(message => message.fatal)).toBeUndefined();
-    expect(messages.filter(message => message.ruleId === 'custom-rules/no-model-react-state')).toEqual([
+    expect(messages.filter(message => message.ruleId === 'mosaic/no-model-react-state')).toEqual([
       expect.objectContaining({
         message: 'Put interaction state in the controller and pass its results to the view.',
         messageId: 'controllerState',
@@ -131,7 +131,7 @@ describe('Mosaic import boundaries', () => {
   ])('preserves unrelated React usage: %s', async source => {
     const messages = await lint('sample.model.ts', source);
     expect(messages.find(message => message.fatal)).toBeUndefined();
-    expect(messages.filter(message => message.ruleId === 'custom-rules/no-model-react-state')).toEqual([]);
+    expect(messages.filter(message => message.ruleId === 'mosaic/no-model-react-state')).toEqual([]);
   });
 
   test.each(['sample.view.ts', 'sample.view.tsx', 'sample.controller.ts', 'sample.controller.tsx'])(
@@ -140,7 +140,7 @@ describe('Mosaic import boundaries', () => {
       for (const source of ["import('./sample.messages');", 'import(`@/features/sample.messages.ts`);']) {
         const messages = await lint(file, source);
         expect(messages.find(message => message.fatal)).toBeUndefined();
-        expect(messages.filter(message => message.ruleId === 'custom-rules/no-dynamic-message-catalogs')).toEqual([
+        expect(messages.filter(message => message.ruleId === 'mosaic/no-dynamic-message-catalogs')).toEqual([
           expect.objectContaining({
             message: 'Use useMessages() for localized and overridden copy instead of importing catalog values.',
             messageId: 'useMessages',
@@ -162,7 +162,7 @@ describe('Mosaic import boundaries', () => {
     expect(messages.find(message => message.fatal)).toBeUndefined();
     expect(
       messages.filter(message =>
-        ['custom-rules/no-model-react-state', 'custom-rules/no-dynamic-message-catalogs'].includes(message.ruleId),
+        ['mosaic/no-model-react-state', 'mosaic/no-dynamic-message-catalogs'].includes(message.ruleId),
       ),
     ).toEqual([]);
   });
