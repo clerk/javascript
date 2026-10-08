@@ -25,28 +25,51 @@ function renderEmail(overrides: Partial<UserProfileAccountSectionViewProps> = {}
 }
 
 describe('email actions', () => {
-  it('returns focus to the email menu after opening with the keyboard and canceling with Escape', async () => {
+  it('marks the email busy while it is being set as primary', async () => {
     const user = userEvent.setup();
-    const onRemoveEmail = vi.fn();
-    renderEmail({ onRemoveEmail });
-    const trigger = screen.getByRole('button', { name: 'Manage test@example.com' });
+    const request = createDeferredPromise();
+    const onSetPrimaryEmail = vi.fn().mockReturnValue(request.promise);
+    renderEmail({ onSetPrimaryEmail });
+    const row = screen.getByText('test@example.com').closest('.cl-section-item');
 
-    trigger.focus();
-    await user.keyboard('{Enter}');
-    await user.keyboard('{Enter}');
-    expect(screen.getByRole('alertdialog', { name: 'Remove email address?' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    expect(row).toHaveAttribute('aria-busy', 'true');
 
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(onRemoveEmail).not.toHaveBeenCalled();
-    await waitFor(() => expect(trigger).toHaveFocus());
+    await act(async () => {
+      request.resolve();
+      await request.promise;
+    });
+    expect(row).not.toHaveAttribute('aria-busy');
   });
 
-  it('focuses Add email after removing the last email', async () => {
+  it('stays busy while the pending indicator is held after a slow request', async () => {
     const user = userEvent.setup();
+    const onSetPrimaryEmail = vi.fn(() => new Promise<void>(resolve => setTimeout(resolve, 200)));
+    renderEmail({ onSetPrimaryEmail });
+    const row = screen.getByText('test@example.com').closest('.cl-section-item');
+
+    await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    await act(() => new Promise(resolve => setTimeout(resolve, 300)));
+
+    expect(screen.getByRole('progressbar', { name: 'Setting as primary' })).toBeInTheDocument();
+    expect(row).toHaveAttribute('aria-busy', 'true');
+
+    await waitFor(() => expect(screen.queryByRole('progressbar')).not.toBeInTheDocument(), { timeout: 1500 });
+    expect(row).not.toHaveAttribute('aria-busy');
+  });
+
+  it('keeps the list order when the primary changes, and holds the badge while the spinner shows', async () => {
+    const user = userEvent.setup();
+    const order = () =>
+      screen.getAllByRole('button', { name: /^Manage / }).map(button => button.getAttribute('aria-label'));
+    const primary = () => screen.getByText('Primary').closest('.cl-section-item')?.textContent;
     function Example() {
-      const [emails, setEmails] = useState([{ id: 'email_1', value: 'test@example.com', isVerified: true }]);
+      const [emails, setEmails] = useState([
+        { id: 'email_1', value: 'first@example.com', isDefault: true, isVerified: true },
+        { id: 'email_2', value: 'second@example.com', isVerified: true },
+      ]);
       return (
         <MosaicProvider>
           <UserProfileAccountSectionView
@@ -55,22 +78,31 @@ describe('email actions', () => {
             username='test'
             phones={[]}
             emails={emails}
-            onSendEmailCode={() => Promise.resolve()}
-            onVerifyEmailCode={() => Promise.resolve()}
-            onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
+            onRemoveEmail={vi.fn()}
+            onSetPrimaryEmail={async id => {
+              await new Promise(resolve => setTimeout(resolve, 200));
+              setEmails(current =>
+                [...current]
+                  .map(email => ({ ...email, isDefault: email.id === id }))
+                  .sort((a, b) => Number(b.isDefault) - Number(a.isDefault)),
+              );
+            }}
           />
         </MosaicProvider>
       );
     }
     render(<Example />);
-    await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(screen.getByRole('button', { name: 'Manage second@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
 
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.queryByRole('button', { name: 'Manage test@example.com' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add email' })).toBeEnabled();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Add email' })).toHaveFocus());
+    await act(() => new Promise(resolve => setTimeout(resolve, 300)));
+    expect(primary()).toContain('first@example.com');
+    expect(
+      screen.getByRole('progressbar', { name: 'Setting as primary' }).closest('.cl-section-item'),
+    ).toHaveTextContent('second@example.com');
+
+    await waitFor(() => expect(primary()).toContain('second@example.com'), { timeout: 1500 });
+    expect(order()).toEqual(['Manage first@example.com', 'Manage second@example.com']);
   });
 
   it('shows a primary update error without opening a dialog', async () => {

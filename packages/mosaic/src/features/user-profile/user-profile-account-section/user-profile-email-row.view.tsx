@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
@@ -6,6 +6,7 @@ import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
+import { useContactList } from './use-contact-list';
 import type { UserProfileEmail } from './user-profile-account-section.types';
 import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
@@ -37,11 +38,15 @@ export function UserProfileEmailRowView({
   onRemoveEmail,
 }: UserProfileEmailRowViewProps) {
   const m = useMessages('userProfileAccountSection');
-  const row = useRef<HTMLDivElement>(null);
+  const list = useContactList({
+    items: emails,
+    onSetPrimary: onSetPrimaryEmail,
+    primaryErrorMessage: m.email.primaryError,
+  });
   const removalFocus = useListRemovalFocus({
-    ids: emails.map(email => email.id),
+    ids: list.shownItems.map(email => email.id),
     onRemove: onRemoveEmail,
-    fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
+    fallback: list.removalFallback,
   });
   const addEmailAction =
     onSendEmailCode && onVerifyEmailCode ? (
@@ -68,28 +73,6 @@ export function UserProfileEmailRowView({
       </Button>
     ) : undefined;
   const removeEmailConfirmation = useMemo(() => Confirmation.createHandle<UserProfileEmail>(), []);
-  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
-  const [primaryError, setPrimaryError] = useState<string>();
-  const settingPrimary = useRef(false);
-
-  const setPrimaryEmail = async (id: string) => {
-    const email = emails.find(email => email.id === id);
-    if (!onSetPrimaryEmail || !email?.isVerified || email.isDefault || settingPrimary.current) {
-      return;
-    }
-    settingPrimary.current = true;
-    setIsSettingPrimary(true);
-    setPrimaryError(undefined);
-    try {
-      await onSetPrimaryEmail(id);
-    } catch (error) {
-      setPrimaryError(error instanceof Error ? error.message : m.email.primaryError);
-    } finally {
-      settingPrimary.current = false;
-      setIsSettingPrimary(false);
-    }
-  };
-
   const removeEmail = (id: string) => {
     const email = emails.find(email => email.id === id);
     if (email && email.canRemove !== false && onRemoveEmail) {
@@ -112,17 +95,19 @@ export function UserProfileEmailRowView({
   return (
     <>
       <UserProfileContactListRowView
-        rowRef={row}
+        rowRef={list.row}
         triggerRef={removalFocus.registerTrigger}
-        items={emails}
+        items={list.shownItems}
         kind='email'
         label={m.email.label}
         addAction={addEmailAction}
         onRemove={onRemoveEmail ? removeEmail : undefined}
-        onSetPrimary={onSetPrimaryEmail && !isSettingPrimary ? id => void setPrimaryEmail(id) : undefined}
+        onSetPrimary={list.setPrimary}
+        pendingId={list.pendingPrimaryId}
+        shownPendingId={list.shownPendingId}
         onVerify={onVerifyEmail}
       >
-        <Section.Error>{primaryError}</Section.Error>
+        <Section.Error>{list.primaryError}</Section.Error>
       </UserProfileContactListRowView>
       {onRemoveEmail ? (
         <Confirmation

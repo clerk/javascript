@@ -33,6 +33,7 @@ the verified address.
     { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
     { name: 'Icon', href: '/components/icon', layer: 'Components' },
     { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
     { name: 'Card', href: '/components/card', layer: 'Components' },
@@ -50,6 +51,20 @@ action. The connection's logo leads the label, or a generic lock when it ships n
   name='NameManagedByConnection'
   storyModule={Stories}
 />
+
+## Motion
+
+A new email address or phone number expands into the list and a removed one collapses out of it,
+each fading at its bottom edge. The list keeps the order it was first shown in, so setting a primary
+moves the badge between rows rather than the rows themselves. **Set as primary** resolves after a
+short simulated request; when the request outlasts a short delay, a spinner shows where the badge
+will land, and the badge waits for the spinner to go.
+
+## Set primary pending
+
+Setting a primary takes a few seconds here, so the pending spinner is easy to see.
+
+<Story name='SetPrimaryPending' storyModule={Stories} />
 
 ## Add phone failure
 

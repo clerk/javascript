@@ -1,5 +1,5 @@
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
@@ -7,6 +7,7 @@ import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
+import { useContactList } from './use-contact-list';
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
@@ -36,11 +37,19 @@ export function UserProfilePhoneRowView({
   onRemovePhone,
 }: UserProfilePhoneRowViewProps) {
   const m = useMessages('userProfileAccountSection');
-  const row = useRef<HTMLDivElement>(null);
+  const formattedPhones = useMemo(
+    () => phones.map(phone => ({ ...phone, value: stringToFormattedPhoneString(phone.value) })),
+    [phones],
+  );
+  const list = useContactList({
+    items: formattedPhones,
+    onSetPrimary: onSetPrimaryPhone,
+    primaryErrorMessage: m.phone.primaryError,
+  });
   const removalFocus = useListRemovalFocus({
-    ids: phones.map(phone => phone.id),
+    ids: list.shownItems.map(phone => phone.id),
     onRemove: onRemovePhone,
-    fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
+    fallback: list.removalFallback,
   });
   const addPhoneAction =
     onSendPhoneCode && onVerifyPhoneCode ? (
@@ -50,39 +59,12 @@ export function UserProfilePhoneRowView({
       />
     ) : undefined;
   const removePhoneConfirmation = useMemo(() => Confirmation.createHandle<UserProfilePhone>(), []);
-  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
-  const [primaryError, setPrimaryError] = useState<string>();
-  const settingPrimary = useRef(false);
-
-  const setPrimaryPhone = async (id: string) => {
-    const phone = phones.find(phone => phone.id === id);
-    if (!onSetPrimaryPhone || !phone?.isVerified || phone.isDefault || settingPrimary.current) {
-      return;
-    }
-    settingPrimary.current = true;
-    setIsSettingPrimary(true);
-    setPrimaryError(undefined);
-    try {
-      await onSetPrimaryPhone(id);
-    } catch (error) {
-      setPrimaryError(error instanceof Error ? error.message : m.phone.primaryError);
-    } finally {
-      settingPrimary.current = false;
-      setIsSettingPrimary(false);
-    }
-  };
-
   const removePhone = (id: string) => {
     const phone = phones.find(phone => phone.id === id);
     if (phone && phone.canRemove !== false && onRemovePhone) {
       removePhoneConfirmation.open(phone);
     }
   };
-  const formattedPhones = phones.map(phone => ({
-    ...phone,
-    value: stringToFormattedPhoneString(phone.value),
-  }));
-
   if (!allowMultipleAccounts) {
     return (
       <UserProfileContactRowView
@@ -98,17 +80,19 @@ export function UserProfilePhoneRowView({
   return (
     <>
       <UserProfileContactListRowView
-        rowRef={row}
+        rowRef={list.row}
         triggerRef={removalFocus.registerTrigger}
-        items={formattedPhones}
+        items={list.shownItems}
         kind='phone'
         label={m.phone.label}
         addAction={addPhoneAction}
         onRemove={onRemovePhone ? removePhone : undefined}
-        onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
+        onSetPrimary={list.setPrimary}
+        pendingId={list.pendingPrimaryId}
+        shownPendingId={list.shownPendingId}
         onVerify={onVerifyPhone}
       >
-        <Section.Error>{primaryError}</Section.Error>
+        <Section.Error>{list.primaryError}</Section.Error>
       </UserProfileContactListRowView>
       {onRemovePhone ? (
         <Confirmation
