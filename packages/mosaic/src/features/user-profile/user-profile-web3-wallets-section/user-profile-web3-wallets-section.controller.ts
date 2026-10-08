@@ -2,8 +2,7 @@ import { useState } from 'react';
 
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
-import type { UserProfileWeb3Provider } from '../user-profile-web3-wallets-section.view';
-import type { ReadyWeb3WalletsModel } from './user-profile-web3-wallets-section.types';
+import type { ReadyWeb3WalletsModel, UserProfileWeb3Provider } from './user-profile-web3-wallets-section.types';
 
 export function useUserProfileWeb3WalletsController({
   wallets,

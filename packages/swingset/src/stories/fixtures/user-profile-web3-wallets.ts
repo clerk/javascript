@@ -1,7 +1,7 @@
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
-} from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';

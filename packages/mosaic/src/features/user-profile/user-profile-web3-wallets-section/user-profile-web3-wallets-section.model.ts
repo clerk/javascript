@@ -7,8 +7,11 @@ import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { allowsIdentificationCreation } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section.model';
-import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from '../user-profile-web3-wallets-section.view';
-import type { UserProfileWeb3WalletsModel } from './user-profile-web3-wallets-section.types';
+import type {
+  UserProfileWeb3Provider,
+  UserProfileWeb3Wallet,
+  UserProfileWeb3WalletsModel,
+} from './user-profile-web3-wallets-section.types';
 
 export type Web3WalletEntry = Pick<Web3WalletResource, 'id' | 'web3Wallet'> & {
   verification: Pick<VerificationResource, 'strategy' | 'status' | 'expireAt'>;

@@ -1,41 +1,15 @@
-import type { Web3Strategy } from '@clerk/shared/types';
 import { useMemo, useRef } from 'react';
 
-import { Confirmation } from '../../blocks/confirmation';
-import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { fill, useMessages } from '../../localization';
-import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
+import { Confirmation } from '../../../blocks/confirmation';
+import { Section } from '../../../components/section';
+import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
+import { fill, useMessages } from '../../../localization';
+import { truncateWithEndVisible } from '../../../utils/truncate-text-with-end-visible';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
-
-export interface UserProfileWeb3Provider {
-  id: Web3Strategy;
-  walletPicker?: 'solana';
-  provider: string;
-  iconUrl?: string;
-  connectError?: string;
-}
-
-export interface UserProfileWeb3Wallet {
-  id: string;
-  address: string;
-  provider?: string;
-  iconUrl?: string;
-  isPrimary?: boolean;
-  isVerified: boolean;
-  canRemove?: boolean;
-  primaryError?: string;
-}
-
-export interface UserProfileWeb3WalletsSectionViewProps {
-  fallbackFocus?: () => HTMLElement | null;
-  wallets: UserProfileWeb3Wallet[];
-  availableProviders?: UserProfileWeb3Provider[];
-  pendingId?: string;
-  onConnect?: (id: string) => void;
-  onSetPrimary?: (id: string) => void;
-  onRemove?: (id: string) => void | Promise<void>;
-}
+import type {
+  UserProfileWeb3Wallet,
+  UserProfileWeb3WalletsSectionViewProps,
+} from './user-profile-web3-wallets-section.types';
 
 export function UserProfileWeb3WalletsSectionView({
   wallets,

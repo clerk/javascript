@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 
-import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 import { UserProfileSolanaWalletDialog } from './user-profile-solana-wallet.dialog';
 import { useUserProfileWeb3WalletsController } from './user-profile-web3-wallets-section.controller';
 import { useUserProfileWeb3WalletsModel } from './user-profile-web3-wallets-section.model';
 import type { ReadyWeb3WalletsModel } from './user-profile-web3-wallets-section.types';
+import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export interface UserProfileWeb3WalletsSectionProps {
   fallback?: ReactNode;

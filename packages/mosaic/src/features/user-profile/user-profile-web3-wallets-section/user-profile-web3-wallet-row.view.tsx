@@ -1,16 +1,16 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import type { ActionMenuAction } from '../../components/action-menu';
-import { ActionMenu } from '../../components/action-menu';
-import { Badge } from '../../components/badge';
-import { SubmitButton } from '../../components/button';
-import { Icon, IconFrame } from '../../components/icon';
-import { Section } from '../../components/section';
-import { fill, useMessages } from '../../localization';
-import { truncationStyles } from '../../styles/typography.styles';
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
+import { Badge } from '../../../components/badge';
+import { SubmitButton } from '../../../components/button';
+import { Icon, IconFrame } from '../../../components/icon';
+import { Section } from '../../../components/section';
+import { fill, useMessages } from '../../../localization';
+import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from './user-profile-web3-wallets.styles';
-import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
+import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.types';
 
 export function UserProfileWeb3WalletRowView({
   wallet,
