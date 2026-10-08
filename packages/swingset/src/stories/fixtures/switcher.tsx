@@ -2,9 +2,9 @@ import {
   switcherBusyKeys,
   type SwitcherInvitation,
   type SwitcherMembership,
-  type SwitcherViewProps,
   type SwitcherSession,
   type SwitcherSuggestion,
+  type SwitcherViewProps,
 } from '@clerk/mosaic/features/switcher/switcher.view';
 import { useState } from 'react';
 

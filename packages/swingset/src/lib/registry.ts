@@ -176,6 +176,11 @@ import {
   SaveFails as OrganizationProfileProfileSectionSaveFails,
 } from '../stories/organization-profile-profile-section.stories';
 import {
+  Default as OrganizationSwitcherDefault,
+  meta as organizationSwitcherMeta,
+  NoOrganizationSelected as OrganizationSwitcherNoOrganizationSelected,
+} from '../stories/organization-switcher.stories';
+import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
   Error as OtpComponentError,
@@ -297,11 +302,6 @@ import {
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
-import {
-  Default as OrganizationSwitcherDefault,
-  meta as organizationSwitcherMeta,
-  NoOrganizationSelected as OrganizationSwitcherNoOrganizationSelected,
-} from '../stories/organization-switcher.stories';
 import {
   Combined as SwitcherCombined,
   meta as userButtonMeta,
