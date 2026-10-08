@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 
-import { useConfirmationController } from '../../../blocks/confirmation/confirmation.controller';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
@@ -14,8 +13,6 @@ export function useUserProfileMfaSectionLeafController({
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const sectionRef = useRef<HTMLDivElement>(null);
-  const triggers = useRef(new Map<string, HTMLButtonElement>());
-  const lastRemovalId = useRef<string>();
   const removalFocus = useListRemovalFocus({
     ids: methods.map(method => method.id),
     onRemove,
@@ -23,53 +20,20 @@ export function useUserProfileMfaSectionLeafController({
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
   });
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState<UserProfileMfaMethod>();
-  const operation = useRef<'idle' | 'default' | 'remove'>('idle');
   const defaultAction = usePendingAction<'default'>({ errorFallback: m.setDefaultError });
-  const confirmation = useConfirmationController();
 
-  const setDefault = async (id: string) => {
+  const setDefault = (id: string) => {
     const method = methods.find(method => method.id === id);
-    if (
-      !onSetDefault ||
-      method?.type !== 'sms' ||
-      !method.canSetDefault ||
-      method.isDefault ||
-      operation.current !== 'idle'
-    ) {
+    if (!onSetDefault || method?.type !== 'sms' || !method.canSetDefault || method.isDefault) {
       return;
     }
-    operation.current = 'default';
-    try {
-      await defaultAction.run('default', () =>
-        Promise.resolve(onSetDefault(id)).catch((error: unknown) => {
-          if (!(error instanceof MfaCancelledError)) {
-            throw error;
-          }
-        }),
-      );
-    } finally {
-      operation.current = 'idle';
-    }
-  };
-
-  const confirmRemoval = () => {
-    if (!selectedMethod || !confirmation.isOpen || operation.current !== 'idle') {
-      return;
-    }
-    const method = selectedMethod;
-    operation.current = 'remove';
-    confirmation.onConfirm(async () => {
-      try {
-        await removalFocus.remove(method.id);
-      } catch (error) {
+    void defaultAction.run('default', () =>
+      Promise.resolve(onSetDefault(id)).catch((error: unknown) => {
         if (!(error instanceof MfaCancelledError)) {
           throw error;
         }
-      } finally {
-        operation.current = 'idle';
-      }
-    });
+      }),
+    );
   };
 
   return {
@@ -77,33 +41,24 @@ export function useUserProfileMfaSectionLeafController({
     pickerOpen,
     onPickerOpenChange: setPickerOpen,
     closePicker: () => setPickerOpen(false),
-    selectedMethod,
-    confirmation,
-    onRemovalOpenChange: confirmation.onOpenChange,
-    openRemoval: (method: UserProfileMfaMethod) => {
-      if (operation.current === 'idle') {
-        defaultAction.reset();
-        lastRemovalId.current = method.id;
-        setSelectedMethod(method);
-        confirmation.onOpenChange(true);
+    registerTrigger: removalFocus.registerTrigger,
+    openRemoval: (open: () => void) => {
+      if (defaultAction.isPending) {
+        return;
+      }
+      defaultAction.reset();
+      open();
+    },
+    confirmRemoval: async (method: UserProfileMfaMethod) => {
+      try {
+        await removalFocus.remove(method.id);
+      } catch (error: unknown) {
+        if (!(error instanceof MfaCancelledError)) {
+          throw error;
+        }
       }
     },
-    confirmRemoval,
-    finalRemovalFocus: () =>
-      removalFocus.finalFocus() ??
-      (lastRemovalId.current ? triggers.current.get(lastRemovalId.current) : undefined) ??
-      sectionRef.current,
-    registerTrigger: (id: string) => {
-      const registerRemovalTrigger = removalFocus.registerTrigger(id);
-      return (element: HTMLButtonElement | null) => {
-        registerRemovalTrigger(element);
-        if (element) {
-          triggers.current.set(id, element);
-        } else {
-          triggers.current.delete(id);
-        }
-      };
-    },
+    finalRemovalFocus: removalFocus.finalFocus,
     isSettingDefault: defaultAction.isPending,
     defaultError: defaultAction.error,
     setDefault,

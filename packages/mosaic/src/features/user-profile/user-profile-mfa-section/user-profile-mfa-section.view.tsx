@@ -1,5 +1,5 @@
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { type ReactNode, type Ref } from 'react';
+import { type ReactNode, type Ref, useMemo } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
@@ -36,6 +36,7 @@ export function UserProfileMfaSectionView({
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const controller = useUserProfileMfaSectionLeafController({ methods, onRemove, onSetDefault });
+  const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
 
   return (
     <>
@@ -69,26 +70,21 @@ export function UserProfileMfaSectionView({
             key={method.id}
             method={method}
             triggerRef={controller.registerTrigger(method.id)}
-            onRemove={onRemove ? () => controller.openRemoval(method) : undefined}
-            onSetDefault={
-              onSetDefault && !controller.isSettingDefault ? id => void controller.setDefault(id) : undefined
-            }
+            onRemove={onRemove ? () => controller.openRemoval(() => removeMethod.open(method)) : undefined}
+            onSetDefault={onSetDefault && !controller.isSettingDefault ? controller.setDefault : undefined}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
         ))}
       </UserProfileSecurityList>
       <Section.Error>{controller.defaultError}</Section.Error>
-      {onRemove && controller.selectedMethod ? (
+      {onRemove ? (
         <Confirmation
-          open={controller.confirmation.isOpen}
-          onOpenChange={controller.onRemovalOpenChange}
-          title={controller.selectedMethod.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle}
-          description={describeMethodRemoval(controller.selectedMethod, m)}
+          handle={removeMethod}
+          title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
+          description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
           finalFocus={controller.finalRemovalFocus}
           onConfirm={controller.confirmRemoval}
-          isConfirming={controller.confirmation.isConfirming}
-          errorMessage={controller.confirmation.errorMessage}
         />
       ) : null}
     </>
