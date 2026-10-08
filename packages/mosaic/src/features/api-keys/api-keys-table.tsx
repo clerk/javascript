@@ -29,7 +29,7 @@ function SubjectAPIKeysTable({ subject, messages: overrides, fallback }: APIKeys
     isOrganizationId(subject) ? 'organization' : 'user',
     overrides,
   );
-  const model = useAPIKeysTableModel(subject, messages);
+  const model = useAPIKeysTableModel(subject);
   const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController(model, messages);
 
   if (!isLoaded || !isAvailable) {

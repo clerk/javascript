@@ -13,6 +13,7 @@ export interface UseFormOptions<TValues extends object> {
   fields?: FieldsConfig<TValues>;
   onSubmit: (values: TValues) => Promise<unknown>;
   canSubmit?: (values: TValues) => boolean;
+  errorFallback?: string;
 }
 
 export interface FormField {
@@ -93,7 +94,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     fields: options.fields,
     onSubmit: options.onSubmit,
     canSubmit: options.canSubmit ?? always,
-    fallbackMessage: m.error,
+    fallbackMessage: options.errorFallback ?? m.error,
     errorText,
   };
   const machineRef = useRef<StateMachine<FormContext<TValues>, FormEvent<TValues>> | null>(null);
