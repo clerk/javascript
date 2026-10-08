@@ -5,8 +5,8 @@ import { CopyButton } from '../../../components/copy-button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
-import { OrganizationProfileEditFieldDialog } from './organization-profile-edit-field.dialog';
 import { useOrganizationProfileEditSlugController } from './organization-profile-edit-slug.controller';
+import { OrganizationProfileEditSlugDialog } from './organization-profile-edit-slug.dialog';
 import { styles } from './organization-profile-profile-section.styles';
 
 export interface OrganizationProfileSlugRowViewProps {
@@ -51,26 +51,13 @@ export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationP
 
 function EditSlug({ slug, onSubmit }: { slug: string; onSubmit: (slug: string) => Promise<void> }) {
   const m = useMessages('organizationProfileProfileSection');
-  const controller = useOrganizationProfileEditSlugController(slug, onSubmit);
-  const { ref, ...field } = controller.form.register('slug');
+  const controller = useOrganizationProfileEditSlugController({ slug, onSubmit });
 
   return (
-    <OrganizationProfileEditFieldDialog
+    <OrganizationProfileEditSlugDialog
+      form={controller.form}
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
-      formId={controller.form.id}
-      onSubmit={controller.form.handleSubmit}
-      fieldRef={ref}
-      {...field}
-      feedback={controller.form.fields.slug.feedback}
-      error={controller.form.error}
-      canSave={controller.form.canSubmit}
-      isSaving={controller.form.isSubmitting}
-      title={m.slug.dialogTitle}
-      description={m.slug.dialogDescription}
-      fieldLabel={m.slug.fieldLabel}
-      cancelLabel={m.slug.cancel}
-      saveLabel={m.slug.save}
       trigger={
         <Button
           color='neutral'

@@ -6,52 +6,32 @@ import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import type { FieldFeedback } from '../../../components/form/form-submit-error';
+import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
+import { useMessages } from '../../../localization';
 
-export interface OrganizationProfileEditFieldDialogProps {
+export interface OrganizationProfileEditSlugValue {
+  slug: string;
+}
+
+export interface OrganizationProfileEditSlugDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
-  title: string;
-  description?: string;
-  fieldLabel: string;
-  cancelLabel: string;
-  saveLabel: string;
-  formId: string;
-  onSubmit: (event: { preventDefault: () => void }) => void;
-  value: string;
-  onChange: (event: { target: { value: string } }) => void;
-  onBlur: () => void;
-  fieldRef: (element: HTMLElement | null) => void;
-  feedback?: FieldFeedback;
-  error?: string;
-  canSave: boolean;
-  isSaving: boolean;
+  form: UseFormResult<OrganizationProfileEditSlugValue>;
 }
 
-export function OrganizationProfileEditFieldDialog({
+export function OrganizationProfileEditSlugDialog({
   open,
   onOpenChange,
   trigger,
-  title,
-  description,
-  fieldLabel,
-  cancelLabel,
-  saveLabel,
-  formId,
-  onSubmit,
-  value,
-  onChange,
-  onBlur,
-  fieldRef,
-  feedback,
-  error,
-  canSave,
-  isSaving,
-}: OrganizationProfileEditFieldDialogProps) {
+  form,
+}: OrganizationProfileEditSlugDialogProps) {
+  const m = useMessages('organizationProfileProfileSection');
   const inputRef = useRef<HTMLInputElement>(null);
-  const mergedRef = useMergeRefs([fieldRef, inputRef]);
+  const { feedback } = form.fields.slug;
+  const { ref, ...control } = form.register('slug');
+  const mergedRef = useMergeRefs([ref, inputRef]);
 
   return (
     <Dialog.Root
@@ -68,33 +48,31 @@ export function OrganizationProfileEditFieldDialog({
           renderBranding={false}
         >
           <Card.Header>
-            <Card.Title>{title}</Card.Title>
-            {description ? <Card.Description>{description}</Card.Description> : null}
+            <Card.Title>{m.slug.dialogTitle}</Card.Title>
+            <Card.Description>{m.slug.dialogDescription}</Card.Description>
           </Card.Header>
           <Card.Banner
             role='alert'
             color='negative'
           >
-            {error}
+            {form.error}
           </Card.Banner>
           <Card.Content
             render={
               <form
-                id={formId}
-                onSubmit={onSubmit}
+                id={form.id}
+                onSubmit={form.handleSubmit}
               />
             }
           >
             <Field.Root
-              disabled={isSaving}
+              disabled={form.isSubmitting}
               invalid={feedback?.type === 'error'}
             >
-              <Field.Label visuallyHidden>{fieldLabel}</Field.Label>
+              <Field.Label visuallyHidden>{m.slug.fieldLabel}</Field.Label>
               <Input
                 ref={mergedRef}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
+                {...control}
               />
               <Field.Feedback feedback={feedback} />
             </Field.Root>
@@ -109,16 +87,16 @@ export function OrganizationProfileEditFieldDialog({
                 />
               }
             >
-              {cancelLabel}
+              {m.slug.cancel}
             </Dialog.Close>
             <SubmitButton
-              form={formId}
+              form={form.id}
               fullWidth
-              isPending={isSaving}
-              disabled={!canSave}
+              isPending={form.isSubmitting}
+              disabled={!form.canSubmit}
               focusableWhenDisabled
             >
-              {saveLabel}
+              {m.slug.save}
             </SubmitButton>
           </Card.Footer>
         </Card.Root>

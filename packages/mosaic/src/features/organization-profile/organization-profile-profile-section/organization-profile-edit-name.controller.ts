@@ -1,8 +1,24 @@
 import { useState } from 'react';
 
+import type { UseFormResult } from '../../../components/form';
 import { useForm } from '../../../components/form';
+import type { OrganizationProfileEditNameValue } from './organization-profile-edit-name.dialog';
 
-export function useOrganizationProfileEditNameController(name: string, onSubmit: (name: string) => Promise<void>) {
+export interface OrganizationProfileEditNameControllerOptions {
+  name: string;
+  onSubmit: (name: string) => Promise<void>;
+}
+
+export interface OrganizationProfileEditNameController {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  form: UseFormResult<OrganizationProfileEditNameValue>;
+}
+
+export function useOrganizationProfileEditNameController({
+  name,
+  onSubmit,
+}: OrganizationProfileEditNameControllerOptions): OrganizationProfileEditNameController {
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm({
     initialValues: { name },
