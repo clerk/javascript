@@ -1,4 +1,5 @@
 import { differenceInCalendarDays } from '@clerk/shared/date';
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/shared/types';
 import { useEffect, useState } from 'react';
@@ -117,7 +118,7 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
         clerk.session?.id !== sessionId ||
         id === sessionId
       ) {
-        throw new Error(m.signOutError);
+        throw new ClerkRuntimeError('This device is no longer available.', { code: 'active_device_unavailable' });
       }
       await target.revoke();
       return clerk.user?.id === userId && clerk.session?.id === sessionId;

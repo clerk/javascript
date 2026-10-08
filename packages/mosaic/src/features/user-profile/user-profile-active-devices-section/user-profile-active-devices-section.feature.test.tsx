@@ -313,7 +313,7 @@ describe('Active devices', () => {
       ),
     );
     const messages = {
-      userProfileActiveDevices: { signOutError: 'Erreur de déconnexion.' },
+      userProfileActiveDevices: { detailsDialog: { signOutError: 'Erreur de déconnexion.' } },
       errors: { invalid_action_for_session: 'Cet appareil est indisponible.' },
     };
     await renderWithClerk(

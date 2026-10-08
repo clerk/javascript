@@ -6,7 +6,6 @@ export const userProfileActiveDevicesMessages = {
   mobileDevice: 'Mobile device',
   webBrowser: 'Web browser',
   lastSeen: 'Last seen {date}',
-  signOutError: 'This device is no longer available. Please try again.',
   otherDevice: '{count} other device',
   otherDevices: '{count} other devices',
   signOutAll: 'Sign out of all devices',
