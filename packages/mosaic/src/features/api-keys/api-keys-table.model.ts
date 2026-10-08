@@ -1,7 +1,6 @@
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
 import { useAPIKeys, useClerk, useSession } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
-import { useState } from 'react';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { save } from '../../utils/errors';
@@ -30,9 +29,8 @@ export function useAPIKeysAccess(subject: string | undefined) {
   return { isLoaded, isAvailable, canRead, canManage };
 }
 
-export function useAPIKeysTableModel(subject: string) {
+export function useAPIKeysTableModel(subject: string, query: string) {
   const clerk = useClerk();
-  const [query, setQuery] = useState('');
   const { isLoaded, isAvailable, canRead, canManage } = useAPIKeysAccess(subject);
   const apiKeys = useAPIKeys({
     subject,
@@ -48,10 +46,6 @@ export function useAPIKeysTableModel(subject: string) {
     ...apiKeys,
     data: apiKeys.data.map(toAPIKeyRecord),
     canManage,
-    search: (nextQuery: string) => {
-      setQuery(nextQuery);
-      apiKeys.fetchPage(1);
-    },
     create: async ({ name, expiresAt }: CreateAPIKeyInput) => {
       let secret = '';
       await save(async () => {
