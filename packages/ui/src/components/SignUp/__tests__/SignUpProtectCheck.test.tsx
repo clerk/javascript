@@ -433,6 +433,35 @@ describe('SignUpProtectCheck', () => {
       expect(await findByText(/unable to complete action at this time/i)).toBeInTheDocument();
     });
 
+    it('retries the callback continuation after the transfer has cleared the sign-up', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      const liveSignUp = fixtures.signUp as unknown as Record<string, unknown>;
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signUp.submitProtectCheck.mockImplementation(() => {
+        Object.assign(liveSignUp, existingAccountSignUp());
+        return Promise.resolve(fixtures.signUp as unknown as SignUpResource);
+      });
+      vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck)
+        .mockImplementationOnce(() => {
+          Object.assign(liveSignUp, {
+            status: null,
+            missingFields: [],
+            verifications: { externalAccount: { status: null, error: null } },
+          });
+          return Promise.reject(new Error('Failed to fetch'));
+        })
+        .mockResolvedValue(undefined);
+
+      const { findByRole } = render(<SignUpProtectCheck oauthCallbackParams={oauthCallbackParams} />, { wrapper });
+
+      fireEvent.click(await findByRole('button', { name: /try again/i }));
+
+      await waitFor(() => expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledTimes(2));
+      expect(fixtures.router.navigate.mock.calls.some(([to]: unknown[]) => to === '../continue')).toBe(false);
+    });
+
     it('leaves an ordinary gated sign-up on the existing path', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignUpWithProtectCheck();

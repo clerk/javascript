@@ -49,6 +49,7 @@ function SignUpProtectCheckInternal({
   // write, which React disallows in the render body.
   const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signUp.protectCheck);
   const didStartNoCheckFallbackRef = useRef(false);
+  const didResumeOAuthCallbackRef = useRef(false);
 
   if (signUp.protectCheck && !everSawProtectCheck) {
     setEverSawProtectCheck(true);
@@ -77,8 +78,9 @@ function SignUpProtectCheckInternal({
       if (
         oauthCallbackParams &&
         typeof __internal_resumeAfterProtectCheck === 'function' &&
-        isSignUpPendingOAuthTransfer(updatedSignUp)
+        (didResumeOAuthCallbackRef.current || isSignUpPendingOAuthTransfer(updatedSignUp))
       ) {
+        didResumeOAuthCallbackRef.current = true;
         await __internal_resumeAfterProtectCheck(
           { ...oauthCallbackParams, __internal_navigateOnSetActive: navigateOnSetActive },
           navigate,

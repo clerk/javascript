@@ -2261,6 +2261,43 @@ describe('Clerk singleton', () => {
             false,
           );
         });
+
+        it('activates the transferred sign-in when resumed again after the transfer has committed', async () => {
+          loadEnvironment();
+          mockClientFetch.mockReturnValue(
+            Promise.resolve({
+              signedInSessions: [],
+              signIn: new SignIn({
+                status: 'complete',
+                first_factor_verification: null,
+                second_factor_verification: null,
+                identifier: '',
+                user_data: null,
+                created_session_id: '123',
+                created_user_id: 'user_1',
+              } as any as SignInJSON),
+              signUp: new SignUp(null),
+            }),
+          );
+
+          const mockSetActive = vi.fn();
+          const mockSignInCreate = vi.fn();
+
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load(mockedLoadOptions);
+          if (!sut.client) {
+            fail('we should always have a client');
+          }
+          sut.client.signIn.create = mockSignInCreate;
+          sut.setActive = mockSetActive;
+
+          await sut.__internal_resumeAfterProtectCheck();
+
+          await waitFor(() => {
+            expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: '123' }));
+          });
+          expect(mockSignInCreate).not.toHaveBeenCalled();
+        });
       });
     });
 
