@@ -3,7 +3,7 @@ import { noDynamicMessageCatalogs, noModelReactState } from './rules.mjs';
 export default [
   {
     name: 'packages/mosaic - import guard plugin',
-    files: ['packages/mosaic/src/**/*'],
+    files: ['src/**/*'],
     plugins: {
       mosaic: {
         rules: {
@@ -15,7 +15,7 @@ export default [
   },
   {
     name: 'packages/mosaic - views and controllers',
-    files: ['packages/mosaic/src/**/*.{view,controller}.{ts,tsx}'],
+    files: ['src/**/*.{view,controller}.{ts,tsx}'],
     rules: {
       'mosaic/no-dynamic-message-catalogs': 'error',
       '@typescript-eslint/no-restricted-imports': [
@@ -69,7 +69,7 @@ export default [
   },
   {
     name: 'packages/mosaic - models',
-    files: ['packages/mosaic/src/**/*.model.{ts,tsx}'],
+    files: ['src/**/*.model.{ts,tsx}'],
     rules: {
       'mosaic/no-model-react-state': 'error',
       '@typescript-eslint/no-restricted-imports': [

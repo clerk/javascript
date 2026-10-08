@@ -21,7 +21,6 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 import { CUSTOM_BLOCK_TAGS, CUSTOM_MODIFIER_TAGS } from './.typedoc/custom-tags.mjs';
-import mosaicImportGuards from './packages/mosaic/eslint/config.mjs';
 
 const REPO_ROOT = import.meta.dirname;
 const ECMA_VERSION = 2021,
@@ -693,7 +692,6 @@ export default tseslint.config([
       ],
     },
   },
-  ...mosaicImportGuards,
   {
     name: 'packages/mosaic/jsx-a11y',
     files: ['packages/mosaic/src/**/*'],

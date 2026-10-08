@@ -4,8 +4,10 @@ import { ESLint } from 'eslint';
 import { describe, expect, test } from 'vitest';
 
 const root = path.resolve(import.meta.dirname, '../../..');
+const mosaicRoot = path.resolve(import.meta.dirname, '..');
+const rootEslint = new ESLint({ cwd: root });
 const eslint = new ESLint({
-  cwd: root,
+  cwd: mosaicRoot,
   overrideConfig: {
     languageOptions: {
       parserOptions: {
@@ -26,7 +28,7 @@ const eslint = new ESLint({
 });
 
 async function lint(file, source) {
-  const [result] = await eslint.lintText(source, { filePath: path.join(root, 'packages/mosaic/src/features', file) });
+  const [result] = await eslint.lintText(source, { filePath: path.join(mosaicRoot, 'src/features', file) });
   return result.messages;
 }
 
@@ -195,5 +197,31 @@ describe('Mosaic import boundaries', () => {
       "import { useUser } from '@clerk/shared';\nimport { css } from '@emotion/react';",
     );
     expect(messages.filter(message => message.ruleId === 'no-restricted-imports')).toHaveLength(2);
+  });
+});
+
+describe('Mosaic package configuration', () => {
+  test.each([
+    'src/features/sample.view.tsx',
+    'src/features/sample.controller.ts',
+    'src/features/sample.model.ts',
+    'src/styles/sample.styles.ts',
+    'src/primitives/sample.tsx',
+  ])('%s inherits repository rules without enabling guards at the root', async file => {
+    const filePath = path.join(mosaicRoot, file);
+    const rootConfig = await rootEslint.calculateConfigForFile(filePath);
+    const mosaicConfig = await eslint.calculateConfigForFile(filePath);
+    const inheritedRules = { ...mosaicConfig.rules };
+
+    for (const rule of [
+      '@typescript-eslint/no-restricted-imports',
+      'mosaic/no-model-react-state',
+      'mosaic/no-dynamic-message-catalogs',
+    ]) {
+      expect(rootConfig.rules[rule]).toBeUndefined();
+      delete inheritedRules[rule];
+    }
+
+    expect(inheritedRules).toEqual(rootConfig.rules);
   });
 });
