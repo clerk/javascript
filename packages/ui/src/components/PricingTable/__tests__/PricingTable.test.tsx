@@ -867,4 +867,36 @@ describe('PricingTable - plans visibility', () => {
       expect(queryByText('Popular')).not.toBeInTheDocument();
     });
   });
+
+  it('shows matrix features and changes the billing period', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
+
+    props.setProps({});
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.billing.getPlans.mockResolvedValue({
+      data: [
+        {
+          ...testPlan,
+          features: [{ id: 'feature_support', name: 'Priority support', description: '' }],
+        } as any,
+      ],
+      total_count: 1,
+    });
+    fixtures.clerk.billing.getSubscription.mockRejectedValue(new Error('Unauthenticated'));
+
+    const { findByRole, getByRole, getByText, userEvent } = render(
+      <PricingTable {...({ layout: 'matrix' } as any)} />,
+      { wrapper },
+    );
+
+    await findByRole('heading', { name: 'Test Plan' });
+    expect(getByRole('table')).toBeVisible();
+    expect(getByText('Priority support')).toBeVisible();
+    expect(getByRole('radio', { name: 'Annually' })).toHaveAttribute('aria-checked', 'true');
+    await userEvent.click(getByRole('radio', { name: 'Monthly' }));
+    expect(getByRole('radio', { name: 'Monthly' })).toHaveAttribute('aria-checked', 'true');
+    expect(getByText('$10.00')).toBeVisible();
+  });
 });

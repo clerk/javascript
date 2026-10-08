@@ -113,3 +113,5 @@ export interface WizardContextValue {
    */
   goToStep: (id: string) => void;
 }
+
+export type WizardStepNavigation = Pick<WizardContextValue, 'goNext' | 'goPrev' | 'isFirstStep' | 'isLastStep'>;

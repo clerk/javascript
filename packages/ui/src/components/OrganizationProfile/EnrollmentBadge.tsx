@@ -10,16 +10,13 @@ const badgeLabelsMap: Record<OrganizationDomainResource['enrollmentMode'], Local
   enterprise_sso: localizationKeys('organizationProfile.badge__enterpriseSso'),
 };
 
-export const EnrollmentBadge = (props: { organizationDomain: OrganizationDomainResource | null }) => {
-  const { organizationDomain } = props;
-  if (!organizationDomain) {
-    return null;
-  }
-
-  const isVerified =
-    organizationDomain.ownershipVerification?.status === 'verified' ||
-    organizationDomain.verification?.status === 'verified';
-
+export const EnrollmentBadgeRow = ({
+  isVerified,
+  enrollmentMode,
+}: {
+  isVerified: boolean;
+  enrollmentMode: OrganizationDomainResource['enrollmentMode'];
+}) => {
   if (!isVerified) {
     return (
       <Badge
@@ -31,8 +28,26 @@ export const EnrollmentBadge = (props: { organizationDomain: OrganizationDomainR
 
   return (
     <Badge
-      localizationKey={badgeLabelsMap[organizationDomain.enrollmentMode]}
-      colorScheme={organizationDomain.enrollmentMode === 'manual_invitation' ? 'primary' : 'success'}
+      localizationKey={badgeLabelsMap[enrollmentMode]}
+      colorScheme={enrollmentMode === 'manual_invitation' ? 'primary' : 'success'}
+    />
+  );
+};
+
+export const EnrollmentBadge = (props: { organizationDomain: OrganizationDomainResource | null }) => {
+  const { organizationDomain } = props;
+  if (!organizationDomain) {
+    return null;
+  }
+
+  const isVerified =
+    organizationDomain.ownershipVerification?.status === 'verified' ||
+    organizationDomain.verification?.status === 'verified';
+
+  return (
+    <EnrollmentBadgeRow
+      isVerified={isVerified}
+      enrollmentMode={organizationDomain.enrollmentMode}
     />
   );
 };

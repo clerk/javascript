@@ -1,10 +1,6 @@
-import type {
-  EmailAddressResource,
-  EnterpriseConnectionResource,
-  OrganizationDomainResource,
-  UserResource,
-} from '@clerk/shared/types';
+import type { EmailAddressResource, EnterpriseConnectionResource, UserResource } from '@clerk/shared/types';
 
+import type { SSOConnection, SSODomain } from '../configure-sso.types';
 import type { EnterpriseConnectionProviderType, OidcProviderType } from '../types';
 
 export const isOidcProvider = (provider: string): provider is OidcProviderType =>
@@ -51,7 +47,7 @@ export const sortEnterpriseConnections = (
  */
 export interface OrganizationEnterpriseConnectionInput {
   /** The connection in scope, i.e. the one the wizard is editing. */
-  connection: EnterpriseConnectionResource | null | undefined;
+  connection: SSOConnection | null | undefined;
   /** Probed upstream — not a property of the connection resource itself. */
   hasSuccessfulTestRun: boolean;
 }
@@ -72,9 +68,7 @@ export interface OrganizationEnterpriseConnection {
   readonly status: OrganizationEnterpriseConnectionStatus;
 }
 
-export const isEnterpriseConnectionConfigured = (
-  connection: EnterpriseConnectionResource | null | undefined,
-): boolean => {
+export const isEnterpriseConnectionConfigured = (connection: SSOConnection | null | undefined): boolean => {
   if (!connection) {
     return false;
   }
@@ -87,7 +81,7 @@ export const isEnterpriseConnectionConfigured = (
   return Boolean(connection.samlConnection?.idpSsoUrl && connection.samlConnection?.idpEntityId);
 };
 
-export const isOrganizationDomainVerified = (domain: OrganizationDomainResource): boolean =>
+export const isOrganizationDomainVerified = (domain: Pick<SSODomain, 'ownershipVerification'>): boolean =>
   domain.ownershipVerification?.status === 'verified';
 
 /**
@@ -116,7 +110,7 @@ export const domainsClaimedByOtherConnections = (
  * selection: every verified organization domain no other connection claims.
  */
 export const defaultConnectionDomains = (
-  organizationDomains: OrganizationDomainResource[] | null | undefined,
+  organizationDomains: Array<Pick<SSODomain, 'name' | 'ownershipVerification'>> | null | undefined,
   claimed: Map<string, string>,
 ): string[] =>
   (organizationDomains ?? [])
@@ -131,7 +125,7 @@ export const defaultConnectionDomains = (
  */
 export const areConnectionDomainsReady = (
   connectionDomains: readonly string[],
-  organizationDomains: OrganizationDomainResource[] | null | undefined,
+  organizationDomains: Array<Pick<SSODomain, 'name' | 'ownershipVerification'>> | null | undefined,
   claimedDomains?: ReadonlyMap<string, string>,
 ): boolean =>
   connectionDomains.length > 0 &&

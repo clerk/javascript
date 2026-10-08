@@ -1,13 +1,13 @@
 import { iconImageUrl } from '@clerk/shared/constants';
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 
 import { getEnterpriseProviderIconId, ProviderIcon } from '../../common';
 import { descriptors } from '../../customizables';
+import type { SSOConnection } from '../ConfigureSSO/configure-sso.types';
 import { providerIconId, toProviderCard } from '../ConfigureSSO/domain/providers';
 import type { EnterpriseConnectionProviderType } from '../ConfigureSSO/types';
 
 type EnterpriseConnectionIconProps = {
-  connection: EnterpriseConnectionResource;
+  connection: Pick<SSOConnection, 'name' | 'provider' | 'logoPublicUrl'>;
   size?: string;
 };
 

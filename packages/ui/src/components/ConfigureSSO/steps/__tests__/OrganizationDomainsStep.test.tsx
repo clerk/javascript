@@ -1,8 +1,8 @@
-import type { OrganizationDomainResource } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen } from '@/test/utils';
+import { act, render, renderHook, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 const goNext = vi.fn();
@@ -13,16 +13,22 @@ vi.mock('../../elements/Wizard/WizardContext', () => ({
 }));
 
 const setConnectionDomains = vi.fn();
+const removeDomain = vi.fn();
+const prepareOwnershipVerification = vi.fn();
+const canRun = vi.fn(() => true);
 
 const contextState = vi.hoisted(() => ({
+  ownerKey: 'owner',
   enterpriseConnection: undefined as { id: string; name: string; active: boolean; domains: string[] } | undefined,
   connectionDomains: [] as string[],
   claimedDomains: new Map<string, string>(),
-  organizationDomains: [] as OrganizationDomainResource[],
+  organizationDomains: [] as SSODomain[],
 }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
+    ownerKey: contextState.ownerKey,
+    canRun,
     enterpriseConnection: contextState.enterpriseConnection,
     connectionDomains: contextState.connectionDomains,
     setConnectionDomains,
@@ -32,27 +38,40 @@ vi.mock('../../ConfigureSSOContext', () => ({
     contentRef: { current: null },
     organizationDomainMutations: {
       createDomain: vi.fn(),
-      revalidate: vi.fn(),
-      prepareOwnershipVerification: vi.fn(),
+      removeDomain,
+      prepareOwnershipVerification,
     },
   }),
 }));
 
+import type { SSODomain } from '../../configure-sso.types';
+import { useOrganizationDomainsStepModel } from '../organization-domains-step.model';
 import { OrganizationDomainsStep } from '../OrganizationDomainsStep';
 
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
 
-const domain = (name: string, status: 'verified' | 'unverified' = 'verified'): OrganizationDomainResource =>
-  ({
-    id: `dmn_${name}`,
-    name,
-    ownershipVerification: { status, strategy: 'txt', verifiedAt: status === 'verified' ? new Date() : null },
-  }) as unknown as OrganizationDomainResource;
+const domain = (name: string, status: 'verified' | 'unverified' = 'verified'): SSODomain => ({
+  id: `dmn_${name}`,
+  name,
+  ownershipVerification: {
+    status,
+    verifiedAt: status === 'verified' ? new Date() : null,
+    expiresAt: null,
+    txtRecordName: null,
+    txtRecordValue: null,
+  },
+});
 
 const resetMocks = () => {
   goNext.mockReset();
+  canRun.mockReturnValue(true);
+  contextState.ownerKey = 'owner';
   setConnectionDomains.mockReset();
   setConnectionDomains.mockResolvedValue(undefined);
+  removeDomain.mockReset();
+  removeDomain.mockResolvedValue(undefined);
+  prepareOwnershipVerification.mockReset();
+  prepareOwnershipVerification.mockResolvedValue(undefined);
   contextState.enterpriseConnection = undefined;
   contextState.connectionDomains = [];
   contextState.claimedDomains = new Map();
@@ -76,6 +95,98 @@ const renderStep = async () => {
 };
 
 describe('OrganizationDomainsStep domain selection', () => {
+  it('blocks an earlier removal command after the selected connection changes', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    contextState.connectionDomains = ['acme.com', 'other.com'];
+    const { result, rerender } = renderHook(() => useOrganizationDomainsStepModel(), { wrapper });
+    const retained = result.current.removeDomain;
+    contextState.enterpriseConnection = { id: 'second', name: 'Second', active: false, domains: [] };
+    rerender();
+    await retained(domain('acme.com'));
+    expect(setConnectionDomains).not.toHaveBeenCalled();
+    expect(removeDomain).not.toHaveBeenCalled();
+  });
+
+  it('does not delete after a pending selection write loses its connection', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    contextState.connectionDomains = ['acme.com', 'other.com'];
+    const pending = createDeferredPromise<void>();
+    setConnectionDomains.mockReturnValueOnce(pending.promise);
+    const { result, rerender } = renderHook(() => useOrganizationDomainsStepModel(), { wrapper });
+    const completion = result.current.removeDomain(domain('acme.com'));
+    contextState.enterpriseConnection = { id: 'second', name: 'Second', active: false, domains: [] };
+    rerender();
+    await act(async () => {
+      pending.resolve();
+      await completion;
+    });
+    expect(removeDomain).not.toHaveBeenCalled();
+  });
+
+  it('suppresses a late selection error after the removal owner changes', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    contextState.connectionDomains = ['acme.com', 'other.com'];
+    const pending = createDeferredPromise<void>();
+    setConnectionDomains.mockReturnValueOnce(pending.promise);
+    const { result, rerender } = renderHook(() => useOrganizationDomainsStepModel(), { wrapper });
+    const completion = result.current.removeDomain(domain('acme.com'));
+    contextState.ownerKey = 'other';
+    rerender();
+    pending.reject(new Error('Earlier selection failed'));
+    await expect(completion).resolves.toBeUndefined();
+    expect(removeDomain).not.toHaveBeenCalled();
+  });
+
+  it('blocks retained model commands after the step closes', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    const { result, unmount } = renderHook(() => useOrganizationDomainsStepModel(), { wrapper });
+    const retained = result.current;
+    unmount();
+    await retained.removeDomain(domain('acme.com'));
+    await retained.prepareDomainOwnershipVerification('domain');
+    await retained.toggleDomain('acme.com', true);
+    expect(removeDomain).not.toHaveBeenCalled();
+    expect(setConnectionDomains).not.toHaveBeenCalled();
+    expect(prepareOwnershipVerification).not.toHaveBeenCalled();
+  });
+
+  it('uses current domain selection when an earlier removal command is confirmed', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    const selectedDomain = domain('acme.com');
+    contextState.connectionDomains = ['acme.com', 'old.com'];
+    const { result, rerender } = renderHook(() => useOrganizationDomainsStepModel(), { wrapper });
+    const remove = result.current.removeDomain;
+    contextState.connectionDomains = ['acme.com', 'current.com'];
+    rerender();
+    await act(async () => {
+      await remove(selectedDomain);
+    });
+    expect(setConnectionDomains).toHaveBeenCalledWith(['current.com']);
+    expect(removeDomain).toHaveBeenCalledWith(selectedDomain.id);
+    expect(setConnectionDomains.mock.invocationCallOrder[0]).toBeLessThan(removeDomain.mock.invocationCallOrder[0]);
+    await act(async () => {
+      await result.current.prepareDomainOwnershipVerification(selectedDomain.id);
+    });
+    expect(prepareOwnershipVerification).toHaveBeenCalledWith([selectedDomain.id]);
+  });
+
+  it('keeps the domain when updating the connection selection fails', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    contextState.connectionDomains = ['acme.com', 'other.com'];
+    setConnectionDomains.mockRejectedValueOnce(new Error('Cannot update'));
+    const { result } = renderHook(() => useOrganizationDomainsStepModel(), { wrapper });
+    await act(async () => {
+      await expect(result.current.removeDomain(domain('acme.com'))).rejects.toThrow('Cannot update');
+    });
+    expect(removeDomain).not.toHaveBeenCalled();
+  });
+
   it('checks the domains the connection covers and lets the admin toggle a verified one', async () => {
     resetMocks();
     contextState.organizationDomains = [domain('acme.com'), domain('example.com')];

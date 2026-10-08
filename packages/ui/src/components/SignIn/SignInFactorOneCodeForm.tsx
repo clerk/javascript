@@ -1,21 +1,12 @@
-import { isUserLockedError } from '@clerk/shared/error';
-import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
-import { useClerk } from '@clerk/shared/react';
-import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor, SignInResource } from '@clerk/shared/types';
-import { useMemo } from 'react';
+import type { EmailCodeFactor, PhoneCodeFactor, ResetPasswordCodeFactor } from '@clerk/shared/types';
 
-import { useCardState } from '@/ui/elements/contexts';
+import { useCodePreparationController } from '@/ui/common/useCodePreparationController';
+import { useCodeSubmissionController } from '@/ui/common/useCodeSubmissionController';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
-import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
-import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn, useSignInContext } from '../../contexts';
-import { useFetch } from '../../hooks';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { type LocalizationKey } from '../../localization';
-import { useRouter } from '../../router';
-import { navigateOnSignInProtectGate } from './handleProtectCheck';
-import { handleSignUpIfMissingTransfer } from './handleSignUpIfMissingTransfer';
+import type { LocalizationKey } from '../../localization';
+import { useSignInFactorOneCodeFormModel } from './sign-in-factor-one-code-form.model';
+import { SignInFactorOneCodeFormView } from './sign-in-factor-one-code-form.view';
 
 export type SignInFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
@@ -36,152 +27,25 @@ export type SignInFactorOneCodeFormProps = SignInFactorOneCodeCard & {
 };
 
 export const SignInFactorOneCodeForm = (props: SignInFactorOneCodeFormProps) => {
-  const signIn = useCoreSignIn();
-  const card = useCardState();
-  const { navigate } = useRouter();
-  const ctx = useSignInContext();
-  const { afterSignInUrl, afterSignUpUrl, signUpIfMissingEnabled, navigateOnSetActive } = ctx;
-  const { setActive } = useClerk();
-  const supportEmail = useSupportEmail();
-  const clerk = useClerk();
-
-  const factorChannel = 'channel' in props.factor ? props.factor.channel : undefined;
-  const normalizedFactorChannel = factorChannel === 'sms' ? undefined : factorChannel;
-  const normalizedVerificationChannel =
-    signIn.firstFactorVerification.channel === 'sms' ? undefined : signIn.firstFactorVerification.channel;
-  const hasPendingFactorVerification =
-    signIn.firstFactorVerification.status === 'unverified' &&
-    signIn.firstFactorVerification.strategy === props.factor.strategy &&
-    normalizedFactorChannel === normalizedVerificationChannel;
-  const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
-  const shouldAvoidInitialPrepare = shouldAvoidPrepare || hasPendingFactorVerification;
-
-  const cacheKey = useMemo(() => {
-    const factor = props.factor;
-    let factorKey = factor.strategy;
-
-    if ('emailAddressId' in factor) {
-      factorKey += `_${factor.emailAddressId}`;
-    }
-    if ('phoneNumberId' in factor) {
-      factorKey += `_${factor.phoneNumberId}`;
-    }
-    if ('channel' in factor && factor.channel) {
-      factorKey += `_${factor.channel}`;
-    }
-
-    return {
-      name: 'signIn.prepareFirstFactor',
-      factorKey,
-    };
-  }, [
-    props.factor.strategy,
-    'emailAddressId' in props.factor ? props.factor.emailAddressId : undefined,
-    'phoneNumberId' in props.factor ? props.factor.phoneNumberId : undefined,
-    'channel' in props.factor ? props.factor.channel : undefined,
-  ]);
-
-  const goBack = () => {
-    return navigate('../');
-  };
-
-  // A `prepare` (the code-send itself, on mount and on resend) can come back Protect-gated, not
-  // just `attempt` below. Route it through the same choke point so the gate isn't dropped — a
-  // no-op when the response isn't gated.
-  const handlePrepareResult = (res: SignInResource) => {
-    if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
-      return;
-    }
-    props.onFactorPrepare();
-  };
-
-  const prepare = () => {
-    if (shouldAvoidPrepare) {
-      return;
-    }
-
-    void signIn
-      .prepareFirstFactor(props.factor)
-      .then(handlePrepareResult)
-      .catch(err => handleError(err, [], card.setError));
-  };
-
-  useFetch(shouldAvoidInitialPrepare ? undefined : () => signIn?.prepareFirstFactor(props.factor), cacheKey, {
-    staleTime: 100,
-    onSuccess: handlePrepareResult,
-    onError: err => handleError(err, [], card.setError),
-  });
-
-  const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    signIn
-      .attemptFirstFactor({ strategy: props.factor.strategy, code })
-      .then(async res => {
-        await resolve();
-
-        if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
-          return;
-        }
-
-        switch (res.status) {
-          case 'complete':
-            return setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-              },
-            });
-          case 'needs_second_factor':
-            return navigate('../factor-two');
-          case 'needs_new_password':
-            return navigate('../reset-password');
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
-      })
-      .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
-        }
-
-        if (signUpIfMissingEnabled && signIn.firstFactorVerification.status === 'transferable') {
-          // The code itself was correct (`transferable` = verified, but no matching user), so
-          // mirror the success path above: resolve the OTP card, then navigate. Resolving also
-          // guarantees the card doesn't sit in a loading state forever if the transferred
-          // sign-up requires no further routing.
-          return resolve()
-            .then(() =>
-              handleSignUpIfMissingTransfer({
-                clerk,
-                navigate,
-                afterSignUpUrl,
-                navigateOnSetActive,
-                unsafeMetadata: ctx.unsafeMetadata,
-              }),
-            )
-            .catch(reject);
-        }
-
-        return reject(err);
-      });
-  };
-
+  const model = useSignInFactorOneCodeFormModel(props);
+  const { prepare } = useCodePreparationController(model);
+  const action = useCodeSubmissionController(model);
   return (
-    <VerificationCodeCard
+    <SignInFactorOneCodeFormView
       cardTitle={props.cardTitle}
       cardSubtitle={props.cardSubtitle}
       cardNotice={props.cardNotice}
       inputLabel={props.inputLabel}
       resendButton={props.resendButton}
-      onCodeEntryFinishedAction={action}
-      onResendCodeClicked={prepare}
-      safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={signIn.userData.imageUrl}
       identityPreviewEditButtonAriaLabel={props.identityPreviewEditButtonAriaLabel}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
-      onIdentityPreviewEditClicked={goBack}
       onBackLinkClicked={props.onBackLinkClicked}
+      action={action}
+      prepare={prepare}
+      goBack={model.goBack}
+      safeIdentifier={model.safeIdentifier}
+      profileImageUrl={model.profileImageUrl}
     />
   );
 };

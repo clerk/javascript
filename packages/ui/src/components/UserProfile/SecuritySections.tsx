@@ -1,51 +1,46 @@
-import { useUser } from '@clerk/shared/react';
 import type { ReactNode } from 'react';
 
-import { getSecondFactors } from '@/ui/utils/mfa';
-
-import { useEnvironment, useUserProfileContext } from '../../contexts';
-import { DeleteSection } from './DeleteSection';
-import { MfaSection } from './MfaSection';
-import { PasskeySection } from './PasskeySection';
-import { PasswordSection } from './PasswordSection';
+import {
+  useSecurityDeleteModel,
+  useSecurityMfaModel,
+  useSecurityPasskeysModel,
+  useSecurityPasswordModel,
+} from './security-sections.model';
+import {
+  SecurityDeleteView,
+  SecurityMfaView,
+  SecurityPasskeysView,
+  SecurityPasswordView,
+} from './security-sections.view';
 
 export function SecurityPassword(): ReactNode {
-  const { instanceIsPasswordBased } = useEnvironment().userSettings;
-
-  if (!instanceIsPasswordBased) {
+  const model = useSecurityPasswordModel();
+  if (!model.available) {
     return null;
   }
-
-  return <PasswordSection />;
+  return <SecurityPasswordView />;
 }
 
 export function SecurityPasskeys(): ReactNode {
-  const { attributes } = useEnvironment().userSettings;
-  const { shouldAllowIdentificationCreation } = useUserProfileContext();
-
-  if (!attributes.passkey?.enabled || !shouldAllowIdentificationCreation) {
+  const model = useSecurityPasskeysModel();
+  if (!model.available) {
     return null;
   }
-
-  return <PasskeySection />;
+  return <SecurityPasskeysView />;
 }
 
 export function SecurityMfa(): ReactNode {
-  const { attributes } = useEnvironment().userSettings;
-
-  if (getSecondFactors(attributes).length === 0) {
+  const model = useSecurityMfaModel();
+  if (!model.available) {
     return null;
   }
-
-  return <MfaSection />;
+  return <SecurityMfaView />;
 }
 
 export function SecurityDelete(): ReactNode {
-  const { user } = useUser();
-
-  if (!user?.deleteSelfEnabled) {
+  const model = useSecurityDeleteModel();
+  if (!model.available) {
     return null;
   }
-
-  return <DeleteSection />;
+  return <SecurityDeleteView />;
 }

@@ -1,158 +1,50 @@
-import { useReverification, useUser } from '@clerk/shared/react';
-import { Fragment, useState } from 'react';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { Card } from '@/ui/elements/Card';
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { ProfileSection } from '@/ui/elements/Section';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
-import { handleError } from '@/ui/utils/errorHandler';
-
-import { ProviderIcon } from '../../common';
-import { Badge, Box, Flex, localizationKeys, Text } from '../../customizables';
-import { Action } from '../../elements/Action';
-import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useEnabledThirdPartyProviders } from '../../hooks';
-import type { PropsOfComponent } from '../../styledSystem';
-import { RemoveWeb3WalletForm } from './RemoveResourceForm';
-import { sortIdentificationBasedOnVerification } from './utils';
+import { useWeb3SectionController, useWeb3WalletMenuController } from './web3-section.controller';
+import type { Web3SectionProps, Web3WalletRow } from './web3-section.model';
+import { useWeb3SectionModel, useWeb3WalletMenuModel } from './web3-section.model';
+import { RemoveWeb3WalletScreen } from './web3-section.screens';
+import { Web3SectionView, Web3WalletMenuView, Web3WalletRowView } from './web3-section.view';
 import { AddWeb3WalletActionMenu } from './Web3Form';
 
-type RemoveWeb3WalletScreenProps = { walletId: string };
-const RemoveWeb3WalletScreen = (props: RemoveWeb3WalletScreenProps) => {
-  const { close } = useActionContext();
+export const Web3Section = withCardStateProvider(({ shouldAllowCreation = true }: Web3SectionProps) => {
+  const model = useWeb3SectionModel();
+  const controller = useWeb3SectionController();
+
+  if (!shouldAllowCreation && !model.hasWeb3Wallets) {
+    return null;
+  }
+
   return (
-    <RemoveWeb3WalletForm
-      onSuccess={close}
-      onReset={close}
-      {...props}
+    <Web3SectionView
+      controller={controller}
+      items={model.rows.map(row => (
+        <Web3WalletRowEntry
+          key={row.id}
+          row={row}
+        />
+      ))}
+      addMenu={shouldAllowCreation ? <AddWeb3WalletActionMenu /> : null}
     />
   );
-};
+});
 
-const shortenWeb3Address = (address: string) => {
-  if (address.length <= 10) {
-    return address;
-  }
-  return address.slice(0, 6) + '...' + address.slice(-4);
-};
-
-export const Web3Section = withCardStateProvider(
-  ({ shouldAllowCreation = true }: { shouldAllowCreation?: boolean }) => {
-    const { user } = useUser();
-    const card = useCardState();
-    const { strategyToDisplayData } = useEnabledThirdPartyProviders();
-    const hasWeb3Wallets = Boolean(user?.web3Wallets?.length);
-    const [actionValue, setActionValue] = useState<string | null>(null);
-
-    if (!shouldAllowCreation && !hasWeb3Wallets) {
-      return null;
+const Web3WalletRowEntry = ({ row }: { row: Web3WalletRow }) => (
+  <Web3WalletRowView
+    row={row}
+    menu={
+      <Web3WalletMenu
+        walletId={row.id}
+        isVerified={row.isVerified}
+      />
     }
-
-    return (
-      <ProfileSection.Root
-        title={localizationKeys('userProfile.start.web3WalletsSection.title')}
-        centered={false}
-        id='web3Wallets'
-      >
-        <Card.Alert>{card.error}</Card.Alert>
-        <Action.Root
-          value={actionValue}
-          onChange={setActionValue}
-        >
-          <ProfileSection.ItemList id='web3Wallets'>
-            {sortIdentificationBasedOnVerification(user?.web3Wallets, user?.primaryWeb3WalletId).map(wallet => {
-              const strategy = wallet.verification.strategy;
-              const walletId = wallet.id;
-              const displayData = strategyToDisplayData[strategy as keyof typeof strategyToDisplayData] ?? null;
-              // We only display the Web3 wallet if it matches a known provider
-              // in displayData, or if it was added by an administrator using BAPI.
-              if (!displayData && strategy !== 'admin') {
-                return null;
-              }
-              return (
-                <Fragment key={wallet.id}>
-                  <ProfileSection.Item
-                    key={walletId}
-                    id='web3Wallets'
-                    align='start'
-                  >
-                    <Flex sx={t => ({ alignItems: 'center', gap: t.space.$2, width: '100%' })}>
-                      {displayData?.iconUrl && (
-                        <ProviderIcon
-                          id={displayData.id}
-                          iconUrl={displayData.iconUrl}
-                          name={displayData.name}
-                          alt={displayData.name}
-                        />
-                      )}
-                      <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                        <Flex
-                          gap={2}
-                          justify='start'
-                        >
-                          <Text>
-                            {displayData
-                              ? `${displayData.name} (${shortenWeb3Address(wallet.web3Wallet)})`
-                              : shortenWeb3Address(wallet.web3Wallet)}
-                          </Text>
-                          {user?.primaryWeb3WalletId === walletId && (
-                            <Badge localizationKey={localizationKeys('badge__primary')} />
-                          )}
-                          {wallet.verification.status !== 'verified' && (
-                            <Badge localizationKey={localizationKeys('badge__unverified')} />
-                          )}
-                        </Flex>
-                      </Box>
-                    </Flex>
-                    <Web3WalletMenu
-                      walletId={walletId}
-                      isVerified={wallet.verification.status === 'verified'}
-                    />
-                  </ProfileSection.Item>
-
-                  <Action.Open value={`remove-${walletId}`}>
-                    <Action.Card variant='destructive'>
-                      <RemoveWeb3WalletScreen walletId={wallet.id} />
-                    </Action.Card>
-                  </Action.Open>
-                </Fragment>
-              );
-            })}
-          </ProfileSection.ItemList>
-          {shouldAllowCreation && <AddWeb3WalletActionMenu />}
-        </Action.Root>
-      </ProfileSection.Root>
-    );
-  },
+    removeScreen={<RemoveWeb3WalletScreen walletId={row.id} />}
+  />
 );
 
 const Web3WalletMenu = ({ walletId, isVerified }: { walletId: string; isVerified: boolean }) => {
-  const card = useCardState();
-  const { open } = useActionContext();
-  const { user } = useUser();
-  const isPrimary = user?.primaryWeb3WalletId === walletId;
-  const setPrimary = useReverification(() => {
-    return user?.update({ primaryWeb3WalletId: walletId });
-  });
+  const model = useWeb3WalletMenuModel(walletId);
+  const controller = useWeb3WalletMenuController(model, walletId, isVerified);
 
-  const actions = (
-    [
-      // Only allow setting as primary if the wallet is verified and not already primary
-      !isPrimary && isVerified
-        ? {
-            label: localizationKeys('userProfile.start.web3WalletsSection.detailsAction__nonPrimary'),
-            onClick: () => {
-              setPrimary().catch(e => handleError(e, [], card.setError));
-            },
-          }
-        : null,
-      {
-        label: localizationKeys('userProfile.start.web3WalletsSection.destructiveAction'),
-        isDestructive: true,
-        onClick: () => open(`remove-${walletId}`),
-      },
-    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
-  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
-
-  return <ThreeDotsMenu actions={actions} />;
+  return <Web3WalletMenuView controller={controller} />;
 };

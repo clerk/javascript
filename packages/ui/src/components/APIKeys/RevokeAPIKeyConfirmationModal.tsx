@@ -1,106 +1,23 @@
-import { useClerk } from '@clerk/shared/react';
+import type { RevokeAPIKeyConfirmationModalProps, RevokeAPIKeyModel } from './api-keys.types';
+import { useRevokeAPIKeyController } from './revoke-api-key.controller';
+import { useRevokeAPIKeyModel } from './revoke-api-key.model';
+import { RevokeAPIKeyView } from './revoke-api-key.view';
 
-import { descriptors } from '@/ui/customizables';
-import { Card } from '@/ui/elements/Card';
-import { Form } from '@/ui/elements/Form';
-import { FormButtons } from '@/ui/elements/FormButtons';
-import { FormContainer } from '@/ui/elements/FormContainer';
-import { localizationKeys, useLocalizations } from '@/ui/localization';
-import { useFormControl } from '@/ui/utils/useFormControl';
-
-import { APIKeyModal } from './APIKeyModal';
-
-type RevokeAPIKeyConfirmationModalProps = {
-  isOpen: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-  apiKeyID?: string;
-  apiKeyName: string;
-  onRevokeSuccess?: () => void;
-  modalRoot?: React.MutableRefObject<HTMLElement | null>;
+const RevokeAPIKeyContent = ({
+  model,
+  ...props
+}: RevokeAPIKeyConfirmationModalProps & { model: RevokeAPIKeyModel }) => {
+  const controller = useRevokeAPIKeyController(model, props);
+  return <RevokeAPIKeyView controller={controller} />;
 };
 
-export const RevokeAPIKeyConfirmationModal = ({
-  isOpen,
-  onOpen,
-  onClose,
-  apiKeyID,
-  apiKeyName,
-  onRevokeSuccess,
-  modalRoot,
-}: RevokeAPIKeyConfirmationModalProps) => {
-  const clerk = useClerk();
-  const { t } = useLocalizations();
-
-  const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
-    type: 'text',
-    label: localizationKeys('apiKeys.revokeConfirmation.inputLabel'),
-    placeholder: localizationKeys('apiKeys.revokeConfirmation.confirmationText'),
-    isRequired: true,
-  });
-
-  const canSubmit =
-    revokeField.value === (t(localizationKeys('apiKeys.revokeConfirmation.confirmationText')) || 'Revoke');
-
-  const handleClose = () => {
-    onClose();
-    revokeField.setValue('');
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!apiKeyID || !canSubmit) {
-      return;
-    }
-
-    await clerk.apiKeys.revoke({ apiKeyID: apiKeyID });
-    onRevokeSuccess?.();
-    handleClose();
-  };
-
-  if (!isOpen) {
-    return null;
-  }
-
+export const RevokeAPIKeyConfirmationModal = (props: RevokeAPIKeyConfirmationModalProps) => {
+  const model = useRevokeAPIKeyModel(props.apiKeyID);
   return (
-    <APIKeyModal
-      handleOpen={onOpen}
-      handleClose={handleClose}
-      canCloseModal={false}
-      modalRoot={modalRoot}
-    >
-      <Card.Root
-        role='alertdialog'
-        elementDescriptor={descriptors.apiKeysRevokeModal}
-      >
-        <Card.Content
-          sx={t => ({
-            textAlign: 'start',
-            padding: `${t.sizes.$4} ${t.sizes.$5} ${t.sizes.$4} ${t.sizes.$6}`,
-          })}
-        >
-          <FormContainer
-            headerTitle={localizationKeys('apiKeys.revokeConfirmation.formTitle', { apiKeyName })}
-            headerSubtitle={localizationKeys('apiKeys.revokeConfirmation.formHint')}
-          >
-            <Form.Root onSubmit={handleSubmit}>
-              <Form.ControlRow
-                elementId={revokeField.id}
-                elementDescriptor={descriptors.apiKeysRevokeModalInput}
-              >
-                <Form.PlainInput {...revokeField.props} />
-              </Form.ControlRow>
-              <FormButtons
-                submitLabel={localizationKeys('apiKeys.revokeConfirmation.formButtonPrimary__revoke')}
-                colorScheme='danger'
-                isDisabled={!canSubmit}
-                onReset={handleClose}
-                elementDescriptor={descriptors.apiKeysRevokeModalSubmitButton}
-              />
-            </Form.Root>
-          </FormContainer>
-        </Card.Content>
-      </Card.Root>
-    </APIKeyModal>
+    <RevokeAPIKeyContent
+      key={JSON.stringify([model.scopeKey, props.isOpen])}
+      model={model}
+      {...props}
+    />
   );
 };

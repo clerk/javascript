@@ -1,39 +1,57 @@
-import type { TOTPResource } from '@clerk/shared/types';
-import React from 'react';
-
+import { useWizard, Wizard } from '@/ui/common';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { SuccessPage } from '@/ui/elements/SuccessPage';
+import { localizationKeys } from '@/ui/localization';
 
-import { useWizard, Wizard } from '../../common';
-import { localizationKeys } from '../../customizables';
 import { AddAuthenticatorApp } from './AddAuthenticatorApp';
+import { useMfaTotpModel } from './mfa-totp.model';
+import type { MfaTotpData } from './mfa-totp.types';
 import { MfaBackupCodeList } from './MfaBackupCodeList';
 import { VerifyTOTP } from './VerifyTOTP';
 
-type MfaTOTPFormProps = FormProps;
-export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => {
-  const { onReset } = props;
-  const wizard = useWizard();
-  const pendingTotpRef = React.useRef<TOTPResource>();
-  const verifiedTotpRef = React.useRef<TOTPResource>();
+export const MfaTOTPScreen = (props: FormProps) => {
+  const model = useMfaTotpModel();
+  return (
+    <MfaTotpContent
+      key={model.requestKey}
+      model={model}
+      {...props}
+    />
+  );
+};
 
+const MfaTotpContent = withCardStateProvider(({ model, ...props }: FormProps & { model: MfaTotpData }) => {
+  const wizard = useWizard();
+  const onReset = () => {
+    if (model.canRun()) {
+      props.onReset();
+    }
+  };
+  const nextStep = () => {
+    if (model.canRun()) {
+      wizard.nextStep();
+    }
+  };
+  const prevStep = () => {
+    if (model.canRun()) {
+      wizard.prevStep();
+    }
+  };
   return (
     <Wizard {...wizard.props}>
       <AddAuthenticatorApp
+        model={model}
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
-        onSuccess={wizard.nextStep}
+        onSuccess={nextStep}
         onReset={onReset}
-        pendingTotpRef={pendingTotpRef}
       />
-
       <VerifyTOTP
-        onSuccess={wizard.nextStep}
+        model={model}
+        onSuccess={nextStep}
         onReset={onReset}
-        onBack={wizard.prevStep}
-        verifiedTotpRef={verifiedTotpRef}
+        onBack={prevStep}
       />
-
       <SuccessPage
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
         text={localizationKeys('userProfile.mfaTOTPPage.successMessage')}
@@ -41,7 +59,7 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
         contents={
           <MfaBackupCodeList
             subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
-            backupCodes={verifiedTotpRef.current?.backupCodes}
+            backupCodes={model.backupCodes}
           />
         }
       />

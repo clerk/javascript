@@ -1,84 +1,73 @@
-import { useSession, useUser } from '@clerk/shared/react';
-import type { SignedInSessionResource } from '@clerk/shared/types';
-import React from 'react';
+import { forwardRef } from 'react';
 
-import { PopoverCard } from '@/ui/elements/PopoverCard';
-import { RootBox } from '@/ui/elements/RootBox';
-import { UserPreview } from '@/ui/elements/UserPreview';
+import type { PopoverCard } from '@/ui/elements/PopoverCard';
 
-import { useEnvironment, useUserButtonContext } from '../../contexts';
-import { descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import type { PropsOfComponent } from '../../styledSystem';
-import { MultiSessionActions, SignOutAllActions, SingleSessionActions } from './SessionActions';
-import { useMultisessionActions } from './useMultisessionActions';
+import { useMultisessionController } from './multisession.controller';
+import { SignOutAllActionsView } from './session-actions.view';
+import { MultiSessionActions, SingleSessionActions } from './SessionActions';
+import type { UserButtonPopoverModel } from './user-button.types';
+import { useUserButtonPopoverModel } from './user-button-popover.model';
+import { UserButtonPopoverView } from './user-button-popover.view';
 
 type UserButtonPopoverProps = { close?: (open: boolean) => void } & PropsOfComponent<typeof PopoverCard.Root>;
 
-export const UserButtonPopover = React.forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
-  const { close: unsafeClose, ...rest } = props;
-  const close = () => unsafeClose?.(false);
-  const { session } = useSession() as { session: SignedInSessionResource };
-  const userButtonContext = useUserButtonContext();
-  const { __experimental_asStandalone } = userButtonContext;
-  const { authConfig } = useEnvironment();
-  const { user } = useUser();
-  const { t } = useLocalizations();
-  const {
-    handleAddAccountClicked,
-    handleManageAccountClicked,
-    handleSessionClicked,
-    handleSignOutAllClicked,
-    handleSignOutSessionClicked,
-    handleUserProfileActionClicked,
-    otherSessions,
-  } = useMultisessionActions({ ...userButtonContext, actionCompleteCallback: close, user });
-
-  return (
-    <RootBox elementDescriptor={descriptors.userButtonPopoverRootBox}>
-      <PopoverCard.Root
-        elementDescriptor={descriptors.userButtonPopoverCard}
-        ref={ref}
-        role='dialog'
-        aria-label={t(localizationKeys('userButton.label__userButtonPopover'))}
-        shouldEntryAnimate={!__experimental_asStandalone}
-        {...rest}
-      >
-        <PopoverCard.Content elementDescriptor={descriptors.userButtonPopoverMain}>
-          <UserPreview
-            elementId={'userButton'}
-            user={user}
-            sx={t => ({
-              width: '100%',
-              padding: `${t.space.$4} ${t.space.$5}`,
-            })}
-          />
-          {authConfig.singleSessionMode ? (
-            <SingleSessionActions
-              handleManageAccountClicked={handleManageAccountClicked}
-              handleSignOutSessionClicked={handleSignOutSessionClicked}
-              handleUserProfileActionClicked={handleUserProfileActionClicked}
-              session={session}
-              completedCallback={close}
-            />
-          ) : (
-            <MultiSessionActions
-              session={session}
-              otherSessions={otherSessions}
-              handleManageAccountClicked={handleManageAccountClicked}
-              handleSignOutSessionClicked={handleSignOutSessionClicked}
-              handleSessionClicked={handleSessionClicked}
-              handleAddAccountClicked={handleAddAccountClicked}
-              handleUserProfileActionClicked={handleUserProfileActionClicked}
-              completedCallback={close}
-            />
-          )}
-        </PopoverCard.Content>
-        <PopoverCard.Footer elementDescriptor={descriptors.userButtonPopoverFooter}>
-          {!authConfig.singleSessionMode && otherSessions.length > 0 && (
-            <SignOutAllActions handleSignOutAllClicked={handleSignOutAllClicked} />
-          )}
-        </PopoverCard.Footer>
-      </PopoverCard.Root>
-    </RootBox>
-  );
+export const UserButtonPopover = forwardRef<HTMLDivElement, UserButtonPopoverProps>((props, ref) => {
+  const model = useUserButtonPopoverModel();
+  return model ? (
+    <UserButtonPopoverContent
+      {...props}
+      key={model.multisession.scopeKey}
+      model={model}
+      ref={ref}
+    />
+  ) : null;
 });
+
+const UserButtonPopoverContent = forwardRef<HTMLDivElement, UserButtonPopoverProps & { model: UserButtonPopoverModel }>(
+  (props, ref) => {
+    const { close: unsafeClose, model, ...rest } = props;
+    const close = () => unsafeClose?.(false);
+    const controller = useMultisessionController(model.multisession, {
+      userProfileMode: model.userProfileMode,
+      actionCompleteCallback: close,
+    });
+    const actions = model.singleSessionMode ? (
+      <SingleSessionActions
+        handleManageAccountClicked={controller.handleManageAccountClicked}
+        handleSignOutSessionClicked={controller.handleSignOutSessionClicked}
+        handleUserProfileActionClicked={controller.handleUserProfileActionClicked}
+        session={model.session}
+        canRun={model.multisession.canRun}
+        completedCallback={close}
+      />
+    ) : (
+      <MultiSessionActions
+        session={model.session}
+        canRun={model.multisession.canRun}
+        otherSessions={controller.otherSessions}
+        handleManageAccountClicked={controller.handleManageAccountClicked}
+        handleSignOutSessionClicked={controller.handleSignOutSessionClicked}
+        handleSessionClicked={controller.handleSessionClicked}
+        handleAddAccountClicked={controller.handleAddAccountClicked}
+        handleUserProfileActionClicked={controller.handleUserProfileActionClicked}
+        completedCallback={close}
+      />
+    );
+    const footerActions =
+      !model.singleSessionMode && controller.otherSessions.length > 0 ? (
+        <SignOutAllActionsView handleSignOutAllClicked={controller.handleSignOutAllClicked} />
+      ) : null;
+
+    return (
+      <UserButtonPopoverView
+        {...rest}
+        userPreview={model.userPreview}
+        isStandalone={model.isStandalone}
+        actions={actions}
+        footerActions={footerActions}
+        ref={ref}
+      />
+    );
+  },
+);

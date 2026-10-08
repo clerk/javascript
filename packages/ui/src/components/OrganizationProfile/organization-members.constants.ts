@@ -1,0 +1,1 @@
+export const ACTIVE_MEMBERS_PAGE_SIZE = 10;

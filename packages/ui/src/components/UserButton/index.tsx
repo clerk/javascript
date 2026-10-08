@@ -1,83 +1,44 @@
-import { cloneElement, type ReactElement, useCallback, useId, useRef } from 'react';
+import type { ReactElement } from 'react';
 
 import { withCardStateProvider, withFloatingTree } from '@/ui/elements/contexts';
-import { Popover } from '@/ui/elements/Popover';
 
-import { useUserButtonContext, withCoreUserGuard } from '../../contexts';
-import { Flow } from '../../customizables';
-import { usePopover } from '../../hooks';
+import { withCoreUserGuard } from '../../contexts';
+import { useFloatingMenuController } from '../../hooks/useFloatingMenuController';
+import { useUserButtonRootModel } from './user-button.model';
+import { UserButtonFloatingView, UserButtonRootView } from './user-button.view';
+import { useUserButtonTriggerModel } from './user-button-trigger.model';
 import { UserButtonPopover } from './UserButtonPopover';
-import { UserButtonTrigger } from './UserButtonTrigger';
 
-const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
-  const { defaultOpen } = useUserButtonContext();
+const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement; defaultOpen?: boolean }>(
+  ({ children, defaultOpen }) => {
+    const controller = useFloatingMenuController({ defaultOpen, placement: 'bottom-end' });
+    const trigger = useUserButtonTriggerModel(controller.isOpen);
 
-  const { floating, reference, styles, toggle, isOpen, nodeId, context, getReferenceProps, getFloatingProps } =
-    usePopover({
-      defaultOpen,
-      placement: 'bottom-end',
-      offset: 8,
-    });
-
-  const userButtonMenuId = useId();
-  const popoverRef = useRef<HTMLElement | null>(null);
-  const floatingRef = useCallback(
-    (node: HTMLElement | null) => {
-      floating(node);
-      popoverRef.current = node;
-    },
-    [floating],
-  );
-
-  return (
-    <>
-      <UserButtonTrigger
-        ref={reference}
-        isOpen={isOpen}
-        {...getReferenceProps({
-          'aria-controls': isOpen ? userButtonMenuId : undefined,
-        })}
-      />
-      <Popover
-        nodeId={nodeId}
-        context={context}
-        isOpen={isOpen}
-        order={['content']}
-        initialFocus={popoverRef}
+    return (
+      <UserButtonFloatingView
+        {...controller}
+        trigger={trigger}
       >
-        {cloneElement(children, {
-          ...getFloatingProps({
-            id: userButtonMenuId,
-            tabIndex: -1,
-            ref: floatingRef,
-            style: styles,
-          }),
-          close: toggle,
-        })}
-      </Popover>
-    </>
-  );
-});
+        {children}
+      </UserButtonFloatingView>
+    );
+  },
+);
 
-const _UserButton = () => {
-  const { __experimental_asStandalone } = useUserButtonContext();
+const UserButtonInternal = () => {
+  const model = useUserButtonRootModel();
 
   return (
-    <Flow.Root
-      flow='userButton'
-      sx={{ display: 'inline-flex' }}
-    >
-      {__experimental_asStandalone ? (
-        <UserButtonPopover
-          close={typeof __experimental_asStandalone === 'function' ? __experimental_asStandalone : undefined}
-        />
+    <UserButtonRootView>
+      {model.standalone ? (
+        <UserButtonPopover close={typeof model.standalone === 'function' ? model.standalone : undefined} />
       ) : (
-        <UserButtonWithFloatingTree>
+        <UserButtonWithFloatingTree defaultOpen={model.defaultOpen}>
           <UserButtonPopover />
         </UserButtonWithFloatingTree>
       )}
-    </Flow.Root>
+    </UserButtonRootView>
   );
 };
 
-export const UserButton = withCoreUserGuard(withCardStateProvider(_UserButton));
+export const UserButton = withCoreUserGuard(withCardStateProvider(UserButtonInternal));

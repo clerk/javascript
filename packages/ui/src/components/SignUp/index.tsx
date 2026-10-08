@@ -1,123 +1,23 @@
-import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
-import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '@/contexts';
-import { Flow } from '@/customizables';
-import { usePreloadTasks } from '@/hooks/usePreloadTasks';
+import { SignUpContext, withCoreSessionSwitchGuard } from '@/contexts';
 import type { WithInternalRouting } from '@/internal';
-import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
-import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStartSolanaWalletsCard';
+import { Route, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 
+import { useSignUpRoutesModel } from './sign-up-routes.model';
+import { SignUpRoutesView } from './sign-up-routes.view';
 import { SignUpContinue } from './SignUpContinue';
-import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
 import { SignUpProtectCheck } from './SignUpProtectCheck';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
 import { SignUpVerifyPhone } from './SignUpVerifyPhone';
 
-function RedirectToSignUp() {
-  const clerk = useClerk();
-  React.useEffect(() => {
-    void clerk.redirectToSignUp();
-  }, [clerk]);
-  return null;
-}
-
 function SignUpRoutes(): JSX.Element {
-  usePreloadTasks();
+  const model = useSignUpRoutesModel();
 
-  const signUpContext = useSignUpContext();
-
-  return (
-    <Flow.Root flow='signUp'>
-      <Switch>
-        {/* No canActivate guard here. `!!signUp.protectCheck` flips to false
-            when submitProtectCheck resolves and clears protectCheck, which
-            unmounts this card mid-navigation and blanks the route. The card
-            owns its own post-resolution routing. */}
-        <Route path='protect-check'>
-          <SignUpProtectCheck />
-        </Route>
-        <Route
-          path='verify-email-address'
-          canActivate={clerk => !!clerk.client.signUp.emailAddress}
-        >
-          <SignUpVerifyEmail />
-        </Route>
-        <Route
-          path='verify-phone-number'
-          canActivate={clerk => !!clerk.client.signUp.phoneNumber}
-        >
-          <SignUpVerifyPhone />
-        </Route>
-        <Route path='sso-callback'>
-          <SignUpSSOCallback
-            signUpUrl={signUpContext.signUpUrl}
-            signInUrl={signUpContext.signInUrl}
-            signUpForceRedirectUrl={signUpContext.afterSignUpUrl}
-            signInForceRedirectUrl={signUpContext.afterSignInUrl}
-            secondFactorUrl={signUpContext.secondFactorUrl}
-            continueSignUpUrl='../continue'
-            verifyEmailAddressUrl='../verify-email-address'
-            verifyPhoneNumberUrl='../verify-phone-number'
-            signUpProtectCheckUrl='../protect-check'
-            unsafeMetadata={signUpContext.unsafeMetadata}
-          />
-        </Route>
-        <Route path='verify'>
-          <SignUpEmailLinkFlowComplete
-            redirectUrlComplete={signUpContext.afterSignUpUrl}
-            ssoCallbackUrl={signUpContext.ssoCallbackUrl}
-            oidcPrompt={signUpContext.oidcPrompt}
-            verifyEmailPath='../verify-email-address'
-            verifyPhonePath='../verify-phone-number'
-          />
-        </Route>
-        <Route path='continue'>
-          {/* No canActivate guard: same resolution race as the top-level
-              protect-check route; the card owns its own routing. */}
-          <Route path='protect-check'>
-            {/* Under `continue`, the continue index is `..`, not `../continue`. */}
-            <SignUpProtectCheck continuePath='..' />
-          </Route>
-          <Route
-            path='verify-email-address'
-            canActivate={clerk => !!clerk.client.signUp.emailAddress}
-          >
-            <SignUpVerifyEmail />
-          </Route>
-          <Route
-            path='verify-phone-number'
-            canActivate={clerk => !!clerk.client.signUp.phoneNumber}
-          >
-            <SignUpVerifyPhone />
-          </Route>
-          <Route index>
-            <SignUpContinue />
-          </Route>
-        </Route>
-        <Route path='tasks'>
-          <LazySessionTasks redirectUrlComplete={signUpContext.afterSignUpUrl} />
-        </Route>
-        <Route path='enterprise-connections'>
-          <SignUpEnterpriseConnections />
-        </Route>
-        <Route path='choose-wallet'>
-          <SignUpStartSolanaWalletsCard />
-        </Route>
-        <Route index>
-          <SignUpStart />
-        </Route>
-        <Route>
-          <RedirectToSignUp />
-        </Route>
-      </Switch>
-    </Flow.Root>
-  );
+  return <SignUpRoutesView {...model} />;
 }
 
 SignUpRoutes.displayName = 'SignUp';

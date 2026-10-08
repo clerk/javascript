@@ -1,4 +1,3 @@
-import type { UserOrganizationInvitationResource } from '@clerk/shared/types';
 import type { PropsWithChildren } from 'react';
 
 import {
@@ -10,6 +9,7 @@ import {
 
 import type { Button } from '../../customizables';
 import { descriptors } from '../../customizables';
+import type { OrganizationListOrganization } from './organization-list.types';
 
 export const PreviewListItems = (props: PropsWithChildren) => {
   return (
@@ -22,7 +22,7 @@ export const PreviewListItems = (props: PropsWithChildren) => {
 
 export const PreviewListItem = (
   props: PropsWithChildren<{
-    organizationData: UserOrganizationInvitationResource['publicOrganizationData'];
+    organizationData: OrganizationListOrganization;
   }>,
 ) => {
   return (

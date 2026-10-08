@@ -1,6 +1,7 @@
 import {
   __internal_useOrganizationDomains,
   __internal_useOrganizationEnterpriseConnections,
+  useClerk,
   useOrganization,
   useSession,
   useUser,
@@ -13,11 +14,9 @@ import type {
   OrganizationDomainResource,
   OrganizationDomainsBulkOwnershipVerificationResource,
   OrganizationResource,
-  SignedInSessionResource,
   UpdateOrganizationEnterpriseConnectionParams,
-  UserResource,
 } from '@clerk/shared/types';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ConnectionScope } from '../domain/connectionScope';
 import {
@@ -59,7 +58,7 @@ export interface EnterpriseConnectionMutations {
   setConnectionActive: (id: string, active: boolean) => Promise<EnterpriseConnectionResource | undefined>;
   deleteConnection: (id: string) => Promise<DeletedObjectResource | undefined>;
   /** Resolves with the test-run URL to open. */
-  createTestRun: (id: string) => Promise<EnterpriseConnectionTestRunInitResource>;
+  createTestRun: (id: string) => Promise<EnterpriseConnectionTestRunInitResource | undefined>;
 }
 
 export interface OrganizationDomainMutations {
@@ -81,8 +80,8 @@ export interface UseOrganizationEnterpriseConnectionResult {
    * configured, so a mid-flow create never re-flashes the global skeleton.
    */
   isLoading: boolean;
-  user: UserResource | null | undefined;
-  session: SignedInSessionResource | null | undefined;
+  canRun: () => boolean;
+  ownerKey: string;
   organization: OrganizationResource | null | undefined;
   /** Every connection of the organization, in deterministic order. */
   enterpriseConnections: EnterpriseConnectionResource[];
@@ -145,25 +144,96 @@ export interface TestRunsView {
 export const useOrganizationEnterpriseConnection = ({
   manage = true,
 }: { manage?: boolean } = {}): UseOrganizationEnterpriseConnectionResult => {
+  const clerk = useClerk();
+  const { user } = useUser();
+  const { session } = useSession();
+  const { organization } = useOrganization();
+  const actor = user?.id;
+  const sessionId = session?.id;
+  const clientId = clerk.client?.id;
+  const organizationId = organization?.id;
+  const ownerKey = JSON.stringify([actor, sessionId, clientId, organizationId]);
+  const owner = useRef({ key: ownerKey, version: 0 });
+  const mounted = useRef(true);
+  const selectionVersion = useRef(0);
+  if (owner.current.key !== ownerKey) {
+    owner.current = { key: ownerKey, version: owner.current.version + 1 };
+  }
+  const version = owner.current.version;
+  const canRun = useCallback(
+    () =>
+      mounted.current &&
+      owner.current.version === version &&
+      Boolean(actor && organizationId) &&
+      clerk.user?.id === actor &&
+      clerk.session?.id === sessionId &&
+      clerk.client?.id === clientId &&
+      clerk.organization?.id === organizationId,
+    [clerk, actor, sessionId, clientId, organizationId, version],
+  );
+  const runOwnedRequest = useCallback(
+    async <T>(request: () => Promise<T>, isCurrent = canRun): Promise<T | undefined> => {
+      if (!isCurrent()) {
+        return;
+      }
+      try {
+        const result = await request();
+        return isCurrent() ? result : undefined;
+      } catch (error) {
+        if (isCurrent()) {
+          throw error;
+        }
+      }
+    },
+    [canRun],
+  );
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const {
     data: sourceConnections,
     isLoading: isLoadingEnterpriseConnections,
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
-  } = __internal_useOrganizationEnterpriseConnections({ enabled: true });
+  } = __internal_useOrganizationEnterpriseConnections({ enabled: true, keepPreviousData: false });
 
   const enterpriseConnections = useMemo(() => sortEnterpriseConnections(sourceConnections ?? []), [sourceConnections]);
 
   // `null` resolves to the first connection so the standalone host, which has no list UI, still edits a deterministic one.
-  const [requestedScope, setRequestedScope] = useState<ConnectionScope | null>(null);
+  const [selection, setSelection] = useState<{
+    ownerVersion: number;
+    requestedScope: ConnectionScope | null;
+    draftDomains: string[] | null;
+  }>({ ownerVersion: version, requestedScope: null, draftDomains: null });
+  const requestedScope = selection.ownerVersion === version ? selection.requestedScope : null;
   // The `new` scope's domains until the create lands; `null` means the admin has not touched the default yet.
-  const [draftDomains, setDraftDomains] = useState<string[] | null>(null);
+  const draftDomains = selection.ownerVersion === version ? selection.draftDomains : null;
+  const setDraftDomains = useCallback(
+    (domains: string[]) => {
+      if (canRun()) {
+        setSelection(current => ({
+          ownerVersion: version,
+          requestedScope: current.ownerVersion === version ? current.requestedScope : null,
+          draftDomains: [...domains],
+        }));
+      }
+    },
+    [version, canRun],
+  );
 
-  const setScope = useCallback((next: ConnectionScope | null) => {
-    setRequestedScope(next);
-    setDraftDomains(null);
-  }, []);
+  const setScope = useCallback(
+    (next: ConnectionScope | null) => {
+      if (canRun()) {
+        selectionVersion.current++;
+        setSelection({ ownerVersion: version, requestedScope: next, draftDomains: null });
+      }
+    },
+    [canRun, version],
+  );
 
   const connectionScope = useMemo<ConnectionScope>(
     () =>
@@ -186,11 +256,17 @@ export const useOrganizationEnterpriseConnection = ({
   //
   // `undefined` until the first settle; render-phase assignment is safe here —
   // it records a one-time fact about load, it does not sync state to props.
-  const hadInitialConnectionRef = useRef<boolean | undefined>(undefined);
-  if (hadInitialConnectionRef.current === undefined && !isLoadingEnterpriseConnections) {
-    hadInitialConnectionRef.current = Boolean(enterpriseConnection);
+  const hadInitialConnectionRef = useRef<{ ownerKey: string; value: boolean | undefined }>({
+    ownerKey,
+    value: undefined,
+  });
+  if (hadInitialConnectionRef.current.ownerKey !== ownerKey) {
+    hadInitialConnectionRef.current = { ownerKey, value: undefined };
   }
-  const hadInitialConnection = hadInitialConnectionRef.current === true;
+  if (hadInitialConnectionRef.current.value === undefined && !isLoadingEnterpriseConnections) {
+    hadInitialConnectionRef.current.value = Boolean(enterpriseConnection);
+  }
+  const hadInitialConnection = hadInitialConnectionRef.current.value === true;
 
   // The test-runs source is relevant exactly when the connection is configured —
   // the same condition that makes the Test step reachable
@@ -220,11 +296,26 @@ export const useOrganizationEnterpriseConnection = ({
     setPage: setTestRunPage,
     refresh: refreshTestRuns,
     revalidateHasSuccessfulTestRun,
-  } = useEnterpriseConnectionTestRuns(enterpriseConnection, testRunsActive && manage);
+  } = useEnterpriseConnectionTestRuns(enterpriseConnection, testRunsActive && manage, ownerKey);
 
-  const { user } = useUser();
-  const { session } = useSession();
-  const { organization } = useOrganization();
+  const resolvedScopeKey = JSON.stringify([
+    connectionScope.kind,
+    connectionScope.kind === 'existing' ? connectionScope.id : null,
+    enterpriseConnection?.id,
+  ]);
+  const resolvedScope = useRef({ key: resolvedScopeKey, version: 0 });
+  if (resolvedScope.current.key !== resolvedScopeKey) {
+    resolvedScope.current = { key: resolvedScopeKey, version: resolvedScope.current.version + 1 };
+  }
+  const resolvedScopeVersion = resolvedScope.current.version;
+  const currentSelectionVersion = selectionVersion.current;
+  const canRunSelection = useCallback(
+    () =>
+      canRun() &&
+      selectionVersion.current === currentSelectionVersion &&
+      resolvedScope.current.version === resolvedScopeVersion,
+    [canRun, currentSelectionVersion, resolvedScopeVersion],
+  );
 
   const claimedDomains = useMemo(
     () => domainsClaimedByOtherConnections(enterpriseConnections, enterpriseConnection?.id),
@@ -235,6 +326,9 @@ export const useOrganizationEnterpriseConnection = ({
   // one another connection claims stays out, since FAPI would reject it.
   const handleDomainOwnershipVerified = useCallback(
     async (verifiedDomains: OrganizationDomainResource[]) => {
+      if (!canRunSelection()) {
+        return;
+      }
       const current = enterpriseConnection ? (enterpriseConnection.domains ?? []) : draftDomains;
       if (current === null) {
         return;
@@ -248,12 +342,20 @@ export const useOrganizationEnterpriseConnection = ({
       }
 
       if (enterpriseConnection) {
-        await updateEnterpriseConnection(enterpriseConnection.id, { domains });
+        await runOwnedRequest(() => updateEnterpriseConnection(enterpriseConnection.id, { domains }), canRunSelection);
       } else {
         setDraftDomains(domains);
       }
     },
-    [enterpriseConnection, draftDomains, claimedDomains, updateEnterpriseConnection],
+    [
+      enterpriseConnection,
+      draftDomains,
+      claimedDomains,
+      updateEnterpriseConnection,
+      canRunSelection,
+      setDraftDomains,
+      runOwnedRequest,
+    ],
   );
 
   const {
@@ -265,6 +367,7 @@ export const useOrganizationEnterpriseConnection = ({
     revalidate: revalidateDomains,
   } = __internal_useOrganizationDomains({
     enabled: manage,
+    keepPreviousData: false,
     enrollmentMode: 'enterprise_sso',
     onOwnershipVerified: handleDomainOwnershipVerified,
   });
@@ -279,30 +382,51 @@ export const useOrganizationEnterpriseConnection = ({
 
   const setConnectionDomains = useCallback(
     async (domains: string[]) => {
+      if (!canRunSelection()) {
+        return;
+      }
       if (enterpriseConnection) {
-        await updateEnterpriseConnection(enterpriseConnection.id, { domains });
+        await runOwnedRequest(() => updateEnterpriseConnection(enterpriseConnection.id, { domains }), canRunSelection);
       } else {
         setDraftDomains(domains);
       }
     },
-    [enterpriseConnection, updateEnterpriseConnection],
+    [enterpriseConnection, updateEnterpriseConnection, canRunSelection, setDraftDomains, runOwnedRequest],
   );
 
   const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
     () => ({
+      createDomain: name => runOwnedRequest(() => createDomain(name)),
+      prepareOwnershipVerification: domains => runOwnedRequest(() => prepareOwnershipVerification(domains)),
+      attemptOwnershipVerification: domains => runOwnedRequest(() => attemptOwnershipVerification(domains)),
+      revalidate: async () => {
+        if (canRun()) {
+          await runOwnedRequest(revalidateDomains);
+        }
+      },
+    }),
+    [
       createDomain,
       prepareOwnershipVerification,
       attemptOwnershipVerification,
-      revalidate: revalidateDomains,
-    }),
-    [createDomain, prepareOwnershipVerification, attemptOwnershipVerification, revalidateDomains],
+      revalidateDomains,
+      canRun,
+      runOwnedRequest,
+    ],
   );
 
   const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
     const createConnection: EnterpriseConnectionMutations['createConnection'] = async provider => {
-      const created = await createEnterpriseConnection({ provider, domains: connectionDomains });
+      if (!canRun()) {
+        return;
+      }
+      const selectedVersion = selectionVersion.current;
+      const created = await runOwnedRequest(() => createEnterpriseConnection({ provider, domains: connectionDomains }));
 
-      if (created) {
+      if (!canRun()) {
+        return;
+      }
+      if (created && selectionVersion.current === selectedVersion) {
         setScope({ kind: 'existing', id: created.id });
       }
 
@@ -310,15 +434,27 @@ export const useOrganizationEnterpriseConnection = ({
     };
 
     const changeProvider: EnterpriseConnectionMutations['changeProvider'] = async (id, provider) => {
+      if (!canRun()) {
+        return;
+      }
+      const selectedVersion = selectionVersion.current;
       // FAPI can't switch a connection's provider in place, so this deletes then
       // recreates. Intentionally non-atomic: a failed create leaves the org one
       // connection short until the user retries, which is then a plain create.
       const replaced = enterpriseConnections.find(connection => connection.id === id);
-      await deleteEnterpriseConnection(id);
+      await runOwnedRequest(() => deleteEnterpriseConnection(id));
+      if (!canRun()) {
+        return;
+      }
 
-      const created = await createEnterpriseConnection({ provider, domains: replaced?.domains ?? connectionDomains });
+      const created = await runOwnedRequest(() =>
+        createEnterpriseConnection({ provider, domains: replaced?.domains ?? connectionDomains }),
+      );
 
-      if (created) {
+      if (!canRun()) {
+        return;
+      }
+      if (created && selectionVersion.current === selectedVersion) {
         setScope({ kind: 'existing', id: created.id });
       }
 
@@ -326,32 +462,45 @@ export const useOrganizationEnterpriseConnection = ({
     };
 
     const updateConnection: EnterpriseConnectionMutations['updateConnection'] = (id, params) =>
-      updateEnterpriseConnection(id, params);
+      runOwnedRequest(() => updateEnterpriseConnection(id, params));
 
     const setConnectionActive: EnterpriseConnectionMutations['setConnectionActive'] = (id, active) =>
-      updateEnterpriseConnection(id, { active });
+      runOwnedRequest(() => updateEnterpriseConnection(id, { active }));
 
     const deleteConnection: EnterpriseConnectionMutations['deleteConnection'] = async id => {
-      const deleted = await deleteEnterpriseConnection(id);
+      if (!canRun()) {
+        return;
+      }
+      const selectedVersion = selectionVersion.current;
+      const deleted = await runOwnedRequest(() => deleteEnterpriseConnection(id));
 
       // Pin to `new` rather than `null`, or the wizard would reseat onto a connection the user never chose.
-      if (connectionScope.kind === 'existing' && connectionScope.id === id) {
+      if (!canRun()) {
+        return;
+      }
+      if (
+        selectionVersion.current === selectedVersion &&
+        connectionScope.kind === 'existing' &&
+        connectionScope.id === id
+      ) {
         setScope({ kind: 'new' });
       }
 
       return deleted;
     };
 
-    const createTestRun: EnterpriseConnectionMutations['createTestRun'] = id => {
+    const createTestRun: EnterpriseConnectionMutations['createTestRun'] = async id => {
       // The flow never reaches the test step without an active organization;
       // guard so the fetcher stays well-typed without leaking an `undefined`
       // organization.
-      if (!organization) {
-        throw new Error(
-          'useOrganizationEnterpriseConnection.createTestRun called before the organization resource was loaded.',
-        );
+      if (!canRun()) {
+        return;
       }
-      return organization.createEnterpriseConnectionTestRun(id);
+      const currentOrganization = clerk.organization;
+      if (!currentOrganization) {
+        return;
+      }
+      return runOwnedRequest(() => currentOrganization.createEnterpriseConnectionTestRun(id));
     };
 
     return {
@@ -363,7 +512,9 @@ export const useOrganizationEnterpriseConnection = ({
       createTestRun,
     };
   }, [
-    organization,
+    clerk,
+    canRun,
+    runOwnedRequest,
     connectionDomains,
     enterpriseConnections,
     connectionScope,
@@ -381,9 +532,25 @@ export const useOrganizationEnterpriseConnection = ({
       isFetching: isFetchingTestRuns,
       isPolling: isPollingTestRuns,
       page: testRunPage,
-      setPage: setTestRunPage,
-      refresh: refreshTestRuns,
-      revalidateHasSuccessfulTestRun,
+      setPage: page => {
+        if (canRunSelection()) {
+          setTestRunPage(page);
+        }
+      },
+      refresh: async options => {
+        if (!canRunSelection()) {
+          return;
+        }
+        const result = await runOwnedRequest(() => refreshTestRuns(options), canRunSelection);
+        return canRunSelection() ? result : undefined;
+      },
+      revalidateHasSuccessfulTestRun: async () => {
+        if (!canRunSelection()) {
+          return false;
+        }
+        const result = await runOwnedRequest(revalidateHasSuccessfulTestRun, canRunSelection);
+        return canRunSelection() && Boolean(result);
+      },
     }),
     [
       testRunRows,
@@ -395,6 +562,8 @@ export const useOrganizationEnterpriseConnection = ({
       setTestRunPage,
       refreshTestRuns,
       revalidateHasSuccessfulTestRun,
+      canRunSelection,
+      runOwnedRequest,
     ],
   );
 
@@ -410,8 +579,8 @@ export const useOrganizationEnterpriseConnection = ({
   );
 
   return {
-    user,
-    session,
+    canRun,
+    ownerKey,
     organization,
     // Test-runs gate the full skeleton only when a connection was present at
     // first load — that case fetches them as part of the initial load. On the

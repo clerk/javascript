@@ -1,15 +1,13 @@
 import type { LocalizationKey } from '@/customizables';
-import { Col, descriptors, localizationKeys } from '@/customizables';
-import { Card } from '@/elements/Card';
-import { useCardState, withCardStateProvider } from '@/elements/contexts';
-import { Form } from '@/elements/Form';
-import { FormButtonContainer } from '@/elements/FormButtons';
-import { FormContainer } from '@/elements/FormContainer';
-import { Modal } from '@/elements/Modal';
-import { useFormControl } from '@/ui/utils/useFormControl';
-import { handleError } from '@/utils/errorHandler';
+import { withCardStateProvider } from '@/elements/contexts';
+
+import { ConfigureSSODialogModalView } from './dialog-modal.view';
+import { useResetConnectionDialogController } from './reset-connection-dialog.controller';
+import { ResetConnectionDialogContentView } from './reset-connection-dialog.view';
 
 type ResetConnectionDialogProps = {
+  requestKey: string;
+  canRun: () => boolean;
   isOpen: boolean;
   onClose: () => void;
   confirmationValue: string;
@@ -25,97 +23,33 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
   if (!props.isOpen) {
     return null;
   }
-
   return (
-    <Modal
-      handleClose={props.onClose}
-      canCloseModal={false}
-      portalRoot={props.contentRef}
-      containerSx={t => ({
-        alignItems: 'center',
-        position: 'absolute',
-        inset: 0,
-        width: 'auto',
-        height: 'auto',
-        backgroundColor: 'inherit',
-        backdropFilter: `blur(${t.sizes.$2})`,
-      })}
+    <ConfigureSSODialogModalView
+      onClose={props.onClose}
+      contentRef={props.contentRef}
     >
-      <ResetConnectionDialogContent {...props} />
-    </Modal>
+      <ResetConnectionDialogContent
+        key={JSON.stringify([props.requestKey, props.confirmationValue])}
+        {...props}
+      />
+    </ConfigureSSODialogModalView>
   );
 };
 
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
-  const { onClose, onDelete, confirmationValue, subtitle } = props;
-  const title = props.title ?? localizationKeys('configureSSO.resetConnectionDialog.title');
-  const confirmButtonLabel =
-    props.confirmButtonLabel ?? localizationKeys('configureSSO.resetConnectionDialog.resetButton');
-  const card = useCardState();
-
-  const confirmationField = useFormControl('deleteConfirmation', '', {
-    type: 'text',
-    label: localizationKeys('configureSSO.resetConnectionDialog.confirmationFieldLabel', {
-      name: confirmationValue,
-    }),
-    isRequired: true,
-    placeholder: confirmationValue,
-  });
-
-  const canSubmit = Boolean(confirmationValue && confirmationField.value === confirmationValue);
-
-  const onSubmit = async () => {
-    if (!canSubmit) {
-      return;
-    }
-
-    try {
-      await onDelete();
-      onClose();
-    } catch (err) {
-      handleError(err as Error, [confirmationField], card.setError);
-    }
-  };
-
+  const controller = useResetConnectionDialogController(
+    props.confirmationValue,
+    props.onDelete,
+    props.onClose,
+    props.canRun,
+  );
   return (
-    <Card.Root
-      elementDescriptor={descriptors.configureSSOResetConnectionDialog}
-      sx={t => ({ borderRadius: t.radii.$md })}
-    >
-      <Card.Content sx={t => ({ textAlign: 'start', padding: t.sizes.$5 })}>
-        <FormContainer
-          headerTitle={title}
-          headerSubtitle={subtitle}
-          sx={t => ({ gap: t.space.$4 })}
-        >
-          <Form.Root onSubmit={onSubmit}>
-            <Col gap={4}>
-              <Form.ControlRow elementId={confirmationField.id}>
-                <Form.PlainInput
-                  {...confirmationField.props}
-                  elementDescriptor={descriptors.configureSSOResetConnectionDialogConfirmationInput}
-                  ignorePasswordManager
-                />
-              </Form.ControlRow>
-              <FormButtonContainer>
-                <Form.SubmitButton
-                  elementDescriptor={descriptors.configureSSOResetConnectionDialogSubmitButton}
-                  block={false}
-                  colorScheme='danger'
-                  isDisabled={!canSubmit}
-                  localizationKey={confirmButtonLabel}
-                />
-                <Form.ResetButton
-                  elementDescriptor={descriptors.configureSSOResetConnectionDialogCancelButton}
-                  block={false}
-                  localizationKey={localizationKeys('configureSSO.resetConnectionDialog.cancelButton')}
-                  onClick={onClose}
-                />
-              </FormButtonContainer>
-            </Col>
-          </Form.Root>
-        </FormContainer>
-      </Card.Content>
-    </Card.Root>
+    <ResetConnectionDialogContentView
+      title={props.title}
+      subtitle={props.subtitle}
+      confirmButtonLabel={props.confirmButtonLabel}
+      {...controller}
+      onClose={props.onClose}
+    />
   );
 });

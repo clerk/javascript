@@ -1,65 +1,46 @@
-import { useOrganization } from '@clerk/shared/react';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { FormContainer } from '@/ui/elements/FormContainer';
-import { IconCircle } from '@/ui/elements/IconCircle';
-import { SuccessPage } from '@/ui/elements/SuccessPage';
-
-import { useWizard, Wizard } from '../../common';
-import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
-import { useActionContext } from '../../elements/Action/ActionRoot';
-import { Envelope } from '../../icons';
+import { useInviteMembersScreenController } from './invite-members-screen.controller';
+import { InvitationsSentMessageView, InviteMembersScreenView } from './invite-members-screen.view';
+import { useInviteMembersOrganizationModel } from './invite-members-wizard.model';
 import { InviteMembersForm } from './InviteMembersForm';
+
 type InviteMembersScreenProps = {
   onReset?: () => void;
 };
 
-export const InviteMembersScreen = withCardStateProvider((props: InviteMembersScreenProps) => {
-  const { close } = useActionContext();
-  const { onReset = close } = props;
-  const title = localizationKeys('organizationProfile.invitePage.title');
-  const subtitle = localizationKeys('organizationProfile.invitePage.subtitle');
-  const card = useCardState();
-  const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
-  const { organization } = useOrganization();
+export const InviteMembersScreen = (props: InviteMembersScreenProps) => {
+  const model = useInviteMembersOrganizationModel();
 
-  if (!organization) {
+  if (!model.hasOrganization) {
     return null;
   }
 
   return (
-    <Wizard {...wizard.props}>
-      <FormContainer
-        headerTitle={title}
-        headerSubtitle={subtitle}
-      >
-        <InviteMembersForm
-          onSuccess={wizard.nextStep}
-          onReset={onReset}
-        />
-      </FormContainer>
-      <SuccessPage
-        title={title}
-        onFinish={close}
-        contents={<InvitationsSentMessage />}
-      />
-    </Wizard>
-  );
-});
-
-export const InvitationsSentMessage = () => {
-  return (
-    <Flex
-      direction='col'
-      center
-      gap={4}
-    >
-      <IconCircle
-        boxElementDescriptor={descriptors.invitationsSentIconBox}
-        iconElementDescriptor={descriptors.invitationsSentIcon}
-        icon={Envelope}
-      />
-      <Text localizationKey={localizationKeys('organizationProfile.invitePage.successMessage')} />
-    </Flex>
+    <InviteMembersScreenContent
+      key={model.scopeKey}
+      {...props}
+      canRun={model.canRun}
+    />
   );
 };
+
+const InviteMembersScreenContent = withCardStateProvider(
+  (props: InviteMembersScreenProps & { canRun: () => boolean }) => {
+    const controller = useInviteMembersScreenController(props.canRun, props.onReset);
+    return (
+      <InviteMembersScreenView
+        controller={controller}
+        form={
+          <InviteMembersForm
+            onSuccess={controller.nextStep}
+            onReset={controller.onReset}
+          />
+        }
+        successMessage={<InvitationsSentMessageView />}
+      />
+    );
+  },
+);
+
+export const InvitationsSentMessage = InvitationsSentMessageView;

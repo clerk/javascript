@@ -87,6 +87,7 @@ import {
 } from '../../utils/authenticateWithPopup';
 import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
+import { createVerificationFlow } from '../../utils/createVerificationFlow';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { getBrowserTimezone } from '../../utils/timezone';
 import { loadZxcvbn } from '../../utils/zxcvbn';
@@ -345,50 +346,21 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource> => {
-    const { run, stop } = Poller();
-
-    const startEmailLinkFlow = async ({
-      emailAddressId,
-      redirectUrl,
-    }: SignInStartEmailLinkFlowParams): Promise<SignInResource> => {
-      if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
-      }
-
-      const emailLinkParams: EmailLinkConfig = {
-        strategy: 'email_link',
-        emailAddressId,
-        redirectUrl,
-      };
-      const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
-      const verificationKey: 'firstFactorVerification' | 'secondFactorVerification' = isSecondFactor
-        ? 'secondFactorVerification'
-        : 'firstFactorVerification';
-
-      if (isSecondFactor) {
-        await this.prepareSecondFactor(emailLinkParams);
-      } else {
-        await this.prepareFirstFactor(emailLinkParams);
-      }
-
-      return new Promise((resolve, reject) => {
-        void run(() => {
-          return this.reload()
-            .then(res => {
-              if (isTerminalEmailLinkVerificationStatus(res[verificationKey].status)) {
-                stop();
-                resolve(res);
-              }
-            })
-            .catch(err => {
-              stop();
-              reject(err);
-            });
-        });
-      });
-    };
-
-    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
+    let verificationKey: 'firstFactorVerification' | 'secondFactorVerification' = 'firstFactorVerification';
+    const flow = createVerificationFlow<SignInStartEmailLinkFlowParams, SignInResource>({
+      prepare: ({ emailAddressId, redirectUrl }) => {
+        if (!this.id) {
+          clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
+        }
+        const emailLinkParams: EmailLinkConfig = { strategy: 'email_link', emailAddressId, redirectUrl };
+        const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
+        verificationKey = isSecondFactor ? 'secondFactorVerification' : 'firstFactorVerification';
+        return isSecondFactor ? this.prepareSecondFactor(emailLinkParams) : this.prepareFirstFactor(emailLinkParams);
+      },
+      reload: () => this.reload(),
+      isComplete: resource => isTerminalEmailLinkVerificationStatus(resource[verificationKey].status),
+    });
+    return { startEmailLinkFlow: flow.start, cancelEmailLinkFlow: flow.cancel };
   };
 
   prepareSecondFactor = (params: PrepareSecondFactorParams): Promise<SignInResource> => {

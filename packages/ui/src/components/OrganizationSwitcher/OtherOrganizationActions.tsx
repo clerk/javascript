@@ -3,7 +3,8 @@ import React from 'react';
 import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
 import { Add } from '@/icons';
 
-import { descriptors, localizationKeys } from '../../customizables';
+import { descriptors } from '../../customizables';
+import { organizationSwitcherMessages } from './organization-switcher.messages';
 import { UserInvitationSuggestionList } from './UserInvitationSuggestionList';
 import type { UserMembershipListProps } from './UserMembershipList';
 import { UserMembershipList } from './UserMembershipList';
@@ -24,7 +25,7 @@ const CreateOrganizationButton = ({
       iconElementDescriptor={descriptors.organizationSwitcherPopoverActionButtonIcon}
       iconElementId={descriptors.organizationSwitcherPopoverActionButtonIcon.setId('createOrganization')}
       icon={Add}
-      label={localizationKeys('organizationSwitcher.action__createOrganization')}
+      label={organizationSwitcherMessages.manage.create}
       onClick={onCreateOrganizationClick}
       sx={t => ({
         padding: `${t.space.$4} ${t.space.$5}`,

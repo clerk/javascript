@@ -1,7 +1,7 @@
 import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import type { MembershipRole } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, render, screen } from '@/test/utils';
@@ -16,6 +16,29 @@ import {
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
 describe('OrganizationSwitcher', () => {
+  it('uses existing localization overrides for feature messages', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+    });
+    fixtures.options.localization = {
+      organizationSwitcher: {
+        action__openOrganizationSwitcher: 'Open organization options',
+        action__closeOrganizationSwitcher: 'Close organization options',
+        personalWorkspace: 'My personal account',
+        action__createOrganization: 'New organization',
+      },
+    };
+
+    const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+    expect(getByText('My personal account')).toBeInTheDocument();
+    const trigger = getByRole('button', { name: 'Open organization options' });
+    await userEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-label', 'Close organization options');
+    expect(getByText('New organization')).toBeInTheDocument();
+  });
+
   it('renders component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -453,6 +476,43 @@ describe('OrganizationSwitcher', () => {
       });
       expect(queryByText('OrgOne')).toBeInTheDocument();
       expect(queryByText('OrgTwo')).toBeInTheDocument();
+    });
+
+    it('starts one invitation acceptance when clicked twice before rendering', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+      const invitation = createFakeUserOrganizationInvitation({
+        id: '1',
+        emailAddress: 'one@clerk.com',
+        publicOrganizationData: { name: 'OrgOne' },
+      });
+      let resolveAccept: ((value: typeof invitation) => void) | undefined;
+      invitation.accept = vi.fn().mockImplementation(
+        () =>
+          new Promise(resolve => {
+            resolveAccept = resolve;
+          }),
+      );
+      fixtures.clerk.user?.getOrganizationInvitations.mockResolvedValue({ data: [invitation], total_count: 1 });
+      fixtures.clerk.getOrganization.mockResolvedValue({ id: 'org_1', name: 'OrgOne' });
+
+      const { getByRole, findByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
+      await userEvent.click(getByRole('button'));
+      const acceptButton = await findByRole('button', { name: 'Join' });
+
+      act(() => {
+        acceptButton.click();
+        acceptButton.click();
+      });
+
+      expect(invitation.accept).toHaveBeenCalledOnce();
+
+      await act(async () => {
+        resolveAccept?.(invitation);
+        await Promise.resolve();
+      });
     });
 
     it('displays a list of user suggestions', async () => {

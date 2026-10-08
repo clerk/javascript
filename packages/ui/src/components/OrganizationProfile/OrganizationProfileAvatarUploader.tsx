@@ -1,15 +1,14 @@
-import type { OrganizationResource } from '@clerk/shared/types';
-
 import type { AvatarUploaderProps } from '@/ui/elements/AvatarUploader';
 import { AvatarUploader } from '@/ui/elements/AvatarUploader';
 import { OrganizationAvatar } from '@/ui/elements/OrganizationAvatar';
 
 import { Col, descriptors, Text } from '../../customizables';
 import { localizationKeys } from '../../localization';
+import type { OrganizationProfileAvatarData } from './profile-form.types';
 
 export const OrganizationProfileAvatarUploader = (
   props: Omit<AvatarUploaderProps, 'avatarPreview' | 'title'> & {
-    organization: Partial<OrganizationResource>;
+    organization: Partial<OrganizationProfileAvatarData>;
     /** Shows a loading spinner while the image is loading */
     showLoadingSpinner?: boolean;
   },

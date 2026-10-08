@@ -1,11 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render } from '@/test/utils';
+import { act, fireEvent, render } from '@/test/utils';
 
 import { SignInAccountSwitcher } from '../SignInAccountSwitcher';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
+afterEach(() => vi.useRealTimers());
 
 const initConfig = createFixtures.config(f => {
   f.withMultiSessionMode();
@@ -36,12 +37,57 @@ describe('SignInAccountSwitcher', () => {
     expect(fixtures.clerk.setActive).toHaveBeenCalled();
   });
 
-  // this one uses the windowNavigate method. we need to mock it correctly
-  it.skip('navigates to SignInStart component if user clicks on "Add account" button', async () => {
+  it('keeps actions disabled through the add-account navigation cooldown', async () => {
     const { wrapper, fixtures } = await createFixtures(initConfig);
-    const { userEvent, getByText } = render(<SignInAccountSwitcher />, { wrapper });
-    await userEvent.click(getByText('Add account'));
-    expect(fixtures.router.navigate).toHaveBeenCalled();
+    fixtures.clerk.__internal_windowNavigate = vi.fn();
+    const { getByRole } = render(<SignInAccountSwitcher />, { wrapper });
+    const addAccount = getByRole('button', { name: 'Add account' });
+    const selectAccount = getByRole('button', { name: /Nick Kouk/ });
+    const signOut = getByRole('button', { name: 'Sign out of all accounts' });
+    vi.useFakeTimers();
+    await act(async () => {
+      fireEvent.click(addAccount);
+      await Promise.resolve();
+    });
+    expect(fixtures.clerk.__internal_windowNavigate).toHaveBeenCalledOnce();
+    expect(addAccount).toBeDisabled();
+    expect(selectAccount).toBeDisabled();
+    expect(signOut).toBeDisabled();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1999);
+    });
+    expect(selectAccount).toBeDisabled();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+    expect(addAccount).not.toBeDisabled();
+    expect(selectAccount).not.toBeDisabled();
+    expect(signOut).not.toBeDisabled();
+    fireEvent.click(selectAccount);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(fixtures.clerk.setActive).toHaveBeenCalledOnce();
+  });
+
+  it('cancels the add-account cooldown when the screen closes', async () => {
+    const { wrapper, fixtures } = await createFixtures(initConfig);
+    fixtures.clerk.__internal_windowNavigate = vi.fn();
+    const { getByRole, unmount } = render(<SignInAccountSwitcher />, { wrapper });
+    vi.useFakeTimers();
+    const initialTimers = vi.getTimerCount();
+    await act(async () => {
+      fireEvent.click(getByRole('button', { name: 'Add account' }));
+      await Promise.resolve();
+    });
+    expect(vi.getTimerCount()).toBe(initialTimers + 1);
+    unmount();
+    expect(vi.getTimerCount()).toBe(initialTimers);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000);
+    });
+    expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+    expect(fixtures.clerk.signOut).not.toHaveBeenCalled();
   });
 
   it('signs out when user clicks on "Sign out of all accounts"', async () => {

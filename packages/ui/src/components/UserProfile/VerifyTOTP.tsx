@@ -1,65 +1,40 @@
-import { useUser } from '@clerk/shared/react';
-import type { TOTPResource } from '@clerk/shared/types';
-import React from 'react';
-
-import { useFieldOTP } from '@/ui/elements/CodeControl';
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { Form } from '@/ui/elements/Form';
-import { FormButtonContainer } from '@/ui/elements/FormButtons';
-import type { FormProps } from '@/ui/elements/FormContainer';
-import { FormContainer } from '@/ui/elements/FormContainer';
 
-import { Button, Col, descriptors, localizationKeys } from '../../customizables';
+import type { TotpVerificationModel, TotpVerificationOptions } from './mfa-totp.types';
+import { useVerifyTOTPController } from './verify-totp.controller';
+import type { VerifyTOTPProps } from './verify-totp.model';
+import { useVerifyTOTPModel } from './verify-totp.model';
+import { VerifyTOTPView } from './verify-totp.view';
 
-type VerifyTOTPProps = FormProps & {
-  verifiedTotpRef: React.MutableRefObject<TOTPResource | undefined>;
-  onBack: () => void;
+export const VerifyTOTP = (props: VerifyTOTPProps | (TotpVerificationOptions & { model: TotpVerificationModel })) => {
+  if ('model' in props) {
+    return (
+      <VerifyTOTPContent
+        key={props.model.requestKey}
+        {...props}
+      />
+    );
+  }
+  return <LegacyVerifyTOTP {...props} />;
 };
 
-export const VerifyTOTP = withCardStateProvider((props: VerifyTOTPProps) => {
-  const { onSuccess, onReset, onBack, verifiedTotpRef } = props;
-  const { user } = useUser();
-
-  const otp = useFieldOTP<TOTPResource>({
-    onCodeEntryFinished: (code, resolve, reject) => {
-      user
-        ?.verifyTOTP({ code })
-        .then((totp: TOTPResource) => resolve(totp))
-        .catch(reject);
-    },
-    onResolve: a => {
-      verifiedTotpRef.current = a;
-      onSuccess();
-    },
-  });
-
+const LegacyVerifyTOTP = (props: VerifyTOTPProps) => {
+  const model = useVerifyTOTPModel(props);
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.mfaTOTPPage.title')}>
-      <Col>
-        <Form.OTPInput
-          {...otp}
-          label={localizationKeys('userProfile.mfaTOTPPage.verifyTitle')}
-          description={localizationKeys('userProfile.mfaTOTPPage.verifySubtitle')}
-        />
-      </Col>
-
-      <FormButtonContainer sx={{ marginTop: 0 }}>
-        <Button
-          onClick={onReset}
-          variant='ghost'
-          isDisabled={otp.isLoading}
-          localizationKey={localizationKeys('userProfile.formButtonReset')}
-          elementDescriptor={descriptors.formButtonReset}
-        />
-
-        <Button
-          onClick={onBack}
-          variant='ghost'
-          isDisabled={otp.isLoading}
-          localizationKey={localizationKeys('backButton')}
-          elementDescriptor={descriptors.backLink}
-        />
-      </FormButtonContainer>
-    </FormContainer>
+    <VerifyTOTPContent
+      key={model.requestKey}
+      model={model}
+      onSuccess={props.onSuccess}
+      onReset={props.onReset}
+      onBack={props.onBack}
+    />
   );
-});
+};
+
+const VerifyTOTPContent = withCardStateProvider(
+  ({ model, ...props }: TotpVerificationOptions & { model: TotpVerificationModel }) => {
+    const controller = useVerifyTOTPController(model, props);
+
+    return <VerifyTOTPView controller={controller} />;
+  },
+);

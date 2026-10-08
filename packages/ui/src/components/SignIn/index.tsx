@@ -1,206 +1,34 @@
-import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
-import {
-  SignInContext,
-  SignUpContext,
-  useSignInContext,
-  useSignUpContext,
-  withCoreSessionSwitchGuard,
-} from '@/contexts';
-import { Flow } from '@/customizables';
-import { useFetch } from '@/hooks';
-import { usePreloadTasks } from '@/hooks/usePreloadTasks';
+import { SignInContext, withCoreSessionSwitchGuard } from '@/contexts';
 import type { WithInternalRouting } from '@/internal';
-import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
-import type { SignUpCtx } from '@/types';
-import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
-import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
+import { Route, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 
-import { buildCombinedFlowOAuthCallbackParams, buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
-import {
-  LazySignUpContinue,
-  LazySignUpProtectCheck,
-  LazySignUpSSOCallback,
-  LazySignUpStart,
-  LazySignUpVerifyEmail,
-  LazySignUpVerifyPhone,
-  preloadSignUp,
-} from './lazy-sign-up';
-import { ResetPassword } from './ResetPassword';
-import { ResetPasswordSuccess } from './ResetPasswordSuccess';
-import { SignInAccountSwitcher } from './SignInAccountSwitcher';
-import { SignInClientTrust } from './SignInClientTrust';
-import { SignInEmailLinkVerify } from './SignInEmailLinkVerify';
-import { SignInFactorOne } from './SignInFactorOne';
-import { SignInFactorTwo } from './SignInFactorTwo';
-import { SignInProtectCheck } from './SignInProtectCheck';
-import { SignInSSOCallback } from './SignInSSOCallback';
-import { SignInStart } from './SignInStart';
-
-function RedirectToSignIn() {
-  const clerk = useClerk();
-  React.useEffect(() => {
-    void clerk.redirectToSignIn();
-  }, [clerk]);
-  return null;
-}
+import { useSignInRootController } from './sign-in-root.controller';
+import { useSignInRootModel } from './sign-in-root.model';
+import { SignInRootView } from './sign-in-root.view';
+import { useSignInRoutesController } from './sign-in-routes.controller';
+import { useSignInRoutesModel } from './sign-in-routes.model';
+import { SignInRoutesView } from './sign-in-routes.view';
 
 function SignInRoutes(): JSX.Element {
-  const signInContext = useSignInContext();
-  const signUpContext = useSignUpContext();
-
-  return (
-    <Flow.Root flow='signIn'>
-      <Switch>
-        {/* No canActivate guard here. `!!signIn.protectCheck` flips to false the
-            instant the check resolves (submitProtectCheck clears protectCheck),
-            which would unmount this card mid-navigation and blank the route
-            (RouteGuard renders null + navigateToFlowStart). The card owns its
-            own routing — it navigates to the next step on resolution. */}
-        <Route path='protect-check'>
-          <SignInProtectCheck />
-        </Route>
-        <Route path='factor-one'>
-          <SignInFactorOne />
-        </Route>
-        <Route path='factor-two'>
-          <SignInFactorTwo />
-        </Route>
-        <Route path='client-trust'>
-          <SignInClientTrust />
-        </Route>
-        <Route path='reset-password'>
-          <ResetPassword />
-        </Route>
-        <Route path='reset-password-success'>
-          <ResetPasswordSuccess />
-        </Route>
-        <Route path='sso-callback'>
-          <SignInSSOCallback {...buildSignInOAuthCallbackParams(signInContext)} />
-        </Route>
-        <Route path='choose'>
-          <SignInAccountSwitcher />
-        </Route>
-        <Route path='choose-wallet'>
-          <SignInFactorOneSolanaWalletsCard />
-        </Route>
-        <Route path='verify'>
-          <SignInEmailLinkVerify />
-        </Route>
-
-        {signInContext.isCombinedFlow && (
-          <Route path='create'>
-            {/* No canActivate guard — same resolution race as the sign-in
-                protect-check route above; the card owns its own routing. */}
-            <Route path='protect-check'>
-              <LazySignUpProtectCheck />
-            </Route>
-            <Route
-              path='verify-email-address'
-              canActivate={clerk => !!clerk.client.signUp.emailAddress}
-            >
-              <LazySignUpVerifyEmail />
-            </Route>
-            <Route
-              path='verify-phone-number'
-              canActivate={clerk => !!clerk.client.signUp.phoneNumber}
-            >
-              <LazySignUpVerifyPhone />
-            </Route>
-            <Route path='sso-callback'>
-              <LazySignUpSSOCallback {...buildCombinedFlowOAuthCallbackParams(signUpContext)} />
-            </Route>
-            <Route path='verify'>
-              <SignUpEmailLinkFlowComplete
-                redirectUrlComplete={signUpContext.afterSignUpUrl}
-                ssoCallbackUrl={signUpContext.ssoCallbackUrl}
-                oidcPrompt={signUpContext.oidcPrompt}
-                verifyEmailPath='../verify-email-address'
-                verifyPhonePath='../verify-phone-number'
-                continuePath='../continue'
-              />
-            </Route>
-            <Route path='continue'>
-              {/* No canActivate guard — same resolution race as the sign-in
-                  protect-check route; the card owns its own routing. */}
-              <Route path='protect-check'>
-                {/* Under `create/continue`, the continue index is `..`, not `../continue`. */}
-                <LazySignUpProtectCheck continuePath='..' />
-              </Route>
-              <Route
-                path='verify-email-address'
-                canActivate={clerk => !!clerk.client.signUp.emailAddress}
-              >
-                <LazySignUpVerifyEmail />
-              </Route>
-              <Route
-                path='verify-phone-number'
-                canActivate={clerk => !!clerk.client.signUp.phoneNumber}
-              >
-                <LazySignUpVerifyPhone />
-              </Route>
-              <Route index>
-                <LazySignUpContinue />
-              </Route>
-            </Route>
-            <Route path='tasks'>
-              <LazySessionTasks redirectUrlComplete={signInContext.afterSignUpUrl} />
-            </Route>
-            <Route index>
-              <LazySignUpStart />
-            </Route>
-          </Route>
-        )}
-        <Route path='tasks'>
-          <LazySessionTasks redirectUrlComplete={signInContext.afterSignInUrl} />
-        </Route>
-        <Route index>
-          <SignInStart />
-        </Route>
-        <Route>
-          <RedirectToSignIn />
-        </Route>
-      </Switch>
-    </Flow.Root>
-  );
-}
-
-const usePreloadSignUp = (enabled = false) =>
-  useFetch(enabled ? preloadSignUp : undefined, 'preloadComponent', { staleTime: Infinity });
-
-function SignInRoot() {
-  const signInContext = useSignInContext();
-  const normalizedSignUpContext = {
-    componentName: 'SignUp',
-    emailLinkRedirectUrl: signInContext.emailLinkRedirectUrl,
-    ssoCallbackUrl: signInContext.ssoCallbackUrl,
-    oidcPrompt: signInContext.oidcPrompt,
-    forceRedirectUrl: signInContext.signUpForceRedirectUrl,
-    fallbackRedirectUrl: signInContext.signUpFallbackRedirectUrl,
-    signInUrl: signInContext.signInUrl,
-    unsafeMetadata: signInContext.unsafeMetadata,
-    ...normalizeRoutingOptions({ routing: signInContext?.routing, path: signInContext?.path }),
-  } as SignUpCtx;
-
-  /**
-   * Preload Sign Up when in Combined Flow.
-   */
-  usePreloadSignUp(signInContext.isCombinedFlow);
-
-  usePreloadTasks();
-
-  return (
-    <SignUpContext.Provider value={normalizedSignUpContext}>
-      <SignInRoutes />
-    </SignUpContext.Provider>
-  );
+  const model = useSignInRoutesModel();
+  const controller = useSignInRoutesController(model);
+  return <SignInRoutesView {...controller} />;
 }
 
 SignInRoutes.displayName = 'SignIn';
+
+function SignInRoot() {
+  const model = useSignInRootModel();
+  const controller = useSignInRootController(model);
+  return (
+    <SignInRootView {...controller}>
+      <SignInRoutes />
+    </SignInRootView>
+  );
+}
 
 export const SignIn: React.ComponentType<SignInProps> = withCoreSessionSwitchGuard(SignInRoot);
 

@@ -1,279 +1,67 @@
-import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
-import { useClerk, useReverification, useUser } from '@clerk/shared/react';
-import type { ExternalAccountResource, OAuthProvider, OAuthScope, OAuthStrategy } from '@clerk/shared/types';
-import { Fragment, useState } from 'react';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { Card } from '@/ui/elements/Card';
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { ProfileSection } from '@/ui/elements/Section';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
-import { handleError } from '@/ui/utils/errorHandler';
-
-import { ProviderIcon } from '../../common';
-import { useUserProfileContext } from '../../contexts';
-import { Box, Button, descriptors, Flex, localizationKeys, Text } from '../../customizables';
-import { Action } from '../../elements/Action';
-import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useEnabledThirdPartyProviders } from '../../hooks';
-import { useRouter } from '../../router';
-import type { PropsOfComponent } from '../../styledSystem';
+import {
+  useConnectedAccountController,
+  useConnectedAccountsSectionController,
+} from './connected-accounts-section.controller';
+import type { ConnectedAccountsSectionProps } from './connected-accounts-section.model';
+import { useConnectedAccountModel, useConnectedAccountsSectionModel } from './connected-accounts-section.model';
+import { RemoveConnectedAccountScreen } from './connected-accounts-section.screens';
+import { ConnectedAccountsSectionView, ConnectedAccountView } from './connected-accounts-section.view';
 import { AddConnectedAccount } from './ConnectedAccountsMenu';
-import { getExternalVerificationRedirectURL, reloadUserAfterOAuthCallback } from './oauthTransport';
-import { RemoveConnectedAccountForm } from './RemoveResourceForm';
 
-type RemoveConnectedAccountScreenProps = { accountId: string };
-const RemoveConnectedAccountScreen = (props: RemoveConnectedAccountScreenProps) => {
-  const { close } = useActionContext();
+export const ConnectedAccountsSection = ({ shouldAllowCreation = true }: ConnectedAccountsSectionProps) => {
+  const model = useConnectedAccountsSectionModel();
+
+  if (!model.hasUser || (!shouldAllowCreation && !model.hasExternalAccounts)) {
+    return null;
+  }
+
   return (
-    <RemoveConnectedAccountForm
-      onSuccess={close}
-      onReset={close}
-      {...props}
+    <ConnectedAccountsContent
+      key={model.requestKey}
+      model={model}
+      shouldAllowCreation={shouldAllowCreation}
     />
   );
 };
 
-const errorCodesForReconnect = [
-  /**
-   * Some Oauth providers will generate a refresh token only the first time the user gives consent to the app.
-   */
-  'external_account_missing_refresh_token',
-  /**
-   * Provider is experiencing an issue currently.
-   */
-  'oauth_fetch_user_error',
-  /**
-   * Provider is experiencing an issue currently (same as above).
-   */
-  'oauth_token_exchange_error',
-  /**
-   * User's associated email address is required to be verified, because it was initially created as unverified.
-   */
-  'external_account_email_address_verification_required',
-];
-
-export const ConnectedAccountsSection = withCardStateProvider(
-  ({ shouldAllowCreation = true }: { shouldAllowCreation?: boolean }) => {
-    const { user } = useUser();
-    const card = useCardState();
-    const hasExternalAccounts = Boolean(user?.externalAccounts?.length);
-    const [actionValue, setActionValue] = useState<string | null>(null);
-
-    if (!user || (!shouldAllowCreation && !hasExternalAccounts)) {
-      return null;
-    }
-
-    const accounts = [
-      ...user.verifiedExternalAccounts,
-      ...user.unverifiedExternalAccounts.filter(a => a.verification?.error),
-    ];
-
+const ConnectedAccountsContent = withCardStateProvider(
+  ({
+    model,
+    shouldAllowCreation,
+  }: {
+    model: ReturnType<typeof useConnectedAccountsSectionModel>;
+    shouldAllowCreation: boolean;
+  }) => {
+    const controller = useConnectedAccountsSectionController();
     return (
-      <ProfileSection.Root
-        title={localizationKeys('userProfile.start.connectedAccountsSection.title')}
-        centered={false}
-        id='connectedAccounts'
-      >
-        <Card.Alert>{card.error}</Card.Alert>
-        <Action.Root
-          value={actionValue}
-          onChange={setActionValue}
-        >
-          <ProfileSection.ItemList id='connectedAccounts'>
-            {accounts.map(account => (
-              <ConnectedAccount
-                key={account.id}
-                account={account}
-              />
-            ))}
-          </ProfileSection.ItemList>
-          {shouldAllowCreation && <AddConnectedAccount onClick={() => setActionValue(null)} />}
-        </Action.Root>
-      </ProfileSection.Root>
+      <ConnectedAccountsSectionView
+        controller={controller}
+        items={model.accountIds.map(accountId => (
+          <ConnectedAccount
+            key={accountId}
+            accountId={accountId}
+          />
+        ))}
+        addMenu={shouldAllowCreation ? <AddConnectedAccount onClick={controller.closeAction} /> : null}
+      />
     );
   },
 );
 
-const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => {
-  const { additionalOAuthScopes, componentName, mode } = useUserProfileContext();
-  const clerk = useClerk();
-  const { navigate } = useRouter();
-  const { user } = useUser();
-  const card = useCardState();
-  const accountId = account.id;
+const ConnectedAccount = ({ accountId }: { accountId: string }) => {
+  const model = useConnectedAccountModel(accountId);
+  const controller = useConnectedAccountController(model);
 
-  const isModal = mode === 'modal';
-  const label = account.username || account.emailAddress;
-  const fallbackErrorMessage = account.verification?.error?.longMessage;
-  const additionalScopes = findAdditionalScopes(account, additionalOAuthScopes);
-  const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
-  const shouldDisplayReconnect =
-    errorCodesForReconnect.includes(account.verification?.error?.code || '') || reauthorizationRequired;
-  const verificationStrategy = account.verification?.strategy;
-  const strategy = (
-    verificationStrategy === 'google_one_tap' ? 'oauth_google' : verificationStrategy || `oauth_${account.provider}`
-  ) as OAuthStrategy;
-
-  const createExternalAccount = useReverification((redirectUrl: string) =>
-    user?.createExternalAccount({
-      strategy,
-      redirectUrl,
-      additionalScopes,
-    }),
-  );
-
-  const { providerToDisplayData } = useEnabledThirdPartyProviders();
-
-  if (!user) {
+  if (!model.exists) {
     return null;
   }
-  const connectedAccountErrorMessage = shouldDisplayReconnect
-    ? localizationKeys(`userProfile.start.connectedAccountsSection.subtitle__disconnected`)
-    : fallbackErrorMessage;
-
-  const reconnect = async () => {
-    const transport = clerk.__internal_oauthTransport;
-    try {
-      const redirectUrl = transport ? String(await transport.getRedirectUrl()) : window.location.href;
-      const decoratedRedirectUrl = isModal ? appendModalState({ url: redirectUrl, componentName }) : redirectUrl;
-      let response: ExternalAccountResource | undefined;
-      if (reauthorizationRequired) {
-        response = await account.reauthorize({ additionalScopes, redirectUrl: decoratedRedirectUrl });
-      } else {
-        response = await createExternalAccount(decoratedRedirectUrl);
-      }
-
-      const url = getExternalVerificationRedirectURL(response);
-      if (transport) {
-        const { callbackUrl } = await transport.open(url);
-        await reloadUserAfterOAuthCallback(user, callbackUrl);
-        return;
-      }
-
-      await navigate(url.href);
-    } catch (err: any) {
-      handleError(err, [], card.setError);
-    }
-  };
-
-  const providerData = providerToDisplayData[account.provider];
 
   return (
-    <Fragment key={account.id}>
-      <ProfileSection.Item id='connectedAccounts'>
-        <Flex
-          align='center'
-          sx={t => ({ overflow: 'hidden', gap: t.space.$2 })}
-        >
-          <ProviderIcon
-            id={account.provider}
-            iconUrl={providerData?.iconUrl}
-            name={providerData?.name || account.provider}
-            alt={providerData?.name || account.provider}
-            elementDescriptor={descriptors.providerIcon}
-            elementId={descriptors.socialButtonsProviderIcon.setId(account.provider)}
-            sx={{ flexShrink: 0 }}
-          />
-          <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-            <Flex
-              gap={1}
-              center
-            >
-              <Text sx={t => ({ color: t.colors.$colorForeground })}>{`${
-                providerData?.name || account.provider
-              }`}</Text>
-              <Text
-                truncate
-                as='span'
-                colorScheme='secondary'
-              >
-                {label ? `• ${label}` : ''}
-              </Text>
-            </Flex>
-          </Box>
-        </Flex>
-
-        <ConnectedAccountMenu account={account} />
-      </ProfileSection.Item>
-      {shouldDisplayReconnect && (
-        <Box
-          sx={t => ({
-            padding: `${t.sizes.$none} ${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$8x5}`,
-          })}
-        >
-          <Text
-            colorScheme='secondary'
-            sx={t => ({
-              paddingInlineEnd: t.sizes.$1x5,
-              display: 'inline-block',
-            })}
-            localizationKey={connectedAccountErrorMessage}
-          />
-
-          <Button
-            sx={{
-              display: 'inline-block',
-            }}
-            onClick={reconnect}
-            variant='link'
-            localizationKey={localizationKeys(
-              'userProfile.start.connectedAccountsSection.actionLabel__connectionFailed',
-            )}
-          />
-        </Box>
-      )}
-
-      {account.verification?.error?.code && !shouldDisplayReconnect && (
-        <Text
-          colorScheme='danger'
-          sx={t => ({
-            padding: `${t.sizes.$none} ${t.sizes.$1x5} ${t.sizes.$1x5} ${t.sizes.$8x5}`,
-          })}
-        >
-          {fallbackErrorMessage}
-        </Text>
-      )}
-
-      <Action.Open value={`remove-${accountId}`}>
-        <Action.Card variant='destructive'>
-          <RemoveConnectedAccountScreen accountId={account.id} />
-        </Action.Card>
-      </Action.Open>
-    </Fragment>
+    <ConnectedAccountView
+      controller={controller}
+      removeScreen={<RemoveConnectedAccountScreen accountId={model.id} />}
+    />
   );
 };
-
-const ConnectedAccountMenu = ({ account }: { account: ExternalAccountResource }) => {
-  const { open } = useActionContext();
-  const accountId = account.id;
-
-  const actions = (
-    [
-      {
-        label: localizationKeys('userProfile.start.connectedAccountsSection.destructiveActionTitle'),
-        isDestructive: true,
-        onClick: () => open(`remove-${accountId}`),
-      },
-    ] satisfies (PropsOfComponent<typeof ThreeDotsMenu>['actions'][0] | null)[]
-  ).filter(a => a !== null) as PropsOfComponent<typeof ThreeDotsMenu>['actions'];
-
-  return <ThreeDotsMenu actions={actions} />;
-};
-
-function findAdditionalScopes(
-  account: ExternalAccountResource,
-  scopes?: Partial<Record<OAuthProvider, OAuthScope[]>>,
-): string[] {
-  if (!scopes) {
-    return [];
-  }
-
-  const additionalScopes = scopes[account.provider] || [];
-  const currentScopes = account.approvedScopes.split(' ');
-  const missingScopes = additionalScopes.filter(scope => !currentScopes.includes(scope));
-  if (missingScopes.length === 0) {
-    return [];
-  }
-
-  return additionalScopes;
-}

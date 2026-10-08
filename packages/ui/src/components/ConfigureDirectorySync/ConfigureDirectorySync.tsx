@@ -1,46 +1,23 @@
 import type { ConfigureSSOProps } from '@clerk/shared/types';
-import React from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 
 import { withCoreUserGuard } from '@/contexts';
-import { Flow } from '@/customizables';
 import { withCardStateProvider } from '@/elements/contexts';
-import { ProfileCard } from '@/elements/ProfileCard';
-import { Route, Switch } from '@/router';
 
-import { ConfigureSSOProtect } from '../ConfigureSSO/ConfigureSSO';
-import { ConfigureDirectorySyncWizard } from './ConfigureDirectorySyncWizard';
-import { DirectorySyncNavbar } from './DirectorySyncNavbar';
+import { AuthenticatedDirectorySyncView, ConfigureDirectorySyncView } from './configure-directory-sync.view';
 
 /**
  * Standalone host for the Directory Sync onboarding wizard, mirroring
  * ConfigureSSO's shell.
  */
 const ConfigureDirectorySyncInternal = (): JSX.Element => {
-  return (
-    <Flow.Root flow='configureDirectorySync'>
-      <Switch>
-        <Route>
-          <AuthenticatedContent />
-        </Route>
-      </Switch>
-    </Flow.Root>
-  );
+  return <ConfigureDirectorySyncView authenticatedContent={<AuthenticatedContent />} />;
 };
 
 const AuthenticatedContent = withCoreUserGuard(() => {
-  const contentRef = React.useRef<HTMLDivElement>(null);
-
-  return (
-    <ProfileCard.Root
-      sx={t => ({ display: 'grid', gridTemplateColumns: '1fr 3fr', height: t.sizes.$176, overflow: 'hidden' })}
-    >
-      <DirectorySyncNavbar contentRef={contentRef}>
-        <ConfigureSSOProtect>
-          <ConfigureDirectorySyncWizard />
-        </ConfigureSSOProtect>
-      </DirectorySyncNavbar>
-    </ProfileCard.Root>
-  );
+  const contentRef = useRef<HTMLDivElement>(null);
+  return <AuthenticatedDirectorySyncView contentRef={contentRef} />;
 });
 
 export const ConfigureDirectorySync: React.ComponentType<ConfigureSSOProps> =

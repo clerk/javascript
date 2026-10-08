@@ -32,6 +32,7 @@ type HandleCombinedFlowTransferProps = {
     decorateUrl: DecorateUrl;
   }) => Promise<unknown>;
   unsafeMetadata?: SignUpUnsafeMetadata;
+  canRun?: () => boolean;
 };
 
 /**
@@ -54,7 +55,13 @@ export function handleCombinedFlowTransfer({
   navigateOnSetActive,
   alternativePhoneCodeChannel,
   unsafeMetadata,
+  canRun = () => true,
 }: HandleCombinedFlowTransferProps): Promise<unknown> | void {
+  if (!canRun()) {
+    return;
+  }
+  const signUp = clerk.client.signUp;
+  const isCurrent = () => canRun() && clerk.client.signUp === signUp;
   if (signUpMode === SIGN_UP_MODES.WAITLIST) {
     const waitlistUrl = clerk.buildWaitlistUrl(
       identifierAttribute === 'emailAddress'
@@ -68,7 +75,7 @@ export function handleCombinedFlowTransfer({
     return navigate(waitlistUrl);
   }
 
-  clerk.client.signUp[identifierAttribute] = identifierValue;
+  signUp[identifierAttribute] = identifierValue;
   const paramsToForward = new URLSearchParams();
   if (organizationTicket) {
     paramsToForward.set('__clerk_ticket', organizationTicket);
@@ -87,17 +94,23 @@ export function handleCombinedFlowTransfer({
   // inform us if the instance is eligible for moving directly to verification.
   if (
     !passwordEnabled &&
-    !hasOptionalFields(clerk.client.signUp, identifierAttribute) &&
+    !hasOptionalFields(signUp, identifierAttribute) &&
     (identifierAttribute === 'emailAddress' || identifierAttribute === 'phoneNumber')
   ) {
-    return clerk.client.signUp
+    return signUp
       .create({
         [identifierAttribute]: identifierValue,
         ...alternativePhoneCodeChannelParams,
         unsafeMetadata,
       })
       .then(async res => {
+        if (!isCurrent()) {
+          return;
+        }
         const completeSignUpFlow = await lazyCompleteSignUpFlow();
+        if (!isCurrent()) {
+          return;
+        }
         return completeSignUpFlow({
           signUp: res,
           verifyEmailPath: 'create/verify-email-address',
@@ -116,7 +129,11 @@ export function handleCombinedFlowTransfer({
           oidcPrompt,
         });
       })
-      .catch(err => handleError(err));
+      .catch(err => {
+        if (isCurrent()) {
+          return handleError(err);
+        }
+      });
   }
 
   return navigate(`create`, { searchParams: paramsToForward });

@@ -1,30 +1,8 @@
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
+import type { SSOConnection } from '../../ConfigureSSO/configure-sso.types';
+import { useDomainsSectionModel } from './domains-section.model';
+import { DomainsSectionView } from './domains-section.view';
 
-import { ProfileSection } from '@/elements/Section';
-
-import { localizationKeys, Text } from '../../../customizables';
-
-export const DomainsSection = ({ connection }: { connection: EnterpriseConnectionResource }): JSX.Element | null => {
-  if (connection.domains.length === 0) {
-    return null;
-  }
-
-  return (
-    <ProfileSection.Root
-      title={localizationKeys('organizationProfile.securityPage.connectionPage.domains.title')}
-      id='ssoConnectionDomains'
-      centered={false}
-    >
-      <ProfileSection.ItemList id='ssoConnectionDomains'>
-        {connection.domains.map(domain => (
-          <ProfileSection.Item
-            key={domain}
-            id='ssoConnectionDomains'
-          >
-            <Text>{domain}</Text>
-          </ProfileSection.Item>
-        ))}
-      </ProfileSection.ItemList>
-    </ProfileSection.Root>
-  );
+export const DomainsSection = ({ connection }: { connection: SSOConnection }): JSX.Element | null => {
+  const model = useDomainsSectionModel(connection);
+  return <DomainsSectionView {...model} />;
 };

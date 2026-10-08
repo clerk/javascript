@@ -230,7 +230,7 @@ describe('MfaPage', () => {
         });
       });
 
-      fixtures.clerk.user?.createBackupCode.mockResolvedValue({} as BackupCodeResource);
+      fixtures.clerk.user?.createBackupCode.mockResolvedValue({ codes: ['11223344'] } as BackupCodeResource);
 
       const { findByText, userEvent, getByRole } = render(
         <CardStateProvider>

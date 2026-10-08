@@ -1,14 +1,14 @@
 import React from 'react';
 
+import { useHavingTroubleController } from '../useHavingTroubleController';
 import type { AlternativeMethodsProps } from './AlternativeMethods';
 import { HavingTrouble } from './HavingTrouble';
 
-export const withHavingTrouble = <P extends AlternativeMethodsProps>(
+const useHavingTrouble = <P extends AlternativeMethodsProps>(
   Component: React.ComponentType<P>,
   props: AlternativeMethodsProps,
 ) => {
-  const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
-  const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
+  const { showHavingTrouble, toggleHavingTrouble } = useHavingTroubleController();
 
   if (showHavingTrouble) {
     return <HavingTrouble onBackLinkClick={toggleHavingTrouble} />;
@@ -21,3 +21,5 @@ export const withHavingTrouble = <P extends AlternativeMethodsProps>(
     />
   );
 };
+
+export const withHavingTrouble = useHavingTrouble;

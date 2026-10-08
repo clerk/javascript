@@ -66,6 +66,26 @@ const getCreatedOrg = (params: Partial<FakeOrganizationParams>) =>
   });
 
 describe('CreateOrganization', () => {
+  it('uses existing field and action localization overrides for feature messages', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    fixtures.options.localization = {
+      createOrganization: {
+        title: 'New workspace',
+        formButtonSubmit: 'Create workspace',
+      },
+      formFieldLabel__organizationName: 'Workspace name',
+      formFieldInputPlaceholder__organizationName: 'Enter workspace name',
+    };
+
+    const { getByRole, getByLabelText } = render(<CreateOrganization />, { wrapper });
+    expect(getByRole('heading', { name: 'New workspace' })).toBeInTheDocument();
+    expect(getByLabelText('Workspace name')).toHaveAttribute('placeholder', 'Enter workspace name');
+    expect(getByRole('button', { name: 'Create workspace' })).toBeInTheDocument();
+  });
+
   it('renders component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();

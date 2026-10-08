@@ -1,26 +1,16 @@
-import { useUser } from '@clerk/shared/react/index';
 import type { UserAvatarProps } from '@clerk/shared/types';
 
-import { useUserAvatarContext, withCoreUserGuard } from '@/ui/contexts';
-import { descriptors } from '@/ui/customizables';
-import { UserAvatar as InternalUserAvatar } from '@/ui/elements/UserAvatar';
-import { InternalThemeProvider } from '@/ui/styledSystem';
+import { withCoreUserGuard } from '@/ui/contexts';
 
-export const _UserAvatar = (props: UserAvatarProps) => {
-  const ctx = useUserAvatarContext();
-  const { user } = useUser();
+import { useUserAvatarController } from './user-avatar.controller';
+import { useUserAvatarModel } from './user-avatar.model';
+import { UserAvatarView } from './user-avatar.view';
 
-  return (
-    <InternalThemeProvider>
-      <InternalUserAvatar
-        boxElementDescriptor={descriptors.userAvatarBox}
-        imageElementDescriptor={descriptors.userAvatarImage}
-        {...user}
-        rounded={props.rounded ?? ctx.rounded ?? true}
-        size={theme => theme.sizes.$7}
-      />
-    </InternalThemeProvider>
-  );
+const UserAvatarContent = (props: UserAvatarProps) => {
+  const model = useUserAvatarModel();
+  const controller = useUserAvatarController(model, props);
+  return <UserAvatarView {...controller} />;
 };
 
-export const UserAvatar = withCoreUserGuard(_UserAvatar);
+export const _UserAvatar = UserAvatarContent;
+export const UserAvatar = withCoreUserGuard(UserAvatarContent);

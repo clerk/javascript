@@ -1,58 +1,20 @@
-import { useCardState } from '@/ui/elements/contexts';
-import { handleError } from '@/ui/utils/errorHandler';
+import { useCodePreparationController } from '@/ui/common/useCodePreparationController';
+import { useCodeSubmissionController } from '@/ui/common/useCodeSubmissionController';
 
-import { useCoreSignUp } from '../../contexts';
-import { Flow, localizationKeys } from '../../customizables';
-import { useFetch } from '../../hooks';
-import { SignUpVerificationCodeForm } from './SignUpVerificationCodeForm';
+import { useSignUpEmailCodeCardModel } from './sign-up-email-code-card.model';
+import { SignUpEmailCodeCardView } from './sign-up-email-code-card.view';
 
 export const SignUpEmailCodeCard = () => {
-  const signUp = useCoreSignUp();
-  const card = useCardState();
-
-  const emailVerificationStatus = signUp.verifications.emailAddress.status;
-  const hasPendingEmailCodeVerification =
-    emailVerificationStatus === 'unverified' && signUp.verifications.emailAddress.strategy === 'email_code';
-  const shouldAvoidPrepare = !signUp.status || emailVerificationStatus === 'verified';
-  const shouldAvoidInitialPrepare = shouldAvoidPrepare || hasPendingEmailCodeVerification;
-
-  const prepare = () => {
-    if (shouldAvoidPrepare) {
-      return;
-    }
-    return signUp
-      .prepareEmailAddressVerification({ strategy: 'email_code' })
-      .catch(err => handleError(err, [], card.setError));
-  };
-
-  // TODO: Introduce a useMutation to handle mutating requests
-  useFetch(
-    shouldAvoidInitialPrepare ? undefined : () => signUp.prepareEmailAddressVerification({ strategy: 'email_code' }),
-    {
-      name: 'prepare',
-      strategy: 'email_code',
-      number: signUp.emailAddress,
-    },
-    {
-      staleTime: 100,
-      onError: err => handleError(err, [], card.setError),
-    },
-  );
-
-  const attempt = (code: string) => signUp.attemptEmailAddressVerification({ code });
+  const model = useSignUpEmailCodeCardModel();
+  const { prepare } = useCodePreparationController(model);
+  const action = useCodeSubmissionController(model);
 
   return (
-    <Flow.Part part='emailCode'>
-      <SignUpVerificationCodeForm
-        cardTitle={localizationKeys('signUp.emailCode.title')}
-        cardSubtitle={localizationKeys('signUp.emailCode.subtitle')}
-        inputLabel={localizationKeys('signUp.emailCode.formSubtitle')}
-        resendButton={localizationKeys('signUp.emailCode.resendButton')}
-        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
-        prepare={prepare}
-        attempt={attempt}
-        safeIdentifier={signUp.emailAddress}
-      />
-    </Flow.Part>
+    <SignUpEmailCodeCardView
+      prepare={prepare}
+      action={action}
+      goBack={model.goBack}
+      emailAddress={model.emailAddress}
+    />
   );
 };

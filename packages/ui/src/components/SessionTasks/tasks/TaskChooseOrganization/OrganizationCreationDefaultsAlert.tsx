@@ -1,12 +1,12 @@
-import type { OrganizationCreationDefaultsResource } from '@clerk/shared/types';
-
 import { Alert, Text } from '@/customizables';
 import { localizationKeys } from '@/localization';
+
+import type { OrganizationCreationDefaultsData } from './task-choose-organization.types';
 
 export function OrganizationCreationDefaultsAlert({
   organizationCreationDefaults,
 }: {
-  organizationCreationDefaults?: OrganizationCreationDefaultsResource | null;
+  organizationCreationDefaults?: OrganizationCreationDefaultsData | null;
 }) {
   const localizationKey = advisoryToLocalizationKey(organizationCreationDefaults?.advisory);
   if (!localizationKey) {
@@ -24,7 +24,7 @@ export function OrganizationCreationDefaultsAlert({
   );
 }
 
-const advisoryToLocalizationKey = (advisory?: OrganizationCreationDefaultsResource['advisory']) => {
+const advisoryToLocalizationKey = (advisory?: OrganizationCreationDefaultsData['advisory']) => {
   if (!advisory) {
     return null;
   }

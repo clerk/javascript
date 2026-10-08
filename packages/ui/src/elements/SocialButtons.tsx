@@ -1,5 +1,3 @@
-import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
-import { useClerk } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3Strategy } from '@clerk/shared/types';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
@@ -19,12 +17,11 @@ import {
   useAppearance,
   useLocalizations,
 } from '../customizables';
-import { useEnabledThirdPartyProviders } from '../hooks';
-import { useTotalEnabledAuthMethods } from '../hooks/useTotalEnabledAuthMethods';
 import { mqu, type PropsOfComponent } from '../styledSystem';
-import { sleep } from '../utils/sleep';
 import { LastAuthenticationStrategyBadge } from './Badge';
-import { useCardState } from './contexts';
+import { useSocialButtonsController } from './social-buttons.controller';
+import type { SocialStrategy } from './social-buttons.model';
+import { useSocialButtonsModel } from './social-buttons.model';
 import { distributeStrategiesIntoRows } from './utils';
 
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
@@ -37,7 +34,7 @@ export type SocialButtonsProps = React.PropsWithChildren<{
   enableAlternativePhoneCodeProviders: boolean;
 }>;
 
-type SocialButtonsRootProps = SocialButtonsProps & {
+export type SocialButtonsRootProps = SocialButtonsProps & {
   oauthCallback: (strategy: OAuthStrategy) => Promise<unknown>;
   web3Callback: (strategy: Web3Strategy) => Promise<unknown>;
   alternativePhoneCodeCallback: (channel: PhoneCodeChannel) => void;
@@ -45,60 +42,41 @@ type SocialButtonsRootProps = SocialButtonsProps & {
   showLastAuthenticationStrategy?: boolean;
 };
 
-const isWeb3Strategy = (val: string): val is Web3Strategy => {
-  return val.startsWith('web3_');
-};
-
-const isPhoneCodeChannel = (val: string): val is PhoneCodeChannel => {
-  return !!getAlternativePhoneCodeProviderData(val);
-};
-
 export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
-  const {
-    oauthCallback,
-    web3Callback,
-    alternativePhoneCodeCallback,
-    enableOAuthProviders = true,
-    enableWeb3Providers = true,
-    enableAlternativePhoneCodeProviders = true,
-    idleAfterDelay = true,
-    showLastAuthenticationStrategy = false,
-  } = props;
-  const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
-    useEnabledThirdPartyProviders();
-  const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
-  const card = useCardState();
-  const clerk = useClerk();
+  const model = useSocialButtonsModel(props);
+  const controller = useSocialButtonsController(model, props);
+  return (
+    <SocialButtonsView
+      strategies={model.strategies}
+      strategyToDisplayData={model.strategyToDisplayData}
+      totalEnabledAuthMethods={model.totalEnabledAuthMethods}
+      lastAuthenticationStrategy={model.lastAuthenticationStrategy}
+      {...controller}
+    />
+  );
+});
+
+type SocialButtonsViewProps = Pick<
+  ReturnType<typeof useSocialButtonsModel>,
+  'strategies' | 'strategyToDisplayData' | 'totalEnabledAuthMethods' | 'lastAuthenticationStrategy'
+> &
+  ReturnType<typeof useSocialButtonsController>;
+
+export const SocialButtonsView = ({
+  strategies,
+  strategyToDisplayData,
+  totalEnabledAuthMethods,
+  lastAuthenticationStrategy,
+  isLoading,
+  loadingMetadata,
+  onSocialButtonClick,
+}: SocialButtonsViewProps) => {
   const { t } = useLocalizations();
   const { socialButtonsVariant } = useAppearance().parsedOptions;
-
-  type TStrategy = OAuthStrategy | Web3Strategy | PhoneCodeChannel;
-
-  const strategies: TStrategy[] = [
-    ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
-    ...(enableWeb3Providers ? web3Strategies : []),
-    ...(enableAlternativePhoneCodeProviders ? alternativePhoneCodeChannels : []),
-  ];
-
   if (!strategies.length) {
     return null;
   }
-
-  const clientLastAuth = showLastAuthenticationStrategy ? clerk.client?.lastAuthenticationStrategy : null;
-
-  const isValidStrategy = (strategy: unknown): strategy is TStrategy => {
-    return strategies.includes(strategy as TStrategy);
-  };
-
-  // Convert SAML strategies to OAuth strategies for consistency when matching last used strategy.
-  const convertedClientLastAuth = clientLastAuth?.startsWith('saml_')
-    ? clientLastAuth.replace('saml_', 'oauth_')
-    : clientLastAuth;
-
-  const lastAuthenticationStrategy =
-    convertedClientLastAuth && isValidStrategy(convertedClientLastAuth) ? convertedClientLastAuth : null;
-
-  const { strategyRows, lastAuthenticationStrategyPresent } = distributeStrategiesIntoRows<TStrategy>(
+  const { strategyRows, lastAuthenticationStrategyPresent } = distributeStrategiesIntoRows<SocialStrategy>(
     [...strategies],
     MAX_STRATEGIES_PER_ROW,
     lastAuthenticationStrategy,
@@ -113,32 +91,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       : socialButtonsVariant === 'iconButton'
         ? false
         : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
-
-  const startOauth = async (strategy: OAuthStrategy | Web3Strategy) => {
-    card.setLoading(strategy);
-    try {
-      if (isWeb3Strategy(strategy)) {
-        await web3Callback(strategy);
-      } else {
-        await oauthCallback(strategy);
-      }
-    } catch {
-      await sleep(1000);
-      card.setIdle();
-    }
-    if (idleAfterDelay) {
-      await sleep(5000);
-      card.setIdle();
-    }
-  };
-
-  const onSocialButtonClick = (strategy: OAuthStrategy | Web3Strategy | PhoneCodeChannel) => async () => {
-    if (isPhoneCodeChannel(strategy)) {
-      alternativePhoneCodeCallback(strategy);
-    } else {
-      await startOauth(strategy);
-    }
-  };
 
   const ButtonElement = preferBlockButtons ? SocialButtonBlock : SocialButtonIcon;
 
@@ -195,8 +147,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 id={strategyToDisplayData[strategy].id}
                 iconUrl={strategyToDisplayData[strategy].iconUrl}
                 name={strategyToDisplayData[strategy].name}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
+                isLoading={loadingMetadata === strategy}
+                isDisabled={isLoading}
                 aria-hidden
                 elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
                 elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
@@ -207,9 +159,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
               <ButtonElement
                 key={strategy}
                 id={strategyToDisplayData[strategy].id}
-                onClick={onSocialButtonClick(strategy)}
-                isLoading={card.loadingMetadata === strategy}
-                isDisabled={card.isLoading}
+                onClick={() => {
+                  void onSocialButtonClick(strategy)();
+                }}
+                isLoading={loadingMetadata === strategy}
+                isDisabled={isLoading}
                 label={label}
                 aria-label={
                   preferBlockButtons || isLastAuthenticationStrategy
@@ -230,7 +184,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
       ))}
     </Flex>
   );
-});
+};
 
 type SocialButtonProps = PropsOfComponent<typeof Button> & {
   icon: React.ReactElement;

@@ -1,271 +1,178 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import type { SignInResource } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
+import { type PropsWithChildren, StrictMode } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render } from '@/test/utils';
+import { act, render, waitFor } from '@/test/utils';
+import { CardStateProvider } from '@/ui/elements/contexts';
+import { localizationKeys } from '@/ui/localization';
 
-import { CardStateProvider } from '../../../elements/contexts';
-import { clearFetchCache, useFetch } from '../../../hooks';
-import { localizationKeys } from '../../../localization';
 import { SignInFactorOneCodeForm } from '../SignInFactorOneCodeForm';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
-
-vi.mock('../../../hooks', async () => {
-  const actual = await vi.importActual('../../../hooks');
-  return {
-    ...actual,
-    useFetch: vi.fn(),
-  };
+const codeProps = () => ({
+  factor: { strategy: 'phone_code' as const, phoneNumberId: 'idn_123', safeIdentifier: '+1234567890' },
+  factorAlreadyPrepared: false,
+  onFactorPrepare: vi.fn(),
+  cardTitle: localizationKeys('signIn.phoneCode.title'),
+  cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
+  inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
+  resendButton: localizationKeys('signIn.phoneCode.resendButton'),
+  identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
 });
+const setup = async (strict = false) => {
+  const { wrapper: Fixture, fixtures } = await createFixtures(f => {
+    f.withPhoneNumber();
+    f.startSignInWithPhoneNumber({ supportPhoneCode: true });
+  });
+  fixtures.signIn.id = 'sin_initial';
+  fixtures.signIn.firstFactorVerification.status = 'expired';
+  const Content = ({ children }: PropsWithChildren) => (
+    <Fixture>
+      <CardStateProvider>{children}</CardStateProvider>
+    </Fixture>
+  );
+  const wrapper = ({ children }: PropsWithChildren) =>
+    strict ? (
+      <StrictMode>
+        <Content>{children}</Content>
+      </StrictMode>
+    ) : (
+      <Content>{children}</Content>
+    );
+  return { wrapper, fixtures };
+};
+const response = { status: 'needs_first_factor' } as SignInResource;
 
-describe('SignInFactorOneCodeForm', () => {
-  beforeEach(() => {
-    clearFetchCache();
-    vi.mocked(useFetch).mockClear();
+describe('Sign-in first-factor code preparation', () => {
+  it('sends one code under Strict Mode and keeps the phone input visible', async () => {
+    const { wrapper, fixtures } = await setup(true);
+    fixtures.signIn.prepareFirstFactor.mockResolvedValue(response);
+    const props = codeProps();
+    const { getByLabelText } = render(<SignInFactorOneCodeForm {...props} />, { wrapper });
+    await waitFor(() => expect(props.onFactorPrepare).toHaveBeenCalledTimes(1));
+    expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledExactlyOnceWith(props.factor);
+    expect(getByLabelText('Enter verification code')).toBeInTheDocument();
   });
 
-  const renderWithProviders = (component: React.ReactElement, options?: any) => {
-    return render(<CardStateProvider>{component}</CardStateProvider>, options);
-  };
+  it('does not send another code when an empty attempt receives its ID', async () => {
+    const { wrapper, fixtures } = await setup();
+    fixtures.signIn.id = undefined;
+    fixtures.signIn.prepareFirstFactor.mockImplementation(() => {
+      fixtures.signIn.id = 'sin_assigned';
+      return Promise.resolve(response);
+    });
+    const props = codeProps();
+    const { rerender } = render(<SignInFactorOneCodeForm {...props} />, { wrapper });
+    await waitFor(() => expect(props.onFactorPrepare).toHaveBeenCalledTimes(1));
+    rerender(<SignInFactorOneCodeForm {...props} />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(1);
+  });
 
-  const defaultProps = {
-    factor: {
-      strategy: 'phone_code' as const,
-      phoneNumberId: 'idn_123',
-      safeIdentifier: '+1234567890',
-    },
-    factorAlreadyPrepared: false,
-    onFactorPrepare: vi.fn(),
-    cardTitle: localizationKeys('signIn.phoneCode.title'),
-    cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
-    inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
-    resendButton: localizationKeys('signIn.phoneCode.resendButton'),
-    identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
-  };
+  it('prepares a new channel without reporting the old channel result', async () => {
+    const { wrapper, fixtures } = await setup();
+    const first = createDeferredPromise<SignInResource>();
+    fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(first.promise).mockResolvedValueOnce(response);
+    const props = codeProps();
+    const { rerender } = render(<SignInFactorOneCodeForm {...props} />, { wrapper });
+    await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(1));
+    const next = { ...props, factor: { ...props.factor, channel: 'whatsapp' as const }, onFactorPrepare: vi.fn() };
+    rerender(<SignInFactorOneCodeForm {...next} />);
+    await waitFor(() => expect(next.onFactorPrepare).toHaveBeenCalledTimes(1));
+    await act(async () => {
+      first.resolve(response);
+      await first.promise;
+    });
+    expect(props.onFactorPrepare).not.toHaveBeenCalled();
+    expect(fixtures.signIn.prepareFirstFactor).toHaveBeenLastCalledWith(next.factor);
+  });
 
-  describe('Cache Key Generation', () => {
-    it('generates cache key without signIn.id to prevent extra API calls', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
-      });
+  it('does not prepare a pending SMS verification when its channel is implicit', async () => {
+    const { wrapper, fixtures } = await setup();
+    fixtures.signIn.firstFactorVerification.status = 'unverified';
+    fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
+    fixtures.signIn.firstFactorVerification.channel = 'sms';
+    render(<SignInFactorOneCodeForm {...codeProps()} />, { wrapper });
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(fixtures.signIn.prepareFirstFactor).not.toHaveBeenCalled();
+  });
 
-      renderWithProviders(<SignInFactorOneCodeForm {...defaultProps} />, { wrapper });
+  it('prepares an expired factor even when the parent previously prepared it', async () => {
+    const { wrapper, fixtures } = await setup();
+    fixtures.signIn.prepareFirstFactor.mockResolvedValue(response);
+    render(
+      <SignInFactorOneCodeForm
+        {...codeProps()}
+        factorAlreadyPrepared
+      />,
+      { wrapper },
+    );
+    await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(1));
+  });
 
-      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(
-        expect.any(Function),
-        {
-          name: 'signIn.prepareFirstFactor',
-          factorKey: 'phone_code_idn_123',
-        },
-        expect.objectContaining({
-          staleTime: 100,
-          onSuccess: expect.any(Function),
-          onError: expect.any(Function),
+  it('routes an owned Protect response without reporting factor preparation', async () => {
+    const { wrapper, fixtures } = await setup();
+    fixtures.signIn.prepareFirstFactor.mockResolvedValue({
+      status: 'needs_protect_check',
+      protectCheck: { status: 'pending' },
+    } as SignInResource);
+    const props = codeProps();
+    render(<SignInFactorOneCodeForm {...props} />, { wrapper });
+    await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../protect-check'));
+    expect(props.onFactorPrepare).not.toHaveBeenCalled();
+  });
+
+  it('ignores a Protect response after the screen closes', async () => {
+    const { wrapper, fixtures } = await setup();
+    const request = createDeferredPromise<SignInResource>();
+    fixtures.signIn.prepareFirstFactor.mockReturnValue(request.promise);
+    const props = codeProps();
+    const { unmount } = render(<SignInFactorOneCodeForm {...props} />, { wrapper });
+    await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(1));
+    unmount();
+    request.resolve({ status: 'needs_protect_check', protectCheck: { status: 'pending' } } as SignInResource);
+    await request.promise;
+    await Promise.resolve();
+    expect(fixtures.router.navigate).not.toHaveBeenCalled();
+    expect(props.onFactorPrepare).not.toHaveBeenCalled();
+  });
+
+  it('ignores a preparation error after a different attempt takes ownership before render', async () => {
+    const { wrapper, fixtures } = await setup();
+    const request = createDeferredPromise<SignInResource>();
+    fixtures.signIn.prepareFirstFactor.mockReturnValue(request.promise);
+    const { queryByText } = render(<SignInFactorOneCodeForm {...codeProps()} />, { wrapper });
+    await waitFor(() => expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledTimes(1));
+    fixtures.signIn.id = 'sin_other';
+    await act(async () => {
+      request.reject(
+        new ClerkAPIResponseError('Failed', {
+          status: 500,
+          data: [{ code: 'internal_server_error', message: 'Failed', long_message: 'Please try again' }],
         }),
       );
+      await request.promise.catch(() => undefined);
     });
-
-    it('includes channel in cache key for phone code with WhatsApp', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
-      });
-
-      const phonePropsWithChannel = {
-        factor: {
-          strategy: 'phone_code' as const,
-          phoneNumberId: 'idn_123',
-          safeIdentifier: '+1234567890',
-          channel: 'whatsapp' as const,
-        },
-        factorAlreadyPrepared: false,
-        onFactorPrepare: vi.fn(),
-        cardTitle: localizationKeys('signIn.phoneCode.title'),
-        cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
-        inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
-        resendButton: localizationKeys('signIn.phoneCode.resendButton'),
-        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
-      };
-
-      renderWithProviders(<SignInFactorOneCodeForm {...phonePropsWithChannel} />, { wrapper });
-
-      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(
-        expect.any(Function),
-        {
-          name: 'signIn.prepareFirstFactor',
-          factorKey: 'phone_code_idn_123_whatsapp',
-        },
-        expect.objectContaining({
-          staleTime: 100,
-          onSuccess: expect.any(Function),
-          onError: expect.any(Function),
-        }),
-      );
-    });
-
-    it('skips automatic prepare when the same factor verification is pending', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
-      });
-      fixtures.signIn.firstFactorVerification.status = 'unverified';
-      fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
-      fixtures.signIn.firstFactorVerification.channel = 'sms';
-
-      const props = {
-        factor: {
-          strategy: 'phone_code' as const,
-          phoneNumberId: 'idn_123',
-          safeIdentifier: '+1234567890',
-        },
-        factorAlreadyPrepared: false,
-        onFactorPrepare: vi.fn(),
-        cardTitle: localizationKeys('signIn.phoneCode.title'),
-        cardSubtitle: localizationKeys('signIn.phoneCode.subtitle'),
-        inputLabel: localizationKeys('signIn.phoneCode.formTitle'),
-        resendButton: localizationKeys('signIn.phoneCode.resendButton'),
-        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__phoneNumber'),
-      };
-
-      renderWithProviders(<SignInFactorOneCodeForm {...props} />, { wrapper });
-
-      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(undefined, expect.any(Object), expect.any(Object));
-    });
+    expect(queryByText('Please try again')).not.toBeInTheDocument();
   });
 
-  describe('shouldAvoidPrepare Logic', () => {
-    it('allows prepare when the same factor verification is expired', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
-      });
-      fixtures.signIn.firstFactorVerification.status = 'expired';
-      fixtures.signIn.firstFactorVerification.strategy = 'phone_code';
-
-      const propsWithFactorPrepared = {
-        ...defaultProps,
-        factorAlreadyPrepared: true,
-      };
-
-      renderWithProviders(<SignInFactorOneCodeForm {...propsWithFactorPrepared} />, { wrapper });
-
-      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(expect.any(Function), expect.any(Object), expect.any(Object));
-    });
-
-    it('allows prepare when factor is not already prepared', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
-      });
-
-      const propsWithFactorNotPrepared = {
-        ...defaultProps,
-        factorAlreadyPrepared: false,
-      };
-
-      renderWithProviders(<SignInFactorOneCodeForm {...propsWithFactorNotPrepared} />, { wrapper });
-
-      expect(vi.mocked(useFetch)).toHaveBeenCalledWith(
-        expect.any(Function), // fetcher should be a function when prepare is allowed
-        expect.any(Object),
-        expect.any(Object),
-      );
-    });
-  });
-
-  describe('Protect gate', () => {
-    // The `prepare` (code-send) call site is routed through the same gate as `attempt`. `useFetch`
-    // is mocked here, so we drive its `onSuccess` directly — the choke point under test — and assert
-    // the literal navigation target rather than re-asserting an argument the caller passed back.
-    const getPrepareOnSuccess = () =>
-      vi.mocked(useFetch).mock.calls.at(-1)?.[2]?.onSuccess as ((res: any) => void) | undefined;
-
-    it('routes to the protect-check card when the prepare is gated by Clerk Protect', async () => {
-      const onFactorPrepare = vi.fn();
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
-      });
-
-      renderWithProviders(
-        <SignInFactorOneCodeForm
-          {...defaultProps}
-          onFactorPrepare={onFactorPrepare}
-        />,
-        { wrapper },
-      );
-
-      const onSuccess = getPrepareOnSuccess();
-      expect(onSuccess).toBeTypeOf('function');
-      onSuccess!({
-        status: 'needs_protect_check',
-        protectCheck: { status: 'pending', token: 'challenge-token', sdkUrl: 'https://protect.example.com/sdk.js' },
-      });
-
-      expect(fixtures.router.navigate).toHaveBeenCalledWith('../protect-check');
-      expect(onFactorPrepare).not.toHaveBeenCalled();
-    });
-
-    it('continues the flow when the prepare is not gated', async () => {
-      const onFactorPrepare = vi.fn();
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
-      });
-
-      renderWithProviders(
-        <SignInFactorOneCodeForm
-          {...defaultProps}
-          onFactorPrepare={onFactorPrepare}
-        />,
-        { wrapper },
-      );
-
-      const onSuccess = getPrepareOnSuccess();
-      onSuccess!({ status: 'needs_first_factor' });
-
-      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../protect-check');
-      expect(onFactorPrepare).toHaveBeenCalled();
-    });
-  });
-
-  describe('Component Rendering', () => {
-    it('renders phone code verification form', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withPhoneNumber();
-        f.startSignInWithPhoneNumber({ supportPhoneCode: true });
-      });
-
-      const { getByLabelText } = renderWithProviders(<SignInFactorOneCodeForm {...defaultProps} />, { wrapper });
-
-      expect(getByLabelText('Enter verification code')).toBeInTheDocument();
-    });
-
-    it('renders email code verification form', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withEmailAddress();
-        f.startSignInWithEmailAddress({ supportEmailCode: true });
-      });
-
-      const emailProps = {
-        factor: {
-          strategy: 'email_code' as const,
-          emailAddressId: 'idn_456',
-          safeIdentifier: 'test@example.com',
-        },
-        factorAlreadyPrepared: false,
-        onFactorPrepare: vi.fn(),
-        cardTitle: localizationKeys('signIn.emailCode.title'),
-        cardSubtitle: localizationKeys('signIn.emailCode.subtitle'),
-        inputLabel: localizationKeys('signIn.emailCode.formTitle'),
-        resendButton: localizationKeys('signIn.emailCode.resendButton'),
-        identityPreviewEditButtonAriaLabel: localizationKeys('identityPreviewEditButton__emailAddress'),
-      };
-
-      const { getByLabelText } = renderWithProviders(<SignInFactorOneCodeForm {...emailProps} />, { wrapper });
-
-      expect(getByLabelText('Enter verification code')).toBeInTheDocument();
-    });
+  it('renders email code verification and sends the email factor', async () => {
+    const { wrapper, fixtures } = await setup();
+    fixtures.signIn.prepareFirstFactor.mockResolvedValue(response);
+    const props = {
+      ...codeProps(),
+      factor: { strategy: 'email_code' as const, emailAddressId: 'email_1', safeIdentifier: 'test@example.com' },
+    };
+    const { getByLabelText } = render(<SignInFactorOneCodeForm {...props} />, { wrapper });
+    await waitFor(() => expect(props.onFactorPrepare).toHaveBeenCalledTimes(1));
+    expect(fixtures.signIn.prepareFirstFactor).toHaveBeenCalledExactlyOnceWith(props.factor);
+    expect(getByLabelText('Enter verification code')).toBeInTheDocument();
   });
 });

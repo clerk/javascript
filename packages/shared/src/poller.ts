@@ -23,10 +23,11 @@ export function Poller({ delayInMs }: PollerOptions = { delayInMs: 1000 }): Poll
   let stopped = false;
 
   const stop: PollerStop = () => {
-    if (timerId) {
+    if (timerId !== undefined) {
       workerTimers.clearTimeout(timerId);
-      workerTimers.cleanup();
     }
+    timerId = undefined;
+    workerTimers.cleanup();
     stopped = true;
   };
 

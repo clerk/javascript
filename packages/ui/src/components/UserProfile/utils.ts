@@ -16,8 +16,6 @@ export const primaryIdentificationFirst = (primaryId: string | null) => (val1: I
   return primaryId === val1.id ? -1 : primaryId === val2.id ? 1 : 0;
 };
 
-export const currentSessionFirst = (id: string) => (a: IDable) => (a.id === id ? -1 : 1);
-
 export function sortIdentificationBasedOnVerification<
   T extends Array<EmailAddressResource | PhoneNumberResource | Web3WalletResource>,
 >(array: T | null | undefined, primaryId: string | null | undefined): T {

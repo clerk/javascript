@@ -1,7 +1,5 @@
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { localizationKeys } from '../../customizables';
 import {
   AccountConnectedAccounts,
   AccountEmails,
@@ -10,27 +8,23 @@ import {
   AccountUsername,
   AccountWeb3,
 } from './AccountSections';
+import { useUserProfilePageController } from './profile-page.controller';
+import { useUserProfilePageModel } from './profile-page.model';
+import { UserProfilePageView } from './profile-page.view';
 import { UserProfileSection } from './UserProfileSection';
 
 export const AccountPage = withCardStateProvider(() => {
-  const card = useCardState();
-
+  const model = useUserProfilePageModel('account');
+  const controller = useUserProfilePageController(model);
   return (
-    <ProfileCard.Page>
-      <ProfileCard.PagePanel
-        pageId='account'
-        titleKey={localizationKeys('userProfile.start.headerTitle__account')}
-        alertContent={card.error}
-        outerSx={t => ({ gap: t.space.$8, color: t.colors.$colorForeground, isolation: 'isolate' })}
-      >
-        <UserProfileSection />
-        <AccountUsername />
-        <AccountEmails />
-        <AccountPhone />
-        <AccountConnectedAccounts />
-        <AccountEnterpriseAccounts />
-        <AccountWeb3 />
-      </ProfileCard.PagePanel>
-    </ProfileCard.Page>
+    <UserProfilePageView {...controller}>
+      <UserProfileSection />
+      <AccountUsername />
+      <AccountEmails />
+      <AccountPhone />
+      <AccountConnectedAccounts />
+      <AccountEnterpriseAccounts />
+      <AccountWeb3 />
+    </UserProfilePageView>
   );
 });

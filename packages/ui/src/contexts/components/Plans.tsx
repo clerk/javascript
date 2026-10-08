@@ -46,9 +46,9 @@ const useBillingHookParams = () => {
   };
 };
 
-export const usePaymentMethods = () => {
+export const usePaymentMethods = (options?: { keepPreviousData?: boolean }) => {
   const params = useBillingHookParams();
-  return __experimental_usePaymentMethods(params);
+  return __experimental_usePaymentMethods({ ...params, ...options });
 };
 
 export const usePaymentAttempts = () => {
@@ -61,9 +61,9 @@ export const useStatements = (externalParams?: { mode: 'cache' }) => {
   return __experimental_useStatements({ ...params, __experimental_mode: externalParams?.mode });
 };
 
-export const useSubscription = () => {
+export const useSubscription = (options?: { keepPreviousData?: boolean }) => {
   const params = useBillingHookParams();
-  const subscription = __experimental_useSubscription(params);
+  const subscription = __experimental_useSubscription({ ...params, ...options });
   const subscriptionItems = useMemo(
     () => subscription.data?.subscriptionItems || [],
     [subscription.data?.subscriptionItems],
@@ -75,22 +75,22 @@ export const useSubscription = () => {
   };
 };
 
-export const usePlans = (params?: { mode: 'cache' }) => {
+export const usePlans = (params?: { mode?: 'cache'; keepPreviousData?: boolean }) => {
   const subscriberType = useSubscriberTypeContext();
 
   return __experimental_usePlans({
     for: subscriberType,
     initialPage: 1,
     pageSize: 50,
-    keepPreviousData: true,
+    keepPreviousData: params?.keepPreviousData ?? true,
     enabled: true,
     __experimental_mode: params?.mode,
   });
 };
 
-export const useCreditBalance = () => {
+export const useCreditBalance = (options?: { keepPreviousData?: boolean }) => {
   const params = useBillingHookParams();
-  return __internal_useCreditBalanceQuery(params);
+  return __internal_useCreditBalanceQuery({ ...params, ...options });
 };
 
 export const useCreditHistory = () => {

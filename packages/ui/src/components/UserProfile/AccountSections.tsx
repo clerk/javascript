@@ -1,90 +1,76 @@
-import { useUser } from '@clerk/shared/react';
 import type { ReactNode } from 'react';
 
-import { useEnvironment, useUserProfileContext } from '../../contexts';
-import { ConnectedAccountsSection } from './ConnectedAccountsSection';
-import { EmailsSection } from './EmailsSection';
-import { EnterpriseAccountsSection } from './EnterpriseAccountsSection';
-import { PhoneSection } from './PhoneSection';
-import { UsernameSection } from './UsernameSection';
-import { isAttributeAvailable } from './utils';
-import { Web3Section } from './Web3Section';
+import {
+  useAccountConnectedAccountsModel,
+  useAccountEmailsModel,
+  useAccountEnterpriseAccountsModel,
+  useAccountPhoneModel,
+  useAccountUsernameModel,
+  useAccountWeb3Model,
+} from './account-sections.model';
+import {
+  AccountConnectedAccountsView,
+  AccountEmailsView,
+  AccountEnterpriseAccountsView,
+  AccountPhoneView,
+  AccountUsernameView,
+  AccountWeb3View,
+} from './account-sections.view';
 
 export function AccountUsername(): ReactNode {
-  const { attributes } = useEnvironment().userSettings;
-  const { immutableAttributes } = useUserProfileContext();
-
-  if (!isAttributeAvailable(attributes.username)) {
+  const model = useAccountUsernameModel();
+  if (!model.available) {
     return null;
   }
-
-  const isImmutable = immutableAttributes.has('username');
-  return <UsernameSection isImmutable={isImmutable} />;
+  return <AccountUsernameView isImmutable={model.isImmutable} />;
 }
 
 export function AccountEmails(): ReactNode {
-  const { attributes } = useEnvironment().userSettings;
-  const { shouldAllowIdentificationCreation, immutableAttributes } = useUserProfileContext();
-
-  if (!isAttributeAvailable(attributes.email_address)) {
+  const model = useAccountEmailsModel();
+  if (!model.available) {
     return null;
   }
-
-  const isImmutable = immutableAttributes.has('email_address');
   return (
-    <EmailsSection
-      shouldAllowCreation={shouldAllowIdentificationCreation && !isImmutable}
-      shouldAllowDeletion={!isImmutable}
+    <AccountEmailsView
+      shouldAllowCreation={model.shouldAllowCreation}
+      shouldAllowDeletion={model.shouldAllowDeletion}
     />
   );
 }
 
 export function AccountPhone(): ReactNode {
-  const { attributes } = useEnvironment().userSettings;
-  const { shouldAllowIdentificationCreation, immutableAttributes } = useUserProfileContext();
-
-  if (!isAttributeAvailable(attributes.phone_number)) {
+  const model = useAccountPhoneModel();
+  if (!model.available) {
     return null;
   }
-
-  const isImmutable = immutableAttributes.has('phone_number');
   return (
-    <PhoneSection
-      shouldAllowCreation={shouldAllowIdentificationCreation && !isImmutable}
-      shouldAllowDeletion={!isImmutable}
+    <AccountPhoneView
+      shouldAllowCreation={model.shouldAllowCreation}
+      shouldAllowDeletion={model.shouldAllowDeletion}
     />
   );
 }
 
 export function AccountConnectedAccounts(): ReactNode {
-  const { social } = useEnvironment().userSettings;
-  const { shouldAllowIdentificationCreation } = useUserProfileContext();
-
-  if (!social || Object.values(social).filter(p => p.enabled).length === 0) {
+  const model = useAccountConnectedAccountsModel();
+  if (!model.available) {
     return null;
   }
-
-  return <ConnectedAccountsSection shouldAllowCreation={shouldAllowIdentificationCreation} />;
+  return <AccountConnectedAccountsView shouldAllowCreation={model.shouldAllowCreation} />;
 }
 
 export function AccountEnterpriseAccounts(): ReactNode {
-  const { enterpriseSSO } = useEnvironment().userSettings;
-  const { user } = useUser();
-
-  if (!user || !enterpriseSSO.enabled) {
+  const model = useAccountEnterpriseAccountsModel();
+  if (!model.available) {
     return null;
   }
-
-  return <EnterpriseAccountsSection />;
+  return <AccountEnterpriseAccountsView />;
 }
 
 export function AccountWeb3(): ReactNode {
-  const { attributes } = useEnvironment().userSettings;
-  const { shouldAllowIdentificationCreation } = useUserProfileContext();
-
-  if (!attributes.web3_wallet?.enabled) {
+  const model = useAccountWeb3Model();
+  if (!model.available) {
     return null;
   }
-
-  return <Web3Section shouldAllowCreation={shouldAllowIdentificationCreation} />;
+  return <AccountWeb3View shouldAllowCreation={model.shouldAllowCreation} />;
 }

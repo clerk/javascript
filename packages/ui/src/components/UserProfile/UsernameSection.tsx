@@ -1,78 +1,21 @@
-import { useUser } from '@clerk/shared/react';
-
-import { ProfileSection } from '@/ui/elements/Section';
-
-import { localizationKeys, Text } from '../../customizables';
-import { Action } from '../../elements/Action';
-import { useActionContext } from '../../elements/Action/ActionRoot';
-import { mqu } from '../../styledSystem';
-import { UsernameForm } from './UsernameForm';
+import { useProfileActionCloseController } from './useProfileActionCloseController';
+import { type UsernameSectionProps, useUsernameSectionModel } from './username-section.model';
+import { UsernameScreenView, UsernameSectionView } from './username-section.view';
 
 const UsernameScreen = () => {
-  const { close } = useActionContext();
-  return (
-    <UsernameForm
-      onSuccess={close}
-      onReset={close}
-    />
-  );
+  const controller = useProfileActionCloseController();
+  return <UsernameScreenView controller={controller} />;
 };
 
-export const UsernameSection = ({ isImmutable }: { isImmutable?: boolean }) => {
-  const { user } = useUser();
-
-  if (!user) {
+export const UsernameSection = (props: UsernameSectionProps) => {
+  const model = useUsernameSectionModel(props);
+  if (model.status === 'hidden') {
     return null;
   }
-
-  if (isImmutable && !user.username) {
-    return null;
-  }
-
   return (
-    <ProfileSection.Root
-      title={localizationKeys('userProfile.start.usernameSection.title')}
-      id='username'
-      sx={{ alignItems: 'center', [mqu.md]: { alignItems: 'flex-start' } }}
-    >
-      <Action.Root>
-        <Action.Closed value='edit'>
-          <ProfileSection.Item
-            id='username'
-            sx={{
-              paddingInlineStart: !user.username ? '0' : undefined,
-            }}
-          >
-            {user.username && (
-              <Text
-                truncate
-                sx={t => ({ color: t.colors.$colorForeground })}
-              >
-                {user.username}
-              </Text>
-            )}
-
-            {!isImmutable && (
-              <Action.Trigger value='edit'>
-                <ProfileSection.Button
-                  id='username'
-                  localizationKey={
-                    user.username
-                      ? localizationKeys('userProfile.start.usernameSection.primaryButton__updateUsername')
-                      : localizationKeys('userProfile.start.usernameSection.primaryButton__setUsername')
-                  }
-                />
-              </Action.Trigger>
-            )}
-          </ProfileSection.Item>
-        </Action.Closed>
-
-        <Action.Open value='edit'>
-          <Action.Card>
-            <UsernameScreen />
-          </Action.Card>
-        </Action.Open>
-      </Action.Root>
-    </ProfileSection.Root>
+    <UsernameSectionView
+      {...model}
+      usernameScreen={<UsernameScreen />}
+    />
   );
 };

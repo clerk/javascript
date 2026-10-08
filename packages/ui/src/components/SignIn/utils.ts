@@ -119,7 +119,7 @@ const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 
 export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null | undefined) =>
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
 
-export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
+export function getSignUpAttributeFromIdentifier(identifier: Pick<FormControlState<'identifier'>, 'type' | 'value'>) {
   if (identifier.type === 'tel') {
     return 'phoneNumber';
   }
@@ -132,7 +132,7 @@ export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'i
 }
 
 export const getPreferredAlternativePhoneChannel = (
-  fields: Array<FormControlState<string>>,
+  fields: Array<Pick<FormControlState<string>, 'id' | 'value'>>,
   preferredChannels: Record<string, PhoneCodeChannel> | null,
   phoneNumberFieldName: 'identifier' | 'phoneNumber',
 ): PhoneCodeChannel | null => {

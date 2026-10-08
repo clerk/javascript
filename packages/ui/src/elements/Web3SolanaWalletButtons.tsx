@@ -17,11 +17,11 @@ import {
   useLocalizations,
 } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
-import { useCardState } from '@/ui/elements/contexts';
 import { LinkRenderer } from '@/ui/elements/LinkRenderer';
 import { distributeStrategiesIntoRows } from '@/ui/elements/utils';
 import { mqu, type PropsOfComponent } from '@/ui/styledSystem';
-import { sleep } from '@/ui/utils/sleep';
+
+import { useWeb3SolanaWalletButtonsController } from './web3-solana-wallet-buttons.controller';
 
 type Web3WalletButtonsProps = {
   web3AuthCallback: ({ walletName }: { walletName: string }) => Promise<unknown>;
@@ -60,20 +60,9 @@ const useInstalledSolanaWallets = () => {
 };
 
 export const Web3SolanaWalletButtons = ({ web3AuthCallback }: Web3WalletButtonsProps) => {
-  const card = useCardState();
+  const controller = useWeb3SolanaWalletButtonsController(web3AuthCallback);
   const installedWallets = useInstalledSolanaWallets();
   const { t } = useLocalizations();
-
-  const startWeb3AuthFlow = (walletName: string) => async () => {
-    card.setLoading(walletName);
-    try {
-      await web3AuthCallback({ walletName });
-    } catch {
-      await sleep(1000);
-    } finally {
-      card.setIdle();
-    }
-  };
 
   const { strategyRows } = distributeStrategiesIntoRows(installedWallets, MAX_STRATEGIES_PER_ROW, undefined);
   const strategyRowOneLength = strategyRows.at(0)?.length ?? 0;
@@ -143,8 +132,8 @@ export const Web3SolanaWalletButtons = ({ web3AuthCallback }: Web3WalletButtonsP
             const imageOrInitial = w.icon ? (
               <Image
                 elementDescriptor={[descriptors.walletIcon, descriptors.web3SolanaWalletButtonsWalletInitialIcon]}
-                isDisabled={card.isLoading}
-                isLoading={card.loadingMetadata === w.name}
+                isDisabled={controller.isLoading}
+                isLoading={controller.loadingMetadata === w.name}
                 src={w.icon}
                 alt={t(localizationKeys('web3SolanaWalletButtons.connect', { walletName: w.name }))}
                 sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
@@ -152,7 +141,7 @@ export const Web3SolanaWalletButtons = ({ web3AuthCallback }: Web3WalletButtonsP
             ) : (
               <WalletInitialIcon
                 value={w.name}
-                isDisabled={card.isLoading}
+                isDisabled={controller.isLoading}
                 id={w.name}
               />
             );
@@ -161,9 +150,11 @@ export const Web3SolanaWalletButtons = ({ web3AuthCallback }: Web3WalletButtonsP
               <ButtonElement
                 key={w.name}
                 id={w.name}
-                onClick={startWeb3AuthFlow(w.name)}
-                isLoading={card.loadingMetadata === w.name}
-                isDisabled={card.isLoading}
+                onClick={() => {
+                  void controller.onWalletClick(w.name)();
+                }}
+                isLoading={controller.loadingMetadata === w.name}
+                isDisabled={controller.isLoading}
                 label={t(label)}
                 icon={imageOrInitial}
               />

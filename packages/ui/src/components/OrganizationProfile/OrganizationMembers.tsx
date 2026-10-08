@@ -1,225 +1,50 @@
-import { useOrganization } from '@clerk/shared/react';
-import { useState } from 'react';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { useFetchRoles } from '@/hooks/useFetchRoles';
-import { Users } from '@/icons';
-import { Alert } from '@/ui/elements/Alert';
-import { Animated } from '@/ui/elements/Animated';
-import { Card } from '@/ui/elements/Card';
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { Header } from '@/ui/elements/Header';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
-import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
-
-import { NotificationCountBadge, useProtect } from '../../common';
-import { useEnvironment } from '../../contexts';
-import { Box, Col, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
-import { Action } from '../../elements/Action';
-import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
 import { MembersActionsRow } from './MembersActions';
 import { MembersSearch } from './MembersSearch';
+import { ACTIVE_MEMBERS_PAGE_SIZE } from './organization-members.constants';
+import { useOrganizationMembersController } from './organization-members.controller';
+import { useOrganizationMembersModel, useOrganizationMembersScope } from './organization-members.model';
+import { OrganizationMembersView } from './organization-members.view';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
 
-export const ACTIVE_MEMBERS_PAGE_SIZE = 10;
+export { ACTIVE_MEMBERS_PAGE_SIZE } from './organization-members.constants';
 
-export const OrganizationMembers = withCardStateProvider(() => {
-  const { organizationSettings } = useEnvironment();
-  const card = useCardState();
-  const { hasRoleSetMigration } = useFetchRoles();
-  const canManageMemberships = useProtect({ permission: 'org:sys_memberships:manage' });
-  const canReadMemberships = useProtect({ permission: 'org:sys_memberships:read' });
-  const isDomainsEnabled = organizationSettings?.domains?.enabled && canManageMemberships;
+const OrganizationMembersContent = withCardStateProvider(() => {
+  const controller = useOrganizationMembersController();
+  const model = useOrganizationMembersModel(controller.query, ACTIVE_MEMBERS_PAGE_SIZE);
 
-  const [query, setQuery] = useState('');
-  const [search, setSearch] = useState('');
-
-  const { membershipRequests, memberships, invitations, organization } = useOrganization({
-    membershipRequests: isDomainsEnabled || undefined,
-    invitations: canManageMemberships || undefined,
-    memberships: canReadMemberships
-      ? {
-          keepPreviousData: true,
-          query: query || undefined,
-        }
-      : undefined,
-  });
-
-  if (canManageMemberships === null) {
+  if (model.isPending) {
     return null;
   }
 
   return (
-    <ProfileCard.Page>
-      <Col
-        elementDescriptor={descriptors.page}
-        gap={2}
-        sx={{ isolation: 'isolate' }}
-      >
-        <Col
-          elementDescriptor={descriptors.profilePage}
-          elementId={descriptors.profilePage.setId('organizationMembers')}
-          gap={4}
-          sx={theme => ({ paddingBottom: theme.space.$13 })}
-        >
-          <Action.Root animate={false}>
-            <Animated asChild>
-              <Header.Root
-                contentSx={{
-                  [mqu.md]: {
-                    flexDirection: 'row',
-                    width: '100%',
-                    justifyContent: 'space-between',
-                  },
-                }}
-              >
-                <Header.Title
-                  localizationKey={localizationKeys('organizationProfile.start.headerTitle__members')}
-                  textVariant='h2'
-                />
-              </Header.Root>
-            </Animated>
-            <Card.Alert>{card.error}</Card.Alert>
-            <Tabs>
-              <TabsList sx={t => ({ gap: t.space.$2 })}>
-                {canReadMemberships && (
-                  <Tab localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__members')}>
-                    {!!memberships?.count && (
-                      <NotificationCountBadge
-                        shouldAnimate={!query}
-                        notificationCount={memberships.count}
-                        colorScheme='outline'
-                      />
-                    )}
-                  </Tab>
-                )}
-                {canManageMemberships && (
-                  <Tab
-                    localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__invitations')}
-                  >
-                    {invitations?.data && !invitations.isLoading && (
-                      <NotificationCountBadge
-                        notificationCount={invitations.count}
-                        colorScheme='outline'
-                      />
-                    )}
-                  </Tab>
-                )}
-                {canManageMemberships && isDomainsEnabled && (
-                  <Tab
-                    localizationKey={localizationKeys('organizationProfile.membersPage.start.headerTitle__requests')}
-                  >
-                    {membershipRequests?.data && !membershipRequests.isLoading && (
-                      <NotificationCountBadge
-                        notificationCount={membershipRequests.count}
-                        colorScheme='outline'
-                      />
-                    )}
-                  </Tab>
-                )}
-              </TabsList>
-              <TabPanels>
-                {canReadMemberships && (
-                  <TabPanel sx={{ width: '100%' }}>
-                    <Flex
-                      gap={4}
-                      direction='col'
-                      sx={{
-                        width: '100%',
-                      }}
-                    >
-                      <Flex
-                        gap={2}
-                        direction='col'
-                        sx={{
-                          width: '100%',
-                        }}
-                      >
-                        <MembersActionsRow
-                          actionSlot={
-                            <MembersSearch
-                              query={query}
-                              value={search}
-                              memberships={memberships}
-                              onSearchChange={query => setSearch(query)}
-                              onQueryTrigger={query => setQuery(query)}
-                            />
-                          }
-                        />
-                        {hasRoleSetMigration && (
-                          <Alert
-                            variant='warning'
-                            title={localizationKeys(
-                              'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.title',
-                            )}
-                            subtitle={localizationKeys(
-                              'organizationProfile.membersPage.alerts.roleSetMigrationInProgress.subtitle',
-                            )}
-                          />
-                        )}
-                        <ActiveMembersList
-                          pageSize={ACTIVE_MEMBERS_PAGE_SIZE}
-                          memberships={memberships}
-                        />
-                      </Flex>
-                    </Flex>
-                  </TabPanel>
-                )}
-                {canManageMemberships && (
-                  <TabPanel sx={{ width: '100%' }}>
-                    <OrganizationMembersTabInvitations />
-                  </TabPanel>
-                )}
-                {canManageMemberships && isDomainsEnabled && (
-                  <TabPanel sx={{ width: '100%' }}>
-                    <OrganizationMembersTabRequests />
-                  </TabPanel>
-                )}
-              </TabPanels>
-            </Tabs>
-          </Action.Root>
-        </Col>
-
-        {canReadMemberships && !!memberships?.count && organization && organization.maxAllowedMemberships > 0 ? (
-          <Box
-            sx={theme => ({
-              position: 'absolute',
-              bottom: 0,
-              insetInline: 0,
-              backgroundColor: theme.colors.$colorBackground,
-              borderTop: `1px solid ${theme.colors.$borderAlpha100}`,
-              paddingInline: theme.space.$4,
-              height: theme.space.$13,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            })}
-          >
-            <Text
-              sx={t => ({
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: t.space.$2,
-              })}
-            >
-              <Icon
-                icon={Users}
-                size='md'
-                colorScheme='neutral'
-              />
-              <Text
-                as='span'
-                colorScheme='inherit'
-                localizationKey={localizationKeys('organizationProfile.start.membershipSeatUsageLabel', {
-                  count: organization.membersCount + organization.pendingInvitationsCount,
-                  limit: organization.maxAllowedMemberships,
-                })}
-              />
-            </Text>
-          </Box>
-        ) : null}
-      </Col>
-    </ProfileCard.Page>
+    <OrganizationMembersView
+      controller={controller}
+      data={model.view}
+      membersActions={
+        <MembersActionsRow
+          actionSlot={
+            <MembersSearch
+              query={controller.query}
+              value={controller.search}
+              memberships={model.searchQuery}
+              onSearchChange={controller.setSearch}
+              onQueryTrigger={controller.setQuery}
+            />
+          }
+        />
+      }
+      activeMembers={<ActiveMembersList model={model.activeMembers} />}
+      invitations={<OrganizationMembersTabInvitations />}
+      requests={<OrganizationMembersTabRequests />}
+    />
   );
 });
+
+export const OrganizationMembers = () => {
+  const scope = useOrganizationMembersScope();
+  return <OrganizationMembersContent key={`${scope.userId}:${scope.organizationId}`} />;
+};

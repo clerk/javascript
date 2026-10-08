@@ -70,7 +70,13 @@ describe('PhoneSection', () => {
       await userEvent.click(getByRole('button', { name: 'Add phone number' }));
       await findByRole('heading', { name: /Add phone number/i });
 
-      fixtures.clerk.user?.createPhoneNumber.mockReturnValueOnce(Promise.resolve({} as any));
+      fixtures.clerk.user?.createPhoneNumber.mockReturnValueOnce(
+        Promise.resolve({
+          id: 'phone_created',
+          phoneNumber: '+16911111111',
+          prepareVerification: vi.fn().mockResolvedValue(undefined),
+        } as any),
+      );
 
       await userEvent.type(getByLabelText(/phone number/i), '6911111111');
       await userEvent.click(getByRole('button', { name: /add$/i }));

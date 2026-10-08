@@ -1,26 +1,21 @@
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { localizationKeys } from '../../customizables';
 import { ActiveDevicesSection } from './ActiveDevicesSection';
+import { useUserProfilePageController } from './profile-page.controller';
+import { useUserProfilePageModel } from './profile-page.model';
+import { UserProfilePageView } from './profile-page.view';
 import { SecurityDelete, SecurityMfa, SecurityPasskeys, SecurityPassword } from './SecuritySections';
 
 export const SecurityPage = withCardStateProvider(() => {
-  const card = useCardState();
-
+  const model = useUserProfilePageModel('security');
+  const controller = useUserProfilePageController(model);
   return (
-    <ProfileCard.Page>
-      <ProfileCard.PagePanel
-        pageId='security'
-        titleKey={localizationKeys('userProfile.start.headerTitle__security')}
-        alertContent={card.error}
-      >
-        <SecurityPassword />
-        <SecurityPasskeys />
-        <SecurityMfa />
-        <ActiveDevicesSection />
-        <SecurityDelete />
-      </ProfileCard.PagePanel>
-    </ProfileCard.Page>
+    <UserProfilePageView {...controller}>
+      <SecurityPassword />
+      <SecurityPasskeys />
+      <SecurityMfa />
+      <ActiveDevicesSection />
+      <SecurityDelete />
+    </UserProfilePageView>
   );
 });

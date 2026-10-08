@@ -1,31 +1,17 @@
-import { useSession } from '@clerk/shared/react';
 import type { PhoneCodeFactor } from '@clerk/shared/types';
 
-import { Flow, localizationKeys } from '../../customizables';
+import { useUVFactorTwoPhoneCodeCardModel } from './uv-factor-two-phone-code-card.model';
+import { UVFactorTwoPhoneCodeCardView } from './uv-factor-two-phone-code-card.view';
 import type { UVFactorTwoCodeCard } from './UVFactorTwoCodeForm';
-import { UVFactorTwoCodeForm } from './UVFactorTwoCodeForm';
 
 type UVFactorTwoPhoneCodeCardProps = UVFactorTwoCodeCard & { factor: PhoneCodeFactor };
+
 export const UVFactorTwoPhoneCodeCard = (props: UVFactorTwoPhoneCodeCardProps) => {
-  const { session } = useSession();
-
-  const prepare = () => {
-    const { phoneNumberId, strategy } = props.factor;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return session!.prepareSecondFactorVerification({ phoneNumberId, strategy });
-  };
-
+  const model = useUVFactorTwoPhoneCodeCardModel(props.factor);
   return (
-    <Flow.Part part='phoneCode2Fa'>
-      <UVFactorTwoCodeForm
-        {...props}
-        cardTitle={localizationKeys('reverification.phoneCodeMfa.title')}
-        cardSubtitle={localizationKeys('reverification.phoneCodeMfa.subtitle')}
-        inputLabel={localizationKeys('reverification.phoneCodeMfa.formTitle')}
-        resendButton={localizationKeys('reverification.phoneCodeMfa.resendButton')}
-        identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
-        prepare={prepare}
-      />
-    </Flow.Part>
+    <UVFactorTwoPhoneCodeCardView
+      props={props}
+      prepare={model.prepare}
+    />
   );
 };

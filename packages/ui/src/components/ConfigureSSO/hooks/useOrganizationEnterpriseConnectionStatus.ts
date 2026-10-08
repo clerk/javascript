@@ -1,6 +1,6 @@
 import { __internal_useOrganizationEnterpriseConnectionTestRuns } from '@clerk/shared/react';
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 
+import type { SSOConnection } from '../configure-sso.types';
 import {
   isEnterpriseConnectionConfigured,
   type OrganizationEnterpriseConnection,
@@ -14,7 +14,7 @@ type StatusOptions = {
 
 /** Same probe and query key as the umbrella hook, so react-query dedupes it for the scoped connection. */
 export const useOrganizationEnterpriseConnectionStatus = (
-  connection: EnterpriseConnectionResource,
+  connection: SSOConnection,
   { probe = true }: StatusOptions = {},
 ): OrganizationEnterpriseConnection => {
   const isConfigured = isEnterpriseConnectionConfigured(connection);

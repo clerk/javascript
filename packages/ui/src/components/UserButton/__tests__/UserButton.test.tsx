@@ -1,4 +1,5 @@
 import { UNSAFE_PortalProvider } from '@clerk/shared/react';
+import { createDeferredPromise } from '@clerk/shared/utils/index';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
@@ -10,6 +11,28 @@ import { UserButton } from '../';
 const { createFixtures } = bindCreateFixtures('UserButton');
 
 describe('UserButton', () => {
+  it('uses existing localization overrides for feature messages', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    fixtures.options.localization = {
+      userButton: {
+        action__openUserMenu: 'Open account options',
+        action__closeUserMenu: 'Close account options',
+        action__manageAccount: 'Account settings',
+        label__userButtonPopover: 'Account options',
+      },
+    };
+
+    const { getByRole, getByText, userEvent } = render(<UserButton />, { wrapper });
+    const trigger = getByRole('button', { name: 'Open account options' });
+    await userEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-label', 'Close account options');
+    expect(getByRole('dialog', { name: 'Account options' })).toBeInTheDocument();
+    expect(getByText('Account settings')).toBeInTheDocument();
+  });
+
   it('renders no button when there is no logged in user', async () => {
     const { wrapper } = await createFixtures();
     const { queryByRole } = render(<UserButton />, { wrapper });
@@ -166,6 +189,22 @@ describe('UserButton', () => {
       expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
         expect.objectContaining({ session: expect.objectContaining({ user: expect.objectContaining({ id: '3' }) }) }),
       );
+    });
+
+    it('keeps other session actions disabled while a session switch is pending', async () => {
+      const { wrapper, fixtures } = await createFixtures(initConfig);
+      const switchSession = createDeferredPromise();
+      fixtures.clerk.setActive.mockReturnValueOnce(switchSession.promise);
+      const { getByRole, userEvent } = render(<UserButton />, { wrapper });
+
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
+      const click = userEvent.click(getByRole('button', { name: /First3 Last3/ }));
+
+      await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalledTimes(1));
+      expect(getByRole('button', { name: /First2 Last2/ })).toBeDisabled();
+
+      switchSession.resolve();
+      await click;
     });
 
     it('signs out of the currently active session when clicking "Sign out"', async () => {

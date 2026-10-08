@@ -1,105 +1,51 @@
-import { useClerk, usePortalRoot } from '@clerk/shared/react';
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
-import { useEffect, useMemo, useState } from 'react';
+import type { PricingTableProps } from '@clerk/shared/types';
 
-import { Flow } from '@/ui/customizables/Flow';
-
-import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscription } from '../../contexts';
+import { usePricingTableContext } from '../../contexts';
+import { usePricingTableController } from './pricing-table.controller';
+import { usePricingTableModel } from './pricing-table.model';
+import type { PricingTableModel } from './pricing-table.types';
+import { PricingTableView } from './pricing-table.view';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTableRoot = (props: PricingTableProps) => {
-  const clerk = useClerk();
-  const getContainer = usePortalRoot();
-  const { mode = 'mounted', signInMode = 'redirect', highlightedPlan } = usePricingTableContext();
-  const isCompact = mode === 'modal';
-  const { data: subscription, subscriptionItems } = useSubscription();
-  const { data: plans } = usePlans();
-  const { handleSelectPlan } = usePlansContext();
-
-  const plansToRender = useMemo(() => {
-    return clerk.isSignedIn
-      ? subscription // All users in billing-enabled applications have a subscription
-        ? plans
-        : []
-      : plans;
-  }, [clerk.isSignedIn, plans, subscription]);
-
-  const defaultPlanPeriod = useMemo(() => {
-    if (isCompact) {
-      const upcomingSubscription = subscriptionItems?.find(sub => sub.status === 'upcoming');
-      if (upcomingSubscription) {
-        return upcomingSubscription.planPeriod;
-      }
-
-      // don't pay attention to the default plan
-      const activeSubscription = subscriptionItems?.find(
-        sub => !sub.canceledAt && sub.status === 'active' && !sub.plan.isDefault,
-      );
-      if (activeSubscription) {
-        return activeSubscription.planPeriod;
-      }
-    }
-
-    return 'annual';
-  }, [isCompact, subscriptionItems]);
-
-  const [planPeriod, setPlanPeriod] = useState<BillingSubscriptionPlanPeriod>(defaultPlanPeriod);
-
-  useEffect(() => {
-    setPlanPeriod(defaultPlanPeriod);
-  }, [defaultPlanPeriod]);
-
-  const selectPlan = (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => {
-    if (!clerk.isSignedIn) {
-      if (signInMode === 'modal') {
-        return clerk.openSignIn({ getContainer });
-      }
-      return clerk.redirectToSignIn();
-    }
-
-    handleSelectPlan({
-      mode,
-      plan,
-      planPeriod,
-      event,
-      appearance: props.checkoutProps?.appearance,
-      newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
-    });
-    return;
-  };
-
-  // Pre-fetch payment methods
-  usePaymentMethods();
-
+  const model = usePricingTableModel(props);
   return (
-    <Flow.Root
-      flow='pricingTable'
-      isFlowReady={clerk.isSignedIn ? !!subscription : plans.length > 0}
-      sx={{
-        width: '100%',
-      }}
-    >
-      {mode !== 'modal' && (props as any).layout === 'matrix' ? (
+    <PricingTableContent
+      key={model.scopeKey}
+      model={model}
+      props={props}
+    />
+  );
+};
+
+const PricingTableContent = ({ model, props }: { model: PricingTableModel; props: PricingTableProps }) => {
+  const controller = usePricingTableController(model);
+  return (
+    <PricingTableView
+      {...controller}
+      matrix={
         <PricingTableMatrix
-          plans={plansToRender}
-          planPeriod={planPeriod}
-          setPlanPeriod={setPlanPeriod}
-          onSelect={selectPlan}
-          highlightedPlan={highlightedPlan}
+          planIds={model.planIds}
+          planPeriod={controller.planPeriod}
+          setPlanPeriod={controller.setPlanPeriod}
+          onSelect={controller.selectPlan}
+          highlightedPlan={controller.highlightedPlan}
         />
-      ) : (
+      }
+      cards={
         <PricingTableDefault
-          plans={plansToRender}
-          highlightedPlan={highlightedPlan}
-          planPeriod={planPeriod}
-          setPlanPeriod={setPlanPeriod}
-          onSelect={selectPlan}
-          isCompact={isCompact}
+          planIds={model.planIds}
+          highlightedPlan={controller.highlightedPlan}
+          planPeriod={controller.planPeriod}
+          setPlanPeriod={controller.setPlanPeriod}
+          onSelect={controller.selectPlan}
+          onShowDetails={controller.showPlanDetails}
+          isCompact={controller.isCompact}
           props={props}
         />
-      )}
-    </Flow.Root>
+      }
+    />
   );
 };
 

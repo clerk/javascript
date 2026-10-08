@@ -1,5 +1,4 @@
-import { __internal_useOrganizationBase } from '@clerk/shared/react';
-import { type PropsWithChildren, type ReactNode, useState } from 'react';
+import { type PropsWithChildren, type ReactNode } from 'react';
 
 import {
   Badge,
@@ -10,15 +9,13 @@ import {
   Heading,
   Icon,
   type LocalizationKey,
-  localizationKeys,
   Text,
   useLocalizations,
 } from '@/customizables';
 import { ChevronLeft, ChevronRight } from '@/icons';
 import { common, type PropsOfComponent } from '@/styledSystem';
 
-import { useConfigureSSO } from '../ConfigureSSOContext';
-import { ResetConnectionDialog } from '../ResetConnectionDialog';
+import { FooterReset } from './FooterReset';
 import { ProfileCardFooter } from './ProfileCard';
 
 type StepLayoutProps = PropsOfComponent<typeof Col>;
@@ -189,54 +186,6 @@ const FooterContinue = ({ onClick, isDisabled, isLoading, label = 'Continue' }: 
   );
 };
 FooterContinue.displayName = 'Step.Footer.Continue';
-
-/**
- * The destructive reset affordance, rendered in a step footer. Self-hides while
- * there is no connection (so it only shows on configure / test / confirmation,
- * never on verify-domain / select-provider).
- *
- * It deliberately does NOT call `useWizard()`. The confirm path deletes the
- * connection directly via the context mutation (a pure delete; the wizard then
- * self-corrects to the furthest-reachable step when the active step's guard
- * breaks), so this works from ANY footer — including the nested SAML configure
- * footers, which have their own (linear) wizard. That is what kills the old
- * per-step nested-binding trap.
- *
- * `marginInlineEnd: 'auto'` pushes it to the far-left of the `justify='end'`
- * footer row, matching the prior destructive affordance.
- */
-const FooterReset = (): JSX.Element | null => {
-  const { enterpriseConnection, enterpriseConnectionMutations, contentRef } = useConfigureSSO();
-  const organization = __internal_useOrganizationBase();
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (!enterpriseConnection) {
-    return null;
-  }
-
-  return (
-    <>
-      <Button
-        elementDescriptor={descriptors.configureSSOFooterResetButton}
-        variant='ghost'
-        size='sm'
-        colorScheme='danger'
-        onClick={() => setIsOpen(true)}
-        localizationKey={localizationKeys('configureSSO.resetConnectionDialog.resetButton')}
-        sx={{ marginInlineEnd: 'auto' }}
-      />
-      <ResetConnectionDialog
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        confirmationValue={organization?.name ?? ''}
-        subtitle={localizationKeys('configureSSO.resetConnectionDialog.subtitle', { name: enterpriseConnection.name })}
-        onDelete={() => enterpriseConnectionMutations.deleteConnection(enterpriseConnection.id)}
-        contentRef={contentRef}
-      />
-    </>
-  );
-};
-FooterReset.displayName = 'Step.Footer.Reset';
 
 const Footer = ({ children }: PropsWithChildren): JSX.Element => <ProfileCardFooter>{children}</ProfileCardFooter>;
 

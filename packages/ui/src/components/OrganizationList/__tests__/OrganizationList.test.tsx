@@ -13,6 +13,25 @@ import { OrganizationList } from '../';
 const { createFixtures } = bindCreateFixtures('OrganizationList');
 
 describe('OrganizationList', () => {
+  it('uses existing localization overrides and subtitle parameters for feature messages', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({ email_addresses: ['test@clerk.com'], create_organization_enabled: true });
+    });
+    fixtures.options.localization = {
+      organizationList: {
+        title: 'Choose a workspace',
+        subtitle: 'Continue to {{applicationName}}',
+        action__createOrganization: 'New workspace',
+      },
+    };
+
+    const { findByRole, getByText } = render(<OrganizationList />, { wrapper });
+    expect(await findByRole('heading', { name: 'Choose a workspace' })).toBeInTheDocument();
+    expect(getByText('Continue to TestApp')).toHaveAttribute('data-localization-key', 'organizationList.subtitle');
+    expect(await findByRole('button', { name: 'New workspace' })).toBeInTheDocument();
+  });
+
   it('renders component with personal and no data', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
@@ -443,6 +462,17 @@ describe('OrganizationList', () => {
           wrapper,
         });
 
+        fixtures.clerk.createOrganization.mockResolvedValue(
+          createFakeOrganization({
+            id: 'org_created',
+            name: 'new org',
+            slug: 'new-org',
+            adminDeleteEnabled: false,
+            maxAllowedMemberships: 3,
+            membersCount: 1,
+            pendingInvitationsCount: 0,
+          }),
+        );
         fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
         await waitFor(async () =>
           expect(await findByRole('button', { name: 'Create organization' })).toBeInTheDocument(),
@@ -451,7 +481,7 @@ describe('OrganizationList', () => {
         await waitFor(async () => expect(await findByLabelText(/name/i)).toBeInTheDocument());
         await userEvent.type(getByLabelText(/name/i), 'new org');
         await userEvent.click(getByRole('button', { name: /create organization/i }));
-        await waitFor(async () => {
+        await waitFor(() => {
           expect(fixtures.router.navigate).toHaveBeenCalledWith(`/org`);
         });
       });

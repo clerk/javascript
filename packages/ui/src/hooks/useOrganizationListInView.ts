@@ -8,15 +8,25 @@ import { useInView } from './useInView';
  *
  * `enabled` withholds the list params so the three requests do not start. Defaults on.
  */
-export const useOrganizationListInView = ({ enabled = true }: { enabled?: boolean } = {}) => {
-  const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(
-    enabled ? organizationListParams : undefined,
-  );
+export const useOrganizationListInView = ({
+  enabled = true,
+  keepPreviousData,
+  canFetch,
+}: { enabled?: boolean; keepPreviousData?: boolean; canFetch?: () => boolean } = {}) => {
+  const params =
+    keepPreviousData === undefined
+      ? organizationListParams
+      : {
+          userMemberships: { ...organizationListParams.userMemberships, keepPreviousData },
+          userInvitations: { ...organizationListParams.userInvitations, keepPreviousData },
+          userSuggestions: { ...organizationListParams.userSuggestions, keepPreviousData },
+        };
+  const { userMemberships, userInvitations, userSuggestions } = useOrganizationList(enabled ? params : undefined);
 
   const { ref } = useInView({
     threshold: 0,
     onChange: inView => {
-      if (!enabled || !inView) {
+      if (!enabled || !inView || canFetch?.() === false) {
         return;
       }
       if (userMemberships.hasNextPage) {

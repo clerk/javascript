@@ -19,6 +19,8 @@ const contextState = vi.hoisted(() => ({
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
+    ownerKey: 'owner',
+    canRun: () => true,
     enterpriseConnection: { id: 'ent_1', domains: contextState.domains },
     organizationEnterpriseConnection: { isActive: contextState.isActive },
     enterpriseConnectionMutations: { setConnectionActive },

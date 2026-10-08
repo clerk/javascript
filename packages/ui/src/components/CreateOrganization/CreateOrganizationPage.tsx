@@ -1,39 +1,19 @@
-import { useClerk } from '@clerk/shared/react';
-
-import { Card } from '@/ui/elements/Card';
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-
-import { useCreateOrganizationContext } from '../../contexts';
-import { localizationKeys } from '../../customizables';
+import { createOrganizationMessages } from './create-organization.messages';
+import { useCreateOrganizationPageModel } from './create-organization-page.model';
+import { CreateOrganizationPageView } from './create-organization-page.view';
 import { CreateOrganizationForm } from './CreateOrganizationForm';
 
-export const CreateOrganizationPage = withCardStateProvider(() => {
-  const { closeCreateOrganization } = useClerk();
-
-  const { mode, navigateAfterCreateOrganization, skipInvitationScreen } = useCreateOrganizationContext();
-  const card = useCardState();
-
+export const CreateOrganizationPage = () => {
+  const model = useCreateOrganizationPageModel();
   return (
-    <Card.Root sx={t => ({ width: t.sizes.$108 })}>
-      <Card.Content
-        sx={t => ({
-          padding: `${t.space.$4} ${t.space.$5}`,
-        })}
-      >
-        <Card.Alert>{card.error}</Card.Alert>
-        <CreateOrganizationForm
-          skipInvitationScreen={skipInvitationScreen}
-          startPage={{ headerTitle: localizationKeys('createOrganization.title') }}
-          navigateAfterCreateOrganization={navigateAfterCreateOrganization}
-          flow={'default'}
-          onComplete={() => {
-            if (mode === 'modal') {
-              closeCreateOrganization();
-            }
-          }}
-        />
-      </Card.Content>
-      <Card.Footer />
-    </Card.Root>
+    <CreateOrganizationPageView>
+      <CreateOrganizationForm
+        skipInvitationScreen={model.skipInvitationScreen}
+        startPage={{ headerTitle: createOrganizationMessages.title }}
+        navigateAfterCreateOrganization={model.navigateAfterCreateOrganization}
+        flow='default'
+        onComplete={model.onComplete}
+      />
+    </CreateOrganizationPageView>
   );
-});
+};

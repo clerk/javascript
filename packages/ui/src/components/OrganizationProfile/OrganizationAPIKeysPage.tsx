@@ -1,39 +1,16 @@
-import { useOrganization } from '@clerk/shared/react';
-
-import { APIKeysContext, useOrganizationProfileContext } from '@/ui/contexts';
-import { Col, localizationKeys } from '@/ui/customizables';
-import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { APIKeysPage } from '../APIKeys/APIKeys';
+import { useOrganizationAPIKeysPageModel } from './organization-api-keys-page.model';
+import { OrganizationAPIKeysPageView } from './organization-api-keys-page.view';
 
 export const OrganizationAPIKeysPage = () => {
-  const { organization } = useOrganization();
+  const model = useOrganizationAPIKeysPageModel();
   const { contentRef } = useUnsafeNavbarContext();
-  const { apiKeysProps } = useOrganizationProfileContext();
 
-  if (!organization) {
+  if (!model.subject) {
     // We should never reach this point, but we'll return null to make TS happy
     return null;
   }
 
-  return (
-    <ProfileCard.Page>
-      <Col gap={4}>
-        <Header.Root>
-          <Header.Title
-            localizationKey={localizationKeys('organizationProfile.apiKeysPage.title')}
-            textVariant='h2'
-          />
-        </Header.Root>
-        <APIKeysContext.Provider value={{ ...apiKeysProps, componentName: 'APIKeys' }}>
-          <APIKeysPage
-            subject={organization.id}
-            revokeModalRoot={contentRef}
-          />
-        </APIKeysContext.Provider>
-      </Col>
-    </ProfileCard.Page>
-  );
+  return <OrganizationAPIKeysPageView data={{ ...model, subject: model.subject, revokeModalRoot: contentRef }} />;
 };

@@ -1,24 +1,14 @@
-import React, { type JSX } from 'react';
-
-import { localizationKeys } from '@/customizables';
-import { Alert } from '@/elements/Alert';
-
-import { useConfigureSSO } from '../../../ConfigureSSOContext';
+import { useActiveConnectionAlertController } from './active-connection-alert.controller';
+import { useActiveConnectionAlertModel } from './active-connection-alert.model';
+import { ActiveConnectionAlertView } from './active-connection-alert.view';
 
 export const ActiveConnectionAlert = (): JSX.Element | null => {
-  const { enterpriseConnection } = useConfigureSSO();
-  const [isDismissed, setIsDismissed] = React.useState(false);
-
-  if (!enterpriseConnection?.active || isDismissed) {
-    return null;
-  }
-
+  const model = useActiveConnectionAlertModel();
+  const controller = useActiveConnectionAlertController();
   return (
-    <Alert
-      variant='warning'
-      title={localizationKeys('configureSSO.configureStep.activeConnectionWarning.title')}
-      dismissLabel={localizationKeys('configureSSO.configureStep.activeConnectionWarning.dismiss')}
-      onDismiss={() => setIsDismissed(true)}
+    <ActiveConnectionAlertView
+      {...model}
+      {...controller}
     />
   );
 };

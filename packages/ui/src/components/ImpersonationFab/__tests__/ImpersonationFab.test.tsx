@@ -38,4 +38,17 @@ describe('ImpersonationFab', () => {
     render(<ImpersonationFab />, { wrapper });
     expect(document.getElementById('cl-impersonationEye')).toBeNull();
   });
+
+  it('signs out the impersonated session', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        actor: { sub: 'user_impersonated' },
+      });
+    });
+    const { userEvent, getByText } = render(<ImpersonationFab />, { wrapper });
+
+    await userEvent.click(getByText('Sign out'));
+    expect(fixtures.clerk.signOut).toHaveBeenCalled();
+  });
 });

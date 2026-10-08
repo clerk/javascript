@@ -1,8 +1,9 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { describe, expect, it, vi } from 'vitest';
 
 import { localizationKeys } from '@/customizables';
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { act, render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { ResetConnectionDialog } from '../ResetConnectionDialog';
@@ -15,6 +16,7 @@ const renderDialog = (
   wrapper: React.ComponentType<{ children?: React.ReactNode }>,
   props: {
     isOpen?: boolean;
+    requestKey?: string;
     onClose?: () => void;
     confirmationValue?: string;
     title?: ReturnType<typeof localizationKeys>;
@@ -23,24 +25,30 @@ const renderDialog = (
   } = {},
 ) => {
   const onClose = props.onClose ?? vi.fn();
-  const utils = render(
+  const dialog = (values: typeof props) => (
     <CardStateProvider>
       <ResetConnectionDialog
-        isOpen={props.isOpen ?? true}
+        isOpen={values.isOpen ?? true}
         onClose={onClose}
-        confirmationValue={props.confirmationValue ?? 'Acme Inc'}
-        onDelete={() => deleteConnection('idn_connection_1')}
+        requestKey={values.requestKey ?? 'idn_connection_1'}
+        canRun={() => true}
+        confirmationValue={values.confirmationValue ?? 'Acme Inc'}
+        onDelete={() => deleteConnection(values.requestKey ?? 'idn_connection_1')}
         contentRef={{ current: null }}
-        title={props.title}
+        title={values.title}
         subtitle={
-          props.subtitle ?? localizationKeys('configureSSO.resetConnectionDialog.subtitle', { name: 'Acme SSO' })
+          values.subtitle ?? localizationKeys('configureSSO.resetConnectionDialog.subtitle', { name: 'Acme SSO' })
         }
-        confirmButtonLabel={props.confirmButtonLabel}
+        confirmButtonLabel={values.confirmButtonLabel}
       />
-    </CardStateProvider>,
-    { wrapper },
+    </CardStateProvider>
   );
-  return { ...utils, onClose };
+  const utils = render(dialog(props), { wrapper });
+  return {
+    ...utils,
+    onClose,
+    rerenderDialog: (values: typeof props) => utils.rerender(dialog({ ...props, ...values })),
+  };
 };
 
 const resetMocks = () => {
@@ -49,6 +57,52 @@ const resetMocks = () => {
 };
 
 describe('ResetConnectionDialog', () => {
+  it('requires fresh confirmation when the target changes with the same display name', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    const { userEvent, rerenderDialog } = renderDialog(wrapper);
+    await userEvent.type(screen.getByLabelText(/below to continue/i), 'Acme Inc');
+    rerenderDialog({ requestKey: 'idn_connection_2' });
+    expect(screen.getByLabelText(/below to continue/i)).toHaveValue('');
+    expect(screen.getByRole('button', { name: 'Reset connection' })).toBeDisabled();
+  });
+
+  it('clears confirmation when the required display value changes', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    const { userEvent, rerenderDialog } = renderDialog(wrapper);
+    await userEvent.type(screen.getByLabelText(/below to continue/i), 'Acme Inc');
+    rerenderDialog({ confirmationValue: 'Second organization' });
+    expect(screen.getByLabelText(/below to continue/i)).toHaveValue('');
+  });
+
+  it('keeps an earlier completion from closing or settling a later target request', async () => {
+    resetMocks();
+    const earlier = createDeferredPromise<void>();
+    const current = createDeferredPromise<void>();
+    deleteConnection.mockReturnValueOnce(earlier.promise).mockReturnValueOnce(current.promise);
+    const { wrapper } = await createFixtures();
+    const { userEvent, rerenderDialog, onClose } = renderDialog(wrapper);
+    await userEvent.type(screen.getByLabelText(/below to continue/i), 'Acme Inc');
+    await userEvent.click(screen.getByRole('button', { name: 'Reset connection' }));
+    rerenderDialog({ requestKey: 'idn_connection_2' });
+    await userEvent.type(screen.getByLabelText(/below to continue/i), 'Acme Inc');
+    const button = screen.getByRole('button', { name: 'Reset connection' });
+    await userEvent.click(button);
+    expect(deleteConnection).toHaveBeenLastCalledWith('idn_connection_2');
+    await act(async () => {
+      earlier.resolve();
+      await earlier.promise;
+    });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(button).toBeDisabled();
+    await act(async () => {
+      current.resolve();
+      await current.promise;
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it('does not render when `isOpen` is `false`', async () => {
     resetMocks();
     const { wrapper } = await createFixtures();

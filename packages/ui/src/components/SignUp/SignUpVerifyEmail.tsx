@@ -1,13 +1,9 @@
 import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { useEnvironment } from '../../contexts';
-import { SignUpEmailCodeCard } from './SignUpEmailCodeCard';
-import { SignUpEmailLinkCard } from './SignUpEmailLinkCard';
+import { useSignUpVerifyEmailModel } from './sign-up-verify-email.model';
+import { SignUpVerifyEmailView } from './sign-up-verify-email.view';
 
 export const SignUpVerifyEmail = withCardStateProvider(() => {
-  const { userSettings } = useEnvironment();
-  const { attributes } = userSettings;
-  const emailLinkStrategyEnabled = attributes.email_address?.verifications?.includes('email_link');
-
-  return emailLinkStrategyEnabled ? <SignUpEmailLinkCard /> : <SignUpEmailCodeCard />;
+  const model = useSignUpVerifyEmailModel();
+  return <SignUpVerifyEmailView emailLinkStrategyEnabled={model.emailLinkStrategyEnabled} />;
 });

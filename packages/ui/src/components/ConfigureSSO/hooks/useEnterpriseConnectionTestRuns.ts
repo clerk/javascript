@@ -1,6 +1,6 @@
 import { __internal_useOrganizationEnterpriseConnectionTestRuns } from '@clerk/shared/react';
 import type { EnterpriseConnectionResource, EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 /** Page size for the paginated list; the success probe is a separate query. */
 export const TEST_RUNS_PAGE_SIZE = 5;
@@ -73,9 +73,19 @@ export interface EnterpriseConnectionTestRuns {
 export const useEnterpriseConnectionTestRuns = (
   connection: EnterpriseConnectionResource | undefined,
   active = true,
+  ownerKey = '',
 ): EnterpriseConnectionTestRuns => {
   const enterpriseConnectionId = connection?.id ?? null;
-  const [page, setPage] = useState(1);
+  const scopeKey = JSON.stringify([ownerKey, enterpriseConnectionId]);
+  const scope = useRef({ key: scopeKey, version: 0 });
+  if (scope.current.key !== scopeKey) {
+    scope.current = { key: scopeKey, version: scope.current.version + 1 };
+  }
+  const version = scope.current.version;
+  const [paging, setPaging] = useState({ version, page: 1 });
+  const page = paging.version === version ? paging.page : 1;
+  const setPage = useCallback((page: number) => setPaging({ version, page }), [version]);
+  const loadedScope = useRef(scopeKey);
 
   // Success probe: a single, success-filtered row purely to answer
   // `hasSuccessfulTestRun`. Distinct cache key from the list below, and
@@ -107,8 +117,11 @@ export const useEnterpriseConnectionTestRuns = (
     enterpriseConnectionId,
     params: { initialPage: page, pageSize: TEST_RUNS_PAGE_SIZE },
     enabled: active,
-    keepPreviousData: true,
+    keepPreviousData: loadedScope.current === scopeKey,
   });
+  if (listData !== undefined) {
+    loadedScope.current = scopeKey;
+  }
 
   const refresh = useCallback(
     (options?: RefreshTestRunsOptions) => {

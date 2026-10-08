@@ -19,27 +19,50 @@ const [FormState, useFormState] = createContextAndHook<{
   submittedWithEnter: boolean;
 }>('FormState');
 
-type FormProps = PropsOfComponent<typeof FormPrim>;
+type FormProps = Omit<PropsOfComponent<typeof FormPrim>, 'onSubmit'> & {
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void | Promise<unknown>;
+};
 
 const FormRoot = (props: FormProps): JSX.Element => {
   const card = useCardState();
   const status = useLoadingStatus();
   const [submittedWithEnter, setSubmittedWithEnter] = useState(false);
+  const mounted = React.useRef(true);
+  const pending = React.useRef<() => void>();
+  const latest = React.useRef({ card, status });
+  latest.current = { card, status };
+  React.useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      if (pending.current) {
+        pending.current();
+        pending.current = undefined;
+      }
+    };
+  }, []);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
     e.stopPropagation();
-    if (!props.onSubmit) {
+    if (!mounted.current || pending.current || !props.onSubmit || latest.current.card.isLoading) {
       return;
     }
+    const release = latest.current.card.beginRequest();
+    if (!release) {
+      return;
+    }
+    pending.current = release;
     try {
-      card.setLoading();
-      status.setLoading();
+      latest.current.status.setLoading();
       setSubmittedWithEnter(true);
       await props.onSubmit(e);
     } finally {
-      card.setIdle();
-      status.setIdle();
+      if (mounted.current && pending.current === release) {
+        pending.current();
+        pending.current = undefined;
+        latest.current.status.setIdle();
+      }
     }
   };
 
@@ -82,10 +105,10 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
       elementDescriptor={descriptors.formButtonPrimary}
       block
       textVariant='buttonLarge'
-      isLoading={isLoading}
-      isDisabled={isDisabled}
       type='submit'
       {...props}
+      isLoading={isLoading || props.isLoading}
+      isDisabled={isDisabled || props.isDisabled}
       localizationKey={props.localizationKey || localizationKeys('formButtonPrimary')}
     />
   );
@@ -99,8 +122,8 @@ const FormReset = (props: PropsOfComponent<typeof Button>) => {
       block
       variant='ghost'
       type='reset'
-      isDisabled={isLoading || isDisabled}
       {...props}
+      isDisabled={isLoading || isDisabled || props.isDisabled}
     />
   );
 };

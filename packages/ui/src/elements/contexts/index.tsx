@@ -19,6 +19,8 @@ type State = {
 type CardStateCtxValue = {
   state: State;
   setState: React.Dispatch<React.SetStateAction<State>>;
+  loading: React.MutableRefObject<boolean>;
+  request: React.MutableRefObject<object | undefined>;
 };
 
 const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('CardState');
@@ -26,6 +28,8 @@ const [CardStateCtx, _useCardState] = createContextAndHook<CardStateCtxValue>('C
 export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const { translateError } = useLocalizations();
   const router = useRouter();
+  const loading = React.useRef(false);
+  const request = React.useRef<object>();
 
   const [state, setState] = React.useState<State>(() => {
     const lastError = window?.Clerk?.__internal_last_error || undefined;
@@ -40,18 +44,41 @@ export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
     }
   }, [translateError, setState, router.currentPath]);
 
-  const value = React.useMemo(() => ({ value: { state, setState } }), [state, setState]);
+  const value = React.useMemo(() => ({ value: { state, setState, loading, request } }), [state, setState]);
   return <CardStateCtx.Provider value={value}>{props.children}</CardStateCtx.Provider>;
 };
 
 export const useCardState = () => {
-  const { state, setState } = _useCardState();
+  const { state, setState, loading, request } = _useCardState();
   const { translateError } = useLocalizations();
 
-  const setIdle = (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata }));
+  const setIdle = (metadata?: Metadata) => {
+    if (request.current) {
+      return;
+    }
+    loading.current = false;
+    setState(s => ({ ...s, status: 'idle', metadata }));
+  };
   const setError = (metadata: CardError) =>
     setState(s => ({ ...s, error: translateError(metadata), rawError: metadata || undefined }));
-  const setLoading = (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata }));
+  const setLoading = (metadata?: Metadata) => {
+    loading.current = true;
+    setState(s => ({ ...s, status: 'loading', metadata }));
+  };
+  const beginRequest = (metadata?: Metadata): (() => void) | undefined => {
+    if (loading.current || request.current) {
+      return;
+    }
+    const owner = {};
+    request.current = owner;
+    setLoading(metadata);
+    return () => {
+      if (request.current === owner) {
+        request.current = undefined;
+        setIdle(metadata);
+      }
+    };
+  };
   const runAsync = async <T = unknown,>(cb: Promise<T> | (() => Promise<T>), metadata?: Metadata) => {
     setLoading(metadata);
     return (typeof cb === 'function' ? cb() : cb)
@@ -63,6 +90,7 @@ export const useCardState = () => {
 
   return {
     setIdle,
+    beginRequest,
     setError,
     setLoading,
     runAsync,

@@ -1,51 +1,35 @@
-import { useClerk } from '@clerk/shared/react';
 import type { WaitlistModalProps } from '@clerk/shared/types';
 
-import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { useWaitlistContext, WaitlistContext } from '../../contexts';
-import { Flow, localizationKeys } from '../../customizables';
+import { WaitlistContext } from '../../contexts';
 import { Route, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
-import { WaitlistForm } from './WaitlistForm';
+import { useWaitlistController } from './waitlist.controller';
+import type { WaitlistModel } from './waitlist.model';
+import { useWaitlistModel } from './waitlist.model';
+import { WaitlistView } from './waitlist.view';
 
-const _Waitlist = () => {
-  const clerk = useClerk();
-  const ctx = useWaitlistContext();
-  const { signInUrl } = ctx;
-
-  const initialValues = ctx.initialValues || {};
-
-  const formState = {
-    emailAddress: useFormControl('emailAddress', initialValues.emailAddress || '', {
-      type: 'email',
-      label: localizationKeys('formFieldLabel__emailAddress'),
-      placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
-    }),
-  };
+const WaitlistContent = withCardStateProvider(({ model }: { model: WaitlistModel }) => {
+  const controller = useWaitlistController(model);
 
   return (
-    <Flow.Root flow='waitlist'>
-      <Card.Root>
-        <Card.Content>
-          <WaitlistForm formState={formState} />
-        </Card.Content>
-        <Card.Footer>
-          <Card.Action elementId='waitlist'>
-            <Card.ActionText localizationKey={localizationKeys('waitlist.start.actionText')} />
-            <Card.ActionLink
-              localizationKey={localizationKeys('waitlist.start.actionLink')}
-              to={clerk.buildUrlWithAuth(signInUrl)}
-            />
-          </Card.Action>
-        </Card.Footer>
-      </Card.Root>
-    </Flow.Root>
+    <WaitlistView
+      {...controller}
+      signInHref={model.signInHref}
+      hasAfterJoinWaitlistUrl={model.hasAfterJoinWaitlistUrl}
+    />
+  );
+});
+
+export const Waitlist = () => {
+  const model = useWaitlistModel();
+  return (
+    <WaitlistContent
+      key={model.requestKey}
+      model={model}
+    />
   );
 };
-
-export const Waitlist = withCardStateProvider(_Waitlist);
 
 export const WaitlistModal = (props: WaitlistModalProps): JSX.Element => {
   const waitlistProps = {

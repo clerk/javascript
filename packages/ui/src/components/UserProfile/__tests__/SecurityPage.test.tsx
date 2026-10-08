@@ -367,6 +367,32 @@ describe('SecurityPage', () => {
     });
   });
 
+  it('refreshes the device list after remote device sign-out', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    const remote = {
+      id: 'session_remote',
+      status: 'active',
+      lastActiveAt: new Date(),
+      latestActivity: { id: 'activity_remote', deviceType: 'Remote device', browserName: 'Firefox' },
+      actor: null,
+      revoke: vi.fn(),
+    } as unknown as SessionWithActivitiesResource;
+    remote.revoke = vi.fn().mockResolvedValue({ ...remote, status: 'ended' });
+    fixtures.clerk
+      .user!.getSessions.mockResolvedValueOnce(Object.freeze([remote]) as unknown as SessionWithActivitiesResource[])
+      .mockResolvedValue([]);
+    const { findByText, getByRole, findByRole, queryByText, userEvent } = render(<SecurityPage />, { wrapper });
+    await findByText('Remote device');
+    await userEvent.click(getByRole('button', { name: 'Open menu' }));
+    await userEvent.click(await findByRole('menuitem', { name: 'Sign out of device' }));
+
+    await waitFor(() => expect(fixtures.clerk.user!.getSessions).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(queryByText('Remote device')).not.toBeInTheDocument());
+    expect(remote.revoke).toHaveBeenCalledOnce();
+  });
+
   it('does not leak the previous user device activity across a user switch', async () => {
     const makeSession = (sessionId: string, city: string) =>
       ({

@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { WizardConfig } from '../reducer';
@@ -574,5 +575,76 @@ describe('useWizardMachine — reachability clamp (self-correct on a broken isRe
     expect(parent.goNext).not.toHaveBeenCalled();
     expect(parent.goPrev).not.toHaveBeenCalled();
     expect(parent.goToStep).not.toHaveBeenCalled();
+  });
+});
+
+describe('useWizardMachine lifecycle', () => {
+  it.each(['goNext', 'goPrev'] as const)('blocks retained %s after a nested wizard closes', action => {
+    const parent = makeParent();
+    const { result, unmount } = renderMachine({ config: cfg([{ id: 'only' }]), parentWizard: parent });
+    const retained = result.current[action];
+    unmount();
+    retained();
+    expect(parent[action]).not.toHaveBeenCalled();
+  });
+
+  it('does not evaluate a retained jump guard after closure', () => {
+    const guard = vi.fn(() => true);
+    const { result, unmount } = renderMachine({
+      config: cfg([{ id: 'first' }, { id: 'second', isReachable: guard }]),
+      initialStepId: 'first',
+    });
+    const retained = result.current.goToStep;
+    unmount();
+    guard.mockClear();
+    retained('second');
+    expect(guard).not.toHaveBeenCalled();
+  });
+
+  it('does not evaluate a retained forward guard after closure', () => {
+    const guard = vi.fn(() => true);
+    const { result, unmount } = renderMachine({
+      config: cfg([{ id: 'first' }, { id: 'second', isReachable: guard }]),
+      initialStepId: 'first',
+    });
+    const retained = result.current.goNext;
+    unmount();
+    guard.mockClear();
+    retained();
+    expect(guard).not.toHaveBeenCalled();
+  });
+
+  it('keeps navigation active after StrictMode effect replay', () => {
+    const parent = makeParent();
+    const { result } = renderHook(
+      () =>
+        useWizardMachine({
+          config: cfg([{ id: 'first' }, { id: 'second' }]),
+          parentWizard: parent,
+          initialStepId: 'first',
+        }),
+      { wrapper: StrictMode },
+    );
+    act(() => result.current.goNext());
+    expect(result.current.current).toBe('second');
+    act(() => result.current.goNext());
+    expect(parent.goNext).toHaveBeenCalledTimes(1);
+    act(() => result.current.goToStep('first'));
+    expect(result.current.current).toBe('first');
+    act(() => result.current.goPrev());
+    expect(parent.goPrev).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the current parent through a retained active callback', () => {
+    const parent = makeParent();
+    const replacement = makeParent();
+    const config = cfg([{ id: 'only' }]);
+    const { result, rerender } = renderMachine({ config, parentWizard: parent });
+    const retained = result.current.goNext;
+    rerender({ config, parentWizard: replacement, initialStepId: undefined });
+    expect(result.current.goNext).toBe(retained);
+    act(() => retained());
+    expect(parent.goNext).not.toHaveBeenCalled();
+    expect(replacement.goNext).toHaveBeenCalledTimes(1);
   });
 });

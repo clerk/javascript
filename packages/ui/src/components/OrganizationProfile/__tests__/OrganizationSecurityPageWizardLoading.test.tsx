@@ -60,6 +60,8 @@ vi.mock('../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection', () => ({
   useOrganizationEnterpriseConnection: () => {
     const isLoading = React.useSyncExternalStore(loadingStore.subscribe, loadingStore.get, loadingStore.get);
     return {
+      canRun: () => true,
+      ownerKey: 'owner',
       isLoading,
       user: { primaryEmailAddress: { emailAddress: 'test@clerk.com' } },
       session: {},

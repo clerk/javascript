@@ -1,4 +1,3 @@
-import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
   CreateEmailLinkFlowReturn,
@@ -13,6 +12,7 @@ import type {
   VerificationResource,
 } from '@clerk/shared/types';
 
+import { createVerificationFlow } from '../../utils/createVerificationFlow';
 import { BaseResource, IdentificationLink, Verification } from './internal';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {
@@ -52,65 +52,29 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource> => {
-    const { run, stop } = Poller();
-
-    const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<EmailAddressResource> => {
-      await this.prepareVerification({
-        strategy: 'email_link',
-        redirectUrl: redirectUrl,
-      });
-      return new Promise((resolve, reject) => {
-        void run(() => {
-          return this.reload()
-            .then(res => {
-              if (res.verification.status === 'verified') {
-                stop();
-                resolve(res);
-              }
-            })
-            .catch(err => {
-              stop();
-              reject(err);
-            });
-        });
-      });
-    };
-    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
+    const flow = createVerificationFlow<StartEmailLinkFlowParams, EmailAddressResource>({
+      prepare: ({ redirectUrl }) => this.prepareVerification({ strategy: 'email_link', redirectUrl }),
+      reload: () => this.reload(),
+      isComplete: resource => resource.verification.status === 'verified',
+    });
+    return { startEmailLinkFlow: flow.start, cancelEmailLinkFlow: flow.cancel };
   };
 
   createEnterpriseSSOLinkFlow = (): CreateEnterpriseSSOLinkFlowReturn<
     StartEnterpriseSSOLinkFlowParams,
     EmailAddressResource
   > => {
-    const { run, stop } = Poller();
-
-    const startEnterpriseSSOLinkFlow = async ({
-      redirectUrl,
-    }: StartEnterpriseSSOLinkFlowParams): Promise<EmailAddressResource> => {
-      const response = await this.prepareVerification({
-        strategy: 'enterprise_sso',
-        redirectUrl,
-      });
-      if (!response.verification.externalVerificationRedirectURL) {
-        throw Error('Unexpected: External verification redirect URL is missing');
-      }
-      return new Promise((resolve, reject) => {
-        void run(() => {
-          return this.reload()
-            .then(res => {
-              if (res.verification.status === 'verified') {
-                stop();
-                resolve(res);
-              }
-            })
-            .catch(err => {
-              stop();
-              reject(err);
-            });
-        });
-      });
-    };
-    return { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow: stop };
+    const flow = createVerificationFlow<StartEnterpriseSSOLinkFlowParams, EmailAddressResource>({
+      prepare: async ({ redirectUrl }) => {
+        const response = await this.prepareVerification({ strategy: 'enterprise_sso', redirectUrl });
+        if (!response.verification.externalVerificationRedirectURL) {
+          throw Error('Unexpected: External verification redirect URL is missing');
+        }
+      },
+      reload: () => this.reload(),
+      isComplete: resource => resource.verification.status === 'verified',
+    });
+    return { startEnterpriseSSOLinkFlow: flow.start, cancelEnterpriseSSOLinkFlow: flow.cancel };
   };
 
   destroy = (): Promise<void> => this._baseDelete();

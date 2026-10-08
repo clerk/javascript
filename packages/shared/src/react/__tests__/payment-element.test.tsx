@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { PaymentElementCheckoutData } from '../billing/payment-element';
 import { __experimental_PaymentElement, __experimental_PaymentElementProvider } from '../billing/payment-element';
 import { ClerkInstanceContext, OptionsContext } from '../contexts';
 
@@ -15,7 +16,14 @@ vi.mock('../stripe-react', () => ({
       {children}
     </div>
   ),
-  PaymentElement: ({ fallback }: { fallback?: React.ReactNode }) => <div>{fallback}</div>,
+  PaymentElement: ({ fallback, options }: { fallback?: React.ReactNode; options?: any }) => (
+    <div
+      data-testid='payment-element'
+      data-recurring={JSON.stringify(options?.applePay?.recurringPaymentRequest)}
+    >
+      {fallback}
+    </div>
+  ),
   useElements: () => null,
   useStripe: () => null,
 }));
@@ -189,7 +197,7 @@ describe('PaymentElement Localization', () => {
     },
   };
 
-  const renderWithLocale = (locale: string) => {
+  const renderWithLocale = (locale: string, checkout: PaymentElementCheckoutData = mockCheckout) => {
     // Mock the __internal_getOption to return the expected localization
     mockGetOption.mockImplementation(key => {
       if (key === 'localization') {
@@ -205,13 +213,31 @@ describe('PaymentElement Localization', () => {
     return render(
       <ClerkInstanceContext.Provider value={{ value: mockClerk as any }}>
         <OptionsContext.Provider value={options}>
-          <__experimental_PaymentElementProvider checkout={mockCheckout}>
+          <__experimental_PaymentElementProvider checkout={checkout}>
             <__experimental_PaymentElement fallback={<div>Loading...</div>} />
           </__experimental_PaymentElementProvider>
         </OptionsContext.Provider>
       </ClerkInstanceContext.Provider>,
     );
   };
+
+  it.each(['month', 'annual'] as const)('configures recurring payments from plain %s checkout data', planPeriod => {
+    renderWithLocale('en', {
+      plan: { name: 'Plain Plan' },
+      totals: { totalDueNow: { amount: 1800 }, grandTotal: { amount: 2000 } },
+      planPeriod,
+    });
+
+    expect(JSON.parse(screen.getByTestId('payment-element').getAttribute('data-recurring')!)).toEqual({
+      paymentDescription: '',
+      managementURL: 'https://example.com/profile',
+      regularBilling: {
+        amount: 1800,
+        label: 'Plain Plan',
+        recurringPaymentIntervalUnit: planPeriod === 'annual' ? 'year' : 'month',
+      },
+    });
+  });
 
   it('should pass the correct locale to Stripe Elements', () => {
     renderWithLocale('es');

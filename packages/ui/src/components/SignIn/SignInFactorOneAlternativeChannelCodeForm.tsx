@@ -1,18 +1,11 @@
-import { isUserLockedError } from '@clerk/shared/error';
-import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
-import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeFactor, SignInFactor } from '@clerk/shared/types';
 
-import { useCardState } from '@/ui/elements/contexts';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
-import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
-import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn, useSignInContext } from '../../contexts';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { type LocalizationKey, localizationKeys } from '../../localization';
-import { useRouter } from '../../router';
-import { navigateOnSignInProtectGate } from './handleProtectCheck';
+import { type LocalizationKey } from '../../localization';
+import { useSignInFactorOneAlternativeChannelCodeController } from './sign-in-factor-one-alternative-channel-code.controller';
+import { useSignInFactorOneAlternativeChannelCodeModel } from './sign-in-factor-one-alternative-channel-code.model';
+import { SignInFactorOneAlternativeChannelCodeView } from './sign-in-factor-one-alternative-channel-code.view';
 
 export type SignInFactorOneAlternativeChannelCodeCard = Pick<
   VerificationCodeCardProps,
@@ -32,90 +25,16 @@ export type SignInFactorOneAlternativeChannelCodeFormProps = SignInFactorOneAlte
 };
 
 export const SignInFactorOneAlternativeChannelCodeForm = (props: SignInFactorOneAlternativeChannelCodeFormProps) => {
-  const signIn = useCoreSignIn();
-  const card = useCardState();
-  const { navigate } = useRouter();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
-  const { setActive } = useClerk();
-  const supportEmail = useSupportEmail();
-  const clerk = useClerk();
-  const channel = props.factor.channel;
-
-  const shouldAvoidPrepare = signIn.firstFactorVerification.status === 'verified' && props.factorAlreadyPrepared;
-
-  const goBack = () => {
-    return navigate('../');
-  };
-
-  const prepare = () => {
-    if (shouldAvoidPrepare) {
-      return;
-    }
-
-    void signIn
-      .prepareFirstFactor({ ...props.factor, channel } as PhoneCodeFactor)
-      .then(() => props.onFactorPrepare())
-      .catch(err => handleError(err, [], card.setError));
-  };
-
-  const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    signIn
-      .attemptFirstFactor({ strategy: props.factor.strategy, code })
-      .then(async res => {
-        await resolve();
-
-        if (navigateOnSignInProtectGate(res, navigate, '../protect-check')) {
-          return;
-        }
-
-        switch (res.status) {
-          case 'complete':
-            return setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
-              },
-            });
-          case 'needs_second_factor':
-            return navigate('../factor-two');
-          case 'needs_new_password':
-            return navigate('../reset-password');
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
-      })
-      .catch(err => {
-        if (isUserLockedError(err)) {
-          // @ts-expect-error -- private method for the time being
-          return clerk.__internal_navigateWithError('..', err.errors[0]);
-        }
-
-        return reject(err);
-      });
-  };
-
-  // This is used on clicking "Send code via SMS instead"
-  const prepareWithSMS = () => {
-    card.setError(undefined);
-    props.onChangePhoneCodeChannel({ ...props.factor, channel: undefined } as SignInFactor);
-  };
-
+  const model = useSignInFactorOneAlternativeChannelCodeModel(props);
+  const controller = useSignInFactorOneAlternativeChannelCodeController(model);
   return (
-    <VerificationCodeCard
+    <SignInFactorOneAlternativeChannelCodeView
       cardTitle={props.cardTitle}
       cardSubtitle={props.cardSubtitle}
       inputLabel={props.inputLabel}
       resendButton={props.resendButton}
-      onCodeEntryFinishedAction={action}
-      onResendCodeClicked={prepare}
-      safeIdentifier={props.factor.safeIdentifier}
-      profileImageUrl={signIn.userData.imageUrl}
-      identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__phoneNumber')}
-      alternativeMethodsLabel={localizationKeys('footerActionLink__alternativePhoneCodeProvider')}
-      onShowAlternativeMethodsClicked={prepareWithSMS}
-      showAlternativeMethods
-      onIdentityPreviewEditClicked={goBack}
       onBackLinkClicked={props.onBackLinkClicked}
+      {...controller}
     />
   );
 };

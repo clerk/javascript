@@ -3,13 +3,18 @@ import React from 'react';
 type OnPrintCallback = () => void;
 type UsePrintableReturn = {
   print: () => void;
-  printableProps: { onPrint: (cb: OnPrintCallback) => void };
+  printableProps: { onPrint: (cb: OnPrintCallback) => () => void };
 };
 
 export const usePrintable = (): UsePrintableReturn => {
-  const callbacks: OnPrintCallback[] = [];
-  const onPrint = (cb: OnPrintCallback) => callbacks.push(cb);
-  const print = () => callbacks.forEach(cb => cb());
+  const callbacks = React.useRef(new Set<OnPrintCallback>());
+  const onPrint = React.useCallback((cb: OnPrintCallback) => {
+    callbacks.current.add(cb);
+    return () => {
+      callbacks.current.delete(cb);
+    };
+  }, []);
+  const print = React.useCallback(() => callbacks.current.forEach(cb => cb()), []);
   return { print, printableProps: { onPrint } };
 };
 
@@ -17,9 +22,17 @@ export const PrintableComponent = (props: UsePrintableReturn['printableProps'] &
   const { children, onPrint } = props;
   const ref = React.useRef<HTMLDivElement>(null);
 
-  onPrint(() => {
-    printContentsOfElementViaIFrame(ref);
-  });
+  React.useEffect(() => {
+    let release: (() => void) | undefined;
+    const unregister = onPrint(() => {
+      release?.();
+      release = printContentsOfElementViaIFrame(ref);
+    });
+    return () => {
+      unregister();
+      release?.();
+    };
+  }, [onPrint, children]);
 
   return (
     <div
@@ -67,17 +80,59 @@ const printContentsOfElementViaIFrame = (elementRef: React.MutableRefObject<HTML
   // frame.style.height = '500px';
   // frame.style.border = '0px';
 
+  let active = true;
+  let printWindow: Window | null = null;
+  let timer: number | undefined;
+  const release = () => {
+    if (!active) {
+      return;
+    }
+    active = false;
+    if (timer !== undefined) {
+      window.clearTimeout(timer);
+    }
+    printWindow?.removeEventListener('afterprint', onAfterPrint);
+    printWindow = null;
+    if (frame.contentDocument?.body) {
+      frame.contentDocument.body.innerHTML = '';
+    }
+    frame.onload = null;
+    frame.onerror = null;
+    frame.remove();
+  };
+  const onAfterPrint = () => {
+    if (timer === undefined) {
+      timer = window.setTimeout(release, 0);
+    }
+  };
+  frame.onerror = release;
   frame.onload = () => {
-    copyStyles(frame);
-    setPrintingStyles(frame);
-    if (frame.contentDocument && frame.contentWindow) {
+    if (!active) {
+      return;
+    }
+    frame.onload = null;
+    try {
+      copyStyles(frame);
+      setPrintingStyles(frame);
+      printWindow = frame.contentWindow;
+      if (!frame.contentDocument || !printWindow) {
+        release();
+        return;
+      }
       frame.contentDocument.body.innerHTML = content.innerHTML;
-      frame.contentWindow.print();
+      printWindow.addEventListener('afterprint', onAfterPrint);
+      printWindow.print();
+    } catch (error) {
+      release();
+      throw error;
     }
   };
 
-  // TODO: Cleaning this iframe is not always possible because
-  // .print() will not block. Leaving this iframe inside the DOM
-  // shouldn't be an issue, but is there any reliable way to remove it?
-  window.document.body.appendChild(frame);
+  try {
+    window.document.body.appendChild(frame);
+  } catch (error) {
+    release();
+    throw error;
+  }
+  return release;
 };

@@ -1,8 +1,9 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { act, render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { RemoveDomainDialog } from '../RemoveDomainDialog';
@@ -18,23 +19,30 @@ const renderDialog = (
     onClose?: () => void;
     domain?: string;
     isConnectionActive?: boolean;
+    scopeKey?: string;
   } = {},
 ) => {
   const onClose = props.onClose ?? vi.fn();
-  const utils = render(
+  const dialog = (values: typeof props) => (
     <CardStateProvider>
       <RemoveDomainDialog
-        isOpen={props.isOpen ?? true}
+        isOpen={values.isOpen ?? true}
         onClose={onClose}
-        domain={props.domain ?? 'acme.com'}
-        isConnectionActive={props.isConnectionActive ?? false}
+        domain={values.domain ?? 'acme.com'}
+        isConnectionActive={values.isConnectionActive ?? false}
+        scopeKey={values.scopeKey ?? 'first'}
+        canRun={() => true}
         onRemove={() => onRemove()}
         contentRef={{ current: null }}
       />
-    </CardStateProvider>,
-    { wrapper },
+    </CardStateProvider>
   );
-  return { ...utils, onClose };
+  const utils = render(dialog(props), { wrapper });
+  return {
+    ...utils,
+    onClose,
+    rerenderDialog: (values: typeof props) => utils.rerender(dialog({ ...props, ...values })),
+  };
 };
 
 const resetMocks = () => {
@@ -43,6 +51,66 @@ const resetMocks = () => {
 };
 
 describe('RemoveDomainDialog', () => {
+  it('updates its copy when the domain changes', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    const { rerenderDialog } = renderDialog(wrapper);
+    rerenderDialog({ domain: 'second.com' });
+    expect(screen.getByText("You're about to remove second.com from this enterprise connection.")).toBeInTheDocument();
+    expect(
+      screen.queryByText("You're about to remove acme.com from this enterprise connection."),
+    ).not.toBeInTheDocument();
+  });
+
+  it('updates the sign-in warning when activation changes', async () => {
+    resetMocks();
+    const { wrapper } = await createFixtures();
+    const { rerenderDialog } = renderDialog(wrapper);
+    rerenderDialog({ isConnectionActive: true });
+    expect(screen.getByText(/Users won't be able to sign-in with acme\.com anymore/i)).toBeInTheDocument();
+  });
+
+  it('keeps an earlier completion from closing or settling a newer domain request', async () => {
+    resetMocks();
+    const earlier = createDeferredPromise<void>();
+    const current = createDeferredPromise<void>();
+    onRemove.mockReturnValueOnce(earlier.promise).mockReturnValueOnce(current.promise);
+    const { wrapper } = await createFixtures();
+    const { userEvent, rerenderDialog, onClose } = renderDialog(wrapper);
+    await userEvent.click(screen.getByRole('button', { name: 'Remove domain' }));
+    rerenderDialog({ domain: 'second.com' });
+    const button = screen.getByRole('button', { name: 'Remove domain' });
+    expect(button).not.toBeDisabled();
+    await userEvent.click(button);
+    await act(async () => {
+      earlier.resolve();
+      await earlier.promise;
+    });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(button).toBeDisabled();
+    await act(async () => {
+      current.resolve();
+      await current.promise;
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears an earlier scope error when another connection opens the dialog', async () => {
+    resetMocks();
+    onRemove.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Request failed', {
+        status: 500,
+        data: [{ code: 'internal_server_error', message: 'Request failed', long_message: 'Earlier scope failed' }],
+      }),
+    );
+    const { wrapper } = await createFixtures();
+    const { userEvent, rerenderDialog } = renderDialog(wrapper);
+    await userEvent.click(screen.getByRole('button', { name: 'Remove domain' }));
+    expect(await screen.findByText('Earlier scope failed')).toBeInTheDocument();
+    rerenderDialog({ scopeKey: 'second' });
+    expect(screen.queryByText('Earlier scope failed')).not.toBeInTheDocument();
+  });
+
   it('does not render when `isOpen` is `false`', async () => {
     resetMocks();
     const { wrapper } = await createFixtures();

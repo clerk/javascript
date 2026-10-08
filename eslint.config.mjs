@@ -600,6 +600,32 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/ui - flow boundaries',
+    files: ['packages/ui/src/**/*.controller.{ts,tsx}', 'packages/ui/src/**/*.view.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "ImportDeclaration[source.value='@clerk/shared/react'][importKind!='type'] > ImportSpecifier[importKind!='type'][imported.name!='createContextAndHook']",
+          message:
+            'Import Clerk React hooks and components in a model. Controllers and views receive plain data and callbacks.',
+        },
+        {
+          selector:
+            "ImportDeclaration[source.value='@clerk/shared/react'][importKind!='type'] > :matches(ImportNamespaceSpecifier, ImportDefaultSpecifier)",
+          message:
+            'Import Clerk React hooks and components in a model. Controllers and views receive plain data and callbacks.',
+        },
+        {
+          selector: "ImportExpression[source.value='@clerk/shared/react']",
+          message:
+            'Import Clerk React hooks and components in a model. Controllers and views receive plain data and callbacks.',
+        },
+      ],
+    },
+  },
+  {
     name: 'packages/mosaic',
     files: ['packages/mosaic/src/**/*'],
     // Tests assert on style values they receive; they are not authoring styles.

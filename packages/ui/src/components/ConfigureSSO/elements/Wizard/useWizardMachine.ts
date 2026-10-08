@@ -1,13 +1,6 @@
 import React from 'react';
 
-import {
-  initialState,
-  isStepReachable,
-  reduce,
-  type WizardConfig,
-  type WizardEvent,
-  type WizardState,
-} from './reducer';
+import { initialState, isStepReachable, reduce, type WizardConfig, type WizardState } from './reducer';
 import type { WizardActiveStep, WizardContextValue } from './types';
 
 /**
@@ -51,7 +44,7 @@ interface UseWizardMachineArgs {
  * treats a boundary nav as a no-op.
  *
  * `configRef`/`stateRef` are mirrored during render (not a `useEffect`) so the
- * stable `dispatch` always sees the freshest config/state. The parent
+ * stable handlers always see the freshest config/state. The parent
  * fall-through runs in the handler body, NEVER inside a `setState` updater:
  * calling the parent's `setState` from a child updater triggers React's "cannot
  * update a component while rendering a different component" warning.
@@ -79,12 +72,24 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
 
   // Render-updated mirrors so the stable handlers below always see the freshest
   // config / parent / callback without taking them as deps (which would churn
-  // `dispatch`/`goNext`/`goPrev` identity every render).
+  // `goNext`/`goPrev`/`goToStep` identity every render).
   const configRef = React.useRef(config);
   configRef.current = config;
 
   const parentRef = React.useRef(parentWizard);
   parentRef.current = parentWizard;
+  const mounted = React.useRef(true);
+
+  React.useEffect(() => {
+    mounted.current = true;
+    configRef.current = config;
+    parentRef.current = parentWizard;
+    return () => {
+      mounted.current = false;
+      configRef.current = { descriptors: [] };
+      parentRef.current = null;
+    };
+  }, [config, parentWizard]);
 
   // Render-updated mirror of the live state so the stable handlers below can
   // read the current state in their body (and decide whether a transition is a
@@ -152,6 +157,9 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
     cfg.descriptors.findIndex(d => d.id === s.current);
 
   const goNext = React.useCallback(() => {
+    if (!mounted.current) {
+      return;
+    }
     const prev = stateRef.current;
     const cfg = configRef.current;
     const next = reduce(prev, { type: 'NEXT' }, cfg);
@@ -185,6 +193,9 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
   }, []);
 
   const goPrev = React.useCallback(() => {
+    if (!mounted.current) {
+      return;
+    }
     // Any explicit navigation abandons a pending forward advance.
     setPendingNextFrom(null);
     const prev = stateRef.current;
@@ -203,20 +214,15 @@ export const useWizardMachine = ({ config, parentWizard, initialStepId }: UseWiz
     setState(next);
   }, []);
 
-  const dispatch = React.useCallback((event: WizardEvent) => {
-    const prev = stateRef.current;
-    const next = reduce(prev, event, configRef.current);
+  const goToStep = React.useCallback((id: string) => {
+    if (!mounted.current) {
+      return;
+    }
+    // Any explicit navigation abandons a pending forward advance.
+    setPendingNextFrom(null);
+    const next = reduce(stateRef.current, { type: 'GOTO', step: id }, configRef.current);
     setState(next);
   }, []);
-
-  const goToStep = React.useCallback(
-    (id: string) => {
-      // Any explicit navigation abandons a pending forward advance.
-      setPendingNextFrom(null);
-      dispatch({ type: 'GOTO', step: id });
-    },
-    [dispatch],
-  );
 
   const current = state.current;
 

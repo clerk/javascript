@@ -1,70 +1,40 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useReverification, useUser } from '@clerk/shared/react';
-import type { BackupCodeResource } from '@clerk/shared/types';
-import React from 'react';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { FormButtonContainer } from '@/ui/elements/FormButtons';
-import type { FormProps } from '@/ui/elements/FormContainer';
-import { FormContainer } from '@/ui/elements/FormContainer';
-import { FullHeightLoader } from '@/ui/elements/FullHeightLoader';
-import { handleError } from '@/ui/utils/errorHandler';
+import { useMfaBackupCodeCreateController } from './mfa-backup-code-create.controller';
+import type { MfaBackupCodeCreateFormProps } from './mfa-backup-code-create.model';
+import { useMfaBackupCodeCreateModel } from './mfa-backup-code-create.model';
+import { MfaBackupCodeCreateView } from './mfa-backup-code-create.view';
 
-import { Button, descriptors, localizationKeys, Text, useAppearance } from '../../customizables';
-import { MfaBackupCodeList } from './MfaBackupCodeList';
+type Model = ReturnType<typeof useMfaBackupCodeCreateModel>;
 
-type MfaBackupCodeCreateFormProps = FormProps;
-export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCodeCreateFormProps) => {
-  const { onSuccess, onReset } = props;
-  const { user } = useUser();
-  const card = useCardState();
-  const { autoFocus: optionAutoFocus } = useAppearance().parsedOptions;
-  const createBackupCode = useReverification(() => user?.createBackupCode());
-  const [backupCode, setBackupCode] = React.useState<BackupCodeResource | undefined>(undefined);
-
-  React.useEffect(() => {
-    if (backupCode || !user) {
-      return;
-    }
-
-    void createBackupCode()
-      .then(backupCode => setBackupCode(backupCode))
-      .catch(err => {
-        if (isReverificationCancelledError(err)) {
-          return onReset();
-        }
-
-        handleError(err, [], card.setError);
-      });
-  }, []);
-
-  if (card.error) {
-    return <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')} />;
+export const MfaBackupCodeCreateForm = (props: MfaBackupCodeCreateFormProps & { model?: Model }) => {
+  if (props.model) {
+    return (
+      <MfaBackupCodeCreateContent
+        key={props.model.requestKey}
+        {...props}
+        model={props.model}
+      />
+    );
   }
+  return <MfaBackupCodeCreateStandalone {...props} />;
+};
 
+const MfaBackupCodeCreateStandalone = (props: MfaBackupCodeCreateFormProps) => {
+  const model = useMfaBackupCodeCreateModel();
   return (
-    <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
-      {!backupCode ? (
-        <FullHeightLoader />
-      ) : (
-        <>
-          <Text localizationKey={localizationKeys('userProfile.backupCodePage.successMessage')} />
-
-          <MfaBackupCodeList
-            subtitle={localizationKeys('userProfile.backupCodePage.subtitle__codelist')}
-            backupCodes={backupCode.codes}
-          />
-
-          <FormButtonContainer>
-            <Button
-              autoFocus={optionAutoFocus}
-              onClick={onSuccess}
-              localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
-              elementDescriptor={descriptors.formButtonPrimary}
-            />
-          </FormButtonContainer>
-        </>
-      )}
-    </FormContainer>
+    <MfaBackupCodeCreateContent
+      key={model.requestKey}
+      {...props}
+      model={model}
+    />
   );
-});
+};
+
+const MfaBackupCodeCreateContent = withCardStateProvider(
+  ({ model, ...props }: MfaBackupCodeCreateFormProps & { model: Model }) => {
+    const controller = useMfaBackupCodeCreateController(model, props);
+
+    return <MfaBackupCodeCreateView controller={controller} />;
+  },
+);

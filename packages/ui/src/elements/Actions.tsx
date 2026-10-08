@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Icon, Spinner, useLocalizations } from '../customizables';
@@ -30,7 +30,8 @@ export const SmallActions = (props: PropsOfComponent<typeof Flex>) => {
   return <Col {...props} />;
 };
 
-type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label'> & {
+type ActionProps = Omit<PropsOfComponent<typeof Button>, 'label' | 'onClick'> & {
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<unknown>;
   icon: React.ComponentType;
   trailing?: React.ReactNode;
   label: string | LocalizationKey;
@@ -76,6 +77,20 @@ export const SmallAction = (props: ActionProps) => {
 export const Action = (props: ActionProps) => {
   const card = useCardState();
   const status = useLoadingStatus();
+  const mounted = useRef(true);
+  const pending = useRef<() => void>();
+  const latest = useRef({ card, status });
+  latest.current = { card, status };
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      if (pending.current) {
+        pending.current();
+        pending.current = undefined;
+      }
+    };
+  }, []);
   const { t } = useLocalizations();
   const {
     icon,
@@ -93,14 +108,24 @@ export const Action = (props: ActionProps) => {
     ...rest
   } = props;
 
-  const onClick: React.MouseEventHandler<HTMLButtonElement> = async e => {
-    card.setLoading();
-    status.setLoading();
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!mounted.current || pending.current) {
+      return;
+    }
+    const release = latest.current.card.beginRequest();
+    if (!release) {
+      return;
+    }
+    pending.current = release;
+    latest.current.status.setLoading();
     try {
       await onClickProp?.(e);
     } finally {
-      card.setIdle();
-      status.setIdle();
+      if (mounted.current && pending.current === release) {
+        pending.current();
+        pending.current = undefined;
+        latest.current.status.setIdle();
+      }
     }
   };
 
@@ -122,7 +147,9 @@ export const Action = (props: ActionProps) => {
         sx,
       ]}
       isDisabled={card.isLoading}
-      onClick={onClick}
+      onClick={event => {
+        void handleClick(event);
+      }}
       {...rest}
     >
       <Flex

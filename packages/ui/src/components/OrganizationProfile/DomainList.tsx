@@ -1,191 +1,81 @@
-import { useOrganization } from '@clerk/shared/react';
 import type {
   GetDomainsParams,
-  OrganizationDomainResource,
   OrganizationDomainVerificationStatus,
   OrganizationEnrollmentMode,
 } from '@clerk/shared/types';
-import React, { useMemo } from 'react';
+import type { ReactNode } from 'react';
 
-import { ProfileSection } from '@/ui/elements/Section';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import { withProtect } from '@/common';
+import { Action } from '@/ui/elements/Action';
 
-import { Protect, withProtect } from '../../common';
-import { Box, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
-import { Action } from '../../elements/Action';
-import { useActionContext } from '../../elements/Action/ActionRoot';
-import { useInView } from '../../hooks';
-import type { PropsOfComponent } from '../../styledSystem';
-import { EnrollmentBadge } from './EnrollmentBadge';
-import { RemoveDomainScreen } from './RemoveDomainScreen';
-import { VerifiedDomainScreen } from './VerifiedDomainScreen';
-import { VerifyDomainScreen } from './VerifyDomainScreen';
+import { useDomainListController, useDomainMenuController } from './domain-list.controller';
+import { useDomainListModel } from './domain-list.model';
+import type { DomainListModel, DomainRow } from './domain-list.types';
+import { DomainListRowView, DomainListView } from './domain-list.view';
 
 type DomainListProps = GetDomainsParams & {
   verificationStatus?: OrganizationDomainVerificationStatus;
   enrollmentMode?: OrganizationEnrollmentMode;
-  fallback?: React.ReactNode;
+  fallback?: ReactNode;
 };
 
-const useMenuActions = (domain: OrganizationDomainResource): PropsOfComponent<typeof ThreeDotsMenu>['actions'] => {
-  const { open } = useActionContext();
-
-  const menuActions: PropsOfComponent<typeof ThreeDotsMenu>['actions'] = [];
-
-  if (domain.verification && domain.verification.status === 'verified') {
-    menuActions.push({
-      label: localizationKeys('organizationProfile.profilePage.domainSection.menuAction__manage'),
-      onClick: () => open('manage'),
-    });
-  } else {
-    menuActions.push({
-      label: localizationKeys('organizationProfile.profilePage.domainSection.menuAction__verify'),
-      onClick: () => open('verify'),
-    });
-  }
-
-  menuActions.push({
-    label: localizationKeys('organizationProfile.profilePage.domainSection.menuAction__remove'),
-    isDestructive: true,
-    onClick: () => open('remove'),
-  });
-
-  return menuActions;
+const DomainListRowContent = ({ row, canManageDomains }: { row: DomainRow; canManageDomains: boolean }) => {
+  const menu = useDomainMenuController(row.isVerificationComplete);
+  return (
+    <DomainListRowView
+      row={row}
+      menu={menu}
+      canManageDomains={canManageDomains}
+    />
+  );
 };
 
-type DomainListMenuProps = { domain: OrganizationDomainResource };
-const DomainListMenu = ({ domain }: DomainListMenuProps) => {
-  const actions = useMenuActions(domain);
-  return <ThreeDotsMenu actions={actions} />;
-};
+const DomainListRow = ({ row, canManageDomains }: { row: DomainRow; canManageDomains: boolean }) => (
+  <Action.Root>
+    <DomainListRowContent
+      row={row}
+      canManageDomains={canManageDomains}
+    />
+  </Action.Root>
+);
 
 export const DomainList = withProtect(
   (props: DomainListProps) => {
-    const { verificationStatus, enrollmentMode, fallback, ...rest } = props;
-    const { organization, domains } = useOrganization({
-      domains: {
-        infinite: true,
-        ...rest,
-      },
-    });
+    const { fallback, ...options } = props;
+    const model = useDomainListModel(options);
 
-    const { ref } = useInView({
-      threshold: 0,
-      onChange: inView => {
-        if (inView) {
-          void domains?.fetchNext?.();
-        }
-      },
-    });
-
-    const domainList = useMemo(() => {
-      if (!domains?.data) {
-        return [];
-      }
-
-      return domains.data.filter(d => {
-        let matchesStatus = true;
-        let matchesMode = true;
-        if (verificationStatus) {
-          matchesStatus = !!d.verification && d.verification.status === verificationStatus;
-        }
-        if (enrollmentMode) {
-          matchesMode = d.enrollmentMode === enrollmentMode;
-        }
-
-        return matchesStatus && matchesMode;
-      });
-    }, [domains?.data]);
-
-    if (!organization) {
+    if (!model.hasOrganization) {
       return null;
     }
-
-    const hasNextOrFetching = domains?.hasNextPage || domains?.isFetching;
-
-    if (domainList.length === 0 && !domains?.isLoading && !fallback) {
-      return null;
-    }
-
     return (
-      <ProfileSection.ItemList id='organizationDomains'>
-        {domainList.length === 0 && !domains?.isLoading && fallback}
-        {domainList.map(domain => {
-          return (
-            <Action.Root key={domain.id}>
-              <ProfileSection.Item
-                id='organizationDomains'
-                hoverable
-              >
-                <Flex sx={t => ({ gap: t.space.$1 })}>
-                  <Text>{domain.name}</Text>
-                  <EnrollmentBadge organizationDomain={domain} />
-                </Flex>
-
-                <Protect permission='org:sys_domains:manage'>
-                  <DomainListMenu domain={domain} />
-                </Protect>
-              </ProfileSection.Item>
-
-              <Action.Open value='remove'>
-                <Action.Card variant='destructive'>
-                  <RemoveDomainScreen domainId={domain.id} />
-                </Action.Card>
-              </Action.Open>
-
-              <Action.Open value='verify'>
-                <Action.Card>
-                  <VerifyDomainScreen domainId={domain.id} />
-                </Action.Card>
-              </Action.Open>
-
-              <Action.Open value='manage'>
-                <Action.Card>
-                  <VerifiedDomainScreen domainId={domain.id} />
-                </Action.Card>
-              </Action.Open>
-            </Action.Root>
-          );
-        })}
-
-        <Box
-          ref={domains?.hasNextPage && !domains.isFetching ? ref : undefined}
-          sx={{ visibility: 'hidden' }}
-        />
-
-        {hasNextOrFetching && domains.data.length === 0 && (
-          <Box
-            sx={[
-              t => ({
-                width: '100%',
-                height: t.space.$8,
-                position: 'relative',
-              }),
-            ]}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                margin: 'auto',
-                position: 'absolute',
-                // eslint-disable-next-line custom-rules/no-physical-css-properties -- Centering with transform: translateX(-50%)
-                left: '50%',
-                top: '50%',
-                transform: 'translateY(-50%) translateX(-50%)',
-              }}
-            >
-              <Spinner
-                size='sm'
-                colorScheme='primary'
-                elementDescriptor={descriptors.spinner}
-              />
-            </Box>
-          </Box>
-        )}
-      </ProfileSection.ItemList>
+      <DomainListContent
+        key={model.scope}
+        model={model}
+        fallback={fallback}
+      />
     );
   },
-  {
-    permission: 'org:sys_domains:read',
-  },
+  { permission: 'org:sys_domains:read' },
 );
+
+const DomainListContent = ({ model, fallback }: { model: DomainListModel; fallback?: ReactNode }) => {
+  const controller = useDomainListController(model);
+  if (controller.rows.length === 0 && !controller.isLoading && !fallback) {
+    return null;
+  }
+
+  return (
+    <DomainListView
+      controller={controller}
+      fallback={fallback}
+    >
+      {controller.rows.map(row => (
+        <DomainListRow
+          key={row.id}
+          row={row}
+          canManageDomains={controller.canManageDomains}
+        />
+      ))}
+    </DomainListView>
+  );
+};

@@ -35,7 +35,7 @@ const useAfterVerification = () => {
           return console.error(clerkInvalidFAPIResponse(sessionVerification.status, supportEmail));
       }
     },
-    [navigate, setActive, supportEmail],
+    [afterVerification, navigate, setActive, setCache, supportEmail],
   );
 
   return {

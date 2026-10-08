@@ -1,10 +1,10 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Box, Button, descriptors, Heading, Icon, Span, Text } from '../../customizables';
-import { useClipboard } from '../../hooks';
-import { Checkmark, Copy, Files } from '../../icons';
+import { Badge, Box, descriptors, Heading, Icon, Span, Text } from '../../customizables';
+import { Files } from '../../icons';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
+import { StatementCopyButton } from './statement-copy-button';
 
 /* -------------------------------------------------------------------------------------------------
  * Statement.Root
@@ -59,7 +59,7 @@ function Header({ title, id, status }: { title: string | LocalizationKey; id: st
             color: t.colors.$colorMutedForeground,
           })}
         >
-          <CopyButton
+          <StatementCopyButton
             copyLabel='Copy statement ID'
             text={id}
           />
@@ -337,7 +337,7 @@ function SectionContentDetailsListItem({
         {typeof value === 'string' ? (
           <>
             {valueCopyable ? (
-              <CopyButton
+              <StatementCopyButton
                 copyLabel='Copy statement ID'
                 text={value}
               />
@@ -413,37 +413,6 @@ function Footer({ label, value }: { label: string | LocalizationKey; value: stri
         </Text>
       </Span>
     </Box>
-  );
-}
-
-function CopyButton({ text, copyLabel = 'Copy' }: { text: string; copyLabel?: string }) {
-  const { onCopy, hasCopied } = useClipboard(text);
-
-  return (
-    <Button
-      elementDescriptor={descriptors.statementCopyButton}
-      variant='unstyled'
-      onClick={() => onCopy()}
-      sx={t => ({
-        color: 'inherit',
-        width: t.sizes.$4,
-        height: t.sizes.$4,
-        padding: 0,
-        borderRadius: t.radii.$sm,
-        '&:focus-visible': {
-          outline: '2px solid',
-          outlineColor: t.colors.$colorRing,
-        },
-      })}
-      focusRing={false}
-      aria-label={hasCopied ? 'Copied' : copyLabel}
-    >
-      <Icon
-        size='sm'
-        icon={hasCopied ? Checkmark : Copy}
-        aria-hidden
-      />
-    </Button>
   );
 }
 

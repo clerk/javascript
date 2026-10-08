@@ -1,21 +1,25 @@
-import { useOrganization } from '@clerk/shared/react';
-
-import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
-import { ProfileSection } from '@/ui/elements/Section';
-
-import { Protect, useProtect } from '../../common';
-import { useEnvironment } from '../../contexts';
-import { Col, localizationKeys, Text } from '../../customizables';
-import { Action } from '../../elements/Action';
-import { useActionContext } from '../../elements/Action/ActionRoot';
 import { DeleteOrganizationForm, LeaveOrganizationForm } from './ActionConfirmationPage';
 import { AddDomainForm } from './AddDomainForm';
 import { DomainList } from './DomainList';
+import { useOrganizationGeneralScreenController } from './organization-general.controller';
+import {
+  useOrganizationDeleteSectionModel,
+  useOrganizationDomainsSectionModel,
+  useOrganizationGeneralPageModel,
+  useOrganizationLeaveSectionModel,
+  useOrganizationProfileSectionModel,
+} from './organization-general.model';
+import {
+  OrganizationDeleteSectionView,
+  OrganizationDomainsSectionView,
+  OrganizationGeneralPageView,
+  OrganizationLeaveSectionView,
+  OrganizationProfileSectionView,
+} from './organization-general.view';
 import { ProfileForm } from './ProfileForm';
 
 const ProfileScreen = () => {
-  const { close } = useActionContext();
+  const { close } = useOrganizationGeneralScreenController();
   return (
     <ProfileForm
       onSuccess={close}
@@ -25,7 +29,7 @@ const ProfileScreen = () => {
 };
 
 const AddDomainScreen = () => {
-  const { close } = useActionContext();
+  const { close } = useOrganizationGeneralScreenController();
   return (
     <AddDomainForm
       onSuccess={close}
@@ -35,7 +39,7 @@ const AddDomainScreen = () => {
 };
 
 const LeaveOrganizationScreen = () => {
-  const { close } = useActionContext();
+  const { close } = useOrganizationGeneralScreenController();
   return (
     <LeaveOrganizationForm
       onSuccess={close}
@@ -45,7 +49,7 @@ const LeaveOrganizationScreen = () => {
 };
 
 const DeleteOrganizationScreen = () => {
-  const { close } = useActionContext();
+  const { close } = useOrganizationGeneralScreenController();
   return (
     <DeleteOrganizationForm
       onSuccess={close}
@@ -55,20 +59,15 @@ const DeleteOrganizationScreen = () => {
 };
 
 export const OrganizationGeneralPage = () => {
+  const model = useOrganizationGeneralPageModel();
+
   return (
-    <ProfileCard.Page>
-      <ProfileCard.PagePanel
-        pageId='organizationGeneral'
-        titleKey={localizationKeys('organizationProfile.start.headerTitle__general')}
-      >
-        <OrganizationProfileSection />
-        <Protect permission='org:sys_domains:read'>
-          <OrganizationDomainsSection />
-        </Protect>
-        <OrganizationLeaveSection />
-        <OrganizationDeleteSection />
-      </ProfileCard.PagePanel>
-    </ProfileCard.Page>
+    <OrganizationGeneralPageView
+      profile={<OrganizationProfileSection />}
+      domains={model.canReadDomains ? <OrganizationDomainsSection /> : null}
+      leave={<OrganizationLeaveSection />}
+      deleteSection={<OrganizationDeleteSection />}
+    />
   );
 };
 
@@ -79,51 +78,16 @@ export const OrganizationGeneralPage = () => {
  * @returns The profile section, or `null` when no organization is active.
  */
 export const OrganizationProfileSection = (): JSX.Element | null => {
-  const { organization } = useOrganization();
-
-  if (!organization) {
+  const model = useOrganizationProfileSectionModel();
+  if (!model.available) {
     return null;
   }
 
-  const profile = (
-    <OrganizationPreview
-      size='lg'
-      mainIdentifierVariant='subtitle'
-      organization={organization}
-    />
-  );
-
   return (
-    <ProfileSection.Root
-      title={localizationKeys('organizationProfile.start.profileSection.title')}
-      id='organizationProfile'
-    >
-      <Action.Root>
-        <Protect
-          permission={'org:sys_profile:manage'}
-          fallback={profile}
-        >
-          <Action.Closed value='edit'>
-            <ProfileSection.Item id='organizationProfile'>
-              {profile}
-
-              <Action.Trigger value='edit'>
-                <ProfileSection.Button
-                  id='organizationProfile'
-                  localizationKey={localizationKeys('organizationProfile.start.profileSection.primaryButton')}
-                />
-              </Action.Trigger>
-            </ProfileSection.Item>
-          </Action.Closed>
-        </Protect>
-
-        <Action.Open value='edit'>
-          <Action.Card>
-            <ProfileScreen />
-          </Action.Card>
-        </Action.Open>
-      </Action.Root>
-    </ProfileSection.Root>
+    <OrganizationProfileSectionView
+      model={model}
+      profileScreen={<ProfileScreen />}
+    />
   );
 };
 
@@ -134,58 +98,17 @@ export const OrganizationProfileSection = (): JSX.Element | null => {
  * there are no domains and the user cannot add any.
  */
 export const OrganizationDomainsSection = (): JSX.Element | null => {
-  const { organizationSettings } = useEnvironment();
-  const { organization, domains } = useOrganization({ domains: { infinite: true } });
-  const canManageDomains = useProtect({ permission: 'org:sys_domains:manage' });
-
-  if (!organizationSettings || !organization) {
-    return null;
-  }
-
-  if (!organizationSettings.domains.enabled) {
-    return null;
-  }
-
-  // Hide the section when there are no domains to show and the user cannot add
-  // any
-  if (!domains?.data?.length && !canManageDomains) {
+  const model = useOrganizationDomainsSectionModel();
+  if (!model.visible) {
     return null;
   }
 
   return (
-    <ProfileSection.Root
-      title={localizationKeys('organizationProfile.profilePage.domainSection.title')}
-      id='organizationDomains'
-      centered={false}
-    >
-      <Action.Root>
-        <DomainList />
-
-        <Protect permission='org:sys_domains:manage'>
-          <Action.Trigger value='add'>
-            <Col>
-              <ProfileSection.ArrowButton
-                localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.primaryButton')}
-                id='organizationDomains'
-              />
-              <Text
-                localizationKey={localizationKeys('organizationProfile.profilePage.domainSection.subtitle')}
-                sx={t => ({
-                  paddingInlineStart: t.space.$8x5,
-                })}
-                colorScheme='secondary'
-              />
-            </Col>
-          </Action.Trigger>
-
-          <Action.Open value='add'>
-            <Action.Card>
-              <AddDomainScreen />
-            </Action.Card>
-          </Action.Open>
-        </Protect>
-      </Action.Root>
-    </ProfileSection.Root>
+    <OrganizationDomainsSectionView
+      domainList={<DomainList />}
+      canManageDomains={model.canManageDomains}
+      addDomainScreen={<AddDomainScreen />}
+    />
   );
 };
 
@@ -195,49 +118,8 @@ export const OrganizationDomainsSection = (): JSX.Element | null => {
  * @returns The leave-organization section, or `null` when no organization is active.
  */
 export const OrganizationLeaveSection = (): JSX.Element | null => {
-  const { organization } = useOrganization();
-
-  if (!organization) {
-    return null;
-  }
-
-  return (
-    <ProfileSection.Root
-      id='organizationDanger'
-      title={localizationKeys('organizationProfile.profilePage.dangerSection.leaveOrganization.title')}
-    >
-      <Action.Root>
-        <Action.Closed value='leave'>
-          <ProfileSection.Item
-            sx={t => ({
-              paddingTop: 0,
-              paddingBottom: 0,
-              paddingInlineStart: t.space.$1,
-            })}
-            id='organizationDanger'
-          >
-            <Action.Trigger value='leave'>
-              <ProfileSection.Button
-                id='organizationDanger'
-                variant='ghost'
-                colorScheme='danger'
-                textVariant='buttonLarge'
-                localizationKey={localizationKeys(
-                  'organizationProfile.profilePage.dangerSection.leaveOrganization.title',
-                )}
-              />
-            </Action.Trigger>
-          </ProfileSection.Item>
-        </Action.Closed>
-
-        <Action.Open value='leave'>
-          <Action.Card variant='destructive'>
-            <LeaveOrganizationScreen />
-          </Action.Card>
-        </Action.Open>
-      </Action.Root>
-    </ProfileSection.Root>
-  );
+  const model = useOrganizationLeaveSectionModel();
+  return model.visible ? <OrganizationLeaveSectionView leaveScreen={<LeaveOrganizationScreen />} /> : null;
 };
 
 /**
@@ -247,55 +129,6 @@ export const OrganizationLeaveSection = (): JSX.Element | null => {
  * lacks `org:sys_profile:delete`, or admin delete is disabled.
  */
 export const OrganizationDeleteSection = (): JSX.Element | null => {
-  const { organization } = useOrganization();
-  const canDeleteOrganization = useProtect({ permission: 'org:sys_profile:delete' });
-
-  if (!organization) {
-    return null;
-  }
-
-  const adminDeleteEnabled = organization.adminDeleteEnabled;
-
-  if (!canDeleteOrganization || !adminDeleteEnabled) {
-    return null;
-  }
-
-  return (
-    <ProfileSection.Root
-      id='organizationDanger'
-      title={localizationKeys('organizationProfile.profilePage.dangerSection.deleteOrganization.title')}
-      sx={t => ({ marginBottom: t.space.$4 })}
-    >
-      <Action.Root>
-        <Action.Closed value='delete'>
-          <ProfileSection.Item
-            sx={t => ({
-              paddingTop: 0,
-              paddingBottom: 0,
-              paddingInlineStart: t.space.$1,
-            })}
-            id={'organizationDanger'}
-          >
-            <Action.Trigger value='delete'>
-              <ProfileSection.Button
-                id='organizationDanger'
-                variant='ghost'
-                colorScheme='danger'
-                textVariant='buttonLarge'
-                localizationKey={localizationKeys(
-                  'organizationProfile.profilePage.dangerSection.deleteOrganization.title',
-                )}
-              />
-            </Action.Trigger>
-          </ProfileSection.Item>
-        </Action.Closed>
-
-        <Action.Open value='delete'>
-          <Action.Card variant='destructive'>
-            <DeleteOrganizationScreen />
-          </Action.Card>
-        </Action.Open>
-      </Action.Root>
-    </ProfileSection.Root>
-  );
+  const model = useOrganizationDeleteSectionModel();
+  return model.visible ? <OrganizationDeleteSectionView deleteScreen={<DeleteOrganizationScreen />} /> : null;
 };

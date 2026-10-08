@@ -1,19 +1,12 @@
 import { withCoreUserGuard } from '../../contexts';
-import { Flow } from '../../customizables';
-import { Route, Switch } from '../../router';
+import { OrganizationListRootView } from './organization-list.view';
 import { OrganizationListPage } from './OrganizationListPage';
 
 const OrganizationListInternal = () => {
   return (
-    <Flow.Root flow='organizationList'>
-      <Flow.Part>
-        <Switch>
-          <Route>
-            <AuthenticatedRoutes />
-          </Route>
-        </Switch>
-      </Flow.Part>
-    </Flow.Root>
+    <OrganizationListRootView>
+      <AuthenticatedRoutes />
+    </OrganizationListRootView>
   );
 };
 

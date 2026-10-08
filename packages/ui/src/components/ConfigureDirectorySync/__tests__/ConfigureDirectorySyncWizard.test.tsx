@@ -1,9 +1,14 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import type { DirectorySyncResource } from '@clerk/shared/types';
+import { StrictMode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { fireEvent, render, screen, waitFor } from '@/test/utils';
+import { act, fireEvent, render, renderHook, screen, waitFor } from '@/test/utils';
 
+import type { ConfigureDirectorySyncModel, DirectorySyncToken } from '../configure-directory-sync.types';
+import { useConfigureDirectorySyncContextController } from '../configure-directory-sync-context.controller';
+import { useConfigureDirectorySyncContextModel } from '../configure-directory-sync-context.model';
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySyncWizard';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
@@ -72,6 +77,26 @@ const notFound = () =>
   new ClerkAPIResponseError('Not found', { status: 404, data: [{ code: 'resource_not_found', message: '' }] });
 
 describe('ConfigureDirectorySyncWizard configure step', () => {
+  it('creates once and reveals the token under Strict Mode', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    const organization = fixtures.clerk.organization!;
+    organization.getEnterpriseConnections.mockResolvedValue([oktaConnection]);
+    const created = directory({ apiKey: 'tok_strict' });
+    let current: DirectorySyncResource | null = null;
+    organization.getDirectorySync.mockImplementation(() => Promise.resolve(current));
+    organization.createDirectorySync.mockImplementation(() => {
+      current = created;
+      return Promise.resolve(created);
+    });
+    render(
+      <StrictMode>
+        <ConfigureDirectorySyncWizard />
+      </StrictMode>,
+      { wrapper },
+    );
+    expect(await screen.findByDisplayValue('tok_strict')).toBeInTheDocument();
+    expect(organization.createDirectorySync).toHaveBeenCalledTimes(1);
+  });
   it('creates the directory on entry and reveals the credentials', async () => {
     const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
     fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([oktaConnection]);
@@ -312,7 +337,7 @@ describe('ConfigureDirectorySyncWizard test step', () => {
     fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
     const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
     let releaseUsers: ((value: unknown) => void) | null = null;
-    existing.sync.mockImplementation(async () => {
+    existing.sync.mockImplementation(() => {
       existing.getSyncStatus.mockResolvedValue({
         lastSyncedAt: new Date(),
         lastSyncStatus: 'succeeded',
@@ -322,6 +347,7 @@ describe('ConfigureDirectorySyncWizard test step', () => {
       // The refreshed list is slow to arrive. Until it does, the list on screen
       // is the one from before the sync.
       existing.getUsers.mockImplementation(() => new Promise(resolve => (releaseUsers = resolve)));
+      return Promise.resolve();
     });
     fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
 
@@ -386,5 +412,77 @@ describe('ConfigureDirectorySyncWizard test step', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
     expect(await screen.findByText('Waiting for the first sync to finish…')).toBeInTheDocument();
+  });
+});
+
+describe('Directory sync data boundary', () => {
+  it('keeps resource methods and shared mutable data inside the model', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([oktaConnection]);
+    const existing = googleDirectory({ attributeMapping: { firstName: 'name.givenName' } });
+    existing.rotateToken.mockResolvedValue(googleDirectory({ apiKey: 'tok_rotated' }));
+    existing.update.mockResolvedValue(existing);
+    existing.setCredentials.mockResolvedValue(existing);
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+    const { result } = renderHook(() => useConfigureDirectorySyncContextModel(), { wrapper });
+
+    await waitFor(() => expect(result.current.directory?.endpointUrl).toBe(existing.endpointUrl));
+    expect(result.current.directory).not.toHaveProperty('rotateToken');
+    expect(result.current.directory).not.toHaveProperty('apiKey');
+    expect(result.current.directory?.attributeMapping).not.toBe(existing.attributeMapping);
+    expect(result.current.connection?.domains).not.toBe(oktaConnection.domains);
+
+    await act(async () => {
+      expect(await result.current.rotateToken()).toEqual({
+        directoryId: 'scimdir_1',
+        enterpriseConnectionId: 'ent_1',
+        token: 'tok_rotated',
+      });
+      expect(await result.current.setDirectoryEnabled(true)).toBeUndefined();
+      expect(
+        await result.current.setCredentials({ serviceAccountJson: '{}', subjectEmail: 'admin@clerk.com' }),
+      ).toBeUndefined();
+    });
+    expect(existing.update).toHaveBeenCalledWith({ enabled: true });
+    expect(existing.setCredentials).toHaveBeenCalledWith({ serviceAccountJson: '{}', subjectEmail: 'admin@clerk.com' });
+  });
+
+  it('does not reveal a delayed token under a different connection', async () => {
+    let resolveToken!: (token: DirectorySyncToken) => void;
+    const model: ConfigureDirectorySyncModel = {
+      requestKey: 'owner_ent_1',
+      directoryKey: 'directory_1_epoch_1',
+      canRun: () => true,
+      canRunDirectory: () => true,
+      isLoading: false,
+      enterpriseConnectionId: 'ent_1',
+      connection: undefined,
+      provider: undefined,
+      providerMeta: undefined,
+      directory: null,
+      createDirectory: () =>
+        new Promise(resolve => {
+          resolveToken = resolve;
+        }),
+      rotateToken: () => Promise.resolve(null),
+      setDirectoryEnabled: () => Promise.resolve(),
+      setCredentials: () => Promise.resolve(),
+      syncDirectory: () => Promise.resolve(),
+    };
+    const { result, rerender } = renderHook(({ data }) => useConfigureDirectorySyncContextController(data), {
+      initialProps: { data: model },
+    });
+    let pending!: Promise<void>;
+    act(() => {
+      pending = result.current.createDirectory();
+    });
+    rerender({ data: { ...model, enterpriseConnectionId: 'ent_2' } });
+    await act(async () => {
+      resolveToken({ directoryId: 'scimdir_1', enterpriseConnectionId: 'ent_1', token: 'tok_previous' });
+      expect(await pending).toBeUndefined();
+    });
+    expect(result.current.revealedToken).toBeNull();
+    rerender({ data: model });
+    expect(result.current.revealedToken).toBeNull();
   });
 });

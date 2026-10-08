@@ -1,5 +1,6 @@
-import { SignInEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { useSignInContext } from '../../contexts';
+import { useSignInEmailLinkVerifyController } from './sign-in-email-link-verify.controller';
+import { useSignInEmailLinkVerifyModel } from './sign-in-email-link-verify.model';
+import { SignInEmailLinkVerifyView } from './sign-in-email-link-verify.view';
 
 /**
  * The SignIn tree's email-link verify route: the tab the verification link opened in.
@@ -11,12 +12,7 @@ import { useSignInContext } from '../../contexts';
  * the winner's sign-up server-side, so this tab only points the user back to the original.
  */
 export const SignInEmailLinkVerify = () => {
-  const { afterSignInUrl } = useSignInContext();
-
-  return (
-    <SignInEmailLinkFlowComplete
-      redirectUrlComplete={afterSignInUrl}
-      redirectUrl='../factor-two'
-    />
-  );
+  const model = useSignInEmailLinkVerifyModel();
+  const controller = useSignInEmailLinkVerifyController(model);
+  return <SignInEmailLinkVerifyView {...controller} />;
 };

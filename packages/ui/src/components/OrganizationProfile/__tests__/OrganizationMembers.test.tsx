@@ -1,5 +1,5 @@
 import type { OrganizationInvitationResource, OrganizationMembershipResource } from '@clerk/shared/types';
-import { screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -17,6 +17,58 @@ async function waitForLoadingCompleted(container: HTMLElement) {
 }
 
 describe('OrganizationMembers', () => {
+  it('resets search when the account changes within the same organization', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+    });
+    fixtures.clerk.organization!.getMemberships.mockResolvedValue({ data: [], total_count: 0 });
+    fixtures.clerk.organization!.getInvitations.mockResolvedValue({ data: [], total_count: 0 });
+    fixtures.clerk.organization!.getRoles.mockResolvedValue({ data: [], total_count: 0 });
+    const { getByRole, userEvent, rerender } = render(<OrganizationMembers />, { wrapper });
+    const search = getByRole('searchbox', { name: 'Search' });
+    await userEvent.type(search, 'old query');
+    expect(search).toHaveValue('old query');
+    const nextUser = { ...fixtures.clerk.user!, id: 'user_second' };
+    vi.spyOn(fixtures.clerk, 'user', 'get').mockReturnValue(nextUser);
+    fixtures.clerk.__internal_lastEmittedResources = {
+      ...fixtures.clerk.__internal_lastEmittedResources!,
+      user: nextUser,
+    };
+    rerender(<OrganizationMembers />);
+    expect(getByRole('searchbox', { name: 'Search' })).toHaveValue('');
+  });
+
+  it('resets search when the active organization changes', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [
+          { name: 'Org1', role: 'admin' },
+          { name: 'Org2', role: 'admin' },
+        ],
+      });
+    });
+    for (const membership of fixtures.clerk.user!.organizationMemberships) {
+      membership.organization.getMemberships.mockResolvedValue({ data: [], total_count: 0 });
+      membership.organization.getInvitations.mockResolvedValue({ data: [], total_count: 0 });
+      membership.organization.getRoles.mockResolvedValue({ data: [], total_count: 0 });
+    }
+    const { getByRole, userEvent, rerender } = render(<OrganizationMembers />, { wrapper });
+    const search = getByRole('searchbox', { name: 'Search' });
+    await userEvent.type(search, 'old query');
+    expect(search).toHaveValue('old query');
+    const nextOrganization = fixtures.clerk.user!.organizationMemberships[1].organization;
+    fixtures.clerk.session!.lastActiveOrganizationId = nextOrganization.id;
+    fixtures.clerk.__internal_lastEmittedResources = {
+      ...fixtures.clerk.__internal_lastEmittedResources!,
+      organization: nextOrganization,
+    };
+    rerender(<OrganizationMembers />);
+    expect(getByRole('searchbox', { name: 'Search' })).toHaveValue('');
+  });
+
   /**
    * `<OrganizationMembers/>` internally uses useFetch which caches the results, be sure to clear the cache before each test
    */
@@ -117,6 +169,31 @@ describe('OrganizationMembers', () => {
     expect(queryByRole('tab', { name: 'Members' })).not.toBeInTheDocument();
     expect(queryByRole('tab', { name: 'Invitations' })).not.toBeInTheDocument();
     expect(queryByRole('tab', { name: 'Requests' })).not.toBeInTheDocument();
+  });
+
+  it('preserves member labels, badges, and initials after an image error', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
+    });
+    const member = createFakeMember({
+      id: fixtures.clerk.user!.id,
+      orgId: fixtures.clerk.organization!.id,
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      identifier: 'ada@example.com',
+      imageUrl: 'https://example.com/avatar.png',
+    });
+    fixtures.clerk.organization!.getMemberships.mockResolvedValue({ data: [member], total_count: 1 });
+    fixtures.clerk.organization!.getInvitations.mockResolvedValue({ data: [], total_count: 0 });
+    fixtures.clerk.organization!.getRoles.mockResolvedValue({ data: [], total_count: 0 });
+    render(<OrganizationMembers />, { wrapper });
+
+    expect(await screen.findByText('Ada Lovelace')).toBeInTheDocument();
+    expect(screen.getByText('ada@example.com')).toBeInTheDocument();
+    expect(screen.getByText('You')).toBeInTheDocument();
+    fireEvent.error(screen.getByRole('img', { name: "Ada Lovelace's logo" }));
+    expect(screen.getByText('AL')).toBeInTheDocument();
   });
 
   it('lists all the members of the Organization', async () => {

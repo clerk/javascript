@@ -1,14 +1,15 @@
-import { within } from '@testing-library/react';
+import { fireEvent, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { clearFetchCache } from '@/hooks/useFetch';
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { act, render, screen, waitFor } from '@/test/utils';
+import { act, render, renderHook, screen, waitFor } from '@/test/utils';
 import { VirtualRouter } from '@/ui/router';
 
 import { OrganizationProfile } from '..';
 import { OrganizationProfileRoutes } from '../OrganizationProfileRoutes';
 import { OrganizationSecurityPage } from '../OrganizationSecurityPage';
+import { useSSOBypassAllowlistModel } from '../sso-bypass-allowlist.model';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
@@ -172,6 +173,28 @@ describe('SSO bypass allowlist', () => {
   });
 
   describe('allow list page', () => {
+    it('keeps a display snapshot stable when the cached SDK record changes', async () => {
+      const { wrapper, fixtures } = await createFixtures(
+        withSecurityPage({ permissions: ['org:sys_entconns:manage', 'org:sys_entconns_sso_bypass:manage'] }),
+      );
+      const source = allowlistEntry('user_1', 'Cameron', 'cameron@clerk.com');
+      fixtures.clerk.organization!.ssoBypassAllowlist.getUsers.mockResolvedValue([source]);
+      const { result, rerender } = renderHook(() => useSSOBypassAllowlistModel(), { wrapper });
+      await waitFor(() => expect(result.current.data).toHaveLength(1));
+      const snapshot = result.current.data![0];
+
+      source.publicUserData.firstName = 'Changed';
+      source.publicUserData.identifier = 'changed@clerk.com';
+      expect(snapshot.preview.name).toBe('Cameron Walker');
+      expect(snapshot.preview.avatar!.firstName).toBe('Cameron');
+      expect(snapshot.subtitle).toBe('cameron@clerk.com');
+      expect(snapshot.searchText).toContain('cameron@clerk.com');
+
+      rerender();
+      expect(result.current.data![0].preview.name).toBe('Changed Walker');
+      expect(result.current.data![0].subtitle).toBe('changed@clerk.com');
+    });
+
     const openAllowlistPage = async (
       wrapper: React.ComponentType<{ children?: React.ReactNode }>,
       fixtures: Awaited<ReturnType<typeof createFixtures>>['fixtures'],
@@ -222,6 +245,27 @@ describe('SSO bypass allowlist', () => {
       await userEvent.clear(screen.getByRole('searchbox', { name: 'Search users' }));
       await userEvent.type(screen.getByRole('searchbox', { name: 'Search users' }), 'nobody');
       expect(await screen.findByText('No members match your search')).toBeInTheDocument();
+    });
+
+    it('shows a username when names are absent and filters by username', async () => {
+      const { wrapper, fixtures } = await createFixtures(
+        withSecurityPage({ permissions: ['org:sys_entconns:manage', 'org:sys_entconns_sso_bypass:manage'] }),
+      );
+      const unnamed = allowlistEntry('user_1', '', 'cameron@clerk.com');
+      unnamed.publicUserData.lastName = '';
+      unnamed.publicUserData.username = 'cameron_handle';
+      const named = allowlistEntry('user_2', 'Dana', 'dana@clerk.com');
+      named.publicUserData.imageUrl = 'https://example.com/avatar.png';
+      const { userEvent } = await openAllowlistPage(wrapper, fixtures, [unnamed, named]);
+
+      expect(screen.getByText('cameron_handle')).toBeInTheDocument();
+      expect(screen.getByText('cameron@clerk.com')).toBeInTheDocument();
+      fireEvent.error(screen.getByRole('img', { name: "Dana Walker's logo" }));
+      expect(screen.getByText('DW')).toBeInTheDocument();
+
+      await userEvent.type(screen.getByRole('searchbox', { name: 'Search users' }), 'CAMERON_HANDLE');
+      expect(screen.getByText('cameron_handle')).toBeInTheDocument();
+      expect(screen.queryByText('Dana Walker')).not.toBeInTheDocument();
     });
 
     it('adds a member by email address', async () => {

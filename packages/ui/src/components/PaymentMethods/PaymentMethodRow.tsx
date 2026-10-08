@@ -1,13 +1,13 @@
-import type { BillingPaymentMethodResource, RemoveFunctions } from '@clerk/shared/types';
-
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { Archive, CreditCard } from '../../icons';
+import { projectPaymentMethodPreview } from './payment-methods.layout';
+import type { PaymentMethodPreview, PaymentMethodPreviewInput } from './payment-methods.types';
 
-export const PaymentMethodRow = ({
-  paymentMethod,
-}: {
-  paymentMethod: RemoveFunctions<BillingPaymentMethodResource>;
-}) => {
+export const PaymentMethodRow = ({ paymentMethod }: { paymentMethod: PaymentMethodPreviewInput }) => (
+  <PaymentMethodRowView paymentMethod={projectPaymentMethodPreview(paymentMethod)} />
+);
+
+export const PaymentMethodRowView = ({ paymentMethod }: { paymentMethod: PaymentMethodPreview }) => {
   return (
     <Flex
       sx={{ overflow: 'hidden' }}
@@ -16,7 +16,7 @@ export const PaymentMethodRow = ({
       elementDescriptor={descriptors.paymentMethodRow}
     >
       <Icon
-        icon={paymentMethod.paymentType === 'card' ? CreditCard : Archive}
+        icon={paymentMethod.isCard ? CreditCard : Archive}
         sx={t => ({ alignSelf: 'center', color: t.colors.$colorMutedForeground })}
         elementDescriptor={descriptors.paymentMethodRowIcon}
       />
@@ -25,7 +25,7 @@ export const PaymentMethodRow = ({
         truncate
         elementDescriptor={descriptors.paymentMethodRowType}
       >
-        {paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType}
+        {paymentMethod.displayType}
       </Text>
       <Text
         sx={t => ({ color: t.colors.$colorMutedForeground })}
@@ -33,7 +33,7 @@ export const PaymentMethodRow = ({
         truncate
         elementDescriptor={descriptors.paymentMethodRowValue}
       >
-        {paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : null}
+        {paymentMethod.last4Text}
       </Text>
       {paymentMethod.isDefault && (
         <Badge
@@ -42,7 +42,7 @@ export const PaymentMethodRow = ({
           localizationKey={localizationKeys('badge__default')}
         />
       )}
-      {paymentMethod.status === 'expired' && (
+      {paymentMethod.isExpired && (
         <Badge
           elementDescriptor={descriptors.paymentMethodRowBadge}
           elementId={descriptors.paymentMethodRowBadge.setId('expired')}

@@ -1,58 +1,38 @@
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
-import { FormContainer } from '@/ui/elements/FormContainer';
 
-import { useWizard, Wizard } from '../../common';
-import { Button, descriptors, localizationKeys, Text } from '../../customizables';
-import { useActionContext } from '../../elements/Action/ActionRoot';
+import { useMfaBackupCodeController } from './mfa-backup-code.controller';
+import { MfaBackupCodeView } from './mfa-backup-code.view';
+import { useMfaBackupCodeCreateModel } from './mfa-backup-code-create.model';
 import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';
 
-type MfaBackupCodeScreenProps = FormProps;
-export const MfaBackupCodeScreen = withCardStateProvider((props: MfaBackupCodeScreenProps) => {
-  const { onSuccess, onReset } = props;
-  const wizard = useWizard();
-
+export const MfaBackupCodeScreen = (props: FormProps) => {
+  const model = useMfaBackupCodeCreateModel();
   return (
-    <Wizard {...wizard.props}>
-      <AddBackupCode onContinue={wizard.nextStep} />
+    <MfaBackupCodeContent
+      key={model.requestKey}
+      {...props}
+      model={model}
+    />
+  );
+};
 
-      <MfaBackupCodeCreateForm
-        onSuccess={onSuccess}
-        onReset={onReset}
+const MfaBackupCodeContent = withCardStateProvider(
+  ({ model, ...props }: FormProps & { model: ReturnType<typeof useMfaBackupCodeCreateModel> }) => {
+    const controller = useMfaBackupCodeController(model, props);
+    return (
+      <MfaBackupCodeView
+        wizardProps={controller.wizardProps}
+        nextStep={controller.nextStep}
+        close={controller.close}
+        createForm={
+          <MfaBackupCodeCreateForm
+            model={model}
+            onSuccess={controller.onSuccess}
+            onReset={controller.onReset}
+          />
+        }
       />
-    </Wizard>
-  );
-});
-
-type AddBackupCodeProps = {
-  onContinue: () => void;
-};
-
-const AddBackupCode = (props: AddBackupCodeProps) => {
-  const { onContinue } = props;
-  const { close } = useActionContext();
-
-  return (
-    <FormContainer headerTitle={localizationKeys('userProfile.backupCodePage.title')}>
-      <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText1')} />
-      <Text localizationKey={localizationKeys('userProfile.backupCodePage.infoText2')} />
-
-      <FormButtonContainer sx={{ marginTop: 0 }}>
-        <Button
-          textVariant='buttonSmall'
-          onClick={onContinue}
-          localizationKey={localizationKeys('userProfile.formButtonPrimary__finish')}
-          elementDescriptor={descriptors.formButtonPrimary}
-        />
-
-        <Button
-          variant='ghost'
-          onClick={close}
-          localizationKey={localizationKeys('userProfile.formButtonReset')}
-          elementDescriptor={descriptors.formButtonReset}
-        />
-      </FormButtonContainer>
-    </FormContainer>
-  );
-};
+    );
+  },
+);

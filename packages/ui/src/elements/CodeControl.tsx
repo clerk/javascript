@@ -31,6 +31,7 @@ type onCodeEntryFinishedActionCallback<R = unknown> = (
 
 type UseFieldOTP = <R = unknown>(params: {
   id?: 'code';
+  isLoading?: boolean;
   onCodeEntryFinished: onCodeEntryFinishedActionCallback<R>;
   onResendCodeClicked?: React.MouseEventHandler;
   onResolve?: (a?: R) => Promise<void> | void;
@@ -62,13 +63,17 @@ export const useFieldOTP: UseFieldOTP = params => {
 
   const reject = async (err: any) => {
     handleError(err, [codeControlState], card.setError);
-    status.setIdle();
+    if (params.isLoading === undefined) {
+      status.setIdle();
+    }
     await sleep(750);
     codeControl.reset();
   };
 
   codeControl.onCodeEntryFinished(code => {
-    status.setLoading();
+    if (params.isLoading === undefined) {
+      status.setLoading();
+    }
     codeControlState.clearFeedback();
     paramsOnCodeEntryFinished(code, resolve, reject);
   });
@@ -87,7 +92,7 @@ export const useFieldOTP: UseFieldOTP = params => {
   );
 
   return {
-    isLoading: status.isLoading,
+    isLoading: params.isLoading ?? status.isLoading,
     otpControl: codeControl,
     onResendCode: paramsOnResendCodeClicked ? onResendCode : undefined,
     onFakeContinue,

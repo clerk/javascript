@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render } from '@/test/utils';
 import {
+  createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
   createFakeUserOrganizationSuggestion,
 } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
@@ -210,6 +211,67 @@ describe('TaskChooseOrganization', () => {
     expect(await findByText('Existing Org')).toBeInTheDocument();
     expect(await findByText('Create new organization')).toBeInTheDocument();
     expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
+  });
+
+  it('accepts an invitation and shows the organization as a membership', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withForceOrganizationSelection();
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        create_organization_enabled: true,
+        tasks: [{ key: 'choose-organization' }],
+      });
+    });
+    const invitation = createFakeUserOrganizationInvitation({
+      id: 'inv_1',
+      emailAddress: 'test@clerk.com',
+      publicOrganizationData: { id: 'org_1', name: 'Invited Org' },
+    });
+    const organization = createFakeOrganization({
+      id: 'org_1',
+      name: 'Invited Org',
+      slug: 'invited-org',
+      membersCount: 1,
+      pendingInvitationsCount: 0,
+      adminDeleteEnabled: false,
+      maxAllowedMemberships: 1,
+    });
+    invitation.accept = vi.fn().mockResolvedValue({ ...invitation, status: 'accepted' });
+    fixtures.clerk.user?.getOrganizationInvitations.mockResolvedValue({ data: [invitation], total_count: 1 });
+    fixtures.clerk.getOrganization.mockResolvedValue(organization);
+
+    const { findByRole, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
+    await userEvent.click(await findByRole('button', { name: 'Join' }));
+
+    await waitFor(() => expect(invitation.accept).toHaveBeenCalledOnce());
+    await waitFor(() => expect(fixtures.clerk.getOrganization).toHaveBeenCalledWith('org_1'));
+    await waitFor(() => expect(queryByRole('button', { name: 'Join' })).not.toBeInTheDocument());
+    const membershipButton = await findByRole('button', { name: /Invited Org/ });
+    expect(membershipButton).toBeInTheDocument();
+    await userEvent.click(membershipButton);
+    expect(fixtures.clerk.setActive).toHaveBeenCalledWith(expect.objectContaining({ organization }));
+  });
+
+  it('accepts a suggestion and shows its pending state', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withForceOrganizationSelection();
+      f.withUser({ email_addresses: ['test@clerk.com'], tasks: [{ key: 'choose-organization' }] });
+    });
+    const suggestion = createFakeUserOrganizationSuggestion({
+      id: 'sug_1',
+      emailAddress: 'test@clerk.com',
+      publicOrganizationData: { id: 'org_1', name: 'Suggested Org' },
+    });
+    suggestion.accept = vi.fn().mockResolvedValue({ ...suggestion, status: 'accepted' });
+    fixtures.clerk.user?.getOrganizationSuggestions.mockResolvedValue({ data: [suggestion], total_count: 1 });
+
+    const { findByRole, findByText } = render(<TaskChooseOrganization />, { wrapper });
+    await userEvent.click(await findByRole('button', { name: 'Request to join' }));
+
+    await waitFor(() => expect(suggestion.accept).toHaveBeenCalledOnce());
+    expect(await findByText('Pending approval')).toBeInTheDocument();
   });
 
   it('displays user identifier in sign out section', async () => {

@@ -59,6 +59,12 @@ const domainsState = vi.hoisted(() => ({
 const verifiedDomain = (name: string) => ({ name, ownershipVerification: { status: 'verified' } });
 
 vi.mock('@clerk/shared/react', () => ({
+  useClerk: () => ({
+    user: { id: 'user_1' },
+    session: { id: 'sess_1' },
+    client: { id: 'client_1' },
+    organization: { id: 'org_1' },
+  }),
   __internal_useOrganizationEnterpriseConnections: () => ({
     data: connectionsState.data,
     isLoading: connectionsState.isLoading,
@@ -88,7 +94,9 @@ vi.mock('@clerk/shared/react', () => ({
       revalidate: vi.fn(() => Promise.resolve()),
     };
   },
-  useUser: () => ({ user: { primaryEmailAddress: { emailAddress: 'admin@clerk.com' }, emailAddresses: [] } }),
+  useUser: () => ({
+    user: { id: 'user_1', primaryEmailAddress: { emailAddress: 'admin@clerk.com' }, emailAddresses: [] },
+  }),
   useSession: () => ({ session: { id: 'sess_1' } }),
   useOrganization: () => ({ organization: { id: 'org_1' } }),
 }));

@@ -1,30 +1,12 @@
-import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
-import { useUser } from '@clerk/shared/react';
-
-import { descriptors, Text } from '../../customizables';
+import { useUserButtonIdentifierModel } from './user-button-trigger.model';
+import { UserButtonIdentifierView } from './user-button-trigger.view';
 
 type UserButtonTopLevelIdentifierProps = {
   showName: boolean | undefined;
 };
 
 export const UserButtonTopLevelIdentifier = ({ showName }: UserButtonTopLevelIdentifierProps) => {
-  const { user } = useUser();
+  const model = useUserButtonIdentifierModel(showName);
 
-  if (!user || !showName) {
-    return null;
-  }
-  return (
-    <Text
-      variant='subtitle'
-      as='span'
-      elementDescriptor={descriptors.userButtonOuterIdentifier}
-      sx={[
-        t => ({
-          paddingInlineStart: t.space.$2,
-        }),
-      ]}
-    >
-      {getFullName(user) || getIdentifier(user)}
-    </Text>
-  );
+  return <UserButtonIdentifierView {...model} />;
 };

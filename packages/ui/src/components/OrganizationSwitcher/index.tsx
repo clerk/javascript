@@ -1,86 +1,36 @@
 import type { ReactElement } from 'react';
-import { cloneElement, useCallback, useId, useRef } from 'react';
 
 import { withCardStateProvider, withFloatingTree } from '@/ui/elements/contexts';
-import { Popover } from '@/ui/elements/Popover';
 
-import { AcceptedInvitationsProvider, useOrganizationSwitcherContext, withCoreUserGuard } from '../../contexts';
-import { Flow } from '../../customizables';
-import { usePopover } from '../../hooks';
+import { AcceptedInvitationsProvider, withCoreUserGuard } from '../../contexts';
+import { useFloatingMenuController } from '../../hooks/useFloatingMenuController';
+import { useOrganizationSwitcherRootModel } from './organization-switcher.model';
+import { OrganizationSwitcherFloatingView, OrganizationSwitcherRootView } from './organization-switcher.view';
 import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
-import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 
-const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
-  const { defaultOpen } = useOrganizationSwitcherContext();
+const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactElement; defaultOpen?: boolean }>(
+  ({ children, defaultOpen }) => {
+    const controller = useFloatingMenuController({ defaultOpen, placement: 'bottom-start' });
+    return <OrganizationSwitcherFloatingView {...controller}>{children}</OrganizationSwitcherFloatingView>;
+  },
+);
 
-  const { floating, reference, styles, toggle, isOpen, nodeId, context, getReferenceProps, getFloatingProps } =
-    usePopover({
-      defaultOpen,
-      placement: 'bottom-start',
-      offset: 8,
-    });
-
-  const switcherButtonMenuId = useId();
-  const popoverRef = useRef<HTMLElement | null>(null);
-  const floatingRef = useCallback(
-    (node: HTMLElement | null) => {
-      floating(node);
-      popoverRef.current = node;
-    },
-    [floating],
-  );
+const OrganizationSwitcherInternal = () => {
+  const model = useOrganizationSwitcherRootModel();
 
   return (
-    <>
-      <OrganizationSwitcherTrigger
-        ref={reference}
-        isOpen={isOpen}
-        {...getReferenceProps({
-          'aria-controls': isOpen ? switcherButtonMenuId : undefined,
-        })}
-      />
-      <Popover
-        nodeId={nodeId}
-        context={context}
-        isOpen={isOpen}
-        order={['content']}
-        initialFocus={popoverRef}
-      >
-        {cloneElement(children, {
-          ...getFloatingProps({
-            id: switcherButtonMenuId,
-            tabIndex: -1,
-            ref: floatingRef,
-            style: styles,
-          }),
-          close: toggle,
-        })}
-      </Popover>
-    </>
-  );
-});
-
-const _OrganizationSwitcher = () => {
-  const { __experimental_asStandalone } = useOrganizationSwitcherContext();
-
-  return (
-    <Flow.Root
-      flow='organizationSwitcher'
-      sx={{ display: 'inline-flex' }}
-    >
+    <OrganizationSwitcherRootView>
       <AcceptedInvitationsProvider>
-        {__experimental_asStandalone ? (
-          <OrganizationSwitcherPopover
-            close={typeof __experimental_asStandalone === 'function' ? __experimental_asStandalone : undefined}
-          />
+        {model.standalone ? (
+          <OrganizationSwitcherPopover close={typeof model.standalone === 'function' ? model.standalone : undefined} />
         ) : (
-          <OrganizationSwitcherWithFloatingTree>
+          <OrganizationSwitcherWithFloatingTree defaultOpen={model.defaultOpen}>
             <OrganizationSwitcherPopover />
           </OrganizationSwitcherWithFloatingTree>
         )}
       </AcceptedInvitationsProvider>
-    </Flow.Root>
+    </OrganizationSwitcherRootView>
   );
 };
 
-export const OrganizationSwitcher = withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher));
+export const OrganizationSwitcher = withCoreUserGuard(withCardStateProvider(OrganizationSwitcherInternal));

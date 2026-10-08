@@ -93,14 +93,24 @@ type internalStripeAppearance = {
   spacingUnit: string;
 };
 
+export type PaymentElementCheckoutData = {
+  plan?: { name: string } | null;
+  totals?: { totalDueNow?: { amount: number } | null; grandTotal: { amount: number } } | null;
+  planPeriod?: 'month' | 'annual' | null;
+};
+
 /**
  * @interface
  */
 export type PaymentElementProviderProps = {
   /**
-   * A checkout resource object. When provided, the payment element is scoped to the specific checkout session.
+   * Checkout data used to configure recurring payment details.
    */
-  checkout?: CheckoutFlowResource | BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+  checkout?:
+    | CheckoutFlowResource
+    | BillingCheckoutResource
+    | ReturnType<typeof useCheckout>['checkout']
+    | PaymentElementCheckoutData;
   /**
    * An object to customize the appearance of the Stripe Payment Element. This allows you to match the form's styling to your application's theme.
    */

@@ -1,4 +1,4 @@
-import type { OrganizationPreviewId, UserOrganizationInvitationResource, UserResource } from '@clerk/shared/types';
+import type { OrganizationPreviewId, UserOrganizationInvitationResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { descriptors, Flex, Text } from '../customizables';
@@ -8,7 +8,13 @@ import { OrganizationAvatar } from './OrganizationAvatar';
 
 export type OrganizationPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'elementId'> & {
   organization: UserOrganizationInvitationResource['publicOrganizationData'];
-  user?: UserResource;
+  user?: {
+    organizationMemberships: Array<{
+      organization: { id: string };
+      role: string;
+      roleName: string;
+    }>;
+  };
   size?: 'lg' | 'md' | 'sm' | 'xs';
   avatarSx?: ThemableCssProp;
   mainIdentifierSx?: ThemableCssProp;

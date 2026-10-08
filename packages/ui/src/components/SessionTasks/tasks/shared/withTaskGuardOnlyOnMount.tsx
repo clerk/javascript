@@ -1,13 +1,8 @@
-import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
-import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
-import { useClerk } from '@clerk/shared/react';
 import type { SessionTask } from '@clerk/shared/types';
 import type { ComponentType } from 'react';
-import { useEffect, useRef } from 'react';
 
-import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
-import { useRouter } from '@/ui/router';
-import type { AvailableComponentProps } from '@/ui/types';
+import { useTaskGuardOnlyOnMountController } from './task-guard-only-on-mount.controller';
+import { useTaskGuardOnlyOnMountModel } from './task-guard-only-on-mount.model';
 
 /**
  * Triggers a redirect if current task is not the given task key on initial mount only.
@@ -21,7 +16,7 @@ import type { AvailableComponentProps } from '@/ui/types';
  *
  * @internal
  */
-export const withTaskGuardOnlyOnMount = <P extends AvailableComponentProps>(
+export const withTaskGuardOnlyOnMount = <P extends object>(
   Component: ComponentType<P>,
   taskKey: SessionTask['key'],
 ): ((props: P) => null | JSX.Element) => {
@@ -29,32 +24,10 @@ export const withTaskGuardOnlyOnMount = <P extends AvailableComponentProps>(
   Component.displayName = displayName;
 
   const HOC = (props: P) => {
-    const ctx = useSessionTasksContext();
-    const clerk = useClerk();
-    const { navigate } = useRouter();
+    const model = useTaskGuardOnlyOnMountModel();
+    const controller = useTaskGuardOnlyOnMountController(model, taskKey);
 
-    const shouldRedirectOnMount = useRef<boolean | null>(null);
-
-    if (shouldRedirectOnMount.current === null) {
-      shouldRedirectOnMount.current =
-        !clerk.session?.currentTask ||
-        (clerk.session.currentTask.key !== taskKey && !clerk.__internal_setActiveInProgress);
-    }
-
-    useEffect(() => {
-      if (shouldRedirectOnMount.current) {
-        if (isDevelopmentFromPublishableKey(clerk.publishableKey)) {
-          console.info(warnings.cannotRenderComponentWhenTaskDoesNotExist);
-        }
-        const redirectUrl = !clerk.session
-          ? clerk.buildSignInUrl()
-          : (ctx.redirectUrlComplete ?? clerk.buildAfterSignInUrl());
-        void navigate(redirectUrl);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    if (shouldRedirectOnMount.current) {
+    if (controller.shouldRedirect) {
       return null;
     }
 

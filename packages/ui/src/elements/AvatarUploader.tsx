@@ -18,18 +18,10 @@ export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
   onAvatarChange: (file: File) => Promise<unknown>;
-  onAvatarRemove?: (() => void) | null;
+  onAvatarRemove?: (() => void | Promise<unknown>) | null;
   avatarPreviewPlaceholder?: React.ReactElement | null;
   rounded?: boolean;
-};
-
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
+  isDisabled?: boolean;
 };
 
 const MAX_SIZE_BYTES = 10 * 1000 * 1000;
@@ -44,7 +36,34 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [isDraggingOver, setIsDraggingOver] = React.useState(false);
   const card = useCardState();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const openDialog = () => inputRef.current?.click();
+  const mounted = React.useRef(true);
+  const pending = React.useRef<Promise<void>>();
+  const previewReader = React.useRef<FileReader>();
+  const releaseRequest = React.useRef<() => void>();
+  const latestCard = React.useRef(card);
+  latestCard.current = card;
+  const cancelPreviewRead = React.useCallback(() => {
+    const reader = previewReader.current;
+    previewReader.current = undefined;
+    if (reader) {
+      reader.onload = null;
+      reader.onerror = null;
+      reader.onabort = null;
+      if (reader.readyState === FileReader.LOADING) {
+        reader.abort();
+      }
+    }
+  }, []);
+  React.useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      cancelPreviewRead();
+      pending.current = undefined;
+      releaseRequest.current?.();
+      releaseRequest.current = undefined;
+    };
+  }, [cancelPreviewRead]);
 
   const {
     onAvatarChange,
@@ -53,52 +72,110 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     avatarPreview,
     avatarPreviewPlaceholder,
     rounded = true,
+    isDisabled = false,
     ...rest
   } = props;
 
-  const handleFileDrop = (file: File | null) => {
-    if (file === null) {
-      return setObjectUrl('');
+  const disabled = isDisabled || card.isLoading;
+  const openDialog = () => {
+    if (!disabled) {
+      inputRef.current?.click();
     }
+  };
 
-    void fileToBase64(file).then(setObjectUrl);
-    card.setLoading();
-    return onAvatarChange(file)
-      .then(() => {
-        card.setIdle();
+  const readPreview = (file: File) => {
+    cancelPreviewRead();
+    const reader = new FileReader();
+    previewReader.current = reader;
+    reader.onload = () => {
+      if (mounted.current && previewReader.current === reader && typeof reader.result === 'string') {
+        setObjectUrl(reader.result);
+      }
+      if (previewReader.current === reader) {
+        cancelPreviewRead();
+      }
+    };
+    reader.onerror = reader.onabort = () => {
+      if (previewReader.current === reader) {
+        cancelPreviewRead();
+      }
+    };
+    try {
+      reader.readAsDataURL(file);
+    } catch {
+      cancelPreviewRead();
+    }
+  };
+
+  const runChange = (action: () => void | Promise<unknown>) => {
+    if (!mounted.current || isDisabled) {
+      return Promise.resolve();
+    }
+    if (pending.current) {
+      return pending.current;
+    }
+    const release = latestCard.current.beginRequest();
+    if (!release) {
+      return Promise.resolve();
+    }
+    releaseRequest.current = release;
+    latestCard.current.setError(undefined);
+    const ownsRequest = () => mounted.current && pending.current === request;
+    const request = (async () => {
+      await action();
+    })()
+      .catch(error => {
+        if (ownsRequest()) {
+          handleError(error, [], latestCard.current.setError);
+        }
       })
-      .catch(err => handleError(err, [], card.setError));
+      .finally(() => {
+        if (ownsRequest()) {
+          pending.current = undefined;
+          if (inputRef.current) {
+            inputRef.current.value = '';
+          }
+          releaseRequest.current = undefined;
+          release();
+        }
+      });
+    pending.current = request;
+    return request;
   };
 
-  const handleRemove = async () => {
-    card.setLoading();
-    await handleFileDrop(null);
-    card.setIdle();
-    return onAvatarRemove?.();
-  };
-
-  const upload = async (f: File | undefined) => {
-    if (!f) {
-      return;
+  const handleRemove = () => {
+    if (disabled || pending.current || !mounted.current) {
+      return Promise.resolve();
     }
+    return runChange(() => {
+      cancelPreviewRead();
+      setObjectUrl('');
+      return onAvatarRemove?.();
+    });
+  };
 
-    if (!validType(f)) {
+  const upload = (file: File | undefined) => {
+    if (!file || disabled || pending.current || !mounted.current) {
+      return Promise.resolve();
+    }
+    if (!validType(file)) {
       card.setError(t(localizationKeys('unstable__errors.avatar_file_type_invalid')));
-      return;
+      return Promise.resolve();
     }
-
-    if (!validSize(f)) {
+    if (!validSize(file)) {
       card.setError(t(localizationKeys('unstable__errors.avatar_file_size_exceeded')));
-      return;
+      return Promise.resolve();
     }
-
-    await handleFileDrop(f);
+    return runChange(() => {
+      readPreview(file);
+      return onAvatarChange(file);
+    });
   };
 
   const isFileDrag = (e: React.DragEvent) => e.dataTransfer?.types?.includes('Files') ?? false;
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    if (card.isLoading || !isFileDrag(e)) {
+    if (disabled || !isFileDrag(e)) {
       return;
     }
     e.preventDefault();
@@ -106,7 +183,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    if (card.isLoading || !isFileDrag(e)) {
+    if (disabled || !isFileDrag(e)) {
       return;
     }
     e.preventDefault();
@@ -129,7 +206,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     }
     e.preventDefault();
     setIsDraggingOver(false);
-    if (card.isLoading) {
+    if (disabled) {
       return;
     }
     void upload(e.dataTransfer.files?.[0]);
@@ -139,17 +216,18 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   const previewElement = objectUrl
     ? React.cloneElement(avatarPreview, { imageUrl: objectUrl })
     : avatarPreviewPlaceholder && !hasExistingImage
-      ? React.cloneElement(avatarPreviewPlaceholder, { onClick: openDialog })
+      ? React.cloneElement(avatarPreviewPlaceholder, { onClick: openDialog, isDisabled: disabled })
       : avatarPreview;
 
   return (
     <Col gap={4}>
       <input
         type='file'
+        disabled={disabled}
         accept={SUPPORTED_MIME_TYPES.join(',')}
         style={{ display: 'none' }}
         ref={inputRef}
-        onChange={e => upload(e.currentTarget.files?.[0])}
+        onChange={e => void upload(e.currentTarget.files?.[0])}
       />
 
       <Flex
@@ -183,7 +261,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
             <SimpleButton
               elementDescriptor={descriptors.avatarImageActionsUpload}
               localizationKey={localizationKeys('userProfile.profilePage.imageFormSubtitle')}
-              isDisabled={card.isLoading}
+              isDisabled={disabled}
               variant='outline'
               size='xs'
               onClick={openDialog}
@@ -193,11 +271,11 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
               <Button
                 elementDescriptor={descriptors.avatarImageActionsRemove}
                 localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
-                isDisabled={card.isLoading}
+                isDisabled={disabled}
                 sx={t => ({ color: t.colors.$danger500 })}
                 variant='ghost'
                 colorScheme='danger'
-                onClick={handleRemove}
+                onClick={() => void handleRemove()}
                 size='xs'
               />
             )}

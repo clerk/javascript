@@ -498,6 +498,7 @@ describe('OrganizationSecurityPage', () => {
     const directory = (overrides: Record<string, unknown> = {}) =>
       ({
         id: 'scimdir_1',
+        organizationId: 'Org1',
         enterpriseConnectionId: 'ent_1',
         endpointUrl: 'https://api.example.com/scim/v2',
         provider: 'okta',

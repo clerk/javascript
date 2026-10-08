@@ -1,14 +1,13 @@
-import type { EnterpriseConnectionResource, OrganizationDomainResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
-import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
 import type {
-  EnterpriseConnectionMutations,
-  OrganizationDomainMutations,
-  TestRunsView,
-} from './hooks/useOrganizationEnterpriseConnection';
-
-export type { OrganizationDomainMutations };
+  SSOConnection,
+  SSOConnectionCommands,
+  SSODomain,
+  SSODomainCommands,
+  SSOTestRuns,
+} from './configure-sso.types';
+import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
 
 /**
  * Shared state for the ConfigureSSO wizard, persisted across steps. Connection
@@ -17,7 +16,9 @@ export type { OrganizationDomainMutations };
  * display gates / mutations from a single place instead of re-deriving.
  */
 export interface ConfigureSSOData {
-  enterpriseConnection: EnterpriseConnectionResource | undefined;
+  ownerKey: string;
+  canRun: () => boolean;
+  enterpriseConnection: SSOConnection | undefined;
   /** The scoped connection's domains, a draft while the scope is `new`. */
   connectionDomains: string[];
   setConnectionDomains: (domains: string[]) => Promise<void>;
@@ -25,32 +26,22 @@ export interface ConfigureSSOData {
   claimedDomains: Map<string, string>;
   /** Ref to the wizard's scrollable content container. */
   contentRef: React.RefObject<HTMLDivElement>;
-  enterpriseConnectionMutations: EnterpriseConnectionMutations;
-  organizationDomainMutations: OrganizationDomainMutations;
+  enterpriseConnectionMutations: SSOConnectionCommands;
+  organizationDomainMutations: SSODomainCommands;
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
-  testRuns: TestRunsView;
-  organizationDomains: OrganizationDomainResource[] | undefined;
+  testRuns: SSOTestRuns;
+  organizationDomains: SSODomain[] | undefined;
   onExit?: () => void;
 }
 
-interface ConfigureSSOProviderProps {
-  enterpriseConnection: EnterpriseConnectionResource | undefined;
-  connectionDomains: string[];
-  setConnectionDomains: (domains: string[]) => Promise<void>;
-  claimedDomains: Map<string, string>;
-  organizationEnterpriseConnection: OrganizationEnterpriseConnection;
-  testRuns: TestRunsView;
-  organizationDomains: OrganizationDomainResource[] | undefined;
-  contentRef: React.RefObject<HTMLDivElement>;
-  enterpriseConnectionMutations: EnterpriseConnectionMutations;
-  organizationDomainMutations: OrganizationDomainMutations;
-  onExit?: () => void;
-}
+export type ConfigureSSOProviderProps = ConfigureSSOData;
 
 const ConfigureSSOContext = React.createContext<ConfigureSSOData | null>(null);
 ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
 export const ConfigureSSOProvider = ({
+  ownerKey,
+  canRun,
   enterpriseConnection,
   connectionDomains,
   setConnectionDomains,
@@ -66,6 +57,8 @@ export const ConfigureSSOProvider = ({
 }: PropsWithChildren<ConfigureSSOProviderProps>): JSX.Element => {
   const value = React.useMemo<ConfigureSSOData>(
     () => ({
+      ownerKey,
+      canRun,
       contentRef,
       enterpriseConnection,
       connectionDomains,
@@ -79,6 +72,8 @@ export const ConfigureSSOProvider = ({
       onExit,
     }),
     [
+      ownerKey,
+      canRun,
       contentRef,
       enterpriseConnectionMutations,
       organizationDomainMutations,
@@ -92,7 +87,6 @@ export const ConfigureSSOProvider = ({
       onExit,
     ],
   );
-
   return <ConfigureSSOContext.Provider value={value}>{children}</ConfigureSSOContext.Provider>;
 };
 

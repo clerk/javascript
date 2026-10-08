@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+import type { Expiration } from './api-keys.types';
+
 type UseAPIKeysPaginationParams = {
   query: string;
   page: number;
@@ -31,4 +33,27 @@ export const useAPIKeysPagination = ({ query, page, pageCount, isFetching, fetch
       fetchPage(Math.max(1, pageCount));
     }
   }, [pageCount, page, isFetching, fetchPage]);
+};
+
+export const EXPIRATION_VALUES = ['never', '1d', '7d', '30d', '60d', '90d', '180d', '1y'] as const;
+
+const EXPIRATION_DURATIONS: Record<Exclude<Expiration, 'never'>, (date: Date) => void> = {
+  '1d': date => date.setDate(date.getDate() + 1),
+  '7d': date => date.setDate(date.getDate() + 7),
+  '30d': date => date.setDate(date.getDate() + 30),
+  '60d': date => date.setDate(date.getDate() + 60),
+  '90d': date => date.setDate(date.getDate() + 90),
+  '180d': date => date.setDate(date.getDate() + 180),
+  '1y': date => date.setFullYear(date.getFullYear() + 1),
+};
+
+export const getTimeLeftInSeconds = (expirationOption?: Expiration): number | undefined => {
+  if (expirationOption === 'never' || !expirationOption) {
+    return;
+  }
+
+  const now = new Date();
+  const future = new Date(now);
+  EXPIRATION_DURATIONS[expirationOption](future);
+  return Math.floor((future.getTime() - now.getTime()) / 1000);
 };

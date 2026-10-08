@@ -1,74 +1,14 @@
 import { withCardStateProvider } from '@/ui/elements/contexts';
-import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
-import { useCoreSignIn } from '../../contexts';
-import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
-import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
-import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
-import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
-import { useSecondFactorSelection } from './useSecondFactorSelection';
+import { useSignInClientTrustController } from './sign-in-client-trust.controller';
+import { useSignInClientTrustModel } from './sign-in-client-trust.model';
+import { SignInClientTrustView } from './sign-in-client-trust.view';
 
 function SignInClientTrustInternal(): JSX.Element {
-  const signIn = useCoreSignIn();
-  const {
-    currentFactor,
-    factorAlreadyPrepared,
-    handleFactorPrepare,
-    selectFactor,
-    showAllStrategies,
-    toggleAllStrategies,
-  } = useSecondFactorSelection(signIn.supportedSecondFactors);
-  const onShowAlternativeMethodsClicked =
-    signIn.supportedSecondFactors && signIn.supportedSecondFactors.length > 1 ? toggleAllStrategies : undefined;
-
-  if (!currentFactor) {
-    return <LoadingCard />;
-  }
-
-  if (showAllStrategies) {
-    return (
-      <SignInFactorTwoAlternativeMethods
-        onBackLinkClick={toggleAllStrategies}
-        onFactorSelected={selectFactor}
-      />
-    );
-  }
-
-  switch (currentFactor?.strategy) {
-    case 'phone_code':
-      return (
-        <SignInFactorTwoPhoneCodeCard
-          showClientTrustNotice
-          factorAlreadyPrepared={factorAlreadyPrepared}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
-        />
-      );
-    case 'email_code':
-      return (
-        <SignInFactorTwoEmailCodeCard
-          showClientTrustNotice
-          factorAlreadyPrepared={factorAlreadyPrepared}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
-        />
-      );
-    case 'email_link':
-      return (
-        <SignInFactorTwoEmailLinkCard
-          showClientTrustNotice
-          factorAlreadyPrepared={factorAlreadyPrepared}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={onShowAlternativeMethodsClicked}
-        />
-      );
-    default:
-      return <LoadingCard />;
-  }
+  const model = useSignInClientTrustModel();
+  const controller = useSignInClientTrustController(model);
+  return <SignInClientTrustView {...controller} />;
 }
 
 export const SignInClientTrust = withRedirectToSignInTask(

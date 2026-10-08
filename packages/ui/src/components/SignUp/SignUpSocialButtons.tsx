@@ -1,17 +1,10 @@
-import { useClerk } from '@clerk/shared/react';
-import type { OAuthStrategy, PhoneCodeChannel } from '@clerk/shared/types';
+import type { PhoneCodeChannel } from '@clerk/shared/types';
 import React from 'react';
 
-import { useCardState } from '@/ui/elements/contexts';
-import { handleError } from '@/ui/utils/errorHandler';
-import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
-import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
+import { useSocialAuthenticationController } from '@/ui/common/useSocialAuthenticationController';
 
-import { useCoreSignUp, useSignUpContext } from '../../contexts';
-import type { SocialButtonsProps } from '../../elements/SocialButtons';
-import { SocialButtons } from '../../elements/SocialButtons';
-import { useRouter } from '../../router';
-import { buildSignUpOAuthTransportCallbackParams } from '../SignIn/buildOAuthCallbackParams';
+import { SocialButtons, type SocialButtonsProps } from '../../elements/SocialButtons';
+import { useSignUpSocialButtonsModel } from './sign-up-social-buttons.model';
 
 export type SignUpSocialButtonsProps = SocialButtonsProps & {
   continueSignUp?: boolean;
@@ -20,91 +13,15 @@ export type SignUpSocialButtonsProps = SocialButtonsProps & {
 };
 
 export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) => {
-  const clerk = useClerk();
-  const { navigate } = useRouter();
-  const card = useCardState();
-  const ctx = useSignUpContext();
-  const signUp = useCoreSignUp();
-  const redirectUrl = ctx.ssoCallbackUrl;
-  const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-  const shouldUsePopup =
-    !clerk.__internal_hasOAuthTransport &&
-    (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup()));
-  const { continueSignUp = false, onAlternativePhoneCodeProviderClick, ...rest } = props;
-
+  const model = useSignUpSocialButtonsModel(props);
+  const controller = useSocialAuthenticationController(model, props.onAlternativePhoneCodeProviderClick);
   return (
     <SocialButtons
-      {...rest}
+      enableOAuthProviders={props.enableOAuthProviders}
+      enableWeb3Providers={props.enableWeb3Providers}
+      enableAlternativePhoneCodeProviders={props.enableAlternativePhoneCodeProviders}
       showLastAuthenticationStrategy={false}
-      idleAfterDelay={!shouldUsePopup && !clerk.__internal_hasOAuthTransport}
-      oauthCallback={(strategy: OAuthStrategy) => {
-        if (shouldUsePopup) {
-          // We create the popup window here with the `about:blank` URL since some browsers will block popups that are
-          // opened within async functions. The `signUpWithPopup` method handles setting the URL of the popup.
-          const popup = window.open('about:blank', '', 'width=600,height=800');
-          // Unfortunately, there's no good way to detect when the popup is closed, so we simply poll and check if it's closed.
-          const interval = setInterval(() => {
-            if (!popup || popup.closed) {
-              clearInterval(interval);
-              card.setIdle();
-            }
-          }, 500);
-
-          return signUp
-            .authenticateWithPopup({
-              strategy,
-              redirectUrl,
-              redirectUrlComplete,
-              popup,
-              continueSignUp,
-              unsafeMetadata: ctx.unsafeMetadata,
-              legalAccepted: props.legalAccepted,
-              oidcPrompt: ctx.oidcPrompt,
-            })
-            .catch(err => handleError(err, [], card.setError));
-        }
-
-        return signUp
-          .authenticateWithRedirect({
-            continueSignUp,
-            redirectUrl,
-            redirectUrlComplete,
-            strategy,
-            unsafeMetadata: ctx.unsafeMetadata,
-            legalAccepted: props.legalAccepted,
-            oidcPrompt: ctx.oidcPrompt,
-            __internal_callbackParams: {
-              ...buildSignUpOAuthTransportCallbackParams(ctx),
-              __internal_navigateOnSetActive: ctx.navigateOnSetActive,
-              __internal_navigate: navigate,
-            },
-          })
-          .catch(err => {
-            handleError(err, [], card.setError);
-            if (clerk.__internal_hasOAuthTransport) {
-              card.setIdle();
-            }
-          });
-      }}
-      web3Callback={strategy => {
-        if (strategy === 'web3_solana_signature') {
-          return navigate(`choose-wallet?strategy=${strategy}`);
-        }
-
-        return clerk
-          .authenticateWithWeb3({
-            customNavigate: navigate,
-            redirectUrl: redirectUrlComplete,
-            signUpContinueUrl: 'continue',
-            unsafeMetadata: ctx.unsafeMetadata,
-            strategy,
-            legalAccepted: props.legalAccepted,
-          })
-          .catch(err => web3CallbackErrorHandler(err, card.setError));
-      }}
-      alternativePhoneCodeCallback={channel => {
-        onAlternativePhoneCodeProviderClick?.(channel);
-      }}
+      {...controller}
     />
   );
 });

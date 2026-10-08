@@ -56,4 +56,33 @@ describe('card state keeps the raw error beside the translated one', () => {
     expect(result.current.rawError).toBe(incorrect);
     expect(result.current.error).toBe('form_password_incorrect');
   });
+  it('does not let an old release clear a replacement request', () => {
+    const { result } = renderCard();
+    let releaseFirst: (() => void) | undefined;
+    let releaseSecond: (() => void) | undefined;
+    act(() => {
+      releaseFirst = result.current.beginRequest();
+    });
+    act(() => releaseFirst?.());
+    act(() => {
+      releaseSecond = result.current.beginRequest();
+    });
+    act(() => releaseFirst?.());
+    expect(result.current.isLoading).toBe(true);
+    act(() => releaseSecond?.());
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('blocks an owned request after a legacy loading update before rendering', () => {
+    const { result } = renderCard();
+    let release: (() => void) | undefined;
+    act(() => {
+      result.current.setLoading();
+      release = result.current.beginRequest();
+    });
+    expect(release).toBeUndefined();
+    expect(result.current.isLoading).toBe(true);
+    act(() => result.current.setIdle());
+    expect(result.current.isLoading).toBe(false);
+  });
 });

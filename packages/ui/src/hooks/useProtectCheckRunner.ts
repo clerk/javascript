@@ -1,24 +1,12 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
-import type { ProtectCheckRunnerResource } from '@clerk/shared/internal/clerk-js/protectCheckRunner';
-import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 import { flushSync } from 'react-dom';
 
-import { useEnvironment } from '@/ui/contexts/EnvironmentContext';
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
 
-export interface ProtectCheckRunnerParams<TResource> extends ProtectCheckRunnerResource<TResource> {
-  /**
-   * Continues the flow once the gate clears (or a chained challenge / already-resolved is
-   * detected). Receives the resource to route on (the `submitProtectCheck` result, or the live
-   * resource after a reload) and must finalize (`setActive`) the `complete` case itself.
-   * `isCancelled` lets the continuation bail if the component unmounted mid-await.
-   */
-  onResolved: (resource: TResource, isCancelled: () => boolean) => Promise<unknown>;
-  onError?: (error: unknown) => void;
-}
+import type { ProtectCheckRunnerParams } from '../components/ProtectCheck/protect-check-runner.types';
 
 export interface ProtectCheckRunnerState {
   containerRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -42,18 +30,11 @@ export interface ProtectCheckRunnerState {
  *
  * Must be called from within a `CardStateProvider`.
  */
-export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunnerState {
+export function useProtectCheckRunner(
+  params: ProtectCheckRunnerParams,
+  { loadTimeoutMs }: { loadTimeoutMs: number | undefined },
+): ProtectCheckRunnerState {
   const card = useCardState();
-
-  // Override for the module-LOAD bound only (see `executeProtectCheck`), resolved loader first
-  // and instance second: a loader being rolled out gradually can carry its own value without
-  // changing anything for browsers still on the loader it replaces. Undefined at both levels
-  // leaves the SDK default in force. Read here rather than inside the effect so the effect keeps
-  // depending on primitives.
-  // Older clerk-js versions omit this getter; undefined preserves the instance/default fallback.
-  const loaderTimeoutMs = useClerk().__internal_protectChallengeLoadTimeoutMs;
-  const instanceTimeoutMs = useEnvironment().protectConfig?.challenge_load_timeout_ms;
-  const loadTimeoutMs = loaderTimeoutMs ?? instanceTimeoutMs;
 
   // Keep the latest callbacks without re-running the effect when the caller re-renders.
   const paramsRef = React.useRef(params);
@@ -99,7 +80,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const token = params.getProtectCheck()?.token;
 
   React.useEffect(() => {
-    const { getProtectCheck, onResolved } = paramsRef.current;
+    const { getProtectCheck } = paramsRef.current;
     const protectCheck = getProtectCheck();
     if (!protectCheck || isRunningRef.current) {
       return;
@@ -109,7 +90,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     let cancelled = false;
     // Routing after the gate clears must survive the effect re-run that
     // clearing `protectCheck` triggers — that re-run is our cue to route, not a
-    // reason to bail. So the onResolved paths below key on REAL unmount, not the
+    // reason to bail. So the completion paths below key on REAL unmount, not the
     // effect's per-run `cancelled` flag (which the re-run's cleanup sets).
     const isUnmounted = () => !mountedRef.current;
 
@@ -174,7 +155,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     const runId = ++runIdRef.current;
 
     // Whether this run still owns the card's error and spinner. Until the gate clears, that ends
-    // with the run's cancellation. Afterwards the continuation (`onResolved`) is still this run's
+    // with the run's cancellation. Afterwards the completion callback is still this run's
     // even though clearing the gate cancelled it, so it only stops owning them on unmount or when a
     // newer challenge has started a run of its own. Keying the continuation on `cancelled` swallowed
     // its failures and left the spinner running with no error.
@@ -192,19 +173,29 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
           return;
         }
         const { runProtectCheck } = await import('@clerk/shared/internal/clerk-js/protectCheckRunner');
-        const outcome = await runProtectCheck(paramsRef.current, protectCheck, {
-          container,
-          expiredReloads: reloadCountRef,
-          signal: abortController.signal,
-          setWidgetVisible,
-          loadTimeoutMs,
-        });
+        const params = paramsRef.current;
+        const outcome = await runProtectCheck(
+          {
+            getProtectCheck: params.getProtectCheck,
+            getResource: params.getCompletion,
+            reload: params.reload,
+            submitProtectCheck: ({ proofToken }) => params.submitProof(proofToken),
+          },
+          protectCheck,
+          {
+            container,
+            expiredReloads: reloadCountRef,
+            signal: abortController.signal,
+            setWidgetVisible,
+            loadTimeoutMs,
+          },
+        );
         // A reissued challenge carries a new token, which re-runs this effect (keyed on the token).
         if (outcome.status === 'reissued' || isUnmounted()) {
           return;
         }
         continuing = true;
-        await onResolved(outcome.resource, isUnmounted);
+        await outcome.resource(isUnmounted);
       } catch (err: any) {
         if (!ownsOutcome()) {
           return;
@@ -233,13 +224,13 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
     // The gate already cleared and it was the continuation that failed: there is no challenge left
     // to re-run, so re-running the effect would do nothing. Retry the continuation instead.
-    const { getProtectCheck, getResource, onResolved } = paramsRef.current;
+    const { getProtectCheck, getCompletion } = paramsRef.current;
     if (!getProtectCheck()) {
       const runId = ++runIdRef.current;
       const ownsOutcome = () => mountedRef.current && runIdRef.current === runId;
       isRunningRef.current = true;
       setIsRunning(true);
-      void onResolved(getResource(), () => !mountedRef.current)
+      void getCompletion()(() => !mountedRef.current)
         .catch(err => {
           if (ownsOutcome()) {
             reportError(err);

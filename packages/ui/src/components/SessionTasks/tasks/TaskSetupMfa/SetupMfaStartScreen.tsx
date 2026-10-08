@@ -1,106 +1,23 @@
 import type { VerificationStrategy } from '@clerk/shared/types';
 
-import { Actions } from '@/elements/Actions';
-import { useCardState, withCardStateProvider } from '@/elements/contexts';
-import { PreviewButton } from '@/elements/PreviewButton';
-import { AuthApp, Mobile } from '@/icons';
-import { descriptors, Flex, Icon, type LocalizationKey, localizationKeys, Text } from '@/ui/customizables';
-import { Card } from '@/ui/elements/Card';
-import { Header } from '@/ui/elements/Header';
+import { withCardStateProvider } from '@/elements/contexts';
 
-import { MFA_METHODS_TO_STEP } from './constants';
-import { SharedFooterActionForSignOut } from './shared';
+import { useSetupMfaStartScreenController } from './setup-mfa-start-screen.controller';
+import { useSetupMfaStartScreenModel } from './setup-mfa-start-screen.model';
+import { SetupMfaStartScreenView } from './setup-mfa-start-screen.view';
 
 type SetupMfaStartScreenProps = {
   availableMethods: VerificationStrategy[];
   goToStep: (step: number) => void;
 };
 
-const METHOD_CONFIG: Record<'totp' | 'phone_code', { icon: JSX.Element; label: LocalizationKey }> = {
-  totp: {
-    icon: <Icon icon={AuthApp} />,
-    label: localizationKeys('taskSetupMfa.start.methodSelection.totp'),
-  },
-  phone_code: {
-    icon: <Icon icon={Mobile} />,
-    label: localizationKeys('taskSetupMfa.start.methodSelection.phoneCode'),
-  },
-};
-
 export const SetupMfaStartScreen = withCardStateProvider((props: SetupMfaStartScreenProps) => {
-  const { availableMethods, goToStep } = props;
-  const card = useCardState();
-
+  const model = useSetupMfaStartScreenModel(props.availableMethods);
+  const controller = useSetupMfaStartScreenController(props.goToStep);
   return (
-    <Card.Root>
-      <Card.Content sx={t => ({ padding: t.space.$none })}>
-        <Header.Root
-          showLogo
-          sx={t => ({
-            paddingTop: t.space.$8,
-            paddingInline: t.space.$8,
-          })}
-        >
-          <Header.Title localizationKey={localizationKeys('taskSetupMfa.start.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('taskSetupMfa.start.subtitle')} />
-        </Header.Root>
-        {card.error && (
-          <Flex sx={t => ({ paddingInline: t.space.$8 })}>
-            <Card.Alert>{card.error}</Card.Alert>
-          </Flex>
-        )}
-        <Actions
-          elementDescriptor={descriptors.taskSetupMfaMethodSelectionItems}
-          sx={t => ({
-            borderTopWidth: t.borderWidths.$normal,
-            borderTopStyle: t.borderStyles.$solid,
-            borderTopColor: t.colors.$borderAlpha100,
-          })}
-        >
-          {availableMethods.map(method => {
-            const methodConfig = METHOD_CONFIG[method as keyof typeof METHOD_CONFIG] ?? null;
-
-            if (!methodConfig) {
-              return null;
-            }
-
-            return (
-              <PreviewButton
-                elementDescriptor={descriptors.taskSetupMfaMethodSelectionItem}
-                hoverAsFocus
-                block
-                key={method}
-                onClick={() => {
-                  goToStep(MFA_METHODS_TO_STEP[method as keyof typeof MFA_METHODS_TO_STEP]);
-                }}
-              >
-                <Flex sx={t => ({ gap: t.space.$2, alignItems: 'center' })}>
-                  <Flex
-                    sx={t => ({
-                      borderRadius: t.radii.$circle,
-                      borderWidth: t.borderWidths.$normal,
-                      borderStyle: t.borderStyles.$solid,
-                      borderColor: t.colors.$avatarBorder,
-                      padding: t.space.$2,
-                      backgroundColor: t.colors.$neutralAlpha50,
-                    })}
-                  >
-                    {methodConfig.icon}
-                  </Flex>
-                  <Text
-                    variant='buttonLarge'
-                    localizationKey={methodConfig.label}
-                  />
-                </Flex>
-              </PreviewButton>
-            );
-          })}
-        </Actions>
-      </Card.Content>
-
-      <Card.Footer>
-        <SharedFooterActionForSignOut />
-      </Card.Footer>
-    </Card.Root>
+    <SetupMfaStartScreenView
+      {...model}
+      {...controller}
+    />
   );
 });

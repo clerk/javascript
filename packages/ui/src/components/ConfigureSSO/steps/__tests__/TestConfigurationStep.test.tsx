@@ -1,9 +1,10 @@
 import type { EnterpriseConnectionTestRunResource } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { act, render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 // The Test step reads navigation through the generic wizard facade. `goPrev`
@@ -34,10 +35,13 @@ const testRunsSource = vi.hoisted(() => ({
   revalidateHasSuccessfulTestRun: vi.fn(() => Promise.resolve(false)),
 }));
 
+const ownerGuard = vi.hoisted(() => vi.fn(() => true));
 const createTestRun = vi.fn(() => Promise.resolve({ url: 'https://idp.example.com/test' }));
 
 vi.mock('../../ConfigureSSOContext', () => ({
   useConfigureSSO: () => ({
+    ownerKey: 'owner',
+    canRun: ownerGuard,
     enterpriseConnection: { id: 'ent_1' },
     contentRef: { current: null },
     // The step reads `hasSuccessfulTestRun` as a field off the connection entity;
@@ -55,6 +59,7 @@ vi.mock('../../ConfigureSSOContext', () => ({
   }),
 }));
 
+import { OpenTestUrlButton } from '../OpenTestUrlButton';
 import { TestConfigurationStep } from '../TestConfigurationStep';
 
 const { createFixtures } = bindCreateFixtures('ConfigureSSO');
@@ -75,6 +80,7 @@ const aRow = (overrides: Partial<EnterpriseConnectionTestRunResource> = {}): Ent
   }) as EnterpriseConnectionTestRunResource;
 
 beforeEach(() => {
+  ownerGuard.mockReturnValue(true);
   goPrev.mockReset();
   goNext.mockReset();
   createTestRun.mockClear();
@@ -92,6 +98,55 @@ beforeEach(() => {
 });
 
 describe('TestConfigurationStep', () => {
+  it('does not show a false-probe error after the context owner guard changes', async () => {
+    const pending = createDeferredPromise<boolean>();
+    testRunsSource.revalidateHasSuccessfulTestRun.mockReturnValueOnce(pending.promise);
+    const { wrapper } = await createFixtures();
+    const { userEvent } = renderStep(wrapper);
+    const button = screen.getByRole('button', { name: /Continue/i });
+    await userEvent.click(button);
+    ownerGuard.mockReturnValue(false);
+    await act(async () => {
+      pending.resolve(false);
+      await pending.promise;
+    });
+    await waitFor(() => expect(button).not.toBeDisabled());
+    expect(goNext).not.toHaveBeenCalled();
+    expect(screen.queryByText(/You need at least one successful test run/i)).not.toBeInTheDocument();
+  });
+
+  it('discards a returned test URL after the context owner guard changes', async () => {
+    const pending = createDeferredPromise<{ url: string }>();
+    createTestRun.mockReturnValueOnce(pending.promise);
+    const { wrapper } = await createFixtures();
+    const onCreated = vi.fn();
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    const { userEvent, getByRole } = renderStep(wrapper, <OpenTestUrlButton onTestRunCreated={onCreated} />);
+    const button = getByRole('button');
+    await userEvent.click(button);
+    ownerGuard.mockReturnValue(false);
+    await act(async () => {
+      pending.resolve({ url: 'https://example.com/earlier' });
+      await pending.promise;
+    });
+    await waitFor(() => expect(button).not.toBeDisabled());
+    expect(onCreated).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+  });
+
+  it('does not open a window or notify the wizard when the source discards a test result', async () => {
+    const { wrapper } = await createFixtures();
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    const onCreated = vi.fn();
+    createTestRun.mockResolvedValueOnce(undefined as never);
+    const { userEvent, getByRole } = renderStep(wrapper, <OpenTestUrlButton onTestRunCreated={onCreated} />);
+    const button = getByRole('button');
+    await userEvent.click(button);
+    await waitFor(() => expect(button).not.toBeDisabled());
+    expect(open).not.toHaveBeenCalled();
+    expect(onCreated).not.toHaveBeenCalled();
+  });
+
   it('renders the table rows from the single source, not its own fetch', async () => {
     testRunsSource.rows = [aRow({ id: 'run_1', parsedUserInfo: { emailAddress: 'alice@clerk.com' } })];
     testRunsSource.totalCount = 1;

@@ -1,8 +1,7 @@
-import { useOrganizationList } from '@clerk/shared/react';
-
-import { organizationListParams } from './OrganizationSwitcher/utils';
+import { useOrganizationSwitcherPrefetchModel } from './prefetch-organization-list.model';
+import { OrganizationSwitcherPrefetchView } from './prefetch-organization-list.view';
 
 export function OrganizationSwitcherPrefetch() {
-  useOrganizationList(organizationListParams);
-  return null;
+  useOrganizationSwitcherPrefetchModel();
+  return <OrganizationSwitcherPrefetchView />;
 }

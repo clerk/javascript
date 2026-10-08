@@ -58,6 +58,7 @@ import {
 } from '../../utils/authenticateWithPopup';
 import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
+import { createVerificationFlow } from '../../utils/createVerificationFlow';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { getBrowserTimezone } from '../../utils/timezone';
@@ -253,36 +254,20 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, SignUpResource> => {
-    const { run, stop } = Poller();
-
-    const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<SignUpResource> => {
-      if (!this.id) {
-        clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
-      }
-      await this.prepareEmailAddressVerification({
-        strategy: 'email_link',
-        redirectUrl,
-      });
-
-      return new Promise((resolve, reject) => {
-        void run(() => {
-          return this.reload()
-            .then(res => {
-              const status = res.verifications.emailAddress.status;
-              if (status === 'verified' || status === 'expired') {
-                stop();
-                resolve(res);
-              }
-            })
-            .catch(err => {
-              stop();
-              reject(err);
-            });
-        });
-      });
-    };
-
-    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
+    const flow = createVerificationFlow<StartEmailLinkFlowParams, SignUpResource>({
+      prepare: ({ redirectUrl }) => {
+        if (!this.id) {
+          clerkVerifyEmailAddressCalledBeforeCreate('SignUp');
+        }
+        return this.prepareEmailAddressVerification({ strategy: 'email_link', redirectUrl });
+      },
+      reload: () => this.reload(),
+      isComplete: resource => {
+        const status = resource.verifications.emailAddress.status;
+        return status === 'verified' || status === 'expired';
+      },
+    });
+    return { startEmailLinkFlow: flow.start, cancelEmailLinkFlow: flow.cancel };
   };
 
   preparePhoneNumberVerification = (params?: PreparePhoneNumberVerificationParams): Promise<SignUpResource> => {

@@ -1,12 +1,9 @@
 import React, { type ComponentProps } from 'react';
 
-import { CardStateProvider } from '@/elements/contexts';
-
+import { useConfigureSSOWizardController } from './configure-sso-wizard.controller';
+import { useConfigureSSOWizardModel } from './configure-sso-wizard.model';
+import { ConfigureSSOWizardView } from './configure-sso-wizard.view';
 import { ConfigureSSOProvider } from './ConfigureSSOContext';
-import { ConfigureSSOHeader } from './ConfigureSSOHeader';
-import { areConnectionDomainsReady } from './domain/organizationEnterpriseConnection';
-import { Wizard, type WizardStepConfig } from './elements/Wizard';
-import { ActivateStep, ConfigureStep, OrganizationDomainsStep, TestConfigurationStep } from './steps';
 
 export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOProvider>, 'children'> & {
   title?: React.ReactNode;
@@ -14,69 +11,14 @@ export type ConfigureSSOWizardProps = Omit<ComponentProps<typeof ConfigureSSOPro
 };
 
 export const ConfigureSSOWizard = ({ title, forceInitialStep, ...props }: ConfigureSSOWizardProps): JSX.Element => {
-  const { organizationEnterpriseConnection: c, connectionDomains, claimedDomains, organizationDomains } = props;
-
-  const domainsReady = areConnectionDomainsReady(connectionDomains, organizationDomains, claimedDomains);
-
-  const steps = React.useMemo<WizardStepConfig[]>(
-    () => [
-      { id: 'verify-domain', label: 'Domains', isComplete: () => domainsReady },
-      {
-        id: 'configure',
-        label: 'Connection',
-        isReachable: () => domainsReady || c.hasConnection,
-        isComplete: () => c.hasMinimumConfiguration || c.isActive,
-      },
-      {
-        id: 'test',
-        label: 'Test',
-        isReachable: () => c.hasMinimumConfiguration || c.isActive,
-        isComplete: () => c.hasSuccessfulTestRun || c.isActive,
-      },
-      {
-        id: 'activate',
-        label: 'Activate',
-        isReachable: () => c.hasSuccessfulTestRun || c.isActive,
-        isComplete: () => c.isActive,
-      },
-    ],
-    [c, domainsReady],
-  );
-
-  const initialStepId = forceInitialStep ? steps[0].id : undefined;
-
+  const model = useConfigureSSOWizardModel(props);
+  const controller = useConfigureSSOWizardController(model, forceInitialStep);
   return (
     <ConfigureSSOProvider {...props}>
-      <Wizard
-        steps={steps}
-        initialStepId={initialStepId}
-      >
-        <ConfigureSSOHeader title={title} />
-
-        <Wizard.Match id='verify-domain'>
-          <CardStateProvider>
-            <OrganizationDomainsStep />
-          </CardStateProvider>
-        </Wizard.Match>
-
-        <Wizard.Match id='configure'>
-          <CardStateProvider>
-            <ConfigureStep />
-          </CardStateProvider>
-        </Wizard.Match>
-
-        <Wizard.Match id='test'>
-          <CardStateProvider>
-            <TestConfigurationStep />
-          </CardStateProvider>
-        </Wizard.Match>
-
-        <Wizard.Match id='activate'>
-          <CardStateProvider>
-            <ActivateStep />
-          </CardStateProvider>
-        </Wizard.Match>
-      </Wizard>
+      <ConfigureSSOWizardView
+        title={title}
+        {...controller}
+      />
     </ConfigureSSOProvider>
   );
 };
