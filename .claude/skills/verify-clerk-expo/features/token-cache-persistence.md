@@ -10,7 +10,7 @@ A signed-in user who closes and reopens the app is still signed in, because `@cl
 
 ## How to get to it (user POV)
 
-- Sign in, close the app, and open it again. The home shows the same user and session ID. Tap `Token cache` on the home. That screen says whether the token cache held a client token when the app started.
+- Sign in, close the app, and open it again. The home shows the same user and session ID. Tap `Token cache status` on the home. That screen says whether the token cache held a client token when the app started.
 
 ## Driving it with verify
 
@@ -19,8 +19,8 @@ Preconditions:
 - The spec seeds a `+clerk_test` user and signs in with a ticket on the first launch.
 
 - **Relaunch.** Run `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run token-cache-persistence --platform android` (or `ios`). The spec launches signed in and reads the session ID on the home. It relaunches with `keepStorage: true` and no ticket, and expects the home to show the same user and the same session ID. Screenshot `restored-home`.
-- **Kept token.** On that relaunched home the test taps `Token cache` and expects `client token kept from the last launch: yes` and `user: <the seeded user ID>`. Screenshot `token-cache`.
-- **New scope.** The same test relaunches with a new storage scope, taps `Token cache` on the signed-out home, and expects `client token kept from the last launch: no` and `user: none`. Screenshot `new-scope`.
+- **Kept token.** On that relaunched home the test sees and taps `Token cache status` and expects `client token kept from the last launch: yes` and `user: <the seeded user ID>`. Screenshot `token-cache`.
+- **New scope.** The same test relaunches with a new storage scope, taps `Token cache status` on the signed-out home, and expects `client token kept from the last launch: no` and `user: none`. Screenshot `new-scope`.
 - **Proof.** `screenshots/restored-home.png` shows the user and the session after a launch that had no ticket, and `screenshots/token-cache.png` shows the kept token.
 
 ## Gotchas

@@ -15,6 +15,7 @@ test('the token cache keeps the session across a relaunch, and a new scope start
   await host.launch({ keepStorage: true, landsOn: host.app.signedIn });
   await host.expectSignedInAs(user);
   await expect(host.app.sessionId).toHaveText(session);
+  await expect(screen.getByText(/^Token cache status$/i)).toBeVisible({ timeout: 15_000 });
   await host.screenshot('restored-home');
 
   await host.tap(tokenCache);

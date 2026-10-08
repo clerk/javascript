@@ -26,7 +26,7 @@ const homeLinks: readonly HomeLink[] = [
   { opens: 'customSignUp', label: 'Custom sign-up', testID: 'e2e.home.customSignUp', shownWhen: 'signedOut' },
   { opens: 'nativeModules', label: 'Native modules', testID: 'e2e.home.nativeModules', shownWhen: 'signedOut' },
   { opens: 'embeddedProfile', label: 'Embedded profile', testID: 'e2e.home.embeddedProfile', shownWhen: 'signedIn' },
-  { opens: 'tokenCache', label: 'Token cache', testID: 'e2e.home.tokenCache', shownWhen: 'always' },
+  { opens: 'tokenCache', label: 'Token cache status', testID: 'e2e.home.tokenCache', shownWhen: 'always' },
 ];
 
 export function homeLinksFor(isSignedIn: boolean): readonly HomeLink[] {
