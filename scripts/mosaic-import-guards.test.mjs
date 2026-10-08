@@ -101,6 +101,72 @@ describe('Mosaic import boundaries', () => {
     },
   );
 
+  test.each([
+    "import React from 'react'; React.useState(0);",
+    "import R from 'react'; R.useReducer(value => value, 0);",
+    "import React from 'react'; React['useState'](0);",
+    "import React from 'react'; const { useState: state } = React; state(0);",
+    "import React from 'react'; const { ['useReducer']: reducer } = React;",
+  ])('rejects state hooks through the React default binding: %s', async source => {
+    const messages = await lint('sample.model.ts', source);
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    expect(messages.filter(message => message.ruleId === 'custom-rules/no-model-react-state')).toEqual([
+      expect.objectContaining({
+        message: 'Put interaction state in the controller and pass its results to the view.',
+        messageId: 'controllerState',
+      }),
+    ]);
+  });
+
+  test.each([
+    "import React from 'react'; React.useMemo(() => 0, []);",
+    "import React from 'react'; export type Node = React.ReactNode;",
+    "import React from 'react'; export type StateHook = typeof React.useState;",
+    "import type React from 'react'; export type StateHook = typeof React.useState;",
+    "import React from 'react'; function read(React) { return React.useState(0); }",
+    'const React = { useState: value => value }; React.useState(0);',
+    "import React from './other'; React.useState(0);",
+    "import React from 'react'; const useState = 'useMemo'; React[useState](() => 0, []);",
+    "import React from 'react'; const useState = 'useMemo'; const { [useState]: memo } = React;",
+  ])('preserves unrelated React usage: %s', async source => {
+    const messages = await lint('sample.model.ts', source);
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    expect(messages.filter(message => message.ruleId === 'custom-rules/no-model-react-state')).toEqual([]);
+  });
+
+  test.each(['sample.view.ts', 'sample.view.tsx', 'sample.controller.ts', 'sample.controller.tsx'])(
+    '%s rejects dynamic catalog imports',
+    async file => {
+      for (const source of ["import('./sample.messages');", 'import(`@/features/sample.messages.ts`);']) {
+        const messages = await lint(file, source);
+        expect(messages.find(message => message.fatal)).toBeUndefined();
+        expect(messages.filter(message => message.ruleId === 'custom-rules/no-dynamic-message-catalogs')).toEqual([
+          expect.objectContaining({
+            message: 'Use useMessages() for localized and overridden copy instead of importing catalog values.',
+            messageId: 'useMessages',
+          }),
+        ]);
+      }
+    },
+  );
+
+  test.each([
+    ['sample.view.ts', "import('./sample.controller');"],
+    ['sample.controller.ts', 'import(`./sample.model`);'],
+    ['sample.view.ts', "export type Messages = typeof import('./sample.messages');"],
+    ['sample.model.ts', "import('./sample.messages');"],
+    ['sample.messages.ts', "import('./other.messages');"],
+    ['sample.controller.ts', "import React from 'react'; React.useState(0);"],
+  ])('preserves allowed imports in %s: %s', async (file, source) => {
+    const messages = await lint(file, source);
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    expect(
+      messages.filter(message =>
+        ['custom-rules/no-model-react-state', 'custom-rules/no-dynamic-message-catalogs'].includes(message.ruleId),
+      ),
+    ).toEqual([]);
+  });
+
   test('allows model Clerk hooks, controller state, catalog registration and shared utilities', async () => {
     expect(await restrictedImports('sample.model.ts', "import { useUser } from '@clerk/shared/react';")).toEqual([]);
     expect(await restrictedImports('sample.model.ts', "import { messages } from './sample.messages';")).toEqual([]);
