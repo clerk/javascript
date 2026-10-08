@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileVerifyEmailSsoDialogProps } from '../user-profile-account-section/user-profile-verify-email-sso.dialog';
 import { UserProfileVerifyEmailSsoDialog } from '../user-profile-account-section/user-profile-verify-email-sso.dialog';
+import { enterpriseLogos } from '../../../components/provider-logo/enterprise.generated';
 
 function renderView(overrides: Partial<UserProfileVerifyEmailSsoDialogProps> = {}) {
   const props: UserProfileVerifyEmailSsoDialogProps = {
@@ -42,7 +43,7 @@ describe('UserProfileVerifyEmailSsoDialog', () => {
   });
 
   it('shows the bundled logo for a known provider', () => {
-    renderView({ connection: { provider: 'Okta SSO', domain: 'acme.co', icon: { logo: 'okta' } } });
+    renderView({ connection: { provider: 'Okta SSO', domain: 'acme.co', icon: { logo: enterpriseLogos.saml_okta } } });
 
     expect(document.querySelector('.cl-provider-logo')).toHaveAttribute('data-provider', 'okta');
   });

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
@@ -140,9 +140,23 @@ function squareViewBox(viewBox) {
   return [x, y, w, h].map(n => +n.toFixed(2)).join(' ');
 }
 
+const GROUPS = {
+  oauth: { map: 'oauthLogos', type: 'OAuthLogoId', lookup: 'getOAuthLogo' },
+  enterprise: { map: 'enterpriseLogos', type: 'EnterpriseLogoId', lookup: 'getEnterpriseLogo' },
+  web3: { map: 'web3Logos', type: 'Web3LogoId', lookup: 'getWeb3Logo' },
+  phone: { map: 'phoneLogos', type: 'PhoneLogoId', lookup: 'getPhoneLogo' },
+};
+
+const exportName = id => id.replace(/_([a-z0-9])/g, (_, c) => c.toUpperCase());
+const objectKey = key => (/^[a-z_$][\w$]*$/i.test(key) ? key : `'${key}'`);
+
 const seen = new Set();
-const glyphs = [];
+const groupEntries = Object.fromEntries(Object.keys(GROUPS).map(group => [group, []]));
+const written = [];
 let rawBytes = '';
+
+rmSync(resolve(dir, 'glyphs'), { recursive: true, force: true });
+mkdirSync(resolve(dir, 'glyphs'));
 
 for (const entry of providers) {
   if (seen.has(entry.id)) {
@@ -151,6 +165,21 @@ for (const entry of providers) {
   seen.add(entry.id);
   if (!TREATMENTS.has(entry.treatment)) {
     throw new Error(`${entry.id}: unknown treatment "${entry.treatment}"`);
+  }
+  const groups = Object.entries(entry.groups ?? {});
+  if (groups.length === 0) {
+    throw new Error(`${entry.id}: a logo needs at least one group`);
+  }
+  for (const [group, keys] of groups) {
+    if (!GROUPS[group]) {
+      throw new Error(`${entry.id}: unknown group "${group}"`);
+    }
+    for (const key of keys) {
+      if (groupEntries[group].some(existing => existing.key === key)) {
+        throw new Error(`${entry.id}: "${key}" is already used in the ${group} group`);
+      }
+      groupEntries[group].push({ key, id: entry.id });
+    }
   }
 
   const optimized = optimizeSvg(entry.id, readFileSync(resolve(dir, `logos/${entry.id}.svg`), 'utf8'));
@@ -183,39 +212,52 @@ for (const entry of providers) {
     throw new Error(`${entry.id}: an adaptive logo needs at least one light-dark() color`);
   }
 
-  const key = /^[a-z_$][\w$]*$/i.test(entry.id) ? entry.id : `'${entry.id}'`;
-  glyphs.push(`  ${key}: {
-    viewBox: '${squareViewBox(svg.attributes.viewBox)}',
-    render: (${ids.size > 0 ? 'uid' : ''}) => (${body}),
-  },`);
-}
+  const file = `glyphs/${entry.id}.generated.tsx`;
+  writeFileSync(
+    resolve(dir, file),
+    `import type { ProviderLogoGlyph } from '../provider-logo.types';
 
-writeFileSync(
-  resolve(dir, 'provider-logo.ids.generated.ts'),
-  `export const providerLogoIds = ${JSON.stringify(providers.map(p => p.id))} as const;
-
-export type ProviderLogoId = (typeof providerLogoIds)[number];
-`,
-);
-
-writeFileSync(
-  resolve(dir, 'provider-logo.glyphs.generated.tsx'),
-  `import type React from 'react';
-
-import type { ProviderLogoId } from './provider-logo.ids.generated';
-
-export type ProviderLogoGlyph = { viewBox: string; render: (uid: string) => React.ReactElement };
-
-export const providerLogoGlyphs: Record<ProviderLogoId, ProviderLogoGlyph> = {
-${glyphs.join('\n')}
+export const ${exportName(entry.id)}: ProviderLogoGlyph = {
+  id: '${entry.id}',
+  viewBox: '${squareViewBox(svg.attributes.viewBox)}',
+  render: (${ids.size > 0 ? 'uid' : ''}) => (${body}),
 };
 `,
-);
+  );
+  written.push(file);
+}
 
-execFileSync(
-  'pnpm',
-  ['exec', 'prettier', '--write', 'provider-logo.ids.generated.ts', 'provider-logo.glyphs.generated.tsx'],
-  { cwd: dir, stdio: 'ignore' },
-);
+for (const [group, { map, type, lookup }] of Object.entries(GROUPS)) {
+  const entries = groupEntries[group];
+  const imports = [...new Set(entries.map(({ id }) => id))]
+    .sort()
+    .map(id => `import { ${exportName(id)} } from './glyphs/${id}.generated';`)
+    .join('\n');
+  const members = entries
+    .map(({ key, id }) => (key === exportName(id) ? `  ${key},` : `  ${objectKey(key)}: ${exportName(id)},`))
+    .join('\n');
+  const file = `${group}.generated.ts`;
+  writeFileSync(
+    resolve(dir, file),
+    `${imports}
+import type { ProviderLogoGlyph } from './provider-logo.types';
+
+export const ${map} = {
+${members}
+} satisfies Record<string, ProviderLogoGlyph>;
+
+export type ${type} = keyof typeof ${map};
+
+const lookup: ReadonlyMap<string, ProviderLogoGlyph> = new Map(Object.entries(${map}));
+
+export function ${lookup}(id: string): ProviderLogoGlyph | undefined {
+  return lookup.get(id);
+}
+`,
+  );
+  written.push(file);
+}
+
+execFileSync('pnpm', ['exec', 'prettier', '--write', ...written], { cwd: dir, stdio: 'ignore' });
 
 console.log(`${providers.length} provider logos, ${gzipSync(rawBytes, { level: 9 }).length} B gzip of optimized SVG`);

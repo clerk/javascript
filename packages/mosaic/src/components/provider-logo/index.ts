@@ -1,4 +1,3 @@
-export { isProviderLogoId, ProviderLogo } from './provider-logo';
+export { ProviderLogo } from './provider-logo';
 export type { ProviderLogoProps } from './provider-logo';
-export { providerLogoIds } from './provider-logo.ids.generated';
-export type { ProviderLogoId } from './provider-logo.ids.generated';
+export type { ProviderLogoGlyph } from './provider-logo.types';

@@ -19,6 +19,7 @@ import type {
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { getOAuthLogo } from '../../../components/provider-logo/oauth.generated';
 import { toProviderIcon } from '../user-profile-provider-icon.model';
 import type {
   ConnectedAccountActionResult,
@@ -89,7 +90,10 @@ export function createProviderCatalog(
     strategy,
     provider,
     enabled: enabled.has(strategy),
-    display: { provider: name, icon: toProviderIcon({ provider, iconUrl: iconImageUrl(provider), label: name }) },
+    display: {
+      provider: name,
+      icon: toProviderIcon({ logo: getOAuthLogo(provider), iconUrl: iconImageUrl(provider), label: name }),
+    },
   }));
   const candidates = new Set([
     ...enabledStrategies,
@@ -178,7 +182,7 @@ function toAccountRow(
     id: account.id,
     ...(providers.find(provider => provider.provider === account.provider)?.display ?? {
       provider: account.provider,
-      icon: toProviderIcon({ provider: account.provider, label: account.provider }),
+      icon: toProviderIcon({ logo: getOAuthLogo(account.provider), label: account.provider }),
     }),
     identifier: account.username || account.emailAddress || undefined,
     status,

@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileNameRowView } from '../user-profile-account-section/user-profile-name-row.view';
+import { enterpriseLogos } from '../../../components/provider-logo/enterprise.generated';
 
 describe('UserProfileNameRowView', () => {
   it('offers to add a name the user does not have yet', async () => {
@@ -67,7 +68,7 @@ describe('UserProfileNameRowView', () => {
       <MosaicProvider>
         <UserProfileNameRowView
           name='Preston Booth'
-          managedBy={{ name: 'Okta', provider: 'okta' }}
+          managedBy={{ name: 'Okta', logo: enterpriseLogos.saml_okta }}
         />
       </MosaicProvider>,
     );

@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Icon } from '../../components/icon';
-import type { ProviderLogoId } from '../../components/provider-logo';
+import type { ProviderLogoGlyph } from '../../components/provider-logo';
 import { ProviderLogo } from '../../components/provider-logo';
 import { Section, sectionCompactStyles } from '../../components/section';
 import { fill, useMessages } from '../../localization';
@@ -9,7 +9,7 @@ import { fill, useMessages } from '../../localization';
 /** The enterprise connection a row's value comes from, which is why the row has nothing to edit. */
 export interface UserProfileManagedBy {
   name?: string;
-  provider?: ProviderLogoId;
+  logo?: ProviderLogoGlyph;
 }
 
 export function UserProfileManagedByLabel({
@@ -24,9 +24,9 @@ export function UserProfileManagedByLabel({
   return (
     <Section.Note
       icon={
-        managedBy.provider ? (
+        managedBy.logo ? (
           <ProviderLogo
-            provider={managedBy.provider}
+            glyph={managedBy.logo}
             size='sm'
           />
         ) : (

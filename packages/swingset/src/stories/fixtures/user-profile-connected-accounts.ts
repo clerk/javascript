@@ -6,17 +6,18 @@ import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosText } from '@/lib/chaos';
+import { oauthLogos } from '@clerk/mosaic/components/provider-logo/oauth.generated';
 
 export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
   identifier: 'test@example.com',
-  icon: { logo: 'google' },
+  icon: { logo: oauthLogos.google },
   status: 'connected',
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
-  { id: 'google', provider: 'Google', icon: { logo: 'google' } },
-  { id: 'apple', provider: 'Apple', icon: { logo: 'apple' } },
+  { id: 'google', provider: 'Google', icon: { logo: oauthLogos.google } },
+  { id: 'apple', provider: 'Apple', icon: { logo: oauthLogos.apple } },
 ];
 
 export function useConnectedAccountsFixture({

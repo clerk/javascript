@@ -20,6 +20,7 @@ import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 import { useUserProfileVerifyEmailLinkFixture } from './fixtures/user-profile-verify-email-link';
 import { useUserProfileVerifyEmailSsoFixture } from './fixtures/user-profile-verify-email-sso';
+import { enterpriseLogos } from '@clerk/mosaic/components/provider-logo/enterprise.generated';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -133,7 +134,7 @@ export function NameManagedByConnection() {
   return (
     <AccountSection
       allowMultipleAccounts={false}
-      nameManagedBy={{ name: 'Okta', provider: 'okta' }}
+      nameManagedBy={{ name: 'Okta', logo: enterpriseLogos.saml_okta }}
     />
   );
 }

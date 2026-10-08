@@ -1,26 +1,15 @@
-import type { ProviderLogoId } from '../../components/provider-logo';
-import { isProviderLogoId } from '../../components/provider-logo';
+import type { ProviderLogoGlyph } from '../../components/provider-logo';
 import type { UserProfileProviderIconProps } from './user-profile-provider-icon';
 
-function stripProviderPrefix(provider: string): string {
-  return provider.replace(/^(oauth_|saml_|oidc_)/, '');
-}
-
-export function toProviderLogoId(provider: string | undefined): ProviderLogoId | undefined {
-  const id = provider && stripProviderPrefix(provider);
-  return id && isProviderLogoId(id) ? id : undefined;
-}
-
 export function toProviderIcon({
-  provider,
+  logo,
   iconUrl,
   label,
 }: {
-  provider?: string;
+  logo?: ProviderLogoGlyph;
   iconUrl?: string | null;
   label: string;
 }): UserProfileProviderIconProps {
-  const logo = toProviderLogoId(provider);
   if (logo) {
     return { logo };
   }

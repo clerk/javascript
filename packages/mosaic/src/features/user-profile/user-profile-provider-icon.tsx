@@ -1,14 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Icon, IconFrame } from '../../components/icon';
-import type { ProviderLogoId } from '../../components/provider-logo';
+import type { ProviderLogoGlyph } from '../../components/provider-logo';
 import { ProviderLogo } from '../../components/provider-logo';
 import { Section } from '../../components/section';
 import type { IconName } from '../../icons/registry';
 import { styles } from './user-profile-profile-panel.styles';
 
 export type UserProfileProviderIconProps =
-  | { logo: ProviderLogoId }
+  | { logo: ProviderLogoGlyph }
   | { iconUrl: string }
   | { name: IconName }
   | { initial: string };
@@ -17,7 +17,7 @@ function ProviderIconContent(props: UserProfileProviderIconProps) {
   if ('logo' in props) {
     return (
       <ProviderLogo
-        provider={props.logo}
+        glyph={props.logo}
         xstyle={styles.providerIcon}
       />
     );

@@ -20,18 +20,32 @@ ProviderLogo renders the logo for an OAuth, Web3, or phone-code provider. Each l
 
 ## Usage
 
+`ProviderLogo` renders the `glyph` it is given. The glyphs come in four groups, each in its own module, keyed by the provider id Clerk uses for that group:
+
+| Module                 | Map               | Lookup              | Keys                              |
+| ---------------------- | ----------------- | ------------------- | --------------------------------- |
+| `oauth.generated`      | `oauthLogos`      | `getOAuthLogo`      | OAuth provider (`google`)         |
+| `enterprise.generated` | `enterpriseLogos` | `getEnterpriseLogo` | Enterprise provider (`saml_okta`) |
+| `web3.generated`       | `web3Logos`       | `getWeb3Logo`       | Web3 provider (`metamask`)        |
+| `phone.generated`      | `phoneLogos`      | `getPhoneLogo`      | Phone code channel (`whatsapp`)   |
+
+A feature imports only the groups it renders, and a logo in more than one group ships once.
+
 ```tsx
 import { ProviderLogo } from '@clerk/mosaic/components/provider-logo';
+import { oauthLogos } from '@clerk/mosaic/components/provider-logo/oauth.generated';
 
-<ProviderLogo provider='google' />;
+<ProviderLogo glyph={oauthLogos.google} />;
 ```
 
-`isProviderLogoId` narrows a provider string from the environment before rendering. A provider without a logo, such as a custom OAuth provider, renders its own image instead.
+A lookup returns `undefined` for an id without a logo, such as a custom OAuth provider, which renders its own image instead.
 
 ```tsx
-import { isProviderLogoId, ProviderLogo } from '@clerk/mosaic/components/provider-logo';
+import { getOAuthLogo } from '@clerk/mosaic/components/provider-logo/oauth.generated';
 
-isProviderLogoId(provider) ? <ProviderLogo provider={provider} /> : <img src={logoUrl} alt='' />;
+const glyph = getOAuthLogo(provider);
+
+glyph ? <ProviderLogo glyph={glyph} /> : <img src={logoUrl} alt='' />;
 ```
 
 ---

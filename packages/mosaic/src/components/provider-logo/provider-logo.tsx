@@ -6,31 +6,22 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import type { IconProps } from '../icon';
 import { sizes } from '../icon/icon.styles';
-import { providerLogoGlyphs } from './provider-logo.glyphs.generated';
-import type { ProviderLogoId } from './provider-logo.ids.generated';
-import { providerLogoIds } from './provider-logo.ids.generated';
 import { styles } from './provider-logo.styles';
+import type { ProviderLogoGlyph } from './provider-logo.types';
 
 export interface ProviderLogoProps extends MosaicElementProps<'svg'> {
-  provider: ProviderLogoId;
+  glyph: ProviderLogoGlyph;
   size?: IconProps['size'];
 }
 
-const providerLogoIdSet: ReadonlySet<string> = new Set(providerLogoIds);
-
-export function isProviderLogoId(value: string): value is ProviderLogoId {
-  return providerLogoIdSet.has(value);
-}
-
 export const ProviderLogo = React.forwardRef<SVGSVGElement, ProviderLogoProps>(function MosaicProviderLogo(
-  { provider, size = 'md', xstyle, ...rest },
+  { glyph, size = 'md', xstyle, ...rest },
   ref,
 ) {
-  const glyph = providerLogoGlyphs[provider];
   const uid = React.useId().replace(/[^\w-]/g, '');
   const props = mergeStyleProps(
     { 'aria-hidden': true },
-    themeProps('provider-logo', { size, provider }),
+    themeProps('provider-logo', { size, provider: glyph.id }),
     stylex.props(reset.base, styles.base, sizes[size], xstyle),
     rest,
   );

@@ -6,13 +6,13 @@ Shared by `provider-logo-update` and `provider-logo-add`.
 
 All paths are under `packages/mosaic/`.
 
-| Path                                                              | What                                                                              |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `src/components/provider-logo/logos/<id>.svg`                     | Source SVG per provider, as downloaded from the brand (hand-trimmed if needed)    |
-| `src/components/provider-logo/logos/manifest.json`                | Source of truth: order, treatment, color swaps, brand URL, provenance, last check |
-| `scripts/generate-provider-logos.mjs`                             | svgo + treatment + JSX codegen                                                    |
-| `src/components/provider-logo/provider-logo.ids.generated.ts`     | Generated id list and `ProviderLogoId`                                            |
-| `src/components/provider-logo/provider-logo.glyphs.generated.tsx` | Generated glyphs, imported statically by `ProviderLogo`                           |
+| Path                                                     | What                                                                              |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `src/components/provider-logo/logos/<id>.svg`            | Source SVG per provider, as downloaded from the brand (hand-trimmed if needed)    |
+| `src/components/provider-logo/logos/manifest.json`       | Source of truth: order, treatment, color swaps, brand URL, provenance, last check |
+| `scripts/generate-provider-logos.mjs`                    | svgo + treatment + JSX codegen                                                    |
+| `src/components/provider-logo/glyphs/<id>.generated.tsx` | Generated glyph module per logo                                                   |
+| `src/components/provider-logo/<group>.generated.ts`      | Generated map and lookup per group (`oauth`, `enterprise`, `web3`, `phone`)       |
 
 Never hand-edit a `*.generated.*` file. Edit the SVG or manifest, then run
 `pnpm --filter @clerk/mosaic generate:provider-logos`.
@@ -24,6 +24,7 @@ Never hand-edit a `*.generated.*` file. Edit the SVG or manifest, then run
   "id": "atlassian",
   "name": "Atlassian",
   "treatment": "adaptive",
+  "groups": { "oauth": ["atlassian"] },
   "colors": { "#1868db": "light-dark(#1868DB, #357DE8)" },
   "brand": "https://atlassian.design/foundations/logos",
   "source": "Paths and colors from @atlaskit/logo.",
@@ -31,8 +32,13 @@ Never hand-edit a `*.generated.*` file. Edit the SVG or manifest, then run
 }
 ```
 
-- `id` is the Clerk provider id (`provider` in `packages/shared/src/oauth.ts`, `web3.ts`, or
-  `channel` in `alternativePhoneCode.ts`), and the SVG filename.
+- `id` names the logo: the SVG filename and the glyph module. Use the Clerk provider id when the
+  logo belongs to one (`provider` in `packages/shared/src/oauth.ts` or `web3.ts`, `channel` in
+  `alternativePhoneCode.ts`).
+- `groups` lists, per group, the ids a lookup in that group resolves to this logo. Keys are the ids
+  Clerk uses in that context: OAuth and Web3 providers, phone code channels, and full enterprise
+  provider ids (`saml_okta`, `oauth_google`, `oidc_gitlab`). A logo in several groups (Google is
+  `oauth` and `enterprise`) is one module that each group map references.
 - `colors` maps a fill **as svgo writes it** (lowercase, shortened hex: `#000`, `#00f`) to its
   replacement. The generator throws if a key is not found; its error prints the optimized markup.
 - `brand` is the official brand or sign-in-button guideline page. Omit it only when none exists.
@@ -85,7 +91,7 @@ The generator throws on `<image>`, `<style>`, `<script>`, `<foreignObject>`, and
 
 1. `pnpm --filter @clerk/mosaic generate:provider-logos`. It prints the gzip size of all logos;
    note the before/after. A single logo over ~1.5KB gzip deserves a second look, since every bundle
-   that imports `ProviderLogo` carries every logo.
+   that imports its group carries it.
 2. `pnpm --filter @clerk/mosaic exec vitest run --project mosaic src/components/provider-logo`.
 3. Look at swingset `/components/provider-logo`: the Color schemes example shows every logo on
    light and dark. Check the changed logo at `sm`, `md`, and `lg` against its neighbors. Swingset
@@ -94,26 +100,14 @@ The generator throws on `<image>`, `<style>`, `<script>`, `<foreignObject>`, and
 
 ## Bundle size
 
-`ProviderLogo` imports every glyph statically. With 37 logos that is ~22.5KB minified / ~7.9KB
-gzip, carried by whichever bundle imports `ProviderLogo`, whether or not the screen shows a logo.
+`ProviderLogo` renders whatever glyph it is handed, so it pulls in no logos itself. A feature pays
+only for the group maps it imports. Minified and gzipped: `oauth` ~6.3KB, `enterprise` ~1.6KB,
+`web3` ~1.5KB, `phone` ~0.6KB. `enterprise` shares Google, Microsoft, GitHub and GitLab with
+`oauth`, so a bundle with both adds only Okta.
 
-### Lazy loading later
-
-Moving the glyphs into a lazy chunk would take that ~7.9KB gzip out of the eager bundle for apps and
-screens that never show a provider logo (no social or enterprise sign-in, `UserButton`-only). It
-costs one round trip and an empty first frame unless the chunk is preloaded. Approaches:
-
-1. **One lazy chunk (built and verified in the first commit of PR #10044).** A module-level loader
-   `import()`s `provider-logo.glyphs.generated`, and `useSyncExternalStore` re-renders every
-   `ProviderLogo` when it resolves. The `<svg>` keeps its size with no `viewBox` until then, so
-   nothing shifts. Export a `preloadProviderLogos()` and call it once the environment shows social
-   or enterprise sign-in is enabled (sign-in/up), or when the `UserButton` menu opens (profile).
-   tsdown emits the chunk as its own file, and a consumer's bundler makes it its own async chunk.
-2. **One module per logo.** Generate a module per provider and `import()` by id, so a screen fetches
-   only the logos it shows. Smallest transfer, but one request per logo and more codegen; worth it
-   only if the set grows well past its current size.
-3. **Stay eager, trim outliers.** Hugging Face alone is ~1.5KB of the ~7.9KB gzip. Simplifying or
-   lazy-loading only the heaviest marks keeps the API synchronous.
+Loading only the logo a screen needs after discovering which one it is was rejected: the extra round
+trip costs more than the bytes it saves. The group modules are the unit for the planned
+per-feature code splitting, so a split chunk carries only the groups its feature imports.
 
 ## Changeset
 

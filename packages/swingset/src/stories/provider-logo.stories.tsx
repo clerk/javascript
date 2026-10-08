@@ -1,11 +1,22 @@
-import type { ProviderLogoProps } from '@clerk/mosaic/components/provider-logo';
-import { ProviderLogo, providerLogoIds } from '@clerk/mosaic/components/provider-logo';
+import type { ProviderLogoGlyph, ProviderLogoProps } from '@clerk/mosaic/components/provider-logo';
+import { ProviderLogo } from '@clerk/mosaic/components/provider-logo';
+import { enterpriseLogos } from '@clerk/mosaic/components/provider-logo/enterprise.generated';
+import { oauthLogos } from '@clerk/mosaic/components/provider-logo/oauth.generated';
+import { phoneLogos } from '@clerk/mosaic/components/provider-logo/phone.generated';
+import { web3Logos } from '@clerk/mosaic/components/provider-logo/web3.generated';
 import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
 
 export { default as __source } from './provider-logo.stories?raw';
+
+const glyphsById = new Map<string, ProviderLogoGlyph>(
+  [oauthLogos, web3Logos, phoneLogos, enterpriseLogos]
+    .flatMap(group => Object.values(group))
+    .map(glyph => [glyph.id, glyph]),
+);
+const glyphs = [...glyphsById.values()];
 
 const styles = stylex.create({
   row: {
@@ -47,18 +58,18 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/provider-logo/provider-logo.tsx',
   styles: {
     _variants: {
-      provider: Object.fromEntries(providerLogoIds.map(id => [id, {}])),
+      glyph: Object.fromEntries(glyphs.map(glyph => [glyph.id, {}])),
       size: { sm: {}, md: {}, lg: {}, inherit: {} },
     },
     _defaultVariants: {
-      provider: 'google',
+      glyph: 'google',
       size: 'md',
     },
   },
 };
 
-function knobsAsProps(props: Record<string, unknown>) {
-  return props as unknown as ProviderLogoProps;
+function knobsAsProps({ glyph, ...props }: Record<string, unknown>): ProviderLogoProps {
+  return { ...props, glyph: glyphsById.get(String(glyph)) ?? oauthLogos.google };
 }
 
 export function Default(props: Record<string, unknown>) {
@@ -69,15 +80,15 @@ export function Sizes() {
   return (
     <div {...stylex.props(styles.row)}>
       <ProviderLogo
-        provider='github'
+        glyph={oauthLogos.github}
         size='sm'
       />
       <ProviderLogo
-        provider='github'
+        glyph={oauthLogos.github}
         size='md'
       />
       <ProviderLogo
-        provider='github'
+        glyph={oauthLogos.github}
         size='lg'
       />
     </div>
@@ -92,10 +103,10 @@ export function ColorSchemes() {
           key={scheme}
           {...stylex.props(styles.panel, styles[scheme])}
         >
-          {providerLogoIds.map(id => (
+          {glyphs.map(glyph => (
             <ProviderLogo
-              key={id}
-              provider={id}
+              key={glyph.id}
+              glyph={glyph}
               size='lg'
             />
           ))}

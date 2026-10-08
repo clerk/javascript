@@ -5,6 +5,7 @@ import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@c
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { getEnterpriseLogo } from '../../../components/provider-logo/enterprise.generated';
 import { toProviderIcon } from '../user-profile-provider-icon.model';
 import type {
   EnterpriseAccountActionResult,
@@ -49,7 +50,7 @@ export function projectEnterpriseAccounts({
       id: account.id ?? '',
       name: account.enterpriseConnection?.name ?? '',
       icon: toProviderIcon({
-        provider: account.provider,
+        logo: getEnterpriseLogo(account.provider),
         iconUrl: account.enterpriseConnection?.logoPublicUrl,
         label: account.enterpriseConnection?.name ?? '',
       }),
@@ -62,7 +63,7 @@ export function projectEnterpriseAccounts({
       id: connection.id,
       name: connection.name,
       icon: toProviderIcon({
-        provider: connection.provider,
+        logo: getEnterpriseLogo(connection.provider),
         iconUrl: connection.logoPublicUrl,
         label: connection.name,
       }),

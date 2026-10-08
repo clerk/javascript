@@ -7,6 +7,7 @@ import {
   projectConnectedAccounts,
   recoveryFor,
 } from './user-profile-connected-accounts-section.model';
+import { oauthLogos } from '../../../components/provider-logo/oauth.generated';
 
 type AccountInput = {
   id: string;
@@ -204,8 +205,8 @@ describe('projectConnectedAccounts', () => {
       allowCreation: true,
     });
     expect(projection.status === 'ready' && projection.availableProviders.map(p => [p.id, p.icon])).toEqual([
-      ['oauth_github', { logo: 'github' }],
-      ['oauth_google', { logo: 'google' }],
+      ['oauth_github', { logo: oauthLogos.github }],
+      ['oauth_google', { logo: oauthLogos.google }],
     ]);
   });
 

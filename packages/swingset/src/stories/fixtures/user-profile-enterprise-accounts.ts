@@ -6,18 +6,19 @@ import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosText } from '@/lib/chaos';
+import { enterpriseLogos } from '@clerk/mosaic/components/provider-logo/enterprise.generated';
 
 export const accounts: UserProfileEnterpriseAccount[] = [
   {
     id: 'account_okta',
     name: 'Acme Okta',
     emailAddress: 'alex@acme.com',
-    icon: { logo: 'okta' },
+    icon: { logo: enterpriseLogos.saml_okta },
   },
   { id: 'account_custom', name: 'Internal SSO', emailAddress: 'alex@internal.acme.com', icon: { initial: 'I' } },
 ];
 const connections: UserProfileEnterpriseConnection[] = [
-  { id: 'connection_google', name: 'Google Workspace', icon: { logo: 'google' } },
+  { id: 'connection_google', name: 'Google Workspace', icon: { logo: enterpriseLogos.saml_google } },
   { id: 'connection_saml', name: 'Partner SAML', icon: { initial: 'P' } },
 ];
 

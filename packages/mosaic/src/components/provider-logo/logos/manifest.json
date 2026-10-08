@@ -4,6 +4,10 @@
       "id": "google",
       "name": "Google",
       "treatment": "color",
+      "groups": {
+        "oauth": ["google"],
+        "enterprise": ["saml_google", "oauth_google"]
+      },
       "brand": "https://developers.google.com/identity/branding-guidelines",
       "source": "Flat four-color G. The 2025 gradient G is not reproducible as clean SVG.",
       "checked": "2026-10-02"
@@ -12,6 +16,9 @@
       "id": "discord",
       "name": "Discord",
       "treatment": "color",
+      "groups": {
+        "oauth": ["discord"]
+      },
       "brand": "https://discord.com/branding",
       "checked": "2026-10-02"
     },
@@ -19,6 +26,9 @@
       "id": "facebook",
       "name": "Facebook",
       "treatment": "color",
+      "groups": {
+        "oauth": ["facebook"]
+      },
       "colors": {
         "#1977f3": "#0866FF"
       },
@@ -29,6 +39,9 @@
       "id": "twitch",
       "name": "Twitch",
       "treatment": "color",
+      "groups": {
+        "oauth": ["twitch"]
+      },
       "brand": "https://brand.twitch.com",
       "checked": "2026-10-02"
     },
@@ -36,6 +49,9 @@
       "id": "twitter",
       "name": "Twitter",
       "treatment": "mono",
+      "groups": {
+        "oauth": ["twitter"]
+      },
       "brand": "https://about.x.com/en/who-we-are/brand-toolkit",
       "source": "Renders the X mark; the bird is retired.",
       "checked": "2026-10-02"
@@ -44,6 +60,10 @@
       "id": "microsoft",
       "name": "Microsoft",
       "treatment": "color",
+      "groups": {
+        "oauth": ["microsoft"],
+        "enterprise": ["saml_microsoft", "oauth_microsoft"]
+      },
       "brand": "https://learn.microsoft.com/en-us/entra/identity-platform/howto-add-branding-in-apps",
       "checked": "2026-10-02"
     },
@@ -51,6 +71,9 @@
       "id": "tiktok",
       "name": "TikTok",
       "treatment": "mono",
+      "groups": {
+        "oauth": ["tiktok"]
+      },
       "brand": "https://developers.tiktok.com/doc/getting-started-design-guidelines",
       "source": "Note glyph from the login button pack.",
       "checked": "2026-10-02"
@@ -59,6 +82,9 @@
       "id": "linkedin",
       "name": "LinkedIn",
       "treatment": "color",
+      "groups": {
+        "oauth": ["linkedin"]
+      },
       "brand": "https://brand.linkedin.com/in-logo",
       "checked": "2026-10-02"
     },
@@ -66,6 +92,9 @@
       "id": "linkedin_oidc",
       "name": "LinkedIn",
       "treatment": "color",
+      "groups": {
+        "oauth": ["linkedin_oidc"]
+      },
       "brand": "https://brand.linkedin.com/in-logo",
       "checked": "2026-10-02"
     },
@@ -73,6 +102,10 @@
       "id": "github",
       "name": "GitHub",
       "treatment": "mono",
+      "groups": {
+        "oauth": ["github"],
+        "enterprise": ["oidc_github_enterprise"]
+      },
       "brand": "https://brand.github.com/foundations/logo",
       "checked": "2026-10-02"
     },
@@ -80,6 +113,10 @@
       "id": "gitlab",
       "name": "GitLab",
       "treatment": "color",
+      "groups": {
+        "oauth": ["gitlab"],
+        "enterprise": ["oidc_gitlab"]
+      },
       "brand": "https://design.gitlab.com/brand-logo/logomark",
       "checked": "2026-10-02"
     },
@@ -87,6 +124,9 @@
       "id": "dropbox",
       "name": "Dropbox",
       "treatment": "color",
+      "groups": {
+        "oauth": ["dropbox"]
+      },
       "brand": "https://brand.dropbox.com/logo",
       "checked": "2026-10-02"
     },
@@ -94,6 +134,9 @@
       "id": "atlassian",
       "name": "Atlassian",
       "treatment": "adaptive",
+      "groups": {
+        "oauth": ["atlassian"]
+      },
       "colors": {
         "#1868db": "light-dark(#1868DB, #357DE8)"
       },
@@ -105,6 +148,9 @@
       "id": "bitbucket",
       "name": "Bitbucket",
       "treatment": "adaptive",
+      "groups": {
+        "oauth": ["bitbucket"]
+      },
       "colors": {
         "#1868db": "light-dark(#1868DB, #357DE8)"
       },
@@ -116,6 +162,9 @@
       "id": "hubspot",
       "name": "HubSpot",
       "treatment": "color",
+      "groups": {
+        "oauth": ["hubspot"]
+      },
       "brand": "https://www.hubspot.com/partners/technology/branding-guidelines",
       "source": "Site now uses #FF4800; the gated asset files were not checked.",
       "checked": "2026-10-02"
@@ -124,6 +173,9 @@
       "id": "notion",
       "name": "Notion",
       "treatment": "color",
+      "groups": {
+        "oauth": ["notion"]
+      },
       "brand": "https://www.notion.com/brand",
       "checked": "2026-10-02"
     },
@@ -131,6 +183,9 @@
       "id": "apple",
       "name": "Apple",
       "treatment": "adaptive",
+      "groups": {
+        "oauth": ["apple"]
+      },
       "colors": {
         "#000": "light-dark(#000, #fff)"
       },
@@ -142,6 +197,9 @@
       "id": "line",
       "name": "LINE",
       "treatment": "color",
+      "groups": {
+        "oauth": ["line"]
+      },
       "brand": "https://developers.line.biz/en/docs/line-login/login-button/",
       "checked": "2026-10-02"
     },
@@ -149,6 +207,9 @@
       "id": "instagram",
       "name": "Instagram",
       "treatment": "mono",
+      "groups": {
+        "oauth": ["instagram"]
+      },
       "brand": "https://www.meta.com/brand/resources/instagram/",
       "source": "Glyph from simple-icons (CC0).",
       "checked": "2026-10-02"
@@ -157,6 +218,9 @@
       "id": "coinbase",
       "name": "Coinbase",
       "treatment": "color",
+      "groups": {
+        "oauth": ["coinbase"]
+      },
       "colors": {
         "#1652f0": "#0052FF"
       },
@@ -167,6 +231,9 @@
       "id": "spotify",
       "name": "Spotify",
       "treatment": "adaptive",
+      "groups": {
+        "oauth": ["spotify"]
+      },
       "colors": {
         "#1ed760": "light-dark(#1ED760, #fff)"
       },
@@ -178,6 +245,9 @@
       "id": "xero",
       "name": "Xero",
       "treatment": "color",
+      "groups": {
+        "oauth": ["xero"]
+      },
       "brand": "https://developer.xero.com/documentation/xero-app-store/app-partner-guides/brand-guidelines",
       "checked": "2026-10-02"
     },
@@ -185,6 +255,9 @@
       "id": "box",
       "name": "Box",
       "treatment": "color",
+      "groups": {
+        "oauth": ["box"]
+      },
       "brand": "https://www.box.com/legal/trademark",
       "checked": "2026-10-02"
     },
@@ -192,6 +265,9 @@
       "id": "slack",
       "name": "Slack",
       "treatment": "color",
+      "groups": {
+        "oauth": ["slack"]
+      },
       "brand": "https://slack.com/media-kit",
       "checked": "2026-10-02"
     },
@@ -199,6 +275,9 @@
       "id": "linear",
       "name": "Linear",
       "treatment": "mono",
+      "groups": {
+        "oauth": ["linear"]
+      },
       "brand": "https://linear.app/brand",
       "checked": "2026-10-02"
     },
@@ -206,6 +285,9 @@
       "id": "x",
       "name": "X",
       "treatment": "mono",
+      "groups": {
+        "oauth": ["x"]
+      },
       "brand": "https://about.x.com/en/who-we-are/brand-toolkit",
       "checked": "2026-10-02"
     },
@@ -213,12 +295,18 @@
       "id": "enstall",
       "name": "Enstall",
       "treatment": "color",
+      "groups": {
+        "oauth": ["enstall"]
+      },
       "checked": "2026-10-02"
     },
     {
       "id": "huggingface",
       "name": "Hugging Face",
       "treatment": "color",
+      "groups": {
+        "oauth": ["huggingface"]
+      },
       "brand": "https://huggingface.co/brand",
       "checked": "2026-10-02"
     },
@@ -226,6 +314,9 @@
       "id": "vercel",
       "name": "Vercel",
       "treatment": "mono",
+      "groups": {
+        "oauth": ["vercel"]
+      },
       "brand": "https://vercel.com/geist/brands",
       "checked": "2026-10-02"
     },
@@ -233,6 +324,9 @@
       "id": "agentid",
       "name": "AgentID",
       "treatment": "mono",
+      "groups": {
+        "oauth": ["agentid"]
+      },
       "brand": "https://agentid.com/brand",
       "checked": "2026-10-02"
     },
@@ -240,6 +334,9 @@
       "id": "metamask",
       "name": "MetaMask",
       "treatment": "color",
+      "groups": {
+        "web3": ["metamask"]
+      },
       "brand": "https://metamask.io/assets",
       "checked": "2026-10-02"
     },
@@ -247,6 +344,9 @@
       "id": "base",
       "name": "Base",
       "treatment": "adaptive",
+      "groups": {
+        "web3": ["base"]
+      },
       "colors": {
         "#00f": "light-dark(#0000FF, #fff)"
       },
@@ -258,6 +358,9 @@
       "id": "coinbase_wallet",
       "name": "Coinbase Wallet",
       "treatment": "color",
+      "groups": {
+        "web3": ["coinbase_wallet"]
+      },
       "source": "Renamed from Base App on 2026-09-08 with a new logo that has not been sourced yet.",
       "checked": "2026-10-02"
     },
@@ -265,12 +368,18 @@
       "id": "okx_wallet",
       "name": "OKX Wallet",
       "treatment": "mono",
+      "groups": {
+        "web3": ["okx_wallet"]
+      },
       "checked": "2026-10-02"
     },
     {
       "id": "solana",
       "name": "Solana",
       "treatment": "color",
+      "groups": {
+        "web3": ["solana"]
+      },
       "brand": "https://solana.com/branding",
       "checked": "2026-10-02"
     },
@@ -278,6 +387,9 @@
       "id": "whatsapp",
       "name": "WhatsApp",
       "treatment": "color",
+      "groups": {
+        "phone": ["whatsapp"]
+      },
       "brand": "https://www.meta.com/brand/resources/whatsapp/",
       "checked": "2026-10-02"
     },
@@ -285,6 +397,9 @@
       "id": "okta",
       "name": "Okta",
       "treatment": "mono",
+      "groups": {
+        "enterprise": ["saml_okta"]
+      },
       "brand": "https://www.okta.com/press-room/media-assets/",
       "checked": "2026-10-02"
     }

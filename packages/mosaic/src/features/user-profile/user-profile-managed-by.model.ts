@@ -1,7 +1,7 @@
 import type { EnterpriseAccountResource } from '@clerk/shared/types';
 
+import { getEnterpriseLogo } from '../../components/provider-logo/enterprise.generated';
 import type { UserProfileManagedBy } from './user-profile-managed-by';
-import { toProviderLogoId } from './user-profile-provider-icon.model';
 
 type ManagingAccount = Pick<EnterpriseAccountResource, 'provider'> & {
   enterpriseConnection?: { name?: string | null } | null;
@@ -9,6 +9,6 @@ type ManagingAccount = Pick<EnterpriseAccountResource, 'provider'> & {
 
 export function toManagedBy(account: ManagingAccount): UserProfileManagedBy {
   const name = account.enterpriseConnection?.name || undefined;
-  const provider = toProviderLogoId(account.provider);
-  return { ...(name ? { name } : {}), ...(provider ? { provider } : {}) };
+  const logo = getEnterpriseLogo(account.provider);
+  return { ...(name ? { name } : {}), ...(logo ? { logo } : {}) };
 }

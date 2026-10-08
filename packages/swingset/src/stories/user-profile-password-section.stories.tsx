@@ -4,6 +4,7 @@ import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-prof
 import type { StoryMeta } from '@/lib/types';
 
 import { useUserProfileEditPasswordFixture } from './fixtures/user-profile-edit-password';
+import { enterpriseLogos } from '@clerk/mosaic/components/provider-logo/enterprise.generated';
 
 export { default as __source } from './user-profile-password-section.stories?raw';
 
@@ -54,7 +55,7 @@ export function ManagedByEnterprise() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
       <UserProfilePasswordSectionView
         hasPassword
-        managedBy={{ name: 'Okta', provider: 'okta' }}
+        managedBy={{ name: 'Okta', logo: enterpriseLogos.saml_okta }}
       />
       <UserProfilePasswordSectionView
         hasPassword

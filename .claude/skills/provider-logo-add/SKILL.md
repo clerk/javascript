@@ -26,9 +26,10 @@ changesets.
 3. **Pick a treatment** and explain the choice in one line to the user, citing the brand guidance.
 4. **Add the files:**
    - `packages/mosaic/src/components/provider-logo/logos/<id>.svg`, cleaned per the reference.
-   - A manifest entry with `id`, `name`, `treatment`, `colors` if adaptive or recolored, `brand`,
+   - A manifest entry with `id`, `name`, `treatment`, `groups` (every group whose lookup should
+     resolve it, keyed by that group's provider ids), `colors` if adaptive or recolored, `brand`,
      `source` if anything is non-obvious, and `checked` set to today. Place it next to providers
      from the same shared list, in that list's order.
 5. **Generate and verify** per the reference. Report the gzip size change, since every bundle that
-   imports `ProviderLogo` carries every logo.
+   imports one of the logo's groups carries it.
 6. **Changeset** per the reference.
