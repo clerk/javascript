@@ -58,6 +58,7 @@ export function useUserProfileWeb3WalletsController({
     pendingWalletName: picker.open && picker.provider.id === action.pendingKey ? picker.walletName : undefined,
     onConnect,
     onSetPrimary: (walletId: string) => action.run(walletId, () => setPrimary(walletId)),
+    // TODO: Share the action lock during removal while preserving errors for the confirmation dialog.
     onRemove: remove,
     connectSolana,
     closeSolanaPicker: () => {
