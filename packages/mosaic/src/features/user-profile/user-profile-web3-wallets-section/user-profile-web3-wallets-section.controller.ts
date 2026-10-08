@@ -21,6 +21,7 @@ export function useUserProfileWeb3WalletsController({
     if (!provider) {
       return;
     }
+    // TODO: Open the Solana picker without pending while preserving the same-render action lock.
     return action.run(provider.id, () => {
       if (provider.walletPicker === 'solana') {
         setPicker(provider);
