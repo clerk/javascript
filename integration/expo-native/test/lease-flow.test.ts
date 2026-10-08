@@ -115,6 +115,16 @@ describe('lease flow', () => {
     });
   });
 
+  it('refuses --runner with the local backend as a usage error, before it builds, leases, or checks anything', async () => {
+    const { deps, events } = setup(0);
+    const usage = (error: VerifyFailure) => error.code === 'USAGE' && error.message === '--runner names a CI runner and the local backend has none' && error.fix === 'drop --runner, or pass --backend remote';
+    await assert.rejects(up(deps, { verb: 'up', runner: 'some-label', waitSeconds: 0 }), usage);
+    await assert.rejects(leaseForRun(deps, 'ios', { ...runCommand, runner: 'some-label' }, { willChange: false }, async () => undefined), usage);
+    await assert.rejects(doctor(deps, { verb: 'doctor', runner: 'some-label', live: true }), usage);
+    assert.deepEqual(events, []);
+    assert.equal(existsSync(deps.workspace.root), false);
+  });
+
   it('leases no device when no Platform API credential works', async () => {
     const { deps, events } = setup(0);
     const noCredential: Deps['instances'] = { ...deps.instances, access: async () => Promise.reject(new VerifyFailure('KEYS_MISSING', 'no Clerk Platform API credential works here', 'set one')) };

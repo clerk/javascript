@@ -9,7 +9,7 @@ import { describe, it } from 'node:test';
 import { isRunning, run } from '../src/core/exec.ts';
 import type { EvidencePath, LocalLease } from '../src/core/types.ts';
 import { readClaim, takeSlot } from '../src/core/claims.ts';
-import { LOG_FILTER, RECORD_SIZE, emulatorArgs, laneSettingsCommand, laneSettingsHold, laneSettingsReadCommand, logFilter, logcatSince } from '../src/platform/android/emulator.ts';
+import { LANE_FAILED, LANE_READY, LOG_FILTER, RECORD_SIZE, collectRecordingArgs, emulatorArgs, laneSettingsCommand, laneSettingsHold, laneSettingsReadCommand, logFilter, logcatSince, stopScreenrecordArgs, waitForLane } from '../src/platform/android/emulator.ts';
 import { lanePort, localAndroidBackend, laneSerial, parseAdbDevices, startScreenrecord, terminateGroup } from '../src/platform/android/local.ts';
 import { ensureLaneAvd, jdkCheck, localAvailability, resolveJavaHome, sdkRoot, systemImage, type Machine } from '../src/platform/android/sdk.ts';
 
@@ -521,5 +521,31 @@ describe('whether this machine can run the emulator', () => {
     assert.ok(written({ ANDROID_USER_HOME: join(dir, 'user') }).at(join(dir, 'user', 'avd')));
     const unset = written({ ANDROID_AVD_HOME: '' });
     assert.ok(unset.at(join(unset.home, '.android', 'avd')));
+  });
+});
+
+describe('what a remote session runs on its emulator', () => {
+  it('holds the install until the lane boot has finished, and fails the build with the boot\'s own error', async () => {
+    const work = mkdtempSync(join(tmpdir(), 'verify-recipe-'));
+    const wait = waitForLane(work);
+    const waiting = run(wait.command, wait.args);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    writeFileSync(join(work, LANE_READY), 'emulator-5560\n');
+    assert.equal((await waiting).code, 0);
+
+    const failed = mkdtempSync(join(tmpdir(), 'verify-recipe-'));
+    writeFileSync(join(failed, LANE_FAILED), 'no KVM here\n');
+    const refuse = waitForLane(failed);
+    const result = await run(refuse.command, refuse.args);
+    assert.equal(result.code, 1);
+    assert.match(result.stdout, /the emulator did not boot: no KVM here/);
+  });
+
+  it('stops screenrecord on the device and waits for it to exit, then pulls the file and deletes it there', () => {
+    assert.match(stopScreenrecordArgs.join(' '), /^shell pkill -INT screenrecord; .*while pidof screenrecord/);
+    assert.deepEqual(collectRecordingArgs('/data/local/tmp/verify-session.mp4', '/work/recording.mp4'), [
+      ['pull', '/data/local/tmp/verify-session.mp4', '/work/recording.mp4'],
+      ['shell', 'rm', '-f', '/data/local/tmp/verify-session.mp4'],
+    ]);
   });
 });
