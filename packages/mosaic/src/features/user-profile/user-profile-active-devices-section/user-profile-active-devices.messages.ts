@@ -6,8 +6,6 @@ export const userProfileActiveDevicesMessages = {
   mobileDevice: 'Mobile device',
   webBrowser: 'Web browser',
   lastSeen: 'Last seen {date}',
-  loadError: 'Could not load active devices.',
-  retry: 'Try again',
   signOutError: 'This device is no longer available. Please try again.',
   otherDevice: '{count} other device',
   otherDevices: '{count} other devices',

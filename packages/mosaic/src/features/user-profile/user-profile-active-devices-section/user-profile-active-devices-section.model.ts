@@ -10,7 +10,6 @@ import type { UserProfileDevice } from './user-profile-active-devices.types';
 export type UserProfileActiveDevicesModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | { status: 'error'; message: string; retry: () => void }
   | {
       status: 'ready';
       identity: string;
@@ -20,7 +19,6 @@ export type UserProfileActiveDevicesModel =
 
 type SessionsQuery =
   | { status: 'loading'; identity: string | undefined }
-  | { status: 'error'; identity: string }
   | { status: 'ready'; identity: string; sessions: SessionWithActivitiesResource[] };
 
 function isActiveDevice(session: SessionWithActivitiesResource): boolean {
@@ -47,7 +45,6 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
 
   const identity = userId && sessionId ? `${userId}:${sessionId}` : undefined;
   const [query, setQuery] = useState<SessionsQuery>({ status: 'loading', identity });
-  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     const currentUser = clerk.user;
@@ -56,22 +53,15 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
     }
     let active = true;
     setQuery({ status: 'loading', identity });
-    void currentUser.getSessions({ forceRefresh: true, throwOnError: true }).then(
-      sessions => {
-        if (active && clerk.user?.id === userId && clerk.session?.id === sessionId) {
-          setQuery({ status: 'ready', identity, sessions });
-        }
-      },
-      () => {
-        if (active && clerk.user?.id === userId && clerk.session?.id === sessionId) {
-          setQuery({ status: 'error', identity });
-        }
-      },
-    );
+    void currentUser.getSessions().then(sessions => {
+      if (active && clerk.user?.id === userId && clerk.session?.id === sessionId) {
+        setQuery({ status: 'ready', identity, sessions });
+      }
+    });
     return () => {
       active = false;
     };
-  }, [clerk, userId, sessionId, identity, attempt]);
+  }, [clerk, userId, sessionId, identity]);
 
   const toDevice = (item: SessionWithActivitiesResource): UserProfileDevice => {
     const activity = item.latestActivity;
@@ -109,14 +99,6 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   if (query.identity !== identity || query.status === 'loading') {
     return { status: 'loading' };
   }
-  if (query.status === 'error') {
-    return {
-      status: 'error',
-      message: m.loadError,
-      retry: () => setAttempt(value => value + 1),
-    };
-  }
-
   return {
     status: 'ready',
     identity,
@@ -126,18 +108,15 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
       .map(toDevice),
     revoke: async id => {
       const currentUser = clerk.user;
+      const target = query.sessions.find(item => item.id === id && isActiveDevice(item));
       if (
+        !target ||
         !currentUser ||
         !sessionId ||
         currentUser.id !== userId ||
         clerk.session?.id !== sessionId ||
         id === sessionId
       ) {
-        throw new Error(m.signOutError);
-      }
-      const sessions = await currentUser.getSessions({ forceRefresh: true, throwOnError: true });
-      const target = sessions.find(item => item.id === id && isActiveDevice(item));
-      if (!target || clerk.user?.id !== userId || clerk.session?.id !== sessionId) {
         throw new Error(m.signOutError);
       }
       await target.revoke();

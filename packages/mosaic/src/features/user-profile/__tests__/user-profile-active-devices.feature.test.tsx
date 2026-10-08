@@ -159,7 +159,7 @@ describe('Active devices', () => {
     expect(screen.queryByRole('button', { name: 'Manage Safari on Expired laptop' })).toBeNull();
   });
 
-  it('shows a load error and retries after the device request recovers', async () => {
+  it('preserves the SDK empty-list behavior after a failed device request', async () => {
     serveDevices([device('sess_current', 'active')]);
     let failing = true;
     worker.use(
@@ -170,12 +170,14 @@ describe('Active devices', () => {
       ),
     );
 
-    await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not load active devices.');
+    expect(await screen.findByText('No current device available')).toBeVisible();
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
     failing = false;
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText('This device')).toBeVisible();
+    await expect(view.clerk.user?.getSessions()).resolves.toEqual([]);
+    expect(screen.queryByText('This device')).toBeNull();
   });
 
   it('maps impersonation sessions to the distinct badges', async () => {
