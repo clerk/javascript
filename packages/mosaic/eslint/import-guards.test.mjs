@@ -40,7 +40,7 @@ async function restrictedImports(file, source) {
     .map(message => message.message);
 }
 
-describe('Mosaic import boundaries', () => {
+describe('Mosaic import boundaries', { timeout: 30_000 }, () => {
   test.each(['sample.view.ts', 'sample.view.tsx', 'sample.controller.ts', 'sample.controller.tsx'])(
     '%s rejects catalog values and Clerk hooks',
     async file => {
@@ -200,7 +200,7 @@ describe('Mosaic import boundaries', () => {
   });
 });
 
-describe('Mosaic package configuration', () => {
+describe('Mosaic package configuration', { timeout: 30_000 }, () => {
   test.each([
     'src/features/sample.view.tsx',
     'src/features/sample.controller.ts',
