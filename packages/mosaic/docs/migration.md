@@ -2,7 +2,7 @@
 
 Migrating a legacy component means taking logic that was fused into one file and
 pulling it apart into the model / controller / view layers (see the skill
-overview and `references/mosaic-architecture.md` → "Flow and data architecture").
+overview and `packages/mosaic/ARCHITECTURE.md` → "Flow and data architecture").
 `packages/mosaic/src/features/user-button/` is the fullest worked example of the
 finished shape.
 
@@ -37,6 +37,12 @@ hit is a row you must consciously place or drop later:
 | `useFetch` / `useOrganization`    | data loading, pagination, loading/empty states     |
 | `useInView`                       | infinite-scroll / intersection triggers            |
 
+Use `packages/mosaic/AGENTS.md` → "Reuse before you write" for shared helpers
+such as `save` and `useReverificationFlow`. The table does not cover every
+legacy behavior. Place revalidation and loading rules in the model, and inspect
+existing features for pagination and derived callouts before choosing their
+implementation in Phase 2.
+
 ```bash
 rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useInView' \
   packages/ui/src/components/<Feature>/
@@ -66,12 +72,18 @@ Two rows deserve extra care because they have no obvious home:
 - **Pure derivation** (slot layout, ordering a consumer's list) belongs in
   `*.layout.ts` / `*.utils.ts` beside the view, where it gets its own test.
 
+Share business-rule helpers when legacy and Mosaic must keep the same behavior.
+Do not extract similar presentation code solely to remove duplication when the
+designs may diverge. Inspect the existing helper and its callers before deciding
+where shared logic belongs.
+
 ## Phase 3 — Implement and test
 
-File shape: `<feature>.model.tsx` · `<feature>.controller.tsx` ·
+File shape: `<feature>.model.ts(x)` · `<feature>.controller.ts(x)` ·
 `<feature>.view.tsx` · `<feature>.tsx` (composition wrapper), plus
 `<feature>.types.ts` for the data contract the model and view share, and
-`<feature>.messages.ts` for the strings.
+`<feature>.messages.ts` for the strings. `*.styles.ts` and `*.dialog.tsx` are
+common extras. See `packages/mosaic/ARCHITECTURE.md` → "File shape".
 
 Only now decide how the controller holds its state: the inventory tells you
 whether the interaction has the async lifecycle and mutually-constraining values
@@ -99,7 +111,8 @@ classifying every legacy behavior as:
   scroll → "Load more" button).
 - **Deferred** — a real tracked ticket, **not** a `// TODO` buried in a
   controller or model. A buried TODO is invisible at review time; that is exactly
-  how the domains-section migration shipped three regressions.
+  how an earlier domains-section migration shipped three regressions (see
+  `parity-audit.md`).
 
 Every inventory row from Phase 1 must land in exactly one bucket. The table is
 **ephemeral**: it drives the work and the PR discussion, then is discarded. It is
@@ -108,7 +121,7 @@ not committed.
 ## Phase 5 — Ship
 
 Tests green, then a changeset and a conventional commit. See the `clerk-monorepo`
-skill for the dev loop and the hard rules. In short: `pnpm changeset` describing
-the user-facing change, scope `ui`, and remember non-major `packages/ui` changes
-load into older SDKs in the wild, so keep the public surface backward
-compatible.
+skill for the dev loop and the hard rules, including which changeset to write.
+The commit scope is `mosaic`. If the migration removes or changes legacy code in
+`packages/ui`, remember non-major `packages/ui` changes load into older SDKs in
+the wild, so keep its public surface backward compatible.

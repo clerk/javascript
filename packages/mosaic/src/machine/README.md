@@ -62,8 +62,8 @@ run it.
 ## Your first machine
 
 ```ts
-import { createMachine } from '@/mosaic/machine/create-machine';
-import { assign } from '@/mosaic/machine/assign';
+import { createMachine } from '../../machine/create-machine';
+import { assign } from '../../machine/assign';
 
 const loader = createMachine({
   initial: 'idle', // where it starts
@@ -112,7 +112,7 @@ assign<LoaderContext, Extract<LoaderEvent, { type: 'SET_QUERY' }>>((_, e) => ({
 factory functions that don't require repeating them:
 
 ```ts
-import { setup } from '@/mosaic/machine/setup';
+import { setup } from '../../machine/setup';
 
 const { createMachine, assign } = setup<LoaderContext, LoaderEvent>();
 
@@ -164,7 +164,7 @@ A machine on its own does nothing — it's just a description. To run it you wra
 it in an **actor** (the running instance):
 
 ```ts
-import { createActor } from '@/mosaic/machine/create-actor';
+import { createActor } from '../../machine/create-actor';
 
 const actor = createActor(loader);
 
@@ -185,7 +185,7 @@ time. `value` is the state name; `context` is the riding data.
 `useMachine` does the create + start + subscribe for you:
 
 ```tsx
-import { useMachine } from '@/mosaic/machine/use-machine';
+import { useMachine } from '../../machine/use-machine';
 
 function Loader() {
   const [snapshot, send] = useMachine(loader);
@@ -223,15 +223,11 @@ You've already seen `states`, `on`, `context`, `assign`, and `invoke`. The rest:
 
 ### API at a glance
 
-| Export                                   | What it is                                                                                                                    |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `createMachine(config)`                  | Build the definition. A plain, inert, inspectable object.                                                                     |
-| `assign(updater)`                        | A `(context, event) => Partial<context>` context update, used inside `actions`.                                               |
-| `createActor(machine, options?)`         | The running instance: `.start()`, `.stop()`, `.send(event)`, `.getSnapshot()`, `.subscribe(fn)`, `.can(event)`, `.recheck()`. |
-| `mockActor(machine, { value, context })` | An actor teleported straight to any step — render a transient/unreachable state for docs and snapshots.                       |
-| `useMachine(machine, options?)`          | React: own an actor for the component's life → `[snapshot, send]`. Accepts `onDone` callback fired when the machine finishes. |
-| `useActor(actor)`                        | React: bind to a **shared** actor → `[snapshot, send]`.                                                                       |
-| `useSelector(actor, selector, equals?)`  | React: subscribe to one **slice** — re-renders only when that slice changes.                                                  |
+The exports live in `create-machine.ts`, `setup.ts`, `assign.ts`, `create-actor.ts` and `use-machine.ts`; their JSDoc is the reference. Which React hook to reach for:
+
+- `useMachine(machine)` when the component owns the actor for its lifetime.
+- `useActor(actor)` when the actor is shared or passed in, including a `mockActor` that renders a step directly.
+- `useSelector(actor, selector)` when a component needs one slice and should re-render only when that slice changes.
 
 ### Two behaviors worth knowing
 
@@ -259,6 +255,9 @@ const actor = mockActor(loader, { value: 'failure', context: { error: 'Network e
 render(<Loader actor={actor} />); // snapshot a state you'd otherwise have to provoke
 ```
 
+A component that takes an actor reads it with `useActor(actor)` instead of
+`useMachine`.
+
 ---
 
 <details>
@@ -269,7 +268,7 @@ a pure reducer (`reducer.ts`) plus a React seam (`useWizardMachine.ts`). It's th
 strongest existing proof that this abstraction earns its keep, and it maps onto
 the library one-to-one. The live migration test —
 [`__tests__/wizard-migration.test.tsx`](./__tests__/wizard-migration.test.tsx) —
-asserts the two are behaviorally identical.
+ports the reducer's test cases to the machine.
 
 ### What the wizard does
 

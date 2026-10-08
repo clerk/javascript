@@ -6,7 +6,7 @@ controller (`controllers.md`) and the view (`views.md`) stay Clerk-free, which i
 what makes both testable without a Clerk fixture.
 
 Worked example: `packages/mosaic/src/features/user-button/user-button.model.tsx`. See
-`references/mosaic-architecture.md` → "Models" for the layer contract.
+`packages/mosaic/ARCHITECTURE.md` → "Models" for the layer contract.
 
 ## Shape
 
@@ -88,9 +88,32 @@ drops the fallback instead of holding the space open. Keep the two apart.
   `new ClerkRuntimeError(message, { code })` and add the copy for `code` to
   `src/localization/errors.messages.ts`. No `try`/`catch` that turns errors into
   strings, no feature-level `toError` helpers.
+- A callback that backs a form wraps its Clerk call in `save(run, fields, params)`
+  from `utils/errors.ts`. It rethrows a Clerk error as a `SaveError` routed to
+  the form fields it names, which the form renders
+  (`user-profile-account-section.model.ts`).
 - No local UI state. What is open and what is in flight belong to the controller.
 - No React state machinery beyond the Clerk hooks themselves; the model is a
   derivation of what Clerk currently says.
+
+## Time-dependent display data
+
+Use the shared `useNow` hook and `MosaicProvider` clock support introduced in
+[#10098](https://github.com/clerk/javascript/pull/10098). These APIs must be
+available in the consuming branch before following this guidance.
+
+`MosaicProvider` supplies a shared initial `Date`. Read it with `useNow` from
+`src/hooks/use-now.ts` in the consuming component or controller, then pass the
+value to pure formatting helpers. For relative labels that refresh each minute,
+use `useNow({ updateInterval: 60_000 })`. Without an interval, the hook retains
+its initial value. Reuse this API instead of adding a feature-specific clock
+provider or timer.
+
+In tests, supply a fixed `Date` through `MosaicNowProvider`, assert the displayed
+label, then advance fake timers across a label boundary and assert the update.
+If a feature supports SSR, also verify matching initial times during server
+rendering and hydration. Sharing time within one provider tree does not by
+itself guarantee agreement between server and client.
 
 ## Testing
 

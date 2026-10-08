@@ -5,19 +5,6 @@ Token semantics live in `packages/mosaic/src/tokens.stylex.ts`, above
 how-to layer: the rules that decide a transition's shape, and how to check one
 rather than eyeball it.
 
-| Token                   | Value                                   | For                                |
-| ----------------------- | --------------------------------------- | ---------------------------------- |
-| `--cl-duration-instant` | `0s`                                    | hover and press arrival            |
-| `--cl-duration-fast`    | `0.1s`                                  | exits                              |
-| `--cl-duration-base`    | `0.15s`                                 | entrances, hover exit              |
-| `--cl-duration-slow`    | `0.25s`                                 | larger surfaces                    |
-| `--cl-duration-slower`  | `0.35s`                                 | —                                  |
-| `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out)        |
-| `--cl-ease-enter`       | `cubic-bezier(0, 0, 0.2, 1)`            | arrivals that must not overshoot   |
-| `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)           |
-| `--cl-ease-in-out`      | `cubic-bezier(0.645, 0.045, 0.355, 1)`  | rest-to-rest layout (In Out Cubic) |
-| `--cl-ease-pulse`       | `cubic-bezier(0.4, 0, 0.6, 1)`          | repeating opacity pulses           |
-
 Named curves come from [easing.dev](https://www.easing.dev) (Lochie Axon's Easing
 Graphs). Take one from there rather than inventing a bezier, so the catalog stays
 the shared vocabulary.
@@ -33,21 +20,17 @@ pixels, and the arithmetic is worth doing rather than eyeballing: the overshoot 
 | what moves                              | travel | overshoot |
 | --------------------------------------- | ------ | --------- |
 | popover, `scale(0.94 → 1)` at 320px     | 19px   | 0.4px     |
-| dialog card, `scale(0.98 → 1)` at 600px | 12px   | 0.3px     |
+| dialog card, `scale(0.94 → 1)` at 600px | 36px   | 0.7px     |
 | sheet, `translate` its own 640px height | 640px  | 15px      |
 
 A scale delta is a few percent of the element, so the pass reaches a whole pixel
 only on something far larger than it is applied to: ~725px of width at a 6% delta,
-~2,175px at 2%. Menu, Select and Combobox cap at `18rem`, and a Popover would have
+~2,175px at 2%. Menu, Select and Popover `sm` cap at `18rem`, and a wider Popover would have
 to be stretched most of the way across the viewport, so `--cl-ease-default` is
 right for all of them. It is travel-based motion that crosses the threshold: a
-sheet passes its inset by ~15px and visibly corrects. That is where
-`--cl-ease-enter` came from, and the dialog surfaces now take it for their scale
-too, as a house choice at that size rather than because the arithmetic demands it.
-
-So the axis is not the element's type but the size of its overshoot. Work out what
-2% of the travel actually is; once it is enough pixels to notice as a bounce, take
-`--cl-ease-enter`, which decelerates the same way without the pass-through.
+sheet passes its inset by ~15px and visibly corrects; take `--cl-ease-enter`,
+which decelerates the same way without the pass-through. Dialog takes it at its
+size as a house choice (`dialog.styles.ts`).
 
 For entrances, opacity takes `--cl-ease-enter`: there is nothing
 past `1` to overshoot into, so the pass is clamped away and only its cost — the
@@ -55,7 +38,8 @@ slower approach to full opacity — is left.
 
 ## Repeating pulses
 
-Use `--cl-ease-pulse` for repeating opacity fades such as loading skeletons. Its
+Use `--cl-ease-pulse` for repeating opacity fades such as loading skeletons
+(`user-profile-backup-codes.styles.ts`). Its
 symmetric curve slows at both ends of each fade, keeping the reversal smooth.
 Keep the pulse duration on the component and disable the animation under
 `prefers-reduced-motion: reduce`.
@@ -95,25 +79,12 @@ ms      scale    opacity    Δscale/frame
 3. **Shape and fade decouple.** Transform finished by ~50ms while a linear opacity
    ran the full 150ms, leaving a motionless fading rectangle.
 
-Use `--cl-ease-exit` on `:where([data-ending-style])`. Same properties, opposite
-direction, so both duration and timing function branch:
-
-```ts
-transitionDuration: {
-  default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
-  ':where([data-ending-style])': durationVars['--cl-duration-fast'],
-},
-transitionTimingFunction: {
-  default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
-  ':where([data-ending-style])': easingVars['--cl-ease-exit'],
-},
-```
-
-The entrance list is **positional against `transitionProperty`** (`opacity,
-transform`) — the fade on `--cl-ease-enter`, the geometry on the overshoot. The
-exit collapses to one value because both properties want the same curve; write the
-list out only when a slot genuinely differs, as the dialog's sheet does for its
-slide.
+Use `--cl-ease-exit` on `:where([data-ending-style])`, branching both duration
+and timing function (`transitionDuration` / `transitionTimingFunction` in
+`popover.styles.ts`). The entrance list is **positional against
+`transitionProperty`** (`opacity, transform`) — the fade on `--cl-ease-enter`, the
+geometry on the overshoot. The exit collapses to one value because both
+properties want the same curve.
 
 ### A layout settle is not an exit
 
@@ -142,20 +113,18 @@ what stop an exit reading as a lingering ghost.
 
 ## An exit must not show new content
 
-An element that animates out is still mounted, and by then the thing that closed
-it has usually changed the data underneath — so the subtree re-renders and the
-exit plays over the _next_ screen's content. It reads as a flash. Whatever you
-animate out, hold its last frame for the length of the exit: `Freeze` around the
-children, or a snapshot of the outgoing content. See "Exiting content must be
-frozen" in `headless.md` for which to use and the two ways to get it wrong.
+Anything that animates out must hold its last frame for the length of the exit:
+`Freeze` around the children, or `useHeldMessage` (`utils/feedback.tsx`) for a
+message row. See "Exiting content must be frozen" in `headless.md`.
 
 ## Expanding and collapsing a row
 
 The reference is `Card.Banner` (`card.styles.ts`, `banner.collapse` / `clip` /
-`surface`). `Field.Message` and `Section.Error` share the measured-height variant in
-`utils/feedback.styles.ts` (see "Inline text", below). It is the recipe to adopt wherever
-a row opens and closes around content; the `Collapsible` panel and swingset's
-`CodeFooter` have not adopted it yet.
+`surface`). `Field.Message` and `Section.Error` share the measured-height variant:
+styles in `styles/feedback.styles.ts`, hooks and `FeedbackBody` in
+`utils/feedback.tsx` (see "Inline text", below). Reuse those for a new message row
+rather than rebuilding the recipe. It is the recipe to adopt wherever
+a row opens and closes around content.
 
 ### The content's enter/exit leads; the row is a byproduct
 
@@ -165,9 +134,7 @@ guarantee different things:
 
 1. **No hard clip edge is ever visible.** The moving edge is the content's own edge
    (it is anchored to it, see Geometry), so nothing is cut there; the stationary edge
-   is faded (see the mask). Clipping under the header is not a goal in itself — it is
-   what falls out of wanting a soft edge for the whole motion and nothing visible at
-   rest.
+   is faded (see the mask).
 2. **The row's fast motion happens while the content is invisible.** That is what
    decides prominence: what the eye attaches to is the content arriving and
    leaving, and the row is just the space it takes. Break it and the collapse gets
@@ -195,9 +162,8 @@ Both totals land at ~250ms; the asymmetry lives inside the sequence.
 - **Row opening: `--cl-ease-enter`.** It answers input, so it departs at once like
   everything else that responds to a pointer; `--cl-ease-default` would carry the
   height past target and read as a bounce in the layout.
-- **Row closing: `--cl-ease-in-out`.** Not `--cl-ease-exit`, per "A layout settle is
-  not an exit" above. Not `--cl-ease-enter` either, tempting as one curve for both
-  directions is: its fast start moves the row 16px in the first frame while the
+- **Row closing: `--cl-ease-in-out`** ("A layout settle is not an exit"). Not
+  `--cl-ease-enter` either, tempting as one curve for both directions is: its fast start moves the row 16px in the first frame while the
   surface is still at 93% opacity, so the collapse gets ahead of the content's
   ease-in exit and the two read as separate animations with the layout in front —
   rule 2 inverted. The in-out's slow start is what keeps the row still until the
@@ -206,8 +172,7 @@ Both totals land at ~250ms; the asymmetry lives inside the sequence.
   `base` on `--cl-ease-default`, both at `fast` on `--cl-ease-exit` going out. Scale
   from `0.96` about the **top** edge: the row grows downward from the header, and
   with the content anchored to the moving edge a top origin pulls the surface's
-  bottom edge a pixel inside the clip rather than onto it. (Center was not tried;
-  top read right.)
+  bottom edge a pixel inside the clip rather than onto it.
 - **Inline text: opacity only.** The scale belongs to content that arrives as a
   **surface** — a filled, bordered box such as the banner, which reads as an object
   and can grow into place. A line of text with no box around it (a field error, a
@@ -230,11 +195,7 @@ messages (`Field.Message`, `Section.Error`) were tried at `base` and read better
 
 ### Geometry
 
-```text
-wrapper   display: grid; grid-template-rows: 0fr ↔ 1fr; carries the transition attrs and the mask
-clip      grid-row: 1 / span 2; display: grid; align-content: end; min-height: 0; overflow: clip; NO padding
-content   spacing as its own margins; the top one is the fade's length (one constant for both)
-```
+Reference: `card.styles.ts` `banner.collapse` / `clip` / `surface`.
 
 - **Anchor the content to the moving edge** (`align-content: end`). Anchored to the
   top, the content is revealed by the clip line crossing it, and the bottom border is
@@ -260,7 +221,7 @@ content   spacing as its own margins; the top one is the fade's length (one cons
   no matter how negative an item's margin, so a closed row still costs one gap.
   Give it a flex or gapless parent (`Card.Banner` sits between the header and the
   content grid for exactly this reason). Measured in Chromium and WebKit.
-- Measure the height (`Field.Message`'s ResizeObserver) only when the content
+- Measure the height (`useMessageHeight` in `utils/feedback.tsx`) only when the content
   changes size _while open_; `0fr ↔ 1fr` covers open/closed on its own.
 
 ### Inline text: the measured-height variant
@@ -272,19 +233,11 @@ over: the wrapper is its own clip layer (no padding, `align-content: end`), the 
 message leaves the flow pinned to the **bottom** (`inset: auto 0 0`) so it rides the
 moving edge, and the mask is the same static top fade.
 
-The spacing that sits above a message is the parent's gap, which a closed row must not
-cost. The wrapper cancels it with a negative top margin and the message puts it back as
-its own top margin, inside the clip, so it can double as the fade's length:
-
-```ts
-const GAP = `var(--_cl-feedback-gap, ${space['2']})`; // the parent's gap, the message's margin, the fade
-wrapper: { marginTop: `calc(-1 * ${GAP})`, height: `calc(var(--_cl-feedback-height) + ${GAP})` }
-message: { marginTop: GAP }
-```
-
-A parent with a different gap sets `--_cl-feedback-gap` (`Field.Content` does, at
-`space['1']`). A parent with no gap, such as the section header grid, zeroes the
-wrapper's margin with `xstyle` and leaves the message's alone.
+The spacing above a message is the parent's gap, which a closed row must not cost.
+Cancel the parent's gap on the wrapper and put it back inside the clip as the
+message's margin: one constant that is also the fade's length (`GAP` in
+`styles/feedback.styles.ts`). A parent with a different gap sets
+`--_cl-feedback-gap`.
 
 A swap while open plays out-then-in rather than overlapping: the old message fades at
 `fast`, and the new one's entrance delay holds it until that is done, while the row
@@ -297,10 +250,7 @@ surface a consumer themes, and tracks the box for free because the wrapper's box
 the animating track (given the span above — without it the clip edge is somewhere
 else).
 
-```ts
-const INSET = space['4']; // the surface's top margin AND the fade's length
-maskImage: `linear-gradient(to bottom, transparent, black ${INSET})`,
-```
+The `INSET` constant in `card.styles.ts` is both the mask length and the surface's top margin.
 
 That is the whole mask, and it is static. The rule — **the fade exists whenever the
 clip edge is crossing content, and is never visible at rest** — is met by geometry
@@ -311,11 +261,8 @@ never touches it while the row is still. **The fade's length and the content's t
 margin are one constant** — drift between them either eats the border at rest or
 leaves a hard strip under the header.
 
-A fade on the _moving_ edge instead (content anchored to the top, a bottom gradient
-slid in and out on `mask-size`) was built first and can be made to work, but it has
-to animate the fade away at exactly the moment the row is crawling to a stop, and
-every timing of that read as an artifact. Anchor the content instead; that variant
-is not a recipe.
+Don't fade the moving edge (top-anchored content plus an animated `mask-size`). It
+has to animate away just as the row stops, and every timing read as an artifact.
 
 A hard line at the moving edge is not a fade problem. Before touching the mask,
 check the clip layer's height against the wrapper's per frame: if they differ, the
@@ -329,6 +276,12 @@ nothing. The surface keeps its fade and pins the scale (inline text has none to 
 and its entrance delay goes to `instant` as well: it exists to wait for the row, and
 a row that has snapped open leaves nothing to wait for.
 
+## Reflowing siblings
+
+When siblings reflow (an item added or removed), use `useLayoutAnimation` from
+`primitives/hooks`; its JSDoc covers the wiring. Set `--cl-layout-duration` /
+`--cl-layout-easing` from the duration and easing tokens, not literals.
+
 ## Color and state changes (hover, press)
 
 A state change on an element that is already there and stays there — background,
@@ -336,10 +289,8 @@ border, text, or an opacity that only dims it — takes **`linear`, always**. Th
 the counterpart to the section above, not an exception to it: a fade that carries a
 surface into or out of existence is an entrance, and takes the entrance and exit
 curves. A hover is not, and neither is a scrim, which dims the page rather than
-arriving on it. Nothing moves, so there is nothing for an ease to sell:
-color interpolation is already perceptually non-uniform, an ease on top just drags
-the midpoint, and `--cl-ease-default`'s overshoot would extrapolate past the target
-color. Reserve the curves for geometry.
+arriving on it. Nothing moves, so there is nothing for an ease to sell. Reserve the
+curves for geometry.
 
 **The arrival is always `0s`. Only the exit is a judgment call**, and what decides
 it is whether a pointer traverses the element on its way somewhere else:
@@ -365,17 +316,7 @@ pointer sweeps across follows the collection row, not the button row.
 
 **The mechanic:** the duration an element carries in a given state governs the
 transition _into_ that state. So the asymmetry falls out of one declaration per
-state — no doubled values, no JS:
-
-```ts
-transitionProperty: 'background-color, border-color, color, opacity',
-transitionTimingFunction: 'linear',
-transitionDuration: {
-  default: durationVars['--cl-duration-base'], // 0.15s — leaving hover or press
-  ':enabled:active': durationVars['--cl-duration-instant'],
-  ':enabled:hover': durationVars['--cl-duration-instant'],
-},
-```
+state — no doubled values, no JS. See `transitionDuration` in `button.styles.ts`.
 
 The bare `:hover` is safe here only because hover and press carry the same value:
 both match during a press, so which one wins does not matter. Give them different
@@ -390,7 +331,7 @@ costs the `:not(:active)` guard, because the at-rule doubles the class and outra
 
 Worked examples: `button.styles.ts` for the isolated control, `item.styles.ts` for
 the traversed collection — which declares no `transition` at all, since both of its
-durations are `0s`.
+durations are `0s`. Do not port a button's 0.15s exit onto rows.
 
 ### Children need the timing handed to them
 
@@ -401,15 +342,8 @@ timing and the child another and the child visibly trails it; at `0s` in, a chil
 still on `0.1s` reads as the icon lagging the button by a tenth of a second.
 
 Hand the duration down the same way the color goes down, so one declaration governs
-both and they cannot drift apart:
-
-```ts
-// container: alongside `--_cl-icon-color`, on the same conditions
-'--_cl-icon-duration': { default: base, ':enabled:active': instant, ':enabled:hover': instant },
-
-// child: read it, defaulting to instant
-transitionDuration: `var(--_cl-icon-duration, ${durationVars['--cl-duration-instant']})`,
-```
+both and they cannot drift apart: `--_cl-icon-duration` in `button.styles.ts`, read
+in `icon.styles.ts`.
 
 **The child's default is `instant`, not a middling fade.** The arrival never varies,
 so any non-zero default is wrong for every container at once; the exit is the only
@@ -426,13 +360,8 @@ frames no matter what duration you set. `text-decoration-line` is the one that b
 toggling `none` → `underline` on hover gives an instant arrival, which is right by
 accident, and an instant exit, which is not.
 
-Draw the thing permanently and animate the color instead:
-
-```ts
-textDecorationColor: { default: 'transparent', ':enabled:hover': 'currentColor' },
-textDecorationLine: 'underline',
-// and add `text-decoration-color` to the shared `transitionProperty`
-```
+Draw the thing permanently and animate the color instead (`textDecorationColor` in
+`button.styles.ts`, with `text-decoration-color` in its `transitionProperty`).
 
 It costs nothing — a transparent decoration paints nothing and never participates in
 layout — and it keeps the change a **color**, so the rule above applies unaltered
@@ -478,17 +407,10 @@ behind the pointer. It is a legibility failure, not a matter of polish, and no
 duration short enough to fix it is long enough to be worth having. Instant tracking
 is also what platform menus have always done.
 
-An isolated button never fails this visibly, but the arrival is the same rule either
-way; there is no button-versus-row split on the way in.
-
 The same arithmetic sizes the comet trail: a 0.15s exit is a longer fade than the
 0.1s modeled above, so it strings out proportionally more rows behind the pointer.
 That is why the exit collapses to `0s` here even though it stays at 0.15s on a
 button.
-
-`Item` declares no `transition` at all, which is `0s` in both directions and is
-correct on both counts — instant arrival, and no exit to trail the pointer. Leave it
-that way; do not "improve" it by porting a button's 0.15s exit onto rows.
 
 ## Small deltas constrain the curve (the dead-frame test)
 
@@ -518,28 +440,17 @@ delta — don't stretch it.
 For anything anchored to a trigger, scale about the **trigger**, not the element's
 own center, so it reads as emerging from what opened it. `cssVars` in
 `packages/mosaic/src/primitives/utils/css-vars.ts` emits two origins on the floating
-element; custom properties inherit, so a popup one level down reads them directly.
-
-| var                     | meaning                                                        |
-| ----------------------- | -------------------------------------------------------------- |
-| `--cl-transform-origin` | nearest **edge**, cross axis tracking the anchor (arrow-aware) |
-| `--cl-anchor-origin`    | the anchor's bounding-box **center**, both axes                |
-
-```ts
-transformOrigin: 'var(--cl-anchor-origin, center)',
-```
+element (`--cl-transform-origin`, the nearest edge, and `--cl-anchor-origin`, the
+anchor's center; see its JSDoc). Custom properties inherit, so a popup one level
+down reads them directly. Use a var, not a keyword origin: keywords anchor to the
+element's own box and drift off the trigger when `shift()` or `flip()` moves it.
 
 **Do not redefine `--cl-transform-origin`** — Menu branches consume it with the
 edge semantics. Add a var instead.
 
-Why a var and not a keyword: keyword origins (`top left`) anchor to the element's
-own box, so they drift off the trigger the moment `shift()` or `flip()` moves it.
-These are recomputed per position update and stay correct.
-
-**Timing is safe.** On a cold mount the var is unset for the mutation frame — but
-the element is `opacity: 0` with `transition: none` then. Both the position and
-the var settle by rAF 1; the transition arms at rAF 2. Origin is always correct
-before anything animates.
+The var is unset for the first frame of a cold mount, but the element is
+`opacity: 0` with `transition: none` then, so the origin is always correct before
+anything animates.
 
 **Geometry.** Travel = `(1 − startScale) × distance(origin, element center)`, so
 origin and start scale must be chosen together — at `scale(0.98)` a trigger-center
@@ -573,11 +484,6 @@ s = 1 − (6 / d)      d = distance from --cl-anchor-origin to the element's cen
 | 200px | `0.97` |
 | 300px | `0.98` |
 
-Two effects push the same way, which is convenient: the absolute size change is
-`(1 − s) ×` the element's own dimensions, so a big surface at a fixed scale is
-already shrinking by more px than a small one. Scaling toward 1 as things grow
-fixes both at once.
-
 Three limits on the rule:
 
 - **Floor the scale around `0.90`.** For an element whose center is very close to
@@ -597,14 +503,8 @@ Three limits on the rule:
 ## Reduced motion
 
 Gate the **moving property**, not the duration — the signal is about vestibular
-safety, so the fade should survive:
-
-```ts
-transitionProperty: {
-  default: 'opacity, transform',
-  '@media (prefers-reduced-motion: reduce)': 'opacity',
-},
-```
+safety, so the fade should survive: `transitionProperty` drops to `'opacity'`
+under `@media (prefers-reduced-motion: reduce)`.
 
 With a positional duration list, the collapsed single-property list takes the
 first value — check that it's the one you want for opacity.
@@ -634,21 +534,8 @@ transform: {
 },
 ```
 
-A bare sibling `'@media (prefers-reduced-motion: reduce)': 'scale(1)'` also works
-today, but it compiles to `(0,2,0)` — the same as the branch it needs to beat — so
-the tiebreak is source order, which `@stylexjs/sort-keys` reorders on autofix.
-Repeating the selector inside the at-rule earns a third class and wins outright:
-
-```css
-.a.a:where([data-starting-style], [data-ending-style]) {
-  transform: scale(0.94);
-} /* 0,2,0 */
-@media (prefers-reduced-motion: reduce) {
-  .b.b.b:where([data-starting-style], [data-ending-style]) {
-    transform: scale(1);
-  } /* 0,3,0 */
-}
-```
+A bare sibling `@media` key ties on specificity, so `@stylexjs/sort-keys` can
+reorder it out of winning. The nested form gets a third class and wins outright.
 
 Verify all four combinations — enter and exit, reduced and normal. Under reduced
 motion both directions should hold the scale flat at `1.0000` for every frame.
@@ -661,11 +548,10 @@ Reading CSS will not tell you a transition stalls. Two cheap techniques:
 intervals across the duration, convert to the property's real values, and count
 frames whose step is below ~0.003 of the total delta.
 
-**Record the real thing** with a rAF sampler (see `references/stylex.md` for the
+**Record the real thing** with a rAF sampler (see `stylex.md` for the
 `data-*` attributes that drive enter/exit):
 
 ```js
-const el = document.querySelector('.cl-popover-popup');
 const t0 = performance.now(),
   rows = [];
 (function tick() {
