@@ -1,9 +1,10 @@
+import type { UserProfileProviderIconProps } from '../user-profile-provider-icon';
+
 export type ConnectedAccountActionResult = 'redirecting' | void;
 
 export interface ConnectedAccountProviderDisplay {
   provider: string;
-  iconUrl?: string;
-  monochromeIcon?: boolean;
+  icon: UserProfileProviderIconProps;
 }
 
 export interface UserProfileConnectionProvider extends ConnectedAccountProviderDisplay {

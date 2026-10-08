@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosText } from '@/lib/chaos';
+import { enterpriseLogos } from '@clerk/mosaic/components/provider-logo/enterprise.generated';
 
 const exampleConnection = {
   provider: 'Okta SSO',
   domain: 'acme.co',
-  iconUrl: 'https://img.clerk.com/static/okta.svg',
+  icon: { logo: enterpriseLogos.saml_okta },
 };
 
 export function useUserProfileVerifyEmailSsoFixture({ failConnect = false } = {}) {

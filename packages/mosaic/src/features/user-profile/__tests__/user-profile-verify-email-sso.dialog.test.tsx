@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileVerifyEmailSsoDialogProps } from '../user-profile-account-section/user-profile-verify-email-sso.dialog';
 import { UserProfileVerifyEmailSsoDialog } from '../user-profile-account-section/user-profile-verify-email-sso.dialog';
+import { enterpriseLogos } from '../../../components/provider-logo/enterprise.generated';
 
 function renderView(overrides: Partial<UserProfileVerifyEmailSsoDialogProps> = {}) {
   const props: UserProfileVerifyEmailSsoDialogProps = {
@@ -39,6 +40,12 @@ describe('UserProfileVerifyEmailSsoDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Connect' }));
     expect(props.onConnect).toHaveBeenCalledOnce();
     expect(props.onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('shows the bundled logo for a known provider', () => {
+    renderView({ connection: { provider: 'Okta SSO', domain: 'acme.co', icon: { logo: enterpriseLogos.saml_okta } } });
+
+    expect(document.querySelector('.cl-provider-logo')).toHaveAttribute('data-provider', 'okta');
   });
 
   it('prevents another connection attempt while connecting and still allows cancellation', async () => {

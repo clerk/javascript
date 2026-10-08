@@ -1,0 +1,69 @@
+import * as ProviderLogoStories from './provider-logo.stories';
+
+# ProviderLogo
+
+ProviderLogo renders the logo for an OAuth, Web3, or phone-code provider. Each logo adapts to the color scheme in scope: monochrome logos follow `currentColor`, and logos with distinct light and dark colors switch with `light-dark()`.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={ProviderLogoStories}
+/>
+
+## Props
+
+<PropTable
+  meta={ProviderLogoStories.meta}
+  extra={[{ name: 'ref', type: 'Ref<SVGSVGElement>' }]}
+/>
+
+## Usage
+
+`ProviderLogo` renders the `glyph` it is given. The glyphs come in four groups, each in its own module, keyed by the provider id Clerk uses for that group:
+
+| Module                 | Map               | Lookup              | Keys                              |
+| ---------------------- | ----------------- | ------------------- | --------------------------------- |
+| `oauth.generated`      | `oauthLogos`      | `getOAuthLogo`      | OAuth provider (`google`)         |
+| `enterprise.generated` | `enterpriseLogos` | `getEnterpriseLogo` | Enterprise provider (`saml_okta`) |
+| `web3.generated`       | `web3Logos`       | `getWeb3Logo`       | Web3 provider (`metamask`)        |
+| `phone.generated`      | `phoneLogos`      | `getPhoneLogo`      | Phone code channel (`whatsapp`)   |
+
+A feature imports only the groups it renders, and a logo in more than one group ships once.
+
+```tsx
+import { ProviderLogo } from '@clerk/mosaic/components/provider-logo';
+import { oauthLogos } from '@clerk/mosaic/components/provider-logo/oauth.generated';
+
+<ProviderLogo glyph={oauthLogos.google} />;
+```
+
+A lookup returns `undefined` for an id without a logo, such as a custom OAuth provider, which renders its own image instead.
+
+```tsx
+import { getOAuthLogo } from '@clerk/mosaic/components/provider-logo/oauth.generated';
+
+const glyph = getOAuthLogo(provider);
+
+glyph ? <ProviderLogo glyph={glyph} /> : <img src={logoUrl} alt='' />;
+```
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={ProviderLogoStories}
+/>
+
+`sm`, `md`, and `lg` match the `Icon` sizes; `inherit` sizes the logo to the surrounding font.
+
+### Color schemes
+
+<Story
+  name='ColorSchemes'
+  storyModule={ProviderLogoStories}
+/>

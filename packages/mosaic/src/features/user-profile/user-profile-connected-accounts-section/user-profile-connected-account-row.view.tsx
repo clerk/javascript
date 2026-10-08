@@ -5,46 +5,16 @@ import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { SubmitButton } from '../../../components/button';
-import { Icon, IconFrame } from '../../../components/icon';
+import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
+import { UserProfileProviderIcon } from '../user-profile-provider-icon';
 import { styles } from './user-profile-connected-accounts-section.styles';
 import type {
-  ConnectedAccountProviderDisplay,
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';
-
-function ProviderMedia({ provider }: { provider: ConnectedAccountProviderDisplay }) {
-  const iconUrl = provider.iconUrl?.trim();
-  return (
-    <Section.Media size='lg'>
-      <IconFrame>
-        {iconUrl && provider.monochromeIcon ? (
-          <span
-            aria-hidden
-            {...stylex.props(styles.maskedIcon, styles.maskImage(iconUrl))}
-          />
-        ) : iconUrl ? (
-          <img
-            src={iconUrl}
-            alt=''
-            aria-hidden
-            {...stylex.props(styles.icon)}
-          />
-        ) : (
-          <span
-            aria-hidden
-            {...stylex.props(styles.fallback)}
-          >
-            {provider.provider.trim().charAt(0).toUpperCase()}
-          </span>
-        )}
-      </IconFrame>
-    </Section.Media>
-  );
-}
 
 export function UserProfileConnectProviderRowView({
   provider,
@@ -61,7 +31,7 @@ export function UserProfileConnectProviderRowView({
   return (
     <Section.Row xstyle={styles.connectRow}>
       <Section.Item>
-        <ProviderMedia provider={provider} />
+        <UserProfileProviderIcon {...provider.icon} />
         <Section.Content>
           <Section.Label>
             <span
@@ -124,7 +94,7 @@ export function UserProfileConnectedAccountRowView({
   return (
     <Section.Row>
       <Section.Item>
-        <ProviderMedia provider={account} />
+        <UserProfileProviderIcon {...account.icon} />
         <Section.Content>
           <Section.Label>
             <span

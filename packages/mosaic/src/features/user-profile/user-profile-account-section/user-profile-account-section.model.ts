@@ -1,11 +1,11 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { AttributeData, Attributes, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
+import type { AttributeData, Attributes, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import type { MessageValues } from '../../../localization';
 import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/errors';
-import type { UserProfileManagedBy } from '../user-profile-managed-by';
+import { toManagedBy } from '../user-profile-managed-by.model';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
@@ -44,14 +44,6 @@ export type UserProfileAccountSectionModel =
 
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
-
-function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfileManagedBy | undefined {
-  if (!account) {
-    return undefined;
-  }
-  const connection = account.enterpriseConnection;
-  return { name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, '') };
-}
 
 function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameAttribute {
   return { enabled: attribute?.enabled ?? false, required: attribute?.required ?? false };
@@ -116,7 +108,8 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
   const usernameAttribute = attributes.username;
   const usernameImmutable = Boolean(usernameAttribute?.immutable);
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
-  const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
+  const managingAccount = user.enterpriseAccounts.find(account => account.active);
+  const nameManagedBy = managingAccount ? toManagedBy(managingAccount) : undefined;
   const showEmails = isAttributeAvailable(attributes.email_address);
   const showPhones = isAttributeAvailable(attributes.phone_number);
 

@@ -1,5 +1,6 @@
 import { Button } from '@clerk/mosaic/components/button';
 import type {
+  UserProfileAccountSectionViewProps,
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
@@ -19,6 +20,7 @@ import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
 import { useUserProfileVerifyEmailLinkFixture } from './fixtures/user-profile-verify-email-link';
 import { useUserProfileVerifyEmailSsoFixture } from './fixtures/user-profile-verify-email-sso';
+import { enterpriseLogos } from '@clerk/mosaic/components/provider-logo/enterprise.generated';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -49,7 +51,7 @@ function AccountSection({
   failEmailVerification?: boolean;
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';
-  nameManagedBy?: { name: string };
+  nameManagedBy?: UserProfileAccountSectionViewProps['nameManagedBy'];
 }) {
   const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
   const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
@@ -132,7 +134,7 @@ export function NameManagedByConnection() {
   return (
     <AccountSection
       allowMultipleAccounts={false}
-      nameManagedBy={{ name: 'Okta' }}
+      nameManagedBy={{ name: 'Okta', logo: enterpriseLogos.saml_okta }}
     />
   );
 }

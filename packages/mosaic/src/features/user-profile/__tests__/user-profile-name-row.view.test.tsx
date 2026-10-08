@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileNameRowView } from '../user-profile-account-section/user-profile-name-row.view';
+import { enterpriseLogos } from '../../../components/provider-logo/enterprise.generated';
 
 describe('UserProfileNameRowView', () => {
   it('offers to add a name the user does not have yet', async () => {
@@ -49,5 +50,29 @@ describe('UserProfileNameRowView', () => {
 
     expect(screen.getByText('Managed by Okta')).toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+  it('names a generic enterprise connection when the connection has no name', () => {
+    render(
+      <MosaicProvider>
+        <UserProfileNameRowView
+          name='Preston Booth'
+          managedBy={{}}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByText('Managed by your enterprise connection')).toBeInTheDocument();
+  });
+  it('shows the managing provider logo when one is bundled', () => {
+    const { container } = render(
+      <MosaicProvider>
+        <UserProfileNameRowView
+          name='Preston Booth'
+          managedBy={{ name: 'Okta', logo: enterpriseLogos.saml_okta }}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(container.querySelector('.cl-provider-logo')).toHaveAttribute('data-provider', 'okta');
   });
 });

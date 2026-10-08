@@ -3,6 +3,7 @@ import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/
 import type { StoryMeta } from '@/lib/types';
 
 import { connectedAccount, useConnectedAccountsFixture } from './fixtures/user-profile-connected-accounts';
+import { oauthLogos } from '@clerk/mosaic/components/provider-logo/oauth.generated';
 
 export { default as __source } from './user-profile-connected-accounts-section.stories?raw';
 export const meta: StoryMeta = {
@@ -45,7 +46,7 @@ export function ConnectionError() {
       {
         id: 'apple',
         provider: 'Apple',
-        iconUrl: 'https://img.clerk.com/static/apple.svg',
+        icon: { logo: oauthLogos.apple },
         connectError: 'Unable to connect. Please try again.',
       },
     ],

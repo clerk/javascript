@@ -6,6 +6,7 @@ import {
   projectConnectedAccounts,
   recoveryFor,
 } from '../user-profile-connected-accounts-section.model';
+import { oauthLogos } from '../../../../components/provider-logo/oauth.generated';
 
 type AccountInput = {
   id: string;
@@ -187,22 +188,20 @@ describe('projectConnectedAccounts', () => {
     });
     expect(projection.status === 'ready' && projection.accounts[0]).toMatchObject({
       provider: 'Custom Provider',
-      iconUrl: 'https://img.example/custom.png',
+      icon: { iconUrl: 'https://img.example/custom.png' },
     });
   });
 
-  it('marks monochrome provider logos', () => {
+  it('uses bundled logos for built-in providers', () => {
     const projection = projectConnectedAccounts({
       user: userWith([]),
       providers: social('oauth_github', 'oauth_google'),
       socialEnabled: true,
       allowCreation: true,
     });
-    expect(
-      projection.status === 'ready' && projection.availableProviders.map(p => [p.id, Boolean(p.monochromeIcon)]),
-    ).toEqual([
-      ['oauth_github', true],
-      ['oauth_google', false],
+    expect(projection.status === 'ready' && projection.availableProviders.map(p => [p.id, p.icon])).toEqual([
+      ['oauth_github', { logo: oauthLogos.github }],
+      ['oauth_google', { logo: oauthLogos.google }],
     ]);
   });
 

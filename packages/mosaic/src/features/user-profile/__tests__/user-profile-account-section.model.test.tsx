@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FormError } from '../../../utils/errors';
 import { SaveError } from '../../../utils/errors';
 import { useUserProfileAccountSectionModel } from '../user-profile-account-section/user-profile-account-section.model';
+import { enterpriseLogos } from '../../../components/provider-logo/enterprise.generated';
 
 interface FakeAttribute {
   enabled: boolean;
@@ -254,14 +255,23 @@ describe('useUserProfileAccountSectionModel', () => {
         enterpriseConnection: { name: 'Okta', logoPublicUrl: 'https://img.clerk.com/okta.svg' },
       });
       expect(ready()).toMatchObject({
-        nameManagedBy: { name: 'Okta' },
+        nameManagedBy: { name: 'Okta', logo: enterpriseLogos.saml_okta },
         onSubmitName: undefined,
       });
     });
 
-    it('falls back to the provider when the active account carries no connection', () => {
+    it('leaves the name to the label when the active account carries no connection', () => {
       user?.enterpriseAccounts.push({ active: true, provider: 'saml_okta', enterpriseConnection: null });
-      expect(ready().nameManagedBy).toEqual({ name: 'okta' });
+      expect(ready().nameManagedBy).toEqual({ logo: enterpriseLogos.saml_okta });
+    });
+
+    it('leaves the provider out for a connection without a bundled logo', () => {
+      user?.enterpriseAccounts.push({
+        active: true,
+        provider: 'saml_custom',
+        enterpriseConnection: { name: 'Acme SSO', logoPublicUrl: null },
+      });
+      expect(ready().nameManagedBy).toEqual({ name: 'Acme SSO' });
     });
 
     it('passes the instance name attributes through for the row to hide itself', () => {

@@ -9,6 +9,8 @@ import type { FieldFeedback } from '../../../components/form';
 import { FormSubmitError } from '../../../components/form';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
+import type { UserProfileManagedBy } from '../user-profile-managed-by';
+import { toManagedBy } from '../user-profile-managed-by.model';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValue, UserProfilePasswordPolicy } from './user-profile-password-section.types';
@@ -18,7 +20,7 @@ type UnavailablePasswordModel =
   | {
       status: 'readonly';
       mode: 'set' | 'change';
-      managedBy: { name: string };
+      managedBy: UserProfileManagedBy;
     };
 
 export type UserProfilePasswordModel =
@@ -35,7 +37,7 @@ export type UserProfilePasswordModel =
 
 type PasswordPolicyResult =
   | { status: 'hidden' }
-  | { status: 'readonly'; mode: 'set' | 'change'; enterpriseConnectionName: string | undefined }
+  | { status: 'readonly'; mode: 'set' | 'change'; managedBy: UserProfileManagedBy }
   | (UserProfilePasswordPolicy & { status: 'ready'; userId: string });
 
 function getPasswordPolicy(
@@ -60,7 +62,7 @@ function getPasswordPolicy(
     return {
       status: 'readonly',
       mode: policy.mode,
-      enterpriseConnectionName: enterpriseAccount.enterpriseConnection?.name,
+      managedBy: toManagedBy(enterpriseAccount),
     };
   }
 
@@ -111,7 +113,7 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     return {
       status: 'readonly',
       mode: policy.mode,
-      managedBy: { name: policy.enterpriseConnectionName || m.enterpriseConnection },
+      managedBy: policy.managedBy,
     };
   }
   if (policy.status !== 'ready') {

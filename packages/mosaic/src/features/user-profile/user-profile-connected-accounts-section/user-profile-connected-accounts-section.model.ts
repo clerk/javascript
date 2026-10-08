@@ -16,7 +16,9 @@ import type {
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { getOAuthLogo } from '../../../components/provider-logo/oauth.generated';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import { toProviderIcon } from '../user-profile-provider-icon.model';
 import type {
   ConnectedAccountActionResult,
   ConnectedAccountProviderDisplay,
@@ -67,8 +69,6 @@ const RECONNECT_ERROR_CODES = [
   'external_account_email_address_verification_required',
 ];
 
-const MONOCHROME_PROVIDERS = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'];
-
 type SocialSettings = Partial<
   Record<string, Pick<OAuthProviders[OAuthStrategy], 'name' | 'logo_url'> & { strategy: string }>
 >;
@@ -85,8 +85,7 @@ export function createProviderCatalog(
     enabled: enabled.has(strategy),
     display: {
       provider: name,
-      iconUrl: iconImageUrl(provider),
-      monochromeIcon: MONOCHROME_PROVIDERS.includes(provider),
+      icon: toProviderIcon({ logo: getOAuthLogo(provider), iconUrl: iconImageUrl(provider), label: name }),
     },
   }));
   const candidates = new Set([
@@ -106,7 +105,10 @@ export function createProviderCatalog(
       strategy,
       provider,
       enabled: enabled.has(strategy),
-      display: { provider: settings?.name || provider, iconUrl: settings?.logo_url || undefined },
+      display: {
+        provider: settings?.name || provider,
+        icon: toProviderIcon({ iconUrl: settings?.logo_url, label: settings?.name || provider }),
+      },
     });
   }
   return [
@@ -159,7 +161,10 @@ function toAccountRow(
   const { status } = recoveryFor(account, scopes, providers);
   return {
     id: account.id,
-    ...(providers.find(provider => provider.provider === account.provider)?.display ?? { provider: account.provider }),
+    ...(providers.find(provider => provider.provider === account.provider)?.display ?? {
+      provider: account.provider,
+      icon: toProviderIcon({ logo: getOAuthLogo(account.provider), label: account.provider }),
+    }),
     identifier: account.username || account.emailAddress || undefined,
     status,
     verificationError: status === 'error' ? error?.longMessage : undefined,

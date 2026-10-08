@@ -6,6 +6,7 @@ import { Icon } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
 import { fill, useMessages } from '../../../localization';
+import type { UserProfileProviderIconProps } from '../user-profile-provider-icon';
 import { UserProfileProviderIcon } from '../user-profile-provider-icon';
 import { styles } from './user-profile-verify-email-sso.styles';
 
@@ -17,7 +18,7 @@ export interface UserProfileVerifyEmailSsoDialogProps {
   connection: {
     provider: string;
     domain: string;
-    iconUrl?: string;
+    icon?: UserProfileProviderIconProps;
   };
   onConnect: () => void;
   isConnecting?: boolean;
@@ -58,7 +59,7 @@ export function UserProfileVerifyEmailSsoDialog({
           </Card.Banner>
           <Card.Content>
             <Item.Root xstyle={styles.connection}>
-              {connection.iconUrl ? <UserProfileProviderIcon iconUrl={connection.iconUrl} /> : null}
+              {connection.icon ? <UserProfileProviderIcon {...connection.icon} /> : null}
               <Item.Content>
                 <Item.Label>{connection.provider}</Item.Label>
                 <Item.Description>{fill(m.connectionDescription, { domain: connection.domain })}</Item.Description>

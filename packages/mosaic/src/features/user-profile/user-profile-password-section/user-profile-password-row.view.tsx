@@ -1,5 +1,5 @@
 import { Section } from '../../../components/section';
-import { fill, useMessages } from '../../../localization';
+import { useMessages } from '../../../localization';
 import { UserProfileManagedByLabel } from '../user-profile-managed-by';
 import type { UserProfilePasswordSectionViewProps } from './user-profile-password-section.types';
 
@@ -20,7 +20,7 @@ export function UserProfilePasswordRowView({
         ) : managedBy ? (
           <UserProfileManagedByLabel
             managedBy={managedBy}
-            label={fill(m.managedBy, { name: managedBy.name })}
+            template={m.managedBy}
           />
         ) : null}
       </Section.Item>

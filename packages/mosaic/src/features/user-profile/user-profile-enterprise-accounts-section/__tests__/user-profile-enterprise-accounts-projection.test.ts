@@ -6,12 +6,14 @@ describe('projectEnterpriseAccounts', () => {
   const connection = (id: string, allowOrganizationAccountLinking = true) => ({
     id,
     name: id,
+    provider: 'saml_custom',
     allowOrganizationAccountLinking,
   });
   const account = (id: string, enterpriseConnectionId: string, active = true, error?: string) => ({
     id,
     emailAddress: `${id}@example.com`,
     enterpriseConnectionId,
+    provider: 'saml_custom' as const,
     verification: error ? { error: { longMessage: error } } : null,
     enterpriseConnection: { active, name: enterpriseConnectionId, logoPublicUrl: null },
   });
