@@ -2,7 +2,7 @@ import { errorThrower } from '../errorThrower';
 import type { ClerkExpoNativeModule } from './loadClerkExpoNative';
 import { loadClerkExpoNative } from './loadClerkExpoNative';
 
-// Public types are declared in native/index.d.ts, which re-exports them from @clerk/expo-native-components.
+// Public types are declared in native/index.d.ts.
 
 const CLERK_EXPO_NATIVE_MISSING_MESSAGE =
   'Native components have moved to the @clerk/expo-native-components package. ' +
@@ -23,5 +23,5 @@ function resolveExport<K extends keyof ClerkExpoNativeModule>(name: K) {
 export const AuthView = resolveExport('AuthView');
 export const UserButton = resolveExport('UserButton');
 export const UserProfileView = resolveExport('UserProfileView');
-export const useAuthViewState = resolveExport('useAuthViewState');
+export { useAuthViewState } from './useAuthViewState';
 export const useUserProfileCustomPageNavigation = resolveExport('useUserProfileCustomPageNavigation');

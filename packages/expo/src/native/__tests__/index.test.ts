@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+vi.mock('../useAuthViewState', () => ({ useAuthViewState: vi.fn() }));
+
 const importNativeEntry = () => import('../index');
 
 describe('@clerk/expo/native', () => {
@@ -25,15 +27,19 @@ describe('@clerk/expo/native', () => {
       },
     );
 
-    test.each(['useAuthViewState', 'useUserProfileCustomPageNavigation'] as const)(
-      'calling %s throws an error with install instructions',
-      async name => {
-        const hook = (await importNativeEntry())[name] as () => unknown;
+    test('calling useUserProfileCustomPageNavigation throws an error with install instructions', async () => {
+      const hook = (await importNativeEntry()).useUserProfileCustomPageNavigation as () => unknown;
 
-        expect(() => hook()).toThrow(`\`${name}\` is unavailable.`);
-        expect(() => hook()).toThrow('add "@clerk/expo-native-components" to the plugins array in your app config');
-      },
-    );
+      expect(() => hook()).toThrow('`useUserProfileCustomPageNavigation` is unavailable.');
+      expect(() => hook()).toThrow('add "@clerk/expo-native-components" to the plugins array in your app config');
+    });
+
+    test('exports its own useAuthViewState', async () => {
+      const nativeEntry = await importNativeEntry();
+      const { useAuthViewState } = await import('../useAuthViewState');
+
+      expect(nativeEntry.useAuthViewState).toBe(useAuthViewState);
+    });
   });
 
   test('re-exports @clerk/expo-native-components when it is installed', async () => {
@@ -41,7 +47,6 @@ describe('@clerk/expo/native', () => {
       AuthView: vi.fn(() => null),
       UserButton: vi.fn(() => null),
       UserProfileView: vi.fn(() => null),
-      useAuthViewState: vi.fn(),
       useUserProfileCustomPageNavigation: vi.fn(),
     };
     vi.doMock('../loadClerkExpoNative', () => ({ loadClerkExpoNative: () => clerkExpoNative }));
@@ -51,7 +56,6 @@ describe('@clerk/expo/native', () => {
     expect(nativeEntry.AuthView).toBe(clerkExpoNative.AuthView);
     expect(nativeEntry.UserButton).toBe(clerkExpoNative.UserButton);
     expect(nativeEntry.UserProfileView).toBe(clerkExpoNative.UserProfileView);
-    expect(nativeEntry.useAuthViewState).toBe(clerkExpoNative.useAuthViewState);
     expect(nativeEntry.useUserProfileCustomPageNavigation).toBe(clerkExpoNative.useUserProfileCustomPageNavigation);
   });
 });

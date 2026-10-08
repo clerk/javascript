@@ -1,10 +1,7 @@
 type ClerkExpoNativeExport = (...args: never[]) => unknown;
 
 export type ClerkExpoNativeModule = Partial<
-  Record<
-    'AuthView' | 'UserButton' | 'UserProfileView' | 'useAuthViewState' | 'useUserProfileCustomPageNavigation',
-    ClerkExpoNativeExport
-  >
+  Record<'AuthView' | 'UserButton' | 'UserProfileView' | 'useUserProfileCustomPageNavigation', ClerkExpoNativeExport>
 >;
 
 export function loadClerkExpoNative(): ClerkExpoNativeModule | null {
