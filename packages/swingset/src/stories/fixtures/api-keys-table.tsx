@@ -79,10 +79,12 @@ export function useAPIKeysTableFixture({
   initialKeys = exampleAPIKeys,
   enableSorting = false,
   subjectKind = 'user',
+  fetchDelay = 0,
 }: {
   initialKeys?: FixtureAPIKey[];
   enableSorting?: boolean;
   subjectKind?: APIKeysTableSubjectKind;
+  fetchDelay?: number;
 } = {}): APIKeysTableViewProps {
   const locale = useLocale();
   const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), subjectKind);
@@ -134,8 +136,23 @@ export function useAPIKeysTableFixture({
     return () => clearTimeout(timer);
   }, [searchValue, query]);
 
+  const requested = { page, query, sort, pageSize };
+  const [settled, setSettled] = useState(requested);
+  const isFetching =
+    fetchDelay > 0 &&
+    (settled.page !== page || settled.query !== query || settled.sort !== sort || settled.pageSize !== pageSize);
+  useEffect(() => {
+    if (!isFetching) {
+      return;
+    }
+    const timer = setTimeout(() => setSettled({ page, query, sort, pageSize }), fetchDelay);
+    return () => clearTimeout(timer);
+  }, [isFetching, page, query, sort, pageSize, fetchDelay]);
+  const shown = fetchDelay > 0 ? settled : requested;
+
   const filtered = items.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
-  const sorted = sortAPIKeys(filtered, sort);
+  const shownFiltered = items.filter(item => item.name.toLowerCase().includes(shown.query.toLowerCase()));
+  const sorted = sortAPIKeys(shownFiltered, shown.sort);
   const pageCount = Math.ceil(filtered.length / pageSize);
   useEffect(() => {
     if (page > Math.max(1, pageCount)) {
@@ -145,7 +162,7 @@ export function useAPIKeysTableFixture({
 
   return {
     messages,
-    apiKeys: sorted.slice((page - 1) * pageSize, page * pageSize).map(item => ({
+    apiKeys: sorted.slice((shown.page - 1) * shown.pageSize, shown.page * shown.pageSize).map(item => ({
       id: item.id,
       name: item.name,
       createdAtLabel: dateLabel(item.createdAt),
@@ -155,11 +172,12 @@ export function useAPIKeysTableFixture({
           ? null
           : relativeTime.format(Math.round((item.lastUsedAt - exampleTime) / 60_000), 'minute'),
     })),
-    totalCount: filtered.length,
+    totalCount: shownFiltered.length,
     page,
     pageSize,
     searchValue,
     isLoading: false,
+    isFetching,
     onCreate: create.onOpen,
     createDialog: create.dialog,
     onSearchChange: setSearchValue,

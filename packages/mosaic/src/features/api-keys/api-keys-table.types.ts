@@ -47,4 +47,6 @@ export interface APIKeysTableViewProps {
   onBulkAction?: (ids: string[]) => void;
   sort?: APIKeysTableSort | null;
   onSortChange?: (sort: APIKeysTableSort | null) => void;
+  skeleton?: boolean;
+  refetchSkeleton?: boolean;
 }

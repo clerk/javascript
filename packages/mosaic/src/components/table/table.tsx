@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -6,6 +7,7 @@ import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
 import { Checkbox } from '../checkbox';
@@ -19,11 +21,18 @@ type TableSection = 'header' | 'body';
 
 const TableSectionContext = React.createContext<TableSection>('body');
 
+const TableSkeletonContext = React.createContext(false);
+
+function useInheritedSkeleton(skeleton: boolean | undefined) {
+  const inherited = React.useContext(TableSkeletonContext);
+  return skeleton ?? inherited;
+}
+
 export type TableAlign = keyof typeof aligns;
 
 export type TableSort = 'ascending' | 'descending' | 'none';
 
-export type TableProps = MosaicElementProps<'table'>;
+export type TableProps = MosaicElementProps<'table'> & { skeleton?: boolean };
 
 export type TableToolbarProps = MosaicComponentProps<'div'>;
 
@@ -94,9 +103,18 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
   );
 });
 
-const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable({ xstyle, ...rest }, ref) {
+const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable(
+  { skeleton = false, xstyle, ...rest },
+  ref,
+) {
   return (
-    <div {...mergeStyleProps(themeProps('table-shell'), stylex.props(reset.base, scrollAreaRoot, styles.shell))}>
+    <div
+      {...(skeleton ? { 'aria-hidden': true, ...inertProps(true) } : {})}
+      {...mergeStyleProps(
+        themeProps('table-shell', { skeleton }),
+        stylex.props(reset.base, scrollAreaRoot, styles.shell),
+      )}
+    >
       <div
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Safari does not focus an overflowing scroll container on its own, and a table without sortable or selectable cells holds nothing focusable.
         tabIndex={0}
@@ -105,10 +123,12 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
           stylex.props(reset.base, scrollAreaViewport('auto', 'inline'), styles.viewport),
         )}
       >
-        <table
-          ref={ref}
-          {...mergeStyleProps(themeProps('table'), stylex.props(reset.base, styles.table, xstyle), rest)}
-        />
+        <TableSkeletonContext.Provider value={skeleton}>
+          <table
+            ref={ref}
+            {...mergeStyleProps(themeProps('table'), stylex.props(reset.base, styles.table, xstyle), rest)}
+          />
+        </TableSkeletonContext.Provider>
       </div>
     </div>
   );
@@ -129,19 +149,27 @@ const Header = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(funct
   return <TableSectionContext.Provider value='header'>{element}</TableSectionContext.Provider>;
 });
 
-export type TableBodyProps = MosaicComponentProps<'tbody'>;
+export type TableBodyProps = MosaicComponentProps<'tbody'> & { skeleton?: boolean };
 
 const Body = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(function MosaicTableBody(
-  { render, xstyle, ...rest },
+  { skeleton: skeletonProp, render, xstyle, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   const element = useRender({
     defaultTagName: 'tbody',
     render,
     ref,
-    props: mergeStyleProps(themeProps('table-body'), stylex.props(reset.base, xstyle), rest),
+    props: {
+      ...(skeletonProp ? { 'aria-hidden': true, ...inertProps(true) } : {}),
+      ...mergeStyleProps(themeProps('table-body', { skeleton }), stylex.props(reset.base, xstyle), rest),
+    },
   });
-  return <TableSectionContext.Provider value='body'>{element}</TableSectionContext.Provider>;
+  return (
+    <TableSectionContext.Provider value='body'>
+      <TableSkeletonContext.Provider value={skeleton}>{element}</TableSkeletonContext.Provider>
+    </TableSectionContext.Provider>
+  );
 });
 
 export interface TableRowProps extends MosaicComponentProps<'tr'> {
@@ -170,6 +198,7 @@ export interface TableHeaderCellProps extends Omit<MosaicComponentProps<'th'>, '
   align?: TableAlign;
   sort?: TableSort;
   onSort?: () => void;
+  skeleton?: boolean;
 }
 
 const sortIcons = {
@@ -179,10 +208,11 @@ const sortIcons = {
 } as const;
 
 const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(function MosaicTableHeaderCell(
-  { align = 'start', sort = 'none', onSort, children, render, xstyle, ...rest },
+  { align = 'start', sort = 'none', onSort, skeleton: skeletonProp, children, render, xstyle, ...rest },
   ref,
 ) {
-  const sortable = onSort !== undefined;
+  const skeleton = useInheritedSkeleton(skeletonProp);
+  const sortable = onSort !== undefined && !skeleton;
   return useRender({
     defaultTagName: 'th',
     render,
@@ -190,12 +220,19 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
     props: {
       scope: 'col',
       ...mergeStyleProps(
-        themeProps('table-header-cell', { align, sortable, sort: sortable && sort !== 'none' ? sort : undefined }),
+        themeProps('table-header-cell', {
+          align,
+          sortable,
+          sort: sortable && sort !== 'none' ? sort : undefined,
+          skeleton,
+        }),
         stylex.props(reset.base, styles.headerCell, aligns[align], sortable && styles.sortableHeaderCell, xstyle),
         { 'aria-sort': sortable && sort !== 'none' ? sort : undefined },
         rest,
       ),
-      children: sortable ? (
+      children: skeleton ? (
+        <SkeletonText>{children}</SkeletonText>
+      ) : sortable ? (
         <Button
           variant='ghost'
           color='neutral'
@@ -220,21 +257,26 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
 export interface TableCellProps extends Omit<MosaicComponentProps<'td'>, 'align'> {
   align?: TableAlign;
   noWrap?: boolean;
+  skeleton?: boolean;
 }
 
 const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function MosaicTableCell(
-  { align = 'start', noWrap = false, render, xstyle, ...rest },
+  { align = 'start', noWrap = false, skeleton: skeletonProp, children, render, xstyle, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   return useRender({
     defaultTagName: 'td',
     render,
     ref,
-    props: mergeStyleProps(
-      themeProps('table-cell', { align, noWrap }),
-      stylex.props(reset.base, styles.cell, aligns[align], noWrap && styles.noWrap, xstyle),
-      rest,
-    ),
+    props: {
+      ...mergeStyleProps(
+        themeProps('table-cell', { align, noWrap, skeleton }),
+        stylex.props(reset.base, styles.cell, aligns[align], noWrap && styles.noWrap, xstyle),
+        rest,
+      ),
+      children: skeleton ? <SkeletonText>{children}</SkeletonText> : children,
+    },
   });
 });
 

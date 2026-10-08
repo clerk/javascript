@@ -20,3 +20,15 @@ The API keys panel lists the keys that belong to the signed-in user under the pa
 ### Empty
 
 <Story name='Empty' storyModule={Stories} />
+
+### Loading
+
+`UserProfileApiKeysPanelSkeleton` renders the panel's first load: the panel title and `APIKeysTableSkeleton`, which is `APIKeysTableView` with `skeleton` and three placeholder keys. When to show it, and for how long, is up to the caller.
+
+<Story name='Loading' storyModule={Stories} />
+
+### Page change
+
+With `refetchSkeleton`, the table turns its rows into placeholders while `isFetching` is set, and keeps its headers and controls. After a page change or a sort it shows exactly as many rows as the next page holds; after a search it shows three. This example takes 2s to fetch a page; go to page 2.
+
+<Story name='PageChange' storyModule={Stories} />
