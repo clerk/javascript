@@ -8,12 +8,12 @@ import { describe, it } from 'node:test';
 import { newTestEmail } from '../specs/support/clerk.ts';
 import { assertPublishable, loggedUserIds, sealEvidence } from '../src/core/evidence.ts';
 import type { Runner } from '../src/core/exec.ts';
-import { commentBody, postToPullRequest } from '../src/core/publish.ts';
+import { evidenceBlock, evidenceMarkers, postToPullRequest, summarize, withEvidenceBlock } from '../src/core/publish.ts';
 import { Secret } from '../specs/support/secret.ts';
 import { attach } from '../src/core/verbs.ts';
 import { newRunId } from '../specs/support/inputs.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
-import type { BuildKey, EvidencePath, EvidenceRecord, HostAdapter, RunId } from '../src/core/types.ts';
+import type { BuildKey, EvidencePath, EvidenceRecord, EvidenceSummary, HostAdapter, RunId } from '../src/core/types.ts';
 
 const OWN_USER = 'user_own';
 
@@ -116,14 +116,135 @@ describe('assertPublishable', () => {
   });
 });
 
-describe('the comment attach posts', () => {
+describe('the evidence block of a pull request description', () => {
+  const summary: EvidenceSummary = { run: 'r20261008-052713-253e' as RunId, platform: 'ios', device: 'iPhone Air on xcode-27', commit: '0f50b597b1c2d3e4f5a60718293a4b5c6d7e8f90', passed: 3, flaky: 0, total: 3 };
+  const media = [{ alt: 'video.mp4', ref: './video.mp4' }, { alt: 'profile', ref: './profile.png' }];
+  const block = evidenceBlock(summary, media);
+
+  it('is one line built from the run, then each file alone in its own paragraph, between the markers of its platform', () => {
+    assert.equal(
+      block,
+      [
+        '<!-- verify-evidence:ios -->',
+        '',
+        'verify run `r20261008-052713-253e` on `iPhone Air on xcode-27` at `0f50b597b1c2`, 3 of 3 passed.',
+        '',
+        '![video.mp4](./video.mp4)',
+        '',
+        '![profile](./profile.png)',
+        '',
+        '<!-- /verify-evidence:ios -->',
+      ].join('\n'),
+    );
+    assert.match(evidenceBlock({ ...summary, passed: 1, flaky: 1, total: 2 }, []), /, 1 of 2 passed, 1 flaky \(passed only on a retry\)\.$/m);
+  });
+
   it('counts a test that passed only on a retry apart from the passed ones', () => {
     const { dir, run } = runDir();
     const base = partialRecord(dir, run);
     const record = sealEvidence(dir, { ...base, results: [base.results[0]!, { ...base.results[0]!, title: 'b', status: 'flaky', attempts: 2, error: 'tap failed' }] }, []);
-    const body = commentBody(assertPublishable(record, [OWN_USER]));
-    assert.match(body, /, 1 of 2 passed, 1 flaky \(passed only on a retry\)\.$/m);
-    assert.match(body, /^- flaky: `specs\/explored\/a\.e2e\.ts` b$/m);
+    assert.deepEqual(summarize(assertPublishable(record, [OWN_USER])), { run, platform: 'ios', device: 'verify-ios-1', commit: 'abc', passed: 1, flaky: 1, total: 2 });
+  });
+
+  it('goes after a description that has no block, and leaves that description as it was', () => {
+    for (const body of ['## Summary\r\n\r\nFixes the button.  \r\n', 'no newline at the end', 'ends with one\n']) {
+      const edit = withEvidenceBlock(body, 'ios', block);
+      assert.ok(edit.ok && edit.was === 'added');
+      assert.ok(edit.body.startsWith(body), JSON.stringify(body));
+      assert.match(edit.body.slice(body.length), /^(\n{1,2}|(\r\n){1,2})<!-- verify-evidence:ios -->/);
+      assert.ok(edit.body.replaceAll('\r\n', '\n').endsWith(block));
+    }
+    assert.deepEqual(withEvidenceBlock('', 'ios', block), { ok: true, body: block, was: 'added' });
+  });
+
+  it('replaces the block that is there and keeps every byte before and after it', () => {
+    const before = '## Summary\r\n\r\nText above.  \n\n';
+    const after = '\n\n- [x] a checklist\r\n<!-- /verify-evidence:android -->\ttrailing\n';
+    const old = evidenceBlock({ ...summary, run: 'r20261007-010101-aaaa' as RunId }, [{ alt: 'old', ref: 'https://github.com/user-attachments/assets/1' }]);
+    const edit = withEvidenceBlock(`${before}${old}${after}`, 'ios', block);
+    assert.deepEqual(edit, { ok: true, body: `${before}${block.replaceAll('\n', '\r\n')}${after}`, was: 'replaced' });
+    assert.equal(edit.ok && edit.body.includes('r20261007-010101-aaaa'), false);
+  });
+
+  it('keeps the block of the other platform', () => {
+    const android = evidenceBlock({ ...summary, platform: 'android', device: 'Pixel 9' }, []);
+    const edit = withEvidenceBlock(`intro\n\n${android}\n`, 'ios', block);
+    assert.deepEqual(edit, { ok: true, body: `intro\n\n${android}\n\n${block}`, was: 'added' });
+  });
+
+  it('takes a marker only when it is a whole line, so a description may quote one', () => {
+    const { start, end } = evidenceMarkers('ios');
+    const quoting = `The block sits between \`${start}\` and \`${end}\`.\n\n    ${start}\n    indented, so not a marker\n    ${end}\n`;
+    assert.deepEqual(withEvidenceBlock(quoting, 'ios', block), { ok: true, body: `${quoting}\n${block}`, was: 'added' });
+  });
+
+  const bodyAfter = (body: string, lines: string = block): string => {
+    const edit = withEvidenceBlock(body, 'ios', lines);
+    assert.ok(edit.ok, body);
+    return edit.body;
+  };
+
+  it('writes the block with the line endings of the description, added or replaced', () => {
+    const crlf = block.replaceAll('\n', '\r\n');
+    const old = evidenceBlock({ ...summary, run: 'r20261007-010101-aaaa' as RunId }, media);
+    const oldCrlf = old.replaceAll('\n', '\r\n');
+    assert.deepEqual(withEvidenceBlock(`intro\r\n\r\n${oldCrlf}\r\noutro`, 'ios', block), { ok: true, body: `intro\r\n\r\n${crlf}\r\noutro`, was: 'replaced' });
+    assert.equal(bodyAfter('intro\r\n'), `intro\r\n\r\n${crlf}`);
+    assert.equal(bodyAfter('one\r\ntwo'), `one\r\ntwo\r\n\r\n${crlf}`);
+    assert.equal(bodyAfter(`intro\n\n${old}\n`), `intro\n\n${block}\n`);
+    for (const body of [`intro\r\n\r\n${oldCrlf}\r\noutro`, 'intro\r\n']) assert.equal(/[^\r]\n/.test(bodyAfter(body)), false, 'no bare line feed');
+  });
+
+  it('replaces the block that the verify-attach workflow writes for a handed-off run', () => {
+    const published = [
+      '<!-- verify-evidence:ios -->',
+      '',
+      'verify run `r20261007-010101-aaaa`, as reported by [the session that ran it](https://github.com/clerk/clerk-ios/actions/runs/37731397352): 3 of 3 passed on `iPhone Air on xcode-27` at `0f50b597b1c2`.',
+      '',
+      '![video.mp4](https://github.com/user-attachments/assets/1)',
+      '',
+      '<!-- /verify-evidence:ios -->',
+    ].join('\n');
+    assert.deepEqual(withEvidenceBlock(`intro\n\n${published}\n`, 'ios', block), { ok: true, body: `intro\n\n${block}\n`, was: 'replaced' });
+  });
+
+  it('refuses to replace text between two markers that is not a block it wrote', () => {
+    const { start, end } = evidenceMarkers('ios');
+    const notes = `${start}\nIMPORTANT reviewer notes that are not evidence\n${end}\n`;
+    assert.deepEqual(withEvidenceBlock(notes, 'ios', block), { ok: false, why: `has text between \`${start}\` and \`${end}\` that is not an evidence block` });
+  });
+
+  it('takes no marker from inside a code fence, so a description may show a whole example block', () => {
+    const example = evidenceBlock({ ...summary, run: 'r20261007-010101-aaaa' as RunId }, media);
+    const later = evidenceBlock({ ...summary, run: 'r20261009-020202-bbbb' as RunId }, media);
+    const fences = [['```', '```'], ['```markdown', '```'], ['~~~~', '~~~~~'], ['   ```', '```  '], ['```\n```not the end, it has text after the ticks', '```'], ['```\n~~~', '```'], ['````\n```', '````']] as const;
+    for (const [open, close] of fences) {
+      const documented = `The block looks like this:\n\n${open}\n${example}\n${close}\n`;
+      const added = withEvidenceBlock(documented, 'ios', block);
+      assert.deepEqual(added, { ok: true, body: `${documented}\n${block}`, was: 'added' }, open);
+      const replaced = withEvidenceBlock(bodyAfter(documented), 'ios', later);
+      assert.deepEqual(replaced, { ok: true, body: `${documented}\n${later}`, was: 'replaced' }, open);
+    }
+  });
+
+  it('still takes a marker after a fence that closed, and one beside a line that only looks like a fence', () => {
+    const real = evidenceBlock({ ...summary, run: 'r20261007-010101-aaaa' as RunId }, media);
+    for (const before of ['```\ncode\n```\n\n', 'Use ```three ticks``` inline.\n\n', '```three ticks``` that open a line are inline code too.\n\n', '    ```\n\n', '``\n\n']) {
+      assert.deepEqual(withEvidenceBlock(`${before}${real}\n`, 'ios', block), { ok: true, body: `${before}${block}\n`, was: 'replaced' }, JSON.stringify(before));
+    }
+  });
+
+  it('refuses a description whose markers are doubled, halved, or out of order, and says which', () => {
+    const { start, end } = evidenceMarkers('ios');
+    const refused = (body: string): string => {
+      const edit = withEvidenceBlock(body, 'ios', block);
+      assert.equal(edit.ok, false, body);
+      return edit.ok ? '' : edit.why;
+    };
+    assert.equal(refused(`${block}\n\n${block}`), `has \`${start}\` 2 times and \`${end}\` 2 times`);
+    assert.equal(refused(`text\n${start}\nno end`), `has \`${start}\` 1 times and \`${end}\` 0 times`);
+    assert.equal(refused(`no start\n${end}\n`), `has \`${start}\` 0 times and \`${end}\` 1 times`);
+    assert.equal(refused(`${end}\n${start}`), `has \`${end}\` before \`${start}\``);
   });
 });
 
@@ -140,15 +261,31 @@ describe('assertPublishable and the groups of a run', () => {
 
 describe('attach', () => {
   const host = { repo: 'clerk-ios', githubRepo: 'clerk/clerk-ios' } as HostAdapter;
+  const PR_URL = 'https://github.com/clerk/clerk-ios/pull/9';
 
-  function recordingRunner(attachFlag = true): { runner: Runner; calls: (readonly string[])[] } {
-    const calls: (readonly string[])[] = [];
-    const runner: Runner = async (command, args) => {
-      if (args.includes('--help')) return { code: 0, stdout: attachFlag ? '      --attach file   Attach a file\n' : '  -b, --body text   The comment body text\n', stderr: '' };
-      calls.push([command, ...args]);
-      return { code: 0, stdout: 'https://github.com/clerk/clerk-ios/pull/9#issuecomment-1\n', stderr: '' };
+  function fakeGh(options: { readonly attachFlag?: boolean; readonly body?: string; readonly onView?: (views: number, pr: { body: string }) => void } = {}) {
+    const pr = { body: options.body ?? '## Summary\n\nFixes the button.\n' };
+    const edits: { readonly args: readonly string[]; readonly cwd: string | undefined; readonly bodyFile: string }[] = [];
+    let views = 0;
+    const runner: Runner = async (command, args, runOptions) => {
+      assert.equal(command, 'gh');
+      if (args.includes('--help')) return { code: 0, stdout: options.attachFlag === false ? '  -b, --body text   Set the new body.\n' : '      --attach file   Attach a file\n', stderr: '' };
+      if (args[1] === 'view') {
+        views += 1;
+        options.onView?.(views, pr);
+        return { code: 0, stdout: JSON.stringify({ body: pr.body, url: PR_URL }), stderr: '' };
+      }
+      const bodyFile = readFileSync(args[args.indexOf('--body-file') + 1]!, 'utf8');
+      edits.push({ args, cwd: runOptions?.cwd, bodyFile });
+      pr.body = bodyFile.replace(/\]\(\.\/[^)]+\)/g, '](https://github.com/user-attachments/assets/uploaded)');
+      return { code: 0, stdout: `${PR_URL}\n`, stderr: '' };
     };
-    return { runner, calls };
+    return { runner, pr, edits };
+  }
+
+  function publishableRun() {
+    const { dir, run } = runDir();
+    return { dir, run, publishable: assertPublishable(sealEvidence(dir, partialRecord(dir, run), []), [OWN_USER]) };
   }
 
   it('never calls gh for a run that fails the gate', async () => {
@@ -158,43 +295,88 @@ describe('attach', () => {
     writeFileSync(join(dir, 'video.mp4'), 'x');
     writeFileSync(join(dir, 'app.log'), hostLogLine('user_foreign'));
     sealEvidence(dir, partialRecord(dir, run), []);
-    const { runner, calls } = recordingRunner();
+    const calls: string[] = [];
+    const runner: Runner = async (command) => (calls.push(command), { code: 0, stdout: '', stderr: '' });
     const deps = { host, workspace, runner, env: {}, progress: () => undefined, instances: heldInstances() };
     await assert.rejects(attach(deps, { verb: 'attach', run, pr: 9, screenshots: 'all' }), { code: 'EVIDENCE_UNSAFE' });
     assert.equal(calls.length, 0);
   });
 
-  it('posts once with --repo and --attach, then reports alreadyPosted', async () => {
-    const { dir, run } = runDir();
-    const record = sealEvidence(dir, partialRecord(dir, run), []);
-    const publishable = assertPublishable(record, [OWN_USER]);
-    const { runner, calls } = recordingRunner();
-    const first = await postToPullRequest(publishable, dir, host, 9, 'all', runner);
-    const second = await postToPullRequest(publishable, dir, host, 9, 'all', runner);
-    assert.equal(calls.length, 1);
-    const args = calls[0]!;
-    assert.deepEqual(args.slice(0, 6), ['gh', 'pr', 'comment', '9', '--repo', 'clerk/clerk-ios']);
-    assert.deepEqual(args.filter((_, i) => args[i - 1] === '--attach'), [join(dir, 'video.mp4'), join(dir, 'screenshots', 'profile.png')]);
-    assert.equal(first.alreadyPosted, false);
-    assert.equal(second.alreadyPosted, true);
-    assert.equal(second.commentUrl, 'https://github.com/clerk/clerk-ios/pull/9#issuecomment-1');
+  it('puts the block after the description with gh pr edit, from the run directory, and uploads a run only once', async () => {
+    const { dir, run, publishable } = publishableRun();
+    const gh = fakeGh();
+    const first = await postToPullRequest(publishable, dir, host, 9, 'all', gh.runner);
+    const second = await postToPullRequest(publishable, dir, host, 9, 'all', gh.runner);
+    assert.equal(gh.edits.length, 1);
+    const edit = gh.edits[0]!;
+    assert.deepEqual(edit.args.slice(0, 5), ['pr', 'edit', '9', '--repo', 'clerk/clerk-ios']);
+    assert.deepEqual(edit.args.filter((_, i) => edit.args[i - 1] === '--attach'), ['./video.mp4', './screenshots/profile.png']);
+    assert.equal(edit.cwd, dir);
+    assert.equal(
+      edit.bodyFile,
+      `## Summary\n\nFixes the button.\n\n<!-- verify-evidence:ios -->\n\nverify run \`${run}\` on \`verify-ios-1\` at \`abc\`, 1 of 1 passed.\n\n![video.mp4](./video.mp4)\n\n![profile](./screenshots/profile.png)\n\n<!-- /verify-evidence:ios -->`,
+    );
+    assert.equal(existsSync(edit.args[edit.args.indexOf('--body-file') + 1]!), false, 'the copy of the description is not kept');
+    assert.deepEqual(first, { verb: 'attach', prUrl: PR_URL, posted: [join(dir, 'video.mp4'), join(dir, 'screenshots', 'profile.png')], alreadyPosted: false });
+    assert.deepEqual(second, { ...first, alreadyPosted: true });
     assert.ok(existsSync(join(dir, 'posted-9.json')));
-    const other = await postToPullRequest(publishable, dir, host, 10, 'all', runner);
-    assert.equal(other.alreadyPosted, false);
-    assert.equal(calls.length, 2);
-    assert.equal(calls[1]![3], '10');
+    await postToPullRequest(publishable, dir, host, 10, 'all', gh.runner);
+    assert.equal(gh.edits[1]!.args[2], '10');
   });
 
-  it('posts nothing and names the fix when gh pr comment has no --attach', async () => {
-    const { dir, run } = runDir();
-    const publishable = assertPublishable(sealEvidence(dir, partialRecord(dir, run), []), [OWN_USER]);
-    const { runner, calls } = recordingRunner(false);
-    await assert.rejects(postToPullRequest(publishable, dir, host, 9, 'all', runner), {
+  it('replaces the block of an earlier run, so a second run does not pile up media', async () => {
+    const earlier = publishableRun();
+    const later = publishableRun();
+    const gh = fakeGh();
+    await postToPullRequest(earlier.publishable, earlier.dir, host, 9, 'all', gh.runner);
+    gh.pr.body += '\nReviewer note added below the block.\n';
+    await postToPullRequest(later.publishable, later.dir, host, 9, ['profile'], gh.runner);
+    assert.equal(gh.pr.body.split('<!-- verify-evidence:ios -->').length, 2);
+    assert.equal(gh.pr.body.includes(earlier.run), false);
+    assert.ok(gh.pr.body.includes(later.run));
+    assert.ok(gh.pr.body.startsWith('## Summary\n\nFixes the button.\n\n<!-- verify-evidence:ios -->'));
+    assert.ok(gh.pr.body.endsWith('<!-- /verify-evidence:ios -->\nReviewer note added below the block.\n'));
+  });
+
+  it('posts nothing and names the fix when gh pr edit has no --attach', async () => {
+    const { dir, run, publishable } = publishableRun();
+    const gh = fakeGh({ attachFlag: false });
+    await assert.rejects(postToPullRequest(publishable, dir, host, 9, 'all', gh.runner), {
       code: 'NOT_READY',
-      message: `this gh has no \`gh pr comment --attach\`, so the video and screenshots of run ${run} cannot be posted`,
-      fix: 'install a gh build whose `gh pr comment` has --attach',
+      message: `this gh has no \`gh pr edit --attach\`, so the video and screenshots of run ${run} cannot be posted`,
+      fix: 'install gh 2.99.0 or newer, whose `gh pr edit` has --attach',
     });
-    assert.deepEqual(calls, []);
+    assert.deepEqual(gh.edits, []);
     assert.equal(existsSync(join(dir, 'posted-9.json')), false);
+  });
+
+  it('builds on the newer description when someone edits it between the read and the write', async () => {
+    const { dir, publishable } = publishableRun();
+    const gh = fakeGh({ onView: (views, pr) => void (views === 2 && (pr.body = 'Rewritten by a reviewer.\n')) });
+    await postToPullRequest(publishable, dir, host, 9, 'all', gh.runner);
+    assert.equal(gh.edits.length, 1);
+    assert.ok(gh.edits[0]!.bodyFile.startsWith('Rewritten by a reviewer.\n\n<!-- verify-evidence:ios -->'));
+  });
+
+  it('writes nothing when the description changes twice, and says so', async () => {
+    const { dir, run, publishable } = publishableRun();
+    const gh = fakeGh({ onView: (views, pr) => void (pr.body = `edit ${views}\n`) });
+    await assert.rejects(postToPullRequest(publishable, dir, host, 9, 'all', gh.runner), {
+      code: 'NOT_READY',
+      message: `the description of PR #9 changed twice while the evidence of run ${run} was being placed, so nothing was written`,
+    });
+    assert.deepEqual(gh.edits, []);
+    assert.equal(existsSync(join(dir, 'posted-9.json')), false);
+  });
+
+  it('writes nothing to a description whose markers are broken, and says which', async () => {
+    const { dir, run, publishable } = publishableRun();
+    const gh = fakeGh({ body: 'text\n<!-- verify-evidence:ios -->\nthe end marker was deleted\n' });
+    await assert.rejects(postToPullRequest(publishable, dir, host, 9, 'all', gh.runner), {
+      code: 'NOT_READY',
+      message: `the description of PR #9 has \`<!-- verify-evidence:ios -->\` 1 times and \`<!-- /verify-evidence:ios -->\` 0 times, so the evidence of run ${run} has no one place to go`,
+      fix: 'leave one pair of those markers in the description, or none, then rerun',
+    });
+    assert.deepEqual(gh.edits, []);
   });
 });

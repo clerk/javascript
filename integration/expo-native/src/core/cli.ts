@@ -228,7 +228,7 @@ function render(value: VerbResult, packageDir: string): string[] {
       return lines;
     }
     case 'attach':
-      return [`${value.alreadyPosted ? 'already posted' : 'posted'}  ${value.posted.map((p) => basename(p)).join(', ')}  ${value.commentUrl}`];
+      return [`${value.alreadyPosted ? 'already posted' : 'posted'}  ${value.posted.map((p) => basename(p)).join(', ')}  in the description of ${value.prUrl}`];
     case 'down':
       return [
         ...(value.dryRun
