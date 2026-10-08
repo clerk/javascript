@@ -30,6 +30,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
     'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_contact_support:
     'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
+  member_unavailable: 'This member is no longer available to manage.',
   network_error: 'Unable to reach the server. Check your connection and try again.',
   oauth_access_denied: 'You did not grant access to your account.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
@@ -54,6 +55,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   protect_check_timed_out: "Verification didn't complete in time. Please try again.",
   protect_check_unsupported_environment:
     "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
+  role_unavailable: 'This role is no longer available.',
   sso_bypass_domain_not_served:
     'This member could not be added because their email address is not served by a connection.',
   ticket_expired_code: 'This link has expired. Please start again or request a new link.',

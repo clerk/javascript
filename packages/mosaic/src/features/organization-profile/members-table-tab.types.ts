@@ -27,6 +27,13 @@ export interface MembersTableTabViewProps {
   searchValue: string;
   isLoading: boolean;
   isFetching?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
+  isRolesError?: boolean;
+  onRetryRoles?: () => void;
+  hasRoleSetMigration?: boolean;
+  isChangingRole?: boolean;
+  roleError?: string;
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;

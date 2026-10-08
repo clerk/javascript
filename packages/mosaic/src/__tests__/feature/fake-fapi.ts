@@ -7,6 +7,7 @@ import type {
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
+  RoleJSON,
   SessionJSON,
   SessionWithActivitiesJSON,
   UserJSON,
@@ -17,6 +18,7 @@ import { http, HttpResponse } from 'msw';
 import { setupWorker } from 'msw/browser';
 
 import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
+import { organizationMemberHandlers } from './fake-fapi/organization-members';
 import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
 import { envelope, error, findSession, missing, updateUser } from './fake-fapi/shared';
 import {
@@ -48,6 +50,8 @@ export interface FakeFapiState {
   environment: FapiEnvironment;
   client: ClientJSON;
   memberships: OrganizationMembershipJSON[];
+  roles: RoleJSON[];
+  hasRoleSetMigration: boolean;
   invitations: UserOrganizationInvitationJSON[];
   suggestions: OrganizationSuggestionJSON[];
   apiKeys: ApiKeyJSON[];
@@ -203,6 +207,8 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     environment: fapiEnvironment(),
     client: fapiClient(),
     memberships: [],
+    roles: [],
+    hasRoleSetMigration: false,
     invitations: [],
     suggestions: [],
     apiKeys: [],
@@ -221,6 +227,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   };
 
   worker.use(
+    ...organizationMemberHandlers(state, fapiUrl),
     ...verificationHandlers(state, fapiUrl),
     ...enterpriseHandlers(state, fapiUrl),
     ...passkeyHandlers(state, fapiUrl, passkeys),
