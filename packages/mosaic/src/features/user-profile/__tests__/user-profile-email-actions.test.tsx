@@ -105,6 +105,54 @@ describe('email actions', () => {
     expect(order()).toEqual(['Manage first@example.com', 'Manage second@example.com']);
   });
 
+  it('returns focus to the email menu after opening with the keyboard and canceling with Escape', async () => {
+    const user = userEvent.setup();
+    const onRemoveEmail = vi.fn();
+    renderEmail({ onRemoveEmail });
+    const trigger = screen.getByRole('button', { name: 'Manage test@example.com' });
+
+    trigger.focus();
+    await user.keyboard('{Enter}');
+    await user.keyboard('{Enter}');
+    expect(screen.getByRole('alertdialog', { name: 'Remove email address?' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(onRemoveEmail).not.toHaveBeenCalled();
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it('focuses Add email after removing the last email', async () => {
+    const user = userEvent.setup();
+    function Example() {
+      const [emails, setEmails] = useState([{ id: 'email_1', value: 'test@example.com', isVerified: true }]);
+      return (
+        <MosaicProvider>
+          <UserProfileAccountSectionView
+            allowMultipleAccounts
+            name='Test'
+            username='test'
+            phones={[]}
+            emails={emails}
+            onSendEmailCode={() => Promise.resolve()}
+            onVerifyEmailCode={() => Promise.resolve()}
+            onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
+          />
+        </MosaicProvider>
+      );
+    }
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: 'Manage test@example.com' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add email' })).toBeEnabled();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add email' })).toHaveFocus());
+  });
+
   it('shows a primary update error without opening a dialog', async () => {
     const user = userEvent.setup();
     const onSetPrimaryEmail = vi.fn().mockRejectedValue(new Error('Unable to update primary email.'));
