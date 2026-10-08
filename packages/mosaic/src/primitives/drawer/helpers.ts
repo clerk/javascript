@@ -7,20 +7,6 @@
  * the snap offset and any nested `scale()`, so reading it back would be wrong.
  */
 
-/** `<input type>` values that are not free-text and therefore never pop the virtual keyboard. */
-const NON_TEXT_INPUT_TYPES = new Set([
-  'button',
-  'checkbox',
-  'color',
-  'file',
-  'hidden',
-  'image',
-  'radio',
-  'range',
-  'reset',
-  'submit',
-]);
-
 /** Logarithmic rubber-banding for over-drag past the open position. (vaul `dampenValue`) */
 export const dampen = (v: number): number => 8 * (Math.log(v + 1) - 2);
 
@@ -42,15 +28,6 @@ export function getSnapPointSwipeMovement(baseOffset: number, movementValue: num
     return movementValue;
   }
   return -Math.sqrt(-nextOffset) - baseOffset;
-}
-
-/** Whether focusing `el` would summon the on-screen keyboard (a text field or contenteditable). */
-export function isInput(el: Element): boolean {
-  return (
-    (el instanceof HTMLInputElement && !NON_TEXT_INPUT_TYPES.has(el.type)) ||
-    el instanceof HTMLTextAreaElement ||
-    (el instanceof HTMLElement && el.isContentEditable)
-  );
 }
 
 /**

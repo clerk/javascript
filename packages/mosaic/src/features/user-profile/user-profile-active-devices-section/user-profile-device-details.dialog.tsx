@@ -39,6 +39,7 @@ export function UserProfileDeviceDetailsDialog({
         return (
           <Dialog.Popup
             variant='card'
+            compactPlacement='center'
             finalFocus={finalFocus}
           >
             <DeviceDetailsCard

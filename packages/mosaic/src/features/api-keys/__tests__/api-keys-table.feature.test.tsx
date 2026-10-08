@@ -435,7 +435,12 @@ describe('APIKeysTable', () => {
       const create = holdRequests('post', '/api_keys');
 
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
-      await waitFor(() => expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toBeDisabled());
+      await waitFor(() =>
+        expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toHaveAttribute(
+          'aria-disabled',
+          'true',
+        ),
+      );
       expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toHaveAttribute('aria-busy', 'true');
 
       create.release();
