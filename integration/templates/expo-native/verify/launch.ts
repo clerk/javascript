@@ -21,11 +21,7 @@ function isOneOf<T extends string>(values: readonly T[], value: string | undefin
 function parseVerifyLaunch(
   inputs: Readonly<Record<string, string>>,
   fallbackPublishableKey: string | undefined,
-): VerifyLaunch | null {
-  if (Object.keys(inputs).length === 0) {
-    return null;
-  }
-
+): VerifyLaunch {
   return {
     publishableKey: inputs.verifyPublishableKey ?? fallbackPublishableKey ?? '',
     runId: inputs.verifyRunId ?? null,
@@ -60,7 +56,7 @@ function decodeBase64(value: string): string {
   }
 }
 
-export function readVerifyLaunch(): VerifyLaunch | null {
+export function readVerifyLaunch(): VerifyLaunch {
   const inputs = VerifyLaunchConfig?.readLaunchInputs() ?? {};
   if (inputs.verifyStorageScope) {
     VerifyLaunchConfig?.applyStorageScope(inputs.verifyStorageScope);
