@@ -139,6 +139,7 @@ export function UserProfileActiveDevicesSectionView({
       ) : null}
       <UserProfileDeviceDetailsDialog
         handle={deviceDetails}
+        devices={devices}
         finalFocus={removalFocus.finalFocus}
         onSignOut={signOutActions?.remove}
       />

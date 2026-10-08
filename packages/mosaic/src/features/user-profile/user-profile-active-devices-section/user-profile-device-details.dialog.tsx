@@ -9,11 +9,17 @@ import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 export interface UserProfileDeviceDetailsDialogProps {
   handle: DialogHandle<UserProfileDevice>;
+  devices: UserProfileDevice[];
   finalFocus?: DialogFocusTarget;
   onSignOut?: (device: UserProfileDevice) => void | Promise<void>;
 }
 
-export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }: UserProfileDeviceDetailsDialogProps) {
+export function UserProfileDeviceDetailsDialog({
+  handle,
+  devices,
+  finalFocus,
+  onSignOut,
+}: UserProfileDeviceDetailsDialogProps) {
   const m = useMessages('userProfileActiveDevices');
   const controller = useConfirmationController({ errorFallback: m.detailsDialog.signOutError });
 
@@ -23,8 +29,14 @@ export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
     >
-      {({ payload: device }) =>
-        device === undefined ? null : (
+      {({ payload }) => {
+        if (payload === undefined) {
+          return null;
+        }
+
+        const device = devices.find(candidate => candidate.id === payload.id) ?? payload;
+
+        return (
           <Dialog.Popup
             variant='card'
             finalFocus={finalFocus}
@@ -36,8 +48,8 @@ export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }
               errorMessage={controller.errorMessage}
             />
           </Dialog.Popup>
-        )
-      }
+        );
+      }}
     </Dialog.Root>
   );
 }
