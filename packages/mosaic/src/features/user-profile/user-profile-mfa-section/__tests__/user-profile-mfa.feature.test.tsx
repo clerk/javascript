@@ -298,7 +298,7 @@ describe('User profile MFA', () => {
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /SMS verification/ }));
     await user.click(screen.getByRole('button', { name: 'Continue' }));
-    await screen.findByRole('textbox', { name: 'Verification code' });
+    const code = await screen.findByRole('textbox', { name: 'Verification code' });
     const held = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
     const later = Date.now() + 31_000;
     vi.useFakeTimers({ toFake: ['Date'] });
@@ -307,6 +307,8 @@ describe('User profile MFA', () => {
       await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 2000 });
       await user.click(screen.getByRole('button', { name: /Resend/ }));
       await waitFor(() => expect(held.requests).toHaveLength(1));
+      expect(code).toHaveAttribute('aria-disabled', 'true');
+      expect(code).toHaveAttribute('readonly');
       expect(screen.getByRole('button', { name: 'Verify' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
     } finally {
@@ -314,6 +316,8 @@ describe('User profile MFA', () => {
       vi.useRealTimers();
     }
     await waitFor(() => expect(screen.getByRole('button', { name: 'Verify' })).toBeEnabled());
+    expect(code).not.toHaveAttribute('aria-disabled');
+    expect(code).not.toHaveAttribute('readonly');
   });
 
   it('keeps a newly created phone when preparing its code fails and retries without duplication', async () => {
@@ -436,7 +440,7 @@ describe('User profile MFA', () => {
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
       prepare.fail('phone_number_invalid', 'Unable to send a code.');
       await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
-      await waitFor(() => expect(number).toBeEnabled());
+      await waitFor(() => expect(number).not.toHaveAttribute('readonly'));
       serveFapi(fapi);
     }
     await user.clear(number);
