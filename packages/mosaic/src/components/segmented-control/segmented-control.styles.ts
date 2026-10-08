@@ -21,8 +21,8 @@ const forcedTextVar = '--_cl-segmented-control-forced-text';
 const secondaryText = `var(${forcedTextVar}, ${colorVars['--cl-color-foreground-secondary']})`;
 const primaryText = `var(${forcedTextVar}, ${colorVars['--cl-color-foreground']})`;
 
-const lead = durationVars['--cl-duration-slow'];
-const trail = durationVars['--cl-duration-slower'];
+const lead = durationVars['--cl-duration-base'];
+const trail = durationVars['--cl-duration-slow'];
 
 const scaleIn = stylex.keyframes({
   from: { transform: 'scale(0.94)' },
@@ -116,7 +116,7 @@ export const styles = stylex.create({
   fallbackIndicator: {
     ...surface,
     inset: 0,
-    animationDuration: durationVars['--cl-duration-slow'],
+    animationDuration: durationVars['--cl-duration-base'],
     animationName: { default: scaleIn, [reduceMotion]: 'none' },
     animationTimingFunction: easingVars['--cl-ease-enter'],
     display: {
