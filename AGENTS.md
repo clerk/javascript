@@ -11,6 +11,11 @@ Clerk's JavaScript SDK and library monorepo.
 - Every PR needs a changeset. `pnpm changeset` for package changes, `pnpm changeset:empty` for tooling/repo-only. Empty changesets are two `---` delimiters with no body. A changeset is a changelog entry for users upgrading the package, not a summary of the work done in the PR. Describe the user-facing change (what changed for someone consuming the library and how it affects them) rather than the implementation details of the diff. If a change has no user-facing impact, use an empty changeset.
 - PR descriptions follow `.github/PULL_REQUEST_TEMPLATE.md` and add no sections of their own. Never add a "Testing" (or "Test plan" / "How to test") section summarizing the tests written or the checks run; the Checklist covers that and reviewers read the diff. Describe the change, not the work done on it.
 
+## Verifying changes
+
+To prove a change to `@clerk/expo` on a simulator or emulator, read the `Verifying changes` section of `packages/expo/AGENTS.md`.
+The skill is `.claude/skills/verify-clerk-expo/`, and the tests and the CLI that runs them are in `integration/expo-native/`.
+
 ## References
 
 - For questions about theming, appearance customization, or the styled system, see `references/theming-architecture.md`.
