@@ -43,16 +43,30 @@ export function evidenceBlock(summary: EvidenceSummary, media: readonly Evidence
   return [start, '', line, ...media.flatMap((m) => ['', `![${m.alt}](${m.ref})`]), '', end].join('\n');
 }
 
-export type BlockEdit = { readonly ok: true; readonly body: string; readonly was: 'added' | 'replaced' } | { readonly ok: false; readonly why: string };
+export class CannotPostHere extends VerifyFailure {
+  readonly why: string;
+  constructor(why: string, message: string, fix: string) {
+    super('NOT_READY', message, fix);
+    this.why = why;
+  }
+}
 
-function fencedCode(text: string): readonly (readonly [number, number])[] {
+export type BlockEdit = { readonly ok: true; readonly body: string; readonly was: 'added' | 'replaced' } | { readonly ok: false; readonly why: string; readonly fix: string };
+
+const ONE_PAIR_OF_MARKERS = 'leave one pair of those markers in the description, or none';
+
+function fencedCode(text: string): { readonly fences: readonly (readonly [number, number])[]; readonly neverCloses: boolean } {
   const fences: [number, number][] = [];
   let open: { readonly char: string; readonly length: number; readonly at: number } | null = null;
+  let inHtmlComment = false;
   for (let at = 0; at <= text.length; ) {
     const newline = text.indexOf('\n', at);
     const lineEnd = newline === -1 ? text.length : newline;
-    const fence = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(text.slice(at, lineEnd).replace(/\r$/, ''));
-    if (fence !== null) {
+    const line = text.slice(at, lineEnd).replace(/\r$/, '');
+    const fence = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    if (open === null && (inHtmlComment || /^ {0,3}<!--/.test(line))) {
+      inHtmlComment = !line.includes('-->');
+    } else if (fence !== null) {
       const ticks = fence[1]!;
       const rest = fence[2]!;
       if (open === null && !(ticks[0] === '`' && rest.includes('`'))) open = { char: ticks[0]!, length: ticks.length, at };
@@ -65,11 +79,11 @@ function fencedCode(text: string): readonly (readonly [number, number])[] {
     at = newline + 1;
   }
   if (open !== null) fences.push([open.at, text.length]);
-  return fences;
+  return { fences, neverCloses: open !== null };
 }
 
 function linesThatAre(text: string, marker: string): number[] {
-  const fences = fencedCode(text);
+  const { fences } = fencedCode(text);
   const found: number[] = [];
   for (let at = text.indexOf(marker); at !== -1; at = text.indexOf(marker, at + marker.length)) {
     const end = at + marker.length;
@@ -87,12 +101,13 @@ export function withEvidenceBlock(body: string, platform: Platform, lines: strin
   const newline = body.includes('\r\n') ? '\r\n' : '\n';
   const block = lines.replaceAll('\n', newline);
   if (starts.length === 0 && ends.length === 0) {
+    if (fencedCode(body).neverCloses) return { ok: false, why: 'ends inside a code fence that is never closed', fix: 'close that code fence' };
     const gap = body === '' ? '' : body.endsWith('\n') ? newline : `${newline}${newline}`;
     return { ok: true, body: `${body}${gap}${block}`, was: 'added' };
   }
-  if (starts.length !== 1 || ends.length !== 1) return { ok: false, why: `has \`${start}\` ${starts.length} times and \`${end}\` ${ends.length} times` };
-  if (ends[0]! < starts[0]!) return { ok: false, why: `has \`${end}\` before \`${start}\`` };
-  if (!body.slice(starts[0]! + start.length, ends[0]!).trimStart().startsWith(BLOCK_LINE_START)) return { ok: false, why: `has text between \`${start}\` and \`${end}\` that is not an evidence block` };
+  if (starts.length !== 1 || ends.length !== 1) return { ok: false, why: `has \`${start}\` ${starts.length} times and \`${end}\` ${ends.length} times`, fix: ONE_PAIR_OF_MARKERS };
+  if (ends[0]! < starts[0]!) return { ok: false, why: `has \`${end}\` before \`${start}\``, fix: ONE_PAIR_OF_MARKERS };
+  if (!body.slice(starts[0]! + start.length, ends[0]!).trimStart().startsWith(BLOCK_LINE_START)) return { ok: false, why: `has text between \`${start}\` and \`${end}\` that is not an evidence block`, fix: ONE_PAIR_OF_MARKERS };
   return { ok: true, body: `${body.slice(0, starts[0]!)}${block}${body.slice(ends[0]! + end.length)}`, was: 'replaced' };
 }
 
@@ -118,7 +133,7 @@ export function chooseFiles(evidence: Publishable, screenshots: 'all' | readonly
 
 async function readDescription(runner: Runner, repo: string, pr: number): Promise<{ readonly body: string; readonly url: string }> {
   const viewed = await runner('gh', ['pr', 'view', String(pr), '--repo', repo, '--json', 'body,url']);
-  if (viewed.code !== 0) throw new VerifyFailure('NOT_READY', `gh pr view failed: ${viewed.stderr.trim()}`, 'check `gh auth status` and that the PR exists');
+  if (viewed.code !== 0) throw new CannotPostHere('gh pr view failed', `gh pr view failed: ${viewed.stderr.trim()}`, 'check `gh auth status` and that the PR exists');
   const parsed = JSON.parse(viewed.stdout) as { readonly body?: string | null; readonly url?: string };
   return { body: parsed.body ?? '', url: parsed.url ?? '' };
 }
@@ -134,12 +149,12 @@ export async function postToPullRequest(
   const postedFile = join(dir, `posted-${pr}.json`);
   if (existsSync(postedFile)) {
     const previous = JSON.parse(readFileSync(postedFile, 'utf8')) as Posted;
-    return { verb: 'attach', prUrl: previous.prUrl, posted: previous.posted, alreadyPosted: true };
+    return { verb: 'attach', via: 'gh', prUrl: previous.prUrl, posted: previous.posted, alreadyPosted: true };
   }
   const { videos, shots } = chooseFiles(evidence, screenshots);
   const files = [...videos, ...shots.map((s) => s.path)];
   const missing = files.length === 0 ? null : await missingAttach(runner);
-  if (missing !== null) throw new VerifyFailure('NOT_READY', `${missing.why}, so the video and screenshots of run ${evidence.run} cannot be posted`, missing.fix);
+  if (missing !== null) throw new CannotPostHere(missing.why, `${missing.why}, so the video and screenshots of run ${evidence.run} cannot be posted`, missing.fix);
 
   const ref = (file: EvidencePath): string => `./${relative(dir, file).split(sep).join('/')}`;
   const block = evidenceBlock(summarize(evidence), [
@@ -152,7 +167,7 @@ export async function postToPullRequest(
   for (let attempt = 0; attempt < 2 && next === null; attempt += 1) {
     const edit = withEvidenceBlock(current.body, evidence.platform, block);
     if (!edit.ok) {
-      throw new VerifyFailure('NOT_READY', `the description of PR #${pr} ${edit.why}, so the evidence of run ${evidence.run} has no one place to go`, 'leave one pair of those markers in the description, or none, then rerun');
+      throw new VerifyFailure('NOT_READY', `the description of PR #${pr} ${edit.why}, so the evidence of run ${evidence.run} has no one place to go`, `${edit.fix}, then rerun`);
     }
     const again = await readDescription(runner, host.githubRepo, pr);
     if (again.body === current.body) next = edit.body;
@@ -168,12 +183,12 @@ export async function postToPullRequest(
     writeFileSync(bodyFile, next);
     const result = await runner('gh', ['pr', 'edit', String(pr), '--repo', host.githubRepo, '--body-file', bodyFile, ...files.flatMap((f) => ['--attach', ref(f)])], { cwd: dir });
     if (result.code !== 0) {
-      throw new VerifyFailure('NOT_READY', `gh pr edit failed: ${result.stderr.trim()}`, 'check `gh auth status` and that you can edit the PR; a file that did upload is in the description already');
+      throw new CannotPostHere('gh pr edit failed', `gh pr edit failed: ${result.stderr.trim()}`, 'check `gh auth status` and that you can edit the PR; a file that did upload is in the description already');
     }
     const prUrl = /https:\/\/github\.com\/\S+/.exec(result.stdout)?.[0] ?? current.url;
     const posted: Posted = { pr, prUrl, posted: files };
     writeFileSync(postedFile, `${JSON.stringify(posted, null, 2)}\n`);
-    return { verb: 'attach', prUrl, posted: files, alreadyPosted: false };
+    return { verb: 'attach', via: 'gh', prUrl, posted: files, alreadyPosted: false };
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }
