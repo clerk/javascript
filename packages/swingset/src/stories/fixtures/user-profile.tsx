@@ -1,5 +1,6 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
@@ -12,7 +13,7 @@ import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -159,9 +160,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
       passkeysSlot: <UserProfilePasskeysSectionView {...passkeys} />,
       ...mfa.security,
-      devices: activeDevices.devices,
-      onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
-      onSignOutDevice: activeDevices.onSignOutDevice,
+      activeDevicesSlot: <UserProfileActiveDevicesSectionView {...activeDevices} />,
     },
     billing: {
       subscription,

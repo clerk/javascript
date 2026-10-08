@@ -494,6 +494,21 @@ describe('createActor — observable contract', () => {
     expect(seen).toEqual(['confirming', 'idle']); // no further notifications
   });
 
+  it('does not notify a listener another listener unsubscribed during the same pass', () => {
+    const actor = createActor(createMachine({ initial: 'a', states: { a: { on: { GO: 'b' } }, b: {} } }));
+    actor.start();
+
+    const calls: string[] = [];
+    const unsubscribeA = actor.subscribe(() => calls.push('A'));
+    actor.subscribe(() => {
+      calls.push('B');
+      unsubscribeA();
+    });
+
+    actor.send({ type: 'GO' });
+    expect(calls).toEqual(['B']);
+  });
+
   it('getSnapshot is referentially stable until a change occurs', () => {
     const actor = createActor(createDeleteOrgMachine(() => Promise.resolve()));
     actor.start();
@@ -1015,5 +1030,29 @@ describe('createActor — inline transition functions (TransitionFn)', () => {
     const actor = createActor(machine);
     actor.start();
     expect(actor.can({ type: 'GO' })).toBe(false);
+  });
+});
+
+describe('createActor — unknown states', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('warns when a transition targets a state the machine does not define', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const actor = createActor(createMachine({ initial: 'a', states: { a: { on: { GO: 'ghost' } } } }));
+    actor.start();
+
+    actor.send({ type: 'GO' });
+
+    expect(warn).toHaveBeenCalledWith('[Clerk] Machine has no state "ghost".');
+  });
+
+  it('does not warn for an empty graph', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const actor = createActor(createMachine({ initial: '', states: {} }));
+    actor.start();
+
+    expect(warn).not.toHaveBeenCalled();
   });
 });

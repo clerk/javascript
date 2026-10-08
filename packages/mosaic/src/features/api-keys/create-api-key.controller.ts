@@ -38,6 +38,7 @@ export function useCreateAPIKeyController({
 
   const form = useForm({
     initialValues,
+    errorFallback: messages.createError,
     canSubmit: values => values.name.trim().length > 2 && values.expiration !== null,
     onSubmit: async ({ name, expiration }) => {
       if (expiration === null) {
