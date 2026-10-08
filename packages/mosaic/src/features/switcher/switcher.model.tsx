@@ -48,16 +48,46 @@ export type SwitcherModel =
 
 /** A URL is the whole opt-in to navigation, and `modal` forbids one, so the pair cannot contradict itself. */
 type UserProfileMode =
-  | { userProfileUrl: string; userProfileMode?: 'navigation' }
-  | { userProfileUrl?: never; userProfileMode?: 'modal' };
+  | {
+      /** Full URL or path of your own user profile page. Setting it routes there instead of opening Clerk's modal. */
+      userProfileUrl: string;
+      /** How the user profile opens: `modal` opens Clerk's, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
+      userProfileMode?: 'navigation';
+    }
+  | {
+      /** Full URL or path of your own user profile page. Setting it routes there instead of opening Clerk's modal. */
+      userProfileUrl?: never;
+      /** How the user profile opens: `modal` opens Clerk's, `navigation` goes to `userProfileUrl`. Follows from whether `userProfileUrl` is set. */
+      userProfileMode?: 'modal';
+    };
 
 type OrganizationProfileMode =
-  | { organizationProfileUrl: string; organizationProfileMode?: 'navigation' }
-  | { organizationProfileUrl?: never; organizationProfileMode?: 'modal' };
+  | {
+      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening Clerk's modal. */
+      organizationProfileUrl: string;
+      /** How the organization profile opens: `modal` opens Clerk's, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
+      organizationProfileMode?: 'navigation';
+    }
+  | {
+      /** Full URL or path of your own organization profile page. Setting it routes there instead of opening Clerk's modal. */
+      organizationProfileUrl?: never;
+      /** How the organization profile opens: `modal` opens Clerk's, `navigation` goes to `organizationProfileUrl`. Follows from whether `organizationProfileUrl` is set. */
+      organizationProfileMode?: 'modal';
+    };
 
 type CreateOrganizationMode =
-  | { createOrganizationUrl: string; createOrganizationMode?: 'navigation' }
-  | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
+  | {
+      /** Full URL or path of your own create-organization page. Setting it routes there instead of opening Clerk's modal. */
+      createOrganizationUrl: string;
+      /** How the create-organization flow opens: `modal` opens Clerk's, `navigation` goes to `createOrganizationUrl`. Follows from whether `createOrganizationUrl` is set. */
+      createOrganizationMode?: 'navigation';
+    }
+  | {
+      /** Full URL or path of your own create-organization page. Setting it routes there instead of opening Clerk's modal. */
+      createOrganizationUrl?: never;
+      /** How the create-organization flow opens: `modal` opens Clerk's, `navigation` goes to `createOrganizationUrl`. Follows from whether `createOrganizationUrl` is set. */
+      createOrganizationMode?: 'modal';
+    };
 
 export type SwitcherModelOptions = OrganizationSwitcherModelOptions &
   Pick<ClerkUserButtonProps, 'signInUrl' | 'afterSwitchSessionUrl'>;

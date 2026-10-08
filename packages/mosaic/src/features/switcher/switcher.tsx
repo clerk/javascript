@@ -49,13 +49,13 @@ export type SwitcherProps = SwitcherModelOptions &
     userProfileProps?: SwitcherUserProfileProps;
     /**
      * Specify options for the underlying <OrganizationProfile /> component.
-     * e.g., <UserButton organizationProfileProps={{appearance: {...}}} />
+     * e.g., organizationProfileProps={{appearance: {...}}}
      */
     organizationProfileProps?: SwitcherOrganizationProfileProps;
     /**
      * Fallback while loading.
      *
-     * Note that the UserButton renders nothing when the user is signed out, so using this on
+     * Note that the component renders nothing when the user is signed out, so using this on
      * pages that are reachable while both signed-out and signed-in can result in Fallback->Nothing.
      */
     fallback?: ReactNode;
