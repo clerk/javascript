@@ -12,6 +12,11 @@
     "android": {
       "package": "com.clerk.exponativebuildfixture"
     },
-    "plugins": ["expo-secure-store", "@clerk/expo", "expo-web-browser"]
+    "plugins": ["expo-secure-store", "@clerk/expo", "@clerk/expo-google-signin", "expo-web-browser"],
+    "extra": {
+      "EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID": "000000000000-clerkverifyplaceholderweb.apps.googleusercontent.com",
+      "EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID": "000000000000-clerkverifyplaceholderios.apps.googleusercontent.com",
+      "EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME": "com.googleusercontent.apps.000000000000-clerkverifyplaceholderios"
+    }
   }
 }
