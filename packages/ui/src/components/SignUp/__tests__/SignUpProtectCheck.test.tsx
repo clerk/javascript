@@ -1,11 +1,13 @@
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import type { SignUpResource } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { fireEvent, render } from '@/test/utils';
 
+import { PathRouter } from '../../../router';
 import { SignUp } from '../index';
 import { SignUpProtectCheck } from '../SignUpProtectCheck';
 
@@ -330,6 +332,218 @@ describe('SignUpProtectCheck', () => {
     expect(params.continueSignUp).toBe(true);
     expect(params.redirectUrl).toBeTruthy();
     expect(params.redirectUrlComplete).toBeTruthy();
+  });
+
+  describe('a sign-up whose external account already belongs to a user', () => {
+    const oauthCallbackParams = {
+      signInUrl: '/sign-in',
+      signUpUrl: '/sign-up',
+      signInForceRedirectUrl: '/after-sign-in',
+    };
+
+    const existingAccountSignUp = (extra: Record<string, unknown> = {}) =>
+      ({
+        status: 'missing_requirements',
+        missingFields: ['email_address', 'password'],
+        unverifiedFields: [],
+        protectCheck: null,
+        createdSessionId: null,
+        verifications: {
+          externalAccount: {
+            status: 'transferable',
+            strategy: 'oauth_google',
+            error: { code: 'external_account_exists' },
+          },
+        },
+        ...extra,
+      }) as unknown as SignUpResource;
+
+    it('resumes the callback continuation instead of asking for the missing fields', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signUp.submitProtectCheck.mockResolvedValue(existingAccountSignUp());
+
+      render(<SignUpProtectCheck oauthCallbackParams={oauthCallbackParams} />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledWith(
+          expect.objectContaining(oauthCallbackParams),
+          expect.any(Function),
+        );
+      });
+      expect(vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mock.calls[0][0]).toHaveProperty(
+        '__internal_navigateOnSetActive',
+      );
+      expect(fixtures.router.navigate.mock.calls.some(([to]: unknown[]) => to === '../continue')).toBe(false);
+    });
+
+    it('runs a chained challenge before resuming the callback continuation', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signUp.submitProtectCheck.mockResolvedValue(
+        existingAccountSignUp({
+          missingFields: ['email_address', 'password', 'protect_check'],
+          protectCheck: {
+            status: 'pending',
+            token: 'challenge-token-2',
+            sdkUrl: 'https://protect.example.com/sdk.js',
+          },
+        }),
+      );
+
+      render(<SignUpProtectCheck oauthCallbackParams={oauthCallbackParams} />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('.', { searchParams: expect.any(URLSearchParams) });
+      });
+      expect(fixtures.clerk.__internal_resumeAfterProtectCheck).not.toHaveBeenCalled();
+    });
+
+    it('degrades to the continue step when the runtime predates the resume method', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      (fixtures.clerk as unknown as Record<string, unknown>).__internal_resumeAfterProtectCheck = undefined;
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signUp.submitProtectCheck.mockResolvedValue(existingAccountSignUp());
+
+      render(<SignUpProtectCheck oauthCallbackParams={oauthCallbackParams} />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../continue', {
+          searchParams: expect.any(URLSearchParams),
+        });
+      });
+    });
+
+    it('surfaces a message when the resumed continuation fails with a non-Clerk error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signUp.submitProtectCheck.mockResolvedValue(existingAccountSignUp());
+      vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mockRejectedValue(new Error('Failed to fetch'));
+
+      const { findByText } = render(<SignUpProtectCheck oauthCallbackParams={oauthCallbackParams} />, { wrapper });
+
+      expect(await findByText(/unable to complete action at this time/i)).toBeInTheDocument();
+    });
+
+    it('leaves an ordinary gated sign-up on the existing path', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signUp.submitProtectCheck.mockResolvedValue(
+        existingAccountSignUp({ verifications: { externalAccount: { status: null, error: null } } }),
+      );
+
+      render(<SignUpProtectCheck oauthCallbackParams={oauthCallbackParams} />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../continue', {
+          searchParams: expect.any(URLSearchParams),
+        });
+      });
+      expect(fixtures.clerk.__internal_resumeAfterProtectCheck).not.toHaveBeenCalled();
+    });
+
+    it('finalizes a completed sign-up rather than resuming the callback continuation', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signUp.submitProtectCheck.mockResolvedValue(
+        existingAccountSignUp({ status: 'complete', missingFields: [], createdSessionId: 'sess_123' }),
+      );
+
+      render(<SignUpProtectCheck oauthCallbackParams={oauthCallbackParams} />, { wrapper });
+
+      await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalled());
+      expect(fixtures.clerk.__internal_resumeAfterProtectCheck).not.toHaveBeenCalled();
+    });
+
+    it('stays on the existing path when the mount was not given the callback params', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignUpWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signUp.submitProtectCheck.mockResolvedValue(existingAccountSignUp());
+
+      render(<SignUpProtectCheck continuePath='..' />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('..', { searchParams: expect.any(URLSearchParams) });
+      });
+      expect(fixtures.clerk.__internal_resumeAfterProtectCheck).not.toHaveBeenCalled();
+    });
+
+    describe('mounted in the sign-up routes', () => {
+      const initialUrl = window.location.href;
+
+      afterEach(() => {
+        window.history.replaceState({}, '', initialUrl);
+      });
+
+      const setupRoutes = async () => {
+        const { wrapper, fixtures, props } = await createFixtures(f => {
+          f.startSignUpWithProtectCheck();
+        });
+        props.setProps({ routing: 'path', path: '/sign-up' });
+        vi.mocked(fixtures.clerk.navigate).mockImplementation((to: string) => {
+          const url = new URL(to, window.location.href);
+          if (url.origin === window.location.origin) {
+            window.history.pushState({}, '', url.href);
+          }
+          return Promise.resolve();
+        });
+        mockExecute.mockResolvedValue('proof-abc');
+        fixtures.signUp.submitProtectCheck.mockResolvedValue(existingAccountSignUp());
+        return { wrapper, fixtures };
+      };
+
+      const renderAt = (wrapper: React.FC<{ children: React.ReactNode }>, path: string) => {
+        window.history.replaceState({}, '', path);
+        return render(
+          <PathRouter basePath='/sign-up'>
+            <SignUp />
+          </PathRouter>,
+          { wrapper },
+        );
+      };
+
+      it('resumes from the route an OAuth callback hands a challenged sign-up to', async () => {
+        const { wrapper, fixtures } = await setupRoutes();
+
+        renderAt(wrapper, '/sign-up/protect-check');
+
+        await waitFor(() => {
+          expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledWith(
+            expect.objectContaining({
+              continueSignUpUrl: '../continue',
+              verifyEmailAddressUrl: '../verify-email-address',
+              verifyPhoneNumberUrl: '../verify-phone-number',
+              signUpProtectCheckUrl: '../protect-check',
+            }),
+            expect.any(Function),
+          );
+        });
+        expect(window.location.pathname).toBe('/sign-up/protect-check');
+      });
+
+      it('returns a challenge raised by the continue form to that form', async () => {
+        const { wrapper, fixtures } = await setupRoutes();
+
+        renderAt(wrapper, '/sign-up/continue/protect-check');
+
+        await waitFor(() => expect(window.location.pathname).toBe('/sign-up/continue'));
+        expect(fixtures.clerk.__internal_resumeAfterProtectCheck).not.toHaveBeenCalled();
+      });
+    });
   });
 
   it('shows a retry control after a failure and re-runs the challenge when clicked', async () => {
