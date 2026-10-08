@@ -1,4 +1,4 @@
-# Motion: entrances, exits, and pulses
+# Motion: entrances, exits, and loading
 
 Token semantics live in `packages/mosaic/src/tokens.stylex.ts`, above
 `durationDefaults` / `easingDefaults` — read those comments first. This file is the
@@ -36,13 +36,11 @@ For entrances, opacity takes `--cl-ease-enter`: there is nothing
 past `1` to overshoot into, so the pass is clamped away and only its cost — the
 slower approach to full opacity — is left.
 
-## Repeating pulses
+## Loading skeletons
 
-Use `--cl-ease-pulse` for repeating opacity fades such as loading skeletons
-(`user-profile-backup-codes.styles.ts`). Its
-symmetric curve slows at both ends of each fade, keeping the reversal smooth.
-Keep the pulse duration on the component and disable the animation under
-`prefers-reduced-motion: reduce`.
+Loading placeholders shimmer: a highlight sweeps across each one over 1.6s on the
+plain `ease-in-out` keyword, not a token. How to build them, size them, and tune the
+shimmer is in `skeletons.md`.
 
 ## A curve has a direction — don't run the entrance curve backwards
 

@@ -125,7 +125,6 @@ export const styles = stylex.create({
     flexDirection: 'column',
     flexGrow: 1,
     justifyContent: 'center',
-    rowGap: space['0.5'],
     minWidth: 0,
   },
   label: {
@@ -155,6 +154,9 @@ export const styles = stylex.create({
     justifyContent: 'end',
     maxWidth: '50%',
     minWidth: 0,
+  },
+  actionsSkeleton: {
+    height: space['7'],
   },
   note: {
     alignItems: 'center',

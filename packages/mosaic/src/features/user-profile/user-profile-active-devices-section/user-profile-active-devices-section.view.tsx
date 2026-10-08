@@ -10,6 +10,7 @@ import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Section } from '../../../components/section';
+import { VisuallyHidden } from '../../../components/visually-hidden';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import type { MosaicMessages } from '../../../localization';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
@@ -24,12 +25,14 @@ export interface UserProfileActiveDevicesSectionViewProps {
   devices: UserProfileDevice[];
   onSignOutDevice?: (id: string) => void | Promise<void>;
   onSignOutAllOtherDevices?: () => void | Promise<void>;
+  skeleton?: boolean;
 }
 
 export function UserProfileActiveDevicesSectionView({
   devices,
   onSignOutDevice,
   onSignOutAllOtherDevices,
+  skeleton = false,
 }: UserProfileActiveDevicesSectionViewProps) {
   const m = useMessages('userProfileActiveDevices');
   const locale = useLocale();
@@ -66,8 +69,9 @@ export function UserProfileActiveDevicesSectionView({
 
   return (
     <div {...stylex.props(styles.sectionCards)}>
+      {skeleton ? <VisuallyHidden role='status'>{m.loading}</VisuallyHidden> : null}
       <Section.Root>
-        <Section.Group>
+        <Section.Group skeleton={skeleton}>
           <Section.Header>
             <Section.Content>
               <Section.Title>{m.title}</Section.Title>
@@ -93,6 +97,7 @@ export function UserProfileActiveDevicesSectionView({
                   <DeviceItem
                     key={device.id}
                     device={device}
+                    skeleton={skeleton}
                     triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTrigger : undefined}
                     onViewDetails={device => deviceDetails.open(device)}
                   />
@@ -108,6 +113,7 @@ export function UserProfileActiveDevicesSectionView({
                 <DeviceItem
                   key={device.id}
                   device={device}
+                  skeleton={skeleton}
                   triggerRef={removalFocus.registerTrigger(device.id)}
                   onSignOut={signOutActions?.open}
                   onViewDetails={device => deviceDetails.open(device)}
@@ -117,7 +123,7 @@ export function UserProfileActiveDevicesSectionView({
           </Section.Body>
         </Section.Group>
       </Section.Root>
-      {onSignOutAllOtherDevices ? (
+      {onSignOutAllOtherDevices && !skeleton ? (
         <Confirmation
           open={signOutAll.isOpen}
           onOpenChange={signOutAll.onOpenChange}
@@ -137,13 +143,15 @@ export function UserProfileActiveDevicesSectionView({
           errorMessage={signOutAll.errorMessage}
         />
       ) : null}
-      <UserProfileDeviceDetailsDialog
-        handle={deviceDetails}
-        devices={devices}
-        finalFocus={removalFocus.finalFocus}
-        onSignOut={signOutActions?.remove}
-      />
-      {onSignOutDevice ? (
+      {skeleton ? null : (
+        <UserProfileDeviceDetailsDialog
+          handle={deviceDetails}
+          devices={devices}
+          finalFocus={removalFocus.finalFocus}
+          onSignOut={signOutActions?.remove}
+        />
+      )}
+      {onSignOutDevice && !skeleton ? (
         <Confirmation
           color='primary'
           handle={signOutDevice}
@@ -174,11 +182,13 @@ function DeviceItem({
   triggerRef,
   onViewDetails,
   onSignOut,
+  skeleton = false,
 }: {
   device: UserProfileDevice;
   triggerRef?: Ref<HTMLButtonElement>;
   onViewDetails: (device: UserProfileDevice) => void;
   onSignOut?: (device: UserProfileDevice) => void;
+  skeleton?: boolean;
 }) {
   const m = useMessages('userProfileActiveDevices');
   const actions: ActionMenuAction[] = [{ label: m.viewDetails, onClick: () => onViewDetails(device) }];
@@ -193,7 +203,7 @@ function DeviceItem({
       <Section.Content>
         <Section.Label>
           {device.name}
-          {deviceBadges(device, m).map(label => (
+          {(skeleton ? [] : deviceBadges(device, m)).map(label => (
             <Badge
               key={label}
               color='neutral'

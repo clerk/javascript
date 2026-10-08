@@ -8,7 +8,10 @@ import { Text } from '../../components/text';
 import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { styles } from './user-profile-backup-codes.styles';
+
+const PLACEHOLDER_CODE = 'xxxxxxxx';
 
 export interface UserProfileBackupCodesViewProps {
   onCancel: () => void;
@@ -80,10 +83,7 @@ export function UserProfileBackupCodesView({
                 aria-hidden='true'
                 {...stylex.props(reset.base, styles.cell)}
               >
-                <Text
-                  render={<span />}
-                  xstyle={styles.skeleton}
-                />
+                <BackupCodeSkeleton />
               </div>
             ))}
           </div>
@@ -150,5 +150,13 @@ export function UserProfileBackupCodesView({
         )}
       </Card.Footer>
     </>
+  );
+}
+
+function BackupCodeSkeleton() {
+  return (
+    <Text render={<span />}>
+      <SkeletonText>{PLACEHOLDER_CODE}</SkeletonText>
+    </Text>
   );
 }

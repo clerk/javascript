@@ -55,7 +55,7 @@ describe('UserProfileBackupCodesView', () => {
     const { props, rerender } = renderView({ codes: [], pendingAction: 'generate' });
     expect(screen.getByRole('progressbar', { name: 'Generating backup codes' })).toBeInTheDocument();
     const loading = screen.getByRole('status', { name: 'Generating backup codes' });
-    expect(loading.textContent).toBe('');
+    expect([...loading.children].every(cell => cell.getAttribute('aria-hidden') === 'true')).toBe(true);
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Copy and close' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Download', exact: true })).not.toBeInTheDocument();

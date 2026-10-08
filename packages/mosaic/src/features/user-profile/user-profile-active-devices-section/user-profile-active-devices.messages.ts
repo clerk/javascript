@@ -1,5 +1,6 @@
 export const userProfileActiveDevicesMessages = {
   title: 'Active devices',
+  loading: 'Loading active devices',
   emptyCurrent: 'No current device available',
   deviceName: '{browser} on {device}',
   desktopDevice: 'Desktop device',

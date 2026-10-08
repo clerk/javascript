@@ -14,6 +14,7 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Author a headless primitive               | [Headless primitives](docs/headless.md)                                           |
 | Style a component or change the CSS build | [StyleX](docs/stylex.md)                                                          |
 | Add or debug motion                       | [Motion](docs/motion.md)                                                          |
+| Build a loading skeleton                  | [Skeletons](docs/skeletons.md)                                                    |
 | Write a model                             | [Models](docs/models.md)                                                          |
 | Write a controller                        | [Controllers](docs/controllers.md)                                                |
 | Author or debug a state machine           | [Controllers](docs/controllers.md), then [Machine runtime](src/machine/README.md) |

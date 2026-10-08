@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
@@ -8,8 +9,10 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { feedbackHeight, feedbackStyles } from '../../styles/feedback.styles';
 import { reset } from '../../styles/reset.styles';
+import { skeletonStyles } from '../../styles/skeleton.styles';
 import { sizes as typographySizes, styles as typographyStyles, truncationStyles } from '../../styles/typography.styles';
 import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
@@ -17,19 +20,19 @@ import { sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
-export type SectionGroupProps = MosaicComponentProps<'div'>;
+export type SectionGroupProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionHeaderProps = MosaicComponentProps<'div'>;
-export type SectionTitleProps = Omit<HeadingProps, 'size'>;
+export type SectionTitleProps = Omit<HeadingProps, 'size'> & { skeleton?: boolean };
 export type SectionBodyProps = MosaicComponentProps<'div'>;
 export type SectionRowProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'ul'>;
 export type SectionItemProps = MosaicComponentProps<'div'> & { wrap?: boolean };
 export type SectionMediaSize = 'sm' | 'md' | 'lg' | 'xl';
-export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize };
+export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize; skeleton?: boolean };
 export type SectionContentProps = MosaicComponentProps<'div'>;
-export type SectionLabelProps = MosaicComponentProps<'div'>;
-export type SectionDescriptionProps = MosaicComponentProps<'div'>;
-export type SectionActionsProps = MosaicComponentProps<'div'>;
+export type SectionLabelProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
+export type SectionDescriptionProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
+export type SectionActionsProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionNoteProps = MosaicComponentProps<'div'> & { icon?: React.ReactNode };
 export type SectionErrorProps = MosaicComponentProps<'p'>;
 
@@ -44,6 +47,12 @@ const SectionGroupContext = React.createContext<React.Dispatch<React.SetStateAct
 const SectionHeaderContext = React.createContext(false);
 const SectionItemsContext = React.createContext(false);
 const SectionItemWrapContext = React.createContext(false);
+const SectionSkeletonContext = React.createContext(false);
+
+function useInheritedSkeleton(skeleton: boolean | undefined) {
+  const inherited = React.useContext(SectionSkeletonContext);
+  return skeleton ?? inherited;
+}
 
 const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot({ render, xstyle, ...rest }, ref) {
   return useRender({
@@ -55,7 +64,7 @@ const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoo
 });
 
 const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function SectionGroup(
-  { render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
+  { skeleton = false, render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
   ref,
 ) {
   const [titleId, setTitleId] = React.useState<string>();
@@ -64,15 +73,29 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      role: 'group',
-      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleId),
-    },
+    props: skeleton
+      ? {
+          'aria-hidden': true,
+          ...inertProps(true),
+          ...mergeStyleProps(
+            themeProps('section-group', { skeleton }),
+            stylex.props(reset.base, styles.group, xstyle),
+            rest,
+          ),
+        }
+      : {
+          role: 'group',
+          ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
+          'aria-label': ariaLabel,
+          'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleId),
+        },
   });
 
-  return <SectionGroupContext.Provider value={setTitleId}>{element}</SectionGroupContext.Provider>;
+  return (
+    <SectionGroupContext.Provider value={setTitleId}>
+      <SectionSkeletonContext.Provider value={skeleton}>{element}</SectionSkeletonContext.Provider>
+    </SectionGroupContext.Provider>
+  );
 });
 
 const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function SectionHeader(
@@ -90,13 +113,14 @@ const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function Sec
 });
 
 const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function SectionTitle(
-  { id: idProp, xstyle, ...rest },
+  { id: idProp, skeleton: skeletonProp, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   const setTitleId = React.useContext(SectionGroupContext);
   const generatedId = React.useId();
   const level = useHeadingLevel();
-  const id = idProp ?? (setTitleId ? `cl-section-${generatedId}-title` : undefined);
+  const id = skeleton ? undefined : (idProp ?? (setTitleId ? `cl-section-${generatedId}-title` : undefined));
 
   useSafeLayoutEffect(() => {
     if (!id || !setTitleId) {
@@ -114,8 +138,10 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
       level={level}
       size='base'
       xstyle={[styles.title, truncationStyles.singleLine, xstyle]}
-      {...mergeStyleProps(themeProps('section-title'), rest)}
-    />
+      {...mergeStyleProps(themeProps('section-title', { skeleton }), rest)}
+    >
+      {skeleton ? <SkeletonText>{children}</SkeletonText> : children}
+    </Heading>
   );
 });
 
@@ -179,17 +205,25 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
 });
 
 const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
-  { size = 'md', render, xstyle, ...rest },
+  { size = 'md', skeleton: skeletonProp, render, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('section-media', { size }),
-      stylex.props(reset.base, styles.mediaBase, mediaSizes[size], xstyle),
-      rest,
+      themeProps('section-media', { size, skeleton }),
+      stylex.props(
+        reset.base,
+        styles.mediaBase,
+        mediaSizes[size],
+        skeleton && skeletonStyles.bone,
+        skeleton && skeletonStyles.shimmer,
+        xstyle,
+      ),
+      { ...rest, children: skeleton ? undefined : children },
     ),
   });
 });
@@ -214,40 +248,43 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
 });
 
 const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function SectionLabel(
-  { render, xstyle, children, ...rest },
+  { skeleton: skeletonProp, render, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(themeProps('section-label'), stylex.props(reset.base, styles.label, xstyle), rest),
-      children: withTruncatableLabel(children),
-    },
+    props: mergeStyleProps(themeProps('section-label', { skeleton }), stylex.props(reset.base, styles.label, xstyle), {
+      ...rest,
+      children: skeleton ? <SkeletonText>{children}</SkeletonText> : withTruncatableLabel(children),
+    }),
   });
 });
 
 const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(function SectionDescription(
-  { render, xstyle, ...rest },
+  { skeleton: skeletonProp, render, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('section-description'),
+      themeProps('section-description', { skeleton }),
       stylex.props(reset.base, styles.description, xstyle),
-      rest,
+      { ...rest, children: skeleton ? <SkeletonText>{children}</SkeletonText> : children },
     ),
   });
 });
 
 const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function SectionActions(
-  { render, xstyle, ...rest },
+  { skeleton: skeletonProp, render, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   const wrap = React.useContext(SectionItemWrapContext);
   const inHeader = React.useContext(SectionHeaderContext);
 
@@ -256,9 +293,16 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('section-actions'),
-      stylex.props(reset.base, styles.actions, wrap && styles.actionsWrap, inHeader && styles.headerActions, xstyle),
-      rest,
+      themeProps('section-actions', { skeleton }),
+      stylex.props(
+        reset.base,
+        styles.actions,
+        wrap && styles.actionsWrap,
+        inHeader && styles.headerActions,
+        skeleton && styles.actionsSkeleton,
+        xstyle,
+      ),
+      { ...rest, children: skeleton ? undefined : children },
     ),
   });
 });

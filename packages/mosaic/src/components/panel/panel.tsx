@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -5,12 +6,13 @@ import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { ContentPanelContext, ProfileContext } from '../profile/profile.context';
 import { styles } from './panel.styles';
 
 export type PanelRootProps = MosaicComponentProps<'div'>;
-export type PanelTitleProps = MosaicComponentProps<'div'>;
+export type PanelTitleProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type PanelSectionsProps = MosaicComponentProps<'div'>;
 
 const Root = React.forwardRef<HTMLDivElement, PanelRootProps>(function PanelRoot({ render, xstyle, ...rest }, ref) {
@@ -24,7 +26,7 @@ const Root = React.forwardRef<HTMLDivElement, PanelRootProps>(function PanelRoot
 
 // Inside a profile page, the profile renders the page title, and the ref reaches that instead.
 const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTitle(
-  { children, render, xstyle, ...rest },
+  { skeleton = false, children, render, xstyle, ...rest },
   ref,
 ) {
   const inProfilePage = React.useContext(ContentPanelContext);
@@ -38,13 +40,18 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
     ref: pageTitleRef ? null : ref,
     enabled: !inProfilePage,
     props: {
-      ...mergeStyleProps(themeProps('panel-title'), stylex.props(reset.base, styles.title, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('panel-title', { skeleton }),
+        stylex.props(reset.base, styles.title, xstyle),
+        skeleton ? { 'aria-hidden': true, ...inertProps(true) } : {},
+        rest,
+      ),
       children: (
         <Heading
           level={level}
           size='2xl'
         >
-          {children}
+          {skeleton ? <SkeletonText>{children}</SkeletonText> : children}
         </Heading>
       ),
     },

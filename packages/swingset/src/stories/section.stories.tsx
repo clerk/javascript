@@ -5,6 +5,7 @@ import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 import { Section } from '@clerk/mosaic/components/section';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
+import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -13,6 +14,14 @@ export { default as __source } from './section.stories?raw';
 const styles = stylex.create({
   rootMax: {
     maxWidth: 560,
+  },
+  loadingStack: {
+    alignItems: 'flex-start',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: space['4'],
+    maxWidth: 560,
+    width: '100%',
   },
   descriptionFlex: {
     alignItems: 'center',
@@ -540,5 +549,64 @@ export function ContainedHeader() {
         ))}
       </Section.Root>
     </>
+  );
+}
+
+const loadingItems = [
+  { icon: 'device-laptop', label: 'Chrome on macOS', description: 'San Francisco, US · Active now' },
+  { icon: 'device-phone', label: 'Safari on iOS', description: 'San Francisco, US · 2 hours ago' },
+  { icon: 'device-laptop', label: 'Firefox on Windows', description: 'Denver, US · 3 days ago' },
+] as const;
+
+export function Loading() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!loading) {
+      return;
+    }
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  return (
+    <div {...stylex.props(styles.loadingStack)}>
+      <Button
+        color='neutral'
+        size='sm'
+        variant='outline'
+        disabled={loading}
+        onClick={() => setLoading(true)}
+      >
+        Reload
+      </Button>
+      <Section.Root>
+        <Section.Group skeleton={loading}>
+          <Section.Header>
+            <Section.Title>Active devices</Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              {loadingItems.map(item => (
+                <Section.Item key={item.label}>
+                  <Section.Media size='lg'>
+                    <IconFrame>
+                      <Icon
+                        name={item.icon}
+                        size='lg'
+                      />
+                    </IconFrame>
+                  </Section.Media>
+                  <Section.Content>
+                    <Section.Label>{item.label}</Section.Label>
+                    <Section.Description>{item.description}</Section.Description>
+                  </Section.Content>
+                </Section.Item>
+              ))}
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>
+    </div>
   );
 }
