@@ -30,6 +30,10 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
   latestActivity!: SessionActivity;
   actor!: ActClaim | null;
 
+  get hasMaximumLifetime(): boolean {
+    return this.expireAt.getTime() > 0;
+  }
+
   constructor(data: SessionWithActivitiesJSON, pathRoot: string) {
     super();
     this.pathRoot = pathRoot;
