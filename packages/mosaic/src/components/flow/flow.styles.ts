@@ -2,8 +2,6 @@ import * as stylex from '@stylexjs/stylex';
 
 import { durationVars, easingVars, space, typeScaleVars } from '../../tokens.stylex';
 
-const DIRECTION = 'var(--cl-flow-transition-direction, 1)';
-
 export const styles = stylex.create({
   root: {
     overflow: 'clip',
@@ -34,18 +32,13 @@ export const styles = stylex.create({
       default: null,
       ':where([data-closed])': 0,
     },
-    position: {
-      default: 'relative',
-      ':where([data-closed])': 'absolute',
-    },
-    willChange: 'transform',
-    minWidth: 0,
-    width: '100%',
-  },
-  stack: {
     opacity: {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
+    },
+    position: {
+      default: 'relative',
+      ':where([data-closed])': 'absolute',
     },
     transform: {
       default: 'scale(1)',
@@ -73,23 +66,8 @@ export const styles = stylex.create({
       default: easingVars['--cl-ease-enter'],
       ':where([data-ending-style])': easingVars['--cl-ease-in-out'],
     },
-  },
-  slide: {
-    transform: {
-      default: 'translateX(0)',
-      ':where([data-ending-style])': `translateX(calc(${DIRECTION} * -100%))`,
-      ':where([data-starting-style])': `translateX(calc(${DIRECTION} * 100%))`,
-      '@media (prefers-reduced-motion: reduce)': {
-        default: 'translateX(0)',
-        ':where([data-ending-style])': 'translateX(0)',
-        ':where([data-starting-style])': 'translateX(0)',
-      },
-    },
-    transitionDuration: durationVars['--cl-duration-slow'],
-    transitionProperty: {
-      default: 'transform',
-      '@media (prefers-reduced-motion: reduce)': 'none',
-    },
-    transitionTimingFunction: easingVars['--cl-ease-enter'],
+    willChange: 'transform',
+    minWidth: 0,
+    width: '100%',
   },
 });
