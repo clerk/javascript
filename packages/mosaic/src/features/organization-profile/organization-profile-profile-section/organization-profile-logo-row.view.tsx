@@ -24,17 +24,15 @@ export interface OrganizationProfileLogoRowViewProps {
   name: string;
   imageUrl?: string;
   hasImage?: boolean;
-  errorMessage?: string;
-  onChange?: (file: File) => void | Promise<void>;
+  onChange?: (file: File) => Promise<void>;
   onReject?: (rejections: FileRejection[]) => void;
-  onRemove?: () => void | Promise<void>;
+  onRemove?: () => Promise<void>;
 }
 
 export function OrganizationProfileLogoRowView({
   name,
   imageUrl,
   hasImage = false,
-  errorMessage,
   onChange,
   onReject,
   onRemove,
@@ -101,7 +99,7 @@ export function OrganizationProfileLogoRowView({
           onRemove={handleRemove}
         />
       </Section.Item>
-      <Section.Error>{error ? errorText(error) : errorMessage}</Section.Error>
+      <Section.Error>{error ? errorText(error) : undefined}</Section.Error>
     </FileUpload.Root>
   );
 }

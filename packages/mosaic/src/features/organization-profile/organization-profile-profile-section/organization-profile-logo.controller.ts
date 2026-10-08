@@ -5,11 +5,22 @@ import { FileUpload } from '../../../primitives/file-upload';
 import { toFormError } from '../../../utils/errors';
 
 export interface OrganizationProfileLogoControllerOptions {
-  onChange?: (file: File) => void | Promise<void>;
-  onRemove?: () => void | Promise<void>;
+  onChange?: (file: File) => Promise<void>;
+  onRemove?: () => Promise<void>;
 }
 
-export function useOrganizationProfileLogoController({ onChange, onRemove }: OrganizationProfileLogoControllerOptions) {
+export interface OrganizationProfileLogoController {
+  onChange?: (file: File) => Promise<void>;
+  onRemove?: () => Promise<void>;
+  isPending: boolean;
+  previewUrl: string | undefined;
+  error: LocalizableError | undefined;
+}
+
+export function useOrganizationProfileLogoController({
+  onChange,
+  onRemove,
+}: OrganizationProfileLogoControllerOptions): OrganizationProfileLogoController {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<LocalizableError>();
   const [preview, setPreview] = useState<File>();
@@ -35,15 +46,12 @@ export function useOrganizationProfileLogoController({ onChange, onRemove }: Org
   };
 
   return {
-    previewUrl,
-    isPending,
-    error,
     onChange: onChange
-      ? (file: File) =>
+      ? file =>
           run(
-            async () => {
+            () => {
               setPreview(file);
-              await onChange(file);
+              return onChange(file);
             },
             () => setPreview(undefined),
           )
@@ -55,5 +63,8 @@ export function useOrganizationProfileLogoController({ onChange, onRemove }: Org
             setPreview(undefined);
           })
       : undefined,
+    isPending,
+    previewUrl,
+    error,
   };
 }

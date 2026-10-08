@@ -10,9 +10,9 @@ export interface OrganizationProfileProfileSectionViewProps {
   slug?: string;
   imageUrl?: string;
   hasImage?: boolean;
-  onLogoChange?: (file: File) => void | Promise<void>;
+  onLogoChange?: (file: File) => Promise<void>;
   onLogoReject?: (rejections: FileRejection[]) => void;
-  onRemoveLogo?: () => void | Promise<void>;
+  onRemoveLogo?: () => Promise<void>;
   onSubmitName?: (name: string) => Promise<void>;
   onSubmitSlug?: (slug: string) => Promise<void>;
 }
