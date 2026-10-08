@@ -2,17 +2,7 @@ import { useClerk, useOAuthConsent, useUser } from '@clerk/shared/react';
 import { useEffect, useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext, withCoreUserGuard } from '@/ui/contexts';
-import {
-  Box,
-  Button,
-  CheckboxInput,
-  descriptors,
-  Flow,
-  Grid,
-  localizationKeys,
-  Text,
-  useLocalizations,
-} from '@/ui/customizables';
+import { Box, Button, Flow, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -24,14 +14,7 @@ import { Route, Switch } from '@/ui/router';
 
 import { InlineAction } from './InlineAction';
 import { getKnownOAuthClient } from './knownClients';
-import {
-  ListGroup,
-  ListGroupContent,
-  ListGroupHeader,
-  ListGroupHeaderTitle,
-  ListGroupItem,
-  ListGroupItemLabel,
-} from './ListGroup';
+import { ListGroup, ListGroupCheckboxItem, ListGroupContent, ListGroupHeader, ListGroupHeaderTitle } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupItemContainer, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
@@ -291,30 +274,20 @@ function _OAuthConsent() {
                 </ListGroupHeader>
                 <ListGroupContent>
                   {displayedScopes.map(item => (
-                    <ListGroupItem
+                    <ListGroupCheckboxItem
                       key={item.scope}
-                      sx={{ '&::before': { display: 'none' } }}
+                      value={item.scope}
+                      checked={!uncheckedScopes.includes(item.scope)}
+                      isDisabled={hasContextCallbacks || item.scope === OFFLINE_ACCESS_SCOPE}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setUncheckedScopes(previous =>
+                          checked ? previous.filter(scope => scope !== item.scope) : [...previous, item.scope],
+                        );
+                      }}
                     >
-                      <ListGroupItemLabel
-                        as='label'
-                        sx={t => ({ display: 'flex', alignItems: 'baseline', gap: t.space.$2, width: '100%' })}
-                      >
-                        <CheckboxInput
-                          elementDescriptor={descriptors.formFieldCheckboxInput}
-                          value={item.scope}
-                          checked={!uncheckedScopes.includes(item.scope)}
-                          isDisabled={hasContextCallbacks || item.scope === OFFLINE_ACCESS_SCOPE}
-                          onChange={e => {
-                            const checked = e.target.checked;
-                            setUncheckedScopes(previous =>
-                              checked ? previous.filter(scope => scope !== item.scope) : [...previous, item.scope],
-                            );
-                          }}
-                          sx={{ flexShrink: 0 }}
-                        />
-                        {item.description || item.scope || ''}
-                      </ListGroupItemLabel>
-                    </ListGroupItem>
+                      {item.description || item.scope || ''}
+                    </ListGroupCheckboxItem>
                   ))}
                 </ListGroupContent>
               </ListGroup>
