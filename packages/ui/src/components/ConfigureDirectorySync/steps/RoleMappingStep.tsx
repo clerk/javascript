@@ -149,12 +149,6 @@ const MappedRow = ({
     <Tr
       elementDescriptor={descriptors.configureDirectorySyncRoleMappingRow}
       data-testid={`role-mapping-row-${group.id}`}
-      draggable={!isReadOnly}
-      onDragStart={e => {
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', String(index));
-        onDragStart(index);
-      }}
       onDragOver={e => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
@@ -164,7 +158,6 @@ const MappedRow = ({
         e.preventDefault();
         onDrop(index);
       }}
-      onDragEnd={onDragEnd}
       sx={t => ({
         opacity: isDragging ? 0.4 : 1,
         boxShadow: isDropTarget ? `inset 0 2px 0 0 ${t.colors.$primary500}` : 'none',
@@ -182,6 +175,17 @@ const MappedRow = ({
           )}
           title={t(localizationKeys('configureDirectorySync.roleMappingStep.actionHint__reorder'))}
           isDisabled={isReadOnly}
+          draggable={!isReadOnly}
+          onDragStart={e => {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', String(index));
+            const row = e.currentTarget.closest('tr');
+            if (row) {
+              e.dataTransfer.setDragImage(row, 0, 0);
+            }
+            onDragStart(index);
+          }}
+          onDragEnd={onDragEnd}
           onKeyDown={onHandleKeyDown}
           sx={t => ({
             position: 'absolute',

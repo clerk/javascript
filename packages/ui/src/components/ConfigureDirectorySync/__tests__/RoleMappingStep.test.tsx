@@ -1,5 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import { within } from '@testing-library/react';
+import { fireEvent, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -191,6 +191,24 @@ describe('RoleMappingStep', () => {
       }),
     );
     expect(dir.update).not.toHaveBeenCalled();
+  });
+
+  it('reorders mappings by dragging the handle, not the row', async () => {
+    await renderRolesStep();
+    await screen.findByTestId('role-mapping-row-dirgrp_leads');
+
+    const handle = screen.getByRole('button', { name: 'Reorder Finance mapping' });
+    expect(handle).toHaveAttribute('draggable', 'true');
+    expect(screen.getByTestId('role-mapping-row-dirgrp_finance')).not.toHaveAttribute('draggable');
+
+    const dataTransfer = { setData: vi.fn(), setDragImage: vi.fn(), effectAllowed: '', dropEffect: '' };
+    const target = screen.getByTestId('role-mapping-row-dirgrp_leads');
+    fireEvent.dragStart(handle, { dataTransfer });
+    expect(dataTransfer.setDragImage).toHaveBeenCalledWith(screen.getByTestId('role-mapping-row-dirgrp_finance'), 0, 0);
+    fireEvent.dragOver(target, { dataTransfer });
+    fireEvent.drop(target, { dataTransfer });
+
+    expect(priorityOrder()).toEqual(['Finance', 'Engineering Leads', 'Engineering']);
   });
 
   it('turns role sync on through the directory on Complete', async () => {
