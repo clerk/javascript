@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react';
 
-import { Box, descriptors, Text } from '@/ui/customizables';
+import { Box, CheckboxInput, descriptors, Flex, Text } from '@/ui/customizables';
+import type { InternalTheme } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
 
@@ -74,7 +75,7 @@ export function ListGroupContent({
           backgroundColor: t.colors.$colorBackground,
           overflowY: 'auto',
           ...common.unstyledScrollbar(t),
-          '--fade-distance': '2.5rem',
+          '--fade-distance': '2rem',
           '&::before, &::after': {
             content: '""',
             display: 'block',
@@ -131,6 +132,14 @@ export function ListGroupContent({
   );
 }
 
+const listGroupItemStyles = (t: InternalTheme) => ({
+  paddingInline: t.space.$3,
+  paddingBlock: t.space.$2,
+  borderTopWidth: t.borderWidths.$normal,
+  borderTopStyle: t.borderStyles.$solid,
+  borderTopColor: t.colors.$borderAlpha100,
+});
+
 export function ListGroupItem({
   children,
   sx,
@@ -142,13 +151,9 @@ export function ListGroupItem({
       as='li'
       sx={[
         t => ({
+          ...listGroupItemStyles(t),
           display: 'flex',
           alignItems: 'baseline',
-          paddingInline: t.space.$3,
-          paddingBlock: t.space.$2,
-          borderTopWidth: t.borderWidths.$normal,
-          borderTopStyle: t.borderStyles.$solid,
-          borderTopColor: t.colors.$borderAlpha100,
           '&::before': {
             content: '""',
             display: 'inline-block',
@@ -177,5 +182,40 @@ export function ListGroupItemLabel(props: Omit<ComponentProps<typeof Text>, 'ele
       variant='subtitle'
       elementDescriptor={descriptors.listGroupItemLabel}
     />
+  );
+}
+
+export function ListGroupCheckboxItem({
+  children,
+  defaultChecked,
+}: {
+  children: ComponentProps<typeof Text>['children'];
+  defaultChecked?: boolean;
+}) {
+  return (
+    <Box
+      as='li'
+      sx={listGroupItemStyles}
+      elementDescriptor={descriptors.listGroupItem}
+    >
+      <Flex
+        as='label'
+        align='start'
+        gap={2}
+        sx={{ cursor: 'pointer', userSelect: 'none' }}
+      >
+        <CheckboxInput
+          defaultChecked={defaultChecked}
+          focusRing={false}
+          elementDescriptor={descriptors.listGroupItemCheckbox}
+          sx={t => ({
+            flexShrink: 0,
+            cursor: 'pointer',
+            marginBlockStart: `calc((${t.fontSizes.$md} * ${t.lineHeights.$small} - ${t.sizes.$4}) / 2)`,
+          })}
+        />
+        <ListGroupItemLabel as='span'>{children}</ListGroupItemLabel>
+      </Flex>
+    </Box>
   );
 }

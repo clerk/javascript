@@ -193,6 +193,7 @@ export type ElementsConfig = {
   listGroupContent: WithOptions;
   listGroupItem: WithOptions;
   listGroupItemLabel: WithOptions;
+  listGroupItemCheckbox: WithOptions;
 
   header: WithOptions;
   headerTitle: WithOptions;

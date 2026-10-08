@@ -109,6 +109,29 @@ describe('OAuthConsent', () => {
     });
   });
 
+  it('renders each scope as a checkbox labelled by its description, checked by default', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['jane@example.com'] });
+    });
+
+    props.setProps({ componentName: 'OAuthConsent' } as any);
+    mockOAuthApplication(fixtures.clerk, {
+      getConsentInfo: vi.fn().mockResolvedValue(fakeConsentInfo),
+    });
+
+    const { findByRole, getByText, userEvent } = render(<OAuthConsent />, { wrapper });
+
+    const identity = await findByRole('checkbox', { name: 'View your identity' });
+    const email = await findByRole('checkbox', { name: 'Access your email address' });
+    expect(identity).toBeChecked();
+    expect(email).toBeChecked();
+
+    await userEvent.click(getByText('Access your email address'));
+
+    expect(email).not.toBeChecked();
+    expect(identity).toBeChecked();
+  });
+
   it('identifies private metadata as potentially sensitive data set by the Clerk application', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['jane@example.com'] });

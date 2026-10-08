@@ -14,14 +14,7 @@ import { Route, Switch } from '@/ui/router';
 
 import { InlineAction } from './InlineAction';
 import { getKnownOAuthClient } from './knownClients';
-import {
-  ListGroup,
-  ListGroupContent,
-  ListGroupHeader,
-  ListGroupHeaderTitle,
-  ListGroupItem,
-  ListGroupItemLabel,
-} from './ListGroup';
+import { ListGroup, ListGroupCheckboxItem, ListGroupContent, ListGroupHeader, ListGroupHeaderTitle } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupItemContainer, LogoGroupSeparator } from './LogoGroup';
 import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
@@ -274,9 +267,12 @@ function _OAuthConsent() {
                 </ListGroupHeader>
                 <ListGroupContent>
                   {displayedScopes.map(item => (
-                    <ListGroupItem key={item.scope}>
-                      <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
-                    </ListGroupItem>
+                    <ListGroupCheckboxItem
+                      key={item.scope}
+                      defaultChecked
+                    >
+                      {item.description || item.scope || ''}
+                    </ListGroupCheckboxItem>
                   ))}
                 </ListGroupContent>
               </ListGroup>
