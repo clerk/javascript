@@ -7,6 +7,7 @@ type NavigateToNextStepSignUpProps = {
   verifyEmailAddressUrl: string;
   verifyPhoneNumberUrl: string;
   signUpProtectCheckUrl: string;
+  enterpriseConnectionsUrl?: string;
   navigate: (to: string, options?: { searchParams?: URLSearchParams }) => Promise<unknown>;
 };
 
@@ -15,6 +16,8 @@ type NavigateToNextStepSignUpProps = {
  * next step:
  *
  * - If the sign-up is protect-gated, go to the protect-check challenge.
+ * - Otherwise, if `enterpriseConnectionsUrl` is set and `enterprise_sso` is
+ *   missing, go to the enterprise connection chooser.
  * - Otherwise, if there are missing fields, go straight to the continue page so
  *   the user can fill them in.
  * - Otherwise, hand off to `completeSignUpFlow` which routes unverified email
@@ -31,6 +34,7 @@ export const navigateToNextStepSignUp = ({
   verifyEmailAddressUrl,
   verifyPhoneNumberUrl,
   signUpProtectCheckUrl,
+  enterpriseConnectionsUrl,
   navigate,
 }: NavigateToNextStepSignUpProps): Promise<unknown> | undefined => {
   // A protect-gated sign-up always carries 'protect_check' in missing_fields, so this gate
@@ -38,6 +42,10 @@ export const navigateToNextStepSignUp = ({
   // callback would land on /continue instead of the challenge.
   if (signUp.protectCheck || signUp.missingFields.includes('protect_check')) {
     return navigate(signUpProtectCheckUrl);
+  }
+
+  if (enterpriseConnectionsUrl && signUp.missingFields.includes('enterprise_sso')) {
+    return navigate(enterpriseConnectionsUrl);
   }
 
   if (signUp.missingFields.length) {

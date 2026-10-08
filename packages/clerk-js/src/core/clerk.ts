@@ -30,6 +30,7 @@ import {
   CLERK_SYNCED_STATUS,
   ERROR_CODES,
 } from '@clerk/shared/internal/clerk-js/constants';
+import { hasMultipleEnterpriseConnections } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -2719,11 +2720,14 @@ export class Clerk implements ClerkInterface {
     const signUpProtectCheckUrl =
       params.signUpProtectCheckUrl ||
       buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true });
+    const signInUrl = params.signInUrl || displayConfig.signInUrl;
+    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
+    const enterpriseConnectionsUrl =
+      params.enterpriseConnectionsUrl ||
+      buildURL({ base: signUpUrl, hashPath: '/enterprise-connections' }, { stringify: true });
 
     const navigateToSignUpProtectCheck = makeNavigate(signUpProtectCheckUrl);
 
-    const signInUrl = params.signInUrl || displayConfig.signInUrl;
-    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
     const internalNavigateOnSetActive = params.__internal_navigateOnSetActive;
 
     const setActiveNavigate = async ({
@@ -2873,6 +2877,7 @@ export class Clerk implements ClerkInterface {
             verifyEmailAddressUrl,
             verifyPhoneNumberUrl,
             signUpProtectCheckUrl,
+            enterpriseConnectionsUrl,
             navigate,
           });
         default:
@@ -2935,6 +2940,7 @@ export class Clerk implements ClerkInterface {
         verifyEmailAddressUrl,
         verifyPhoneNumberUrl,
         signUpProtectCheckUrl,
+        enterpriseConnectionsUrl,
         navigate,
       });
     }
@@ -2944,6 +2950,15 @@ export class Clerk implements ClerkInterface {
         redirectUrl: this.buildAfterSignInUrl(),
       });
       return;
+    }
+
+    const userMustChooseEnterpriseConnection =
+      params.reloadResource !== 'signUp' &&
+      si.status === 'needs_first_factor' &&
+      hasMultipleEnterpriseConnections(signIn.supportedFirstFactors);
+
+    if (userMustChooseEnterpriseConnection) {
+      return navigateToFactorOne();
     }
 
     return navigateToSignIn();
