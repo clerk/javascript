@@ -210,7 +210,7 @@ export function ListGroupCheckboxItem({
           sx={t => ({
             flexShrink: 0,
             cursor: 'pointer',
-            marginBlockStart: `calc((${t.fontSizes.$md} * ${t.lineHeights.$small} - ${t.sizes.$4}) / 2)`,
+            marginBlockStart: `calc((${t.fontSizes.$md} * ${t.lineHeights.$small} - ${t.sizes.$3x5}) / 2)`,
           })}
         />
         <ListGroupItemLabel as='span'>{children}</ListGroupItemLabel>
