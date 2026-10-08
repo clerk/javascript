@@ -47,7 +47,9 @@ export function UserProfileContactListRowView({
       tabIndex={-1}
     >
       <Section.Header>
-        <Section.Title>{label}</Section.Title>
+        <Section.Content>
+          <Section.Title>{label}</Section.Title>
+        </Section.Content>
         {addAction ? (
           <Section.Actions>{addAction}</Section.Actions>
         ) : onAdd ? (

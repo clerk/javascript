@@ -34,7 +34,7 @@ env:
 
 jobs:
   native-build:
-    if: ${{ github.head_ref != 'changeset-release/main' }}
+    if: ${{ github.head_ref != 'changeset-release/main' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false) }}
     name: Native ${{ matrix.run-e2e == true && 'E2E' || 'Build' }} (${{ matrix.platform }}, sdk ${{ matrix.expo-sdk }})
     runs-on: ${{ matrix.runner }}
     timeout-minutes: ${{ matrix.run-e2e == true && 60 || 45 }}

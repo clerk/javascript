@@ -9,19 +9,15 @@ import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { Section } from '../../components/section';
 import { Spinner } from '../../components/spinner';
-import { Table, type TableHeaderCellProps } from '../../components/table';
+import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { type PendingAction, usePendingAction } from '../../hooks/use-pending-action';
+import { usePendingAction } from '../../hooks/use-pending-action';
+import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill, useMessages } from '../../localization';
-import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './requests-table-tab.styles';
-import type {
-  OrganizationProfileRequest,
-  RequestsTableSort,
-  RequestsTableTabViewProps,
-} from './requests-table-tab.types';
+import type { OrganizationProfileRequest, RequestsTableTabViewProps } from './requests-table-tab.types';
 import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (request: OrganizationProfileRequest) => request.id;
@@ -60,55 +56,20 @@ export function RequestsTableTabView({
     onRemove: onDecline,
     fallback: () => inviteButton.current ?? searchInput.current,
   });
-  const pagination = { pageIndex: page - 1, pageSize };
-  const table = useDataTable({
+  const { table, sortHeader, pagination } = useServerDataTable({
     data: requests,
     totalCount,
     getRowId,
-    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
-    onSortingChange: onSortChange
-      ? update => {
-          const next = typeof update === 'function' ? update(table.sorting) : update;
-          const active = next[0];
-          table.setRowSelection({});
-          onSortChange(
-            active && (active.id === 'email' || active.id === 'requestedAt')
-              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
-              : null,
-          );
-        }
-      : undefined,
-    pagination,
-    onPaginationChange: update => {
-      const next = typeof update === 'function' ? update(pagination) : update;
-      table.setRowSelection({});
-      if (next.pageSize !== pageSize) {
-        onPageSizeChange?.(next.pageSize);
-      }
-      onPageChange(next.pageIndex + 1);
-    },
-    globalFilter: searchValue,
-    onGlobalFilterChange: update => {
-      table.setRowSelection({});
-      onSearchChange(typeof update === 'function' ? update(searchValue) : update);
-    },
+    sortableColumns: ['email', 'requestedAt'],
+    sort,
+    onSortChange,
+    page,
+    pageSize,
+    onPageChange,
+    onPageSizeChange,
+    searchValue,
+    onSearchChange,
   });
-  const sortHeader = (column: RequestsTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
-    const active = table.sorting[0];
-    return {
-      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
-      onSort: onSortChange
-        ? () =>
-            table.setSorting(current => {
-              const active = current[0];
-              if (active?.id !== column) {
-                return [{ id: column, desc: false }];
-              }
-              return active.desc ? [] : [{ id: column, desc: true }];
-            })
-        : undefined,
-    };
-  };
   return (
     <div {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(tableTabStyles.root))}>
       <Table.Toolbar>
@@ -239,19 +200,13 @@ export function RequestsTableTabView({
           )}
         </Table.Body>
       </Table.Root>
-      {table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange) ? (
+      {pagination ? (
         <Pagination
-          page={table.pagination.pageIndex + 1}
-          pageSize={table.pagination.pageSize}
-          totalItems={totalCount}
+          {...pagination}
           label={m.pagination}
           pageSizeLabel={m.pageSize}
           previousPageLabel={m.previousPage}
           nextPageLabel={m.nextPage}
-          onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
-          onPageSizeChange={
-            onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
-          }
         />
       ) : null}
     </div>
@@ -274,17 +229,13 @@ function RequestActions({
   const m = useMessages('requestsTableTab');
   const [acceptRef] = useState(() => registerAcceptTrigger(request.id));
   const [declineRef] = useState(() => registerDeclineTrigger(request.id));
-  const accept = usePendingAction(() => onAccept?.(), { errorFallback: m.acceptError });
-  const decline = usePendingAction(() => onDecline?.(), { errorFallback: m.declineError });
-  const pendingAction =
-    request.pendingAction ?? (accept.isPending ? 'accept' : decline.isPending ? 'decline' : undefined);
-  const error = accept.errorMessage ?? decline.errorMessage;
-  const decide = (action: PendingAction<[]>, other: PendingAction<[]>) => {
+  const actions = usePendingAction<'accept' | 'decline'>();
+  const pendingAction = request.pendingAction ?? actions.pendingKey;
+  const decide = (key: 'accept' | 'decline', action: () => void | Promise<void>, errorFallback: string) => {
     if (pendingAction) {
       return;
     }
-    other.reset();
-    void action.run();
+    void actions.run(key, action, { errorFallback });
   };
   return (
     <>
@@ -300,7 +251,7 @@ function RequestActions({
             variant='outline'
             color='neutral'
             aria-label={fill(m.declineRequest, { name: request.name ?? request.email })}
-            onClick={() => decide(decline, accept)}
+            onClick={() => decide('decline', () => onDecline?.(), m.declineError)}
           >
             {m.decline}
           </SubmitButton>
@@ -314,13 +265,13 @@ function RequestActions({
             isPending={pendingAction === 'accept'}
             pendingLabel={m.accepting}
             aria-label={fill(m.acceptRequest, { name: request.name ?? request.email })}
-            onClick={() => decide(accept, decline)}
+            onClick={() => decide('accept', () => onAccept?.(), m.acceptError)}
           >
             {m.accept}
           </SubmitButton>
         ) : null}
       </div>
-      <Section.Error>{error}</Section.Error>
+      <Section.Error>{actions.error}</Section.Error>
     </>
   );
 }
