@@ -770,6 +770,33 @@ describe('revokeCurrentDeviceCredential', () => {
     expect(biometrics.store.records.map(record => record.id)).toEqual(['td_other']);
   });
 
+  test('revokes when biometrics are no longer available on the device', async () => {
+    addLocalCredential();
+    biometrics.getAvailability.mockResolvedValue({
+      biometryType: 'none',
+      canEvaluateBiometrics: false,
+      canEvaluateDeviceOwner: true,
+      errorCode: 'biometry_not_enrolled',
+      secureKeyStorageAvailable: true,
+    });
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toMatchObject({ id: 'td_1' });
+  });
+
+  test('revokes the server credential when the local key is gone', async () => {
+    addLocalCredential({}, { withKey: false });
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toMatchObject({ id: 'td_1' });
+  });
+
+  test('resolves null and deletes the local record when the server credential is already gone', async () => {
+    addLocalCredential();
+    clerk.user.__experimental_revokeBiometricCredential.mockRejectedValue(apiError('resource_not_found'));
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toBeNull();
+    expect(biometrics.store.records).toEqual([]);
+  });
+
   test('requires an active or pending session', async () => {
     clerk.instance.session = null;
     addLocalCredential();

@@ -15,6 +15,7 @@ import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';
 import type { BiometricCredentialError, BiometricCredentialErrorCode } from './errors';
+import { isBiometricCredentialError } from './errors';
 import type { ExpoBiometricsModule, ExpoBiometricsRecord } from './loadExpoBiometrics';
 import { loadExpoBiometrics } from './loadExpoBiometrics';
 import type {
@@ -277,7 +278,6 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     biometrics: Biometrics,
     id: string | undefined,
     identifierHint: string | undefined,
-    userId?: string,
   ): Promise<ExpoBiometricsRecord[] | BiometricCredentialUnavailableReason> {
     const unavailableReason = featureUnavailableReason();
     if (unavailableReason) {
@@ -295,7 +295,6 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
         record =>
           record.appIdentifier === biometrics.appIdentifier &&
           (id === undefined || record.id === id) &&
-          (userId === undefined || record.userId === userId) &&
           matchesIdentifierHint(record),
       )
       .sort(newestFirst);
@@ -328,9 +327,8 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     biometrics: Biometrics,
     id: string | undefined,
     identifierHint: string | undefined,
-    userId?: string,
   ): Promise<LocalCredentialSelection> {
-    const candidates = await localCredentialCandidates(biometrics, id, identifierHint, userId);
+    const candidates = await localCredentialCandidates(biometrics, id, identifierHint);
     if (typeof candidates === 'string') {
       return { unavailableReason: candidates };
     }
@@ -577,8 +575,21 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
         );
       }
       const user = session.user;
-      const selection = await selectLocalCredential(biometrics, undefined, undefined, user.id);
-      return selection.record ? revokeCredential(biometrics, user, selection.record.id) : null;
+      const record = (await callModule(biometrics, module => module.listRecords()))
+        .filter(record => record.appIdentifier === biometrics.appIdentifier && record.userId === user.id)
+        .sort(newestFirst)[0];
+      if (!record) {
+        return null;
+      }
+      try {
+        return await revokeCredential(biometrics, user, record.id);
+      } catch (error) {
+        if (!isBiometricCredentialError(error) || error.code !== 'resource_not_found') {
+          throw error;
+        }
+        await ignoreErrors(() => deleteLocalCredential(biometrics, record));
+        return null;
+      }
     },
 
     signIn: async params => {
