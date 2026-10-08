@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { clerkApiError } from '../../../__tests__/clerk-errors';
-import { toLocalizableError } from '../../../utils/errors';
-import { userProfileWeb3WalletsMessages } from '../user-profile-web3-wallets.messages';
-import { web3WalletFeedback } from './user-profile-web3-wallets-feedback';
-import { Web3WalletActionError } from './user-profile-web3-wallets-section.types';
+import { clerkApiError } from '../../../../__tests__/clerk-errors';
+import { toLocalizableError } from '../../../../utils/errors';
+import { userProfileWeb3WalletsMessages } from '../../user-profile-web3-wallets.messages';
+import { web3WalletFeedback } from '../user-profile-web3-wallets-feedback';
+import { Web3WalletActionError } from '../user-profile-web3-wallets-section.types';
 
 describe('Web3 wallet feedback', () => {
   it('preserves Clerk error codes for the shared localization boundary', () => {

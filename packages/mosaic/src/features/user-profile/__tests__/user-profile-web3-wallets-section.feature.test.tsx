@@ -551,14 +551,12 @@ describe('Web3 wallets', () => {
 
   it('distinguishes localized discovery loading and failure from no installed wallets', async () => {
     const props = { onConnect: vi.fn() };
-    const retry = vi.fn();
     const localization = {
       messages: {
         userProfileWeb3Wallets: {
           solanaDialog: {
             loading: 'Recherche des portefeuilles…',
             loadError: 'Chargement impossible.',
-            retry: 'Réessayer',
           },
         },
       },
@@ -586,7 +584,7 @@ describe('Web3 wallets', () => {
           <Dialog.Popup variant='card'>
             <UserProfileSolanaWalletView
               {...props}
-              discovery={{ status: 'error', retry }}
+              discovery={{ status: 'error' }}
             />
           </Dialog.Popup>
         </Dialog.Root>
@@ -597,8 +595,7 @@ describe('Web3 wallets', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(screen.queryByText('No Solana wallets are available.')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Find a Solana wallet' })).not.toBeInTheDocument();
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Réessayer' }));
-    expect(retry).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('button', { name: /Retry|Try again/ })).not.toBeInTheDocument();
     expect(props.onConnect).not.toHaveBeenCalled();
   });
 
@@ -823,7 +820,7 @@ describe('Web3 wallets', () => {
         expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
         await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
 
-        expect(within(screen.getByRole('dialog')).queryByRole('alert')).toBeNull();
+        expect(within(screen.getByRole('dialog')).queryByText('Something went wrong. Please try again.')).toBeNull();
         expect(screen.getByRole('button', { name: 'Test Solana' })).toBeEnabled();
         await user.click(screen.getByRole('button', { name: 'Test Solana' }));
         expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(

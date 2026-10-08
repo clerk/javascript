@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export type InstalledSolanaWallet = { name: string; icon: string };
 
 export type SolanaWalletDiscovery =
   | { status: 'loading' }
   | { status: 'ready'; wallets: readonly InstalledSolanaWallet[] }
-  | { status: 'error'; retry: () => void };
+  | { status: 'error' };
 
 function isSolanaSignInWallet(wallet: {
   chains: readonly string[];
@@ -20,12 +20,6 @@ function isSolanaSignInWallet(wallet: {
 
 export function useUserProfileSolanaWalletsModel(): SolanaWalletDiscovery {
   const [discovery, setDiscovery] = useState<SolanaWalletDiscovery>({ status: 'loading' });
-  const [attempt, setAttempt] = useState(0);
-  const retry = useCallback(() => {
-    setDiscovery({ status: 'loading' });
-    setAttempt(attempt => attempt + 1);
-  }, []);
-
   useEffect(() => {
     let disposed = false;
     let unsubscribe: (() => void) | undefined;
@@ -58,14 +52,14 @@ export function useUserProfileSolanaWalletsModel(): SolanaWalletDiscovery {
         if (disposed) {
           return;
         }
-        setDiscovery({ status: 'error', retry });
+        setDiscovery({ status: 'error' });
       });
 
     return () => {
       disposed = true;
       unsubscribe?.();
     };
-  }, [attempt, retry]);
+  }, []);
 
   return discovery;
 }

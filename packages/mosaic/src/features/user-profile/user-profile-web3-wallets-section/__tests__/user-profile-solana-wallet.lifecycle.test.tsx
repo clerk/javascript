@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event';
 import type { Wallet } from '@wallet-standard/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfileWeb3WalletsSection } from './user-profile-web3-wallets-section';
-import type { ReadyWeb3WalletsModel } from './user-profile-web3-wallets-section.types';
+import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section';
+import type { ReadyWeb3WalletsModel } from '../user-profile-web3-wallets-section.types';
 
 const registry = vi.hoisted(() => {
   const wallets: Wallet[] = [];
@@ -24,7 +24,7 @@ vi.mock('@wallet-standard/core', () => {
   registry.loadModule();
   return { getWallets: registry.getWallets };
 });
-vi.mock('./user-profile-web3-wallets-section.model', () => ({
+vi.mock('../user-profile-web3-wallets-section.model', () => ({
   useUserProfileWeb3WalletsModel: () =>
     ({
       status: 'ready',

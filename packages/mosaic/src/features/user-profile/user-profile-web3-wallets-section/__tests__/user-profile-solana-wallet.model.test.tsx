@@ -4,7 +4,7 @@ import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useUserProfileSolanaWalletsModel } from './user-profile-solana-wallet.model';
+import { useUserProfileSolanaWalletsModel } from '../user-profile-solana-wallet.model';
 
 const registry = vi.hoisted(() => {
   const wallets: Wallet[] = [];

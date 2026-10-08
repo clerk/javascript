@@ -1,4 +1,3 @@
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
@@ -28,35 +27,14 @@ export function UserProfileSolanaWalletView({
         <Card.Title>{m.solanaDialog.title}</Card.Title>
         <Card.Description>{m.solanaDialog.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {discovery.status === 'error' ? m.solanaDialog.loadError : error}
+      </Card.Banner>
       <Card.Content>
-        {error ? (
-          <Banner.Root
-            role='alert'
-            color='negative'
-          >
-            <Banner.Label>{error}</Banner.Label>
-          </Banner.Root>
-        ) : null}
         {discovery.status === 'loading' ? <p role='status'>{m.solanaDialog.loading}</p> : null}
-        {discovery.status === 'error' ? (
-          <>
-            <Banner.Root
-              role='alert'
-              color='negative'
-            >
-              <Banner.Label>{m.solanaDialog.loadError}</Banner.Label>
-            </Banner.Root>
-            <Button
-              type='button'
-              variant='outline'
-              color='neutral'
-              fullWidth
-              onClick={discovery.retry}
-            >
-              {m.solanaDialog.retry}
-            </Button>
-          </>
-        ) : null}
         {discovery.status === 'ready' && discovery.wallets.length === 0 ? (
           <p>
             {m.solanaDialog.noneAvailable}{' '}

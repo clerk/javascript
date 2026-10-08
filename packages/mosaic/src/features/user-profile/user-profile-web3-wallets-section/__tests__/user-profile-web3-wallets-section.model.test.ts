@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { normalizedWeb3Wallet, projectWeb3Wallets } from './user-profile-web3-wallets-section.model';
+import { normalizedWeb3Wallet, projectWeb3Wallets } from '../user-profile-web3-wallets-section.model';
 
 const metamask = {
   id: 'wallet_metamask',

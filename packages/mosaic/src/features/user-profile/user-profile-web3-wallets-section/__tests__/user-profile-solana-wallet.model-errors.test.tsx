@@ -1,9 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import type { Wallet } from '@wallet-standard/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { deferred } from '../../../__tests__/async';
-import { useUserProfileSolanaWalletsModel } from './user-profile-solana-wallet.model';
+import { deferred } from '../../../../__tests__/async';
+import { useUserProfileSolanaWalletsModel } from '../user-profile-solana-wallet.model';
 
 afterEach(() => {
   vi.doUnmock('@wallet-standard/core');
@@ -33,7 +32,7 @@ describe('Solana wallet discovery failures', () => {
     }
   });
 
-  it('reports a failed registry import instead of an empty wallet list and can retry', async () => {
+  it('reports a failed registry import instead of an empty wallet list', async () => {
     vi.doMock('@wallet-standard/core', () => {
       throw new Error('Failed to fetch the wallet registry chunk');
     });
@@ -44,34 +43,5 @@ describe('Solana wallet discovery failures', () => {
       await vi.dynamicImportSettled();
     });
     expect(result.current).toMatchObject({ status: 'error' });
-
-    vi.doMock('@wallet-standard/core', () => ({
-      getWallets: () => ({
-        get: (): Wallet[] => [
-          {
-            name: 'Recovered Solana',
-            icon: 'data:image/svg+xml;base64,',
-            version: '1.0.0',
-            chains: ['solana:mainnet'],
-            accounts: [],
-            features: { 'standard:connect': {}, 'solana:signMessage': {} },
-          },
-        ],
-        on: () => () => {},
-      }),
-    }));
-
-    act(() => {
-      if (result.current.status === 'error') {
-        result.current.retry();
-      }
-    });
-    expect(result.current).toEqual({ status: 'loading' });
-    await waitFor(() =>
-      expect(result.current).toEqual({
-        status: 'ready',
-        wallets: [{ name: 'Recovered Solana', icon: 'data:image/svg+xml;base64,' }],
-      }),
-    );
   });
 });
