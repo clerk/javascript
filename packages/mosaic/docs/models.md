@@ -92,6 +92,9 @@ drops the fallback instead of holding the space open. Keep the two apart.
   Write a type by hand only for what Clerk has no type for, such as a
   formatted label or a UI-only flag.
 
+- A model hook is called by a wrapper, never by a view. A wrapper in another
+  feature may call it too: the profile API keys panels call `useAPIKeysAccess`
+  from `api-keys-table.model.ts` to decide whether to render the table.
 - An async callback returns its promise — the controller drives pending state off
   it. Navigation callbacks stay fire-and-forget.
 - Never format an error. Let Clerk errors propagate untouched. For a failure
