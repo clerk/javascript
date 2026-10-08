@@ -352,7 +352,7 @@ describe('APIKeysTable', () => {
       await user.click(await within(dialog).findByRole('button', { name: 'Copy API key' }));
 
       await expect(navigator.clipboard.readText()).resolves.toBe(`ak_secret_${fapi.apiKeys[0].id}`);
-      expect(screen.getByRole('alertdialog', { name: 'Add new API key' })).toBeVisible();
+      expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
     });
 
     it('keeps the secret open on an outside click but closes it on Escape', async () => {
@@ -368,7 +368,7 @@ describe('APIKeysTable', () => {
 
       await user.click(backdrop);
       expect(dialog).not.toHaveAttribute('data-closed');
-      expect(screen.getByRole('alertdialog', { name: 'Add new API key' })).toBeVisible();
+      expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
 
       await user.keyboard('{Escape}');
       await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
