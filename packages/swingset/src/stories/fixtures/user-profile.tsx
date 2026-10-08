@@ -12,7 +12,7 @@ import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';

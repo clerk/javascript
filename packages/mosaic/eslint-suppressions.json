@@ -59,7 +59,7 @@
       "count": 1
     }
   },
-  "src/features/user-profile/user-profile-web3-wallet-row.view.tsx": {
+  "src/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallet-row.view.tsx": {
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
