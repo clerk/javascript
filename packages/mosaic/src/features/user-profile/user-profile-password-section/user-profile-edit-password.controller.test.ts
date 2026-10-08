@@ -11,6 +11,7 @@ describe('useUserProfileEditPasswordController timing', () => {
     try {
       const { result } = renderHook(() =>
         useUserProfileEditPasswordController({
+          policy: { mode: 'set', requiresCurrentPassword: false },
           onSubmit: () => Promise.resolve(),
           validatePassword: () => Promise.reject(new Error('Failed to load strength checker')),
         }),
@@ -30,6 +31,7 @@ describe('useUserProfileEditPasswordController timing', () => {
       const validatePassword = vi.fn(() => Promise.resolve(feedback));
       const { result } = renderHook(() =>
         useUserProfileEditPasswordController({
+          policy: { mode: 'set', requiresCurrentPassword: false },
           onSubmit: () => Promise.resolve(),
           validatePassword,
         }),
@@ -51,7 +53,11 @@ describe('useUserProfileEditPasswordController timing', () => {
     try {
       const validatePassword = vi.fn(() => Promise.resolve(undefined));
       const { result } = renderHook(() =>
-        useUserProfileEditPasswordController({ onSubmit: () => Promise.resolve(), validatePassword }),
+        useUserProfileEditPasswordController({
+          policy: { mode: 'set', requiresCurrentPassword: false },
+          onSubmit: () => Promise.resolve(),
+          validatePassword,
+        }),
       );
       act(() => result.current.onOpenChange(true));
       act(() => result.current.form.setValue('newPassword', 'first password'));
@@ -75,7 +81,11 @@ describe('useUserProfileEditPasswordController timing', () => {
     const newer = deferred<FieldFeedback>();
     const validatePassword = vi.fn().mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise);
     const { result } = renderHook(() =>
-      useUserProfileEditPasswordController({ onSubmit: () => Promise.resolve(), validatePassword }),
+      useUserProfileEditPasswordController({
+        policy: { mode: 'set', requiresCurrentPassword: false },
+        onSubmit: () => Promise.resolve(),
+        validatePassword,
+      }),
     );
     act(() => result.current.onOpenChange(true));
     act(() => result.current.form.setValue('newPassword', 'first password'));
@@ -101,7 +111,10 @@ describe('useUserProfileEditPasswordController timing', () => {
     const save = deferred<void>();
     const onSubmit = vi.fn(() => save.promise);
     const { result } = renderHook(() =>
-      useUserProfileEditPasswordController({ requiresCurrentPassword: true, onSubmit }),
+      useUserProfileEditPasswordController({
+        policy: { mode: 'change', requiresCurrentPassword: true },
+        onSubmit,
+      }),
     );
     act(() => result.current.onOpenChange(true));
     act(() => result.current.form.setValue('currentPassword', 'old-secret'));

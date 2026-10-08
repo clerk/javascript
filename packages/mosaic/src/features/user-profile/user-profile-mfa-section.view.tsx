@@ -3,6 +3,7 @@ import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { usePendingAction } from '../../hooks/use-pending-action';
 import { fill, type MosaicMessages, useMessages } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
@@ -51,32 +52,10 @@ export function UserProfileMfaSectionView({
   });
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [isSettingDefault, setIsSettingDefault] = useState(false);
-  const [defaultError, setDefaultError] = useState<string>();
-  const settingDefault = useRef(false);
-
-  const setDefault = async (id: string) => {
+  const setDefault = usePendingAction({ errorFallback: m.setDefaultError });
+  const canSetDefault = (id: string) => {
     const method = methods.find(method => method.id === id);
-    if (
-      !onSetDefault ||
-      method?.type !== 'sms' ||
-      !method.canSetDefault ||
-      method.isDefault ||
-      settingDefault.current
-    ) {
-      return;
-    }
-    settingDefault.current = true;
-    setIsSettingDefault(true);
-    setDefaultError(undefined);
-    try {
-      await onSetDefault(id);
-    } catch (error) {
-      setDefaultError(error instanceof Error ? error.message : m.setDefaultError);
-    } finally {
-      settingDefault.current = false;
-      setIsSettingDefault(false);
-    }
+    return method?.type === 'sms' && method.canSetDefault && !method.isDefault;
   };
 
   return (
@@ -112,12 +91,20 @@ export function UserProfileMfaSectionView({
             method={method}
             triggerRef={removalFocus.registerTrigger(method.id)}
             onRemove={onRemove ? () => removeMethod.open(method) : undefined}
-            onSetDefault={onSetDefault && !isSettingDefault ? id => void setDefault(id) : undefined}
+            onSetDefault={
+              onSetDefault && !setDefault.isPending
+                ? id => {
+                    if (canSetDefault(id)) {
+                      void setDefault.run('set-default', () => onSetDefault(id));
+                    }
+                  }
+                : undefined
+            }
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
         ))}
       </UserProfileSecurityList>
-      <Section.Error>{defaultError}</Section.Error>
+      <Section.Error>{setDefault.error}</Section.Error>
       {onRemove ? (
         <Confirmation
           handle={removeMethod}

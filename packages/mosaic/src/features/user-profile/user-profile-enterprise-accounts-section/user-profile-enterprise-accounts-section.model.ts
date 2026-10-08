@@ -1,12 +1,11 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { __internal_useUserEnterpriseConnections, useClerk, useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
-import { useErrorText, useMessages } from '../../../localization';
 import { toProviderIcon } from '../user-profile-provider-icon.model';
-import { enterpriseAccountErrorMessage } from './user-profile-enterprise-accounts-feedback';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
@@ -90,8 +89,6 @@ export function useUserProfileEnterpriseAccountsModel({
 }: { mode?: 'modal' | 'mounted' } = {}): UserProfileEnterpriseAccountsModel {
   const clerk = useClerk();
   const router = useMosaicRouter();
-  const m = useMessages('userProfileEnterpriseAccountsSection');
-  const errorText = useErrorText();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const { data: connections = [] } = __internal_useUserEnterpriseConnections({
@@ -118,10 +115,15 @@ export function useUserProfileEnterpriseAccountsModel({
 
   const userId = user.id;
 
+  const unavailable = () =>
+    new ClerkRuntimeError('This enterprise connection is no longer available.', {
+      code: 'enterprise_connection_unavailable',
+    });
+
   const currentUser = () => {
     const current = clerk.user;
     if (!current || current.id !== userId) {
-      throw new Error(m.errors.unavailable);
+      throw unavailable();
     }
     return current;
   };
@@ -132,19 +134,17 @@ export function useUserProfileEnterpriseAccountsModel({
     connect: async connectionId => {
       const current = currentUser();
       if (!projection.connections.some(connection => connection.id === connectionId)) {
-        throw new Error(m.errors.unavailable);
+        throw unavailable();
       }
       const url = window.location.href;
       const redirectUrl = mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile' }) : url;
-      const account = await current
-        .createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl })
-        .catch(error => {
-          throw new Error(enterpriseAccountErrorMessage(error, errorText, m.errors.generic), { cause: error });
-        });
+      const account = await current.createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl });
       currentUser();
       const redirect = account.verification?.externalVerificationRedirectURL;
       if (!redirect) {
-        throw new Error(m.errors.missingVerificationUrl);
+        throw new ClerkRuntimeError('OAuth flow did not receive a verification URL.', {
+          code: 'oauth_missing_verification_url',
+        });
       }
       router.windowNavigate(redirect);
       return 'redirecting';

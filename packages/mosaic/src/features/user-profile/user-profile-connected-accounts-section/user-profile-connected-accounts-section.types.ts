@@ -29,14 +29,3 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   onReconnect?: (id: string) => void;
   onRemove?: (id: string) => void | Promise<void>;
 }
-
-export class ConnectedAccountActionError extends Error {
-  constructor(
-    readonly code: 'unavailable' | 'missing_verification_url',
-    message: string = code,
-    options?: ErrorOptions,
-  ) {
-    super(message, options);
-    this.name = 'ConnectedAccountActionError';
-  }
-}

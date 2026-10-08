@@ -10,17 +10,13 @@ import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { Spinner } from '../../components/spinner';
-import { Table, type TableHeaderCellProps } from '../../components/table';
+import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill, useMessages } from '../../localization';
-import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
-import type {
-  InvitationsTableSort,
-  InvitationsTableTabViewProps,
-  OrganizationProfileInvitation,
-} from './invitations-table-tab.types';
+import type { InvitationsTableTabViewProps, OrganizationProfileInvitation } from './invitations-table-tab.types';
 import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (invitation: OrganizationProfileInvitation) => invitation.id;
@@ -53,55 +49,20 @@ export function InvitationsTableTabView({
     fallback: () => inviteButton.current ?? searchInput.current,
   });
   const revokeDialog = useMemo(() => Confirmation.createHandle<OrganizationProfileInvitation>(), []);
-  const pagination = { pageIndex: page - 1, pageSize };
-  const table = useDataTable({
+  const { table, sortHeader, pagination } = useServerDataTable({
     data: invitations,
     totalCount,
     getRowId,
-    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
-    onSortingChange: onSortChange
-      ? update => {
-          const next = typeof update === 'function' ? update(table.sorting) : update;
-          const active = next[0];
-          table.setRowSelection({});
-          onSortChange(
-            active && (active.id === 'email' || active.id === 'invitedAt' || active.id === 'roleLabel')
-              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
-              : null,
-          );
-        }
-      : undefined,
-    pagination,
-    onPaginationChange: update => {
-      const next = typeof update === 'function' ? update(pagination) : update;
-      table.setRowSelection({});
-      if (next.pageSize !== pageSize) {
-        onPageSizeChange?.(next.pageSize);
-      }
-      onPageChange(next.pageIndex + 1);
-    },
-    globalFilter: searchValue,
-    onGlobalFilterChange: update => {
-      table.setRowSelection({});
-      onSearchChange(typeof update === 'function' ? update(searchValue) : update);
-    },
+    sortableColumns: ['email', 'invitedAt', 'roleLabel'],
+    sort,
+    onSortChange,
+    page,
+    pageSize,
+    onPageChange,
+    onPageSizeChange,
+    searchValue,
+    onSearchChange,
   });
-  const sortHeader = (column: InvitationsTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
-    const active = table.sorting[0];
-    return {
-      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
-      onSort: onSortChange
-        ? () =>
-            table.setSorting(current => {
-              const active = current[0];
-              if (active?.id !== column) {
-                return [{ id: column, desc: false }];
-              }
-              return active.desc ? [] : [{ id: column, desc: true }];
-            })
-        : undefined,
-    };
-  };
   return (
     <>
       <div {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(tableTabStyles.root))}>
@@ -221,19 +182,13 @@ export function InvitationsTableTabView({
             )}
           </Table.Body>
         </Table.Root>
-        {table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange) ? (
+        {pagination ? (
           <Pagination
-            page={table.pagination.pageIndex + 1}
-            pageSize={table.pagination.pageSize}
-            totalItems={totalCount}
+            {...pagination}
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
             nextPageLabel={m.nextPage}
-            onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
-            onPageSizeChange={
-              onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
-            }
           />
         ) : null}
       </div>
@@ -244,13 +199,8 @@ export function InvitationsTableTabView({
           description={m.revokeDescription}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onConfirm={async invitation => {
-            try {
-              await removalFocus.remove(invitation.id);
-            } catch (error) {
-              throw error instanceof Error && error.message.trim() ? error : new Error(m.revokeError);
-            }
-          }}
+          onConfirm={invitation => removalFocus.remove(invitation.id)}
+          errorFallback={m.revokeError}
           finalFocus={removalFocus.finalFocus}
         />
       ) : null}

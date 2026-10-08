@@ -12,14 +12,14 @@ import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { Select } from '../../components/select';
 import { Spinner } from '../../components/spinner';
-import { Table, type TableHeaderCellProps } from '../../components/table';
+import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill, useMessages } from '../../localization';
-import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './members-table-tab.styles';
-import type { MembersTableSort, MembersTableTabViewProps, OrganizationProfileMember } from './members-table-tab.types';
+import type { MembersTableTabViewProps, OrganizationProfileMember } from './members-table-tab.types';
 import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (member: OrganizationProfileMember) => member.id;
@@ -53,39 +53,20 @@ export function MembersTableTabView({
     fallback: () => inviteButton.current ?? searchInput.current,
   });
   const removeDialog = useMemo(() => Confirmation.createHandle<OrganizationProfileMember>(), []);
-  const pagination = { pageIndex: page - 1, pageSize };
-  const table = useDataTable({
+  const { table, sortHeader, pagination } = useServerDataTable({
     data: members,
     totalCount,
     getRowId,
     isRowSelectable: canManageMember,
-    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
-    onSortingChange: onSortChange
-      ? update => {
-          const next = typeof update === 'function' ? update(table.sorting) : update;
-          const active = next[0];
-          table.setRowSelection({});
-          onSortChange(
-            active && (active.id === 'name' || active.id === 'joinedAt' || active.id === 'role')
-              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
-              : null,
-          );
-        }
-      : undefined,
-    pagination,
-    onPaginationChange: update => {
-      const next = typeof update === 'function' ? update(pagination) : update;
-      table.setRowSelection({});
-      if (next.pageSize !== pageSize) {
-        onPageSizeChange?.(next.pageSize);
-      }
-      onPageChange(next.pageIndex + 1);
-    },
-    globalFilter: searchValue,
-    onGlobalFilterChange: update => {
-      table.setRowSelection({});
-      onSearchChange(typeof update === 'function' ? update(searchValue) : update);
-    },
+    sortableColumns: ['name', 'joinedAt', 'role'],
+    sort,
+    onSortChange,
+    page,
+    pageSize,
+    onPageChange,
+    onPageSizeChange,
+    searchValue,
+    onSearchChange,
   });
   const resetSelection = useRef(table.setRowSelection);
   useEffect(() => {
@@ -94,22 +75,6 @@ export function MembersTableTabView({
   useEffect(() => {
     resetSelection.current({});
   }, [page, pageSize, searchValue, sort?.column, sort?.direction]);
-  const sortHeader = (column: MembersTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
-    const active = table.sorting[0];
-    return {
-      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
-      onSort: onSortChange
-        ? () =>
-            table.setSorting(current => {
-              const active = current[0];
-              if (active?.id !== column) {
-                return [{ id: column, desc: false }];
-              }
-              return active.desc ? [] : [{ id: column, desc: true }];
-            })
-        : undefined,
-    };
-  };
   const columnCount = 3 + Number(Boolean(onRemove)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
   return (
@@ -269,19 +234,13 @@ export function MembersTableTabView({
             )}
           </Table.Body>
         </Table.Root>
-        {table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange) ? (
+        {pagination ? (
           <Pagination
-            page={table.pagination.pageIndex + 1}
-            pageSize={table.pagination.pageSize}
-            totalItems={totalCount}
+            {...pagination}
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
             nextPageLabel={m.nextPage}
-            onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
-            onPageSizeChange={
-              onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
-            }
           />
         ) : null}
       </div>
@@ -292,13 +251,8 @@ export function MembersTableTabView({
           description={m.removeDescription}
           actionLabel={m.remove}
           cancelLabel={m.cancel}
-          onConfirm={async member => {
-            try {
-              await removalFocus.remove(member.id);
-            } catch (error) {
-              throw error instanceof Error ? error : new Error(m.removeError);
-            }
-          }}
+          onConfirm={member => removalFocus.remove(member.id)}
+          errorFallback={m.removeError}
           finalFocus={removalFocus.finalFocus}
         />
       ) : null}

@@ -1,13 +1,15 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { UseFormResult } from '../../../components/form';
 import { useForm } from '../../../components/form';
 import type { FieldFeedback } from '../../../components/form/form-submit-error';
+import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import { useMessages } from '../../../localization';
 import type {
   UserProfileEditPasswordValue,
   UserProfileEditPasswordValues,
+  UserProfilePasswordPolicy,
 } from './user-profile-password-section.types';
 
 const initialValues: UserProfileEditPasswordValues = {
@@ -18,7 +20,7 @@ const initialValues: UserProfileEditPasswordValues = {
 };
 
 export interface UserProfileEditPasswordControllerOptions {
-  requiresCurrentPassword?: boolean;
+  policy: UserProfilePasswordPolicy;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<unknown>;
   validatePassword?: (password: string) => Promise<FieldFeedback | undefined>;
 }
@@ -31,14 +33,14 @@ export interface UserProfileEditPasswordController {
 }
 
 export function useUserProfileEditPasswordController({
-  requiresCurrentPassword = false,
+  policy,
   onSubmit,
   validatePassword,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
+  const requiresCurrentPassword = policy.requiresCurrentPassword;
   const validationError = useMessages('errors').generic;
   const m = useMessages('userProfilePasswordSection');
   const [isOpen, setIsOpen] = useState(false);
-  const [passwordFeedback, setPasswordFeedback] = useState<FieldFeedback>();
 
   const form = useForm({
     initialValues,
@@ -66,35 +68,15 @@ export function useUserProfileEditPasswordController({
 
   const password = form.values.newPassword;
   const passwordLeft = form.fields.newPassword.touched;
-  useEffect(() => {
-    // TODO: Discuss keeping the password hint hidden on open or showing it immediately when the field autofocuses. https://github.com/clerk/javascript/pull/9930#discussion_r4150863181
-    if (!isOpen || (password === '' && !passwordLeft) || !validatePassword) {
-      setPasswordFeedback(undefined);
-      return;
-    }
-
-    let active = true;
-    const timeout = setTimeout(() => {
-      void Promise.resolve()
-        .then(() => validatePassword(password))
-        .then(
-          feedback => {
-            if (active) {
-              setPasswordFeedback(feedback);
-            }
-          },
-          () => {
-            if (active) {
-              setPasswordFeedback({ type: 'error', message: validationError });
-            }
-          },
-        );
-    }, DEBOUNCE_MS);
-    return () => {
-      active = false;
-      clearTimeout(timeout);
-    };
-  }, [isOpen, password, passwordLeft, validatePassword, validationError]);
+  // TODO: Discuss keeping the password hint hidden on open or showing it immediately when the field autofocuses. https://github.com/clerk/javascript/pull/9930#discussion_r4150863181
+  const strength = useDebouncedAsync(
+    password,
+    value => (validatePassword ? validatePassword(value) : Promise.resolve(undefined)),
+    { delayMs: DEBOUNCE_MS, enabled: isOpen && (password !== '' || passwordLeft) && validatePassword !== undefined },
+  );
+  const passwordFeedback: FieldFeedback | undefined = strength.isError
+    ? { type: 'error', message: validationError }
+    : strength.data;
 
   const onOpenChange = (open: boolean) => {
     if (form.isSubmitting) {

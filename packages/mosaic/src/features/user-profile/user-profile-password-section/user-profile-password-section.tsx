@@ -6,59 +6,52 @@ import { useUserProfileEditPasswordController } from './user-profile-edit-passwo
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
 import type { UserProfilePasswordModel } from './user-profile-password-section.model';
 import { useUserProfilePasswordModel } from './user-profile-password-section.model';
-import type { UserProfilePasswordSlot } from './user-profile-password-section.types';
 import { UserProfilePasswordSectionView } from './user-profile-password-section.view';
 
 export interface UserProfilePasswordSectionProps {
   fallback?: ReactNode;
 }
 
-export function UserProfilePasswordSection(props: UserProfilePasswordSectionProps) {
-  return useUserProfilePasswordSlot(props)?.content ?? null;
+export function UserProfilePasswordSection({ fallback = null }: UserProfilePasswordSectionProps) {
+  const model = useUserProfilePasswordModel();
+  return renderPasswordSection(model, fallback);
 }
 
-export function useUserProfilePasswordSlot({
-  fallback = null,
-}: UserProfilePasswordSectionProps = {}): UserProfilePasswordSlot | null {
-  const model = useUserProfilePasswordModel();
+export function renderPasswordSection(model: UserProfilePasswordModel, fallback: ReactNode): ReactNode {
   if (model.status === 'loading') {
-    // TODO: Add a password section skeleton as the default loading fallback.
-    return fallback ? { content: fallback } : null;
+    return fallback || null;
   }
   if (model.status === 'hidden') {
     return null;
   }
   if (model.status === 'readonly') {
-    return {
-      content: (
-        <UserProfilePasswordSectionView
-          hasPassword={model.mode === 'change'}
-          managedBy={model.managedBy}
-        />
-      ),
-    };
-  }
-  return {
-    content: (
-      <PasswordEditor
-        key={`${model.userId}:${model.sessionId}`}
-        model={model}
+    return (
+      <UserProfilePasswordSectionView
+        hasPassword={model.mode === 'change'}
+        managedBy={model.managedBy}
       />
-    ),
-  };
+    );
+  }
+  return (
+    <PasswordEditor
+      key={`${model.userId}:${model.sessionId}`}
+      model={model}
+    />
+  );
 }
 
 function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
   const m = useMessages('userProfilePasswordSection');
+  const hasPassword = model.mode === 'change';
   const controller = useUserProfileEditPasswordController({
+    policy: model,
     validatePassword: model.validatePassword,
-    requiresCurrentPassword: model.requiresCurrentPassword,
     onSubmit: model.updatePassword,
   });
 
   return (
     <UserProfilePasswordSectionView
-      hasPassword={model.mode === 'change'}
+      hasPassword={hasPassword}
       action={
         <UserProfileEditPasswordDialog
           form={controller.form}
@@ -66,7 +59,7 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
           identifier={model.identifier}
           open={controller.isOpen}
           onOpenChange={controller.onOpenChange}
-          hasPassword={model.mode === 'change'}
+          hasPassword={hasPassword}
           requiresCurrentPassword={model.requiresCurrentPassword}
           trigger={
             <Button
@@ -74,7 +67,7 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
               size='sm'
               variant='outline'
             >
-              {model.mode === 'change' ? m.change : m.set}
+              {hasPassword ? m.change : m.set}
             </Button>
           }
         />

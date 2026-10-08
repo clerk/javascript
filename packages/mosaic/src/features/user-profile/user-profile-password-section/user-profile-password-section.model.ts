@@ -13,11 +13,7 @@ import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import { toManagedBy } from '../user-profile-managed-by.model';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
-import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
-
-type EditablePasswordPolicy =
-  | { mode: 'set'; requiresCurrentPassword: false }
-  | { mode: 'change'; requiresCurrentPassword: boolean };
+import type { UserProfileEditPasswordValue, UserProfilePasswordPolicy } from './user-profile-password-section.types';
 
 type UnavailablePasswordModel =
   | { status: 'hidden' }
@@ -30,7 +26,7 @@ type UnavailablePasswordModel =
 export type UserProfilePasswordModel =
   | { status: 'loading' }
   | UnavailablePasswordModel
-  | (EditablePasswordPolicy & {
+  | (UserProfilePasswordPolicy & {
       status: 'ready';
       userId: string;
       sessionId: string;
@@ -39,10 +35,15 @@ export type UserProfilePasswordModel =
       updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
     });
 
+type PasswordPolicyResult =
+  | { status: 'hidden' }
+  | { status: 'readonly'; mode: 'set' | 'change'; managedBy: UserProfileManagedBy }
+  | (UserProfilePasswordPolicy & { status: 'ready'; userId: string });
+
 function getPasswordPolicy(
   user: UserResource | null | undefined,
   environment: EnvironmentResource,
-): UnavailablePasswordModel | (EditablePasswordPolicy & { status: 'ready'; userId: string }) {
+): PasswordPolicyResult {
   if (!user) {
     return { status: 'hidden' };
   }
@@ -52,7 +53,7 @@ function getPasswordPolicy(
   }
 
   // TODO: When session reverification is supported, require the current password only when reverification is disabled.
-  const policy: EditablePasswordPolicy = user.passwordEnabled
+  const policy: UserProfilePasswordPolicy = user.passwordEnabled
     ? { mode: 'change', requiresCurrentPassword: true }
     : { mode: 'set', requiresCurrentPassword: false };
 
@@ -108,6 +109,13 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
   }
 
   const policy = getPasswordPolicy(user, environment);
+  if (policy.status === 'readonly') {
+    return {
+      status: 'readonly',
+      mode: policy.mode,
+      managedBy: policy.managedBy,
+    };
+  }
   if (policy.status !== 'ready') {
     return policy;
   }

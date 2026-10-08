@@ -1,8 +1,8 @@
 import type { LocalizableError } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { TransitionResult } from '../../machine/types';
-import { SaveError } from '../../utils/form-error';
-import { keysOf, mapKeys } from '../../utils/object';
+import { keysOf, mapKeys } from '../../primitives/utils/object';
+import { SaveError } from '../../utils/errors';
 import type { FieldFeedback, FormError, FormFieldErrors } from './form-submit-error';
 import { FormSubmitError } from './form-submit-error';
 
@@ -149,7 +149,7 @@ function savedFieldErrors<TValues extends object>(
 
 function toFormError<TValues extends object>(cause: unknown, context: FormContext<TValues>): FormError<TValues> {
   if (!(cause instanceof FormSubmitError) && !(cause instanceof SaveError)) {
-    console.error(cause);
+    console.error('[Clerk] Could not localize error', cause);
     return { message: context.fallbackMessage };
   }
   const error: FormError<TValues> =

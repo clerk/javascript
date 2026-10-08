@@ -31,7 +31,9 @@ export function UserProfilePaymentMethodsSectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Payment methods</Section.Title>
+          <Section.Content>
+            <Section.Title>Payment methods</Section.Title>
+          </Section.Content>
           {onAdd ? (
             <Section.Actions>
               <Button

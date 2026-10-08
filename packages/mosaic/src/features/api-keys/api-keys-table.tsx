@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { FormSubmitError } from '../../components/form';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useNow } from '../../hooks/use-now';
 import { useLocale, useMessages } from '../../localization';
 import { formatDate, formatRelativeTime } from './api-keys-table.format';
 import { resolveAPIKeysTableMessages } from './api-keys-table.messages';
@@ -95,6 +96,7 @@ function createErrorMessage(
       return m.nameTakenError;
     }
   }
+  // TODO: Let the model propagate Clerk errors, now that the errors catalog covers token_quota_exceeded and token_creation_conflict, and give useForm an errorFallback so m.createError replaces the raw message.
   return error instanceof Error ? error.message : m.createError;
 }
 
@@ -122,7 +124,7 @@ function useDebouncedSearch() {
 
 function useApiKeyLabels(apiKeys: APIKeyResource[]): APIKey[] {
   const locale = useLocale();
-  const now = new Date();
+  const now = useNow({ updateInterval: 60_000 });
 
   return apiKeys.map(key => ({
     id: key.id,

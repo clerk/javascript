@@ -3,8 +3,8 @@ import type * as SharedReact from '@clerk/shared/react';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { FormError } from '../../../utils/form-error';
-import { SaveError } from '../../../utils/form-error';
+import type { FormError } from '../../../utils/errors';
+import { SaveError } from '../../../utils/errors';
 import { useUserProfileAccountSectionModel } from '../user-profile-account-section/user-profile-account-section.model';
 
 interface FakeAttribute {
@@ -289,8 +289,9 @@ describe('useUserProfileAccountSectionModel', () => {
   });
 
   it('rethrows a failure that is not from Clerk', async () => {
-    user?.update.mockRejectedValue(new TypeError('boom'));
-    await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).rejects.toThrow('boom');
+    const error = new TypeError('boom');
+    user?.update.mockRejectedValue(error);
+    await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).rejects.toBe(error);
   });
 
   describe('username', () => {
