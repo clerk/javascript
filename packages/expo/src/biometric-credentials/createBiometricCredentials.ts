@@ -234,6 +234,14 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     return user;
   }
 
+  function requireSessionWithUser(code: BiometricCredentialErrorCode, message: string) {
+    const session = clerk.session;
+    if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
+      throw biometricCredentialError(code, message);
+    }
+    return { session, user: session.user };
+  }
+
   async function deleteLocalCredential(biometrics: Biometrics, record: ExpoBiometricsRecord): Promise<void> {
     await callModule(biometrics, module => module.deleteRecord(record.localKeyId));
   }
@@ -483,14 +491,10 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
     enroll: async params => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_ENROLLMENT_FAILED');
-      const session = clerk.session;
-      if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
-        throw biometricCredentialError(
-          biometrics.fallbackCode,
-          'Unable to enroll a biometric credential without an active or pending Clerk session.',
-        );
-      }
-      const user = session.user;
+      const { user } = requireSessionWithUser(
+        biometrics.fallbackCode,
+        'Unable to enroll a biometric credential without an active or pending Clerk session.',
+      );
       const unavailableReason = featureUnavailableReason();
       if (unavailableReason) {
         throw biometricCredentialError(
@@ -567,14 +571,10 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
     revokeCurrentDeviceCredential: async () => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_REVOCATION_FAILED');
-      const session = clerk.session;
-      if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
-        throw biometricCredentialError(
-          biometrics.fallbackCode,
-          'Unable to revoke a biometric credential without an active or pending Clerk session.',
-        );
-      }
-      const user = session.user;
+      const { user } = requireSessionWithUser(
+        biometrics.fallbackCode,
+        'Unable to revoke a biometric credential without an active or pending Clerk session.',
+      );
       const record = (await callModule(biometrics, module => module.listRecords()))
         .filter(record => record.appIdentifier === biometrics.appIdentifier && record.userId === user.id)
         .sort(newestFirst)[0];
@@ -664,14 +664,11 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
           'Biometric reverification level must be first_factor, second_factor, or multi_factor.',
         );
       }
-      const session = clerk.session;
-      if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
-        throw biometricCredentialError(
-          'biometric_reverification_session_unavailable',
-          'Biometric reverification requires an active or pending session with a user.',
-        );
-      }
-      const record = await reverificationCredential(biometrics, session.user.id);
+      const { session, user } = requireSessionWithUser(
+        'biometric_reverification_session_unavailable',
+        'Biometric reverification requires an active or pending session with a user.',
+      );
+      const record = await reverificationCredential(biometrics, user.id);
       const reason = params?.reason ?? DEFAULT_REVERIFICATION_REASON;
 
       let verification = await callApi(biometrics.fallbackCode, () => session.startVerification({ level }));
