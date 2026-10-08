@@ -140,6 +140,12 @@ describe('APIKeysTable', () => {
       expect(within(table()).getByText('ak_...FKWO', { exact: false })).toBeVisible();
     });
 
+    it('describes a key last used after the table read the time as used now', async () => {
+      await renderTable(signedIn([userKey('ak_3', 'Worker', { last_used_at: Date.now() + 5 * 60_000 })]));
+
+      expect(await within(table()).findByRole('cell', { name: 'now' })).toBeVisible();
+    });
+
     it('shows loading until the first page arrives', async () => {
       serveFapi(signedIn());
       const list = holdRequests('get', '/api_keys');
