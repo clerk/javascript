@@ -52,7 +52,10 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     ...(shouldForceMount
       ? {
           ...effectiveTransitionProps,
-          style: { ...effectiveTransitionProps.style, '--cl-tab-transition-direction': String(direction) },
+          style: {
+            ...effectiveTransitionProps.style,
+            '--cl-tab-transition-direction': direction === 'forward' ? '1' : '-1',
+          },
         }
       : {}),
   };

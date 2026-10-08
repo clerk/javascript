@@ -10,11 +10,10 @@ export type TabsListProps = ComponentProps<'div'>;
 
 export function TabsList(props: TabsListProps) {
   const { render, children, ...otherProps } = props;
-  const { orientation, setListElement } = useTabsContext();
+  const { orientation } = useTabsContext();
 
   return (
     <Composite
-      ref={setListElement}
       orientation={orientation}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {

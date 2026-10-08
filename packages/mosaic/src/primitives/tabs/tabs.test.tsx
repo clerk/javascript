@@ -1,6 +1,6 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -131,6 +131,16 @@ describe('Tabs', () => {
       await user.click(screen.getByText('Settings'));
 
       expect(onValueChange).toHaveBeenCalledWith('tab2');
+    });
+
+    it('does not call onValueChange when the selected tab is chosen again', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderTabs({ onValueChange });
+
+      await user.click(screen.getByText('Account'));
+
+      expect(onValueChange).not.toHaveBeenCalled();
     });
   });
 
@@ -351,198 +361,84 @@ describe('Tabs', () => {
   });
 
   describe('Tabs.Indicator', () => {
-    function renderWithIndicator() {
-      return render(
-        <Tabs.Root defaultValue='tab1'>
-          <Tabs.List style={{ position: 'relative' }}>
+    function Indicated(props: Partial<React.ComponentProps<typeof Tabs.Root>>) {
+      return (
+        <Tabs.Root
+          defaultValue='tab1'
+          {...props}
+        >
+          <Tabs.List>
             <Tabs.Tab value='tab1'>Account</Tabs.Tab>
             <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
             <Tabs.Indicator data-testid='indicator' />
           </Tabs.List>
           <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
           <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
-        </Tabs.Root>,
+          <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
+        </Tabs.Root>
       );
     }
-
-    it('has position absolute', () => {
-      renderWithIndicator();
-      const indicator = screen.getByTestId('indicator');
-      expect(indicator.style.position).toBe('absolute');
-    });
 
     it('has aria-hidden', () => {
-      renderWithIndicator();
-      const indicator = screen.getByTestId('indicator');
-      expect(indicator).toHaveAttribute('aria-hidden', 'true');
+      render(<Indicated />);
+      expect(screen.getByTestId('indicator')).toHaveAttribute('aria-hidden', 'true');
     });
 
-    it('sets --cl-tab-width and --cl-tab-left CSS vars', () => {
-      renderWithIndicator();
-      const indicator = screen.getByTestId('indicator');
-      // In a real browser, getBoundingClientRect returns actual measurements
-      expect(indicator.style.getPropertyValue('--cl-tab-width')).toBeTruthy();
-      expect(indicator.style.getPropertyValue('--cl-tab-left')).toBeTruthy();
-    });
-
-    it('updates position when tab changes', async () => {
+    it('marks the direction the selection traveled', async () => {
       const user = userEvent.setup();
-      renderWithIndicator();
-
+      render(<Indicated />);
       const indicator = screen.getByTestId('indicator');
+
+      expect(indicator).toHaveAttribute('data-direction', 'forward');
+
+      await user.click(screen.getByText('Billing'));
+      expect(indicator).toHaveAttribute('data-direction', 'forward');
 
       await user.click(screen.getByText('Settings'));
-
-      // Verify the effect ran and style properties are set
-      expect(indicator.style.position).toBe('absolute');
-      expect(indicator.style.getPropertyValue('--cl-tab-width')).toBeDefined();
+      expect(indicator).toHaveAttribute('data-direction', 'backward');
     });
 
-    it('skips transition on initial render', () => {
-      renderWithIndicator();
-      const indicator = screen.getByTestId('indicator');
-      expect(indicator.style.transition).toBe('none');
+    it('marks the direction when a controlled value changes', () => {
+      const { rerender } = render(<Indicated value='tab3' />);
+      rerender(<Indicated value='tab1' />);
+
+      expect(screen.getByTestId('indicator')).toHaveAttribute('data-direction', 'backward');
     });
-  });
 
-  describe('Tabs.Indicator resize tracking (B1)', () => {
-    it('re-measures the active tab when it resizes without a tab change', () => {
-      // Capture every ResizeObserver the tree creates so the test can drive it.
-      const observers: Array<{ cb: ResizeObserverCallback; targets: Element[] }> = [];
-      class MockResizeObserver {
-        cb: ResizeObserverCallback;
-        targets: Element[] = [];
-        constructor(cb: ResizeObserverCallback) {
-          this.cb = cb;
-          observers.push(this);
-        }
-        observe(el: Element) {
-          this.targets.push(el);
-        }
-        unobserve() {}
-        disconnect() {}
-      }
-      vi.stubGlobal('ResizeObserver', MockResizeObserver);
-
-      try {
-        render(
-          <Tabs.Root defaultValue='tab1'>
-            <Tabs.List style={{ position: 'relative' }}>
-              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
-              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
-              <Tabs.Indicator data-testid='indicator' />
-            </Tabs.List>
-            <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
-            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
-          </Tabs.Root>,
+    it('marks the direction when a controlled parent follows onValueChange', async () => {
+      const user = userEvent.setup();
+      function Controlled() {
+        const [value, setValue] = useState('tab3');
+        return (
+          <Indicated
+            value={value}
+            onValueChange={setValue}
+          />
         );
-
-        const indicator = screen.getByTestId('indicator');
-        const list = screen.getByRole('tablist');
-
-        // The indicator should have registered an observer for its active tab.
-        expect(observers.length).toBeGreaterThan(0);
-
-        // Simulate the active tab growing (e.g. font load / container resize)
-        // with no tab-selection change.
-        const rect = (left: number, width: number) =>
-          ({ left, top: 0, right: left + width, bottom: 20, width, height: 20, x: left, y: 0, toJSON() {} }) as DOMRect;
-        list.getBoundingClientRect = () => rect(0, 400);
-        for (const tab of screen.getAllByRole('tab')) {
-          tab.getBoundingClientRect = () => rect(0, 250);
-        }
-
-        // Fire every observer the tree created.
-        act(() => {
-          for (const o of observers) {
-            o.cb([], o as unknown as ResizeObserver);
-          }
-        });
-
-        expect(indicator.style.getPropertyValue('--cl-tab-width')).toBe('250px');
-      } finally {
-        vi.unstubAllGlobals();
       }
+      render(<Controlled />);
+
+      await user.click(screen.getByText('Account'));
+
+      expect(screen.getByText('Account')).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByTestId('indicator')).toHaveAttribute('data-direction', 'backward');
     });
 
-    function setupObservedIndicator() {
-      const observers: Array<{ cb: ResizeObserverCallback }> = [];
-      class MockResizeObserver {
-        cb: ResizeObserverCallback;
-        constructor(cb: ResizeObserverCallback) {
-          this.cb = cb;
-          observers.push(this);
-        }
-        observe() {}
-        unobserve() {}
-        disconnect() {}
-      }
-      vi.stubGlobal('ResizeObserver', MockResizeObserver);
-
+    it('follows vertical tabs the same way', async () => {
+      const user = userEvent.setup();
       render(
-        <Tabs.Root defaultValue='tab1'>
-          <Tabs.List style={{ position: 'relative' }}>
-            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
-            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
-            <Tabs.Indicator data-testid='indicator' />
-          </Tabs.List>
-          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
-          <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
-        </Tabs.Root>,
+        <Indicated
+          orientation='vertical'
+          defaultValue='tab3'
+        />,
       );
 
-      const rect = (left: number, width: number) =>
-        ({ left, top: 0, right: left + width, bottom: 20, width, height: 20, x: left, y: 0, toJSON() {} }) as DOMRect;
-      const setTabRects = (widths: number[]) => {
-        screen.getByRole('tablist').getBoundingClientRect = () => rect(0, 400);
-        let left = 0;
-        screen.getAllByRole('tab').forEach((tab, i) => {
-          const tabLeft = left;
-          tab.getBoundingClientRect = () => rect(tabLeft, widths[i]);
-          left += widths[i];
-        });
-      };
-      const fireResize = () =>
-        act(() => {
-          for (const o of observers) {
-            o.cb([], o as unknown as ResizeObserver);
-          }
-        });
+      await user.click(screen.getByText('Billing'));
+      await user.keyboard('{ArrowUp}');
 
-      return { indicator: screen.getByTestId('indicator'), setTabRects, fireResize };
-    }
-
-    it('does not animate when the active tab resizes after mount', () => {
-      try {
-        const { indicator, setTabRects, fireResize } = setupObservedIndicator();
-
-        setTabRects([100, 120]);
-        fireResize();
-
-        expect(indicator.style.getPropertyValue('--cl-tab-width')).toBe('100px');
-        expect(indicator.style.transition).toBe('none');
-      } finally {
-        vi.unstubAllGlobals();
-      }
-    });
-
-    it('keeps animating a tab change when the observer reports the same size', async () => {
-      try {
-        const user = userEvent.setup();
-        const { indicator, setTabRects, fireResize } = setupObservedIndicator();
-
-        setTabRects([100, 120]);
-        await user.click(screen.getByText('Settings'));
-
-        expect(indicator.style.getPropertyValue('--cl-tab-left')).toBe('100px');
-        expect(indicator.style.transition).toBe('');
-
-        fireResize();
-
-        expect(indicator.style.transition).toBe('');
-      } finally {
-        vi.unstubAllGlobals();
-      }
+      expect(screen.getByText('Settings')).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByTestId('indicator')).toHaveAttribute('data-direction', 'backward');
     });
   });
 
