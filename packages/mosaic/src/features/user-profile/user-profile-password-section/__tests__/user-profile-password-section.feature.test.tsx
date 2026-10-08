@@ -153,6 +153,7 @@ describe('Changing a password', () => {
     try {
       const user = userEvent.setup();
       await user.click(screen.getByRole('button', { name: 'Change password' }));
+      await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
       await user.type(screen.getByLabelText('New password'), 'new-password-123');
 
       await waitFor(() =>
