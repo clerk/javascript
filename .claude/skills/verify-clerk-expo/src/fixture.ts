@@ -362,6 +362,12 @@ export async function buildFixture(build: FixtureBuild, site: FixtureSite = THIS
   return built;
 }
 
+async function committedNativeKey(platform: Platform): Promise<string> {
+  const listed = await run('git', ['ls-tree', '-r', 'HEAD', '--', ...nativeInputs(platform)], { cwd: WORKTREE });
+  if (listed.code !== 0) throw new VerifyFailure('NOT_READY', `git ls-tree failed: ${listed.stderr.trim()}`, 'retry');
+  return createHash('sha256').update(listed.stdout).digest('hex').slice(0, 12);
+}
+
 async function printKeptNativeBuild(platform: Platform): Promise<void> {
   const cache = nativeCacheDir();
   if (cache === null) throw new VerifyFailure('USAGE', 'VERIFY_NATIVE_CACHE is not set', 'set it to a directory');
@@ -372,13 +378,32 @@ async function printKeptNativeBuild(platform: Platform): Promise<void> {
 }
 
 if (import.meta.main) {
-  const [verb, platform] = process.argv.slice(2);
-  if (verb !== 'native' || (platform !== 'ios' && platform !== 'android')) {
-    console.error('usage: fixture.ts native ios|android');
+  const [first, second] = process.argv.slice(2);
+  const platform = first === 'native' ? second : first;
+  if (platform !== 'ios' && platform !== 'android') {
+    console.error('usage: fixture.ts [native] ios|android');
     process.exit(2);
   }
+  if (first === 'native') {
+    try {
+      await printKeptNativeBuild(platform);
+      process.exit(0);
+    } catch (error) {
+      console.error((error as Error).message);
+      process.exit(1);
+    }
+  }
   try {
-    await printKeptNativeBuild(platform);
+    console.log('build   pnpm install --frozen-lockfile');
+    await mustStep('pnpm install', 'pnpm', ['install', '--frozen-lockfile'], WORKTREE);
+    const built = await buildFixture({
+      platform,
+      product: 'standalone',
+      nativeKey: await committedNativeKey(platform),
+      buildPackages: true,
+      progress: line => console.log(line),
+    });
+    console.log(`build   ${built}`);
   } catch (error) {
     console.error((error as Error).message);
     process.exit(1);
