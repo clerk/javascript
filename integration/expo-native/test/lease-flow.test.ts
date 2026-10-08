@@ -110,8 +110,8 @@ describe('lease flow', () => {
       id: 'gh-attach',
       ok: true,
       state: 'warning',
-      detail: "this gh has no `gh pr comment --attach`, so `{cli} attach` cannot post a run's video and screenshots from this machine",
-      fix: 'install a gh build whose `gh pr comment` has --attach',
+      detail: "this gh has no `gh pr edit --attach`, so `{cli} attach` cannot put a run's video and screenshots in a pull request description from this machine",
+      fix: 'install gh 2.99.0 or newer, whose `gh pr edit` has --attach',
     });
   });
 

@@ -177,9 +177,19 @@ export interface ScreenResult {
   readonly png: ScratchPath | null;
 }
 
+export interface EvidenceSummary {
+  readonly run: RunId;
+  readonly platform: Platform;
+  readonly device: string;
+  readonly commit: string;
+  readonly passed: number;
+  readonly flaky: number;
+  readonly total: number;
+}
+
 export interface AttachResult {
   readonly verb: 'attach';
-  readonly commentUrl: string;
+  readonly prUrl: string;
   readonly posted: readonly EvidencePath[];
   readonly alreadyPosted: boolean;
 }

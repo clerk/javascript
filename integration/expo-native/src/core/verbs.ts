@@ -137,8 +137,8 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
   const noAttach = await missingAttach(runner);
   checks.push(
     noAttach === null
-      ? check('gh-attach', true, 'gh pr comment supports --attach', '')
-      : { id: 'gh-attach', ok: true, state: 'warning', detail: `${noAttach.why}, so \`{cli} attach\` cannot post a run's video and screenshots from this machine`, fix: noAttach.fix },
+      ? check('gh-attach', true, 'gh pr edit supports --attach', '')
+      : { id: 'gh-attach', ok: true, state: 'warning', detail: `${noAttach.why}, so \`{cli} attach\` cannot put a run's video and screenshots in a pull request description from this machine`, fix: noAttach.fix },
   );
 
   const stale = readClaims(workspace.claimsDir, platform).filter(isOrphaned);

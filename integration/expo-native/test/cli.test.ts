@@ -168,7 +168,7 @@ describe('doctor output', () => {
     backend: { ios: 'local' },
     checks: [
       { id: 'node', ok: true, detail: '24.15.0' },
-      { id: 'gh-attach', ok: true, state: 'warning', detail: 'gh pr comment has no --attach', fix: 'install one that has' },
+      { id: 'gh-attach', ok: true, state: 'warning', detail: 'gh pr edit has no --attach', fix: 'install one that has' },
       { id: 'live-session', ok: true, state: 'not-run', detail: 'not run: needs --live' },
     ],
   };
@@ -176,7 +176,7 @@ describe('doctor output', () => {
   it('labels a warning and a check that was not run, and neither fails doctor', () => {
     let out = '';
     createOutput(false, '/tmp', 'bin/control-x', { write: (t: string) => (out += t) }, { write: () => true }).result(report);
-    assert.deepEqual(out.trimEnd().split('\n'), ['ok    node          24.15.0', 'warn  gh-attach     gh pr comment has no --attach', '      fix: install one that has', 'skip  live-session  not run: needs --live']);
+    assert.deepEqual(out.trimEnd().split('\n'), ['ok    node          24.15.0', 'warn  gh-attach     gh pr edit has no --attach', '      fix: install one that has', 'skip  live-session  not run: needs --live']);
     assert.equal(exitCodeFor(report), 0);
   });
 
