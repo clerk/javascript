@@ -1,5 +1,16 @@
 # @clerk/mosaic
 
+## 0.1.7
+
+### Patch Changes
+
+- Rename the `userButton.workspaces` localization keys to `userButton.organizations`. Update any overrides of `userButton.workspaces.*` to use `userButton.organizations.*`. ([#10072](https://github.com/clerk/javascript/pull/10072)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Show the active organization's name, instead of the account's email or username, under the user's name in the `UserButton` popover header when an organization is active in combined mode. ([#10096](https://github.com/clerk/javascript/pull/10096)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/shared@4.39.1
+
 ## 0.1.6
 
 ### Patch Changes

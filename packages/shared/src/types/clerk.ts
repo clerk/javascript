@@ -1393,6 +1393,11 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     signUpProtectCheckUrl?: string | null;
     /**
+     * The full URL or path to navigate to if the sign-up must choose between several enterprise connections
+     * (`enterprise_sso` is missing). Defaults to the `enterprise-connections` route on the sign-up URL.
+     */
+    enterpriseConnectionsUrl?: string | null;
+    /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
     reloadResource?: 'signIn' | 'signUp';

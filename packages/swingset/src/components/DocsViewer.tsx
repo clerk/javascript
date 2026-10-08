@@ -153,7 +153,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose prose-headings:scroll-mt-16 mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
         <DocContent />
       </article>

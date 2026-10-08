@@ -2,6 +2,7 @@ import type { MouseEventHandler } from 'react';
 import { useRef, useState } from 'react';
 
 import { useForm } from '../../components/form';
+import { useNow } from '../../hooks/use-now';
 import { useLocale } from '../../localization';
 import { formatDate, getExpirationDate } from './api-keys-table.format';
 import type { APIKeysTableMessages } from './api-keys-table.types';
@@ -29,6 +30,7 @@ export function useCreateAPIKeyController({
   onCreate,
 }: CreateAPIKeyControllerOptions): CreateAPIKeyController {
   const locale = useLocale();
+  const now = useNow({ updateInterval: 60_000 });
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
   const [secret, setSecret] = useState<string | null>(null);
@@ -36,6 +38,7 @@ export function useCreateAPIKeyController({
 
   const form = useForm({
     initialValues,
+    errorFallback: messages.createError,
     canSubmit: values => values.name.trim().length > 2 && values.expiration !== null,
     onSubmit: async ({ name, expiration }) => {
       if (expiration === null) {
@@ -46,7 +49,7 @@ export function useCreateAPIKeyController({
   });
 
   const { expiration } = form.values;
-  const expirationDate = expiration === null ? null : getExpirationDate(expiration, new Date());
+  const expirationDate = expiration === null ? null : getExpirationDate(expiration, now);
 
   return {
     onOpen: event => {

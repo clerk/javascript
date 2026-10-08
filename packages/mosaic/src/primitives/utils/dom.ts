@@ -20,6 +20,14 @@ export function getWindow(node: Node) {
   return node.ownerDocument?.defaultView ?? window;
 }
 
+export function isElement(target: unknown): target is Element {
+  return typeof target === 'object' && target !== null && 'nodeType' in target && target.nodeType === Node.ELEMENT_NODE;
+}
+
+export function isHTMLElement(target: unknown): target is HTMLElement {
+  return isElement(target) && target instanceof getWindow(target).HTMLElement;
+}
+
 /**
  * `getComputedStyle` from the window that owns `element`.
  */
