@@ -48,6 +48,7 @@ export type {
   UseOrganizationEnterpriseConnectionsReturn,
 } from './useOrganizationEnterpriseConnections';
 export { __internal_useOrganizationDomains } from './useOrganizationDomains';
+export { __internal_useOrganizationRoles } from './useOrganizationRoles';
 export type { UseOrganizationDomainsParams, UseOrganizationDomainsReturn } from './useOrganizationDomains';
 export { __internal_useOrganizationDirectorySync } from './useOrganizationDirectorySync';
 export type {
