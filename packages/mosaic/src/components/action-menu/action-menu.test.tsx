@@ -36,4 +36,35 @@ describe('Mosaic ActionMenu', () => {
 
     expect(onClick).toHaveBeenCalledOnce();
   });
+  it('disables both the trigger and existing menu items while busy', async () => {
+    const onClick = vi.fn();
+    const actions = [{ label: 'Remove', onClick }];
+    const view = render(
+      <MosaicProvider>
+        <ActionMenu
+          label='Manage wallet'
+          actions={actions}
+        />
+      </MosaicProvider>,
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage wallet' }));
+    expect(await screen.findByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+
+    view.rerender(
+      <MosaicProvider>
+        <ActionMenu
+          label='Manage wallet'
+          actions={actions}
+          disabled
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Manage wallet' })).toBeDisabled();
+    const remove = screen.getByRole('menuitem', { name: 'Remove' });
+    expect(remove).toHaveAttribute('aria-disabled', 'true');
+    await user.click(remove);
+    expect(onClick).not.toHaveBeenCalled();
+  });
 });

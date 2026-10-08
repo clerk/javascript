@@ -16,7 +16,9 @@ function Account() {
         <Section.Root>
           <Section.Group>
             <Section.Header>
-              <Section.Title>Email addresses</Section.Title>
+              <Section.Content>
+                <Section.Title>Email addresses</Section.Title>
+              </Section.Content>
             </Section.Header>
           </Section.Group>
         </Section.Root>

@@ -9,7 +9,7 @@ import type {
 } from './user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from './user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
-import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
+import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
 export type { UserProfileNameAttribute } from './user-profile-account-section/user-profile-account-section.types';

@@ -26,7 +26,7 @@ import { userProfileEnterpriseAccountsMessages } from '../features/user-profile/
 import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section.messages';
 import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section.messages';
 import { userProfilePasswordSectionMessages } from '../features/user-profile/user-profile-password-section/user-profile-password-section.messages';
-import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
+import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets.messages';
 import { errorMessages } from './errors.messages';
 
 export const mosaicMessages = {
