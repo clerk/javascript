@@ -45,7 +45,9 @@ async function renderSection(seed: FakeFapiSeed = signedIn(), props: Organizatio
 
 async function openDialog(user: User, action: string) {
   await user.click(await screen.findByRole('button', { name: action }));
-  return screen.getByRole('dialog');
+  const dialog = screen.getByRole('dialog');
+  await waitFor(() => expect(dialog).toContainElement(document.activeElement));
+  return dialog;
 }
 
 async function confirm(user: User, dialog: HTMLElement, action: string, name = 'Acme') {
