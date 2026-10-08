@@ -68,6 +68,32 @@ describe('UserProfileContactListRowView', () => {
     expect(row?.closest('li')).not.toHaveAttribute('data-starting-style');
   });
 
+  it('keeps first-load rows out of the entering state when the list re-renders before the first frame', () => {
+    const items = [{ id: 'contact_1', value: 'first@example.com', isDefault: true }];
+    const { rerender } = render(
+      <UserProfileContactListRowView
+        kind='email'
+        label='Emails'
+        items={items}
+      />,
+    );
+
+    rerender(
+      <UserProfileContactListRowView
+        kind='email'
+        label='Emails'
+        items={items}
+        pendingId='none'
+      />,
+    );
+
+    const row = screen.getByText('first@example.com').closest('.cl-section-item');
+    expect(row).not.toHaveAttribute('data-starting-style');
+    expect(row?.closest('li')).not.toHaveAttribute('data-starting-style');
+    expect(row?.closest('li')).not.toHaveAttribute('style');
+    expect(screen.getByText('Primary').closest('.cl-badge')).not.toHaveAttribute('data-starting-style');
+  });
+
   it('renders a first-load primary badge without an entering state', () => {
     render(
       <UserProfileContactListRowView

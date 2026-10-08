@@ -302,11 +302,14 @@ the recipe for a `<ul>` whose rows come and go. What differs from the banner:
   the first frame to the last in both directions; the moving edge is the bottom one,
   under a static `mask-image` the height of the row's bottom padding less the focus
   ring's extent, so at rest it touches neither the text nor a focused trigger's
-  outline. Every row carries its 1px border and the body's own top border is zeroed
-  for this list, so the first row's border is the header divider: when it exits, its
-  border leaves with its track and the next row's lands in the same place, rather
-  than two borders meeting and one snapping away. `Section.Item`'s sibling-marker
-  rule cannot see across the slots, so the border is the row's own.
+  outline. A row draws its border only when an open slot precedes it: the first row
+  has none under the card's own edge, and when a row starts closing the row below it
+  drops its line at once rather than meeting the card border and snapping away when
+  the closed row unmounts. `Section.Item`'s sibling-marker rule cannot see across
+  the slots, so the rule is keyed on the slot.
+- **Rows that are already there never enter.** A row locks in whether it animates
+  when it first mounts: rows present at the list's first render skip the entering
+  state, and a re-render before the first frame must not hand it back to them.
 - **The content fade lives on the row's children** (a marker on the row,
   `stylex.when.ancestor` on `Section.Content` and `Section.Actions`), never on the
   row itself: opacity on the row would fade its border too. Inline text takes opacity

@@ -1,14 +1,11 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { durationVars, easingVars, focusVars, space } from '../../../tokens.stylex';
-import { contactItemMarker } from './user-profile-account-section.markers.stylex';
+import { contactItemMarker, contactSlotMarker } from './user-profile-account-section.markers.stylex';
 
 const ring = `calc(${focusVars['--cl-focus-outline-width']} + ${focusVars['--cl-focus-outline-offset']})`;
 
 export const styles = stylex.create({
-  contactBody: {
-    borderBlockStartWidth: '0px',
-  },
   contactSlot: {
     display: 'grid',
     gridTemplateRows: {
@@ -35,7 +32,10 @@ export const styles = stylex.create({
     minHeight: 0,
   },
   contactItem: {
-    borderBlockStartWidth: '1px',
+    borderBlockStartWidth: {
+      default: '0px',
+      [stylex.when.ancestor(':where([data-open] ~ *)', contactSlotMarker)]: '1px',
+    },
   },
   contactFade: {
     opacity: {

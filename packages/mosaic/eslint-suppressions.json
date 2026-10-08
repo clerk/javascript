@@ -49,16 +49,6 @@
       "count": 1
     }
   },
-  "src/features/user-profile/user-profile-account-section/user-profile-email-row.view.tsx": {
-    "sonarjs/cognitive-complexity": {
-      "count": 1
-    }
-  },
-  "src/features/user-profile/user-profile-active-devices-section.view.tsx": {
-    "sonarjs/cognitive-complexity": {
-      "count": 1
-    }
-  },
   "src/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.model.ts": {
     "@typescript-eslint/no-restricted-imports": {
       "count": 1

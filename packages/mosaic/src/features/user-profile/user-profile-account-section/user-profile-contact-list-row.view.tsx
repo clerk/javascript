@@ -16,7 +16,7 @@ import { usePresenceList, useTransition } from '../../../primitives/hooks';
 import { reset } from '../../../styles/reset.styles';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles as panelStyles } from '../user-profile-profile-panel.styles';
-import { contactItemMarker } from './user-profile-account-section.markers.stylex';
+import { contactItemMarker, contactSlotMarker } from './user-profile-account-section.markers.stylex';
 import { badgeShift, styles } from './user-profile-account-section.styles';
 
 export interface UserProfileContactListRowViewProps {
@@ -53,13 +53,17 @@ function SlotItem({
   children: (ref: Ref<HTMLSpanElement>, props: TransitionProps) => ReactNode;
 }) {
   const element = useRef<HTMLSpanElement>(null);
+  const entrance = useRef<boolean | null>(null);
   const { mounted, transitionProps } = useTransition({ open, ref: element });
+  if (mounted && entrance.current === null) {
+    entrance.current = appear;
+  }
 
   if (!mounted) {
     return null;
   }
 
-  return children(element, withoutEntrance(transitionProps, appear));
+  return children(element, withoutEntrance(transitionProps, entrance.current ?? appear));
 }
 
 function ContactListItem({
@@ -78,7 +82,11 @@ function ContactListItem({
   children: ReactNode;
 }) {
   const element = useRef<HTMLLIElement>(null);
+  const entrance = useRef<boolean | null>(null);
   const { mounted, transitionProps } = useTransition({ open: present, ref: element });
+  if (mounted && entrance.current === null) {
+    entrance.current = appear;
+  }
 
   useEffect(() => {
     if (!mounted) {
@@ -90,14 +98,14 @@ function ContactListItem({
     return null;
   }
 
-  const slotProps = withoutEntrance(transitionProps, appear);
+  const slotProps = withoutEntrance(transitionProps, entrance.current ?? appear);
   const rowProps = { ...slotProps, style: undefined };
 
   return (
     <li
       ref={element}
       aria-hidden={present ? undefined : true}
-      {...stylex.props(reset.base, styles.contactSlot)}
+      {...stylex.props(reset.base, styles.contactSlot, contactSlotMarker)}
       {...slotProps}
       {...inertProps(!present)}
     >
@@ -176,7 +184,7 @@ export function UserProfileContactListRowView({
           </Section.Actions>
         ) : null}
       </Section.Header>
-      <Section.Body xstyle={styles.contactBody}>
+      <Section.Body>
         <Section.Items>
           {entries.map(({ key, item, present, onExited }) => {
             const actions: ActionMenuAction[] = [];
