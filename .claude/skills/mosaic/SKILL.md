@@ -8,7 +8,7 @@ description: >-
   `useSelector`), or the view (rendering), testing a feature, or
   migrating a legacy / pre-Mosaic component into the model / controller / view
   split. Use when building, styling, debugging, testing, or migrating anything
-  Mosaic. `references/mosaic-architecture.md` (repo root) holds the design-system
+  Mosaic. `packages/mosaic/ARCHITECTURE.md` holds the design-system
   contract; this skill is the how-to layer.
 ---
 
@@ -50,7 +50,7 @@ sometimes both in one controller. Either way the controller returns plain props,
 so the view cannot tell and neither can its tests. Criteria and worked
 before/afters: `packages/mosaic/src/machine/ADOPTION.md`.
 
-`references/mosaic-architecture.md` (repo root, read by all agents) is the
+`packages/mosaic/ARCHITECTURE.md` is the
 canonical contract for the whole design system — the `--cl-*` tokens, the
 `.cl-<slot>` + `data-<axis>` styling API, the CSS build, and the "Flow and data
 architecture" section that defines the split. Read it for the _what_; this skill
@@ -58,24 +58,21 @@ is the _how-to_.
 
 `packages/mosaic/src/features/user-button/` is the fullest worked example of the split
 in the repo — model, controller, view, wrapper, types, messages, and a feature
-test. Copy from it.
+test. Copy from it. Tests go in its `__tests__/` folder, as
+`packages/mosaic/docs/testing.md` describes under "Test placement".
+
+`packages/mosaic/AGENTS.md` loads for any work in the package. It maps common
+problems (errors, pending state, focus after removal, debouncing, confirm steps)
+to the shared helper that already solves them, and says to ask the user before
+adding a new pattern. Check it before writing any of those by hand.
 
 ## Which reference to read
 
-| You are…                                                                                               | Read                                                   |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
-| Building on / authoring a headless primitive (`src/primitives/`)                                       | `references/headless.md`                               |
-| Styling a component (tokens, `stylex.create`, `themeProps`, CSS build)                                 | `references/stylex.md`                                 |
-| Building an enter/exit transition, a row that expands and collapses, or any motion that reads as wrong | `references/motion.md`                                 |
-| Writing the model (the Clerk adapter, `status`, permissions)                                           | `references/models.md`                                 |
-| Writing the controller (local state, pending, action wrapping)                                         | `references/controllers.md`                            |
-| Authoring or debugging a state machine, or wiring one to React                                         | `references/machines.md` → in-tree `machine/README.md` |
-| Writing the view (rendering plain props)                                                               | `references/views.md`                                  |
-| Testing a feature (feature tests, unit tests)                                                          | `references/testing.md`                                |
-| Migrating a legacy component into Mosaic (the end-to-end workflow)                                     | `references/migration.md`                              |
-| Running the parity audit that guards a migration                                                       | `references/parity-audit.md`                           |
+Use the "Task guides" table in `packages/mosaic/AGENTS.md`. It is the shared
+task index for agents, including those that do not discover this skill. Read
+the guide for the layer or behavior you are changing.
 
-The migration workflow (`migration.md`) ties the flow references together: it
+The migration workflow (`packages/mosaic/docs/migration.md`) ties the flow references together: it
 treats the legacy component as the spec and drives you through the model,
 controller, and view layers, then verifies parity with `parity-audit.md`.
 
@@ -108,8 +105,6 @@ this axis.
 Which surface the dialog holds, and the geometry that comes with it.
 ```
 
-This is the opposite of the rule for **code**, where a comment earns its place by
-explaining what the code cannot say for itself — the cascade fight behind a
-`null`, the measured reason a duration is what it is. Keep that reasoning where a
-future maintainer will hit it, which is the source file. The trade you rejected
-belongs in a code comment or the PR description; the docs get the conclusion.
+Follow the root `AGENTS.md` rule for code comments. Put implementation rationale
+and rejected alternatives in the PR description. Component docs describe the
+resulting API.

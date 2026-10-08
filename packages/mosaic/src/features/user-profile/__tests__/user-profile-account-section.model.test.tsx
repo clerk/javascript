@@ -36,7 +36,9 @@ let user: {
   update: ReturnType<typeof vi.fn>;
 } | null;
 let activeUser: typeof user;
-let attributes: Record<'first_name' | 'last_name' | 'username' | 'email_address' | 'phone_number', FakeAttribute>;
+let attributes: Partial<
+  Record<'first_name' | 'last_name' | 'username' | 'email_address' | 'phone_number', FakeAttribute>
+>;
 let usernameSettings: { min_length: number; max_length: number };
 let environmentHydrated: boolean;
 
@@ -280,8 +282,9 @@ describe('useUserProfileAccountSectionModel', () => {
   });
 
   it('rethrows a failure that is not from Clerk', async () => {
-    user?.update.mockRejectedValue(new TypeError('boom'));
-    await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).rejects.toThrow('boom');
+    const error = new TypeError('boom');
+    user?.update.mockRejectedValue(error);
+    await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).rejects.toBe(error);
   });
 
   describe('username', () => {
@@ -314,6 +317,12 @@ describe('useUserProfileAccountSectionModel', () => {
     it('is hidden when the instance does not use usernames', () => {
       attributes.username = attribute({ enabled: false });
       expect(ready().username).toBeUndefined();
+    });
+
+    it('is hidden and optional when the environment omits the username attribute', () => {
+      delete attributes.username;
+      expect(ready().username).toBeUndefined();
+      expect(ready().usernameRequired).toBe(false);
     });
 
     it('stays available when usernames only sign in', () => {

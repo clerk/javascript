@@ -1,5 +1,40 @@
 # Change Log
 
+## 4.10.0
+
+### Minor Changes
+
+- Add `revokeCurrentDeviceCredential()` to `useBiometricCredentials()`. It revokes this device's biometric credential for the signed-in user, so you no longer need to store the ID from `enroll()`. It returns the revoked credential, or `null` if there is nothing to revoke. Call it before signing out, since it needs a session. ([#10143](https://github.com/clerk/javascript/pull/10143)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```tsx
+  import { useBiometricCredentials } from '@clerk/expo/biometrics';
+
+  const { revokeCurrentDeviceCredential } = useBiometricCredentials();
+
+  await revokeCurrentDeviceCredential();
+  ```
+
+## 4.9.0
+
+### Minor Changes
+
+- Deprecate `useLocalCredentials()`. It will be removed in the next major version. To keep the same flow, store the credentials with [`expo-secure-store`](https://docs.expo.dev/versions/latest/sdk/securestore/) and its `requireAuthentication` option, then sign in with the stored identifier and password. ([#10104](https://github.com/clerk/javascript/pull/10104)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.5.8` to `1.5.9`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.9. ([#10083](https://github.com/clerk/javascript/pull/10083)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.9` to `1.6.0`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.6.0. ([#10101](https://github.com/clerk/javascript/pull/10101)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.6.0` to `1.6.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.6.1. ([#10123](https://github.com/clerk/javascript/pull/10123)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Fix the close button of a dismissible `<AuthView />` doing nothing on iOS when the view is rendered inline instead of inside a modal. Tapping it now calls `onDismiss`. ([#10079](https://github.com/clerk/javascript/pull/10079)) by [@mikepitre](https://github.com/mikepitre)
+
+- Updated dependencies [[`fc7d050`](https://github.com/clerk/javascript/commit/fc7d0506c59ca01f7d86bea1a9999a1fe4dd81ff), [`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/clerk-js@6.38.1
+  - @clerk/react@6.17.7
+  - @clerk/shared@4.39.1
+
 ## 4.8.1
 
 ### Patch Changes

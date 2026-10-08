@@ -1,6 +1,8 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as React from 'react';
 
+import { keysOf } from './object';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -18,11 +20,7 @@ import * as React from 'react';
  *   collides with the `color` variant a styled component spreads these props into.
  */
 export type RenderProps = Omit<React.HTMLAttributes<HTMLElement>, 'color'> & {
-  // SAFETY: the rendered element is chosen by the callback, after this type is fixed, so
-  // no concrete element type is correct here. `Ref<Element>` does not work: `RefObject<Element>`
-  // is not a `RefObject<HTMLAnchorElement>`. `any` is what makes the ref spreadable onto
-  // whatever the callback returns, which is the whole point of `render`. Base UI's
-  // `HTMLProps` resolves this the same way.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The callback picks the rendered element after this type is fixed, and `Ref<Element>` is not assignable to a narrower element ref, so only `any` spreads onto any element (as in Base UI's `HTMLProps`).
   ref?: React.Ref<any>;
 };
 
@@ -124,6 +122,10 @@ export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown
 // useRender
 // ---------------------------------------------------------------------------
 
+export function isRef(value: unknown): value is React.Ref<unknown> {
+  return value === null || typeof value === 'function' || (typeof value === 'object' && 'current' in value);
+}
+
 /**
  * Reads the ref off a React element passed to `render`. React 19 exposes it on
  * `props.ref`; React <=18 keeps it on the element itself.
@@ -204,7 +206,7 @@ export function useRender<
 
   let dataAttrs: Record<string, string> = {};
   if (state && stateAttributesMapping) {
-    for (const key of Object.keys(stateAttributesMapping) as Array<keyof State>) {
+    for (const key of keysOf(stateAttributesMapping)) {
       const mapper = stateAttributesMapping[key];
       if (mapper) {
         const attrs = mapper(state[key]);

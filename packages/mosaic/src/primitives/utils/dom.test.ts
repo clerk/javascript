@@ -1,6 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { autoUpdate, canScrollToward, getDimensions, getRectRelativeTo, getScale, getScrollDimensions } from './dom';
+import {
+  autoUpdate,
+  canScrollToward,
+  getDimensions,
+  getRectRelativeTo,
+  getScale,
+  getScrollDimensions,
+  isElement,
+  isHTMLElement,
+} from './dom';
 
 function stub(element: HTMLElement, values: Record<string, number>) {
   for (const [key, value] of Object.entries(values)) {
@@ -25,6 +34,30 @@ afterEach(() => {
   document.body.replaceChildren();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+});
+
+describe('isElement', () => {
+  it.each([
+    ['an element', () => document.createElement('div'), true],
+    ['an svg element', () => document.createElementNS('http://www.w3.org/2000/svg', 'svg'), true],
+    ['a text node', () => document.createTextNode('text'), false],
+    ['the document', () => document, false],
+    ['the window', () => window, false],
+    ['null', () => null, false],
+  ])('is %s: %s', (_, target, expected) => {
+    expect(isElement(target())).toBe(expected);
+  });
+});
+
+describe('isHTMLElement', () => {
+  it.each([
+    ['an element', () => document.createElement('div'), true],
+    ['an svg element', () => document.createElementNS('http://www.w3.org/2000/svg', 'svg'), false],
+    ['a text node', () => document.createTextNode('text'), false],
+    ['null', () => null, false],
+  ])('is %s: %s', (_, target, expected) => {
+    expect(isHTMLElement(target())).toBe(expected);
+  });
 });
 
 describe('getDimensions', () => {

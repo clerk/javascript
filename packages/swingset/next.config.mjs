@@ -3,6 +3,7 @@ import stylexPlugin from '@stylexjs/unplugin/webpack';
 import { createRequire } from 'module';
 import { dirname, resolve } from 'path';
 import rehypeRaw from 'rehype-raw';
+import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 import { fileURLToPath } from 'url';
 
@@ -21,6 +22,7 @@ const withMDX = createMDX({
           passThrough: ['mdxjsEsm', 'mdxJsxFlowElement', 'mdxJsxTextElement', 'mdxFlowExpression', 'mdxTextExpression'],
         },
       ],
+      rehypeSlug,
     ],
     allowDangerousHtml: true,
   },

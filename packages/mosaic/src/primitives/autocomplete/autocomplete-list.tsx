@@ -40,10 +40,7 @@ export const AutocompleteList = React.forwardRef<HTMLDivElement, AutocompleteLis
         {useRender({
           defaultTagName: 'div',
           render,
-          // floating-ui types `setFloating` as a method signature, but at runtime it's
-          // a stable callback that doesn't use `this`, so the unbound-method check is a
-          // false positive here.
-          // eslint-disable-next-line @typescript-eslint/unbound-method
+          // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
           ref: [refs.setFloating, ref],
           props: merged,
         })}

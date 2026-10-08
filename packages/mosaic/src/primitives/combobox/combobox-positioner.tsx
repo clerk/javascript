@@ -4,6 +4,7 @@ import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useComboboxContext } from './combobox-context';
 
 export interface ComboboxPositionerProps extends ComponentProps<'div'> {
@@ -25,7 +26,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
       return () => refs.setPositionReference(refs.domReference.current);
     }, [anchor, refs]);
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
@@ -47,10 +48,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
     const element = useRender({
       defaultTagName: 'div',
       render,
-      // floating-ui types `setFloating` as a method signature, but at runtime it's
-      // a stable callback that doesn't use `this`, so the unbound-method check is a
-      // false positive here.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
       ref: [refs.setFloating, ref],
       enabled: mounted,
       props: merged,

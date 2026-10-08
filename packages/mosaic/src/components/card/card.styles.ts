@@ -10,7 +10,7 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
-import { cardContentMarker } from './card.markers.stylex';
+import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
@@ -161,13 +161,18 @@ export const content = stylex.create({
   // keeps its height instead of collapsing to a zero basis on the block axis.
   base: {
     gap: space['4'],
-    paddingBlock: space['4'],
     paddingInline: space['5'],
     display: 'grid',
     flexBasis: 'auto',
     flexGrow: '1',
     flexShrink: '1',
     gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+    paddingBlockEnd: {
+      default: space['5'],
+      // eslint-disable-next-line @stylexjs/no-lookahead-selectors -- every browser this package builds for supports `:has()`; an older one keeps the footerless padding.
+      [stylex.when.siblingAfter(':where(*)', cardFooterMarker)]: space['4'],
+    },
+    paddingBlockStart: space['4'],
   },
 });
 
