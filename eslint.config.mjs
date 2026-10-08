@@ -326,6 +326,7 @@ export default tseslint.config([
       '**/build/*',
       '**/coverage/*',
       '**/dist/*',
+      '**/integration/expo-native/**/*',
       '**/integration/templates/**/*',
       '**/node_modules/**',
       '*.snap',
