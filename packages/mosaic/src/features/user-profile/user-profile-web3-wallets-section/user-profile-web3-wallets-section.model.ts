@@ -6,7 +6,7 @@ import type { VerificationResource, Web3WalletResource } from '@clerk/shared/typ
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
-import { allowsIdentificationCreation } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section.model';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
