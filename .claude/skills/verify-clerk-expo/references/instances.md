@@ -56,7 +56,7 @@ A declaration that breaks a rule the CLI can check from the file stops `run` bef
 
 One team key creates, changes, and deletes the application, and reads its secret key. The key needs four scopes: `applications:read`, `applications:manage`, `applications:delete`, and `application_secret_keys:read`. The CLI reads `CLERK_PLATFORM_API_KEY` first, then the file that `CLERK_PLATFORM_API_KEY_FILE` names. A variable that is set and does not work is an error. With neither variable set, the CLI reads the key's 1Password secret reference from `VERIFY_PLATFORM_KEY_REFERENCE` and asks the 1Password CLI for the key. The 1Password app then asks a person to approve, and a refused or unanswered request is an error.
 
-Before it asks 1Password, the CLI sends one request with no key. In a cloud environment that holds the key as an API credential for `api.clerk.com`, the environment adds the key after the request leaves the machine, so that request succeeds and no key is ever in the session. The output then names the source as `a key attached outside this machine (no key is in this process)`.
+Before it asks 1Password, the CLI sends one request with no key. In a cloud environment that holds the key as an API credential for `api.clerk.com`, the environment adds the key after the request leaves the machine, so that request succeeds and no key is ever in the session. The output then names the source as `a key attached outside this machine (no key is in this process)`. [Remote devices](remote.md) has the setup.
 
 `doctor` checks the credential every time and names its source in the `instances` line. `up`, `run`, and a `down` that deletes an application use it. `screen` and `attach` never use it.
 

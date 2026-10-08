@@ -33,9 +33,9 @@ Fast Refresh stays on. When you save a JS change while an app from an earlier ru
 
 The check dates a Metro revision it has not seen before by the second it was built. If two edits land within the same second, or an edit is reverted while Metro's watcher is still behind, the check can, rarely, launch a bundle one edit older than `dist`. Touching files cannot force a newer revision, because Metro skips modules whose transform key did not change.
 
-## A standalone build has none of this
+## A remote lease has none of this
 
-The `Verify end-to-end tests` workflow sets `VERIFY_LOCAL_BUILD=standalone`, so its devices run a standalone Release app with the JS embedded, with no watch build, no Metro, and none of the three checks.
+A remote lease runs a standalone Release build with the JS embedded, so there is no watch build, no Metro, and none of the three checks. Its build key also covers the JS inputs, and a JS edit reaches the app by commit, push, `run`. See [remote.md](remote.md). The `Verify end-to-end tests` workflow sets `VERIFY_LOCAL_BUILD=standalone`, so its local devices run the same kind of app.
 
 ## Troubleshooting
 
@@ -60,4 +60,4 @@ A JS edit does not change it, and a new version of a JS-only package does not ch
 
 A later standalone build with the same fingerprint runs no `expo prebuild`, `xcodebuild`, or Gradle. It builds the workspace packages, exports the bundle from the working tree with `expo export:embed`, compiles it with the test app's `hermesc`, and puts it in a copy of the kept app. The build fails unless the app then holds exactly the bundle it compiled. It builds natively instead, and prints `not reused:` with the reason, when the kept app holds no Hermes bundle, when it runs another Hermes bytecode version, when an Android bundle has image assets, or when the Android SDK has no build-tools 35 or newer to align the APK again. On Android the app is signed with the generated project's debug keystore when the working tree has one and with a new key otherwise, so a device that already holds the app under another key needs it uninstalled first.
 
-A job of the workflow that had to build natively stores the app as a run artifact named `verify-expo-native-<platform>-<fingerprint>` for seven days, and a later job takes it only from a run of the same branch of this repository. When there is none, the job builds natively. Unset, nothing is kept and every standalone build is a native build.
+A job of the workflow that had to build natively stores the app as a run artifact named `verify-expo-native-<platform>-<fingerprint>` for seven days, and a later job takes it only from a run of the same branch of this repository. When there is none, the job builds natively. Unset, nothing is kept and every standalone build is a native build. A remote session does not set it.
