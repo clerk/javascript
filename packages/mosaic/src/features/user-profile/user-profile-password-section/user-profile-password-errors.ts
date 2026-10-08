@@ -69,7 +69,8 @@ export function passwordFormError(
   const fields: { currentPassword?: string; newPassword?: string } = {};
   const passwordErrors: ClerkAPIError[] = [];
   let message: string | undefined;
-  for (const item of error.errors) {
+  const items: ClerkAPIError[] = error.errors;
+  for (const item of items) {
     const text = errorText(toLocalizableApiError(item));
     const name = snakeToCamel(item.meta?.paramName);
     if (name === 'currentPassword' && requiresCurrentPassword) {
