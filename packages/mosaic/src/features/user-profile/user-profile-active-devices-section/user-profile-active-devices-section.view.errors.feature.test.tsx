@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
-import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
+import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
 
 describe.each(['confirmation', 'details'] as const)('device %s errors', surface => {
   it.each(['private', 'clerk'] as const)('renders a safe localized message for a %s error', async kind => {
