@@ -1,6 +1,6 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
+import type { AttributeData, Attributes, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import type { MessageValues } from '../../../localization';
@@ -111,7 +111,8 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
       params,
     );
 
-  const { attributes, usernameSettings } = environment.userSettings;
+  const { usernameSettings } = environment.userSettings;
+  const attributes: Partial<Attributes> = environment.userSettings.attributes;
   const usernameAttribute = attributes.username;
   const usernameImmutable = Boolean(usernameAttribute?.immutable);
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);

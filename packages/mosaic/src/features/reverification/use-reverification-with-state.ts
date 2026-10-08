@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ReverificationState } from './reverification.types';
 
-export type ReverificationFetcher = (...args: any[]) => Promise<any> | undefined;
+export type ReverificationFetcher = Parameters<typeof useReverification>[0];
 
 export type UseReverificationWithStateResult<F extends ReverificationFetcher = ReverificationFetcher> = readonly [
   ReturnType<typeof useReverification<F>>,

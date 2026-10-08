@@ -2,7 +2,6 @@ import type { OAuthProvider } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {
-  allowsIdentificationCreation,
   createProviderCatalog,
   projectConnectedAccounts,
   recoveryFor,
@@ -45,14 +44,10 @@ function account({
   };
 }
 
-function userWith(
-  accounts: ReturnType<typeof account>[],
-  enterpriseAccounts: Parameters<typeof allowsIdentificationCreation>[0]['enterpriseAccounts'] = [],
-) {
+function userWith(accounts: ReturnType<typeof account>[]) {
   return {
     verifiedExternalAccounts: accounts.filter(a => a.verification?.status === 'verified'),
     unverifiedExternalAccounts: accounts.filter(a => a.verification?.status !== 'verified'),
-    enterpriseAccounts,
   };
 }
 
@@ -317,26 +312,6 @@ describe('createProviderCatalog', () => {
         .filter(provider => provider.enabled)
         .map(provider => provider.strategy),
     ).toEqual(['oauth_apple', 'oauth_custom_acme', 'oauth_github']);
-  });
-});
-
-describe('allowsIdentificationCreation', () => {
-  const enterpriseSSO = { enabled: true };
-
-  it('blocks creation for an active enterprise connection that disables additional identifications', () => {
-    const blocked = userWith([], [{ active: true, enterpriseConnection: { disableAdditionalIdentifications: true } }]);
-    expect(allowsIdentificationCreation(blocked, enterpriseSSO)).toBe(false);
-  });
-
-  it('allows creation when the enterprise connection is inactive or enterprise SSO is off', () => {
-    const inactive = userWith(
-      [],
-      [{ active: false, enterpriseConnection: { disableAdditionalIdentifications: true } }],
-    );
-    expect(allowsIdentificationCreation(inactive, enterpriseSSO)).toBe(true);
-
-    const active = userWith([], [{ active: true, enterpriseConnection: { disableAdditionalIdentifications: true } }]);
-    expect(allowsIdentificationCreation(active, { enabled: false })).toBe(true);
   });
 });
 

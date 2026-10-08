@@ -45,7 +45,7 @@ import { Profile } from '@clerk/mosaic/components/profile';
       Security
     </Profile.NavItem>
   </Profile.Nav>
-  <Profile.Content>
+  <Profile.Content pageTitle={page === 'security' ? 'Security' : 'Account'}>
     <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
     <Profile.ContentPanel value='security'>…</Profile.ContentPanel>
   </Profile.Content>
@@ -60,7 +60,7 @@ scrolls, the columns a gap apart, held to a reading width and centered. A
 leading mark and trailing status. A `Badge` passed to `badge` is `neutral` unless it sets its own `color`. `Title` is a visually hidden heading: it names the navigation, the compact
 sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
-`Content` renders the page title above the pages: the selected `NavItem`'s label, as a heading that
+`Content` renders its `pageTitle` above the pages, the selected page's name, as a heading that
 scrolls with the page and names it. A page's `Panel.Title` renders nothing there, and a ref on it
 reaches the page title instead.
 

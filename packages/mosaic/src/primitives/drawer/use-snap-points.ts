@@ -82,11 +82,12 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
       // `offset` is read during render (via `restOffset` below), so it must be
       // SSR-safe: `window` is absent on the server. Return 0 (fully open) until
       // the client can measure; the popup's mount-effect writes the real offset.
-      if (!snapPoints || snapPoints.length === 0 || typeof window === 'undefined') {
+      const point = snapPoints?.[i];
+      if (point === undefined || typeof window === 'undefined') {
         return 0;
       }
       const vh = window.innerHeight;
-      return vh - snapPoints[i] * vh;
+      return vh - point * vh;
     },
     [snapPoints],
   );

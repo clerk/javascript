@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -113,5 +114,24 @@ describe('useConfirmationController', () => {
     act(() => result.current.onConfirm(() => Promise.reject(new Error('internal'))));
 
     await waitFor(() => expect(result.current.errorMessage).toBe('Unable to remove this member.'));
+  });
+
+  it('clears the previous error while a retry is pending', async () => {
+    const { result } = renderHook(() => useConfirmationController());
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onConfirm(() => Promise.reject(blocked)));
+    await waitFor(() => expect(result.current.errorMessage).toMatch(/contact support/));
+
+    const pending = createDeferredPromise();
+    try {
+      act(() => result.current.onConfirm(() => pending.promise));
+
+      expect(result.current.isOpen).toBe(true);
+      expect(result.current.isConfirming).toBe(true);
+      expect(result.current.errorMessage).toBeUndefined();
+    } finally {
+      await act(() => pending.resolve());
+    }
+    await waitFor(() => expect(result.current.isOpen).toBe(false));
   });
 });
