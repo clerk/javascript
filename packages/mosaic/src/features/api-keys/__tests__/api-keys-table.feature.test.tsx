@@ -469,6 +469,19 @@ describe('APIKeysTable', () => {
       );
     });
 
+    it('explains a failure Clerk cannot describe with the create error', async () => {
+      const { user } = await renderTable();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      worker.use(http.post(fapiUrl('/api_keys'), () => HttpResponse.json({ errors: [] }, { status: 500 })));
+
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not create the API key. Try again.'),
+      );
+    });
+
     it.todo('creates a key with an optional description when descriptions are enabled');
   });
 
