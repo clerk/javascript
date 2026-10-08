@@ -1,0 +1,83 @@
+name: verify-attach
+
+on:
+  workflow_run:
+    workflows:
+      - verify-remote
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  publish:
+    name: Publish handed-off evidence
+    if: >-
+      github.event.workflow_run.event == 'workflow_dispatch' &&
+      github.event.workflow_run.path == '.github/workflows/verify-remote.yml' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    environment: verify-evidence
+    concurrency:
+      group: verify-attach-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+      cancel-in-progress: false
+      queue: max
+    env:
+      HAS_EVIDENCE_TOKEN: ${{ secrets.VERIFY_EVIDENCE_TOKEN != '' }}
+      REPO: ${{ github.repository }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+      RUN_ACTOR: ${{ github.event.workflow_run.actor.login }}
+    steps:
+      - name: Say that no token is set
+        if: env.HAS_EVIDENCE_TOKEN != 'true'
+        run: echo "::notice title=verify-attach::The environment verify-evidence has no secret VERIFY_EVIDENCE_TOKEN, so no evidence is published."
+
+      - name: Checkout the trusted script
+        if: env.HAS_EVIDENCE_TOKEN == 'true'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: scripts/verify-attach.mjs
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Set up Node
+        if: env.HAS_EVIDENCE_TOKEN == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+
+      - name: Fetch and validate the evidence
+        id: evidence
+        if: env.HAS_EVIDENCE_TOKEN == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          WORK: ${{ runner.temp }}/verify-attach
+          RUN_EVENT: ${{ github.event.workflow_run.event }}
+          RUN_PATH: ${{ github.event.workflow_run.path }}
+          RUN_HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+        run: node scripts/verify-attach.mjs fetch
+
+      - name: Install a gh whose pr edit has --attach
+        if: steps.evidence.outputs.found == 'true'
+        env:
+          GH_VERSION: '2.102.0'
+          GH_SHA256: bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386
+        run: |
+          set -euo pipefail
+          curl -fsSL --max-time 300 --retry 3 --retry-delay 2 -o "$RUNNER_TEMP/gh.tar.gz" "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz"
+          echo "$GH_SHA256  $RUNNER_TEMP/gh.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gh.tar.gz" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gh_${GH_VERSION}_linux_amd64/bin" >> "$GITHUB_PATH"
+
+      - name: Put the evidence in the pull request description
+        if: steps.evidence.outputs.found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.VERIFY_EVIDENCE_TOKEN }}
+          WORK: ${{ runner.temp }}/verify-attach
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: node scripts/verify-attach.mjs publish
