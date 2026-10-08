@@ -40,4 +40,5 @@ CLAUDE.md
 .claude/skills/verify-clerk-expo/test/*.ts
 !.claude/skills/verify-clerk-expo/test/freshness.test.ts
 !.claude/skills/verify-clerk-expo/test/host.test.ts
+!.claude/skills/verify-clerk-expo/test/remote-host.test.ts
 .claude/skills/verify-clerk-expo/.verify/

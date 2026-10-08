@@ -119,6 +119,7 @@ jobs:
       WATCHED: >-
         .claude/skills/verify-clerk-expo
         .github/workflows/ci.yml
+        .github/workflows/verify-remote.yml
         .github/actionlint.yaml
         integration/templates/expo-native
         packages/expo
