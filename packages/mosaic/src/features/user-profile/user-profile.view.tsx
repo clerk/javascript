@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
@@ -51,7 +52,11 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
 ) {
   const m = useMessages('userProfile');
   const entries = resolveUserProfilePages(getAvailableUserProfilePages(pages), customPages, pageOrder);
-  const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : (entries[0]?.id ?? 'account');
+  const firstPage = entries[0];
+  if (!firstPage) {
+    logger.warnOnce('[Clerk] UserProfile has no pages to show.');
+  }
+  const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : (firstPage?.id ?? 'account');
 
   return (
     <Profile.Root

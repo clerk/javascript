@@ -1,3 +1,5 @@
+import { logger } from '@clerk/shared/logger';
+
 import { isAssignAction } from './assign';
 import type {
   Actions,
@@ -47,7 +49,16 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
   const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject>>;
   const emptyState: StateConfig<TContext, EventObject> = {};
-  const stateOf = (id: string): StateConfig<TContext, EventObject> => states[id] ?? emptyState;
+  const stateOf = (id: string): StateConfig<TContext, EventObject> => {
+    const state = states[id];
+    if (state) {
+      return state;
+    }
+    if (Object.keys(states).length > 0) {
+      logger.warnOnce(`[Clerk] Machine has no state "${id}".`);
+    }
+    return emptyState;
+  };
 
   // Tracks the latest setContext patch so it survives a stop/start cycle.
   let liveContextPatch: Partial<TContext> = options.context ?? {};
@@ -245,8 +256,14 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   function commit(): void {
     snapshot = { value, context, status };
+    notifyListeners();
+  }
+
+  function notifyListeners(): void {
     for (const listener of [...listeners].reverse()) {
-      listener(snapshot);
+      if (listeners.includes(listener)) {
+        listener(snapshot);
+      }
     }
   }
 
@@ -275,9 +292,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       invocationToken++; // abandon any in-flight invoke
       clearAfterTimers();
       snapshot = { value, context, status };
-      for (const listener of [...listeners].reverse()) {
-        listener(snapshot);
-      }
+      notifyListeners();
       listeners.length = 0;
     },
 

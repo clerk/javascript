@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
@@ -58,7 +59,11 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
       customPages,
       pageOrder,
     );
-    const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : (entries[0]?.id ?? 'general');
+    const firstPage = entries[0];
+    if (!firstPage) {
+      logger.warnOnce('[Clerk] OrganizationProfile has no pages to show.');
+    }
+    const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : (firstPage?.id ?? 'general');
 
     return (
       <Profile.Root
