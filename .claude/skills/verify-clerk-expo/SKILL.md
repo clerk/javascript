@@ -1,11 +1,11 @@
 ---
 name: verify-clerk-expo
-description: Drive @clerk/expo in the expo-native test app (native AuthView, UserButton, UserProfileView, custom useSignIn and useSignUp flows, token cache, the Google and biometrics native modules) on an iOS simulator or Android emulator against a real Clerk development instance that the session creates and deletes, and capture video, screenshots, and the app log as evidence. Use it to prove any change to packages/expo or the test app works before calling it done, to reproduce a UI bug, or to run the golden regression specs.
+description: Drive @clerk/expo in the expo-native test app (native AuthView, UserButton, UserProfileView, custom useSignIn and useSignUp flows, token cache, the Google and biometrics native modules) on an iOS simulator or Android emulator against a real Clerk development instance that the session creates and deletes, and capture video, screenshots, and the app log as evidence. The device runs on this Mac, or on a CI runner when the machine cannot run it. Use it to prove any change to packages/expo or the test app works before calling it done, to reproduce a UI bug, or to run the golden regression specs.
 ---
 
 # verify-clerk-expo
 
-`.claude/skills/verify-clerk-expo/bin/control-clerk-expo` is a control CLI over [e2e](https://github.com/tester-army/e2e) 0.18.0 and `@e2e-dev/mobile` 0.10.0. It builds the `expo-native` test app in `integration/templates/expo-native`, leases a simulator or emulator, creates one Clerk application for the worktree, seeds `+clerk_test` users, runs specs, and keeps the evidence. The test app is a Debug dev client, and Metro serves your working tree to it.
+`.claude/skills/verify-clerk-expo/bin/control-clerk-expo` is a control CLI over [e2e](https://github.com/tester-army/e2e) 0.18.0 and `@e2e-dev/mobile` 0.10.0. It builds the `expo-native` test app in `integration/templates/expo-native`, leases a simulator or emulator, creates one Clerk application for the worktree, seeds `+clerk_test` users, runs specs, and keeps the evidence. On a Mac the device is local, the test app is a Debug dev client, and Metro serves your working tree to it. On a machine that cannot run the device, the CLI leases one on a GitHub Actions runner, and the runner builds your pushed commit as a Release app with the JS embedded. The verbs, specs, and evidence are the same.
 
 No change to `@clerk/expo` UI or auth behavior is done until a `run` on the real test app shows the changed behavior, on each platform the change touches.
 
@@ -61,6 +61,26 @@ A worktree can hold one lane of each platform. The two lanes share the watch bui
 
 A Mac has four iOS lanes and two Android lanes, shared by every worktree on it. When all are taken, `up` and `run` fail with `POOL_FULL`, and `--wait <seconds>` on either verb waits for a lane. The CLI drives only the simulators and emulators that it creates. [Local devices](references/devices.md) says how to find a lane's UDID or serial.
 
+### Borrow a device on a CI runner
+
+A machine that is not a Mac cannot run the simulator, and a machine with no hardware virtualization cannot run the emulator. There the CLI leases a device on a GitHub Actions runner and drives it through a tunnel. That machine needs Node 24.8.0 or newer on 24, the Platform API key, and access to GitHub, and `doctor` checks each. The session builds a pushed commit, never your working tree, so commit and push before `up` or `run`.
+
+```console
+$ git push
+$ .claude/skills/verify-clerk-expo/bin/control-clerk-expo up --platform ios --backend remote
+backend remote  forced by --backend remote
+build   <build key>  github-actions  commit <commit>  the session builds it
+device  remote ios  starting session <session> on macos-26 (idle stop 15 min, cap 60 min)
+device  remote ios  tunnel up, iPhone 17 Pro on macos-26
+build   <build key>  github-actions  <commit> built in 1432s on macos-26
+device  iPhone 17 Pro on macos-26  remote  leased by this worktree  installed <build key>
+$ .claude/skills/verify-clerk-expo/bin/control-clerk-expo down   # ends the runner job
+```
+
+The `backend` line says which backend the CLI chose and why. This transcript is from a Mac, where `--backend remote` forced the remote backend, and it leaves out the `instance`, `clerk`, `install`, and `wait` lines and the line with the run's URL. On a machine that cannot run the device, `up` needs no flag, and the `backend` line says why the local backend is out. `--backend local` or `--backend remote` on `doctor`, `up`, or `run` forces a backend, and a worktree that holds a lease keeps its backend until `down`. `--runner <label>` on `up` or `run` names another runner label for a new session. With the local backend, `--runner` is a usage error.
+
+A remote session has no Metro and no watch build. A worktree's iOS session and its Android session share the worktree's application, so their runs go one after the other too, and the second fails with `DEVICE_BUSY` while the first is driving. After an edit to the app or to a package, commit, push, and `run` again, and the same session builds the new commit and installs it. Specs run from your working tree, so an edit to a spec needs no commit. The session runs on a free GitHub-hosted runner, where `up` takes tens of minutes, nearly all of it the build. `down` stops the session at once, so run `down` as soon as you are done. [Remote devices](references/remote.md) has what the machine needs, the faster runner labels, the session limits, and what the session builds.
+
 On a Linux machine that can run the emulator, the CLI picks the local backend for Android and builds the test app on that machine, as the `Verify end-to-end tests` workflow does on its Linux runner.
 
 ## Doctor
@@ -73,6 +93,8 @@ $ .claude/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform andr
 Run it first, and again whenever anything looks off. Without `--live` it only reads. It creates no file, no device, and no Clerk application. Each line starts with `ok`, `warn`, `skip`, or `FAIL`, then has the id of the check and what the check found. `skip` marks a check that did not run, and its text starts with `not run:`. A failing check also prints a `fix:` line with the command to run, and `doctor` exits 3. A warning does not change the exit code.
 
 After the once-per-machine setup and before the first `up`, `build` is the one failing check, and its fix is the `up` command for that platform. A machine with no Platform API credential fails `instances`, and the fix line says how to supply one. `doctor --live` also creates one application, configures it, compares it with the standard settings, and deletes it, which proves that the credential can do each.
+
+With the remote backend, plain `doctor` starts nothing and pushes nothing, and `doctor --live` starts one short session to prove the path. With that backend, `build` fails until a session holds the current build, and `remote-commit` fails until HEAD is pushed.
 
 ## Drive
 
@@ -88,7 +110,7 @@ $ .claude/skills/verify-clerk-expo/bin/control-clerk-expo screen --platform ios 
 
 `run` also takes `--grep <regex>`, `--retries <n>`, `--no-video`, and `--wait <seconds>`. `--retries <n>` runs a failed test again, up to `n` more times. The default is 0, so a run of your own change shows exactly what happened. The wait covers a free lane and another `run` in this worktree that holds the device. A spec limited to one platform with `test(title, { platforms: ['ios'] }, fn)` reports as skipped on the other.
 
-For a JS change on a local device, edit the source and `run` the spec, with no `up` in between. For a change to a native input, the same `run` rebuilds the dev client first.
+For a JS change on a local device, edit the source and `run` the spec, with no `up` in between. For a change to a native input, the same `run` rebuilds the dev client first. On a remote device, commit and push, then `run`.
 
 ### Sign in with the form or with a ticket
 
@@ -167,6 +189,8 @@ A proof drives the real user path. The video and the screenshots show the action
 
 After a run, the CLI searches the run directory for every secret the run used: the Platform API key, the instance's secret key, sign-in tickets, and a GitHub token in `GITHUB_TOKEN` or `GH_TOKEN`. A hit marks the file as tainted in `run.json`. The user ID and the session ID on the home are not secrets, because neither can sign anyone in.
 
+A remote run writes the same files. The runner records the video, and the CLI downloads it into the run directory. `run.json` also has `remote`, with `provider`, `runner`, and `builtSha`, the commit the session built.
+
 ```console
 $ .claude/skills/verify-clerk-expo/bin/control-clerk-expo attach <run-id> --pr <n>                       # the video and every screenshot
 $ .claude/skills/verify-clerk-expo/bin/control-clerk-expo attach <run-id> --pr <n> --screenshot profile  # the video and one screenshot
@@ -203,12 +227,15 @@ While the other platform stays leased, `down --platform <p>` releases that platf
 
 If a worktree is removed without `down`, the next `up` or `run` in any worktree on the same Mac finishes for it, and prints a `reap` line for each lane and ledger it cleans up.
 
+For a remote device, `down` ends the runner job and waits for it to finish, and `down --stale` also ends a session that a crashed run of this checkout left running. No other checkout cleans up a remote session. If its checkout is deleted, the session's own idle stop ends it.
+
 ## For maintainers of the skill
 
-- `src/core/`, `src/platform/ios/`, `src/platform/android/`, `specs/fixtures.ts`, `testing/`, and every test but `test/host.test.ts`, `test/freshness.test.ts`, and `test/native-build.test.ts` are shared with the clerk-ios and clerk-android verification skills. Change them there first, then copy them here. `doctor`'s `core-drift` check fails when a file under `src/core/` differs from `src/core/MANIFEST`, and `node src/core/manifest.ts --write` in the skill directory regenerates the manifest.
+- `src/core/`, `src/platform/ios/`, `src/platform/android/`, `specs/fixtures.ts`, `testing/`, and every test but `test/host.test.ts`, `test/remote-host.test.ts`, `test/freshness.test.ts`, and `test/native-build.test.ts` are shared with the clerk-ios and clerk-android verification skills. Change them there first, then copy them here. `doctor`'s `core-drift` check fails when a file under `src/core/` differs from `src/core/MANIFEST`, and `node src/core/manifest.ts --write` in the skill directory regenerates the manifest.
 - `src/host.ts`, `src/fixture.ts`, `src/native-build.ts`, and `src/freshness.ts` are this repository's own: the build of the test app, the native build that CI keeps between runs, the Metro ports, and the check that Metro serves current JS. `specs/native.ts` holds the per-platform locators for the native views and the locators of the home's links.
 - `npm test --prefix .claude/skills/verify-clerk-expo` runs the CLI's unit tests, with no network, key, or device. `npm run typecheck --prefix .claude/skills/verify-clerk-expo` runs `tsc`. The `Verify Skill Tests` job in `.github/workflows/ci.yml` runs both on Linux when a pull request changes the skill, the test app, or a package the test app links.
 - `run --github-report` hands the results of the run to `@e2e-dev/github` as one report. The reporter writes the report to the job summary. With a `GITHUB_TOKEN` that may write pull request comments, it also posts one comment on the pull request and updates that comment on later runs. The reporter never changes the exit code, and nothing is reported for a run with a tainted file.
-- `.github/workflows/verify-e2e.yml`, the `Verify end-to-end tests` workflow, runs `up --backend local`, `run --all --retries 1 --github-report`, and `down` on a runner for each platform, with a device and a Clerk application for each. It starts on a pull request to `main` that changes the skill's code, the test app, or one of the three packages the test app links. It runs for a pull request that is not a draft, and a draft or a pull request from a fork gets a notice instead. Start it by hand with `gh workflow run verify-e2e.yml --ref <branch>`. A failing spec shows on the pull request and is not required for a merge, and a test that fails and then passes on its one retry is `flaky` and does not fail the job. The runners are GitHub-hosted, `macos-26` and `ubuntu-24.04`, and the repository variables `VERIFY_CI_RUNNER_IOS` and `VERIFY_CI_RUNNER_ANDROID` name other labels. The Platform API key comes from the `MOBILE_VERIFICATION_PLATFORM_API_KEY` repository secret. The workflow sets `VERIFY_LOCAL_BUILD=standalone` and `VERIFY_NATIVE_CACHE` ([freshness.md](references/freshness.md)). It uploads each run's `run.json`, video, screenshots, and e2e's `report.json`, `junit.xml`, summary, and failure pages for three days, and only when no secret is found in the run. `bin/boot-ios-simulators.sh wait` waits until a booted simulator is ready, and the workflow calls it.
+- `.github/workflows/verify-e2e.yml`, the `Verify end-to-end tests` workflow, runs `up --backend local`, `run --all --retries 1 --github-report`, and `down` on a runner for each platform, with a device and a Clerk application for each. It starts on a pull request to `main` that changes the skill's code, the test app, or one of the three packages the test app links. It runs for a pull request that is not a draft, and a draft or a pull request from a fork gets a notice instead. Start it by hand with `gh workflow run verify-e2e.yml --ref <branch>`. A failing spec shows on the pull request and is not required for a merge, and a test that fails and then passes on its one retry is `flaky` and does not fail the job. The runners are GitHub-hosted, `macos-26` and `ubuntu-24.04`, and the repository variables `VERIFY_CI_RUNNER_IOS` and `VERIFY_CI_RUNNER_ANDROID` name other labels. The Platform API key comes from the `MOBILE_VERIFICATION_PLATFORM_API_KEY` repository secret. The workflow sets `VERIFY_LOCAL_BUILD=standalone` and `VERIFY_NATIVE_CACHE` ([freshness.md](references/freshness.md)). It uploads each run's `run.json`, video, screenshots, and e2e's `report.json`, `junit.xml`, summary, and failure pages for three days, and only when no secret is found in the run. `bin/boot-ios-simulators.sh wait` waits until a booted simulator is ready, and this workflow and `.github/workflows/verify-remote.yml` call it.
 - The `Expo` workflow, `.github/workflows/expo-native-build.yml`, runs nothing on a device. It builds the test app as a Release app on Expo SDK 54, 55, and 57 for each platform, and runs the Android unit tests of `@clerk/expo-biometrics`.
+- A remote session runs in `.github/workflows/verify-remote.yml`. `src/platform/session-device.ts` holds the steps that the session runs on its device, and `src/core/remote/` is the code on both ends of it. The runner installs this skill with `npm ci`. A session keeps the code under `src/core/` from the commit it started on, so after a change under `src/core/`, commit, push, `down`, then `up`.
 - The skill's files are in `.claude/skills/verify-clerk-expo/`. `.cursor/skills/verify-clerk-expo` is a symlink to that directory, so edit only the `.claude` copy.

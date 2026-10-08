@@ -44,8 +44,8 @@ relevant.
 
 ## Skills in this repo
 
-| Skill               | Use it for                                                                                                                              |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `clerk-monorepo`    | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.            |
-| `mosaic`            | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification). |
-| `verify-clerk-expo` | Proving a `@clerk/expo` change on an iOS simulator or Android emulator, with video and screenshots as evidence.                         |
+| Skill               | Use it for                                                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `clerk-monorepo`    | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.                      |
+| `mosaic`            | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification).           |
+| `verify-clerk-expo` | Proving a `@clerk/expo` change on an iOS simulator or Android emulator, local or borrowed on a CI runner, with video and screenshots as evidence. |
