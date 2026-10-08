@@ -59,6 +59,30 @@ Avoid per-layer tests with mocked layers that repeat what a feature test
 already covers. Older per-layer tests like that can go once a feature test
 covers the same behavior.
 
+## Test placement
+
+Keep test files out of the way of the implementation, so a folder reads at a
+glance and reviewers can fold the tests away.
+
+- **One test file can sit beside the code.** When a folder gets a second test
+  file, create a `__tests__/` folder and move both into it.
+- **Features and blocks always use `__tests__/`**, from their first test.
+  Everything under `features/` and `blocks/` tends to grow more tests.
+- **Once a folder has `__tests__/`, every test file in that folder goes in it.**
+- **Test files** include `*.test.ts(x)`, `*.feature.test.tsx`, fixtures, and
+  test helpers. Fixtures and helpers always go in `__tests__/`.
+- **Type tests (`*.test-d.ts`) stay beside the code** and don't count toward
+  the rules above. `pnpm typecheck` skips `__tests__/`, so a type test moved
+  there is never checked.
+- **`__tests__/` goes in the folder whose code it tests**, not in a parent.
+  `<UserProfilePasswordSection />` lives in
+  `user-profile/user-profile-password-section/`, so its tests live in
+  `user-profile-password-section/__tests__/`, not `user-profile/__tests__/`. A
+  test that spans several subfolders goes in the `__tests__/` of the folder
+  that holds them all.
+
+Existing tests that break these rules move when their folder next changes.
+
 ## Running
 
 ```bash
@@ -104,14 +128,8 @@ it('makes the selected organization active and closes', async () => {
 `packages/mosaic/src/features/user-button/__tests__/user-button.feature.test.tsx`
 is the worked example.
 
-Put a feature test in a `__tests__/` folder inside the folder that groups the
-feature, and name it after the component it renders. `<UserProfilePasswordSection />`
-lives in `user-profile/user-profile-password-section/`, so it is tested by
-`user-profile-password-section/__tests__/user-profile-password-section.feature.test.tsx`,
-not by a file in `user-profile/__tests__/`. The tests stay next to the code they
-cover and move or go with it, and the `__tests__/` folder keeps them apart from
-the source files. Existing tests that sit loose beside a component, or in a
-parent's `__tests__/` folder, move when their feature next changes.
+Name a feature test after the component it renders, and place it as described
+in [Test placement](#test-placement).
 
 ### The toolkit (`src/__tests__/feature/`)
 
