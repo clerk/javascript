@@ -107,7 +107,7 @@ export const styles = stylex.create({
       ':where([data-direction="backward"])': `${lead}, ${trail}`,
     },
     transitionProperty: 'inset-inline-start, inset-inline-end',
-    transitionTimingFunction: easingVars['--cl-ease-default'],
+    transitionTimingFunction: easingVars['--cl-ease-enter'],
   },
   fallbackIndicator: {
     ...underline,
