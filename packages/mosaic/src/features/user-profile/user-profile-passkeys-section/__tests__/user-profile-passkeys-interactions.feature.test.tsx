@@ -2,11 +2,11 @@ import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfilePasskeysSection } from '../user-profile-passkeys-section/user-profile-passkeys-section';
+import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 
 afterEach(() => {
   vi.useRealTimers();

@@ -1,11 +1,11 @@
 import { screen } from '@testing-library/react';
 import { expect, it } from 'vitest';
 
-import { serveFapi } from '../../../__tests__/feature/fake-fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
-import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
-import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
+import { serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileProfilePanelView } from '../../user-profile-profile-panel.view';
+import { UserProfileWeb3WalletsSectionView } from '../../user-profile-web3-wallets-section.view';
+import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section';
 import { enterpriseAccountSeed } from './enterprise-accounts.fixtures';
 
 it('places the connected enterprise section before Web3 wallets in the profile host', async () => {

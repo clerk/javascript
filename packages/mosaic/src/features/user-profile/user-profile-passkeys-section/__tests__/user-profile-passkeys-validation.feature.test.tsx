@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfilePasskeysSection } from '../user-profile-passkeys-section/user-profile-passkeys-section';
+import { fapiUrl, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 
 afterEach(() => vi.restoreAllMocks());
 

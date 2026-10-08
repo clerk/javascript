@@ -3,7 +3,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -11,12 +11,12 @@ import {
   fapiOrganization,
   fapiSession,
   fapiUser,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
+} from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
 import {
   OrganizationProfileDangerSection,
   type OrganizationProfileDangerSectionProps,
-} from '../organization-profile-danger-section/organization-profile-danger-section';
+} from '../organization-profile-danger-section';
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 20 });
 const deletePermission = ['org:sys_profile:delete'];

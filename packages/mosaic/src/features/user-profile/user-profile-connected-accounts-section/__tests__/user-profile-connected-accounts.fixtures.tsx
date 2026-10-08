@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react';
 import type userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 
-import { type FakeFapiSeed, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -10,10 +10,10 @@ import {
   fapiSession,
   fapiUser,
   fapiVerification,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section';
-import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+} from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileProfilePanelView } from '../../user-profile-profile-panel.view';
+import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 
 export const google = fapiExternalAccount({ id: 'idn_google', provider: 'google', username: 'jdoe' });
 export const github = fapiExternalAccount({ id: 'idn_github', provider: 'github' });

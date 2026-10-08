@@ -4,12 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, serveFapi, worker } from '../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiSession, fapiUser } from '../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../__tests__/feature/render';
-import { useReverificationFlow } from '../../features/reverification';
-import { Destructive } from './destructive';
-import { useDestructiveController } from './destructive.controller';
+import { fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../__tests__/feature/render';
+import { useReverificationFlow } from '../../../features/reverification';
+import { Destructive } from '../destructive';
+import { useDestructiveController } from '../destructive.controller';
 
 const session = fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) });
 

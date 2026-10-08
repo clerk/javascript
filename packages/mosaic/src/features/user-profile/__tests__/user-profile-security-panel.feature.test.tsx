@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { serveFapi } from '../../__tests__/feature/fake-fapi';
+import { serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEmailAddress,
@@ -9,10 +9,10 @@ import {
   fapiEnvironment,
   fapiSession,
   fapiUser,
-} from '../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../__tests__/feature/render';
-import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
-import { UserProfileSecurityPanel } from './user-profile-security-panel';
+} from '../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../__tests__/feature/render';
+import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
+import { UserProfileSecurityPanel } from '../user-profile-security-panel';
 
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
 const alice = fapiUser({ id: 'user_1', email_addresses: [email] });

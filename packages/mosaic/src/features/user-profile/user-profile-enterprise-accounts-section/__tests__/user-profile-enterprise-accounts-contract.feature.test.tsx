@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { http } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import { fapiUrl, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -12,9 +12,9 @@ import {
   fapiSession,
   fapiUser,
   fapiVerification,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
+} from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section';
 import { enterpriseAccountSeed, enterpriseMember, okta } from './enterprise-accounts.fixtures';
 
 function serveMember(connections = [okta]) {

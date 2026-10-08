@@ -2,7 +2,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -10,18 +10,15 @@ import {
   fapiPasskey,
   fapiSession,
   fapiUser,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
-import {
-  passkeysSectionNode,
-  UserProfilePasskeysSection,
-} from '../user-profile-passkeys-section/user-profile-passkeys-section';
-import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section/user-profile-passkeys-section.model';
+} from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
 import {
   UserProfileSecurityPanelView,
   type UserProfileSecurityPanelViewProps,
-} from '../user-profile-security-panel.view';
+} from '../../user-profile-security-panel.view';
+import { passkeysSectionNode, UserProfilePasskeysSection } from '../user-profile-passkeys-section';
+import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.model';
 
 afterEach(() => vi.restoreAllMocks());
 

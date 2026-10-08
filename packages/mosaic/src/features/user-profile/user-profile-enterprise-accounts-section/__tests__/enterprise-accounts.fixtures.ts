@@ -1,4 +1,4 @@
-import type { FakeFapiSeed } from '../../../__tests__/feature/fake-fapi';
+import type { FakeFapiSeed } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEmailAddress,
@@ -9,7 +9,7 @@ import {
   fapiSession,
   fapiUser,
   fapiVerification,
-} from '../../../__tests__/feature/fapi';
+} from '../../../../__tests__/feature/fapi';
 
 export const okta = fapiEnterpriseConnection({ id: 'okta', name: 'Acme Okta', organization_id: 'org_acme' });
 export const custom = fapiEnterpriseConnection({ id: 'saml', name: 'Custom SAML', organization_id: 'org_acme' });

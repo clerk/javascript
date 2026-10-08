@@ -2,11 +2,11 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfilePasskeysSection } from '../user-profile-passkeys-section/user-profile-passkeys-section';
+import { fapiUrl, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 
 afterEach(() => vi.restoreAllMocks());
 

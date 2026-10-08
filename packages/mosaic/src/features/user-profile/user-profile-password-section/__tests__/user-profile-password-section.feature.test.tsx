@@ -2,7 +2,7 @@ import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEmailAddress,
@@ -10,9 +10,9 @@ import {
   fapiEnvironment,
   fapiSession,
   fapiUser,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfilePasswordSection } from './user-profile-password-section';
+} from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfilePasswordSection } from '../user-profile-password-section';
 
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
 const alice = fapiUser({ id: 'user_1', email_addresses: [email] });

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -12,11 +12,11 @@ import {
   fapiSession,
   fapiUser,
   fapiVerification,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
-import { useUserProfileEnterpriseAccountsModel } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.model';
+} from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section';
+import { useUserProfileEnterpriseAccountsModel } from '../user-profile-enterprise-accounts-section.model';
 import { custom, enterpriseAccountSeed as signedIn, enterpriseMember, okta } from './enterprise-accounts.fixtures';
 
 async function renderSection(seed: FakeFapiSeed = signedIn()) {

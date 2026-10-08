@@ -2,10 +2,10 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnterpriseAccount, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section';
+import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { fapiClient, fapiEnterpriseAccount, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 import { github, google, renderSection, signedIn } from './user-profile-connected-accounts.fixtures';
 
 async function openRemoval(user: ReturnType<typeof userEvent.setup>, provider: string) {

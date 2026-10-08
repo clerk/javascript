@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -12,16 +12,13 @@ import {
   fapiPasskey,
   fapiSession,
   fapiUser,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
-import {
-  passkeysSectionNode,
-  UserProfilePasskeysSection,
-} from '../user-profile-passkeys-section/user-profile-passkeys-section';
-import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section/user-profile-passkeys-section.model';
-import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
+} from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfilePasskeysSectionView } from '../../user-profile-passkeys-section.view';
+import { UserProfileSecurityPanelView } from '../../user-profile-security-panel.view';
+import { passkeysSectionNode, UserProfilePasskeysSection } from '../user-profile-passkeys-section';
+import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.model';
 
 function ReadonlyPasskeys() {
   const model = useUserProfilePasskeysModel();
