@@ -1,15 +1,15 @@
 import { useSpinDelay } from '../../hooks/use-spin-delay';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
-import type { UserButtonModel } from './user-button.model';
-import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
-import type { UserButtonProps as UserButtonViewProps, UserButtonTriggerProps } from './user-button.view';
-import { userButtonBusyKeys } from './user-button.view';
+import type { SwitcherModel } from './switcher.model';
+import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
+import type { SwitcherTriggerProps, SwitcherViewProps } from './switcher.view';
+import { switcherBusyKeys } from './switcher.view';
 
 /** The model once Clerk has answered, which is the only shape an action can start from. */
-export type UserButtonReadyModel = Extract<UserButtonModel, { status: 'ready' }>;
+export type SwitcherReadyModel = Extract<SwitcherModel, { status: 'ready' }>;
 
-interface UserButtonMachineContext {
+interface SwitcherMachineContext {
   /** Independent of the action: dismissing must not abandon an in-flight invoke. */
   open: boolean;
   /** Which action is currently pending. */
@@ -19,30 +19,30 @@ interface UserButtonMachineContext {
    * promise is still in flight, so the live model would rearrange the popup mid-action.
    * The view renders this instead until the action settles.
    */
-  frozenModel: UserButtonReadyModel | null;
+  frozenModel: SwitcherReadyModel | null;
   /** Injected per-action effect — the model callback the clicked row runs. */
   run: () => Promise<unknown>;
   /** Whether succeeding ends the interaction, and the popup with it. */
   closeOnSuccess: boolean;
 }
 
-type UserButtonMachineEvent =
+type SwitcherMachineEvent =
   | { type: 'OPEN' }
   | { type: 'CLOSE' }
   | {
       type: 'RUN';
       key: string;
-      frozenModel: UserButtonReadyModel;
+      frozenModel: SwitcherReadyModel;
       run: () => Promise<unknown>;
       closeOnSuccess: boolean;
     };
 
-const { createMachine, assign, fromPromise } = setup<UserButtonMachineContext, UserButtonMachineEvent>();
+const { createMachine, assign, fromPromise } = setup<SwitcherMachineContext, SwitcherMachineEvent>();
 
 const settled = { pendingKey: null, frozenModel: null };
 
-const userButtonMachine = createMachine({
-  id: 'userButton',
+const switcherMachine = createMachine({
+  id: 'switcher',
   initial: 'idle',
   context: {
     open: false,
@@ -96,12 +96,12 @@ const userButtonMachine = createMachine({
   },
 });
 
-export type UserButtonControllerOptions = Pick<UserButtonModeProps, 'mode'> & UserButtonMenuProps;
+export type SwitcherControllerOptions = { mode?: SwitcherMode } & SwitcherMenuProps;
 
-export type UserButtonController =
+export type SwitcherController =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | ({ status: 'ready' } & Omit<UserButtonViewProps, keyof UserButtonTriggerProps>);
+  | ({ status: 'ready' } & Omit<SwitcherViewProps, keyof SwitcherTriggerProps>);
 
 /**
  * The controller is the layer between the component (view) and the external world (model).
@@ -109,12 +109,12 @@ export type UserButtonController =
  * keep the UI stable while an action is ongoing, close the popup on completed actions
  * when appropriate, etc.
  */
-export function useUserButtonController(
-  model: UserButtonModel,
-  options: UserButtonControllerOptions = {},
-): UserButtonController {
+export function useSwitcherController(
+  model: SwitcherModel,
+  options: SwitcherControllerOptions = {},
+): SwitcherController {
   const { mode: requestedMode, customMenuItems, menuItemOrder } = options;
-  const [{ context }, send] = useMachine(userButtonMachine);
+  const [{ context }, send] = useMachine(switcherMachine);
 
   // Every action here is a network round trip, so we can start the
   // pending state immediately, we use this for the minDuration
@@ -129,6 +129,10 @@ export function useUserButtonController(
   const resolvedModel = context.frozenModel ?? model;
   if (resolvedModel.status !== 'ready') {
     return { status: resolvedModel.status };
+  }
+
+  if (requestedMode === 'organization' && !resolvedModel.organizationsEnabled) {
+    return { status: 'hidden' };
   }
 
   const close = () => send({ type: 'CLOSE' });
@@ -208,17 +212,17 @@ export function useUserButtonController(
     open: context.open,
     onOpenChange: next => send(next ? { type: 'OPEN' } : { type: 'CLOSE' }),
     pendingKey: displayPendingKey,
-    onSelectOrganization: runAction(userButtonBusyKeys.selectOrganization, onSelectOrganization, true),
-    onSwitchSession: runAction(userButtonBusyKeys.switchSession, onSwitchSession),
+    onSelectOrganization: runAction(switcherBusyKeys.selectOrganization, onSelectOrganization, true),
+    onSwitchSession: runAction(switcherBusyKeys.switchSession, onSwitchSession),
     // Last-account and all-accounts sign-out unmount the button. Staying `open` would reopen the menu on the next sign-in.
     onSignOutSession: runAction(
-      userButtonBusyKeys.signOutSession,
+      switcherBusyKeys.signOutSession,
       onSignOutSession,
       data.additionalSessions.length === 0,
     ),
-    onSignOutAll: runAction(userButtonBusyKeys.signOutAll, onSignOutAll, true),
-    onAcceptSuggestion: runAction(userButtonBusyKeys.acceptSuggestion, onAcceptSuggestion),
-    onAcceptInvitation: runAction(userButtonBusyKeys.acceptInvitation, onAcceptInvitation),
+    onSignOutAll: runAction(switcherBusyKeys.signOutAll, onSignOutAll, true),
+    onAcceptSuggestion: runAction(switcherBusyKeys.acceptSuggestion, onAcceptSuggestion),
+    onAcceptInvitation: runAction(switcherBusyKeys.acceptInvitation, onAcceptInvitation),
     onManageAccount: handOff(onManageAccount),
     onManageOrganization: handOff(onManageOrganization),
     onInviteMembers: handOff(onInviteMembers),

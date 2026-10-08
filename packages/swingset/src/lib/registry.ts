@@ -298,10 +298,14 @@ import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
 import {
-  Combined as UserButtonCombined,
+  Default as OrganizationSwitcherDefault,
+  meta as organizationSwitcherMeta,
+  NoOrganizationSelected as OrganizationSwitcherNoOrganizationSelected,
+} from '../stories/organization-switcher.stories';
+import {
+  Combined as SwitcherCombined,
   meta as userButtonMeta,
-  Organizations as UserButtonOrganizations,
-  User as UserButtonUser,
+  User as SwitcherUser,
 } from '../stories/user-button.stories';
 import {
   Default as UserProfileDefault,
@@ -589,9 +593,14 @@ const itemModule: StoryModule = {
 
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
-  Combined: UserButtonCombined,
-  Organizations: UserButtonOrganizations,
-  User: UserButtonUser,
+  Combined: SwitcherCombined,
+  User: SwitcherUser,
+};
+
+const organizationSwitcherModule: StoryModule = {
+  meta: organizationSwitcherMeta,
+  Default: OrganizationSwitcherDefault,
+  NoOrganizationSelected: OrganizationSwitcherNoOrganizationSelected,
 };
 
 const headingModule: StoryModule = {
@@ -906,6 +915,8 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
+  // Organization Switcher
+  organizationSwitcherModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels

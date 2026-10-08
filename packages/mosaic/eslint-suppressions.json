@@ -39,7 +39,7 @@
       "count": 1
     }
   },
-  "src/features/user-button/user-button.view.tsx": {
+  "src/features/switcher/switcher.view.tsx": {
     "sonarjs/cognitive-complexity": {
       "count": 1
     }

@@ -8,15 +8,15 @@ with the active organization, carrying **Settings** and **Invite**. The account'
 accounts as a flyout — the active one checked — so an account never reads as an organization. The
 flyout also adds an account and signs out of all of them. With nobody to switch to, that row is
 **Add account** instead. The foot signs out of the active account. `mode` narrows all of it;
-see [Modes](#modes).
+see [Modes](#modes). For organizations alone, use `OrganizationSwitcher`.
 
 Only the active account's organizations are listed. Not a design choice: org requests are scoped to
 the session that makes them, so another account's organizations are unknowable until it _is_ active.
 Hence `additionalSessions` carries sessions alone, and `onSelectOrganization` takes no session.
 
 Composed from `Popover`, `Card`, `Item`, `Avatar`, and `Menu`, so behavior, focus, and ARIA come from
-them rather than being restyled. `UserButtonView` is presentational; the connected `UserButton` wraps
-it with `useUserButtonController()` and needs no props.
+them rather than being restyled. `SwitcherView` is presentational; the connected `UserButton` wraps
+it with `useSwitcherController()` and needs no props.
 
 ## Example
 
@@ -32,12 +32,12 @@ that would navigate (Manage, Invite, Create organization, Add account) only clos
 
 ## Usage
 
-`UserButtonView` renders trigger and popup from one prop-driven call:
+`SwitcherView` renders trigger and popup from one prop-driven call:
 
 ```tsx
-import { UserButtonView } from '@clerk/mosaic/features/user-button/user-button.view';
+import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
 
-<UserButtonView
+<SwitcherView
   activeSession={{ sessionId: 'sess_1', name: 'Cameron Walker', identifier: 'cameron@clerk.com' }}
   activeOrganization={{ kind: 'membership', organizationId: 'org_nestlabs', name: 'NestLabs Creative', membersCount: 24, planLabel: 'Pro plan' }}
   hasOrganizations
@@ -55,19 +55,19 @@ import { UserButtonView } from '@clerk/mosaic/features/user-button/user-button.v
 ```
 
 To drop the popup into your own trigger, compose the parts. Data and callbacks live on
-`UserButtonRoot`; the leaves read them from context:
+`SwitcherRoot`; the leaves read them from context:
 
 ```tsx
 import {
-  UserButtonRoot,
-  UserButtonTrigger,
-  UserButtonPopup,
-} from '@clerk/mosaic/features/user-button/user-button.view';
+  SwitcherRoot,
+  SwitcherTrigger,
+  SwitcherPopup,
+} from '@clerk/mosaic/features/switcher/switcher.view';
 
-<UserButtonRoot {...data} {...callbacks}>
-  <UserButtonTrigger />
-  <UserButtonPopup />
-</UserButtonRoot>
+<SwitcherRoot {...data} {...callbacks}>
+  <SwitcherTrigger />
+  <SwitcherPopup />
+</SwitcherRoot>
 ```
 
 Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use client'` boundary.
@@ -110,7 +110,6 @@ Everything else is data.
 | Mode                 | Popup                                | Leads with                        |
 | -------------------- | ------------------------------------ | --------------------------------- |
 | `combined` (default) | Organizations and accounts together. | The account, badged with the org. |
-| `organization`       | Organizations only; no account rows. | The active org, else the account. |
 | `user`               | Accounts only; never shows an org.   | The account.                      |
 
 What a mode leads with is named in the trigger and heads the popup — the two always agree.
@@ -136,21 +135,6 @@ With one account signed in, the foot is **Add account** and **Sign out**.
 
 <Story
   name='CombinedSingleAccount'
-  storyModule={UserButtonStories}
-/>
-
-### Org only
-
-The org heads it, with **Settings** and **Invite**. **Create organization** trails the organizations, and
-nothing else is on offer, so the popup ends there.
-
-<Story
-  name='Organizations'
-  storyModule={UserButtonStories}
-/>
-
-<Story
-  name='OrganizationsIconTrigger'
   storyModule={UserButtonStories}
 />
 
@@ -202,17 +186,6 @@ all accounts**. The foot keeps **Sign out**.
   storyModule={UserButtonStories}
 />
 
-## No organization selected
-
-`hidePersonal` withholds the personal account — the instance does this when it forces an
-organization, or the app does it itself. In `organization` mode with no org active either, trigger and
-header say **No organization selected**, the mark is square, and the gear is **Manage account**.
-
-<Story
-  name='NoOrganizationSelected'
-  storyModule={UserButtonStories}
-/>
-
 ## Menu items
 
 `customMenuItems` adds the app's own rows to the foot of the popup, ahead of Clerk's own. A row with
@@ -235,11 +208,11 @@ is ignored rather than an error, so one order can cover every mode.
 
 ## Parts
 
-| Part                | Description                                                                      |
-| ------------------- | -------------------------------------------------------------------------------- |
-| `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`.     |
-| `UserButtonTrigger` | The trigger: the active account or organization's avatar, and what it is called. |
-| `UserButtonPopup`   | The popover surface: header, organization list, footer.                          |
+| Part              | Description                                                                      |
+| ----------------- | -------------------------------------------------------------------------------- |
+| `SwitcherRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`.     |
+| `SwitcherTrigger` | The trigger: the active account or organization's avatar, and what it is called. |
+| `SwitcherPopup`   | The popover surface: header, organization list, footer.                          |
 
 ## Styling
 

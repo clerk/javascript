@@ -1,4 +1,4 @@
-import type { UserButtonData, UserButtonHeaderLayout, UserButtonMode } from './user-button.types';
+import type { SwitcherData, SwitcherHeaderLayout, SwitcherMode } from './switcher.types';
 
 /*
  * Which mode puts what where. The surface is three slots deep, in this order, and each mode fills
@@ -28,9 +28,9 @@ import type { UserButtonData, UserButtonHeaderLayout, UserButtonMode } from './u
  */
 
 /** The three places an action can land. Every mode has a header and a footer; the list's varies. */
-export type UserButtonSlot = 'header' | 'organizationsFooter' | 'footer';
+export type SwitcherSlot = 'header' | 'organizationsFooter' | 'footer';
 
-export type UserButtonAction =
+export type SwitcherAction =
   | 'addAccount'
   | 'createOrganization'
   | 'inviteMembers'
@@ -45,14 +45,14 @@ export type UserButtonAction =
  * organization it is active in. `none` is an organization-led surface with no organization active
  * and no personal account to fall back to.
  */
-export type UserButtonLead = 'organization' | 'member' | 'user' | 'none';
+export type SwitcherLead = 'organization' | 'member' | 'user' | 'none';
 
 const headers = {
   organization: ['inviteMembers', 'manageLead'],
   member: ['inviteMembers', 'manageLead'],
   user: ['manageLead'],
   none: ['manageLead'],
-} as const satisfies Record<UserButtonLead, readonly UserButtonAction[]>;
+} as const satisfies Record<SwitcherLead, readonly SwitcherAction[]>;
 
 /** One mode's whole surface below the header, top to bottom. */
 interface ModeLayout {
@@ -61,12 +61,12 @@ interface ModeLayout {
    * `false` is a list the mode does not carry at all. `footer` trails the rows, inside the list,
    * since what it offers is one more organization.
    */
-  organizations: { footer: readonly UserButtonAction[] } | false;
+  organizations: { footer: readonly SwitcherAction[] } | false;
   /**
    * With a second account the foot switches between them, or signs out of every one. With just the
    * one there is nothing to switch between or to sign out of "all" of.
    */
-  footer: { multiSession: readonly UserButtonAction[]; singleSession: readonly UserButtonAction[] };
+  footer: { multiSession: readonly SwitcherAction[]; singleSession: readonly SwitcherAction[] };
 }
 
 const modes = {
@@ -84,22 +84,22 @@ const modes = {
     organizations: false,
     footer: { multiSession: ['switchAccount', 'signOut'], singleSession: ['addAccount', 'signOut'] },
   },
-} as const satisfies Record<UserButtonMode, ModeLayout>;
+} as const satisfies Record<SwitcherMode, ModeLayout>;
 
 /**
  * Where each of the surface's actions landed, resolved once from `mode` and the data, so no
  * section has to read either again.
  */
-export interface UserButtonLayout {
-  lead: UserButtonLead;
+export interface SwitcherLayout {
+  lead: SwitcherLead;
   /** The organization rows: the personal account, the organizations, and what is on offer. */
   showOrganizations: boolean;
-  headerLayout: UserButtonHeaderLayout;
+  headerLayout: SwitcherHeaderLayout;
   /** What each slot carries, in the order it renders. */
-  actions: Record<UserButtonSlot, UserButtonAction[]>;
+  actions: Record<SwitcherSlot, SwitcherAction[]>;
 }
 
-function resolveLead(mode: UserButtonMode, data: UserButtonData): UserButtonLead {
+function resolveLead(mode: SwitcherMode, data: SwitcherData): SwitcherLead {
   if (mode === 'user') {
     return 'user';
   }
@@ -112,7 +112,7 @@ function resolveLead(mode: UserButtonMode, data: UserButtonData): UserButtonLead
   return data.hidePersonal ? 'none' : 'user';
 }
 
-export function resolveUserButtonLayout(mode: UserButtonMode, data: UserButtonData): UserButtonLayout {
+export function resolveSwitcherLayout(mode: SwitcherMode, data: SwitcherData): SwitcherLayout {
   const declared: ModeLayout = modes[mode];
   const organizationsFooter = declared.organizations === false ? [] : declared.organizations.footer;
 

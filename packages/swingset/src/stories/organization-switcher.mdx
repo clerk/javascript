@@ -1,0 +1,88 @@
+import * as OrganizationSwitcherStories from './organization-switcher.stories';
+
+# OrganizationSwitcher
+
+The organization switcher on its own. The active organization heads the surface, carrying **Settings**
+and **Invite**. The account's organizations sit under it: every one it belongs to, plus **suggested**
+and **invited** ones it can Join, with **Create organization** at their foot. There are no account rows;
+for those, use `UserButton`.
+
+It renders nothing while Clerk loads, when nobody is signed in, and when the instance has organizations
+turned off.
+
+It shares its view with `UserButton`, so the parts, loading state, and behavior are the same. Only the
+surface differs: its own `.cl-organization-switcher-*` classes and its own `organizationSwitcher`
+localization namespace.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={OrganizationSwitcherStories}
+/>
+
+## Usage
+
+```tsx
+import { OrganizationSwitcher } from '@clerk/mosaic';
+
+<OrganizationSwitcher />;
+```
+
+## Trigger
+
+The avatar and name of the active organization. Where none is active, the account leads instead.
+
+`renderTriggerLabel={false}` leaves the avatar alone.
+
+<Story
+  name='IconTrigger'
+  storyModule={OrganizationSwitcherStories}
+/>
+
+## Personal account
+
+Unless `hidePersonal` is set, the personal account is listed beside the organizations, and picking it
+leaves the active organization.
+
+<Story
+  name='WithPersonalAccount'
+  storyModule={OrganizationSwitcherStories}
+/>
+
+## No organization selected
+
+`hidePersonal` withholds the personal account — the instance does this when it forces an
+organization, or the app does it itself. With no org active either, trigger and header say
+**No organization selected**, the mark is square, and the gear is **Manage account**.
+
+<Story
+  name='NoOrganizationSelected'
+  storyModule={OrganizationSwitcherStories}
+/>
+
+## Menu items
+
+`customMenuItems` and `menuItemOrder` work as they do on `UserButton`: the app's own rows join the foot
+of the popup, in the order given. There are no account rows here, so `switchAccount`, `addAccount`, and
+`signOut` in an order are ignored.
+
+## Styling
+
+| Slot                                           | Attributes                              |
+| ---------------------------------------------- | --------------------------------------- |
+| `.cl-organization-switcher-trigger`            |                                         |
+| `.cl-organization-switcher-popover`            |                                         |
+| `.cl-organization-switcher-header`             | `data-layout="inline \| stacked"`       |
+| `.cl-organization-switcher-header-content`     |                                         |
+| `.cl-organization-switcher-header-title`       |                                         |
+| `.cl-organization-switcher-header-description` |                                         |
+| `.cl-organization-switcher-header-actions`     |                                         |
+| `.cl-organization-switcher-group`              |                                         |
+| `.cl-organization-switcher-separator`          |                                         |
+| `.cl-organization-switcher-item`               | `data-interactive`                      |
+| `.cl-organization-switcher-item-media`         |                                         |
+| `.cl-organization-switcher-item-content`       |                                         |
+| `.cl-organization-switcher-item-label`         | `data-variant="default \| interactive"` |
+| `.cl-organization-switcher-item-description`   |                                         |
+| `.cl-organization-switcher-item-trailing`      |                                         |

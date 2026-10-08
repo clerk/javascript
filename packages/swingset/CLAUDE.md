@@ -59,11 +59,12 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 ### Layers
 
-`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, `Reverification`, and `Localization` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
+`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `Organization Switcher`, `User Profile`, `Reverification`, and `Localization` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
 
 | Group        | What lives here                                                | Archetype |
 | ------------ | -------------------------------------------------------------- | --------- |
 | `User Button` | Composed flow UI (e.g. `UserButton`)                          | C         |
+| `Organization Switcher` | Composed flow UI (e.g. `OrganizationSwitcher`)      | C         |
 | `User Profile` | Composed flow UI (e.g. `UserProfileProfilePanel`)             | C         |
 | `Components` | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A         |
 | `Primitives` | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`) | B         |
@@ -253,7 +254,7 @@ The story is `meta` (no `styles`) plus a single `Default` export that renders th
 These compose lower layers, so the docs lead with the composition rather than knobs. Required MDX:
 
 ```mdx
-import * as UserButtonStories from './user-button.stories';
+import * as SwitcherStories from './user-button.stories';
 
 # UserButton
 
@@ -261,7 +262,7 @@ import * as UserButtonStories from './user-button.stories';
 
 <Story
   name='Default'
-  storyModule={UserButtonStories}
+  storyModule={SwitcherStories}
   composition={[
     { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
     { name: 'Item', href: '/components/item', layer: 'Components' },

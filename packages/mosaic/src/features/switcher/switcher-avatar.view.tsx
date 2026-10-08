@@ -5,7 +5,8 @@ import type { AvatarProps } from '../../components/avatar';
 import { Avatar } from '../../components/avatar';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { badgeSizes, leadSizes, ringSizes, sizes, styles } from './user-button-avatar.styles';
+import { badgeSizes, leadSizes, ringSizes, sizes, styles } from './switcher-avatar.styles';
+import { useSlot } from './switcher-surface';
 
 function initials(name: string): string {
   const [first = '', second = ''] = name.trim().split(/\s+/);
@@ -41,7 +42,7 @@ export function RowAvatar({ name, imageUrl, shape, size, xstyle }: RowAvatarProp
   );
 }
 
-export interface UserButtonAvatarProps {
+export interface SwitcherAvatarProps {
   name: string;
   imageUrl?: string;
   shape: 'circle' | 'square';
@@ -50,14 +51,15 @@ export interface UserButtonAvatarProps {
   focusRing?: boolean;
 }
 
-export function UserButtonAvatar({
+export function SwitcherAvatar({
   name,
   imageUrl,
   shape,
   size,
   badge,
   focusRing = false,
-}: UserButtonAvatarProps): ReactElement {
+}: SwitcherAvatarProps): ReactElement {
+  const slot = useSlot();
   if (!badge) {
     return (
       <RowAvatar
@@ -72,10 +74,7 @@ export function UserButtonAvatar({
   return (
     <span
       aria-hidden
-      {...mergeStyleProps(
-        themeProps('user-button-avatar', { size }),
-        stylex.props(reset.base, styles.root, sizes[size]),
-      )}
+      {...mergeStyleProps(themeProps(slot('avatar'), { size }), stylex.props(reset.base, styles.root, sizes[size]))}
     >
       <RowAvatar
         name={name}
@@ -85,7 +84,7 @@ export function UserButtonAvatar({
         xstyle={[styles.lead, leadSizes[size]]}
       />
       {focusRing ? <span {...stylex.props(reset.base, styles.ring, ringSizes[size])} /> : null}
-      <span {...mergeStyleProps(themeProps('user-button-avatar-badge'), stylex.props(reset.base, styles.badge))}>
+      <span {...mergeStyleProps(themeProps(slot('avatar-badge')), stylex.props(reset.base, styles.badge))}>
         <RowAvatar
           name={badge.name}
           imageUrl={badge.imageUrl}

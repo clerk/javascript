@@ -129,7 +129,7 @@ async function openWithList() {
 }
 
 describe('UserButton', () => {
-  describe.each(['combined', 'organization', 'user'] as const)('in %s mode', mode => {
+  describe.each(['combined', 'user'] as const)('in %s mode', mode => {
     it('renders nothing while Clerk is still loading', async () => {
       serveFapi(signedIn());
       const client = holdRequests('get', '/v1/client');
@@ -750,56 +750,6 @@ describe('UserButton', () => {
     });
   });
 
-  describe('in organization mode', () => {
-    it('heads the surface with the active organization and what can be done to it', async () => {
-      await renderUserButton({ mode: 'organization' });
-      await open();
-
-      expect(within(requiredPopup()).getByText('Acme')).toBeInTheDocument();
-      expect(within(requiredPopup()).getByText('3 members')).toBeInTheDocument();
-      expect(within(requiredPopup()).getByRole('button', { name: 'Invite' })).toBeInTheDocument();
-      expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
-    });
-
-    it('falls back to the account where no organization is active', async () => {
-      await renderUserButton({ mode: 'organization' }, signedIn({ client: fapiClient([personalSession]) }));
-      await open();
-
-      expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
-      expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
-    });
-
-    it('names no organization selected where personal is hidden and none is active', async () => {
-      await renderUserButton(
-        { mode: 'organization', hidePersonal: true },
-        signedIn({ client: fapiClient([personalSession]) }),
-      );
-
-      expect(trigger()).toHaveAccessibleName(/No organization selected/);
-      await open();
-
-      expect(within(requiredPopup()).getByText('No organization selected')).toBeInTheDocument();
-      expect(within(requiredPopup()).queryByText('Alice Smith')).toBeNull();
-      expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
-    });
-
-    it('carries no account rows, and trails the organizations with create-organization', async () => {
-      await renderUserButton({ mode: 'organization' }, noOffers());
-      await openWithList();
-
-      expect(reading('Personal account', 'Acme', 'Other', 'Create organization')).toEqual([
-        'Acme',
-        'Personal account',
-        'Other',
-        'Create organization',
-      ]);
-      for (const name of ['Switch account', 'Add account', 'Sign out', 'Sign out of all accounts']) {
-        expect(screen.queryByRole('button', { name })).toBeNull();
-      }
-    });
-  });
-
   describe('in combined mode', () => {
     it('heads the surface with the account, managing its active organization', async () => {
       const { clerk } = await renderUserButton();
@@ -1070,15 +1020,6 @@ describe('UserButton', () => {
       ).toBe(label);
     });
 
-    it('carries the custom rows on an organization surface too', async () => {
-      await renderUserButton({ mode: 'organization', customMenuItems: [terms] });
-      await open();
-
-      expect(
-        reading('Terms of service', 'Support', 'Switch account', 'Add account', 'Sign out of all accounts'),
-      ).toEqual(['Terms of service']);
-    });
-
     it('signs the popup with Clerk where the instance is branded', async () => {
       await renderUserButton({}, signedIn({ environment: fapiEnvironment({ display_config: { branded: true } }) }));
       await open();
@@ -1165,7 +1106,6 @@ describe('UserButton', () => {
 
   describe('the trigger', () => {
     it.each([
-      [{ mode: 'organization' as const }, 'Acme'],
       [{ mode: 'combined' as const }, 'Alice Smith'],
       [{ mode: 'user' as const }, 'Alice Smith'],
     ])('with %o names %s beside the avatar', async (props, name) => {
@@ -1195,16 +1135,16 @@ describe('UserButton', () => {
     });
 
     it('renders the avatar alone when the label is off', async () => {
-      await renderUserButton({ mode: 'organization', renderTriggerLabel: false });
+      await renderUserButton({ mode: 'user', renderTriggerLabel: false });
 
-      expect(trigger()).toHaveAccessibleName('Open account menu for Acme');
-      expect(within(trigger()).queryByText('Acme')).toBeNull();
+      expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
     });
 
     it('names the active organization before its membership list has loaded', async () => {
       serveFapi(signedIn());
       const memberships = holdRequests('get', '/v1/me/organization_memberships');
-      await renderWithClerk(tree({ mode: 'organization' }));
+      await renderWithClerk(tree());
 
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
       await userEvent.setup().click(trigger());
