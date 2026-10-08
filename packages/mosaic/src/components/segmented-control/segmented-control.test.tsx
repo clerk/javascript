@@ -56,6 +56,20 @@ describe('Mosaic SegmentedControl', () => {
     expect(monthly).toHaveAttribute('aria-checked', 'true');
   });
 
+  it('flips the arrow keys in a right-to-left layout', async () => {
+    render(
+      <div dir='rtl'>
+        <BillingPeriod defaultValue='monthly' />
+      </div>,
+    );
+
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowLeft}');
+
+    expect(screen.getByRole('radio', { name: 'Annual' })).toHaveFocus();
+    expect(screen.getByRole('radio', { name: 'Annual' })).toHaveAttribute('aria-checked', 'true');
+  });
+
   it('does not select a disabled item', async () => {
     render(
       <SegmentedControl.Root

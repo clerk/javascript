@@ -15,7 +15,11 @@ import {
 const anchors = '@supports (anchor-scope: all) and (not (-moz-appearance: none))' as const;
 const noAnchors = '@supports not ((anchor-scope: all) and (not (-moz-appearance: none)))' as const;
 const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
+const forcedColors = '@media (forced-colors: active)' as const;
 const activeAnchor = '--_cl-segmented-control-active';
+const forcedTextVar = '--_cl-segmented-control-forced-text';
+const secondaryText = `var(${forcedTextVar}, ${colorVars['--cl-color-foreground-secondary']})`;
+const primaryText = `var(${forcedTextVar}, ${colorVars['--cl-color-foreground']})`;
 
 const lead = durationVars['--cl-duration-slow'];
 const trail = durationVars['--cl-duration-slower'];
@@ -27,8 +31,9 @@ const scaleIn = stylex.keyframes({
 
 const surface = {
   borderRadius: radiusVars['--cl-radius-md'],
-  backgroundColor: colorVars['--cl-color-background'],
+  backgroundColor: { default: colorVars['--cl-color-background'], [forcedColors]: 'Highlight' },
   boxShadow: shadowVars['--cl-shadow-sm'],
+  forcedColorAdjust: 'none',
 } as const;
 
 export const styles = stylex.create({
@@ -71,6 +76,14 @@ export const styles = stylex.create({
   item: {
     // eslint-disable-next-line @stylexjs/valid-styles -- `anchor-name`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
     anchorName: { default: null, ':where([data-selected])': activeAnchor },
+    [forcedTextVar]: {
+      default: null,
+      [forcedColors]: {
+        default: 'ButtonText',
+        ':is([data-disabled])': 'GrayText',
+        ':where([data-selected])': 'HighlightText',
+      },
+    },
     borderRadius: radiusVars['--cl-radius-md'],
     borderStyle: 'none',
     paddingInline: space['3'],
@@ -78,11 +91,11 @@ export const styles = stylex.create({
     appearance: 'none',
     backgroundColor: 'transparent',
     color: {
-      default: colorVars['--cl-color-foreground-secondary'],
-      ':where([data-selected])': colorVars['--cl-color-foreground'],
+      default: secondaryText,
+      ':where([data-selected])': primaryText,
       '@media (hover: hover)': {
         default: null,
-        ':hover:not([data-selected]):not([data-disabled])': colorVars['--cl-color-foreground'],
+        ':hover:not([data-selected]):not([data-disabled])': primaryText,
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
