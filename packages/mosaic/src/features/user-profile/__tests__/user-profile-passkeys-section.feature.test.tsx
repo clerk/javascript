@@ -1,5 +1,5 @@
 import type { PasskeyJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -164,6 +164,25 @@ describe('Seeing passkeys', () => {
     expect(screen.getByText(/Created:|Erstellt:/)).toHaveTextContent(
       `Erstellt: 20.8.2026 · Zuletzt verwendet: ${lastUsed}`,
     );
+  });
+
+  it('refreshes created and last-used dates after midnight without a user update', async () => {
+    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+    vi.setSystemTime(new Date(2026, 8, 16, 23, 59, 30));
+    servePasskeys([
+      fapiPasskey({
+        id: 'pk_1',
+        created_at: new Date(2026, 8, 16, 12, 30).getTime(),
+        last_used_at: new Date(2026, 8, 16, 14, 45).getTime(),
+      }),
+    ]);
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    const details = screen.getByText(/Created:/);
+    expect(details).toHaveTextContent(/Created: Today at .+ · Last used: Today at/);
+
+    await act(() => vi.advanceTimersByTimeAsync(60_000));
+
+    expect(details).toHaveTextContent(/Created: Yesterday at .+ · Last used: Yesterday at/);
   });
 
   it('shows a fallback while Clerk loads and then shows existing passkeys', async () => {
