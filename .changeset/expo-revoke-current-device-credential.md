@@ -2,7 +2,7 @@
 '@clerk/expo': minor
 ---
 
-Add `revokeCurrentDeviceCredential()` to `useBiometricCredentials()`. It revokes the biometric credential enrolled by this app installation for the current user, so you no longer need to store the credential ID returned by `enroll()`. It resolves with the revoked credential, or `null` when this installation has no credential for the current user. Call it before signing out, because it requires an active or pending session.
+Add `revokeCurrentDeviceCredential()` to `useBiometricCredentials()`. It revokes this device's biometric credential for the signed-in user, so you no longer need to store the ID from `enroll()`. It returns the revoked credential, or `null` if there is nothing to revoke. Call it before signing out, since it needs a session.
 
 ```tsx
 import { useBiometricCredentials } from '@clerk/expo/biometrics';
