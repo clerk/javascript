@@ -18,8 +18,6 @@ export interface MfaPhone extends Pick<PhoneNumberResource, 'id' | 'phoneNumber'
   verified: boolean;
 }
 
-export class MfaCancelledError extends Error {}
-
 export interface MfaEnrollmentResult {
   backupCodes: readonly string[];
 }

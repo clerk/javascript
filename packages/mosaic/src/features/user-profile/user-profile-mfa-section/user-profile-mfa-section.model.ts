@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/shared/types';
@@ -6,7 +6,6 @@ import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@cl
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useReverificationWithState } from '../../reverification/use-reverification-with-state';
 import {
-  MfaCancelledError,
   type MfaEnrollmentResult,
   type MfaPhone,
   type SmsEnrollmentResult,
@@ -260,16 +259,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     const current = requireIdentity(clerk, userId, sessionId);
     await current.reload();
   };
-  const runProtected = async (operation: ProtectedOperation) => {
-    try {
-      return await protectedAction(operation);
-    } catch (error) {
-      if (isReverificationCancelledError(error)) {
-        throw new MfaCancelledError('Verification was cancelled.');
-      }
-      throw error;
-    }
-  };
+  const runProtected = (operation: ProtectedOperation) => protectedAction(operation);
 
   const smsActions = smsEnabled ? createSmsActions(clerk, userId, sessionId, runProtected, refresh) : {};
 

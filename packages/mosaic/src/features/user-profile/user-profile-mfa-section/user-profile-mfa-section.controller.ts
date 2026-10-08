@@ -1,4 +1,4 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import { useRef } from 'react';
 
 import { useNow } from '../../../hooks/use-now';
@@ -9,11 +9,7 @@ import { useMachine } from '../../../machine/use-machine';
 import { toLocalizableError } from '../../../utils/errors';
 import { useReverificationController } from '../../reverification/reverification.controller';
 import type { ReverificationModel } from '../../reverification/reverification.model';
-import {
-  MfaCancelledError,
-  type UserProfileMfaAddableMethod,
-  type UserProfileMfaModel,
-} from './user-profile-mfa-section.types';
+import type { UserProfileMfaAddableMethod, UserProfileMfaModel } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 import type { UserProfileMfaSetupViewProps } from './user-profile-mfa-setup.view';
 
@@ -210,7 +206,7 @@ const mfaMachine = createMachine({
           actions: [
             (context, event) => context.reject(event.error),
             assign((context, event) => {
-              if (event.error instanceof MfaCancelledError) {
+              if (isReverificationCancelledError(event.error)) {
                 return { flow: { kind: 'closed' }, savedSetup: undefined, pending: undefined };
               }
               const flow = context.flow;
