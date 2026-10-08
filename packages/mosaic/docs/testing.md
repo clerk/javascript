@@ -104,14 +104,14 @@ it('makes the selected organization active and closes', async () => {
 `packages/mosaic/src/features/user-button/__tests__/user-button.feature.test.tsx`
 is the worked example.
 
-Put a feature test next to the component it renders, and name it after that
-component, as `blocks/destructive/destructive.feature.test.tsx` does.
-`<UserProfilePasswordSection />` is tested by
-`user-profile-password-section/user-profile-password-section.feature.test.tsx`.
-Vitest finds feature tests by the `.feature.test.tsx` suffix, so a shared
-`__tests__/` folder buys nothing and makes a section's tests harder to find.
-Existing tests in `__tests__/` folders, the worked example included, move when
-their feature next changes.
+Put a feature test in a `__tests__/` folder inside the folder that groups the
+feature, and name it after the component it renders. `<UserProfilePasswordSection />`
+lives in `user-profile/user-profile-password-section/`, so it is tested by
+`user-profile-password-section/__tests__/user-profile-password-section.feature.test.tsx`,
+not by a file in `user-profile/__tests__/`. The tests stay next to the code they
+cover and move or go with it, and the `__tests__/` folder keeps them apart from
+the source files. Existing tests that sit loose beside a component, or in a
+parent's `__tests__/` folder, move when their feature next changes.
 
 ### The toolkit (`src/__tests__/feature/`)
 
