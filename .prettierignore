@@ -41,5 +41,6 @@ integration/expo-native/e2e.config.ts
 integration/expo-native/test/*.ts
 !integration/expo-native/test/freshness.test.ts
 !integration/expo-native/test/host.test.ts
+!integration/expo-native/test/remote-host.test.ts
 integration/expo-native/.verify/
 integration/expo-native/specs/explored/

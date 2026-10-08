@@ -30,6 +30,7 @@ function partialRecord(dir: EvidencePath, run: RunId): Omit<EvidenceRecord, 'sea
     dirty: false,
     platform: 'ios',
     backend: 'local',
+    remote: null,
     device: 'verify-ios-1',
     build: 'ios-000000000000' as BuildKey,
     results: [
@@ -199,7 +200,7 @@ describe('the evidence block of a pull request description', () => {
     const published = [
       '<!-- verify-evidence:ios -->',
       '',
-      'verify run `r20261007-010101-aaaa`, as reported by [the session that ran it](https://github.com/clerk/clerk-ios/actions/runs/37731397352): 3 of 3 passed on `iPhone Air on xcode-27` at `0f50b597b1c2`.',
+      'verify run `r20261007-010101-aaaa`, as reported by [the session](https://github.com/clerk/clerk-ios/actions/runs/37731397352) that `octocat` started: 3 of 3 passed on `iPhone Air on xcode-27` at `0f50b597b1c2`.',
       '',
       '![video.mp4](https://github.com/user-attachments/assets/1)',
       '',
@@ -211,7 +212,7 @@ describe('the evidence block of a pull request description', () => {
   it('refuses to replace text between two markers that is not a block it wrote', () => {
     const { start, end } = evidenceMarkers('ios');
     const notes = `${start}\nIMPORTANT reviewer notes that are not evidence\n${end}\n`;
-    assert.deepEqual(withEvidenceBlock(notes, 'ios', block), { ok: false, why: `has text between \`${start}\` and \`${end}\` that is not an evidence block` });
+    assert.deepEqual(withEvidenceBlock(notes, 'ios', block), { ok: false, why: `has text between \`${start}\` and \`${end}\` that is not an evidence block`, fix: 'leave one pair of those markers in the description, or none' });
   });
 
   it('takes no marker from inside a code fence, so a description may show a whole example block', () => {
@@ -232,6 +233,24 @@ describe('the evidence block of a pull request description', () => {
     for (const before of ['```\ncode\n```\n\n', 'Use ```three ticks``` inline.\n\n', '```three ticks``` that open a line are inline code too.\n\n', '    ```\n\n', '``\n\n']) {
       assert.deepEqual(withEvidenceBlock(`${before}${real}\n`, 'ios', block), { ok: true, body: `${before}${block}\n`, was: 'replaced' }, JSON.stringify(before));
     }
+  });
+
+  it('opens no fence at a fence line inside an HTML comment, so the next attach finds the block it wrote', () => {
+    const later = evidenceBlock({ ...summary, run: 'r20261009-020202-bbbb' as RunId }, media);
+    for (const hidden of ['<!--\n```\n-->\n\nintro\n', '<!-- a note\r\n~~~\r\nstill the note -->\r\n', 'intro\n   <!--\n```\n']) {
+      const again = withEvidenceBlock(bodyAfter(hidden), 'ios', later);
+      assert.equal(again.ok && again.was, 'replaced', JSON.stringify(hidden));
+      assert.equal(again.ok && again.body.split('<!-- verify-evidence:ios -->').length, 2, 'one block, not two');
+    }
+    assert.equal(bodyAfter(`\`\`\`\n<!--\n\`\`\`\n\n${later}\n`), `\`\`\`\n<!--\n\`\`\`\n\n${block}\n`, 'a comment inside a fence is code, and the fence still closes');
+  });
+
+  it('refuses a description that ends inside a code fence that never closes, where a block would be code and never found again', () => {
+    for (const unclosed of ['intro\n\n```\ncode\n', 'intro\r\n~~~~ js\r\ncode', '```']) {
+      assert.deepEqual(withEvidenceBlock(unclosed, 'ios', block), { ok: false, why: 'ends inside a code fence that is never closed', fix: 'close that code fence' }, JSON.stringify(unclosed));
+    }
+    const earlier = evidenceBlock({ ...summary, run: 'r20261007-010101-aaaa' as RunId }, media);
+    assert.equal(bodyAfter(`intro\n\n${earlier}\n\n~~~\ncode\n`), `intro\n\n${block}\n\n~~~\ncode\n`, 'a block before the open fence is still replaced');
   });
 
   it('refuses a description whose markers are doubled, halved, or out of order, and says which', () => {
@@ -317,7 +336,7 @@ describe('attach', () => {
       `## Summary\n\nFixes the button.\n\n<!-- verify-evidence:ios -->\n\nverify run \`${run}\` on \`verify-ios-1\` at \`abc\`, 1 of 1 passed.\n\n![video.mp4](./video.mp4)\n\n![profile](./screenshots/profile.png)\n\n<!-- /verify-evidence:ios -->`,
     );
     assert.equal(existsSync(edit.args[edit.args.indexOf('--body-file') + 1]!), false, 'the copy of the description is not kept');
-    assert.deepEqual(first, { verb: 'attach', prUrl: PR_URL, posted: [join(dir, 'video.mp4'), join(dir, 'screenshots', 'profile.png')], alreadyPosted: false });
+    assert.deepEqual(first, { verb: 'attach', via: 'gh', prUrl: PR_URL, posted: [join(dir, 'video.mp4'), join(dir, 'screenshots', 'profile.png')], alreadyPosted: false });
     assert.deepEqual(second, { ...first, alreadyPosted: true });
     assert.ok(existsSync(join(dir, 'posted-9.json')));
     await postToPullRequest(publishable, dir, host, 10, 'all', gh.runner);
