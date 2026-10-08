@@ -11,19 +11,29 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { createRequire } from 'node:module';
-import { join, relative } from 'node:path';
+import { basename, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isRunning, run, sleep } from './core/exec.ts';
 import {
   LOCAL_POOL,
   VerifyFailure,
+  type BackendKind,
   type HostAdapter,
   type Platform,
   type RuntimeProcess,
   type ScratchPath,
 } from './core/types.ts';
 import { takeSlotLock } from './core/workspace.ts';
-import { FIXTURE, IOS_PRODUCT, WORKTREE, buildFixture, mustStep, nativeInputs } from './fixture.ts';
+import {
+  FIXTURE,
+  IOS_PRODUCT,
+  WORKTREE,
+  buildFixture,
+  buildInputs,
+  mustStep,
+  nativeCacheDir,
+  type BuildProduct,
+} from './fixture.ts';
 import { APP_ID, app } from '../specs/app.ts';
 import {
   confirmServed,
@@ -443,9 +453,20 @@ async function ensureServed(
   return current;
 }
 
-function keepBuild(platform: Platform, built: string, into: string): string {
+export function productFor(backend: BackendKind, env: NodeJS.ProcessEnv = process.env): BuildProduct {
+  const asked = env.VERIFY_LOCAL_BUILD;
+  if (asked === undefined || asked === '' || asked === 'dev-client') return 'dev-client';
+  if (asked === 'standalone') return 'standalone';
+  throw new VerifyFailure(
+    'USAGE',
+    `VERIFY_LOCAL_BUILD=${asked} is not dev-client or standalone`,
+    'unset VERIFY_LOCAL_BUILD or set it to standalone',
+  );
+}
+
+function keepBuild(built: string, into: string): string {
   mkdirSync(into, { recursive: true });
-  const path = join(into, platform === 'ios' ? `${IOS_PRODUCT}.app` : 'app-debug.apk');
+  const path = join(into, basename(built));
   rmSync(path, { recursive: true, force: true });
   cpSync(built, path, { recursive: true, verbatimSymlinks: true });
   return path;
@@ -457,31 +478,28 @@ export const host: HostAdapter = {
   platforms: ['ios', 'android'],
   githubRepo: GITHUB_REPO,
   appId: app.id,
-  buildInputs: platform => nativeInputs(platform),
+  buildInputs: (platform, backend) => buildInputs(platform, productFor(backend)),
   async build(platform, key, into, progress) {
-    if (process.platform !== 'darwin')
-      throw new VerifyFailure(
-        'UNSUPPORTED',
-        `the expo-native fixture is built locally on macOS only, and this machine runs ${process.platform}`,
-        'run this command on a Mac',
-      );
+    const product = productFor('local');
     const path = await withFixtureLock(progress, async () => {
-      const watching = readRuntime('watch') !== null;
+      const watching = product === 'dev-client' && readRuntime('watch') !== null;
       if (watching)
         progress('build   the running watch build keeps packages/expo/dist current, so turbo build is skipped');
       else stopRuntime();
       const built = await buildFixture({
         platform,
-        product: 'dev-client',
+        product,
         nativeKey: key,
         buildPackages: !watching,
+        nativeCache: nativeCacheDir(),
         progress,
       });
-      return keepBuild(platform, built, into);
+      return keepBuild(built, into);
     });
     return { platform, key, appId: APP_ID, path: path as ScratchPath, source: 'local' };
   },
   async runtime(lease, progress) {
+    if (productFor(lease.backend) === 'standalone') return { devServer: null, processes: [] };
     const port = metroPort(lease);
     return withCleanup(
       stopRuntime,
