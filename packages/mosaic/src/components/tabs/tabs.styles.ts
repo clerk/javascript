@@ -10,8 +10,8 @@ const forcedColors = '@media (forced-colors: active)' as const;
 const activeAnchor = '--_cl-tabs-active';
 const halfGap = `calc(${space['5']} / -2)`;
 
-const lead = durationVars['--cl-duration-slow'];
-const trail = durationVars['--cl-duration-slower'];
+const lead = durationVars['--cl-duration-base'];
+const trail = durationVars['--cl-duration-slow'];
 
 const underline = {
   backgroundColor: { default: colorVars['--cl-color-foreground'], [forcedColors]: 'Highlight' },
