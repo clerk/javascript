@@ -3,3 +3,5 @@ export const AGENT_CREDENTIAL_VARIABLES: readonly string[];
 export const INSTANCE_SECRET_VARIABLES: readonly string[];
 export function supportsNode(version: string): boolean;
 export function ensureRuntime(): Promise<void>;
+export function proxyPort(proxy: URL): number;
+export function chooseEgress(observed: { readonly proxyListens: boolean; readonly directConnects: boolean; readonly tokenStatusDirect: number | null }): { readonly proxy: boolean; readonly why: string };
