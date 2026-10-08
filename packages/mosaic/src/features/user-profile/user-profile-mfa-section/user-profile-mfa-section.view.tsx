@@ -1,3 +1,4 @@
+import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { type ReactNode, type Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
@@ -97,7 +98,7 @@ export function UserProfileMfaSectionView({
 function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfileMfa']) {
   if (method.type === 'sms') {
     return method.description
-      ? fill(m.removeDialog.smsDescription, { phoneNumber: method.description })
+      ? fill(m.removeDialog.smsDescription, { phoneNumber: stringToFormattedPhoneString(method.description) })
       : m.removeDialog.smsDescriptionWithoutNumber;
   }
   return m.removeDialog.authenticatorDescription;

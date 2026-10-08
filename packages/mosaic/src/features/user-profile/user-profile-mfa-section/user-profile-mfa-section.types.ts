@@ -35,6 +35,8 @@ export type UserProfileMfaModel =
       status: 'ready';
       userId: string;
       sessionId: string;
+      applicationName: string;
+      identifier: string;
       methods: readonly UserProfileMfaMethod[];
       addableMethods: readonly UserProfileMfaAddableMethod[];
       phones: readonly MfaPhone[];

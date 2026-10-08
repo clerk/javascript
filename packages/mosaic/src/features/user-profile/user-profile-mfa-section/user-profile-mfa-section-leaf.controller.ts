@@ -41,7 +41,13 @@ export function useUserProfileMfaSectionLeafController({
     }
     operation.current = 'default';
     try {
-      await defaultAction.run('default', () => onSetDefault(id));
+      await defaultAction.run('default', () =>
+        Promise.resolve(onSetDefault(id)).catch((error: unknown) => {
+          if (!(error instanceof MfaCancelledError)) {
+            throw error;
+          }
+        }),
+      );
     } finally {
       operation.current = 'idle';
     }

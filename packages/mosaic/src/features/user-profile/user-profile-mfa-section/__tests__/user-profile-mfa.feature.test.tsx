@@ -46,12 +46,26 @@ describe('User profile MFA', () => {
     await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
     const rows = screen.getAllByText('SMS verification');
     expect(rows).toHaveLength(2);
-    expect(rows[0]?.closest('li')).toHaveTextContent('+15555550202');
+    expect(rows[0]?.closest('li')).toHaveTextContent('+1 (555) 555-0202');
     expect(rows[0]?.closest('li')).toHaveTextContent('Default');
-    expect(rows[1]?.closest('li')).toHaveTextContent('+15555550101');
+    expect(rows[1]?.closest('li')).toHaveTextContent('+1 (555) 555-0101');
     expect(rows[1]?.closest('li')).not.toHaveTextContent('Default');
-    expect(screen.getByText('+15555550202')).toBeVisible();
+    expect(screen.getByText('+1 (555) 555-0202')).toBeVisible();
     expect(screen.getByText('Default')).toBeVisible();
+  });
+
+  it('hides set-as-default while an authenticator is enrolled', async () => {
+    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+    await renderMfa(
+      fapiUser({ id: 'user_1', phone_numbers: [first, second], totp_enabled: true, two_factor_enabled: true }),
+    );
+    expect(screen.getByText('Authenticator app').closest('li')).toHaveTextContent('Default');
+    expect(screen.getAllByText('Default')).toHaveLength(1);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
+    expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
   });
 
   it('verifies a new authenticator and shows server-issued backup codes', async () => {
@@ -149,7 +163,7 @@ describe('User profile MFA', () => {
     );
     expect(screen.getByText('SMS verification')).toBeVisible();
     expect(screen.queryByText('Authenticator app')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Manage SMS verification +15555550101' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' })).toBeNull();
   });
 
   it('keeps backup codes visible when TOTP was the only addable method', async () => {

@@ -2,7 +2,7 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useRef } from 'react';
 
 import { useNow } from '../../../hooks/use-now';
-import { type ErrorDescription, useErrorText } from '../../../localization';
+import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
@@ -314,7 +314,14 @@ function createSmsActions(
   return { submitSms, resendSms };
 }
 
-function createBackupCodeActions(model: ReadyModel, flow: MfaFlow, run: RunMfaAction, send: MfaSend) {
+function createBackupCodeActions(
+  model: ReadyModel,
+  flow: MfaFlow,
+  run: RunMfaAction,
+  send: MfaSend,
+  m: MosaicMessages['userProfileBackupCodes'],
+) {
+  const fileValues = { applicationName: model.applicationName, identifier: model.identifier };
   const generateBackupCodes = () => {
     const generate = model.generateBackupCodes;
     if (!generate) {
@@ -342,18 +349,20 @@ function createBackupCodeActions(model: ReadyModel, flow: MfaFlow, run: RunMfaAc
     if (flow.kind !== 'backup' || !flow.codes.length) {
       return;
     }
-    const url = URL.createObjectURL(new Blob([flow.codes.join('\n')], { type: 'text/plain' }));
+    const content = [fill(m.fileIntro, fileValues), m.fileInstructions, '', ...flow.codes].join('\n');
+    const url = URL.createObjectURL(new Blob([content], { type: 'text/plain' }));
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'clerk-backup-codes.txt';
+    anchor.download = fill(m.fileName, fileValues);
     anchor.click();
     URL.revokeObjectURL(url);
   };
 
-  const print = (titleText: string) => {
+  const print = () => {
     if (flow.kind !== 'backup' || !flow.codes.length) {
       return;
     }
+    const titleText = fill(m.printTitle, fileValues);
     const printable = window.open('', '_blank', 'width=640,height=720');
     if (!printable) {
       send({ type: 'PRINT_FAILED' });
@@ -390,7 +399,7 @@ interface MfaSetupActions {
   generateBackupCodes: () => void;
   copy: () => void;
   download: () => void;
-  print: (titleText: string) => void;
+  print: () => void;
 }
 
 function createSetupProps(
@@ -470,6 +479,7 @@ function useMfaActionRunner(value: string, send: MfaSend) {
 
 export function useUserProfileMfaController(model: ReadyModel, reverificationModel: ReverificationModel) {
   const errorText = useErrorText();
+  const backupCodeMessages = useMessages('userProfileBackupCodes');
   const reverificationProps = useReverificationController(reverificationModel, model.resetReverification);
   const [{ context, value }, send] = useMachine(mfaMachine);
   const { run, isLocked } = useMfaActionRunner(value, send);
@@ -479,7 +489,13 @@ export function useUserProfileMfaController(model: ReadyModel, reverificationMod
   const flow = context.flow;
   const { prepareAuthenticator, verifyAuthenticator } = createAuthenticatorActions(model, flow, run);
   const { submitSms, resendSms } = createSmsActions(model, flow, resendAvailableAt, run, send);
-  const { generateBackupCodes, copy, download, print } = createBackupCodeActions(model, flow, run, send);
+  const { generateBackupCodes, copy, download, print } = createBackupCodeActions(
+    model,
+    flow,
+    run,
+    send,
+    backupCodeMessages,
+  );
 
   const close = () => send({ type: 'CLOSE' });
   const back = () => send({ type: 'BACK', hasPhones: model.phones.length > 0 });

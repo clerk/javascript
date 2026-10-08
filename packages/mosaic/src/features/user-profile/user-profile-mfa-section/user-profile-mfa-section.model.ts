@@ -1,4 +1,5 @@
 import { ClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
+import { getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
@@ -24,6 +25,7 @@ type ProtectedOperation =
   | { kind: 'reservePhone'; userId: string; sessionId: string; phoneId: string }
   | { kind: 'removeAuthenticator'; userId: string; sessionId: string }
   | { kind: 'removePhone'; userId: string; sessionId: string; phoneId: string }
+  | { kind: 'setDefaultPhone'; userId: string; sessionId: string; phoneId: string }
   | { kind: 'generateBackupCodes'; userId: string; sessionId: string };
 
 function configuredFactors(environment: EnvironmentResource | undefined): string[] {
@@ -108,6 +110,14 @@ async function executeProtectedOperation(
       await phone.setReservedForSecondFactor({ reserved: false });
       return { kind: 'done' } as const;
     }
+    case 'setDefaultPhone': {
+      const phone = current.phoneNumbers.find(item => item.id === operation.phoneId);
+      if (!phone?.reservedForSecondFactor || phone.verification.status !== 'verified') {
+        throw new ClerkRuntimeError('This phone number is unavailable.', { code: 'mfa_phone_unavailable' });
+      }
+      await phone.makeDefaultSecondFactor();
+      return { kind: 'done' } as const;
+    }
     case 'generateBackupCodes': {
       if (!currentSecondFactors.includes('backup_code') || usableFactorCount(current, currentSecondFactors) === 0) {
         throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
@@ -126,8 +136,9 @@ function describeMfa(user: UserResource, environment: EnvironmentResource): MfaS
   const reservedPhones = verifiedReservedPhones(user);
   const usableCount = usableFactorCount(user, secondFactors);
   const canRemove = !environment.userSettings.signUp.mfa?.required || usableCount > 1;
+  const authenticatorEnrolled = totpEnabled && user.totpEnabled;
   const methods: UserProfileMfaMethod[] = [];
-  if (totpEnabled && user.totpEnabled) {
+  if (authenticatorEnrolled) {
     methods.push({ id: 'authenticator', type: 'authenticator', isDefault: true, canRemove });
   }
   for (const phone of smsEnabled
@@ -137,9 +148,9 @@ function describeMfa(user: UserResource, environment: EnvironmentResource): MfaS
       id: phone.id,
       type: 'sms',
       description: phone.phoneNumber,
-      isDefault: !(totpEnabled && user.totpEnabled) && phone.defaultSecondFactor,
+      isDefault: !authenticatorEnrolled && phone.defaultSecondFactor,
       canRemove,
-      canSetDefault: !phone.defaultSecondFactor,
+      canSetDefault: !authenticatorEnrolled && !phone.defaultSecondFactor,
     });
   }
   if (backupEnabled && user.backupCodeEnabled) {
@@ -210,11 +221,7 @@ function createSmsActions(
       await currentPhone(phoneId).prepareVerification();
     },
     setDefault: async phoneId => {
-      const phone = currentPhone(phoneId);
-      if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
-        throw new ClerkRuntimeError('This phone number is unavailable.', { code: 'mfa_phone_unavailable' });
-      }
-      await phone.makeDefaultSecondFactor();
+      await runProtected({ kind: 'setDefaultPhone', userId, sessionId, phoneId });
       await refresh().catch(() => undefined);
     },
   };
@@ -270,6 +277,8 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     status: 'ready',
     userId,
     sessionId,
+    applicationName: environment.displayConfig.applicationName,
+    identifier: getIdentifier(user),
     methods,
     addableMethods,
     phones,

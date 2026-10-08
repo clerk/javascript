@@ -11,4 +11,8 @@ export const userProfileBackupCodesMessages = {
   generating: 'Generating backup codes',
   copying: 'Copying backup codes',
   downloading: 'Downloading backup codes',
+  fileName: '{applicationName}_backup_codes.txt',
+  fileIntro: 'These are your backup codes for {applicationName} account {identifier}.',
+  fileInstructions: 'Store them securely and keep them secret. Each code can only be used once.',
+  printTitle: 'Your backup codes for {applicationName} account {identifier}',
 } as const;

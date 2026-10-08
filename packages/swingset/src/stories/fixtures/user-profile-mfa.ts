@@ -4,7 +4,6 @@ import type {
   UserProfileMfaSectionViewProps,
 } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
 import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
-import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useEffect, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -129,7 +128,7 @@ export function useUserProfileMfaFixture({
       return {
         id: phone.id,
         type: 'sms' as const,
-        description: stringToFormattedPhoneString(phone.phoneNumber),
+        description: phone.phoneNumber,
         isDefault,
         canSetDefault: !isDefault,
       };

@@ -1,3 +1,4 @@
+import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import type { Ref } from 'react';
 
 import type { ActionMenuAction } from '../../../components/action-menu';
@@ -22,9 +23,11 @@ export function UserProfileMfaRowView({
 }) {
   const m = useMessages('userProfileMfa');
   const label = method.label ?? m.methods[method.type];
+  const description =
+    method.type === 'sms' && method.description ? stringToFormattedPhoneString(method.description) : method.description;
   const manageLabel =
-    method.type === 'sms' && method.description
-      ? fill(m.manageSms, { label, phoneNumber: method.description })
+    method.type === 'sms' && description
+      ? fill(m.manageSms, { label, phoneNumber: description })
       : fill(m.manage, { label });
   const actions: ActionMenuAction[] = [];
 
@@ -48,7 +51,7 @@ export function UserProfileMfaRowView({
           {label}
           {method.isDefault ? <Badge color='neutral'>{m.default}</Badge> : null}
         </Section.Label>
-        {method.description ? <Section.Description>{method.description}</Section.Description> : null}
+        {description ? <Section.Description>{description}</Section.Description> : null}
       </Section.Content>
       {actions.length > 0 ? (
         <Section.Actions>
