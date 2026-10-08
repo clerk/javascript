@@ -1,0 +1,290 @@
+name: Verify end-to-end tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - 'integration/expo-native/**'
+      - '!integration/expo-native/**/*.md'
+      - '.github/workflows/verify-e2e.yml'
+      - 'integration/templates/expo-native/**'
+      - 'packages/expo/**'
+      - 'packages/expo-biometrics/**'
+      - 'packages/expo-google-signin/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-e2e-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    if: ${{ github.head_ref != 'changeset-release/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.plan.outputs.run }}
+    steps:
+      - name: Decide whether the end-to-end tests can run
+        id: plan
+        env:
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          HAS_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY != '' }}
+          DRAFT: ${{ github.event.pull_request.draft == true }}
+        run: |
+          set -euo pipefail
+
+          skip_reason=""
+          if [ "$DRAFT" = "true" ]; then
+            skip_reason="The end-to-end tests did not run. This pull request is a draft. They run when it is marked ready for review."
+          elif [ "$HEAD_REPOSITORY" != "$GITHUB_REPOSITORY" ]; then
+            skip_reason="The end-to-end tests did not run. They need a repository secret, and this pull request comes from a fork ($HEAD_REPOSITORY)."
+          elif [ "$HAS_PLATFORM_API_KEY" != "true" ]; then
+            skip_reason="The end-to-end tests did not run. The MOBILE_VERIFICATION_PLATFORM_API_KEY secret is not set for this repository."
+          fi
+
+          if [ -n "$skip_reason" ]; then
+            echo "::notice title=End-to-end tests skipped::$skip_reason"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  e2e-tests:
+    needs: plan
+    if: needs.plan.outputs.run == 'true'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ios
+            runner: ${{ vars.VERIFY_CI_RUNNER_IOS || 'macos-26' }}
+          - platform: android
+            runner: ${{ vars.VERIFY_CI_RUNNER_ANDROID || 'ubuntu-24.04' }}
+    env:
+      PACKAGE: integration/expo-native
+      CLI: integration/expo-native/bin/control-clerk-expo
+      PLATFORM: ${{ matrix.platform }}
+      VERIFY_LOCAL_BUILD: standalone
+      VERIFY_NATIVE_CACHE: integration/expo-native/.verify/native
+      VERIFY_THROWAWAY_HOURS: '2'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.15.0
+          cache: ${{ matrix.platform == 'android' && 'pnpm' || '' }}
+
+      - name: Set up JDK 21
+        if: matrix.platform == 'android'
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Enable KVM
+        if: matrix.platform == 'android'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Prepare the device image
+        id: device-image
+        background: true
+        timeout-minutes: 15
+        env:
+          IOS_RUNTIME: com.apple.CoreSimulator.SimRuntime.iOS-26-5
+        run: |
+          set -euo pipefail
+          if [ "$PLATFORM" = "ios" ]; then
+            if ! xcrun simctl list runtimes available -j | jq -e --arg id "$IOS_RUNTIME" '.runtimes[] | select(.identifier == $id)' > /dev/null; then
+              echo "::error::This runner image has no $IOS_RUNTIME. It has: $(xcrun simctl list runtimes available -j | jq -r '[.runtimes[].identifier] | join(", ")')"
+              exit 1
+            fi
+            udid="$(xcrun simctl create "Clerk Verify Template iOS" "iPhone 17 Pro" "$IOS_RUNTIME")"
+            xcrun simctl boot "$udid"
+            xcrun simctl bootstatus "$udid" -b
+            CLERK_TEST_DEVICES="$udid" integration/expo-native/bin/boot-ios-simulators.sh wait
+            xcrun simctl shutdown "$udid"
+          else
+            IMAGE="system-images;android-36;google_apis;x86_64"
+            for attempt in 1 2 3; do
+              if "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "$IMAGE" emulator platform-tools < /dev/null > "$RUNNER_TEMP/sdkmanager.log" 2>&1; then
+                break
+              fi
+              echo "::warning::sdkmanager could not install $IMAGE on attempt $attempt"
+              grep -v '^\[' "$RUNNER_TEMP/sdkmanager.log" | tail -20 || true
+              if [ "$attempt" = "3" ]; then
+                exit 1
+              fi
+            done
+            echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          fi
+
+      - name: Install monorepo dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install the test package
+        id: install
+        run: npm ci --prefix "$PACKAGE" --no-audit --no-fund
+
+      - name: Name the native build that this commit needs
+        id: native
+        run: node "$PACKAGE/src/fixture.ts" native "$PLATFORM" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch a native build that an earlier run made
+        id: kept
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+          NATIVE_ID: ${{ steps.native.outputs.id }}
+          NATIVE_DIR: ${{ steps.native.outputs.dir }}
+          NATIVE_APP: ${{ steps.native.outputs.app }}
+        run: |
+          set -euo pipefail
+
+          fetch() {
+            local name="verify-expo-native-$NATIVE_ID" artifact unpacked
+            artifact="$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=$name&per_page=100" --jq "[.artifacts[] | select(.expired == false and .workflow_run.head_repository_id == .workflow_run.repository_id and .workflow_run.head_branch == \$ENV.BRANCH)] | sort_by(.created_at) | last | .id // empty")" || return 1
+            if [ -z "$artifact" ]; then
+              return 1
+            fi
+            unpacked="$(mktemp -d "$RUNNER_TEMP/native-build.XXXXXX")" || return 1
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact/zip" > "$unpacked.zip" || return 1
+            unzip -q "$unpacked.zip" -d "$unpacked" || return 1
+            mkdir -p "$NATIVE_DIR" || return 1
+            if [ "$PLATFORM" = "ios" ]; then
+              mv "$unpacked" "$NATIVE_DIR/$NATIVE_APP" || return 1
+            else
+              mv "$unpacked/$NATIVE_APP" "$NATIVE_DIR/$NATIVE_APP" || return 1
+            fi
+            echo "Took the native build from artifact $artifact ($name)."
+          }
+
+          if fetch; then
+            echo "found=kept" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "No native build of this branch is kept for $NATIVE_ID, so this job builds it."
+          echo "found=none" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for the device image
+        wait: device-image
+
+      - name: Build the fixture and boot a device
+        timeout-minutes: 30
+        env:
+          CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
+        run: |
+          "$CLI" up --platform "$PLATFORM" --backend local
+
+      - name: Keep the native build for later runs
+        if: ${{ !cancelled() && steps.kept.outputs.found == 'none' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verify-expo-native-${{ steps.native.outputs.id }}
+          path: ${{ steps.native.outputs.dir }}/${{ steps.native.outputs.app }}
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Cache the XCTest runner
+        if: matrix.platform == 'ios'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.agent-device/apple-runner
+          key: verify-agent-device-${{ runner.os }}-${{ hashFiles('integration/expo-native/package-lock.json') }}
+
+      - name: Compile the XCTest runner before the first spec launches
+        if: matrix.platform == 'ios'
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          udid="$(node -p 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).deviceId' "$PACKAGE/.verify/leases/ios.json")"
+          AGENT_DEVICE_STATE_DIR="$GITHUB_WORKSPACE/$PACKAGE/.verify/agent-device" \
+            "$PACKAGE/node_modules/.bin/agent-device" prepare ios-runner --platform ios --udid "$udid" --timeout 900000 \
+            || echo "::warning::prepare ios-runner failed; the run starts its own agent-device daemon, and the first test waits for the XCTest runner"
+
+      - name: Launch the app once before the first spec
+        if: matrix.platform == 'ios'
+        timeout-minutes: 5
+        run: |
+          "$CLI" screen --platform ios > /dev/null || echo "::warning::the first launch failed here; the first spec pays for the cold start"
+
+      - name: Run the golden specs
+        timeout-minutes: 30
+        env:
+          CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          "$CLI" run --all --platform "$PLATFORM" --backend local --retries 1 --github-report
+
+      - name: Release the device and delete the Clerk application
+        if: always() && steps.install.outcome == 'success'
+        env:
+          CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
+        run: |
+          "$CLI" down
+
+      - name: Check that every run is sealed
+        id: evidence
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const runs = path.join(process.env.PACKAGE, ".verify", "runs");
+            const ids = fs.existsSync(runs) ? fs.readdirSync(runs) : [];
+            let upload = ids.length > 0;
+            for (const id of ids) {
+              let record = null;
+              try { record = JSON.parse(fs.readFileSync(path.join(runs, id, "run.json"), "utf8")); } catch {}
+              if (record === null || record.sealed !== true || record.tainted.length > 0) {
+                upload = false;
+                console.log("::warning::Run " + id + " was not sealed, or a file in it holds a secret value. No evidence is uploaded.");
+              }
+            }
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, "upload=" + upload + "\n");
+          '
+
+      - name: Upload the evidence
+        if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verify-e2e-${{ matrix.platform }}
+          overwrite: true
+          include-hidden-files: true
+          path: |
+            ${{ env.PACKAGE }}/.verify/runs/*/run.json
+            ${{ env.PACKAGE }}/.verify/runs/*/app.log
+            ${{ env.PACKAGE }}/.verify/runs/*/driver
+            ${{ env.PACKAGE }}/.verify/runs/*/video.mp4
+            ${{ env.PACKAGE }}/.verify/runs/*/screenshots
+            ${{ env.PACKAGE }}/.verify/runs/*/e2e*/report.json
+            ${{ env.PACKAGE }}/.verify/runs/*/e2e*/junit.xml
+            ${{ env.PACKAGE }}/.verify/runs/*/e2e*/summary.md
+            ${{ env.PACKAGE }}/.verify/runs/*/e2e*/failures
+            ${{ env.PACKAGE }}/.verify/runs/*/e2e*/artifacts
+          retention-days: 3
+          if-no-files-found: warn
