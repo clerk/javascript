@@ -77,17 +77,17 @@ export function UserProfileMfaSectionView({
         ))}
       </UserProfileSecurityList>
       <Section.Error>{controller.defaultError}</Section.Error>
-      {onRemove && controller.removal ? (
+      {onRemove && controller.selectedMethod ? (
         <Confirmation
-          open
+          open={controller.confirmation.isOpen}
           onOpenChange={controller.onRemovalOpenChange}
-          title={controller.removal.method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle}
-          description={describeMethodRemoval(controller.removal.method, m)}
+          title={controller.selectedMethod.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle}
+          description={describeMethodRemoval(controller.selectedMethod, m)}
           actionLabel={m.removeDialog.confirm}
           finalFocus={controller.finalRemovalFocus}
           onConfirm={controller.confirmRemoval}
-          isConfirming={controller.removal.status === 'pending'}
-          errorMessage={controller.removal.error}
+          isConfirming={controller.confirmation.isConfirming}
+          errorMessage={controller.confirmation.errorMessage}
         />
       ) : null}
     </>

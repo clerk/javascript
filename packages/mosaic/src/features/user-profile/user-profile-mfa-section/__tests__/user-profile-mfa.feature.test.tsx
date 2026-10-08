@@ -3,10 +3,16 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnvironment, fapiPhoneNumber, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileMfaSection } from '../user-profile-mfa-section/user-profile-mfa-section';
+import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import {
+  fapiClient,
+  fapiEnvironment,
+  fapiPhoneNumber,
+  fapiSession,
+  fapiUser,
+} from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileMfaSection } from '../user-profile-mfa-section';
 import { mfaEnvironment, phone, renderMfa } from './mfa-feature-setup';
 
 describe('User profile MFA', () => {
@@ -281,7 +287,8 @@ describe('User profile MFA', () => {
     await screen.findByRole('textbox', { name: 'Verification code' });
     const held = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
     const later = Date.now() + 31_000;
-    const clock = vi.spyOn(Date, 'now').mockReturnValue(later);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(later);
     try {
       await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 2000 });
       await user.click(screen.getByRole('button', { name: /Resend/ }));
@@ -290,8 +297,9 @@ describe('User profile MFA', () => {
       expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
     } finally {
       held.release();
-      clock.mockRestore();
+      vi.useRealTimers();
     }
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Verify' })).toBeEnabled());
   });
 
   it('keeps a newly created phone when preparing its code fails and retries without duplication', async () => {

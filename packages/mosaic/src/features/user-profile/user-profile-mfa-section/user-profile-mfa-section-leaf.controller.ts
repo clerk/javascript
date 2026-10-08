@@ -1,16 +1,11 @@
 import { useRef, useState } from 'react';
 
+import { useConfirmationController } from '../../../blocks/confirmation/confirmation.controller';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
-import { useErrorText, useMessages } from '../../../localization';
-import { toLocalizableError } from '../../../utils/errors';
+import { usePendingAction } from '../../../hooks/use-pending-action';
+import { useMessages } from '../../../localization';
 import { MfaCancelledError, type UserProfileMfaMethod } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
-
-type LeafState =
-  | { kind: 'idle'; defaultError?: string }
-  | { kind: 'settingDefault' }
-  | { kind: 'confirmingRemoval'; method: UserProfileMfaMethod; error?: string }
-  | { kind: 'removing'; method: UserProfileMfaMethod };
 
 export function useUserProfileMfaSectionLeafController({
   methods,
@@ -18,8 +13,6 @@ export function useUserProfileMfaSectionLeafController({
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const errors = useMessages('errors');
-  const errorText = useErrorText();
   const sectionRef = useRef<HTMLDivElement>(null);
   const triggers = useRef(new Map<string, HTMLButtonElement>());
   const lastRemovalId = useRef<string>();
@@ -30,8 +23,10 @@ export function useUserProfileMfaSectionLeafController({
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
   });
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [state, setState] = useState<LeafState>({ kind: 'idle' });
+  const [selectedMethod, setSelectedMethod] = useState<UserProfileMfaMethod>();
   const operation = useRef<'idle' | 'default' | 'remove'>('idle');
+  const defaultAction = usePendingAction<'default'>({ errorFallback: m.setDefaultError });
+  const confirmation = useConfirmationController();
 
   const setDefault = async (id: string) => {
     const method = methods.find(method => method.id === id);
@@ -45,62 +40,46 @@ export function useUserProfileMfaSectionLeafController({
       return;
     }
     operation.current = 'default';
-    setState({ kind: 'settingDefault' });
     try {
-      await onSetDefault(id);
-      setState({ kind: 'idle' });
-    } catch (error) {
-      setState({ kind: 'idle', defaultError: errorText(toLocalizableError(error), m.setDefaultError) });
+      await defaultAction.run('default', () => onSetDefault(id));
     } finally {
       operation.current = 'idle';
     }
   };
 
-  const confirmRemoval = async () => {
-    if (state.kind !== 'confirmingRemoval' || operation.current !== 'idle') {
+  const confirmRemoval = () => {
+    if (!selectedMethod || !confirmation.isOpen || operation.current !== 'idle') {
       return;
     }
-    const method = state.method;
+    const method = selectedMethod;
     operation.current = 'remove';
-    setState({ kind: 'removing', method });
-    try {
-      await removalFocus.remove(method.id);
-      setState({ kind: 'idle' });
-    } catch (error) {
-      if (error instanceof MfaCancelledError) {
-        setState({ kind: 'idle' });
-      } else {
-        setState({ kind: 'confirmingRemoval', method, error: errorText(toLocalizableError(error), errors.generic) });
+    confirmation.onConfirm(async () => {
+      try {
+        await removalFocus.remove(method.id);
+      } catch (error) {
+        if (!(error instanceof MfaCancelledError)) {
+          throw error;
+        }
+      } finally {
+        operation.current = 'idle';
       }
-    } finally {
-      operation.current = 'idle';
-    }
+    });
   };
-
-  const removal =
-    state.kind === 'confirmingRemoval' || state.kind === 'removing'
-      ? ({
-          method: state.method,
-          status: state.kind === 'removing' ? 'pending' : 'confirming',
-          error: state.kind === 'confirmingRemoval' ? state.error : undefined,
-        } as const)
-      : undefined;
 
   return {
     sectionRef,
     pickerOpen,
     onPickerOpenChange: setPickerOpen,
     closePicker: () => setPickerOpen(false),
-    removal,
-    onRemovalOpenChange: (open: boolean) => {
-      if (!open && operation.current === 'idle') {
-        setState({ kind: 'idle' });
-      }
-    },
+    selectedMethod,
+    confirmation,
+    onRemovalOpenChange: confirmation.onOpenChange,
     openRemoval: (method: UserProfileMfaMethod) => {
       if (operation.current === 'idle') {
+        defaultAction.reset();
         lastRemovalId.current = method.id;
-        setState({ kind: 'confirmingRemoval', method });
+        setSelectedMethod(method);
+        confirmation.onOpenChange(true);
       }
     },
     confirmRemoval,
@@ -119,8 +98,8 @@ export function useUserProfileMfaSectionLeafController({
         }
       };
     },
-    isSettingDefault: state.kind === 'settingDefault',
-    defaultError: state.kind === 'idle' ? state.defaultError : undefined,
+    isSettingDefault: defaultAction.isPending,
+    defaultError: defaultAction.error,
     setDefault,
   };
 }

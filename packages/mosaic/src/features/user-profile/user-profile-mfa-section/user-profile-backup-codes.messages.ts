@@ -4,7 +4,6 @@ export const userProfileBackupCodesMessages = {
   codesLabel: 'Backup codes',
   download: 'Download',
   print: 'Print',
-  printUnavailable: 'Printing is unavailable in this browser.',
   copyAndClose: 'Copy and close',
   cancel: 'Cancel',
   back: 'Back',

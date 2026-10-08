@@ -2,6 +2,7 @@ import type { ClientJSON, PhoneNumberJSON, UserJSON } from '@clerk/shared/types'
 import { http, HttpResponse } from 'msw';
 
 import { type FapiEnvironment, fapiPhoneNumber, fapiVerification } from '../fapi';
+import { envelope, missing, requestUser, updateUser } from './shared';
 
 export interface FakeMfaState {
   totpCreations: number;
@@ -33,7 +34,6 @@ export function mfaHandlers(
   state: { client: ClientJSON; environment: FapiEnvironment; mfa: FakeMfaState },
   fapiUrl: (path: string) => string,
 ) {
-  const active = () => state.client.sessions.find(session => session.id === state.client.last_active_session_id);
   const backupEnabled = () =>
     state.environment.user_settings.attributes.backup_code.enabled &&
     state.environment.user_settings.attributes.backup_code.used_for_second_factor;
@@ -43,82 +43,69 @@ export function mfaHandlers(
       .length;
   const error = (code: string, message: string, status = 400) =>
     HttpResponse.json({ errors: [{ code, message, long_message: message }] }, { status });
-  const respond = (response: object) => HttpResponse.json({ response, client: state.client });
-  const missing = () =>
-    HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
-  const updateUser = (transform: (user: UserJSON) => UserJSON) => {
-    const session = active();
-    if (!session) {
+  const updatePhone = (user: UserJSON, id: string, transform: (phone: PhoneNumberJSON) => PhoneNumberJSON) => {
+    const phone = user.phone_numbers.find(phone => phone.id === id);
+    if (!phone) {
       return undefined;
     }
-    const user = transform(session.user);
-    state.client = {
-      ...state.client,
-      sessions: state.client.sessions.map(item => (item.id === session.id ? { ...item, user } : item)),
-    };
-    return user;
-  };
-  const updatePhone = (id: string, transform: (phone: PhoneNumberJSON) => PhoneNumberJSON) => {
-    let updated: PhoneNumberJSON | undefined;
-    updateUser(user => ({
+    const updated = transform(phone);
+    updateUser(state, {
       ...user,
-      phone_numbers: user.phone_numbers.map(phone => {
-        if (phone.id !== id) {
-          return phone;
-        }
-        updated = transform(phone);
-        return updated;
-      }),
-    }));
+      phone_numbers: user.phone_numbers.map(phone => (phone.id === id ? updated : phone)),
+    });
     return updated;
   };
 
   return [
-    http.get(fapiUrl('/v1/me'), () => {
-      const session = active();
-      return session ? respond(session.user) : missing();
-    }),
     http.post(fapiUrl('/v1/me/totp'), ({ request }) => {
-      if (!active()) {
+      const currentUser = requestUser(state, request);
+      if (!currentUser) {
         return missing();
       }
       if (new URL(request.url).searchParams.get('_method') === 'DELETE') {
-        const currentUser = active()?.user;
         if (
-          !currentUser?.totp_enabled ||
+          !currentUser.totp_enabled ||
           (state.environment.user_settings.sign_up.mfa?.required && usableFactors(currentUser) <= 1)
         ) {
           return error('second_factor_deletion_not_allowed', 'This method cannot be removed.');
         }
         state.mfa.totpRemovals += 1;
-        const user = updateUser(current => ({
-          ...current,
+        updateUser(state, {
+          ...currentUser,
           totp_enabled: false,
-          two_factor_enabled: current.phone_numbers.some(phone => phone.reserved_for_second_factor),
+          two_factor_enabled: currentUser.phone_numbers.some(phone => phone.reserved_for_second_factor),
           backup_code_enabled:
-            current.phone_numbers.some(phone => phone.reserved_for_second_factor) && current.backup_code_enabled,
-        }));
-        return user ? respond({ object: 'deleted', id: 'totp_1' }) : missing();
+            currentUser.phone_numbers.some(phone => phone.reserved_for_second_factor) &&
+            currentUser.backup_code_enabled,
+        });
+        return envelope({ object: 'deleted', id: 'totp_1' }, state.client);
       }
       if (
-        active()?.user.totp_enabled ||
+        currentUser.totp_enabled ||
         !state.environment.user_settings.attributes.authenticator_app.used_for_second_factor
       ) {
         return error('form_param_value_invalid', 'Authenticator is unavailable.', 422);
       }
       state.mfa.totpCreations += 1;
-      return respond({
-        object: 'totp',
-        id: 'totp_1',
-        secret: `SECRET${state.mfa.totpCreations}`,
-        uri: `otpauth://totp/Acme:user?secret=SECRET${state.mfa.totpCreations}`,
-        verified: false,
-        created_at: Date.now(),
-        updated_at: Date.now(),
-      });
+      return envelope(
+        {
+          object: 'totp',
+          id: 'totp_1',
+          secret: `SECRET${state.mfa.totpCreations}`,
+          uri: `otpauth://totp/Acme:user?secret=SECRET${state.mfa.totpCreations}`,
+          verified: false,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        state.client,
+      );
     }),
     http.post(fapiUrl('/v1/me/totp/attempt_verification'), async ({ request }) => {
-      if (state.mfa.totpCreations === 0 || active()?.user.totp_enabled) {
+      const currentUser = requestUser(state, request);
+      if (!currentUser) {
+        return missing();
+      }
+      if (state.mfa.totpCreations === 0 || currentUser.totp_enabled) {
         return error('form_param_value_invalid', 'No authenticator setup is pending.', 422);
       }
       const code = new URLSearchParams(await request.text()).get('code') ?? '';
@@ -129,27 +116,27 @@ export function mfaHandlers(
           { status: 422 },
         );
       }
-      const newCodes = backupEnabled() && !active()?.user.backup_code_enabled;
-      const user = updateUser(current => ({
-        ...current,
+      const newCodes = backupEnabled() && !currentUser.backup_code_enabled;
+      updateUser(state, {
+        ...currentUser,
         totp_enabled: true,
         two_factor_enabled: true,
-        backup_code_enabled: current.backup_code_enabled || newCodes,
-      }));
-      if (!user) {
-        return missing();
-      }
-      return respond({
-        object: 'totp',
-        id: 'totp_1',
-        verified: true,
-        ...(newCodes ? { backup_codes: state.mfa.codes } : {}),
-        created_at: Date.now(),
-        updated_at: Date.now(),
+        backup_code_enabled: currentUser.backup_code_enabled || newCodes,
       });
+      return envelope(
+        {
+          object: 'totp',
+          id: 'totp_1',
+          verified: true,
+          ...(newCodes ? { backup_codes: state.mfa.codes } : {}),
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        state.client,
+      );
     }),
-    http.post(fapiUrl('/v1/me/backup_codes/'), () => {
-      const currentUser = active()?.user;
+    http.post(fapiUrl('/v1/me/backup_codes/'), ({ request }) => {
+      const currentUser = requestUser(state, request);
       if (!currentUser || usableFactors(currentUser) === 0 || !backupEnabled()) {
         return error('form_param_value_invalid', 'Set up a verification method first.', 422);
       }
@@ -158,21 +145,26 @@ export function mfaHandlers(
         { length: 10 },
         (_, index) => `CODE${String(state.mfa.backupCodeCreations).padStart(2, '0')}${String(index).padStart(2, '0')}`,
       );
-      const user = updateUser(current => ({ ...current, backup_code_enabled: true }));
-      return user
-        ? respond({
-            object: 'backup_code',
-            id: 'backup_1',
-            codes: state.mfa.codes,
-            created_at: Date.now(),
-            updated_at: Date.now(),
-          })
-        : missing();
+      updateUser(state, { ...currentUser, backup_code_enabled: true });
+      return envelope(
+        {
+          object: 'backup_code',
+          id: 'backup_1',
+          codes: state.mfa.codes,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        state.client,
+      );
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/'), async ({ request }) => {
+      const currentUser = requestUser(state, request);
+      if (!currentUser) {
+        return missing();
+      }
       const number = new URLSearchParams(await request.text()).get('phone_number') ?? '';
       state.mfa.phoneCreations.push(number);
-      if (active()?.user.phone_numbers.some(phone => phone.phone_number === number)) {
+      if (currentUser.phone_numbers.some(phone => phone.phone_number === number)) {
         return HttpResponse.json(
           {
             errors: [
@@ -187,7 +179,7 @@ export function mfaHandlers(
           { status: 422 },
         );
       }
-      const existingIds = new Set(active()?.user.phone_numbers.map(phone => phone.id));
+      const existingIds = new Set(currentUser.phone_numbers.map(phone => phone.id));
       let nextPhoneNumber = state.mfa.phoneCreations.length;
       while (existingIds.has(`phone_${nextPhoneNumber}`)) {
         nextPhoneNumber += 1;
@@ -197,16 +189,27 @@ export function mfaHandlers(
         phone_number: number,
         verification: fapiVerification('phone_code'),
       });
-      const user = updateUser(current => ({ ...current, phone_numbers: [...current.phone_numbers, phone] }));
-      return user ? respond(phone) : missing();
+      updateUser(state, { ...currentUser, phone_numbers: [...currentUser.phone_numbers, phone] });
+      return envelope(phone, state.client);
     }),
-    http.post(fapiUrl('/v1/me/phone_numbers/:id/prepare_verification'), ({ params }) => {
+    http.post(fapiUrl('/v1/me/phone_numbers/:id/prepare_verification'), ({ params, request }) => {
+      const currentUser = requestUser(state, request);
+      if (!currentUser) {
+        return missing();
+      }
       const id = String(params.id);
       state.mfa.phonePreparations.push(id);
-      const phone = updatePhone(id, current => ({ ...current, verification: fapiVerification('phone_code') }));
-      return phone ? respond(phone) : missing();
+      const phone = updatePhone(currentUser, id, current => ({
+        ...current,
+        verification: fapiVerification('phone_code'),
+      }));
+      return phone ? envelope(phone, state.client) : missing();
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id/attempt_verification'), async ({ params, request }) => {
+      const currentUser = requestUser(state, request);
+      if (!currentUser) {
+        return missing();
+      }
       const id = String(params.id);
       const code = new URLSearchParams(await request.text()).get('code') ?? '';
       state.mfa.phoneAttempts.push({ id, code });
@@ -216,11 +219,11 @@ export function mfaHandlers(
           { status: 422 },
         );
       }
-      const phone = updatePhone(id, current => ({
+      const phone = updatePhone(currentUser, id, current => ({
         ...current,
         verification: fapiVerification('phone_code', { status: 'verified' }),
       }));
-      return phone ? respond(phone) : missing();
+      return phone ? envelope(phone, state.client) : missing();
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id'), async ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
@@ -233,63 +236,51 @@ export function mfaHandlers(
         : undefined;
       const isDefault = body.has('default_second_factor') ? body.get('default_second_factor') === 'true' : undefined;
       state.mfa.phoneUpdates.push({ id, reserved, default: isDefault });
-      const previous = active()?.user;
-      const existingPhone = previous?.phone_numbers.find(phone => phone.id === id);
-      if (reserved === true && (!existingPhone || existingPhone.verification.status !== 'verified')) {
+      const user = requestUser(state, request);
+      const existingPhone = user?.phone_numbers.find(phone => phone.id === id);
+      if (!user || !existingPhone) {
+        return missing();
+      }
+      if (reserved === true && existingPhone.verification.status !== 'verified') {
         return error(
           'identification_update_second_factor_unverified',
           'Cannot update second factor attributes for unverified identification',
         );
       }
-      if (
-        reserved === false &&
-        state.environment.user_settings.sign_up.mfa?.required &&
-        previous &&
-        usableFactors(previous) <= 1
-      ) {
+      if (reserved === false && state.environment.user_settings.sign_up.mfa?.required && usableFactors(user) <= 1) {
         return error('second_factor_deletion_not_allowed', 'This method cannot be removed.');
       }
-      const firstReservedPhone = !previous?.phone_numbers.some(item => item.reserved_for_second_factor);
-      const newCodes = reserved && backupEnabled() && !previous?.backup_code_enabled;
-      const phone = updatePhone(id, current => ({
-        ...current,
-        reserved_for_second_factor: reserved ?? current.reserved_for_second_factor,
+      const firstReservedPhone = !user.phone_numbers.some(item => item.reserved_for_second_factor);
+      const newCodes = reserved && backupEnabled() && !user.backup_code_enabled;
+      const phone = {
+        ...existingPhone,
+        reserved_for_second_factor: reserved ?? existingPhone.reserved_for_second_factor,
         default_second_factor:
           isDefault ??
-          (reserved && firstReservedPhone ? true : reserved === false ? false : current.default_second_factor),
+          (reserved && firstReservedPhone ? true : reserved === false ? false : existingPhone.default_second_factor),
         backup_codes: newCodes ? state.mfa.codes : undefined,
-      }));
-      if (isDefault) {
-        updateUser(user => ({
-          ...user,
-          phone_numbers: user.phone_numbers.map(item =>
-            item.id === id ? item : { ...item, default_second_factor: false },
-          ),
-        }));
-      }
-      if (reserved !== undefined) {
-        updateUser(user => ({
-          ...user,
-          two_factor_enabled: user.totp_enabled || user.phone_numbers.some(item => item.reserved_for_second_factor),
-          backup_code_enabled: reserved
-            ? user.backup_code_enabled || Boolean(newCodes)
-            : user.totp_enabled || user.phone_numbers.some(item => item.reserved_for_second_factor)
-              ? user.backup_code_enabled
-              : false,
-        }));
-        if (reserved === false && previous?.phone_numbers.find(item => item.id === id)?.default_second_factor) {
-          updateUser(user => {
-            const next = user.phone_numbers.find(item => item.reserved_for_second_factor);
-            return {
-              ...user,
-              phone_numbers: user.phone_numbers.map(item =>
-                item.id === next?.id ? { ...item, default_second_factor: true } : item,
-              ),
-            };
-          });
+      };
+      let phones = user.phone_numbers.map(item => {
+        if (item.id === id) {
+          return phone;
         }
+        return isDefault ? { ...item, default_second_factor: false } : item;
+      });
+      if (reserved === false && existingPhone.default_second_factor) {
+        const next = phones.find(item => item.reserved_for_second_factor);
+        phones = phones.map(item => (item.id === next?.id ? { ...item, default_second_factor: true } : item));
       }
-      return phone ? respond(phone) : missing();
+      const hasFactor = user.totp_enabled || phones.some(item => item.reserved_for_second_factor);
+      updateUser(state, {
+        ...user,
+        phone_numbers: phones,
+        two_factor_enabled: reserved === undefined ? user.two_factor_enabled : hasFactor,
+        backup_code_enabled:
+          reserved === undefined
+            ? user.backup_code_enabled
+            : hasFactor && (user.backup_code_enabled || Boolean(newCodes)),
+      });
+      return envelope(phone, state.client);
     }),
   ];
 }

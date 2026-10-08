@@ -17,7 +17,7 @@ export interface UserProfileBackupCodesViewProps {
   onRetry: () => void;
   onCopy: () => void;
   onDownload: () => void;
-  onPrint?: (title: string, unavailableMessage: string) => void;
+  onPrint?: (title: string) => void;
   pendingAction?: 'generate' | 'copy' | 'download';
   errorMessage?: string;
 }
@@ -100,7 +100,7 @@ export function UserProfileBackupCodesView({
                 variant='outline'
                 color='neutral'
                 fullWidth
-                onClick={() => onPrint(m.codesLabel, m.printUnavailable)}
+                onClick={() => onPrint(m.codesLabel)}
               >
                 {m.print}
               </Button>

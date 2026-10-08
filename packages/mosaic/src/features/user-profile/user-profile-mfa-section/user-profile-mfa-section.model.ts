@@ -1,10 +1,8 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
+import { ClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
-import { isLocalizableError, useErrorText, useMessages } from '../../../localization';
-import { SaveError, toLocalizableError } from '../../../utils/errors';
 import { useReverificationWithState } from '../../reverification/use-reverification-with-state';
 import {
   MfaCancelledError,
@@ -15,6 +13,11 @@ import {
   type UserProfileMfaMethod,
   type UserProfileMfaModel,
 } from './user-profile-mfa-section.types';
+
+type ReadyModel = Extract<UserProfileMfaModel, { status: 'ready' }>;
+type MfaSnapshotData = Pick<ReadyModel, 'methods' | 'addableMethods' | 'phones'>;
+type ProtectedResult = Awaited<ReturnType<typeof executeProtectedOperation>>;
+type RunProtected = (operation: ProtectedOperation) => Promise<ProtectedResult>;
 
 type ProtectedOperation =
   | { kind: 'createAuthenticator'; userId: string; sessionId: string }
@@ -48,111 +51,78 @@ function summarizePhone(phone: PhoneNumberResource): MfaPhone {
   };
 }
 
-function errorMessage(error: unknown, localize: ReturnType<typeof useErrorText>): Error {
-  if (error instanceof MfaCancelledError) {
-    return error;
+function requireIdentity(clerk: ReturnType<typeof useClerk>, userId: string, sessionId: string): UserResource {
+  const current = clerk.user;
+  if (!current || current.id !== userId || clerk.session?.id !== sessionId) {
+    throw new ClerkRuntimeError('This account changed. Please reopen verification.', { code: 'mfa_account_changed' });
   }
-  const description = toLocalizableError(error);
-  return new SaveError({
-    global: {
-      ...(isLocalizableError(description) ? description : { code: 'generic' }),
-      message: localize(description),
-    },
-  });
+  return current;
 }
 
-export function useUserProfileMfaModel(): UserProfileMfaModel {
-  const clerk = useClerk();
-  const { isLoaded: userLoaded, user } = useUser();
-  const { isLoaded: sessionLoaded, session } = useSession();
-  const environment = useMosaicEnvironment();
-  const localize = useErrorText();
-  const m = useMessages('userProfileMfa');
-
-  const requireIdentity = (userId: string, sessionId: string): UserResource => {
-    const current = clerk.user;
-    if (!current || current.id !== userId || clerk.session?.id !== sessionId) {
-      throw new SaveError({ global: { code: 'mfa_account_changed', message: m.errors.accountChanged } });
-    }
-    return current;
-  };
-
-  const [protectedAction, reverification, resetReverification] = useReverificationWithState(
-    async (operation: ProtectedOperation) => {
-      const current = requireIdentity(operation.userId, operation.sessionId);
-      const currentSecondFactors = configuredFactors(environment);
-      switch (operation.kind) {
-        case 'createAuthenticator': {
-          if (current.totpEnabled || !currentSecondFactors.includes('totp')) {
-            throw new SaveError({
-              global: { code: 'mfa_authenticator_unavailable', message: m.errors.authenticatorUnavailable },
-            });
-          }
-          const result = await current.createTOTP();
-          return { kind: 'authenticatorSetup', secret: result.secret ?? '', uri: result.uri ?? '' } as const;
-        }
-        case 'reservePhone': {
-          const phone = current.phoneNumbers.find(item => item.id === operation.phoneId);
-          if (
-            !phone ||
-            phone.verification.status !== 'verified' ||
-            phone.reservedForSecondFactor ||
-            !currentSecondFactors.includes('phone_code')
-          ) {
-            throw new SaveError({ global: { code: 'mfa_phone_unavailable', message: m.errors.phoneUnavailable } });
-          }
-          const result = await phone.setReservedForSecondFactor({ reserved: true });
-          return { kind: 'enrollment', backupCodes: result.backupCodes ?? [] } as const;
-        }
-        case 'removeAuthenticator': {
-          const usableCount = usableFactorCount(current, currentSecondFactors);
-          if (!current.totpEnabled || (environment?.userSettings.signUp.mfa?.required && usableCount <= 1)) {
-            throw new SaveError({ global: { code: 'mfa_method_cannot_remove', message: m.errors.methodCannotRemove } });
-          }
-          await current.disableTOTP();
-          return { kind: 'done' } as const;
-        }
-        case 'removePhone': {
-          const phone = current.phoneNumbers.find(item => item.id === operation.phoneId);
-          const usableCount = usableFactorCount(current, currentSecondFactors);
-          if (
-            !phone?.reservedForSecondFactor ||
-            phone.verification.status !== 'verified' ||
-            (environment?.userSettings.signUp.mfa?.required && usableCount <= 1)
-          ) {
-            throw new SaveError({ global: { code: 'mfa_method_cannot_remove', message: m.errors.methodCannotRemove } });
-          }
-          await phone.setReservedForSecondFactor({ reserved: false });
-          return { kind: 'done' } as const;
-        }
-        case 'generateBackupCodes': {
-          if (!currentSecondFactors.includes('backup_code') || usableFactorCount(current, currentSecondFactors) === 0) {
-            throw new SaveError({ global: { code: 'mfa_setup_factor_first', message: m.errors.setupFactorFirst } });
-          }
-          const result = await current.createBackupCode();
-          return { kind: 'backupCodes', codes: result.codes } as const;
-        }
+async function executeProtectedOperation(
+  clerk: ReturnType<typeof useClerk>,
+  environment: EnvironmentResource | undefined,
+  operation: ProtectedOperation,
+) {
+  const current = requireIdentity(clerk, operation.userId, operation.sessionId);
+  const currentSecondFactors = configuredFactors(environment);
+  switch (operation.kind) {
+    case 'createAuthenticator': {
+      if (current.totpEnabled || !currentSecondFactors.includes('totp')) {
+        throw new ClerkRuntimeError('Authenticator is unavailable.', { code: 'mfa_authenticator_unavailable' });
       }
-    },
-  );
-
-  if (!userLoaded || !sessionLoaded || !environment) {
-    return { status: 'loading', reverification, resetReverification };
+      const result = await current.createTOTP();
+      return { kind: 'authenticatorSetup', secret: result.secret ?? '', uri: result.uri ?? '' } as const;
+    }
+    case 'reservePhone': {
+      const phone = current.phoneNumbers.find(item => item.id === operation.phoneId);
+      if (
+        !phone ||
+        phone.verification.status !== 'verified' ||
+        phone.reservedForSecondFactor ||
+        !currentSecondFactors.includes('phone_code')
+      ) {
+        throw new ClerkRuntimeError('This phone number is unavailable.', { code: 'mfa_phone_unavailable' });
+      }
+      const result = await phone.setReservedForSecondFactor({ reserved: true });
+      return { kind: 'enrollment', backupCodes: result.backupCodes ?? [] } as const;
+    }
+    case 'removeAuthenticator': {
+      const usableCount = usableFactorCount(current, currentSecondFactors);
+      if (!current.totpEnabled || (environment?.userSettings.signUp.mfa?.required && usableCount <= 1)) {
+        throw new ClerkRuntimeError('This method cannot be removed.', { code: 'mfa_method_cannot_remove' });
+      }
+      await current.disableTOTP();
+      return { kind: 'done' } as const;
+    }
+    case 'removePhone': {
+      const phone = current.phoneNumbers.find(item => item.id === operation.phoneId);
+      const usableCount = usableFactorCount(current, currentSecondFactors);
+      if (
+        !phone?.reservedForSecondFactor ||
+        phone.verification.status !== 'verified' ||
+        (environment?.userSettings.signUp.mfa?.required && usableCount <= 1)
+      ) {
+        throw new ClerkRuntimeError('This method cannot be removed.', { code: 'mfa_method_cannot_remove' });
+      }
+      await phone.setReservedForSecondFactor({ reserved: false });
+      return { kind: 'done' } as const;
+    }
+    case 'generateBackupCodes': {
+      if (!currentSecondFactors.includes('backup_code') || usableFactorCount(current, currentSecondFactors) === 0) {
+        throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
+      }
+      const result = await current.createBackupCode();
+      return { kind: 'backupCodes', codes: result.codes } as const;
+    }
   }
-  if (!user || !session) {
-    return { status: 'hidden', reverification, resetReverification };
-  }
+}
 
+function describeMfa(user: UserResource, environment: EnvironmentResource): MfaSnapshotData {
   const secondFactors = configuredFactors(environment);
   const smsEnabled = secondFactors.includes('phone_code');
   const totpEnabled = secondFactors.includes('totp');
   const backupEnabled = secondFactors.includes('backup_code');
-  if (!smsEnabled && !totpEnabled) {
-    return { status: 'hidden', reverification, resetReverification };
-  }
-
-  const userId = user.id;
-  const sessionId = session.id;
   const reservedPhones = verifiedReservedPhones(user);
   const usableCount = usableFactorCount(user, secondFactors);
   const canRemove = !environment.userSettings.signUp.mfa?.required || usableCount > 1;
@@ -186,8 +156,101 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     addableMethods.push('backup-codes');
   }
 
+  return {
+    methods,
+    addableMethods,
+    phones: user.phoneNumbers.filter(phone => !phone.reservedForSecondFactor).map(summarizePhone),
+  };
+}
+
+function createSmsActions(
+  clerk: ReturnType<typeof useClerk>,
+  userId: string,
+  sessionId: string,
+  runProtected: RunProtected,
+  refresh: () => Promise<void>,
+): Pick<ReadyModel, 'findOrCreatePhone' | 'enrollSms' | 'resendSms' | 'setDefault'> {
+  const currentPhone = (phoneId: string) => {
+    const current = requireIdentity(clerk, userId, sessionId);
+    const phone = current.phoneNumbers.find(item => item.id === phoneId);
+    if (!phone) {
+      throw new ClerkRuntimeError('This phone number is unavailable.', { code: 'mfa_phone_unavailable' });
+    }
+    return phone;
+  };
+
+  return {
+    findOrCreatePhone: async phoneNumber => {
+      const current = requireIdentity(clerk, userId, sessionId);
+      const existing = current.phoneNumbers.find(
+        phone => !phone.reservedForSecondFactor && phone.phoneNumber === phoneNumber,
+      );
+      return summarizePhone(existing ?? (await current.createPhoneNumber({ phoneNumber })));
+    },
+    enrollSms: async (phoneId, code): Promise<SmsEnrollmentResult> => {
+      let phone = currentPhone(phoneId);
+      if (phone.verification.status !== 'verified') {
+        if (!code) {
+          await phone.prepareVerification();
+          return { status: 'needsVerification', phone: summarizePhone(phone) };
+        }
+        await phone.attemptVerification({ code });
+        phone = currentPhone(phoneId);
+      }
+      const result = await runProtected({ kind: 'reservePhone', userId, sessionId, phoneId });
+      if (result.kind !== 'enrollment') {
+        throw new ClerkRuntimeError('The verification response was unexpected. Please try again.', {
+          code: 'mfa_unexpected_response',
+        });
+      }
+      await refresh().catch(() => undefined);
+      return { status: 'complete', backupCodes: result.backupCodes };
+    },
+    resendSms: async phoneId => {
+      await currentPhone(phoneId).prepareVerification();
+    },
+    setDefault: async phoneId => {
+      const phone = currentPhone(phoneId);
+      if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
+        throw new ClerkRuntimeError('This phone number is unavailable.', { code: 'mfa_phone_unavailable' });
+      }
+      await phone.makeDefaultSecondFactor();
+      await refresh().catch(() => undefined);
+    },
+  };
+}
+
+export function useUserProfileMfaModel(): UserProfileMfaModel {
+  const clerk = useClerk();
+  const { isLoaded: userLoaded, user } = useUser();
+  const { isLoaded: sessionLoaded, session } = useSession();
+  const environment = useMosaicEnvironment();
+
+  const [protectedAction, reverification, resetReverification] = useReverificationWithState(
+    (operation: ProtectedOperation) => executeProtectedOperation(clerk, environment, operation),
+  );
+
+  if (!userLoaded || !sessionLoaded || !environment) {
+    return { status: 'loading', reverification, resetReverification };
+  }
+  if (!user || !session) {
+    return { status: 'hidden', reverification, resetReverification };
+  }
+
+  const secondFactors = configuredFactors(environment);
+  const smsEnabled = secondFactors.includes('phone_code');
+  const totpEnabled = secondFactors.includes('totp');
+  const backupEnabled = secondFactors.includes('backup_code');
+  if (!smsEnabled && !totpEnabled) {
+    return { status: 'hidden', reverification, resetReverification };
+  }
+
+  const userId = user.id;
+  const sessionId = session.id;
+  const { methods, addableMethods, phones } = describeMfa(user, environment);
+  const usableCount = usableFactorCount(user, secondFactors);
   const refresh = async () => {
-    const current = requireIdentity(userId, sessionId);
+    const current = requireIdentity(clerk, userId, sessionId);
     await current.reload();
   };
   const runProtected = async (operation: ProtectedOperation) => {
@@ -197,17 +260,11 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
       if (isReverificationCancelledError(error)) {
         throw new MfaCancelledError('Verification was cancelled.');
       }
-      throw errorMessage(error, localize);
+      throw error;
     }
   };
-  const currentPhone = (phoneId: string) => {
-    const current = requireIdentity(userId, sessionId);
-    const phone = current.phoneNumbers.find(item => item.id === phoneId);
-    if (!phone) {
-      throw new SaveError({ global: { code: 'mfa_phone_unavailable', message: m.errors.phoneUnavailable } });
-    }
-    return phone;
-  };
+
+  const smsActions = smsEnabled ? createSmsActions(clerk, userId, sessionId, runProtected, refresh) : {};
 
   return {
     status: 'ready',
@@ -215,75 +272,27 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     sessionId,
     methods,
     addableMethods,
-    phones: user.phoneNumbers.filter(phone => !phone.reservedForSecondFactor).map(summarizePhone),
+    phones,
     reverification,
     resetReverification,
-    findOrCreatePhone: smsEnabled
-      ? async phoneNumber => {
-          try {
-            const current = requireIdentity(userId, sessionId);
-            const existing = current.phoneNumbers.find(
-              phone => !phone.reservedForSecondFactor && phone.phoneNumber === phoneNumber,
-            );
-            return summarizePhone(existing ?? (await current.createPhoneNumber({ phoneNumber })));
-          } catch (error) {
-            throw errorMessage(error, localize);
-          }
-        }
-      : undefined,
-    enrollSms: smsEnabled
-      ? async (phoneId, code): Promise<SmsEnrollmentResult> => {
-          try {
-            let phone = currentPhone(phoneId);
-            if (phone.verification.status !== 'verified') {
-              if (!code) {
-                await phone.prepareVerification();
-                return { status: 'needsVerification', phone: summarizePhone(phone) };
-              }
-              await phone.attemptVerification({ code });
-              phone = currentPhone(phoneId);
-            }
-            const result = await runProtected({ kind: 'reservePhone', userId, sessionId, phoneId });
-            if (result.kind !== 'enrollment') {
-              throw new SaveError({
-                global: { code: 'mfa_unexpected_response', message: m.errors.unexpectedResponse },
-              });
-            }
-            await refresh().catch(() => undefined);
-            return { status: 'complete', backupCodes: result.backupCodes };
-          } catch (error) {
-            throw errorMessage(error, localize);
-          }
-        }
-      : undefined,
-    resendSms: smsEnabled
-      ? async phoneId => {
-          try {
-            await currentPhone(phoneId).prepareVerification();
-          } catch (error) {
-            throw errorMessage(error, localize);
-          }
-        }
-      : undefined,
+    ...smsActions,
     createAuthenticator: totpEnabled
       ? async () => {
           const result = await runProtected({ kind: 'createAuthenticator', userId, sessionId });
           if (result.kind !== 'authenticatorSetup') {
-            throw new SaveError({ global: { code: 'mfa_unexpected_response', message: m.errors.unexpectedResponse } });
+            throw new ClerkRuntimeError('The verification response was unexpected. Please try again.', {
+              code: 'mfa_unexpected_response',
+            });
           }
           return { secret: result.secret, uri: result.uri };
         }
       : undefined,
     verifyAuthenticator: totpEnabled
       ? async (code): Promise<MfaEnrollmentResult> => {
-          try {
-            const result = await requireIdentity(userId, sessionId).verifyTOTP({ code });
-            const backupCodes = result.backupCodes ?? [];
-            await refresh().catch(() => undefined);
-            return { backupCodes };
-          } catch (error) {
-            throw errorMessage(error, localize);
-          }
+          const result = await requireIdentity(clerk, userId, sessionId).verifyTOTP({ code });
+          const backupCodes = result.backupCodes ?? [];
+          await refresh().catch(() => undefined);
+          return { backupCodes };
         }
       : undefined,
     generateBackupCodes:
@@ -291,8 +300,8 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
         ? async () => {
             const result = await runProtected({ kind: 'generateBackupCodes', userId, sessionId });
             if (result.kind !== 'backupCodes') {
-              throw new SaveError({
-                global: { code: 'mfa_unexpected_response', message: m.errors.unexpectedResponse },
+              throw new ClerkRuntimeError('The verification response was unexpected. Please try again.', {
+                code: 'mfa_unexpected_response',
               });
             }
             await refresh().catch(() => undefined);
@@ -307,15 +316,5 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
       await runProtected(operation);
       await refresh().catch(() => undefined);
     },
-    setDefault: smsEnabled
-      ? async phoneId => {
-          const phone = currentPhone(phoneId);
-          if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
-            throw new SaveError({ global: { code: 'mfa_phone_unavailable', message: m.errors.phoneUnavailable } });
-          }
-          await phone.makeDefaultSecondFactor();
-          await refresh().catch(() => undefined);
-        }
-      : undefined,
   };
 }

@@ -1,3 +1,5 @@
+import type { PhoneNumberResource } from '@clerk/shared/types';
+
 import type { ReverificationState } from '../../reverification/reverification.types';
 
 export interface UserProfileMfaMethod {
@@ -12,9 +14,7 @@ export interface UserProfileMfaMethod {
 
 export type UserProfileMfaAddableMethod = 'sms' | 'authenticator' | 'backup-codes';
 
-export interface MfaPhone {
-  id: string;
-  phoneNumber: string;
+export interface MfaPhone extends Pick<PhoneNumberResource, 'id' | 'phoneNumber'> {
   verified: boolean;
 }
 

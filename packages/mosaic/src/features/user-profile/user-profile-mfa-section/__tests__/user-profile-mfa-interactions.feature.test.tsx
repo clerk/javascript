@@ -3,10 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileMfaSection } from '../user-profile-mfa-section/user-profile-mfa-section';
+import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import { fapiClient, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileMfaSection } from '../user-profile-mfa-section';
 import { mfaEnvironment, renderMfa } from './mfa-feature-setup';
 
 describe('User profile MFA interaction boundaries', () => {
@@ -162,19 +162,22 @@ describe('User profile MFA interaction boundaries', () => {
 
   it('keeps issued codes available after copy fails and lets the user retry', async () => {
     await renderMfa();
+    const user = userEvent.setup();
     const write = vi
       .spyOn(navigator.clipboard, 'writeText')
       .mockRejectedValueOnce(new Error('Clipboard unavailable'))
       .mockResolvedValue();
     try {
-      const user = userEvent.setup();
       await user.click(screen.getByRole('button', { name: 'Add verification method' }));
       await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
       await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
       const codes = await screen.findByRole('list', { name: 'Backup codes' });
       expect(within(codes).getByText('CODE0001')).toBeVisible();
       await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Clipboard unavailable'));
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+      );
+      expect(screen.queryByText('Clipboard unavailable')).toBeNull();
       expect(within(codes).getByText('CODE0001')).toBeVisible();
       await user.click(screen.getByRole('button', { name: 'Copy and close' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());

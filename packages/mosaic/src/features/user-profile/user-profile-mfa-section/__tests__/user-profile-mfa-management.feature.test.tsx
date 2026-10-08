@@ -3,17 +3,76 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { mfaSectionNode, UserProfileMfaSection } from '../user-profile-mfa-section/user-profile-mfa-section';
-import { useUserProfileMfaModel } from '../user-profile-mfa-section/user-profile-mfa-section.model';
-import { renderPasswordSection } from '../user-profile-password-section/user-profile-password-section';
-import { useUserProfilePasswordModel } from '../user-profile-password-section/user-profile-password-section.model';
-import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
+import { clerkApiError } from '../../../../__tests__/clerk-errors';
+import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfileMfaSection } from '../user-profile-mfa-section';
 import { mfaEnvironment, phone, renderMfa } from './mfa-feature-setup';
 
 describe('User profile MFA management', () => {
+  it('updates an existing setup error when localization changes', async () => {
+    serveFapi({
+      environment: mfaEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    const section = (message: string) => (
+      <MosaicProvider localization={{ overrides: { 'errors.action_blocked': message } }}>
+        <UserProfileMfaSection />
+      </MosaicProvider>
+    );
+    const { rerender } = await renderWithClerk(section('First localized error'));
+    worker.use(
+      http.post(fapiUrl('/v1/me/totp'), () =>
+        HttpResponse.json({ errors: [{ code: 'action_blocked', message: 'Server detail' }] }, { status: 403 }),
+      ),
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('First localized error'));
+    rerender(section('Updated localized error'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Updated localized error'));
+  });
+
+  it.each([
+    {
+      cause: clerkApiError('phone_number_not_verified', 'Unable to update the default method.'),
+      message: 'Unable to update the default method.',
+    },
+    {
+      cause: new Error('Cannot read properties of undefined'),
+      message: 'Unable to set this method as default. Please try again.',
+    },
+    { cause: 'network failure', message: 'Unable to set this method as default. Please try again.' },
+  ])('shows a safe default-change error for $message', async ({ cause, message }) => {
+    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+    serveFapi({
+      environment: mfaEnvironment(),
+      client: fapiClient([
+        fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', phone_numbers: [first, second] }) }),
+      ]),
+    });
+    const { clerk } = await renderWithClerk(<UserProfileMfaSection />);
+    const selectedPhone = clerk.user?.phoneNumbers.find(item => item.id === 'phone_2');
+    if (!selectedPhone) {
+      throw new Error('Expected the second phone');
+    }
+    const changeDefault = vi.spyOn(selectedPhone, 'makeDefaultSecondFactor').mockRejectedValue(cause);
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      const user = userEvent.setup();
+      await user.click(screen.getByRole('button', { name: 'Manage SMS verification +15555550202' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
+    } finally {
+      changeDefault.mockRestore();
+      log.mockRestore();
+    }
+  });
+
   it('shows a safe message when authenticator setup throws an unexpected error', async () => {
     serveFapi({
       environment: mfaEnvironment(),
@@ -62,38 +121,6 @@ describe('User profile MFA management', () => {
     expect(screen.getByText('Authenticator app')).toBeVisible();
   });
 
-  it('renders a plain MFA node in Authentication over legacy methods', async () => {
-    serveFapi({
-      environment: mfaEnvironment(),
-      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
-    });
-    await renderWithClerk(
-      <UserProfileSecurityPanelView
-        mfaSlot={<div>Connected MFA</div>}
-        mfaMethods={[{ id: 'injected', type: 'authenticator' }]}
-      />,
-    );
-
-    const authentication = screen.getByRole('region', { name: 'Authentication' });
-    expect(within(authentication).getByText('Connected MFA')).toBeVisible();
-    expect(within(authentication).queryByRole('heading', { name: '2-step verification' })).toBeNull();
-  });
-
-  it('suppresses injected MFA when the slot is explicitly null', async () => {
-    serveFapi({
-      environment: mfaEnvironment(),
-      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
-    });
-    await renderWithClerk(
-      <UserProfileSecurityPanelView
-        mfaSlot={null}
-        mfaMethods={[{ id: 'injected', type: 'authenticator' }]}
-      />,
-    );
-
-    expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-  });
-
   it('removes SMS MFA while retaining the phone number', async () => {
     const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
     const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved], two_factor_enabled: true }));
@@ -108,6 +135,32 @@ describe('User profile MFA management', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: false, default: undefined });
     expect(fapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+  });
+
+  it('keeps removal pending through dismissal and duplicate confirmation attempts', async () => {
+    const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved], two_factor_enabled: true }));
+    const held = holdRequests('post', '/v1/me/phone_numbers/phone_1');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +15555550101' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    const dialog = screen.getByRole('alertdialog');
+    const remove = within(dialog).getByRole('button', { name: 'Remove' });
+    await user.click(remove);
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      await user.keyboard('{Escape}');
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      expect(dialog).toBeVisible();
+      remove.click();
+      expect(held.requests).toHaveLength(1);
+      expect(fapi.mfa.phoneUpdates).toHaveLength(0);
+    } finally {
+      held.release();
+    }
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(fapi.mfa.phoneUpdates).toHaveLength(1);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
   });
 
   it('moves focus through remaining MFA rows and then to Add after sequential removals', async () => {
@@ -201,6 +254,7 @@ describe('User profile MFA management', () => {
     await waitFor(() => expect(screen.getByText('Verification required')).toBeVisible());
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByText('Verification required')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.mfa.totpRemovals).toBe(0);
     expect(screen.getByText('Authenticator app')).toBeVisible();
     expect(screen.queryByRole('alert')).toBeNull();
@@ -222,64 +276,6 @@ describe('User profile MFA management', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(action).toHaveFocus();
-  });
-
-  it('places a connected MFA slot after password in the security panel', async () => {
-    function Panel() {
-      const mfaSlot = mfaSectionNode(useUserProfileMfaModel());
-      const passwordSlot = renderPasswordSection(useUserProfilePasswordModel(), null);
-      return (
-        <UserProfileSecurityPanelView
-          passwordSlot={passwordSlot}
-          mfaSlot={mfaSlot}
-        />
-      );
-    }
-    serveFapi({
-      environment: mfaEnvironment(),
-      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
-    });
-    await renderWithClerk(<Panel />);
-    const authentication = screen.getByRole('region', { name: 'Authentication' });
-    expect(authentication).toHaveTextContent('Password');
-    expect(authentication).toHaveTextContent('2-step verification');
-    expect(authentication.textContent?.indexOf('Password')).toBeLessThan(
-      authentication.textContent?.indexOf('2-step verification') ?? 0,
-    );
-  });
-
-  it('uses the connected slot instead of duplicate injected MFA props', async () => {
-    function Panel() {
-      const mfaSlot = mfaSectionNode(useUserProfileMfaModel());
-      return (
-        <UserProfileSecurityPanelView
-          mfaSlot={mfaSlot}
-          mfaMethods={[{ id: 'injected', type: 'authenticator' }]}
-        />
-      );
-    }
-    serveFapi({
-      environment: mfaEnvironment(),
-      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
-    });
-    await renderWithClerk(<Panel />);
-    expect(screen.getAllByText('2-step verification')).toHaveLength(1);
-    expect(screen.queryByText('Authenticator app')).toBeNull();
-  });
-
-  it('suppresses injected MFA when the connected slot is hidden', async () => {
-    function Panel() {
-      const mfaSlot = mfaSectionNode(useUserProfileMfaModel());
-      return (
-        <UserProfileSecurityPanelView
-          mfaSlot={mfaSlot}
-          mfaMethods={[{ id: 'injected', type: 'authenticator' }]}
-        />
-      );
-    }
-    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]) });
-    await renderWithClerk(<Panel />);
-    expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
   });
 
   it('reverifies the first factor before creating an authenticator secret', async () => {
@@ -691,6 +687,8 @@ describe('User profile MFA management', () => {
         }
         expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
         await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
+        await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+        expect(screen.queryByRole('alertdialog')).toBeNull();
       } finally {
         held.release();
       }
@@ -731,8 +729,18 @@ describe('User profile MFA management', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 
-  it('offers printing for newly issued backup codes', async () => {
-    await renderMfa();
+  it.each([
+    { message: 'Printing is unavailable in this browser.', overrides: {} },
+    {
+      message: 'Allow popups to print these codes.',
+      overrides: { 'errors.mfa_print_unavailable': 'Allow popups to print these codes.' },
+    },
+  ])('localizes printing failures as $message', async ({ message, overrides }) => {
+    serveFapi({
+      environment: mfaEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    await renderWithClerk(<UserProfileMfaSection />, undefined, { overrides });
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
@@ -741,7 +749,7 @@ describe('User profile MFA management', () => {
     const open = vi.spyOn(window, 'open').mockReturnValue(null);
     await user.click(screen.getByRole('button', { name: 'Print' }));
     expect(open).toHaveBeenCalledOnce();
-    expect(screen.getByRole('alert')).toHaveTextContent('Printing is unavailable in this browser.');
+    expect(screen.getByRole('alert')).toHaveTextContent(message);
     open.mockRestore();
   });
 });

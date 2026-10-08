@@ -19,9 +19,9 @@ import { http, HttpResponse } from 'msw';
 import { setupWorker } from 'msw/browser';
 
 import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
+import { createMfaState, type FakeMfaState, mfaHandlers } from './fake-fapi/mfa';
 import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
 import { envelope, error, findSession, missing, updateUser } from './fake-fapi/shared';
-import { createMfaState, type FakeMfaState, mfaHandlers } from './fake-fapi/mfa';
 import {
   createVerificationState,
   type FakeVerificationSeed,
