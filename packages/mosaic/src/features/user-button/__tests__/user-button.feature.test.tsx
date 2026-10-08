@@ -751,6 +751,15 @@ describe('UserButton', () => {
   });
 
   describe('in combined mode', () => {
+    it('stands in for a mode it does not take', async () => {
+      const props: UserButtonProps = {};
+      Object.assign(props, { mode: 'organization' });
+      await renderUserButton(props);
+
+      expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(document.querySelector('.cl-user-button-trigger')).not.toBeNull();
+    });
+
     it('heads the surface with the account, managing its active organization', async () => {
       const { clerk } = await renderUserButton();
       const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
