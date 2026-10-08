@@ -1,15 +1,24 @@
+import { useState } from 'react';
+
 import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { useMessages } from '../../../localization';
-import type { FileRejection } from '../../../primitives/file-upload';
+import type { LocalizableError } from '../../../localization';
+import { useErrorText, useMessages } from '../../../localization';
+import type { FileRejection, FileRejectionReason } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
 import { useOrganizationProfileLogoController } from './organization-profile-logo.controller';
 
 const LOGO_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 const LOGO_MAX_BYTES = 10 * 1000 * 1000;
+
+const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
+  accept: { code: 'avatar_file_type_invalid' },
+  size: { code: 'avatar_file_size_exceeded' },
+  overflow: { code: 'avatar_file_count_exceeded' },
+};
 
 export interface OrganizationProfileLogoRowViewProps {
   name: string;
@@ -31,7 +40,17 @@ export function OrganizationProfileLogoRowView({
   onRemove,
 }: OrganizationProfileLogoRowViewProps) {
   const m = useMessages('organizationProfileProfileSection');
-  const logo = useOrganizationProfileLogoController({ onChange, onReject, onRemove });
+  const errorText = useErrorText();
+  const logo = useOrganizationProfileLogoController({ onChange, onRemove });
+  const [rejection, setRejection] = useState<LocalizableError>();
+  const error = rejection ?? logo.error;
+  const remove = logo.onRemove;
+  const handleRemove = remove
+    ? () => {
+        setRejection(undefined);
+        return remove();
+      }
+    : undefined;
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -41,15 +60,21 @@ export function OrganizationProfileLogoRowView({
 
   return (
     <FileUpload.Root
-      disabled={logo.isPending || !onChange}
+      disabled={logo.isPending}
+      aria-busy={logo.isPending || undefined}
       accept={LOGO_MIME_TYPES}
       maxSize={LOGO_MAX_BYTES}
       render={<Section.Row />}
-      onReject={logo.onReject}
+      onReject={rejections => {
+        const rejected = rejections[0];
+        setRejection(rejected ? REJECTION_ERRORS[rejected.reason] : undefined);
+        onReject?.(rejections);
+      }}
       onValueChange={files => {
         const file = files[0];
         if (file) {
-          logo.onChange(file);
+          setRejection(undefined);
+          void logo.onChange?.(file);
         }
       }}
     >
@@ -72,12 +97,11 @@ export function OrganizationProfileLogoRowView({
         </Section.Content>
         <LogoActions
           canChange={Boolean(onChange)}
-          hasImage={hasImage || Boolean(logo.previewUrl)}
-          isPending={logo.isPending}
-          onRemove={logo.onRemove}
+          hasImage={hasImage}
+          onRemove={handleRemove}
         />
       </Section.Item>
-      <Section.Error>{logo.errorMessage ?? errorMessage}</Section.Error>
+      <Section.Error>{error ? errorText(error) : errorMessage}</Section.Error>
     </FileUpload.Root>
   );
 }
@@ -85,13 +109,11 @@ export function OrganizationProfileLogoRowView({
 function LogoActions({
   hasImage,
   canChange,
-  isPending,
   onRemove,
 }: {
   hasImage: boolean;
   canChange: boolean;
-  isPending: boolean;
-  onRemove?: () => void;
+  onRemove?: () => Promise<void>;
 }) {
   const m = useMessages('organizationProfileProfileSection');
   const { openFilePicker } = FileUpload.useFileUpload();
@@ -102,7 +124,7 @@ function LogoActions({
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.logo.remove, icon: 'x', onClick: onRemove });
+    actions.push({ label: m.logo.remove, icon: 'x', onClick: () => void onRemove() });
   }
 
   if (actions.length > 0) {
@@ -111,7 +133,6 @@ function LogoActions({
         <ActionMenu
           actions={actions}
           label={m.logo.manage}
-          disabled={isPending}
         />
       </Section.Actions>
     );

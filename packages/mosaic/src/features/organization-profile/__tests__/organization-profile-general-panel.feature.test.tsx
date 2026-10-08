@@ -158,7 +158,9 @@ describe('OrganizationProfileGeneralPanel', () => {
     const upload = holdRequests('post', '/v1/organizations/:organizationId/logo');
     await user.upload(input, new File(['image'], 'logo.png', { type: 'image/png' }));
     await waitFor(() => expect(upload.requests).toHaveLength(1));
-    expect(screen.getByRole('button', { name: 'Manage logo' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'Manage logo' })).toBeNull();
+    expect(input).toBeDisabled();
     upload.release();
     await waitFor(() => expect(fapi.memberships[0]?.organization.has_image).toBe(true));
     const manage = await screen.findByRole('button', { name: 'Manage logo' });
@@ -166,7 +168,11 @@ describe('OrganizationProfileGeneralPanel', () => {
     const remove = holdRequests('post', '/v1/organizations/:organizationId/logo');
     await user.click(await screen.findByRole('menuitem', { name: 'Remove logo' }));
     await waitFor(() => expect(remove.requests).toHaveLength(1));
-    expect(manage).toBeDisabled();
+    expect(manage).toBeEnabled();
+    expect(input).toBeDisabled();
+    await user.click(manage);
+    await user.click(await screen.findByRole('menuitem', { name: 'Remove logo' }));
+    expect(remove.requests).toHaveLength(1);
     remove.release();
     await waitFor(() => expect(fapi.memberships[0]?.organization.has_image).toBe(false));
     expect(await screen.findByRole('button', { name: 'Upload' })).toBeVisible();
@@ -200,12 +206,19 @@ describe('OrganizationProfileGeneralPanel', () => {
     if (!input) {
       throw new Error('Logo upload input is missing');
     }
+    expect(container.querySelector('img[alt="Acme"]')).toBeNull();
+    const png = Uint8Array.from(
+      atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/zXcAAAAASUVORK5CYII='),
+      character => character.charCodeAt(0),
+    );
     const upload = holdRequests('post', '/v1/organizations/:organizationId/logo');
-    await user.upload(input, new File(['image'], 'logo.png', { type: 'image/png' }));
+    await user.upload(input, new File([png], 'logo.png', { type: 'image/png' }));
     await waitFor(() => expect(upload.requests).toHaveLength(1));
+    await waitFor(() => expect(container.querySelector('img[alt="Acme"]')?.getAttribute('src')).toMatch(/^blob:/));
     upload.fail('image_invalid', 'Server rejected logo');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Upload' })).toBeVisible());
     await waitFor(() => expect(screen.getByText('Server rejected logo')).toBeVisible());
+    await waitFor(() => expect(container.querySelector('img[alt="Acme"]')).toBeNull());
     const retry = serveFapi(signedIn());
     await user.upload(input, new File(['image2'], 'second.png', { type: 'image/png' }));
     await waitFor(() => expect(retry.memberships[0]?.organization.has_image).toBe(true));

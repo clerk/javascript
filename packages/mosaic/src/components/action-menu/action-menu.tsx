@@ -15,10 +15,9 @@ export interface ActionMenuProps {
   label: string;
   actions: ActionMenuAction[];
   triggerRef?: Ref<HTMLButtonElement>;
-  disabled?: boolean;
 }
 
-export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuProps) {
+export function ActionMenu({ label, actions, triggerRef }: ActionMenuProps) {
   if (actions.length === 0) {
     return null;
   }
@@ -28,7 +27,6 @@ export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuP
       <Menu.Trigger
         ref={triggerRef}
         aria-label={label}
-        disabled={disabled}
       />
       <Menu.Popup>
         {actions.map(action => (
@@ -37,7 +35,6 @@ export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuP
             color={action.color}
             label={action.label}
             onClick={action.onClick}
-            disabled={disabled}
           >
             {action.icon ? (
               <Menu.Media>

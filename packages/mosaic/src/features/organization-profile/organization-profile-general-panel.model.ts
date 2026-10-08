@@ -50,16 +50,8 @@ export function useOrganizationProfileGeneralPanelModel(): OrganizationProfileGe
 
   return {
     ...profile,
-    onLogoChange: file =>
-      currentOrganization()
-        .setLogo({ file })
-        .then(() => undefined),
-    onRemoveLogo: organization.hasImage
-      ? () =>
-          currentOrganization()
-            .setLogo({ file: null })
-            .then(() => undefined)
-      : undefined,
+    onLogoChange: file => save(() => currentOrganization().setLogo({ file })),
+    onRemoveLogo: organization.hasImage ? () => save(() => currentOrganization().setLogo({ file: null })) : undefined,
     onSubmitName: name => save(() => currentOrganization().update({ name }), ['name']),
     onSubmitSlug: !environment.organizationSettings.slug.disabled
       ? slug =>
