@@ -198,7 +198,6 @@ jobs:
     name: Static analysis
     permissions:
       contents: read
-      actions: write # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
@@ -251,7 +250,6 @@ jobs:
     name: Unit Tests (${{ matrix.filter-label }})
     permissions:
       contents: read
-      actions: write # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
@@ -367,7 +365,6 @@ jobs:
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }})
     permissions:
       contents: read
-      actions: write # needed for actions/upload-artifact
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     defaults:
       run:
