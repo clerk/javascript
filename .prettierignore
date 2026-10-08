@@ -29,3 +29,15 @@ CLAUDE.md
 
 # Written by `eslint --suppress-rule` / `--prune-suppressions`; ESLint owns the formatting.
 /**/eslint-suppressions.json
+
+# Copied byte for byte from another repo; do not reformat.
+.claude/skills/verify-clerk-expo/src/core/
+.claude/skills/verify-clerk-expo/src/platform/android/
+.claude/skills/verify-clerk-expo/src/platform/ios/
+.claude/skills/verify-clerk-expo/specs/fixtures.ts
+.claude/skills/verify-clerk-expo/testing/
+.claude/skills/verify-clerk-expo/e2e.config.ts
+.claude/skills/verify-clerk-expo/test/*.ts
+!.claude/skills/verify-clerk-expo/test/freshness.test.ts
+!.claude/skills/verify-clerk-expo/test/host.test.ts
+.claude/skills/verify-clerk-expo/.verify/

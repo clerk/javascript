@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+import { ensureRuntime } from '../src/core/launch.mjs';
+
+await ensureRuntime();
+const { main } = await import('../src/core/cli.ts');
+const { host } = await import('../src/host.ts');
+process.exitCode = await main(process.argv.slice(2), host);
