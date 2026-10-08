@@ -4,12 +4,12 @@ import type { UseFormResult } from '../../../components/form';
 import { useForm } from '../../../components/form';
 import type { OrganizationProfileEditNameValue } from './organization-profile-edit-name.dialog';
 
-export interface OrganizationProfileEditNameControllerOptions {
+interface OrganizationProfileEditNameControllerOptions {
   name: string;
   onSubmit: (name: string) => Promise<void>;
 }
 
-export interface OrganizationProfileEditNameController {
+interface OrganizationProfileEditNameController {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   form: UseFormResult<OrganizationProfileEditNameValue>;

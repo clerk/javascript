@@ -9,7 +9,7 @@ import { useOrganizationProfileEditSlugController } from './organization-profile
 import { OrganizationProfileEditSlugDialog } from './organization-profile-edit-slug.dialog';
 import { styles } from './organization-profile-profile-section.styles';
 
-export interface OrganizationProfileSlugRowViewProps {
+interface OrganizationProfileSlugRowViewProps {
   slug: string;
   onSubmit?: (slug: string) => Promise<void>;
 }

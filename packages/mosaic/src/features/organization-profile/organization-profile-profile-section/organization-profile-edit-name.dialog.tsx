@@ -14,7 +14,7 @@ export interface OrganizationProfileEditNameValue {
   name: string;
 }
 
-export interface OrganizationProfileEditNameDialogProps {
+interface OrganizationProfileEditNameDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];

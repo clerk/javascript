@@ -20,7 +20,7 @@ const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
   overflow: { code: 'avatar_file_count_exceeded' },
 };
 
-export interface OrganizationProfileLogoRowViewProps {
+interface OrganizationProfileLogoRowViewProps {
   name: string;
   imageUrl?: string;
   hasImage?: boolean;

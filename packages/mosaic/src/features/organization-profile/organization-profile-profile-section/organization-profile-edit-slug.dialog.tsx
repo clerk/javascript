@@ -14,7 +14,7 @@ export interface OrganizationProfileEditSlugValue {
   slug: string;
 }
 
-export interface OrganizationProfileEditSlugDialogProps {
+interface OrganizationProfileEditSlugDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];

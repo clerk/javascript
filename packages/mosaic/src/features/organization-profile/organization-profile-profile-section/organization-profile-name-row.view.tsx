@@ -4,7 +4,7 @@ import { useMessages } from '../../../localization';
 import { useOrganizationProfileEditNameController } from './organization-profile-edit-name.controller';
 import { OrganizationProfileEditNameDialog } from './organization-profile-edit-name.dialog';
 
-export interface OrganizationProfileNameRowViewProps {
+interface OrganizationProfileNameRowViewProps {
   name: string;
   onSubmit?: (name: string) => Promise<void>;
 }

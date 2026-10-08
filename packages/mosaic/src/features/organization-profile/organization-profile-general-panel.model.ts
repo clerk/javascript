@@ -7,7 +7,7 @@ import type { OrganizationProfileGeneralPanelViewProps } from './organization-pr
 
 type GeneralData = Omit<OrganizationProfileGeneralPanelViewProps, 'dangerSlot'>;
 
-export type OrganizationProfileGeneralPanelModel =
+type OrganizationProfileGeneralPanelModel =
   | { status: 'loading' }
   | { status: 'hidden' }
   | (GeneralData & { status: 'ready'; organizationId: string });

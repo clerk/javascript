@@ -4,12 +4,12 @@ import type { LocalizableError } from '../../../localization';
 import { FileUpload } from '../../../primitives/file-upload';
 import { toFormError } from '../../../utils/errors';
 
-export interface OrganizationProfileLogoControllerOptions {
+interface OrganizationProfileLogoControllerOptions {
   onChange?: (file: File) => Promise<void>;
   onRemove?: () => Promise<void>;
 }
 
-export interface OrganizationProfileLogoController {
+interface OrganizationProfileLogoController {
   onChange?: (file: File) => Promise<void>;
   onRemove?: () => Promise<void>;
   isPending: boolean;
