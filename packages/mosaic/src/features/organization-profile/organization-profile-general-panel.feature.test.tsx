@@ -55,14 +55,16 @@ describe('OrganizationProfileGeneralPanel', () => {
       await renderPanel(signedIn({ permissions: [] }));
       expect(await screen.findByRole('heading', { name: 'Organization details' })).toBeVisible();
       expect(screen.getByRole('heading', { name: 'Danger zone' })).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Copy slug' })).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Edit name' })).toBeNull();
       expect(screen.queryByRole('button', { name: 'Edit slug' })).toBeNull();
       expect(screen.queryByRole('button', { name: 'Upload' })).toBeNull();
     });
 
-    it('hides slug when disabled and allows an enabled empty slug to be edited', async () => {
+    it('allows an empty slug to be edited without offering to copy it', async () => {
       await renderPanel(signedIn({ organizations: [fapiOrganization({ id: 'org_1', name: 'Acme', slug: '' })] }));
       expect(await screen.findByRole('button', { name: 'Edit slug' })).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Copy slug' })).toBeNull();
     });
 
     it('omits the slug row when disabled', async () => {

@@ -28,12 +28,14 @@ export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationP
             >
               {slug}
             </span>
-            <CopyButton
-              value={slug}
-              label={m.slug.copy}
-              copiedLabel={m.slug.copied}
-              xstyle={styles.copyAction}
-            />
+            {slug ? (
+              <CopyButton
+                value={slug}
+                label={m.slug.copy}
+                copiedLabel={m.slug.copied}
+                xstyle={styles.copyAction}
+              />
+            ) : null}
           </Section.Description>
         </Section.Content>
         {onSubmit ? (
