@@ -1,9 +1,9 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { __internal_useOrganizationRoles, useOrganization, useSession } from '@clerk/shared/react';
+import { useOrganization, useSession } from '@clerk/shared/react';
 import type { OrganizationMembershipResource } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
-import type { OrganizationProfileMember } from './members-table-tab.types';
+import type { MembersRoles, OrganizationProfileMember } from './members-table-tab.types';
 
 const PAGE_SIZE = 10;
 const READ_PERMISSION = 'org:sys_memberships:read';
@@ -18,7 +18,7 @@ export function useMembersTableAccessModel() {
   if (!organization || !session?.checkAuthorization({ permission: READ_PERMISSION })) {
     return { status: 'hidden' as const };
   }
-  return { status: 'ready' as const, organizationId: organization.id };
+  return { status: 'ready' as const, organizationId: organization.id, sessionId: session.id };
 }
 
 export function useMembersTableModel(query: string) {
@@ -28,7 +28,6 @@ export function useMembersTableModel(query: string) {
   const { organization, memberships } = useOrganization({
     memberships: canRead ? { pageSize: PAGE_SIZE, keepPreviousData: true, query } : undefined,
   });
-  const roles = __internal_useOrganizationRoles({ enabled: canRead });
   const fetchPage = useRef(memberships?.fetchPage);
   fetchPage.current = memberships?.fetchPage;
   useEffect(() => {
@@ -55,10 +54,16 @@ export function useMembersTableModel(query: string) {
 
   return {
     rows,
-    roles: roles.data?.map(role => ({ value: role.key, label: role.name })) ?? [],
-    hasRoleSetMigration: roles.hasRoleSetMigration,
-    isRolesError: Boolean(roles.error),
-    retryRoles: roles.revalidate,
+    loadRoles: async (): Promise<MembersRoles> => {
+      if (!organization || !canRead) {
+        throw new ClerkRuntimeError('Roles are unavailable.', { code: 'role_unavailable' });
+      }
+      const result = await organization.getRoles({ pageSize: 20 });
+      return {
+        roles: result.data.map(({ key, name }) => ({ key, name })),
+        hasRoleSetMigration: result.has_role_set_migration ?? false,
+      };
+    },
     totalCount: memberships?.count ?? 0,
     page: memberships?.page ?? 1,
     isLoading: memberships?.isLoading ?? true,
@@ -66,16 +71,15 @@ export function useMembersTableModel(query: string) {
     isError: memberships?.isError ?? false,
     retry: () => memberships?.revalidate?.(),
     fetchPage: (page: number) => memberships?.fetchPage?.(page),
-    changeRole:
-      canManage && !roles.hasRoleSetMigration && !roles.error && roles.data
-        ? async (id: string, role: string) => {
-            if (!roles.data?.some(option => option.key === role)) {
-              throw new ClerkRuntimeError('This role is unavailable.', { code: 'role_unavailable' });
-            }
-            await findManageable(id).update({ role });
-            await memberships?.revalidate?.();
+    changeRole: canManage
+      ? async (id: string, role: string, roles: MembersRoles) => {
+          if (roles.hasRoleSetMigration || !roles.roles.some(option => option.key === role)) {
+            throw new ClerkRuntimeError('This role is unavailable.', { code: 'role_unavailable' });
           }
-        : undefined,
+          await findManageable(id).update({ role });
+          await memberships?.revalidate?.();
+        }
+      : undefined,
     remove: canManage
       ? async (id: string) => {
           const lastOnPage = (memberships?.data?.length ?? 0) === 1 && (memberships?.page ?? 1) > 1;

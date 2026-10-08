@@ -56,10 +56,13 @@ describe('OrganizationProfileMembersPanel', () => {
   it('does not fetch or show the list without read permission', async () => {
     serve([]);
     const request = holdRequests('get', '/v1/organizations/:organizationId/memberships');
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     const { container } = await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(container).toBeEmptyDOMElement();
     expect(request.requests).toHaveLength(0);
+    expect(roles.requests).toHaveLength(0);
     request.release();
+    roles.release();
   });
 
   it('searches after the input settles and keeps rows while a new page loads', async () => {
@@ -113,6 +116,42 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByText(/role migration is in progress/)).toBeVisible();
     expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeVisible();
+  });
+
+  it('loads fresh roles after switching sessions in the same organization', async () => {
+    const fapi = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
+    const currentUser = fapi.client.sessions[0]?.user;
+    if (!currentUser) {
+      throw new Error('Expected a signed-in user');
+    }
+    fapi.client = fapiClient([
+      ...fapi.client.sessions,
+      fapiSession({ id: 'sess_2', user: currentUser, last_active_organization_id: organization.id }),
+    ]);
+    fapi.hasRoleSetMigration = true;
+    const { clerk } = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByText(/role migration is in progress/)).toBeVisible();
+
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    fapi.hasRoleSetMigration = false;
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    expect(screen.queryByText(/role migration is in progress/)).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
+    roles.release();
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+  });
+
+  it('keeps members visible and role editing unavailable while roles load', async () => {
+    serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeVisible();
+    roles.release();
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
   });
 
   it('shows the membership role label when the role is absent from available options', async () => {

@@ -12,7 +12,7 @@ export function OrganizationProfileMembersPanel({ fallback }: { fallback?: React
   if (access.status === 'hidden') {
     return null;
   }
-  return <ConnectedMembersPanel key={access.organizationId} />;
+  return <ConnectedMembersPanel key={`${access.organizationId}:${access.sessionId}`} />;
 }
 
 function ConnectedMembersPanel() {
