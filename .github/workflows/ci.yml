@@ -236,6 +236,9 @@ jobs:
       - name: Run lint
         run: pnpm turbo lint $TURBO_ARGS
 
+      - name: Test Mosaic import guards
+        run: pnpm exec vitest run --config scripts/vitest.config.mjs scripts/mosaic-import-guards.test.mjs
+
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
