@@ -24,6 +24,8 @@ export interface OtpContextValue {
   length: number;
   /** Whether the whole field is disabled. */
   disabled: boolean;
+  /** Whether a disabled field keeps focus: read-only and `aria-disabled` rather than natively disabled. */
+  focusableWhenDisabled: boolean;
   /** Whether every slot must be filled before the enclosing form submits. */
   required: boolean;
   /** Whether every slot is filled. */

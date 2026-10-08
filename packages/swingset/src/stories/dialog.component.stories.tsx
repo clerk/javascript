@@ -29,7 +29,7 @@ export const meta: StoryMeta = {
     },
     _defaultVariants: {
       variant: 'card',
-      compactPlacement: 'center',
+      compactPlacement: 'sheet',
     },
   },
 };
@@ -151,12 +151,8 @@ export function Alert() {
 const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email address</Button>;
 
 /**
- * `compactPlacement='sheet'` bottom-anchors the surface in the compact band — the dialog viewport
- * under `48rem` — and slides it up from the edge, instead of centering it. Above the band nothing
- * changes, so narrow the window to see it.
- *
- * For a dialog that asks one thing and returns: a confirmation, or a single-field form like this
- * one, where the answer belongs within thumb's reach.
+ * A card dialog is a bottom sheet in the compact band — a window under `40rem` — sliding up from
+ * the edge. Above the band it is centered, so narrow the window to see it.
  */
 export function Sheet() {
   const [open, setOpen] = React.useState(false);
@@ -174,10 +170,7 @@ export function Sheet() {
       }}
     >
       <Dialog.Trigger render={addEmailTrigger} />
-      <Dialog.Popup
-        compactPlacement='sheet'
-        initialFocus={inputRef}
-      >
+      <Dialog.Popup initialFocus={inputRef}>
         <Card.Root
           elevation='overlay'
           renderBranding={false}
@@ -378,10 +371,7 @@ function AddEmailDialog({
         }
       }}
     >
-      <Dialog.Popup
-        compactPlacement='sheet'
-        initialFocus={inputRef}
-      >
+      <Dialog.Popup initialFocus={inputRef}>
         <Card.Root
           elevation='overlay'
           renderBranding={false}

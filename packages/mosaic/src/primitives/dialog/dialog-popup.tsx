@@ -3,8 +3,8 @@
 import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
-import { type FocusTarget, useFinalFocus, useInitialFocus } from '../hooks/use-focus-target';
-import { type ComponentProps, type DefaultProps, Freeze, mergeProps, useRender } from '../utils';
+import { type FocusTarget, type ResolvedInitialFocus, useFinalFocus, useInitialFocus } from '../hooks/use-focus-target';
+import { type ComponentProps, type DefaultProps, Freeze, mergeProps, opensKeyboard, useRender } from '../utils';
 import { useDialogContext } from './dialog-context';
 
 /** Where a popup's focus goes on open (`initialFocus`) or close (`finalFocus`); see `useFocusTarget`. */
@@ -12,10 +12,26 @@ export type DialogFocusTarget = FocusTarget;
 
 /** Props for {@link DialogPopup}. */
 export interface DialogPopupProps extends ComponentProps<'div'> {
-  /** Where focus moves when the dialog opens. Default: the first tabbable element inside it. */
+  /**
+   * Where focus moves when the dialog opens. Default: the first tabbable element inside it. A ref to a
+   * text field is focused within the opening tap, so on iOS the keyboard opens with the dialog.
+   */
   initialFocus?: DialogFocusTarget;
   /** Where focus returns when the dialog closes. Default: the trigger, via `useReturnFocus`. */
   finalFocus?: DialogFocusTarget;
+}
+
+// Focuses a text-field `initialFocus` inside the opening tap, the only focus iOS raises the keyboard for.
+// A child, not a hook: React runs child layout effects first, so this lands before the focus manager's.
+function OpeningFocus({ target }: { target: ResolvedInitialFocus }) {
+  const openingTarget = React.useRef(target).current;
+  React.useLayoutEffect(() => {
+    const element = typeof openingTarget === 'number' ? null : openingTarget.current;
+    if (element && opensKeyboard(element) && element !== element.ownerDocument.activeElement) {
+      element.focus({ preventScroll: true });
+    }
+  }, [openingTarget]);
+  return null;
 }
 
 /** The dialog content container. Manages focus trapping via `FloatingFocusManager` and wires ARIA attributes from `Dialog.Title` and `Dialog.Description`. */
@@ -60,7 +76,12 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
     // usually reset the state behind it — a machine returning to `idle`, a form clearing. The
     // contents hold their last frame on the way out instead of snapping back under the fade. The
     // popup element itself stays live, so `data-closed` / `data-ending-style` still land.
-    children: <Freeze frozen={!open}>{children}</Freeze>,
+    children: (
+      <>
+        <Freeze frozen={!open}>{children}</Freeze>
+        {open ? <OpeningFocus target={resolvedInitialFocus} /> : null}
+      </>
+    ),
   };
 
   const element = useRender({

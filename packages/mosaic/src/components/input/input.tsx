@@ -47,6 +47,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
   });
   const size = inputGroup?.size ?? sizeProp ?? 'md';
   const disabled = inputGroup?.disabled || fieldProps?.disabled || disabledProp || false;
+  const keepsFocus = disabled && (fieldProps?.focusableWhenDisabled ?? false);
   const required = fieldProps?.required ?? requiredProp;
   const ariaInvalidValue = inputGroup?.invalid ? true : (fieldProps?.['aria-invalid'] ?? ariaInvalid);
 
@@ -55,7 +56,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
     render,
     ref: [forwardedRef, inputGroup?.inputRef],
     props: {
-      disabled,
+      disabled: disabled && !keepsFocus,
+      ...(keepsFocus ? { readOnly: true, 'aria-disabled': true } : null),
       required,
       id: fieldProps?.id ?? id,
       'aria-invalid': ariaInvalidValue,

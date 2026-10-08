@@ -94,7 +94,12 @@ describe('UserProfileAddSmsView', () => {
       const user = userEvent.setup();
       const { props, rerender } = renderView({ step, code: '123456', isPending: true });
       const field = screen.getByRole(role, { name });
-      expect(field).toBeDisabled();
+      if (role === 'textbox') {
+        expect(field).toHaveAttribute('aria-disabled', 'true');
+        expect(field).toHaveAttribute('readonly');
+      } else {
+        expect(field).toBeDisabled();
+      }
       const submit = screen.getByRole('button', { name: action, exact: true });
       expect(submit).toHaveAttribute('aria-busy', 'true');
       await user.click(submit);
@@ -125,7 +130,8 @@ describe('UserProfileAddSmsView', () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ step: 'verify', code: '123456', isResending: true });
     const code = screen.getByRole('textbox', { name: 'Verification code' });
-    expect(code).toBeDisabled();
+    expect(code).toHaveAttribute('aria-disabled', 'true');
+    expect(code).toHaveAttribute('readonly');
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Verify', exact: true })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Sending a new code…' })).toBeDisabled();
@@ -136,7 +142,7 @@ describe('UserProfileAddSmsView', () => {
         sms={{ ...props, isResending: false, resendSeconds: 12 }}
       />,
     );
-    expect(code).toBeEnabled();
+    expect(code).not.toHaveAttribute('aria-disabled');
     expect(screen.getByRole('button', { name: 'Didn’t receive a code? Resend (12)' })).toBeDisabled();
     rerender(
       <MfaSetupDialog
