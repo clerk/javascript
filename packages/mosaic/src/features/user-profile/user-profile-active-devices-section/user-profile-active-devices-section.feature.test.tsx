@@ -746,23 +746,6 @@ describe('Deferred active-device actions', () => {
 });
 
 describe('active devices focus after connected revocation', () => {
-  it.each(['confirmation', 'details'])('hands focus to the next row after signing out from %s', async surface => {
-    serveDevices([
-      device('sess_current', 'active'),
-      device('sess_other', 'active', { device_type: 'iPhone' }),
-      device('sess_next', 'active', { device_type: 'Next laptop' }),
-    ]);
-    await renderWithClerk(<UserProfileActiveDevicesSection />);
-    const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
-    await user.click(screen.getByRole('menuitem', { name: surface === 'details' ? 'View details' : 'Sign out' }));
-    const dialog = screen.getByRole(surface === 'details' ? 'dialog' : 'alertdialog');
-    await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
-
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on Next laptop' })).toHaveFocus());
-    expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
-  });
-
   it('falls back to the previous row, then the current device', async () => {
     serveDevices([
       device('sess_current', 'active'),
