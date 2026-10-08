@@ -10,11 +10,8 @@ export function useUserProfileActiveDevicesController(
   return {
     devices: model.devices.filter(device => !removedIds.includes(device.id)),
     onSignOutDevice: async (id: string) => {
-      const removed = await model.revoke(id);
-      if (removed) {
-        setRemovedIds(ids => [...ids, id]);
-      }
-      return removed;
+      await model.revoke(id);
+      setRemovedIds(ids => [...ids, id]);
     },
   };
 }

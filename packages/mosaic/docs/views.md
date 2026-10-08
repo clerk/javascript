@@ -106,33 +106,32 @@ opened the dialog unmounted with the menu, and a dialog mounted at the section
 rather than inside the menu has no floating-tree ancestor to walk back to. A
 keyboard user loses their place mid-list and a screen reader announces nothing.
 
-Use `useListRemovalFocus` (`packages/mosaic/src/hooks/use-list-removal-focus.ts`)
-to hand focus to a surviving element. Pass `finalFocus` to `Dialog.Popup` or
-`Confirmation`. The dialog calls it when it closes, after the row has gone:
+Hand focus to a surviving element with `useListRemovalFocus` (`hooks/`). It
+records which row was removed and, through `finalFocus`, picks the row that took
+its place, the last row when it was the last, or `fallback()` once the list is
+empty. `finalFocus` on `Dialog.Popup` and on the `Confirmation` block takes a
+function resolved when the dialog closes, after the row has gone:
 
 ```tsx
-const fallbackTrigger = useRef<HTMLButtonElement>(null);
 const removalFocus = useListRemovalFocus({
-  ids: rows.map(row => row.id),
+  ids: methods.map(method => method.id),
   onRemove,
-  fallback: () => fallbackTrigger.current,
+  fallback: () => section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? section.current,
 });
 
-triggerRef={removalFocus.registerTrigger(row.id)}
+// each row's trigger
+triggerRef={removalFocus.registerTrigger(method.id)}
+
+// the dialog
 finalFocus={removalFocus.finalFocus}
-onConfirm={row => removalFocus.remove(row.id)}
+onConfirm={method => removalFocus.remove(method.id)}
 ```
 
-When `onRemove` resolves to `void` or `true`, the hook records the row and its
-index. `finalFocus` then picks the next row's registered trigger, the previous
-row's trigger if the removed row was last, or `fallback()` if the chosen
-trigger is unavailable. Attach `fallbackTrigger` to a control that outlives the list.
+A cancelled or failed removal keeps its own trigger, so `finalFocus` returns
+`null` and the dialog's default (the trigger) applies.
 
-When `onRemove` resolves to `false`, the hook does not record that attempt or
-choose replacement focus for it. A rejection also leaves that attempt
-unrecorded; let the existing error owner handle it. If no earlier removal is
-recorded, `finalFocus` returns `null` and the dialog's default focus behavior
-applies.
+Prefer the row that took the removed one's place, the last row when it was the
+last, and a control that outlives the list once it is empty.
 
 Test the removal, not just the cancel: `toHaveFocus()` on the row that should
 have caught it. A suite that only asserts focus after cancelling passes while

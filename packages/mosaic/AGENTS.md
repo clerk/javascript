@@ -85,10 +85,6 @@ Docs say what the code cannot: rules, reasons, and which tool fits which problem
 
 A PR that adds, renames or changes the signature of a shared helper in `src/hooks/`, `src/utils/`, `src/blocks/`, `src/components/form/` or `src/machine/` updates the table above, and any doc that names it, in the same PR.
 
-## Reuse
-
-Use `useListRemovalFocus` (`src/hooks/use-list-removal-focus.ts`) when removing a list row also removes its dialog trigger. Pass the row ids, `onRemove`, and a surviving fallback control. Return `false` from `onRemove` to skip removal tracking and replacement focus for that action, such as when its result is stale. See [Views](../../.claude/skills/mosaic/references/views.md) for the wiring.
-
 ## Lint
 
 Mosaic runs stricter lint rules than the rest of the repo (the `packages/mosaic` block in `eslint.config.mjs`).

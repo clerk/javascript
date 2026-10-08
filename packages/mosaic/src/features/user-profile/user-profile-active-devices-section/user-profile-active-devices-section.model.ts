@@ -15,7 +15,7 @@ export type UserProfileActiveDevicesModel =
       status: 'ready';
       identity: string;
       devices: UserProfileDevice[];
-      revoke: (id: string) => Promise<boolean>;
+      revoke: (id: string) => Promise<void>;
     };
 
 type SessionsQuery =
@@ -121,7 +121,6 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
         throw new ClerkRuntimeError('This device is no longer available.', { code: 'active_device_unavailable' });
       }
       await target.revoke();
-      return clerk.user?.id === userId && clerk.session?.id === sessionId;
     },
   };
 }
