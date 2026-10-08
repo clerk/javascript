@@ -92,6 +92,11 @@ function parseLease(text: string, file: string): Lease {
     if (r.deviceName !== `verify-${r.platform}-${r.slot}`) throw bad();
     return { ...(r as object), installedBuild } as Lease;
   }
+  if (r.backend === 'remote') {
+    const strings = ['provider', 'session', 'providerRef', 'baseUrl', 'tokenFile', 'deviceId', 'deviceName', 'runner', 'expiresAt'];
+    if (strings.some((name) => typeof r[name] !== 'string')) throw bad();
+    return { ...(r as object), installedBuild, builtSha: typeof r.builtSha === 'string' ? r.builtSha : null } as Lease;
+  }
   throw bad();
 }
 

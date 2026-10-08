@@ -14,6 +14,7 @@ import { createRequire } from 'node:module';
 import { basename, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isRunning, run, sleep } from './core/exec.ts';
+import { remoteBackend } from './core/remote/backend.ts';
 import {
   LOCAL_POOL,
   VerifyFailure,
@@ -53,13 +54,14 @@ import {
   type GateMemory,
 } from './freshness.ts';
 import { localAndroidBackend } from './platform/android/local.ts';
-import { sdkTool } from './platform/android/sdk.ts';
+import { AVD_NAME, sdkTool } from './platform/android/sdk.ts';
 import { localIosBackend } from './platform/ios/local.ts';
 
 const ANDROID_ACTIVITY = '.MainActivity';
 const DEV_CLIENT_SCHEME = 'exp+clerk-expo-native-build-fixture';
 const ANDROID_DEV_MENU_PREFS = `<?xml version='1.0' encoding='utf-8' standalone='yes' ?><map><boolean name="isOnboardingFinished" value="true" /><boolean name="showsAtLaunch" value="false" /><boolean name="showFab" value="false" /></map>`;
 
+const SKILL_DIR = fileURLToPath(new URL('../', import.meta.url));
 const GITHUB_REPO = 'clerk/javascript';
 const EXPO_PACKAGE = join(WORKTREE, 'packages', 'expo');
 const RUNTIME_DIR = fileURLToPath(new URL('../.verify/runtime/', import.meta.url));
@@ -483,6 +485,7 @@ async function ensureServed(
 }
 
 export function productFor(backend: BackendKind, env: NodeJS.ProcessEnv = process.env): BuildProduct {
+  if (backend === 'remote') return 'standalone';
   const asked = env.VERIFY_LOCAL_BUILD;
   if (asked === undefined || asked === '' || asked === 'dev-client') return 'dev-client';
   if (asked === 'standalone') return 'standalone';
@@ -500,6 +503,24 @@ function keepBuild(built: string, into: string): string {
   cpSync(built, path, { recursive: true, verbatimSymlinks: true });
   return path;
 }
+
+const REMOTE_DEVICE: Readonly<Record<Platform, { readonly runner: string; readonly device: string }>> = {
+  ios: { runner: 'macos-26', device: 'iPhone 17 Pro' },
+  android: { runner: 'ubuntu-24.04', device: AVD_NAME },
+};
+
+const remote = (platform: Platform) =>
+  remoteBackend({
+    platform,
+    repo: GITHUB_REPO,
+    workflow: 'verify-remote.yml',
+    sessionsDir: join(SKILL_DIR, '.verify', 'remote'),
+    ...REMOTE_DEVICE[platform],
+    plumbingRunner: 'ubuntu-latest',
+    idleMinutes: 15,
+    capMinutes: 60,
+    requirement: `a pushed branch and access to GitHub Actions on ${GITHUB_REPO}`,
+  });
 
 export const host: HostAdapter = {
   repo: 'clerk-expo',
@@ -528,7 +549,8 @@ export const host: HostAdapter = {
     return { platform, key, appId: APP_ID, path: path as ScratchPath, source: 'local' };
   },
   async runtime(lease, progress) {
-    if (productFor(lease.backend) === 'standalone') return { entry: { kind: 'binary' }, processes: [] };
+    if (lease.backend === 'remote' || productFor(lease.backend) === 'standalone')
+      return { entry: { kind: 'binary' }, processes: [] };
     const port = metroPort(lease);
     return withCleanup(
       stopRuntime,
@@ -576,5 +598,5 @@ export const host: HostAdapter = {
     );
   },
   logPredicates: { ios: `process == "${IOS_PRODUCT}" AND senderImagePath CONTAINS "${IOS_PRODUCT}"` },
-  backends: [localIosBackend(), localAndroidBackend()],
+  backends: [localIosBackend(), localAndroidBackend(), remote('ios'), remote('android')],
 };

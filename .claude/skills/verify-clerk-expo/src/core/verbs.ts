@@ -85,8 +85,12 @@ const platformOf = (host: HostAdapter, platform: Platform | undefined): Platform
   return chosen;
 };
 
-function chooseBackend(deps: Deps, platform: Platform, command: { readonly backend?: BackendKind }): BackendChoice {
-  return selectBackend(deps.host, platform, command.backend, deps.workspace.readLease(platform));
+function chooseBackend(deps: Deps, platform: Platform, command: { readonly backend?: BackendKind; readonly runner?: string }): BackendChoice {
+  const choice = selectBackend(deps.host, platform, command.backend, deps.workspace.readLease(platform));
+  if (command.runner !== undefined && choice.backend.kind === 'local') {
+    throw new VerifyFailure('USAGE', '--runner names a CI runner and the local backend has none', 'drop --runner, or pass --backend remote');
+  }
+  return choice;
 }
 
 function readJson(file: string): Record<string, unknown> | null {
@@ -96,6 +100,7 @@ function readJson(file: string): Record<string, unknown> | null {
 export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doctor' }>): Promise<DoctorReport> {
   const { host, workspace, runner } = deps;
   const platform = platformOf(host, command.platform);
+  const held = workspace.readLease(platform);
   const choice = chooseBackend(deps, platform, command);
   const { backend } = choice;
   const skill = workspace.skillDir;
@@ -105,6 +110,7 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
   checks.push(check('node', supportsNode(node), node, 'install Node 24.8.0 or newer on 24 (nvm install 24)'));
   const backendChecks = await backend.doctorChecks({
     live: command.live,
+    ...(command.runner === undefined ? {} : { runner: command.runner }),
     worktree: workspace.worktree,
     progress: deps.progress,
   });
@@ -129,8 +135,13 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
 
   const key = await computeBuildKey(host, platform, backend.kind, workspace.worktree);
   const up = ['{cli} up', ...(host.platforms.length > 1 ? [`--platform ${platform}`] : []), ...(command.backend === undefined ? [] : [`--backend ${command.backend}`])].join(' ');
-  const built = readBuiltApp(workspace, key);
-  checks.push(check('build', built !== null, built === null ? `no ${host.appId(platform)} build for ${key}` : `${key} at ${built.path}`, up));
+  if (backend.sourceCommit === undefined) {
+    const built = readBuiltApp(workspace, key);
+    checks.push(check('build', built !== null, built === null ? `no ${host.appId(platform)} build for ${key}` : `${key} at ${built.path}`, up));
+  } else {
+    const onSession = held !== null && held.backend === 'remote' && held.installedBuild === key;
+    checks.push(check('build', onSession, onSession ? `${key} (commit ${held.builtSha?.slice(0, 12) ?? 'unknown'}) is on the session's device` : `no session holds a ${host.appId(platform)} build for ${key}`, `commit and push, then ${up}`));
+  }
 
   const noAttach = await missingAttach(runner);
   checks.push(
@@ -192,7 +203,7 @@ export async function up(deps: Deps, command: Extract<Command, { verb: 'up' }>):
   chooseBackend(deps, platform, command);
   return deps.workspace.withAcquireLock(platform, async (lock) => {
     const [leased, instances] = await leaseWithInstances(deps, { willChange: false }, () =>
-      ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, instances: deps.instances, retryWith: '{cli} up --wait <seconds>' }),
+      ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, ...(command.runner === undefined ? {} : { runner: command.runner }), progress: deps.progress, instances: deps.instances, retryWith: '{cli} up --wait <seconds>' }),
     );
     const outcome = { ...leased, entry: await startRuntime(deps, leased.lease), instances };
     writeLeaseContext(deps, outcome);
@@ -269,7 +280,7 @@ export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Ex
     deviceWait,
     async (lock) => {
       const [leased, up] = await leaseWithInstances(deps, instances, () =>
-        ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, instances: deps.instances, retryWith }),
+        ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, ...(command.runner === undefined ? {} : { runner: command.runner }), progress: deps.progress, instances: deps.instances, retryWith }),
       );
       const outcome: RuntimeOutcome = { ...leased, entry: await startRuntime(deps, leased.lease), instances: up };
       writeLeaseContext(deps, outcome);
@@ -487,6 +498,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
         dirty: git.dirty,
         platform,
         backend: lease.backend,
+        remote: lease.backend === 'remote' ? { provider: lease.provider, runner: lease.runner, builtSha: lease.builtSha } : null,
         device: outcome.view.device,
         build: outcome.app.key,
         results,
@@ -597,7 +609,7 @@ interface DownPlan {
   readonly staleIntents: readonly string[];
 }
 
-const leaseIdentity = (lease: Lease): string => `local:${lease.claimNonce}`;
+const leaseIdentity = (lease: Lease): string => (lease.backend === 'local' ? `local:${lease.claimNonce}` : `remote:${lease.session}`);
 
 async function planDown(deps: Deps, command: Extract<Command, { verb: 'down' }>): Promise<DownPlan> {
   const { host, workspace } = deps;
