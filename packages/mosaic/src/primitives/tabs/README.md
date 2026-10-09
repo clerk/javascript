@@ -1,6 +1,6 @@
 # Tabs
 
-A tabbed interface with automatic or manual activation, keyboard navigation, and an animated indicator. Panels are shown/hidden via the HTML `hidden` attribute (not unmounted).
+A tabbed interface with automatic or manual activation, keyboard navigation, and an optional indicator element. Panels are shown/hidden via the HTML `hidden` attribute (not unmounted).
 
 ## When to Use
 
@@ -62,7 +62,7 @@ By default, arrowing to a tab immediately activates it. Use `activationMode="man
 | `Tabs.Tab`       | `<button>`      | A tab trigger inside `Tabs.List` (`role="tab"`)    |
 | `Tabs.Trigger`   | `<button>`      | Standalone tab trigger for use outside `Tabs.List` |
 | `Tabs.Panel`     | `<div>`         | Content panel (`role="tabpanel"`)                  |
-| `Tabs.Indicator` | `<span>`        | Animated indicator tracking the active tab         |
+| `Tabs.Indicator` | `<span>`        | Decorative element for the selection               |
 
 ## Props
 
@@ -118,6 +118,7 @@ No additional props beyond standard HTML attributes and the `render` prop.
 | Attribute             | Applies To   | Description                                     |
 | --------------------- | ------------ | ----------------------------------------------- |
 | `data-selected`       | Tab, Trigger | Active tab                                      |
+| `data-direction`      | Indicator    | `forward` or `backward`, see below              |
 | `data-disabled`       | Tab, Trigger | Disabled tab                                    |
 | `data-hidden`         | Panel        | Inactive panel                                  |
 | `data-open`           | Panel        | Selected panel (when `shouldForceMount`)        |
@@ -125,33 +126,31 @@ No additional props beyond standard HTML attributes and the `render` prop.
 | `data-starting-style` | Panel        | Enter animation frame (when `shouldForceMount`) |
 | `data-ending-style`   | Panel        | Exit animation frame (when `shouldForceMount`)  |
 
-## CSS Variables
+## Indicator
 
-### Indicator
-
-`Tabs.Indicator` exposes CSS custom properties for positioning and sizing:
-
-| CSS Variable      | Description                        |
-| ----------------- | ---------------------------------- |
-| `--cl-tab-left`   | Left offset of the active tab (px) |
-| `--cl-tab-width`  | Width of the active tab (px)       |
-| `--cl-tab-top`    | Top offset of the active tab (px)  |
-| `--cl-tab-height` | Height of the active tab (px)      |
-
-Use these to animate the indicator:
+`Tabs.Indicator` carries `data-direction`: `forward` when the selection last moved to a later tab, `backward` when it moved to an earlier one. Position it with CSS anchor positioning:
 
 ```css
+.cl-tabs-list {
+  position: relative;
+  anchor-scope: --active-tab;
+}
+.cl-tabs-tab[data-selected] {
+  anchor-name: --active-tab;
+}
 .cl-tabs-indicator {
   position: absolute;
-  left: var(--cl-tab-left);
-  width: var(--cl-tab-width);
+  position-anchor: --active-tab;
+  inset-inline: anchor(start) anchor(end);
+  bottom: 0;
+  height: 2px;
   transition:
-    left 200ms ease,
-    width 200ms ease;
+    inset-inline-start 200ms,
+    inset-inline-end 200ms;
 }
 ```
 
-The transition only runs when the active tab changes. The initial render and resizes (font load, container resize) skip it, so the indicator never animates from `0,0` or on mount.
+## CSS Variables
 
 ### Panel (with `shouldForceMount`)
 
@@ -184,7 +183,6 @@ Use this to drive directional slide animations:
 
 ## Important Notes
 
-- **`Tabs.List` must have `position: relative`** in your CSS for the indicator to position correctly.
 - **Panels use the `hidden` attribute** by default — they stay in the DOM but are hidden when inactive. This preserves state in inactive panels.
 - **`shouldForceMount` panels** stay in layout flow with `inert` on inactive panels. This enables CSS enter/exit animations between tabs. The initially-selected panel appears instantly (no enter animation on page load).
 - **`Tabs.Trigger` vs `Tabs.Tab`**: Use `Tabs.Tab` inside `Tabs.List` for keyboard-navigable tabs with roving tabindex. Use `Tabs.Trigger` for standalone tab buttons placed anywhere in the tree (e.g., in a sidebar).

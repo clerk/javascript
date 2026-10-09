@@ -1,6 +1,5 @@
 export { Tabs } from './tabs';
 export type {
-  TabsIndicatorProps,
   TabsListProps,
   TabsPanelProps,
   TabsPanelsProps,
