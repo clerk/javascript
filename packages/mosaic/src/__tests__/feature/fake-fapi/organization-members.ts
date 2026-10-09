@@ -3,6 +3,8 @@ import { http, HttpResponse } from 'msw';
 import type { FakeFapiState } from '../fake-fapi';
 import { envelope, missing, rejectUnknownParams } from './shared';
 
+const INVITATION_STATUSES = ['pending', 'accepted', 'revoked', 'expired'];
+
 export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path: string) => string) {
   return [
     http.get(fapiUrl('/v1/organizations/:organizationId/memberships'), ({ params, request }) => {
@@ -50,6 +52,21 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
         return rejected;
       }
       const statuses = url.searchParams.getAll('status');
+      const invalidStatus = statuses.find(status => !INVITATION_STATUSES.includes(status));
+      if (invalidStatus) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_value_invalid',
+                message: `${invalidStatus} is not a valid value for status.`,
+                meta: { param_name: 'status' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
       const matching = state.organizationInvitations.filter(
         invitation =>
           invitation.organization_id === params.organizationId &&
@@ -63,8 +80,19 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       const invitation = state.organizationInvitations.find(
         item => item.organization_id === params.organizationId && item.id === params.invitationId,
       );
-      if (!invitation) {
-        return missing();
+      if (!invitation || invitation.status !== 'pending') {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'organization_invitation_not_pending',
+                message: 'not pending',
+                long_message: "The organization invitation is not in the 'pending' status.",
+              },
+            ],
+          },
+          { status: 404 },
+        );
       }
       const revoked = { ...invitation, status: 'revoked' as const };
       state.organizationInvitations = state.organizationInvitations.map(item =>

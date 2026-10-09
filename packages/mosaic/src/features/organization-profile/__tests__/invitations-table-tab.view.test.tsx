@@ -11,9 +11,8 @@ function propsFor(overrides: Partial<InvitationsTableTabViewProps> = {}): Invita
     invitations: [{ id: 'invite-1', email: 'ada@example.com', invitedAtLabel: 'Sep 1, 2026', roleLabel: 'Admin' }],
     totalCount: 1,
     page: 1,
-    searchValue: '',
+    pageSize: 10,
     isLoading: false,
-    onSearchChange: vi.fn(),
     onPageChange: vi.fn(),
     ...overrides,
   };
@@ -56,7 +55,7 @@ describe('InvitationsTableTabView', () => {
     },
   );
 
-  it('distinguishes loading, an empty invitation list, and an empty search', () => {
+  it('chooses loading, retained rows, an empty list, and the error state from the supplied state', () => {
     const { props, rerender } = renderView({ invitations: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading invitations');
     rerender(
@@ -67,60 +66,43 @@ describe('InvitationsTableTabView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByText('No pending invitations')).toBeVisible();
-    rerender(
-      <MosaicProvider>
-        <InvitationsTableTabView
-          {...props}
-          isLoading={false}
-          searchValue='Nobody'
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('status')).toHaveTextContent('No invitations found');
+    expect(screen.getByRole('status')).toHaveTextContent('No pending invitations');
     rerender(
       <MosaicProvider>
         <InvitationsTableTabView
           {...propsFor()}
           isFetching
-          searchValue='Nobody'
         />
       </MosaicProvider>,
     );
     expect(screen.getByText('ada@example.com')).toBeVisible();
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
-  });
-  it('connects invitation search, sorting, and paging while clearing the old selection', async () => {
-    const user = userEvent.setup();
-    const { props, rerender } = renderView({
-      totalCount: 21,
-      onBulkAction: vi.fn(),
-      onSortChange: vi.fn(),
-      onPageSizeChange: vi.fn(),
-    });
-    await user.click(screen.getByRole('checkbox', { name: 'Select ada@example.com' }));
-    await user.click(screen.getByRole('button', { name: 'Invited' }));
-    expect(props.onSortChange).toHaveBeenCalledWith({ column: 'invitedAt', direction: 'ascending' });
-    expect(screen.getByRole('checkbox', { name: 'Select ada@example.com' })).not.toBeChecked();
     rerender(
       <MosaicProvider>
         <InvitationsTableTabView
-          {...props}
-          sort={{ column: 'invitedAt', direction: 'ascending' }}
+          {...propsFor()}
+          isError
+          onRetry={vi.fn()}
         />
       </MosaicProvider>,
     );
-    await user.click(screen.getByRole('button', { name: 'Invited' }));
-    expect(props.onSortChange).toHaveBeenLastCalledWith({ column: 'invitedAt', direction: 'descending' });
-    await user.type(screen.getByRole('searchbox', { name: 'Search invitations' }), 'A');
-    expect(props.onSearchChange).toHaveBeenCalledWith('A');
+    expect(screen.queryByText('ada@example.com')).toBeNull();
+    expect(within(screen.getByRole('table')).getByRole('alert')).toHaveTextContent('Unable to load invitations');
+    expect(screen.getAllByRole('button', { name: 'Try again' })).toHaveLength(1);
+  });
+
+  it('forwards paging without search, sorting, or page-size controls', async () => {
+    const user = userEvent.setup();
+    const { props } = renderView({ totalCount: 21, onBulkAction: vi.fn() });
+    await user.click(screen.getByRole('checkbox', { name: 'Select ada@example.com' }));
+    expect(screen.getByRole('checkbox', { name: 'Select ada@example.com' })).toBeChecked();
     await user.click(screen.getByRole('button', { name: 'Next invitations page' }));
     expect(props.onPageChange).toHaveBeenCalledWith(2);
-    await user.click(screen.getByRole('combobox', { name: /^Results per page/ }));
-    await user.click(screen.getByRole('option', { name: '20', exact: true }));
-    expect(props.onPageSizeChange).toHaveBeenCalledWith(20);
-    expect(props.onPageChange).toHaveBeenLastCalledWith(1);
+    expect(screen.queryByRole('searchbox')).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /^Results per page/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Invited' })).toBeNull();
   });
+
   it('routes invite and withholds unavailable actions', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ onInvite: vi.fn(), onRevoke: vi.fn() });

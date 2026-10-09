@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiMembership, fapiOrganization, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
 
 const organization = fapiOrganization({ id: 'org_invitations', name: 'Acme' });
@@ -38,6 +39,7 @@ describe('connected organization invitations', () => {
     const requests = holdRequests('get', '/v1/organizations/:organizationId/invitations');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(await screen.findByRole('tab', { name: 'Members' })).toBeVisible();
+    await waitFor(() => expect(screen.queryByText('Loading members')).toBeNull());
     expect(screen.queryByRole('tab', { name: 'Invitations' })).toBeNull();
     expect(requests.requests).toHaveLength(0);
     requests.release();
@@ -120,15 +122,48 @@ describe('connected organization invitations', () => {
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(revoke.requests).toHaveLength(1));
-    revoke.fail('invitation_rejected', 'Invitation rejected');
-    expect(await within(screen.getByRole('alertdialog')).findByRole('alert')).toBeVisible();
+    revoke.fail('network_error', 'Unavailable');
+    expect(await within(screen.getByRole('alertdialog')).findByRole('alert')).toHaveTextContent(
+      'Unable to reach the server. Check your connection and try again.',
+    );
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
     const retry = serve(['org:sys_memberships:manage']);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(retry.organizationInvitations[0]?.status).toBe('revoked'));
   });
 
-  it('keeps remaining rows and offers retry when refresh fails after revoke', async () => {
+  it('keeps the dialog open with the server message when the invitation is no longer pending', async () => {
+    const fapi = serve(['org:sys_memberships:manage']);
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+    fapi.organizationInvitations = [{ ...invitation, status: 'accepted' }];
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    expect(await within(screen.getByRole('alertdialog')).findByRole('alert')).toHaveTextContent(
+      'This invitation is no longer pending.',
+    );
+    expect(fapi.organizationInvitations[0]?.status).toBe('accepted');
+  });
+
+  it('sends one revoke request when confirm is pressed repeatedly', async () => {
+    serve(['org:sys_memberships:manage']);
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+    const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
+    const confirm = within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' });
+    await user.click(confirm);
+    await waitFor(() => expect(revoke.requests).toHaveLength(1));
+    confirm.click();
+    confirm.click();
+    revoke.release();
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(revoke.requests).toHaveLength(1);
+  });
+
+  it('replaces rows with the table error state and retries when refreshing after a revoke fails', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
     const other = { ...invitation, id: 'orginv_other', email_address: 'other@example.com' };
     fapi.organizationInvitations.push(other);
@@ -140,18 +175,48 @@ describe('connected organization invitations', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(refresh.requests).toHaveLength(1));
     refresh.fail('network_error', 'Unavailable');
-    expect(await screen.findByText('Unable to load invitations', {}, { timeout: 12_000 })).toBeVisible();
+    await waitFor(() => expect(screen.getByText('Unable to load invitations')).toBeVisible(), { timeout: 12_000 });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.organizationInvitations.find(item => item.id === invitation.id)?.status).toBe('revoked');
-    expect(screen.getByText('other@example.com')).toBeVisible();
-    expect(screen.queryByText('ada@example.com')).toBeNull();
+    expect(screen.queryByText('other@example.com')).toBeNull();
+    const table = within(screen.getByRole('table', { name: 'Invitations' }));
+    expect(table.getByRole('alert')).toHaveTextContent('Unable to load invitations');
     const retry = serve(['org:sys_memberships:manage']);
     retry.organizationInvitations = [other];
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    await user.click(table.getByRole('button', { name: 'Try again' }));
     await waitFor(() => expect(screen.queryByText('Unable to load invitations')).toBeNull());
     expect(screen.getByText('other@example.com')).toBeVisible();
     expect(screen.queryByText('ada@example.com')).toBeNull();
   }, 20_000);
+
+  it('shows localized role names in invitation rows', async () => {
+    const fapi = serve(['org:sys_memberships:manage']);
+    fapi.organizationInvitations.push({
+      ...invitation,
+      id: 'orginv_admin',
+      email_address: 'admin@example.com',
+      role: 'org:admin',
+      role_name: 'Admin',
+    });
+    await renderWithClerk(
+      <MosaicLocalizationProvider
+        value={resolveLocalization({ overrides: { roles: { 'org:admin': 'Administrateur', 'org:member': 'Membre' } } })}
+      >
+        <OrganizationProfileMembersPanel />
+      </MosaicLocalizationProvider>,
+    );
+    const table = within(await screen.findByRole('table', { name: 'Invitations' }));
+    expect(await table.findByRole('cell', { name: 'Administrateur' })).toBeVisible();
+    expect(table.getByRole('cell', { name: 'Membre' })).toBeVisible();
+    expect(table.queryByRole('cell', { name: 'Admin' })).toBeNull();
+  });
+
+  it('shows the invitation role name for a custom role', async () => {
+    const fapi = serve(['org:sys_memberships:manage']);
+    fapi.organizationInvitations = [{ ...invitation, role: 'org:billing', role_name: 'Billing' }];
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByRole('cell', { name: 'Billing' })).toBeVisible();
+  });
 
   it('returns to the previous page after revoking the last invitation on a later page', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
@@ -263,4 +328,6 @@ describe('connected organization invitations', () => {
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(screen.queryByText('ada@example.com')).toBeNull();
   });
+
+  it.todo('invites members from the Invitations tab');
 });
