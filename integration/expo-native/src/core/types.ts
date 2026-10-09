@@ -48,18 +48,20 @@ export interface ApplicationView {
   readonly name: string;
 }
 
-export type BackendKind = 'local';
+export type BackendKind = 'local' | 'remote';
+export type RemoteProvider = 'github-actions';
 
 export type SpecSelection = { readonly all: true } | { readonly selectors: readonly string[] };
 
 export type Command =
-  | { readonly verb: 'doctor'; readonly platform?: Platform; readonly backend?: BackendKind; readonly live: boolean }
-  | { readonly verb: 'up'; readonly platform?: Platform; readonly backend?: BackendKind; readonly waitSeconds: number }
+  | { readonly verb: 'doctor'; readonly platform?: Platform; readonly backend?: BackendKind; readonly runner?: string; readonly live: boolean }
+  | { readonly verb: 'up'; readonly platform?: Platform; readonly backend?: BackendKind; readonly runner?: string; readonly waitSeconds: number }
   | {
       readonly verb: 'run';
       readonly selection: SpecSelection;
       readonly platform?: Platform;
       readonly backend?: BackendKind;
+      readonly runner?: string;
       readonly grep?: string;
       readonly video: boolean;
       readonly retries: number;
@@ -110,7 +112,7 @@ export type DoctorCheckId =
   | 'node' | 'xcode' | 'jdk' | 'e2e-pins' | 'template' | 'proxy-trust'
   | 'settings' | 'build' | 'gh-attach' | 'core-drift' | 'stale-claims' | 'lane-ports'
   | 'instances' | 'clerk-api' | 'agent'
-  | 'backend'
+  | 'backend' | 'remote-env' | 'git-fetch' | 'git-push' | 'github-rest' | 'remote-commit' | 'tunnel-egress' | 'clerk-egress' | 'remote-sessions'
   | `live-${string}`;
 
 interface DoctorCheckBase {
@@ -177,12 +179,30 @@ export interface ScreenResult {
   readonly png: ScratchPath | null;
 }
 
-export interface AttachResult {
-  readonly verb: 'attach';
-  readonly commentUrl: string;
-  readonly posted: readonly EvidencePath[];
-  readonly alreadyPosted: boolean;
+export interface EvidenceSummary {
+  readonly run: RunId;
+  readonly platform: Platform;
+  readonly device: string;
+  readonly commit: string;
+  readonly passed: number;
+  readonly flaky: number;
+  readonly total: number;
 }
+
+export interface EvidenceBundle {
+  readonly pr: number;
+  readonly summary: EvidenceSummary;
+  readonly files: readonly { readonly name: string; readonly path: EvidencePath }[];
+}
+
+export interface HandOffReceipt {
+  readonly sessionRun: string;
+  readonly sessionRunUrl: string;
+}
+
+export type AttachResult =
+  | { readonly verb: 'attach'; readonly via: 'gh'; readonly prUrl: string; readonly posted: readonly EvidencePath[]; readonly alreadyPosted: boolean }
+  | ({ readonly verb: 'attach'; readonly via: 'runner'; readonly pr: number; readonly handedOff: readonly EvidencePath[]; readonly because: string } & HandOffReceipt);
 
 export type DownResult =
   | {
@@ -225,7 +245,12 @@ export interface LocalBuild extends BuiltAppBase {
   readonly source: 'local';
   readonly path: ScratchPath;
 }
-export type BuiltApp = LocalBuild;
+export interface SessionBuild extends BuiltAppBase {
+  readonly source: 'github-actions';
+  readonly path: null;
+  readonly sourceSha: string;
+}
+export type BuiltApp = LocalBuild | SessionBuild;
 export type BuildSource = BuiltApp['source'];
 
 export type DeviceName = `verify-${Platform}-${number}`;
@@ -242,7 +267,20 @@ export interface LocalLease extends LeaseBase {
   readonly deviceId: string;
   readonly claimNonce: string;
 }
-export type Lease = LocalLease;
+export interface RemoteLease extends LeaseBase {
+  readonly backend: 'remote';
+  readonly provider: RemoteProvider;
+  readonly session: string;
+  readonly providerRef: string;
+  readonly baseUrl: string;
+  readonly tokenFile: string;
+  readonly deviceId: string;
+  readonly deviceName: string;
+  readonly runner: string;
+  readonly expiresAt: string;
+  readonly builtSha: string | null;
+}
+export type Lease = LocalLease | RemoteLease;
 
 export type LedgerEntry =
   | { readonly id: string; readonly kind: 'lease-intent'; readonly platform: Platform; readonly backend: BackendKind; readonly worktree: string }
@@ -278,6 +316,7 @@ export interface EvidenceRecord {
   readonly dirty: boolean;
   readonly platform: Platform;
   readonly backend: BackendKind;
+  readonly remote: { readonly provider: RemoteProvider; readonly runner: string; readonly builtSha: string | null } | null;
   readonly device: string;
   readonly build: BuildKey;
   readonly results: readonly SpecResult[];
@@ -327,6 +366,7 @@ export interface AcquireRequest {
   readonly worktree: string;
   readonly waitSeconds: number;
   readonly app: BuiltApp;
+  readonly runner?: string;
   readonly retryWith: string;
   readonly progress: (line: string) => void;
 }
@@ -349,6 +389,7 @@ export interface Availability {
 
 export interface DoctorOptions {
   readonly live: boolean;
+  readonly runner?: string;
   readonly worktree: string;
   readonly progress: (line: string) => void;
 }
@@ -357,13 +398,15 @@ export interface DeviceBackend<L extends Lease = Lease> {
   readonly kind: BackendKind;
   readonly platform: Platform;
   availability(): Availability;
+  sourceCommit?(input: { readonly worktree: string; readonly inputs: readonly string[] }): Promise<string>;
   acquire(request: AcquireRequest): Promise<L>;
-  check(lease: L): Promise<'held' | 'lost'>;
+  check(lease: L): Promise<'held' | 'lost' | 'expiring'>;
   install(lease: L, app: BuiltApp, progress: (line: string) => void): Promise<L>;
   release(lease: L): Promise<void>;
   reapable(owner?: string): Promise<readonly L[]>;
   startRecording(lease: L, into: EvidencePath): Promise<Recording>;
   logs(lease: L, since: Date, extraPredicate?: string): Promise<string>;
+  handOffEvidence?(lease: L, bundle: EvidenceBundle, progress: (line: string) => void): Promise<HandOffReceipt>;
   describe(lease: L): string;
   readonly requirement: string;
   doctorChecks(options: DoctorOptions): Promise<{ readonly toolchain: readonly DoctorCheck[]; readonly device: readonly DoctorCheck[] }>;

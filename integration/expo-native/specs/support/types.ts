@@ -36,7 +36,7 @@ export interface SecretLike {
   use<T>(sink: SecretSink, fn: (plain: string) => T): T;
 }
 
-export type SecretSink = 'bapi-authorization' | 'launch-argument' | 'platform-authorization' | 'one-password-read' | 'bapi-user-password' | 'device-input' | 'gateway-provider' | 'e2e-agent-environment' | 'test-process-environment';
+export type SecretSink = 'bapi-authorization' | 'launch-argument' | 'agent-device-daemon' | 'e2e-provider-lease' | 'github-authorization' | 'session-bearer' | 'platform-authorization' | 'one-password-read' | 'bapi-user-password' | 'device-input' | 'gateway-provider' | 'e2e-agent-environment' | 'test-process-environment';
 
 export interface HostLaunch {
   readonly verifyPublishableKey: PublishableKey;

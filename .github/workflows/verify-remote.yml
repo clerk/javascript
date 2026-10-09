@@ -1,0 +1,228 @@
+name: verify-remote
+run-name: verify-remote ${{ inputs.owner }}/${{ inputs.session }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: Random id of the driver's checkout, so it can find and end its own sessions
+        required: true
+      session:
+        description: Session id the driver chose
+        required: true
+      request:
+        description: The session request as one JSON string (src/core/remote/protocol.ts)
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  PACKAGE: integration/expo-native
+  IOS_RUNTIME: com.apple.CoreSimulator.SimRuntime.iOS-26-5
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      runner: ${{ steps.plan.outputs.runner }}
+      device: ${{ steps.plan.outputs.device }}
+      sha: ${{ steps.plan.outputs.sha }}
+      timeout: ${{ steps.plan.outputs.timeout }}
+      request: ${{ steps.plan.outputs.request }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          sparse-checkout: integration/expo-native/src/core
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.15.0
+      - name: Read the request
+        id: plan
+        env:
+          VERIFY_REQUEST: ${{ inputs.request }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node "$PACKAGE/src/core/remote/session-agent.ts" plan
+
+  session:
+    needs: plan
+    if: needs.plan.outputs.mode == 'session'
+    runs-on: ${{ needs.plan.outputs.runner }}
+    timeout-minutes: ${{ fromJSON(needs.plan.outputs.timeout) }}
+    env:
+      VERIFY_SESSION_REQUEST: ${{ needs.plan.outputs.request }}
+      PLATFORM: ${{ fromJSON(needs.plan.outputs.request).platform }}
+      DEVICE: ${{ needs.plan.outputs.device }}
+      # agent-device reaps its daemon, its XCTest runner, and its device lease after five idle minutes by default.
+      AGENT_DEVICE_DAEMON_IDLE_TIMEOUT_MS: '0'
+      AGENT_DEVICE_IOS_RUNNER_IDLE_STOP_MS: '0'
+      AGENT_DEVICE_LEASE_TTL_MS: '21600000'
+      AGENT_DEVICE_LEASE_MAX_TTL_MS: '21600000'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.plan.outputs.sha || github.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        if: needs.plan.outputs.device != ''
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.15.0
+          cache: ${{ needs.plan.outputs.device != '' && (env.PLATFORM == 'android' || startsWith(needs.plan.outputs.runner, 'blacksmith-')) && 'pnpm' || '' }}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        if: needs.plan.outputs.device != '' && env.PLATFORM == 'android'
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@4733eaac7c1b0da527e4206b7671e0061de1ce37 # v6.3.0
+        if: needs.plan.outputs.device != '' && env.PLATFORM == 'android'
+        with:
+          # Sessions never run on main, so the default (write from main only) would never seed the cache.
+          cache-read-only: false
+          cache-disabled: ${{ !startsWith(needs.plan.outputs.runner, 'blacksmith-') }}
+          add-job-summary: never
+
+      # Nothing ends an idle session before the agent starts, so each step up to it has its own limit.
+      - name: Make the work directory and name the device
+        id: device
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/verify-remote"
+          echo "VERIFY_SESSION_WORK=$RUNNER_TEMP/verify-remote" >> "$GITHUB_ENV"
+          if [ -z "$DEVICE" ]; then exit 0; fi
+          if [ "$PLATFORM" = ios ]; then
+            xcodebuild -version
+            if ! xcrun simctl list runtimes available -j | jq -e --arg id "$IOS_RUNTIME" '.runtimes[] | select(.identifier == $id)' > /dev/null; then
+              echo "::error::This runner image has no $IOS_RUNTIME. It has: $(xcrun simctl list runtimes available -j | jq -r '[.runtimes[].identifier] | join(", ")'). Change IOS_RUNTIME in this workflow on purpose, or choose another runner."
+              exit 1
+            fi
+            ID="$(xcrun simctl create "$DEVICE 1" "$DEVICE" "$IOS_RUNTIME")"
+            xcrun simctl boot "$ID"
+            echo "$DEVICE 1 on $IOS_RUNTIME: $ID"
+            echo "id=$ID" >> "$GITHUB_OUTPUT"
+          else
+            [ -x "$ANDROID_HOME/platform-tools/adb" ] || "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install platform-tools < /dev/null > /dev/null
+            echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+            echo "id=$(node "$PACKAGE/src/platform/android/session-lane.ts" serial)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Start the session agent and tunnel
+        id: tunnel
+        timeout-minutes: 20
+        env:
+          VERIFY_SESSION_DEVICE_ID: ${{ steps.device.outputs.id }}
+          VERIFY_SESSION_DEVICE_NAME: ${{ needs.plan.outputs.device }}
+          VERIFY_SESSION_DEVICE_MODULE: integration/expo-native/src/platform/session-device.ts
+          GITHUB_TOKEN: ${{ github.token }}
+          CLOUDFLARED_VERSION: '2026.9.3'
+        run: |
+          set -euo pipefail
+          WORK="$VERIFY_SESSION_WORK"
+          case "$(uname -s)-$(uname -m)" in
+            Darwin-arm64) ASSET=cloudflared-darwin-arm64.tgz; SUM=587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 ;;
+            Linux-x86_64) ASSET=cloudflared-linux-amd64; SUM=77e26d8d900e0b8469f416239d14b5f296525fdf79fee6f511ef55609e3fbac2 ;;
+            *) echo "::error::no cloudflared build for $(uname -s)-$(uname -m)"; exit 1 ;;
+          esac
+          curl -fsSL --max-time 300 --retry 3 --retry-delay 2 --retry-all-errors -o "$WORK/$ASSET" "https://github.com/cloudflare/cloudflared/releases/download/$CLOUDFLARED_VERSION/$ASSET"
+          echo "$SUM  $WORK/$ASSET" | shasum -a 256 -c -
+          if [ "${ASSET%.tgz}" != "$ASSET" ]; then tar -xzf "$WORK/$ASSET" -C "$WORK"; else mv "$WORK/$ASSET" "$WORK/cloudflared"; fi
+          chmod +x "$WORK/cloudflared"
+          VERIFY_SESSION_CLOUDFLARED="$WORK/cloudflared" \
+            nohup node "$PACKAGE/src/core/remote/session-agent.ts" serve > "$WORK/agent.log" 2>&1 &
+          disown
+          for _ in $(seq 1 600); do
+            [ -s "$WORK/tunnel" ] && break
+            sleep 1
+          done
+          [ -s "$WORK/tunnel" ] || { echo "::error::no tunnel came up"; tail -20 "$WORK/agent.log" "$WORK/tunnel.log" || true; exit 1; }
+          echo "host=$(cat "$WORK/tunnel")" >> "$GITHUB_OUTPUT"
+
+      # GitHub's jobs API returns a step's name while the job still runs, so the tunnel host travels in this name.
+      - name: verify-remote tunnel ${{ steps.tunnel.outputs.host }}
+        run: 'true'
+
+      # The agent is already building the app, so the system image download and the boot overlap that build.
+      - name: Start the emulator
+        if: steps.device.outputs.id != '' && env.PLATFORM == 'android'
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules > /dev/null
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          IMAGE="system-images;android-36;google_apis;x86_64"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "$IMAGE" emulator < /dev/null > "$VERIFY_SESSION_WORK/sdkmanager.log" 2>&1 \
+            || { echo "::error::sdkmanager could not install $IMAGE"; tail -20 "$VERIFY_SESSION_WORK/sdkmanager.log"; exit 1; }
+          nohup node "$PACKAGE/src/platform/android/session-lane.ts" boot "$VERIFY_SESSION_WORK" > "$VERIFY_SESSION_WORK/lane.log" 2>&1 &
+          disown
+
+      - name: Install the package's pinned tools
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          npm ci --prefix "$PACKAGE" --no-audit --no-fund
+          "$PACKAGE/node_modules/.bin/agent-device" --version
+
+      - name: Wait for the simulator
+        if: steps.device.outputs.id != '' && env.PLATFORM == 'ios'
+        timeout-minutes: 15
+        env:
+          CLERK_TEST_DEVICES: ${{ steps.device.outputs.id }}
+        run: |
+          xcrun simctl bootstatus "$CLERK_TEST_DEVICES" -b
+          integration/expo-native/bin/boot-ios-simulators.sh wait
+
+      - name: Wait for the emulator
+        if: steps.device.outputs.id != '' && env.PLATFORM == 'android'
+        timeout-minutes: 6
+        run: |
+          until [ -f "$VERIFY_SESSION_WORK/lane-ready" ]; do
+            if [ -f "$VERIFY_SESSION_WORK/lane-failed" ]; then
+              echo "::error::the emulator did not boot: $(cat "$VERIFY_SESSION_WORK/lane-failed")"
+              tail -20 "$HOME/.verify/emulators/android-1.log" || true
+              exit 1
+            fi
+            sleep 2
+          done
+          cat "$VERIFY_SESSION_WORK/lane.log"
+
+      - name: Prepare the XCTest runner
+        if: steps.device.outputs.id != '' && env.PLATFORM == 'ios'
+        timeout-minutes: 20
+        run: |
+          "$PACKAGE/node_modules/.bin/agent-device" prepare ios-runner --platform ios --timeout 900000 || echo "::warning::prepare ios-runner failed; the first snapshot pays for it"
+
+      - name: Mark the device ready
+        run: touch "$VERIFY_SESSION_WORK/device-ready"
+
+      - name: Hold the session
+        run: |
+          set -uo pipefail
+          while [ ! -f "$VERIFY_SESSION_WORK/ended" ]; do
+            pgrep -f 'session-agent.ts serve' > /dev/null || [ -f "$VERIFY_SESSION_WORK/ended" ] || { echo "::error::the session agent died"; tail -30 "$VERIFY_SESSION_WORK/agent.log"; exit 1; }
+            sleep 3
+          done
+          echo "session ended: $(cat "$VERIFY_SESSION_WORK/ended")"
+
+      - name: Shut down
+        if: always()
+        env:
+          ID: ${{ steps.device.outputs.id }}
+        run: |
+          pkill -f 'session-agent.ts serve' || true
+          if [ -z "$ID" ]; then exit 0; fi
+          if [ "$PLATFORM" = ios ]; then xcrun simctl shutdown "$ID" || true; else adb -s "$ID" emu kill || true; fi
+
+      - name: Keep the evidence that attach handed off
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verify-evidence
+          path: ${{ runner.temp }}/verify-remote/evidence/
+          if-no-files-found: ignore
+          retention-days: 3
+          compression-level: 0

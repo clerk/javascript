@@ -9,7 +9,7 @@ import { exitCodeFor } from '../src/core/cli.ts';
 import { assertPublishable, readRecord } from '../src/core/evidence.ts';
 import { createInstances } from '../src/core/instances/instances.ts';
 import { SettingsRefused, settingsFileOf } from '../src/core/instances/settings.ts';
-import { commentBody } from '../src/core/publish.ts';
+import { summarize } from '../src/core/publish.ts';
 import { runVerb, type Deps } from '../src/core/verbs.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
 import { VerifyFailure, type BuildKey, type Command, type DeviceBackend, type HostAdapter, type InstanceSettings, type LocalLease, type ScratchPath } from '../src/core/types.ts';
@@ -252,10 +252,7 @@ describe('a run whose spec files declare different settings', () => {
 
     assert.match(result.next, /^\{cli\} attach /);
     assert.equal(exitCodeFor(result), 0);
-    const comment = commentBody(assertPublishable(record, []));
-    assert.ok(comment.includes(`Instance settings \`${ORG_LABEL}\` (declared by \`${CHOOSE_ORG}\`): 1 of 1 passed.`));
-    assert.ok(comment.includes(`Instance settings \`${MFA_LABEL}\` (declared by \`${COMPLETE_MFA}\`): 2 of 2 passed.`));
-    assert.equal(comment.includes('Instance settings `standard`'), false);
+    assert.deepEqual(summarize(assertPublishable(record, [])), { run: record.run, platform: 'ios', device: record.device, commit: record.gitHead, passed: 5, flaky: 0, total: 5 });
 
     w.lines.length = 0;
     await runVerb(w.deps(), RUN_ALL);
@@ -270,7 +267,6 @@ describe('a run whose spec files declare different settings', () => {
     assert.deepEqual(w.invocations().map((invocation) => invocation.output.split('/').at(-1)), ['e2e']);
     assert.equal(w.lines.some((line) => /groups in this run/.test(line)), false);
     assert.deepEqual(record.settings.map((group) => [group.label, group.changed, group.e2eReport]), [['standard', false, join(dir, 'e2e', 'report.json')]], 'the application was put on the standard file before the run drove, so the group changed nothing');
-    assert.equal(commentBody(assertPublishable(record, [])).includes('Instance settings'), false);
   });
 
   it('opens the Platform credential before it leases a device when the run will change settings', async () => {

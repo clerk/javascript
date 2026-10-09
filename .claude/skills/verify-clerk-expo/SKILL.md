@@ -1,11 +1,11 @@
 ---
 name: verify-clerk-expo
-description: Drive @clerk/expo in the expo-native test app (native AuthView, UserButton, UserProfileView, custom useSignIn and useSignUp flows, token cache, the Google and biometrics native modules) on an iOS simulator or Android emulator against a real Clerk development instance that the session creates and deletes, and capture video, screenshots, and the app log as evidence. Use it to prove any change to packages/expo or the test app works before calling it done, to reproduce a UI bug, or to run the golden regression specs.
+description: Drive @clerk/expo in the expo-native test app (native AuthView, UserButton, UserProfileView, custom useSignIn and useSignUp flows, token cache, the Google and biometrics native modules) on an iOS simulator or Android emulator against a real Clerk development instance that the session creates and deletes, and capture video, screenshots, and the app log as evidence. The device runs on this Mac, or on a CI runner when the machine cannot run it. Use it to prove any change to packages/expo or the test app works before calling it done, to reproduce a UI bug, or to run the golden regression specs.
 ---
 
 # verify-clerk-expo
 
-`integration/expo-native/bin/control-clerk-expo` is a control CLI over [e2e](https://github.com/tester-army/e2e) 0.18.0 and `@e2e-dev/mobile` 0.10.0. It builds the `expo-native` test app in `integration/templates/expo-native`, leases a simulator or emulator, creates one Clerk application for the worktree, seeds `+clerk_test` users, runs specs, and keeps the evidence. The test app is a Debug dev client, and Metro serves your working tree to it.
+`integration/expo-native/bin/control-clerk-expo` is a control CLI over [e2e](https://github.com/tester-army/e2e) 0.18.0 and `@e2e-dev/mobile` 0.10.0. It builds the `expo-native` test app in `integration/templates/expo-native`, leases a simulator or emulator, creates one Clerk application for the worktree, seeds `+clerk_test` users, runs specs, and keeps the evidence. On a Mac the device is local, the test app is a Debug dev client, and Metro serves your working tree to it. On a machine that cannot run the device, the CLI leases one on a GitHub Actions runner, and the runner builds your pushed commit as a Release app with the JS embedded. The verbs, specs, and evidence are the same.
 
 The tests are an ordinary e2e project. `e2e.config.ts` and `specs/` run under `npx e2e run` when the environment names a device, a build of the test app, and a development instance's keys. The CLI sits on top: it makes those three for a run and keeps the evidence. [The package README](../../../integration/expo-native/README.md) has the commands for a run by hand and what such a run leaves out.
 
@@ -63,6 +63,26 @@ A worktree can hold one lane of each platform. The two lanes share the watch bui
 
 A Mac has four iOS lanes and two Android lanes, shared by every worktree on it. When all are taken, `up` and `run` fail with `POOL_FULL`, and `--wait <seconds>` on either verb waits for a lane. The CLI drives only the simulators and emulators that it creates. [Local devices](references/devices.md) says how to find a lane's UDID or serial.
 
+### Borrow a device on a CI runner
+
+A machine that is not a Mac cannot run the simulator, and a machine with no hardware virtualization cannot run the emulator. There the CLI leases a device on a GitHub Actions runner and drives it through a tunnel. That machine needs Node 24.8.0 or newer on 24, the Platform API key, and access to GitHub, and `doctor` checks each. The session builds a pushed commit, never your working tree, so commit and push before `up` or `run`.
+
+```console
+$ git push
+$ integration/expo-native/bin/control-clerk-expo up --platform ios --backend remote
+backend remote  forced by --backend remote
+build   <build key>  github-actions  commit <commit>  the session builds it
+device  remote ios  starting session <session> on macos-26 (idle stop 15 min, cap 60 min)
+device  remote ios  tunnel up, iPhone 17 Pro on macos-26
+build   <build key>  github-actions  <commit> built in 1432s on macos-26
+device  iPhone 17 Pro on macos-26  remote  leased by this worktree  installed <build key>
+$ integration/expo-native/bin/control-clerk-expo down   # ends the runner job
+```
+
+The `backend` line says which backend the CLI chose and why. This transcript is from a Mac, where `--backend remote` forced the remote backend, and it leaves out the `instance`, `clerk`, `install`, and `wait` lines and the line with the run's URL. On a machine that cannot run the device, `up` needs no flag, and the `backend` line says why the local backend is out. `--backend local` or `--backend remote` on `doctor`, `up`, or `run` forces a backend, and a worktree that holds a lease keeps its backend until `down`. `--runner <label>` on `up` or `run` names another runner label for a new session. With the local backend, `--runner` is a usage error.
+
+A remote session has no Metro and no watch build. A worktree's iOS session and its Android session share the worktree's application, so their runs go one after the other too, and the second fails with `DEVICE_BUSY` while the first is driving. After an edit to the app or to a package, commit, push, and `run` again, and the same session builds the new commit and installs it. Specs run from your working tree, so an edit to a spec needs no commit. The session runs on a free GitHub-hosted runner, where `up` takes tens of minutes, nearly all of it the build. `down` stops the session at once, so run `down` as soon as you are done. [Remote devices](references/remote.md) has what the machine needs, the faster runner labels, the session limits, and what the session builds.
+
 On a Linux machine that can run the emulator, the CLI picks the local backend for Android and builds the test app on that machine, as the `Verify end-to-end tests` workflow does on its Linux runner.
 
 ## Doctor
@@ -75,6 +95,8 @@ $ integration/expo-native/bin/control-clerk-expo doctor --platform android
 Run it first, and again whenever anything looks off. Without `--live` it only reads. It creates no file, no device, and no Clerk application. Each line starts with `ok`, `warn`, `skip`, or `FAIL`, then has the id of the check and what the check found. `skip` marks a check that did not run, and its text starts with `not run:`. A failing check also prints a `fix:` line with the command to run, and `doctor` exits 3. A warning does not change the exit code.
 
 After the once-per-machine setup and before the first `up`, `build` is the one failing check, and its fix is the `up` command for that platform. A machine with no Platform API credential fails `instances`, and the fix line says how to supply one. `doctor --live` also creates one application, configures it, compares it with the standard settings, and deletes it, which proves that the credential can do each.
+
+With the remote backend, plain `doctor` starts nothing and pushes nothing, and `doctor --live` starts one short session to prove the path. With that backend, `build` fails until a session holds the current build, and `remote-commit` fails until HEAD is pushed.
 
 ## Drive
 
@@ -90,7 +112,7 @@ $ integration/expo-native/bin/control-clerk-expo screen --platform ios          
 
 `run` also takes `--grep <regex>`, `--retries <n>`, `--no-video`, and `--wait <seconds>`. `--retries <n>` runs a failed test again, up to `n` more times. The default is 0, so a run of your own change shows exactly what happened. The wait covers a free lane and another `run` in this worktree that holds the device. A spec limited to one platform with `test(title, { platforms: ['ios'] }, fn)` reports as skipped on the other.
 
-For a JS change on a local device, edit the source and `run` the spec, with no `up` in between. For a change to a native input, the same `run` rebuilds the dev client first.
+For a JS change on a local device, edit the source and `run` the spec, with no `up` in between. For a change to a native input, the same `run` rebuilds the dev client first. On a remote device, commit and push, then `run`.
 
 ### Sign in with the form or with a ticket
 
@@ -170,12 +192,24 @@ A proof drives the real user path. The video and the screenshots show the action
 
 After a run, the CLI searches the run directory for every secret the run used: the Platform API key, the instance's secret key, sign-in tickets, the passwords the tests typed, and a GitHub token in `GITHUB_TOKEN` or `GH_TOKEN`. It also searches for any token shaped like a JWT. A hit marks the file as tainted in `run.json`. The user ID and the session ID on the home are not secrets, because neither can sign anyone in.
 
+A remote run writes the same files. The runner records the video, and the CLI downloads it into the run directory. `run.json` also has `remote`, with `provider`, `runner`, and `builtSha`, the commit the session built.
+
 ```console
 $ integration/expo-native/bin/control-clerk-expo attach <run-id> --pr <n>                       # the video and every screenshot
 $ integration/expo-native/bin/control-clerk-expo attach <run-id> --pr <n> --screenshot profile  # the video and one screenshot
 ```
 
-`attach` posts one comment per run and PR with `gh pr comment --attach`. It needs a `gh` whose `gh pr comment` has that flag, and it fails with a fix when the flag is missing. It refuses a run that is tainted, that has a failing spec or no passing one, or whose `app.log` names a user that the run did not create.
+`attach` puts the video and the screenshots in the description of the pull request with `gh pr edit --attach`. It writes one block for the platform of the run: a line that names the run, the device, and the commit, then the files, between the comments `<!-- verify-evidence:ios -->` and `<!-- /verify-evidence:ios -->`, or the same two with `android`. The first `attach` of a platform adds its block after the description. A later `attach` of that platform replaces its block, so the description holds the latest run of each platform and the media does not pile up. `attach` changes nothing outside the block. Keep both comments of a block or remove both: `attach` refuses a description that has one without the other, or either one twice. A comment counts only when it is a whole line outside a code fence, so a description can quote one in a sentence or show a whole block as an example.
+
+`attach` reads the description again just before it writes, and builds on the newer text once if it changed. It cannot see an edit that someone saves while the files upload, and that edit is lost, so do not edit the description while `attach` runs.
+
+On a machine whose `gh` can attach, `attach` edits the description itself and prints `posted`. That needs gh 2.99.0 or newer, whose `gh pr edit` has `--attach`. It uploads a run to a PR once, and a second `attach` of the same run and PR prints `already posted`.
+
+`attach` always tries `gh pr edit --attach` itself first, on every kind of machine, and hands off only when that cannot work. On a machine whose `gh` cannot attach, such as a cloud sandbox, it hands the files of a remote run to the session's runner and prints `handed off`. Run it before `down`. The evidence reaches the description after `down` ends the session, when the `verify-attach` workflow publishes it. Its line says that the session reported the result, links the session's run, and names the account that started the session and the commit the run was made at. That workflow publishes only to the open pull request of the session's branch, and only when the commit the session started on and the commit of the run are both commits of that pull request. So open the pull request before `up`. A later push does not lose the evidence: the line then says that the pull request has newer commits. To show the newer commit, `run` and `attach` again, which replaces the block. `attach` checks the pull request first, and fails with the reason when the workflow would refuse it. Each platform has its own session, so `attach` the run of each platform before the `down` that ends its session.
+
+When this machine cannot attach and there is no session to hand the files to, or the hand-off fails, `attach` fails and says which. Then name the run id in the PR and say that the evidence was not attached. A run on a local device has no session, so its fix is a newer `gh`. [Remote devices](references/remote.md) has what the repository needs before a hand-off can be published, and its limits.
+
+`attach` refuses a run that is tainted, that has a failing spec or no passing one, or whose `app.log` names a user that the run did not create.
 
 Attach the run of your own change. Run your new or changed spec on its own and attach that run, so the PR video shows only the behavior the change is about. You do not owe a regression run: PR CI (`.github/workflows/verify-e2e.yml`) runs every golden spec on the pull request and reports them there. If you ran other golden specs anyway, cite that run's id in the PR and leave its video in `.verify/runs/`.
 
@@ -206,12 +240,16 @@ While the other platform stays leased, `down --platform <p>` releases that platf
 
 If a worktree is removed without `down`, the next `up` or `run` in any worktree on the same Mac finishes for it, and prints a `reap` line for each lane and ledger it cleans up.
 
+For a remote device, `down` ends the runner job and waits for it to finish, and `down --stale` also ends a session that a crashed run of this checkout left running. No other checkout cleans up a remote session. If its checkout is deleted, the session's own idle stop ends it.
+
 ## For maintainers of the tests and the CLI
 
-- `src/core/`, `src/platform/ios/`, `src/platform/android/`, `specs/support/`, `specs/fixtures.ts`, `e2e.config.ts`, `testing/`, and every test but `test/host.test.ts`, `test/freshness.test.ts`, and `test/native-build.test.ts` are shared with the same package in clerk-ios and clerk-android. Change them there first, then copy them here. `doctor`'s `core-drift` check fails when `src/core/`, `specs/support/`, `specs/fixtures.ts`, or `e2e.config.ts` differs from `src/core/MANIFEST`, and `node src/core/manifest.ts --write` in the package directory regenerates the manifest. Nothing under `specs/` or `e2e.config.ts` imports the CLI, and `test/seam.test.ts` fails when a file does.
+- `src/core/`, `src/platform/ios/`, `src/platform/android/`, `specs/support/`, `specs/fixtures.ts`, `e2e.config.ts`, `testing/`, and every test but `test/host.test.ts`, `test/remote-host.test.ts`, `test/freshness.test.ts`, and `test/native-build.test.ts` are shared with the same package in clerk-ios and clerk-android. Change them there first, then copy them here. `doctor`'s `core-drift` check fails when `src/core/`, `specs/support/`, `specs/fixtures.ts`, or `e2e.config.ts` differs from `src/core/MANIFEST`, and `node src/core/manifest.ts --write` in the package directory regenerates the manifest. Nothing under `specs/` or `e2e.config.ts` imports the CLI, and `test/seam.test.ts` fails when a file does.
 - `src/host.ts`, `src/fixture.ts`, `src/native-build.ts`, and `src/freshness.ts` are this repository's own: the build of the test app, the native build that CI keeps between runs, the Metro ports, and the check that Metro serves current JS. `specs/app.ts` names the test app and its entry for a dev client, and `specs/native.ts` holds the per-platform locators for the native views and the locators of the home's links. Both are this repository's own too.
 - `npm test --prefix integration/expo-native` runs the CLI's unit tests, with no network, key, or device. `npm run typecheck --prefix integration/expo-native` runs `tsc`. The `Expo Native Runner Tests` job in `.github/workflows/ci.yml` runs both on Linux when a pull request changes the package, the test app, or a package the test app links.
 - `run --github-report` hands the results of the run to `@e2e-dev/github` as one report. The reporter writes the report to the job summary. With a `GITHUB_TOKEN` that may write pull request comments, it also posts one comment on the pull request and updates that comment on later runs. The reporter never changes the exit code, and nothing is reported for a run with a tainted file.
-- `.github/workflows/verify-e2e.yml`, the `Verify end-to-end tests` workflow, runs `up --backend local`, `run --all --retries 1 --github-report`, and `down` on a runner for each platform, with a device and a Clerk application for each. It starts on a pull request to `main` that changes the package, the test app, or one of the three packages the test app links. It runs for a pull request that is not a draft, and a draft or a pull request from a fork gets a notice instead. Start it by hand with `gh workflow run verify-e2e.yml --ref <branch>`. A failing spec shows on the pull request and is not required for a merge, and a test that fails and then passes on its one retry is `flaky` and does not fail the job. The runners are GitHub-hosted, `macos-26` and `ubuntu-24.04`, and the repository variables `VERIFY_CI_RUNNER_IOS` and `VERIFY_CI_RUNNER_ANDROID` name other labels. The Platform API key comes from the `MOBILE_VERIFICATION_PLATFORM_API_KEY` repository secret. The workflow sets `VERIFY_LOCAL_BUILD=standalone` and `VERIFY_NATIVE_CACHE` ([freshness.md](references/freshness.md)). It uploads each run's `run.json`, app log, driver logs, video, screenshots, and e2e's `report.json`, `junit.xml`, summary, and failure pages for three days, and only when no secret is found in the run. `bin/boot-ios-simulators.sh wait` waits until a booted simulator is ready, and the workflow calls it.
+- `.github/workflows/verify-e2e.yml`, the `Verify end-to-end tests` workflow, runs `up --backend local`, `run --all --retries 1 --github-report`, and `down` on a runner for each platform, with a device and a Clerk application for each. It starts on a pull request to `main` that changes the package, the test app, or one of the three packages the test app links. It runs for a pull request that is not a draft, and a draft or a pull request from a fork gets a notice instead. Start it by hand with `gh workflow run verify-e2e.yml --ref <branch>`. A failing spec shows on the pull request and is not required for a merge, and a test that fails and then passes on its one retry is `flaky` and does not fail the job. The runners are GitHub-hosted, `macos-26` and `ubuntu-24.04`, and the repository variables `VERIFY_CI_RUNNER_IOS` and `VERIFY_CI_RUNNER_ANDROID` name other labels. The Platform API key comes from the `MOBILE_VERIFICATION_PLATFORM_API_KEY` repository secret. The workflow sets `VERIFY_LOCAL_BUILD=standalone` and `VERIFY_NATIVE_CACHE` ([freshness.md](references/freshness.md)). It uploads each run's `run.json`, app log, driver logs, video, screenshots, and e2e's `report.json`, `junit.xml`, summary, and failure pages for three days, and only when no secret is found in the run. `bin/boot-ios-simulators.sh wait` waits until a booted simulator is ready, and this workflow and `.github/workflows/verify-remote.yml` call it.
 - The `Expo` workflow, `.github/workflows/expo-native-build.yml`, runs nothing on a device. It builds the test app as a Release app on Expo SDK 54, 55, and 57 for each platform, and runs the Android unit tests of `@clerk/expo-biometrics`.
+- `.github/workflows/verify-attach.yml` publishes the evidence that `attach` hands to a session's runner, with `scripts/verify-attach.mjs`. It reads the manifest that `src/core/remote/handoff.ts` writes. It and `src/core/publish.ts` each replace the block the other wrote, and each applies the same rules to the comments and to the start of the line. So a change to the manifest, the comments, or those rules is a change in both places. `scripts/verify-attach.test.mjs` has its tests.
+- A remote session runs in `.github/workflows/verify-remote.yml`. `src/platform/session-device.ts` holds the steps that the session runs on its device, and `src/core/remote/` is the code on both ends of it. The runner installs the package with `npm ci`. A session keeps the code under `src/core/` from the commit it started on, so after a change to a file that `src/core/MANIFEST` lists, commit, push, `down`, then `up`.
 - `SKILL.md`, `references/`, and `features/` are in `.claude/skills/verify-clerk-expo/`. `.cursor/skills/verify-clerk-expo` is a symlink to that directory, so edit only the `.claude` copy.

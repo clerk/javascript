@@ -1,8 +1,9 @@
 import { execFile } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import type { Device } from './inputs.ts';
+import { Secret } from './secret.ts';
 import type { Platform } from './types.ts';
 
 export interface CommandLine {
@@ -19,7 +20,13 @@ export interface CommandResult {
 export type CommandRunner = (command: string, args: readonly string[]) => Promise<CommandResult>;
 
 export function agentDevice(device: Device, platform: Platform): { readonly selector: readonly string[]; readonly env: Readonly<Record<string, string>> } {
-  return { selector: ['--platform', platform, platform === 'ios' ? '--udid' : '--serial', device.id], env: {} };
+  const selector = ['--platform', platform, platform === 'ios' ? '--udid' : '--serial', device.id];
+  if (device.kind === 'local') return { selector, env: {} };
+  const token = new Secret('session-bearer', readFileSync(device.tokenFile, 'utf8').trim());
+  return {
+    selector: [...selector, '--daemon-base-url', device.daemonUrl],
+    env: token.use('agent-device-daemon', (plain) => ({ AGENT_DEVICE_DAEMON_AUTH_TOKEN: plain })),
+  };
 }
 
 const REVERSE_FLAGS: ReadonlySet<string> = new Set(['--list', '--no-rebind', '--remove', '--remove-all']);

@@ -110,9 +110,19 @@ describe('lease flow', () => {
       id: 'gh-attach',
       ok: true,
       state: 'warning',
-      detail: "this gh has no `gh pr comment --attach`, so `{cli} attach` cannot post a run's video and screenshots from this machine",
-      fix: 'install a gh build whose `gh pr comment` has --attach',
+      detail: "this gh has no `gh pr edit --attach`, so `{cli} attach` cannot put a run's video and screenshots in a pull request description from this machine",
+      fix: 'install gh 2.99.0 or newer, whose `gh pr edit` has --attach',
     });
+  });
+
+  it('refuses --runner with the local backend as a usage error, before it builds, leases, or checks anything', async () => {
+    const { deps, events } = setup(0);
+    const usage = (error: VerifyFailure) => error.code === 'USAGE' && error.message === '--runner names a CI runner and the local backend has none' && error.fix === 'drop --runner, or pass --backend remote';
+    await assert.rejects(up(deps, { verb: 'up', runner: 'some-label', waitSeconds: 0 }), usage);
+    await assert.rejects(leaseForRun(deps, 'ios', { ...runCommand, runner: 'some-label' }, { willChange: false }, async () => undefined), usage);
+    await assert.rejects(doctor(deps, { verb: 'doctor', runner: 'some-label', live: true }), usage);
+    assert.deepEqual(events, []);
+    assert.equal(existsSync(deps.workspace.root), false);
   });
 
   it('leases no device when no Platform API credential works', async () => {

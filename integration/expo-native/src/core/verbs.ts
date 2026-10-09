@@ -1,5 +1,5 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { isOrphaned, readClaims } from './claims.ts';
 import { check, type AppliedInstance, type Instances } from './instances/instances.ts';
 import { STANDARD, SettingsRefused, planGroups, readSpecText, settingsFileOf, sourceHash, straySettingsFile, type SettingsGroup } from './instances/settings.ts';
@@ -20,7 +20,7 @@ import { protectGitHubTokens, reportToGitHub } from './github-report.ts';
 import { isRunning, type Runner } from './exec.ts';
 import { ledgerAgentDeviceDaemon, processesIn, readDaemonInfo, stopProcesses, type ProcessEntry } from './ledgers.ts';
 import { SHARED_ROOTS, manifestDrift } from './manifest.ts';
-import { missingAttach, postToPullRequest } from './publish.ts';
+import { CannotPostHere, chooseFiles, missingAttach, postToPullRequest, summarize } from './publish.ts';
 import { redact } from '../../specs/support/secret.ts';
 import { count } from './state.ts';
 import { newEntryId, parseRunId, type Workspace } from './workspace.ts';
@@ -35,8 +35,10 @@ import {
   type DoctorCheck,
   type DoctorReport,
   type DownResult,
+  type EvidenceBundle,
   type EvidencePath,
   type EvidenceRecord,
+  type HandOffReceipt,
   type HostAdapter,
   type InstanceView,
   type Lease,
@@ -87,8 +89,12 @@ const platformOf = (host: HostAdapter, platform: Platform | undefined): Platform
   return chosen;
 };
 
-function chooseBackend(deps: Deps, platform: Platform, command: { readonly backend?: BackendKind }): BackendChoice {
-  return selectBackend(deps.host, platform, command.backend, deps.workspace.readLease(platform));
+function chooseBackend(deps: Deps, platform: Platform, command: { readonly backend?: BackendKind; readonly runner?: string }): BackendChoice {
+  const choice = selectBackend(deps.host, platform, command.backend, deps.workspace.readLease(platform));
+  if (command.runner !== undefined && choice.backend.kind === 'local') {
+    throw new VerifyFailure('USAGE', '--runner names a CI runner and the local backend has none', 'drop --runner, or pass --backend remote');
+  }
+  return choice;
 }
 
 function readJson(file: string): Record<string, unknown> | null {
@@ -98,6 +104,7 @@ function readJson(file: string): Record<string, unknown> | null {
 export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doctor' }>): Promise<DoctorReport> {
   const { host, workspace, runner } = deps;
   const platform = platformOf(host, command.platform);
+  const held = workspace.readLease(platform);
   const choice = chooseBackend(deps, platform, command);
   const { backend } = choice;
   const packageDir = workspace.packageDir;
@@ -107,6 +114,7 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
   checks.push(check('node', supportsNode(node), node, 'install Node 24.8.0 or newer on 24 (nvm install 24)'));
   const backendChecks = await backend.doctorChecks({
     live: command.live,
+    ...(command.runner === undefined ? {} : { runner: command.runner }),
     worktree: workspace.worktree,
     progress: deps.progress,
   });
@@ -131,14 +139,19 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
 
   const key = await computeBuildKey(host, platform, backend.kind, workspace.worktree);
   const up = ['{cli} up', ...(host.platforms.length > 1 ? [`--platform ${platform}`] : []), ...(command.backend === undefined ? [] : [`--backend ${command.backend}`])].join(' ');
-  const built = readBuiltApp(workspace, key);
-  checks.push(check('build', built !== null, built === null ? `no ${host.appId(platform)} build for ${key}` : `${key} at ${built.path}`, up));
+  if (backend.sourceCommit === undefined) {
+    const built = readBuiltApp(workspace, key);
+    checks.push(check('build', built !== null, built === null ? `no ${host.appId(platform)} build for ${key}` : `${key} at ${built.path}`, up));
+  } else {
+    const onSession = held !== null && held.backend === 'remote' && held.installedBuild === key;
+    checks.push(check('build', onSession, onSession ? `${key} (commit ${held.builtSha?.slice(0, 12) ?? 'unknown'}) is on the session's device` : `no session holds a ${host.appId(platform)} build for ${key}`, `commit and push, then ${up}`));
+  }
 
   const noAttach = await missingAttach(runner);
   checks.push(
     noAttach === null
-      ? check('gh-attach', true, 'gh pr comment supports --attach', '')
-      : { id: 'gh-attach', ok: true, state: 'warning', detail: `${noAttach.why}, so \`{cli} attach\` cannot post a run's video and screenshots from this machine`, fix: noAttach.fix },
+      ? check('gh-attach', true, 'gh pr edit supports --attach', '')
+      : { id: 'gh-attach', ok: true, state: 'warning', detail: `${noAttach.why}, so \`{cli} attach\` cannot put a run's video and screenshots in a pull request description from this machine`, fix: noAttach.fix },
   );
 
   const stale = readClaims(workspace.claimsDir, platform).filter(isOrphaned);
@@ -178,7 +191,7 @@ export async function up(deps: Deps, command: Extract<Command, { verb: 'up' }>):
   chooseBackend(deps, platform, command);
   return deps.workspace.withAcquireLock(platform, async (lock) => {
     const [leased, instances] = await leaseWithInstances(deps, { willChange: false }, () =>
-      ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, instances: deps.instances, retryWith: '{cli} up --wait <seconds>' }),
+      ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, ...(command.runner === undefined ? {} : { runner: command.runner }), progress: deps.progress, instances: deps.instances, retryWith: '{cli} up --wait <seconds>' }),
     );
     const outcome = { ...leased, devServer: await startRuntime(deps, leased.lease), instances };
     return { verb: 'up', leases: [outcome.view], builds: [outcome.build], instances: outcome.instances };
@@ -249,7 +262,7 @@ export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Ex
     deviceWait,
     async (lock) => {
       const [leased, up] = await leaseWithInstances(deps, instances, () =>
-        ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, instances: deps.instances, retryWith }),
+        ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, ...(command.runner === undefined ? {} : { runner: command.runner }), progress: deps.progress, instances: deps.instances, retryWith }),
       );
       const outcome: RuntimeOutcome = { ...leased, devServer: await startRuntime(deps, leased.lease), instances: up };
       deps.progress(leaseLine(outcome.view));
@@ -466,6 +479,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
         dirty: git.dirty,
         platform,
         backend: lease.backend,
+        remote: lease.backend === 'remote' ? { provider: lease.provider, runner: lease.runner, builtSha: lease.builtSha } : null,
         device: outcome.view.device,
         build: outcome.app.key,
         results,
@@ -566,7 +580,32 @@ export async function attach(deps: Deps, command: Extract<Command, { verb: 'atta
   if (!existsSync(dir)) throw new VerifyFailure('USAGE', `no run ${run} in ${deps.workspace.root}/runs`, 'pass a run id that `{cli} run` printed');
   const record = readRecord(dir);
   const publishable = assertPublishable(record, loggedUserIds(dir));
-  return postToPullRequest(publishable, dir, deps.host, command.pr, command.screenshots, deps.runner);
+  try {
+    return await postToPullRequest(publishable, dir, deps.host, command.pr, command.screenshots, deps.runner);
+  } catch (error) {
+    if (!(error instanceof CannotPostHere) || record.backend !== 'remote') throw error;
+    const unattached = `name run ${run} in the PR and say that the evidence was not attached`;
+    const session = sessionToHandOffTo(deps, record);
+    if (typeof session === 'string') throw new VerifyFailure('NOT_READY', `${error.message}, and ${session}`, `${unattached}; to attach it, {cli} run again and {cli} attach before {cli} down`);
+    const { videos, shots } = chooseFiles(publishable, command.screenshots);
+    const files = [...videos, ...shots.map((shot) => shot.path)];
+    try {
+      const receipt = await session.handOff({ pr: command.pr, summary: summarize(publishable), files: files.map((path) => ({ name: basename(path), path })) }, deps.progress);
+      return { verb: 'attach', via: 'runner', pr: command.pr, handedOff: files, because: error.why, ...receipt };
+    } catch (failure) {
+      if (!(failure instanceof VerifyFailure)) throw failure;
+      throw new VerifyFailure(failure.code, `${error.message}, and ${failure.message}`, `${failure.fix}; until then, ${unattached}`);
+    }
+  }
+}
+
+function sessionToHandOffTo(deps: Deps, record: EvidenceRecord): { readonly handOff: (bundle: EvidenceBundle, progress: (line: string) => void) => Promise<HandOffReceipt> } | string {
+  const lease = deps.workspace.readLease(record.platform);
+  if (lease === null || lease.backend !== 'remote') return `this worktree holds no session now, so nothing can take the evidence to a runner`;
+  if (Date.parse(record.startedAt) < Date.parse(lease.acquiredAt)) return `run ${record.run} ran before the session that is up now started`;
+  const backend = backendFor(deps.host, record.platform, 'remote');
+  const handOffEvidence = backend.handOffEvidence?.bind(backend);
+  return handOffEvidence === undefined ? `the ${record.platform} remote backend takes no evidence` : { handOff: (bundle, progress) => handOffEvidence(lease, bundle, progress) };
 }
 
 interface DownPlan {
@@ -576,7 +615,7 @@ interface DownPlan {
   readonly staleIntents: readonly string[];
 }
 
-const leaseIdentity = (lease: Lease): string => `local:${lease.claimNonce}`;
+const leaseIdentity = (lease: Lease): string => (lease.backend === 'local' ? `local:${lease.claimNonce}` : `remote:${lease.session}`);
 
 async function planDown(deps: Deps, command: Extract<Command, { verb: 'down' }>): Promise<DownPlan> {
   const { host, workspace } = deps;

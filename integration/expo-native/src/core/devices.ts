@@ -32,7 +32,8 @@ export interface LeaseOutcome {
   readonly build: BuildView;
 }
 
-export const deviceOf = (lease: Lease): Device => ({ kind: 'local', id: lease.deviceId });
+export const deviceOf = (lease: Lease): Device =>
+  lease.backend === 'local' ? { kind: 'local', id: lease.deviceId } : { kind: 'borrowed', id: lease.deviceId, daemonUrl: `${lease.baseUrl}/agent-device`, tokenFile: lease.tokenFile };
 
 export function backendFor(host: HostAdapter, platform: Platform, kind: BackendKind): DeviceBackend {
   const backend = host.backends.find((b) => b.platform === platform && b.kind === kind);
@@ -77,7 +78,7 @@ export function leaseView(backend: DeviceBackend, lease: Lease, renewed: boolean
     backend: lease.backend,
     device: backend.describe(lease),
     installedBuild: lease.installedBuild,
-    expiresAt: null,
+    expiresAt: lease.backend === 'remote' ? lease.expiresAt : null,
     renewed,
   };
 }
@@ -112,8 +113,14 @@ export function readBuiltApp(workspace: Workspace, key: BuildKey): LocalBuild | 
   return existsSync(app.path) ? app : null;
 }
 
-async function ensureBuild(host: HostAdapter, platform: Platform, workspace: Workspace, backend: DeviceBackend, progress: (line: string) => void): Promise<{ app: BuiltApp; view: BuildView }> {
+async function ensureBuild(host: HostAdapter, platform: Platform, workspace: Workspace, backend: DeviceBackend, held: Lease | null, progress: (line: string) => void): Promise<{ app: BuiltApp; view: BuildView }> {
   const key = await computeBuildKey(host, platform, backend.kind, workspace.worktree);
+  if (backend.sourceCommit !== undefined) {
+    const onSession = held !== null && held.backend === 'remote' && held.installedBuild === key ? held.builtSha : null;
+    const sourceSha = onSession ?? (await backend.sourceCommit({ worktree: workspace.worktree, inputs: host.buildInputs(platform, backend.kind) }));
+    const app: BuiltApp = { platform, key, appId: host.appId(platform), path: null, source: 'github-actions', sourceSha };
+    return { app, view: { platform, key, source: app.source, reused: onSession !== null, seconds: 0 } };
+  }
   const existing = readBuiltApp(workspace, key);
   if (existing !== null) return { app: existing, view: { platform, key, source: existing.source, reused: true, seconds: 0 } };
   const started = Date.now();
@@ -144,12 +151,15 @@ export async function ensureLease(
   requested: BackendKind | undefined,
   workspace: Workspace,
   host: HostAdapter,
-  options: { readonly waitSeconds: number; readonly progress: (line: string) => void; readonly instances: Instances; readonly retryWith: string },
+  options: { readonly waitSeconds: number; readonly runner?: string; readonly progress: (line: string) => void; readonly instances: Instances; readonly retryWith: string },
 ): Promise<LeaseOutcome> {
   const { platform } = lock;
   const held = workspace.readLease(platform);
   if (held !== null && requested !== undefined && held.backend !== requested) {
     throw new VerifyFailure('NOT_READY', `this worktree holds a ${held.backend} ${platform} lease, not ${requested}`, '{cli} down');
+  }
+  if (held !== null && held.backend === 'remote' && options.runner !== undefined && held.runner !== options.runner) {
+    throw new VerifyFailure('NOT_READY', `this worktree holds a session on ${held.runner}, not ${options.runner}`, '{cli} down, then rerun with --runner');
   }
   const choice = selectBackend(host, platform, requested, held);
   const { backend } = choice;
@@ -160,15 +170,15 @@ export async function ensureLease(
   }
   await finishOrphanLedgers(workspace.home, resolve(workspace.worktree), options.instances, options.progress);
 
-  const { app, view: build } = await ensureBuild(host, platform, workspace, backend, options.progress);
-  const builtBy = build.reused ? 'reused' : `built in ${build.seconds}s`;
+  const { app, view: build } = await ensureBuild(host, platform, workspace, backend, held, options.progress);
+  const builtBy = app.source === 'local' ? (build.reused ? 'reused' : `built in ${build.seconds}s`) : `commit ${app.sourceSha.slice(0, 12)}  ${build.reused ? 'already on the session' : 'the session builds it'}`;
   options.progress(`build   ${build.key}  ${build.source}  ${builtBy}`);
 
   let lease: Lease | null = held;
   let renewed = false;
   const state = lease === null ? 'held' : await backend.check(lease);
   if (lease !== null && state !== 'held') {
-    options.progress(`${'lost'.padEnd(7)} ${backend.describe(lease)}  renewing`);
+    options.progress(`${(state === 'expiring' ? 'ending' : 'lost').padEnd(7)} ${backend.describe(lease)}  renewing`);
     await releaseLease(workspace, backend, lease);
     lease = null;
     renewed = true;
@@ -180,14 +190,14 @@ export async function ensureLease(
     }
     const intent = { id: newEntryId(), kind: 'lease-intent' as const, platform, backend: backend.kind, worktree: workspace.worktree };
     workspace.append(intent);
-    const acquired = await backend.acquire({ platform, worktree: workspace.worktree, waitSeconds: options.waitSeconds, app, retryWith: options.retryWith, progress: options.progress });
+    const acquired = await backend.acquire({ platform, worktree: workspace.worktree, waitSeconds: options.waitSeconds, app, ...(options.runner === undefined ? {} : { runner: options.runner }), retryWith: options.retryWith, progress: options.progress });
     workspace.writeLease(acquired);
     workspace.append({
       id: newEntryId(),
       kind: 'lease-held',
       platform,
       backend: backend.kind,
-      sessionId: null,
+      sessionId: acquired.backend === 'remote' ? acquired.session : null,
       deviceId: acquired.deviceId,
     });
     workspace.append({ id: newEntryId(), kind: 'done', ref: intent.id });

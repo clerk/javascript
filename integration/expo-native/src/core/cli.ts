@@ -6,6 +6,7 @@ import { takeAgent } from './agent.ts';
 import { PLATFORM_CREDENTIAL_VARIABLES } from './launch.mjs';
 import { redact } from '../../specs/support/secret.ts';
 import { leaseLine } from './devices.ts';
+import { RUNNER_LABEL } from './remote/protocol.ts';
 import { count } from './state.ts';
 import { createInstances } from './instances/instances.ts';
 import { verbs, type Deps } from './verbs.ts';
@@ -28,9 +29,9 @@ import {
 const VERBS: readonly Verb[] = ['doctor', 'up', 'run', 'screen', 'attach', 'down'];
 
 const USAGE_FIX = [
-  '{cli} doctor [--platform p] [--backend auto|local] [--live]',
-  '{cli} up [--platform p] [--backend auto|local] [--wait <seconds>]',
-  '{cli} run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--backend auto|local] [--grep re] [--retries <n>] [--github-report] [--no-video] [--wait <seconds>]',
+  '{cli} doctor [--platform p] [--backend auto|local|remote] [--live [--runner <label>]]',
+  '{cli} up [--platform p] [--backend auto|local|remote] [--runner <label>] [--wait <seconds>]',
+  '{cli} run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--backend auto|local|remote] [--runner <label>] [--grep re] [--retries <n>] [--github-report] [--no-video] [--wait <seconds>]',
   '{cli} screen [--platform p] [--png]',
   '{cli} attach <run-id> --pr <n> [--screenshot label]...',
   '{cli} down [--platform p] [--stale] [--dry-run]',
@@ -42,9 +43,9 @@ const usage = (message: string) => new VerifyFailure('USAGE', message, USAGE_FIX
 type FlagSpec = Readonly<Record<string, 'value' | 'bool' | 'list'>>;
 
 const FLAGS: Readonly<Record<Verb, FlagSpec>> = {
-  doctor: { platform: 'value', backend: 'value', live: 'bool' },
-  up: { platform: 'value', backend: 'value', wait: 'value' },
-  run: { platform: 'value', backend: 'value', all: 'bool', grep: 'value', retries: 'value', 'github-report': 'bool', 'no-video': 'bool', wait: 'value' },
+  doctor: { platform: 'value', backend: 'value', runner: 'value', live: 'bool' },
+  up: { platform: 'value', backend: 'value', runner: 'value', wait: 'value' },
+  run: { platform: 'value', backend: 'value', runner: 'value', all: 'bool', grep: 'value', retries: 'value', 'github-report': 'bool', 'no-video': 'bool', wait: 'value' },
   screen: { platform: 'value', png: 'bool' },
   attach: { pr: 'value', screenshot: 'list' },
   down: { platform: 'value', stale: 'bool', 'dry-run': 'bool' },
@@ -58,8 +59,13 @@ function platformFlag(value: string | undefined): Platform | undefined {
 
 function backendFlag(value: string | undefined): BackendKind | undefined {
   if (value === undefined || value === 'auto') return undefined;
-  if (value === 'local') return value;
-  throw usage(`--backend must be auto or local, not ${value}`);
+  if (value === 'local' || value === 'remote') return value;
+  throw usage(`--backend must be auto, local, or remote, not ${value}`);
+}
+
+function runnerFlag(value: string | undefined): string | undefined {
+  if (value !== undefined && !RUNNER_LABEL.test(value)) throw usage(`--runner must be a runner label such as ubuntu-latest, not ${value}`);
+  return value;
 }
 
 function positiveInt(flag: string, value: string | undefined, fallback: number | undefined): number {
@@ -112,12 +118,14 @@ export function parseArgv(argv: readonly string[]): Invocation {
   };
   const platform = platformFlag(values.get('platform'));
   const backend = backendFlag(values.get('backend'));
-  const base = { ...(platform === undefined ? {} : { platform }), ...(backend === undefined ? {} : { backend }) };
+  const runner = runnerFlag(values.get('runner'));
+  const base = { ...(platform === undefined ? {} : { platform }), ...(backend === undefined ? {} : { backend }), ...(runner === undefined ? {} : { runner }) };
 
   let command: Command;
   switch (verb) {
     case 'doctor':
       noPositionals();
+      if (runner !== undefined && !bools.has('live')) throw usage('--runner names the runner of the session that doctor --live starts; add --live or drop --runner');
       command = { verb, ...base, live: bools.has('live') };
       break;
     case 'up':
@@ -228,7 +236,11 @@ function render(value: VerbResult, packageDir: string): string[] {
       return lines;
     }
     case 'attach':
-      return [`${value.alreadyPosted ? 'already posted' : 'posted'}  ${value.posted.map((p) => basename(p)).join(', ')}  ${value.commentUrl}`];
+      if (value.via === 'gh') return [`${value.alreadyPosted ? 'already posted' : 'posted'}  ${value.posted.map((p) => basename(p)).join(', ')}  in the description of ${value.prUrl}`];
+      return [
+        `handed off  ${value.handedOff.map((p) => basename(p)).join(', ')}  to the session's runner (${value.sessionRunUrl}), because ${value.because}`,
+        `next        {cli} down ends the session; the verify-attach workflow then puts the evidence in the description of PR #${value.pr}`,
+      ];
     case 'down':
       return [
         ...(value.dryRun

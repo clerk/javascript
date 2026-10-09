@@ -20,8 +20,10 @@ describe('parseArgv', () => {
   it('parses every verb', () => {
     assert.deepEqual(parseArgv(['doctor']).command, { verb: 'doctor', live: false });
     assert.deepEqual(parseArgv(['doctor', '--platform', 'ios', '--backend', 'local']).command, { verb: 'doctor', platform: 'ios', backend: 'local', live: false });
+    assert.deepEqual(parseArgv(['doctor', '--backend', 'remote', '--live', '--runner', 'ubuntu-latest']).command, { verb: 'doctor', backend: 'remote', runner: 'ubuntu-latest', live: true });
     assert.deepEqual(parseArgv(['up', '--backend', 'auto']).command, { verb: 'up', waitSeconds: 0 });
-    assert.throws(() => parseArgv(['up', '--backend', 'elsewhere']), /auto or local/);
+    assert.throws(() => parseArgv(['up', '--backend', 'elsewhere']), /auto, local, or remote/);
+    assert.throws(() => parseArgv(['up', '--runner', 'bad label; rm']), /runner label/);
     assert.deepEqual(parseArgv(['up', '--wait', '300']).command, { verb: 'up', waitSeconds: 300 });
     assert.deepEqual(parseArgv(['up']).command, { verb: 'up', waitSeconds: 0 });
     assert.deepEqual(parseArgv(['run', 'auth-start', 'sign-up/request-code']).command, {
@@ -69,6 +71,7 @@ describe('parseArgv', () => {
       ['frobnicate'],
       ['Doctor'],
       ['doctor', '--wait', '3'],
+      ['doctor', '--backend', 'remote', '--runner', 'ubuntu-latest'],
       ['up', '--png'],
       ['run'],
       ['run', 'x', '--all'],
@@ -168,7 +171,7 @@ describe('doctor output', () => {
     backend: { ios: 'local' },
     checks: [
       { id: 'node', ok: true, detail: '24.15.0' },
-      { id: 'gh-attach', ok: true, state: 'warning', detail: 'gh pr comment has no --attach', fix: 'install one that has' },
+      { id: 'gh-attach', ok: true, state: 'warning', detail: 'gh pr edit has no --attach', fix: 'install one that has' },
       { id: 'live-session', ok: true, state: 'not-run', detail: 'not run: needs --live' },
     ],
   };
@@ -176,7 +179,7 @@ describe('doctor output', () => {
   it('labels a warning and a check that was not run, and neither fails doctor', () => {
     let out = '';
     createOutput(false, '/tmp', 'bin/control-x', { write: (t: string) => (out += t) }, { write: () => true }).result(report);
-    assert.deepEqual(out.trimEnd().split('\n'), ['ok    node          24.15.0', 'warn  gh-attach     gh pr comment has no --attach', '      fix: install one that has', 'skip  live-session  not run: needs --live']);
+    assert.deepEqual(out.trimEnd().split('\n'), ['ok    node          24.15.0', 'warn  gh-attach     gh pr edit has no --attach', '      fix: install one that has', 'skip  live-session  not run: needs --live']);
     assert.equal(exitCodeFor(report), 0);
   });
 

@@ -1,10 +1,12 @@
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { E2EConfig } from 'e2e';
-import { mobile } from '@e2e-dev/mobile';
+import { mobile, type DeviceProvider } from '@e2e-dev/mobile';
 import { readAgent } from './agent.ts';
-import type { Target, TestApp } from './inputs.ts';
+import type { Device, Target, TestApp } from './inputs.ts';
+import { Secret } from './secret.ts';
 
 export const ASSERTION_TIMEOUT_MS = 10_000;
 export const TEST_TIMEOUT_MS = 240_000;
@@ -12,6 +14,21 @@ export const TEST_TIMEOUT_MS = 240_000;
 export const PACKAGE_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 type Env = Readonly<Record<string, string | undefined>>;
+
+export function engineDevice(device: Device): readonly string[] | DeviceProvider {
+  if (device.kind === 'local') return [device.id];
+  const token = new Secret('session-bearer', readFileSync(device.tokenFile, 'utf8').trim());
+  return {
+    name: 'borrowed',
+    acquire: async () => ({
+      id: device.id,
+      deviceId: device.id,
+      device: device.id,
+      daemon: token.use('e2e-provider-lease', (authToken) => ({ baseUrl: device.daemonUrl, authToken })),
+    }),
+    release: async () => {},
+  };
+}
 
 const requireOnlyForAnAgent = createRequire(import.meta.url);
 
@@ -29,7 +46,7 @@ export function composeE2EConfig(app: TestApp, target: Target, env: Env): E2ECon
     targets: [
       {
         name: target.platform,
-        engine: mobile({ platform: target.platform, device: [target.device.id], session: target.session, videoTouches: false }),
+        engine: mobile({ platform: target.platform, device: engineDevice(target.device), session: target.session, videoTouches: false }),
         app: { bundleId: app.id(target.platform), appPath: target.build.path ?? undefined },
       },
     ],

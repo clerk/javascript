@@ -4,10 +4,9 @@ import type { AppEntry, Platform, PublishableKey, RunId } from './types.ts';
 
 type Env = Readonly<Record<string, string | undefined>>;
 
-export interface Device {
-  readonly kind: 'local';
-  readonly id: string;
-}
+export type Device =
+  | { readonly kind: 'local'; readonly id: string }
+  | { readonly kind: 'borrowed'; readonly id: string; readonly daemonUrl: string; readonly tokenFile: string };
 
 export interface AppBuild {
   readonly path: string | null;
@@ -46,6 +45,8 @@ const NAMES = {
   platform: 'CLERK_E2E_PLATFORM',
   device: 'CLERK_E2E_DEVICE',
   session: 'CLERK_E2E_DEVICE_SESSION',
+  daemonUrl: 'CLERK_E2E_DEVICE_DAEMON_URL',
+  daemonTokenFile: 'CLERK_E2E_DEVICE_DAEMON_TOKEN_FILE',
   appPath: 'CLERK_E2E_APP_PATH',
   devServer: 'CLERK_E2E_DEV_SERVER',
   publishableKey: 'CLERK_PUBLISHABLE_KEY',
@@ -84,7 +85,12 @@ function readDevice(platform: Platform, env: Env): Device {
   const { id: shape, expects, listedBy } = DEVICES[platform];
   if (id === null) throw new Error(`${NAMES.device} is not set; set it to the id of a booted device, which \`${listedBy}\` prints`);
   if (!shape.test(id)) throw new Error(`${NAMES.device} is ${id}, which is not ${expects}, so copy the id that \`${listedBy}\` prints`);
-  return { kind: 'local', id };
+  const daemonUrl = given(env, NAMES.daemonUrl);
+  if (daemonUrl === null) return { kind: 'local', id };
+  if (!/^https?:\/\/\S+$/.test(daemonUrl)) throw new Error(`${NAMES.daemonUrl} is ${daemonUrl}, which is not the http or https address of an agent-device daemon`);
+  const tokenFile = given(env, NAMES.daemonTokenFile);
+  if (tokenFile === null) throw new Error(`${NAMES.daemonUrl} is set and ${NAMES.daemonTokenFile} is not; the daemon of a borrowed device needs its token file`);
+  return { kind: 'borrowed', id, daemonUrl, tokenFile };
 }
 
 export function readTarget(app: TestApp, env: Env): Target {
@@ -141,6 +147,7 @@ export function inputsEnv(inputs: Inputs): Readonly<Record<string, string>> {
   return {
     [NAMES.platform]: target.platform,
     [NAMES.device]: target.device.id,
+    ...(target.device.kind === 'borrowed' ? { [NAMES.daemonUrl]: target.device.daemonUrl, [NAMES.daemonTokenFile]: target.device.tokenFile } : {}),
     [NAMES.session]: target.session,
     ...(target.build.path === null ? {} : { [NAMES.appPath]: target.build.path }),
     ...(target.build.devServer === null ? {} : { [NAMES.devServer]: target.build.devServer }),
