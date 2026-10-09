@@ -48,10 +48,18 @@ import {
   fapiWeb3Wallet,
 } from './fapi';
 
-export const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
-const FAPI = 'https://clerk.abcef.12345.prod.lclclerk.com';
+const FAPI_DOMAIN = '12345.prod.lclclerk.com';
+let fapiRun = 0;
+let fapiHost = `clerk.run${fapiRun}.${FAPI_DOMAIN}`;
 
-export const fapiUrl = (path: string) => `${FAPI}${path}`;
+export function switchFapiHost() {
+  fapiRun += 1;
+  fapiHost = `clerk.run${fapiRun}.${FAPI_DOMAIN}`;
+}
+
+export const publishableKey = () => `pk_live_${btoa(`${fapiHost}$`)}`;
+
+export const fapiUrl = (path: string) => `https://${fapiHost}${path}`;
 
 export interface FakeFapiState {
   environment: FapiEnvironment;
@@ -92,13 +100,17 @@ export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpr
 
 const unhandled: string[] = [];
 
-export const worker = setupWorker();
+export const worker = setupWorker(
+  http.all(`https://*.${FAPI_DOMAIN}/*`, ({ request }) =>
+    new URL(request.url).host === fapiHost ? undefined : HttpResponse.error(),
+  ),
+);
 
 export function startWorker() {
   return worker.start({
     quiet: true,
     onUnhandledRequest: request => {
-      if (new URL(request.url).origin === FAPI) {
+      if (new URL(request.url).host === fapiHost) {
         unhandled.push(`${request.method} ${request.url}`);
       }
     },

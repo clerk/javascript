@@ -6,14 +6,14 @@ import { vi } from 'vitest';
 
 import type { MosaicLocalization } from '../../localization';
 import { MosaicProvider } from '../../mosaic-provider';
-import { PUBLISHABLE_KEY } from './fake-fapi';
+import { publishableKey } from './fake-fapi';
 
 export async function renderWithClerk(
   ui: ReactElement,
   options?: Parameters<Clerk['load']>[0],
   localization?: MosaicLocalization,
 ) {
-  const clerk = new Clerk(PUBLISHABLE_KEY);
+  const clerk = new Clerk(publishableKey());
   const navigate = vi.fn((_to: string) => Promise.resolve());
 
   const wrap = (element: ReactElement) => (
