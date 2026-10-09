@@ -1,7 +1,7 @@
 'use client';
 
 import { CompositeItem } from '@floating-ui/react';
-import React, { useCallback } from 'react';
+import React from 'react';
 
 import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import { useSegmentedControlContext } from './segmented-control-context';
@@ -14,27 +14,10 @@ export interface SegmentedControlItemProps extends ComponentProps<'button'> {
 export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, SegmentedControlItemProps>(
   function SegmentedControlItem(props, ref) {
     const { render, value: itemValue, disabled: disabledProp, children, ...otherProps } = props;
-    const {
-      value: selectedValue,
-      select: selectValue,
-      isNavigating,
-      registerItem,
-      disabled: groupDisabled,
-    } = useSegmentedControlContext();
+    const { value: selectedValue, select, disabled: groupDisabled } = useSegmentedControlContext();
 
     const disabled = groupDisabled || !!disabledProp;
     const isSelected = selectedValue === itemValue;
-
-    const select = () => {
-      if (!disabled && !isSelected) {
-        selectValue(itemValue);
-      }
-    };
-
-    const register = useCallback(
-      (element: HTMLButtonElement | null) => registerItem(itemValue, element),
-      [registerItem, itemValue],
-    );
 
     const state = {
       selected: isSelected,
@@ -49,10 +32,10 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
             type: 'button' as const,
             'aria-checked': isSelected,
             'aria-disabled': disabled || undefined,
-            onClick: select,
-            onFocus: () => {
-              if (isNavigating()) {
-                select();
+            value: itemValue,
+            onClick: () => {
+              if (!disabled) {
+                select(itemValue);
               }
             },
           };
@@ -69,7 +52,7 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
           return useRender({
             defaultTagName: 'button',
             render,
-            ref: [isRef(compositeRef) ? compositeRef : undefined, register, ref],
+            ref: [isRef(compositeRef) ? compositeRef : undefined, ref],
             state,
             stateAttributesMapping: {
               selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
