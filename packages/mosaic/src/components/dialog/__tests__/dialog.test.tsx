@@ -639,12 +639,8 @@ describe('compactPlacement', () => {
 describe('fullscreen track', () => {
   const probe = stylex.create({ noInset: { paddingInline: 0 }, fill: { width: '100%' } });
 
-  it('fills the track, where other variants fit their content', () => {
-    const fullscreen = renderVariant('fullscreen');
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.fill)));
-    fullscreen.unmount();
-
-    renderVariant('profile');
+  it('fits its surface like every other variant, leaving the width to the profile', () => {
+    renderVariant('fullscreen');
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.fill)));
   });
 

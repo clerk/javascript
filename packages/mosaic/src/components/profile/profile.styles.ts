@@ -115,7 +115,7 @@ export const styles = stylex.create({
   },
 
   rootFullscreen: {
-    width: '100%',
+    inlineSize: '100cqi',
   },
 
   layoutFullscreen: {

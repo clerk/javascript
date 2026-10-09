@@ -365,12 +365,6 @@ export const trackVariants = stylex.create({
   },
 });
 
-export const fullscreenPopup = stylex.create({
-  fill: {
-    width: '100%',
-  },
-});
-
 export const variants = stylex.create({
   // The surface is a `Card` — so it comes from `Card`'s own `elevations.overlay`, and the popup
   // contributes geometry and motion. Compose it by rendering the card INSIDE the popup:
