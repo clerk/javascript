@@ -5,6 +5,7 @@ import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 import { Section } from '@clerk/mosaic/components/section';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -238,6 +239,69 @@ export function Cards() {
           </Section.Body>
         </Section.Group>
       ))}
+    </Section.Root>
+  );
+}
+
+const emailSeeds = ['item1@clerk.dev', 'item2@clerk.dev', 'item3@clerk.dev', 'item4@clerk.dev'];
+
+export function AnimatedItems() {
+  const [emails, setEmails] = useState(emailSeeds.slice(0, 2));
+  const next = emailSeeds.find(email => !emails.includes(email));
+
+  return (
+    <Section.Root xstyle={styles.rootMax}>
+      <Section.Group>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Email</Section.Title>
+          </Section.Content>
+          <Section.Actions>
+            <Button
+              aria-label='Add email'
+              color='neutral'
+              size='sm'
+              variant='outline'
+              disabled={!next}
+              onClick={() => next && setEmails(current => [...current, next])}
+            >
+              <Icon
+                name='plus'
+                placement='inline-start'
+                size='sm'
+              />
+              Add
+            </Button>
+          </Section.Actions>
+        </Section.Header>
+        <Section.Body>
+          <Section.AnimatedItems
+            items={emails}
+            getKey={email => email}
+            empty={<Section.Description>No email addresses added</Section.Description>}
+          >
+            {email => (
+              <>
+                <Section.Content>
+                  <Section.Description>{email}</Section.Description>
+                </Section.Content>
+                <Section.Actions>
+                  <Button
+                    aria-label={`Remove ${email}`}
+                    color='neutral'
+                    shape='square'
+                    size='sm'
+                    variant='ghost'
+                    onClick={() => setEmails(current => current.filter(item => item !== email))}
+                  >
+                    <Icon name='x-circle' />
+                  </Button>
+                </Section.Actions>
+              </>
+            )}
+          </Section.AnimatedItems>
+        </Section.Body>
+      </Section.Group>
     </Section.Root>
   );
 }
