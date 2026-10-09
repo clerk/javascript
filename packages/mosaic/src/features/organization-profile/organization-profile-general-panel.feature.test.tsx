@@ -15,7 +15,9 @@ import {
 } from '../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../__tests__/feature/render';
 import { MosaicProvider } from '../../mosaic-provider';
+import { OrganizationProfileDangerSection } from './organization-profile-danger-section/organization-profile-danger-section';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
+import { OrganizationProfileProfileSection } from './organization-profile-profile-section/organization-profile-profile-section';
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', slug: 'acme' });
 
@@ -47,9 +49,41 @@ async function renderPanel(seed: FakeFapiSeed = signedIn()) {
 
 describe('OrganizationProfileGeneralPanel', () => {
   describe('availability', () => {
-    it('hides without an active organization', async () => {
-      const { container } = await renderPanel(signedIn({ activeOrganizationId: null }));
-      expect(container).toBeEmptyDOMElement();
+    it('keeps the title and hides every section without an active organization', async () => {
+      await renderPanel(signedIn({ activeOrganizationId: null }));
+      expect(await screen.findByRole('heading', { name: 'General', level: 2 })).toBeVisible();
+      expect(screen.queryAllByRole('heading', { level: 3 })).toHaveLength(0);
+    });
+
+    it('renders the given sections in order instead of the defaults', async () => {
+      serveFapi(signedIn());
+      await renderWithClerk(
+        <OrganizationProfileGeneralPanel>
+          <OrganizationProfileDangerSection />
+          <OrganizationProfileProfileSection />
+        </OrganizationProfileGeneralPanel>,
+      );
+      await screen.findByRole('heading', { name: 'Organization details' });
+      expect(screen.getAllByRole('heading', { level: 3 }).map(heading => heading.textContent)).toEqual([
+        'Danger zone',
+        'Organization details',
+      ]);
+    });
+
+    it('shows the section fallback while the organization loads', async () => {
+      serveFapi(signedIn());
+      const loading = renderWithClerk(
+        <OrganizationProfileGeneralPanel>
+          <OrganizationProfileProfileSection fallback={<p>Loading details</p>} />
+        </OrganizationProfileGeneralPanel>,
+      );
+      try {
+        expect(screen.getByText('Loading details')).toBeInTheDocument();
+      } finally {
+        await loading;
+      }
+      expect(await screen.findByRole('heading', { name: 'Organization details' })).toBeVisible();
+      expect(screen.queryByText('Loading details')).toBeNull();
     });
 
     it('shows details and danger but omits mutation controls without manage permission', async () => {

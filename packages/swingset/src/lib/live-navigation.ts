@@ -25,6 +25,7 @@ const liveRoutes = new Map([
   ['/organization-profile/organization-profile-general-panel', '/live/organization-general'],
   ['/organization-profile/organization-profile-members-panel', '/live/organization-members'],
   ['/organization-profile/organization-profile-api-keys-panel', '/live/organization-api-keys'],
+  ['/organization-profile/organization-profile-profile-section', '/live/organization-details'],
   ['/organization-profile/organization-profile-danger-section', '/live/organization-danger'],
   ['/user-profile/user-profile-passkeys-section', '/live/passkeys'],
   ['/user-profile/user-profile-web3wallets-section', '/live/web3-wallets'],

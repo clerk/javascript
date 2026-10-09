@@ -1,17 +1,23 @@
 'use client';
 
-import { OrganizationProfileGeneralPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel';
+import { OrganizationProfileProfileSection } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useOrganization, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 
-export default function OrganizationGeneralLivePage() {
+export default function OrganizationDetailsLivePage() {
   const { isLoaded, isSignedIn } = useUser();
   const { organization } = useOrganization();
 
   return (
     <MosaicProvider>
       <div className='mx-auto flex w-full max-w-3xl flex-col gap-6 p-3 sm:p-8'>
+        <div className='flex flex-col gap-1'>
+          <h1 className='text-xl font-semibold'>Organization details</h1>
+          <p className='text-muted-foreground text-sm'>
+            The active organization&apos;s logo, name, and slug. Editing needs the manage profile permission.
+          </p>
+        </div>
         {!isLoaded ? <p className='text-muted-foreground text-sm'>Loading…</p> : null}
         {isLoaded && !isSignedIn ? (
           <p className='text-muted-foreground text-sm'>
@@ -25,9 +31,9 @@ export default function OrganizationGeneralLivePage() {
           </p>
         ) : null}
         {isLoaded && isSignedIn && !organization ? (
-          <p className='text-muted-foreground text-sm'>Pick an active organization to see its general panel.</p>
+          <p className='text-muted-foreground text-sm'>Pick an active organization to see its details.</p>
         ) : null}
-        {isLoaded && isSignedIn ? <OrganizationProfileGeneralPanel /> : null}
+        {isLoaded && isSignedIn ? <OrganizationProfileProfileSection /> : null}
       </div>
     </MosaicProvider>
   );

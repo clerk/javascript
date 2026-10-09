@@ -13,9 +13,30 @@ The organization's General page: its details, and the danger zone under them.
   ]}
 />
 
+## Usage
+
+`OrganizationProfileGeneralPanel` renders the General title with the organization details and danger zone sections. Each section shows itself only when there is an active organization.
+
+```tsx
+import { OrganizationProfileGeneralPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel';
+
+<OrganizationProfileGeneralPanel />;
+```
+
+Pass sections as children to choose which ones render and in what order.
+
+```tsx
+import { OrganizationProfileGeneralPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel';
+import { OrganizationProfileProfileSection } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section';
+
+<OrganizationProfileGeneralPanel>
+  <OrganizationProfileProfileSection />
+</OrganizationProfileGeneralPanel>;
+```
+
 ## Without the danger zone
 
-The danger zone renders from `dangerSlot`. Without it, the panel shows only the organization details.
+The panel shows only the organization details, read-only.
 
 <Story
   name='ReadOnly'
