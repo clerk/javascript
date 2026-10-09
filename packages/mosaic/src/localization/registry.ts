@@ -27,10 +27,12 @@ import { userProfileAddPhoneMessages } from '../features/user-profile/user-profi
 import { userProfileProfileSectionMessages } from '../features/user-profile/user-profile-profile-section/user-profile-profile-section.messages';
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets.messages';
 import { errorMessages } from './errors.messages';
+import { roleMessages } from './roles.messages';
 
 export const mosaicMessages = {
   apiKeysTable: apiKeysTableMessages,
   errors: errorMessages,
+  roles: roleMessages,
   form: formMessages,
   membersTableTab: membersTableTabMessages,
   invitationsTableTab: invitationsTableTabMessages,

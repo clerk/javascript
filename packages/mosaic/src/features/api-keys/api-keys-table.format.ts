@@ -33,10 +33,6 @@ export function getExpirationDate(expiration: APIKeyExpiration, now: Date): Date
   return date;
 }
 
-export function formatDate(date: Date, locale: string): string {
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
-}
-
 export function formatRelativeTime(date: Date, locale: string, now: Date): string {
   const seconds = Math.min(0, Math.round((date.getTime() - now.getTime()) / 1000));
   const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
