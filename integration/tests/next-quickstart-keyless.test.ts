@@ -51,6 +51,7 @@ test.describe('Keyless mode @quickstart', () => {
      * Seed claimed keyless state directly: the SDK no longer mints keys, so write the
      * keys fixture to `.clerk/.tmp/keyless.json` and copy the matching keys into `.env`.
      */
+    await appConfigs.envs.withEmailCodes.resolve();
     const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
     const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
     await fs.ensureDir(path.join(app.appDir, '.clerk', '.tmp'));
