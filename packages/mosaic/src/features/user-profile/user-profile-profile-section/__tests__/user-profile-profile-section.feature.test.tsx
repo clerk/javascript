@@ -133,6 +133,7 @@ describe('the user profile profile section', () => {
     const { actor, container } = await renderSection();
     await actor.upload(fileInput(container), new File(['x'], 'me.png', { type: 'image/png' }));
     await screen.findByRole('button', { name: 'Manage profile picture' });
+    await waitFor(() => expect(fileInput(container)).toBeEnabled());
 
     await actor.upload(fileInput(container), oversized());
     expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
