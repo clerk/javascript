@@ -1,7 +1,9 @@
 import { createHash } from 'node:crypto';
+import { open } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { retry } from '@clerk/shared/retry';
 import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import fs from 'fs-extra';
 
@@ -9,17 +11,25 @@ import { constants } from '../constants';
 import type { EnvironmentConfig } from '../models/environment';
 import { environmentConfig } from '../models/environment';
 import { instanceKeys } from './instanceKeys';
-import type { PlatformApplication, PlatformApplicationConfig } from './platformApplication';
+import type { InstanceKeys, PlatformApplication, PlatformApplicationConfig } from './platformApplication';
 import { createApplicationFromConfig } from './platformApplication';
 
 export { instanceKeys };
 
 const STAGING_API_URL = 'https://api.clerkstage.dev';
 const STAGING_KEY_PREFIX = 'clerkstage-';
-const platformApplicationCachePaths = new Set<string>();
+const canProvisionPlatformApplications = process.env.E2E_STAGING !== '1' && Boolean(constants.CLERK_PLATFORM_API_KEY);
+const platformApplicationCacheDir = resolve(
+  constants.TMP_DIR,
+  'platform-applications',
+  createHash('sha256')
+    .update(constants.INTEGRATION_TEST_RUN_KEY || constants.E2E_APP_ID || '')
+    .digest('hex'),
+);
+const instanceResolutions = new Map<string, Promise<InstanceKeys>>();
 
 export const removePlatformApplicationCache = async () => {
-  await Promise.all([...platformApplicationCachePaths].map(cachePath => fs.remove(cachePath)));
+  await fs.remove(platformApplicationCacheDir);
 };
 
 const isPlatformApplication = (value: unknown): value is PlatformApplication => {
@@ -54,8 +64,7 @@ const getPlatformApplication = async (
     .update(JSON.stringify(definition.config))
     .update(constants.INTEGRATION_TEST_RUN_KEY || constants.E2E_APP_ID || '')
     .digest('hex');
-  const cachePath = resolve(constants.TMP_DIR, 'platform-applications', `${cacheKey}.json`);
-  platformApplicationCachePaths.add(cachePath);
+  const cachePath = resolve(platformApplicationCacheDir, `${cacheKey}.json`);
   const cached = (await fs.pathExists(cachePath)) ? await fs.readJSON(cachePath, { throws: false }) : null;
 
   if (isPlatformApplication(cached)) {
@@ -63,15 +72,33 @@ const getPlatformApplication = async (
     return cached;
   }
 
-  const application = await createApplicationFromConfig(
-    platformApiKey,
-    keyName,
-    definition,
-    constants.INTEGRATION_TEST_RUN_KEY,
-  );
-  await fs.outputJSON(cachePath, application, { mode: 0o600 });
-  console.log(`Created Platform API application ${application.applicationId} for ${keyName}.`);
-  return application;
+  await fs.ensureDir(platformApplicationCacheDir);
+  const lockPath = `${cachePath}.lock`;
+  const startedAt = Date.now();
+  const lock = await retry(() => open(lockPath, 'wx', 0o600), {
+    maxDelayBetweenRetries: 1000,
+    shouldRetry: error => (error as NodeJS.ErrnoException).code === 'EEXIST' && Date.now() - startedAt < 120_000,
+  });
+
+  try {
+    const cached = (await fs.pathExists(cachePath)) ? await fs.readJSON(cachePath, { throws: false }) : null;
+    if (isPlatformApplication(cached)) {
+      console.log(`Using Platform API application ${cached.applicationId} for ${keyName}.`);
+      return cached;
+    }
+    const application = await createApplicationFromConfig(
+      platformApiKey,
+      keyName,
+      definition,
+      constants.INTEGRATION_TEST_RUN_KEY,
+    );
+    await fs.outputJSON(cachePath, application, { mode: 0o600 });
+    console.log(`Created Platform API application ${application.applicationId} for ${keyName}.`);
+    return application;
+  } finally {
+    await lock.close();
+    await fs.remove(lockPath);
+  }
 };
 
 const loadPlatformApplicationConfig = async (configPath: string): Promise<PlatformApplicationConfig> => {
@@ -89,6 +116,36 @@ const loadPlatformApplicationConfig = async (configPath: string): Promise<Platfo
   return definition;
 };
 
+const loadInstanceKeys = async (keyName: string): Promise<InstanceKeys> => {
+  let keys = instanceKeys.get(keyName);
+
+  if (canProvisionPlatformApplications) {
+    const configPath = resolve(import.meta.dirname, '..', 'configs', `${keyName}.js`);
+    if (await fs.pathExists(configPath)) {
+      const definition = await loadPlatformApplicationConfig(configPath);
+      keys = await getPlatformApplication(keyName, definition);
+    }
+  }
+
+  if (!keys) {
+    throw new Error(`No instance keys found for ${keyName}.`);
+  }
+
+  instanceKeys.set(keyName, keys);
+  return keys;
+};
+
+export const resolveInstanceKeys = (keyName: string): Promise<InstanceKeys> => {
+  const cached = instanceResolutions.get(keyName);
+  if (cached) {
+    return cached;
+  }
+
+  const resolution = loadInstanceKeys(keyName);
+  instanceResolutions.set(keyName, resolution);
+  return resolution;
+};
+
 /**
  * Check whether an env config is ready for staging tests.
  * In non-staging mode, always returns true.
@@ -103,7 +160,7 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
 }
 
 /**
- * Creates an application from a matching config file or sets PK/SK from the instance keys map.
+ * Sets PK/SK from the instance keys map and defers matching application creation until env.resolve()
  * When E2E_STAGING=1 is set, swaps PK/SK to staging keys (looked up as `clerkstage-<keyName>`)
  * and adds CLERK_API_URL. If the staging key doesn't exist, removes any inherited CLERK_API_URL
  * so the config falls back to production and is filtered from long-running apps by isStagingReady.
@@ -111,14 +168,17 @@ export function isStagingReady(env: EnvironmentConfig): boolean {
  */
 async function withInstanceKeys(keyName: string, env: EnvironmentConfig): Promise<EnvironmentConfig> {
   const configPath = resolve(import.meta.dirname, '..', 'configs', `${keyName}.js`);
-  // if we're not testing against staging, and the keyName provided matches a config file on disk, and we have a PLAPI
-  // key, create an application and obtain its keys, otherwise use the existing instance keys
-  const keys =
-    process.env.E2E_STAGING !== '1' && (await fs.pathExists(configPath)) && constants.CLERK_PLATFORM_API_KEY
-      ? await getPlatformApplication(keyName, await loadPlatformApplicationConfig(configPath))
-      : instanceKeys.get(keyName)!;
-  instanceKeys.set(keyName, keys);
+  const keys = instanceKeys.get(keyName)!;
   env.setEnvVariable('private', 'CLERK_SECRET_KEY', keys.sk).setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
+
+  if (canProvisionPlatformApplications && (await fs.pathExists(configPath))) {
+    env.setResolver(async target => {
+      const resolved = await resolveInstanceKeys(keyName);
+      target
+        .setEnvVariable('private', 'CLERK_SECRET_KEY', resolved.sk)
+        .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', resolved.pk);
+    });
+  }
 
   if (process.env.E2E_STAGING !== '1') {
     return env;
@@ -251,7 +311,11 @@ const withDynamicKeys = withEmailCodes
   .clone()
   .setId('withDynamicKeys')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', '')
-  .setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', withEmailCodes.privateVariables.get('CLERK_SECRET_KEY'));
+  .setResolver(async env => {
+    const keys = await resolveInstanceKeys('with-email-codes');
+    env.setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', keys.pk);
+    env.setEnvVariable('private', 'CLERK_DYNAMIC_SECRET_KEY', keys.sk);
+  });
 
 const withRestrictedMode = await withInstanceKeys(
   'with-restricted-mode',

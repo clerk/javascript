@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
-import { instanceKeys } from '../presets/envs';
+import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { withRetry } from '../testUtils/retryableClerkClient';
@@ -24,8 +24,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
   test.beforeAll(async () => {
     // Create a clerkClient for the OAuth provider instance.
     const client = createClerkClient({
-      secretKey: instanceKeys.get('oauth-provider').sk,
-      publishableKey: instanceKeys.get('oauth-provider').pk,
+      secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+      publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
     });
     const users = createUserService(withRetry(client));
     fakeUser = users.createFakeUser(test, {
@@ -317,8 +317,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
 
     test.beforeAll(async () => {
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
       const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
@@ -374,8 +374,8 @@ testAgainstRunningApps({ withPattern: ['react.vite.withLegalConsent'] })(
 
     test.beforeAll(async () => {
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
       const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {
@@ -435,8 +435,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     test.beforeAll(async () => {
       // Create a clerkClient for the OAuth provider instance.
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
       const users = createUserService(withRetry(client));
       fakeUser = users.createFakeUser(test, {

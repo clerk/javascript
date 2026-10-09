@@ -1,7 +1,7 @@
 import { createClerkClient } from '@clerk/backend';
 import { parsePublishableKey } from '@clerk/shared/keys';
 
-import { instanceKeys } from './instanceKeys';
+import { resolveInstanceKeys } from './envs';
 
 export async function setupOAuthProvider(
   { applicationName, publishableKey, patchConfig },
@@ -12,10 +12,11 @@ export async function setupOAuthProvider(
     throw new Error('The created application has an invalid publishable key.');
   }
 
-  const oauthProviderUrl = `https://${parsePublishableKey(instanceKeys.get('oauth-provider').pk).frontendApi}`;
+  const providerKeys = await resolveInstanceKeys('oauth-provider');
+  const oauthProviderUrl = `https://${parsePublishableKey(providerKeys.pk).frontendApi}`;
 
   const client = await createClerkClient({
-    secretKey: instanceKeys.get('oauth-provider').sk,
+    secretKey: providerKeys.sk,
   }).oauthApplications.create({
     name: applicationName,
     redirectUris: [`https://${parsedPublishableKey.frontendApi}/v1/oauth_callback`],

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import { instanceKeys } from '../../presets/envs';
+import { resolveInstanceKeys } from '../../presets/envs';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { withRetry } from '../../testUtils/retryableClerkClient';
@@ -23,8 +23,8 @@ test.describe('Custom Flows OAuth @custom', () => {
     await app.dev();
 
     const client = createClerkClient({
-      secretKey: instanceKeys.get('oauth-provider').sk,
-      publishableKey: instanceKeys.get('oauth-provider').pk,
+      secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+      publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
     });
     const users = createUserService(withRetry(client));
     fakeUser = users.createFakeUser(test, { withUsername: true });

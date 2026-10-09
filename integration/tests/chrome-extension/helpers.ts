@@ -28,6 +28,7 @@ export function getAuthFromBackground(
  * Set up Clerk testing environment (clerkSetup) for extension tests that use build() instead of dev().
  */
 export async function setupClerkTestingEnv(env: EnvironmentConfig) {
+  await env.resolve();
   const publishableKey = env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
   const secretKey = env.privateVariables.get('CLERK_SECRET_KEY');
   const apiUrl = env.privateVariables.get('CLERK_API_URL');
@@ -80,6 +81,7 @@ export async function getExtensionId(context: BrowserContext) {
  * Create a fake user from an env config and register it via the Backend API.
  */
 export async function createTestUser(env: EnvironmentConfig, test: PlaywrightTest): Promise<FakeUser> {
+  await env.resolve();
   const clerkClient = withRetry(
     backendCreateClerkClient({
       apiUrl: env.privateVariables.get('CLERK_API_URL'),
