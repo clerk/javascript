@@ -1,6 +1,8 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
+import type { OrganizationProfileProfileSectionViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
+import { OrganizationProfileProfileSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
 import { SaveError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
@@ -61,7 +63,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     apply();
   };
 
-  const general: OrganizationProfileViewProps['pages']['general'] = {
+  const profile: OrganizationProfileProfileSectionViewProps = {
     name,
     slug,
     imageUrl,
@@ -70,11 +72,17 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     onRemoveLogo: clearImage,
     onSubmitName: async next => save('name', () => setName(next)),
     onSubmitSlug: async next => save('slug', () => setSlug(next)),
-    dangerSlot: (
-      <OrganizationProfileDangerPreview
-        name={name}
-        memberCount={organization.memberCount}
-      />
+  };
+
+  const general: OrganizationProfileViewProps['pages']['general'] = {
+    children: (
+      <>
+        <OrganizationProfileProfileSectionView {...profile} />
+        <OrganizationProfileDangerPreview
+          name={name}
+          memberCount={organization.memberCount}
+        />
+      </>
     ),
   };
 
@@ -86,5 +94,5 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
-  return { activePage, setActivePage, pages, general, name };
+  return { activePage, setActivePage, pages, general, profile, name };
 }

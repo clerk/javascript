@@ -11,7 +11,7 @@ it('keeps the Members placeholder until a table is configured', () => {
         activePage='members'
         onPageChange={vi.fn()}
         pages={{
-          general: { name: 'Acme', slug: 'acme', memberCount: 1 },
+          general: {},
           members: {},
         }}
       />

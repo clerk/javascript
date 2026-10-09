@@ -1,4 +1,5 @@
 import { OrganizationProfileGeneralPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel.view';
+import { OrganizationProfileProfileSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -21,13 +22,15 @@ export function Default() {
 }
 
 export function ReadOnly() {
-  const { general } = useOrganizationProfileFixture();
+  const { profile } = useOrganizationProfileFixture();
   return (
-    <OrganizationProfileGeneralPanelView
-      name={general.name}
-      slug={general.slug}
-      imageUrl={general.imageUrl}
-      hasImage={general.hasImage}
-    />
+    <OrganizationProfileGeneralPanelView>
+      <OrganizationProfileProfileSectionView
+        name={profile.name}
+        slug={profile.slug}
+        imageUrl={profile.imageUrl}
+        hasImage={profile.hasImage}
+      />
+    </OrganizationProfileGeneralPanelView>
   );
 }
