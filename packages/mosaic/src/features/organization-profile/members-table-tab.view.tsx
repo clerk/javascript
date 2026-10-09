@@ -386,6 +386,7 @@ function MemberRow({
             <ActionMenu
               label={fill(m.manage, { name: member.name })}
               triggerRef={triggerRef}
+              disabled={isChangingRole}
               actions={[{ label: m.remove, color: 'negative', onClick: onRemoveClick }]}
             />
           ) : null}

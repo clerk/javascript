@@ -41,13 +41,18 @@ const rolesMachine = createMachine({
 export function useMembersTableController(model: ReturnType<typeof useMembersTableModel>) {
   const locale = useLocale();
   const messages = useMessages('membersTableTab');
+  const roleNames = useMessages('roles');
   const roleAction = usePendingAction({ errorFallback: messages.roleChangeError });
   const [rolesState, sendRoles] = useMachine(rolesMachine, { context: { loadRoles: model.loadRoles } });
   const roles = rolesState.value === 'ready' ? rolesState.context.result : null;
 
   return {
-    members: model.rows.map(({ joinedAt, ...member }) => ({ ...member, joinedAtLabel: formatDate(joinedAt, locale) })),
-    roles: roles?.roles.map(role => ({ value: role.key, label: role.name })) ?? [],
+    members: model.rows.map(({ joinedAt, ...member }) => ({
+      ...member,
+      roleLabel: roleNames[member.role] ?? member.roleLabel,
+      joinedAtLabel: formatDate(joinedAt, locale),
+    })),
+    roles: roles?.roles.map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })) ?? [],
     totalCount: model.totalCount,
     page: model.page,
     onPageChange: model.fetchPage,
@@ -64,7 +69,7 @@ export function useMembersTableController(model: ReturnType<typeof useMembersTab
       model.changeRole && roles && !roles.hasRoleSetMigration
         ? (id: string, role: string) => void roleAction.run(id, () => model.changeRole?.(id, role, roles))
         : undefined,
-    onRemove: roleAction.isPending ? undefined : model.remove,
+    onRemove: model.remove,
   };
 }
 
