@@ -8,11 +8,10 @@ import { UserProfileEnterpriseAccountsSectionView } from './user-profile-enterpr
 
 export type UserProfileEnterpriseAccountsSectionProps = {
   fallback?: ReactNode;
-  mode?: 'modal' | 'mounted';
 };
 
-export function UserProfileEnterpriseAccountsSection({ fallback, mode }: UserProfileEnterpriseAccountsSectionProps) {
-  const model = useUserProfileEnterpriseAccountsModel({ mode });
+export function UserProfileEnterpriseAccountsSection({ fallback }: UserProfileEnterpriseAccountsSectionProps) {
+  const model = useUserProfileEnterpriseAccountsModel();
   if (model.status === 'loading') {
     return fallback ?? null;
   }

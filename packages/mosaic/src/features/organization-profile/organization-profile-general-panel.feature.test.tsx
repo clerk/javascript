@@ -15,6 +15,7 @@ import {
 } from '../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../__tests__/feature/render';
 import { MosaicProvider } from '../../mosaic-provider';
+import { OrganizationProfileProvider } from './organization-profile.provider';
 import { OrganizationProfileDangerSection } from './organization-profile-danger-section/organization-profile-danger-section';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
 import { OrganizationProfileProfileSection } from './organization-profile-profile-section/organization-profile-profile-section';
@@ -110,6 +111,25 @@ describe('OrganizationProfileGeneralPanel', () => {
     });
 
     it.todo('shows verified domains when enabled and the member can read them');
+  });
+
+  describe('leave', () => {
+    it('sends the user to the provider url after leaving from the default sections', async () => {
+      const fapi = serveFapi(signedIn());
+      const { navigate } = await renderWithClerk(
+        <OrganizationProfileProvider afterLeaveOrganizationUrl='/organizations'>
+          <OrganizationProfileGeneralPanel />
+        </OrganizationProfileProvider>,
+      );
+      const user = userEvent.setup();
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }));
+
+      await user.type(within(dialog).getByRole('textbox'), 'Acme');
+      await user.click(within(dialog).getByRole('button', { name: 'Leave organization' }));
+
+      await waitFor(() => expect(fapi.memberships).toHaveLength(0));
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'));
+    });
   });
 
   describe('edit name', () => {

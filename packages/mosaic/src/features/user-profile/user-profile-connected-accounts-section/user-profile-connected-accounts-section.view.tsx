@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
+import { usePanelTitle } from '../../../components/panel';
 import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
@@ -21,7 +22,6 @@ export type {
 
 export function UserProfileConnectedAccountsSectionView({
   accounts,
-  fallbackFocus,
   availableProviders = [],
   pendingId,
   onConnect,
@@ -30,14 +30,12 @@ export function UserProfileConnectedAccountsSectionView({
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
   const section = useRef<HTMLDivElement>(null);
+  const panelTitle = usePanelTitle();
   const removalFocus = useListRemovalFocus({
     ids: accounts.map(account => account.id),
     onRemove,
     fallback: () =>
-      section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
-      section.current ??
-      fallbackFocus?.() ??
-      null,
+      section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? section.current ?? panelTitle(),
   });
   const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));

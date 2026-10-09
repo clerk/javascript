@@ -1,7 +1,6 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
@@ -32,19 +31,16 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('tab')).toBeNull();
   });
 
-  it('keeps the final wallet confirmation mounted until removal settles', async () => {
+  it('keeps the final wallet confirmation mounted until removal settles, then focuses the title', async () => {
     const user = userEvent.setup();
-    const titleRef = createRef<HTMLDivElement>();
     const removal = createDeferredPromise();
     const onRemoveWeb3Wallet = vi.fn(async () => {
       await removal.promise;
     });
     const { rerender } = renderView({
-      titleRef,
       children: (
         <UserProfileWeb3WalletsSectionView
           wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
-          fallbackFocus={() => titleRef.current}
           onRemove={onRemoveWeb3Wallet}
         />
       ),
@@ -54,10 +50,9 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     rerender(
       <MosaicProvider>
-        <UserProfileProfilePanelView titleRef={titleRef}>
+        <UserProfileProfilePanelView>
           <UserProfileWeb3WalletsSectionView
             wallets={[]}
-            fallbackFocus={() => titleRef.current}
             onRemove={onRemoveWeb3Wallet}
           />
         </UserProfileProfilePanelView>
@@ -70,6 +65,9 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Account', level: 2 }).closest('.cl-panel-title')).toHaveFocus(),
+    );
   });
 
   it('renders the danger zone when provided', () => {

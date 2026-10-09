@@ -20,7 +20,6 @@ export interface UserProfileConnectedAccount extends ConnectedAccountProviderDis
 }
 
 export interface UserProfileConnectedAccountsSectionViewProps {
-  fallbackFocus?: () => HTMLElement | null;
   accounts: UserProfileConnectedAccount[];
   availableProviders?: UserProfileConnectionProvider[];
   pendingId?: string;

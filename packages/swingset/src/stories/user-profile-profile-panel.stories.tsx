@@ -4,7 +4,6 @@ import { UserProfilePhoneSectionView } from '@clerk/mosaic/features/user-profile
 import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
 import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
-import { useRef } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -27,7 +26,6 @@ export const meta: StoryMeta = {
 };
 
 export function Default(_args: Record<string, unknown>) {
-  const titleRef = useRef<HTMLDivElement>(null);
   const connections = useConnectedAccountsFixture();
   const wallets = useWeb3WalletsFixture();
   const profile = useUserProfileProfileFixture();
@@ -35,18 +33,12 @@ export function Default(_args: Record<string, unknown>) {
   const phones = useUserProfilePhonesFixture();
 
   return (
-    <UserProfileProfilePanelView titleRef={titleRef}>
+    <UserProfileProfilePanelView>
       <UserProfileProfileSectionView {...profile} />
       <UserProfileEmailSectionView {...emails} />
       <UserProfilePhoneSectionView {...phones} />
-      <UserProfileConnectedAccountsSectionView
-        {...connections}
-        fallbackFocus={() => titleRef.current}
-      />
-      <UserProfileWeb3WalletsSectionView
-        {...wallets}
-        fallbackFocus={() => titleRef.current}
-      />
+      <UserProfileConnectedAccountsSectionView {...connections} />
+      <UserProfileWeb3WalletsSectionView {...wallets} />
       <UserProfileDangerPreview />
     </UserProfileProfilePanelView>
   );

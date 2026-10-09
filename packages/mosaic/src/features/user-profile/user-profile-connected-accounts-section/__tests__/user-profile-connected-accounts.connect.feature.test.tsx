@@ -15,6 +15,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 import {
   deferred,
@@ -100,7 +101,9 @@ describe('connected accounts', () => {
   it('sends requested scopes and the current URL to connect', async () => {
     serveFapi(signedIn([]));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ github: ['repo'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ github: ['repo'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
     );
     const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
     const request = holdRequests('post', '/v1/me/external_accounts');
@@ -183,7 +186,11 @@ describe('connected accounts', () => {
 
   it('preserves modal state when connecting', async () => {
     serveFapi(signedIn([]));
-    await renderWithClerk(<UserProfileConnectedAccountsSection mode='modal' />);
+    await renderWithClerk(
+      <UserProfileProvider mode='modal'>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
+    );
     const request = holdRequests('post', '/v1/me/external_accounts');
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
@@ -374,7 +381,9 @@ describe('connected accounts', () => {
     const callback = deferred<{ callbackUrl: string }>();
     const open = vi.fn(() => callback.promise);
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ github: ['repo'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ github: ['repo'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
       {
         __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
       },

@@ -35,3 +35,14 @@ import { UserProfileProfileSection } from '@clerk/mosaic/features/user-profile/u
   <UserProfileEmailSection />
 </UserProfileProfilePanel>;
 ```
+
+Wrap the panel in `UserProfileProvider` to set `additionalOAuthScopes` for connected accounts, or `mode='modal'` when the panel renders inside a modal.
+
+```tsx
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
+import { UserProfileProvider } from '@clerk/mosaic/features/user-profile/user-profile.provider';
+
+<UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+  <UserProfileProfilePanel />
+</UserProfileProvider>;
+```
