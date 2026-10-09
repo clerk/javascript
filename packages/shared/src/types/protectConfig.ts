@@ -17,7 +17,7 @@ export interface ProtectLoader {
   type: string;
   /**
    * Attribute values may contain the placeholders `{cid}`, `{pid}`, `{rid}` and `{sdkver}`, which
-   * are substituted before the element is appended. An unrecognised `{…}` is left verbatim.
+   * are substituted before the element is appended. An unrecognized `{…}` is left verbatim.
    * `{sdkver}` is how the server tells a build that interpolates from one that does not, so a
    * loader wanting the current response shape has to carry it.
    */

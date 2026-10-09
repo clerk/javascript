@@ -51,7 +51,7 @@ const removeDevBrowserFromURLSearchParams = (_url: URL) => {
  * the legacy __dev_session from the URL searchParams
  * We no longer need to use this value, however, we should remove it from the URL
  * Existing v4 apps will write the dev browser to the hash and the search params in order to ensure
- * backwards compatibility with older v4 apps.
+ * backward compatibility with older v4 apps.
  * The only use case where this is needed now is when a user upgrades to clerk@5 locally
  * without changing the component's version on their dashboard.
  * In this scenario, the AP@4 -> localhost@5 redirect will still have the value in the hash,

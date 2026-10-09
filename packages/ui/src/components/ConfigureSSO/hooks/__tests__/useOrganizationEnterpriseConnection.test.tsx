@@ -81,7 +81,7 @@ vi.mock('@clerk/shared/react', () => ({
       totalCount: 0,
       error: null,
       // Only report loading when the query is actually enabled — mirrors the
-      // real disabled-query behaviour (`enabled: false` → not loading).
+      // real disabled-query behavior (`enabled: false` → not loading).
       isLoading: params.enabled !== false && testRunsState.isLoading,
       isFetching: params.enabled !== false && testRunsState.isFetching,
       isPolling: false,

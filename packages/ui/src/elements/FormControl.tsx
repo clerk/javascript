@@ -143,7 +143,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return {
       elementDescriptor: descriptor,
       elementId: id ? descriptor?.setId?.(id) : undefined,
-      // Use legacy pattern for errors (backwards compatible), new pattern for other types
+      // Use legacy pattern for errors (backward compatible), new pattern for other types
       id: type === 'error' ? `error-${id}` : `${id}-${type}-feedback`,
     };
   };

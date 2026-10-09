@@ -25,8 +25,8 @@ export const applyTokensToString = (s: string | undefined, tokens: Tokens): stri
   if (!s) {
     return '';
   }
-  const { normalisedString, expressions } = parseTokensFromLocalizedString(s, tokens);
-  return applyTokenExpressions(normalisedString, expressions, tokens);
+  const { normalizedString, expressions } = parseTokensFromLocalizedString(s, tokens);
+  return applyTokenExpressions(normalizedString, expressions, tokens);
 };
 
 export const useGlobalTokens = (): GlobalTokens => {
@@ -49,7 +49,7 @@ export const useGlobalTokens = (): GlobalTokens => {
 const parseTokensFromLocalizedString = (
   s: string,
   tokens: Tokens,
-): { normalisedString: string; expressions: TokenExpression[] } => {
+): { normalizedString: string; expressions: TokenExpression[] } => {
   const matches = (s.match(/{{.+?}}/g) || []).map(m => m.replace(/[{}]/g, ''));
   const parsedMatches = matches.map(m => m.split('|').map(m => m.trim()));
   const expressions = parsedMatches
@@ -59,13 +59,13 @@ const parseTokensFromLocalizedString = (
       modifiers: modifiers.map(m => getModifierWithParams(m)).filter(m => assertKnownModifier(m.modifierName)),
     }));
 
-  let normalisedString = s;
+  let normalizedString = s;
   expressions.forEach(({ token }) => {
     // Marking the position of each token with _++token++_ so we can easily
     // replace it with its localized value in the next step
-    normalisedString = normalisedString.replace(/{{.+?}}/, `_++${token}++_`);
+    normalizedString = normalizedString.replace(/{{.+?}}/, `_++${token}++_`);
   });
-  return { expressions: expressions as TokenExpression[], normalisedString };
+  return { expressions: expressions as TokenExpression[], normalizedString };
 };
 
 const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens: Tokens) => {

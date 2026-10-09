@@ -740,7 +740,7 @@ describe('Dialog', () => {
       await user.keyboard('{Escape}');
 
       expect(finalFocus).toHaveBeenCalledWith('keyboard');
-      // Default behaviour on `undefined`: back to the trigger.
+      // Default behavior on `undefined`: back to the trigger.
       expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open dialog' }));
     });
 

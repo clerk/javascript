@@ -610,7 +610,7 @@ describe('SubscriptionDetails', () => {
     expect(nextPaymentElements.length).toBe(2);
   });
 
-  it('allows cancelling a subscription of a monthly plan', async () => {
+  it('allows canceling a subscription of a monthly plan', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
@@ -1129,7 +1129,7 @@ describe('SubscriptionDetails', () => {
     expect(getByText('Cancel free trial')).toBeVisible();
   });
 
-  it('allows cancelling a free trial with specific dialog text', async () => {
+  it('allows canceling a free trial with specific dialog text', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();

@@ -23,6 +23,7 @@ describe.each(['SignIn', 'SignUp'] as const)('%s accessible labels', component =
       fixtures.options.localization = {
         ...frFR,
         socialButtonsBlockButton: 'Se connecter avec {{provider}}',
+        // american-spelling-ignore-next-line: utiliser -- French localization
         socialButtonsBlockButtonManyInView: 'Utiliser {{provider|titleize}}',
       };
 
@@ -46,6 +47,7 @@ describe.each(['SignIn', 'SignUp'] as const)('%s accessible labels', component =
       );
 
       for (const provider of ['Apple', 'Facebook', 'Google']) {
+        // american-spelling-ignore-next-line: utiliser -- French localization
         const name = socialButtonsVariant === 'blockButton' ? `Utiliser ${provider}` : `Se connecter avec ${provider}`;
         const button = screen.getByRole('button', { name, exact: true });
         expect(button).toHaveAccessibleName(name);
@@ -66,6 +68,7 @@ describe.each(['SignIn', 'SignUp'] as const)('%s accessible labels', component =
       fixtures.clerk.client.lastAuthenticationStrategy = 'oauth_google';
       fixtures.options.localization = {
         ...frFR,
+        // american-spelling-ignore-next-line: utilisation -- French localization
         lastAuthenticationStrategy: 'Dernière utilisation',
         socialButtonsBlockButton: 'Se connecter avec {{provider}}',
       };
@@ -91,6 +94,7 @@ describe.each(['SignIn', 'SignUp'] as const)('%s accessible labels', component =
       );
 
       expect(
+        // american-spelling-ignore-next-line: utilisation -- French localization
         screen.getByRole('button', { name: 'Dernière utilisation Se connecter avec Google', exact: true }),
       ).toBeVisible();
     },

@@ -342,9 +342,9 @@ interface HeaderAction {
   id: UserButtonAction;
   label: string;
   icon: IconName;
-  /** Inline, the button is square and shows the icon alone, labelling itself through `aria-label`. */
+  /** Inline, the button is square and shows the icon alone, labeling itself through `aria-label`. */
   iconOnly?: boolean;
-  /** Shows the icon ahead of the label even inline, where a labelled button otherwise has none. */
+  /** Shows the icon ahead of the label even inline, where a labeled button otherwise has none. */
   leadingIcon?: boolean;
   onClick?: () => void;
   /** Opens a menu of these rather than acting itself. */
@@ -496,7 +496,7 @@ function Header() {
       }
     }
   }
-  // Inline, the gear trails the labelled actions; stacked, it leads them.
+  // Inline, the gear trails the labeled actions; stacked, it leads them.
   const ordered =
     layout === 'stacked'
       ? [...actions.filter(a => a.id === 'manageLead'), ...actions.filter(a => a.id !== 'manageLead')]
@@ -654,7 +654,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
         note ? (
           <UserButtonItemDescription>{note}</UserButtonItemDescription>
         ) : onAccept ? (
-          // Every other affordance here swaps its icon for a spinner, but this one is a labelled
+          // Every other affordance here swaps its icon for a spinner, but this one is a labeled
           // button, so the spinner goes inside it rather than taking the row's trailing edge — the
           // press and the thing that reports it stay the same element. `pendingKey` is already
           // spin-delayed by the container, so this asks for no second delay of its own.
@@ -1121,7 +1121,7 @@ export function UserButtonTrigger({
       xstyle={[
         ringsAvatar ? styles.triggerRinglessAvatar : focusOutline.visible,
         styles.trigger,
-        renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
+        renderTriggerLabel ? styles.triggerLabeled : styles.triggerAvatarOnly,
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >

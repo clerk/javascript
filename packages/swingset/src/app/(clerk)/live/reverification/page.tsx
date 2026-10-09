@@ -9,7 +9,7 @@ import { Flow, type FlowDirection } from '@clerk/mosaic/components/flow';
 import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
-import { isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
+import { isClerkRuntimeError, isReverificationCanceledError } from '@clerk/shared/error';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
@@ -38,7 +38,7 @@ async function resetMockDelete() {
 }
 
 function CardHarness() {
-  const [status, setStatus] = useState<'idle' | 'success' | 'cancelled' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'success' | 'canceled' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);
   const [requestPending, setRequestPending] = useState(false);
   const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(false));
@@ -68,9 +68,9 @@ function CardHarness() {
                   return;
                 }
                 await resetMockDelete();
-                if (isReverificationCancelledError(error)) {
-                  setStatus('cancelled');
-                  setMessage('Reverification cancelled.');
+                if (isReverificationCanceledError(error)) {
+                  setStatus('canceled');
+                  setMessage('Reverification canceled.');
                   return;
                 }
                 setStatus('error');
@@ -140,7 +140,7 @@ function DialogHarness() {
           return;
         }
         await resetMockDelete();
-        if (isReverificationCancelledError(error)) {
+        if (isReverificationCanceledError(error)) {
           setErrorMessage(null);
           setOpen(false);
           return;

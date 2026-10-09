@@ -147,6 +147,7 @@ export type AuthenticationResponseJSON = {
 };
 
 // Native error codes that the renderer maps to ClerkWebAuthnError codes.
+// american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits
 export type PasskeyNativeErrorCode = 'cancelled' | 'invalid_rp' | 'not_supported' | 'timeout' | 'unknown';
 
 // Keep errors inside the response; Electron loses structure when invoke promises reject.

@@ -102,7 +102,7 @@ describe('SignInProtectCheck', () => {
       expect(mockExecute.mock.calls[1][0]).toMatchObject({ token: 'challenge-token-2' });
     });
 
-    it('shows a failed hand-off and lets the user retry it, after clearing the challenge cancelled the run', async () => {
+    it('shows a failed hand-off and lets the user retry it, after clearing the challenge canceled the run', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignInWithProtectCheck();
       });
@@ -668,7 +668,7 @@ describe('SignInProtectCheck', () => {
     it('resumes even when the resolved sign-in no longer carries the transferable marker', async () => {
       // `SignIn.fromJSON` replaces `firstFactorVerification` wholesale on every write, so the
       // marker that routed us here is not guaranteed to survive `submitProtectCheck`. The
-      // component latches it at mount for exactly this case; re-reading it afterwards would
+      // component latches it at mount for exactly this case; re-reading it afterward would
       // silently fall back to the broken path.
       const { wrapper, fixtures } = await createFixtures(f => {
         f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
@@ -719,7 +719,7 @@ describe('SignInProtectCheck', () => {
     });
 
     it('surfaces a message when the resumed continuation fails with a non-Clerk error', async () => {
-      // `handleError` re-throws what it does not recognise, and the continuation can raise a plain
+      // `handleError` re-throws what it does not recognize, and the continuation can raise a plain
       // Error (a transient fetch failure, or a callback that did not complete). That throw escaped
       // the void-invoked challenge run, leaving the card with no spinner, no message and no retry --
       // stranding the user on the very flow this card exists to resume.

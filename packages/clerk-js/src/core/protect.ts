@@ -18,7 +18,7 @@ export class Protect {
    * Resolved from the APPLIED loaders rather than from the config, because rollout is decided by
    * a random draw per page load: a loader being ramped can carry its own value without changing
    * anything for browsers still on the loader it replaces, and which one a browser got cannot be
-   * recomputed afterwards.
+   * recomputed afterward.
    */
   get challengeLoadTimeoutMs(): number | undefined {
     return this.#challengeLoadTimeoutMs;

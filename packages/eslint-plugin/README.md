@@ -224,7 +224,7 @@ For each unprotected resource it flags, the rule offers an editor quick-fix sugg
 ## Bulk auto-fixing
 
 > [!WARNING]
-> Applying these fixes changes the runtime behavior of your application — `await auth.protect()` enforces authentication where there potentially was none, or might override custom auth checks that were already in place. Always review the changes and test your application afterwards.
+> Applying these fixes changes the runtime behavior of your application — `await auth.protect()` enforces authentication where there potentially was none, or might override custom auth checks that were already in place. Always review the changes and test your application afterward.
 
 Because the protection insertion is a suggestion rather than an autofix, `eslint --fix` deliberately won't apply it. To apply it across many files at once, use the bundled command, which lints with your existing ESLint config (so your protected/public globs are honored) and applies the suggestion to every resource it can safely fix:
 

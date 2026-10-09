@@ -6,7 +6,7 @@ import { createClerkUrl } from './clerkUrl';
 
 /**
  * A class that extends the native Request class,
- * adds cookies helpers and a normalised clerkUrl that is constructed by using the values found
+ * adds cookies helpers and a normalized clerkUrl that is constructed by using the values found
  * in req.headers so it is able to work reliably when the app is running behind a proxy server.
  */
 class ClerkRequest extends Request {

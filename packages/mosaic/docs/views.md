@@ -127,14 +127,14 @@ finalFocus={removalFocus.finalFocus}
 onConfirm={method => removalFocus.remove(method.id)}
 ```
 
-A cancelled or failed removal keeps its own trigger, so `finalFocus` returns
+A canceled or failed removal keeps its own trigger, so `finalFocus` returns
 `null` and the dialog's default (the trigger) applies.
 
 Prefer the row that took the removed one's place, the last row when it was the
 last, and a control that outlives the list once it is empty.
 
 Test the removal, not just the cancel: `toHaveFocus()` on the row that should
-have caught it. A suite that only asserts focus after cancelling passes while
+have caught it. A suite that only asserts focus after canceling passes while
 every successful removal drops focus on the floor.
 
 ## Testing

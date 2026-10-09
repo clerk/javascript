@@ -42,7 +42,7 @@ export type MosaicElementProps<Tag extends keyof React.JSX.IntrinsicElements> = 
  *
  * Derived from the headless part contract, which already drops `color` and hands
  * `render` callbacks tag-agnostic props, so the two layers cannot drift. Mosaic
- * additionally drops `className`/`style` in favour of `xstyle` (see `MosaicStyleProps`).
+ * additionally drops `className`/`style` in favor of `xstyle` (see `MosaicStyleProps`).
  */
 export type MosaicComponentProps<Tag extends keyof React.JSX.IntrinsicElements> = Omit<
   ComponentProps<Tag>,

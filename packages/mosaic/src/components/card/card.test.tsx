@@ -364,7 +364,7 @@ describe('Mosaic Card', () => {
   });
 
   // Nothing above named the card, so the parts carry no borrowed id.
-  it('leaves the title and description unidentified outside a labelled surface', () => {
+  it('leaves the title and description unidentified outside a labeled surface', () => {
     render(
       <Card.Root>
         <Card.Title data-testid='title'>Review terms</Card.Title>

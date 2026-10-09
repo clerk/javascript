@@ -12,6 +12,7 @@ export function mapPasskeyIpcError(
   const { code, message } = error;
 
   switch (code) {
+    // american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits
     case 'cancelled':
       return new ClerkWebAuthnError(message, {
         code: action === 'create' ? 'passkey_registration_cancelled' : 'passkey_retrieval_cancelled',

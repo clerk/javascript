@@ -51,7 +51,7 @@ export function Inline(props: Record<string, unknown>) {
   );
 }
 
-export function Labelled(props: Record<string, unknown>) {
+export function Labeled(props: Record<string, unknown>) {
   return (
     <CopyButton
       {...knobsAsProps(props)}

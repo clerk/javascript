@@ -33,8 +33,8 @@ export function useAccessibleNameWarning(node: HTMLElement | null, component: st
       // title part the attribute points at an id that is not in the document — which names the
       // dialog exactly as poorly as having no attribute at all, and is what a presence check would
       // wave through. `Popover` omits the attribute instead, so resolving covers both shapes.
-      const labelledBy = node.getAttribute('aria-labelledby');
-      const named = labelledBy
+      const labeledBy = node.getAttribute('aria-labelledby');
+      const named = labeledBy
         ?.split(/\s+/)
         .filter(Boolean)
         .some(id => node.ownerDocument.getElementById(id)?.textContent.trim());

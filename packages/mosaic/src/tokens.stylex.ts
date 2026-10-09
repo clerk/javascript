@@ -88,7 +88,7 @@ export const colorVars = stylex.defineVars(colorDefaults);
 // Radius Tokens
 // =============================================================================
 // `md` is 6px rather than a 4/8/12 step: it is the control radius (button), and
-// neither neighbour sits right on a control.
+// neither neighbor sits right on a control.
 
 const radiusDefaults = {
   '--cl-radius-none': '0rem',
@@ -143,7 +143,7 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // outer radius minus each side's own border width, so unequal insets draw the two halves of every
 // cap with different curvature. Tried and measured; not worth a hairline of position.
 //
-// The colours are FOUR states, not three, and they run from quietest to loudest: `idle` while the
+// The colors are FOUR states, not three, and they run from quietest to loudest: `idle` while the
 // pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
 // thumb's own two. Each derives from `--cl-scrollbar-thumb` rather than baking its value in, so
 // they resolve at use time — overriding the base re-derives all three, while any one stays
@@ -385,7 +385,7 @@ export const durationVars = stylex.defineVars(durationDefaults);
 // property, not the duration — a transform at `fast` still wants this curve.
 //
 // `--cl-ease-exit` is its counterpart for things LEAVING, In Quad
-// (https://www.easing.dev/in-quad). Swift Out run backwards spends 90% of its travel
+// (https://www.easing.dev/in-quad). Swift Out run backward spends 90% of its travel
 // in the first three frames and then crawls, and its overshoot inverts into a wobble
 // past the target — a departure has nothing to settle into, so it wants to accelerate
 // away instead. Deliberately the gentlest of the in-family: an exit moves a small

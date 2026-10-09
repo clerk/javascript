@@ -1605,7 +1605,7 @@ describe('SessionTokenCache', () => {
       // Advance past refresh fire time
       vi.advanceTimersByTime(44 * 1000);
 
-      // Only the second (background refresh) callback should fire; the hydrate timer was cancelled
+      // Only the second (background refresh) callback should fire; the hydrate timer was canceled
       expect(hydrateRefresh).not.toHaveBeenCalled();
       expect(backgroundRefresh).toHaveBeenCalledTimes(1);
     });
@@ -1623,7 +1623,7 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token1) });
       await Promise.resolve();
 
-      // Second set() with 120s TTL — old 30s expiration timer should be cancelled
+      // Second set() with 120s TTL — old 30s expiration timer should be canceled
       SessionTokenCache.set({ ...key, tokenResolver: Promise.resolve<TokenResource>(token2) });
       await Promise.resolve();
 
@@ -1788,7 +1788,7 @@ describe('SessionTokenCache', () => {
 
       vi.advanceTimersByTime(44 * 1000);
 
-      // The old onRefresh should have been cancelled, and no new one was scheduled
+      // The old onRefresh should have been canceled, and no new one was scheduled
       expect(onRefresh).not.toHaveBeenCalled();
     });
   });

@@ -42,6 +42,7 @@ function loadNativeModule(): Promise<NativePasskeysModule> {
   return nativeModulePromise;
 }
 
+// american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits
 const NATIVE_ERROR_CODES: PasskeyNativeErrorCode[] = ['cancelled', 'invalid_rp', 'not_supported', 'timeout', 'unknown'];
 
 function isPasskeyIpcResult<T>(value: unknown): value is PasskeyIpcResult<T> {

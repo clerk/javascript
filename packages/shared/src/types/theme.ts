@@ -5,6 +5,7 @@ export type FontWeight = string;
 export type BoxShadow = string;
 
 export type TransparentColor = 'transparent';
+// american-spelling-ignore-next-line: grey -- CSS named color apps pass in
 export type BuiltInColors = 'black' | 'blue' | 'red' | 'green' | 'grey' | 'white' | 'yellow';
 
 export type HexColor = `#${string}`;

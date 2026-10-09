@@ -24,7 +24,7 @@ export type {
   ExplicitSignInParams,
   GoogleUser,
   OneTapSuccessResponse,
-  CancelledResponse,
+  CanceledResponse,
   NoSavedCredentialFound,
   OneTapResponse,
   GoogleSignInErrorCode,

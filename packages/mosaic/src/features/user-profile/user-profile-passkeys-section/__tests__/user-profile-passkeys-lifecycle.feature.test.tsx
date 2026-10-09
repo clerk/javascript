@@ -239,7 +239,7 @@ describe('Submitting passkey actions', () => {
 
   it('uses localized coded cancellation errors', async () => {
     serveAccounts();
-    authenticator().mockRejectedValueOnce(new DOMException('Cancelled', 'NotAllowedError'));
+    authenticator().mockRejectedValueOnce(new DOMException('Canceled', 'NotAllowedError'));
     await renderWithClerk(
       <MosaicProvider
         localization={{

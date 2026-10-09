@@ -770,7 +770,7 @@ const InstantPasswordRow = ({
   }, []);
 
   useEffect(() => {
-    //if the field receives a value, we default to normal behaviour
+    //if the field receives a value, we default to normal behavior
     if (field?.value && field.value !== '') {
       setAutofilled(false);
     }

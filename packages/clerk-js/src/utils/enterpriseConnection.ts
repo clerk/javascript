@@ -41,7 +41,7 @@ export function toEnterpriseConnectionBody(
   // `domains` is an array of FQDN strings. The form serializer downstream emits
   // each element as a repeated `domains` form field (e.g. `domains=a.com&domains=b.com`),
   // matching how the backend parses repeated form params. An omitted or empty
-  // array is not sent, keeping older callers backwards-compatible.
+  // array is not sent, keeping older callers backward-compatible.
   const domains = (params as CreateOrganizationEnterpriseConnectionParams).domains;
   if (domains && domains.length > 0) {
     body.domains = domains;

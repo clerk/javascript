@@ -17,7 +17,7 @@ export interface OtpProps
   extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style' | 'ref'>, MosaicStyleProps {
   /** The number of boxes in the code. @default 6 */
   length?: number;
-  /** Colours every slot for the verification outcome. Defaults to the enclosing `Field`'s validity. */
+  /** Colors every slot for the verification outcome. Defaults to the enclosing `Field`'s validity. */
   status?: OtpStatus;
 }
 

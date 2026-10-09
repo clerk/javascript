@@ -69,7 +69,7 @@ afterEach(() => {
 });
 
 describe('Mosaic ActionBar', () => {
-  it('renders a labelled toolbar tied to its table and described by its count', () => {
+  it('renders a labeled toolbar tied to its table and described by its count', () => {
     render(<BulkActions />);
     const bar = screen.getByRole('toolbar', { name: 'Bulk actions' });
     expect(bar).toHaveClass('cl-action-bar');
@@ -243,7 +243,7 @@ describe('Mosaic ActionBar', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Next row' })).toHaveFocus());
   });
 
-  it('dismisses with a labelled button', async () => {
+  it('dismisses with a labeled button', async () => {
     const onDismiss = vi.fn();
     render(<BulkActions onDismiss={onDismiss} />);
     await userEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
@@ -348,7 +348,7 @@ describe('Mosaic ActionBar', () => {
       );
     }
 
-    it('returns focus to the bar when the dialog is cancelled', async () => {
+    it('returns focus to the bar when the dialog is canceled', async () => {
       const user = userEvent.setup();
       render(<ConfirmRemove />);
       await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));

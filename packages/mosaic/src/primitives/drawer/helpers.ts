@@ -15,7 +15,7 @@ export const clamp = (v: number, lo: number, hi: number): number => Math.min(Mat
 /**
  * Resolves the vertical swipe movement for a snap point, applying square-root
  * damping once the drag overshoots the fully-open edge (`nextOffset < 0`) so the
- * sheet resists travelling past it. `baseOffset` is the resting offset of the
+ * sheet resists traveling past it. `baseOffset` is the resting offset of the
  * active snap point (>= 0); `movementValue` is the signed live drag delta
  * (positive downward). Returns the movement to add on top of `baseOffset`.
  *
@@ -32,7 +32,7 @@ export function getSnapPointSwipeMovement(baseOffset: number, movementValue: num
 
 /**
  * Best-effort iOS detection. Used only to work around iOS not dispatching
- * `pointerup` after a scroll-cancelled gesture; never reached in happy-dom.
+ * `pointerup` after a scroll-canceled gesture; never reached in happy-dom.
  */
 export function isIOS(): boolean {
   if (typeof navigator === 'undefined') {

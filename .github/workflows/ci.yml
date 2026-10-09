@@ -85,6 +85,9 @@ jobs:
       - name: Check Dashboard links
         run: pnpm lint:dashboard-links
 
+      - name: Check American spelling
+        run: pnpm lint:american-spelling
+
       - name: Verify localizations are generated
         run: |
           pnpm --filter @clerk/localizations generate
@@ -360,6 +363,7 @@ jobs:
         run: pnpm --filter @clerk/mosaic test:feature
 
       - name: Upload failure artifacts
+        # american-spelling-ignore-next-line: cancelled -- GitHub Actions status function
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -586,6 +590,7 @@ jobs:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Sanitize artifact name
+        # american-spelling-ignore-next-line: cancelled -- GitHub Actions status function
         if: ${{ cancelled() || failure() }}
         id: sanitize
         run: |
@@ -595,6 +600,7 @@ jobs:
           TEST_NAME: ${{ matrix.test-name }}
 
       - name: Upload test-results
+        # american-spelling-ignore-next-line: cancelled -- GitHub Actions status function
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

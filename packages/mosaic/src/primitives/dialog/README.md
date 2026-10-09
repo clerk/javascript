@@ -114,7 +114,7 @@ the dialog returns focus to it on close, exactly as if it had been clicked.
 ### Custom focus management
 
 `initialFocus` and `finalFocus` on `Dialog.Popup` control where focus moves on open and close.
-Each accepts `true` (the default behaviour), `false` (do not move focus), a ref, or a function of
+Each accepts `true` (the default behavior), `false` (do not move focus), a ref, or a function of
 the interaction type behind the open/close (`'mouse' | 'touch' | 'pen' | 'keyboard' | ''`, empty
 for programmatic) returning any of those:
 

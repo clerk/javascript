@@ -1082,7 +1082,7 @@ export type Theme = {
 export type Options = {
   /**
    * Controls whether the logo will be rendered inside or outside the component card.
-   * To customise the logo further, you can use {@link Appearance.elements}
+   * To customize the logo further, you can use {@link Appearance.elements}
    *
    * @default inside
    */
@@ -1092,7 +1092,7 @@ export type Options = {
    * By default, the components will use the logo you've set in the Clerk Dashboard.
    * This option is helpful when you need to display different logos for different themes,
    * eg: white logo on dark themes, black logo on light themes
-   * To customise the logo further, you can use {@link Appearance.elements}
+   * To customize the logo further, you can use {@link Appearance.elements}
    *
    * @default undefined
    */
@@ -1110,14 +1110,14 @@ export type Options = {
    * Controls the variant that will be used for the social buttons.
    * By default, the components will use block buttons if you have less than
    * 3 social providers enabled, otherwise icon buttons will be used.
-   * To customise the social buttons further, you can use {@link Appearance.elements}
+   * To customize the social buttons further, you can use {@link Appearance.elements}
    *
    * @default auto
    */
   socialButtonsVariant?: 'auto' | 'iconButton' | 'blockButton';
   /**
    * Controls whether the social buttons will be rendered above or below the card form.
-   * To customise the social button container further, you can use {@link Appearance.elements}
+   * To customize the social button container further, you can use {@link Appearance.elements}
    *
    * @default 'top'
    */

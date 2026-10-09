@@ -209,7 +209,7 @@ const EnableOrganizationsPromptInternal = ({
                 <RadioGroup
                   value={allowPersonalAccount ? 'optional' : 'required'}
                   onChange={value => setAllowPersonalAccount(value === 'optional')}
-                  labelledBy={radioGroupLabelId}
+                  labeledBy={radioGroupLabelId}
                 >
                   <RadioGroupItem
                     value='required'
@@ -470,10 +470,10 @@ type RadioGroupProps = {
   value: string;
   onChange: (value: string) => void;
   children: React.ReactNode;
-  labelledBy?: string;
+  labeledBy?: string;
 };
 
-const RadioGroup = ({ value, onChange, children, labelledBy }: RadioGroupProps): JSX.Element => {
+const RadioGroup = ({ value, onChange, children, labeledBy }: RadioGroupProps): JSX.Element => {
   const name = useId();
   const contextValue = React.useMemo(() => ({ value: { name, value, onChange } }), [name, value, onChange]);
 
@@ -484,7 +484,7 @@ const RadioGroup = ({ value, onChange, children, labelledBy }: RadioGroupProps):
         direction='col'
         gap={3}
         aria-orientation='vertical'
-        aria-labelledby={labelledBy}
+        aria-labelledby={labeledBy}
       >
         {children}
       </Flex>

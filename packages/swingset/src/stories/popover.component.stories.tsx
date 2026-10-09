@@ -51,7 +51,7 @@ export function Default() {
 // Each placement demo shares the same trigger and panel so the example reads as the
 // placement it sets. The wrapper reserves vertical room — without it the `flip`
 // middleware bounces a `top` popover back to the bottom inside a short preview.
-const labelledTrigger = (label: string) => <Button variant='outline'>{label}</Button>;
+const labeledTrigger = (label: string) => <Button variant='outline'>{label}</Button>;
 
 const panel = (label: string) => (
   <Card.Root>
@@ -73,7 +73,7 @@ export function Placement() {
       }}
     >
       <Popover.Root placement='top'>
-        <Popover.Trigger render={labelledTrigger('Top')} />
+        <Popover.Trigger render={labeledTrigger('Top')} />
         <Popover.Popup
           size='sm'
           aria-label='Top placement'
@@ -82,7 +82,7 @@ export function Placement() {
         </Popover.Popup>
       </Popover.Root>
       <Popover.Root placement='bottom'>
-        <Popover.Trigger render={labelledTrigger('Bottom')} />
+        <Popover.Trigger render={labeledTrigger('Bottom')} />
         <Popover.Popup
           size='sm'
           aria-label='Bottom placement'
@@ -91,7 +91,7 @@ export function Placement() {
         </Popover.Popup>
       </Popover.Root>
       <Popover.Root placement='left'>
-        <Popover.Trigger render={labelledTrigger('Left')} />
+        <Popover.Trigger render={labeledTrigger('Left')} />
         <Popover.Popup
           size='sm'
           aria-label='Left placement'
@@ -100,7 +100,7 @@ export function Placement() {
         </Popover.Popup>
       </Popover.Root>
       <Popover.Root placement='right'>
-        <Popover.Trigger render={labelledTrigger('Right')} />
+        <Popover.Trigger render={labeledTrigger('Right')} />
         <Popover.Popup
           size='sm'
           aria-label='Right placement'
@@ -123,7 +123,7 @@ export function Alignment() {
       }}
     >
       <Popover.Root placement='bottom-start'>
-        <Popover.Trigger render={labelledTrigger('bottom-start')} />
+        <Popover.Trigger render={labeledTrigger('bottom-start')} />
         <Popover.Popup
           size='sm'
           aria-label='Bottom start'
@@ -132,7 +132,7 @@ export function Alignment() {
         </Popover.Popup>
       </Popover.Root>
       <Popover.Root placement='bottom'>
-        <Popover.Trigger render={labelledTrigger('bottom')} />
+        <Popover.Trigger render={labeledTrigger('bottom')} />
         <Popover.Popup
           size='sm'
           aria-label='Bottom'
@@ -141,7 +141,7 @@ export function Alignment() {
         </Popover.Popup>
       </Popover.Root>
       <Popover.Root placement='bottom-end'>
-        <Popover.Trigger render={labelledTrigger('bottom-end')} />
+        <Popover.Trigger render={labeledTrigger('bottom-end')} />
         <Popover.Popup
           size='sm'
           aria-label='Bottom end'

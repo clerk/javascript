@@ -41,7 +41,7 @@ const WIDE = '@container cl-dialog (width >= 90rem)';
 const SHEET = '@media (width < 40rem)';
 
 export const styles = stylex.create({
-  // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
+  // The scrim. Black in both schemes. A gray veil was tried for dark mode — lightening a dark page rather
   // than darkening it — and it read as haze over the page rather than as a surface lifting off it.
   //
   // A dialog opened over a `profile` or a `card` paints its OWN scrim, lighter than the base because
@@ -164,7 +164,7 @@ export const styles = stylex.create({
      *
      * A veil rather than `opacity` on the popup, because those are different effects. Fading the
      * popup fades the SURFACE — its background and its shadow — and the scrim shows through, which
-     * reads as the dialog dissolving. Painting the background colour back over the contents leaves
+     * reads as the dialog dissolving. Painting the background color back over the contents leaves
      * the surface at full strength and dims only what sits on it.
      *
      * Driven by a private custom property rather than by a state branch on the pseudo-element:
@@ -574,7 +574,7 @@ const SHEET_EXIT_EASE = 'ease-out';
 
 // The entering/exiting scale. `transform: scale()` scales the RENDERED border-radius along with
 // everything else, so a surface at 0.94 draws its corners at 94% of their value for the length of
-// the transition — about 0.77px on a 12px radius. An earlier version cancelled that by dividing
+// the transition — about 0.77px on a 12px radius. An earlier version canceled that by dividing
 // the popup's radius by the same factor, which only reaches corners the POPUP paints: since a
 // `card` and a `profile` are painted by the surface inside, the correction had stopped reaching the
 // corners that matter and was dropped rather than pushed into every surface's API. If it comes
@@ -646,7 +646,7 @@ export const popupMotion = stylex.create({
       // ANIMATION, not for no distinction: `transitionProperty` below narrows to `opacity` in
       // this mode, so the recede lands in one frame with nothing interpolating. Dropping it
       // outright leaves a stacked sheet sitting on an identical sheet with no scrim between
-      // them, which reads as a rendering fault rather than as a preference being honoured.
+      // them, which reads as a rendering fault rather than as a preference being honored.
       '@media (prefers-reduced-motion: reduce)': {
         default: 'scale(1)',
         ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
@@ -660,7 +660,7 @@ export const popupMotion = stylex.create({
     //
     // The FIRST slot tracks the fourth on the phone branch rather than staying at `fast`: opacity
     // and the slide are one gesture there, and a fade that finishes while the surface is still
-    // travelling reads as a flash rather than as an arrival. Above the phone band the fade keeps
+    // traveling reads as a flash rather than as an arrival. Above the phone band the fade keeps
     // `fast` and lands with the scrim, since the scale it accompanies barely moves. The list is
     // positional against `transitionProperty` below.
     //
@@ -740,7 +740,7 @@ export const popupMotion = stylex.create({
       // ANIMATION, not for no distinction. `transitionProperty` below narrows to `opacity` in this
       // mode, so the recede lands in one frame with nothing interpolating. Dropping it outright
       // leaves a stacked dialog sitting on an identical one with no scrim between them, which
-      // reads as a rendering fault rather than as a preference being honoured.
+      // reads as a rendering fault rather than as a preference being honored.
       '@media (prefers-reduced-motion: reduce)': {
         default: 'scale(1)',
         ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,

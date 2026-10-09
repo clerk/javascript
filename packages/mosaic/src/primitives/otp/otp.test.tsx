@@ -568,7 +568,7 @@ describe('Otp', () => {
     });
   });
 
-  describe('labelling', () => {
+  describe('labeling', () => {
     it('puts the root id on the first slot and derives the rest from it', () => {
       render(<Harness id='code' />);
       expect(inputs().map(input => input.id)).toEqual(['code', 'code-2', 'code-3', 'code-4']);

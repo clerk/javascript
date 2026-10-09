@@ -179,7 +179,7 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     // screen, while the page behind must never veto a drag.
     for (let el: Element | null = target; el; el = el.parentElement) {
       // Only a box that can scroll is inner content: a clipped or overflowing one has the same
-      // geometry and none of the behaviour, and would swallow every upward drag at rest.
+      // geometry and none of the behavior, and would swallow every upward drag at rest.
       if (canScrollToward(el, 0, down ? 1 : -1)) {
         if (down) {
           lastScrollAt.current = clock();
@@ -318,7 +318,7 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
         window.removeEventListener('pointercancel', onWindowRelease, true);
       };
 
-      // iOS doesn't dispatch pointerup after a scroll-cancelled gesture, so reset
+      // iOS doesn't dispatch pointerup after a scroll-canceled gesture, so reset
       // `allowed` on touchend. Track the listener (and drop any stale one from a
       // prior gesture that never fired) so it's removed on release/unmount instead
       // of leaking on `window`.

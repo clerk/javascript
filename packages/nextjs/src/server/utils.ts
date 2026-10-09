@@ -40,7 +40,7 @@ export const setRequestHeadersOnNextResponse = (
     });
   }
 
-  // Now that we have normalised res to include overrides, just append the new header
+  // Now that we have normalized res to include overrides, just append the new header
   Object.entries(newHeaders).forEach(([key, val]) => {
     res.headers.set(OVERRIDE_HEADERS, `${res.headers.get(OVERRIDE_HEADERS)},${key}`);
     res.headers.set(`${MIDDLEWARE_HEADER_PREFIX}-${key}`, val);

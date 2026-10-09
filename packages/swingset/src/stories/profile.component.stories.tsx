@@ -212,7 +212,7 @@ export function Default(props: Record<string, unknown>) {
 /**
  * Sliding selected and hover marks, in CSS alone: the selected item and the hovered item each
  * publish an anchor name, and two pseudo-elements of the tablist follow them through CSS anchor
- * positioning — no measuring, no script. Both are the neutral colour at a low opacity, so on the
+ * positioning — no measuring, no script. Both are the neutral color at a low opacity, so on the
  * selected item the hover mark stacks on the selected one and the fill deepens rather than
  * changing hue. Where anchors are unsupported the rules inside `@supports` never apply and the
  * items keep their own fills.

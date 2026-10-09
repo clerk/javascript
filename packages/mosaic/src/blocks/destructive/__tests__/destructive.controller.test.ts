@@ -128,9 +128,9 @@ describe('useDestructiveController', () => {
     );
   });
 
-  it('closes without a message when reverification is cancelled', async () => {
+  it('closes without a message when reverification is canceled', async () => {
     const onDelete = vi.fn(() =>
-      Promise.reject(new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' })),
+      Promise.reject(new ClerkRuntimeError('canceled', { code: 'reverification_cancelled' })),
     );
     const { result } = renderHook(() => useDestructiveController({ onDelete, reverification: idleReverification }));
     act(() => result.current.onOpenChange(true));

@@ -120,10 +120,10 @@ Mosaic already dims the bar while the pointer is elsewhere; this takes that stat
 fades because idle → base is the one step set on the scroller, which owns the transition — see
 [Styling](#styling). The lane stays reserved throughout, so nothing reflows on the way in or out.
 
-Reach for a zero-alpha colour rather than `transparent` in any fade like this. `transparent` is
+Reach for a zero-alpha color rather than `transparent` in any fade like this. `transparent` is
 defined as `rgba(0, 0, 0, 0)` — transparent **black** — so interpolating out of it drags the thumb
-through dark, half-transparent greys and reads as dirty. Relative colour syntax
-(`oklch(from … l c h / 0)`) keeps the colour's own channels and moves only the alpha.
+through dark, half-transparent grays and reads as dirty. Relative color syntax
+(`oklch(from … l c h / 0)`) keeps the color's own channels and moves only the alpha.
 
 ### Theming the scrollbar
 
@@ -132,17 +132,17 @@ through dark, half-transparent greys and reads as dirty. Relative colour syntax
   storyModule={ScrollAreaStories}
 />
 
-A colour per state, far louder than anything you'd ship but told apart at a glance. Move the pointer
+A color per state, far louder than anything you'd ship but told apart at a glance. Move the pointer
 into the region, then onto the bar, then drag it.
 
 Only the first of those moves animates, and the reason is structural rather than chromatic: amber →
-teal changes the region's own rest colour, so it happens on the scroller, where the transition
+teal changes the region's own rest color, so it happens on the scroller, where the transition
 lives. Pink and violet are the thumb's own states and switch instantly however they're written (see
 [Styling](#styling)). The example stretches the transition to `0.6s` because at Mosaic's real
 `0.15s` the fade is over before you've finished moving the pointer in.
 
 Every value is an `oklch()` literal, which is what keeps the animated step well defined — the
-registered property interpolates between two colours in one space rather than guessing across
+registered property interpolates between two colors in one space rather than guessing across
 notations.
 
 ### Shadows instead of the fade
@@ -187,7 +187,7 @@ The vars are registered as `<number>`, so they drive position as readily as opac
 slides out from behind its own edge as it fades in. Clip the root — `overflow: hidden` — so the half
 that is still offscreen stays there.
 
-Mix the scrim from a theme colour rather than hardcoding black: `--cl-color-foreground` inverts
+Mix the scrim from a theme color rather than hardcoding black: `--cl-color-foreground` inverts
 with the theme, so one declaration reads as a shadow on light and a soft glow on dark, where black
 would vanish.
 
@@ -209,16 +209,16 @@ These tokens are global, so setting them once retunes every scrolling surface in
 | `--cl-scroll-fade-range`      | `1.5rem`                 | How far you scroll before the fade reaches full strength. |
 | `--cl-scrollbar-width`        | `8px`                    | Width of the scrollbar lane. `0px` hides it.              |
 | `--cl-scrollbar-thumb-inset`  | `2px`                    | How far the thumb's paint is held inside that lane.       |
-| `--cl-scrollbar-thumb`        | derived from the palette | Thumb colour once the pointer reaches the region.         |
-| `--cl-scrollbar-thumb-idle`   | derived from the above   | Thumb colour while the pointer is elsewhere.              |
-| `--cl-scrollbar-thumb-hover`  | derived from the above   | Thumb colour while the pointer is over the thumb.         |
-| `--cl-scrollbar-thumb-active` | derived from the above   | Thumb colour while the thumb is being dragged.            |
+| `--cl-scrollbar-thumb`        | derived from the palette | Thumb color once the pointer reaches the region.          |
+| `--cl-scrollbar-thumb-idle`   | derived from the above   | Thumb color while the pointer is elsewhere.               |
+| `--cl-scrollbar-thumb-hover`  | derived from the above   | Thumb color while the pointer is over the thumb.          |
+| `--cl-scrollbar-thumb-active` | derived from the above   | Thumb color while the thumb is being dragged.             |
 
 The two lane sizes are in pixels rather than on the `rem` scale, deliberately: a scrollbar is chrome
 rather than content, so it should stay the same hairline whether or not the surrounding text scales.
 The default is a 4px pill in an 8px lane.
 
-The colours are four states running quietest to loudest: `idle` while the pointer is elsewhere, the
+The colors are four states running quietest to loudest: `idle` while the pointer is elsewhere, the
 base once it reaches the region — or the content takes keyboard focus — then `hover` and `active`
 for the thumb's own two. Each of the three derives from `--cl-scrollbar-thumb` rather than baking
 its value in, so setting the base re-derives all of them, and any one can still be pinned on its
@@ -238,7 +238,7 @@ insets draw the two halves of each cap with different curvature. On a 4px pill t
 round. Position the surrounding padding instead.
 
 Mosaic paints the scrollbar through `::-webkit-scrollbar`, which is what buys a real width and a
-thumb colour per interaction state; the standard `scrollbar-color` can express neither, and setting
+thumb color per interaction state; the standard `scrollbar-color` can express neither, and setting
 it would make the engines that _do_ implement the pseudo-elements ignore them. Firefox implements
 neither and keeps its platform scrollbar. Everything here is gated on `@media (pointer: fine)`, so
 touch platforms keep the native overlay bar they already draw. The gutter is not gated: it is a
@@ -247,7 +247,7 @@ layout decision rather than an appearance one.
 One consequence worth knowing before you theme: styling the scrollbar takes macOS out of overlay
 mode, so the bar is always visible and always occupies its lane rather than auto-hiding. That is the
 cross-platform consistency the tokens exist for, but it is a change from the platform default. To
-keep the lane without the bar, take both resting colours transparent:
+keep the lane without the bar, take both resting colors transparent:
 
 ```css
 :root {

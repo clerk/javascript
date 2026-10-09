@@ -17,7 +17,7 @@ function handlesOwnDrag(element: Element): boolean {
  *   dialog instead.
  * - Tapping a submit button leaves focus on the field, so the keyboard stays up while the form
  *   submits and through to whatever field comes next.
- * - A one-finger drag is cancelled unless something under it can scroll that way or takes the drag
+ * - A one-finger drag is canceled unless something under it can scroll that way or takes the drag
  *   itself. With the keyboard up, iOS would otherwise pan the visual viewport over the page; with
  *   it down, the drag would only rubber-band the scroll-locked page.
  */

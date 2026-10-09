@@ -15,6 +15,7 @@ const STATUS_COLOR_SCHEME = {
   succeeded: 'success',
   running: 'primary',
   failed: 'danger',
+  // american-spelling-ignore-next-line: cancelled -- Directory Sync run status the Clerk API returns
   cancelled: 'warning',
 } as const;
 
@@ -45,7 +46,7 @@ export const SyncNowRow = ({ status, onSync, onSynced }: SyncNowRowProps): JSX.E
       try {
         handleError(err as Error, [], message => setError(typeof message === 'string' ? message : undefined));
       } catch {
-        // handleError rethrows anything it does not recognise, and a network
+        // handleError rethrows anything it does not recognize, and a network
         // failure is exactly that. Without this the click would appear to do
         // nothing at all.
         setError(t(localizationKeys('configureDirectorySync.testStep.error__syncFailed')));

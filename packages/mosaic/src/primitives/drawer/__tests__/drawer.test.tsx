@@ -642,7 +642,7 @@ describe('Drawer', () => {
     });
 
     // A press on a control inside the sheet is not a drag: nothing that keys on `data-swiping` — the
-    // grip's held colour, the transition freeze — should react until the sheet actually moves.
+    // grip's held color, the transition freeze — should react until the sheet actually moves.
     it('marks swiping only once a move commits to dragging the sheet', () => {
       render(<DrawerFixture defaultOpen />);
       const popup = screen.getByRole('dialog');
@@ -827,7 +827,7 @@ describe('Drawer', () => {
 
     it('removes the iOS touchend fallback listener on release (no leak per gesture)', () => {
       // iOS registers a `touchend` fallback on pointerdown (it may not dispatch
-      // pointerup after a scroll-cancelled gesture). A normal release must remove
+      // pointerup after a scroll-canceled gesture). A normal release must remove
       // it so listeners can't pile up on `window` across gestures.
       const hadPlatform = Object.getOwnPropertyDescriptor(navigator, 'platform');
       Object.defineProperty(navigator, 'platform', { value: 'iPhone', configurable: true });

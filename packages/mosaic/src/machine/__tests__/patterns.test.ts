@@ -618,7 +618,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
             },
             onError: { target: 'failed' },
           }),
-          on: { CANCEL: 'cancelled' },
+          on: { CANCEL: 'canceled' },
         },
         routing: {
           always: [
@@ -631,7 +631,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
         secondFactor: {},
         complete: { type: 'final' },
         failed: {},
-        cancelled: {},
+        canceled: {},
       },
     });
   }
@@ -685,7 +685,7 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
     expect(actor.getSnapshot().value).toBe('failed');
   });
 
-  it('can be cancelled while the invoke is in-flight — late resolve is a no-op', async () => {
+  it('can be canceled while the invoke is in-flight — late resolve is a no-op', async () => {
     const gate = deferred<{ status: string }>();
     const actor = createActor(
       makeMachine(() => gate.promise),
@@ -693,11 +693,11 @@ describe('pattern: on-mount async — initial state invokes immediately', () => 
     );
     actor.start();
     actor.send({ type: 'CANCEL' });
-    expect(actor.getSnapshot().value).toBe('cancelled');
+    expect(actor.getSnapshot().value).toBe('canceled');
     gate.resolve({ status: 'complete' });
     await tick();
-    // Machine stays in cancelled — the in-flight invoke was abandoned
-    expect(actor.getSnapshot().value).toBe('cancelled');
+    // Machine stays in canceled — the in-flight invoke was abandoned
+    expect(actor.getSnapshot().value).toBe('canceled');
   });
 });
 

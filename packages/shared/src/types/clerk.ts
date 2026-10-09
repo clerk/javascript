@@ -1010,7 +1010,7 @@ export interface Clerk {
   /**
    * Decorates the provided URL with the auth token for development instances.
    *
-   * @param to - The route to create a URL towards.
+   * @param to - The route to create a URL toward.
    */
   buildUrlWithAuth(to: string): string;
 
@@ -1753,7 +1753,7 @@ type NavigationType =
    */
   | 'external'
   /**
-   * Window navigations are navigations towards a different origin
+   * Window navigations are navigations toward a different origin
    * and are not handled by the Clerk component or the host app router.
    */
   | 'window';
@@ -1975,7 +1975,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   afterVerification?: () => void;
 
   /**
-   * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
+   * Non-awaitable callback for when verification is canceled, (i.e modal is closed)
    */
   afterVerificationCancelled?: () => void;
 
@@ -2056,7 +2056,7 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   /**
    * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
    * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
-   * Backwards compatible with browsers that still support third-party cookies.
+   * Backward compatible with browsers that still support third-party cookies.
    *
    * @default true
    */
