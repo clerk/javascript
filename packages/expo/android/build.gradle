@@ -27,6 +27,7 @@ ext {
   composeVersion = "1.7.0"
   activityComposeVersion = "1.9.0"
   lifecycleVersion = "2.8.0"
+  savedStateVersion = "1.4.0"
 }
 
 def safeExtGet(prop, fallback) {
@@ -44,6 +45,7 @@ android {
     versionCode 1
     versionName "1.0.0"
     buildConfigField "String", "CLERK_EXPO_VERSION", "\"${clerkExpoVersion}\""
+    consumerProguardFiles "proguard-rules.pro"
   }
 
   buildTypes {
@@ -146,6 +148,7 @@ dependencies {
   implementation "androidx.activity:activity-compose:$activityComposeVersion"
   implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion"
   implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion"
+  implementation "androidx.savedstate:savedstate-compose:$savedStateVersion"
 
   testImplementation "junit:junit:4.13.2"
 }
