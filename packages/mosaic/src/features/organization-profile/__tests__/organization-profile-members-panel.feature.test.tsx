@@ -316,7 +316,7 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(role).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeDisabled();
     update.fail('role_rejected', 'Role rejected by server');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Role rejected by server');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Role rejected by server'));
     expect(screen.getByRole('alert')).toHaveAttribute('data-color', 'negative');
     const retry = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     await user.click(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ }));
