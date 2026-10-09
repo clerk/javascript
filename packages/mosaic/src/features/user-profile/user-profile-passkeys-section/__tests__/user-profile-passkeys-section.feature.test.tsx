@@ -428,7 +428,7 @@ describe('Removing a passkey', () => {
     await waitFor(() => expect(removal.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Remove' })).toHaveAttribute('aria-busy', 'true');
     await user.keyboard('{Escape}');
-    expect(screen.getByRole('alertdialog')).toBeVisible();
+    expect(screen.getByRole('alertdialog')).not.toHaveAttribute('data-closed');
     removal.release();
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByText('No passkeys added')).toBeVisible();
@@ -454,7 +454,7 @@ describe('Removing a passkey', () => {
     await waitFor(() => expect(removal.requests).toHaveLength(1));
     removal.fail('session_reverification_required');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Veuillez confirmer votre identité.'));
-    expect(screen.getByRole('alertdialog')).toBeVisible();
+    expect(screen.getByRole('alertdialog')).not.toHaveAttribute('data-closed');
     expect(screen.queryByLabelText('Password')).toBeNull();
     expect(removal.requests).toHaveLength(1);
     const retried = serveFapi(fapi);

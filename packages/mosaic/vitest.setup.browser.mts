@@ -9,6 +9,17 @@ expect.extend(matchers);
 
 configure({ asyncUtilTimeout: 3000 });
 
+const disableMotion = document.createElement('style');
+disableMotion.textContent = `
+  *, *::before, *::after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+`;
+document.head.append(disableMotion);
+
 const NativeBroadcastChannel = window.BroadcastChannel;
 const channelNamespace = crypto.randomUUID();
 const openChannels = new Set<IsolatedBroadcastChannel>();

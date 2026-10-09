@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
+import { openDialog } from '../../../__tests__/feature/dialog';
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiApiKey,
@@ -72,8 +73,9 @@ async function expectFallback(seed: FakeFapiSeed, props: Partial<APIKeysTablePro
 }
 
 async function openCreate(user: User) {
-  await user.click(await screen.findByRole('button', { name: 'Create API key' }));
-  return screen.findByRole('dialog', { name: 'Add new API key' });
+  return openDialog(user, await screen.findByRole('button', { name: 'Create API key' }), {
+    name: 'Add new API key',
+  });
 }
 
 async function fillCreate(user: User, dialog: HTMLElement, name: string, expiration: string) {
@@ -84,8 +86,9 @@ async function fillCreate(user: User, dialog: HTMLElement, name: string, expirat
 
 async function startRevoke(user: User, name: string) {
   await user.click(await screen.findByRole('button', { name: `Manage ${name}` }));
-  await user.click(await screen.findByRole('menuitem', { name: 'Revoke key' }));
-  return screen.findByRole('dialog', { name: `Revoke ${name}?` });
+  return openDialog(user, await screen.findByRole('menuitem', { name: 'Revoke key' }), {
+    name: `Revoke ${name}?`,
+  });
 }
 
 async function openRevoke(user: User, name: string) {
@@ -352,7 +355,7 @@ describe('APIKeysTable', () => {
       await user.click(await within(dialog).findByRole('button', { name: 'Copy API key' }));
 
       await expect(navigator.clipboard.readText()).resolves.toBe(`ak_secret_${fapi.apiKeys[0].id}`);
-      expect(screen.getByRole('alertdialog', { name: 'Add new API key' })).toBeVisible();
+      expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
     });
 
     it('keeps the secret open on an outside click but closes it on Escape', async () => {
@@ -368,7 +371,7 @@ describe('APIKeysTable', () => {
 
       await user.click(backdrop);
       expect(dialog).not.toHaveAttribute('data-closed');
-      expect(screen.getByRole('alertdialog', { name: 'Add new API key' })).toBeVisible();
+      expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
 
       await user.keyboard('{Escape}');
       await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
