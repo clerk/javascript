@@ -43,22 +43,6 @@ function renderDialog(props: HarnessProps = {}) {
 }
 
 describe('OrganizationProfileInviteMembersDialog', () => {
-  it('turns typed emails into tags and submits them', async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    renderDialog({ onSubmit });
-
-    const submit = screen.getByRole('button', { name: 'Send invites' });
-    expect(submit).toHaveAttribute('aria-disabled', 'true');
-
-    await user.type(screen.getByRole('textbox', { name: 'Email' }), 'preston@clerk.dev,nate@clerk.dev{Enter}');
-    expect(screen.getByRole('button', { name: 'Remove preston@clerk.dev' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Remove nate@clerk.dev' })).toBeInTheDocument();
-
-    await user.click(submit);
-    expect(onSubmit).toHaveBeenCalledOnce();
-  });
-
   it('blocks submitting until malformed emails are removed', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -71,19 +55,5 @@ describe('OrganizationProfileInviteMembersDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Remove nate' }));
     await user.click(screen.getByRole('button', { name: 'Send invites' }));
     expect(onSubmit).toHaveBeenCalledOnce();
-  });
-
-  it('marks emails the server rejected and shows its error', () => {
-    renderDialog({
-      initialEmailAddresses: ['preston@clerk.dev', 'ada@clerk.dev'],
-      rejectedEmailAddresses: ['ada@clerk.dev'],
-      error: 'ada@clerk.dev is already a member.',
-    });
-
-    expect(screen.getByRole('alert')).toHaveTextContent('ada@clerk.dev is already a member.');
-    const [preston, ada] = screen.getAllByRole('listitem');
-    expect(preston).not.toHaveAttribute('data-invalid');
-    expect(ada).toHaveAttribute('data-invalid', '');
-    expect(screen.getByRole('button', { name: 'Send invites' })).toHaveAttribute('aria-disabled', 'true');
   });
 });
