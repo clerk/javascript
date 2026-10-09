@@ -314,22 +314,6 @@ import {
   Overlay as UserProfileOverlay,
 } from '../stories/user-profile.stories';
 import {
-  AddEmailFails as UserProfileAccountSectionAddEmailFails,
-  AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
-  Default as UserProfileAccountSectionDefault,
-  EmailLinkFails as UserProfileAccountSectionEmailLinkFails,
-  EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
-  EmailRemovalError as UserProfileAccountSectionEmailRemovalError,
-  EmailRemovalPending as UserProfileAccountSectionEmailRemovalPending,
-  EmailSsoFails as UserProfileAccountSectionEmailSsoFails,
-  EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
-  meta as userProfileAccountSectionMeta,
-  MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
-  NameManagedByConnection as UserProfileAccountSectionNameManagedByConnection,
-  PhoneRemovalError as UserProfileAccountSectionPhoneRemovalError,
-  PhoneRemovalPending as UserProfileAccountSectionPhoneRemovalPending,
-} from '../stories/user-profile-account-section.stories';
-import {
   Default as UserProfileActiveDevicesSectionDefault,
   Impersonation as UserProfileActiveDevicesSectionImpersonation,
   meta as userProfileActiveDevicesSectionMeta,
@@ -366,6 +350,17 @@ import {
   WithError as UserProfileDangerSectionWithError,
 } from '../stories/user-profile-danger-section.stories';
 import {
+  AddEmailFails as UserProfileEmailSectionAddEmailFails,
+  Default as UserProfileEmailSectionDefault,
+  EmailLinkFails as UserProfileEmailSectionEmailLinkFails,
+  EmailLinkVerification as UserProfileEmailSectionEmailLinkVerification,
+  EmailRemovalError as UserProfileEmailSectionEmailRemovalError,
+  EmailRemovalPending as UserProfileEmailSectionEmailRemovalPending,
+  EmailSsoFails as UserProfileEmailSectionEmailSsoFails,
+  EmailSsoVerification as UserProfileEmailSectionEmailSsoVerification,
+  meta as userProfileEmailSectionMeta,
+} from '../stories/user-profile-email-section.stories';
+import {
   ConnectionError as UserProfileEnterpriseAccountsSectionConnectionError,
   ConnectOnly as UserProfileEnterpriseAccountsSectionConnectOnly,
   Default as UserProfileEnterpriseAccountsSectionDefault,
@@ -398,9 +393,23 @@ import {
   meta as userProfilePaymentMethodsSectionMeta,
 } from '../stories/user-profile-payment-methods-section.stories';
 import {
+  AddPhoneFails as UserProfilePhoneSectionAddPhoneFails,
+  Default as UserProfilePhoneSectionDefault,
+  meta as userProfilePhoneSectionMeta,
+  PhoneRemovalError as UserProfilePhoneSectionPhoneRemovalError,
+  PhoneRemovalPending as UserProfilePhoneSectionPhoneRemovalPending,
+} from '../stories/user-profile-phone-section.stories';
+import {
   Default as UserProfileProfilePanelDefault,
   meta as userProfileProfilePanelMeta,
 } from '../stories/user-profile-profile-panel.stories';
+import {
+  Default as UserProfileProfileSectionDefault,
+  EditNameFails as UserProfileProfileSectionEditNameFails,
+  EditUsernameFails as UserProfileProfileSectionEditUsernameFails,
+  meta as userProfileProfileSectionMeta,
+  NameManagedByConnection as UserProfileProfileSectionNameManagedByConnection,
+} from '../stories/user-profile-profile-section.stories';
 import {
   Default as UserProfileSecurityPanelDefault,
   meta as userProfileSecurityPanelMeta,
@@ -757,21 +766,32 @@ const userProfileModule: StoryModule = {
   Overlay: UserProfileOverlay,
 };
 
-const userProfileAccountSectionModule: StoryModule = {
-  meta: userProfileAccountSectionMeta,
-  Default: UserProfileAccountSectionDefault,
-  MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
-  NameManagedByConnection: UserProfileAccountSectionNameManagedByConnection,
-  AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
-  AddEmailFails: UserProfileAccountSectionAddEmailFails,
-  EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,
-  EmailLinkFails: UserProfileAccountSectionEmailLinkFails,
-  EmailSsoVerification: UserProfileAccountSectionEmailSsoVerification,
-  EmailSsoFails: UserProfileAccountSectionEmailSsoFails,
-  EmailRemovalPending: UserProfileAccountSectionEmailRemovalPending,
-  EmailRemovalError: UserProfileAccountSectionEmailRemovalError,
-  PhoneRemovalPending: UserProfileAccountSectionPhoneRemovalPending,
-  PhoneRemovalError: UserProfileAccountSectionPhoneRemovalError,
+const userProfileProfileSectionModule: StoryModule = {
+  meta: userProfileProfileSectionMeta,
+  Default: UserProfileProfileSectionDefault,
+  NameManagedByConnection: UserProfileProfileSectionNameManagedByConnection,
+  EditNameFails: UserProfileProfileSectionEditNameFails,
+  EditUsernameFails: UserProfileProfileSectionEditUsernameFails,
+};
+
+const userProfileEmailSectionModule: StoryModule = {
+  meta: userProfileEmailSectionMeta,
+  Default: UserProfileEmailSectionDefault,
+  AddEmailFails: UserProfileEmailSectionAddEmailFails,
+  EmailLinkVerification: UserProfileEmailSectionEmailLinkVerification,
+  EmailLinkFails: UserProfileEmailSectionEmailLinkFails,
+  EmailSsoVerification: UserProfileEmailSectionEmailSsoVerification,
+  EmailSsoFails: UserProfileEmailSectionEmailSsoFails,
+  EmailRemovalPending: UserProfileEmailSectionEmailRemovalPending,
+  EmailRemovalError: UserProfileEmailSectionEmailRemovalError,
+};
+
+const userProfilePhoneSectionModule: StoryModule = {
+  meta: userProfilePhoneSectionMeta,
+  Default: UserProfilePhoneSectionDefault,
+  AddPhoneFails: UserProfilePhoneSectionAddPhoneFails,
+  PhoneRemovalPending: UserProfilePhoneSectionPhoneRemovalPending,
+  PhoneRemovalError: UserProfilePhoneSectionPhoneRemovalError,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
@@ -925,7 +945,9 @@ export const registry: StoryModule[] = [
   userProfileBillingPanelModule,
   userProfileApiKeysPanelModule,
   // User Profile · Sections
-  userProfileAccountSectionModule,
+  userProfileProfileSectionModule,
+  userProfileEmailSectionModule,
+  userProfilePhoneSectionModule,
   userProfilePasswordSectionModule,
   userProfilePasskeysSectionModule,
   userProfileMfaSectionModule,
