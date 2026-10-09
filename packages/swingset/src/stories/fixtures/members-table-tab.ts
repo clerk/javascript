@@ -1,5 +1,4 @@
 import type {
-  MembersTableSort,
   MembersTableTabViewProps,
   OrganizationProfileMember,
 } from '@clerk/mosaic/features/organization-profile/members-table-tab.types';
@@ -48,20 +47,12 @@ export function useMembersTableFixture({ proposed = false, empty = false } = {})
   );
   const [items, setItems] = useState(empty ? [] : seed);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
   const [searchValue, setSearchValue] = useState('');
-  const [sort, setSort] = useState<MembersTableSort | null>(null);
   const query = searchValue.trim().toLowerCase();
   const filtered = items.filter(item => `${item.name} ${item.email}`.toLowerCase().includes(query));
-  const sorted = sort
-    ? [...filtered].sort((a, b) => {
-        const comparison =
-          sort.column === 'joinedAt' ? a.joinedAt - b.joinedAt : a[sort.column].localeCompare(b[sort.column]);
-        return sort.direction === 'ascending' ? comparison : -comparison;
-      })
-    : filtered;
-  const currentPage = Math.min(page, Math.max(1, Math.ceil(sorted.length / pageSize)));
-  const members: OrganizationProfileMember[] = sorted
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / pageSize)));
+  const members: OrganizationProfileMember[] = filtered
     .slice((currentPage - 1) * pageSize, currentPage * pageSize)
     .map(item => ({
       ...item,
@@ -76,7 +67,7 @@ export function useMembersTableFixture({ proposed = false, empty = false } = {})
   return {
     members,
     roles,
-    totalCount: sorted.length,
+    totalCount: filtered.length,
     page: currentPage,
     pageSize,
     searchValue,
@@ -86,16 +77,8 @@ export function useMembersTableFixture({ proposed = false, empty = false } = {})
       setPage(1);
     },
     onPageChange: setPage,
-    onPageSizeChange: setPageSize,
     onChangeRole: (id, role) => setItems(current => current.map(item => (item.id === id ? { ...item, role } : item))),
     onRemove: id => setItems(current => current.filter(item => item.id !== id)),
     onBulkAction: proposed ? () => undefined : undefined,
-    sort,
-    onSortChange: proposed
-      ? next => {
-          setSort(next);
-          setPage(1);
-        }
-      : undefined,
   };
 }

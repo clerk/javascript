@@ -64,6 +64,7 @@ export function useMembersTableModel(query: string) {
         hasRoleSetMigration: result.has_role_set_migration ?? false,
       };
     },
+    pageSize: PAGE_SIZE,
     totalCount: memberships?.count ?? 0,
     page: memberships?.page ?? 1,
     isLoading: memberships?.isLoading ?? true,

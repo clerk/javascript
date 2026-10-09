@@ -35,6 +35,7 @@ function propsFor(overrides: Partial<MembersTableTabViewProps> = {}): MembersTab
     ],
     totalCount: 2,
     page: 1,
+    pageSize: 10,
     searchValue: '',
     isLoading: false,
     onSearchChange: vi.fn(),
@@ -117,54 +118,43 @@ describe('MembersTableTabView', () => {
     const { props } = renderView({
       totalCount: 25,
       onBulkAction: vi.fn(),
-      onSortChange: vi.fn(),
-      onPageSizeChange: vi.fn(),
     });
     await user.click(screen.getByRole('checkbox', { name: 'Select all members on this page' }));
     expect(screen.getByRole('checkbox', { name: 'Select Ada Lovelace' })).not.toBeChecked();
     expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).toBeChecked();
-    await user.click(screen.getByRole('button', { name: 'Joined' }));
-    expect(props.onSortChange).toHaveBeenCalledWith({ column: 'joinedAt', direction: 'ascending' });
-    expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).not.toBeChecked();
     await user.type(screen.getByRole('searchbox', { name: 'Search members' }), 'G');
     expect(props.onSearchChange).toHaveBeenCalledWith('G');
     await user.click(screen.getByRole('button', { name: 'Next members page' }));
     expect(props.onPageChange).toHaveBeenCalledWith(2);
-    await user.click(screen.getByRole('combobox', { name: /^Results per page/ }));
-    await user.click(screen.getByRole('option', { name: '20', exact: true }));
-    expect(props.onPageSizeChange).toHaveBeenCalledWith(20);
-    expect(props.onPageChange).toHaveBeenLastCalledWith(1);
+    expect(screen.queryByRole('combobox', { name: /^Results per page/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Joined' })).toBeNull();
   });
-  it.each<Partial<MembersTableTabViewProps>>([
-    { page: 2 },
-    { pageSize: 20 },
-    { searchValue: 'Grace' },
-    { sort: { column: 'role', direction: 'ascending' } },
-    { sort: { column: 'name', direction: 'descending' } },
-  ])('clears selection when the caller changes result state: %j', async change => {
-    const user = userEvent.setup();
-    const { props, rerender } = renderView({ onBulkAction: vi.fn(), sort: { column: 'name', direction: 'ascending' } });
-    await user.click(screen.getByRole('checkbox', { name: 'Select Grace Hopper' }));
-    rerender(
-      <MosaicProvider>
-        <MembersTableTabView
-          {...props}
-          sort={{ column: 'name', direction: 'ascending' }}
-          isFetching
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).toBeChecked();
-    rerender(
-      <MosaicProvider>
-        <MembersTableTabView
-          {...props}
-          {...change}
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).not.toBeChecked();
-  });
+  it.each<Partial<MembersTableTabViewProps>>([{ page: 2 }, { pageSize: 20 }, { searchValue: 'Grace' }])(
+    'clears selection when the caller changes result state: %j',
+    async change => {
+      const user = userEvent.setup();
+      const { props, rerender } = renderView({ onBulkAction: vi.fn() });
+      await user.click(screen.getByRole('checkbox', { name: 'Select Grace Hopper' }));
+      rerender(
+        <MosaicProvider>
+          <MembersTableTabView
+            {...props}
+            isFetching
+          />
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).toBeChecked();
+      rerender(
+        <MosaicProvider>
+          <MembersTableTabView
+            {...props}
+            {...change}
+          />
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).not.toBeChecked();
+    },
+  );
 
   it('does not retain hidden selection for protected members within a Shift-click range', async () => {
     const user = userEvent.setup();
