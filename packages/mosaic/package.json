@@ -1,6 +1,6 @@
 {
   "name": "@clerk/mosaic",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Clerk Mosaic UI components",
   "keywords": [
     "clerk",
@@ -64,7 +64,8 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
-    "@floating-ui/react": "catalog:repo"
+    "@floating-ui/react": "catalog:repo",
+    "@wallet-standard/core": "catalog:module-manager"
   },
   "devDependencies": {
     "@clerk/clerk-js": "workspace:^",

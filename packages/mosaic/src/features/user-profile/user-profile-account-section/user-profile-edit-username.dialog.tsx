@@ -72,6 +72,7 @@ export function UserProfileEditUsernameDialog({
           >
             <Field.Root
               disabled={form.isSubmitting}
+              focusableWhenDisabled
               invalid={error !== undefined}
             >
               <Field.Label>{m.username.fieldLabel}</Field.Label>

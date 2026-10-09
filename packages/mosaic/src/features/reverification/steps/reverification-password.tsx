@@ -60,6 +60,7 @@ export function ReverificationPassword({
             required
             invalid={Boolean(errorMessage)}
             disabled={isPending}
+            focusableWhenDisabled
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Input

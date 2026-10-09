@@ -79,3 +79,28 @@ export function useOrganizationDirectorySyncStatusCacheKeys(params: {
     });
   }, [organizationId, enterpriseConnectionId, directoryId]);
 }
+
+/**
+ * @internal
+ */
+export function useOrganizationDirectorySyncGroupRoleMappingsCacheKeys(params: {
+  organizationId: string | null;
+  enterpriseConnectionId: string | null;
+  directoryId: string | null;
+}) {
+  const { organizationId, enterpriseConnectionId, directoryId } = params;
+  return useMemo(() => {
+    return createCacheKeys({
+      stablePrefix: INTERNAL_STABLE_KEYS.ORGANIZATION_DIRECTORY_SYNC_GROUP_ROLE_MAPPINGS_KEY,
+      authenticated: Boolean(organizationId),
+      tracked: {
+        organizationId: organizationId ?? null,
+        enterpriseConnectionId: enterpriseConnectionId ?? null,
+        directoryId: directoryId ?? null,
+      },
+      untracked: {
+        args: {},
+      },
+    });
+  }, [organizationId, enterpriseConnectionId, directoryId]);
+}

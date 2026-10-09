@@ -414,32 +414,31 @@ export function Destructive() {
   );
 }
 
-export function Flat() {
+export function ContainedHeader() {
   return (
     <>
       <style>{`
         @scope {
           .cl-section-group {
+            border: 1px solid var(--cl-color-border) !important;
+            border-radius: var(--cl-radius-xl) !important;
+            background: var(--cl-color-background) !important;
+          }
+          .cl-section-header {
+            margin: 0 1rem !important;
+            padding-block: 0.75rem !important;
+            min-height: 3.25rem !important;
+            width: auto !important;
+          }
+          .cl-section-body {
+            margin-inline: 1rem !important;
+            padding-inline: 0 !important;
             border: none !important;
             border-radius: 0 !important;
             background: none !important;
           }
-          .cl-section-header {
-            margin: 0 0 0.75rem !important;
-            padding: 0 !important;
-            min-height: 0 !important;
-          }
-          .cl-section-header .cl-button {
-            padding: 0 !important;
-            border: none !important;
-            background: none !important;
-          }
-          .cl-section-body {
-            margin: 0 !important;
-            padding-inline: 1rem !important;
-            border: 1px solid var(--cl-color-border) !important;
-            border-radius: var(--cl-radius-xl) !important;
-            background: var(--cl-color-background) !important;
+          .cl-section-header + .cl-section-body {
+            border-top: 1px solid var(--cl-color-border) !important;
           }
         }
       `}</style>

@@ -140,6 +140,12 @@ describe('APIKeysTable', () => {
       expect(within(table()).getByText('ak_...FKWO', { exact: false })).toBeVisible();
     });
 
+    it('describes a key last used after the table read the time as used now', async () => {
+      await renderTable(signedIn([userKey('ak_3', 'Worker', { last_used_at: Date.now() + 5 * 60_000 })]));
+
+      expect(await within(table()).findByRole('cell', { name: 'now' })).toBeVisible();
+    });
+
     it('shows loading until the first page arrives', async () => {
       serveFapi(signedIn());
       const list = holdRequests('get', '/api_keys');
@@ -429,7 +435,12 @@ describe('APIKeysTable', () => {
       const create = holdRequests('post', '/api_keys');
 
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
-      await waitFor(() => expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toBeDisabled());
+      await waitFor(() =>
+        expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toHaveAttribute(
+          'aria-disabled',
+          'true',
+        ),
+      );
       expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toHaveAttribute('aria-busy', 'true');
 
       create.release();
@@ -460,6 +471,19 @@ describe('APIKeysTable', () => {
         expect(within(dialog).getByRole('alert')).toHaveTextContent(
           'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
         ),
+      );
+    });
+
+    it('explains a failure Clerk cannot describe with the create error', async () => {
+      const { user } = await renderTable();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      worker.use(http.post(fapiUrl('/api_keys'), () => HttpResponse.json({ errors: [] }, { status: 500 })));
+
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not create the API key. Try again.'),
       );
     });
 

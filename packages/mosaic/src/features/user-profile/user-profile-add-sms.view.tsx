@@ -120,6 +120,7 @@ function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HT
         <Field.Root
           required
           disabled={props.isPending}
+          focusableWhenDisabled
           invalid={Boolean(props.errorMessage)}
         >
           <Field.Label>{m.phoneLabel}</Field.Label>

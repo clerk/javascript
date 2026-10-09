@@ -76,6 +76,52 @@ describe('usePendingAction', () => {
     expect(result.current.isPending).toBe(false);
   });
 
+  it('holds the pending action until a redirect grace period completes', async () => {
+    vi.useFakeTimers();
+    try {
+      const { result } = renderHook(() => usePendingAction({ errorFallback: 'Try again.' }));
+      act(() => {
+        void result.current.run('oauth', () => new Promise(resolve => setTimeout(resolve, 2000)));
+      });
+      await act(() => vi.advanceTimersByTimeAsync(1999));
+      expect(result.current.pendingKey).toBe('oauth');
+      await act(() => vi.advanceTimersByTimeAsync(1));
+      expect(result.current.pendingKey).toBeUndefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it.each([
+    ['success', () => Promise.resolve()],
+    ['failure', () => Promise.reject(blocked())],
+  ])('blocks actions from the same render and releases them after %s', async (_label, settle) => {
+    const pending = deferred<void>();
+    const { result } = renderHook(() => usePendingAction());
+    const action = result.current;
+    const second = vi.fn(() => Promise.resolve());
+    let run: Promise<boolean> | undefined;
+    let blockedRun: Promise<boolean> | undefined;
+
+    act(() => {
+      run = action.run('a', () => pending.promise.then(settle));
+      blockedRun = action.run('b', second);
+    });
+    expect(second).not.toHaveBeenCalled();
+    expect(await blockedRun).toBe(false);
+    expect(result.current.isPending).toBe(true);
+
+    await act(async () => {
+      pending.resolve();
+      await run;
+    });
+    expect(result.current.isPending).toBe(false);
+    await act(async () => {
+      expect(await action.run('b', second)).toBe(true);
+    });
+    expect(second).toHaveBeenCalledOnce();
+  });
+
   it('reports which key failed', async () => {
     const { result } = renderHook(() => usePendingAction());
 
@@ -130,6 +176,26 @@ describe('usePendingAction', () => {
     await act(() => result.current.run('a', () => Promise.reject(new Error('Cannot read properties of undefined'))));
 
     expect(result.current.error).toBe('Unable to sign out.');
+  });
+
+  it.each([
+    [undefined, 'Impossible de créer cette clé.'],
+    ['Action-specific fallback.', 'Action-specific fallback.'],
+  ])('updates the hook fallback after failure while preserving a run override of %s', async (runFallback, expected) => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { result, rerender } = renderHook(({ fallback }) => usePendingAction({ errorFallback: fallback }), {
+      initialProps: { fallback: 'Could not add this passkey.' },
+    });
+
+    await act(() =>
+      result.current.run('add', () => Promise.reject(new Error('Private authenticator details')), {
+        errorFallback: runFallback,
+      }),
+    );
+
+    expect(result.current.error).toBe(runFallback ?? 'Could not add this passkey.');
+    rerender({ fallback: 'Impossible de créer cette clé.' });
+    expect(result.current.error).toBe(expected);
   });
 
   it('prefers the fallback given to the run over the one given to the hook', async () => {

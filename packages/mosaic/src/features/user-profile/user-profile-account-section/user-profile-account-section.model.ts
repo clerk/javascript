@@ -3,6 +3,7 @@ import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type {
   AttributeData,
+  Attributes,
   EmailAddressResource,
   EnterpriseAccountResource,
   PhoneNumberResource,
@@ -174,6 +175,71 @@ function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
   };
 }
 
+type SaveAsUser = (run: (current: UserResource) => Promise<unknown>) => Promise<void>;
+
+type ContactActions = {
+  user: UserResource;
+  access: ReturnType<typeof toContactAccess>;
+  currentUser: () => UserResource;
+  saveAsUser: SaveAsUser;
+};
+
+function toEmailProps(
+  { user, access, currentUser, saveAsUser }: ContactActions,
+  verifierFor: (email: EmailAddressResource) => UserProfileEmailVerifier,
+): Pick<
+  UserProfileAccountSectionData,
+  'emails' | 'onCreateEmail' | 'getEmailVerifier' | 'onSetPrimaryEmail' | 'onRemoveEmail'
+> {
+  if (!access.show) {
+    return {};
+  }
+  return {
+    emails: toContacts(user.emailAddresses, user.primaryEmailAddressId, email => email.emailAddress),
+    onCreateEmail: access.canCreate
+      ? async emailAddress => {
+          const request = currentUser().createEmailAddress({ email: emailAddress });
+          await save(() => request, ADD_EMAIL_FIELDS);
+          return verifierFor(await request);
+        }
+      : undefined,
+    getEmailVerifier: id => verifierFor(byId(user.emailAddresses, id, 'email address')),
+    onSetPrimaryEmail: id => saveAsUser(current => current.update({ primaryEmailAddressId: id })),
+    onRemoveEmail: access.canRemove
+      ? id => saveAsUser(current => byId(current.emailAddresses, id, 'email address').destroy())
+      : undefined,
+  };
+}
+
+function toPhoneProps({
+  user,
+  access,
+  currentUser,
+  saveAsUser,
+}: ContactActions): Pick<
+  UserProfileAccountSectionData,
+  'phones' | 'onCreatePhone' | 'getPhoneVerifier' | 'onSetPrimaryPhone' | 'onRemovePhone'
+> {
+  if (!access.show) {
+    return {};
+  }
+  return {
+    phones: toContacts(user.phoneNumbers, user.primaryPhoneNumberId, phone => phone.phoneNumber),
+    onCreatePhone: access.canCreate
+      ? async phoneNumber => {
+          const request = currentUser().createPhoneNumber({ phoneNumber });
+          await save(() => request, ADD_PHONE_FIELDS);
+          return toPhoneVerifier(await request);
+        }
+      : undefined,
+    getPhoneVerifier: id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')),
+    onSetPrimaryPhone: id => saveAsUser(current => current.update({ primaryPhoneNumberId: id })),
+    onRemovePhone: access.canRemove
+      ? id => saveAsUser(current => byId(current.phoneNumbers, id, 'phone number').destroy())
+      : undefined,
+  };
+}
+
 export function useUserProfileAccountSectionModel(): UserProfileAccountSectionModel {
   const { isLoaded, user } = useUser();
   const clerk = useClerk();
@@ -204,7 +270,8 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     params?: MessageValues,
   ): Promise<void> => save(() => run(currentUser()), fields, params);
 
-  const { attributes, usernameSettings, enterpriseSSO } = environment.userSettings;
+  const { usernameSettings, enterpriseSSO } = environment.userSettings;
+  const attributes: Partial<Attributes> = environment.userSettings.attributes;
   const usernameAttribute = attributes.username;
   const usernameImmutable = Boolean(usernameAttribute?.immutable);
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
@@ -230,41 +297,9 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
     usernameRequired: Boolean(usernameAttribute?.required),
-    emails: emailAccess.show
-      ? toContacts(user.emailAddresses, user.primaryEmailAddressId, email => email.emailAddress)
-      : undefined,
-    phones: phoneAccess.show
-      ? toContacts(user.phoneNumbers, user.primaryPhoneNumberId, phone => phone.phoneNumber)
-      : undefined,
+    ...toEmailProps({ user, access: emailAccess, currentUser, saveAsUser }, verifierFor),
+    ...toPhoneProps({ user, access: phoneAccess, currentUser, saveAsUser }),
     defaultPhoneCountry: toCountryIso(clerk.__internal_country),
-    onCreateEmail: emailAccess.canCreate
-      ? async emailAddress => {
-          const request = currentUser().createEmailAddress({ email: emailAddress });
-          await save(() => request, ADD_EMAIL_FIELDS);
-          return verifierFor(await request);
-        }
-      : undefined,
-    getEmailVerifier: emailAccess.show ? id => verifierFor(byId(user.emailAddresses, id, 'email address')) : undefined,
-    onSetPrimaryEmail: emailAccess.show
-      ? id => saveAsUser(current => current.update({ primaryEmailAddressId: id }))
-      : undefined,
-    onRemoveEmail: emailAccess.canRemove
-      ? id => saveAsUser(current => byId(current.emailAddresses, id, 'email address').destroy())
-      : undefined,
-    onCreatePhone: phoneAccess.canCreate
-      ? async phoneNumber => {
-          const request = currentUser().createPhoneNumber({ phoneNumber });
-          await save(() => request, ADD_PHONE_FIELDS);
-          return toPhoneVerifier(await request);
-        }
-      : undefined,
-    getPhoneVerifier: phoneAccess.show ? id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')) : undefined,
-    onSetPrimaryPhone: phoneAccess.show
-      ? id => saveAsUser(current => current.update({ primaryPhoneNumberId: id }))
-      : undefined,
-    onRemovePhone: phoneAccess.canRemove
-      ? id => saveAsUser(current => byId(current.phoneNumbers, id, 'phone number').destroy())
-      : undefined,
     onProfilePictureChange: file => saveAsUser(current => current.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage
       ? () => saveAsUser(current => current.setProfileImage({ file: null }))

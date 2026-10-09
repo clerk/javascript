@@ -153,6 +153,7 @@ function NameField({
   return (
     <Field.Root
       disabled={form.isSubmitting}
+      focusableWhenDisabled
       invalid={error !== undefined}
       required={required}
     >

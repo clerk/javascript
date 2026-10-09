@@ -17,6 +17,7 @@ import type {
   OrganizationMembershipJSON,
   OrganizationSettingsJSON,
   OrganizationSuggestionJSON,
+  PasskeyJSON,
   PhoneNumberJSON,
   PublicKeyCredentialRequestOptionsJSON,
   PublicOrganizationDataJSON,
@@ -27,11 +28,20 @@ import type {
   UserOrganizationInvitationJSON,
   UserSettingsJSON,
   VerificationJSON,
+  Web3Strategy,
+  Web3WalletJSON,
 } from '@clerk/shared/types';
 
 type Settings<T> = Omit<T, 'id' | 'object'>;
 
-export type FapiUserSettings = Omit<Settings<UserSettingsJSON>, 'social'> & { social: Partial<OAuthProviders> };
+type FapiWeb3Attribute = Omit<AttributeDataJSON, 'first_factors'> & {
+  first_factors: Array<AttributeDataJSON['first_factors'][number] | Web3Strategy>;
+};
+
+export type FapiUserSettings = Omit<Settings<UserSettingsJSON>, 'social' | 'attributes'> & {
+  social: Partial<OAuthProviders>;
+  attributes: Omit<AttributesJSON, 'web3_wallet'> & { web3_wallet: FapiWeb3Attribute };
+};
 
 export type FapiEnvironment = Omit<EnvironmentJSON, 'user_settings' | 'organization_settings'> & {
   user_settings: FapiUserSettings;
@@ -374,6 +384,21 @@ export function fapiEnterpriseAccount(
   };
 }
 
+export function fapiWeb3Wallet(
+  overrides: Partial<Web3WalletJSON> & Pick<Web3WalletJSON, 'id' | 'web3_wallet'>,
+): Web3WalletJSON {
+  return {
+    object: 'web3_wallet',
+    verification: fapiVerification('web3_metamask_signature', {
+      status: 'verified',
+      verified_at_client: '',
+      attempts: 1,
+      expire_at: 0,
+    }),
+    ...overrides,
+  };
+}
+
 export function fapiSession(overrides: Partial<SessionJSON> & Pick<SessionJSON, 'id' | 'user'>): SessionJSON {
   const { user } = overrides;
   const primaryEmail = user.email_addresses.find(email => email.id === user.primary_email_address_id);
@@ -569,4 +594,16 @@ export function fapiApiKey(overrides: Partial<ApiKeyJSON> & Pick<ApiKeyJSON, 'id
 
 export function fapiPage<T>(data: T[], totalCount = data.length): FapiPage<T> {
   return { data, total_count: totalCount };
+}
+
+export function fapiPasskey(overrides: Partial<PasskeyJSON> & Pick<PasskeyJSON, 'id'>): PasskeyJSON {
+  return {
+    object: 'passkey',
+    name: 'Laptop',
+    verification: null,
+    created_at: createdAt,
+    updated_at: createdAt,
+    last_used_at: null,
+    ...overrides,
+  };
 }

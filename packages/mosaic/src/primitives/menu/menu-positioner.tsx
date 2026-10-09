@@ -4,6 +4,7 @@ import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useMenuContext } from './menu-context';
 
 export type MenuPositionerProps = ComponentProps<'div'>;
@@ -25,7 +26,7 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
       setActiveIndex,
     } = useMenuContext();
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps({
       onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
@@ -68,10 +69,7 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
       defaultTagName: 'div',
       render,
       enabled: mounted,
-      // floating-ui types `setFloating` as a method signature, but at runtime it's
-      // a stable callback that doesn't use `this`, so the unbound-method check is a
-      // false positive here.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
       ref: [refs.setFloating, ref],
       props: merged,
     });

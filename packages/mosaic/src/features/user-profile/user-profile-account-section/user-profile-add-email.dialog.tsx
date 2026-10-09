@@ -154,6 +154,7 @@ function EnterEmailStep(props: EnterEmailStepProps) {
         <Field.Root
           required
           disabled={props.isPending}
+          focusableWhenDisabled
           invalid={Boolean(props.errorMessage)}
         >
           <Field.Label>{m.email.label}</Field.Label>
@@ -225,6 +226,7 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
         <Field.Root
           required
           disabled={props.isPending}
+          focusableWhenDisabled
           invalid={Boolean(props.errorMessage)}
         >
           <Field.Label visuallyHidden>{m.verify.label}</Field.Label>

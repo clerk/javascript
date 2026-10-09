@@ -1,6 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { autoUpdate, getDimensions, getRectRelativeTo, getScale, getScrollDimensions } from './dom';
+import {
+  autoUpdate,
+  canScrollToward,
+  getDimensions,
+  getRectRelativeTo,
+  getScale,
+  getScrollDimensions,
+  isElement,
+  isHTMLElement,
+} from './dom';
 
 function stub(element: HTMLElement, values: Record<string, number>) {
   for (const [key, value] of Object.entries(values)) {
@@ -25,6 +34,30 @@ afterEach(() => {
   document.body.replaceChildren();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+});
+
+describe('isElement', () => {
+  it.each([
+    ['an element', () => document.createElement('div'), true],
+    ['an svg element', () => document.createElementNS('http://www.w3.org/2000/svg', 'svg'), true],
+    ['a text node', () => document.createTextNode('text'), false],
+    ['the document', () => document, false],
+    ['the window', () => window, false],
+    ['null', () => null, false],
+  ])('is %s: %s', (_, target, expected) => {
+    expect(isElement(target())).toBe(expected);
+  });
+});
+
+describe('isHTMLElement', () => {
+  it.each([
+    ['an element', () => document.createElement('div'), true],
+    ['an svg element', () => document.createElementNS('http://www.w3.org/2000/svg', 'svg'), false],
+    ['a text node', () => document.createTextNode('text'), false],
+    ['null', () => null, false],
+  ])('is %s: %s', (_, target, expected) => {
+    expect(isHTMLElement(target())).toBe(expected);
+  });
 });
 
 describe('getDimensions', () => {
@@ -168,5 +201,33 @@ describe('autoUpdate', () => {
     autoUpdate(create(), update)();
 
     expect(update).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('canScrollToward', () => {
+  function scroller(overflowY: string, scrollTop: number) {
+    const element = document.createElement('div');
+    element.style.overflowY = overflowY;
+    document.body.appendChild(element);
+    stub(element, { scrollHeight: 400, clientHeight: 200, scrollTop, scrollWidth: 100, clientWidth: 100 });
+    return element;
+  }
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('follows a drag with room on the axis it moved', () => {
+    expect(canScrollToward(scroller('auto', 0), 0, -1)).toBe(true);
+    expect(canScrollToward(scroller('auto', 0), 0, 1)).toBe(false);
+    expect(canScrollToward(scroller('auto', 200), 0, -1)).toBe(false);
+  });
+
+  it('keeps a vertical scroller when the first move jitters mostly sideways', () => {
+    expect(canScrollToward(scroller('auto', 0), 2, -1)).toBe(true);
+  });
+
+  it('ignores a box that overflows without scrolling', () => {
+    expect(canScrollToward(scroller('hidden', 0), 0, -1)).toBe(false);
   });
 });

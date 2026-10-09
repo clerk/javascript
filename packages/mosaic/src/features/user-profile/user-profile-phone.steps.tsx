@@ -55,6 +55,7 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
         <Field.Root
           required
           disabled={props.isPending}
+          focusableWhenDisabled
           invalid={Boolean(props.errorMessage)}
         >
           <Field.Label>{m.phone.label}</Field.Label>
@@ -132,6 +133,7 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
         <Field.Root
           required
           disabled={props.isPending || props.isResending}
+          focusableWhenDisabled
           invalid={Boolean(props.errorMessage)}
         >
           <Field.Label visuallyHidden>{m.verify.label}</Field.Label>

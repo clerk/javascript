@@ -1,7 +1,14 @@
+import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [],
+  resolve: {
+    alias: {
+      '#components': fileURLToPath(new URL('./src/components.client.ts', import.meta.url)),
+    },
+  },
   test: {
     typecheck: {
       enabled: true,

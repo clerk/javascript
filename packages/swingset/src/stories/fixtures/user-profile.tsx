@@ -1,17 +1,19 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { UserProfileDangerSectionView } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section.view';
+import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -160,17 +162,10 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
         setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      passwordSlot: { content: <UserProfilePasswordSectionView {...editPassword} /> },
-      passkeys: passkeys.passkeys,
-      addPasskeyError: passkeys.addError,
-      onRenamePasskey: passkeys.onRename,
+      passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
+      passkeysSlot: <UserProfilePasskeysSectionView {...passkeys} />,
       ...mfa.security,
-      devices: activeDevices.devices,
-      onAddPasskey: passkeys.onAdd,
-      dangerSlot: <UserProfileDangerPreview />,
-      onRemovePasskey: passkeys.onRemove,
-      onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
-      onSignOutDevice: activeDevices.onSignOutDevice,
+      activeDevicesSlot: <UserProfileActiveDevicesSectionView {...activeDevices} />,
     },
     billing: {
       subscription,

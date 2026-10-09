@@ -119,7 +119,7 @@ export function OrganizationProfileInviteMembersDialog({
               <Select.Root
                 items={roles}
                 value={role ?? undefined}
-                onValueChange={value => onRoleChange(value ?? null)}
+                onValueChange={onRoleChange}
               >
                 <Select.Trigger placeholder={m.rolePlaceholder} />
                 <Select.Popup />

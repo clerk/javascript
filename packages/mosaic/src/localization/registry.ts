@@ -13,7 +13,7 @@ import { userProfileMessages } from '../features/user-profile/user-profile.messa
 import { userProfileAccountSectionMessages } from '../features/user-profile/user-profile-account-section/user-profile-account-section.messages';
 import { userProfileAddEmailMessages } from '../features/user-profile/user-profile-account-section/user-profile-add-email.messages';
 import { userProfileAddPhoneMessages } from '../features/user-profile/user-profile-account-section/user-profile-add-phone.messages';
-import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices.messages';
+import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices-section/user-profile-active-devices.messages';
 import { userProfileAddAuthenticatorMessages } from '../features/user-profile/user-profile-add-authenticator.messages';
 import { userProfileAddSmsMessages } from '../features/user-profile/user-profile-add-sms.messages';
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';
@@ -24,7 +24,7 @@ import { userProfileEnterpriseAccountsMessages } from '../features/user-profile/
 import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section.messages';
 import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section.messages';
 import { userProfilePasswordSectionMessages } from '../features/user-profile/user-profile-password-section/user-profile-password-section.messages';
-import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
+import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets.messages';
 import { errorMessages } from './errors.messages';
 
 export const mosaicMessages = {
