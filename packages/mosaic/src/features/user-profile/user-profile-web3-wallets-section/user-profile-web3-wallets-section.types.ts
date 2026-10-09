@@ -10,6 +10,7 @@ export interface UserProfileWeb3Provider {
 
 export interface UserProfileWeb3Wallet {
   id: string;
+  providerId?: string;
   address: string;
   provider?: string;
   iconUrl?: string;

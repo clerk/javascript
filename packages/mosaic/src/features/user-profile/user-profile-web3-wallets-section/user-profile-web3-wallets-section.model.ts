@@ -74,6 +74,7 @@ export function projectWeb3Wallets({
       const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === wallet.verification.strategy);
       return {
         id: wallet.id,
+        providerId: provider?.strategy,
         address: wallet.web3Wallet,
         provider: provider?.name,
         iconUrl: provider ? iconImageUrl(provider.provider) : undefined,

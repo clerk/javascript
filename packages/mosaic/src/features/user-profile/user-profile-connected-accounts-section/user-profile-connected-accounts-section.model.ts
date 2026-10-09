@@ -157,9 +157,11 @@ function toAccountRow(
 ): UserProfileConnectedAccount {
   const error = account.verification?.error;
   const { status } = recoveryFor(account, scopes, providers);
+  const provider = providers.find(provider => provider.provider === account.provider);
   return {
     id: account.id,
-    ...(providers.find(provider => provider.provider === account.provider)?.display ?? { provider: account.provider }),
+    providerId: provider?.strategy,
+    ...(provider?.display ?? { provider: account.provider }),
     identifier: account.username || account.emailAddress || undefined,
     status,
     verificationError: status === 'error' ? error?.longMessage : undefined,

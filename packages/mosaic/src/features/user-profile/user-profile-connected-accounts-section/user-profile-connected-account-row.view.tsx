@@ -7,6 +7,7 @@ import { Badge } from '../../../components/badge';
 import { SubmitButton } from '../../../components/button';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import type { MosaicMessages } from '../../../localization';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from './user-profile-connected-accounts-section.styles';
@@ -46,71 +47,19 @@ function ProviderMedia({ provider }: { provider: ConnectedAccountProviderDisplay
   );
 }
 
-export function UserProfileConnectProviderRowView({
-  provider,
-  isPending,
-  isDisabled,
-  onConnect,
-}: {
-  provider: UserProfileConnectionProvider;
-  isPending: boolean;
-  isDisabled: boolean;
-  onConnect: (id: string) => void;
-}) {
-  const m = useMessages('userProfileConnectedAccounts');
-  return (
-    <Section.Row xstyle={styles.connectRow}>
-      <Section.Item>
-        <ProviderMedia provider={provider} />
-        <Section.Content>
-          <Section.Label>
-            <span
-              title={provider.provider}
-              {...stylex.props(truncationStyles.singleLine, styles.text)}
-            >
-              {provider.provider}
-            </span>
-          </Section.Label>
-        </Section.Content>
-        <Section.Actions>
-          <SubmitButton
-            type='button'
-            size='sm'
-            variant='outline'
-            color='neutral'
-            aria-label={fill(m.connectLabel, { provider: provider.provider })}
-            isPending={isPending}
-            disabled={isDisabled && !isPending}
-            onClick={() => onConnect(provider.id)}
-          >
-            {m.connect}
-            <Icon
-              name='arrow-up-right'
-              placement='inline-end'
-              size='sm'
-            />
-          </SubmitButton>
-        </Section.Actions>
-      </Section.Item>
-      <Section.Error>{provider.connectError}</Section.Error>
-    </Section.Row>
-  );
-}
-
-export function UserProfileConnectedAccountRowView({
+function accountActions({
   account,
-  triggerRef,
-  isDisabled = false,
+  m,
+  isDisabled,
   onReconnect,
   onRemove,
 }: {
   account: UserProfileConnectedAccount;
-  triggerRef?: Ref<HTMLButtonElement>;
-  isDisabled?: boolean;
+  m: MosaicMessages['userProfileConnectedAccounts'];
+  isDisabled: boolean;
   onReconnect?: (id: string) => void;
   onRemove?: (account: UserProfileConnectedAccount) => void;
-}) {
-  const m = useMessages('userProfileConnectedAccounts');
+}): ActionMenuAction[] {
   const actions: ActionMenuAction[] = [];
   if ((account.status === 'reconnect' || account.status === 'error') && onReconnect && !isDisabled) {
     actions.push({
@@ -121,39 +70,91 @@ export function UserProfileConnectedAccountRowView({
   if (onRemove) {
     actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(account) });
   }
+  return actions;
+}
+
+export function UserProfileConnectedAccountRowView({
+  account,
+  provider,
+  triggerRef,
+  isPending = false,
+  isDisabled = false,
+  onConnect,
+  onReconnect,
+  onRemove,
+}: {
+  account?: UserProfileConnectedAccount;
+  provider?: UserProfileConnectionProvider;
+  triggerRef?: Ref<HTMLButtonElement>;
+  isPending?: boolean;
+  isDisabled?: boolean;
+  onConnect?: (id: string) => void;
+  onReconnect?: (id: string) => void;
+  onRemove?: (account: UserProfileConnectedAccount) => void;
+}) {
+  const m = useMessages('userProfileConnectedAccounts');
+  const display = account ?? provider;
+  if (!display) {
+    return null;
+  }
+  const actions = account ? accountActions({ account, m, isDisabled, onReconnect, onRemove }) : [];
+
   return (
-    <Section.Row>
+    <Section.Row xstyle={account ? undefined : styles.connectRow}>
       <Section.Item>
-        <ProviderMedia provider={account} />
+        <ProviderMedia provider={display} />
         <Section.Content>
           <Section.Label>
             <span
-              title={account.provider}
+              title={display.provider}
               {...stylex.props(truncationStyles.singleLine, styles.text)}
             >
-              {account.provider}
+              {display.provider}
             </span>
-            {account.status === 'reconnect' ? <Badge color='warning'>{m.disconnected}</Badge> : null}
+            {account?.status === 'reconnect' ? <Badge color='warning'>{m.disconnected}</Badge> : null}
           </Section.Label>
           <Section.CollapsibleDescription
             truncate
-            title={account.identifier}
+            title={account?.identifier}
           >
-            {account.identifier}
+            {account?.identifier}
           </Section.CollapsibleDescription>
         </Section.Content>
-        {actions.length > 0 ? (
+        {account ? (
+          actions.length > 0 ? (
+            <Section.Actions>
+              <ActionMenu
+                triggerRef={triggerRef}
+                label={fill(m.manageLabel, { provider: account.provider })}
+                actions={actions}
+              />
+            </Section.Actions>
+          ) : null
+        ) : provider && onConnect ? (
           <Section.Actions>
-            <ActionMenu
-              triggerRef={triggerRef}
-              label={fill(m.manageLabel, { provider: account.provider })}
-              actions={actions}
-            />
+            <SubmitButton
+              type='button'
+              size='sm'
+              variant='outline'
+              color='neutral'
+              aria-label={fill(m.connectLabel, { provider: provider.provider })}
+              isPending={isPending}
+              disabled={isDisabled && !isPending}
+              onClick={() => onConnect(provider.id)}
+            >
+              {m.connect}
+              <Icon
+                name='arrow-up-right'
+                placement='inline-end'
+                size='sm'
+              />
+            </SubmitButton>
           </Section.Actions>
         ) : null}
       </Section.Item>
-      <Section.Error>{account.reconnectError}</Section.Error>
-      <Section.Error>{account.status === 'error' ? account.verificationError : undefined}</Section.Error>
+      <Section.Error>{provider?.connectError}</Section.Error>
+      <Section.Error>{account?.reconnectError}</Section.Error>
+      <Section.Error>{account?.status === 'error' ? account.verificationError : undefined}</Section.Error>
     </Section.Row>
   );
 }
