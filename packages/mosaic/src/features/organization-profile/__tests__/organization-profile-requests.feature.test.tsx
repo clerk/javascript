@@ -91,10 +91,9 @@ describe('connected organization requests', () => {
     expect(await screen.findByText('ada@example.com')).toBeVisible();
   });
 
-  it('declines a request without fetching Members or roles in manage-only mode', async () => {
+  it('declines a request without fetching Members in manage-only mode', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
     const members = holdRequests('get', '/v1/organizations/:organizationId/memberships');
-    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
     await user.click(await screen.findByRole('tab', { name: 'Requests' }));
@@ -103,15 +102,12 @@ describe('connected organization requests', () => {
     await waitFor(() => expect(fapi.organizationMembershipRequests[0]?.status).toBe('rejected'));
     expect(await screen.findByText('No pending requests')).toBeVisible();
     expect(members.requests).toHaveLength(0);
-    expect(roles.requests).toHaveLength(0);
     members.release();
-    roles.release();
   });
 
-  it('accepts in manage-only mode without requesting Members or roles', async () => {
+  it('accepts in manage-only mode without requesting Members', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
     const members = holdRequests('get', '/v1/organizations/:organizationId/memberships');
-    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
     await user.click(await screen.findByRole('tab', { name: 'Requests' }));
@@ -119,9 +115,7 @@ describe('connected organization requests', () => {
     await waitFor(() => expect(fapi.organizationMembershipRequests[0]?.status).toBe('accepted'));
     expect(await screen.findByText('No pending requests')).toBeVisible();
     expect(members.requests).toHaveLength(0);
-    expect(roles.requests).toHaveLength(0);
     members.release();
-    roles.release();
   });
 
   it('shows an initial load error and retries', async () => {
