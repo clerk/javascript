@@ -2515,6 +2515,46 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('builds the factor-two URL from the signInUrl param when provided', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_second_factor',
+            first_factor_verification: {
+              status: 'verified',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: null,
+              error: null,
+            },
+            second_factor_verification: null,
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ signInUrl: '/custom-sign-in' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-sign-in#/factor-two');
+      });
+    });
+
     it('redirects an existing user to a custom 2fa page if 2fa is enabled and secondFactorUrl is passed during sign in', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
@@ -2855,6 +2895,42 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/factor-one');
+      });
+    });
+
+    it('builds the factor-one URL from the signInUrl param when provided', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ signInUrl: '/custom-sign-in' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-sign-in#/factor-one');
       });
     });
 

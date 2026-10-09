@@ -2688,12 +2688,12 @@ export class Clerk implements ClerkInterface {
 
     const navigateToFactorOne = makeNavigate(
       params.firstFactorUrl ||
-        buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-one' }, { stringify: true }),
+        buildURL({ base: params.signInUrl || displayConfig.signInUrl, hashPath: '/factor-one' }, { stringify: true }),
     );
 
     const navigateToFactorTwo = makeNavigate(
       params.secondFactorUrl ||
-        buildURL({ base: displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
+        buildURL({ base: params.signInUrl || displayConfig.signInUrl, hashPath: '/factor-two' }, { stringify: true }),
     );
 
     const navigateToResetPassword = makeNavigate(
