@@ -1,6 +1,7 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type { AttributeData, Attributes, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
+import { useMemo } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import type { MessageValues } from '../../../localization';
@@ -81,6 +82,8 @@ function toPhones(user: UserResource): UserProfilePhone[] {
 
 export function useUserProfileAccountSectionModel(): UserProfileAccountSectionModel {
   const { isLoaded, user } = useUser();
+  const emails = useMemo(() => (user ? toEmails(user) : []), [user]);
+  const phones = useMemo(() => (user ? toPhones(user) : []), [user]);
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
 
@@ -134,8 +137,8 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
     usernameRequired: Boolean(usernameAttribute?.required),
-    emails: showEmails ? toEmails(user) : undefined,
-    phones: showPhones ? toPhones(user) : undefined,
+    emails: showEmails ? emails : undefined,
+    phones: showPhones ? phones : undefined,
     onProfilePictureChange: file => saveAsUser(current => current.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage
       ? () => saveAsUser(current => current.setProfileImage({ file: null }))

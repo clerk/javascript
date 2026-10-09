@@ -276,11 +276,131 @@ nothing. The surface keeps its fade and pins the scale (inline text has none to 
 and its entrance delay goes to `instant` as well: it exists to wait for the row, and
 a row that has snapped open leaves nothing to wait for.
 
+### Rows in a list
+
+The contact rows in the user profile (`user-profile-contact-list-row.view.tsx`) adopt
+the recipe for a `<ul>` whose rows come and go. What differs from the banner:
+
+- **The slot is the `<li>`.** `grid-template-rows` on the list item, the clip layer
+  inside it (`grid-row: 1 / span 2`, `min-height: 0`, no padding), and the real row
+  rendered as a `div` through `Section.Item`'s `render`. `usePresenceList` keeps a
+  removed row mounted, in place and `inert`, until its collapse ends.
+- **The entering track starts from `data-starting-style`**, as every other
+  transition does. Rows present at the list's first render skip the entering state,
+  or the list expands from nothing on load.
+- **The track waits out the dialog.** A row is added or removed by a dialog that is
+  still animating out when the data lands, and a track that starts at the same moment
+  is lost behind it. The slot's transition carries a `base` delay both ways (the
+  dialog exits at `fast`, its phone sheet at `base`), and the content's own delays
+  are offset by the same amount so they stay relative to the track.
+- **One duration and one curve both ways**: `--cl-duration-slower` on
+  `--cl-ease-in-out`. The row is still there when either transition ends, so a
+  collapse is a layout settle rather than an exit and takes the same curve as the
+  expand.
+- **Anchored to the start, faded at the bottom.** The row's top border is the list's
+  separator, so the content sits at the top of the clip and the border is there from
+  the first frame to the last in both directions; the moving edge is the bottom one,
+  under a static `mask-image` the height of the row's bottom padding less the focus
+  ring's extent, so at rest it touches neither the text nor a focused trigger's
+  outline. A row draws its border only when an open slot precedes it: the first row
+  has none under the card's own edge, and when a row starts closing the row below it
+  drops its line at once rather than meeting the card border and snapping away when
+  the closed row unmounts. `Section.Item`'s sibling-marker rule cannot see across
+  the slots, so the rule is keyed on the slot.
+- **Rows that are already there never enter.** A row locks in whether it animates
+  when it first mounts: rows present at the list's first render skip the entering
+  state, and a re-render before the first frame must not hand it back to them.
+- **The content fade lives on the row's children** (a marker on the row,
+  `stylex.when.ancestor` on `Section.Content` and `Section.Actions`), never on the
+  row itself: opacity on the row would fade its border too. Inline text takes opacity
+  only. It enters after `base + slow` (the track's own `base` delay, then `slow`, so
+  the track is ~90% open before text shows; longer than the banner's `fast` because
+  this track runs `slower` on in-out), at `base`; it exits at once with the track, at
+  `fast`.
+- **Reduced motion is a cut.** Every transition off and every value at rest;
+  `useTransition` then unmounts an exiting row as soon as it finds nothing to wait
+  for.
+
+- **The empty state rides the last row.** Two slots cannot be made to start in the
+  same frame, so the empty text is not its own animated row. Every slot has an
+  `auto` track above the row's `1fr` track; when a row is the last one, that track
+  holds the empty text (`aria-hidden`, opacity 0 under the row), so the slot's
+  collapse stops at the empty text's height instead of zero and one track carries
+  the whole change: the height moves from the row's to the empty row's, the row's
+  content fades out at `fast`, and the empty text fades in after `base + fast`. Once
+  the exit ends, a static empty row with no transitions takes its place at the same
+  size. The first row added plays this in reverse: its slot mounts at the empty
+  text's height with that text visible, which fades out at `fast` as the track opens.
+
+**Rows do not reorder.** While the list is mounted it keeps the order it was first
+shown in (`useStableOrder`): a new row is appended, a removed row drops out, and a
+row the model now sorts elsewhere stays put. Setting a primary therefore moves the
+badge, which enters and exits on the ordinary rules (`base` in on `--cl-ease-enter`
+with `scale(0.9 → 1)` on `--cl-ease-default`, `fast` out on `--cl-ease-exit`),
+rather than moving rows past each other.
+
+**A pending request shows where its outcome will land.** A set-primary request marks
+its row busy at once; once it outlasts `useSpinDelay`'s 150ms, a small `Spinner`
+(`role='progressbar'`, named) fades in beside the value, in the spot the badge will
+take, and the badge change is held until the spinner has shown for its 400ms
+minimum. The old badge then exits at `fast` and the new one enters after a `fast`
+delay, so the two never cross; the spinner leaves with the old badge. Both share one
+transition (opacity, `scale(0.9 → 1)`, `blur(1px → 0)`) in one grid cell, so neither
+shifts the other, and the badge adds half a rem of `translate` toward the row the
+primary moves to or arrives from, with the scale's origin left at center. The pending
+pattern itself is in "Small elements", below.
+
 ## Reflowing siblings
 
 When siblings reflow (an item added or removed), use `useLayoutAnimation` from
 `primitives/hooks`; its JSDoc covers the wiring. Set `--cl-layout-duration` /
 `--cl-layout-easing` from the duration and easing tokens, not literals.
+
+## Small elements: pills, badges, indicators
+
+The reference is the Primary badge and its pending spinner on the contact rows
+(`user-profile-contact-list-row.view.tsx`, `badgeSlotItem`). The tag input's tags
+should adopt the same recipe. Everything here is tuned on a ~20px pill; the numbers
+do not scale up to surfaces.
+
+**The base transition is the ordinary one.** `base` in with opacity on
+`--cl-ease-enter` and `scale(0.9 → 1)` on `--cl-ease-default`, plus any `translate`
+on the same curve; `fast` out with all of it on `--cl-ease-exit`. Use the individual `scale` property, not `transform`: a spinner
+rotates through a `transform` keyframe, and a `transform: scale()` on the same element
+would be overridden by it. The two compose.
+
+**A slight blur, `blur(1px)`, at both ends.** Add `filter` to the transition list,
+on `--cl-ease-enter` in and `--cl-ease-exit` out, and drop it to `blur(0)` under
+reduced motion with the scale. It reads as the pill resolving into place rather than
+switching on.
+
+**Replacing one with another: exit first, then enter.** When a badge moves from one
+row to another, or a spinner gives way to a badge, give the entering element a
+`transition-delay` equal to the leaving one's exit duration (`fast`), with the delay
+dropped on the exit branch. The two then never cross and the eye reads one thing
+leaving and another arriving. Without the delay they overlap mid-fade and read as a
+flicker.
+
+**Put the two in one cell so neither shifts the other.** A `display: grid` wrapper
+with both children at `grid-area: 1 / 1`, start-aligned, and `:empty { display: none }`
+so an empty slot adds no gap to the flex row around it. The wrapper's width follows
+whichever child is widest, which is the only layout change, and it happens at the
+end of the text where nothing follows.
+
+**A pending state shows where its outcome will land.** Mark the container busy at
+once, and once the request outlasts `useSpinDelay`'s threshold, fade a small named
+`Spinner` (`role='progressbar'`) into the slot the result will take. Hold the result
+until the spinner has shown for its minimum, then let the spinner leave with the old
+state and the new state arrive after its `fast` delay.
+
+**Spinners are small elements too.** A spinner that appears after a spin delay and
+leaves when the work is done takes the same entrance and exit as a badge: opacity,
+`scale`, the 1px blur, and the `fast` delay when it is replacing or being replaced by
+something in its slot. The contact rows' pending spinner does; `SubmitButton`'s still
+snaps its spinner on and off through `opacity` and is the next to adopt it. Keep its
+accessibility approach either way: hide a pending spinner with opacity, never
+`display` or `visibility`, so the `progressbar` stays in the tree for the whole
+action.
 
 ## Color and state changes (hover, press)
 

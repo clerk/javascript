@@ -43,6 +43,7 @@ export const userProfileAccountSectionMessages = {
   add: 'Add',
   manage: 'Manage',
   setPrimary: 'Set as primary',
+  settingPrimary: 'Setting as primary',
   completeVerification: 'Complete verification',
 
   manageValue: 'Manage {value}',

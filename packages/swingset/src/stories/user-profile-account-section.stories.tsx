@@ -22,6 +22,10 @@ import { useUserProfileVerifyEmailSsoFixture } from './fixtures/user-profile-ver
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
+function primaryFirst<T extends { isDefault?: boolean }>(items: T[]): T[] {
+  return [...items.filter(item => item.isDefault), ...items.filter(item => !item.isDefault)];
+}
+
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
@@ -41,6 +45,7 @@ function AccountSection({
   emailRemovalState,
   phoneRemovalState,
   nameManagedBy,
+  setPrimaryDelay = 700,
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
@@ -50,6 +55,7 @@ function AccountSection({
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';
   nameManagedBy?: { name: string };
+  setPrimaryDelay?: number;
 }) {
   const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
   const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
@@ -60,6 +66,9 @@ function AccountSection({
       ? [
           { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
           { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
+          { id: 'email_3', value: 'item3@clerk.dev', isVerified: true },
+          { id: 'email_4', value: 'item4@clerk.dev', isVerified: true },
+          { id: 'email_5', value: 'item5@clerk.dev', isVerified: true },
         ]
       : [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
   );
@@ -104,7 +113,10 @@ function AccountSection({
         }
         setEmails(current => current.filter(email => email.id !== id));
       }}
-      onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
+      onSetPrimaryEmail={async id => {
+        await new Promise(resolve => setTimeout(resolve, setPrimaryDelay));
+        setEmails(current => primaryFirst(current.map(email => ({ ...email, isDefault: email.id === id }))));
+      }}
       onRemovePhone={async id => {
         if (phoneRemovalState === 'pending') {
           await new Promise(resolve => setTimeout(resolve, 1500));
@@ -115,7 +127,10 @@ function AccountSection({
         }
         setPhones(current => current.filter(phone => phone.id !== id));
       }}
-      onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
+      onSetPrimaryPhone={async id => {
+        await new Promise(resolve => setTimeout(resolve, setPrimaryDelay));
+        setPhones(current => primaryFirst(current.map(phone => ({ ...phone, isDefault: phone.id === id }))));
+      }}
     />
   );
 }
@@ -139,6 +154,15 @@ export function NameManagedByConnection() {
 
 export function MultipleAccounts() {
   return <AccountSection allowMultipleAccounts />;
+}
+
+export function SetPrimaryPending() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      setPrimaryDelay={2500}
+    />
+  );
 }
 
 export function AddEmailFails() {
