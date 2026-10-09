@@ -2,14 +2,22 @@ import { ClerkProvider, useAuth, useUser } from '@clerk/expo';
 import { AuthView, UserButton, UserProfileView } from '@clerk/expo/native';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
-import { Button, Modal, StyleSheet, Text, View } from 'react-native';
+import { Button, LogBox, Modal, StyleSheet, Text, View } from 'react-native';
 
 import { BiometricAvailabilityButton } from './components/BiometricAvailabilityButton';
 import { GoogleSignInButton } from './components/GoogleSignInButton';
+import { readVerifyLaunch } from './verify/launch';
+import { logRequests, VerifyHost } from './verify/VerifyHost';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const verifyLaunch = readVerifyLaunch();
 
-if (!publishableKey) {
+if (verifyLaunch) {
+  LogBox.ignoreAllLogs();
+  if (verifyLaunch.debugLogging) {
+    logRequests();
+  }
+} else if (!publishableKey) {
   throw new Error('Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY');
 }
 
@@ -111,6 +119,10 @@ function NativeBuildFixture() {
 }
 
 export default function App() {
+  if (verifyLaunch) {
+    return <VerifyHost launch={verifyLaunch} />;
+  }
+
   return (
     <ClerkProvider
       publishableKey={publishableKey}
