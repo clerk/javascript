@@ -1,10 +1,18 @@
-import type { OrganizationInvitationJSON } from '@clerk/shared/types';
+import type { OrganizationInvitationJSON, RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { userEvent as browserEvent } from 'vitest/browser';
 
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiMembership, fapiOrganization, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import {
+  fapiClient,
+  fapiEnvironment,
+  fapiMembership,
+  fapiOrganization,
+  fapiSession,
+  fapiUser,
+} from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
@@ -63,24 +71,21 @@ describe('connected organization invitations', () => {
     expect(await screen.findByText('ada@example.com')).toBeVisible();
   });
 
-  it('loads pending invitations for managers without fetching members or roles', async () => {
+  it('loads pending invitations for managers without fetching members', async () => {
     serve(['org:sys_memberships:manage']);
     const requests = holdRequests('get', '/v1/organizations/:organizationId/invitations');
     const members = holdRequests('get', '/v1/organizations/:organizationId/memberships');
-    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(requests.requests).toHaveLength(1));
     const url = new URL(requests.requests[0]?.url ?? '');
     expect(url.searchParams.get('limit')).toBe('10');
     expect(url.searchParams.getAll('status')).toEqual(['pending']);
     expect(members.requests).toHaveLength(0);
-    expect(roles.requests).toHaveLength(0);
     requests.release();
     expect(await screen.findByText('ada@example.com')).toBeVisible();
     expect(screen.queryByRole('searchbox', { name: 'Search invitations' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Invited' })).toBeNull();
     members.release();
-    roles.release();
   });
 
   it('shows a failed initial load and retries the invitation list', async () => {
@@ -332,6 +337,393 @@ describe('connected organization invitations', () => {
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(screen.queryByText('ada@example.com')).toBeNull();
   });
+});
 
-  it.todo('invites members from the Invitations tab');
+const adminRole: RoleJSON = {
+  object: 'role',
+  id: 'role_admin',
+  key: 'org:admin',
+  name: 'Admin',
+  description: '',
+  permissions: [],
+  created_at: 0,
+  updated_at: 0,
+};
+const memberRole: RoleJSON = { ...adminRole, id: 'role_member', key: 'org:member', name: 'Member' };
+const bob = fapiMembership(organization, {
+  id: 'orgmem_bob',
+  public_user_data: {
+    user_id: 'user_bob',
+    first_name: 'Bob',
+    last_name: 'Smith',
+    identifier: 'bob@example.com',
+    image_url: '',
+    has_image: false,
+  },
+});
+const MANAGE = ['org:sys_memberships:read', 'org:sys_memberships:manage'];
+
+function serveInvite({
+  permissions = MANAGE,
+  roles = [adminRole, memberRole],
+  defaultRole = null,
+  maxAllowedMemberships = 0,
+}: {
+  permissions?: string[];
+  roles?: RoleJSON[];
+  defaultRole?: string | null;
+  maxAllowedMemberships?: number;
+} = {}) {
+  const org = { ...organization, max_allowed_memberships: maxAllowedMemberships };
+  const membership = fapiMembership(org, { permissions });
+  const user = fapiUser({ id: 'user_invitations', organization_memberships: [membership] });
+  return serveFapi({
+    environment: fapiEnvironment({
+      organization_settings: {
+        ...fapiEnvironment().organization_settings,
+        domains: { enabled: false, enrollment_modes: [], default_role: defaultRole },
+      },
+    }),
+    client: fapiClient([fapiSession({ id: 'sess_invitations', user, last_active_organization_id: org.id })]),
+    memberships: [membership, { ...bob, organization: org }],
+    organizationInvitations: [invitation],
+    roles,
+  });
+}
+
+async function openInviteDialog() {
+  const user = userEvent.setup();
+  await user.click(await screen.findByRole('tab', { name: 'Invitations' }));
+  expect(await screen.findByText('ada@example.com')).toBeVisible();
+  await user.click(await screen.findByRole('button', { name: 'Invite' }));
+  const dialog = within(await screen.findByRole('dialog', { name: 'Invite members' }));
+  return { user, dialog };
+}
+
+async function addEmails(dialog: ReturnType<typeof within>, ...emailAddresses: string[]) {
+  const user = userEvent.setup();
+  await user.type(dialog.getByRole('textbox', { name: 'Email' }), `${emailAddresses.join(',')}{Enter}`);
+}
+
+describe('inviting members', () => {
+  it('invites members from the Invitations tab with a role chosen from the keyboard', async () => {
+    const fapi = serveInvite();
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await addEmails(dialog, 'grace@example.com', ' linus@example.com', 'grace@example.com');
+    expect(dialog.getAllByRole('listitem').map(item => item.textContent)).toEqual([
+      'grace@example.com',
+      'linus@example.com',
+    ]);
+    const send = dialog.getByRole('button', { name: 'Send invites' });
+    expect(send).toHaveAttribute('aria-disabled', 'true');
+
+    dialog.getByRole('combobox', { name: /Role/ }).focus();
+    await browserEvent.keyboard('{ArrowDown}');
+    const admin = await screen.findByRole('option', { name: 'Admin' });
+    await waitFor(() => expect(admin).toHaveFocus());
+    await browserEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(screen.getByRole('option', { name: 'Member' })).toHaveFocus());
+    await browserEvent.keyboard('{Enter}');
+    await waitFor(() => expect(dialog.getByRole('combobox', { name: /Role/ })).toHaveTextContent('Member'));
+
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await user.click(send);
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    const body = new URLSearchParams(await bulk.requests[0]?.text());
+    expect(body.getAll('email_address')).toEqual(['grace@example.com', 'linus@example.com']);
+    expect(body.get('role')).toBe('org:member');
+    expect(body.has('notify')).toBe(false);
+    bulk.release();
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Invitations sent' })).toBeVisible());
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+    const table = within(screen.getByRole('table', { name: 'Invitations' }));
+    expect(await table.findByText('grace@example.com')).toBeVisible();
+    expect(table.getByText('linus@example.com')).toBeVisible();
+    expect(
+      fapi.organizationInvitations
+        .filter(item => item.status === 'pending')
+        .map(item => [item.email_address, item.role]),
+    ).toEqual([
+      ['grace@example.com', 'org:member'],
+      ['linus@example.com', 'org:member'],
+      ['ada@example.com', 'org:member'],
+    ]);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Invite' })).toHaveFocus());
+  });
+
+  it.each([
+    ['the organization default role', { defaultRole: 'org:admin' }, 'Admin'],
+    ['the only role', { roles: [memberRole] }, 'Member'],
+  ])('starts with %s', async (_, options, label) => {
+    serveInvite(options);
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { dialog } = await openInviteDialog();
+    expect(dialog.getByRole('combobox', { name: /Role/ })).toHaveTextContent(label);
+    await addEmails(dialog, 'grace@example.com');
+    expect(dialog.getByRole('button', { name: 'Send invites' })).not.toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('ignores a default role that is not in the role list', async () => {
+    serveInvite({ defaultRole: 'org:missing' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { dialog } = await openInviteDialog();
+    expect(dialog.getByRole('combobox', { name: /Role/ })).toHaveTextContent('Select a role');
+  });
+
+  it('lists localized role names and falls back to the server name for custom roles', async () => {
+    serveInvite({ roles: [adminRole, { ...adminRole, id: 'role_billing', key: 'org:billing', name: 'Billing' }] });
+    await renderWithClerk(
+      <MosaicLocalizationProvider
+        value={resolveLocalization({ overrides: { roles: { 'org:admin': 'Administrateur' } } })}
+      >
+        <OrganizationProfileMembersPanel />
+      </MosaicLocalizationProvider>,
+    );
+    const { user, dialog } = await openInviteDialog();
+    await user.click(dialog.getByRole('combobox', { name: /Role/ }));
+    expect(await screen.findByRole('option', { name: 'Administrateur' })).toBeVisible();
+    expect(screen.getByRole('option', { name: 'Billing' })).toBeVisible();
+    expect(screen.queryByRole('option', { name: 'Admin' })).toBeNull();
+  });
+
+  it('keeps the default role and locks the picker during a role set migration', async () => {
+    const fapi = serveInvite({ defaultRole: 'org:member' });
+    fapi.hasRoleSetMigration = true;
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    const picker = dialog.getByRole('combobox', { name: /Role/ });
+    expect(picker).toHaveTextContent('Member');
+    expect(picker).toHaveAttribute('data-disabled');
+    await addEmails(dialog, 'grace@example.com');
+    await user.click(dialog.getByRole('button', { name: 'Send invites' }));
+    await waitFor(() =>
+      expect(fapi.organizationInvitations.find(item => item.email_address === 'grace@example.com')?.role).toBe(
+        'org:member',
+      ),
+    );
+  });
+
+  it('offers Invite on every tab to managers', async () => {
+    const fapi = serveInvite();
+    fapi.environment = fapiEnvironment({
+      organization_settings: {
+        ...fapiEnvironment().organization_settings,
+        domains: { enabled: true, enrollment_modes: [], default_role: null },
+      },
+    });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const user = userEvent.setup();
+    for (const tab of ['Members', 'Invitations', 'Requests']) {
+      await user.click(await screen.findByRole('tab', { name: tab }));
+      expect(await within(screen.getByRole('tabpanel')).findByRole('button', { name: 'Invite' })).toBeVisible();
+    }
+  });
+
+  it('does not offer Invite without the manage permission', async () => {
+    serveInvite({ permissions: ['org:sys_memberships:read'] });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+  });
+
+  it('does not offer Invite when roles fail to load', async () => {
+    serveInvite();
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    roles.fail('network_error', 'Unavailable');
+    await userEvent.setup().click(await screen.findByRole('tab', { name: 'Invitations' }));
+    expect(await screen.findByText('ada@example.com')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage ada@example.com' })).toBeVisible());
+    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+  });
+
+  it('replaces a pending invitation for the same address', async () => {
+    const fapi = serveInvite({ defaultRole: 'org:admin' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await addEmails(dialog, 'ada@example.com');
+    await user.click(dialog.getByRole('button', { name: 'Send invites' }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Invitations sent' })).toBeVisible());
+    expect(fapi.organizationInvitations.map(item => [item.email_address, item.status, item.role])).toEqual([
+      ['ada@example.com', 'pending', 'org:admin'],
+      ['ada@example.com', 'revoked', 'org:member'],
+    ]);
+    const table = within(screen.getByRole('table', { name: 'Invitations' }));
+    await waitFor(() => expect(table.getByRole('cell', { name: 'Admin' })).toBeVisible());
+    expect(table.getAllByText('ada@example.com')).toHaveLength(1);
+  });
+
+  it.each([
+    [
+      'an existing member',
+      'bob@example.com',
+      'Some of these email addresses already belong to members of this organization.',
+    ],
+    ['an address the server cannot parse', 'grace@@example.com', 'Email address must be a valid email address.'],
+  ])('keeps the dialog open and marks %s as rejected', async (_, rejected, message) => {
+    const fapi = serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await addEmails(dialog, 'linus@example.com', rejected);
+    const send = dialog.getByRole('button', { name: 'Send invites' });
+    await user.click(send);
+    await waitFor(() => expect(dialog.getByRole('alert')).toHaveTextContent(message));
+    const tags = dialog.getAllByRole('listitem');
+    expect(tags.find(tag => tag.textContent === rejected)).toHaveAttribute('data-invalid');
+    expect(tags.find(tag => tag.textContent === 'linus@example.com')).not.toHaveAttribute('data-invalid');
+    expect(send).toHaveAttribute('aria-disabled', 'true');
+    expect(fapi.organizationInvitations).toHaveLength(1);
+
+    await user.click(dialog.getByRole('button', { name: `Remove ${rejected}` }));
+    await user.click(send);
+    await waitFor(() => expect(fapi.organizationInvitations).toHaveLength(2));
+    expect(fapi.organizationInvitations[0]?.email_address).toBe('linus@example.com');
+  });
+
+  it.each([
+    [
+      'the membership quota is reached',
+      (fapi: ReturnType<typeof serveInvite>) => fapi,
+      { maxAllowedMemberships: 3 },
+      'You have reached your limit of organization memberships, including outstanding invitations.',
+    ],
+    [
+      'the selected role was deleted',
+      (fapi: ReturnType<typeof serveInvite>) => {
+        fapi.roles = [adminRole];
+        return fapi;
+      },
+      {},
+      'This role is no longer available.',
+    ],
+    [
+      'the manage permission was removed',
+      (fapi: ReturnType<typeof serveInvite>) => {
+        const session = fapi.client.sessions[0];
+        const membership = session?.user.organization_memberships?.[0];
+        if (!session || !membership) {
+          throw new Error('Expected a signed-in member');
+        }
+        fapi.client = fapiClient([
+          { ...session, user: { ...session.user, organization_memberships: [{ ...membership, permissions: [] }] } },
+        ]);
+        return fapi;
+      },
+      {},
+      'You do not have permission to perform this action.',
+    ],
+  ])('shows the server error in the dialog when %s', async (_, change, options, message) => {
+    const fapi = serveInvite({ defaultRole: 'org:member', ...options });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    change(fapi);
+    await addEmails(dialog, 'grace@example.com', 'linus@example.com');
+    await user.click(dialog.getByRole('button', { name: 'Send invites' }));
+    await waitFor(() => expect(dialog.getByRole('alert')).toHaveTextContent(message));
+    expect(fapi.organizationInvitations).toHaveLength(1);
+    expect(dialog.getAllByRole('listitem').some(tag => tag.hasAttribute('data-invalid'))).toBe(false);
+    expect(screen.queryByRole('heading', { name: 'Invitations sent' })).toBeNull();
+  });
+
+  it('sends one request and stays open while the invite is pending', async () => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user, dialog } = await openInviteDialog();
+    await addEmails(dialog, 'grace@example.com');
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    const send = dialog.getByRole('button', { name: 'Send invites' });
+    await user.click(send);
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    send.click();
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('dialog', { name: 'Invite members' })).toBeVisible();
+    bulk.release();
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+    expect(bulk.requests).toHaveLength(1);
+  });
+
+  it('clears the draft, rejected addresses and error after closing and reopening', async () => {
+    serveInvite({ defaultRole: 'org:member' });
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const first = await openInviteDialog();
+    await addEmails(first.dialog, 'bob@example.com');
+    await first.user.click(first.dialog.getByRole('combobox', { name: /Role/ }));
+    await first.user.click(await screen.findByRole('option', { name: 'Admin' }));
+    await first.user.click(first.dialog.getByRole('button', { name: 'Send invites' }));
+    await waitFor(() =>
+      expect(first.dialog.getByRole('alert')).toHaveTextContent(
+        'Some of these email addresses already belong to members of this organization.',
+      ),
+    );
+    await first.user.click(first.dialog.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+
+    await first.user.click(screen.getByRole('button', { name: 'Invite' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Invite members' }));
+    expect(dialog.queryAllByRole('listitem')).toHaveLength(0);
+    expect(dialog.getByRole('alert')).toHaveTextContent('');
+    expect(dialog.getByRole('combobox', { name: /Role/ })).toHaveTextContent('Member');
+    await addEmails(dialog, 'bob@example.com');
+    expect(dialog.getByRole('listitem')).not.toHaveAttribute('data-invalid');
+  });
+
+  it.each([
+    [
+      'switching organizations',
+      async (clerk: Awaited<ReturnType<typeof renderWithClerk>>['clerk']) => {
+        await clerk.setActive({ organization: 'org_other' });
+      },
+      2,
+    ],
+    [
+      'switching sessions',
+      async (clerk: Awaited<ReturnType<typeof renderWithClerk>>['clerk']) => {
+        await clerk.setActive({ session: 'sess_second' });
+      },
+      2,
+    ],
+    [
+      'signing out',
+      async (clerk: Awaited<ReturnType<typeof renderWithClerk>>['clerk']) => {
+        await clerk.signOut();
+      },
+      1,
+    ],
+  ])('drops a held invite after %s', async (_, change, invitationCount) => {
+    const otherOrganization = fapiOrganization({ id: 'org_other', name: 'Other' });
+    const firstMembership = fapiMembership(organization, { permissions: MANAGE });
+    const secondMembership = fapiMembership(otherOrganization, { permissions: MANAGE });
+    const user = fapiUser({ id: 'user_invitations', organization_memberships: [firstMembership, secondMembership] });
+    const fapi = serveFapi({
+      environment: fapiEnvironment({
+        organization_settings: {
+          ...fapiEnvironment().organization_settings,
+          domains: { enabled: false, enrollment_modes: [], default_role: 'org:member' },
+        },
+      }),
+      client: fapiClient([
+        fapiSession({ id: 'sess_invitations', user, last_active_organization_id: organization.id }),
+        fapiSession({ id: 'sess_second', user, last_active_organization_id: organization.id }),
+      ]),
+      memberships: [firstMembership, secondMembership],
+      organizationInvitations: [invitation],
+      roles: [adminRole, memberRole],
+    });
+    const { clerk } = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { user: actor, dialog } = await openInviteDialog();
+    await addEmails(dialog, 'grace@example.com');
+    const bulk = holdRequests('post', '/v1/organizations/:organizationId/invitations/bulk');
+    await actor.click(dialog.getByRole('button', { name: 'Send invites' }));
+    await waitFor(() => expect(bulk.requests).toHaveLength(1));
+    await act(() => change(clerk));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull());
+    bulk.release();
+    await waitFor(() => expect(fapi.organizationInvitations).toHaveLength(invitationCount));
+    await act(() => new Promise(resolve => setTimeout(resolve, 300)));
+    expect(screen.queryByRole('heading', { name: 'Invitations sent' })).toBeNull();
+    expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull();
+  });
 });

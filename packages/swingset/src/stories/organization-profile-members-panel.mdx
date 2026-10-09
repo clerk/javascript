@@ -10,7 +10,7 @@ Revoking an invitation opens a confirmation dialog. The dialog awaits the action
 
 Accepting or declining a request runs immediately. Both row actions are held while the callback is pending, and failures appear beside the actions so the user can retry. After a decision, focus moves to a surviving row action, the Invite button, or the Requests table.
 
-Every tab shows an Invite button when the panel is given `onInvite`. It opens the invite dialog, which takes email addresses in a tag input and a role. Malformed email addresses, and any the caller passes in `rejectedEmailAddresses`, show as invalid tags and disable sending. The dialog stays open while `isPending` is true.
+Every tab shows an Invite button when the panel is given `onInvite`. It opens the invite dialog, which takes email addresses in a tag input and a role. Malformed email addresses, and any the caller passes in `rejectedEmailAddresses`, show as invalid tags and disable sending. `isRoleDisabled` keeps the current role and disables the role picker. The dialog stays open while `isPending` is true.
 
 ## Example
 

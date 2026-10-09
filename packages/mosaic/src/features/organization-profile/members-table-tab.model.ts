@@ -42,18 +42,6 @@ export function useMembersTableModel(query: string) {
 
   return {
     rows,
-    loadRoles: canManage
-      ? async (): Promise<MembersRoles> => {
-          if (!organization) {
-            throw new ClerkRuntimeError('Roles are unavailable.', { code: 'role_unavailable' });
-          }
-          const result = await organization.getRoles({ pageSize: 20 });
-          return {
-            roles: result.data.map(({ key, name }) => ({ key, name })),
-            hasRoleSetMigration: result.has_role_set_migration ?? false,
-          };
-        }
-      : undefined,
     pageSize: PAGE_SIZE,
     totalCount: memberships?.count ?? 0,
     page: memberships?.page ?? 1,

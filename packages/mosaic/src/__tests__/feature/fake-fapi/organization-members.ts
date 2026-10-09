@@ -1,11 +1,150 @@
+import type { OrganizationInvitationJSON } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
 import { fapiMembership } from '../fapi';
-import { envelope, missing, rejectUnknownParams } from './shared';
+import { envelope, missing, rejectUnknownParams, requestUser } from './shared';
 
 const INVITATION_STATUSES = ['pending', 'accepted', 'revoked', 'expired'];
 const MEMBERSHIP_REQUEST_STATUSES = ['pending', 'accepted', 'rejected'];
+const MAX_BULK_SIZE = 50;
+const INVITATION_PARAMS = ['email_address', 'role', 'notify'];
+
+function clerkErrors(status: number, ...errors: Array<Record<string, unknown>>) {
+  return HttpResponse.json({ errors }, { status });
+}
+
+async function createInvitations(
+  state: FakeFapiState,
+  organizationId: string,
+  request: Request,
+): Promise<OrganizationInvitationJSON[] | Response> {
+  const body = new URLSearchParams(await request.text());
+  const unknown = [...body.keys()].find(key => !key.startsWith('_') && !INVITATION_PARAMS.includes(key));
+  if (unknown) {
+    return clerkErrors(422, {
+      code: 'form_param_unknown',
+      message: `${unknown} is not a valid parameter for this request.`,
+      meta: { param_name: unknown },
+    });
+  }
+  const emailAddresses = body.getAll('email_address');
+  const role = body.get('role');
+  const notify = body.get('notify');
+  for (const [name, value] of [
+    ['email_address', emailAddresses[0]],
+    ['role', role],
+  ] as const) {
+    if (!value) {
+      return clerkErrors(422, {
+        code: 'form_param_missing',
+        message: `${name} must be included.`,
+        meta: { param_name: name },
+      });
+    }
+  }
+  if (notify !== null && notify !== 'true' && notify !== 'false') {
+    return clerkErrors(422, {
+      code: 'form_param_format_invalid',
+      message: 'notify must be a boolean.',
+      meta: { param_name: 'notify' },
+    });
+  }
+  const organization = state.memberships.find(item => item.organization.id === organizationId)?.organization;
+  if (!organization) {
+    return missing();
+  }
+  const invalid = emailAddresses.filter(email => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  if (invalid.length > 0) {
+    return clerkErrors(422, {
+      code: 'form_param_format_invalid',
+      message: 'invalid email addresses',
+      long_message: `The following email addresses are invalid: ${invalid.join(', ')}`,
+      meta: { param_name: 'email_address', email_addresses: invalid },
+    });
+  }
+  if (emailAddresses.length > MAX_BULK_SIZE) {
+    return clerkErrors(400, {
+      code: 'bulk_size_exceeded',
+      message: 'bulk size exceeded',
+      long_message: `Parameters exceed the maximum allowed bulk processing size of ${MAX_BULK_SIZE}.`,
+    });
+  }
+  const selectedRole = state.roles.find(item => item.key === role);
+  if (!selectedRole) {
+    return clerkErrors(404, {
+      code: 'resource_not_found',
+      message: 'not found',
+      long_message: 'Organization role not found',
+      meta: { param_name: 'role' },
+    });
+  }
+  const inviter = requestUser(state, request)?.organization_memberships?.find(
+    item => item.organization.id === organizationId,
+  );
+  if (!inviter) {
+    return clerkErrors(403, {
+      code: 'not_a_member_in_organization',
+      message: 'not a member',
+      long_message:
+        'Current user is not a member of the organization. Only organization members can perform this action.',
+    });
+  }
+  if (!inviter.permissions.includes('org:sys_memberships:manage')) {
+    return clerkErrors(403, {
+      code: 'missing_organization_permission',
+      message: 'missing permission',
+      long_message: 'Current user is missing an organization permission.',
+      meta: { permissions: ['org:sys_memberships:manage'] },
+    });
+  }
+  const pending = state.organizationInvitations.filter(
+    item => item.organization_id === organizationId && item.status === 'pending',
+  );
+  const normalized = emailAddresses.map(email => email.toLowerCase());
+  const replaced = pending.filter(item => normalized.includes(item.email_address.toLowerCase()));
+  const members = state.memberships.filter(item => item.organization.id === organizationId);
+  const member = normalized.find(email =>
+    members.some(item => item.public_user_data?.identifier?.toLowerCase() === email),
+  );
+  if (member) {
+    return clerkErrors(400, {
+      code: 'already_a_member_in_organization',
+      message: 'already a member',
+      long_message: `${member} is already a member of the organization.`,
+    });
+  }
+  const maxAllowed = organization.max_allowed_memberships;
+  if (maxAllowed > 0 && members.length + pending.length + (normalized.length - replaced.length) > maxAllowed) {
+    return clerkErrors(403, {
+      code: 'organization_membership_quota_exceeded',
+      message: 'organization membership quota exceeded',
+      long_message: `You have reached your limit of ${maxAllowed} organization memberships, including outstanding invitations.`,
+    });
+  }
+  const now = Date.now();
+  const created = normalized.map(
+    (email, index): OrganizationInvitationJSON => ({
+      object: 'organization_invitation',
+      id: `orginv_${now}_${state.organizationInvitations.length + index}`,
+      email_address: email,
+      organization_id: organizationId,
+      public_metadata: {},
+      status: 'pending',
+      role: selectedRole.key,
+      role_name: selectedRole.name,
+      created_at: now,
+      updated_at: now,
+    }),
+  );
+  state.organizationInvitations = [
+    ...created,
+    ...state.organizationInvitations.map(item =>
+      replaced.includes(item) ? { ...item, status: 'revoked' as const } : item,
+    ),
+  ];
+  return created;
+}
 
 export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path: string) => string) {
   return [
@@ -142,6 +281,14 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
         item.id === rejected.id ? rejected : item,
       );
       return envelope(rejected, null);
+    }),
+    http.post(fapiUrl('/v1/organizations/:organizationId/invitations'), async ({ params, request }) => {
+      const created = await createInvitations(state, String(params.organizationId), request);
+      return created instanceof Response ? created : envelope(created[0] ?? null, null);
+    }),
+    http.post(fapiUrl('/v1/organizations/:organizationId/invitations/bulk'), async ({ params, request }) => {
+      const created = await createInvitations(state, String(params.organizationId), request);
+      return created instanceof Response ? created : envelope(created, null);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/invitations/:invitationId/revoke'), ({ params }) => {
       const invitation = state.organizationInvitations.find(
