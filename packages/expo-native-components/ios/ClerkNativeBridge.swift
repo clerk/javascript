@@ -398,6 +398,7 @@ func userProfileCustomPageLabel(
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
 private var clerkNativeAuthFlowChangedEmitter: (([String: Any]?) -> Void)?
 private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
+private var clerkNativeClientInvalidatedEmitter: (() -> Void)?
 
 struct ClerkNativeErrorDescriptor {
   let code: String
@@ -446,6 +447,8 @@ final class ClerkNativeBridge {
   private var lastObservedAuthFlowState: AuthFlowStateSnapshot?
   private var configurationDepth = 0
   private var jsOriginatedClientSyncDepth = 0
+  private var clientInvalidationGeneration = 0
+  private var clientInvalidationTracker: ClerkClientInvalidationTracker?
   private var pendingURL: URL?
   private var shouldFlushPendingURL = false
 
@@ -478,22 +481,25 @@ final class ClerkNativeBridge {
   }
 
   @MainActor
+  private func endConfiguration() {
+    lastObservedClientState = Self.clerkConfigured ? Self.clientStateSnapshot() : nil
+    let authFlowState = Self.authFlowStateSnapshot()
+    lastObservedAuthFlowState = authFlowState
+    configurationDepth = max(0, configurationDepth - 1)
+    Self.emitAuthFlowChanged(Self.authFlowStatePayload(authFlowState))
+
+    // Overlapping calls can finish out of order, so replay once the last one settles and any
+    // of them succeeded. A batch where every call threw keeps the URL for the next attempt.
+    if configurationDepth == 0, shouldFlushPendingURL {
+      shouldFlushPendingURL = false
+      flushPendingURL()
+    }
+  }
+
+  @MainActor
   func configure(publishableKey: String, bearerToken: String? = nil) async throws {
     configurationDepth += 1
-    defer {
-      lastObservedClientState = Self.clerkConfigured ? Self.clientStateSnapshot() : nil
-      let authFlowState = Self.authFlowStateSnapshot()
-      lastObservedAuthFlowState = authFlowState
-      configurationDepth = max(0, configurationDepth - 1)
-      Self.emitAuthFlowChanged(Self.authFlowStatePayload(authFlowState))
-
-      // Overlapping calls can finish out of order, so replay once the last one settles and any
-      // of them succeeded. A batch where every call threw keeps the URL for the next attempt.
-      if configurationDepth == 0, shouldFlushPendingURL {
-        shouldFlushPendingURL = false
-        flushPendingURL()
-      }
-    }
+    defer { endConfiguration() }
 
     loadThemes()
 
@@ -537,6 +543,120 @@ final class ClerkNativeBridge {
     await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
     Self.postConfiguredNotification()
     shouldFlushPendingURL = true
+  }
+
+  /// Configures ClerkKit without waiting for the client to load. ClerkKit's stored device token
+  /// wins; `seedDeviceToken` is only adopted when ClerkKit has none.
+  @MainActor
+  func configureNative(publishableKey: String, seedDeviceToken: String?) async throws {
+    configurationDepth += 1
+    defer { endConfiguration() }
+
+    loadThemes()
+
+    var didConfigure = true
+    if Self.shouldReconfigure(for: publishableKey) {
+      try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+      Self.configuredPublishableKey = publishableKey
+      startClientObserver(reset: true)
+      startAuthFlowObserver(reset: true)
+    } else if Self.clerkConfigured {
+      didConfigure = false
+      startClientObserver()
+      startAuthFlowObserver()
+    } else {
+      Self.clerkConfigured = true
+      Self.configuredPublishableKey = publishableKey
+      Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+      startClientObserver()
+      startAuthFlowObserver()
+    }
+
+    let didAdoptSeed = try await Self.adoptSeedDeviceTokenIfNeeded(seedDeviceToken)
+    startClientInvalidationObserver(reset: didConfigure)
+    if didAdoptSeed {
+      // A client load started before the seed was stored may have been fenced off by the token change.
+      Task { @MainActor in
+        _ = try? await Clerk.shared.refreshClient()
+      }
+    }
+    if didConfigure {
+      Self.postConfiguredNotification()
+    }
+    shouldFlushPendingURL = true
+  }
+
+  @MainActor
+  private static func adoptSeedDeviceTokenIfNeeded(_ seedDeviceToken: String?) async throws -> Bool {
+    guard let seed = seedDeviceToken?.trimmingCharacters(in: .whitespacesAndNewlines), !seed.isEmpty,
+      Clerk.shared.deviceToken == nil
+    else {
+      return false
+    }
+    return try await Clerk.shared.setDeviceToken(seed, expected: nil)
+  }
+
+  @MainActor
+  func getDeviceToken() -> String? {
+    guard Self.clerkConfigured else { return nil }
+    return Clerk.shared.deviceToken
+  }
+
+  @MainActor
+  func setDeviceToken(_ token: String?, expected: String?) async throws -> Bool {
+    guard Self.clerkConfigured else { throw ClerkClientSyncError.notConfigured }
+
+    let didSet = try await Clerk.shared.setDeviceToken(token, expected: expected)
+    let fingerprint = Self.clientFingerprint()
+    if didSet {
+      clientInvalidationTracker?.acknowledgeDeviceToken(fingerprint.deviceToken, current: fingerprint)
+    } else {
+      clientInvalidationTracker?.observe(fingerprint)
+    }
+    return didSet
+  }
+
+  @MainActor
+  func refreshClient() async throws {
+    guard Self.clerkConfigured else { throw ClerkClientSyncError.notConfigured }
+    defer { recordClientFingerprint() }
+    _ = try await Clerk.shared.refreshClient()
+  }
+
+  @MainActor
+  private func startClientInvalidationObserver(reset: Bool) {
+    let tracker = clientInvalidationTracker ?? ClerkClientInvalidationTracker { Self.emitClientInvalidated() }
+    clientInvalidationTracker = tracker
+    tracker.reset(to: Self.clientFingerprint())
+
+    guard reset || clientInvalidationGeneration == 0 else { return }
+    clientInvalidationGeneration += 1
+    observeClientInvalidation(generation: clientInvalidationGeneration)
+  }
+
+  @MainActor
+  private func observeClientInvalidation(generation: Int) {
+    withObservationTracking {
+      _ = Self.clientFingerprint()
+    } onChange: { [weak self] in
+      Task { @MainActor [weak self] in
+        await Task.yield()
+
+        guard let self, generation == self.clientInvalidationGeneration else { return }
+        self.recordClientFingerprint()
+        self.observeClientInvalidation(generation: generation)
+      }
+    }
+  }
+
+  @MainActor
+  private func recordClientFingerprint() {
+    clientInvalidationTracker?.observe(Self.clientFingerprint())
+  }
+
+  @MainActor
+  private static func clientFingerprint() -> ClerkClientFingerprint {
+    ClerkClientFingerprint(client: Clerk.shared.client, deviceToken: Clerk.shared.deviceToken)
   }
 
   @MainActor
@@ -1147,6 +1267,19 @@ final class ClerkNativeBridge {
     clerkNativeClientEventQueue.sync {
       clerkNativeClientChangedEmitter = emitter
     }
+  }
+
+  static func setClientInvalidatedEmitter(_ emitter: (() -> Void)?) {
+    clerkNativeClientEventQueue.sync {
+      clerkNativeClientInvalidatedEmitter = emitter
+    }
+  }
+
+  static func emitClientInvalidated() {
+    let emitter = clerkNativeClientEventQueue.sync {
+      clerkNativeClientInvalidatedEmitter
+    }
+    emitter?()
   }
 
   static func setAuthFlowChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
