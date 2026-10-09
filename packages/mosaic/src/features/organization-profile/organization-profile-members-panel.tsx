@@ -6,6 +6,8 @@ import { useMembersTableController, useMembersTableSearchController } from './me
 import { useMembersTableModel } from './members-table-tab.model';
 import { useMembersPanelAccessModel } from './organization-profile-members-panel.model';
 import { OrganizationProfileMembersPanelView } from './organization-profile-members-panel.view';
+import { useRequestsTableController } from './requests-table-tab.controller';
+import { useRequestsTableModel } from './requests-table-tab.model';
 
 export function OrganizationProfileMembersPanel({ fallback }: { fallback?: ReactNode }) {
   const access = useMembersPanelAccessModel();
@@ -17,9 +19,10 @@ export function OrganizationProfileMembersPanel({ fallback }: { fallback?: React
   }
   return (
     <ConnectedMembersPanel
-      key={`${access.organizationId}:${access.sessionId}:${access.canReadMembers}:${access.canManageInvitations}`}
+      key={`${access.organizationId}:${access.sessionId}:${access.canReadMembers}:${access.canManageInvitations}:${access.canManageRequests}`}
       canReadMembers={access.canReadMembers}
       canManageInvitations={access.canManageInvitations}
+      canManageRequests={access.canManageRequests}
     />
   );
 }
@@ -27,22 +30,38 @@ export function OrganizationProfileMembersPanel({ fallback }: { fallback?: React
 function ConnectedMembersPanel({
   canReadMembers,
   canManageInvitations,
+  canManageRequests,
 }: {
   canReadMembers: boolean;
   canManageInvitations: boolean;
+  canManageRequests: boolean;
 }) {
   const model = useInvitationsTableModel();
   const invitations = useInvitationsTableController(model);
+  const requestsModel = useRequestsTableModel(canManageRequests);
+  const requests = useRequestsTableController(requestsModel);
   if (canReadMembers) {
-    return <ConnectedReadableMembersPanel invitations={canManageInvitations ? invitations : undefined} />;
+    return (
+      <ConnectedReadableMembersPanel
+        invitations={canManageInvitations ? invitations : undefined}
+        requests={canManageRequests ? requests : undefined}
+      />
+    );
   }
-  return <OrganizationProfileMembersPanelView invitations={canManageInvitations ? invitations : undefined} />;
+  return (
+    <OrganizationProfileMembersPanelView
+      invitations={canManageInvitations ? invitations : undefined}
+      requests={canManageRequests ? requests : undefined}
+    />
+  );
 }
 
 function ConnectedReadableMembersPanel({
   invitations,
+  requests,
 }: {
   invitations?: ReturnType<typeof useInvitationsTableController>;
+  requests?: ReturnType<typeof useRequestsTableController>;
 }) {
   const search = useMembersTableSearchController();
   const model = useMembersTableModel(search.query);
@@ -51,6 +70,7 @@ function ConnectedReadableMembersPanel({
     <OrganizationProfileMembersPanelView
       members={{ ...members, ...search }}
       invitations={invitations}
+      requests={requests}
     />
   );
 }
