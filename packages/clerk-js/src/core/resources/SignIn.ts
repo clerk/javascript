@@ -412,8 +412,15 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
-      params || {};
+    const {
+      strategy,
+      redirectUrlComplete,
+      identifier,
+      oidcPrompt,
+      oidcLoginHint,
+      continueSignIn,
+      enterpriseConnectionId,
+    } = params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
@@ -443,6 +450,7 @@ export class SignIn extends BaseResource implements SignInResource {
       await this.create({
         strategy,
         identifier,
+        oidcLoginHint,
         redirectUrl,
         actionCompleteRedirectUrl,
       });
@@ -1307,8 +1315,16 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sso(params: SignInFutureSSOParams): Promise<{ error: ClerkError | null }> {
-    const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId, identifier } =
-      params;
+    const {
+      strategy,
+      redirectUrl,
+      redirectCallbackUrl,
+      popup,
+      oidcPrompt,
+      oidcLoginHint,
+      enterpriseConnectionId,
+      identifier,
+    } = params;
     return runAsyncResourceTask(this.#resource, async () => {
       let actionCompleteRedirectUrl = redirectUrl;
       try {
@@ -1355,6 +1371,7 @@ class SignInFuture implements SignInFutureResource {
             strategy,
             ...routes,
             identifier,
+            oidcLoginHint,
           },
           { resolveProtectCheck: false },
         );

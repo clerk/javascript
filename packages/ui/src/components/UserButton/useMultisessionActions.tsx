@@ -16,6 +16,7 @@ type UseMultisessionActionsParams = {
   navigateAfterSignOut?: () => any;
   navigateAfterMultiSessionSingleSignOut?: () => any;
   afterSwitchSessionUrl?: string;
+  onBeforeSwitchSessionNavigate?: (session: SignedInSessionResource) => Promise<boolean | void>;
   userProfileUrl?: string;
   signInUrl?: string;
   taskUrl?: string | null;
@@ -80,6 +81,12 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     return setActive({
       session,
       navigate: async ({ session }) => {
+        if (opts.onBeforeSwitchSessionNavigate) {
+          const shouldContinue = await opts.onBeforeSwitchSessionNavigate(session as SignedInSessionResource);
+          if (shouldContinue === false) {
+            return;
+          }
+        }
         if (!session.currentTask && opts.afterSwitchSessionUrl) {
           await navigate(opts.afterSwitchSessionUrl);
           return;

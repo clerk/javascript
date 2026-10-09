@@ -156,6 +156,14 @@ export class Session extends BaseResource implements SessionResource {
     return getClientResourceFromPayload(json);
   };
 
+  __internal_acknowledgeChatGPTAccountChoice = async (authorizationUrl: string): Promise<void> => {
+    await BaseResource._fetch({
+      method: 'POST',
+      path: '/oauth/authorize/account-selection',
+      body: { authorizationUrl } as any,
+    });
+  };
+
   clearCache = (): void => {
     return SessionTokenCache.clear();
   };
