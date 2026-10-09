@@ -8,7 +8,7 @@ import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
 
 const pages: UserProfileViewProps['pages'] = {
-  account: { name: 'Preston Booth', username: 'prestonxyz' },
+  account: {},
   security: {},
   billing: {
     subscription: {

@@ -11,7 +11,9 @@ type LiveSidebarGroup = {
 
 const liveRoutes = new Map([
   ['/user-profile/user-profile-api-keys-panel', '/live/api-keys'],
-  ['/user-profile/user-profile-account-section', '/live/account-section'],
+  ['/user-profile/user-profile-profile-section', '/live/profile'],
+  ['/user-profile/user-profile-email-section', '/live/email'],
+  ['/user-profile/user-profile-phone-section', '/live/phone'],
   ['/user-profile/user-profile-password-section', '/live/password'],
   ['/user-profile/user-profile-active-devices-section', '/live/active-devices'],
   ['/user-profile/user-profile-mfa-section', '/live/mfa'],

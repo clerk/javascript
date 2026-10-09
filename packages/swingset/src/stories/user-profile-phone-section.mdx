@@ -1,0 +1,41 @@
+import * as Stories from './user-profile-phone-section.stories';
+
+# UserProfilePhoneSection
+
+The user's phone numbers, composed with `Section`. Each row's menu verifies, sets the primary
+number, or removes it.
+
+Add phone opens the flow using local state and simulated requests. Entering or pasting six digits
+submits automatically. Use `000000` to see an incorrect-code error.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Otp', href: '/components/otp', layer: 'Components' },
+  ]}
+/>
+
+## Add phone failure
+
+Add a phone number to see a failed send request while keeping the entered number.
+
+<Story name='AddPhoneFails' storyModule={Stories} />
+
+## Removal pending
+
+Remove a phone number to see the confirmation remain open until removal completes.
+
+<Story name='PhoneRemovalPending' storyModule={Stories} />
+
+## Removal error
+
+The first removal fails. Retry in the confirmation to remove the phone number.
+
+<Story name='PhoneRemovalError' storyModule={Stories} />

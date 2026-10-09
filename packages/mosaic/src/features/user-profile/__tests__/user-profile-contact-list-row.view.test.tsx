@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { UserProfileContactListRowView } from '../user-profile-account-section/user-profile-contact-list-row.view';
+import { UserProfileContactListRowView } from '../user-profile-contact-list-row.view';
 
 describe('UserProfileContactListRowView', () => {
   it.each(['email', 'phone'] as const)('hides the menu when no %s action applies', kind => {

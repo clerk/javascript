@@ -12,10 +12,6 @@ it('places the connected enterprise section before Web3 wallets in the profile h
   serveFapi(enterpriseAccountSeed());
   await renderWithClerk(
     <UserProfileProfilePanelView
-      name='Jane Doe'
-      username=''
-      emails={[]}
-      phones={[]}
       enterpriseAccountsSlot={<UserProfileEnterpriseAccountsSection />}
       web3WalletsSlot={
         <UserProfileWeb3WalletsSectionView
