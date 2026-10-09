@@ -8,6 +8,7 @@ import {
   radiusVars,
   shadowVars,
   space,
+  targetVars,
   typeScaleVars,
 } from '../../tokens.stylex';
 import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
@@ -75,6 +76,13 @@ export const header = stylex.create({
     flexGrow: '1',
     rowGap: space['0.5'],
   },
+  centered: {
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  centeredWithClose: {
+    marginInlineStart: `calc(${space['7']} + ${space['1']})`,
+  },
   title: {
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-base-size'],
@@ -87,6 +95,40 @@ export const header = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textWrap: 'pretty',
+  },
+});
+
+export const image = stylex.create({
+  base: {
+    alignSelf: 'flex-start',
+    display: 'inline-flex',
+    marginBlockEnd: space['3.5'],
+    maxWidth: '100%',
+  },
+  centered: {
+    alignSelf: 'center',
+  },
+  interactive: {
+    borderRadius: radiusVars['--cl-radius-sm'],
+    textDecoration: 'none',
+    color: 'inherit',
+  },
+  touchTarget: {
+    position: { default: null, '@media (pointer: coarse)': 'relative' },
+    '::after': {
+      insetBlock: `min(0px, (100% - ${targetVars['--cl-target-coarse']}) / 2)`,
+      insetInline: `min(0px, (100% - ${targetVars['--cl-target-coarse']}) / 2)`,
+      content: { default: null, '@media (pointer: coarse)': '""' },
+      position: 'absolute',
+    },
+  },
+  scale: (scale: number) => ({ height: `calc(${space['6']} * ${scale})` }),
+  image: {
+    display: 'block',
+    objectFit: 'contain',
+    height: '100%',
+    maxWidth: '100%',
+    width: 'auto',
   },
 });
 

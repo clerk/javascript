@@ -19,7 +19,8 @@ import * as CardStories from './card.component.stories';
 import { Card } from '@clerk/mosaic/components/card';
 
 <Card.Root>
-  <Card.Header>
+  <Card.Header align='center'>
+    <Card.Image src={logoImageUrl} alt={applicationName} href={homeUrl} />
     <Card.Title>Title</Card.Title>
     <Card.Description>Description</Card.Description>
   </Card.Header>
@@ -29,11 +30,22 @@ import { Card } from '@clerk/mosaic/components/card';
 </Card.Root>
 ```
 
+`Card.Image` is the application's logo, placed first in `Card.Header` on a row of its own above the title. It is sized from the image's proportions: a wide logo is one line tall, a square or tall logo is two. With `href` it links home; pass `render` to route through a framework link instead.
+
+`Card.Header` takes `align`. The default `start` lines its parts up on the leading edge; `center` stacks the image, title, and description down the middle, as a sign-in or sign-up card does.
+
 `Card.Banner` sits between the header and the content and is always rendered. While its children hold a message, a `Banner` of the given `color` expands into it; once they are empty it collapses again. Give it `role='alert'` so the message is announced.
 
 ---
 
 ## Examples
+
+### Image
+
+<Story
+  name='WithImage'
+  storyModule={CardStories}
+/>
 
 ### Banner
 

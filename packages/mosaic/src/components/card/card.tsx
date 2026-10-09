@@ -1,3 +1,4 @@
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -5,6 +6,7 @@ import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { hasMessage, useHeldMessage } from '../../utils/feedback';
 import type { BannerRootProps } from '../banner';
@@ -26,6 +28,10 @@ const DEFAULT_ELEVATION: CardElevation = 'card';
 // The enclosing card and the dialog it was rendered in. Context crosses portals, so a card in a
 // dialog opened from inside another card is still the dialog's outermost one.
 const CardContext = React.createContext<{ elevation: CardElevation; dialog: DialogContextValue | null } | null>(null);
+
+type CardHeaderAlign = 'start' | 'center';
+
+const CardHeaderAlignContext = React.createContext<CardHeaderAlign>('start');
 
 function CardBranding() {
   return (
@@ -109,17 +115,34 @@ function HeaderCloseButton() {
   );
 }
 
-const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardHeader(
-  { render, xstyle, children, ...rest },
+/** Props for the card header, including alignment and native `div` props. */
+export interface CardHeaderProps extends MosaicComponentProps<'div'> {
+  /**
+   * How the header's parts line up. `center` stacks the image, title, and description down the
+   * middle, the shape of a sign-in or sign-up card.
+   *
+   * @default 'start'
+   */
+  align?: CardHeaderAlign;
+}
+
+const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHeader(
+  { align = 'start', render, xstyle, children, ...rest },
   ref,
-) {
+): React.ReactElement {
   const dialog = React.useContext(DialogContext);
-  return useRender({
+  const centered = align === 'center';
+  const hasCloseButton = isInDialog(dialog) && dialog.role !== 'alertdialog';
+  const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('card-header'), stylex.props(reset.base, slots.header.base, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('card-header', { align }),
+        stylex.props(reset.base, slots.header.base, xstyle),
+        rest,
+      ),
       children: (
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
@@ -127,11 +150,106 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
               Not outside a dialog, where there is nothing to close, and not in an alert dialog. */}
           {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
               without answering one. The cancel action in the footer is the way out. */}
-          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <HeaderCloseButton /> : null}
-          <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
+          {hasCloseButton ? <HeaderCloseButton /> : null}
+          <div
+            {...mergeStyleProps(
+              themeProps('card-header-content'),
+              stylex.props(
+                reset.base,
+                slots.header.content,
+                centered && slots.header.centered,
+                centered && hasCloseButton && slots.header.centeredWithClose,
+              ),
+            )}
+          >
             {children}
           </div>
         </>
+      ),
+    },
+  });
+
+  return <CardHeaderAlignContext.Provider value={align}>{element}</CardHeaderAlignContext.Provider>;
+});
+
+/** Props for the application-logo slot and optional home link. */
+export interface CardImageProps extends Omit<MosaicComponentProps<'a'>, 'children'> {
+  /** The URL of the logo image. */
+  src: string;
+  /** Names the logo, and so the link when `href` is set. Pass the application name. */
+  alt: string;
+  /**
+   * Makes the logo a link, to the application's home. Renders an `<a>`; pass `render` instead to
+   * route through a framework link.
+   */
+  href?: string;
+}
+
+function imageScale(image: HTMLImageElement): number {
+  const { naturalWidth, naturalHeight } = image;
+  if (!naturalWidth || !naturalHeight) {
+    return 1;
+  }
+  const ratio = naturalWidth / naturalHeight;
+  if (ratio <= 1) {
+    return 2;
+  }
+  if (ratio <= 2) {
+    return 2 / ratio;
+  }
+  return 1;
+}
+
+/**
+ * The application's logo, the first thing in a `Card.Header` of a sign-in or sign-up card. Sized
+ * from the image's own proportions: a wide mark sits one line tall, a square or tall mark takes
+ * two, and one in between scales to the width of a square. With `href` it is the link home.
+ */
+const Image = React.forwardRef<HTMLElement, CardImageProps>(function CardImage(
+  { src, alt, href, render, xstyle, ...rest },
+  ref,
+): React.ReactElement | null {
+  const [scale, setScale] = React.useState(1);
+  const img = React.useRef<HTMLImageElement>(null);
+  const interactive = Boolean(href || render);
+  const centered = React.useContext(CardHeaderAlignContext) === 'center';
+
+  useSafeLayoutEffect(() => {
+    setScale(1);
+    if (img.current?.complete) {
+      setScale(imageScale(img.current));
+    }
+  }, [src]);
+
+  return useRender({
+    defaultTagName: href ? 'a' : 'span',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-image', { interactive }),
+        stylex.props(
+          reset.base,
+          slots.image.base,
+          slots.image.scale(scale),
+          centered && slots.image.centered,
+          interactive && slots.image.interactive,
+          interactive && slots.image.touchTarget,
+          interactive && focusOutline.visible,
+          xstyle,
+        ),
+        href ? { href } : undefined,
+        rest,
+      ),
+      children: (
+        <img
+          ref={img}
+          src={src}
+          alt={alt}
+          draggable={false}
+          onLoad={event => setScale(imageScale(event.currentTarget))}
+          {...mergeStyleProps(themeProps('card-image-img'), stylex.props(reset.base, slots.image.image))}
+        />
       ),
     },
   });
@@ -260,9 +378,11 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
 });
 
 /**
- * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Title`, `Card.Description`,
- * `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic `render` prop and
- * forwards its ref.
+ * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Image`, `Card.Title`,
+ * `Card.Description`, `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the
+ * Mosaic `render` prop and forwards its ref.
+ *
+ * `Card.Image` is the application's mark, placed first in a `Card.Header` above the title.
  *
  * `Card.Banner` is a message slot between the header and the content. It is always rendered, and
  * a `Banner` expands into it while its children hold a message, collapsing again once they are
@@ -271,4 +391,4 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
  * Rendered as the content of a `Dialog.Popup`, the card reads that surface from `DialogContext`:
  * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
  */
-export const Card = { Root, Header, Title, Description, Banner: CardBanner, Content, Footer };
+export const Card = { Root, Header, Image, Title, Description, Banner: CardBanner, Content, Footer };
