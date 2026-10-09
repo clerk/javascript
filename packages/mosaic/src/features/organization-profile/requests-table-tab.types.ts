@@ -19,12 +19,14 @@ export interface RequestsTableTabViewProps {
   totalCount: number;
   page: number;
   pageSize?: number;
-  searchValue: string;
+  searchValue?: string;
   isLoading: boolean;
   isFetching?: boolean;
+  isError?: boolean;
+  onRetry?: () => void | Promise<unknown>;
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
-  onSearchChange: (value: string) => void;
+  onSearchChange?: (value: string) => void;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
   onAccept?: (id: string) => void | Promise<void>;
   onDecline?: (id: string) => void | Promise<void>;

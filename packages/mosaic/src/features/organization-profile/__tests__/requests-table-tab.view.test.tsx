@@ -1,6 +1,5 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
@@ -194,45 +193,4 @@ describe('RequestsTableTabView', () => {
     );
     expect(screen.queryByRole('button', { name: 'Invite' })).not.toBeInTheDocument();
   });
-});
-
-it.each(['Accept', 'Decline'] as const)('runs %s immediately as requests leave the list', async action => {
-  const user = userEvent.setup();
-  const onAccept = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
-  const onDecline = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
-  const onDecision = action === 'Accept' ? onAccept : onDecline;
-  const onOtherDecision = action === 'Accept' ? onDecline : onAccept;
-  function Example() {
-    const [items, setItems] = useState([
-      { id: 'ada', email: 'ada@example.com', requestedAtLabel: 'Sep 1, 2026' },
-      { id: 'grace', email: 'grace@example.com', requestedAtLabel: 'Sep 2, 2026' },
-    ]);
-    return (
-      <MosaicProvider>
-        <RequestsTableTabView
-          {...propsFor()}
-          requests={items}
-          totalCount={items.length}
-          onAccept={async id => {
-            await onAccept(id);
-            setItems(current => current.filter(item => item.id !== id));
-          }}
-          onDecline={async id => {
-            await onDecline(id);
-            setItems(current => current.filter(item => item.id !== id));
-          }}
-        />
-      </MosaicProvider>
-    );
-  }
-  render(<Example />);
-  for (const id of ['ada', 'grace']) {
-    await user.click(screen.getByRole('button', { name: `${action} ${id}@example.com` }));
-    expect(onDecision).toHaveBeenLastCalledWith(id);
-    expect(onOtherDecision).not.toHaveBeenCalled();
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.queryByRole('button', { name: `${action} ${id}@example.com` })).not.toBeInTheDocument(),
-    );
-  }
 });

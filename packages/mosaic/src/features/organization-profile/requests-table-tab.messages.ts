@@ -19,6 +19,8 @@ export const requestsTableTabMessages = {
   noRequests: 'No pending requests',
   noRequestsDescription: 'Requests to join this organization will show up here.',
   loading: 'Loading requests',
+  loadError: 'Unable to load requests',
+  retry: 'Try again',
   selectAll: 'Select all requests on this page',
   select: 'Select {name}',
   pagination: 'Requests pagination',

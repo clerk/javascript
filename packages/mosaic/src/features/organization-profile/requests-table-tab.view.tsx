@@ -22,6 +22,7 @@ import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (request: OrganizationProfileRequest) => request.id;
 
+// eslint-disable-next-line sonarjs/cognitive-complexity -- The request table renders independent states and optional controls in one view.
 export function RequestsTableTabView({
   requests,
   onInvite,
@@ -30,7 +31,7 @@ export function RequestsTableTabView({
   totalCount,
   page,
   pageSize = 10,
-  searchValue,
+  searchValue = '',
   onSearchChange,
   onPageChange,
   onPageSizeChange,
@@ -39,6 +40,8 @@ export function RequestsTableTabView({
   onSortChange,
   isLoading,
   isFetching = false,
+  isError = false,
+  onRetry,
 }: RequestsTableTabViewProps) {
   const m = useMessages('requestsTableTab');
   const hasActions = Boolean(onAccept || onDecline);
@@ -46,15 +49,16 @@ export function RequestsTableTabView({
   const query = searchValue.trim();
   const searchInput = useRef<HTMLInputElement>(null);
   const inviteButton = useRef<HTMLButtonElement>(null);
+  const tableContainer = useRef<HTMLDivElement>(null);
   const acceptFocus = useListRemovalFocus({
     ids: requests.map(getRowId),
     onRemove: onAccept,
-    fallback: () => inviteButton.current ?? searchInput.current,
+    fallback: () => inviteButton.current ?? searchInput.current ?? tableContainer.current,
   });
   const declineFocus = useListRemovalFocus({
     ids: requests.map(getRowId),
     onRemove: onDecline,
-    fallback: () => inviteButton.current ?? searchInput.current,
+    fallback: () => inviteButton.current ?? searchInput.current ?? tableContainer.current,
   });
   const { table, sortHeader, pagination } = useServerDataTable({
     data: requests,
@@ -68,28 +72,43 @@ export function RequestsTableTabView({
     onPageChange,
     onPageSizeChange,
     searchValue,
-    onSearchChange,
+    onSearchChange: onSearchChange ?? (() => {}),
   });
   return (
-    <div {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(tableTabStyles.root))}>
-      <Table.Toolbar>
-        <Table.Search
-          ref={searchInput}
-          label={m.search}
-          clearLabel={m.clearSearch}
-          value={table.globalFilter}
-          onValueChange={table.setGlobalFilter}
-        />
-        {onInvite ? (
-          <Button
-            ref={inviteButton}
-            onClick={onInvite}
-          >
-            <Icon name='plus' />
-            {m.invite}
-          </Button>
-        ) : null}
-      </Table.Toolbar>
+    <div
+      {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(tableTabStyles.root))}
+      ref={tableContainer}
+      tabIndex={-1}
+      role='group'
+      aria-label={m.title}
+    >
+      {onSearchChange || onInvite ? (
+        <Table.Toolbar>
+          {onSearchChange ? (
+            <Table.Search
+              ref={searchInput}
+              label={m.search}
+              clearLabel={m.clearSearch}
+              value={table.globalFilter}
+              onValueChange={table.setGlobalFilter}
+            />
+          ) : null}
+          {onInvite ? (
+            <Button
+              ref={inviteButton}
+              onClick={onInvite}
+            >
+              <Icon name='plus' />
+              {m.invite}
+            </Button>
+          ) : null}
+        </Table.Toolbar>
+      ) : null}
+      {isError && table.rows.length > 0 ? (
+        <p role='alert'>
+          {m.loadError} {onRetry ? <Button onClick={() => void onRetry()}>{m.retry}</Button> : null}
+        </p>
+      ) : null}
       <Table.Root
         aria-label={m.title}
         aria-busy={isLoading || isFetching}
@@ -120,6 +139,18 @@ export function RequestsTableTabView({
                 <Spinner />
                 <VisuallyHidden>{m.loading}</VisuallyHidden>
               </span>
+            </Table.Empty>
+          ) : isError && table.rows.length === 0 ? (
+            <Table.Empty colSpan={columnCount}>
+              <EmptyState.Root role='alert'>
+                <EmptyState.Icon name='exclamation-circle' />
+                <EmptyState.Label>{m.loadError}</EmptyState.Label>
+                {onRetry ? (
+                  <EmptyState.Actions>
+                    <Button onClick={() => void onRetry()}>{m.retry}</Button>
+                  </EmptyState.Actions>
+                ) : null}
+              </EmptyState.Root>
             </Table.Empty>
           ) : table.rows.length === 0 ? (
             <Table.Empty colSpan={columnCount}>
