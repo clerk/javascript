@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
-import { useMembersTableController } from '../members-table-tab.controller';
+import { useMembersTableController, useMembersTableSearchController } from '../members-table-tab.controller';
 import type { MembersRoles } from '../members-table-tab.types';
 
 function createModel(loadRoles: () => Promise<MembersRoles>) {
@@ -90,5 +90,19 @@ describe('members table role loading', () => {
     });
     expect(result.current.roles).toEqual([{ value: 'org:new', label: 'New' }]);
     expect(result.current.onChangeRole).toBeDefined();
+  });
+
+  it('applies a cleared search without waiting for the debounce', async () => {
+    vi.useFakeTimers();
+    try {
+      const { result } = renderHook(() => useMembersTableSearchController());
+      act(() => result.current.onSearchChange('ada'));
+      await act(() => vi.advanceTimersByTimeAsync(500));
+      expect(result.current.query).toBe('ada');
+      act(() => result.current.onSearchChange(''));
+      expect(result.current.query).toBe('');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

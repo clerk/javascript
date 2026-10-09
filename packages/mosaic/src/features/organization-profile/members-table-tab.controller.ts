@@ -73,5 +73,5 @@ export function useMembersTableController(model: ReturnType<typeof useMembersTab
 export function useMembersTableSearchController() {
   const [searchValue, setSearchValue] = useState('');
   const query = useDebouncedAsync(searchValue, value => Promise.resolve(value.trim()), { delayMs: 500 });
-  return { searchValue, onSearchChange: setSearchValue, query: query.data ?? '' };
+  return { searchValue, onSearchChange: setSearchValue, query: searchValue.trim() === '' ? '' : (query.data ?? '') };
 }
