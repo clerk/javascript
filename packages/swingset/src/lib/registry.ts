@@ -82,6 +82,13 @@ import {
   NoResults as EmptyStateNoResults,
 } from '../stories/empty-state.stories';
 import {
+  Default as EntityDefault,
+  meta as entityMeta,
+  LabelOnly as EntityLabelOnly,
+  Truncation as EntityTruncation,
+  WithBadge as EntityWithBadge,
+} from '../stories/entity.stories';
+import {
   Default as FieldDefault,
   meta as fieldMeta,
   VisuallyHiddenLabel as FieldVisuallyHiddenLabel,
@@ -593,6 +600,14 @@ const dataListModule: StoryModule = {
   Plain: DataListPlain,
 };
 
+const entityModule: StoryModule = {
+  meta: entityMeta,
+  Default: EntityDefault,
+  WithBadge: EntityWithBadge,
+  LabelOnly: EntityLabelOnly,
+  Truncation: EntityTruncation,
+};
+
 const itemModule: StoryModule = {
   meta: itemMeta,
   Default: ItemDefault,
@@ -994,6 +1009,7 @@ export const registry: StoryModule[] = [
   dialogComponentModule,
   drawerComponentModule,
   emptyStateModule,
+  entityModule,
   headingModule,
   iconModule,
   iconFrameModule,
