@@ -44,7 +44,7 @@ export function UserProfileMfaRowView({
   }
 
   return (
-    <Section.Item>
+    <>
       <UserProfileSecurityIcon name={method.type} />
       <Section.Content>
         <Section.Label>
@@ -62,6 +62,6 @@ export function UserProfileMfaRowView({
           />
         </Section.Actions>
       ) : null}
-    </Section.Item>
+    </>
   );
 }

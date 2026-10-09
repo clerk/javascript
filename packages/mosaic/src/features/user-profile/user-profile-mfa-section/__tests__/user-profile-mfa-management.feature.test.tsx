@@ -374,7 +374,7 @@ describe('User profile MFA management', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
-  it('sets a different SMS phone as default and moves its row first', async () => {
+  it('sets a different SMS phone as default and keeps its row in place', async () => {
     const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
     const second = fapiPhoneNumber({
       ...phone,
@@ -389,10 +389,11 @@ describe('User profile MFA management', () => {
     await waitFor(() =>
       expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_2', default: true, reserved: undefined }),
     );
-    await waitFor(() =>
-      expect(screen.getAllByText('SMS verification')[0]?.closest('li')).toHaveTextContent('+1 (555) 555-0202'),
-    );
-    expect(screen.getAllByText('SMS verification')[0]?.closest('li')).toHaveTextContent('Default');
+    const rows = () => screen.getAllByText('SMS verification').map(label => label.closest('li'));
+    await waitFor(() => expect(rows()[1]).toHaveTextContent('Default'));
+    expect(rows()[1]).toHaveTextContent('+1 (555) 555-0202');
+    expect(rows()[0]).toHaveTextContent('+1 (555) 555-0101');
+    expect(rows()[0]).not.toHaveTextContent('Default');
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
     await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
   });

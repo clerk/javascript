@@ -49,33 +49,31 @@ export function UserProfilePasskeyRowView({
 
   return (
     <>
-      <Section.Item>
-        <Section.Media size='lg'>
-          <IconFrame
-            filled
-            bordered={false}
-          >
-            <Icon
-              name='security-passkey'
-              size='md'
-              xstyle={styles.icon}
-            />
-          </IconFrame>
-        </Section.Media>
-        <Section.Content>
-          <Section.Label>{passkey.name}</Section.Label>
-          {description ? <Section.Description>{description}</Section.Description> : null}
-        </Section.Content>
-        {actions.length > 0 ? (
-          <Section.Actions>
-            <ActionMenu
-              triggerRef={triggerRef}
-              actions={actions}
-              label={fill(m.manage, { name: passkey.name })}
-            />
-          </Section.Actions>
-        ) : null}
-      </Section.Item>
+      <Section.Media size='lg'>
+        <IconFrame
+          filled
+          bordered={false}
+        >
+          <Icon
+            name='security-passkey'
+            size='md'
+            xstyle={styles.icon}
+          />
+        </IconFrame>
+      </Section.Media>
+      <Section.Content>
+        <Section.Label>{passkey.name}</Section.Label>
+        {description ? <Section.Description>{description}</Section.Description> : null}
+      </Section.Content>
+      {actions.length > 0 ? (
+        <Section.Actions>
+          <ActionMenu
+            triggerRef={triggerRef}
+            actions={actions}
+            label={fill(m.manage, { name: passkey.name })}
+          />
+        </Section.Actions>
+      ) : null}
       {onRename ? (
         <UserProfileRenamePasskeyDialog
           {...controller}

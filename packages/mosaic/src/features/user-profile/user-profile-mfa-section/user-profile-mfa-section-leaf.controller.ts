@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
+import { removalFallback } from '../user-profile-contact.utils';
 import type { UserProfileMfaMethod } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 
@@ -16,8 +17,7 @@ export function useUserProfileMfaSectionLeafController({
   const removalFocus = useListRemovalFocus({
     ids: methods.map(method => method.id),
     onRemove,
-    fallback: () =>
-      sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
+    fallback: () => removalFallback(sectionRef.current),
   });
   const [pickerOpen, setPickerOpen] = useState(false);
   const defaultAction = usePendingAction<'default'>({ errorFallback: m.setDefaultError });

@@ -4,6 +4,7 @@ import { type ReactNode, type Ref, useMemo } from 'react';
 import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
+import { useStableOrder } from '../../../primitives/hooks';
 import { UserProfileSecurityList } from '../user-profile-security-list';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
@@ -24,6 +25,8 @@ export interface UserProfileMfaSectionViewProps {
   onSetDefault?: (id: string) => void | Promise<void>;
 }
 
+const byId = (method: UserProfileMfaMethod) => method.id;
+
 export function UserProfileMfaSectionView({
   methods,
   addableMethods,
@@ -35,7 +38,8 @@ export function UserProfileMfaSectionView({
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const controller = useUserProfileMfaSectionLeafController({ methods, onRemove, onSetDefault });
+  const ordered = useStableOrder(methods, byId);
+  const controller = useUserProfileMfaSectionLeafController({ methods: ordered, onRemove, onSetDefault });
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
 
   return (
@@ -62,19 +66,19 @@ export function UserProfileMfaSectionView({
         }
         addLabel={m.addLabel}
         emptyLabel={m.empty}
-        hasItems={methods.length > 0}
+        items={ordered}
+        getKey={byId}
         label={m.label}
       >
-        {methods.map(method => (
+        {(method, { present }) => (
           <UserProfileMfaRowView
-            key={method.id}
             method={method}
-            triggerRef={controller.registerTrigger(method.id)}
+            triggerRef={present ? controller.registerTrigger(method.id) : undefined}
             onRemove={onRemove ? () => controller.openRemoval(() => removeMethod.open(method)) : undefined}
             onSetDefault={onSetDefault && !controller.isSettingDefault ? controller.setDefault : undefined}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
-        ))}
+        )}
       </UserProfileSecurityList>
       <Section.Error>{controller.defaultError}</Section.Error>
       {onRemove ? (
