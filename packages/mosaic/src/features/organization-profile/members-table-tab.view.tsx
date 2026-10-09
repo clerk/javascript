@@ -5,6 +5,7 @@ import { Confirmation } from '../../blocks/confirmation';
 import { ActionMenu } from '../../components/action-menu';
 import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
+import { Banner } from '../../components/banner';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
@@ -185,18 +186,42 @@ function MembersTableNotices({
   const m = useMessages('membersTableTab');
   return (
     <>
-      {hasRoleSetMigration ? <p role='status'>{m.roleSetMigration}</p> : null}
+      {hasRoleSetMigration ? (
+        <Banner.Root
+          color='warning'
+          role='status'
+        >
+          <Banner.Description>{m.roleSetMigration}</Banner.Description>
+        </Banner.Root>
+      ) : null}
       {hasLoadError ? (
-        <p role='alert'>
-          {m.loadError} {onRetry ? <Button onClick={onRetry}>{m.retry}</Button> : null}
-        </p>
+        <Banner.Root
+          color='negative'
+          role='alert'
+        >
+          <Banner.Description>
+            {m.loadError} {onRetry ? <Button onClick={onRetry}>{m.retry}</Button> : null}
+          </Banner.Description>
+        </Banner.Root>
       ) : null}
       {isRolesError ? (
-        <p role='alert'>
-          {m.rolesError} {onRetryRoles ? <Button onClick={onRetryRoles}>{m.retry}</Button> : null}
-        </p>
+        <Banner.Root
+          color='negative'
+          role='alert'
+        >
+          <Banner.Description>
+            {m.rolesError} {onRetryRoles ? <Button onClick={onRetryRoles}>{m.retry}</Button> : null}
+          </Banner.Description>
+        </Banner.Root>
       ) : null}
-      {roleError ? <p role='alert'>{roleError}</p> : null}
+      {roleError ? (
+        <Banner.Root
+          color='negative'
+          role='alert'
+        >
+          <Banner.Description>{roleError}</Banner.Description>
+        </Banner.Root>
+      ) : null}
     </>
   );
 }
