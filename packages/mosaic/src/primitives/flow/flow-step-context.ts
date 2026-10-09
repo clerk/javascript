@@ -3,11 +3,16 @@
 import { createContext, type RefCallback, useCallback, useContext, useRef } from 'react';
 
 export interface FlowStepContextValue {
+  active: boolean;
   registerFocusTarget: (element: HTMLElement) => void;
   unregisterFocusTarget: (element: HTMLElement) => void;
 }
 
 export const FlowStepContext = createContext<FlowStepContextValue | null>(null);
+
+export function useFlowStepActive(): boolean {
+  return useContext(FlowStepContext)?.active ?? true;
+}
 
 /**
  * Marks an element as the one to focus when the enclosing `Flow.Step` enters.
