@@ -1,10 +1,20 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import * as stylex from '@stylexjs/stylex';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { truncationStyles } from '../../styles/typography.styles';
 import { HeadingLevelProvider } from '../heading';
 import { Section } from './section';
+
+type Animated = { getAnimations?: () => Animation[] };
+
+function holdExits() {
+  const exit = createDeferredPromise();
+  (Element.prototype as Animated).getAnimations = () => [{ finished: exit.promise } as Animation];
+  return exit;
+}
 
 const overrides = stylex.create({
   root: { containerType: 'inline-size' },
@@ -18,6 +28,10 @@ const atoms = (style: stylex.StyleXStyles) =>
   (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
 describe('Section', () => {
+  afterEach(() => {
+    delete (Element.prototype as Animated).getAnimations;
+  });
+
   it('renders a card named by its heading, with every compound part', () => {
     render(
       <Section.Root data-testid='root'>
@@ -356,6 +370,96 @@ describe('Section', () => {
     // jsdom runs no transitions, so the exit finishes at once and the row empties again.
     rerender(<Host />);
     await waitFor(() => expect(screen.queryByTestId('error')).not.toBeInTheDocument());
+  });
+
+  describe('CollapsibleDescription', () => {
+    function Host({ value, truncate }: { value?: string; truncate?: boolean }) {
+      return (
+        <Section.Row>
+          <Section.Item>
+            <Section.Content>
+              <Section.Label>Google</Section.Label>
+              <Section.CollapsibleDescription
+                data-testid='description'
+                truncate={truncate}
+                title={value}
+              >
+                {value}
+              </Section.CollapsibleDescription>
+            </Section.Content>
+          </Section.Item>
+        </Section.Row>
+      );
+    }
+
+    it('renders nothing while it has no content', () => {
+      render(<Host />);
+
+      expect(screen.queryByTestId('description')).not.toBeInTheDocument();
+    });
+
+    it('shows content present at mount without an entrance', async () => {
+      render(<Host value='ada@example.com' />);
+
+      const description = screen.getByTestId('description');
+      expect(description).toHaveClass('cl-section-description');
+      expect(description).toHaveAttribute('data-collapsible');
+      expect(description).toHaveAttribute('data-open');
+      expect(description).not.toHaveAttribute('data-starting-style');
+      expect(description.getAttribute('style')).toContain('transition: none');
+      expect(description.getAttribute('style')).toContain('--_cl-feedback-height');
+      await waitFor(() => expect(description.getAttribute('style')).not.toContain('transition'));
+    });
+
+    it('opens from its starting state on content that arrives after mount', async () => {
+      const { rerender } = render(<Host />);
+      rerender(<Host value='ada@example.com' />);
+
+      const description = screen.getByTestId('description');
+      expect(description).toHaveAttribute('data-starting-style');
+      expect(description).toHaveTextContent('ada@example.com');
+      await waitFor(() => expect(description).not.toHaveAttribute('data-starting-style'));
+      expect(description).toHaveAttribute('data-open');
+      expect(description).not.toHaveAttribute('aria-hidden');
+    });
+
+    it('holds the last content through the exit, then leaves', async () => {
+      const exit = holdExits();
+      const { rerender } = render(<Host value='ada@example.com' />);
+      rerender(<Host />);
+
+      const description = screen.getByTestId('description');
+      expect(description).toHaveAttribute('data-ending-style');
+      expect(description).toHaveAttribute('aria-hidden', 'true');
+      expect(description).toHaveTextContent('ada@example.com');
+
+      await act(async () => {
+        exit.resolve();
+        await exit.promise;
+      });
+      expect(screen.queryByTestId('description')).not.toBeInTheDocument();
+    });
+
+    it('enters again after it has closed', async () => {
+      const { rerender } = render(<Host value='ada@example.com' />);
+      rerender(<Host />);
+      await waitFor(() => expect(screen.queryByTestId('description')).not.toBeInTheDocument());
+
+      rerender(<Host value='grace@example.com' />);
+      expect(screen.getByTestId('description')).toHaveAttribute('data-starting-style');
+    });
+
+    it('truncates the text to one line and carries the title', () => {
+      render(
+        <Host
+          value='ada@example.com'
+          truncate
+        />,
+      );
+
+      expect(screen.getByText('ada@example.com')).toHaveClass(...atoms(truncationStyles.singleLine));
+      expect(screen.getByTestId('description')).toHaveAttribute('title', 'ada@example.com');
+    });
   });
 
   it('states why a row has no action, with the leading glyph in its own slot', () => {

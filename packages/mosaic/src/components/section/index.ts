@@ -3,6 +3,7 @@ export { sectionCompactStyles } from './section.styles';
 export type {
   SectionActionsProps,
   SectionBodyProps,
+  SectionCollapsibleDescriptionProps,
   SectionContentProps,
   SectionDescriptionProps,
   SectionGroupProps,

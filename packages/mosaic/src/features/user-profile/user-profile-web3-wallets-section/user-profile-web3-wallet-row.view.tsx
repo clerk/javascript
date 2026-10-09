@@ -78,14 +78,12 @@ export function UserProfileWeb3WalletRowView({
             {linkedWallet?.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
             {linkedWallet && !linkedWallet.isVerified ? <Badge color='warning'>{m.unverified}</Badge> : null}
           </Section.Label>
-          {wallet.provider && address ? (
-            <Section.Description
-              xstyle={truncationStyles.singleLine}
-              title={address}
-            >
-              {shortAddress}
-            </Section.Description>
-          ) : null}
+          <Section.CollapsibleDescription
+            truncate
+            title={address}
+          >
+            {wallet.provider && address ? shortAddress : undefined}
+          </Section.CollapsibleDescription>
         </Section.Content>
         {onConnect ? (
           <Section.Actions>

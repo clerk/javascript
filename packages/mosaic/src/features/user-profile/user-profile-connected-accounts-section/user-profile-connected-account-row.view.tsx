@@ -135,14 +135,12 @@ export function UserProfileConnectedAccountRowView({
             </span>
             {account.status === 'reconnect' ? <Badge color='warning'>{m.disconnected}</Badge> : null}
           </Section.Label>
-          {account.identifier ? (
-            <Section.Description
-              xstyle={truncationStyles.singleLine}
-              title={account.identifier}
-            >
-              {account.identifier}
-            </Section.Description>
-          ) : null}
+          <Section.CollapsibleDescription
+            truncate
+            title={account.identifier}
+          >
+            {account.identifier}
+          </Section.CollapsibleDescription>
         </Section.Content>
         {actions.length > 0 ? (
           <Section.Actions>
