@@ -9,18 +9,6 @@ const PAGE_SIZE = 10;
 const READ_PERMISSION = 'org:sys_memberships:read';
 const MANAGE_PERMISSION = 'org:sys_memberships:manage';
 
-export function useMembersTableAccessModel() {
-  const { isLoaded, organization } = useOrganization();
-  const { isLoaded: isSessionLoaded, session } = useSession();
-  if (!isLoaded || !isSessionLoaded) {
-    return { status: 'loading' as const };
-  }
-  if (!organization || !session?.checkAuthorization({ permission: READ_PERMISSION })) {
-    return { status: 'hidden' as const };
-  }
-  return { status: 'ready' as const, organizationId: organization.id, sessionId: session.id };
-}
-
 export function useMembersTableModel(query: string) {
   const { session } = useSession();
   const canRead = session?.checkAuthorization({ permission: READ_PERMISSION }) ?? false;

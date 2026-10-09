@@ -5,6 +5,7 @@ import type {
   EmailAddressJSON,
   EnterpriseConnectionJSON,
   OAuthProvider,
+  OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
@@ -59,6 +60,7 @@ export interface FakeFapiState {
   roles: RoleJSON[];
   hasRoleSetMigration: boolean;
   invitations: UserOrganizationInvitationJSON[];
+  organizationInvitations: OrganizationInvitationJSON[];
   suggestions: OrganizationSuggestionJSON[];
   apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
@@ -293,6 +295,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     roles: [],
     hasRoleSetMigration: false,
     invitations: [],
+    organizationInvitations: [],
     suggestions: [],
     apiKeys: [],
     passwordUpdates: [],

@@ -39,6 +39,31 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
           )
         : missing();
     }),
+    http.get(fapiUrl('/v1/organizations/:organizationId/invitations'), ({ params, request }) => {
+      const url = new URL(request.url);
+      const statuses = url.searchParams.getAll('status');
+      const matching = state.organizationInvitations.filter(
+        invitation =>
+          invitation.organization_id === params.organizationId &&
+          (statuses.length === 0 || statuses.includes(invitation.status)),
+      );
+      const offset = Number(url.searchParams.get('offset') ?? 0);
+      const limit = Number(url.searchParams.get('limit') ?? 10);
+      return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, null);
+    }),
+    http.post(fapiUrl('/v1/organizations/:organizationId/invitations/:invitationId/revoke'), ({ params }) => {
+      const invitation = state.organizationInvitations.find(
+        item => item.organization_id === params.organizationId && item.id === params.invitationId,
+      );
+      if (!invitation) {
+        return missing();
+      }
+      const revoked = { ...invitation, status: 'revoked' as const };
+      state.organizationInvitations = state.organizationInvitations.map(item =>
+        item.id === revoked.id ? revoked : item,
+      );
+      return envelope(revoked, null);
+    }),
     http.post(fapiUrl('/v1/organizations/:organizationId/memberships/:userId'), async ({ params, request }) => {
       const member = state.memberships.find(
         item => item.organization.id === params.organizationId && item.public_user_data?.user_id === params.userId,
