@@ -1123,8 +1123,9 @@ export function SwitcherTrigger({
       xstyle={[
         ringsAvatar ? styles.triggerRinglessAvatar : focusOutline.visible,
         styles.trigger,
-        renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
-        !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
+        renderTriggerLabel
+          ? [styles.triggerLabelled, user && styles.triggerLabelledBadged]
+          : [styles.triggerAvatarOnly, shape === 'circle' && styles.triggerRound],
       ]}
     >
       {user ? (

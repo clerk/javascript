@@ -41,7 +41,6 @@ export const styles = stylex.create({
   },
 
   labelled: {
-    marginInlineStart: step(1),
     transform: `translateY(${step(0.5)})`,
   },
 
