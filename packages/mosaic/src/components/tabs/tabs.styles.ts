@@ -2,8 +2,25 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, durationVars, easingVars, fontFamilyVars, space, typeScaleVars } from '../../tokens.stylex';
 
+// Literals: StyleX cannot import them. Must match `segmented-control.styles.ts`.
+const anchors = '@supports (anchor-scope: all) and (not (-moz-appearance: none))' as const;
+const noAnchors = '@supports not ((anchor-scope: all) and (not (-moz-appearance: none)))' as const;
 const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
+const forcedColors = '@media (forced-colors: active)' as const;
+const activeAnchor = '--_cl-tabs-active';
 const halfGap = `calc(${space['5']} / -2)`;
+
+const lead = durationVars['--cl-duration-base'];
+const trail = durationVars['--cl-duration-slow'];
+
+const underline = {
+  backgroundColor: { default: colorVars['--cl-color-foreground'], [forcedColors]: 'Highlight' },
+  forcedColorAdjust: 'none',
+  pointerEvents: 'none',
+  position: 'absolute',
+  bottom: '-1px',
+  height: '2px',
+} as const;
 
 export const styles = stylex.create({
   root: {
@@ -13,6 +30,8 @@ export const styles = stylex.create({
     width: '100%',
   },
   list: {
+    // eslint-disable-next-line @stylexjs/valid-styles -- `anchor-scope`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
+    anchorScope: activeAnchor,
     gap: space['5'],
     alignItems: 'center',
     display: 'flex',
@@ -44,9 +63,13 @@ export const styles = stylex.create({
     paddingBottom: space['3'],
     paddingTop: space['2.5'],
   },
+  anchor: {
+    // eslint-disable-next-line @stylexjs/valid-styles -- `anchor-name`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
+    anchorName: { default: null, ':where([data-selected])': activeAnchor },
+  },
   hitArea: {
     '--_cl-tab-hit-end': { default: '0px', ':has(+ [role="tab"])': halfGap },
-    '--_cl-tab-hit-start': { default: halfGap, ':first-child': '0px' },
+    '--_cl-tab-hit-start': { default: halfGap, ':first-of-type': '0px' },
     position: 'relative',
     '::before': {
       insetBlock: 0,
@@ -66,16 +89,32 @@ export const styles = stylex.create({
     gridRowStart: '1',
   },
   indicator: {
-    backgroundColor: colorVars['--cl-color-foreground'],
-    pointerEvents: 'none',
-    position: 'absolute',
-    transitionDuration: {
-      default: durationVars['--cl-duration-base'],
-      [reduceMotion]: durationVars['--cl-duration-instant'],
+    ...underline,
+    // eslint-disable-next-line @stylexjs/valid-styles -- `position-anchor`: anchor positioning postdates StyleX's property allowlist; it compiles and emits correctly.
+    positionAnchor: activeAnchor,
+    display: {
+      [anchors]: { default: 'none', ':has(~ [data-selected])': 'block' },
+      default: 'none',
     },
-    transitionProperty: 'left, width',
+    insetInlineEnd: 'anchor(end)',
+    insetInlineStart: 'anchor(start)',
+    transitionDuration: {
+      default: `${trail}, ${lead}`,
+      [reduceMotion]: {
+        default: durationVars['--cl-duration-instant'],
+        ':where([data-direction="backward"])': durationVars['--cl-duration-instant'],
+      },
+      ':where([data-direction="backward"])': `${lead}, ${trail}`,
+    },
+    transitionProperty: 'inset-inline-start, inset-inline-end',
     transitionTimingFunction: easingVars['--cl-ease-enter'],
-    bottom: '-1px',
-    height: '2px',
+  },
+  fallbackIndicator: {
+    ...underline,
+    insetInline: 0,
+    display: {
+      default: 'none',
+      [noAnchors]: { default: 'none', ':where([data-selected] > *)': 'block' },
+    },
   },
 });

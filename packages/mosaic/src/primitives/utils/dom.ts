@@ -8,8 +8,6 @@ export interface Dimensions {
   height: number;
 }
 
-export type Rect = Coords & Dimensions;
-
 const ALIGNMENT_PROPERTIES = ['justify-content', 'align-items', 'align-content', 'justify-items'];
 
 /**
@@ -87,23 +85,6 @@ export function getScale(element: HTMLElement): Coords {
   return {
     x: x && Number.isFinite(x) ? x : 1,
     y: y && Number.isFinite(y) ? y : 1,
-  };
-}
-
-/**
- * The element's position and size in `parent`'s coordinate space: relative to its padding box,
- * following its scroll, and with its scale removed. When `parent` is the containing block, these are
- * the `left` / `top` / `width` / `height` an absolutely positioned child needs to cover the element.
- */
-export function getRectRelativeTo(element: Element, parent: HTMLElement): Rect {
-  const rect = element.getBoundingClientRect();
-  const parentRect = parent.getBoundingClientRect();
-  const scale = getScale(parent);
-  return {
-    x: (rect.left - parentRect.left) / scale.x - parent.clientLeft + parent.scrollLeft,
-    y: (rect.top - parentRect.top) / scale.y - parent.clientTop + parent.scrollTop,
-    width: rect.width / scale.x,
-    height: rect.height / scale.y,
   };
 }
 

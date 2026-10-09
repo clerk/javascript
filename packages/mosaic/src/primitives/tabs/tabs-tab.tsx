@@ -1,7 +1,7 @@
 'use client';
 
 import { CompositeItem } from '@floating-ui/react';
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 
 import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
@@ -18,12 +18,10 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
   const isSelected = selectedValue === tabValue;
   const tabId = `${tabsId}-tab-${tabValue}`;
   const panelId = `${tabsId}-panel-${tabValue}`;
-  const internalRef = useRef<HTMLButtonElement | null>(null);
-
-  useLayoutEffect(() => {
-    registerTab(tabValue, internalRef.current);
-    return () => registerTab(tabValue, null);
-  }, [tabValue, registerTab]);
+  const register = useCallback(
+    (element: HTMLButtonElement | null) => registerTab(tabValue, element),
+    [registerTab, tabValue],
+  );
 
   const state = {
     selected: isSelected,
@@ -32,7 +30,7 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
 
   return (
     <CompositeItem
-      ref={internalRef}
+      ref={register}
       disabled={disabled}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {
@@ -91,7 +89,7 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
         return useRender({
           defaultTagName: 'button',
           render,
-          ref: [internalRef, isRef(compositeRef) ? compositeRef : undefined, ref],
+          ref: [register, isRef(compositeRef) ? compositeRef : undefined, ref],
           state,
           stateAttributesMapping: {
             selected: (v: boolean) => (v ? { 'data-selected': '' } : null),
