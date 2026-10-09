@@ -60,22 +60,31 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   );
 
   const startOAuthRedirect = useCallback(
-    (strategy: OAuthStrategy) =>
-      signIn.authenticateWithRedirect({
+    (strategy: OAuthStrategy) => {
+      const isChatGPTSIWC = isChatGPTSIWCFlow(ctx.queryParams);
+      const oidcParams = isChatGPTSIWC
+        ? strategy === 'oauth_chatgpt'
+          ? {
+              oidcPrompt: chatGPTSIWCOIDCPrompt(ctx.oidcPrompt, ctx.queryParams),
+              oidcLoginHint: ignoreChatGPTLoginHint
+                ? undefined
+                : ctx.queryParams.email_address || ctx.queryParams.login_hint,
+            }
+          : {}
+        : { oidcPrompt: ctx.oidcPrompt };
+
+      return signIn.authenticateWithRedirect({
         strategy,
         redirectUrl,
         redirectUrlComplete,
-        oidcPrompt: chatGPTSIWCOIDCPrompt(ctx.oidcPrompt, ctx.queryParams),
-        oidcLoginHint:
-          isChatGPTSIWCFlow(ctx.queryParams) && !ignoreChatGPTLoginHint
-            ? ctx.queryParams.email_address || ctx.queryParams.login_hint
-            : undefined,
+        ...oidcParams,
         __internal_callbackParams: {
           ...buildSignInOAuthTransportCallbackParams(ctx),
           __internal_navigateOnSetActive: ctx.navigateOnSetActive,
           __internal_navigate: navigate,
         },
-      }),
+      });
+    },
     [ctx, ignoreChatGPTLoginHint, navigate, redirectUrl, redirectUrlComplete, signIn],
   );
 
