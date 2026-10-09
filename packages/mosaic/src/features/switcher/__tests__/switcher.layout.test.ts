@@ -47,6 +47,13 @@ describe('resolveSwitcherLayout, where each action lands', () => {
 });
 
 describe('resolveSwitcherLayout, what the data settles', () => {
+  it('leads with the active organization alone in organization mode', () => {
+    const layout = resolve('organization');
+
+    expect(layout.lead).toBe('organization');
+    expect(layout.userBadge).toBe(false);
+  });
+
   it('leads with the account where no organization is active', () => {
     const layout = resolve('combined', { activeOrganization: null });
 
@@ -71,10 +78,11 @@ describe('resolveSwitcherLayout, what the data settles', () => {
 });
 
 describe('resolveSwitcherLayout, a combined surface', () => {
-  it('leads with the account inside its active organization, inviting to that organization', () => {
+  it('leads with its active organization, badged with the user, inviting to that organization', () => {
     const layout = resolve('combined');
 
-    expect(layout.lead).toBe('member');
+    expect(layout.lead).toBe('organization');
+    expect(layout.userBadge).toBe(true);
     expect(layout.actions.header).toEqual(['inviteMembers', 'manageLead']);
   });
 
