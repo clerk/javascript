@@ -1,0 +1,298 @@
+{
+  "config": {
+    "auth_access_control": {
+      "allowlist_blocklist_enforced_on_sign_in": true,
+      "allowlist_enabled": false,
+      "block_disposable_email_domains": false,
+      "block_email_subaddresses": false,
+      "blocklist_enabled": false,
+      "sign_up_mode": "public"
+    },
+    "auth_attack_protection": {
+      "bot_protection": {
+        "captcha_enabled": false,
+        "captcha_widget_type": "smart"
+      },
+      "email_link_require_same_client": false,
+      "enumeration_protection": "bulk",
+      "pii_protection_enabled": true,
+      "user_lockout": {
+        "duration_in_minutes": 60,
+        "enabled": true,
+        "max_attempts": 100
+      }
+    },
+    "auth_biometric": {
+      "enrollment_prompt_after_sign_in": false,
+      "enrollment_prompt_after_sign_up": false,
+      "used_for_sign_in": false
+    },
+    "auth_email": {
+      "immutable": false,
+      "required_for_sign_up": true,
+      "sign_in_strategies": [
+        "email_code",
+        "email_link"
+      ],
+      "used_for_sign_in": true,
+      "used_for_sign_up": true,
+      "verification_strategies": [
+        "email_code"
+      ],
+      "verify_at_sign_up": true
+    },
+    "auth_multi_factor": {
+      "authenticator_app": {
+        "enabled": true
+      },
+      "backup_code": {
+        "enabled": true
+      },
+      "required_for_sign_in": false,
+      "required_for_sign_up": false
+    },
+    "auth_passkey": {
+      "allow_autofill": true,
+      "satisfies_second_factor": true,
+      "show_sign_in_button": true,
+      "used_for_sign_in": false
+    },
+    "auth_password": {
+      "device_trust": {
+        "enabled": true
+      },
+      "disable_hibp": false,
+      "disable_password_reverification": false,
+      "enabled": true,
+      "enforce_hibp_on_sign_in": false,
+      "max_length": 0,
+      "min_length": 8,
+      "min_zxcvbn_strength": 0,
+      "require_lowercase": false,
+      "require_numbers": false,
+      "require_special_char": true,
+      "require_uppercase": false,
+      "required": true,
+      "show_zxcvbn": false
+    },
+    "auth_phone": {
+      "immutable": false,
+      "required_for_sign_up": false,
+      "second_factor_strategies": [
+        "phone_code"
+      ],
+      "sign_in_strategies": [
+        "phone_code"
+      ],
+      "used_for_second_factor": true,
+      "used_for_sign_in": true,
+      "used_for_sign_up": true,
+      "verification_strategies": [
+        "phone_code"
+      ],
+      "verify_at_sign_up": true
+    },
+    "auth_username": {
+      "allow_extended_special_characters": false,
+      "allow_numeric_usernames": false,
+      "immutable": false,
+      "max_length": 64,
+      "min_length": 4,
+      "required_for_sign_up": false,
+      "used_for_sign_in": true,
+      "used_for_sign_up": true
+    },
+    "auth_web3": {
+      "required_for_sign_up": false,
+      "sign_in_strategies": [
+        "web3_metamask_signature"
+      ],
+      "used_for_sign_in": true,
+      "used_for_sign_up": true,
+      "verification_strategies": [
+        "web3_metamask_signature"
+      ],
+      "verify_at_sign_up": true
+    },
+    "compliance": {
+      "legal_consent": {
+        "enabled": false,
+        "privacy_policy_url": null,
+        "terms_of_service_url": null
+      }
+    },
+    "connection_oauth_google": {
+      "block_email_subaddresses": false
+    },
+    "organization_settings": {
+      "admin_delete_enabled": true,
+      "creator_role": "org:admin",
+      "domains_default_role": "org:member",
+      "domains_enabled": true,
+      "domains_enrollment_modes": [
+        "manual_invitation",
+        "automatic_invitation",
+        "automatic_suggestion"
+      ],
+      "enabled": true,
+      "force_organization_selection": false,
+      "initial_role_set_key": "role_set:default",
+      "max_allowed_domains": 10,
+      "max_allowed_memberships": 3,
+      "max_allowed_roles": 10,
+      "max_role_sets_allowed": 30,
+      "organization_creation_defaults": {
+        "automatic_organization_creation": {
+          "enabled": false
+        },
+        "detect_from_email_domain": {
+          "enabled": false
+        },
+        "enabled": false,
+        "fallback": {
+          "name": ""
+        },
+        "organization_name_template": {
+          "enabled": false,
+          "template": ""
+        }
+      },
+      "slug_disabled": false
+    },
+    "session_settings": {
+      "inactivity_timeout": {
+        "duration_seconds": 0,
+        "enabled": false
+      },
+      "maximum_lifetime": {
+        "duration_seconds": 604800,
+        "enabled": true
+      },
+      "multi_session_enabled": true
+    },
+    "user_model": {
+      "first_name": {
+        "enabled": true,
+        "required": false
+      },
+      "last_name": {
+        "enabled": true,
+        "required": false
+      }
+    }
+  },
+  "environment": {
+    "auth_config.first_factors": [
+      "email_code",
+      "email_link",
+      "oauth_google",
+      "password",
+      "phone_code",
+      "reset_password_email_code",
+      "reset_password_phone_code",
+      "ticket",
+      "web3_metamask_signature"
+    ],
+    "auth_config.first_name": "on",
+    "auth_config.identification_requirements[0]": [
+      "email_address",
+      "oauth_google",
+      "phone_number",
+      "web3_wallet"
+    ],
+    "auth_config.identification_requirements[1]": [
+      "username"
+    ],
+    "auth_config.identification_strategies": [
+      "email_address",
+      "oauth_google",
+      "phone_number",
+      "username",
+      "web3_wallet"
+    ],
+    "auth_config.last_name": "on",
+    "auth_config.native_settings.api_enabled": true,
+    "auth_config.phone_number": "on",
+    "auth_config.second_factors": [
+      "backup_code",
+      "phone_code",
+      "totp"
+    ],
+    "auth_config.single_session_mode": false,
+    "auth_config.test_mode": true,
+    "auth_config.username": "on",
+    "display_config.captcha_provider": null,
+    "display_config.captcha_widget_type": null,
+    "organization_settings.domains.default_role": "org:member",
+    "organization_settings.domains.enabled": true,
+    "organization_settings.domains.enrollment_modes": [
+      "automatic_invitation",
+      "automatic_suggestion",
+      "manual_invitation"
+    ],
+    "organization_settings.enabled": true,
+    "organization_settings.force_organization_selection": false,
+    "organization_settings.max_allowed_memberships": 3,
+    "organization_settings.organization_creation_defaults.detect_from_email_domain.enabled": false,
+    "organization_settings.organization_creation_defaults.enabled": false,
+    "organization_settings.organization_creation_defaults.fallback.name": "",
+    "organization_settings.organization_creation_defaults.organization_name_template.enabled": false,
+    "organization_settings.organization_creation_defaults.organization_name_template.template": "",
+    "organization_settings.slug.disabled": false,
+    "user_settings.actions.create_organization": true,
+    "user_settings.actions.delete_self": true,
+    "user_settings.attack_protection.email_link.require_same_client": false,
+    "user_settings.attack_protection.user_lockout.max_attempts": 100,
+    "user_settings.attributes.authenticator_app.enabled": true,
+    "user_settings.attributes.authenticator_app.second_factors": [
+      "totp"
+    ],
+    "user_settings.attributes.authenticator_app.used_for_second_factor": true,
+    "user_settings.attributes.authenticator_app.verifications": [
+      "totp"
+    ],
+    "user_settings.attributes.backup_code.enabled": true,
+    "user_settings.attributes.backup_code.second_factors": [
+      "backup_code"
+    ],
+    "user_settings.attributes.backup_code.used_for_second_factor": true,
+    "user_settings.attributes.email_address.first_factors": [
+      "email_code",
+      "email_link"
+    ],
+    "user_settings.attributes.first_name.enabled": true,
+    "user_settings.attributes.last_name.enabled": true,
+    "user_settings.attributes.phone_number.enabled": true,
+    "user_settings.attributes.phone_number.first_factors": [
+      "phone_code"
+    ],
+    "user_settings.attributes.phone_number.second_factors": [
+      "phone_code"
+    ],
+    "user_settings.attributes.phone_number.used_for_first_factor": true,
+    "user_settings.attributes.phone_number.used_for_second_factor": true,
+    "user_settings.attributes.phone_number.verifications": [
+      "phone_code"
+    ],
+    "user_settings.attributes.phone_number.verify_at_sign_up": true,
+    "user_settings.attributes.ticket.enabled": true,
+    "user_settings.attributes.username.enabled": true,
+    "user_settings.attributes.username.used_for_first_factor": true,
+    "user_settings.attributes.web3_wallet.enabled": true,
+    "user_settings.attributes.web3_wallet.first_factors": [
+      "web3_metamask_signature"
+    ],
+    "user_settings.attributes.web3_wallet.used_for_first_factor": true,
+    "user_settings.attributes.web3_wallet.verifications": [
+      "web3_metamask_signature"
+    ],
+    "user_settings.attributes.web3_wallet.verify_at_sign_up": true,
+    "user_settings.password_settings.enforce_hibp_on_sign_in": false,
+    "user_settings.password_settings.min_length": 8,
+    "user_settings.password_settings.require_special_char": true,
+    "user_settings.restrictions.allowlist_blocklist_disabled_on_sign_in.enabled": false,
+    "user_settings.sign_up.captcha_enabled": false,
+    "user_settings.sign_up.mfa.required": false,
+    "user_settings.social.oauth_google.block_email_subaddresses": false
+  }
+}

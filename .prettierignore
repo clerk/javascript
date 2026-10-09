@@ -29,3 +29,17 @@ CLAUDE.md
 
 # Written by `eslint --suppress-rule` / `--prune-suppressions`; ESLint owns the formatting.
 /**/eslint-suppressions.json
+
+# Copied byte for byte from another repo; do not reformat.
+integration/expo-native/src/core/
+integration/expo-native/src/platform/android/
+integration/expo-native/src/platform/ios/
+integration/expo-native/specs/fixtures.ts
+integration/expo-native/specs/support/
+integration/expo-native/testing/
+integration/expo-native/e2e.config.ts
+integration/expo-native/test/*.ts
+!integration/expo-native/test/freshness.test.ts
+!integration/expo-native/test/host.test.ts
+integration/expo-native/.verify/
+integration/expo-native/specs/explored/

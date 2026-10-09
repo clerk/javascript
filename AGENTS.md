@@ -12,6 +12,11 @@ Clerk's JavaScript SDK and library monorepo.
 - Reuse existing patterns before writing new ones. Before adding a helper, hook, or a local way of handling errors, pending state, focus or similar cross-cutting concerns, search the package for one that already solves it. If none fits, stop and ask the user before introducing a new pattern: say what the problem is, what you checked, and what you propose.
 - PR descriptions follow `.github/PULL_REQUEST_TEMPLATE.md` and add no sections of their own. Never add a "Testing" (or "Test plan" / "How to test") section summarizing the tests written or the checks run; the Checklist covers that and reviewers read the diff. Describe the change, not the work done on it.
 
+## Verifying changes
+
+To prove a change to `@clerk/expo` on a simulator or emulator, read the `Verifying changes` section of `packages/expo/AGENTS.md`.
+The skill is `.claude/skills/verify-clerk-expo/`, and the tests and the CLI that runs them are in `integration/expo-native/`.
+
 ## References
 
 - For questions about theming, appearance customization, or the styled system, see `references/theming-architecture.md`.

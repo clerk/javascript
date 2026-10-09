@@ -1,0 +1,20 @@
+{
+  "name": "verify-clerk-expo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@e2e-dev/github": "0.4.0",
+    "@e2e-dev/mobile": "0.10.0",
+    "@types/node": "24.19.1",
+    "ai": "7.0.128",
+    "e2e": "0.18.0",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=24.8.0 <25"
+  }
+}
