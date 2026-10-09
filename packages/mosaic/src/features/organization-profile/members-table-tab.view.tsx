@@ -307,7 +307,11 @@ function MemberRow({
   const m = useMessages('membersTableTab');
   const manageable = canManageMember(member);
   return (
-    <Table.Row selected={Boolean(onToggleSelected) && manageable && selected}>
+    <Table.Row
+      selected={Boolean(onToggleSelected) && manageable && selected}
+      aria-disabled={member.isDeprovisioned || undefined}
+      xstyle={member.isDeprovisioned && styles.deprovisionedRow}
+    >
       {onToggleSelected ? (
         <Table.SelectCell
           aria-label={fill(m.select, { name: member.name })}

@@ -184,6 +184,13 @@ describe('MembersTableTabView', () => {
     expect(screen.getByRole('checkbox', { name: 'Select Deprovisioned' })).not.toBeChecked();
   });
 
+  it('marks deprovisioned members as inactive', () => {
+    const member = propsFor().members[1];
+    renderView({ members: [member, { ...member, id: 'gone', name: 'Gone', isDeprovisioned: true }], totalCount: 2 });
+    expect(screen.getByRole('row', { name: /Gone/ })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('row', { name: /Grace Hopper/ })).not.toHaveAttribute('aria-disabled');
+  });
+
   it('routes invite and role changes while withholding protected member actions', async () => {
     const user = userEvent.setup();
     const { props } = renderView({ onRemove: vi.fn(), onChangeRole: vi.fn(), onInvite: vi.fn() });
