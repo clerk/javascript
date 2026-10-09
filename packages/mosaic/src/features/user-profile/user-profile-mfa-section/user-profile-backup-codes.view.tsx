@@ -36,6 +36,7 @@ export function UserProfileBackupCodesView({
   const m = useMessages('userProfileBackupCodes');
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const hasCodes = codes.length > 0 && pendingAction !== 'generate';
+  const showSaveActions = hasCodes || pendingAction === 'generate';
 
   return (
     <>
@@ -92,7 +93,7 @@ export function UserProfileBackupCodesView({
         ) : null}
       </Card.Content>
       <Card.Footer>
-        {hasCodes ? (
+        {showSaveActions ? (
           <>
             {onPrint ? (
               <Button
@@ -100,6 +101,7 @@ export function UserProfileBackupCodesView({
                 variant='outline'
                 color='neutral'
                 fullWidth
+                disabled={!hasCodes}
                 onClick={onPrint}
               >
                 {m.print}
@@ -111,7 +113,7 @@ export function UserProfileBackupCodesView({
               color='neutral'
               fullWidth
               isPending={pendingAction === 'download'}
-              disabled={pendingAction === 'copy'}
+              disabled={!hasCodes || pendingAction === 'copy'}
               pendingLabel={m.downloading}
               onClick={onDownload}
             >
@@ -121,46 +123,37 @@ export function UserProfileBackupCodesView({
               />
               {m.download}
             </SubmitButton>
-            <SubmitButton
-              type='button'
-              fullWidth
-              isPending={pendingAction === 'copy'}
-              disabled={pendingAction === 'download'}
-              ref={actionRef}
-              pendingLabel={m.copying}
-              onClick={onCopy}
-            >
-              <Icon
-                name='clipboard'
-                placement='inline-start'
-              />
-              {m.copyAndClose}
-            </SubmitButton>
           </>
         ) : (
-          <>
-            <Button
-              type='button'
-              variant='outline'
-              color='neutral'
-              fullWidth
-              disabled={Boolean(pendingAction)}
-              onClick={onBack ?? onCancel}
-            >
-              {onBack ? m.back : m.cancel}
-            </Button>
-            <SubmitButton
-              type='button'
-              fullWidth
-              isPending={pendingAction === 'generate'}
-              ref={actionRef}
-              pendingLabel={m.generating}
-              onClick={onRetry}
-            >
-              {m.retry}
-            </SubmitButton>
-          </>
+          <Button
+            type='button'
+            variant='outline'
+            color='neutral'
+            fullWidth
+            disabled={Boolean(pendingAction)}
+            onClick={onBack ?? onCancel}
+          >
+            {onBack ? m.back : m.cancel}
+          </Button>
         )}
+        <SubmitButton
+          type='button'
+          fullWidth
+          isPending={pendingAction === 'copy'}
+          disabled={showSaveActions && (!hasCodes || pendingAction === 'download')}
+          focusableWhenDisabled
+          ref={actionRef}
+          pendingLabel={m.copying}
+          onClick={showSaveActions ? onCopy : onRetry}
+        >
+          {showSaveActions ? (
+            <Icon
+              name='clipboard'
+              placement='inline-start'
+            />
+          ) : null}
+          {showSaveActions ? m.copyAndClose : m.retry}
+        </SubmitButton>
       </Card.Footer>
     </>
   );

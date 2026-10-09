@@ -242,11 +242,18 @@ describe('User profile MFA management', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
     await waitFor(() => expect(held.requests).toHaveLength(1));
     await waitFor(() => expect(screen.getByRole('status', { name: 'Generating backup codes' })).toBeVisible());
-    expect(screen.queryByRole('button', { name: 'Copy and close' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Download' })).toBeNull();
+    for (const name of ['Print', 'Download']) {
+      expect(screen.getByRole('button', { name })).toBeVisible();
+      expect(screen.getByRole('button', { name })).toBeDisabled();
+    }
+    expect(screen.getByRole('button', { name: 'Copy and close' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
     held.release();
     await waitFor(() => expect(screen.getByText('CODE0100')).toBeVisible());
+    for (const name of ['Print', 'Download', 'Copy and close']) {
+      expect(screen.getByRole('button', { name })).toBeEnabled();
+    }
   });
 
   it('uses fresh server codes for explicit regeneration', async () => {
