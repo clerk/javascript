@@ -1,0 +1,64 @@
+import * as SegmentedControlStories from './segmented-control.stories';
+
+# Segmented Control
+
+A row of mutually exclusive options where exactly one is active. It is announced as a radio group,
+and the arrow keys move the selection.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={SegmentedControlStories}
+/>
+
+## Usage
+
+```tsx
+import { SegmentedControl } from '@clerk/mosaic/components/segmented-control';
+
+<SegmentedControl.Root
+  aria-label='Billing period'
+  defaultValue='monthly'
+>
+  <SegmentedControl.Item value='monthly'>Monthly</SegmentedControl.Item>
+  <SegmentedControl.Item value='annual'>Annual</SegmentedControl.Item>
+</SegmentedControl.Root>;
+```
+
+## Parts
+
+| Part                    | Element    | Description                                        |
+| ----------------------- | ---------- | -------------------------------------------------- |
+| `SegmentedControl.Root` | `<div>`    | `role="radiogroup"` track that holds the selection |
+| `SegmentedControl.Item` | `<button>` | `role="radio"` option; the selected one is raised  |
+
+All parts accept `xstyle`, a `render` prop, and standard HTML attributes. Give `Root` an
+`aria-label` or `aria-labelledby`.
+
+The selected pill is `.cl-segmented-control-indicator`. Style that class to restyle the selection.
+
+## Props
+
+### `SegmentedControl.Root`
+
+| Prop            | Type                      | Default | Description                       |
+| --------------- | ------------------------- | ------- | --------------------------------- |
+| `value`         | `string`                  | —       | Controlled selected value         |
+| `defaultValue`  | `string`                  | `""`    | Initial selected value            |
+| `onValueChange` | `(value: string) => void` | —       | Called when the selection changes |
+| `disabled`      | `boolean`                 | `false` | Disables every item               |
+
+### `SegmentedControl.Item`
+
+| Prop       | Type      | Default      | Description                           |
+| ---------- | --------- | ------------ | ------------------------------------- |
+| `value`    | `string`  | **required** | Unique option identifier              |
+| `disabled` | `boolean` | —            | Disables the item; it stays focusable |
+
+## Disabled
+
+<Story
+  name='Disabled'
+  storyModule={SegmentedControlStories}
+/>

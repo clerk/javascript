@@ -252,6 +252,11 @@ import {
   meta as sectionMeta,
 } from '../stories/section.stories';
 import {
+  Default as SegmentedControlDefault,
+  Disabled as SegmentedControlDisabled,
+  meta as segmentedControlMeta,
+} from '../stories/segmented-control.stories';
+import {
   Controlled as SelectComponentControlled,
   Default as SelectComponentDefault,
   Descriptions as SelectComponentDescriptions,
@@ -727,6 +732,12 @@ const tableModule: StoryModule = {
   Overflow: TableOverflow,
 };
 
+const segmentedControlModule: StoryModule = {
+  meta: segmentedControlMeta,
+  Default: SegmentedControlDefault,
+  Disabled: SegmentedControlDisabled,
+};
+
 const tabsComponentModule: StoryModule = {
   meta: tabsComponentMeta,
   Default: TabsComponentDefault,
@@ -971,6 +982,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   sectionModule,
+  segmentedControlModule,
   selectComponentModule,
   tableModule,
   tabsComponentModule,
