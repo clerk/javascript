@@ -44,8 +44,8 @@ const titleRef = useRef<HTMLDivElement>(null);
   connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
   web3WalletsSlot={<UserProfileWeb3WalletsSectionView wallets={wallets} onRemove={removeWeb3Wallet} fallbackFocus={() => titleRef.current} />}
   onVerifyEmail={verifyEmail}
-  onSendEmailCode={sendEmailCode}
-  onVerifyEmailCode={verifyEmailCode}
+  onCreateEmail={createEmail}
+  getEmailVerifier={getEmailVerifier}
   onSetPrimaryEmail={setPrimaryEmail}
   onRemoveEmail={removeEmail}
   onVerifyPhone={verifyPhone}

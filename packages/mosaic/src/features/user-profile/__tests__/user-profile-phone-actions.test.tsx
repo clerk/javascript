@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../mosaic-provider';
+import { SaveError } from '../../../utils/errors';
 import type { UserProfileAccountSectionViewProps } from '../user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '../user-profile-account-section/user-profile-account-section.view';
 
@@ -16,12 +17,14 @@ function renderPhone(overrides: Partial<UserProfileAccountSectionViewProps> = {}
         name='Test'
         username='test'
         emails={[]}
-        phones={[{ id: 'phone_1', value: '+18015550100', isVerified: true }]}
+        phones={[{ id: 'phone_1', value: '+18015550100', isDefault: false, isVerified: true }]}
         {...overrides}
       />
     </MosaicProvider>,
   );
 }
+
+const phoneVerifier = { sendCode: () => Promise.resolve(), verifyCode: () => Promise.resolve() };
 
 describe('phone actions', () => {
   it('ignores backdrop clicks and allows Escape to cancel removal', async () => {
@@ -63,7 +66,7 @@ describe('phone actions', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
-  it('hides set primary while an update is pending', async () => {
+  it('ignores a second set primary while the first is pending', async () => {
     const user = userEvent.setup();
     let finish = () => {};
     const pending = new Promise<void>(resolve => {
@@ -74,24 +77,24 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
-    expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+
     expect(onSetPrimaryPhone).toHaveBeenCalledOnce();
     finish();
-    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as primary' })).toBeInTheDocument());
   });
-  it.each([{ isDefault: true, isVerified: true }, { isDefault: false, isVerified: false }, { isDefault: false }])(
-    'hides set primary for an ineligible phone: %j',
-    async flags => {
-      const user = userEvent.setup();
-      renderPhone({
-        phones: [{ id: 'phone_1', value: '+18015550100', ...flags }],
-        onSetPrimaryPhone: vi.fn(),
-        onRemovePhone: vi.fn(),
-      });
-      await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
-      expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).not.toBeInTheDocument();
-    },
-  );
+  it.each([
+    { isDefault: true, isVerified: true },
+    { isDefault: false, isVerified: false },
+  ])('hides set primary for an ineligible phone: %j', async flags => {
+    const user = userEvent.setup();
+    renderPhone({
+      phones: [{ id: 'phone_1', value: '+18015550100', ...flags }],
+      onSetPrimaryPhone: vi.fn(),
+      onRemovePhone: vi.fn(),
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
+    expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).not.toBeInTheDocument();
+  });
 
   it('updates the primary badge immediately without confirmation', async () => {
     const user = userEvent.setup();
@@ -153,7 +156,9 @@ describe('phone actions', () => {
   it('shows Add phone number after removing the last phone', async () => {
     const user = userEvent.setup();
     function Example() {
-      const [phones, setPhones] = useState([{ id: 'phone_1', value: '+18015550100', isVerified: true }]);
+      const [phones, setPhones] = useState([
+        { id: 'phone_1', value: '+18015550100', isDefault: false, isVerified: true },
+      ]);
       return (
         <MosaicProvider>
           <UserProfileAccountSectionView
@@ -162,8 +167,8 @@ describe('phone actions', () => {
             username='test'
             emails={[]}
             phones={phones}
-            onSendPhoneCode={() => Promise.resolve()}
-            onVerifyPhoneCode={() => Promise.resolve()}
+            getPhoneVerifier={() => phoneVerifier}
+            onCreatePhone={() => Promise.resolve(phoneVerifier)}
             onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
           />
         </MosaicProvider>
@@ -198,22 +203,34 @@ describe('phone actions', () => {
   it('does not offer removal when it is forbidden', async () => {
     const user = userEvent.setup();
     renderPhone({
-      phones: [{ id: 'phone_1', value: '+18015550100', isVerified: true, canRemove: false }],
+      phones: [{ id: 'phone_1', value: '+18015550100', isDefault: false, isVerified: true }],
       onSetPrimaryPhone: vi.fn(),
-      onRemovePhone: vi.fn(),
     });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     expect(screen.queryByRole('menuitem', { name: 'Remove phone number' })).not.toBeInTheDocument();
   });
-  it('shows a primary update error without opening a dialog', async () => {
+  it('shows why the primary update failed, without opening a dialog', async () => {
     const user = userEvent.setup();
-    const onSetPrimaryPhone = vi.fn().mockRejectedValue(new Error('Unable to update primary phone.'));
+    const onSetPrimaryPhone = vi.fn().mockRejectedValue(new SaveError({ global: { message: 'Not verified yet.' } }));
     renderPhone({ onSetPrimaryPhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledExactlyOnceWith('phone_1');
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Unable to update primary phone.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Not verified yet.'));
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('shows the generic message and logs a primary update that threw unexpectedly', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    const failure = new TypeError('boom');
+    const onSetPrimaryPhone = vi.fn().mockRejectedValue(failure);
+    renderPhone({ onSetPrimaryPhone });
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
+    expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
+    log.mockRestore();
   });
   it('requires confirmation before removing a phone number', async () => {
     const user = userEvent.setup();
@@ -225,7 +242,7 @@ describe('phone actions', () => {
           name='Test'
           username='test'
           emails={[]}
-          phones={[{ id: 'phone_1', value: '+18015550100', isVerified: true }]}
+          phones={[{ id: 'phone_1', value: '+18015550100', isDefault: false, isVerified: true }]}
           onRemovePhone={onRemovePhone}
         />
       </MosaicProvider>,
@@ -238,5 +255,23 @@ describe('phone actions', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
     expect(onRemovePhone).toHaveBeenCalledExactlyOnceWith('phone_1');
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+  it.each([
+    [true, 'You won’t be able to use it to sign in.'],
+    [false, undefined],
+  ])('warns about signing in only when removing a verified phone (verified: %s)', async (isVerified, warning) => {
+    const user = userEvent.setup();
+    renderPhone({
+      phones: [{ id: 'phone_1', value: '+18015550100', isDefault: false, isVerified }],
+      onRemovePhone: vi.fn(),
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
+    const dialog = screen.getByRole('alertdialog');
+    if (warning) {
+      expect(dialog).toHaveTextContent(warning);
+    } else {
+      expect(dialog).not.toHaveTextContent('sign in');
+    }
   });
 });

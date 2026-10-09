@@ -10,6 +10,7 @@ import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from '../user-profile-profile-panel.styles';
+import type { UserProfileContact } from './user-profile-account-section.types';
 
 export interface UserProfileContactListRowViewProps {
   rowRef?: Ref<HTMLDivElement>;
@@ -17,11 +18,11 @@ export interface UserProfileContactListRowViewProps {
   addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
-  items: Array<{ id: string; value: string; isDefault?: boolean; isVerified?: boolean; canRemove?: boolean }>;
+  items: UserProfileContact[];
   onAdd?: () => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (item: UserProfileContact) => void;
   children?: ReactNode;
 }
 
@@ -83,20 +84,20 @@ export function UserProfileContactListRowView({
             items.map(item => {
               const actions: ActionMenuAction[] = [];
 
-              if (item.isVerified === false && onVerify) {
+              if (!item.isVerified && onVerify) {
                 actions.push({
                   label: item.isDefault ? m.completeVerification : m[kind].verify,
                   onClick: () => onVerify(item.id),
                 });
-              } else if (!item.isDefault && item.isVerified === true && onSetPrimary) {
+              } else if (item.isVerified && !item.isDefault && onSetPrimary) {
                 actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
               }
 
-              if (onRemove && item.canRemove !== false) {
+              if (onRemove) {
                 actions.push({
                   label: m[kind].remove,
                   color: 'negative',
-                  onClick: () => onRemove(item.id),
+                  onClick: () => onRemove(item),
                 });
               }
 
@@ -106,6 +107,7 @@ export function UserProfileContactListRowView({
                     <Section.Description xstyle={styles.contactValue}>
                       <span {...stylex.props(truncationStyles.singleLine, styles.contactText)}>{item.value}</span>
                       {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
+                      {item.isVerified ? null : <Badge color='warning'>{m.unverified}</Badge>}
                     </Section.Description>
                   </Section.Content>
                   {actions.length > 0 ? (

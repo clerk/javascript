@@ -1,18 +1,21 @@
 import { useRef } from 'react';
 
 import { Card } from '../../../components/card';
-import type { DialogTriggerProps } from '../../../components/dialog';
+import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Flow } from '../../../components/flow';
+import type { CountryIso } from '../../../components/phone-input';
 import { EnterPhoneStep, VerifyPhoneStep } from '../user-profile-phone.steps';
 
 export interface UserProfileAddPhoneDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  trigger?: DialogTriggerProps['render'];
+  handle?: DialogHandle<unknown>;
+  finalFocus?: DialogFocusTarget;
   step: 'phone' | 'verify';
   phoneNumber: string;
   onPhoneNumberChange: (value: string) => void;
+  defaultCountry?: CountryIso;
   code: string;
   onCodeChange: (value: string) => void;
   onSubmit: (code?: string) => void;
@@ -28,13 +31,14 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
 
   return (
     <Dialog.Root
+      handle={props.handle}
       open={props.open}
       onOpenChange={props.onOpenChange}
     >
-      {props.trigger ? <Dialog.Trigger render={props.trigger} /> : null}
       <Dialog.Popup
         variant='card'
         initialFocus={props.step === 'phone' ? phoneRef : undefined}
+        finalFocus={props.finalFocus}
       >
         <Card.Root
           elevation='overlay'
@@ -51,6 +55,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                     inputRef={phoneRef}
                     phoneNumber={current.phoneNumber}
                     onPhoneNumberChange={current.onPhoneNumberChange}
+                    defaultCountry={current.defaultCountry}
                     onSubmit={current.onSubmit}
                     isPending={current.isPending}
                     errorMessage={current.errorMessage}
