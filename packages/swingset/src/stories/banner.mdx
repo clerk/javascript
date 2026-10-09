@@ -33,8 +33,8 @@ import { Banner } from '@clerk/mosaic/components/banner';
 | Part                 | Stable slot class        | Description                                                     |
 | -------------------- | ------------------------ | --------------------------------------------------------------- |
 | `Banner.Root`        | `.cl-banner-root`        | Tinted `div` surface. Owns `color` and renders the icon for it. |
-| `Banner.Label`       | `.cl-banner-label`       | The headline `span`, in the root's color at medium weight.      |
-| `Banner.Description` | `.cl-banner-description` | Supporting `p` beneath the label.                               |
+| `Banner.Label`       | `.cl-banner-label`       | The headline `span`, in the foreground color at medium weight.  |
+| `Banner.Description` | `.cl-banner-description` | Supporting `p` beneath the label, in the secondary text color.  |
 
 `Banner.Root` also wraps its children in a `.cl-banner-content` column so the copy aligns past the icon. Every part accepts `render` for polymorphism and forwards its ref.
 
@@ -52,13 +52,13 @@ Each part carries its stable slot class alongside the generated StyleX atoms and
 }
 ```
 
-| Part                 | `data-color`                         |
-| -------------------- | ------------------------------------ |
-| `Banner.Root`        | `neutral` \| `warning` \| `negative` |
-| `Banner.Label`       | `neutral` \| `warning` \| `negative` |
-| `Banner.Description` | `neutral` \| `warning` \| `negative` |
+| Part                 | `data-color`                                       |
+| -------------------- | -------------------------------------------------- |
+| `Banner.Root`        | `neutral` \| `warning` \| `negative` \| `positive` |
+| `Banner.Label`       | `neutral` \| `warning` \| `negative` \| `positive` |
+| `Banner.Description` | `neutral` \| `warning` \| `negative` \| `positive` |
 
-Warning and negative paint the color's `-subtle` surface inside its `-border` hairline and use the saturated token for the icon and copy, so retheme one by overriding `--cl-color-negative-subtle`, `--cl-color-negative-border`, and `--cl-color-negative` (or the `warning` equivalents). Neutral has no subtle surface of its own: its fill is `--cl-color-neutral-alpha-100`, a 6% wash of `--cl-color-neutral` over whatever it sits on, and `--cl-color-border` draws its hairline.
+Warning, negative, and positive paint the color's `-subtle` surface inside its `-border` hairline and use the saturated token for the icon, so retheme one by overriding `--cl-color-negative-subtle`, `--cl-color-negative-border`, and `--cl-color-negative` (or the `warning` and `positive` equivalents). The label uses `--cl-color-foreground` and the description `--cl-color-foreground-secondary` for every color. Neutral has no subtle surface of its own: its fill is `--cl-color-neutral-alpha-100`, a 6% wash of `--cl-color-neutral` over whatever it sits on, and `--cl-color-border` draws its hairline.
 
 ---
 

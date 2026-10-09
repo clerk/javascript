@@ -15,6 +15,7 @@ export const styles = stylex.create({
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    color: colorVars['--cl-color-foreground'],
   },
   icon: {
     flexShrink: 0,
@@ -31,6 +32,7 @@ export const styles = stylex.create({
   },
   description: {
     textWrap: 'pretty',
+    color: colorVars['--cl-color-foreground-secondary'],
   },
 });
 
@@ -38,22 +40,24 @@ export const rootColors = stylex.create({
   neutral: {
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: colorVars['--cl-color-neutral-alpha-100'],
-    color: colorVars['--cl-color-foreground'],
   },
   warning: {
     borderColor: colorVars['--cl-color-warning-border'],
     backgroundColor: colorVars['--cl-color-warning-subtle'],
-    color: colorVars['--cl-color-warning'],
   },
   negative: {
     borderColor: colorVars['--cl-color-negative-border'],
     backgroundColor: colorVars['--cl-color-negative-subtle'],
-    color: colorVars['--cl-color-negative'],
+  },
+  positive: {
+    borderColor: colorVars['--cl-color-positive-border'],
+    backgroundColor: colorVars['--cl-color-positive-subtle'],
   },
 });
 
-export const descriptionColors = stylex.create({
+export const iconColors = stylex.create({
   neutral: { color: colorVars['--cl-color-foreground-secondary'] },
   warning: { color: colorVars['--cl-color-warning'] },
   negative: { color: colorVars['--cl-color-negative'] },
+  positive: { color: colorVars['--cl-color-positive'] },
 });
