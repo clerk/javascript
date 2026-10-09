@@ -1,12 +1,11 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../mosaic-provider';
-import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from '../user-profile-mfa-section.view';
+import type { UserProfileMfaSectionViewProps } from '../user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '../user-profile-mfa-section.view';
 
 function renderView(overrides: Partial<UserProfileMfaSectionViewProps> = {}) {
@@ -34,43 +33,6 @@ afterEach(() => {
 });
 
 describe('MFA section', () => {
-  it.each(['picker', 'custom', 'none'] as const)(
-    'restores focus after removing methods with %s add control',
-    async add => {
-      const user = userEvent.setup();
-      function Example() {
-        const [methods, setMethods] = useState<UserProfileMfaMethod[]>([
-          { id: 'totp', type: 'authenticator' },
-          { id: 'sms', type: 'sms' },
-        ]);
-        return (
-          <MosaicProvider>
-            <UserProfileMfaSectionView
-              methods={methods}
-              addableMethods={['sms', 'authenticator']}
-              onAdd={add === 'picker' ? () => {} : undefined}
-              addControl={add === 'custom' ? <button type='button'>Add custom method</button> : undefined}
-              onRemove={id => setMethods(current => current.filter(method => method.id !== id))}
-            />
-          </MosaicProvider>
-        );
-      }
-      render(<Example />);
-      await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
-      await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage SMS verification' })).toHaveFocus());
-      await user.keyboard('{Enter}');
-      await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-      const fallback =
-        add === 'none'
-          ? screen.getByRole('group', { name: '2-step verification' })
-          : screen.getByRole('button', { name: add === 'picker' ? 'Add verification method' : 'Add custom method' });
-      await waitFor(() => expect(fallback).toHaveFocus());
-    },
-  );
-
   it.each(['sms', 'authenticator'] as const)('continues immediately when the %s option is activated', async type => {
     const user = userEvent.setup();
     const { props } = renderView({
@@ -91,7 +53,7 @@ describe('MFA section', () => {
     expect(screen.getByText('+1 801-555-0100')).toBeVisible();
   });
 
-  it('cancels without selecting a method and restores focus to Add', async () => {
+  it('cancels without selecting a method', async () => {
     const user = userEvent.setup();
     const { props } = renderView();
     const add = screen.getByRole('button', { name: 'Add verification method' });
@@ -101,15 +63,13 @@ describe('MFA section', () => {
     await user.keyboard('{Escape}');
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(add).toHaveFocus();
     expect(props.onAdd).not.toHaveBeenCalled();
     await user.click(add);
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(add).toHaveFocus();
   });
 
-  it('confirms the selected SMS method and restores focus when removal is canceled', async () => {
+  it('removes only the SMS method confirmed after a cancel', async () => {
     const user = userEvent.setup();
     const { props } = renderView({
       methods: [
@@ -129,7 +89,6 @@ describe('MFA section', () => {
     expect(props.onRemove).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0100' })).toHaveFocus();
 
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0200' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));

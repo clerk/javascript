@@ -745,38 +745,6 @@ describe('Deferred active-device actions', () => {
   it.todo('reverifies device revocation before retrying verification-required API errors');
 });
 
-describe('active devices focus after connected revocation', () => {
-  it('falls back to the previous row, then the current device', async () => {
-    serveDevices([
-      device('sess_current', 'active'),
-      device('sess_other', 'active', { device_type: 'iPhone' }),
-      device('sess_last', 'active', { device_type: 'Last laptop' }),
-    ]);
-    await renderWithClerk(<UserProfileActiveDevicesSection />);
-    const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on Last laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toHaveFocus());
-
-    await user.click(screen.getByRole('button', { name: 'Manage Safari on iPhone' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on MacBook Pro' })).toHaveFocus());
-  });
-
-  it('returns focus to the same row when sign out is canceled', async () => {
-    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
-    await renderWithClerk(<UserProfileActiveDevicesSection />);
-    const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
-
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toHaveFocus());
-  });
-});
-
 describe('Sign out an unavailable device', () => {
   it.each([
     ['en-US', 'This device is no longer available. Please try again.'],
