@@ -5,7 +5,6 @@ import { Confirmation } from '../../blocks/confirmation';
 import { ActionMenu } from '../../components/action-menu';
 import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
-import { Banner } from '../../components/banner';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
@@ -186,40 +185,18 @@ function MembersTableNotices({
   const m = useMessages('membersTableTab');
   return (
     <>
-      {hasRoleSetMigration ? (
-        <Banner.Root
-          role='status'
-          color='warning'
-        >
-          <Banner.Label>{m.roleSetMigration}</Banner.Label>
-        </Banner.Root>
-      ) : null}
+      {hasRoleSetMigration ? <p role='status'>{m.roleSetMigration}</p> : null}
       {hasLoadError ? (
-        <Banner.Root
-          role='alert'
-          color='negative'
-        >
-          <Banner.Label>{m.loadError}</Banner.Label>
-          {onRetry ? <Button onClick={onRetry}>{m.retry}</Button> : null}
-        </Banner.Root>
+        <p role='alert'>
+          {m.loadError} {onRetry ? <Button onClick={onRetry}>{m.retry}</Button> : null}
+        </p>
       ) : null}
       {isRolesError ? (
-        <Banner.Root
-          role='alert'
-          color='negative'
-        >
-          <Banner.Label>{m.rolesError}</Banner.Label>
-          {onRetryRoles ? <Button onClick={onRetryRoles}>{m.retry}</Button> : null}
-        </Banner.Root>
+        <p role='alert'>
+          {m.rolesError} {onRetryRoles ? <Button onClick={onRetryRoles}>{m.retry}</Button> : null}
+        </p>
       ) : null}
-      {roleError ? (
-        <Banner.Root
-          role='alert'
-          color='negative'
-        >
-          <Banner.Label>{roleError}</Banner.Label>
-        </Banner.Root>
-      ) : null}
+      {roleError ? <p role='alert'>{roleError}</p> : null}
     </>
   );
 }
