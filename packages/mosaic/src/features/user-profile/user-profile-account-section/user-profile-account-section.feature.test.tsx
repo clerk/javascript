@@ -134,7 +134,7 @@ describe('the user profile phone numbers', () => {
     await enterCode(actor, '000000');
 
     expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
-    expect(screen.getByRole('dialog', { name: 'Add phone number' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Verify your phone number' })).toBeInTheDocument();
   });
 
   it('holds the resend behind a countdown while the code is still fresh', async () => {
