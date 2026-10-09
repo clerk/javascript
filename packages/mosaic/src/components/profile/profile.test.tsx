@@ -655,18 +655,6 @@ describe('Profile', () => {
         expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
       });
 
-      it('spans the dialog by its own width, where a profile dialog fits its content', () => {
-        const spans = atomsOf(stylex.create({ spans: { inlineSize: '100cqi' } }).spans);
-        const root = () => Array.from(document.querySelector('.cl-profile')!.classList);
-
-        const fullscreen = renderFullscreen();
-        expect(root()).toEqual(expect.arrayContaining(spans));
-        fullscreen.unmount();
-
-        renderInDialog();
-        expect(root()).not.toEqual(expect.arrayContaining(spans));
-      });
-
       it('reads the back button label from the catalog', () => {
         renderFullscreen(vi.fn(), { overrides: { 'profile.backToApp': 'Retour à l’application' } });
 

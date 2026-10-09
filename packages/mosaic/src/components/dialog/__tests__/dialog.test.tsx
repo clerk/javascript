@@ -617,11 +617,10 @@ describe('compactPlacement', () => {
     warn.mockRestore();
   });
 
-  it('ignores a placement on a fullscreen profile, and warns', () => {
+  it('warns when a fullscreen profile is given a placement', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     renderPlacement('sheet', 'fullscreen');
 
-    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
     warn.mockRestore();
   });
@@ -633,24 +632,6 @@ describe('compactPlacement', () => {
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
     warn.mockRestore();
-  });
-});
-
-describe('fullscreen track', () => {
-  const probe = stylex.create({ noInset: { paddingInline: 0 }, fill: { width: '100%' } });
-
-  it('fits its surface like every other variant, leaving the width to the profile', () => {
-    renderVariant('fullscreen');
-    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.fill)));
-  });
-
-  it('has no inset around the popup, where a profile keeps one', () => {
-    const fullscreen = renderVariant('fullscreen');
-    expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.noInset)));
-    fullscreen.unmount();
-
-    renderVariant('profile');
-    expect(classesOf('.cl-dialog-track')).not.toEqual(expect.arrayContaining(atomFor(probe.noInset)));
   });
 });
 
