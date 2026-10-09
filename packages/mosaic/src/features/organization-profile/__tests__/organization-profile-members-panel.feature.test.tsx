@@ -206,7 +206,7 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByText('Bob Smith')).toBeVisible();
   }, 20_000);
 
-  it('keeps rows and offers retry when refreshing the current page fails', async () => {
+  it('replaces rows with the table error state and retries when refreshing the current page fails', async () => {
     serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(await screen.findByText('Bob Smith')).toBeVisible();
@@ -219,9 +219,11 @@ describe('OrganizationProfileMembersPanel', () => {
     await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible(), {
       timeout: 12_000,
     });
-    expect(screen.getByText('Bob Smith')).toBeVisible();
+    expect(screen.queryByText('Bob Smith')).toBeNull();
+    const table = within(screen.getByRole('table', { name: 'Members' }));
+    expect(table.getByRole('alert')).toHaveTextContent('Unable to load members');
     serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    await user.click(table.getByRole('button', { name: 'Try again' }));
     await waitFor(() => expect(screen.queryByText('Unable to load members')).toBeNull());
     expect(screen.getByText('Bob Smith')).toBeVisible();
   }, 20_000);

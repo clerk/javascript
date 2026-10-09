@@ -101,8 +101,6 @@ export function MembersTableTabView({
         </Table.Toolbar>
         <MembersTableNotices
           hasRoleSetMigration={hasRoleSetMigration}
-          hasLoadError={isError && table.rows.length > 0}
-          onRetry={onRetry}
           isRolesError={isRolesError}
           onRetryRoles={onRetryRoles}
           roleError={roleError}
@@ -174,24 +172,15 @@ export function MembersTableTabView({
 
 function MembersTableNotices({
   hasRoleSetMigration,
-  hasLoadError,
-  onRetry,
   isRolesError,
   onRetryRoles,
   roleError,
-}: Pick<MembersTableTabViewProps, 'hasRoleSetMigration' | 'onRetry' | 'isRolesError' | 'onRetryRoles' | 'roleError'> & {
-  hasLoadError: boolean;
-}) {
+}: Pick<MembersTableTabViewProps, 'hasRoleSetMigration' | 'isRolesError' | 'onRetryRoles' | 'roleError'>) {
   const m = useMessages('membersTableTab');
   return (
     <>
       {/* TODO: Use banners for these notices once banners support actions. */}
       {hasRoleSetMigration ? <p role='status'>{m.roleSetMigration}</p> : null}
-      {hasLoadError ? (
-        <p role='alert'>
-          {m.loadError} {onRetry ? <Button onClick={onRetry}>{m.retry}</Button> : null}
-        </p>
-      ) : null}
       {isRolesError ? (
         <p role='alert'>
           {m.rolesError} {onRetryRoles ? <Button onClick={onRetryRoles}>{m.retry}</Button> : null}
@@ -242,7 +231,7 @@ function MembersTableBody({
       </Table.Body>
     );
   }
-  if (isError && rows.length === 0) {
+  if (isError) {
     return (
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
