@@ -35,11 +35,11 @@ function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
   return sentinelWidth >= 2 ? 'select' : 'column';
 }
 
-function dismissOf(dialog: DialogContextValue | null, compact: boolean): ProfileDismiss {
+function dismissOf(dialog: DialogContextValue | null, backInNav: boolean): ProfileDismiss {
   if (!isInDialog(dialog) || dialog.role === 'alertdialog') {
     return 'none';
   }
-  return dialog.variant === 'fullscreen' && !compact ? 'back' : 'corner';
+  return backInNav ? 'back' : 'corner';
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -91,7 +91,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     return autoUpdate(sentinel, () => setNavLayout(navLayoutFor(getDimensions(sentinel).width)));
   }, [sentinel]);
   const compact = navLayout !== 'column';
-  const dismiss = dismissOf(dialog, compact);
+  const dismiss = dismissOf(dialog, fullscreen && !compact);
   const pageTitleId = React.useId();
   const pageTitleRef = React.useRef<HTMLHeadingElement | null>(null);
   const navTriggerRef = React.useRef<HTMLButtonElement | null>(null);
