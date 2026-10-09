@@ -33,14 +33,11 @@ export function MembersTableTabView({
   onChangeRole,
   totalCount,
   page,
-  pageSize = 10,
+  pageSize,
   searchValue,
   onSearchChange,
   onPageChange,
-  onPageSizeChange,
   onBulkAction,
-  sort,
-  onSortChange,
   isLoading,
   isFetching = false,
   isError = false,
@@ -60,18 +57,15 @@ export function MembersTableTabView({
     fallback: () => inviteButton.current ?? searchInput.current,
   });
   const removeDialog = useMemo(() => Confirmation.createHandle<OrganizationProfileMember>(), []);
-  const { table, sortHeader, pagination } = useServerDataTable({
+  const { table, pagination } = useServerDataTable({
     data: members,
     totalCount,
     getRowId,
     isRowSelectable: canManageMember,
-    sortableColumns: ['name', 'joinedAt', 'role'],
-    sort,
-    onSortChange,
+    sortableColumns: [],
     page,
     pageSize,
     onPageChange,
-    onPageSizeChange,
     searchValue,
     onSearchChange,
   });
@@ -81,7 +75,7 @@ export function MembersTableTabView({
   }, [table.setRowSelection]);
   useEffect(() => {
     resetSelection.current({});
-  }, [page, pageSize, searchValue, sort?.column, sort?.direction]);
+  }, [page, pageSize, searchValue]);
   const columnCount = 3 + Number(Boolean(onRemove)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
   return (
@@ -127,9 +121,9 @@ export function MembersTableTabView({
                   onChange={table.toggleAllRowsSelected}
                 />
               ) : null}
-              <Table.HeaderCell {...sortHeader('name')}>{m.name}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('joinedAt')}>{m.joinedAt}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('role')}>{m.role}</Table.HeaderCell>
+              <Table.HeaderCell>{m.name}</Table.HeaderCell>
+              <Table.HeaderCell>{m.joinedAt}</Table.HeaderCell>
+              <Table.HeaderCell>{m.role}</Table.HeaderCell>
               {onRemove ? (
                 <Table.HeaderCell align='end'>
                   <VisuallyHidden>{m.actions}</VisuallyHidden>

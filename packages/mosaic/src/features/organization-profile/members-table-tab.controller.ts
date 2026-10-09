@@ -53,6 +53,7 @@ export function useMembersTableController(model: ReturnType<typeof useMembersTab
       joinedAtLabel: formatDate(joinedAt, locale),
     })),
     roles: roles?.roles.map(role => ({ value: role.key, label: roleNames[role.key] ?? role.name })) ?? [],
+    pageSize: model.pageSize,
     totalCount: model.totalCount,
     page: model.page,
     onPageChange: model.fetchPage,
