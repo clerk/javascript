@@ -1,4 +1,4 @@
-import { Flow } from '../../components/flow';
+import { Flow } from '../../../components/flow';
 import type { UserProfileAddAuthenticatorViewProps } from './user-profile-add-authenticator.view';
 import { UserProfileAddAuthenticatorView } from './user-profile-add-authenticator.view';
 import type { UserProfileAddMfaViewProps } from './user-profile-add-mfa.view';
@@ -7,7 +7,7 @@ import type { UserProfileAddSmsViewProps } from './user-profile-add-sms.view';
 import { UserProfileAddSmsView } from './user-profile-add-sms.view';
 import type { UserProfileBackupCodesViewProps } from './user-profile-backup-codes.view';
 import { UserProfileBackupCodesView } from './user-profile-backup-codes.view';
-import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
+import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.types';
 
 export interface UserProfileMfaSetupViewProps extends UserProfileAddMfaViewProps {
   step: UserProfileMfaAddableMethod | 'select';

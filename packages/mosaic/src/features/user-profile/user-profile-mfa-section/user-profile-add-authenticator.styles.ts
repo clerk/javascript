@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, space } from '../../tokens.stylex';
+import { colorVars, space } from '../../../tokens.stylex';
 
 export const styles = stylex.create({
   verification: {

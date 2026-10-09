@@ -32,6 +32,12 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
     'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_contact_support:
     'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
+  mfa_account_changed: 'This account changed. Please try again.',
+  mfa_authenticator_unavailable: 'Authenticator is unavailable.',
+  mfa_method_cannot_remove: 'This method cannot be removed.',
+  mfa_phone_unavailable: 'This phone number is unavailable.',
+  mfa_print_unavailable: 'Printing is unavailable in this browser.',
+  mfa_setup_factor_first: 'Set up a verification method first.',
   network_error: 'Unable to reach the server. Check your connection and try again.',
   oauth_access_denied: 'You did not grant access to your account.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',

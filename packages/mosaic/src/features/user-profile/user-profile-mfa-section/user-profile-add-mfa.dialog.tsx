@@ -1,17 +1,18 @@
 import { useMergeRefs } from '@floating-ui/react';
 import { type ReactNode, type Ref, useRef } from 'react';
 
-import { Button } from '../../components/button';
-import { Card } from '../../components/card';
-import { Dialog } from '../../components/dialog';
-import { Icon } from '../../components/icon';
-import { useMessages } from '../../localization';
+import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { Dialog } from '../../../components/dialog';
+import { Icon } from '../../../components/icon';
+import { useMessages } from '../../../localization';
 
 export interface UserProfileAddMfaDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: ReactNode;
   disabled?: boolean;
+  hideTrigger?: boolean;
   triggerRef?: Ref<HTMLButtonElement>;
 }
 
@@ -20,6 +21,7 @@ export function UserProfileAddMfaDialog({
   onOpenChange,
   children,
   disabled,
+  hideTrigger,
   triggerRef: triggerRefProp,
 }: UserProfileAddMfaDialogProps) {
   const m = useMessages('userProfileMfa');
@@ -30,25 +32,27 @@ export function UserProfileAddMfaDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <Dialog.Trigger
-        ref={triggerRef}
-        aria-label={m.addLabel}
-        disabled={disabled}
-        render={
-          <Button
-            color='neutral'
+      {!hideTrigger ? (
+        <Dialog.Trigger
+          ref={triggerRef}
+          aria-label={m.addLabel}
+          disabled={disabled}
+          render={
+            <Button
+              color='neutral'
+              size='sm'
+              variant='outline'
+            />
+          }
+        >
+          <Icon
+            name='plus'
+            placement='inline-start'
             size='sm'
-            variant='outline'
           />
-        }
-      >
-        <Icon
-          name='plus'
-          placement='inline-start'
-          size='sm'
-        />
-        {m.add}
-      </Dialog.Trigger>
+          {m.add}
+        </Dialog.Trigger>
+      ) : null}
       <Dialog.Popup
         variant='card'
         finalFocus={addButtonRef}

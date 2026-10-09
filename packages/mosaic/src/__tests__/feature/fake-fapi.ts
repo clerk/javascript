@@ -19,8 +19,9 @@ import { http, HttpResponse } from 'msw';
 import { setupWorker } from 'msw/browser';
 
 import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
+import { createMfaState, type FakeMfaState, mfaHandlers } from './fake-fapi/mfa';
 import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
-import { envelope, error, findSession, missing, updateUser } from './fake-fapi/shared';
+import { envelope, error, findSession, missing, updateUser, VERIFICATION_CODE } from './fake-fapi/shared';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -60,6 +61,7 @@ export interface FakeFapiState {
   passwordUpdates: URLSearchParams[];
   enterpriseConnections: EnterpriseConnectionJSON[];
   enterpriseLinking: FakeEnterpriseLinking;
+  mfa: FakeMfaState;
   activeDevices?: ActiveDeviceRecord[];
   deviceTrackingEnabled: boolean;
 }
@@ -206,7 +208,7 @@ function rejected(code: string, message: string) {
   return HttpResponse.json({ errors: [{ code, message, long_message: message }] }, { status: 400 });
 }
 
-export const VERIFICATION_CODE = '424242';
+export { VERIFICATION_CODE } from './fake-fapi/shared';
 export const PROFILE_IMAGE_URL = 'https://img.clerk.com/uploaded.png';
 
 const USER_FIELDS = [
@@ -290,6 +292,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     passwordUpdates: [],
     enterpriseConnections: [],
     deviceTrackingEnabled: true,
+    mfa: createMfaState(),
     ...rest,
     verification: createVerificationState(verification),
     enterpriseLinking: {
@@ -306,6 +309,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     ...verificationHandlers(state, fapiUrl),
     ...enterpriseHandlers(state, fapiUrl),
     ...passkeyHandlers(state, fapiUrl, passkeys),
+    ...mfaHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () =>
       HttpResponse.json(state.environment, state.country ? { headers: { 'x-country': state.country } } : undefined),
     ),

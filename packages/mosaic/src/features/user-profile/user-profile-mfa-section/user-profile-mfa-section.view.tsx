@@ -1,26 +1,17 @@
-import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
+import { stringToFormattedPhoneString } from '@clerk/shared/phone';
+import { type ReactNode, type Ref, useMemo } from 'react';
 
-import { Confirmation } from '../../blocks/confirmation';
-import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { usePendingAction } from '../../hooks/use-pending-action';
-import { fill, type MosaicMessages, useMessages } from '../../localization';
+import { Confirmation } from '../../../blocks/confirmation';
+import { Section } from '../../../components/section';
+import { fill, type MosaicMessages, useMessages } from '../../../localization';
+import { UserProfileSecurityList } from '../user-profile-security-list';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
-import { UserProfileSecurityList } from './user-profile-security-list';
+import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.types';
+import { useUserProfileMfaSectionLeafController } from './user-profile-mfa-section-leaf.controller';
 
-export interface UserProfileMfaMethod {
-  id: string;
-  type: 'sms' | 'authenticator' | 'backup-codes';
-  label?: string;
-  description?: string;
-  isDefault?: boolean;
-  canRemove?: boolean;
-  canSetDefault?: boolean;
-}
-
-export type UserProfileMfaAddableMethod = 'sms' | 'authenticator' | 'backup-codes';
+export type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.types';
 
 export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];
@@ -44,37 +35,26 @@ export function UserProfileMfaSectionView({
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const section = useRef<HTMLDivElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: methods.map(method => method.id),
-    onRemove,
-    fallback: () => section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? section.current,
-  });
+  const controller = useUserProfileMfaSectionLeafController({ methods, onRemove, onSetDefault });
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const setDefault = usePendingAction({ errorFallback: m.setDefaultError });
-  const canSetDefault = (id: string) => {
-    const method = methods.find(method => method.id === id);
-    return method?.type === 'sms' && method.canSetDefault && !method.isDefault;
-  };
 
   return (
     <>
       <UserProfileSecurityList
-        sectionRef={section}
+        sectionRef={controller.sectionRef}
         addControl={
           addControl ??
           (onAdd && addableMethods?.length ? (
             <UserProfileAddMfaDialog
               triggerRef={addButtonRef}
-              open={pickerOpen}
-              onOpenChange={setPickerOpen}
+              open={controller.pickerOpen}
+              onOpenChange={controller.onPickerOpenChange}
             >
               <UserProfileAddMfaView
                 methods={addableMethods}
                 onSelect={type => {
                   onAdd(type);
-                  setPickerOpen(false);
+                  controller.closePicker();
                 }}
               />
             </UserProfileAddMfaDialog>
@@ -89,30 +69,22 @@ export function UserProfileMfaSectionView({
           <UserProfileMfaRowView
             key={method.id}
             method={method}
-            triggerRef={removalFocus.registerTrigger(method.id)}
-            onRemove={onRemove ? () => removeMethod.open(method) : undefined}
-            onSetDefault={
-              onSetDefault && !setDefault.isPending
-                ? id => {
-                    if (canSetDefault(id)) {
-                      void setDefault.run('set-default', () => onSetDefault(id));
-                    }
-                  }
-                : undefined
-            }
+            triggerRef={controller.registerTrigger(method.id)}
+            onRemove={onRemove ? () => controller.openRemoval(() => removeMethod.open(method)) : undefined}
+            onSetDefault={onSetDefault && !controller.isSettingDefault ? controller.setDefault : undefined}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
         ))}
       </UserProfileSecurityList>
-      <Section.Error>{setDefault.error}</Section.Error>
+      <Section.Error>{controller.defaultError}</Section.Error>
       {onRemove ? (
         <Confirmation
           handle={removeMethod}
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
           description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
-          finalFocus={removalFocus.finalFocus}
-          onConfirm={method => removalFocus.remove(method.id)}
+          finalFocus={controller.finalRemovalFocus}
+          onConfirm={controller.confirmRemoval}
         />
       ) : null}
     </>
@@ -122,7 +94,7 @@ export function UserProfileMfaSectionView({
 function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfileMfa']) {
   if (method.type === 'sms') {
     return method.description
-      ? fill(m.removeDialog.smsDescription, { phoneNumber: method.description })
+      ? fill(m.removeDialog.smsDescription, { phoneNumber: stringToFormattedPhoneString(method.description) })
       : m.removeDialog.smsDescriptionWithoutNumber;
   }
   return m.removeDialog.authenticatorDescription;

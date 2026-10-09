@@ -1,5 +1,5 @@
-import { UserProfileAddMfaDialog } from '@clerk/mosaic/features/user-profile/user-profile-add-mfa.dialog';
-import { UserProfileMfaSetupView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-setup.view';
+import { UserProfileAddMfaDialog } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-add-mfa.dialog';
+import { UserProfileMfaSetupView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
 import type { UserProfileSecurityPanelViewProps } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 
 import { useUserProfileMfaFixture } from './user-profile-mfa';

@@ -1,12 +1,12 @@
 import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import { Field } from '../../components/field';
-import { useFlowAutoFocus } from '../../components/flow';
-import { Otp } from '../../components/otp';
-import { Text } from '../../components/text';
-import { useMessages } from '../../localization';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { Field } from '../../../components/field';
+import { useFlowAutoFocus } from '../../../components/flow';
+import { Otp } from '../../../components/otp';
+import { Text } from '../../../components/text';
+import { useMessages } from '../../../localization';
 import { styles } from './user-profile-add-authenticator.styles';
 import { UserProfileAuthenticatorSetupView } from './user-profile-authenticator-setup.view';
 
@@ -110,7 +110,7 @@ export function UserProfileAddAuthenticatorView({
           variant='outline'
           color='neutral'
           fullWidth
-          disabled={Boolean(setup) && isPending}
+          disabled={isPending}
           onClick={onBack}
         >
           {m.back}

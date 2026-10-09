@@ -1,13 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../components/flow';
-import { Icon } from '../../components/icon';
-import { Text } from '../../components/text';
-import { useMessages } from '../../localization';
-import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../styles/reset.styles';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { useFlowAutoFocus } from '../../../components/flow';
+import { Icon } from '../../../components/icon';
+import { Text } from '../../../components/text';
+import { useMessages } from '../../../localization';
+import { mergeStyleProps, themeProps } from '../../../props';
+import { reset } from '../../../styles/reset.styles';
 import { styles } from './user-profile-backup-codes.styles';
 
 export interface UserProfileBackupCodesViewProps {
@@ -17,6 +17,7 @@ export interface UserProfileBackupCodesViewProps {
   onRetry: () => void;
   onCopy: () => void;
   onDownload: () => void;
+  onPrint?: () => void;
   pendingAction?: 'generate' | 'copy' | 'download';
   errorMessage?: string;
 }
@@ -28,12 +29,14 @@ export function UserProfileBackupCodesView({
   onRetry,
   onCopy,
   onDownload,
+  onPrint,
   pendingAction,
   errorMessage,
 }: UserProfileBackupCodesViewProps) {
   const m = useMessages('userProfileBackupCodes');
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const hasCodes = codes.length > 0 && pendingAction !== 'generate';
+  const showSaveActions = hasCodes || pendingAction === 'generate';
 
   return (
     <>
@@ -90,15 +93,27 @@ export function UserProfileBackupCodesView({
         ) : null}
       </Card.Content>
       <Card.Footer>
-        {hasCodes ? (
+        {showSaveActions ? (
           <>
+            {onPrint ? (
+              <Button
+                type='button'
+                variant='outline'
+                color='neutral'
+                fullWidth
+                disabled={!hasCodes}
+                onClick={onPrint}
+              >
+                {m.print}
+              </Button>
+            ) : null}
             <SubmitButton
               type='button'
               variant='outline'
               color='neutral'
               fullWidth
               isPending={pendingAction === 'download'}
-              disabled={pendingAction === 'copy'}
+              disabled={!hasCodes || pendingAction === 'copy'}
               pendingLabel={m.downloading}
               onClick={onDownload}
             >
@@ -108,46 +123,37 @@ export function UserProfileBackupCodesView({
               />
               {m.download}
             </SubmitButton>
-            <SubmitButton
-              type='button'
-              fullWidth
-              isPending={pendingAction === 'copy'}
-              disabled={pendingAction === 'download'}
-              ref={actionRef}
-              pendingLabel={m.copying}
-              onClick={onCopy}
-            >
-              <Icon
-                name='clipboard'
-                placement='inline-start'
-              />
-              {m.copyAndClose}
-            </SubmitButton>
           </>
         ) : (
-          <>
-            <Button
-              type='button'
-              variant='outline'
-              color='neutral'
-              fullWidth
-              disabled={Boolean(pendingAction)}
-              onClick={onBack ?? onCancel}
-            >
-              {onBack ? m.back : m.cancel}
-            </Button>
-            <SubmitButton
-              type='button'
-              fullWidth
-              isPending={pendingAction === 'generate'}
-              ref={actionRef}
-              pendingLabel={m.generating}
-              onClick={onRetry}
-            >
-              {m.retry}
-            </SubmitButton>
-          </>
+          <Button
+            type='button'
+            variant='outline'
+            color='neutral'
+            fullWidth
+            disabled={Boolean(pendingAction)}
+            onClick={onBack ?? onCancel}
+          >
+            {onBack ? m.back : m.cancel}
+          </Button>
         )}
+        <SubmitButton
+          type='button'
+          fullWidth
+          isPending={pendingAction === 'copy'}
+          disabled={showSaveActions && (!hasCodes || pendingAction === 'download')}
+          focusableWhenDisabled
+          ref={actionRef}
+          pendingLabel={m.copying}
+          onClick={showSaveActions ? onCopy : onRetry}
+        >
+          {showSaveActions ? (
+            <Icon
+              name='clipboard'
+              placement='inline-start'
+            />
+          ) : null}
+          {showSaveActions ? m.copyAndClose : m.retry}
+        </SubmitButton>
       </Card.Footer>
     </>
   );

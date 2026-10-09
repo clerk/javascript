@@ -1,4 +1,4 @@
-import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
+import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -9,11 +9,10 @@ export { default as __source } from './user-profile-mfa-section.stories?raw';
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
-  substatus: 'needs wire-up',
   title: 'UserProfileMfaSection',
   label: '2-step verification',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-mfa-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view.tsx',
 };
 
 export function Default() {
