@@ -32,6 +32,7 @@ export function useUserProfileProfileSectionModel(): UserProfileProfileSectionMo
   const { user, environment, saveAsUser } = model;
   const { attributes, usernameSettings } = environment.userSettings;
   const usernameImmutable = Boolean(attributes.username?.immutable);
+  const showUsername = isAttributeAvailable(attributes.username) && !(usernameImmutable && !user.username);
   const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
 
   return {
@@ -53,15 +54,16 @@ export function useUserProfileProfileSectionModel(): UserProfileProfileSectionMo
       ? undefined
       : value =>
           saveAsUser(current => current.update({ firstName: value.firstName, lastName: value.lastName }), NAME_FIELDS),
-    showUsername: isAttributeAvailable(attributes.username) && !(usernameImmutable && !user.username),
+    showUsername,
     username: user.username ?? '',
     usernameRequired: Boolean(attributes.username?.required),
-    onSubmitUsername: usernameImmutable
-      ? undefined
-      : username =>
-          saveAsUser(current => current.update({ username }), USERNAME_FIELDS, {
-            min_length: usernameSettings.min_length,
-            max_length: usernameSettings.max_length,
-          }),
+    onSubmitUsername:
+      showUsername && !usernameImmutable
+        ? username =>
+            saveAsUser(current => current.update({ username }), USERNAME_FIELDS, {
+              min_length: usernameSettings.min_length,
+              max_length: usernameSettings.max_length,
+            })
+        : undefined,
   };
 }
