@@ -21,6 +21,7 @@ import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (invitation: OrganizationProfileInvitation) => invitation.id;
 
+// eslint-disable-next-line sonarjs/cognitive-complexity -- The invitation table renders independent states and optional controls in one view.
 export function InvitationsTableTabView({
   invitations,
   onInvite,
@@ -28,7 +29,7 @@ export function InvitationsTableTabView({
   totalCount,
   page,
   pageSize = 10,
-  searchValue,
+  searchValue = '',
   onSearchChange,
   onPageChange,
   onPageSizeChange,
@@ -37,16 +38,19 @@ export function InvitationsTableTabView({
   onSortChange,
   isLoading,
   isFetching = false,
+  isError = false,
+  onRetry,
 }: InvitationsTableTabViewProps) {
   const m = useMessages('invitationsTableTab');
   const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
   const searchInput = useRef<HTMLInputElement>(null);
   const inviteButton = useRef<HTMLButtonElement>(null);
+  const tableContainer = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: invitations.map(getRowId),
     onRemove: onRevoke,
-    fallback: () => inviteButton.current ?? searchInput.current,
+    fallback: () => inviteButton.current ?? searchInput.current ?? tableContainer.current,
   });
   const revokeDialog = useMemo(() => Confirmation.createHandle<OrganizationProfileInvitation>(), []);
   const { table, sortHeader, pagination } = useServerDataTable({
@@ -61,29 +65,44 @@ export function InvitationsTableTabView({
     onPageChange,
     onPageSizeChange,
     searchValue,
-    onSearchChange,
+    onSearchChange: onSearchChange ?? (() => {}),
   });
   return (
     <>
-      <div {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(tableTabStyles.root))}>
-        <Table.Toolbar>
-          <Table.Search
-            ref={searchInput}
-            label={m.search}
-            clearLabel={m.clearSearch}
-            value={table.globalFilter}
-            onValueChange={table.setGlobalFilter}
-          />
-          {onInvite ? (
-            <Button
-              ref={inviteButton}
-              onClick={onInvite}
-            >
-              <Icon name='plus' />
-              {m.invite}
-            </Button>
-          ) : null}
-        </Table.Toolbar>
+      <div
+        {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(tableTabStyles.root))}
+        ref={tableContainer}
+        tabIndex={-1}
+        role='group'
+        aria-label={m.title}
+      >
+        {onSearchChange || onInvite ? (
+          <Table.Toolbar>
+            {onSearchChange ? (
+              <Table.Search
+                ref={searchInput}
+                label={m.search}
+                clearLabel={m.clearSearch}
+                value={table.globalFilter}
+                onValueChange={table.setGlobalFilter}
+              />
+            ) : null}
+            {onInvite ? (
+              <Button
+                ref={inviteButton}
+                onClick={onInvite}
+              >
+                <Icon name='plus' />
+                {m.invite}
+              </Button>
+            ) : null}
+          </Table.Toolbar>
+        ) : null}
+        {isError && table.rows.length > 0 ? (
+          <p role='alert'>
+            {m.loadError} {onRetry ? <Button onClick={onRetry}>{m.retry}</Button> : null}
+          </p>
+        ) : null}
         <Table.Root
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
@@ -115,6 +134,18 @@ export function InvitationsTableTabView({
                   <Spinner />
                   <VisuallyHidden>{m.loading}</VisuallyHidden>
                 </span>
+              </Table.Empty>
+            ) : isError && table.rows.length === 0 ? (
+              <Table.Empty colSpan={columnCount}>
+                <EmptyState.Root role='alert'>
+                  <EmptyState.Icon name='exclamation-circle' />
+                  <EmptyState.Label>{m.loadError}</EmptyState.Label>
+                  {onRetry ? (
+                    <EmptyState.Actions>
+                      <Button onClick={onRetry}>{m.retry}</Button>
+                    </EmptyState.Actions>
+                  ) : null}
+                </EmptyState.Root>
               </Table.Empty>
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>
