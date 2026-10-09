@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiMembership, fapiOrganization, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
 
 const organization = fapiOrganization({ id: 'org_1', name: 'Acme' });
@@ -89,7 +90,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(await screen.findByRole('option', { name: 'Admin' }));
     await waitFor(() => expect(fapi.memberships.find(item => item.id === bob.id)?.role).toBe('org:admin'));
     await waitFor(() => expect(members.requests).toHaveLength(1));
-    expect(screen.queryByRole('button', { name: 'Manage Bob Smith' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeDisabled();
     members.release();
     await user.click(await screen.findByRole('button', { name: 'Manage Bob Smith' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
@@ -275,13 +276,29 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(await screen.findByRole('option', { name: 'Admin' }));
     await waitFor(() => expect(update.requests).toHaveLength(1));
     expect(role).toBeDisabled();
-    expect(screen.queryByRole('button', { name: 'Manage Bob Smith' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeDisabled();
     update.fail('role_rejected', 'Role rejected by server');
     expect(await screen.findByRole('alert')).toHaveTextContent('Role rejected by server');
     const retry = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     await user.click(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ }));
     await user.click(await screen.findByRole('option', { name: 'Admin' }));
     await waitFor(() => expect(retry.memberships.find(item => item.id === bob.id)?.role).toBe('org:admin'));
+  });
+
+  it('shows localized role names in the role list', async () => {
+    serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
+    await renderWithClerk(
+      <MosaicLocalizationProvider
+        value={resolveLocalization({ overrides: { roles: { 'org:admin': 'Administrateur', 'org:member': 'Membre' } } })}
+      >
+        <OrganizationProfileMembersPanel />
+      </MosaicLocalizationProvider>,
+    );
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ }));
+    expect(await screen.findByRole('option', { name: 'Administrateur' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Membre' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Admin' })).toBeNull();
   });
 
   it('resets the search and rows when the active organization changes', async () => {
