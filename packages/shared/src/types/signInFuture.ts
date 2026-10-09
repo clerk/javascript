@@ -243,6 +243,7 @@ export interface SignInFutureSSOParams {
    * The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+  oidcLoginHint?: string;
   /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    * @experimental

@@ -1,4 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
@@ -12,7 +13,7 @@ import type {
   SignInResource,
 } from '@clerk/shared/types';
 import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -48,6 +49,7 @@ import {
 } from './enterpriseSSOFactors';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
+import { chatGPTSIWCOIDCPrompt, isChatGPTSIWCFlow } from './chatGPTSIWC';
 import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
@@ -56,6 +58,18 @@ import {
   getPreferredAlternativePhoneChannelForCombinedFlow,
   getSignUpAttributeFromIdentifier,
 } from './utils';
+
+const CHATGPT_SIWC_AUTO_START_STORAGE_KEY = '__clerk_siwc_auto_start_at';
+const CHATGPT_SIWC_AUTO_START_TTL_MS = 10 * 60 * 1000;
+
+const isChatGPTHintPreflightFailure = (err: unknown) =>
+  isClerkAPIResponseError(err) &&
+  err.errors.some(
+    error => error.code === ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND || error.code === 'form_param_format_invalid',
+  );
+
+const isChatGPTLoginHintFormatFailure = (err: unknown) =>
+  isClerkAPIResponseError(err) && err.errors.some(error => error.code === 'form_param_format_invalid');
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -167,6 +181,9 @@ function SignInStartInternal(): JSX.Element {
   const hasSocialOrWeb3Buttons =
     !!authenticatableSocialStrategies.length || !!web3FirstFactors.length || !!alternativePhoneCodeChannels.length;
   const [shouldAutofocus, setShouldAutofocus] = useState(!isMobileDevice() && !hasSocialOrWeb3Buttons);
+  const [autoStartChatGPT, setAutoStartChatGPT] = useState(false);
+  const [ignoreChatGPTLoginHint, setIgnoreChatGPTLoginHint] = useState(false);
+  const chatGPTPreflightStarted = useRef(false);
   // When the captcha escalates to an interactive challenge, spotlight it by collapsing/inerting the
   // rest of the card (see the descriptors.main column below).
   const [captchaIsInteractive, setCaptchaIsInteractive] = useState(false);
@@ -455,7 +472,7 @@ function SignInStartInternal(): JSX.Element {
     }
   };
 
-  const authenticateWithEnterpriseSSO = async () => {
+  const authenticateWithEnterpriseSSO = useCallback(async () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
@@ -464,7 +481,7 @@ function SignInStartInternal(): JSX.Element {
         strategy: 'enterprise_sso',
         redirectUrl,
         redirectUrlComplete,
-        oidcPrompt: ctx.oidcPrompt,
+        oidcPrompt: chatGPTSIWCOIDCPrompt(ctx.oidcPrompt, ctx.queryParams),
         continueSignIn: true,
       });
     } catch (err) {
@@ -476,7 +493,7 @@ function SignInStartInternal(): JSX.Element {
       }
       throw err;
     }
-  };
+  }, [ctx.afterSignInUrl, ctx.oidcPrompt, ctx.queryParams, ctx.ssoCallbackUrl, navigate, signIn]);
 
   const attemptToRecoverFromSignInError = async (e: any) => {
     if (!e.errors) {
@@ -572,6 +589,109 @@ function SignInStartInternal(): JSX.Element {
     return signInWithFields([identifierField, instantPasswordField]);
   };
 
+  useEffect(() => {
+    let hasRecentChatGPTAutoStart = false;
+    try {
+      const autoStartRecord = JSON.parse(
+        window.sessionStorage.getItem(CHATGPT_SIWC_AUTO_START_STORAGE_KEY) || 'null',
+      ) as {
+        href?: string;
+        startedAt?: number;
+      } | null;
+      const startedAt = autoStartRecord?.startedAt || 0;
+      const elapsed = Date.now() - startedAt;
+      hasRecentChatGPTAutoStart =
+        autoStartRecord?.href === window.location.href &&
+        Number.isFinite(startedAt) &&
+        elapsed >= 0 &&
+        elapsed < CHATGPT_SIWC_AUTO_START_TTL_MS;
+    } catch {
+      // The component-level ref still guards repeat effects when storage is unavailable.
+    }
+
+    if (
+      chatGPTPreflightStarted.current ||
+      hasRecentChatGPTAutoStart ||
+      !isChatGPTSIWCFlow(ctx.queryParams) ||
+      organizationTicket ||
+      signIn.firstFactorVerification?.error ||
+      !authenticatableSocialStrategies.includes('oauth_chatgpt')
+    ) {
+      return;
+    }
+
+    chatGPTPreflightStarted.current = true;
+    const loginHint = ctx.queryParams.email_address || ctx.queryParams.login_hint;
+
+    const preflight = async () => {
+      status.setLoading();
+      card.setLoading();
+      try {
+        const res = await signIn.create(loginHint ? { identifier: loginHint } : {});
+        if (navigateOnSignInProtectGate(res, navigate, 'protect-check')) {
+          return;
+        }
+        if (res.status === 'needs_first_factor' && shouldHandOffToEnterpriseConnection(res)) {
+          await authenticateWithEnterpriseSSO();
+          return;
+        }
+        if (res.status === 'needs_identifier' && shouldHandOffUnidentifiedToEnterpriseConnection(res)) {
+          await authenticateWithEnterpriseSSO();
+          return;
+        }
+        if (res.status === 'needs_second_factor') {
+          await navigate('factor-two');
+          return;
+        }
+        if (res.status === 'needs_client_trust') {
+          await navigate('client-trust');
+          return;
+        }
+        if (res.status === 'complete') {
+          await clerk.setActive({
+            session: res.createdSessionId,
+            navigate: async ({ session, decorateUrl }) => {
+              await navigateOnSetActive({ session, redirectUrl: afterSignInUrl, decorateUrl });
+            },
+          });
+          return;
+        }
+        status.setIdle();
+        card.setIdle();
+        setAutoStartChatGPT(true);
+      } catch (err) {
+        if (loginHint && isChatGPTHintPreflightFailure(err)) {
+          if (isChatGPTLoginHintFormatFailure(err)) {
+            setIgnoreChatGPTLoginHint(true);
+          }
+          status.setIdle();
+          card.setIdle();
+          setAutoStartChatGPT(true);
+          return;
+        }
+        handleError(err as Error, [], card.setError);
+        status.setIdle();
+        card.setIdle();
+      }
+    };
+
+    void preflight();
+  }, [
+    afterSignInUrl,
+    authenticatableSocialStrategies,
+    authenticateWithEnterpriseSSO,
+    card,
+    clerk,
+    ctx.queryParams.email_address,
+    ctx.queryParams.login_hint,
+    ctx.queryParams.target_flow,
+    navigate,
+    navigateOnSetActive,
+    organizationTicket,
+    signIn,
+    status,
+  ]);
+
   const handleForgotPasswordClick: React.MouseEventHandler = e => {
     e.preventDefault();
     // Surface the same native required-field validation as the Continue button
@@ -658,6 +778,8 @@ function SignInStartInternal(): JSX.Element {
                     enableWeb3Providers
                     enableOAuthProviders
                     enableAlternativePhoneCodeProviders={showAlternativePhoneCodeProviders}
+                    autoStartChatGPT={autoStartChatGPT}
+                    ignoreChatGPTLoginHint={ignoreChatGPTLoginHint}
                     onAlternativePhoneCodeProviderClick={onAlternativePhoneCodeProviderClick}
                   />
                 )}

@@ -2,8 +2,8 @@ import type { ClerkAPIError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneCodeChannel } from '@clerk/shared/types';
-import React from 'react';
+import type { OAuthStrategy, PhoneCodeChannel } from '@clerk/shared/types';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { handleError as _handleError } from '@/ui/utils/errorHandler';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
@@ -15,9 +15,12 @@ import type { SocialButtonsProps } from '../../elements/SocialButtons';
 import { SocialButtons } from '../../elements/SocialButtons';
 import { useRouter } from '../../router';
 import { buildSignInOAuthTransportCallbackParams } from './buildOAuthCallbackParams';
+import { chatGPTSIWCOIDCPrompt, isChatGPTSIWCFlow } from './chatGPTSIWC';
 
 export type SignInSocialButtonsProps = SocialButtonsProps & {
   onAlternativePhoneCodeProviderClick?: (channel: PhoneCodeChannel) => void;
+  autoStartChatGPT?: boolean;
+  ignoreChatGPTLoginHint?: boolean;
 };
 
 export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) => {
@@ -26,35 +29,90 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const card = useCardState();
   const ctx = useSignInContext();
   const signIn = useCoreSignIn();
+  const autoStarted = useRef(false);
   const redirectUrl = ctx.ssoCallbackUrl;
   const redirectUrlComplete = ctx.afterSignInUrl || '/';
   const shouldUsePopup =
     !clerk.__internal_hasOAuthTransport &&
     (ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup()));
-  const { onAlternativePhoneCodeProviderClick, ...rest } = props;
+  const { onAlternativePhoneCodeProviderClick, autoStartChatGPT, ignoreChatGPTLoginHint, ...rest } = props;
 
-  const handleError = (err: any) => {
-    if (isClerkAPIResponseError(err)) {
-      const sessionAlreadyExistsError: ClerkAPIError | undefined = err.errors.find(
-        (e: ClerkAPIError) => e.code === ERROR_CODES.SESSION_EXISTS,
-      );
+  const handleError = useCallback(
+    (err: any) => {
+      if (isClerkAPIResponseError(err)) {
+        const sessionAlreadyExistsError: ClerkAPIError | undefined = err.errors.find(
+          (e: ClerkAPIError) => e.code === ERROR_CODES.SESSION_EXISTS,
+        );
 
-      if (sessionAlreadyExistsError) {
-        return clerk.setActive({
-          session: clerk.client.lastActiveSessionId,
-          navigate: async ({ session, decorateUrl }) => {
-            await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl, decorateUrl });
-          },
-        });
+        if (sessionAlreadyExistsError) {
+          return clerk.setActive({
+            session: clerk.client.lastActiveSessionId,
+            navigate: async ({ session, decorateUrl }) => {
+              await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl, decorateUrl });
+            },
+          });
+        }
       }
-    }
 
-    return _handleError(err, [], card.setError);
-  };
+      return _handleError(err, [], card.setError);
+    },
+    [card, clerk, ctx],
+  );
+
+  const startOAuthRedirect = useCallback(
+    (strategy: OAuthStrategy) =>
+      signIn.authenticateWithRedirect({
+        strategy,
+        redirectUrl,
+        redirectUrlComplete,
+        oidcPrompt: chatGPTSIWCOIDCPrompt(ctx.oidcPrompt, ctx.queryParams),
+        oidcLoginHint:
+          isChatGPTSIWCFlow(ctx.queryParams) && !ignoreChatGPTLoginHint
+            ? ctx.queryParams.email_address || ctx.queryParams.login_hint
+            : undefined,
+        __internal_callbackParams: {
+          ...buildSignInOAuthTransportCallbackParams(ctx),
+          __internal_navigateOnSetActive: ctx.navigateOnSetActive,
+          __internal_navigate: navigate,
+        },
+      }),
+    [ctx, ignoreChatGPTLoginHint, navigate, redirectUrl, redirectUrlComplete, signIn],
+  );
+
+  useEffect(() => {
+    if (!autoStartChatGPT || autoStarted.current || !isChatGPTSIWCFlow(ctx.queryParams)) {
+      return;
+    }
+    autoStarted.current = true;
+    card.setLoading('oauth_chatgpt');
+    try {
+      window.sessionStorage.setItem(
+        '__clerk_siwc_auto_start_at',
+        JSON.stringify({ href: window.location.href, startedAt: Date.now() }),
+      );
+    } catch {
+      // Browser storage may be unavailable; the in-memory guard still prevents repeated effects.
+    }
+    void startOAuthRedirect('oauth_chatgpt').catch(err => {
+      void handleError(err);
+      card.setIdle();
+    });
+  }, [autoStartChatGPT, card, clerk.__internal_hasOAuthTransport, ctx.queryParams, handleError, startOAuthRedirect]);
+
+  useEffect(() => {
+    const resetLoadingAfterHistoryRestore = (event: PageTransitionEvent) => {
+      if (event.persisted && autoStarted.current) {
+        card.setIdle();
+      }
+    };
+    window.addEventListener('pageshow', resetLoadingAfterHistoryRestore);
+    return () => window.removeEventListener('pageshow', resetLoadingAfterHistoryRestore);
+  }, [card]);
 
   return (
     <SocialButtons
       {...rest}
+      preferredOAuthStrategy={isChatGPTSIWCFlow(ctx.queryParams) ? 'oauth_chatgpt' : undefined}
       showLastAuthenticationStrategy
       idleAfterDelay={!shouldUsePopup && !clerk.__internal_hasOAuthTransport}
       oauthCallback={strategy => {

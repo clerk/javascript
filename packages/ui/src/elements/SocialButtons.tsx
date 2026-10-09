@@ -35,6 +35,7 @@ export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
   enableWeb3Providers: boolean;
   enableAlternativePhoneCodeProviders: boolean;
+  preferredOAuthStrategy?: OAuthStrategy;
 }>;
 
 type SocialButtonsRootProps = SocialButtonsProps & {
@@ -61,6 +62,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     enableOAuthProviders = true,
     enableWeb3Providers = true,
     enableAlternativePhoneCodeProviders = true,
+    preferredOAuthStrategy,
     idleAfterDelay = true,
     showLastAuthenticationStrategy = false,
   } = props;
@@ -74,11 +76,16 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
 
   type TStrategy = OAuthStrategy | Web3Strategy | PhoneCodeChannel;
 
-  const strategies: TStrategy[] = [
+  const availableStrategies: TStrategy[] = [
     ...(enableOAuthProviders ? authenticatableOauthStrategies : []),
     ...(enableWeb3Providers ? web3Strategies : []),
     ...(enableAlternativePhoneCodeProviders ? alternativePhoneCodeChannels : []),
   ];
+
+  const strategies: TStrategy[] =
+    preferredOAuthStrategy && availableStrategies.includes(preferredOAuthStrategy)
+      ? [preferredOAuthStrategy, ...availableStrategies.filter(strategy => strategy !== preferredOAuthStrategy)]
+      : availableStrategies;
 
   if (!strategies.length) {
     return null;
@@ -178,11 +185,12 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
               remainingStrategiesLength === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD ||
               (strategy === lastAuthenticationStrategy && row.length === 1);
 
-            const label = shouldShowPreText
+            const shouldShowContinueLabel = shouldShowPreText || strategy === preferredOAuthStrategy;
+            const label = shouldShowContinueLabel
               ? `Continue with ${strategyToDisplayData[strategy].name}`
               : strategyToDisplayData[strategy].name;
 
-            const localizedText = shouldShowPreText
+            const localizedText = shouldShowContinueLabel
               ? localizationKeys('socialButtonsBlockButton', {
                   provider: strategyToDisplayData[strategy].name,
                 })

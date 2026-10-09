@@ -1,9 +1,13 @@
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
+import { useClerk } from '@clerk/shared/react';
+
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { PreviewButton } from '@/ui/elements/PreviewButton';
 import { UserPreview } from '@/ui/elements/UserPreview';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { withRedirectToAfterSignIn } from '../../common';
 import { useEnvironment, useSignInContext, useSignOutContext } from '../../contexts';
@@ -11,19 +15,50 @@ import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { Add, ArrowRight } from '../../icons';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
+import { SignInStart } from './SignInStart';
+import { isChatGPTSIWCAccountMismatch } from './chatGPTSIWC';
 
 const SignInAccountSwitcherInternal = () => {
   const card = useCardState();
-  const { userProfileUrl } = useEnvironment().displayConfig;
-  const { afterSignInUrl, path: signInPath, signInUrl, taskUrl } = useSignInContext();
+  const { displayConfig } = useEnvironment();
+  const { afterSignInUrl, path: signInPath, signInUrl, taskUrl, queryParams } = useSignInContext();
+  const isChatGPTSIWCMismatch = isChatGPTSIWCAccountMismatch(queryParams);
+  const accountSwitcherSignInUrl = isChatGPTSIWCMismatch
+    ? buildURL(
+        {
+          // signInUrl already preserves the OAuth continuation parameters in
+          // both path and virtual routing. Starting from signInPath drops them.
+          base: signInUrl,
+          hashSearchParams: {
+            __clerk_siwc_account_mismatch: 'false',
+            __clerk_siwc_account_choice_pending: 'true',
+          },
+        },
+        { stringify: true },
+      )
+    : signInUrl;
   const { navigateAfterSignOut } = useSignOutContext();
   const { handleSignOutAllClicked, handleSessionClicked, signedInSessions, handleAddAccountClicked } =
     useMultisessionActions({
       taskUrl,
       navigateAfterSignOut,
       afterSwitchSessionUrl: afterSignInUrl,
-      userProfileUrl,
-      signInUrl: signInPath ?? signInUrl,
+      onBeforeSwitchSessionNavigate: isChatGPTSIWCMismatch
+        ? async session => {
+            try {
+              if (!session.__internal_acknowledgeChatGPTAccountChoice) {
+                throw new Error('This session cannot confirm the ChatGPT account choice.');
+              }
+              await session.__internal_acknowledgeChatGPTAccountChoice(afterSignInUrl);
+              return true;
+            } catch (error) {
+              handleError(error as Error, [], card.setError);
+              return false;
+            }
+          }
+        : undefined,
+      userProfileUrl: displayConfig.userProfileUrl,
+      signInUrl: isChatGPTSIWCMismatch ? accountSwitcherSignInUrl : (signInPath ?? signInUrl),
       user: undefined,
     });
 
@@ -126,4 +161,12 @@ const SignInAccountSwitcherInternal = () => {
     </Flow.Part>
   );
 };
+export const SignInAccountSwitcherForChatGPTSIWC = withCardStateProvider(() => {
+  const clerk = useClerk();
+  if (clerk.client.sessions.length === 0) {
+    return <SignInStart />;
+  }
+  return <SignInAccountSwitcherInternal />;
+});
+
 export const SignInAccountSwitcher = withRedirectToAfterSignIn(withCardStateProvider(SignInAccountSwitcherInternal));

@@ -19,6 +19,7 @@ import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 import type { SignUpCtx } from '@/types';
 import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
+import { isChatGPTSIWCAccountMismatch } from './chatGPTSIWC';
 
 import { buildCombinedFlowOAuthCallbackParams, buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
@@ -32,7 +33,7 @@ import {
 } from './lazy-sign-up';
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
-import { SignInAccountSwitcher } from './SignInAccountSwitcher';
+import { SignInAccountSwitcher, SignInAccountSwitcherForChatGPTSIWC } from './SignInAccountSwitcher';
 import { SignInClientTrust } from './SignInClientTrust';
 import { SignInEmailLinkVerify } from './SignInEmailLinkVerify';
 import { SignInFactorOne } from './SignInFactorOne';
@@ -159,7 +160,11 @@ function SignInRoutes(): JSX.Element {
           <LazySessionTasks redirectUrlComplete={signInContext.afterSignInUrl} />
         </Route>
         <Route index>
-          <SignInStart />
+          {isChatGPTSIWCAccountMismatch(signInContext.queryParams) ? (
+            <SignInAccountSwitcherForChatGPTSIWC />
+          ) : (
+            <SignInStart />
+          )}
         </Route>
         <Route>
           <RedirectToSignIn />

@@ -1,6 +1,7 @@
 import { SIGN_IN_INITIAL_VALUE_KEYS, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { getQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
@@ -14,6 +15,7 @@ import { useRouter } from '../../router';
 import type { SignInCtx } from '../../types';
 import { warnAboutPasswordInSignInOrUpFlow } from '../../utils/warnAboutPasswordInSignInOrUpFlow';
 import { clerkWindowNavigate } from '../../utils/windowNavigate';
+import { isChatGPTSIWCAccountChoicePending, isChatGPTSIWCFlow } from '../../components/SignIn/chatGPTSIWC';
 import { getInitialValuesFromQueryParams } from '../utils';
 
 export type SignInContextType = Omit<SignInCtx, 'fallbackRedirectUrl' | 'forceRedirectUrl'> & {
@@ -46,7 +48,15 @@ export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
   const { navigate, basePath, startPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
-  const { queryParams, queryString } = useRouter();
+  const { queryParams: routedQueryParams } = useRouter();
+  // Hosted authorization redirects arrive in window.location.search. Hash and
+  // virtual routers keep their own route query, so merge both sources to keep
+  // server-provided OAuth state (including SIWC routing markers) visible to
+  // every sign-in step. Router values win after an in-component navigation.
+  const queryParams = {
+    ...(typeof window === 'undefined' ? {} : getQueryParams(window.location.search)),
+    ...routedQueryParams,
+  };
   const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
@@ -64,7 +74,7 @@ export const useSignInContext = (): SignInContextType => {
 
   const { componentName, mode, ...ctx } = context;
   const initialValuesFromQueryParams = useMemo(
-    () => getInitialValuesFromQueryParams(queryString, SIGN_IN_INITIAL_VALUE_KEYS),
+    () => getInitialValuesFromQueryParams(new URLSearchParams(queryParams).toString(), SIGN_IN_INITIAL_VALUE_KEYS),
     [],
   );
 
@@ -130,6 +140,18 @@ export const useSignInContext = (): SignInContextType => {
     );
   }
 
+  if (isChatGPTSIWCFlow(queryParams)) {
+    // A separate sign-up route must receive the validated outer authorization
+    // continuation in its ordinary search params so it survives a full-page
+    // navigation and can be resumed after OpenAI sign-in.
+    const signUpURL = new URL(signUpUrl, window.location.origin);
+    for (const key of ['target_flow', 'redirect_url', 'login_hint'] as const) {
+      const value = queryParams[key];
+      if (value) signUpURL.searchParams.set(key, value);
+    }
+    signUpUrl = signUpURL.href;
+  }
+
   // Static preconditions of the sign-up-if-missing flow, shared by SignInStart (which requests
   // `signUpIfMissing` on sign-in create) and the factor-one cards (which handle the resulting
   // `transferable` verification status). Per-attempt conditions (identifier type, password use)
@@ -162,6 +184,13 @@ export const useSignInContext = (): SignInContextType => {
     redirectUrl: string;
     decorateUrl: DecorateUrl;
   }) => {
+    if (isChatGPTSIWCAccountChoicePending(queryParams)) {
+      if (!session.__internal_acknowledgeChatGPTAccountChoice) {
+        throw new Error('This session cannot confirm the ChatGPT account choice.');
+      }
+      await session.__internal_acknowledgeChatGPTAccountChoice(afterSignInUrl);
+    }
+
     const currentTask = session.currentTask;
     if (!currentTask) {
       // Use decorateUrl to enable Safari ITP cookie refresh when needed
