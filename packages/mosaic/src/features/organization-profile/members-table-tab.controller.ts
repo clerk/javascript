@@ -11,7 +11,7 @@ import type { useMembersTableModel } from './members-table-tab.model';
 import type { MembersRoles } from './members-table-tab.types';
 
 interface RolesContext {
-  loadRoles: () => Promise<MembersRoles>;
+  loadRoles: (() => Promise<MembersRoles>) | undefined;
   result: MembersRoles | null;
 }
 
@@ -21,14 +21,15 @@ const { createMachine, assign, fromPromise } = setup<RolesContext, RolesEvent>()
 
 const rolesMachine = createMachine({
   id: 'membersRoles',
-  initial: 'loading',
-  context: { loadRoles: () => Promise.resolve({ roles: [], hasRoleSetMigration: false }), result: null },
+  initial: context => (context.loadRoles ? 'loading' : 'unavailable'),
+  context: { loadRoles: undefined, result: null },
   states: {
+    unavailable: {},
     loading: {
-      invoke: fromPromise(context => context.loadRoles(), {
+      invoke: fromPromise(context => context.loadRoles?.() ?? Promise.resolve(null), {
         onDone: {
           target: 'ready',
-          actions: assign<DoneInvokeEvent<MembersRoles>>((_, event) => ({ result: event.output })),
+          actions: assign<DoneInvokeEvent<MembersRoles | null>>((_, event) => ({ result: event.output })),
         },
         onError: { target: 'failed' },
       }),

@@ -54,6 +54,17 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(screen.queryByRole('button', { name: 'Manage Bob Smith' })).toBeNull();
   });
 
+  it('does not load roles for a member who cannot change them', async () => {
+    serve();
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+    expect(roles.requests).toHaveLength(0);
+    roles.release();
+  });
+
   it('does not fetch or show the list without read permission', async () => {
     serve([]);
     const request = holdRequests('get', '/v1/organizations/:organizationId/memberships');
