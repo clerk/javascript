@@ -112,6 +112,63 @@ describe('Mosaic SegmentedControl', () => {
     expect(screen.getByRole('radio', { name: 'Lifetime' })).toHaveAttribute('aria-checked', 'true');
   });
 
+  it('moves to and selects the first and last enabled items with Home and End', async () => {
+    render(
+      <SegmentedControl.Root
+        aria-label='Billing period'
+        defaultValue='monthly'
+      >
+        <SegmentedControl.Item
+          value='free'
+          disabled
+        >
+          Free
+        </SegmentedControl.Item>
+        <SegmentedControl.Item value='monthly'>Monthly</SegmentedControl.Item>
+        <SegmentedControl.Item value='annual'>Annual</SegmentedControl.Item>
+        <SegmentedControl.Item
+          value='lifetime'
+          disabled
+        >
+          Lifetime
+        </SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+
+    await userEvent.tab();
+    await userEvent.keyboard('{End}');
+
+    expect(screen.getByRole('radio', { name: 'Annual' })).toHaveFocus();
+    expect(screen.getByRole('radio', { name: 'Annual' })).toHaveAttribute('aria-checked', 'true');
+
+    await userEvent.keyboard('{Home}');
+
+    expect(screen.getByRole('radio', { name: 'Monthly' })).toHaveFocus();
+    expect(screen.getByRole('radio', { name: 'Monthly' })).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('keeps moving focus with the arrow keys when a controlled parent ignores onValueChange', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <SegmentedControl.Root
+        aria-label='Billing period'
+        value='monthly'
+        onValueChange={onValueChange}
+      >
+        <SegmentedControl.Item value='monthly'>Monthly</SegmentedControl.Item>
+        <SegmentedControl.Item value='annual'>Annual</SegmentedControl.Item>
+        <SegmentedControl.Item value='lifetime'>Lifetime</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowRight}{ArrowRight}');
+
+    expect(screen.getByRole('radio', { name: 'Lifetime' })).toHaveFocus();
+    expect(onValueChange).toHaveBeenLastCalledWith('lifetime');
+    expect(screen.getByRole('radio', { name: 'Monthly' })).toHaveAttribute('aria-checked', 'true');
+  });
+
   it('does not select a disabled item', async () => {
     render(
       <SegmentedControl.Root

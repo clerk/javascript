@@ -54,6 +54,8 @@ import { SegmentedControl } from '@/primitives/segmented-control';
 | `Tab`             | Focuses the selected item              |
 | `ArrowRight`      | Moves to and selects the next item     |
 | `ArrowLeft`       | Moves to and selects the previous item |
+| `Home`            | Moves to and selects the first item    |
+| `End`             | Moves to and selects the last item     |
 | `Space` / `Enter` | Selects the focused item               |
 
 When nothing is selected yet, focus lands on the first item without selecting it.
