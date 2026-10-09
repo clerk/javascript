@@ -5,6 +5,7 @@ import { fapiMembership } from '../fapi';
 import { envelope, missing, rejectUnknownParams } from './shared';
 
 const INVITATION_STATUSES = ['pending', 'accepted', 'revoked', 'expired'];
+const MEMBERSHIP_REQUEST_STATUSES = ['pending', 'accepted', 'rejected'];
 
 export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path: string) => string) {
   return [
@@ -84,6 +85,21 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
         return rejected;
       }
       const statuses = url.searchParams.getAll('status').flatMap(status => status.split(','));
+      const invalidStatus = statuses.find(status => !MEMBERSHIP_REQUEST_STATUSES.includes(status));
+      if (invalidStatus) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_value_invalid',
+                message: `${invalidStatus} is not a valid value for status.`,
+                meta: { param_name: 'status' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
       const matching = state.organizationMembershipRequests.filter(
         item =>
           item.organization_id === params.organizationId && (statuses.length === 0 || statuses.includes(item.status)),

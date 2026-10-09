@@ -1,5 +1,5 @@
 import type { OrganizationMembershipRequestJSON } from '@clerk/shared/types';
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -158,7 +158,7 @@ describe('connected organization requests', () => {
     expect(await screen.findByText('No pending requests')).toBeVisible();
   });
 
-  it('keeps remaining rows and offers retry if refresh fails after decline', async () => {
+  it('replaces rows with the table error state and retries when refreshing after a decline fails', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
     fapi.organizationMembershipRequests.push({
       ...request,
@@ -179,13 +179,15 @@ describe('connected organization requests', () => {
     await user.click(screen.getByRole('button', { name: 'Decline Ada Lovelace' }));
     await waitFor(() => expect(refresh.requests).toHaveLength(1));
     refresh.fail('network_error', 'Unavailable');
-    expect(await screen.findByText('Unable to load requests', {}, { timeout: 12_000 })).toBeVisible();
+    await waitFor(() => expect(screen.getByText('Unable to load requests')).toBeVisible(), { timeout: 12_000 });
     expect(screen.queryByText('Unable to decline this request. Please try again.')).toBeNull();
-    expect(screen.getByText('grace@example.com')).toBeVisible();
+    expect(screen.queryByText('grace@example.com')).toBeNull();
+    const table = within(screen.getByRole('table', { name: 'Requests' }));
+    expect(table.getByRole('alert')).toHaveTextContent('Unable to load requests');
     expect(fapi.organizationMembershipRequests[0]?.status).toBe('rejected');
     const retry = serve(['org:sys_memberships:manage']);
     retry.organizationMembershipRequests = fapi.organizationMembershipRequests;
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    await user.click(table.getByRole('button', { name: 'Try again' }));
     await waitFor(() => expect(screen.queryByText('Unable to load requests')).toBeNull());
     expect(screen.getByText('grace@example.com')).toBeVisible();
   }, 20_000);

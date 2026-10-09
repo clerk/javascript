@@ -37,6 +37,7 @@ export function useRequestsTableModel(enabled: boolean) {
 
   return {
     rows,
+    pageSize: PAGE_SIZE,
     totalCount: membershipRequests?.count ?? 0,
     page: membershipRequests?.page ?? 1,
     isLoading: membershipRequests?.isLoading ?? true,
@@ -53,7 +54,7 @@ export function useRequestsTableModel(enabled: boolean) {
     reject: enabled
       ? async (id: string) => {
           await findPending(id).reject();
-          await Promise.allSettled([refresh()]);
+          await refresh();
         }
       : undefined,
   };

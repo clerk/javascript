@@ -1,5 +1,5 @@
 import { useLocale } from '../../localization';
-import { formatDate } from '../api-keys/api-keys-table.format';
+import { formatDate } from '../../utils/format-date';
 import type { useRequestsTableModel } from './requests-table-tab.model';
 
 export function useRequestsTableController(model: ReturnType<typeof useRequestsTableModel>) {
@@ -12,6 +12,7 @@ export function useRequestsTableController(model: ReturnType<typeof useRequestsT
       imageUrl,
       requestedAtLabel: formatDate(createdAt, locale),
     })),
+    pageSize: model.pageSize,
     totalCount: model.totalCount,
     page: model.page,
     isLoading: model.isLoading,
