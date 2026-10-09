@@ -130,7 +130,7 @@ describe('Destructive with reverification', () => {
     );
     const { user } = await openVerification();
 
-    await waitFor(() => expect(screen.getByText('Something went wrong')).toBeVisible());
+    expect(await screen.findByText('Something went wrong')).toBeVisible();
     const buttons = screen.getAllByRole('button', { name: 'Close' });
     await untilConfirmStepIsGone();
     const stopWatching = watchForConfirmStep();
@@ -153,7 +153,7 @@ describe('Destructive with reverification', () => {
       );
       const { user } = await openVerification();
 
-      await waitFor(() => expect(screen.getByLabelText('Password')).toBeVisible());
+      expect(await screen.findByLabelText('Password')).toBeVisible();
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
@@ -201,7 +201,7 @@ describe('Destructive with reverification', () => {
       />,
     );
     const { user } = await openVerification();
-    await waitFor(() => expect(screen.getByLabelText('Password')).toBeVisible());
+    expect(await screen.findByLabelText('Password')).toBeVisible();
     await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 
@@ -210,7 +210,7 @@ describe('Destructive with reverification', () => {
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
     await new Promise(resolve => setTimeout(resolve, 150));
     expect(screen.queryByLabelText('Password')).toBeNull();
-    await waitFor(() => expect(screen.getByLabelText('Password', undefined, { timeout: 3000 })).toBeVisible());
+    expect(await screen.findByLabelText('Password', undefined, { timeout: 3000 })).toBeVisible();
     expect(stopWatching()).toEqual([]);
   });
 });

@@ -305,7 +305,7 @@ describe('Reverification', () => {
 
       const user = await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       await user.type(passwordField(), `${PASSWORD}{Enter}`);
       await untilResolved();
       expect(action).toHaveBeenCalledTimes(2);
@@ -319,7 +319,7 @@ describe('Reverification', () => {
 
       await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.totp)).toBeVisible());
+      expect(await screen.findByText(STEP.totp)).toBeVisible();
       expect(screen.queryByLabelText('Password')).toBeNull();
     });
 
@@ -333,7 +333,7 @@ describe('Reverification', () => {
 
       await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.totp)).toBeVisible());
+      expect(await screen.findByText(STEP.totp)).toBeVisible();
     });
 
     it('lets the user dismiss the pending card while verification is starting', async () => {
@@ -370,7 +370,7 @@ describe('Reverification', () => {
       const user = await startVerification();
 
       // The error card stays on screen without the server's message
-      await waitFor(() => expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible());
+      expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
       expect(screen.getByText('Please try again.')).toBeVisible();
       expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
       expect(screen.queryByText('Nope')).toBeNull();
@@ -390,7 +390,7 @@ describe('Reverification', () => {
 
       const user = await startVerification();
 
-      await waitFor(() => expect(screen.getByText(NO_FACTORS_TITLE)).toBeVisible());
+      expect(await screen.findByText(NO_FACTORS_TITLE)).toBeVisible();
       expect(screen.getByText(/No suitable authentication factor is configured/)).toBeVisible();
       expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
       await settle();
@@ -415,7 +415,7 @@ describe('Reverification', () => {
       try {
         await startVerification();
 
-        await waitFor(() => expect(screen.getByText(STEP.passkey)).toBeVisible());
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
         expect(screen.queryByLabelText('Password')).toBeNull();
       } finally {
         restore();
@@ -430,7 +430,7 @@ describe('Reverification', () => {
 
       await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
     });
 
     it('starts with a code method when the instance prefers code sign in', async () => {
@@ -441,7 +441,7 @@ describe('Reverification', () => {
 
       await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.emailCode)).toBeVisible());
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
     });
 
     it('starts the second factor on the authenticator app when the user has one', async () => {
@@ -452,7 +452,7 @@ describe('Reverification', () => {
 
       await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.totp)).toBeVisible());
+      expect(await screen.findByText(STEP.totp)).toBeVisible();
     });
 
     it('starts the second factor on a phone code when there is no authenticator app', async () => {
@@ -463,7 +463,7 @@ describe('Reverification', () => {
 
       await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.phoneCode)).toBeVisible());
+      expect(await screen.findByText(STEP.phoneCode)).toBeVisible();
     });
 
     it('starts the second factor on the first remaining method when there is neither', async () => {
@@ -474,7 +474,7 @@ describe('Reverification', () => {
 
       await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.backupCode)).toBeVisible());
+      expect(await screen.findByText(STEP.backupCode)).toBeVisible();
     });
 
     // This is a future behavior we will need to account for, here's the PR that builds it for the existing reverification: https://github.com/clerk/javascript/pull/9127
@@ -494,7 +494,7 @@ describe('Reverification', () => {
 
       // The password step opens when the action needs reverification
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
 
       // A wrong password shows the server message and stays on the step
       // Pressing Enter submits the password
@@ -544,7 +544,7 @@ describe('Reverification', () => {
 
       // A code is sent once when the step opens
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.emailCode)).toBeVisible());
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
 
       // The field is usable while the code is being sent
@@ -577,7 +577,7 @@ describe('Reverification', () => {
     it('resubmits the typed code with the Continue button', async () => {
       const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.emailCode)).toBeVisible());
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
       await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
       await pasteCode(user, WRONG_CODE);
       expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
@@ -638,7 +638,7 @@ describe('Reverification', () => {
 
       try {
         const user = await startVerification();
-        await waitFor(() => expect(screen.getByText(STEP.emailCode)).toBeVisible());
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
         await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
 
         // Resend is disabled and shows the countdown while the cooldown runs
@@ -682,7 +682,7 @@ describe('Reverification', () => {
       const user = await startVerification();
 
       // The SMS code is sent through the first factor endpoints when the step opens
-      await waitFor(() => expect(screen.getByText(STEP.phoneCode)).toBeVisible());
+      expect(await screen.findByText(STEP.phoneCode)).toBeVisible();
       await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('phone_code'));
 
       // The correct code completes the challenge
@@ -700,11 +700,11 @@ describe('Reverification', () => {
 
       // The first factor step opens first
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       await user.type(passwordField(), `${PASSWORD}{Enter}`);
 
       // The second factor step opens after the first factor is verified
-      await waitFor(() => expect(screen.getByText(STEP.phoneCode)).toBeVisible());
+      expect(await screen.findByText(STEP.phoneCode)).toBeVisible();
       await waitFor(() => expect(screen.queryByLabelText('Password')).toBeNull());
 
       // The second factor starts with an empty field and no error
@@ -716,12 +716,12 @@ describe('Reverification', () => {
 
       // The picker lists second factors only
       await useAnotherMethod(user);
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Use a backup code' })).toBeVisible());
+      expect(await screen.findByRole('button', { name: 'Use a backup code' })).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Continue with your password' })).toBeNull();
       await user.click(screen.getByRole('button', { name: 'Back' }));
 
       // The correct code completes the challenge
-      await waitFor(() => expect(screen.getByText(STEP.phoneCode)).toBeVisible());
+      expect(await screen.findByText(STEP.phoneCode)).toBeVisible();
       await pasteCode(user, CODE);
       await untilResolved();
     });
@@ -737,12 +737,12 @@ describe('Reverification', () => {
 
       // The authenticator app step opens first
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.totp)).toBeVisible());
+      expect(await screen.findByText(STEP.totp)).toBeVisible();
 
       // The picker offers the backup code
       await useAnotherMethod(user);
       await user.click(await screen.findByRole('button', { name: 'Use a backup code' }));
-      await waitFor(() => expect(screen.getByText(STEP.backupCode)).toBeVisible());
+      expect(await screen.findByText(STEP.backupCode)).toBeVisible();
 
       // An invalid backup code shows the server error
       await user.type(screen.getByLabelText('Backup code'), 'invalid{Enter}');
@@ -781,7 +781,7 @@ describe('Reverification', () => {
       try {
         // The passkey step opens
         const user = await startVerification();
-        await waitFor(() => expect(screen.getByText(STEP.passkey)).toBeVisible());
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
 
         // A refused credential shows an error banner and stays on the step
         await user.click(screen.getByRole('button', { name: 'Continue' }));
@@ -808,15 +808,15 @@ describe('Reverification', () => {
 
       try {
         const user = await startVerification();
-        await waitFor(() => expect(screen.getByText(STEP.passkey)).toBeVisible());
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
         await useAnotherMethod(user);
         await user.click(await screen.findByRole('button', { name: 'Continue with your password' }));
-        await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+        expect(await screen.findByText(STEP.password)).toBeVisible();
 
         // The passkey is listed once the user is on another method
         await useAnotherMethod(user);
         await user.click(await screen.findByRole('button', { name: 'Use your passkey' }));
-        await waitFor(() => expect(screen.getByText(STEP.passkey)).toBeVisible());
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
       } finally {
         restore();
       }
@@ -832,13 +832,11 @@ describe('Reverification', () => {
       try {
         // The passkey is not the starting method
         const user = await startVerification();
-        await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+        expect(await screen.findByText(STEP.password)).toBeVisible();
 
         // The passkey is not listed in the picker
         await useAnotherMethod(user);
-        await waitFor(() =>
-          expect(screen.getByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible(),
-        );
+        expect(await screen.findByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible();
         expect(screen.queryByRole('button', { name: 'Use your passkey' })).toBeNull();
       } finally {
         restore();
@@ -854,32 +852,28 @@ describe('Reverification', () => {
         verificationSeed({ firstFactors: [passwordFactor, emailFactor, workEmailFactor, phoneFactor] }),
       );
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
 
       // The picker lists every method except the one currently shown
       // Each email address and phone number is its own method
       await useAnotherMethod(user);
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible(),
-      );
+      expect(await screen.findByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible();
       expect(method('Email code to alice@work.example')).toBeVisible();
       expect(method('Send SMS code to +1 555 0100')).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Continue with your password' })).toBeNull();
 
       // Help opens from the picker and offers to email support
       await user.click(screen.getByRole('button', { name: 'Get help' }));
-      await waitFor(() => expect(screen.getByText(/If you have trouble verifying your account/)).toBeVisible());
+      expect(await screen.findByText(/If you have trouble verifying your account/)).toBeVisible();
       expect(screen.getByRole('button', { name: 'Email support' })).toBeVisible();
 
       // Back from help returns to the picker
       await user.click(screen.getByRole('button', { name: 'Back' }));
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible(),
-      );
+      expect(await screen.findByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible();
 
       // Back from the picker returns to the method the user came from
       await user.click(screen.getByRole('button', { name: 'Back' }));
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
 
       // Focus moves to the first field of the step the user switches to
       await waitFor(() => expect(passwordField()).toHaveFocus());
@@ -890,7 +884,7 @@ describe('Reverification', () => {
 
       await startVerification();
 
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Use another method' })).toBeNull();
     });
 
@@ -900,13 +894,11 @@ describe('Reverification', () => {
         verificationSeed({ firstFactors: [passwordFactor, enterpriseSsoFactor, emailFactor] }),
       );
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
 
       await useAnotherMethod(user);
 
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible(),
-      );
+      expect(await screen.findByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible();
       expect(screen.queryByText(/SSO/i)).toBeNull();
       expect(screen.queryByText(/enterprise/i)).toBeNull();
     });
@@ -921,14 +913,14 @@ describe('Reverification', () => {
       );
       const firstPrepare = holdRequests('post', PREPARE_FIRST);
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.emailCode)).toBeVisible());
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
       await waitFor(() => expect(firstPrepare.requests).toHaveLength(1));
       firstPrepare.release();
 
       // Picking the password shows the password step without sending anything
       await useAnotherMethod(user);
       await user.click(await screen.findByRole('button', { name: 'Continue with your password' }));
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       expect(firstPrepare.requests).toHaveLength(1);
 
       // Picking an email code shows a pending row and disables the other actions while the code is sent
@@ -942,14 +934,14 @@ describe('Reverification', () => {
 
       // The code step opens with an empty field and no error once the code is sent
       await screen.findByRole('group', { name: 'Verification code' });
-      await waitFor(() => expect(screen.getByText(STEP.emailCode)).toBeVisible());
+      expect(screen.getByText(STEP.emailCode)).toBeVisible();
       await waitFor(() => expect(slotValues()).toEqual(['', '', '', '', '', '']));
       expect(screen.queryByText('Incorrect code')).toBeNull();
 
       // Picking a phone code sends the SMS code through the first factor endpoints
       await useAnotherMethod(user);
       await user.click(await screen.findByRole('button', { name: 'Send SMS code to +1 555 0100' }));
-      await waitFor(() => expect(screen.getByText(STEP.phoneCode)).toBeVisible());
+      expect(await screen.findByText(STEP.phoneCode)).toBeVisible();
       expect(fapi.verification.firstFactorVerification?.strategy).toBe('phone_code');
 
       // The correct code completes the challenge
@@ -960,7 +952,7 @@ describe('Reverification', () => {
     it('lands on the picked method with an error when the code cannot be sent', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor, emailFactor] }));
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       const prepare = holdRequests('post', PREPARE_FIRST);
 
       await useAnotherMethod(user);
@@ -969,7 +961,7 @@ describe('Reverification', () => {
       prepare.fail();
 
       // The code step opens for the picked method
-      await waitFor(() => expect(screen.getByText(STEP.emailCode)).toBeVisible());
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
 
       // The error is shown on the step
       expect(await screen.findByText('form_param_invalid')).toBeInTheDocument();
@@ -987,7 +979,7 @@ describe('Reverification', () => {
 
       try {
         const user = await startVerification();
-        await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+        expect(await screen.findByText(STEP.password)).toBeVisible();
         await useAnotherMethod(user);
         await user.click(await screen.findByRole('button', { name: 'Get help' }));
 
@@ -1005,7 +997,7 @@ describe('Reverification', () => {
 
       try {
         const user = await startVerification();
-        await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+        expect(await screen.findByText(STEP.password)).toBeVisible();
         await useAnotherMethod(user);
         await user.click(await screen.findByRole('button', { name: 'Get help' }));
 
@@ -1037,7 +1029,7 @@ describe('Reverification', () => {
       touch.fail();
 
       // The step is replaced by a generic error card without the server's message
-      await waitFor(() => expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible());
+      expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
       expect(screen.getByText('Please try again.')).toBeVisible();
       expect(screen.queryByText('form_param_invalid')).toBeNull();
       expect(screen.queryByText(STEP.password)).toBeNull();
@@ -1089,7 +1081,7 @@ describe('Reverification', () => {
 
       // A later call opens a new challenge from the first step with empty fields
       await user.click(screen.getByRole('button', { name: 'Run action' }));
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       expect(passwordField()).toHaveValue('');
       expect(passwordField()).toBeEnabled();
     });
@@ -1143,7 +1135,7 @@ describe('Reverification', () => {
       expect(visible()).toBe('false');
 
       start.release();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       expect(visible()).toBe('true');
 
       await dismiss(user);
@@ -1183,18 +1175,16 @@ describe('Reverification', () => {
 
       // Running the action again opens from the first step with empty fields
       await user.click(screen.getByRole('button', { name: 'Run action' }));
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       expect(passwordField()).toHaveValue('');
     });
 
     it('can be dismissed from the method picker', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor, emailFactor] }));
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       await useAnotherMethod(user);
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible(),
-      );
+      expect(await screen.findByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible();
 
       await dismiss(user);
 
@@ -1205,10 +1195,10 @@ describe('Reverification', () => {
     it('can be dismissed from the help step', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor, emailFactor] }));
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       await useAnotherMethod(user);
       await user.click(await screen.findByRole('button', { name: 'Get help' }));
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Email support' })).toBeVisible());
+      expect(await screen.findByRole('button', { name: 'Email support' })).toBeVisible();
 
       await dismiss(user);
 
@@ -1220,7 +1210,7 @@ describe('Reverification', () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
       const prepare = holdRequests('post', PREPARE_FIRST);
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.emailCode)).toBeVisible());
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
 
       await dismiss(user);
@@ -1296,7 +1286,7 @@ describe('Reverification', () => {
 
       // The new challenge opens from the first step with empty fields
       await user.click(screen.getByRole('button', { name: 'Run action' }));
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       expect(passwordField()).toHaveValue('');
       expect(passwordField()).toBeEnabled();
 
@@ -1334,7 +1324,7 @@ describe('Reverification', () => {
         verificationSeed({ firstFactors: [passwordFactor] }),
       );
       await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
 
       await act(() => clerk.signOut());
 
@@ -1411,7 +1401,7 @@ describe('Reverification', () => {
         },
       );
       const user = await startVerification();
-      await waitFor(() => expect(screen.getByText(STEP.password)).toBeVisible());
+      expect(await screen.findByText(STEP.password)).toBeVisible();
       vi.spyOn(clerk.session!, 'attemptFirstFactorVerification').mockRejectedValue('not an error');
 
       await user.type(passwordField(), `${PASSWORD}{Enter}`);

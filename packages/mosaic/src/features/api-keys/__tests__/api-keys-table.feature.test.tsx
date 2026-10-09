@@ -447,7 +447,7 @@ describe('APIKeysTable', () => {
       expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toHaveAttribute('aria-busy', 'true');
 
       create.release();
-      await waitFor(() => expect(within(dialog).getByRole('textbox', { name: 'API key' })).toBeVisible());
+      expect(await within(dialog).findByRole('textbox', { name: 'API key' })).toBeVisible();
     });
 
     it('explains a name that is already taken and keeps the form', async () => {
