@@ -47,65 +47,67 @@ export function UserProfilePasskeysSectionView({
 
   return (
     <>
-      <Section.Group
-        ref={section}
-        tabIndex={-1}
-      >
-        <Section.Header>
-          <Section.Content>
-            <Section.Title>{m.label}</Section.Title>
-            <Field.Message
-              role={addError ? 'alert' : 'status'}
-              xstyle={styles.addError}
-            >
-              <Field.Error>{addError}</Field.Error>
-            </Field.Message>
-          </Section.Content>
-          {onAdd ? (
-            <Section.Actions>
-              <Button
-                ref={addButton}
-                aria-label={m.addLabel}
-                color='neutral'
-                size='sm'
-                variant='outline'
-                disabled={isAdding}
-                aria-busy={isAdding}
-                onClick={onAdd}
+      <Section.Root>
+        <Section.Group
+          ref={section}
+          tabIndex={-1}
+        >
+          <Section.Header>
+            <Section.Content>
+              <Section.Title>{m.label}</Section.Title>
+              <Field.Message
+                role={addError ? 'alert' : 'status'}
+                xstyle={styles.addError}
               >
-                <Icon
-                  name='plus'
-                  placement='inline-start'
+                <Field.Error>{addError}</Field.Error>
+              </Field.Message>
+            </Section.Content>
+            {onAdd ? (
+              <Section.Actions>
+                <Button
+                  ref={addButton}
+                  aria-label={m.addLabel}
+                  color='neutral'
                   size='sm'
-                />
-                {m.add}
-              </Button>
-            </Section.Actions>
-          ) : null}
-        </Section.Header>
-        <Section.Body>
-          <Section.Items>
-            {passkeys.length > 0 ? (
-              passkeys.map(passkey => (
-                <UserProfilePasskeyRowView
-                  key={passkey.id}
-                  passkey={passkey}
-                  triggerRef={removalFocus.registerTrigger(passkey.id)}
-                  onRename={onRename}
-                  validateName={validateName}
-                  onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
-                />
-              ))
-            ) : (
-              <Section.Item>
-                <Section.Content>
-                  <Section.Description>{m.empty}</Section.Description>
-                </Section.Content>
-              </Section.Item>
-            )}
-          </Section.Items>
-        </Section.Body>
-      </Section.Group>
+                  variant='outline'
+                  disabled={isAdding}
+                  aria-busy={isAdding}
+                  onClick={onAdd}
+                >
+                  <Icon
+                    name='plus'
+                    placement='inline-start'
+                    size='sm'
+                  />
+                  {m.add}
+                </Button>
+              </Section.Actions>
+            ) : null}
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              {passkeys.length > 0 ? (
+                passkeys.map(passkey => (
+                  <UserProfilePasskeyRowView
+                    key={passkey.id}
+                    passkey={passkey}
+                    triggerRef={removalFocus.registerTrigger(passkey.id)}
+                    onRename={onRename}
+                    validateName={validateName}
+                    onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
+                  />
+                ))
+              ) : (
+                <Section.Item>
+                  <Section.Content>
+                    <Section.Description>{m.empty}</Section.Description>
+                  </Section.Content>
+                </Section.Item>
+              )}
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>
       {onRemove ? (
         <Confirmation
           handle={removePasskey}

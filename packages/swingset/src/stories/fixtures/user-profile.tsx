@@ -12,6 +12,7 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-contact.types';
 import { UserProfileDangerSectionView } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section.view';
 import { UserProfileEmailSectionView } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.view';
+import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
 import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import { UserProfilePhoneSectionView } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.view';
@@ -108,28 +109,32 @@ export function useUserProfileFixture() {
   const pages: UserProfileViewProps['pages'] = {
     account: {
       titleRef,
-      profileSlot: <UserProfileProfileSectionView {...profile} />,
-      emailSlot: <UserProfileEmailSectionView {...emails} />,
-      phoneSlot: <UserProfilePhoneSectionView {...phones} />,
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          {...connections}
-          fallbackFocus={() => titleRef.current}
-        />
+      children: (
+        <>
+          <UserProfileProfileSectionView {...profile} />
+          <UserProfileEmailSectionView {...emails} />
+          <UserProfilePhoneSectionView {...phones} />
+          <UserProfileConnectedAccountsSectionView
+            {...connections}
+            fallbackFocus={() => titleRef.current}
+          />
+          <UserProfileWeb3WalletsSectionView
+            {...wallets}
+            fallbackFocus={() => titleRef.current}
+          />
+          <UserProfileDangerPreview />
+        </>
       ),
-      web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
-          {...wallets}
-          fallbackFocus={() => titleRef.current}
-        />
-      ),
-      dangerSlot: <UserProfileDangerPreview />,
     },
     security: {
-      passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
-      passkeysSlot: <UserProfilePasskeysSectionView {...passkeys} />,
-      ...mfa.security,
-      activeDevicesSlot: <UserProfileActiveDevicesSectionView {...activeDevices} />,
+      children: (
+        <>
+          <UserProfilePasswordSectionView {...editPassword} />
+          <UserProfilePasskeysSectionView {...passkeys} />
+          <UserProfileMfaSectionView {...mfa.section} />
+          <UserProfileActiveDevicesSectionView {...activeDevices} />
+        </>
+      ),
     },
     billing: {
       subscription,

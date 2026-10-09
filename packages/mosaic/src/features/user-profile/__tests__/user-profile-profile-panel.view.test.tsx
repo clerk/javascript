@@ -32,22 +32,6 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('tab')).toBeNull();
   });
 
-  it('places the sections in the order of the composed profile page', () => {
-    renderView({
-      dangerSlot: <div data-testid='danger' />,
-      web3WalletsSlot: <div data-testid='web3' />,
-      enterpriseAccountsSlot: <div data-testid='enterprise' />,
-      connectedAccountsSlot: <div data-testid='connected' />,
-      phoneSlot: <div data-testid='phone' />,
-      emailSlot: <div data-testid='email' />,
-      profileSlot: <div data-testid='profile' />,
-    });
-
-    const order = ['profile', 'email', 'phone', 'connected', 'enterprise', 'web3', 'danger'];
-    const rendered = Array.from(document.querySelectorAll('[data-testid]'), node => node.getAttribute('data-testid'));
-    expect(rendered).toEqual(order);
-  });
-
   it('keeps the final wallet confirmation mounted until removal settles', async () => {
     const user = userEvent.setup();
     const titleRef = createRef<HTMLDivElement>();
@@ -57,7 +41,7 @@ describe('UserProfileProfilePanelView', () => {
     });
     const { rerender } = renderView({
       titleRef,
-      web3WalletsSlot: (
+      children: (
         <UserProfileWeb3WalletsSectionView
           wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
           fallbackFocus={() => titleRef.current}
@@ -70,16 +54,13 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     rerender(
       <MosaicProvider>
-        <UserProfileProfilePanelView
-          titleRef={titleRef}
-          web3WalletsSlot={
-            <UserProfileWeb3WalletsSectionView
-              wallets={[]}
-              fallbackFocus={() => titleRef.current}
-              onRemove={onRemoveWeb3Wallet}
-            />
-          }
-        />
+        <UserProfileProfilePanelView titleRef={titleRef}>
+          <UserProfileWeb3WalletsSectionView
+            wallets={[]}
+            fallbackFocus={() => titleRef.current}
+            onRemove={onRemoveWeb3Wallet}
+          />
+        </UserProfileProfilePanelView>
       </MosaicProvider>,
     );
     expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
@@ -93,7 +74,7 @@ describe('UserProfileProfilePanelView', () => {
 
   it('renders the danger zone when provided', () => {
     renderView({
-      dangerSlot: <DeleteAccount />,
+      children: <DeleteAccount />,
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
@@ -103,27 +84,9 @@ describe('UserProfileProfilePanelView', () => {
     );
   });
 
-  it('places enterprise accounts before Web3 wallets and the danger zone', () => {
-    renderView({
-      web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
-          wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
-        />
-      ),
-      enterpriseAccountsSlot: <div data-testid='enterprise'>Enterprise accounts</div>,
-      dangerSlot: <DeleteAccount />,
-    });
-
-    const wallets = screen.getByRole('group', { name: 'Web3 wallets' });
-    const enterprise = screen.getByTestId('enterprise');
-    const danger = screen.getByRole('heading', { name: 'Danger zone' });
-    expect(enterprise.compareDocumentPosition(wallets) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(enterprise.compareDocumentPosition(danger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
   it('renders Web3 images inside icon frames', () => {
     const { container } = renderView({
-      web3WalletsSlot: (
+      children: (
         <UserProfileWeb3WalletsSectionView
           wallets={[
             { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
@@ -142,7 +105,7 @@ describe('UserProfileProfilePanelView', () => {
 
   it('composes linked wallets and available providers', () => {
     renderView({
-      web3WalletsSlot: (
+      children: (
         <UserProfileWeb3WalletsSectionView
           wallets={[
             {
