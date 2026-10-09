@@ -34,6 +34,17 @@ import { OrganizationProfileProfileSection } from '@clerk/mosaic/features/organi
 </OrganizationProfileGeneralPanel>;
 ```
 
+Wrap the panel in `OrganizationProfileProvider` to set where the user goes after leaving or deleting the organization.
+
+```tsx
+import { OrganizationProfileGeneralPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel';
+import { OrganizationProfileProvider } from '@clerk/mosaic/features/organization-profile/organization-profile.provider';
+
+<OrganizationProfileProvider afterLeaveOrganizationUrl='/'>
+  <OrganizationProfileGeneralPanel />
+</OrganizationProfileProvider>;
+```
+
 ## Without the danger zone
 
 The panel shows only the organization details, read-only.

@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import type { ConfirmController } from '../../../blocks/confirm';
 import { useConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
+import { usePanelTitle } from '../../../components/panel';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
@@ -20,7 +21,6 @@ export interface UserProfileConnectedAccountsControllerOptions {
   onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onRemove?: (id: string) => void | Promise<void>;
-  fallbackFocus?: () => HTMLElement | null;
   reverification?: ReverificationController;
 }
 
@@ -44,20 +44,19 @@ export function useUserProfileConnectedAccountsController({
   onConnect,
   onReconnect,
   onRemove,
-  fallbackFocus,
   reverification,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const messages = useMessages('userProfileConnectedAccounts');
   const actions = usePendingAction({ errorFallback: messages.errors.generic });
   const sectionRef = useRef<HTMLDivElement>(null);
+  const panelTitle = usePanelTitle();
   const removalFocus = useListRemovalFocus({
     ids: accounts.map(account => account.id),
     onRemove,
     fallback: () =>
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
       sectionRef.current ??
-      fallbackFocus?.() ??
-      null,
+      panelTitle(),
   });
   const remove = useConfirmController<UserProfileConnectedAccount>({
     onConfirm: account => removalFocus.remove(account.id),
