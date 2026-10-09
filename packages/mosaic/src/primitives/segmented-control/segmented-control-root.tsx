@@ -55,9 +55,8 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
     }, [value]);
 
     const onNavigate = (index: number) => {
-      if (navigatedIndexRef.current === null) {
-        setActiveIndex(index);
-      } else {
+      setActiveIndex(index);
+      if (navigatedIndexRef.current !== null) {
         navigatedIndexRef.current = index;
       }
     };
