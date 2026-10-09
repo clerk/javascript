@@ -85,9 +85,13 @@ describe('OrganizationProfileMembersPanel', () => {
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
     await user.click(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ }));
+    const members = holdRequests('get', '/v1/organizations/:organizationId/memberships');
     await user.click(await screen.findByRole('option', { name: 'Admin' }));
     await waitFor(() => expect(fapi.memberships.find(item => item.id === bob.id)?.role).toBe('org:admin'));
-    await user.click(screen.getByRole('button', { name: 'Manage Bob Smith' }));
+    await waitFor(() => expect(members.requests).toHaveLength(1));
+    expect(screen.queryByRole('button', { name: 'Manage Bob Smith' })).toBeNull();
+    members.release();
+    await user.click(await screen.findByRole('button', { name: 'Manage Bob Smith' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
     const dialog = await screen.findByRole('alertdialog', { name: 'Remove Bob Smith?' });
     await user.click(within(dialog).getByRole('button', { name: 'Remove from organization' }));
@@ -180,7 +184,7 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByText('Bob Smith')).toBeVisible();
     const members = holdRequests('get', '/v1/organizations/:organizationId/memberships');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('combobox', { name: /^Change role for Bob Smith/ }));
+    await user.click(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ }));
     await user.click(await screen.findByRole('option', { name: 'Admin' }));
     await waitFor(() => expect(members.requests).toHaveLength(1));
     members.fail('network_error', 'Unavailable');
@@ -222,7 +226,7 @@ describe('OrganizationProfileMembersPanel', () => {
     });
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(await screen.findByText('Alice')).toBeVisible();
-    expect(screen.getByRole('combobox', { name: /^Change role for Alice/ })).toBeDisabled();
+    expect(await screen.findByRole('combobox', { name: /^Change role for Alice/ })).toBeDisabled();
     expect(screen.queryByRole('button', { name: 'Manage Alice' })).toBeNull();
     expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Manage Bob Smith' })).toBeNull();
