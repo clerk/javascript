@@ -2,6 +2,7 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useMessages } from '../../localization';
 import { Select as SelectPrimitive } from '../../primitives/select';
 import type { TabsProps } from '../../primitives/tabs';
 import { Tabs } from '../../primitives/tabs';
@@ -11,6 +12,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
+import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
@@ -69,6 +71,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
 ) {
   const dialog = React.useContext(DialogContext);
   const inline = elevation === 'flush';
+  const fullscreen = dialog?.variant === 'fullscreen';
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
   const [sentinel, setSentinel] = React.useState<HTMLSpanElement | null>(null);
@@ -116,6 +119,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       pageTitleRef,
       navTriggerRef,
       inline,
+      fullscreen,
     }),
     [
       titleId,
@@ -130,6 +134,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       navItems,
       pageTitleId,
       inline,
+      fullscreen,
     ],
   );
   const element = useRender({
@@ -150,7 +155,9 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM so it takes the dialog's opening focus, as in `Card.Header`. */}
-          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <Dialog.CloseButton /> : null}
+          {isInDialog(dialog) && dialog.role !== 'alertdialog' && !(fullscreen && !compact) ? (
+            <Dialog.CloseButton />
+          ) : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),
@@ -158,7 +165,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
                 reset.base,
                 styles.layout,
                 inline && styles.layoutInline,
-                dialog !== null && !inline && styles.layoutInDialog,
+                dialog !== null && !inline && !fullscreen && styles.layoutInDialog,
+                fullscreen && styles.layoutFullscreen,
               ),
             )}
           >
@@ -209,6 +217,32 @@ type NavItemMode = 'tab' | 'option';
 // `Profile.Nav` children render again as the select's options.
 const NavItemModeContext = React.createContext<NavItemMode>('tab');
 
+function BackButton() {
+  const m = useMessages('profile');
+  return (
+    <Dialog.Close
+      {...mergeStyleProps(
+        themeProps('profile-back-button'),
+        stylex.props(reset.base, styles.navItem, focusOutline.visible, styles.backItem),
+      )}
+    >
+      <span
+        aria-hidden
+        {...mergeStyleProps(themeProps('profile-back-button-icon'), stylex.props(reset.base, styles.navItemIcon))}
+      >
+        <Icon
+          name='arrow-left'
+          size='sm'
+          xstyle={rtl.mirror}
+        />
+      </span>
+      <span {...mergeStyleProps(themeProps('profile-back-button-label'), stylex.props(styles.navItemLabel))}>
+        {m.backToApp}
+      </span>
+    </Dialog.Close>
+  );
+}
+
 function NavBranding() {
   return (
     <div {...mergeStyleProps(themeProps('profile-branding'), stylex.props(reset.base, styles.branding))}>
@@ -225,8 +259,18 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   { children, render, xstyle, ...rest },
   ref,
 ) {
-  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, setNavItems, navTriggerRef, inline } =
-    useProfileContext('Profile.Nav');
+  const {
+    titleId,
+    renderBranding,
+    compact,
+    navLayout,
+    navOpen,
+    closeNav,
+    setNavItems,
+    navTriggerRef,
+    inline,
+    fullscreen,
+  } = useProfileContext('Profile.Nav');
   useSafeLayoutEffect(() => {
     setNavItems(children);
   }, [children, setNavItems]);
@@ -239,11 +283,18 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       'aria-labelledby': titleId,
       ...mergeStyleProps(
         themeProps('profile-nav', { compact }),
-        stylex.props(reset.base, styles.nav, (inline || compact) && styles.navFlush, xstyle),
+        stylex.props(
+          reset.base,
+          styles.nav,
+          (inline || compact) && styles.navFlush,
+          fullscreen && !compact && styles.navFullscreen,
+          xstyle,
+        ),
         rest,
       ),
       children: (
         <>
+          {fullscreen && navLayout === 'column' ? <BackButton /> : null}
           <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
             {children}
           </Tabs.List>
@@ -452,7 +503,7 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
   { pageTitle, children, render, xstyle, ...rest },
   ref,
 ) {
-  const { inline, compact, renderBranding } = useProfileContext('Profile.Content');
+  const { inline, compact, renderBranding, fullscreen } = useProfileContext('Profile.Content');
   return useRender({
     defaultTagName: 'div',
     render,
@@ -460,7 +511,13 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
     props: {
       ...mergeStyleProps(
         themeProps('profile-content', { inline }),
-        stylex.props(reset.base, styles.content, inline ? styles.contentInline : contentScroll, xstyle),
+        stylex.props(
+          reset.base,
+          styles.content,
+          inline ? styles.contentInline : contentScroll,
+          fullscreen && styles.contentFullscreen,
+          xstyle,
+        ),
         rest,
       ),
       children: (

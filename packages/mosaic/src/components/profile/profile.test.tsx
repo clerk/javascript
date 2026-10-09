@@ -469,6 +469,28 @@ describe('Profile', () => {
     it.each([
       ['sheet', 3],
       ['select', 2],
+    ])('falls back to the corner dismiss in a fullscreen dialog in the %s layout', (_, width) => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup variant='fullscreen'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('button', { name: 'Back to app' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+
+      act(() => observe?.(width));
+
+      expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+    });
+
+    it.each([
+      ['sheet', 3],
+      ['select', 2],
     ])('shows the page as a group named by the page title in the %s layout', (_, width) => {
       renderSurface();
       act(() => observe?.(width));
@@ -594,6 +616,59 @@ describe('Profile', () => {
       expect(screen.getByRole('alertdialog', { name: 'User profile' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    });
+
+    describe('fullscreen', () => {
+      function renderFullscreen(
+        onOpenChange = vi.fn(),
+        localization?: React.ComponentProps<typeof MosaicProvider>['localization'],
+      ) {
+        return render(
+          <MosaicProvider localization={localization}>
+            <Dialog.Root
+              defaultOpen
+              onOpenChange={onOpenChange}
+            >
+              <Dialog.Popup variant='fullscreen'>
+                <Surface />
+              </Dialog.Popup>
+            </Dialog.Root>
+          </MosaicProvider>,
+        );
+      }
+
+      it('puts a back button first in the navigation in place of the corner dismiss', () => {
+        renderFullscreen();
+
+        const back = screen.getByRole('button', { name: 'Back to app' });
+        expect(screen.getByRole('navigation', { name: 'User profile' })).toContainElement(back);
+        expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+        expect(back.compareDocumentPosition(screen.getByRole('tablist'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+
+      it('dismisses the dialog from the back button', async () => {
+        const onOpenChange = vi.fn();
+        renderFullscreen(onOpenChange);
+
+        await userEvent.setup().click(screen.getByRole('button', { name: 'Back to app' }));
+
+        expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+      });
+
+      it('reads the back button label from the catalog', () => {
+        renderFullscreen(vi.fn(), { overrides: { 'profile.backToApp': 'Retour à l’application' } });
+
+        expect(screen.getByRole('button', { name: 'Retour à l’application' })).toBeInTheDocument();
+      });
+    });
+
+    it('has no back button in a profile dialog, or standalone', () => {
+      const standalone = renderSurface();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+      standalone.unmount();
+
+      renderInDialog();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
     });
 
     it('carries no dismiss standalone', () => {

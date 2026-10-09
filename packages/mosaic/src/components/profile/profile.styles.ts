@@ -114,6 +114,45 @@ export const styles = stylex.create({
     minHeight: 0,
   },
 
+  layoutFullscreen: {
+    borderRadius: 0,
+    borderWidth: '0px',
+    backgroundColor: colorVars['--cl-color-background-subtle'],
+    blockSize: 'auto',
+    boxShadow: 'none',
+    flexGrow: 1,
+    minHeight: 0,
+  },
+
+  navFullscreen: {
+    borderInlineEndWidth: '0px',
+  },
+
+  backItem: {
+    marginBlockEnd: space['4'],
+  },
+
+  contentFullscreen: {
+    borderRadius: {
+      [compact]: 0,
+      default: radiusVars['--cl-radius-xl'],
+    },
+    marginBlock: {
+      [compact]: 0,
+      default: space['2'],
+    },
+    paddingBlock: 0,
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: {
+      [compact]: 'none',
+      default: `0 0 0 1px ${colorVars['--cl-color-border']}`,
+    },
+    marginInlineEnd: {
+      [compact]: 0,
+      default: space['2'],
+    },
+  },
+
   nav: {
     padding: space['4'],
     borderInlineEndColor: colorVars['--cl-color-border'],
@@ -182,17 +221,16 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '0px',
     gap: space['2'],
-    paddingBlock: space['2'],
     paddingInline: space['2.5'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':focus-visible': colorVars['--cl-color-border-subtle'],
-      ':where([data-selected])': colorVars['--cl-color-border-subtle'],
-      ':active': colorVars['--cl-color-border-subtle'],
+      ':focus-visible': colorVars['--cl-color-neutral-alpha-100'],
+      ':where([data-selected])': colorVars['--cl-color-neutral-alpha-200'],
+      ':active': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-border-subtle'],
+        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {
@@ -210,6 +248,7 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
     // Above the neighbors, so the selected item's fill cannot cover the ring.
     zIndex: { default: null, ':focus-visible': 1 },
+    height: space['8'],
     minHeight: {
       default: null,
       '@media (pointer: coarse)': targetVars['--cl-target-coarse'],

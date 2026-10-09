@@ -18,6 +18,7 @@ export interface ProfileContextValue {
   pageTitleRef: React.MutableRefObject<HTMLHeadingElement | null>;
   navTriggerRef: React.MutableRefObject<HTMLButtonElement | null>;
   inline: boolean;
+  fullscreen: boolean;
 }
 
 export const ProfileContext = React.createContext<ProfileContextValue | null>(null);

@@ -33,11 +33,15 @@ import { guardKeyboardTouch } from './keyboard-touch';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
- * card's width, `profile` a `Profile` filling the height. Not a `size`, because these are
- * different surfaces rather than one surface at two widths — a second card width would be a size
- * of the `card` variant.
+ * card's width, `profile` a `Profile` filling the height, `fullscreen` a `Profile` filling the
+ * viewport. Not a `size`, because these are different surfaces rather than one surface at two
+ * widths — a second card width would be a size of the `card` variant.
  */
-export type DialogVariant = keyof typeof variants;
+export type DialogVariant = keyof typeof variants | 'fullscreen';
+
+function surfaceOf(variant: DialogVariant): keyof typeof variants {
+  return variant === 'fullscreen' ? 'profile' : variant;
+}
 
 /**
  * Where the surface sits in the compact band — a window under `40rem`. `center`
@@ -223,7 +227,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
   const variant = surface?.variant ?? 'card';
   useCloseButtonWarning(role === 'alertdialog');
   return (
-    <span {...stylex.props(styles.closeButton, closeInsets[variant])}>
+    <span {...stylex.props(styles.closeButton, closeInsets[surfaceOf(variant)])}>
       <Primitive.Close
         ref={ref}
         aria-label={ariaLabel}
@@ -254,7 +258,12 @@ function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boole
         themeProps('dialog-backdrop'),
         // All in one `stylex.props` call so a later `backgroundColor` replaces the one in
         // `backdrop` outright — across two calls both would emit and the cascade would decide.
-        stylex.props(reset.base, styles.backdrop, stacked && styles.backdropStacked, backdropMotion[variant]),
+        stylex.props(
+          reset.base,
+          styles.backdrop,
+          stacked && styles.backdropStacked,
+          backdropMotion[surfaceOf(variant)],
+        ),
       )}
     />
   );
@@ -289,7 +298,7 @@ function Viewport({
         stylex.props(
           reset.base,
           styles.viewport,
-          viewportVariants[variant],
+          viewportVariants[surfaceOf(variant)],
           viewportCompactPlacements[compactPlacement],
         ),
       )}
@@ -297,7 +306,13 @@ function Viewport({
       <div
         {...mergeStyleProps(
           themeProps('dialog-track', { variant }),
-          stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
+          stylex.props(
+            reset.base,
+            styles.track,
+            trackVariants[surfaceOf(variant)],
+            variant === 'fullscreen' && trackVariants.fullscreen,
+            trackCompactPlacements[compactPlacement],
+          ),
         )}
         ref={trackRef}
       >
@@ -317,11 +332,11 @@ function Viewport({
  */
 function useNestedVariantWarning(isNestedInDialog: boolean, variant: DialogVariant) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || variant !== 'profile') {
+    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || surfaceOf(variant) !== 'profile') {
       return;
     }
     console.warn(
-      '[Clerk] a variant="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.',
+      `[Clerk] a variant="${variant}" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.`,
     );
   }, [isNestedInDialog, variant]);
 }
@@ -336,14 +351,14 @@ function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCom
   React.useEffect(() => {
     if (
       process.env.NODE_ENV === 'production' ||
-      variant !== 'profile' ||
+      surfaceOf(variant) !== 'profile' ||
       placement === undefined ||
       placement === 'center'
     ) {
       return;
     }
     console.warn(
-      `[Clerk] <Dialog.Popup variant="profile" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
+      `[Clerk] <Dialog.Popup variant="${variant}" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
     );
   }, [variant, placement]);
 }
@@ -364,7 +379,8 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
   const isAlert = role === 'alertdialog';
   // A profile has its own compact-band treatment and takes no placement; the warning says so.
-  const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : (compactPlacementProp ?? 'sheet');
+  const compactPlacement: DialogCompactPlacement =
+    surfaceOf(variant) === 'profile' ? 'center' : (compactPlacementProp ?? 'sheet');
   useCompactPlacementWarning(variant, compactPlacementProp);
   useNestedVariantWarning(isNestedInDialog, variant);
 
@@ -375,7 +391,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog', variant === 'profile' ? 'Profile.Title' : 'Card.Title');
+  useAccessibleNameWarning(node, 'Dialog', surfaceOf(variant) === 'profile' ? 'Profile.Title' : 'Card.Title');
   // A name alone is enough for an ordinary dialog; an alert is announced as an interruption and
   // its description is what says which decision is being asked for.
   useAccessibleDescriptionWarning(isAlert ? node : null, 'Dialog', 'Card.Description');
@@ -403,12 +419,12 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
           stylex.props(
             reset.base,
             styles.popup,
-            variants[variant],
+            variants[surfaceOf(variant)],
             compactPlacements[compactPlacement],
             // One cell per (variant, placement) that exists, selected rather than layered: StyleX
             // dedupes by PROPERTY across a `stylex.props` call, so a thin "sheet only" atom would
             // replace the centered cell's `transform` wholesale and take the desktop scale with it.
-            compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[variant],
+            compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[surfaceOf(variant)],
             xstyle,
           ),
           rest,
@@ -437,7 +453,9 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 
   return (
-    <Primitive.Portal>{variant === 'profile' ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
+    <Primitive.Portal>
+      {surfaceOf(variant) === 'profile' ? <ToastProvider>{viewport}</ToastProvider> : viewport}
+    </Primitive.Portal>
   );
 });
 

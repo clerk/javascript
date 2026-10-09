@@ -96,6 +96,17 @@ describe('Mosaic Dialog', () => {
     expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-variant', 'profile');
   });
 
+  it('reflects the fullscreen variant as data-variant on the popup and the viewport', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup variant='fullscreen'>Body</Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-variant', 'fullscreen');
+    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-variant', 'fullscreen');
+  });
+
   it('composes consumer xstyle onto the popup', () => {
     const caller = stylex.create({ popup: { marginTop: '8px' } });
     render(
@@ -248,6 +259,17 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="profile"'));
+    warn.mockRestore();
+  });
+
+  it('warns when a fullscreen profile opens inside another dialog', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(<Nested innerVariant='fullscreen' />);
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
     warn.mockRestore();
   });
 
@@ -595,6 +617,15 @@ describe('compactPlacement', () => {
     warn.mockRestore();
   });
 
+  it('ignores a placement on a fullscreen profile, and warns', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPlacement('sheet', 'fullscreen');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
+    warn.mockRestore();
+  });
+
   it('keeps a profile centered by default without warning', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     renderPlacement(undefined, 'profile');
@@ -602,6 +633,19 @@ describe('compactPlacement', () => {
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
     warn.mockRestore();
+  });
+});
+
+describe('fullscreen track', () => {
+  const probe = stylex.create({ noInset: { paddingInline: 0 } });
+
+  it('has no inset around the popup, where a profile keeps one', () => {
+    const fullscreen = renderVariant('fullscreen');
+    expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.noInset)));
+    fullscreen.unmount();
+
+    renderVariant('profile');
+    expect(classesOf('.cl-dialog-track')).not.toEqual(expect.arrayContaining(atomFor(probe.noInset)));
   });
 });
 

@@ -359,6 +359,10 @@ export const trackVariants = stylex.create({
     // Same definite row as the viewport's, one level down, so the popup's `stretch` lands on it.
     gridTemplateRows: 'minmax(0, 1fr)',
   },
+  fullscreen: {
+    '--_cl-dialog-inset': '0px',
+    paddingInline: 0,
+  },
 });
 
 export const variants = stylex.create({
