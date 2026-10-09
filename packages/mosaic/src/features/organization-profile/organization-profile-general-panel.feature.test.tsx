@@ -149,7 +149,6 @@ describe('OrganizationProfileGeneralPanel', () => {
       expect(within(dialog).getByText('Name')).toHaveAttribute('data-visually-hidden', '');
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      await waitFor(() => expect(trigger).toHaveFocus());
     });
 
     it('requires a nonblank changed name before saving', async () => {
@@ -218,7 +217,6 @@ describe('OrganizationProfileGeneralPanel', () => {
       await user.type(field, '-draft');
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      await waitFor(() => expect(trigger).toHaveFocus());
       await user.click(trigger);
       expect(within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
     });

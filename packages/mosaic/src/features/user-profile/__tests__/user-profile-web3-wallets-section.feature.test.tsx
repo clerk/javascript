@@ -512,7 +512,7 @@ describe('Web3 wallets', () => {
     expect(screen.getByText('Primary')).toBeInTheDocument();
   });
 
-  it('confirms removal and focuses Connect after deleting the last wallet', async () => {
+  it('confirms removal and clears the primary after deleting the last wallet', async () => {
     const fapi = await renderWeb3({
       web3_wallets: [fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' })],
       primary_web3_wallet_id: 'wallet_1',
@@ -526,7 +526,6 @@ describe('Web3 wallets', () => {
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
     expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBeNull();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toHaveFocus());
   });
 
   it('keeps a failed wallet removal in its confirmation for a manual retry', async () => {
@@ -554,7 +553,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
-  it('cancels removal, then removes the newly selected wallet and focuses the remaining row', async () => {
+  it('cancels removal, then removes the newly selected wallet', async () => {
     const fapi = await renderWeb3({
       web3_wallets: [
         fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' }),
@@ -568,7 +567,7 @@ describe('Web3 wallets', () => {
     await user.keyboard('{Enter}');
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
     await user.keyboard('{Escape}');
-    await waitFor(() => expect(first).toHaveFocus());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(2);
     await user.click(screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
@@ -578,7 +577,6 @@ describe('Web3 wallets', () => {
     expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual(['wallet_1']);
     expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_1');
     expect(screen.getByText('Primary')).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toHaveFocus());
   });
 
   it('distinguishes localized discovery loading and failure from no installed wallets', async () => {

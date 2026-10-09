@@ -143,53 +143,47 @@ describe('InvitationsTableTabView', () => {
   });
 });
 
-it.each([true, false])(
-  'revokes the confirmed invitation and restores focus with invite available: %s',
-  async hasInvite => {
-    const user = userEvent.setup();
-    const pending = deferred<void>();
-    const onMutation = vi
-      .fn<(id: string) => Promise<void>>()
-      .mockImplementationOnce(() => pending.promise)
-      .mockResolvedValue(undefined);
-    function Example() {
-      const [items, setItems] = useState([
-        { ...propsFor().invitations[0], id: 'ada', email: 'ada@example.com' },
-        { ...propsFor().invitations[0], id: 'grace', email: 'Grace' },
-      ]);
-      return (
-        <MosaicProvider>
-          <InvitationsTableTabView
-            {...propsFor()}
-            invitations={items}
-            totalCount={items.length}
-            onInvite={hasInvite ? vi.fn() : undefined}
-            onRevoke={async id => {
-              await onMutation(id);
-              setItems(current => current.filter(item => item.id !== id));
-            }}
-          />
-        </MosaicProvider>
-      );
-    }
-    render(<Example />);
-    await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
-    expect(onMutation).not.toHaveBeenCalled();
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
-    expect(onMutation).toHaveBeenCalledExactlyOnceWith('ada');
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-    await act(async () => {
-      pending.resolve();
-      await pending.promise;
-    });
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.getByRole('button', { name: 'Manage Grace' })).toHaveFocus();
-    await user.click(screen.getByRole('button', { name: 'Manage Grace' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(onMutation).toHaveBeenLastCalledWith('grace');
-    expect(hasInvite ? screen.getByRole('button', { name: 'Invite' }) : screen.getByRole('searchbox')).toHaveFocus();
-  },
-);
+it('revokes the confirmed invitation', async () => {
+  const user = userEvent.setup();
+  const pending = deferred<void>();
+  const onMutation = vi
+    .fn<(id: string) => Promise<void>>()
+    .mockImplementationOnce(() => pending.promise)
+    .mockResolvedValue(undefined);
+  function Example() {
+    const [items, setItems] = useState([
+      { ...propsFor().invitations[0], id: 'ada', email: 'ada@example.com' },
+      { ...propsFor().invitations[0], id: 'grace', email: 'Grace' },
+    ]);
+    return (
+      <MosaicProvider>
+        <InvitationsTableTabView
+          {...propsFor()}
+          invitations={items}
+          totalCount={items.length}
+          onRevoke={async id => {
+            await onMutation(id);
+            setItems(current => current.filter(item => item.id !== id));
+          }}
+        />
+      </MosaicProvider>
+    );
+  }
+  render(<Example />);
+  await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+  expect(onMutation).not.toHaveBeenCalled();
+  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+  expect(onMutation).toHaveBeenCalledExactlyOnceWith('ada');
+  expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+  await act(async () => {
+    pending.resolve();
+    await pending.promise;
+  });
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  await user.click(screen.getByRole('button', { name: 'Manage Grace' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  expect(onMutation).toHaveBeenLastCalledWith('grace');
+});

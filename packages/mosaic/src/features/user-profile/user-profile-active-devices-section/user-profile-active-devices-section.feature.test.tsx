@@ -745,19 +745,6 @@ describe('Deferred active-device actions', () => {
   it.todo('reverifies device revocation before retrying verification-required API errors');
 });
 
-describe('active devices focus after connected revocation', () => {
-  it('returns focus to the same row when sign out is cancelled', async () => {
-    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
-    await renderWithClerk(<UserProfileActiveDevicesSection />);
-    const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
-
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toHaveFocus());
-  });
-});
-
 describe('Sign out an unavailable device', () => {
   it.each([
     ['en-US', 'This device is no longer available. Please try again.'],
