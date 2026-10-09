@@ -104,6 +104,7 @@ export function OrganizationProfileInviteMembersDialog({
               <TagInput
                 ref={emailInput}
                 name='emailAddresses'
+                delimiters={[',', ' ']}
                 value={emailAddresses}
                 onValueChange={onEmailAddressesChange}
                 validate={isValid}
