@@ -1,8 +1,9 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEmailAddress,
@@ -21,6 +22,34 @@ async function renderPassword(user = alice, environment = fapiEnvironment()) {
   const fapi = serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
   await renderWithClerk(<UserProfilePasswordSection />);
   return fapi;
+}
+
+async function renderWithReverification() {
+  const fapi = serveFapi({
+    environment: fapiEnvironment({ auth_config: { reverification: true } }),
+    client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]),
+    verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+  });
+  let required = false;
+  worker.use(
+    http.post(fapiUrl('/v1/me/change_password'), () => {
+      if (required) {
+        return undefined;
+      }
+      required = true;
+      return HttpResponse.json(
+        { errors: [{ code: 'session_reverification_required', message: 'Verification required' }] },
+        { status: 403 },
+      );
+    }),
+  );
+  await renderWithClerk(<UserProfilePasswordSection />);
+  const user = userEvent.setup();
+  await user.click(screen.getByRole('button', { name: 'Change password' }));
+  await user.type(screen.getByLabelText('New password'), 'new-password-123');
+  await user.type(screen.getByLabelText('Confirm password'), 'new-password-123');
+  await user.click(screen.getByRole('button', { name: 'Save changes' }));
+  return { fapi, user };
 }
 
 async function fillPassword() {
@@ -197,6 +226,31 @@ describe('Changing a password', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
+  it('skips the current password and asks to verify before saving when reverification is on', async () => {
+    const { fapi, user } = await renderWithReverification();
+
+    expect(screen.queryByLabelText('Current password')).toBeNull();
+    const field = await screen.findByPlaceholderText('Enter your password');
+    expect(fapi.passwordUpdates).toHaveLength(0);
+    await user.type(field, 'hunter2{Enter}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull(), { timeout: 3000 });
+    expect(fapi.passwordUpdates).toHaveLength(1);
+  });
+
+  it('closes without saving when verification is dismissed, and reopens on an empty form', async () => {
+    const { fapi, user } = await renderWithReverification();
+
+    await screen.findByPlaceholderText('Enter your password');
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(0);
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    expect(screen.getByLabelText('New password')).toHaveValue('');
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeVisible();
+  });
+
   it('shows a direct API error and keeps the draft without retrying automatically', async () => {
     const fapi = await renderPassword();
     const user = await fillPassword();
@@ -204,11 +258,10 @@ describe('Changing a password', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(update.requests).toHaveLength(1));
-    update.fail('session_reverification_required');
+    update.fail('form_param_invalid');
 
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('session_reverification_required'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_param_invalid'));
     expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
-    expect(screen.queryByText('Verification required')).toBeNull();
     expect(update.requests).toHaveLength(1);
     serveFapi(fapi);
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
