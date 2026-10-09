@@ -34,6 +34,11 @@ export type ClerkProviderProps = Omit<
   passkeys?: PasskeySupport;
 };
 
+const SDK_METADATA = {
+  name: PACKAGE_NAME,
+  version: PACKAGE_VERSION,
+};
+
 let cachedClerkUI: { promise: Promise<ClerkUIConstructor>; publishableKey: string } | null = null;
 
 function loadClerkUI(publishableKey: string, props: Partial<ClerkProviderProps>): Promise<ClerkUIConstructor> {
@@ -136,6 +141,7 @@ export function ClerkProvider({
     <ReactClerkProvider
       {...props}
       {...routerHandlers}
+      sdkMetadata={SDK_METADATA}
       Clerk={clerk}
       __internal_oauthTransport={oauthTransport}
       allowedRedirectProtocols={allowedRedirectProtocols ?? defaultAllowedRedirectProtocols()}

@@ -64,6 +64,16 @@
         "default": "./dist/cjs/react/index.js"
       }
     },
+    "./react/experimental": {
+      "import": {
+        "types": "./dist/types/react/experimental.d.ts",
+        "default": "./dist/esm/react/experimental.js"
+      },
+      "require": {
+        "types": "./dist/types/react/experimental.d.ts",
+        "default": "./dist/cjs/react/experimental.js"
+      }
+    },
     "./passkeys": {
       "import": {
         "types": "./dist/types/passkeys/index.d.ts",

@@ -157,3 +157,19 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
     ipcMain.removeHandler(OAUTH_TRANSPORT_CHANNELS.open);
   };
 }
+
+export function setupMissingRendererOAuthTransportIpcHandlers(): () => void {
+  const rejectMissingRenderer = (): never => {
+    throw new Error(
+      'Clerk: OAuth sign-in requires the renderer option. Pass createClerkBridge({ renderer: { scheme, host } }) so the OAuth callback can reach the app.',
+    );
+  };
+
+  ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl, rejectMissingRenderer);
+  ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.open, rejectMissingRenderer);
+
+  return () => {
+    ipcMain.removeHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);
+    ipcMain.removeHandler(OAUTH_TRANSPORT_CHANNELS.open);
+  };
+}

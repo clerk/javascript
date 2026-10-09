@@ -96,7 +96,8 @@ describe('createClerkBridge', () => {
   it('sets up token persistence IPC handlers with the provided storage', () => {
     createClerkBridge({ storage });
 
-    expect(ipcMain.handle).toHaveBeenCalledTimes(3);
+    const channels = vi.mocked(ipcMain.handle).mock.calls.map(([channel]) => channel);
+    expect(channels).toEqual(expect.arrayContaining(Object.values(TOKEN_CACHE_CHANNELS)));
   });
 
   it('keeps the platform details when setting the app user-agent fallback', () => {
@@ -230,7 +231,7 @@ describe('createClerkBridge', () => {
 
     clerk.cleanup();
 
-    expect(ipcMain.removeHandler).toHaveBeenCalledTimes(3);
+    expect(ipcMain.removeHandler).toHaveBeenCalledTimes(5);
   });
 
   it('does not register passkey IPC handlers by default', () => {
@@ -256,7 +257,32 @@ describe('createClerkBridge', () => {
 
     clerk.cleanup();
 
-    expect(ipcMain.removeHandler).toHaveBeenCalledTimes(6);
+    expect(ipcMain.removeHandler).toHaveBeenCalledTimes(8);
+  });
+
+  it('registers OAuth transport handlers that throw a Clerk error when renderer is not configured', () => {
+    createClerkBridge({ storage });
+
+    const getHandler = (channel: string) =>
+      vi.mocked(ipcMain.handle).mock.calls.find(([registered]) => registered === channel)?.[1];
+
+    for (const channel of Object.values(OAUTH_TRANSPORT_CHANNELS)) {
+      const handler = getHandler(channel);
+      expect(handler).toBeDefined();
+      expect(() => handler?.(mainFrameEvent, 'https://accounts.example.com')).toThrow(
+        'Clerk: OAuth sign-in requires the renderer option',
+      );
+    }
+    expect(app.setAsDefaultProtocolClient).not.toHaveBeenCalled();
+  });
+
+  it('cleans up the missing-renderer OAuth transport handlers', () => {
+    const clerk = createClerkBridge({ storage });
+
+    clerk.cleanup();
+
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);
+    expect(ipcMain.removeHandler).toHaveBeenCalledWith(OAUTH_TRANSPORT_CHANNELS.open);
   });
 
   it('cleans up OAuth transport handlers when renderer origin is configured', () => {

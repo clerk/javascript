@@ -2,7 +2,7 @@ import { app, protocol } from 'electron';
 
 import type { ClerkBridge, CreateClerkBridgeOptions } from '../shared/types';
 import { setupTokenCacheIpcHandlers } from './ipc-handlers';
-import { setupOAuthTransportIpcHandlers } from './oauth-transport';
+import { setupMissingRendererOAuthTransportIpcHandlers, setupOAuthTransportIpcHandlers } from './oauth-transport';
 import { setupPasskeysMain } from './passkey-handlers';
 
 function assertValidRendererOriginConfig(renderer: NonNullable<CreateClerkBridgeOptions['renderer']>): void {
@@ -127,6 +127,8 @@ export function createClerkBridge(options: CreateClerkBridgeOptions): ClerkBridg
           renderer: options.renderer,
         }),
       );
+    } else {
+      teardowns.push(setupMissingRendererOAuthTransportIpcHandlers());
     }
 
     return {
