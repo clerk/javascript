@@ -102,9 +102,9 @@ describe('User profile MFA', () => {
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /SMS verification/ }));
     await user.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('CODE0001')).toBeVisible();
     expect(fapi.mfa.phoneCreations).toEqual([]);
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: true, default: undefined });
-    expect(await screen.findByText('CODE0001')).toBeVisible();
   });
 
   it('shows the backend error when the last login identifier cannot be reserved', async () => {
