@@ -39,7 +39,7 @@ const getPlatformApplication = async (
   if (!platformApiKey) {
     throw new Error('CLERK_PLATFORM_API_KEY is required to create a Platform API application.');
   }
-  if (!constants.E2E_APP_ID) {
+  if (!constants.INTEGRATION_TEST_RUN_KEY && !constants.E2E_APP_ID) {
     const application = await createApplicationFromConfig(
       platformApiKey,
       keyName,
@@ -52,8 +52,7 @@ const getPlatformApplication = async (
   const cacheKey = createHash('sha256')
     .update(keyName)
     .update(JSON.stringify(definition.config))
-    .update(constants.INTEGRATION_TEST_RUN_KEY || '')
-    .update(constants.E2E_APP_ID)
+    .update(constants.INTEGRATION_TEST_RUN_KEY || constants.E2E_APP_ID || '')
     .digest('hex');
   const cachePath = resolve(constants.TMP_DIR, 'platform-applications', `${cacheKey}.json`);
   platformApplicationCachePaths.add(cachePath);
@@ -278,13 +277,10 @@ const withSignInOrUpEmailLinksFlow = withEmailLinks
   .setId('withSignInOrUpEmailLinksFlow')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
-const withSignInOrUpwithRestrictedModeFlow = await withInstanceKeys(
-  'with-restricted-mode',
-  withEmailCodes
-    .clone()
-    .setId('withSignInOrUpwithRestrictedModeFlow')
-    .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined),
-);
+const withSignInOrUpwithRestrictedModeFlow = withRestrictedMode
+  .clone()
+  .setId('withSignInOrUpwithRestrictedModeFlow')
+  .setEnvVariable('public', 'CLERK_SIGN_UP_URL', undefined);
 
 const withSessionTasks = await withInstanceKeys(
   'with-session-tasks',
