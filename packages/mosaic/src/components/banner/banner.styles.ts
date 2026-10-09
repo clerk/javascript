@@ -11,11 +11,11 @@ export const styles = stylex.create({
     paddingBlock: space['2'],
     paddingInline: space['3'],
     alignItems: 'flex-start',
+    color: colorVars['--cl-color-foreground'],
     display: 'flex',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    color: colorVars['--cl-color-foreground'],
   },
   icon: {
     flexShrink: 0,
@@ -31,8 +31,8 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   description: {
-    textWrap: 'pretty',
     color: colorVars['--cl-color-foreground-secondary'],
+    textWrap: 'pretty',
   },
 });
 

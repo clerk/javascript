@@ -33,7 +33,7 @@ import { Banner } from '@clerk/mosaic/components/banner';
 | Part                 | Stable slot class        | Description                                                     |
 | -------------------- | ------------------------ | --------------------------------------------------------------- |
 | `Banner.Root`        | `.cl-banner-root`        | Tinted `div` surface. Owns `color` and renders the icon for it. |
-| `Banner.Label`       | `.cl-banner-label`       | The headline `span`, in the foreground color at medium weight.  |
+| `Banner.Label`       | `.cl-banner-label`       | The headline `p`, in the foreground color at medium weight.     |
 | `Banner.Description` | `.cl-banner-description` | Supporting `p` beneath the label, in the secondary text color.  |
 
 `Banner.Root` also wraps its children in a `.cl-banner-content` column so the copy aligns past the icon. Every part accepts `render` for polymorphism and forwards its ref.
