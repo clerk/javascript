@@ -81,6 +81,9 @@ describe('OrganizationProfileInviteMembersDialog', () => {
     });
 
     expect(screen.getByRole('alert')).toHaveTextContent('ada@clerk.dev is already a member.');
+    const [preston, ada] = screen.getAllByRole('listitem');
+    expect(preston).not.toHaveAttribute('data-invalid');
+    expect(ada).toHaveAttribute('data-invalid', '');
     expect(screen.getByRole('button', { name: 'Send invites' })).toHaveAttribute('aria-disabled', 'true');
   });
 });

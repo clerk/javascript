@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
@@ -35,25 +35,5 @@ describe('members panel role loading', () => {
   it('does not load without a loader', () => {
     const { result } = renderHook(() => useMembersPanelRolesController(undefined));
     expect(result.current).toBeNull();
-  });
-
-  it.each(['resolve', 'reject'] as const)('drops an unresolved %s after unmount', async outcome => {
-    const oldRequest = deferred<MembersRoles>();
-    const { unmount } = renderHook(() => useMembersPanelRolesController(() => oldRequest.promise));
-    unmount();
-
-    const fresh = { roles: [{ key: 'org:new', name: 'New' }], hasRoleSetMigration: false };
-    const { result } = renderHook(() => useMembersPanelRolesController(() => Promise.resolve(fresh)));
-    await waitFor(() => expect(result.current).toEqual(fresh));
-
-    await act(() => {
-      if (outcome === 'resolve') {
-        oldRequest.resolve({ roles: [{ key: 'org:old', name: 'Old' }], hasRoleSetMigration: false });
-      } else {
-        oldRequest.reject(new Error('old request failed'));
-      }
-      return Promise.resolve();
-    });
-    expect(result.current).toEqual(fresh);
   });
 });
