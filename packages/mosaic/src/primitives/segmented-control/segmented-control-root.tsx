@@ -10,6 +10,8 @@ import {
   type SegmentedControlDirection,
 } from './segmented-control-context';
 
+const NAVIGATION_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End']);
+
 interface SelectionState {
   value: string;
   direction: SegmentedControlDirection;
@@ -50,6 +52,8 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
     });
     const [activeIndex, setActiveIndex] = useState(0);
     const [rtl, setRtl] = useState(false);
+    const navigatingRef = useRef(false);
+    const isNavigating = useCallback(() => navigatingRef.current, []);
     const itemsRef = useRef(new Map<string, HTMLElement>());
 
     const registerItem = useCallback((itemValue: string, element: HTMLElement | null) => {
@@ -106,8 +110,8 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
     }, [getIndex, value]);
 
     const contextValue = useMemo<SegmentedControlContextValue>(
-      () => ({ value, select, registerItem, disabled, direction }),
-      [value, select, registerItem, disabled, direction],
+      () => ({ value, select, isNavigating, registerItem, disabled, direction }),
+      [value, select, isNavigating, registerItem, disabled, direction],
     );
 
     const state = { disabled };
@@ -125,6 +129,14 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
               role: 'radiogroup' as const,
               onFocus: (event: React.FocusEvent<HTMLElement>) => {
                 setRtl((event.currentTarget.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl');
+              },
+              onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+                if (NAVIGATION_KEYS.has(event.key)) {
+                  navigatingRef.current = true;
+                  queueMicrotask(() => {
+                    navigatingRef.current = false;
+                  });
+                }
               },
               'aria-disabled': disabled || undefined,
             };

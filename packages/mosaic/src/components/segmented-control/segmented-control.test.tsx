@@ -70,6 +70,48 @@ describe('Mosaic SegmentedControl', () => {
     expect(screen.getByRole('radio', { name: 'Annual' })).toHaveAttribute('aria-checked', 'true');
   });
 
+  it('does not select an item that is focused without keyboard navigation', () => {
+    const onValueChange = vi.fn();
+    render(
+      <BillingPeriod
+        value='monthly'
+        onValueChange={onValueChange}
+      />,
+    );
+
+    screen.getByRole('radio', { name: 'Annual' }).focus();
+
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('radio', { name: 'Monthly' })).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('keeps a disabled item focusable and skips it with the arrow keys', async () => {
+    render(
+      <SegmentedControl.Root
+        aria-label='Billing period'
+        defaultValue='monthly'
+      >
+        <SegmentedControl.Item value='monthly'>Monthly</SegmentedControl.Item>
+        <SegmentedControl.Item
+          value='annual'
+          disabled
+        >
+          Annual
+        </SegmentedControl.Item>
+        <SegmentedControl.Item value='lifetime'>Lifetime</SegmentedControl.Item>
+      </SegmentedControl.Root>,
+    );
+
+    expect(screen.getByRole('radio', { name: 'Annual' })).not.toHaveAttribute('disabled');
+    expect(screen.getByRole('radio', { name: 'Annual' })).toHaveAttribute('aria-disabled', 'true');
+
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowRight}');
+
+    expect(screen.getByRole('radio', { name: 'Lifetime' })).toHaveFocus();
+    expect(screen.getByRole('radio', { name: 'Lifetime' })).toHaveAttribute('aria-checked', 'true');
+  });
+
   it('does not select a disabled item', async () => {
     render(
       <SegmentedControl.Root

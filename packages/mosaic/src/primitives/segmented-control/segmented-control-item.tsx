@@ -17,6 +17,7 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
     const {
       value: selectedValue,
       select: selectValue,
+      isNavigating,
       registerItem,
       disabled: groupDisabled,
     } = useSegmentedControlContext();
@@ -42,7 +43,6 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
 
     return (
       <CompositeItem
-        disabled={disabled}
         render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
           const defaultProps: Record<string, unknown> = {
             role: 'radio' as const,
@@ -51,7 +51,7 @@ export const SegmentedControlItem = React.forwardRef<HTMLButtonElement, Segmente
             'aria-disabled': disabled || undefined,
             onClick: select,
             onFocus: () => {
-              if (selectedValue !== '') {
+              if (isNavigating()) {
                 select();
               }
             },

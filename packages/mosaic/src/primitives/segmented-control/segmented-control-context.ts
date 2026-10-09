@@ -5,6 +5,7 @@ export type SegmentedControlDirection = 'forward' | 'backward';
 export interface SegmentedControlContextValue {
   value: string;
   select: (value: string) => void;
+  isNavigating: () => boolean;
   registerItem: (value: string, element: HTMLElement | null) => void;
   disabled: boolean;
   direction: SegmentedControlDirection;
