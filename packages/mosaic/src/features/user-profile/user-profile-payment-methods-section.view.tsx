@@ -4,6 +4,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { useStableOrder } from '../../primitives/hooks';
 import { UserProfileProviderIcon } from './user-profile-provider-icon';
 
 export interface UserProfilePaymentMethod {
@@ -21,12 +22,15 @@ export interface UserProfilePaymentMethodsSectionViewProps {
   onRemove?: (id: string) => void;
 }
 
+const byId = (paymentMethod: UserProfilePaymentMethod) => paymentMethod.id;
+
 export function UserProfilePaymentMethodsSectionView({
   paymentMethods,
   onAdd,
   onMakeDefault,
   onRemove,
 }: UserProfilePaymentMethodsSectionViewProps) {
+  const ordered = useStableOrder(paymentMethods, byId);
   return (
     <Section.Root>
       <Section.Group>
@@ -54,24 +58,23 @@ export function UserProfilePaymentMethodsSectionView({
           ) : null}
         </Section.Header>
         <Section.Body>
-          <Section.Items>
-            {paymentMethods.length > 0 ? (
-              paymentMethods.map(paymentMethod => (
-                <PaymentMethodItem
-                  key={paymentMethod.id}
-                  paymentMethod={paymentMethod}
-                  onMakeDefault={onMakeDefault}
-                  onRemove={onRemove}
-                />
-              ))
-            ) : (
-              <Section.Item>
-                <Section.Content>
-                  <Section.Description>No payment methods added</Section.Description>
-                </Section.Content>
-              </Section.Item>
+          <Section.AnimatedItems
+            items={ordered}
+            getKey={byId}
+            empty={
+              <Section.Content>
+                <Section.Description>No payment methods added</Section.Description>
+              </Section.Content>
+            }
+          >
+            {paymentMethod => (
+              <PaymentMethodItem
+                paymentMethod={paymentMethod}
+                onMakeDefault={onMakeDefault}
+                onRemove={onRemove}
+              />
             )}
-          </Section.Items>
+          </Section.AnimatedItems>
         </Section.Body>
       </Section.Group>
     </Section.Root>
@@ -97,7 +100,7 @@ function PaymentMethodItem({
   }
 
   return (
-    <Section.Item>
+    <>
       <UserProfileProviderIcon name='credit-card' />
       <Section.Content>
         <Section.Label>
@@ -111,6 +114,6 @@ function PaymentMethodItem({
           label={`Manage ${paymentMethod.label}`}
         />
       </Section.Actions>
-    </Section.Item>
+    </>
   );
 }

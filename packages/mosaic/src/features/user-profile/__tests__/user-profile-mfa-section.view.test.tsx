@@ -222,7 +222,10 @@ describe('MFA section', () => {
     const { props } = renderView({ methods: [{ id: 'backup', type: 'backup-codes' }] });
 
     expect(screen.getByText('Backup codes')).toBeVisible();
-    expect(screen.queryByText('No verification methods added')).not.toBeInTheDocument();
+    expect(screen.getByText('No verification methods added').closest('.cl-section-item')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
     expect(screen.getAllByRole('menuitem')).toHaveLength(1);
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));

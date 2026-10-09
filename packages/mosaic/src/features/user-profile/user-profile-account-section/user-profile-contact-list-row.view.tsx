@@ -1,4 +1,3 @@
-import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactNode, Ref } from 'react';
 import { useEffect, useRef } from 'react';
@@ -12,11 +11,10 @@ import { Section } from '../../../components/section';
 import { Spinner } from '../../../components/spinner';
 import { fill, useMessages } from '../../../localization';
 import type { TransitionProps } from '../../../primitives/hooks';
-import { usePresenceList, useTransition } from '../../../primitives/hooks';
-import { reset } from '../../../styles/reset.styles';
+import { useTransition } from '../../../primitives/hooks';
+import { mergeRenderList } from '../../../primitives/hooks/use-presence-list';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles as panelStyles } from '../user-profile-profile-panel.styles';
-import { contactItemMarker, contactSlotMarker } from './user-profile-account-section.markers.stylex';
 import { badgeShift, styles } from './user-profile-account-section.styles';
 
 export interface UserProfileContactListRowViewProps {
@@ -66,75 +64,6 @@ function SlotItem({
   return children(element, withoutEntrance(transitionProps, entrance.current ?? appear));
 }
 
-function ContactListItem({
-  present = true,
-  appear,
-  pending = false,
-  emptyText,
-  onExited,
-  actions,
-  children,
-}: {
-  present?: boolean;
-  appear: boolean;
-  pending?: boolean;
-  emptyText?: string;
-  onExited?: () => void;
-  actions?: ReactNode;
-  children: ReactNode;
-}) {
-  const element = useRef<HTMLLIElement>(null);
-  const entrance = useRef<boolean | null>(null);
-  const { mounted, transitionProps } = useTransition({ open: present, ref: element });
-  if (mounted && entrance.current === null) {
-    entrance.current = appear;
-  }
-
-  useEffect(() => {
-    if (!mounted) {
-      onExited?.();
-    }
-  }, [mounted, onExited]);
-
-  if (!mounted) {
-    return null;
-  }
-
-  const slotProps = withoutEntrance(transitionProps, entrance.current ?? appear);
-  const rowProps = { ...slotProps, style: undefined };
-
-  return (
-    <li
-      ref={element}
-      aria-hidden={present ? undefined : true}
-      {...stylex.props(reset.base, styles.contactSlot, contactSlotMarker)}
-      {...slotProps}
-      {...inertProps(!present)}
-    >
-      {emptyText ? (
-        <Section.Item
-          render={<div />}
-          aria-hidden
-          xstyle={styles.contactEmpty}
-        >
-          <Section.Description>{emptyText}</Section.Description>
-        </Section.Item>
-      ) : null}
-      <div {...stylex.props(styles.contactClip)}>
-        <Section.Item
-          render={<div />}
-          aria-busy={pending || undefined}
-          xstyle={[styles.contactItem, contactItemMarker]}
-          {...rowProps}
-        >
-          <Section.Content xstyle={styles.contactFade}>{children}</Section.Content>
-          {actions ? <Section.Actions xstyle={styles.contactFade}>{actions}</Section.Actions> : null}
-        </Section.Item>
-      </div>
-    </li>
-  );
-}
-
 export function UserProfileContactListRowView({
   kind,
   label,
@@ -151,18 +80,21 @@ export function UserProfileContactListRowView({
   children,
 }: UserProfileContactListRowViewProps) {
   const m = useMessages('userProfileAccountSection');
-  const entries = usePresenceList(items, byId);
+  const keys = items.map(byId);
+  const previousKeys = useRef(keys);
   const primaryId = items.find(item => item.isDefault)?.id;
   const primaryMove = useRef({ id: primaryId, direction: 0 });
   if (primaryMove.current.id !== primaryId) {
-    const from = entries.findIndex(entry => entry.item.id === primaryMove.current.id);
-    const to = entries.findIndex(entry => entry.item.id === primaryId);
+    const order = mergeRenderList(previousKeys.current, keys);
+    const from = primaryMove.current.id === undefined ? -1 : order.indexOf(primaryMove.current.id);
+    const to = primaryId === undefined ? -1 : order.indexOf(primaryId);
     primaryMove.current = { id: primaryId, direction: from === -1 || to === -1 ? 0 : Math.sign(to - from) };
   }
   const settled = useRef(false);
   useEffect(() => {
     settled.current = true;
-  }, []);
+    previousKeys.current = keys;
+  });
   const appear = settled.current;
 
   return (
@@ -196,9 +128,17 @@ export function UserProfileContactListRowView({
         ) : null}
       </Section.Header>
       <Section.Body>
-        <Section.Items>
-          {entries.map(({ key, item, present, onExited }) => {
-            const terminal = items.length === 0 || (present && items.length === 1);
+        <Section.AnimatedItems
+          items={items}
+          getKey={byId}
+          busy={item => pendingId === item.id || shownPendingId === item.id}
+          empty={
+            <Section.Content>
+              <Section.Description>{m[kind].empty}</Section.Description>
+            </Section.Content>
+          }
+        >
+          {(item, { present }) => {
             const actions: ActionMenuAction[] = [];
 
             if (item.isVerified === false && onVerify) {
@@ -219,77 +159,58 @@ export function UserProfileContactListRowView({
             }
 
             return (
-              <ContactListItem
-                key={key}
-                present={present}
-                appear={appear}
-                pending={pendingId === item.id || shownPendingId === item.id}
-                emptyText={terminal ? m[kind].empty : undefined}
-                onExited={onExited}
-                actions={
-                  actions.length > 0 ? (
+              <>
+                <Section.Content>
+                  <Section.Description xstyle={panelStyles.contactValue}>
+                    <span {...stylex.props(truncationStyles.singleLine, panelStyles.contactText)}>{item.value}</span>
+                    <span {...stylex.props(styles.badgeSlot)}>
+                      <SlotItem
+                        open={item.isDefault === true}
+                        appear={appear}
+                      >
+                        {(ref, props) => (
+                          <Badge
+                            ref={ref}
+                            color='neutral'
+                            xstyle={[styles.badgeSlotItem, badgeShift.along(primaryMove.current.direction)]}
+                            {...props}
+                          >
+                            {m.primary}
+                          </Badge>
+                        )}
+                      </SlotItem>
+                      <SlotItem
+                        open={shownPendingId === item.id}
+                        appear={appear}
+                      >
+                        {(ref, props) => (
+                          <Spinner
+                            ref={ref}
+                            role='progressbar'
+                            aria-hidden={undefined}
+                            aria-label={m.settingPrimary}
+                            size='sm'
+                            xstyle={styles.badgeSlotItem}
+                            {...props}
+                          />
+                        )}
+                      </SlotItem>
+                    </span>
+                  </Section.Description>
+                </Section.Content>
+                {actions.length > 0 ? (
+                  <Section.Actions>
                     <ActionMenu
                       triggerRef={present ? triggerRef?.(item.id) : undefined}
                       actions={actions}
                       label={fill(m.manageValue, { value: item.value })}
                     />
-                  ) : null
-                }
-              >
-                <Section.Description xstyle={panelStyles.contactValue}>
-                  <span {...stylex.props(truncationStyles.singleLine, panelStyles.contactText)}>{item.value}</span>
-                  <span {...stylex.props(styles.badgeSlot)}>
-                    <SlotItem
-                      open={item.isDefault === true}
-                      appear={appear}
-                    >
-                      {(ref, props) => (
-                        <Badge
-                          ref={ref}
-                          color='neutral'
-                          xstyle={[styles.badgeSlotItem, badgeShift.along(primaryMove.current.direction)]}
-                          {...props}
-                        >
-                          {m.primary}
-                        </Badge>
-                      )}
-                    </SlotItem>
-                    <SlotItem
-                      open={shownPendingId === item.id}
-                      appear={appear}
-                    >
-                      {(ref, props) => (
-                        <Spinner
-                          ref={ref}
-                          role='progressbar'
-                          aria-hidden={undefined}
-                          aria-label={m.settingPrimary}
-                          size='sm'
-                          xstyle={styles.badgeSlotItem}
-                          {...props}
-                        />
-                      )}
-                    </SlotItem>
-                  </span>
-                </Section.Description>
-              </ContactListItem>
+                  </Section.Actions>
+                ) : null}
+              </>
             );
-          })}
-          {items.length === 0 && entries.length === 0 ? (
-            <li {...stylex.props(reset.base, styles.contactSlot, contactSlotMarker)}>
-              <div {...stylex.props(styles.contactClip)}>
-                <Section.Item
-                  render={<div />}
-                  xstyle={[styles.contactItem, contactItemMarker]}
-                >
-                  <Section.Content>
-                    <Section.Description>{m[kind].empty}</Section.Description>
-                  </Section.Content>
-                </Section.Item>
-              </div>
-            </li>
-          ) : null}
-        </Section.Items>
+          }}
+        </Section.AnimatedItems>
         {children}
       </Section.Body>
     </Section.Group>

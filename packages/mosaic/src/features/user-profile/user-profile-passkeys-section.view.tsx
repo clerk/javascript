@@ -26,6 +26,8 @@ export interface UserProfilePasskeysSectionViewProps {
   onRemove?: (id: string) => void | Promise<void>;
 }
 
+const byId = (passkey: UserProfilePasskey) => passkey.id;
+
 export function UserProfilePasskeysSectionView({
   passkeys,
   onAdd,
@@ -84,26 +86,25 @@ export function UserProfilePasskeysSectionView({
           ) : null}
         </Section.Header>
         <Section.Body>
-          <Section.Items>
-            {passkeys.length > 0 ? (
-              passkeys.map(passkey => (
-                <UserProfilePasskeyRowView
-                  key={passkey.id}
-                  passkey={passkey}
-                  triggerRef={removalFocus.registerTrigger(passkey.id)}
-                  onRename={onRename}
-                  validateName={validateName}
-                  onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
-                />
-              ))
-            ) : (
-              <Section.Item>
-                <Section.Content>
-                  <Section.Description>{m.empty}</Section.Description>
-                </Section.Content>
-              </Section.Item>
+          <Section.AnimatedItems
+            items={passkeys}
+            getKey={byId}
+            empty={
+              <Section.Content>
+                <Section.Description>{m.empty}</Section.Description>
+              </Section.Content>
+            }
+          >
+            {(passkey, { present }) => (
+              <UserProfilePasskeyRowView
+                passkey={passkey}
+                triggerRef={present ? removalFocus.registerTrigger(passkey.id) : undefined}
+                onRename={onRename}
+                validateName={validateName}
+                onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
+              />
             )}
-          </Section.Items>
+          </Section.AnimatedItems>
         </Section.Body>
       </Section.Group>
       {onRemove ? (

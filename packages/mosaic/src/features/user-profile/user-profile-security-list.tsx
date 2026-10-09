@@ -4,12 +4,13 @@ import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
 
-export function UserProfileSecurityList({
+export function UserProfileSecurityList<T>({
   sectionRef,
   label,
   addLabel,
   emptyLabel,
-  hasItems,
+  items,
+  getKey,
   onAdd,
   addControl,
   children,
@@ -18,10 +19,11 @@ export function UserProfileSecurityList({
   label: string;
   addLabel: string;
   emptyLabel: string;
-  hasItems: boolean;
+  items: T[];
+  getKey: (item: T) => string;
   onAdd?: () => void;
   addControl?: ReactNode;
-  children: ReactNode;
+  children: (item: T, row: { present: boolean }) => ReactNode;
 }) {
   return (
     <Section.Group
@@ -54,17 +56,17 @@ export function UserProfileSecurityList({
         ) : null}
       </Section.Header>
       <Section.Body>
-        <Section.Items>
-          {hasItems ? (
-            children
-          ) : (
-            <Section.Item>
-              <Section.Content>
-                <Section.Description>{emptyLabel}</Section.Description>
-              </Section.Content>
-            </Section.Item>
-          )}
-        </Section.Items>
+        <Section.AnimatedItems
+          items={items}
+          getKey={getKey}
+          empty={
+            <Section.Content>
+              <Section.Description>{emptyLabel}</Section.Description>
+            </Section.Content>
+          }
+        >
+          {children}
+        </Section.AnimatedItems>
       </Section.Body>
     </Section.Group>
   );

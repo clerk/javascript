@@ -5,6 +5,7 @@ import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../hooks/use-pending-action';
 import { fill, type MosaicMessages, useMessages } from '../../localization';
+import { useStableOrder } from '../../primitives/hooks';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
@@ -33,6 +34,8 @@ export interface UserProfileMfaSectionViewProps {
   onSetDefault?: (id: string) => void | Promise<void>;
 }
 
+const byId = (method: UserProfileMfaMethod) => method.id;
+
 export function UserProfileMfaSectionView({
   methods,
   addableMethods,
@@ -45,10 +48,14 @@ export function UserProfileMfaSectionView({
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const section = useRef<HTMLDivElement>(null);
+  const ordered = useStableOrder(methods, byId);
   const removalFocus = useListRemovalFocus({
-    ids: methods.map(method => method.id),
+    ids: ordered.map(method => method.id),
     onRemove,
-    fallback: () => section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? section.current,
+    fallback: () =>
+      Array.from(section.current?.querySelectorAll<HTMLButtonElement>('button:not([disabled])') ?? []).find(
+        button => !button.closest('[aria-hidden="true"]'),
+      ) ?? section.current,
   });
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -82,14 +89,14 @@ export function UserProfileMfaSectionView({
         }
         addLabel={m.addLabel}
         emptyLabel={m.empty}
-        hasItems={methods.length > 0}
+        items={ordered}
+        getKey={byId}
         label={m.label}
       >
-        {methods.map(method => (
+        {(method, { present }) => (
           <UserProfileMfaRowView
-            key={method.id}
             method={method}
-            triggerRef={removalFocus.registerTrigger(method.id)}
+            triggerRef={present ? removalFocus.registerTrigger(method.id) : undefined}
             onRemove={onRemove ? () => removeMethod.open(method) : undefined}
             onSetDefault={
               onSetDefault && !setDefault.isPending
@@ -102,7 +109,7 @@ export function UserProfileMfaSectionView({
             }
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
-        ))}
+        )}
       </UserProfileSecurityList>
       <Section.Error>{setDefault.error}</Section.Error>
       {onRemove ? (

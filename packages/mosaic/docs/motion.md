@@ -278,8 +278,11 @@ a row that has snapped open leaves nothing to wait for.
 
 ### Rows in a list
 
-The contact rows in the user profile (`user-profile-contact-list-row.view.tsx`) adopt
-the recipe for a `<ul>` whose rows come and go. What differs from the banner:
+`Section.AnimatedItems` (`section.tsx`; `animatedSlot` / `animatedClip` / `animatedEmpty`
+/ `animatedRow` in `section.styles.ts`) adopts the recipe for a `<ul>` whose rows come
+and go. Every user-profile list that adds and removes rows renders through it
+(contacts, passkeys, active devices, MFA methods, payment methods); a new list takes
+it rather than rebuilding the slot. What differs from the banner:
 
 - **The slot is the `<li>`.** `grid-template-rows` on the list item, the clip layer
   inside it (`grid-row: 1 / span 2`, `min-height: 0`, no padding), and the real row
@@ -310,13 +313,15 @@ the recipe for a `<ul>` whose rows come and go. What differs from the banner:
 - **Rows that are already there never enter.** A row locks in whether it animates
   when it first mounts: rows present at the list's first render skip the entering
   state, and a re-render before the first frame must not hand it back to them.
-- **The content fade lives on the row's children** (a marker on the row,
-  `stylex.when.ancestor` on `Section.Content` and `Section.Actions`), never on the
-  row itself: opacity on the row would fade its border too. Inline text takes opacity
-  only. It enters after `base + slow` (the track's own `base` delay, then `slow`, so
-  the track is ~90% open before text shows; longer than the banner's `fast` because
-  this track runs `slower` on in-out), at `base`; it exits at once with the track, at
-  `fast`.
+- **The border is the clip layer's `::before`, not the row's.** The fade is opacity on
+  the row (`Section.Item`) itself, which is what lets whatever a list puts in a row —
+  media, content, actions — fade as one without each taking an atom; opacity on the
+  row would fade a border drawn on it, so the border sits on the clip, absolutely
+  positioned at the top and inset by the focus-ring gutter, where the clip's own
+  overflow cuts it off with the track. Inline text takes opacity only. The row enters
+  after `base + slow` (the track's own `base` delay, then `slow`, so the track is
+  ~90% open before text shows; longer than the banner's `fast` because this track
+  runs `slower` on in-out), at `base`; it exits at once with the track, at `fast`.
 - **Reduced motion is a cut.** Every transition off and every value at rest;
   `useTransition` then unmounts an exiting row as soon as it finds nothing to wait
   for.
@@ -332,12 +337,13 @@ the recipe for a `<ul>` whose rows come and go. What differs from the banner:
   size. The first row added plays this in reverse: its slot mounts at the empty
   text's height with that text visible, which fades out at `fast` as the track opens.
 
-**Rows do not reorder.** While the list is mounted it keeps the order it was first
-shown in (`useStableOrder`): a new row is appended, a removed row drops out, and a
-row the model now sorts elsewhere stays put. Setting a primary therefore moves the
-badge, which enters and exits on the ordinary rules (`base` in on `--cl-ease-enter`
-with `scale(0.9 → 1)` on `--cl-ease-default`, `fast` out on `--cl-ease-exit`),
-rather than moving rows past each other.
+**Rows do not reorder.** `Section.AnimatedItems` keeps the order `items` gives, and a
+list whose model sorts (a primary or default first) passes it through `useStableOrder`
+so that while mounted it keeps the order it was first shown in: a new row is appended,
+a removed row drops out, and a row the model now sorts elsewhere stays put. Setting a
+primary therefore moves the badge, which enters and exits on the ordinary rules
+(`base` in on `--cl-ease-enter` with `scale(0.9 → 1)` on `--cl-ease-default`, `fast`
+out on `--cl-ease-exit`), rather than moving rows past each other.
 
 **A pending request shows where its outcome will land.** A set-primary request marks
 its row busy at once; once it outlasts `useSpinDelay`'s 150ms, a small `Spinner`
