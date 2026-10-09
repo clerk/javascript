@@ -83,8 +83,8 @@ import {
 } from '../stories/empty-state.stories';
 import {
   Default as EntityDefault,
-  meta as entityMeta,
   LabelOnly as EntityLabelOnly,
+  meta as entityMeta,
   Truncation as EntityTruncation,
   WithBadge as EntityWithBadge,
 } from '../stories/entity.stories';
