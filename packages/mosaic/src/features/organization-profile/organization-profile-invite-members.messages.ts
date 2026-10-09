@@ -1,7 +1,7 @@
 export const organizationProfileInviteMembersMessages = {
   title: 'Invite members',
   emailLabel: 'Email',
-  emailHint: 'Press enter, comma, or paste to add',
+  emailHint: 'Enter or paste one or more email addresses, separated by spaces or commas.',
   removeEmail: 'Remove {email}',
   invalidEmails: 'Remove invalid email addresses to continue',
   roleLabel: 'Role',
