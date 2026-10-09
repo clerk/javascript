@@ -42,44 +42,36 @@ export function RowAvatar({ name, imageUrl, shape, size, xstyle }: RowAvatarProp
   );
 }
 
-export interface SwitcherAvatarProps {
+export interface BadgedAvatarProps {
   name: string;
   imageUrl?: string;
-  shape: 'circle' | 'square';
-  size: 'xs' | 'sm' | 'md';
-  badge?: { name: string; imageUrl?: string };
+  badge: { name: string; imageUrl?: string };
+  size: 'sm' | 'md';
   focusRing?: boolean;
+  labelled?: boolean;
 }
 
-export function SwitcherAvatar({
+export function BadgedAvatar({
   name,
   imageUrl,
-  shape,
-  size,
   badge,
+  size,
   focusRing = false,
-}: SwitcherAvatarProps): ReactElement {
+  labelled = false,
+}: BadgedAvatarProps): ReactElement {
   const slot = useSlot();
-  if (!badge) {
-    return (
-      <RowAvatar
-        name={name}
-        imageUrl={imageUrl}
-        shape={shape}
-        size={size}
-      />
-    );
-  }
-
   return (
     <span
       aria-hidden
-      {...mergeStyleProps(themeProps(slot('avatar'), { size }), stylex.props(reset.base, styles.root, sizes[size]))}
+      {...mergeStyleProps(
+        themeProps(slot('avatar'), { size }),
+        stylex.props(reset.base, styles.root, sizes[size], labelled && styles.labelled),
+      )}
     >
       <RowAvatar
         name={name}
         imageUrl={imageUrl}
-        shape={shape}
+        shape='square'
         size='fit'
         xstyle={[styles.lead, leadSizes[size]]}
       />
@@ -88,7 +80,7 @@ export function SwitcherAvatar({
         <RowAvatar
           name={badge.name}
           imageUrl={badge.imageUrl}
-          shape='square'
+          shape='circle'
           size='fit'
           xstyle={badgeSizes[size]}
         />

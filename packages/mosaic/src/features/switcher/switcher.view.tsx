@@ -36,7 +36,7 @@ import type {
   SwitcherMode,
   SwitcherSession,
 } from './switcher.types';
-import { RowAvatar, SwitcherAvatar } from './switcher-avatar.view';
+import { BadgedAvatar, RowAvatar } from './switcher-avatar.view';
 import { SwitcherHeader } from './switcher-header.view';
 import {
   SwitcherGroup,
@@ -106,8 +106,9 @@ type LeadSelection =
       imageUrl?: string;
       shape: 'square';
       organization: SwitcherMembership;
+      user?: SwitcherSession;
     }
-  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle'; badge?: SwitcherMembership }
+  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle' }
   | { kind: 'none'; name: string; imageUrl?: string; shape: 'square' };
 
 /**
@@ -127,26 +128,22 @@ function leadSelection(
       imageUrl: activeOrganization.imageUrl,
       shape: 'square',
       organization: activeOrganization,
+      user: layout.userBadge ? activeSession : undefined,
     };
   }
   if (layout.lead === 'none') {
     return { kind: 'none', name: m.organizations.notSelected, shape: 'square' };
   }
-  return {
-    kind: 'user',
-    name: activeSession.name,
-    imageUrl: activeSession.imageUrl,
-    shape: 'circle',
-    badge: layout.lead === 'member' && activeOrganization ? activeOrganization : undefined,
-  };
+  return { kind: 'user', name: activeSession.name, imageUrl: activeSession.imageUrl, shape: 'circle' };
 }
 
-/** The organization a lead shows: the one it is, or the one badging the account. */
+/** The organization a lead shows. */
 function leadOrganization(lead: LeadSelection): SwitcherMembership | undefined {
-  if (lead.kind === 'organization') {
-    return lead.organization;
-  }
-  return lead.kind === 'user' ? lead.badge : undefined;
+  return lead.kind === 'organization' ? lead.organization : undefined;
+}
+
+function leadUser(lead: LeadSelection): SwitcherSession | undefined {
+  return lead.kind === 'organization' ? lead.user : undefined;
 }
 
 function joinDetails(...parts: Array<string | undefined>): string {
@@ -163,14 +160,11 @@ function membershipSubtitle(membership: SwitcherMembership, m: Messages, locale:
 
 function headerSubtitle(lead: LeadSelection, identifier: string, m: Messages, locale: string): string {
   if (lead.kind === 'organization') {
-    return membershipSubtitle(lead.organization, m, locale);
+    return lead.user ? identifier : membershipSubtitle(lead.organization, m, locale);
   }
   if (lead.kind === 'none') {
     // No selection is not the account, so it carries no identifier line.
     return '';
-  }
-  if (lead.badge) {
-    return lead.badge.name;
   }
   // An account with no name is titled by its identifier, and repeating it underneath says nothing.
   return identifier === lead.name ? '' : identifier;
@@ -453,6 +447,7 @@ function Header() {
   const lead = leadSelection(data, m);
   const { name } = lead;
   const organization = leadOrganization(lead);
+  const user = leadUser(lead);
   const subtitle = headerSubtitle(lead, identifier, m, locale);
 
   const actions: HeaderAction[] = [];
@@ -460,8 +455,8 @@ function Header() {
     if (action === 'inviteMembers' && data.onInviteMembers) {
       actions.push({ id: action, label: m.manage.invite, icon: 'users-add-right', onClick: data.onInviteMembers });
     }
-    // The gear manages the header's organization, named or badged, and the account wherever the
-    // account leads. With both to manage it opens a menu of the two. It reads "Settings" when
+    // The gear manages the header's organization, and the account wherever the account leads or
+    // badges it. With both to manage it opens a menu of the two. It reads "Settings" when
     // stacked, or when the account leads on its own; otherwise inline it is the icon alone, named
     // for what it manages.
     if (action === 'manageLead') {
@@ -474,7 +469,7 @@ function Header() {
           onClick: data.onManageOrganization,
         });
       }
-      if (lead.kind !== 'organization' && data.onManageAccount) {
+      if ((lead.kind !== 'organization' || user) && data.onManageAccount) {
         settings.push({
           name: m.manage.account,
           label: m.manage.profileSettings,
@@ -507,13 +502,21 @@ function Header() {
     <SwitcherHeader
       layout={layout}
       avatar={
-        <SwitcherAvatar
-          name={lead.name}
-          imageUrl={lead.imageUrl}
-          shape={lead.shape}
-          size='md'
-          badge={lead.kind === 'user' ? lead.badge : undefined}
-        />
+        user ? (
+          <BadgedAvatar
+            name={lead.name}
+            imageUrl={lead.imageUrl}
+            badge={user}
+            size='md'
+          />
+        ) : (
+          <RowAvatar
+            name={lead.name}
+            imageUrl={lead.imageUrl}
+            shape={lead.shape}
+            size='md'
+          />
+        )
       }
       title={name}
       description={subtitle}
@@ -1083,9 +1086,9 @@ export function SwitcherRoot(props: SwitcherRootProps): ReactElement {
 
 export interface SwitcherTriggerProps {
   /**
-   * Names the lead beside its avatar — the organization wherever one heads the
-   * trigger, no selection when personal is hidden and none is active, the account otherwise, with
-   * its active organization beneath it. Turn it off for the avatar alone.
+   * Names the lead beside its avatar — the organization wherever one heads the trigger, with the
+   * account's identifier beneath it where the account badges it, no selection when personal is
+   * hidden and none is active, the account otherwise. Turn it off for the avatar alone.
    *
    * @default true
    */
@@ -1110,13 +1113,13 @@ export function SwitcherTrigger({
   const lead = leadSelection(data, m);
   const { name, shape } = lead;
   const planLabel = renderTriggerBadge ? leadOrganization(lead)?.planLabel : undefined;
-  const badge = lead.kind === 'user' ? lead.badge : undefined;
-  const ringsAvatar = !renderTriggerLabel && badge !== undefined;
+  const user = leadUser(lead);
+  const ringsAvatar = !renderTriggerLabel && user !== undefined;
 
   return (
     <Popover.Trigger
       {...themeProps(slot('trigger'))}
-      aria-label={fill(m.trigger.open, { name })}
+      aria-label={fill(m.trigger.open, { name: user?.name ?? name })}
       xstyle={[
         ringsAvatar ? styles.triggerRinglessAvatar : focusOutline.visible,
         styles.trigger,
@@ -1124,20 +1127,29 @@ export function SwitcherTrigger({
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
-      <SwitcherAvatar
-        name={lead.name}
-        imageUrl={lead.imageUrl}
-        shape={lead.shape}
-        size={renderTriggerLabel && !badge ? 'xs' : 'sm'}
-        badge={badge}
-        focusRing={ringsAvatar}
-      />
+      {user ? (
+        <BadgedAvatar
+          name={lead.name}
+          imageUrl={lead.imageUrl}
+          badge={user}
+          size='sm'
+          focusRing={!renderTriggerLabel}
+          labelled={renderTriggerLabel}
+        />
+      ) : (
+        <RowAvatar
+          name={lead.name}
+          imageUrl={lead.imageUrl}
+          shape={shape}
+          size={renderTriggerLabel ? 'xs' : 'sm'}
+        />
+      )}
       {renderTriggerLabel ? (
         <>
           <span {...stylex.props(styles.triggerText)}>
             <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
-            {badge ? (
-              <span {...stylex.props(styles.triggerOrganization, truncationStyles.singleLine)}>{badge.name}</span>
+            {user ? (
+              <span {...stylex.props(styles.triggerDescription, truncationStyles.singleLine)}>{user.identifier}</span>
             ) : null}
           </span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}

@@ -71,7 +71,7 @@ export const styles = stylex.create({
     maxWidth: '12rem',
   },
 
-  triggerOrganization: {
+  triggerDescription: {
     color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
@@ -80,7 +80,7 @@ export const styles = stylex.create({
 
   triggerCaret: {
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    marginInlineEnd: space['1'],
+    marginInline: space['1'],
   },
 
   // The organization list scrolls; the header and footer stay put. The scroll area carries the

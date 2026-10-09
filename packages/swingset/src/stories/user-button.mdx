@@ -2,8 +2,8 @@ import * as UserButtonStories from './user-button.stories';
 
 # UserButton
 
-The account & organization switcher behind the user avatar. The account heads the surface, badged
-with the active organization, carrying **Settings** and **Invite**. The account's organizations sit under it: every one it belongs to, plus
+The account & organization switcher behind the user avatar. The active organization heads the surface,
+badged with the account, carrying **Settings** and **Invite**. The account's organizations sit under it: every one it belongs to, plus
 **suggested** and **invited** ones it can Join. **Switch account** at the foot opens the signed-in
 accounts as a flyout — the active one checked — so an account never reads as an organization. The
 flyout also adds an account and signs out of all of them. With nobody to switch to, that row is
@@ -74,8 +74,8 @@ Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use 
 
 ## Trigger
 
-The avatar and name of whatever leads the popup, badged with the active organization where the
-account leads.
+The avatar and name of whatever leads the popup. With an organization active, it leads with the
+organization, badged with the account, and names the account's identifier beneath it.
 
 `renderTriggerLabel={false}` leaves the avatar alone. A user's avatar on its own rounds the trigger
 fully to match it; see [User only](#user-only).
@@ -96,7 +96,7 @@ fully to match it; see [User only](#user-only).
 
 The header names whatever leads and carries what you can do about it, stacked under it as
 full-width labelled buttons. An organization is described by its plan and member count, and carries
-**Settings** with **Invite**. An account is described by its identifier. Where **Settings** is the only
+**Settings** with **Invite**. An account is described by its identifier, and so is an organization the account badges. Where **Settings** is the only
 action, as it is for an account, it trails the account inline.
 
 With an organization active in `combined`, **Settings** opens a menu of **Organization settings** and
@@ -107,16 +107,16 @@ With an organization active in `combined`, **Settings** opens a menu of **Organi
 `mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
 Everything else is data.
 
-| Mode                 | Popup                                | Leads with                        |
-| -------------------- | ------------------------------------ | --------------------------------- |
-| `combined` (default) | Organizations and accounts together. | The account, badged with the org. |
-| `user`               | Accounts only; never shows an org.   | The account.                      |
+| Mode                 | Popup                                | Leads with                               |
+| -------------------- | ------------------------------------ | ---------------------------------------- |
+| `combined` (default) | Organizations and accounts together. | The active org, badged with the account. |
+| `user`               | Accounts only; never shows an org.   | The account.                             |
 
 What a mode leads with is named in the trigger and heads the popup — the two always agree.
 
 ### Combined
 
-The account heads it, badged with the active org, with **Settings** and **Invite**. The organizations
+The active org heads it, badged with the account, with **Settings** and **Invite**. The organizations
 sit under it, with **Create organization** at their foot. **Switch account** opens the signed-in
 accounts, with **Add account** and **Sign out of all accounts**, and **Sign out** at the foot signs
 out of the active account.

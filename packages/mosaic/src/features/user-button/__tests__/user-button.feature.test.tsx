@@ -182,7 +182,7 @@ describe('UserButton', () => {
     await open();
 
     expect(await screen.findByRole('button', { name: 'Other' })).toBeInTheDocument();
-    expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
+    expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
   });
 
   describe('switching organization', () => {
@@ -760,18 +760,35 @@ describe('UserButton', () => {
       expect(document.querySelector('.cl-user-button-trigger')).not.toBeNull();
     });
 
-    it('heads the surface with the account, managing its active organization', async () => {
+    it('heads the surface with the active organization, badged with the account, managing both', async () => {
       const { clerk } = await renderUserButton();
       const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       const user = await open();
 
-      expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
-      expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('Acme');
+      const header = requiredPopup().querySelector('.cl-user-button-header');
+      expect(header?.querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
+      expect(header?.querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
+      expect(header?.querySelector('.cl-user-button-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
+      expect(header?.querySelector('.cl-user-button-avatar-badge > [data-shape]')).toHaveAttribute(
+        'data-shape',
+        'circle',
+      );
       expect(within(requiredPopup()).getByRole('button', { name: 'Invite' })).toBeInTheDocument();
       await openSettings(user, 'Organization settings');
       expect(openOrganizationProfile).toHaveBeenCalled();
+    });
+
+    it('keeps the identifier beneath the organization even when it is all that names the account', async () => {
+      const nameless = fapiUser({ ...alice, first_name: null, last_name: null });
+      await renderUserButton({}, signedIn({ client: fapiClient([fapiSession({ ...aliceSession, user: nameless })]) }));
+
+      expect(trigger()).toHaveAccessibleName('Open account menu for alice');
+      await open();
+
+      expect(requiredPopup().querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
+      expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
     });
 
     it('trails the foot with sign-out, behind the flyout of accounts', async () => {
@@ -970,7 +987,7 @@ describe('UserButton', () => {
 
       expect(await screen.findByText('Loading organizations…')).toBeInTheDocument();
       expect(reading('Personal account', 'Other')).toEqual([]);
-      expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
+      expect(requiredPopup().querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
 
       invitations.release();
       await waitFor(() => expect(screen.queryByText('Loading organizations…')).toBeNull());
@@ -1115,7 +1132,7 @@ describe('UserButton', () => {
 
   describe('the trigger', () => {
     it.each([
-      [{ mode: 'combined' as const }, 'Alice Smith'],
+      [{ mode: 'combined' as const }, 'Acme'],
       [{ mode: 'user' as const }, 'Alice Smith'],
     ])('with %o names %s beside the avatar', async (props, name) => {
       await renderUserButton(props);
@@ -1124,11 +1141,24 @@ describe('UserButton', () => {
       expect(popup()).toBeNull();
     });
 
-    it('names the active organization beneath the account', async () => {
+    it('names the account beneath the active organization, and opens as the account', async () => {
       await renderUserButton();
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+      expect(within(trigger()).getByText('alice')).toBeInTheDocument();
+      expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
+    });
+
+    it('leads the avatar alone with the organization, badged with the account', async () => {
+      await renderUserButton({ renderTriggerLabel: false });
+
+      expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(trigger().querySelector('.cl-user-button-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
+      expect(trigger().querySelector('.cl-user-button-avatar-badge > [data-shape]')).toHaveAttribute(
+        'data-shape',
+        'circle',
+      );
     });
 
     it('names no organization beneath the account in user mode', async () => {

@@ -6,7 +6,7 @@ import type { SwitcherData, SwitcherHeaderLayout, SwitcherMode } from './switche
  *
  *  combined                       organization                 user
  *  ┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
- *  │ Alice ᶠ                    │ │ Foundry                  │ │ Alice                   ⚙  │ header
+ *  │ Foundry ᵃ                  │ │ Foundry                  │ │ Alice                   ⚙  │ header
  *  │ [⚙ Settings ▾] [Invite]    │ │ [⚙ Settings] [Invite]    │ │                            │
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
  *  │ Personal account           │ │ Personal account         │ │                            │ ┐
@@ -22,9 +22,9 @@ import type { SwitcherData, SwitcherHeaderLayout, SwitcherMode } from './switche
  * flyout of them, so the surface stays about the organization it is on.
  *
  * The header is about whatever leads, not the mode: an organization is managed and invited to, an
- * account is managed, and signed out of at the foot. A combined surface always leads with the account. With an
- * organization active, the account is badged with it, invites to it, and its Settings opens onto
- * both the organization's settings and the account's.
+ * account is managed, and signed out of at the foot. A combined surface leads with the account until
+ * an organization is active. Then it leads with the organization, badged with the account, invites
+ * to it, and its Settings opens onto both the organization's settings and the account's.
  */
 
 /** The three places an action can land. Every mode has a header and a footer; the list's varies. */
@@ -41,15 +41,13 @@ export type SwitcherAction =
   | 'switchAccount';
 
 /**
- * What the trigger names and the header leads with. `member` is the account, badged with the
- * organization it is active in. `none` is an organization-led surface with no organization active
- * and no personal account to fall back to.
+ * What the trigger names and the header leads with. `none` is an organization-led surface with no
+ * organization active and no personal account to fall back to.
  */
-export type SwitcherLead = 'organization' | 'member' | 'user' | 'none';
+export type SwitcherLead = 'organization' | 'user' | 'none';
 
 const headers = {
   organization: ['inviteMembers', 'manageLead'],
-  member: ['inviteMembers', 'manageLead'],
   user: ['manageLead'],
   none: ['manageLead'],
 } as const satisfies Record<SwitcherLead, readonly SwitcherAction[]>;
@@ -92,6 +90,8 @@ const modes = {
  */
 export interface SwitcherLayout {
   lead: SwitcherLead;
+  /** The organization lead is badged with the user, and its gear manages both. */
+  userBadge: boolean;
   /** The organization rows: the personal account, the organizations, and what is on offer. */
   showOrganizations: boolean;
   headerLayout: SwitcherHeaderLayout;
@@ -104,7 +104,7 @@ function resolveLead(mode: SwitcherMode, data: SwitcherData): SwitcherLead {
     return 'user';
   }
   if (mode === 'combined') {
-    return data.activeOrganization ? 'member' : 'user';
+    return data.activeOrganization ? 'organization' : 'user';
   }
   if (data.activeOrganization) {
     return 'organization';
@@ -126,6 +126,7 @@ export function resolveSwitcherLayout(mode: SwitcherMode, data: SwitcherData): S
 
   return {
     lead,
+    userBadge: mode === 'combined' && lead === 'organization',
     showOrganizations: declared.organizations !== false && hasOrganizations,
     headerLayout: header.some(action => action !== 'manageLead') ? 'stacked' : 'inline',
     actions: {
