@@ -17,7 +17,7 @@ import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePasskeysSectionView } from '../../user-profile-passkeys-section.view';
 import { UserProfileSecurityPanelView } from '../../user-profile-security-panel.view';
-import { passkeysSectionNode, UserProfilePasskeysSection } from '../user-profile-passkeys-section';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.model';
 
 function ReadonlyPasskeys() {
@@ -26,8 +26,11 @@ function ReadonlyPasskeys() {
 }
 
 function SecurityPanel() {
-  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
-  return <UserProfileSecurityPanelView passkeysSlot={passkeysSlot} />;
+  return (
+    <UserProfileSecurityPanelView>
+      <UserProfilePasskeysSection />
+    </UserProfileSecurityPanelView>
+  );
 }
 
 function servePasskeys(passkeys: PasskeyJSON[] = [fapiPasskey({ id: 'pk_1' })]) {
@@ -473,7 +476,6 @@ describe('Satellite passkeys', () => {
     expect(screen.getByRole('group', { name: 'Passkeys' })).toBeVisible();
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
-    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
   });
 
   it('removes the final passkey without Add', async () => {

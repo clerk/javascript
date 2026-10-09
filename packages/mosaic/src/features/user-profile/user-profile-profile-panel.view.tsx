@@ -12,25 +12,10 @@ export type { UserProfileEditNameValue } from './user-profile-profile-section/us
 
 export interface UserProfileProfilePanelViewProps {
   titleRef?: Ref<HTMLDivElement>;
-  profileSlot?: ReactNode;
-  emailSlot?: ReactNode;
-  phoneSlot?: ReactNode;
-  connectedAccountsSlot?: ReactNode;
-  web3WalletsSlot?: ReactNode;
-  enterpriseAccountsSlot?: ReactNode;
-  dangerSlot?: ReactNode;
+  children?: ReactNode;
 }
 
-export function UserProfileProfilePanelView({
-  titleRef,
-  profileSlot,
-  emailSlot,
-  phoneSlot,
-  connectedAccountsSlot,
-  web3WalletsSlot,
-  enterpriseAccountsSlot,
-  dangerSlot,
-}: UserProfileProfilePanelViewProps): ReactElement {
+export function UserProfileProfilePanelView({ titleRef, children }: UserProfileProfilePanelViewProps): ReactElement {
   return (
     <Panel.Root render={<div {...themeProps('user-profile-profile-panel')} />}>
       <Panel.Title
@@ -39,15 +24,7 @@ export function UserProfileProfilePanelView({
       >
         Account
       </Panel.Title>
-      <Panel.Sections>
-        {profileSlot}
-        {emailSlot}
-        {phoneSlot}
-        {connectedAccountsSlot}
-        {enterpriseAccountsSlot}
-        {web3WalletsSlot}
-        {dangerSlot}
-      </Panel.Sections>
+      <Panel.Sections>{children}</Panel.Sections>
     </Panel.Root>
   );
 }

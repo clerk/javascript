@@ -117,7 +117,11 @@ describe('Active devices', () => {
       },
       { ...device('sess_expired', 'active', { device_type: 'Expired laptop' }), expire_at: 1 },
     ]);
-    await renderWithClerk(<UserProfileSecurityPanelView activeDevicesSlot={<UserProfileActiveDevicesSection />} />);
+    await renderWithClerk(
+      <UserProfileSecurityPanelView>
+        <UserProfileActiveDevicesSection />
+      </UserProfileSecurityPanelView>,
+    );
 
     expect(await screen.findByRole('button', { name: 'Manage Safari on MacBook Pro' })).toBeInTheDocument();
     expect(screen.getByText('This device')).toBeVisible();

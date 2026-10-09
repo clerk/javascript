@@ -35,24 +35,19 @@ export function Default(_args: Record<string, unknown>) {
   const phones = useUserProfilePhonesFixture();
 
   return (
-    <UserProfileProfilePanelView
-      titleRef={titleRef}
-      profileSlot={<UserProfileProfileSectionView {...profile} />}
-      emailSlot={<UserProfileEmailSectionView {...emails} />}
-      phoneSlot={<UserProfilePhoneSectionView {...phones} />}
-      connectedAccountsSlot={
-        <UserProfileConnectedAccountsSectionView
-          {...connections}
-          fallbackFocus={() => titleRef.current}
-        />
-      }
-      web3WalletsSlot={
-        <UserProfileWeb3WalletsSectionView
-          {...wallets}
-          fallbackFocus={() => titleRef.current}
-        />
-      }
-      dangerSlot={<UserProfileDangerPreview />}
-    />
+    <UserProfileProfilePanelView titleRef={titleRef}>
+      <UserProfileProfileSectionView {...profile} />
+      <UserProfileEmailSectionView {...emails} />
+      <UserProfilePhoneSectionView {...phones} />
+      <UserProfileConnectedAccountsSectionView
+        {...connections}
+        fallbackFocus={() => titleRef.current}
+      />
+      <UserProfileWeb3WalletsSectionView
+        {...wallets}
+        fallbackFocus={() => titleRef.current}
+      />
+      <UserProfileDangerPreview />
+    </UserProfileProfilePanelView>
   );
 }

@@ -1,17 +1,13 @@
-import { act, screen, within } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfileView } from '../user-profile.view';
-import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
-import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
-import { passkeysSectionNode } from '../user-profile-passkeys-section/user-profile-passkeys-section';
-import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section/user-profile-passkeys-section.model';
-import { renderPasswordSection } from '../user-profile-password-section/user-profile-password-section';
-import { useUserProfilePasswordModel } from '../user-profile-password-section/user-profile-password-section.model';
-import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section/user-profile-passkeys-section';
+import { UserProfilePasswordSection } from '../user-profile-password-section/user-profile-password-section';
+import { UserProfileSecurityPanel } from '../user-profile-security-panel';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -34,22 +30,7 @@ function serveAccounts() {
   });
 }
 
-function SecurityHost() {
-  const passwordSlot = renderPasswordSection(useUserProfilePasswordModel(), null);
-  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
-  return (
-    <UserProfileSecurityPanelView
-      passwordSlot={passwordSlot}
-      passkeysSlot={passkeysSlot}
-      mfaMethods={[]}
-      activeDevicesSlot={<UserProfileActiveDevicesSectionView devices={[]} />}
-    />
-  );
-}
-
 function ProfileHost() {
-  const passwordSlot = renderPasswordSection(useUserProfilePasswordModel(), null);
-  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
   return (
     <UserProfileView
       activePage='security'
@@ -57,37 +38,21 @@ function ProfileHost() {
       pages={{
         account: {},
         security: {
-          passwordSlot,
-          passkeysSlot,
-          mfaMethods: [],
-          activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={[]} />,
+          children: (
+            <>
+              <UserProfilePasswordSection />
+              <UserProfilePasskeysSection />
+            </>
+          ),
         },
       }}
     />
   );
 }
 
-describe('Composing connected authentication sections', () => {
-  it('renders a plain passkeys section node inside Authentication', async () => {
-    serveAccounts();
-    await renderWithClerk(
-      <UserProfileSecurityPanelView
-        passkeysSlot={
-          <UserProfilePasskeysSectionView
-            passkeys={[]}
-            onAdd={vi.fn()}
-          />
-        }
-      />,
-    );
-
-    const authentication = screen.getByRole('region', { name: 'Authentication' });
-    expect(within(authentication).getByText('No passkeys added')).toBeVisible();
-    expect(within(authentication).getByRole('button', { name: 'Add passkey' })).toBeVisible();
-  });
-
+describe('Composing connected security sections', () => {
   it.each([
-    { name: 'Security', Host: SecurityHost },
+    { name: 'Security', Host: UserProfileSecurityPanel },
     { name: 'UserProfile', Host: ProfileHost },
   ])('keeps one current-account section of each kind after a user switch in $name', async ({ Host }) => {
     serveAccounts();
@@ -99,19 +64,5 @@ describe('Composing connected authentication sections', () => {
     expect(screen.getAllByRole('group', { name: 'Password' })).toHaveLength(1);
     expect(screen.getAllByRole('group', { name: 'Passkeys' })).toHaveLength(1);
     expect(screen.queryByText('Alice laptop')).toBeNull();
-  });
-
-  it('places Password and Passkeys before MFA and devices', async () => {
-    serveAccounts();
-    await renderWithClerk(<SecurityHost />);
-    const authentication = screen.getByRole('region', { name: 'Authentication' });
-    const password = within(authentication).getByText('Password');
-    const passkeys = within(authentication).getByText('Passkeys');
-    const mfa = within(authentication).getByText('2-step verification');
-    expect(password.compareDocumentPosition(passkeys) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(passkeys.compareDocumentPosition(mfa) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(
-      mfa.compareDocumentPosition(screen.getByText('Active devices')) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
   });
 });
