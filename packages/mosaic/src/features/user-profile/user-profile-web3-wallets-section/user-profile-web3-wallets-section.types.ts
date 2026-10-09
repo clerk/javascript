@@ -20,7 +20,6 @@ export interface UserProfileWeb3Wallet {
 }
 
 export interface UserProfileWeb3WalletsSectionViewProps {
-  fallbackFocus?: () => HTMLElement | null;
   wallets: UserProfileWeb3Wallet[];
   availableProviders?: UserProfileWeb3Provider[];
   pendingId?: string;

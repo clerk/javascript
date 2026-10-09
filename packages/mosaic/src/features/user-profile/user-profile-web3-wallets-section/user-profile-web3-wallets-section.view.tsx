@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
+import { usePanelTitle } from '../../../components/panel';
 import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
@@ -13,7 +14,6 @@ import type {
 
 export function UserProfileWeb3WalletsSectionView({
   wallets,
-  fallbackFocus,
   availableProviders = [],
   pendingId,
   onConnect,
@@ -22,14 +22,12 @@ export function UserProfileWeb3WalletsSectionView({
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
   const section = useRef<HTMLDivElement>(null);
+  const panelTitle = usePanelTitle();
   const removalFocus = useListRemovalFocus({
     ids: wallets.map(wallet => wallet.id),
     onRemove,
     fallback: () =>
-      section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
-      section.current ??
-      fallbackFocus?.() ??
-      null,
+      section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? section.current ?? panelTitle(),
   });
   const removeWallet = useMemo(() => Confirmation.createHandle<UserProfileWeb3Wallet>(), []);
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));

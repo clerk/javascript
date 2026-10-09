@@ -18,7 +18,7 @@ import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-prof
 import { UserProfilePhoneSectionView } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.view';
 import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
 import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
@@ -64,7 +64,6 @@ const examplePaymentMethods: UserProfilePaymentMethod[] = [
  * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture() {
-  const titleRef = useRef<HTMLDivElement>(null);
   const connections = useConnectedAccountsFixture();
   const wallets = useWeb3WalletsFixture();
   const profile = useUserProfileProfileFixture();
@@ -108,20 +107,13 @@ export function useUserProfileFixture() {
   const apiKeys = useAPIKeysTableFixture();
   const pages: UserProfileViewProps['pages'] = {
     account: {
-      titleRef,
       children: (
         <>
           <UserProfileProfileSectionView {...profile} />
           <UserProfileEmailSectionView {...emails} />
           <UserProfilePhoneSectionView {...phones} />
-          <UserProfileConnectedAccountsSectionView
-            {...connections}
-            fallbackFocus={() => titleRef.current}
-          />
-          <UserProfileWeb3WalletsSectionView
-            {...wallets}
-            fallbackFocus={() => titleRef.current}
-          />
+          <UserProfileConnectedAccountsSectionView {...connections} />
+          <UserProfileWeb3WalletsSectionView {...wallets} />
           <UserProfileDangerPreview />
         </>
       ),

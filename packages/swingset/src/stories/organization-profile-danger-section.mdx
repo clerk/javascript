@@ -5,7 +5,8 @@ import * as Stories from './organization-profile-danger-section.stories';
 Leaving and deleting the active organization. Both ask for the organization's name to be typed out.
 Leaving is offered to every member. Deleting needs the `org:sys_profile:delete` permission and admin
 delete turned on for the instance. After either one, the section refreshes the user's organization
-lists and navigates to `afterLeaveOrganizationUrl`, falling back to the instance's setting.
+lists and navigates to the `afterLeaveOrganizationUrl` set on `OrganizationProfileProvider`, falling back to the
+instance's setting.
 
 Below `26rem` of group width, through `Section.Item`'s `wrap`, each action wraps under its description.
 

@@ -17,6 +17,7 @@ import type {
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import { useUserProfileOptions } from '../user-profile.provider';
 import type {
   ConnectedAccountActionResult,
   ConnectedAccountProviderDisplay,
@@ -213,13 +214,8 @@ export type UserProfileConnectedAccountsModel =
       remove: (accountId: string) => Promise<void>;
     };
 
-export function useUserProfileConnectedAccountsModel({
-  additionalOAuthScopes,
-  mode,
-}: {
-  additionalOAuthScopes?: AdditionalOAuthScopes;
-  mode?: 'modal' | 'mounted';
-}): UserProfileConnectedAccountsModel {
+export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
+  const { additionalOAuthScopes, mode } = useUserProfileOptions();
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();

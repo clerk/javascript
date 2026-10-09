@@ -8,10 +8,9 @@ import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-s
 
 export interface UserProfileWeb3WalletsSectionProps {
   fallback?: ReactNode;
-  fallbackFocus?: () => HTMLElement | null;
 }
 
-export function UserProfileWeb3WalletsSection({ fallback, fallbackFocus }: UserProfileWeb3WalletsSectionProps) {
+export function UserProfileWeb3WalletsSection({ fallback }: UserProfileWeb3WalletsSectionProps) {
   const model = useUserProfileWeb3WalletsModel();
   if (model.status === 'loading') {
     return fallback ?? null;
@@ -23,23 +22,15 @@ export function UserProfileWeb3WalletsSection({ fallback, fallbackFocus }: UserP
     <Web3Wallets
       key={model.userId}
       model={model}
-      fallbackFocus={fallbackFocus}
     />
   );
 }
 
-function Web3Wallets({
-  model,
-  fallbackFocus,
-}: {
-  model: ReadyWeb3WalletsModel;
-  fallbackFocus?: () => HTMLElement | null;
-}) {
+function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
   const controller = useUserProfileWeb3WalletsController(model);
   return (
     <>
       <UserProfileWeb3WalletsSectionView
-        fallbackFocus={fallbackFocus}
         wallets={controller.wallets}
         availableProviders={controller.availableProviders}
         pendingId={controller.pendingId}

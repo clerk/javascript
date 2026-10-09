@@ -10,7 +10,7 @@ import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { HeadingLevelProvider } from '../heading';
 import { Icon } from '../icon';
-import { Panel } from '../panel';
+import { Panel, usePanelTitle } from '../panel';
 import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
 import { Profile } from './profile';
@@ -527,6 +527,36 @@ describe('Profile', () => {
       expect(titleRef.current).toBe(title());
       act(() => observe?.(3));
       expect(titleRef.current).toBe(title());
+    });
+
+    it('makes the page title the panel title inside a profile page', () => {
+      let panelTitle: () => HTMLDivElement | null = () => null;
+      function ReadPanelTitle() {
+        panelTitle = usePanelTitle();
+        return null;
+      }
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Nav>
+              <Profile.NavItem value='account'>Account</Profile.NavItem>
+            </Profile.Nav>
+            <Profile.Content pageTitle='Account'>
+              <Profile.ContentPanel value='account'>
+                <Panel.Root>
+                  <Panel.Title>Account</Panel.Title>
+                  <Panel.Sections>
+                    <ReadPanelTitle />
+                  </Panel.Sections>
+                </Panel.Root>
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+
+      expect(panelTitle()).toBe(screen.getByRole('heading', { level: 3, name: 'Account' }));
     });
 
     it('returns the tablist to the column when the width comes back', () => {

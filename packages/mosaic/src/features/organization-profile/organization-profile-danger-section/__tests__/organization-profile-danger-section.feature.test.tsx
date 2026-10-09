@@ -14,10 +14,8 @@ import {
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
-import {
-  OrganizationProfileDangerSection,
-  type OrganizationProfileDangerSectionProps,
-} from '../organization-profile-danger-section';
+import { OrganizationProfileProvider } from '../../organization-profile.provider';
+import { OrganizationProfileDangerSection } from '../organization-profile-danger-section';
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 20 });
 const deletePermission = ['org:sys_profile:delete'];
@@ -38,9 +36,9 @@ function signedIn({
   } satisfies FakeFapiSeed;
 }
 
-async function renderSection(seed: FakeFapiSeed = signedIn(), props: OrganizationProfileDangerSectionProps = {}) {
+async function renderSection(seed: FakeFapiSeed = signedIn()) {
   const fapi = serveFapi(seed);
-  const view = await renderWithClerk(<OrganizationProfileDangerSection {...props} />);
+  const view = await renderWithClerk(<OrganizationProfileDangerSection />);
   return { ...view, fapi };
 }
 
@@ -144,8 +142,13 @@ describe('OrganizationProfileDangerSection', () => {
       expect(dialog).toHaveTextContent('This removes 1 member and permanently deletes all organization data.');
     });
 
-    it('deletes the organization and sends the user to the url the host passed', async () => {
-      const { fapi, navigate } = await renderSection(signedIn(), { afterLeaveOrganizationUrl: '/organizations' });
+    it('deletes the organization and sends the user to the url from the provider', async () => {
+      const fapi = serveFapi(signedIn());
+      const { navigate } = await renderWithClerk(
+        <OrganizationProfileProvider afterLeaveOrganizationUrl='/organizations'>
+          <OrganizationProfileDangerSection />
+        </OrganizationProfileProvider>,
+      );
       const user = userEvent.setup();
       const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }));
 
