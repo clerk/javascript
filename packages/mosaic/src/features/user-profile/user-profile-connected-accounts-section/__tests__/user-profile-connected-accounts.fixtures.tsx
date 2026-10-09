@@ -67,14 +67,9 @@ export async function renderSection(accounts = [google], overrides: FakeFapiSeed
   const fapi = serveFapi(signedIn(accounts, overrides));
   const titleRef = createRef<HTMLDivElement>();
   const view = await renderWithClerk(
-    <UserProfileProfilePanelView
-      name='Jane Doe'
-      username=''
-      emails={[]}
-      phones={[]}
-      titleRef={titleRef}
-      connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
-    />,
+    <UserProfileProfilePanelView titleRef={titleRef}>
+      <UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />
+    </UserProfileProfilePanelView>,
   );
   return { ...view, fapi };
 }
