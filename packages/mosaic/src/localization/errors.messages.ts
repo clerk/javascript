@@ -10,6 +10,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   connected_account_unavailable: 'This connected account is no longer available.',
   enterprise_connection_unavailable: 'This enterprise connection is no longer available.',
   form_new_password_matches_current: 'New password cannot be the same as the current password.',
+  form_param_format_invalid__email_address: 'Email address must be a valid email address.',
+  form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
   form_password_incorrect: 'Your current password is incorrect.',
   form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
   form_password_matches_identifier:
@@ -30,9 +32,18 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
     'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_contact_support:
     'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
+  invitation_unavailable: 'This invitation is no longer pending.',
+  member_unavailable: 'This member is no longer available to manage.',
+  mfa_account_changed: 'This account changed. Please try again.',
+  mfa_authenticator_unavailable: 'Authenticator is unavailable.',
+  mfa_method_cannot_remove: 'This method cannot be removed.',
+  mfa_phone_unavailable: 'This phone number is unavailable.',
+  mfa_print_unavailable: 'Printing is unavailable in this browser.',
+  mfa_setup_factor_first: 'Set up a verification method first.',
   network_error: 'Unable to reach the server. Check your connection and try again.',
   oauth_access_denied: 'You did not grant access to your account.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
+  organization_invitation_not_pending: 'This invitation is no longer pending.',
   organization_membership_quota_exceeded:
     'You have reached your limit of organization memberships, including outstanding invitations.',
   organization_not_found_or_unauthorized:
@@ -54,6 +65,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   protect_check_timed_out: "Verification didn't complete in time. Please try again.",
   protect_check_unsupported_environment:
     "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
+  role_unavailable: 'This role is no longer available.',
   sso_bypass_domain_not_served:
     'This member could not be added because their email address is not served by a connection.',
   ticket_expired_code: 'This link has expired. Please start again or request a new link.',

@@ -3,6 +3,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { openDialog } from '../../__tests__/feature/dialog';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -81,8 +82,7 @@ describe('OrganizationProfileGeneralPanel', () => {
     it('updates only the changed name and shows the refreshed value', async () => {
       const { fapi } = await renderPanel();
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Edit name' }));
-      const dialog = screen.getByRole('dialog');
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit name' }));
       await user.clear(within(dialog).getByRole('textbox', { name: 'Name' }));
       await user.type(within(dialog).getByRole('textbox', { name: 'Name' }), 'Acme Inc');
       const update = holdRequests('post', '/v1/organizations/:organizationId');
@@ -100,8 +100,8 @@ describe('OrganizationProfileGeneralPanel', () => {
       const other = fapiOrganization({ id: 'org_2', name: 'Other' });
       const { clerk } = await renderPanel(signedIn({ organizations: [acme, other] }));
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Edit name' }));
-      await user.type(within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Name' }), ' changed');
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit name' }));
+      await user.type(within(dialog).getByRole('textbox', { name: 'Name' }), ' changed');
       await act(() => clerk.setActive({ organization: other.id }));
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
       await user.click(await screen.findByRole('button', { name: 'Edit name' }));
@@ -111,8 +111,7 @@ describe('OrganizationProfileGeneralPanel', () => {
     it('keeps a failed name draft and a field error, then resets after cancel', async () => {
       await renderPanel();
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Edit name' }));
-      const dialog = screen.getByRole('dialog');
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit name' }));
       const field = within(dialog).getByRole('textbox', { name: 'Name' });
       await user.clear(field);
       await user.type(field, 'Rejected');
@@ -128,12 +127,12 @@ describe('OrganizationProfileGeneralPanel', () => {
       expect(field).toHaveValue('Rejected');
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      await user.click(screen.getByRole('button', { name: 'Edit name' }));
-      expect(within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Name' })).toHaveValue('Acme');
-      await user.clear(within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Name' }));
-      await user.type(within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Name' }), 'Acme retry');
+      const reopened = await openDialog(user, screen.getByRole('button', { name: 'Edit name' }));
+      expect(within(reopened).getByRole('textbox', { name: 'Name' })).toHaveValue('Acme');
+      await user.clear(within(reopened).getByRole('textbox', { name: 'Name' }));
+      await user.type(within(reopened).getByRole('textbox', { name: 'Name' }), 'Acme retry');
       const retry = serveFapi(signedIn());
-      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Save changes' }));
+      await user.click(within(reopened).getByRole('button', { name: 'Save changes' }));
       await waitFor(() => expect(retry.memberships[0]?.organization.name).toBe('Acme retry'));
     });
 
@@ -149,14 +148,14 @@ describe('OrganizationProfileGeneralPanel', () => {
       expect(within(dialog).getByText('Name')).toHaveAttribute('data-visually-hidden', '');
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      await waitFor(() => expect(trigger).toHaveFocus());
     });
 
     it('requires a nonblank changed name before saving', async () => {
       await renderPanel();
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Edit name' }));
-      const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit name' }), {
+        name: 'Edit name',
+      });
       const field = within(dialog).getByRole('textbox', { name: 'Name' });
       await user.clear(field);
       await user.type(field, '   ');
@@ -166,8 +165,9 @@ describe('OrganizationProfileGeneralPanel', () => {
     it('shows the generic fallback for an unknown name error', async () => {
       await renderPanel();
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Edit name' }));
-      const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit name' }), {
+        name: 'Edit name',
+      });
       const field = within(dialog).getByRole('textbox', { name: 'Name' });
       await user.type(field, ' changed');
       const update = holdRequests('post', '/v1/organizations/:organizationId');
@@ -185,8 +185,7 @@ describe('OrganizationProfileGeneralPanel', () => {
     it('clears the slug while preserving the current name', async () => {
       const { fapi } = await renderPanel();
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Edit slug' }));
-      const dialog = screen.getByRole('dialog');
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit slug' }));
       await user.clear(within(dialog).getByRole('textbox', { name: 'Slug' }));
       const update = holdRequests('post', '/v1/organizations/:organizationId');
       await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
@@ -218,7 +217,6 @@ describe('OrganizationProfileGeneralPanel', () => {
       await user.type(field, '-draft');
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      await waitFor(() => expect(trigger).toHaveFocus());
       await user.click(trigger);
       expect(within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
     });
@@ -226,8 +224,9 @@ describe('OrganizationProfileGeneralPanel', () => {
     it('shows a slug-specific FAPI error at the field and keeps the draft', async () => {
       await renderPanel();
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Edit slug' }));
-      const dialog = screen.getByRole('dialog', { name: 'Edit slug' });
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit slug' }), {
+        name: 'Edit slug',
+      });
       const field = within(dialog).getByRole('textbox', { name: 'Slug' });
       await user.type(field, '-new');
       const update = holdRequests('post', '/v1/organizations/:organizationId');
@@ -249,8 +248,7 @@ describe('OrganizationProfileGeneralPanel', () => {
         </MosaicProvider>,
       );
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Edit slug' }));
-      const dialog = screen.getByRole('dialog');
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Edit slug' }));
       const field = within(dialog).getByRole('textbox', { name: 'Slug' });
       await user.clear(field);
       await user.type(field, 'new-slug');

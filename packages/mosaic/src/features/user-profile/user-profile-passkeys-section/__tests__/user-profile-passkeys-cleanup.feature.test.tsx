@@ -55,6 +55,6 @@ it('retains the localized cancellation error when pending cleanup fails', async 
   await userEvent.setup().click(screen.getByRole('button', { name: 'Add passkey' }));
   await waitFor(() => expect(cleanup.requests).toHaveLength(1));
   cleanup.fail('session_reverification_required', 'Cleanup requires reverification');
-  expect(await screen.findByRole('alert')).toHaveTextContent('Création annulée.');
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Création annulée.'));
   expect(screen.getByRole('button', { name: 'Add passkey' })).toBeEnabled();
 });

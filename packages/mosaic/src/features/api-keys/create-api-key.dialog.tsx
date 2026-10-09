@@ -109,6 +109,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
         <Field.Root
           required
           disabled={form.isSubmitting}
+          focusableWhenDisabled
         >
           <Field.Label>{m.nameLabel}</Field.Label>
           <Input

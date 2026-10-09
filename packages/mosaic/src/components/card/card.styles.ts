@@ -43,6 +43,15 @@ export const root = stylex.create({
   },
 });
 
+// The outermost card takes what the box around it publishes: a sheet's popup paints the shape and
+// has the card only fill it. `minWidth` rather than `width`, so it beats the size's fixed width.
+export const surface = stylex.create({
+  root: {
+    boxShadow: `var(--_cl-surface-shadow, ${shadowVars['--cl-shadow-lg']})`,
+    minWidth: 'var(--_cl-surface-min-width, auto)',
+  },
+});
+
 // A fixed `width` capped by `max-width`, not the reverse, so a parent that sizes to its content
 // (a dialog popup) takes the card's full width rather than the width of its text.
 export const sizes = stylex.create({

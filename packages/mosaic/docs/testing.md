@@ -189,6 +189,13 @@ click.
   or Mosaic modules.
 - **Wait for things to disappear.** Popovers and dialogs run exit transitions
   in a real browser, so use `waitFor(() => expect(...).toBeNull())`.
+- **Wait for an alert's text, not the alert.** Live regions such as
+  `Card.Banner` are always mounted, so `findByRole('alert')` can return one
+  before its text arrives. Use
+  `waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(...))`.
+- **Control time instead of waiting it out.** Don't raise a `waitFor` or
+  `findBy*` timeout. If the test waits on a request or a poll, hold it with
+  `holdRequests()` and release it when the test is ready.
 - **One `describe` per user task**, so the file reads like the feature's spec.
 
 ### Clerk behaviors worth knowing

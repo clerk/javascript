@@ -7,16 +7,17 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { Icon } from '../icon';
-import { descriptionColors, rootColors, styles } from './banner.styles';
+import { iconColors, rootColors, styles } from './banner.styles';
 
-type BannerColor = 'neutral' | 'warning' | 'negative';
+type BannerColor = 'neutral' | 'warning' | 'negative' | 'positive';
 
 const DEFAULT_COLOR: BannerColor = 'neutral';
 
 const ICONS: Record<BannerColor, IconName> = {
   neutral: 'information-circle',
   warning: 'exclamation-circle',
-  negative: 'exclamation-circle',
+  negative: 'x-circle',
+  positive: 'checkmark-circle',
 };
 
 const BannerColorContext = React.createContext<BannerColor>(DEFAULT_COLOR);
@@ -45,7 +46,7 @@ const Root = React.forwardRef<HTMLDivElement, BannerRootProps>(function MosaicBa
         <>
           <Icon
             name={ICONS[color]}
-            xstyle={styles.icon}
+            xstyle={[styles.icon, iconColors[color]]}
             {...themeProps('banner-icon')}
           />
           <div {...mergeStyleProps(themeProps('banner-content'), stylex.props(reset.base, styles.content))}>
@@ -92,7 +93,7 @@ const Description = React.forwardRef<HTMLParagraphElement, BannerDescriptionProp
     props: {
       ...mergeStyleProps(
         themeProps('banner-description', { color }),
-        stylex.props(reset.base, styles.description, descriptionColors[color], xstyle),
+        stylex.props(reset.base, styles.description, xstyle),
         rest,
       ),
     },
