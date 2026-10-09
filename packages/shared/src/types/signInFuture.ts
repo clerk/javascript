@@ -248,6 +248,7 @@ export interface SignInFutureSSOParams {
    * The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
    */
   oidcPrompt?: string;
+  oidcLoginHint?: string;
   /**
    * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
    */

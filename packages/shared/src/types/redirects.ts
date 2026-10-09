@@ -81,6 +81,8 @@ export type AuthenticateWithRedirectParams = {
    */
   slackTeamIdHint?: string;
 
+  oidcLoginHint?: string;
+
   /**
    * Internal OAuth callback context, consumed only when an OAuth transport completes the
    * flow in-process. Ignored by the web redirect/popup paths. Shape matches the params

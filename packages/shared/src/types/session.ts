@@ -370,6 +370,7 @@ export interface SessionResource extends ClerkResource {
   verifyWithPasskey: (params?: SessionVerifyWithPasskeyParams) => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
   __internal_touch: (params?: SessionTouchParams) => Promise<ClientResource | undefined>;
+  __internal_acknowledgeChatGPTAccountChoice?: (authorizationUrl: string) => Promise<void>;
 }
 
 /**

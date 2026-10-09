@@ -1,4 +1,5 @@
 import { waitFor } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -17,6 +18,74 @@ const registerOAuthTransport = (clerk: unknown) => {
 };
 
 describe('SignInSocialButtons', () => {
+  it('starts the existing ChatGPT OAuth redirect for the plugin flow', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withSocialProvider({ provider: 'chatgpt' });
+    });
+    fixtures.router.queryParams = {
+      target_flow: 'chatgpt_siwc',
+      redirect_url:
+        'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+      login_hint: 'user@example.com',
+      __clerk_siwc_prompt_login: 'true',
+    } as any;
+    fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined as any);
+
+    render(
+      <CardStateProvider>
+        <SignInSocialButtons
+          enableOAuthProviders
+          enableWeb3Providers={false}
+          enableAlternativePhoneCodeProviders={false}
+          autoStartChatGPT
+        />
+      </CardStateProvider>,
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({
+          strategy: 'oauth_chatgpt',
+          oidcPrompt: 'login',
+          oidcLoginHint: 'user@example.com',
+        }),
+      );
+    });
+  });
+
+  it('clears the loading state after restoring the page from browser history', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withSocialProvider({ provider: 'chatgpt' });
+    });
+    fixtures.router.queryParams = {
+      target_flow: 'chatgpt_siwc',
+      redirect_url:
+        'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+    } as any;
+    fixtures.signIn.authenticateWithRedirect.mockReturnValue(new Promise(() => {}));
+
+    render(
+      <CardStateProvider>
+        <SignInSocialButtons
+          enableOAuthProviders
+          enableWeb3Providers={false}
+          enableAlternativePhoneCodeProviders={false}
+          autoStartChatGPT
+        />
+      </CardStateProvider>,
+      { wrapper },
+    );
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /continue with chatgpt/i })).toBeDisabled());
+
+    const event = new Event('pageshow');
+    Object.defineProperty(event, 'persisted', { value: true });
+    fireEvent(window, event);
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /continue with chatgpt/i })).toBeEnabled());
+  });
+
   it('with a transport registered, calls authenticateWithRedirect with __internal_callbackParams and never opens a popup', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withSocialProvider({ provider: 'google' });

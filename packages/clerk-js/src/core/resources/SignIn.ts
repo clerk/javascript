@@ -429,6 +429,7 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier,
       oidcPrompt,
       slackTeamIdHint,
+      oidcLoginHint,
       continueSignIn,
       enterpriseConnectionId,
     } = params || {};
@@ -462,6 +463,7 @@ export class SignIn extends BaseResource implements SignInResource {
       await this.create({
         strategy,
         identifier,
+        oidcLoginHint,
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
@@ -1391,6 +1393,7 @@ class SignInFuture implements SignInFutureResource {
       popup,
       oidcPrompt,
       slackTeamIdHint,
+      oidcLoginHint,
       enterpriseConnectionId,
       identifier,
     } = params;
@@ -1441,6 +1444,7 @@ class SignInFuture implements SignInFutureResource {
             identifier,
             oidcPrompt,
             slackTeamIdHint,
+            oidcLoginHint,
           },
           { resolveProtectCheck: false },
         );

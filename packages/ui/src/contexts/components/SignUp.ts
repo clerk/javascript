@@ -1,6 +1,7 @@
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { getQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { DecorateUrl, SessionResource } from '@clerk/shared/types';
@@ -42,7 +43,11 @@ export const useSignUpContext = (): SignUpContextType => {
   const context = useContext(SignUpContext);
   const { navigate, basePath, startPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
-  const { queryParams, queryString } = useRouter();
+  const { queryParams: routedQueryParams, queryString } = useRouter();
+  const queryParams = {
+    ...(typeof window === 'undefined' ? {} : getQueryParams(window.location.search)),
+    ...routedQueryParams,
+  };
   const signUpMode = userSettings.signUp.mode;
   const options = useOptions();
   const clerk = useClerk();
