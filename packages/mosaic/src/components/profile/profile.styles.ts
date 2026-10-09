@@ -120,11 +120,7 @@ export const styles = stylex.create({
 
   layoutFullscreen: {
     borderRadius: 0,
-    borderWidth: '0px',
-    blockSize: 'auto',
     boxShadow: 'none',
-    flexGrow: 1,
-    minHeight: 0,
   },
 
   backItem: {

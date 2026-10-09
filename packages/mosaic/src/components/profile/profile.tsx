@@ -16,13 +16,14 @@ import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
+import type { DialogContextValue } from '../dialog';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { Icon } from '../icon';
 import { SelectPopup } from '../select';
 import { VisuallyHidden } from '../visually-hidden';
-import type { ProfileContextValue, ProfileNavLayout } from './profile.context';
+import type { ProfileContextValue, ProfileDismiss, ProfileNavLayout } from './profile.context';
 import { ContentPanelContext, ProfileContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
@@ -32,6 +33,13 @@ function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
     return 'sheet';
   }
   return sentinelWidth >= 2 ? 'select' : 'column';
+}
+
+function dismissOf(dialog: DialogContextValue | null, compact: boolean): ProfileDismiss {
+  if (!isInDialog(dialog) || dialog.role === 'alertdialog') {
+    return 'none';
+  }
+  return dialog.variant === 'fullscreen' && !compact ? 'back' : 'corner';
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -83,6 +91,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     return autoUpdate(sentinel, () => setNavLayout(navLayoutFor(getDimensions(sentinel).width)));
   }, [sentinel]);
   const compact = navLayout !== 'column';
+  const dismiss = dismissOf(dialog, compact);
   const pageTitleId = React.useId();
   const pageTitleRef = React.useRef<HTMLHeadingElement | null>(null);
   const navTriggerRef = React.useRef<HTMLButtonElement | null>(null);
@@ -119,7 +128,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       pageTitleRef,
       navTriggerRef,
       inline,
-      fullscreen,
+      dismiss,
     }),
     [
       titleId,
@@ -134,7 +143,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       navItems,
       pageTitleId,
       inline,
-      fullscreen,
+      dismiss,
     ],
   );
   const element = useRender({
@@ -161,9 +170,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM so it takes the dialog's opening focus, as in `Card.Header`. */}
-          {isInDialog(dialog) && dialog.role !== 'alertdialog' && !(fullscreen && !compact) ? (
-            <Dialog.CloseButton />
-          ) : null}
+          {dismiss === 'corner' ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),
@@ -171,7 +178,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
                 reset.base,
                 styles.layout,
                 inline && styles.layoutInline,
-                dialog !== null && !inline && !fullscreen && styles.layoutInDialog,
+                dialog !== null && !inline && styles.layoutInDialog,
                 fullscreen && styles.layoutFullscreen,
               ),
             )}
@@ -275,7 +282,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
     setNavItems,
     navTriggerRef,
     inline,
-    fullscreen,
+    dismiss,
   } = useProfileContext('Profile.Nav');
   useSafeLayoutEffect(() => {
     setNavItems(children);
@@ -294,7 +301,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       ),
       children: (
         <>
-          {fullscreen && navLayout === 'column' ? <BackButton /> : null}
+          {dismiss === 'back' ? <BackButton /> : null}
           <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
             {children}
           </Tabs.List>
