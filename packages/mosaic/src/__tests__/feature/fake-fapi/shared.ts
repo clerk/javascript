@@ -32,3 +32,25 @@ export function updateUser(state: ClientState, user: UserJSON): void {
 export function missing() {
   return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
 }
+
+const paginationParams = ['limit', 'offset', 'paginated'];
+
+export function rejectUnknownParams(url: URL, allowed: readonly string[]) {
+  const unknown = [...url.searchParams.keys()].find(
+    key => !key.startsWith('_') && !paginationParams.includes(key) && !allowed.includes(key),
+  );
+  return unknown
+    ? HttpResponse.json(
+        {
+          errors: [
+            {
+              code: 'form_param_unknown',
+              message: `${unknown} is not a valid parameter for this request.`,
+              meta: { param_name: unknown },
+            },
+          ],
+        },
+        { status: 422 },
+      )
+    : undefined;
+}

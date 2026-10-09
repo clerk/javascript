@@ -1,12 +1,16 @@
 import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
-import { envelope, missing } from './shared';
+import { envelope, missing, rejectUnknownParams } from './shared';
 
 export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path: string) => string) {
   return [
     http.get(fapiUrl('/v1/organizations/:organizationId/memberships'), ({ params, request }) => {
       const url = new URL(request.url);
+      const rejected = rejectUnknownParams(url, ['query', 'role']);
+      if (rejected) {
+        return rejected;
+      }
       const query = url.searchParams.get('query')?.toLowerCase();
       if (query === '') {
         return HttpResponse.json(
@@ -41,6 +45,10 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
     }),
     http.get(fapiUrl('/v1/organizations/:organizationId/invitations'), ({ params, request }) => {
       const url = new URL(request.url);
+      const rejected = rejectUnknownParams(url, ['status']);
+      if (rejected) {
+        return rejected;
+      }
       const statuses = url.searchParams.getAll('status');
       const matching = state.organizationInvitations.filter(
         invitation =>
