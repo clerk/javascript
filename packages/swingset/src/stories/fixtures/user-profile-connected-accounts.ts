@@ -9,6 +9,7 @@ import { chaosEmail, chaosText } from '@/lib/chaos';
 
 export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
+  providerId: 'google',
   provider: 'Google',
   identifier: 'test@example.com',
   iconUrl: 'https://img.clerk.com/static/google.svg',
@@ -52,6 +53,7 @@ export function useConnectedAccountsFixture({
           ...current,
           {
             id: provider.id,
+            providerId: provider.id,
             provider: provider.provider,
             iconUrl: provider.iconUrl,
             identifier: 'test@example.com',

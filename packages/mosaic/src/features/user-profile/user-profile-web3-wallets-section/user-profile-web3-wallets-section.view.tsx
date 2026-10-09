@@ -3,13 +3,18 @@ import { useMemo, useRef } from 'react';
 import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
+import { useProviderRows } from '../../../hooks/use-provider-rows';
 import { fill, useMessages } from '../../../localization';
 import { truncateWithEndVisible } from '../../../utils/truncate-text-with-end-visible';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
 import type {
+  UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
   UserProfileWeb3WalletsSectionViewProps,
 } from './user-profile-web3-wallets-section.types';
+
+const providerOf = (wallet: UserProfileWeb3Wallet) => wallet.providerId;
+const noProviders: UserProfileWeb3Provider[] = [];
 
 export function UserProfileWeb3WalletsSectionView({
   wallets,
@@ -34,6 +39,7 @@ export function UserProfileWeb3WalletsSectionView({
   const removeWallet = useMemo(() => Confirmation.createHandle<UserProfileWeb3Wallet>(), []);
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
   const isBusy = pendingId !== undefined;
+  const rows = useProviderRows(wallets, onConnect ? availableProviders : noProviders, providerOf);
 
   return (
     <>
@@ -49,27 +55,19 @@ export function UserProfileWeb3WalletsSectionView({
               </Section.Content>
             </Section.Header>
             <Section.Body>
-              {wallets.map(wallet => (
+              {rows.map(({ key, connected: wallet, provider }) => (
                 <UserProfileWeb3WalletRowView
-                  key={wallet.id}
+                  key={key}
                   wallet={wallet}
-                  triggerRef={removalFocus.registerTrigger(wallet.id)}
+                  provider={provider}
+                  triggerRef={wallet ? removalFocus.registerTrigger(wallet.id) : undefined}
+                  isPending={provider !== undefined && pendingId === provider.id}
                   isDisabled={isBusy}
+                  onConnect={onConnect}
                   onSetPrimary={onSetPrimary}
                   onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
                 />
               ))}
-              {onConnect
-                ? availableProviders.map(provider => (
-                    <UserProfileWeb3WalletRowView
-                      key={provider.id}
-                      wallet={provider}
-                      isPending={pendingId === provider.id}
-                      isDisabled={isBusy}
-                      onConnect={onConnect}
-                    />
-                  ))
-                : null}
             </Section.Body>
           </Section.Group>
         </Section.Root>

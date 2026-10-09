@@ -14,6 +14,7 @@ import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-prof
 
 export function UserProfileWeb3WalletRowView({
   wallet,
+  provider,
   triggerRef,
   isPending = false,
   isDisabled = false,
@@ -21,7 +22,8 @@ export function UserProfileWeb3WalletRowView({
   onSetPrimary,
   onRemove,
 }: {
-  wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
+  wallet?: UserProfileWeb3Wallet;
+  provider?: UserProfileWeb3Provider;
   triggerRef?: Ref<HTMLButtonElement>;
   isPending?: boolean;
   isDisabled?: boolean;
@@ -30,23 +32,23 @@ export function UserProfileWeb3WalletRowView({
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
 }) {
   const m = useMessages('userProfileWeb3Wallets');
-  const iconUrl = wallet.iconUrl?.trim();
-  const linkedWallet = 'address' in wallet ? wallet : undefined;
-  const address = linkedWallet?.address;
+  const name = wallet?.provider || provider?.provider;
+  const iconUrl = (wallet?.iconUrl ?? provider?.iconUrl)?.trim();
+  const address = wallet?.address;
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
   const actions: ActionMenuAction[] = [];
 
-  if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
+  if (wallet && !wallet.isPrimary && wallet.isVerified && onSetPrimary) {
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
   }
-  if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
-    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(linkedWallet) });
+  if (wallet && onRemove && wallet.canRemove !== false) {
+    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(wallet) });
   }
 
   return (
-    <Section.Row xstyle={onConnect && styles.connectRow}>
+    <Section.Row xstyle={wallet ? undefined : styles.connectRow}>
       <Section.Item>
-        {wallet.provider || iconUrl ? (
+        {name || iconUrl ? (
           <Section.Media size='lg'>
             <IconFrame>
               {iconUrl ? (
@@ -61,7 +63,7 @@ export function UserProfileWeb3WalletRowView({
                   aria-hidden
                   {...stylex.props(styles.fallback)}
                 >
-                  {wallet.provider?.trim().charAt(0).toUpperCase()}
+                  {name?.trim().charAt(0).toUpperCase()}
                 </span>
               )}
             </IconFrame>
@@ -70,24 +72,33 @@ export function UserProfileWeb3WalletRowView({
         <Section.Content>
           <Section.Label>
             <span
-              title={wallet.provider || address}
+              title={name || address}
               {...stylex.props(truncationStyles.singleLine, styles.text)}
             >
-              {wallet.provider || shortAddress}
+              {name || shortAddress}
             </span>
-            {linkedWallet?.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
-            {linkedWallet && !linkedWallet.isVerified ? <Badge color='warning'>{m.unverified}</Badge> : null}
+            {wallet?.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
+            {wallet && !wallet.isVerified ? <Badge color='warning'>{m.unverified}</Badge> : null}
           </Section.Label>
-          {wallet.provider && address ? (
-            <Section.Description
-              xstyle={truncationStyles.singleLine}
-              title={address}
-            >
-              {shortAddress}
-            </Section.Description>
-          ) : null}
+          <Section.CollapsibleDescription
+            truncate
+            title={address}
+          >
+            {name && address ? shortAddress : undefined}
+          </Section.CollapsibleDescription>
         </Section.Content>
-        {onConnect ? (
+        {wallet ? (
+          actions.length > 0 ? (
+            <Section.Actions>
+              <ActionMenu
+                triggerRef={triggerRef}
+                actions={actions}
+                disabled={isDisabled}
+                label={fill(m.manageLabel, { wallet: name || address || '' })}
+              />
+            </Section.Actions>
+          ) : null
+        ) : provider && onConnect ? (
           <Section.Actions>
             <SubmitButton
               color='neutral'
@@ -95,8 +106,8 @@ export function UserProfileWeb3WalletRowView({
               variant='outline'
               isPending={isPending}
               disabled={isDisabled && !isPending}
-              aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
-              onClick={() => onConnect(wallet.id)}
+              aria-label={fill(m.connectLabel, { provider: provider.provider })}
+              onClick={() => onConnect(provider.id)}
             >
               {m.connect}
               <Icon
@@ -106,19 +117,10 @@ export function UserProfileWeb3WalletRowView({
               />
             </SubmitButton>
           </Section.Actions>
-        ) : actions.length > 0 ? (
-          <Section.Actions>
-            <ActionMenu
-              triggerRef={triggerRef}
-              actions={actions}
-              disabled={isDisabled}
-              label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
-            />
-          </Section.Actions>
         ) : null}
       </Section.Item>
-      <Section.Error>{'connectError' in wallet ? wallet.connectError : undefined}</Section.Error>
-      <Section.Error>{linkedWallet?.primaryError}</Section.Error>
+      <Section.Error>{provider?.connectError}</Section.Error>
+      <Section.Error>{wallet?.primaryError}</Section.Error>
     </Section.Row>
   );
 }

@@ -2,6 +2,7 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { TransitionProps } from '../../primitives/hooks/use-transition';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -29,6 +30,7 @@ export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMe
 export type SectionContentProps = MosaicComponentProps<'div'>;
 export type SectionLabelProps = MosaicComponentProps<'div'>;
 export type SectionDescriptionProps = MosaicComponentProps<'div'>;
+export type SectionCollapsibleDescriptionProps = MosaicComponentProps<'div'> & { truncate?: boolean };
 export type SectionActionsProps = MosaicComponentProps<'div'>;
 export type SectionNoteProps = MosaicComponentProps<'div'> & { icon?: React.ReactNode };
 export type SectionErrorProps = MosaicComponentProps<'p'>;
@@ -244,6 +246,81 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
   });
 });
 
+function useSettledEntrance(mounted: boolean, transitionProps: TransitionProps): TransitionProps {
+  const settled = React.useRef(false);
+  const entrance = React.useRef<boolean | null>(null);
+
+  React.useEffect(() => {
+    settled.current = true;
+  }, []);
+
+  if (!mounted) {
+    entrance.current = null;
+  } else if (entrance.current === null) {
+    entrance.current = settled.current;
+  }
+
+  return entrance.current ? transitionProps : { ...transitionProps, 'data-starting-style': undefined };
+}
+
+/**
+ * A `Section.Description` that opens and closes on the content it is given, so a row grows and
+ * shrinks by a line rather than jumping. Render it with the content —
+ * `<Section.CollapsibleDescription>{identifier}</Section.CollapsibleDescription>` — rather than
+ * behind a conditional: empty content closes it, and the last content stays in place until it has
+ * closed. Content present when it first mounts shows at once. `truncate` keeps the text to one
+ * line with an ellipsis; pass `title` with it so the full text is still reachable.
+ */
+const CollapsibleDescription = React.forwardRef<HTMLDivElement, SectionCollapsibleDescriptionProps>(
+  function SectionCollapsibleDescription({ truncate = false, render, xstyle, children, ...rest }, ref) {
+    const open = hasMessage(children);
+    const element = React.useRef<HTMLElement | null>(null);
+    const [textElement, setTextElement] = React.useState<HTMLElement | null>(null);
+    const height = useMessageHeight(textElement);
+    const transition = useTransition({ open, ref: element });
+    const transitionProps = useSettledEntrance(transition.mounted, transition.transitionProps);
+    const content = useHeldMessage(children, open);
+    const textProps = stylex.props(
+      reset.base,
+      feedbackStyles.message,
+      styles.collapsibleDescriptionText,
+      truncate && truncationStyles.singleLine,
+    );
+
+    return useRender({
+      defaultTagName: 'div',
+      render,
+      enabled: transition.mounted,
+      ref: [ref, element],
+      props: {
+        ...mergeStyleProps(
+          themeProps('section-description', { collapsible: true }),
+          stylex.props(
+            reset.base,
+            styles.description,
+            feedbackStyles.collapse,
+            feedbackHeight.measured(height),
+            styles.collapsibleDescription,
+            xstyle,
+          ),
+          { 'aria-hidden': open ? undefined : true, ...transitionProps },
+          rest,
+        ),
+        children: (
+          <span
+            ref={setTextElement}
+            {...textProps}
+            {...transitionProps}
+            style={{ ...textProps.style, ...transitionProps.style }}
+          >
+            {content}
+          </span>
+        ),
+      },
+    });
+  },
+);
+
 const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function SectionActions(
   { render, xstyle, ...rest },
   ref,
@@ -364,6 +441,7 @@ export const Section = {
   Content,
   Label,
   Description,
+  CollapsibleDescription,
   Actions,
   Note,
   Error: SectionError,
