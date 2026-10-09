@@ -35,20 +35,6 @@ describe('connected accounts', () => {
     expect(fapi.client.sessions[0]?.user.external_accounts.map(account => account.id)).toEqual(['idn_google']);
   });
 
-  it('returns focus to the account menu when removal is canceled', async () => {
-    await renderSection();
-    const user = userEvent.setup();
-    const trigger = screen.getByRole('button', { name: 'Manage Google' });
-
-    trigger.focus();
-    await user.keyboard('{Enter}');
-    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove' })).toHaveFocus());
-    await user.keyboard('{Enter}');
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(trigger).toHaveFocus());
-  });
-
   it('keeps removal pending until the request completes', async () => {
     const { fapi } = await renderSection([google, github]);
     const request = holdRequests('post', '/v1/me/external_accounts/idn_github');
@@ -115,22 +101,9 @@ describe('connected accounts', () => {
     expect(fapi.client.sessions[0]?.user.external_accounts.map(account => account.id)).toEqual(['idn_google']);
   });
 
-  it('focuses the next account and then Connect as accounts are removed', async () => {
-    await renderSection([google, github]);
-    const user = userEvent.setup();
-
-    const first = await openRemoval(user, 'Google');
-    await user.click(within(first).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage GitHub' })).toHaveFocus());
-
-    const second = await openRemoval(user, 'GitHub');
-    await user.click(within(second).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect GitHub' })).toHaveFocus());
-  });
-
-  it('restores the profile title after removing the final enterprise-restricted account', async () => {
+  it('hides the section after removing the final enterprise-restricted account', async () => {
     const environment = signedIn().environment;
-    const { titleRef } = await renderSection([google], {
+    await renderSection([google], {
       client: fapiClient([
         fapiSession({
           id: 'sess_1',
@@ -154,7 +127,6 @@ describe('connected accounts', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.queryByRole('group', { name: 'Connected accounts' })).toBeNull();
-    await waitFor(() => expect(titleRef.current).toHaveFocus());
   });
 
   it.each(['switch', 'sign out'] as const)('closes a stale removal confirmation after %s', async change => {

@@ -4,6 +4,7 @@ import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useComboboxContext } from './combobox-context';
 
 export interface ComboboxPositionerProps extends ComponentProps<'div'> {
@@ -25,7 +26,7 @@ export const ComboboxPositioner = React.forwardRef<HTMLDivElement, ComboboxPosit
       return () => refs.setPositionReference(refs.domReference.current);
     }, [anchor, refs]);
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;

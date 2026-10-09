@@ -547,13 +547,13 @@ describe('compactPlacement', () => {
   // Written out rather than imported: an atom is named from its property, value AND condition, so
   // the probe only yields the popup's own atom if the query string matches `dialog.styles.ts`
   // exactly. A drift here shows up as a failing test rather than as a silently empty assertion.
-  const PHONE = '@container cl-dialog (width < 48rem)';
+  const SHEET = '@media (width < 40rem)';
   const probe = stylex.create({
-    anchored: { alignSelf: { [PHONE]: 'end', default: null } },
-    clipped: { overflow: { [PHONE]: 'clip', default: null } },
+    anchored: { alignSelf: { [SHEET]: 'end', default: null } },
+    clipped: { overflow: { [SHEET]: 'clip', default: null } },
   });
 
-  const renderPlacement = (compactPlacement: 'center' | 'sheet', variant: DialogVariant = 'card') =>
+  const renderPlacement = (compactPlacement: 'center' | 'sheet' | undefined, variant: DialogVariant = 'card') =>
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup
@@ -565,7 +565,13 @@ describe('compactPlacement', () => {
       </Dialog.Root>,
     );
 
-  it('centers by default, anchoring nothing to the bottom edge', () => {
+  it('makes a card a sheet by default', () => {
+    renderPlacement(undefined);
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+  });
+
+  it('centers when asked, anchoring nothing to the bottom edge', () => {
     renderPlacement('center');
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
@@ -586,6 +592,15 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
+    warn.mockRestore();
+  });
+
+  it('keeps a profile centered by default without warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPlacement(undefined, 'profile');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
     warn.mockRestore();
   });
 });

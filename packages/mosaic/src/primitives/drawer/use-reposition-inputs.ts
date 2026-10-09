@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import { isInput } from './helpers';
+import { opensKeyboard } from '../utils';
 
 export interface UseRepositionInputsOptions {
   /** `repositionInputs && open` — the hook is inert unless this is true. */
@@ -39,7 +39,7 @@ export function useRepositionInputs({ enabled, popupRef }: UseRepositionInputsOp
         return;
       }
       const active = document.activeElement;
-      if (!active || !isInput(active)) {
+      if (!active || !opensKeyboard(active)) {
         // The keyboard has closed (focus usually falls back to `body`); drop the
         // lift we applied so the sheet doesn't stay raised until unmount.
         if (touched) {

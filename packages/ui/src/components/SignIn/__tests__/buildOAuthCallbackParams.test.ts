@@ -16,6 +16,7 @@ describe('buildSignInOAuthCallbackParams', () => {
       afterSignUpUrl: '/after-up',
       signUpContinueUrl: '/continue',
       signUpProtectCheckUrl: '/sign-up-protect-check',
+      signUpEnterpriseConnectionsUrl: '/sign-up-enterprise-connections',
       transferable: true,
       unsafeMetadata: { a: 1 },
     } as any;
@@ -32,6 +33,7 @@ describe('buildSignInOAuthCallbackParams', () => {
       resetPasswordUrl: '../reset-password',
       signInProtectCheckUrl: '../protect-check',
       signUpProtectCheckUrl: '/sign-up-protect-check',
+      enterpriseConnectionsUrl: '/sign-up-enterprise-connections',
       unsafeMetadata: { a: 1 },
     });
   });
@@ -51,6 +53,7 @@ describe('buildSignInOAuthTransportCallbackParams', () => {
       afterSignUpUrl: '/after-up',
       signUpContinueUrl: '/continue',
       signUpProtectCheckUrl: '/sign-up-protect-check',
+      signUpEnterpriseConnectionsUrl: '/sign-up-enterprise-connections',
       transferable: true,
       unsafeMetadata: { a: 1 },
     } as any;
@@ -73,6 +76,7 @@ describe('buildSignInOAuthTransportCallbackParams', () => {
       verifyEmailAddressUrl: `${origin}/sign-up/verify-email-address`,
       verifyPhoneNumberUrl: `${origin}/sign-up/verify-phone-number`,
       signUpProtectCheckUrl: `${origin}/sign-up/protect-check`,
+      enterpriseConnectionsUrl: `${origin}/sign-up/enterprise-connections`,
       unsafeMetadata: { a: 1 },
     });
   });
@@ -120,6 +124,7 @@ describe('buildSignInOAuthTransportCallbackParams', () => {
     expect(params.verifyEmailAddressUrl).toBe('create/verify-email-address');
     expect(params.verifyPhoneNumberUrl).toBe('create/verify-phone-number');
     expect(params.signUpProtectCheckUrl).toBe('create/protect-check');
+    expect(params.enterpriseConnectionsUrl).toBe('create/enterprise-connections');
   });
 });
 
@@ -144,6 +149,7 @@ describe('buildSignUpOAuthCallbackParams', () => {
       verifyEmailAddressUrl: '../verify-email-address',
       verifyPhoneNumberUrl: '../verify-phone-number',
       signUpProtectCheckUrl: '../protect-check',
+      enterpriseConnectionsUrl: '../enterprise-connections',
       unsafeMetadata: { b: 2 },
     });
   });
@@ -175,6 +181,7 @@ describe('buildSignUpOAuthTransportCallbackParams', () => {
       verifyEmailAddressUrl: 'verify-email-address',
       verifyPhoneNumberUrl: 'verify-phone-number',
       signUpProtectCheckUrl: 'protect-check',
+      enterpriseConnectionsUrl: 'enterprise-connections',
       unsafeMetadata: { b: 2 },
     });
   });

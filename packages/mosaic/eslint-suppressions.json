@@ -59,7 +59,17 @@
       "count": 1
     }
   },
-  "src/features/user-profile/user-profile-web3-wallet-row.view.tsx": {
+  "src/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.model.ts": {
+    "@typescript-eslint/no-restricted-imports": {
+      "count": 1
+    }
+  },
+  "src/features/user-profile/user-profile-web3-wallets-section/user-profile-solana-wallet.model.ts": {
+    "@typescript-eslint/no-restricted-imports": {
+      "count": 1
+    }
+  },
+  "src/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallet-row.view.tsx": {
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
@@ -81,7 +91,7 @@
   },
   "src/machine/create-actor.ts": {
     "@typescript-eslint/consistent-type-assertions": {
-      "count": 9
+      "count": 8
     }
   },
   "src/machine/create-machine.ts": {
@@ -92,11 +102,6 @@
   "src/machine/setup.ts": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 2
-    }
-  },
-  "src/primitives/autocomplete/autocomplete-root.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
     }
   },
   "src/primitives/dialog/dialog-trigger.tsx": {
@@ -131,16 +136,6 @@
   },
   "src/primitives/otp/otp-input.tsx": {
     "sonarjs/cognitive-complexity": {
-      "count": 1
-    }
-  },
-  "src/primitives/select/select-root.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
-  "src/primitives/utils/css-vars.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
       "count": 1
     }
   },

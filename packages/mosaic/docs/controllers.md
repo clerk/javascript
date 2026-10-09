@@ -245,9 +245,10 @@ One path, so every error a user sees goes through the `errors.*` catalog:
   the feature's `errorFallback`, then the generic error. Views never call
   `useErrorText` on an error they did not create themselves.
 - Not there yet, each with a follow-up: `useForm` resolves when the save fails
-  and falls back to `form.error` instead of taking an `errorFallback`; the
-  profile picture row resolves its controller's error in the view; and the
-  password section maps its own errors (`user-profile-password-errors.ts`).
+  instead of at render; the profile picture row resolves its controller's error
+  in the view; and the password section maps its own errors
+  (`user-profile-password-errors.ts`). `useForm` takes an `errorFallback` and
+  uses `form.error` when none is given.
 - **`errorFallback` is the feature's copy for faults Clerk cannot describe**
   (code bugs, non-Clerk errors). An `UnlocalizableError` renders the fallback,
   never its cause's `.message`. A failure carrying the Clerk code `network_error`

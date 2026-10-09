@@ -1,26 +1,30 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import type { ActionMenuAction } from '../../components/action-menu';
-import { ActionMenu } from '../../components/action-menu';
-import { Badge } from '../../components/badge';
-import { Button } from '../../components/button';
-import { Icon, IconFrame } from '../../components/icon';
-import { Section } from '../../components/section';
-import { fill, useMessages } from '../../localization';
-import { truncationStyles } from '../../styles/typography.styles';
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
+import { Badge } from '../../../components/badge';
+import { SubmitButton } from '../../../components/button';
+import { Icon, IconFrame } from '../../../components/icon';
+import { Section } from '../../../components/section';
+import { fill, useMessages } from '../../../localization';
+import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from './user-profile-web3-wallets.styles';
-import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
+import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.types';
 
 export function UserProfileWeb3WalletRowView({
   wallet,
   triggerRef,
+  isPending = false,
+  isDisabled = false,
   onConnect,
   onSetPrimary,
   onRemove,
 }: {
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
   triggerRef?: Ref<HTMLButtonElement>;
+  isPending?: boolean;
+  isDisabled?: boolean;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
@@ -85,10 +89,12 @@ export function UserProfileWeb3WalletRowView({
         </Section.Content>
         {onConnect ? (
           <Section.Actions>
-            <Button
+            <SubmitButton
               color='neutral'
               size='sm'
               variant='outline'
+              isPending={isPending}
+              disabled={isDisabled && !isPending}
               aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
               onClick={() => onConnect(wallet.id)}
             >
@@ -98,13 +104,14 @@ export function UserProfileWeb3WalletRowView({
                 placement='inline-end'
                 size='sm'
               />
-            </Button>
+            </SubmitButton>
           </Section.Actions>
         ) : actions.length > 0 ? (
           <Section.Actions>
             <ActionMenu
               triggerRef={triggerRef}
               actions={actions}
+              disabled={isDisabled}
               label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
             />
           </Section.Actions>

@@ -71,6 +71,7 @@ export function ReverificationOTP({
             required
             invalid={Boolean(errorMessage)}
             disabled={isPending}
+            focusableWhenDisabled
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Otp

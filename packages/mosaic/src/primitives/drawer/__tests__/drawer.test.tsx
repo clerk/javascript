@@ -1177,6 +1177,22 @@ describe('Drawer', () => {
       expect(popup).toHaveAttribute('data-expanded', '');
     });
 
+    it('rests fully open when snapPoints shrinks below the active index', () => {
+      const { rerender } = render(
+        <DrawerFixture
+          defaultOpen
+          snapPoints={[0.25, 0.5, 1]}
+        />,
+      );
+      rerender(
+        <DrawerFixture
+          defaultOpen
+          snapPoints={SNAP_POINTS}
+        />,
+      );
+      expect(snapOffset(screen.getByRole('dialog'))).toBe('0px');
+    });
+
     it('positions at a controlled activeSnapPoint', () => {
       render(
         <DrawerFixture

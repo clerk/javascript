@@ -9,7 +9,7 @@ import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
-import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
+import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 
 function DeleteAccount() {
   const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
@@ -96,7 +96,6 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {

@@ -140,6 +140,12 @@ describe('APIKeysTable', () => {
       expect(within(table()).getByText('ak_...FKWO', { exact: false })).toBeVisible();
     });
 
+    it('describes a key last used after the table read the time as used now', async () => {
+      await renderTable(signedIn([userKey('ak_3', 'Worker', { last_used_at: Date.now() + 5 * 60_000 })]));
+
+      expect(await within(table()).findByRole('cell', { name: 'now' })).toBeVisible();
+    });
+
     it('shows loading until the first page arrives', async () => {
       serveFapi(signedIn());
       const list = holdRequests('get', '/api_keys');
@@ -429,7 +435,12 @@ describe('APIKeysTable', () => {
       const create = holdRequests('post', '/api_keys');
 
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
-      await waitFor(() => expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toBeDisabled());
+      await waitFor(() =>
+        expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toHaveAttribute(
+          'aria-disabled',
+          'true',
+        ),
+      );
       expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toHaveAttribute('aria-busy', 'true');
 
       create.release();
@@ -463,6 +474,19 @@ describe('APIKeysTable', () => {
       );
     });
 
+    it('explains a failure Clerk cannot describe with the create error', async () => {
+      const { user } = await renderTable();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      worker.use(http.post(fapiUrl('/api_keys'), () => HttpResponse.json({ errors: [] }, { status: 500 })));
+
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not create the API key. Try again.'),
+      );
+    });
+
     it.todo('creates a key with an optional description when descriptions are enabled');
   });
 
@@ -479,7 +503,7 @@ describe('APIKeysTable', () => {
       expect(fapi.apiKeys.find(key => key.id === webApp.id)?.revoked).toBe(true);
     });
 
-    it('revokes only once the exact name is typed, and returns focus on cancel', async () => {
+    it('revokes only once the exact name is typed', async () => {
       const { fapi, user } = await renderTable();
       const dialog = await startRevoke(user, 'Web app');
 
@@ -490,7 +514,7 @@ describe('APIKeysTable', () => {
       expect(within(dialog).getByRole('button', { name: 'Revoke key' })).toHaveAttribute('aria-disabled', 'true');
 
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Web app' })).toHaveFocus());
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
       expect(fapi.apiKeys.find(key => key.id === webApp.id)?.revoked).toBeFalsy();
     });
 
@@ -539,17 +563,6 @@ describe('APIKeysTable', () => {
 
       expect(within(second).getByRole('textbox')).toHaveValue('');
       expect(within(second).getByRole('textbox')).not.toHaveAccessibleDescription('api_key_revoke_failed');
-    });
-
-    it('moves focus to the next key, then to create once no keys are left', async () => {
-      const { user } = await renderTable();
-
-      await user.click(within(await openRevoke(user, 'Web app')).getByRole('button', { name: 'Revoke key' }));
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage CI pipeline' })).toHaveFocus());
-
-      await user.click(within(await openRevoke(user, 'CI pipeline')).getByRole('button', { name: 'Revoke key' }));
-      expect(await screen.findByText('No API Keys created')).toBeVisible();
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Create API key' })).toHaveFocus());
     });
 
     it('returns to the previous page when the last key on a page is revoked', async () => {

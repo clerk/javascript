@@ -20,11 +20,7 @@ import { keysOf } from './object';
  *   collides with the `color` variant a styled component spreads these props into.
  */
 export type RenderProps = Omit<React.HTMLAttributes<HTMLElement>, 'color'> & {
-  // SAFETY: the rendered element is chosen by the callback, after this type is fixed, so
-  // no concrete element type is correct here. `Ref<Element>` does not work: `RefObject<Element>`
-  // is not a `RefObject<HTMLAnchorElement>`. `any` is what makes the ref spreadable onto
-  // whatever the callback returns, which is the whole point of `render`. Base UI's
-  // `HTMLProps` resolves this the same way.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The callback picks the rendered element after this type is fixed, and `Ref<Element>` is not assignable to a narrower element ref, so only `any` spreads onto any element (as in Base UI's `HTMLProps`).
   ref?: React.Ref<any>;
 };
 

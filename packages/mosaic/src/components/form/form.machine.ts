@@ -23,6 +23,13 @@ export interface FieldConfig<TValue, TValues extends object> {
 
 export type FieldsConfig<TValues extends object> = { [K in keyof TValues]?: FieldConfig<TValues[K], TValues> };
 
+export function fieldConfig<TValues extends object, K extends keyof TValues>(
+  fields: FieldsConfig<TValues> | undefined,
+  name: K,
+): FieldConfig<TValues[K], TValues> | undefined {
+  return fields?.[name];
+}
+
 export interface AsyncFieldState {
   value: unknown;
   feedback: FieldFeedback | undefined;
@@ -62,7 +69,7 @@ function syncFeedback<TValues extends object>(
   context: FormContext<TValues>,
   name: keyof TValues,
 ): FieldFeedback | undefined {
-  return context.fields?.[name]?.validate?.(context.values[name], context.values);
+  return fieldConfig(context.fields, name)?.validate?.(context.values[name], context.values);
 }
 
 function settledAsyncFeedback<TValues extends object>(
@@ -180,7 +187,7 @@ function asyncStateFor<TValues extends object>(
   name: keyof TValues,
   value: TValues[keyof TValues],
 ): AsyncFieldState | undefined {
-  if (context.fields?.[name]?.validateAsync === undefined || value === initialOf(context)[name]) {
+  if (fieldConfig(context.fields, name)?.validateAsync === undefined || value === initialOf(context)[name]) {
     return undefined;
   }
   return { value, feedback: context.async[name]?.feedback, pending: true };

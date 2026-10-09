@@ -135,7 +135,8 @@ describe('UserProfileAddEmailDialog', () => {
     const { props } = renderView({ step: 'verify', code: '123456', isPending: true });
 
     for (const slot of screen.getAllByRole('textbox')) {
-      expect(slot).toBeDisabled();
+      expect(slot).toHaveAttribute('aria-disabled', 'true');
+      expect(slot).toHaveAttribute('readonly');
     }
     const verify = screen.getByRole('button', { name: 'Verify', exact: true });
     expect(verify).toHaveAttribute('aria-busy', 'true');

@@ -251,7 +251,7 @@ function RequestActions({
             variant='outline'
             color='neutral'
             aria-label={fill(m.declineRequest, { name: request.name ?? request.email })}
-            onClick={() => decide('decline', () => onDecline?.(), m.declineError)}
+            onClick={() => decide('decline', onDecline, m.declineError)}
           >
             {m.decline}
           </SubmitButton>
@@ -265,7 +265,7 @@ function RequestActions({
             isPending={pendingAction === 'accept'}
             pendingLabel={m.accepting}
             aria-label={fill(m.acceptRequest, { name: request.name ?? request.email })}
-            onClick={() => decide('accept', () => onAccept?.(), m.acceptError)}
+            onClick={() => decide('accept', onAccept, m.acceptError)}
           >
             {m.accept}
           </SubmitButton>
