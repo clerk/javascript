@@ -20,6 +20,7 @@ import {
   backdropMotion,
   closeInsets,
   compactPlacements,
+  fullscreenPopup,
   popupMotion,
   styles,
   trackCompactPlacements,
@@ -420,6 +421,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
             reset.base,
             styles.popup,
             variants[surfaceOf(variant)],
+            variant === 'fullscreen' && fullscreenPopup.fill,
             compactPlacements[compactPlacement],
             // One cell per (variant, placement) that exists, selected rather than layered: StyleX
             // dedupes by PROPERTY across a `stylex.props` call, so a thin "sheet only" atom would

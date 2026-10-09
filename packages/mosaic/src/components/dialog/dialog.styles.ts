@@ -362,7 +362,12 @@ export const trackVariants = stylex.create({
   fullscreen: {
     '--_cl-dialog-inset': '0px',
     paddingInline: 0,
-    justifyItems: 'stretch',
+  },
+});
+
+export const fullscreenPopup = stylex.create({
+  fill: {
+    width: '100%',
   },
 });
 
