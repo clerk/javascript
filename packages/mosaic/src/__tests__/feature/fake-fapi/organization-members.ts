@@ -8,6 +8,12 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
     http.get(fapiUrl('/v1/organizations/:organizationId/memberships'), ({ params, request }) => {
       const url = new URL(request.url);
       const query = url.searchParams.get('query')?.toLowerCase();
+      if (query === '') {
+        return HttpResponse.json(
+          { errors: [{ code: 'form_param_missing', message: 'Enter query.', meta: { param_name: 'query' } }] },
+          { status: 422 },
+        );
+      }
       const matching = state.memberships.filter(member => {
         if (member.organization.id !== params.organizationId) {
           return false;

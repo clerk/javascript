@@ -26,7 +26,7 @@ export function useMembersTableModel(query: string) {
   const canRead = session?.checkAuthorization({ permission: READ_PERMISSION }) ?? false;
   const canManage = session?.checkAuthorization({ permission: MANAGE_PERMISSION }) ?? false;
   const { organization, memberships } = useOrganization({
-    memberships: canRead ? { pageSize: PAGE_SIZE, keepPreviousData: true, query } : undefined,
+    memberships: canRead ? { pageSize: PAGE_SIZE, keepPreviousData: true, query: query || undefined } : undefined,
   });
   const fetchPage = useRef(memberships?.fetchPage);
   fetchPage.current = memberships?.fetchPage;
