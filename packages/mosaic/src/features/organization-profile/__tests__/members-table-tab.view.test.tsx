@@ -129,33 +129,20 @@ describe('MembersTableTabView', () => {
     expect(screen.queryByRole('combobox', { name: /^Results per page/ })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Joined' })).toBeNull();
   });
-  it.each<Partial<MembersTableTabViewProps>>([{ page: 2 }, { pageSize: 20 }, { searchValue: 'Grace' }])(
-    'clears selection when the caller changes result state: %j',
-    async change => {
-      const user = userEvent.setup();
-      const { props, rerender } = renderView({ onBulkAction: vi.fn() });
-      await user.click(screen.getByRole('checkbox', { name: 'Select Grace Hopper' }));
-      rerender(
-        <MosaicProvider>
-          <MembersTableTabView
-            {...props}
-            isFetching
-          />
-        </MosaicProvider>,
-      );
-      expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).toBeChecked();
-      rerender(
-        <MosaicProvider>
-          <MembersTableTabView
-            {...props}
-            {...change}
-          />
-        </MosaicProvider>,
-      );
-      expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).not.toBeChecked();
-    },
-  );
-
+  it('clears selection when a removal is confirmed', async () => {
+    const user = userEvent.setup();
+    const member = propsFor().members[1];
+    renderView({
+      members: [member, { ...member, id: 'linus', name: 'Linus Torvalds' }],
+      onBulkAction: vi.fn(),
+      onRemove: vi.fn().mockResolvedValue(undefined),
+    });
+    await user.click(screen.getByRole('checkbox', { name: 'Select Linus Torvalds' }));
+    await user.click(screen.getByRole('button', { name: 'Manage Grace Hopper' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
+    await waitFor(() => expect(screen.getByRole('checkbox', { name: 'Select Linus Torvalds' })).not.toBeChecked());
+  });
   it('does not retain hidden selection for protected members within a Shift-click range', async () => {
     const user = userEvent.setup();
     const member = propsFor().members[1];

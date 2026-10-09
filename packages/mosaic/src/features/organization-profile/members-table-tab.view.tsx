@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { type Ref, useEffect, useMemo, useRef } from 'react';
+import { type Ref, useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { ActionMenu } from '../../components/action-menu';
@@ -68,13 +68,6 @@ export function MembersTableTabView({
     searchValue,
     onSearchChange,
   });
-  const resetSelection = useRef(table.setRowSelection);
-  useEffect(() => {
-    resetSelection.current = table.setRowSelection;
-  }, [table.setRowSelection]);
-  useEffect(() => {
-    resetSelection.current({});
-  }, [page, pageSize, searchValue]);
   const columnCount = 3 + Number(Boolean(onRemove)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
   return (
@@ -158,7 +151,10 @@ export function MembersTableTabView({
           description={m.removeDescription}
           actionLabel={m.remove}
           cancelLabel={m.cancel}
-          onConfirm={member => removalFocus.remove(member.id)}
+          onConfirm={member => {
+            table.setRowSelection({});
+            return removalFocus.remove(member.id);
+          }}
           errorFallback={m.removeError}
           finalFocus={removalFocus.finalFocus}
         />
