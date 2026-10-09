@@ -589,26 +589,7 @@ function PersonalRow() {
   );
 }
 
-/** The active organization, which leads the list whichever page of memberships it is on. */
-function ActiveMembershipRow() {
-  const data = useSwitcherContext();
-  const active = data.activeOrganization;
-  const selectOrganization = data.onSelectOrganization;
-
-  if (!active) {
-    return null;
-  }
-
-  return (
-    <MembershipRow
-      membership={active}
-      onSelect={selectOrganization ? () => selectOrganization(active.organizationId) : undefined}
-      active
-    />
-  );
-}
-
-/** The other organizations the active account belongs to. */
+/** The organizations the active account belongs to, in the order they come. */
 function MembershipRows() {
   const data = useSwitcherContext();
   const selectOrganization = data.onSelectOrganization;
@@ -616,16 +597,14 @@ function MembershipRows() {
 
   return (
     <>
-      {data.memberships
-        .filter(m => m.organizationId !== activeId)
-        .map(m => (
-          <MembershipRow
-            key={m.organizationId}
-            membership={m}
-            onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
-            active={false}
-          />
-        ))}
+      {data.memberships.map(m => (
+        <MembershipRow
+          key={m.organizationId}
+          membership={m}
+          onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
+          active={m.organizationId === activeId}
+        />
+      ))}
     </>
   );
 }
@@ -949,7 +928,6 @@ function OrganizationSection() {
             <OrganizationListLoadingRow />
           ) : (
             <>
-              <ActiveMembershipRow />
               <PersonalRow />
               <MembershipRows />
               <PendingRows />

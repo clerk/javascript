@@ -166,8 +166,8 @@ describe('OrganizationSwitcher', () => {
     await openWithList();
 
     expect(reading('Personal account', 'Acme', 'Other', 'Create organization')).toEqual([
-      'Acme',
       'Personal account',
+      'Acme',
       'Other',
       'Create organization',
     ]);

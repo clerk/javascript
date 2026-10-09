@@ -683,18 +683,18 @@ describe('UserButton', () => {
     expect(await screen.findByRole('button', { name: 'Org 15' })).toBeInTheDocument();
   });
 
-  it('leads with the active organization before the page holding it has loaded, and lists it once', async () => {
+  it('lists the active organization where its page puts it, and lists it once', async () => {
     const many = Array.from({ length: 15 }, (_, i) => fapiOrganization({ id: `org_p${i + 1}`, name: `Org ${i + 1}` }));
     await renderUserButton({}, signedIn({ memberships: [...many.map(o => fapiMembership(o)), fapiMembership(acme)] }));
     await open();
 
     const last = await screen.findByRole('button', { name: 'Org 9' });
-    expect(reading('Acme', 'Personal account', 'Org 1')).toEqual(['Acme', 'Personal account', 'Org 1']);
+    expect(reading('Acme', 'Personal account', 'Org 1')).toEqual(['Personal account', 'Org 1']);
 
     last.scrollIntoView();
     await screen.findByRole('button', { name: 'Org 15' });
 
-    expect(reading('Acme', 'Personal account', 'Org 15')).toEqual(['Acme', 'Personal account', 'Org 15']);
+    expect(reading('Acme', 'Personal account', 'Org 15')).toEqual(['Personal account', 'Org 15', 'Acme']);
   });
 
   describe('in user mode', () => {
@@ -889,14 +889,14 @@ describe('UserButton', () => {
   });
 
   describe('the organization list', () => {
-    it('lists the active organization first, then the rest held, then the invitations, then the suggestions', async () => {
-      await renderUserButton();
+    it('lists the organizations held in the order they come, then the invitations, then the suggestions', async () => {
+      await renderUserButton({}, signedIn({ memberships: [fapiMembership(other), fapiMembership(acme)] }));
       await openWithList();
 
       expect(reading('Gamma', 'Beta', 'Personal account', 'Acme', 'Other')).toEqual([
-        'Acme',
         'Personal account',
         'Other',
+        'Acme',
         'Gamma',
         'Beta',
       ]);
@@ -954,8 +954,8 @@ describe('UserButton', () => {
       await openWithList();
 
       expect(reading('Gamma', 'Beta', 'Personal account', 'Acme', 'Other')).toEqual([
-        'Acme',
         'Personal account',
+        'Acme',
         'Other',
       ]);
     });
