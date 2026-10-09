@@ -1,5 +1,5 @@
 import { defineConfig } from '../presets/platformApplication.js';
-import { setup } from './with-email-codes.js';
+import { setupOAuthProvider } from '../presets/setupOAuthProvider.js';
 
 export default defineConfig({
   config: {
@@ -20,5 +20,5 @@ export default defineConfig({
       },
     },
   },
-  setup: context => setup(context, false),
+  setup: context => setupOAuthProvider(context, { consentScreenEnabled: false }),
 });
