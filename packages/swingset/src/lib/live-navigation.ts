@@ -10,6 +10,8 @@ type LiveSidebarGroup = {
 };
 
 const liveRoutes = new Map([
+  ['/user-profile/user-profile-profile-panel', '/live/account'],
+  ['/user-profile/user-profile-security-panel', '/live/security'],
   ['/user-profile/user-profile-api-keys-panel', '/live/api-keys'],
   ['/user-profile/user-profile-profile-section', '/live/profile'],
   ['/user-profile/user-profile-email-section', '/live/email'],
@@ -22,9 +24,11 @@ const liveRoutes = new Map([
   ['/user-profile/user-profile-danger-section', '/live/user-danger'],
   ['/organization-profile/organization-profile-general-panel', '/live/organization-general'],
   ['/organization-profile/organization-profile-members-panel', '/live/organization-members'],
+  ['/organization-profile/organization-profile-api-keys-panel', '/live/organization-api-keys'],
   ['/organization-profile/organization-profile-danger-section', '/live/organization-danger'],
   ['/user-profile/user-profile-passkeys-section', '/live/passkeys'],
   ['/user-profile/user-profile-web3wallets-section', '/live/web3-wallets'],
+  ['/api-keys/api-keys-table', '/live/api-keys-table'],
   ['/reverification/reverification', '/live/reverification'],
 ]);
 
