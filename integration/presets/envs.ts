@@ -1,11 +1,10 @@
 import { createHash } from 'node:crypto';
-import { open } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { retry } from '@clerk/shared/retry';
 import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import fs from 'fs-extra';
+import lockfile from 'proper-lockfile';
 
 import { constants } from '../constants';
 import type { EnvironmentConfig } from '../models/environment';
@@ -73,11 +72,10 @@ const getPlatformApplication = async (
   }
 
   await fs.ensureDir(platformApplicationCacheDir);
-  const lockPath = `${cachePath}.lock`;
-  const startedAt = Date.now();
-  const lock = await retry(() => open(lockPath, 'wx', 0o600), {
-    maxDelayBetweenRetries: 1000,
-    shouldRetry: error => (error as NodeJS.ErrnoException).code === 'EEXIST' && Date.now() - startedAt < 120_000,
+  const release = await lockfile.lock(cachePath, {
+    realpath: false,
+    stale: 30_000,
+    retries: { retries: 120, factor: 1, minTimeout: 1000, maxTimeout: 1000 },
   });
 
   try {
@@ -96,8 +94,7 @@ const getPlatformApplication = async (
     console.log(`Created Platform API application ${application.applicationId} for ${keyName}.`);
     return application;
   } finally {
-    await lock.close();
-    await fs.remove(lockPath);
+    await release();
   }
 };
 
