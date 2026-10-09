@@ -243,6 +243,10 @@ A swap while open plays out-then-in rather than overlapping: the old message fad
 `fast`, and the new one's entrance delay holds it until that is done, while the row
 eases between the two heights on `--cl-ease-enter`.
 
+`Section.CollapsibleDescription` is the same recipe for a row's description line (the
+connected account identifier, the wallet address), with the gap var set to
+`Section.Content`'s.
+
 ### The fade on the clipped edge
 
 A mask on the wrapper, not an element: it needs no background color, works on any

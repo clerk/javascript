@@ -146,6 +146,14 @@ export const styles = stylex.create({
     overflowWrap: 'anywhere',
     textWrap: 'balance',
   },
+  collapsibleDescription: {
+    '--_cl-feedback-gap': space['0.5'],
+    gridTemplateRows: 'max-content',
+  },
+  collapsibleDescriptionText: {
+    display: 'block',
+    textWrap: null,
+  },
   actions: {
     alignItems: 'center',
     display: 'grid',
