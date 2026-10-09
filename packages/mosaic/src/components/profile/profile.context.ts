@@ -2,6 +2,8 @@ import React from 'react';
 
 export type ProfileNavLayout = 'column' | 'select' | 'sheet';
 
+export type ProfileDismiss = 'back' | 'corner' | 'none';
+
 export interface ProfileContextValue {
   titleId: string;
   renderBranding: boolean;
@@ -18,7 +20,7 @@ export interface ProfileContextValue {
   pageTitleRef: React.MutableRefObject<HTMLHeadingElement | null>;
   navTriggerRef: React.MutableRefObject<HTMLButtonElement | null>;
   inline: boolean;
-  fullscreen: boolean;
+  dismiss: ProfileDismiss;
 }
 
 export const ProfileContext = React.createContext<ProfileContextValue | null>(null);

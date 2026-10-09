@@ -20,7 +20,6 @@ import {
   backdropMotion,
   closeInsets,
   compactPlacements,
-  fullscreenPopup,
   popupMotion,
   styles,
   trackCompactPlacements,
@@ -38,10 +37,10 @@ import { guardKeyboardTouch } from './keyboard-touch';
  * viewport. Not a `size`, because these are different surfaces rather than one surface at two
  * widths — a second card width would be a size of the `card` variant.
  */
-export type DialogVariant = keyof typeof variants | 'fullscreen';
+export type DialogVariant = keyof typeof variants;
 
-function surfaceOf(variant: DialogVariant): keyof typeof variants {
-  return variant === 'fullscreen' ? 'profile' : variant;
+function holdsProfile(variant: DialogVariant): boolean {
+  return variant !== 'card';
 }
 
 /**
@@ -228,7 +227,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
   const variant = surface?.variant ?? 'card';
   useCloseButtonWarning(role === 'alertdialog');
   return (
-    <span {...stylex.props(styles.closeButton, closeInsets[surfaceOf(variant)])}>
+    <span {...stylex.props(styles.closeButton, closeInsets[variant])}>
       <Primitive.Close
         ref={ref}
         aria-label={ariaLabel}
@@ -259,12 +258,7 @@ function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boole
         themeProps('dialog-backdrop'),
         // All in one `stylex.props` call so a later `backgroundColor` replaces the one in
         // `backdrop` outright — across two calls both would emit and the cascade would decide.
-        stylex.props(
-          reset.base,
-          styles.backdrop,
-          stacked && styles.backdropStacked,
-          backdropMotion[surfaceOf(variant)],
-        ),
+        stylex.props(reset.base, styles.backdrop, stacked && styles.backdropStacked, backdropMotion[variant]),
       )}
     />
   );
@@ -299,7 +293,7 @@ function Viewport({
         stylex.props(
           reset.base,
           styles.viewport,
-          viewportVariants[surfaceOf(variant)],
+          viewportVariants[variant],
           viewportCompactPlacements[compactPlacement],
         ),
       )}
@@ -307,13 +301,7 @@ function Viewport({
       <div
         {...mergeStyleProps(
           themeProps('dialog-track', { variant }),
-          stylex.props(
-            reset.base,
-            styles.track,
-            trackVariants[surfaceOf(variant)],
-            variant === 'fullscreen' && trackVariants.fullscreen,
-            trackCompactPlacements[compactPlacement],
-          ),
+          stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
         ref={trackRef}
       >
@@ -333,7 +321,7 @@ function Viewport({
  */
 function useNestedVariantWarning(isNestedInDialog: boolean, variant: DialogVariant) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || surfaceOf(variant) !== 'profile') {
+    if (process.env.NODE_ENV === 'production' || !isNestedInDialog || !holdsProfile(variant)) {
       return;
     }
     console.warn(
@@ -352,7 +340,7 @@ function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCom
   React.useEffect(() => {
     if (
       process.env.NODE_ENV === 'production' ||
-      surfaceOf(variant) !== 'profile' ||
+      !holdsProfile(variant) ||
       placement === undefined ||
       placement === 'center'
     ) {
@@ -380,8 +368,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
   const isAlert = role === 'alertdialog';
   // A profile has its own compact-band treatment and takes no placement; the warning says so.
-  const compactPlacement: DialogCompactPlacement =
-    surfaceOf(variant) === 'profile' ? 'center' : (compactPlacementProp ?? 'sheet');
+  const compactPlacement: DialogCompactPlacement = holdsProfile(variant) ? 'center' : (compactPlacementProp ?? 'sheet');
   useCompactPlacementWarning(variant, compactPlacementProp);
   useNestedVariantWarning(isNestedInDialog, variant);
 
@@ -392,7 +379,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
-  useAccessibleNameWarning(node, 'Dialog', surfaceOf(variant) === 'profile' ? 'Profile.Title' : 'Card.Title');
+  useAccessibleNameWarning(node, 'Dialog', holdsProfile(variant) ? 'Profile.Title' : 'Card.Title');
   // A name alone is enough for an ordinary dialog; an alert is announced as an interruption and
   // its description is what says which decision is being asked for.
   useAccessibleDescriptionWarning(isAlert ? node : null, 'Dialog', 'Card.Description');
@@ -420,13 +407,12 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
           stylex.props(
             reset.base,
             styles.popup,
-            variants[surfaceOf(variant)],
-            variant === 'fullscreen' && fullscreenPopup.fill,
+            variants[variant],
             compactPlacements[compactPlacement],
             // One cell per (variant, placement) that exists, selected rather than layered: StyleX
             // dedupes by PROPERTY across a `stylex.props` call, so a thin "sheet only" atom would
             // replace the centered cell's `transform` wholesale and take the desktop scale with it.
-            compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[surfaceOf(variant)],
+            compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[variant],
             xstyle,
           ),
           rest,
@@ -455,9 +441,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   );
 
   return (
-    <Primitive.Portal>
-      {surfaceOf(variant) === 'profile' ? <ToastProvider>{viewport}</ToastProvider> : viewport}
-    </Primitive.Portal>
+    <Primitive.Portal>{holdsProfile(variant) ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
   );
 });
 
