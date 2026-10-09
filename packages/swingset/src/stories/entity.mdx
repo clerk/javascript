@@ -1,0 +1,86 @@
+import * as EntityStories from './entity.stories';
+
+# Entity
+
+Entity shows a person or organization as media, a label and a description, such as a member in a table cell. It's composed from parts via dot syntax (`Entity.Root`, `Entity.Media`, `Entity.Content`, `Entity.Label`, `Entity.Description`). It has no padding and no fixed height, so it sizes to its content and sits flush inside its container.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={EntityStories}
+/>
+
+### With badge
+
+Elements inside `Entity.Label`, such as a `Badge`, sit beside the name.
+
+<Story
+  name='WithBadge'
+  storyModule={EntityStories}
+/>
+
+### Label only
+
+<Story
+  name='LabelOnly'
+  storyModule={EntityStories}
+/>
+
+### Truncation
+
+the label text and the description each truncate to a single line. A badge in the label stays whole.
+
+<Story
+  name='Truncation'
+  storyModule={EntityStories}
+/>
+
+## Usage
+
+```tsx
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Badge } from '@clerk/mosaic/components/badge';
+import { Entity } from '@clerk/mosaic/components/entity';
+
+<Entity.Root>
+  <Entity.Media>
+    <Avatar.Root size='fit'>
+      <Avatar.Image src={member.imageUrl} alt='' />
+      <Avatar.Fallback />
+    </Avatar.Root>
+  </Entity.Media>
+  <Entity.Content>
+    <Entity.Label>
+      {member.name}
+      <Badge>You</Badge>
+    </Entity.Label>
+    <Entity.Description>{member.email}</Entity.Description>
+  </Entity.Content>
+</Entity.Root>;
+```
+
+Give `Entity.Media` a child that fills it, such as an `Avatar.Root` with `size='fit'`.
+
+## Parts
+
+| Part                 | Class                   | Description                                                           |
+| -------------------- | ----------------------- | --------------------------------------------------------------------- |
+| `Entity.Root`        | `cl-entity`             | Root row. Renders a `<div>`.                                          |
+| `Entity.Media`       | `cl-entity-media`       | 38px square leading column that centers its child.                    |
+| `Entity.Content`     | `cl-entity-content`     | Vertical stack that fills the row beside the media.                   |
+| `Entity.Label`       | `cl-entity-label`       | The entity's name. Its text truncates; elements beside it stay whole. |
+| `Entity.Description` | `cl-entity-description` | Secondary text beneath the label. Truncates to a single line.         |
+
+Every part accepts a `render` prop for element polymorphism and forwards a ref.
+
+## Styling
+
+Each part carries its `.cl-entity-*` class and reflects no `data-*` attributes. Colors, type and spacing resolve from the Mosaic tokens (`--cl-color-foreground`, `--cl-color-foreground-secondary`, `--cl-text-sm-*`, `--cl-text-xs-*`, `--cl-spacing`).
+
+```css
+/* Enlarge the media column */
+.cl-entity-media {
+  width: 3rem;
+}
+```
