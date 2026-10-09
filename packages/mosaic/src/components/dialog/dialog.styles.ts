@@ -314,8 +314,6 @@ const profileViewport = {
  * `profile` fixes the height. Its content NAVIGATES — a settings surface switches sections in
  * place — and a content-driven height would resize the window on every section change, in both
  * directions at once since the viewport centers it. Its width is the surface's own.
- *
- * `fullscreen` is a `profile` with no frame of overlay around it, at every width.
  */
 /**
  * How the viewport behaves when the popup is taller than the screen — the "inside scroll" vs
