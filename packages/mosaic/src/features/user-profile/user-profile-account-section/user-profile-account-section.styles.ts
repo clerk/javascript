@@ -26,12 +26,14 @@ export const styles = stylex.create({
     paddingInline: ring,
     alignContent: 'start',
     display: 'grid',
+    gridColumnStart: '1',
     gridRowEnd: 'span 2',
     gridRowStart: '1',
     maskImage: `linear-gradient(to top, transparent, black calc(${space['4']} - ${ring}))`,
     minHeight: 0,
   },
   contactEmpty: {
+    gridColumnStart: '1',
     gridRowStart: '1',
     opacity: {
       default: 0,
