@@ -344,19 +344,6 @@ export function fapiUser(overrides: Partial<UserJSON> & Pick<UserJSON, 'id'>): U
   };
 }
 
-export function fapiPhoneNumber(
-  overrides: Partial<PhoneNumberJSON> & Pick<PhoneNumberJSON, 'id' | 'phone_number'>,
-): PhoneNumberJSON {
-  return {
-    object: 'phone_number',
-    reserved_for_second_factor: false,
-    default_second_factor: false,
-    linked_to: [],
-    verification: fapiVerification('phone_code', { status: 'verified' }),
-    ...overrides,
-  };
-}
-
 export function fapiEnterpriseAccount(
   overrides: Partial<EnterpriseAccountJSON> & Pick<EnterpriseAccountJSON, 'id'>,
   connection: Partial<EnterpriseAccountConnectionJSON> = {},

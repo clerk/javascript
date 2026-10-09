@@ -21,7 +21,7 @@ import { setupWorker } from 'msw/browser';
 import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
 import { createMfaState, type FakeMfaState, mfaHandlers } from './fake-fapi/mfa';
 import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
-import { envelope, error, findSession, missing, updateUser } from './fake-fapi/shared';
+import { envelope, error, findSession, missing, updateUser, VERIFICATION_CODE } from './fake-fapi/shared';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -208,7 +208,7 @@ function rejected(code: string, message: string) {
   return HttpResponse.json({ errors: [{ code, message, long_message: message }] }, { status: 400 });
 }
 
-export const VERIFICATION_CODE = '424242';
+export { VERIFICATION_CODE } from './fake-fapi/shared';
 export const PROFILE_IMAGE_URL = 'https://img.clerk.com/uploaded.png';
 
 const USER_FIELDS = [

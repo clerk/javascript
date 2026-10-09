@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
 import { fapiUrl, serveFapi } from './fake-fapi';
-import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from './fapi';
+import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser, fapiVerification } from './fapi';
 
 describe('fake FAPI MFA session routing', () => {
   it('updates the requested user across their sessions without changing the active user', async () => {
     const requestedUser = fapiUser({
       id: 'user_2',
-      phone_numbers: [fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202' })],
+      phone_numbers: [
+        fapiPhoneNumber({
+          id: 'phone_2',
+          phone_number: '+15555550202',
+          verification: fapiVerification('phone_code', { status: 'verified' }),
+        }),
+      ],
     });
     const fapi = serveFapi({
       client: fapiClient([

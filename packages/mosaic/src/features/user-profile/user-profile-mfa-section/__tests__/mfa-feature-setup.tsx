@@ -5,11 +5,16 @@ import {
   fapiPhoneNumber,
   fapiSession,
   fapiUser,
+  fapiVerification,
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileMfaSection } from '../user-profile-mfa-section';
 
-export const phone = fapiPhoneNumber({ id: 'phone_1', phone_number: '+15555550101' });
+export const phone = fapiPhoneNumber({
+  id: 'phone_1',
+  phone_number: '+15555550101',
+  verification: fapiVerification('phone_code', { status: 'verified' }),
+});
 
 export function mfaEnvironment() {
   const environment = fapiEnvironment();

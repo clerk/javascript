@@ -2,7 +2,7 @@ import type { ClientJSON, PhoneNumberJSON, UserJSON } from '@clerk/shared/types'
 import { http, HttpResponse } from 'msw';
 
 import { type FapiEnvironment, fapiPhoneNumber, fapiVerification } from '../fapi';
-import { envelope, missing, requestUser, updateUser } from './shared';
+import { envelope, missing, requestUser, updateUser, VERIFICATION_CODE } from './shared';
 
 export interface FakeMfaState {
   totpCreations: number;
@@ -39,7 +39,7 @@ export function mfaHandlers(
     state.environment.user_settings.attributes.backup_code.used_for_second_factor;
   const usableFactors = (user: UserJSON) =>
     Number(user.totp_enabled) +
-    user.phone_numbers.filter(phone => phone.reserved_for_second_factor && phone.verification.status === 'verified')
+    user.phone_numbers.filter(phone => phone.reserved_for_second_factor && phone.verification?.status === 'verified')
       .length;
   const error = (code: string, message: string, status = 400) =>
     HttpResponse.json({ errors: [{ code, message, long_message: message }] }, { status });
@@ -213,11 +213,8 @@ export function mfaHandlers(
       const id = String(params.id);
       const code = new URLSearchParams(await request.text()).get('code') ?? '';
       state.mfa.phoneAttempts.push({ id, code });
-      if (code !== '123456') {
-        return HttpResponse.json(
-          { errors: [{ code: 'form_code_incorrect', message: 'Incorrect code' }] },
-          { status: 422 },
-        );
+      if (code !== VERIFICATION_CODE) {
+        return error('form_code_incorrect', 'Incorrect code');
       }
       const phone = updatePhone(currentUser, id, current => ({
         ...current,
@@ -241,7 +238,7 @@ export function mfaHandlers(
       if (!user || !existingPhone) {
         return missing();
       }
-      if (reserved === true && existingPhone.verification.status !== 'verified') {
+      if (reserved === true && existingPhone.verification?.status !== 'verified') {
         return error(
           'identification_update_second_factor_unverified',
           'Cannot update second factor attributes for unverified identification',

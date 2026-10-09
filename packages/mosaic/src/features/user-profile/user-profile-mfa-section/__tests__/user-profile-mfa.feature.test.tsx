@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import { fapiUrl, holdRequests, serveFapi, VERIFICATION_CODE, worker } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -34,6 +34,7 @@ describe('User profile MFA', () => {
 
   it('shows enrolled methods with the default SMS phone first', async () => {
     const second = fapiPhoneNumber({
+      ...phone,
       id: 'phone_2',
       phone_number: '+15555550202',
       reserved_for_second_factor: true,
@@ -56,7 +57,12 @@ describe('User profile MFA', () => {
 
   it('hides set-as-default while an authenticator is enrolled', async () => {
     const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
-    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+    const second = fapiPhoneNumber({
+      ...phone,
+      id: 'phone_2',
+      phone_number: '+15555550202',
+      reserved_for_second_factor: true,
+    });
     await renderMfa(
       fapiUser({ id: 'user_1', phone_numbers: [first, second], totp_enabled: true, two_factor_enabled: true }),
     );
@@ -219,9 +225,9 @@ describe('User profile MFA', () => {
     expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
     expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
     expect(fapi.mfa.phoneUpdates).toEqual([]);
-    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), VERIFICATION_CODE);
     expect(await screen.findByText('CODE0001')).toBeVisible();
-    expect(fapi.mfa.phoneAttempts).toEqual([{ id: 'phone_1', code: '123456' }]);
+    expect(fapi.mfa.phoneAttempts).toEqual([{ id: 'phone_1', code: VERIFICATION_CODE }]);
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: true, default: undefined });
   });
 
@@ -270,9 +276,9 @@ describe('User profile MFA', () => {
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /SMS verification/ }));
     await user.click(screen.getByRole('button', { name: 'Continue' }));
-    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+    await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), VERIFICATION_CODE);
     await waitFor(() => expect(screen.getByText('Reservation failed')).toBeVisible());
-    expect(fapi.mfa.phoneAttempts).toEqual([{ id: 'phone_1', code: '123456' }]);
+    expect(fapi.mfa.phoneAttempts).toEqual([{ id: 'phone_1', code: VERIFICATION_CODE }]);
     await user.click(screen.getByRole('button', { name: 'Verify' }));
     await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
     expect(reservations).toBe(2);
@@ -450,7 +456,7 @@ describe('User profile MFA', () => {
     expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
     expect(fapi.mfa.phoneCreations).toEqual(['+15555550303', '+15555550404']);
     expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
-    await user.type(screen.getByRole('textbox', { name: 'Verification code' }), '123456');
+    await user.type(screen.getByRole('textbox', { name: 'Verification code' }), VERIFICATION_CODE);
     expect(await screen.findByText('CODE0001')).toBeVisible();
     expect(fapi.mfa.phoneUpdates).toEqual([{ id: 'phone_1', reserved: true, default: undefined }]);
   });

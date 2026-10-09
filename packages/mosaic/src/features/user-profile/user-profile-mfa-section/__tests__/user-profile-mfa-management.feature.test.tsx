@@ -48,7 +48,12 @@ describe('User profile MFA management', () => {
     { cause: 'network failure', message: 'Unable to set this method as default. Please try again.' },
   ])('shows a safe default-change error for $message', async ({ cause, message }) => {
     const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
-    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+    const second = fapiPhoneNumber({
+      ...phone,
+      id: 'phone_2',
+      phone_number: '+15555550202',
+      reserved_for_second_factor: true,
+    });
     serveFapi({
       environment: mfaEnvironment(),
       client: fapiClient([
@@ -371,7 +376,12 @@ describe('User profile MFA management', () => {
 
   it('sets a different SMS phone as default and moves its row first', async () => {
     const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
-    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+    const second = fapiPhoneNumber({
+      ...phone,
+      id: 'phone_2',
+      phone_number: '+15555550202',
+      reserved_for_second_factor: true,
+    });
     const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
@@ -389,7 +399,12 @@ describe('User profile MFA management', () => {
 
   it('shows a failed default change and clears its error on retry', async () => {
     const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
-    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+    const second = fapiPhoneNumber({
+      ...phone,
+      id: 'phone_2',
+      phone_number: '+15555550202',
+      reserved_for_second_factor: true,
+    });
     const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
     let attempts = 0;
     worker.use(
@@ -432,7 +447,12 @@ describe('User profile MFA management', () => {
     'keeps method menus available but hides default changes during $phase',
     async ({ method, path, pendingPhone }) => {
       const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
-      const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+      const second = fapiPhoneNumber({
+        ...phone,
+        id: 'phone_2',
+        phone_number: '+15555550202',
+        reserved_for_second_factor: true,
+      });
       await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
       const held = holdRequests(method, path);
       const user = userEvent.setup();
