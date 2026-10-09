@@ -26,9 +26,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
 
-    const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
-    const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
-    const apiUrl = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_API_URL');
+    const env = app.env;
+    const publishableKey = env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+    const secretKey = env.privateVariables.get('CLERK_SECRET_KEY');
+    const apiUrl = env.privateVariables.get('CLERK_API_URL');
     const { frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
 
     await clerkSetup({
