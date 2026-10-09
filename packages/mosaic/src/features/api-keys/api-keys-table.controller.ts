@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useNow } from '../../hooks/use-now';
 import { useLocale } from '../../localization';
-import { formatDate, formatRelativeTime } from './api-keys-table.format';
+import { formatDate } from '../../utils/format-date';
+import { formatRelativeTime } from './api-keys-table.format';
 import { useAPIKeysTableModel } from './api-keys-table.model';
 import type { APIKey, APIKeyRecord, APIKeysTableMessages } from './api-keys-table.types';
 import { useCreateAPIKeyController } from './create-api-key.controller';

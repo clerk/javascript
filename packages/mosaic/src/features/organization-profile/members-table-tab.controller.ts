@@ -6,7 +6,7 @@ import { useLocale, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
-import { formatDate } from '../api-keys/api-keys-table.format';
+import { formatDate } from '../../utils/format-date';
 import type { useMembersTableModel } from './members-table-tab.model';
 import type { MembersRoles } from './members-table-tab.types';
 

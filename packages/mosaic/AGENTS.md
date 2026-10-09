@@ -42,6 +42,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Moving focus after a list row is removed                                | `useListRemovalFocus` (`src/hooks/`)                                                                          |
 | A debounced, abortable async check as the user types                    | `useDebouncedAsync` (`src/hooks/`)                                                                            |
 | A spinner that should not flash or flicker                              | `useSpinDelay` (`src/hooks/`)                                                                                 |
+| A date shown to the user                                                | `formatDate` (`src/utils/format-date.ts`)                                                                     |
 | Current time for display labels                                         | `useNow` + `MosaicProvider` ([#10098](https://github.com/clerk/javascript/pull/10098), once available)        |
 | Whether enterprise SSO permits adding another identification            | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                |
 | An inline message row that animates open and closed                     | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `styles/feedback.styles.ts` |
