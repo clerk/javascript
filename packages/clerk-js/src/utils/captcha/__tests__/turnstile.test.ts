@@ -51,8 +51,10 @@ describe('getTurnstileToken — invisible flow', () => {
 
     expect(result).toEqual({ captchaToken: 'mock_token', captchaWidgetType: 'invisible' });
 
-    // The invisible flow targets its own `.clerk-invisible-captcha` div with the invisible key.
-    expect((window as any).turnstile.render).toHaveBeenCalledWith(`.${CAPTCHA_INVISIBLE_CLASSNAME}`, expect.anything());
+    // The invisible flow targets a per-instance container (id starts with `clerk-invisible-captcha-`)
+    // and uses the invisible key. Per-instance ids prevent concurrent challenges from colliding.
+    const renderCall = (window as any).turnstile.render.mock.calls[0];
+    expect(renderCall[0]).toMatch(new RegExp(`^#${CAPTCHA_INVISIBLE_CLASSNAME}-`));
     expect(renderConfig?.sitekey).toBe('invisible-key');
 
     // The spotlight signal on #clerk-captcha is untouched throughout → no spotlight.
