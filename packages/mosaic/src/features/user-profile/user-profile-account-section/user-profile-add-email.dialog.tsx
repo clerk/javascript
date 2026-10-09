@@ -225,7 +225,7 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
       >
         <Field.Root
           required
-          disabled={props.isPending}
+          disabled={props.isPending || props.isResending}
           focusableWhenDisabled
           invalid={Boolean(props.errorMessage)}
         >
