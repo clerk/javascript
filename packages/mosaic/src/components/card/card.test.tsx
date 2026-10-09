@@ -83,6 +83,45 @@ function SteppedDialog({ step }: { step: string }) {
   );
 }
 
+function NestedSteppedDialog({ step }: { step: string }) {
+  return (
+    <Dialog.Root defaultOpen>
+      <Dialog.Popup>
+        <Flow.Root
+          value={step}
+          state={null}
+        >
+          {() => (
+            <>
+              <Flow.Step ids={['sms']}>
+                <Flow.Root
+                  value='phone'
+                  state={null}
+                >
+                  {() => (
+                    <Flow.Step ids={['phone']}>
+                      <StepCard
+                        title='Set up SMS verification'
+                        description='Enter your phone number.'
+                      />
+                    </Flow.Step>
+                  )}
+                </Flow.Root>
+              </Flow.Step>
+              <Flow.Step ids={['backup']}>
+                <StepCard
+                  title='Save your backup codes'
+                  description='Store them somewhere safe.'
+                />
+              </Flow.Step>
+            </>
+          )}
+        </Flow.Root>
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
 function holdExitAnimations() {
   let finish = () => undefined as void;
   const finished = new Promise<void>(resolve => {
@@ -554,6 +593,21 @@ describe('Mosaic Card', () => {
     await finishExit();
     expect(screen.queryByText('Add new API key')).toBeNull();
     expect(popup).toHaveAccessibleName('Copy your API key');
+  });
+
+  it('names the dialog after the entering step when the exiting step holds a nested flow', async () => {
+    const finishExit = holdExitAnimations();
+    const { rerender } = render(<NestedSteppedDialog step='sms' />);
+
+    rerender(<NestedSteppedDialog step='backup' />);
+
+    const popup = screen.getByRole('dialog');
+    expect(screen.getByText('Set up SMS verification')).toBeInTheDocument();
+    expect(popup).toHaveAccessibleName('Save your backup codes');
+    expect(popup).toHaveAccessibleDescription('Store them somewhere safe.');
+    expectSingleOwner(popup);
+
+    await finishExit();
   });
 
   it('names the dialog after the returning step when it comes back mid-exit', async () => {

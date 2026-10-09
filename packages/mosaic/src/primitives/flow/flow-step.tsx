@@ -6,7 +6,7 @@ import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { useFlowContext } from './flow-context';
-import { FlowStepContext, type FlowStepContextValue } from './flow-step-context';
+import { FlowStepContext, type FlowStepContextValue, useFlowStepActive } from './flow-step-context';
 
 export interface FlowStepProps extends ComponentProps<'div'> {
   ids: readonly string[];
@@ -29,6 +29,7 @@ function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | nu
 
 export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(props, forwardedRef) {
   const { render, ids, children, ...otherProps } = props;
+  const parentActive = useFlowStepActive();
   const {
     value,
     direction,
@@ -98,8 +99,8 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     focusTargetsRef.current.delete(element);
   }, []);
   const stepContext = useMemo<FlowStepContextValue>(
-    () => ({ active: open, registerFocusTarget, unregisterFocusTarget }),
-    [open, registerFocusTarget, unregisterFocusTarget],
+    () => ({ active: open && parentActive, registerFocusTarget, unregisterFocusTarget }),
+    [open, parentActive, registerFocusTarget, unregisterFocusTarget],
   );
 
   const effectiveTransitionProps = !hasBeenClosed.current

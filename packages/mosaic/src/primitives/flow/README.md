@@ -76,7 +76,7 @@ Focus moves only for a step that transitions in; the initially active step is le
 | `data-starting-style` | Present for the incoming step's initial animation frame  |
 | `data-ending-style`   | Present while the outgoing step's animation is finishing |
 
-The initially active step does not receive `data-starting-style`. An exiting step is inert, hidden from the accessibility tree, and retains the content from its last active render until it unmounts. `useFlowStepActive()` returns `false` inside an exiting step and `true` everywhere else, so content can give up an id it shares with the incoming step, as `Card.Title` does with the dialog's label.
+The initially active step does not receive `data-starting-style`. An exiting step is inert, hidden from the accessibility tree, and retains the content from its last active render until it unmounts. `useFlowStepActive()` returns `false` inside an exiting step, including inside any flow nested in it, and `true` everywhere else, so content can give up an id it shares with the incoming step, as `Card.Title` does with the dialog's label.
 
 `Flow.Root` carries `data-initial` through the first measured frame. Styled adapters can use it to disable viewport transitions so the initial step never animates.
 
