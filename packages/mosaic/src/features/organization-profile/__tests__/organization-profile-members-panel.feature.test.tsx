@@ -1,7 +1,7 @@
 import type { RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiMembership, fapiOrganization, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
@@ -127,25 +127,34 @@ describe('OrganizationProfileMembersPanel', () => {
     await waitFor(() => expect(screen.queryByText('Bob Smith')).toBeNull());
   });
 
-  it('keeps members visible when roles fail and restores editing after retry', async () => {
+  it('keeps members visible without a roles notice when roles fail', async () => {
     serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
-    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const { clerk, rerender } = await renderWithClerk(<div />);
+    const activeOrganization = clerk.organization;
+    if (!activeOrganization) {
+      throw new Error('Expected an active organization');
+    }
+    const getRoles = vi.spyOn(activeOrganization, 'getRoles');
+    rerender(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(roles.requests).toHaveLength(1));
     roles.fail('roles_unavailable', 'Roles unavailable');
+    await act(async () => {
+      await expect(getRoles.mock.results[0]?.value).rejects.toThrow();
+    });
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-    await waitFor(() => expect(screen.getByText(/Roles are unavailable/)).toBeVisible(), { timeout: 12_000 });
     expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
-    serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
-  }, 20_000);
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+    expect(getRoles).toHaveBeenCalledTimes(1);
+  });
 
   it('warns about role migration while retaining removal', async () => {
     const fapi = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     fapi.hasRoleSetMigration = true;
     await renderWithClerk(<OrganizationProfileMembersPanel />);
-    expect(await screen.findByText(/role migration is in progress/)).toBeVisible();
+    const migration = await screen.findByText(/role migration is in progress/);
+    expect(migration.closest('[role="status"]')).toHaveAttribute('data-color', 'warning');
     expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeVisible();
   });
@@ -308,6 +317,7 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeDisabled();
     update.fail('role_rejected', 'Role rejected by server');
     expect(await screen.findByRole('alert')).toHaveTextContent('Role rejected by server');
+    expect(screen.getByRole('alert')).toHaveAttribute('data-color', 'negative');
     const retry = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     await user.click(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ }));
     await user.click(await screen.findByRole('option', { name: 'Admin' }));

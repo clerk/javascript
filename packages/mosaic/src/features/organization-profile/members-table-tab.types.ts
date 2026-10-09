@@ -32,8 +32,6 @@ export interface MembersTableTabViewProps {
   isFetching?: boolean;
   isError?: boolean;
   onRetry?: () => void;
-  isRolesError?: boolean;
-  onRetryRoles?: () => void;
   hasRoleSetMigration?: boolean;
   isChangingRole?: boolean;
   roleError?: string;

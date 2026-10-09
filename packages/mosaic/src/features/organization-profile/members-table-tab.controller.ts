@@ -15,9 +15,7 @@ interface RolesContext {
   result: MembersRoles | null;
 }
 
-type RolesEvent = { type: 'RETRY' };
-
-const { createMachine, assign, fromPromise } = setup<RolesContext, RolesEvent>();
+const { createMachine, assign, fromPromise } = setup<RolesContext, never>();
 
 const rolesMachine = createMachine({
   id: 'membersRoles',
@@ -31,11 +29,10 @@ const rolesMachine = createMachine({
           target: 'ready',
           actions: assign<DoneInvokeEvent<MembersRoles | null>>((_, event) => ({ result: event.output })),
         },
-        onError: { target: 'failed' },
+        onError: { target: 'unavailable' },
       }),
     },
     ready: {},
-    failed: { on: { RETRY: 'loading' } },
   },
 });
 
@@ -44,7 +41,7 @@ export function useMembersTableController(model: ReturnType<typeof useMembersTab
   const messages = useMessages('membersTableTab');
   const roleNames = useMessages('roles');
   const roleAction = usePendingAction({ errorFallback: messages.roleChangeError });
-  const [rolesState, sendRoles] = useMachine(rolesMachine, { context: { loadRoles: model.loadRoles } });
+  const [rolesState] = useMachine(rolesMachine, { context: { loadRoles: model.loadRoles } });
   const roles = rolesState.value === 'ready' ? rolesState.context.result : null;
 
   return {
@@ -62,8 +59,6 @@ export function useMembersTableController(model: ReturnType<typeof useMembersTab
     isFetching: model.isFetching,
     isError: model.isError,
     onRetry: model.retry,
-    isRolesError: rolesState.value === 'failed',
-    onRetryRoles: () => sendRoles({ type: 'RETRY' }),
     hasRoleSetMigration: roles?.hasRoleSetMigration ?? false,
     isChangingRole: roleAction.isPending,
     roleError: roleAction.error,

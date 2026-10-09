@@ -41,31 +41,17 @@ describe('members table role loading', () => {
     expect(model.changeRole).toHaveBeenCalledWith('member_1', 'org:reader', roles);
   });
 
-  it('retries only after failure and ignores repeated retry while loading', async () => {
+  it('keeps role editing unavailable after a failed role load', async () => {
     const first = deferred<MembersRoles>();
-    const second = deferred<MembersRoles>();
-    const model = createModel(
-      vi
-        .fn()
-        .mockImplementationOnce(() => first.promise)
-        .mockImplementationOnce(() => second.promise),
-    );
-    const { result } = renderHook(() => useMembersTableController(model));
+    const model = createModel(vi.fn(() => first.promise));
+    const { result, rerender } = renderHook(() => useMembersTableController(model));
 
-    act(() => result.current.onRetryRoles?.());
     expect(model.loadRoles).toHaveBeenCalledTimes(1);
     await act(() => Promise.resolve(first.reject(new Error('failed'))));
-    expect(result.current.isRolesError).toBe(true);
+    expect(result.current.roles).toEqual([]);
     expect(result.current.onChangeRole).toBeUndefined();
-
-    act(() => result.current.onRetryRoles?.());
-    expect(model.loadRoles).toHaveBeenCalledTimes(2);
-    expect(result.current.isRolesError).toBe(false);
-    act(() => result.current.onRetryRoles?.());
-    expect(model.loadRoles).toHaveBeenCalledTimes(2);
-
-    await act(() => Promise.resolve(second.resolve({ roles: [], hasRoleSetMigration: false })));
-    expect(result.current.isRolesError).toBe(false);
+    rerender();
+    expect(model.loadRoles).toHaveBeenCalledTimes(1);
   });
 
   it('keeps migration roles visible but prevents role changes', async () => {
@@ -103,6 +89,6 @@ describe('members table role loading', () => {
       return Promise.resolve();
     });
     expect(result.current.roles).toEqual([{ value: 'org:new', label: 'New' }]);
-    expect(result.current.isRolesError).toBe(false);
+    expect(result.current.onChangeRole).toBeDefined();
   });
 });

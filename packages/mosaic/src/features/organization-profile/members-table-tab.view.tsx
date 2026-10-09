@@ -5,6 +5,7 @@ import { Confirmation } from '../../blocks/confirmation';
 import { ActionMenu } from '../../components/action-menu';
 import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
+import { Banner } from '../../components/banner';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
@@ -42,8 +43,6 @@ export function MembersTableTabView({
   isFetching = false,
   isError = false,
   onRetry,
-  isRolesError = false,
-  onRetryRoles,
   hasRoleSetMigration = false,
   isChangingRole = false,
   roleError,
@@ -101,8 +100,6 @@ export function MembersTableTabView({
         </Table.Toolbar>
         <MembersTableNotices
           hasRoleSetMigration={hasRoleSetMigration}
-          isRolesError={isRolesError}
-          onRetryRoles={onRetryRoles}
           roleError={roleError}
         />
         <Table.Root
@@ -172,21 +169,27 @@ export function MembersTableTabView({
 
 function MembersTableNotices({
   hasRoleSetMigration,
-  isRolesError,
-  onRetryRoles,
   roleError,
-}: Pick<MembersTableTabViewProps, 'hasRoleSetMigration' | 'isRolesError' | 'onRetryRoles' | 'roleError'>) {
+}: Pick<MembersTableTabViewProps, 'hasRoleSetMigration' | 'roleError'>) {
   const m = useMessages('membersTableTab');
   return (
     <>
-      {/* TODO: Use banners for these notices once banners support actions. */}
-      {hasRoleSetMigration ? <p role='status'>{m.roleSetMigration}</p> : null}
-      {isRolesError ? (
-        <p role='alert'>
-          {m.rolesError} {onRetryRoles ? <Button onClick={onRetryRoles}>{m.retry}</Button> : null}
-        </p>
+      {hasRoleSetMigration ? (
+        <Banner.Root
+          color='warning'
+          role='status'
+        >
+          <Banner.Label>{m.roleSetMigration}</Banner.Label>
+        </Banner.Root>
       ) : null}
-      {roleError ? <p role='alert'>{roleError}</p> : null}
+      {roleError ? (
+        <Banner.Root
+          color='negative'
+          role='alert'
+        >
+          <Banner.Label>{roleError}</Banner.Label>
+        </Banner.Root>
+      ) : null}
     </>
   );
 }

@@ -14,7 +14,6 @@ export const membersTableTabMessages = {
   loading: 'Loading members',
   loadError: 'Unable to load members',
   retry: 'Try again',
-  rolesError: 'Roles are unavailable. Member roles cannot be changed right now.',
   roleChangeError: 'Unable to change this member’s role. Please try again.',
   roleSetMigration: 'Roles cannot be changed while this organization’s role migration is in progress.',
   selectAll: 'Select all members on this page',
