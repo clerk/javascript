@@ -27,7 +27,7 @@ export default function OrganizationGeneralLivePage() {
         {isLoaded && isSignedIn && !organization ? (
           <p className='text-muted-foreground text-sm'>Pick an active organization to see its general panel.</p>
         ) : null}
-        {isLoaded && isSignedIn ? <OrganizationProfileGeneralPanel afterLeaveOrganizationUrl='/live' /> : null}
+        {isLoaded && isSignedIn ? <OrganizationProfileGeneralPanel /> : null}
       </div>
     </MosaicProvider>
   );

@@ -15,12 +15,12 @@ The organization's General page: its details, and the danger zone under them.
 
 ## Usage
 
-`OrganizationProfileGeneralPanel` renders the General title with the organization details and danger zone sections. Each section shows itself only when there is an active organization. `afterLeaveOrganizationUrl` is passed to the default danger zone section.
+`OrganizationProfileGeneralPanel` renders the General title with the organization details and danger zone sections. Each section shows itself only when there is an active organization.
 
 ```tsx
 import { OrganizationProfileGeneralPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel';
 
-<OrganizationProfileGeneralPanel afterLeaveOrganizationUrl='/' />;
+<OrganizationProfileGeneralPanel />;
 ```
 
 Pass sections as children to choose which ones render and in what order.

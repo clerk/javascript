@@ -6,19 +6,15 @@ import { OrganizationProfileProfileSection } from './organization-profile-profil
 
 export interface OrganizationProfileGeneralPanelProps {
   children?: ReactNode;
-  afterLeaveOrganizationUrl?: string;
 }
 
-export function OrganizationProfileGeneralPanel({
-  children,
-  afterLeaveOrganizationUrl,
-}: OrganizationProfileGeneralPanelProps) {
+export function OrganizationProfileGeneralPanel({ children }: OrganizationProfileGeneralPanelProps) {
   return (
     <OrganizationProfileGeneralPanelView>
       {children ?? (
         <>
           <OrganizationProfileProfileSection />
-          <OrganizationProfileDangerSection afterLeaveOrganizationUrl={afterLeaveOrganizationUrl} />
+          <OrganizationProfileDangerSection />
         </>
       )}
     </OrganizationProfileGeneralPanelView>
