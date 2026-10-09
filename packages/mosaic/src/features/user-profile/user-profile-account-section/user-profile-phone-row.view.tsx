@@ -1,24 +1,25 @@
-import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
+import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
+import type { CountryIso } from '../../../components/phone-input';
 import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
-import type { UserProfilePhone } from './user-profile-account-section.types';
-import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
-import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
+import type { UserProfilePhone, UserProfilePhoneVerifier } from './user-profile-account-section.types';
 import { UserProfileAddPhoneDialog } from './user-profile-add-phone.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
+import { useUserProfilePhoneRowController } from './user-profile-phone-row.controller';
 
 export interface UserProfilePhoneRowViewProps {
   phones: UserProfilePhone[];
+  defaultPhoneCountry?: CountryIso;
   allowMultipleAccounts?: boolean;
-  onSendPhoneCode?: (phoneNumber: string) => Promise<void>;
-  onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
+  onCreatePhone?: (phoneNumber: string) => Promise<UserProfilePhoneVerifier>;
+  getPhoneVerifier?: (id: string) => UserProfilePhoneVerifier;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
   onSetPrimaryPhone?: (id: string) => void | Promise<void>;
@@ -27,9 +28,10 @@ export interface UserProfilePhoneRowViewProps {
 
 export function UserProfilePhoneRowView({
   phones,
+  defaultPhoneCountry,
   allowMultipleAccounts = false,
-  onSendPhoneCode,
-  onVerifyPhoneCode,
+  onCreatePhone,
+  getPhoneVerifier,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
@@ -42,56 +44,71 @@ export function UserProfilePhoneRowView({
     onRemove: onRemovePhone,
     fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
   });
-  const addPhoneAction =
-    onSendPhoneCode && onVerifyPhoneCode ? (
-      <AddPhone
-        options={{ onSend: onSendPhoneCode, onVerify: onVerifyPhoneCode }}
-        compact={allowMultipleAccounts}
-      />
-    ) : undefined;
+  const {
+    phones: items,
+    verification,
+    error,
+    onVerify,
+    onSetPrimary,
+  } = useUserProfilePhoneRowController({
+    phones,
+    onCreatePhone,
+    getPhoneVerifier,
+    onVerifyPhone,
+    onSetPrimaryPhone,
+  });
+  const verificationDialog = useMemo(() => Dialog.createHandle(), []);
   const removePhoneConfirmation = useMemo(() => Confirmation.createHandle<UserProfilePhone>(), []);
-  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
-  const [primaryError, setPrimaryError] = useState<string>();
-  const settingPrimary = useRef(false);
+  const verifyingId = useRef<string | undefined>(undefined);
+  const addPhoneAction =
+    verification && onCreatePhone ? (
+      <Dialog.Trigger
+        handle={verificationDialog}
+        render={
+          <Button
+            aria-label={m.phone.add}
+            color='neutral'
+            size='sm'
+            variant='outline'
+          />
+        }
+      >
+        {allowMultipleAccounts ? (
+          <Icon
+            name='plus'
+            placement='inline-start'
+            size='sm'
+          />
+        ) : null}
+        {allowMultipleAccounts ? m.add : m.phone.add}
+      </Dialog.Trigger>
+    ) : undefined;
 
-  const setPrimaryPhone = async (id: string) => {
-    const phone = phones.find(phone => phone.id === id);
-    if (!onSetPrimaryPhone || !phone?.isVerified || phone.isDefault || settingPrimary.current) {
-      return;
-    }
-    settingPrimary.current = true;
-    setIsSettingPrimary(true);
-    setPrimaryError(undefined);
-    try {
-      await onSetPrimaryPhone(id);
-    } catch (error) {
-      setPrimaryError(error instanceof Error ? error.message : m.phone.primaryError);
-    } finally {
-      settingPrimary.current = false;
-      setIsSettingPrimary(false);
-    }
-  };
-
-  const removePhone = (id: string) => {
-    const phone = phones.find(phone => phone.id === id);
-    if (phone && phone.canRemove !== false && onRemovePhone) {
-      removePhoneConfirmation.open(phone);
-    }
-  };
-  const formattedPhones = phones.map(phone => ({
-    ...phone,
-    value: stringToFormattedPhoneString(phone.value),
-  }));
+  const dialog = verification ? (
+    <UserProfileAddPhoneDialog
+      {...verification}
+      defaultCountry={defaultPhoneCountry}
+      handle={verificationDialog}
+      finalFocus={() => {
+        const id = verifyingId.current;
+        verifyingId.current = undefined;
+        return id ? removalFocus.trigger(id) : null;
+      }}
+    />
+  ) : null;
 
   if (!allowMultipleAccounts) {
     return (
-      <UserProfileContactRowView
-        items={formattedPhones}
-        kind='phone'
-        label={m.phone.label}
-        addAction={addPhoneAction}
-        onManage={onManagePhone}
-      />
+      <>
+        <UserProfileContactRowView
+          items={items}
+          kind='phone'
+          label={m.phone.label}
+          addAction={addPhoneAction}
+          onManage={onManagePhone}
+        />
+        {dialog}
+      </>
     );
   }
 
@@ -100,22 +117,32 @@ export function UserProfilePhoneRowView({
       <UserProfileContactListRowView
         rowRef={row}
         triggerRef={removalFocus.registerTrigger}
-        items={formattedPhones}
+        items={items}
         kind='phone'
         label={m.phone.label}
         addAction={addPhoneAction}
-        onRemove={onRemovePhone ? removePhone : undefined}
-        onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
-        onVerify={onVerifyPhone}
+        onRemove={onRemovePhone ? phone => removePhoneConfirmation.open(phone) : undefined}
+        onSetPrimary={onSetPrimary}
+        onVerify={
+          onVerify
+            ? id => {
+                verifyingId.current = id;
+                onVerify(id);
+              }
+            : undefined
+        }
       >
-        <Section.Error>{primaryError}</Section.Error>
+        <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>
+      {dialog}
       {onRemovePhone ? (
         <Confirmation
           handle={removePhoneConfirmation}
           title={m.phone.removeDialog.title}
           description={phone =>
-            fill(m.phone.removeDialog.description, { phoneNumber: stringToFormattedPhoneString(phone.value) })
+            fill(phone.isVerified ? m.phone.removeDialog.verifiedDescription : m.phone.removeDialog.description, {
+              phoneNumber: phone.value,
+            })
           }
           actionLabel={m.phone.removeDialog.confirm}
           cancelLabel={m.phone.removeDialog.cancel}
@@ -124,32 +151,5 @@ export function UserProfilePhoneRowView({
         />
       ) : null}
     </>
-  );
-}
-
-function AddPhone({ options, compact }: { options: UserProfileAddPhoneControllerOptions; compact: boolean }) {
-  const m = useMessages('userProfileAccountSection');
-  const controller = useUserProfileAddPhoneController(options);
-  return (
-    <UserProfileAddPhoneDialog
-      {...controller}
-      trigger={
-        <Button
-          aria-label={m.phone.add}
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {compact ? (
-            <Icon
-              name='plus'
-              placement='inline-start'
-              size='sm'
-            />
-          ) : null}
-          {compact ? m.add : m.phone.add}
-        </Button>
-      }
-    />
   );
 }

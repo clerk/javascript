@@ -1,8 +1,7 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
-import type { LocalizableError } from '../../../localization';
+import { usePendingAction } from '../../../hooks/use-pending-action';
 import { FileUpload } from '../../../primitives/file-upload';
-import { toGlobalError } from '../../../utils/errors';
 
 export interface UserProfilePictureControllerOptions {
   onChange?: (file: File) => Promise<void>;
@@ -10,61 +9,32 @@ export interface UserProfilePictureControllerOptions {
 }
 
 export interface UserProfilePictureController {
-  onChange?: (file: File) => Promise<void>;
-  onRemove?: () => Promise<void>;
+  onChange?: (file: File) => void;
+  onRemove?: () => void;
   isPending: boolean;
   previewUrl: string | undefined;
-  error: LocalizableError | undefined;
+  error: string | undefined;
 }
 
 export function useUserProfilePictureController({
   onChange,
   onRemove,
 }: UserProfilePictureControllerOptions): UserProfilePictureController {
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<LocalizableError>();
-  const [preview, setPreview] = useState<File>();
-  const previewUrl = FileUpload.useObjectUrl(preview);
-  const inFlight = useRef(false);
+  const [picked, setPicked] = useState<File>();
+  const upload = usePendingAction();
+  const previewUrl = FileUpload.useObjectUrl(upload.error ? undefined : picked);
 
-  const run = async (action: () => Promise<void>, revert?: () => void) => {
-    if (inFlight.current) {
-      return;
-    }
-    inFlight.current = true;
-    setIsPending(true);
-    setError(undefined);
-    try {
+  const save = (next: File | undefined, action: () => Promise<void>) =>
+    upload.run('picture', async () => {
+      setPicked(next);
       await action();
-    } catch (cause) {
-      revert?.();
-      setError(toGlobalError(cause));
-    } finally {
-      inFlight.current = false;
-      setIsPending(false);
-    }
-  };
+    });
 
   return {
-    onChange: onChange
-      ? file =>
-          run(
-            () => {
-              setPreview(file);
-              return onChange(file);
-            },
-            () => setPreview(undefined),
-          )
-      : undefined,
-    onRemove: onRemove
-      ? () =>
-          run(async () => {
-            await onRemove();
-            setPreview(undefined);
-          })
-      : undefined,
-    isPending,
+    onChange: onChange ? file => void save(file, () => onChange(file)) : undefined,
+    onRemove: onRemove ? () => void save(undefined, onRemove) : undefined,
+    isPending: upload.isPending,
     previewUrl,
-    error,
+    error: upload.error,
   };
 }

@@ -1,12 +1,9 @@
-import { Button } from '@clerk/mosaic/components/button';
+import type { UserProfileEmailVerification } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
-import { UserProfileVerifyEmailLinkDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
-import { UserProfileVerifyEmailSsoDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
 import type { FormError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
@@ -17,8 +14,6 @@ import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-em
 import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
-import { useUserProfileVerifyEmailLinkFixture } from './fixtures/user-profile-verify-email-link';
-import { useUserProfileVerifyEmailSsoFixture } from './fixtures/user-profile-verify-email-sso';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -34,19 +29,21 @@ export const meta: StoryMeta = {
 
 function AccountSection({
   allowMultipleAccounts,
-  failAt,
+  failPhone,
   failWith,
   usernameFailWith,
   failEmailVerification = false,
+  emailVerificationMethod,
   emailRemovalState,
   phoneRemovalState,
   nameManagedBy,
 }: {
   allowMultipleAccounts: boolean;
-  failAt?: UserProfileAddPhoneDialogProps['step'];
+  failPhone?: 'create' | 'verify';
   failWith?: FormError;
   usernameFailWith?: FormError;
   failEmailVerification?: boolean;
+  emailVerificationMethod?: UserProfileEmailVerification['method'];
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';
   nameManagedBy?: { name: string };
@@ -59,22 +56,27 @@ function AccountSection({
     allowMultipleAccounts
       ? [
           { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
-          { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
+          { id: 'email_2', value: 'item2@clerk.dev', isDefault: false, isVerified: true },
         ]
       : [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
   );
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
-    ...(allowMultipleAccounts ? [{ id: 'phone_2', value: '+18015550100', isVerified: true }] : []),
+    ...(allowMultipleAccounts ? [{ id: 'phone_2', value: '+18015550100', isDefault: false, isVerified: true }] : []),
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addPhone = createUserProfileAddPhoneFixture({
-    failAt,
-    onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+    fail: failPhone,
+    onCreated: (id, value) => setPhones(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
   });
   const emailFlow = createUserProfileAddEmailFixture({
-    failAt: failEmailVerification ? 'verify' : undefined,
-    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+    method: emailVerificationMethod,
+    fail: failEmailVerification ? 'verify' : undefined,
+    onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
   });
 
   return (
@@ -151,69 +153,39 @@ export function AddEmailFails() {
 }
 
 export function EmailLinkVerification() {
-  const fixture = useUserProfileVerifyEmailLinkFixture();
   return (
-    <UserProfileVerifyEmailLinkDialog
-      {...fixture}
-      trigger={
-        <Button
-          variant='outline'
-          color='neutral'
-        >
-          Verify email link
-        </Button>
-      }
+    <AccountSection
+      allowMultipleAccounts
+      emailVerificationMethod='link'
     />
   );
 }
 
-export function EmailLinkResendFails() {
-  const fixture = useUserProfileVerifyEmailLinkFixture({ failResend: true });
+export function EmailLinkFails() {
   return (
-    <UserProfileVerifyEmailLinkDialog
-      {...fixture}
-      trigger={
-        <Button
-          variant='outline'
-          color='neutral'
-        >
-          Verify email link
-        </Button>
-      }
+    <AccountSection
+      allowMultipleAccounts
+      emailVerificationMethod='link'
+      failEmailVerification
     />
   );
 }
 
 export function EmailSsoVerification() {
-  const fixture = useUserProfileVerifyEmailSsoFixture();
   return (
-    <UserProfileVerifyEmailSsoDialog
-      {...fixture}
-      trigger={
-        <Button
-          variant='outline'
-          color='neutral'
-        >
-          Verify with SSO
-        </Button>
-      }
+    <AccountSection
+      allowMultipleAccounts
+      emailVerificationMethod='sso'
     />
   );
 }
 
-export function EmailSsoConnectFails() {
-  const fixture = useUserProfileVerifyEmailSsoFixture({ failConnect: true });
+export function EmailSsoFails() {
   return (
-    <UserProfileVerifyEmailSsoDialog
-      {...fixture}
-      trigger={
-        <Button
-          variant='outline'
-          color='neutral'
-        >
-          Verify with SSO
-        </Button>
-      }
+    <AccountSection
+      allowMultipleAccounts
+      emailVerificationMethod='sso'
+      failEmailVerification
     />
   );
 }
@@ -249,7 +221,7 @@ export function AddPhoneFails() {
   return (
     <AccountSection
       allowMultipleAccounts
-      failAt='phone'
+      failPhone='create'
     />
   );
 }

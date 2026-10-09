@@ -10,6 +10,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   connected_account_unavailable: 'This connected account is no longer available.',
   enterprise_connection_unavailable: 'This enterprise connection is no longer available.',
   form_new_password_matches_current: 'New password cannot be the same as the current password.',
+  form_param_format_invalid__email_address: 'Email address must be a valid email address.',
+  form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
   form_password_incorrect: 'Your current password is incorrect.',
   form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
   form_password_matches_identifier:

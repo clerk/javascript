@@ -73,21 +73,21 @@ describe('useUserProfilePictureController', () => {
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.error).toEqual({ code: 'avatar_file_size_exceeded', message: 'Too big.' });
+    expect(result.current.error).toBe('File size exceeds the maximum limit of 10MB. Please choose a smaller file.');
     expect(result.current.isPending).toBe(false);
 
     await act(async () => result.current.onChange?.(file));
     expect(result.current.error).toBeUndefined();
   });
 
-  it('shows the generic error and logs an unexpected throw', async () => {
+  it('shows the generic message and logs an unexpected throw', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     const failure = new TypeError('boom');
     const onChange = vi.fn().mockRejectedValue(failure);
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.error).toEqual({ code: 'generic' });
+    expect(result.current.error).toBe('Something went wrong. Please try again.');
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
     log.mockRestore();
   });
@@ -97,7 +97,7 @@ describe('useUserProfilePictureController', () => {
     const { result } = renderController({ onRemove });
 
     await act(async () => result.current.onRemove?.());
-    expect(result.current.error).toEqual({ message: 'Nope.' });
+    expect(result.current.error).toBe('Nope.');
   });
 
   it('shows the picked file while the upload is still running', async () => {
