@@ -61,6 +61,57 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.expect.toBeSignedIn();
   });
 
+  test('does not return to the start card after the email code is accepted', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // The regression this guards against is a flash: the start card renders for ~150ms while
+    // setActive is still running. A locator assertion cannot catch that, so record every URL the
+    // page passes through and sample the rendered card each frame instead.
+    await page.addInitScript(() => {
+      const flash = { recording: false, urls: [] as string[], sawStartCard: false };
+      (window as any).__startCardFlash = flash;
+
+      for (const key of ['pushState', 'replaceState'] as const) {
+        const original = history[key];
+        history[key] = function (...args: Parameters<History['pushState']>) {
+          const result = original.apply(this, args);
+          if (flash.recording) {
+            flash.urls.push(location.pathname);
+          }
+          return result;
+        };
+      }
+
+      const sample = () => {
+        if (flash.recording && location.pathname === '/sign-in' && document.querySelector('input[name=identifier]')) {
+          flash.sawStartCard = true;
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.getUseAnotherMethodLink().click();
+
+    const prepared = page.waitForResponse(
+      res => res.request().method() === 'POST' && res.url().includes('prepare_first_factor'),
+    );
+    await u.po.signIn.getAltMethodsEmailCodeButton().click();
+    await prepared;
+
+    // From here on the flow is past the start card and must never go back to it.
+    await page.evaluate(() => ((window as any).__startCardFlash.recording = true));
+    await u.po.signIn.enterTestOtpCode({ awaitPrepare: false });
+    await u.po.expect.toBeSignedIn();
+
+    const flash = await page.evaluate(() => (window as any).__startCardFlash);
+    expect(flash.urls).not.toContain('/sign-in');
+    expect(flash.sawStartCard).toBe(false);
+  });
+
   test('sign in with phone number and password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
