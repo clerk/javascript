@@ -114,43 +114,21 @@ export const styles = stylex.create({
     minHeight: 0,
   },
 
+  rootFullscreen: {
+    width: '100%',
+  },
+
   layoutFullscreen: {
     borderRadius: 0,
     borderWidth: '0px',
-    backgroundColor: colorVars['--cl-color-background-subtle'],
     blockSize: 'auto',
     boxShadow: 'none',
     flexGrow: 1,
     minHeight: 0,
   },
 
-  navFullscreen: {
-    borderInlineEndWidth: '0px',
-  },
-
   backItem: {
     marginBlockEnd: space['4'],
-  },
-
-  contentFullscreen: {
-    borderRadius: {
-      [compact]: 0,
-      default: radiusVars['--cl-radius-xl'],
-    },
-    marginBlock: {
-      [compact]: 0,
-      default: space['2'],
-    },
-    paddingBlock: 0,
-    backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: {
-      [compact]: 'none',
-      default: `0 0 0 1px ${colorVars['--cl-color-border']}`,
-    },
-    marginInlineEnd: {
-      [compact]: 0,
-      default: space['2'],
-    },
   },
 
   nav: {

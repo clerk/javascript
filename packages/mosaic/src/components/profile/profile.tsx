@@ -144,7 +144,13 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
-        stylex.props(reset.base, styles.root, isInDialog(dialog) && styles.rootInDialog, xstyle),
+        stylex.props(
+          reset.base,
+          styles.root,
+          isInDialog(dialog) && styles.rootInDialog,
+          fullscreen && styles.rootFullscreen,
+          xstyle,
+        ),
         rest,
       ),
       children: (
@@ -283,13 +289,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       'aria-labelledby': titleId,
       ...mergeStyleProps(
         themeProps('profile-nav', { compact }),
-        stylex.props(
-          reset.base,
-          styles.nav,
-          (inline || compact) && styles.navFlush,
-          fullscreen && !compact && styles.navFullscreen,
-          xstyle,
-        ),
+        stylex.props(reset.base, styles.nav, (inline || compact) && styles.navFlush, xstyle),
         rest,
       ),
       children: (
@@ -503,7 +503,7 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
   { pageTitle, children, render, xstyle, ...rest },
   ref,
 ) {
-  const { inline, compact, renderBranding, fullscreen } = useProfileContext('Profile.Content');
+  const { inline, compact, renderBranding } = useProfileContext('Profile.Content');
   return useRender({
     defaultTagName: 'div',
     render,
@@ -511,13 +511,7 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
     props: {
       ...mergeStyleProps(
         themeProps('profile-content', { inline }),
-        stylex.props(
-          reset.base,
-          styles.content,
-          inline ? styles.contentInline : contentScroll,
-          fullscreen && styles.contentFullscreen,
-          xstyle,
-        ),
+        stylex.props(reset.base, styles.content, inline ? styles.contentInline : contentScroll, xstyle),
         rest,
       ),
       children: (
