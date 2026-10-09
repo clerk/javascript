@@ -54,6 +54,42 @@ describe('SignInSocialButtons', () => {
     });
   });
 
+  it('does not send the SIWC prompt or login hint to another social provider', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withSocialProvider({ provider: 'google' });
+    });
+    fixtures.router.queryParams = {
+      target_flow: 'chatgpt_siwc',
+      redirect_url:
+        'https://clerk.example.test/v1/oauth/authorize/continue?target_flow=chatgpt_siwc&client_id=client&state=state&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fcallback&code_challenge=challenge&code_challenge_method=S256',
+      login_hint: 'user@example.com',
+      __clerk_siwc_prompt_login: 'true',
+    } as any;
+    fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined as any);
+
+    const { userEvent } = render(
+      <CardStateProvider>
+        <SignInSocialButtons
+          enableOAuthProviders
+          enableWeb3Providers={false}
+          enableAlternativePhoneCodeProviders={false}
+        />
+      </CardStateProvider>,
+      { wrapper },
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: /continue with google/i }));
+
+    await waitFor(() => {
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
+        expect.objectContaining({ strategy: 'oauth_google' }),
+      );
+    });
+    const [params] = fixtures.signIn.authenticateWithRedirect.mock.calls[0];
+    expect(params.oidcPrompt).toBeUndefined();
+    expect(params.oidcLoginHint).toBeUndefined();
+  });
+
   it('clears the loading state after restoring the page from browser history', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withSocialProvider({ provider: 'chatgpt' });
