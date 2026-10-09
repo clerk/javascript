@@ -30,7 +30,8 @@ export type UserProfilePasswordModel =
       sessionId: string;
       identifier: string;
       validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
-      updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
+      updatePassword: (input: UserProfileEditPasswordValue) => Promise<unknown>;
+      formatError: (error: unknown) => unknown;
     });
 
 type PasswordPolicyResult =
@@ -50,9 +51,8 @@ function getPasswordPolicy(
     return { status: 'hidden' };
   }
 
-  // TODO: When session reverification is supported, require the current password only when reverification is disabled.
   const policy: UserProfilePasswordPolicy = user.passwordEnabled
-    ? { mode: 'change', requiresCurrentPassword: true }
+    ? { mode: 'change', requiresCurrentPassword: !environment.authConfig.reverification }
     : { mode: 'set', requiresCurrentPassword: false };
 
   const enterpriseAccount = user.enterpriseAccounts.find(account => account.active);
@@ -126,7 +126,6 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     sessionId,
     identifier: session.publicUserData.identifier ?? '',
     validatePassword,
-    // TODO: Add session reverification for password updates; surface API errors until then.
     updatePassword: async ({ currentPassword, newPassword, signOutOfOtherSessions }) => {
       const currentUser = clerk.user;
       if (
@@ -140,22 +139,22 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
         throw new FormSubmitError({ message: m.errors.unavailable });
       }
 
-      try {
-        await currentUser.updatePassword({
-          newPassword,
-          signOutOfOtherSessions,
-          ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
-        });
-      } catch (error) {
-        throw passwordFormError(
-          error,
-          policy.requiresCurrentPassword,
-          environment.userSettings.passwordSettings,
-          m,
-          locale,
-          errorText,
-        );
-      }
+      return currentUser.updatePassword({
+        newPassword,
+        signOutOfOtherSessions,
+        ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
+      });
     },
+    formatError: error =>
+      error instanceof FormSubmitError
+        ? error
+        : passwordFormError(
+            error,
+            policy.requiresCurrentPassword,
+            environment.userSettings.passwordSettings,
+            m,
+            locale,
+            errorText,
+          ),
   };
 }
