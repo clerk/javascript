@@ -673,6 +673,9 @@ describe('inviting members', () => {
     expect(dialog.getByRole('listitem')).not.toHaveAttribute('data-invalid');
   });
 
+  it.todo('drops the success toast after the panel unmounts during an invite');
+  it.todo('drops the success toast after a session switch while the list revalidates');
+
   it.each([
     [
       'switching organizations',

@@ -36,6 +36,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
         return;
       }
       await invite({ emailAddresses, role, roles, onRejected: setRejectedEmailAddresses });
+      // TODO: Skip closing and the success toast when the panel unmounted or its identity changed during the invite or the list revalidation; useForm has no success hook that is dropped on unmount.
       setOpen(false);
       toast.add({ type: 'success', label: m.sent });
     },
