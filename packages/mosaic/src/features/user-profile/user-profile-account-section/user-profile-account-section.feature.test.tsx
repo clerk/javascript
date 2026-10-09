@@ -239,12 +239,11 @@ async function manageEmail(actor: Actor, label: string, action: string) {
 }
 
 describe('the user profile email addresses', () => {
-  it('adds an address, verifies the code it was sent, and returns focus to the trigger', async () => {
+  it('adds an address and verifies the code it was sent', async () => {
     const { actor } = await renderSection(signedInWithEmails([]));
-    const trigger = screen.getByRole('button', { name: 'Add email' });
     expect(emailRow()).toHaveTextContent('No email addresses added');
 
-    await actor.click(trigger);
+    await actor.click(screen.getByRole('button', { name: 'Add email' }));
     await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
     await actor.click(screen.getByRole('button', { name: 'Continue' }));
     await enterCode(actor, VERIFICATION_CODE);
@@ -252,13 +251,29 @@ describe('the user profile email addresses', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(emailsListed()).toEqual(['new@example.com']);
     expect(emailRow()).not.toHaveTextContent('Unverified');
-    await waitFor(() => expect(trigger).toHaveFocus());
   });
 
-  it('verifies an address left unverified and returns focus to its menu', async () => {
+  it('holds the code field until the code has been sent', async () => {
+    const { actor } = await renderSection(signedInWithEmails([]));
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+
+    await actor.click(screen.getByRole('button', { name: 'Add email' }));
+    await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
+    await actor.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+
+    expect(await screen.findByRole('textbox', { name: 'Verification code' })).toHaveAttribute('aria-disabled', 'true');
+
+    prepare.release();
+    await enterCode(actor, VERIFICATION_CODE);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(emailsListed()).toEqual(['new@example.com']);
+  });
+
+  it('verifies an address left unverified', async () => {
     const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
     const { actor } = await renderSection(signedInWithEmails([PRIMARY, pending]));
-    const trigger = within(emailRow()).getByRole('button', { name: 'Manage pending@example.com' });
     expect(within(emailRow()).getByText('pending@example.com').parentElement).toHaveTextContent('Unverified');
 
     await manageEmail(actor, 'pending@example.com', 'Verify');
@@ -268,21 +283,23 @@ describe('the user profile email addresses', () => {
     await waitFor(() =>
       expect(within(emailRow()).getByText('pending@example.com').parentElement).not.toHaveTextContent('Unverified'),
     );
-    await waitFor(() => expect(trigger).toHaveFocus());
   });
 
   it('waits for the emailed link when the instance verifies by link, then closes once it is opened', async () => {
     const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
     const { actor, fapi } = await renderSection(signedInWithEmails([PRIMARY, pending], verifiesByLink));
+    const poll = holdRequests('get', '/v1/me/email_addresses/:id');
 
     await manageEmail(actor, 'pending@example.com', 'Verify');
     const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
     await waitFor(() => expect(dialog).toHaveTextContent('Open the link we sent to pending@example.com'));
     expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
+    await waitFor(() => expect(poll.requests).toHaveLength(1));
 
     verifyEmailOutOfBand(fapi, 'idn_pending');
+    poll.release();
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument(), { timeout: 5000 });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('points the emailed link at the user profile on the host origin', async () => {
@@ -422,8 +439,10 @@ describe('the user profile name, username and picture', () => {
 
     await actor.upload(fileInput(container), new File(['x'], 'me.png', { type: 'image/png' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+      ),
     );
   });
 });

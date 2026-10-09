@@ -75,7 +75,7 @@ describe('MembersTableTabView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not remove member.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not remove member.'));
   });
 
   it('chooses loading, retained rows, and filtered empty results from the supplied state', () => {

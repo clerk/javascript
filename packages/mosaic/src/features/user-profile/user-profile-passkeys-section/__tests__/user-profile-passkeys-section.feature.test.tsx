@@ -246,7 +246,7 @@ describe('Adding a passkey', () => {
       await user.click(screen.getByRole('button', { name: 'Add passkey' }));
       await waitFor(() => expect(creation.requests).toHaveLength(1));
       creation.fail(code);
-      expect(await screen.findByRole('alert')).toHaveTextContent(code);
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(code));
       expect(screen.queryByRole('dialog')).toBeNull();
       expect(creation.requests).toHaveLength(1);
       const retried = serveFapi(fapi);
