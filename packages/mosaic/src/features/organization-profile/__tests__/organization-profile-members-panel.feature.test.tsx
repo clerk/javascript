@@ -66,6 +66,22 @@ describe('OrganizationProfileMembersPanel', () => {
     roles.release();
   });
 
+  it('loads members with an empty search and restores them after clearing a search', async () => {
+    serve();
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+
+    const user = userEvent.setup();
+    await user.type(screen.getByRole('searchbox', { name: 'Search members' }), 'Nobody');
+    expect(await screen.findByText('No members found')).toBeVisible();
+    expect(screen.queryByText('Bob Smith')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Clear search' }));
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+    expect(screen.getByRole('searchbox', { name: 'Search members' })).toHaveValue('');
+    expect(screen.queryByText('Unable to load members')).toBeNull();
+  });
+
   it('searches after the input settles and keeps rows while a new page loads', async () => {
     serve();
     await renderWithClerk(<OrganizationProfileMembersPanel />);
