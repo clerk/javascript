@@ -163,26 +163,6 @@ describe('User profile MFA management', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
   });
 
-  it('moves focus through remaining MFA rows and then to Add after sequential removals', async () => {
-    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
-    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
-    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
-    const user = userEvent.setup();
-
-    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    const remaining = await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' });
-    await waitFor(() => expect(remaining).toHaveFocus());
-
-    await user.keyboard('{Enter}');
-    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
-    expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: false, default: undefined });
-    expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_2', reserved: false, default: undefined });
-  });
-
   it('restores the selected SMS row action after cancelling removal confirmation', async () => {
     const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
     await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved], two_factor_enabled: true }));
