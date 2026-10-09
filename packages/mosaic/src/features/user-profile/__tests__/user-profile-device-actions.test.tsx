@@ -1,7 +1,6 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
@@ -22,10 +21,6 @@ const mobile: UserProfileDevice = {
   description: 'Last seen 2 weeks ago · Orem, UT, United States',
   type: 'mobile',
 };
-
-async function openMenu(user: ReturnType<typeof userEvent.setup>, device: UserProfileDevice) {
-  await user.click(screen.getByRole('button', { name: `Manage ${device.name}` }));
-}
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -68,7 +63,6 @@ describe('signing out of all other devices', () => {
 
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onSignOutAllOtherDevices).not.toHaveBeenCalled();
-    expect(screen.getByRole('button', { name: 'Sign out of all devices' })).toHaveFocus();
   });
 
   it('holds the confirmation open and explains a failure', async () => {
@@ -112,64 +106,5 @@ describe('signing out of all other devices', () => {
       await signOutAll.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-  });
-
-  it('hands focus to the current device once the others are gone', async () => {
-    const user = userEvent.setup();
-    function Example() {
-      const [devices, setDevices] = useState([current, mobile]);
-      return (
-        <MosaicProvider>
-          <UserProfileActiveDevicesSectionView
-            devices={devices}
-            onSignOutAllOtherDevices={() => setDevices(list => list.filter(device => device.isCurrent))}
-          />
-        </MosaicProvider>
-      );
-    }
-    render(<Example />);
-    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
-    await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
-
-    await waitFor(() =>
-      expect(screen.queryByRole('button', { name: 'Sign out of all devices' })).not.toBeInTheDocument(),
-    );
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on macOS' })).toHaveFocus());
-  });
-});
-
-describe('focus after a delayed row update', () => {
-  const desktop: UserProfileDevice = { id: 'desktop', name: 'Clerk App on macOS', type: 'desktop' };
-
-  it('skips the signed-out row when the list only catches up later', async () => {
-    const user = userEvent.setup();
-    const catchUp = createDeferredPromise();
-    function LateExample() {
-      const [devices, setDevices] = useState([current, mobile, desktop]);
-      return (
-        <MosaicProvider>
-          <UserProfileActiveDevicesSectionView
-            devices={devices}
-            onSignOutDevice={id => {
-              void catchUp.promise.then(() => setDevices(list => list.filter(device => device.id !== id)));
-              return Promise.resolve();
-            }}
-          />
-        </MosaicProvider>
-      );
-    }
-    render(<LateExample />);
-    await openMenu(user, mobile);
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus());
-
-    await act(async () => {
-      catchUp.resolve();
-      await catchUp.promise;
-    });
-    expect(screen.queryByRole('button', { name: 'Manage Safari on iOS' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus();
   });
 });

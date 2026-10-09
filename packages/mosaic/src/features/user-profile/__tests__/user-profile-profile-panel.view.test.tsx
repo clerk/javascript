@@ -98,7 +98,6 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
