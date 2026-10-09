@@ -29,15 +29,7 @@ function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | nu
 
 export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(props, forwardedRef) {
   const { render, ids, children, ...otherProps } = props;
-  const {
-    value,
-    direction,
-    rootRef,
-    registerActiveStep,
-    unregisterActiveStep,
-    registerExitingStep,
-    unregisterExitingStep,
-  } = useFlowContext();
+  const { value, direction, rootRef, registerActiveStep, unregisterActiveStep } = useFlowContext();
   const open = ids.includes(value);
   const stepRef = useRef<HTMLDivElement | null>(null);
   const activeChildrenRef = useRef(children);
@@ -62,18 +54,6 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     registerActiveStep(element);
     return () => unregisterActiveStep(element);
   }, [open, registerActiveStep, unregisterActiveStep]);
-
-  const exiting = mounted && !open;
-
-  useLayoutEffect(() => {
-    const element = stepRef.current;
-    if (!exiting || !element) {
-      return;
-    }
-
-    registerExitingStep(element);
-    return () => unregisterExitingStep(element);
-  }, [exiting, registerExitingStep, unregisterExitingStep]);
 
   // A layout effect, so focus moves in the commit that makes the leaving step inert: field to field,
   // which iOS does without dropping the keyboard. A passive effect would leave a frame with none.

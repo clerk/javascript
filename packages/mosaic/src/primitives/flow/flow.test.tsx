@@ -239,40 +239,101 @@ describe('Flow', () => {
 
     expect(root).not.toHaveAttribute('data-initial');
 
+    expect(root).not.toHaveAttribute('data-height-change');
+
     rerender(<TestFlow value='otp' />);
 
     expect(root.style.getPropertyValue('--cl-flow-step-height')).toBe('240px');
+    expect(root).toHaveAttribute('data-height-change', 'grow');
     expect(root).not.toHaveAttribute('data-initial');
+
+    rerender(<TestFlow value='password' />);
+
+    expect(root).toHaveAttribute('data-height-change', 'shrink');
     offsetHeight.mockRestore();
   });
-  it('marks the root as transitioning only while a step is exiting', async () => {
-    let finishAnimation!: () => void;
-    const animationFinished = new Promise<void>(resolve => {
-      finishAnimation = resolve;
+  describe('data-transitioning', () => {
+    function deferred() {
+      let resolve!: () => void;
+      const promise = new Promise<void>(r => {
+        resolve = r;
+      });
+      return { promise, resolve };
+    }
+
+    function mockRootAnimations(root: HTMLElement, animations: Array<Record<string, unknown>>) {
+      root.getAnimations = vi.fn(() => animations as unknown as Animation[]);
+    }
+
+    it('lasts from a step change until the root height transition finishes', async () => {
+      const height = deferred();
+      const { rerender } = render(<TestFlow value='password' />);
+      const root = screen.getByTestId('flow-root');
+      mockRootAnimations(root, [{ transitionProperty: 'height', finished: height.promise }]);
+
+      rerender(<TestFlow value='password-error' />);
+
+      expect(root).not.toHaveAttribute('data-transitioning');
+
+      rerender(<TestFlow value='otp' />);
+
+      expect(screen.queryByTestId('password-step')).not.toBeInTheDocument();
+      expect(root).toHaveAttribute('data-transitioning');
+
+      mockRootAnimations(root, []);
+      await act(async () => {
+        height.resolve();
+        await height.promise;
+      });
+
+      expect(root).not.toHaveAttribute('data-transitioning');
     });
-    const { rerender } = render(<TestFlow value='password' />);
-    const root = screen.getByTestId('flow-root');
-    const outgoingStep = screen.getByTestId('password-step');
-    outgoingStep.getAnimations = vi.fn(() => [{ finished: animationFinished }] as unknown as Animation[]);
 
-    expect(root).not.toHaveAttribute('data-transitioning');
+    it('clears at once when the root height does not transition', () => {
+      const { rerender } = render(<TestFlow value='password' />);
+      const root = screen.getByTestId('flow-root');
+      mockRootAnimations(root, []);
 
-    rerender(<TestFlow value='password-error' />);
+      rerender(<TestFlow value='otp' />);
 
-    expect(root).not.toHaveAttribute('data-transitioning');
-
-    rerender(<TestFlow value='otp' />);
-
-    expect(root).toHaveAttribute('data-transitioning');
-
-    outgoingStep.getAnimations = vi.fn(() => []);
-    await act(async () => {
-      finishAnimation();
-      await animationFinished;
+      expect(root).not.toHaveAttribute('data-transitioning');
     });
 
-    expect(screen.queryByTestId('password-step')).not.toBeInTheDocument();
-    expect(root).not.toHaveAttribute('data-transitioning');
+    it('is not held by other animations on the root', () => {
+      const { rerender } = render(<TestFlow value='password' />);
+      const root = screen.getByTestId('flow-root');
+      mockRootAnimations(root, [{ animationName: 'pulse', finished: new Promise<void>(() => {}) }]);
+
+      rerender(<TestFlow value='otp' />);
+
+      expect(root).not.toHaveAttribute('data-transitioning');
+    });
+
+    it('waits for the latest height transition when the step changes again', async () => {
+      const first = deferred();
+      const second = deferred();
+      const { rerender } = render(<TestFlow value='password' />);
+      const root = screen.getByTestId('flow-root');
+      mockRootAnimations(root, [{ transitionProperty: 'height', finished: first.promise }]);
+
+      rerender(<TestFlow value='otp' />);
+      mockRootAnimations(root, [{ transitionProperty: 'height', finished: second.promise }]);
+      rerender(<TestFlow value='password' />);
+      await act(async () => {
+        first.resolve();
+        await first.promise;
+      });
+
+      expect(root).toHaveAttribute('data-transitioning');
+
+      mockRootAnimations(root, []);
+      await act(async () => {
+        second.resolve();
+        await second.promise;
+      });
+
+      expect(root).not.toHaveAttribute('data-transitioning');
+    });
   });
 
   describe('useFlowAutoFocus', () => {
