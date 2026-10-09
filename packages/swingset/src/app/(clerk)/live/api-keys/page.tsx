@@ -1,6 +1,5 @@
 'use client';
 
-import { OrganizationProfileApiKeysPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-api-keys-panel';
 import { UserProfileApiKeysPanel } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
@@ -15,8 +14,8 @@ export default function ApiKeysLivePage() {
         <div className='flex flex-col gap-1'>
           <h1 className='text-xl font-semibold'>API keys</h1>
           <p className='text-muted-foreground text-sm'>
-            The user and organization profile API keys panels, listing, creating, and revoking real API keys for the
-            signed-in user and their active organization. API keys must be enabled for the application.
+            The user profile API keys panel, listing, creating, and revoking real API keys for the signed-in user. API
+            keys must be enabled for the application.
           </p>
         </div>
         {!isLoaded ? <p className='text-muted-foreground text-sm'>Loading…</p> : null}
@@ -31,12 +30,7 @@ export default function ApiKeysLivePage() {
             to use the live harness.
           </p>
         ) : null}
-        {isLoaded && isSignedIn ? (
-          <>
-            <UserProfileApiKeysPanel />
-            <OrganizationProfileApiKeysPanel />
-          </>
-        ) : null}
+        {isLoaded && isSignedIn ? <UserProfileApiKeysPanel /> : null}
       </div>
     </MosaicProvider>
   );
