@@ -13,17 +13,19 @@ You need Node 24.8 or newer on 24, Xcode and a booted iOS simulator, or the Andr
 ```sh
 cd integration/expo-native
 npm ci
+node src/fixture.ts ios
 export CLERK_E2E_PLATFORM=ios
 xcrun simctl list devices booted
 export CLERK_E2E_DEVICE=<the id of a booted simulator, from the list above>
-export CLERK_E2E_APP_PATH=<a build of the test app, see below>
-export CLERK_E2E_DEV_SERVER=http://localhost:8081
+export CLERK_E2E_APP_PATH=<the path on the last line that the build printed>
 export CLERK_PUBLISHABLE_KEY=pk_test_...
 export CLERK_SECRET_KEY=sk_test_...
 npx e2e run specs/golden/custom-flow-sign-in/complete.e2e.ts
 ```
 
-The test app is built from `integration/templates/expo-native`. `integration/expo-native/bin/control-clerk-expo up --platform ios` builds it as a dev client, leaves it under `.verify/builds/`, and starts the Metro server that the dev client loads its bundle from. The `metro` line that `up` prints has the port. `CLERK_E2E_APP_PATH` is the `.app` or `.apk` in that directory, and `CLERK_E2E_DEV_SERVER` is `http://localhost:<port>`. After `up` ends, no CLI process is running, and Metro stays up until `down`.
+`node src/fixture.ts ios` runs `pnpm install`, builds the packages the test app uses, and builds the test app in `integration/templates/expo-native` as a standalone app. A standalone app carries its JavaScript, so the run needs no Metro server. `node src/fixture.ts android` builds the APK for an emulator.
+
+To run against a dev client instead, `integration/expo-native/bin/control-clerk-expo up --platform ios` builds one, leaves it under `.verify/builds/`, and starts the Metro server it loads its bundle from. The `metro` line that `up` prints has the port. Set `CLERK_E2E_APP_PATH` to the `.app` or `.apk` in that directory and `CLERK_E2E_DEV_SERVER` to `http://localhost:<port>`. After `up` ends, no CLI process is running, and Metro stays up until `down`.
 
 `--video on`, `--retries`, `--grep`, and `--output` are e2e's own flags. e2e writes its report and its screenshots to `.e2e/`, which git ignores.
 

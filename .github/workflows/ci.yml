@@ -121,7 +121,6 @@ jobs:
         .github/workflows/ci.yml
         .github/actionlint.yaml
         integration/templates/expo-native
-        integration/tests/expo-native
         packages/expo
         packages/expo-biometrics
         packages/expo-google-signin

@@ -7,3 +7,13 @@ self-hosted-runner:
   labels:
     - blacksmith-8vcpu-ubuntu-2204
     - blacksmith-6vcpu-macos-26
+
+paths:
+  # actionlint 1.7.x predates GitHub's background steps and rejects them:
+  # https://github.com/rhysd/actionlint/issues/693
+  # Remove once actionlint supports those keys. Until then, a step in this file
+  # with neither `run` nor `uses` is not reported either.
+  .github/workflows/verify-e2e.yml:
+    ignore:
+      - 'unexpected key "background" for step to run shell command'
+      - 'step must run script with "run" section or run action with "uses" section'
