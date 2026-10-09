@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
@@ -293,17 +293,18 @@ describe('User profile MFA', () => {
 
   it('disables verification and Back while resending an SMS code', async () => {
     const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }));
-    const user = userEvent.setup();
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /SMS verification/ }));
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     const code = await screen.findByRole('textbox', { name: 'Verification code' });
     const held = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
-    const later = Date.now() + 31_000;
-    vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(later);
     try {
+      for (let second = 0; second < 30; second++) {
+        await act(async () => vi.advanceTimersByTimeAsync(1000));
+      }
       await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 2000 });
       await user.click(screen.getByRole('button', { name: /Resend/ }));
       await waitFor(() => expect(held.requests).toHaveLength(1));

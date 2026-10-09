@@ -34,7 +34,6 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
     'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
   mfa_account_changed: 'This account changed. Please try again.',
   mfa_authenticator_unavailable: 'Authenticator is unavailable.',
-  mfa_busy: 'Another verification action is in progress.',
   mfa_method_cannot_remove: 'This method cannot be removed.',
   mfa_phone_unavailable: 'This phone number is unavailable.',
   mfa_print_unavailable: 'Printing is unavailable in this browser.',

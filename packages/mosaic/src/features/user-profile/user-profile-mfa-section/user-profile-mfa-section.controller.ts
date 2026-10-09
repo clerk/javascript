@@ -1,7 +1,5 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
-import { useRef } from 'react';
+import { useEffect } from 'react';
 
-import { useNow } from '../../../hooks/use-now';
 import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
@@ -13,15 +11,7 @@ import type { UserProfileMfaSetupViewProps } from './user-profile-mfa-setup.view
 
 type ReadyModel = Extract<UserProfileMfaModel, { status: 'ready' }>;
 type AuthenticatorSetup = { secret: string; uri: string };
-type MfaAction =
-  | 'prepareAuthenticator'
-  | 'verifyAuthenticator'
-  | 'sms'
-  | 'resend'
-  | 'generate'
-  | 'copy'
-  | 'remove'
-  | 'default';
+type MfaAction = 'prepareAuthenticator' | 'verifyAuthenticator' | 'sms' | 'resend' | 'generate' | 'copy';
 type MfaFlow =
   | { kind: 'closed' }
   | { kind: 'select' }
@@ -48,7 +38,8 @@ interface MfaContext {
   flow: MfaFlow;
   savedSetup?: AuthenticatorSetup;
   pending?: MfaAction;
-  resendAvailableAt?: number;
+  dismissed: boolean;
+  resendSeconds: number;
   run: () => Promise<MfaFlow>;
   resolve: () => void;
   reject: (error: unknown) => void;
@@ -64,16 +55,20 @@ type MfaEvent =
   | { type: 'EDIT_CODE'; value: string }
   | { type: 'PHONE_RESOLVED'; id: string; phoneNumber: string }
   | { type: 'PRINT_FAILED' }
+  | { type: 'TICK' }
   | { type: 'RUN'; key: MfaAction; run: () => Promise<MfaFlow>; resolve: () => void; reject: (error: unknown) => void };
 
 const { createMachine, assign, fromPromise } = setup<MfaContext, MfaEvent>();
-const RESEND_COOLDOWN_MS = 30_000;
+const RESEND_COOLDOWN_SECONDS = 30;
+const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 
 const mfaMachine = createMachine({
   id: 'userProfileMfa',
   initial: 'idle',
   context: {
     flow: { kind: 'closed' },
+    dismissed: false,
+    resendSeconds: 0,
     run: () => Promise.resolve({ kind: 'closed' }),
     resolve: () => undefined,
     reject: () => undefined,
@@ -83,8 +78,9 @@ const mfaMachine = createMachine({
       on: {
         OPEN: { actions: assign(() => ({ flow: { kind: 'select' } })) },
         CLOSE: {
-          actions: assign(() => ({ flow: { kind: 'closed' }, savedSetup: undefined, resendAvailableAt: undefined })),
+          actions: assign(() => ({ flow: { kind: 'closed' }, savedSetup: undefined, resendSeconds: 0 })),
         },
+        TICK: tick,
         SELECT: {
           actions: assign((context, event) => ({
             flow:
@@ -159,6 +155,7 @@ const mfaMachine = createMachine({
           target: 'busy',
           actions: assign((_, event) => ({
             pending: event.key,
+            dismissed: false,
             run: event.run,
             resolve: event.resolve,
             reject: event.reject,
@@ -168,6 +165,16 @@ const mfaMachine = createMachine({
     },
     busy: {
       on: {
+        OPEN: { actions: assign(() => ({ flow: { kind: 'select' }, dismissed: true })) },
+        CLOSE: {
+          actions: assign(() => ({
+            flow: { kind: 'closed' },
+            savedSetup: undefined,
+            resendSeconds: 0,
+            dismissed: true,
+          })),
+        },
+        TICK: tick,
         PHONE_RESOLVED: {
           actions: assign((context, event) => ({
             flow:
@@ -182,21 +189,27 @@ const mfaMachine = createMachine({
           target: 'idle',
           actions: [
             context => context.resolve(),
-            assign<DoneInvokeEvent<MfaFlow>>((context, event) => ({
-              flow: event.output,
-              savedSetup:
-                event.output.kind === 'authenticator' && event.output.setup
-                  ? event.output.setup
-                  : event.output.kind === 'closed'
-                    ? undefined
-                    : context.savedSetup,
-              pending: undefined,
-              resendAvailableAt:
-                context.pending === 'resend' ||
-                (context.pending === 'sms' && event.output.kind === 'sms' && event.output.step === 'verify')
-                  ? Date.now() + RESEND_COOLDOWN_MS
-                  : context.resendAvailableAt,
-            })),
+            assign<DoneInvokeEvent<MfaFlow>>((context, event) => {
+              if (context.dismissed && event.output.kind !== 'backup') {
+                return { pending: undefined, dismissed: false };
+              }
+              return {
+                flow: event.output,
+                savedSetup:
+                  event.output.kind === 'authenticator' && event.output.setup
+                    ? event.output.setup
+                    : event.output.kind === 'closed'
+                      ? undefined
+                      : context.savedSetup,
+                pending: undefined,
+                dismissed: false,
+                resendSeconds:
+                  context.pending === 'resend' ||
+                  (context.pending === 'sms' && event.output.kind === 'sms' && event.output.step === 'verify')
+                    ? RESEND_COOLDOWN_SECONDS
+                    : context.resendSeconds,
+              };
+            }),
           ],
         },
         onError: {
@@ -205,6 +218,9 @@ const mfaMachine = createMachine({
             (context, event) => context.reject(event.error),
             assign((context, event) => {
               const flow = context.flow;
+              if (context.dismissed) {
+                return { pending: undefined, dismissed: false };
+              }
               if (flow.kind !== 'authenticator' && flow.kind !== 'sms' && flow.kind !== 'backup') {
                 return { pending: undefined };
               }
@@ -256,13 +272,7 @@ function createAuthenticatorActions(model: ReadyModel, flow: MfaFlow, run: RunMf
   return { prepareAuthenticator, verifyAuthenticator };
 }
 
-function createSmsActions(
-  model: ReadyModel,
-  flow: MfaFlow,
-  resendAvailableAt: number | undefined,
-  run: RunMfaAction,
-  send: MfaSend,
-) {
+function createSmsActions(model: ReadyModel, flow: MfaFlow, resendSeconds: number, run: RunMfaAction, send: MfaSend) {
   const submitSms = (code?: string) => {
     const enrollSms = model.enrollSms;
     const findOrCreatePhone = model.findOrCreatePhone;
@@ -292,7 +302,7 @@ function createSmsActions(
 
   const resendSms = () => {
     const resend = model.resendSms;
-    if (flow.kind !== 'sms' || !flow.phoneId || !resend || (resendAvailableAt && Date.now() < resendAvailableAt)) {
+    if (flow.kind !== 'sms' || !flow.phoneId || !resend || resendSeconds > 0) {
       return;
     }
     const current = flow;
@@ -398,7 +408,6 @@ function createSetupProps(
   context: MfaContext,
   send: MfaSend,
   actions: MfaSetupActions,
-  resendSeconds: number,
   errorText: ReturnType<typeof useErrorText>,
 ): UserProfileMfaSetupViewProps {
   const flow = context.flow;
@@ -426,7 +435,7 @@ function createSetupProps(
       onResend: actions.resendSms,
       isPending: context.pending === 'sms',
       isResending: context.pending === 'resend',
-      resendSeconds,
+      resendSeconds: context.resendSeconds,
       errorMessage: sms?.error ? errorText(sms.error) : undefined,
     },
     authenticator: {
@@ -451,34 +460,31 @@ function createSetupProps(
   };
 }
 
-function useMfaActionRunner(value: string, send: MfaSend) {
-  const locked = useRef(false);
-  const run: RunMfaAction = (key, action) => {
-    if (locked.current || value === 'busy') {
-      return Promise.reject(new ClerkRuntimeError('Another verification action is in progress.', { code: 'mfa_busy' }));
-    }
-    locked.current = true;
-    return new Promise<void>((resolve, reject) => {
-      send({ type: 'RUN', key, run: action, resolve, reject });
-    }).finally(() => {
-      locked.current = false;
-    });
-  };
-
-  return { run, isLocked: () => locked.current };
-}
-
 export function useUserProfileMfaController(model: ReadyModel) {
   const errorText = useErrorText();
   const backupCodeMessages = useMessages('userProfileBackupCodes');
   const [{ context, value }, send] = useMachine(mfaMachine);
-  const { run, isLocked } = useMfaActionRunner(value, send);
-  const now = useNow({ updateInterval: 1000 });
-  const resendAvailableAt = context.resendAvailableAt;
-  const resendSeconds = resendAvailableAt ? Math.max(0, Math.ceil((resendAvailableAt - now.getTime()) / 1000)) : 0;
+  const isBusy = value === 'busy';
+  const run: RunMfaAction = (key, action) => {
+    if (isBusy) {
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve, reject) => {
+      send({ type: 'RUN', key, run: action, resolve, reject });
+    });
+  };
+  const { resendSeconds } = context;
   const flow = context.flow;
+  const dialogOpen = flow.kind !== 'closed';
+  useEffect(() => {
+    if (!dialogOpen || resendSeconds === 0) {
+      return;
+    }
+    const timer = setTimeout(() => send({ type: 'TICK' }), 1000);
+    return () => clearTimeout(timer);
+  }, [dialogOpen, resendSeconds, send]);
   const { prepareAuthenticator, verifyAuthenticator } = createAuthenticatorActions(model, flow, run);
-  const { submitSms, resendSms } = createSmsActions(model, flow, resendAvailableAt, run, send);
+  const { submitSms, resendSms } = createSmsActions(model, flow, resendSeconds, run, send);
   const { generateBackupCodes, copy, download, print } = createBackupCodeActions(
     model,
     flow,
@@ -491,7 +497,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
   const back = () => send({ type: 'BACK', hasPhones: model.phones.length > 0 });
 
   const select = (method: UserProfileMfaAddableMethod) => {
-    if (isLocked()) {
+    if (isBusy) {
       return;
     }
     send({ type: 'SELECT', method, phoneId: model.phones[0]?.id ?? '', hasPhones: model.phones.length > 0 });
@@ -502,20 +508,6 @@ export function useUserProfileMfaController(model: ReadyModel) {
       generateBackupCodes();
     }
   };
-
-  const remove = (id: string) =>
-    run('remove', async () => {
-      await model.remove(id);
-      return flow;
-    });
-  const setDefaultAction = model.setDefault;
-  const setDefault = setDefaultAction
-    ? (id: string) =>
-        run('default', async () => {
-          await setDefaultAction(id);
-          return flow;
-        })
-    : undefined;
 
   const setupProps = createSetupProps(
     model,
@@ -534,7 +526,6 @@ export function useUserProfileMfaController(model: ReadyModel) {
       download,
       print,
     },
-    resendSeconds,
     errorText,
   );
 
@@ -542,11 +533,10 @@ export function useUserProfileMfaController(model: ReadyModel) {
     methods: [...model.methods],
     addableMethods: model.addableMethods,
     onRegenerateBackupCodes: model.generateBackupCodes ? generateBackupCodes : undefined,
-    onRemove: remove,
-    onSetDefault: setDefault,
+    onRemove: model.remove,
+    onSetDefault: model.setDefault,
   };
 
-  const dialogOpen = flow.kind !== 'closed';
   const showAddTrigger = model.addableMethods.length > 0;
 
   return {

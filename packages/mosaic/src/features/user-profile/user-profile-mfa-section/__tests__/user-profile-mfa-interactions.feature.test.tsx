@@ -92,6 +92,40 @@ describe('User profile MFA interaction boundaries', () => {
     expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
   });
 
+  it('keeps the dialog closed when dismissed while authenticator preparation is pending', async () => {
+    const fapi = await renderMfa();
+    const held = holdRequests('post', '/v1/me/totp');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    held.release();
+    await waitFor(() => expect(fapi.mfa.totpCreations).toBe(1));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    expect(await screen.findByRole('dialog', { name: 'Add 2-step verification' })).toHaveAccessibleDescription(
+      'Choose a verification method',
+    );
+  });
+
+  it('shows backup codes when dismissed while authenticator verification is pending', async () => {
+    const fapi = await renderMfa();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    const code = await screen.findByRole('textbox', { name: 'Verification code' });
+    const held = holdRequests('post', '/v1/me/totp/attempt_verification');
+    await user.type(code, '123456');
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    held.release();
+    await waitFor(() => expect(screen.getByText('CODE0001')).toBeVisible());
+    expect(fapi.mfa.totpAttempts).toEqual(['123456']);
+  });
+
   it('focuses SMS selection and new phone entry', async () => {
     await renderMfa();
     const user = userEvent.setup();

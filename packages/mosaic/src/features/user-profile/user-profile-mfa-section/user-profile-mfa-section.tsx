@@ -18,7 +18,7 @@ export function UserProfileMfaSection(props: UserProfileMfaSectionProps = {}) {
 
 export function mfaSectionNode(model: UserProfileMfaModel, fallback: ReactNode = null): ReactNode {
   if (model.status === 'loading') {
-    return fallback || null;
+    return fallback ?? null;
   }
   if (model.status === 'hidden') {
     return null;
