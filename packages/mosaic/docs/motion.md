@@ -321,6 +321,17 @@ the recipe for a `<ul>` whose rows come and go. What differs from the banner:
   `useTransition` then unmounts an exiting row as soon as it finds nothing to wait
   for.
 
+- **The empty state rides the last row.** Two slots cannot be made to start in the
+  same frame, so the empty text is not its own animated row. Every slot has an
+  `auto` track above the row's `1fr` track; when a row is the last one, that track
+  holds the empty text (`aria-hidden`, opacity 0 under the row), so the slot's
+  collapse stops at the empty text's height instead of zero and one track carries
+  the whole change: the height moves from the row's to the empty row's, the row's
+  content fades out at `fast`, and the empty text fades in after `base + fast`. Once
+  the exit ends, a static empty row with no transitions takes its place at the same
+  size. The first row added plays this in reverse: its slot mounts at the empty
+  text's height with that text visible, which fades out at `fast` as the track opens.
+
 **Rows do not reorder.** While the list is mounted it keeps the order it was first
 shown in (`useStableOrder`): a new row is appended, a removed row drops out, and a
 row the model now sorts elsewhere stays put. Setting a primary therefore moves the

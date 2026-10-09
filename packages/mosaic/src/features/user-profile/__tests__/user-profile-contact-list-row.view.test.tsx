@@ -129,8 +129,7 @@ describe('UserProfileContactListRowView', () => {
     expect(row?.closest('li')).toHaveAttribute('data-starting-style');
   });
 
-  it('collapses the empty state when the first item is added', () => {
-    holdExits();
+  it('carries the empty text inside the first item as it enters', () => {
     const { rerender } = render(
       <UserProfileContactListRowView
         kind='email'
@@ -138,6 +137,7 @@ describe('UserProfileContactListRowView', () => {
         items={[]}
       />,
     );
+    expect(screen.getByText('No email addresses added').closest('li')).not.toHaveAttribute('data-open');
 
     rerender(
       <UserProfileContactListRowView
@@ -147,8 +147,10 @@ describe('UserProfileContactListRowView', () => {
       />,
     );
 
-    expect(screen.getByText('No email addresses added').closest('li')).toHaveAttribute('data-ending-style');
-    expect(screen.getByText('first@example.com')).toBeInTheDocument();
+    const slot = screen.getByText('first@example.com').closest('li');
+    expect(slot).toHaveAttribute('data-starting-style');
+    expect(screen.getAllByText('No email addresses added')).toHaveLength(1);
+    expect(screen.getByText('No email addresses added').closest('li')).toBe(slot);
   });
 
   it('keeps a removed item inert in place until its exit finishes', async () => {
@@ -188,8 +190,8 @@ describe('UserProfileContactListRowView', () => {
     expect(screen.queryByText('second@example.com')).not.toBeInTheDocument();
   });
 
-  it('shows the empty state while the last item exits', () => {
-    holdExits();
+  it('carries the empty text inside the last item while it exits, then shows it at rest', async () => {
+    const exit = holdExits();
     const { rerender } = render(
       <UserProfileContactListRowView
         kind='phone'
@@ -206,8 +208,17 @@ describe('UserProfileContactListRowView', () => {
       />,
     );
 
-    expect(screen.getByText('+1 (801) 555-0100').closest('li')).toHaveAttribute('data-ending-style');
-    expect(screen.getByText('No phone numbers added')).toBeInTheDocument();
+    const slot = screen.getByText('+1 (801) 555-0100').closest('li');
+    expect(slot).toHaveAttribute('data-ending-style');
+    expect(screen.getAllByText('No phone numbers added')).toHaveLength(1);
+    expect(screen.getByText('No phone numbers added').closest('li')).toBe(slot);
+
+    await act(async () => {
+      exit.resolve();
+      await exit.promise;
+    });
+    expect(screen.queryByText('+1 (801) 555-0100')).not.toBeInTheDocument();
+    expect(screen.getByText('No phone numbers added').closest('li')).not.toHaveAttribute('data-ending-style');
   });
 
   it('transitions the primary badge out when another item becomes primary', () => {

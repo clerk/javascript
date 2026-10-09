@@ -9,8 +9,8 @@ export const styles = stylex.create({
   contactSlot: {
     display: 'grid',
     gridTemplateRows: {
-      default: '1fr',
-      ':where([data-starting-style], [data-ending-style])': '0fr',
+      default: 'auto 1fr',
+      ':where([data-starting-style], [data-ending-style])': 'auto 0fr',
     },
     transitionDelay: durationVars['--cl-duration-base'],
     transitionDuration: durationVars['--cl-duration-slower'],
@@ -30,6 +30,34 @@ export const styles = stylex.create({
     gridRowStart: '1',
     maskImage: `linear-gradient(to top, transparent, black calc(${space['4']} - ${ring}))`,
     minHeight: 0,
+  },
+  contactEmpty: {
+    gridRowStart: '1',
+    opacity: {
+      default: 0,
+      [stylex.when.ancestor(':where([data-starting-style], [data-ending-style])', contactSlotMarker)]: 1,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 0,
+        [stylex.when.ancestor(':where([data-starting-style], [data-ending-style])', contactSlotMarker)]: 1,
+      },
+    },
+    transitionDelay: {
+      default: durationVars['--cl-duration-instant'],
+      [stylex.when.ancestor(':where([data-ending-style])', contactSlotMarker)]:
+        `calc(${durationVars['--cl-duration-base']} + ${durationVars['--cl-duration-fast']})`,
+    },
+    transitionDuration: {
+      default: durationVars['--cl-duration-fast'],
+      [stylex.when.ancestor(':where([data-ending-style])', contactSlotMarker)]: durationVars['--cl-duration-base'],
+    },
+    transitionProperty: {
+      default: 'opacity',
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-exit'],
+      [stylex.when.ancestor(':where([data-ending-style])', contactSlotMarker)]: easingVars['--cl-ease-enter'],
+    },
   },
   contactItem: {
     borderBlockStartWidth: {

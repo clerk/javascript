@@ -70,6 +70,7 @@ function ContactListItem({
   present = true,
   appear,
   pending = false,
+  emptyText,
   onExited,
   actions,
   children,
@@ -77,6 +78,7 @@ function ContactListItem({
   present?: boolean;
   appear: boolean;
   pending?: boolean;
+  emptyText?: string;
   onExited?: () => void;
   actions?: ReactNode;
   children: ReactNode;
@@ -109,6 +111,15 @@ function ContactListItem({
       {...slotProps}
       {...inertProps(!present)}
     >
+      {emptyText ? (
+        <Section.Item
+          render={<div />}
+          aria-hidden
+          xstyle={styles.contactEmpty}
+        >
+          <Section.Description>{emptyText}</Section.Description>
+        </Section.Item>
+      ) : null}
       <div {...stylex.props(styles.contactClip)}>
         <Section.Item
           render={<div />}
@@ -187,6 +198,7 @@ export function UserProfileContactListRowView({
       <Section.Body>
         <Section.Items>
           {entries.map(({ key, item, present, onExited }) => {
+            const terminal = items.length === 0 || (present && items.length === 1);
             const actions: ActionMenuAction[] = [];
 
             if (item.isVerified === false && onVerify) {
@@ -212,6 +224,7 @@ export function UserProfileContactListRowView({
                 present={present}
                 appear={appear}
                 pending={pendingId === item.id || shownPendingId === item.id}
+                emptyText={terminal ? m[kind].empty : undefined}
                 onExited={onExited}
                 actions={
                   actions.length > 0 ? (
@@ -262,12 +275,20 @@ export function UserProfileContactListRowView({
               </ContactListItem>
             );
           })}
-          <ContactListItem
-            present={items.length === 0}
-            appear={appear}
-          >
-            <Section.Description>{m[kind].empty}</Section.Description>
-          </ContactListItem>
+          {items.length === 0 && entries.length === 0 ? (
+            <li {...stylex.props(reset.base, styles.contactSlot, contactSlotMarker)}>
+              <div {...stylex.props(styles.contactClip)}>
+                <Section.Item
+                  render={<div />}
+                  xstyle={[styles.contactItem, contactItemMarker]}
+                >
+                  <Section.Content>
+                    <Section.Description>{m[kind].empty}</Section.Description>
+                  </Section.Content>
+                </Section.Item>
+              </div>
+            </li>
+          ) : null}
         </Section.Items>
         {children}
       </Section.Body>
