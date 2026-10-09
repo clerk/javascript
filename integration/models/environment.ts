@@ -12,16 +12,29 @@ export type EnvironmentConfig = {
   toJson(): { public: Record<string, string>; private: Record<string, string> };
   fromJson(json: ReturnType<EnvironmentConfig['toJson']>): EnvironmentConfig;
   clone(): EnvironmentConfig;
+  setResolver(resolver: (env: EnvironmentConfig) => Promise<void>): EnvironmentConfig;
+  resolve(): Promise<void>;
 };
 
 export const environmentConfig = () => {
   let id = '';
+  let resolver: ((env: EnvironmentConfig) => Promise<void>) | undefined;
+  let resolution: Promise<void> | undefined;
   const envVars: EnvironmentVariables = {
     public: new Map<string, string>(),
     private: new Map<string, string>(),
   };
 
   const self: EnvironmentConfig = {
+    setResolver: value => {
+      resolver = value;
+      resolution = undefined;
+      return self;
+    },
+    resolve: () => {
+      resolution ||= resolver ? resolver(self) : Promise.resolve();
+      return resolution;
+    },
     setId: (newId: string) => {
       id = newId;
       return self;
@@ -54,6 +67,9 @@ export const environmentConfig = () => {
       const res = environmentConfig();
       envVars.private.forEach((v, k) => res.setEnvVariable('private', k, v));
       envVars.public.forEach((v, k) => res.setEnvVariable('public', k, v));
+      if (resolver) {
+        res.setResolver(resolver);
+      }
       return res;
     },
   };

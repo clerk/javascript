@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import { instanceKeys } from '../../presets/envs';
+import { resolveInstanceKeys } from '../../presets/envs';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { withRetry } from '../../testUtils/retryableClerkClient';
@@ -23,8 +23,8 @@ test.describe('Custom Flows OAuth @custom', () => {
     await app.dev();
 
     const client = createClerkClient({
-      secretKey: instanceKeys.get('oauth-provider').sk,
-      publishableKey: instanceKeys.get('oauth-provider').pk,
+      secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+      publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
     });
     const users = createUserService(withRetry(client));
     fakeUser = users.createFakeUser(test, { withUsername: true });
@@ -86,7 +86,7 @@ test.describe('Custom Flows OAuth @custom', () => {
     expect(secondPost.method()).toBe('POST');
 
     // Complete the OAuth flow end-to-end and assert we're signed in on the app instance.
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();

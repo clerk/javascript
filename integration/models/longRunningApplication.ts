@@ -5,7 +5,6 @@ import { awaitableTreekill, fs } from '../scripts';
 import type { Application } from './application';
 import type { ApplicationConfig } from './applicationConfig';
 import type { EnvironmentConfig } from './environment';
-import { environmentConfig } from './environment';
 import { stateFile } from './stateFile';
 
 const getPort = (_url: string) => {
@@ -40,7 +39,7 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
   let port = getPort(params.serverUrl);
   let serverUrl: string = params.serverUrl;
   let appDir: string;
-  let env: EnvironmentConfig = params.env;
+  const env: EnvironmentConfig = params.env;
 
   const readFromStateFile = () => {
     if (!stateFile.getLongRunningApps() || [port, serverUrl, pid, appDir, env].filter(Boolean).length === 0) {
@@ -51,7 +50,9 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
     serverUrl ||= data.serverUrl;
     pid ||= data.pid;
     appDir ||= data.appDir;
-    env ||= environmentConfig().fromJson(data.env);
+    if (data.env) {
+      env.fromJson(data.env);
+    }
   };
 
   const self = new Proxy(
@@ -62,6 +63,7 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
         const log = (msg: string) => console.log(`[${name}] ${msg}`);
         log('Starting init...');
         try {
+          await params.env.resolve();
           const publishableKey = params.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
           const secretKey = params.env.privateVariables.get('CLERK_SECRET_KEY');
           const apiUrl = params.env.privateVariables.get('CLERK_API_URL');
