@@ -62,6 +62,19 @@ Every part takes `xstyle`, `ref`, and `render` along with its element's props.
 | Inside `Profile.ContentPanel`           | `h3`          | `h4`            |
 | Inside `HeadingLevelProvider level={4}` | `h4`          | `h5`            |
 
+## Focus
+
+`Panel.Title` takes `tabIndex={-1}`, so it can receive focus without joining the tab order. Content
+inside `Panel.Root` reaches the title with `usePanelTitle()`, which returns a function that gives
+the title element. Inside a profile page, that is the profile's page title.
+
+```tsx
+import { usePanelTitle } from '@clerk/mosaic/components/panel';
+
+const panelTitle = usePanelTitle();
+panelTitle()?.focus();
+```
+
 ## Styling
 
 Each part carries a stable class and reflects no state, so target the classes directly:
