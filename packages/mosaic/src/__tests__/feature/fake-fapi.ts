@@ -8,6 +8,7 @@ import type {
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
+  OrganizationMembershipRequestJSON,
   OrganizationSuggestionJSON,
   PhoneNumberJSON,
   RoleJSON,
@@ -61,6 +62,9 @@ export interface FakeFapiState {
   hasRoleSetMigration: boolean;
   invitations: UserOrganizationInvitationJSON[];
   organizationInvitations: OrganizationInvitationJSON[];
+  organizationMembershipRequests: Array<
+    Omit<OrganizationMembershipRequestJSON, 'status'> & { status: 'pending' | 'accepted' | 'rejected' }
+  >;
   suggestions: OrganizationSuggestionJSON[];
   apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
@@ -296,6 +300,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     hasRoleSetMigration: false,
     invitations: [],
     organizationInvitations: [],
+    organizationMembershipRequests: [],
     suggestions: [],
     apiKeys: [],
     passwordUpdates: [],

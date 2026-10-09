@@ -1,9 +1,11 @@
 import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
+import { fapiMembership } from '../fapi';
 import { envelope, missing, rejectUnknownParams } from './shared';
 
 const INVITATION_STATUSES = ['pending', 'accepted', 'revoked', 'expired'];
+const MEMBERSHIP_REQUEST_STATUSES = ['pending', 'accepted', 'rejected'];
 
 export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path: string) => string) {
   return [
@@ -75,6 +77,71 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       const offset = Number(url.searchParams.get('offset') ?? 0);
       const limit = Number(url.searchParams.get('limit') ?? 10);
       return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, null);
+    }),
+    http.get(fapiUrl('/v1/organizations/:organizationId/membership_requests'), ({ params, request }) => {
+      const url = new URL(request.url);
+      const rejected = rejectUnknownParams(url, ['status']);
+      if (rejected) {
+        return rejected;
+      }
+      const statuses = url.searchParams.getAll('status').flatMap(status => status.split(','));
+      const invalidStatus = statuses.find(status => !MEMBERSHIP_REQUEST_STATUSES.includes(status));
+      if (invalidStatus) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_param_value_invalid',
+                message: `${invalidStatus} is not a valid value for status.`,
+                meta: { param_name: 'status' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
+      const matching = state.organizationMembershipRequests.filter(
+        item =>
+          item.organization_id === params.organizationId && (statuses.length === 0 || statuses.includes(item.status)),
+      );
+      const offset = Number(url.searchParams.get('offset') ?? 0);
+      const limit = Number(url.searchParams.get('limit') ?? 10);
+      return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, null);
+    }),
+    http.post(fapiUrl('/v1/organizations/:organizationId/membership_requests/:requestId/accept'), ({ params }) => {
+      const request = state.organizationMembershipRequests.find(
+        item =>
+          item.organization_id === params.organizationId && item.id === params.requestId && item.status === 'pending',
+      );
+      const organization = state.memberships.find(item => item.organization.id === params.organizationId)?.organization;
+      if (!request || !organization) {
+        return missing();
+      }
+      const accepted = { ...request, status: 'accepted' as const };
+      state.organizationMembershipRequests = state.organizationMembershipRequests.map(item =>
+        item.id === accepted.id ? accepted : item,
+      );
+      state.memberships.push(
+        fapiMembership(organization, {
+          id: `orgmem_${request.public_user_data.user_id}`,
+          public_user_data: request.public_user_data,
+        }),
+      );
+      return envelope(accepted, null);
+    }),
+    http.post(fapiUrl('/v1/organizations/:organizationId/membership_requests/:requestId/reject'), ({ params }) => {
+      const request = state.organizationMembershipRequests.find(
+        item =>
+          item.organization_id === params.organizationId && item.id === params.requestId && item.status === 'pending',
+      );
+      if (!request) {
+        return missing();
+      }
+      const rejected = { ...request, status: 'rejected' as const };
+      state.organizationMembershipRequests = state.organizationMembershipRequests.map(item =>
+        item.id === rejected.id ? rejected : item,
+      );
+      return envelope(rejected, null);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/invitations/:invitationId/revoke'), ({ params }) => {
       const invitation = state.organizationInvitations.find(

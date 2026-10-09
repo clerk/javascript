@@ -50,6 +50,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
     'You are no longer a member of this organization. Please choose or create another one.',
   organization_not_found_or_unauthorized_with_create_organization_disabled:
     'You are no longer a member of this organization. Please choose another one.',
+  request_unavailable: 'This request is no longer pending.',
   passkey_already_exists: 'A passkey is already registered with this device.',
   passkey_not_supported: 'Passkeys are not supported on this device.',
   passkey_pa_not_supported: 'Registration requires a platform authenticator but the device does not support it.',

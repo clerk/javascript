@@ -2,13 +2,13 @@ import * as Stories from './organization-profile-members-panel.stories';
 
 # OrganizationProfileMembersPanel
 
-The organization profile’s Members panel owns the page title and tab navigation. These examples show its Members, Invitations, and Requests tabs with controlled tables. The tables page on the server ten rows at a time, without sorting or a page-size control, following the API keys table. The Members table has a search field; the Invitations table does not, because the API cannot search invitations.
+The organization profile’s Members panel owns the page title and tab navigation. These examples show its Members, Invitations, and Requests tabs with controlled tables. The tables page on the server ten rows at a time, without sorting or a page-size control, following the API keys table. The Members table has a search field; the Invitations and Requests tables do not, because the API cannot search them.
 
 Removing a member opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
 
 Revoking an invitation opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful revocation, focus moves to a surviving row action, the Invite button, or the Invitations table.
 
-Accepting or declining a request runs immediately. Both row actions are held while the callback is pending, and failures appear beside the actions so the user can retry. After a successful removal, focus moves to a surviving row action or the search field.
+Accepting or declining a request runs immediately. Both row actions are held while the callback is pending, and failures appear beside the actions so the user can retry. After a decision, focus moves to a surviving row action, the Invite button, or the Requests table.
 
 Every tab shows an Invite button when the panel is given `onInvite`. It opens the invite dialog, which takes email addresses in a tag input and a role. Malformed email addresses, and any the caller passes in `rejectedEmailAddresses`, show as invalid tags and disable sending. The dialog stays open while `isPending` is true.
 
