@@ -1,18 +1,16 @@
 import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/shared/types';
 
-import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
-import { save, SaveError, UNEXPECTED_ERROR } from '../../utils/errors';
-import type { OrganizationProfileGeneralPanelViewProps } from './organization-profile-general-panel.view';
+import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
+import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/errors';
+import type { OrganizationProfileProfileSectionViewProps } from './organization-profile-profile-section.view';
 
-type GeneralData = Omit<OrganizationProfileGeneralPanelViewProps, 'dangerSlot'>;
-
-type OrganizationProfileGeneralPanelModel =
+type OrganizationProfileProfileSectionModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (GeneralData & { status: 'ready'; organizationId: string });
+  | (OrganizationProfileProfileSectionViewProps & { status: 'ready'; organizationId: string });
 
-export function useOrganizationProfileGeneralPanelModel(): OrganizationProfileGeneralPanelModel {
+export function useOrganizationProfileProfileSectionModel(): OrganizationProfileProfileSectionModel {
   const { isLoaded, organization, membership } = useOrganization();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const clerk = useClerk();
