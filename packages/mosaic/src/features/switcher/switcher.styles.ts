@@ -35,6 +35,12 @@ export const styles = stylex.create({
     transitionProperty: 'background-color',
   },
 
+  triggerLabelledBadged: {
+    borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['1']})`,
+    paddingBlock: space['0.5'],
+    paddingInline: space['1.5'],
+  },
+
   triggerAvatarOnly: {
     opacity: {
       default: 1,
