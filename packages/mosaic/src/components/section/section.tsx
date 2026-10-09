@@ -1,7 +1,10 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { usePresenceList } from '../../primitives/hooks/use-presence-list';
+import type { TransitionProps } from '../../primitives/hooks/use-transition';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -13,7 +16,7 @@ import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../.
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
-import { sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionAnimatedSlotMarker, sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
@@ -23,6 +26,13 @@ export type SectionTitleProps = Omit<HeadingProps, 'size'>;
 export type SectionBodyProps = MosaicComponentProps<'div'>;
 export type SectionRowProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'ul'>;
+export interface SectionAnimatedItemsProps<T> extends Omit<SectionItemsProps, 'children'> {
+  items: readonly T[];
+  getKey: (item: T) => string;
+  empty?: React.ReactNode;
+  busy?: (item: T) => boolean;
+  children: (item: T, row: { present: boolean }) => React.ReactNode;
+}
 export type SectionItemProps = MosaicComponentProps<'div'> & { wrap?: boolean };
 export type SectionMediaSize = 'sm' | 'md' | 'lg' | 'xl';
 export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize };
@@ -177,6 +187,129 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
 
   return <SectionItemWrapContext.Provider value={wrap}>{element}</SectionItemWrapContext.Provider>;
 });
+
+function useEntrance(appear: boolean, mounted: boolean) {
+  const entrance = React.useRef(appear);
+  const wasMounted = React.useRef(false);
+  if (mounted !== wasMounted.current) {
+    wasMounted.current = mounted;
+    if (mounted) {
+      entrance.current = appear;
+    }
+  }
+  return entrance.current;
+}
+
+function withoutEntrance(transitionProps: TransitionProps, appear: boolean) {
+  return appear ? transitionProps : { ...transitionProps, 'data-starting-style': undefined, style: undefined };
+}
+
+function AnimatedItem({
+  present,
+  appear,
+  busy = false,
+  empty,
+  onExited,
+  children,
+}: {
+  present: boolean;
+  appear: boolean;
+  busy?: boolean;
+  empty?: React.ReactNode;
+  onExited?: () => void;
+  children: React.ReactNode;
+}) {
+  const element = React.useRef<HTMLLIElement>(null);
+  const { mounted, transitionProps } = useTransition({ open: present, ref: element });
+  const entrance = useEntrance(appear, mounted);
+
+  React.useEffect(() => {
+    if (!mounted) {
+      onExited?.();
+    }
+  }, [mounted, onExited]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  const slotProps = withoutEntrance(transitionProps, entrance);
+  const rowProps = { ...slotProps, style: undefined };
+
+  return (
+    <li
+      ref={element}
+      aria-hidden={present ? undefined : true}
+      {...stylex.props(reset.base, styles.animatedSlot, sectionAnimatedSlotMarker)}
+      {...slotProps}
+      {...inertProps(!present)}
+    >
+      {empty !== undefined ? (
+        <Item
+          render={<div />}
+          aria-hidden
+          xstyle={styles.animatedEmpty}
+        >
+          {empty}
+        </Item>
+      ) : null}
+      <div {...stylex.props(styles.animatedClip)}>
+        <Item
+          render={<div />}
+          aria-busy={busy || undefined}
+          xstyle={styles.animatedRow}
+          {...rowProps}
+        >
+          {children}
+        </Item>
+      </div>
+    </li>
+  );
+}
+
+/**
+ * A `Section.Items` list whose rows enter and exit. Each entry in `items` renders as a row holding
+ * what `children` returns for it, keyed by `getKey`; a row that leaves `items` collapses in place
+ * before it unmounts, and `empty` is the row shown while `items` is empty, which the last row
+ * collapses into and the first row grows out of. Rows present on the first render do not enter.
+ * `busy` marks a row `aria-busy`. Rows keep the order `items` gives; pair with `useStableOrder` to
+ * hold the first-seen order while the list is mounted.
+ */
+function AnimatedItems<T>({ items, getKey, empty, busy, children, xstyle, ...rest }: SectionAnimatedItemsProps<T>) {
+  const entries = usePresenceList(items, getKey);
+  const settled = React.useRef(false);
+  React.useEffect(() => {
+    settled.current = true;
+  }, []);
+  const appear = settled.current;
+
+  return (
+    <Items
+      xstyle={xstyle}
+      {...rest}
+    >
+      {entries.map(({ key, item, present, onExited }) => (
+        <AnimatedItem
+          key={key}
+          present={present}
+          appear={appear}
+          busy={busy?.(item)}
+          empty={items.length === 0 || (present && items.length === 1) ? empty : undefined}
+          onExited={onExited}
+        >
+          {children(item, { present })}
+        </AnimatedItem>
+      ))}
+      {empty !== undefined && items.length === 0 && entries.length === 0 ? (
+        <li {...stylex.props(reset.base, styles.animatedSlot, sectionAnimatedSlotMarker)}>
+          <div {...stylex.props(styles.animatedClip)}>
+            <Item render={<div />}>{empty}</Item>
+          </div>
+        </li>
+      ) : null}
+    </Items>
+  );
+}
 
 const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
   { size = 'md', render, xstyle, ...rest },
@@ -359,6 +492,7 @@ export const Section = {
   Body,
   Row,
   Items,
+  AnimatedItems,
   Item,
   Media,
   Content,

@@ -1,10 +1,47 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import * as stylex from '@stylexjs/stylex';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { HeadingLevelProvider } from '../heading';
 import { Section } from './section';
+
+type Animated = { getAnimations?: () => Animation[] };
+
+function holdExits() {
+  const exit = createDeferredPromise();
+  (Element.prototype as Animated).getAnimations = () => [{ finished: exit.promise } as Animation];
+  return exit;
+}
+
+function AnimatedEmails({ emails }: { emails: string[] }) {
+  return (
+    <Section.Group>
+      <Section.Body data-testid='body'>
+        <Section.AnimatedItems
+          data-testid='items'
+          items={emails}
+          getKey={email => email}
+          busy={email => email.startsWith('busy')}
+          empty={<Section.Description>No email addresses added</Section.Description>}
+        >
+          {(email, { present }) => (
+            <Section.Content>
+              <Section.Description>{email}</Section.Description>
+              <button
+                type='button'
+                disabled={!present}
+              >
+                Manage {email}
+              </button>
+            </Section.Content>
+          )}
+        </Section.AnimatedItems>
+      </Section.Body>
+    </Section.Group>
+  );
+}
 
 const overrides = stylex.create({
   root: { containerType: 'inline-size' },
@@ -396,6 +433,120 @@ describe('Section', () => {
     render(<Section.Note data-testid='note'>Managed by Acme SSO</Section.Note>);
 
     expect(screen.getByTestId('note').querySelector('.cl-section-note-icon')).toBeNull();
+  });
+
+  describe('AnimatedItems', () => {
+    afterEach(() => {
+      delete (Element.prototype as Animated).getAnimations;
+    });
+
+    it('renders a list of rows without an entering state on first render', () => {
+      render(<AnimatedEmails emails={['ada@example.com', 'busy@example.com']} />);
+
+      const list = screen.getByRole('list');
+      expect(list).toBe(screen.getByTestId('items'));
+      expect(list).toHaveClass('cl-section-items');
+      expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+      const row = screen.getByText('ada@example.com').closest('.cl-section-item');
+      expect(row?.tagName).toBe('DIV');
+      expect(row).toHaveAttribute('data-nested');
+      expect(row).not.toHaveAttribute('data-starting-style');
+      expect(row?.closest('li')).not.toHaveAttribute('data-starting-style');
+      expect(row).not.toHaveAttribute('aria-busy');
+      expect(screen.getByText('busy@example.com').closest('.cl-section-item')).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByText('No email addresses added')).not.toBeInTheDocument();
+    });
+
+    it('enters a row added after mount from its starting state', () => {
+      const { rerender } = render(<AnimatedEmails emails={['ada@example.com']} />);
+      rerender(<AnimatedEmails emails={['ada@example.com', 'grace@example.com']} />);
+
+      const row = screen.getByText('grace@example.com').closest('.cl-section-item');
+      expect(row).toHaveAttribute('data-starting-style');
+      expect(row?.closest('li')).toHaveAttribute('data-starting-style');
+      expect(screen.getByText('ada@example.com').closest('li')).not.toHaveAttribute('data-starting-style');
+    });
+
+    it('keeps a removed row inert in place until its exit finishes', async () => {
+      const exit = holdExits();
+      const emails = ['ada@example.com', 'grace@example.com', 'mary@example.com'];
+      const { rerender } = render(<AnimatedEmails emails={emails} />);
+      rerender(<AnimatedEmails emails={emails.filter(email => email !== 'grace@example.com')} />);
+
+      const slot = screen.getByText('grace@example.com').closest('li');
+      expect(slot).toHaveAttribute('data-ending-style');
+      expect(slot).toHaveAttribute('inert');
+      expect(slot).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByRole('button', { name: 'Manage grace@example.com', hidden: true })).toBeDisabled();
+      expect(slot?.previousElementSibling).toHaveTextContent('ada@example.com');
+      expect(slot?.nextElementSibling).toHaveTextContent('mary@example.com');
+
+      await act(async () => {
+        exit.resolve();
+        await exit.promise;
+      });
+      expect(screen.queryByText('grace@example.com')).not.toBeInTheDocument();
+    });
+
+    it('keeps first-render rows out of the entering state when the list re-renders before the first frame', () => {
+      const { rerender } = render(<AnimatedEmails emails={['ada@example.com']} />);
+      rerender(<AnimatedEmails emails={['ada@example.com']} />);
+
+      const row = screen.getByText('ada@example.com').closest('.cl-section-item');
+      expect(row).not.toHaveAttribute('data-starting-style');
+      expect(row?.closest('li')).not.toHaveAttribute('data-starting-style');
+      expect(row?.closest('li')).not.toHaveAttribute('style');
+    });
+
+    it('carries the empty row inside the last row while it exits, then shows it at rest', async () => {
+      const exit = holdExits();
+      const { rerender } = render(<AnimatedEmails emails={['ada@example.com', 'grace@example.com']} />);
+      expect(screen.queryByText('No email addresses added')).not.toBeInTheDocument();
+
+      rerender(<AnimatedEmails emails={['ada@example.com']} />);
+      expect(screen.getAllByText('No email addresses added')).toHaveLength(1);
+      expect(screen.getByText('No email addresses added').closest('li')).toBe(
+        screen.getByText('ada@example.com').closest('li'),
+      );
+      await act(async () => {
+        exit.resolve();
+        await exit.promise;
+      });
+
+      const lastExit = holdExits();
+      rerender(<AnimatedEmails emails={[]} />);
+      const slot = screen.getByText('ada@example.com').closest('li');
+      expect(slot).toHaveAttribute('data-ending-style');
+      expect(screen.getAllByText('No email addresses added')).toHaveLength(1);
+      const empty = screen.getByText('No email addresses added').closest('.cl-section-item');
+      expect(empty?.closest('li')).toBe(slot);
+      expect(empty).toHaveAttribute('aria-hidden', 'true');
+      expect(slot?.querySelector('.cl-section-item:not([aria-hidden])')).toHaveTextContent('ada@example.com');
+
+      await act(async () => {
+        lastExit.resolve();
+        await lastExit.promise;
+      });
+      expect(screen.queryByText('ada@example.com')).not.toBeInTheDocument();
+      const rest = screen.getByText('No email addresses added').closest('li');
+      expect(rest).not.toHaveAttribute('data-open');
+      expect(rest).not.toHaveAttribute('data-ending-style');
+      expect(within(screen.getByRole('list')).getAllByRole('listitem')).toHaveLength(1);
+    });
+
+    it('carries the empty row inside the first row as it enters', () => {
+      const { rerender } = render(<AnimatedEmails emails={[]} />);
+      expect(screen.getByText('No email addresses added').closest('li')).not.toHaveAttribute('data-open');
+
+      rerender(<AnimatedEmails emails={['grace@example.com']} />);
+      const slot = screen.getByText('grace@example.com').closest('li');
+      expect(slot).toHaveAttribute('data-starting-style');
+      expect(screen.getAllByText('No email addresses added')).toHaveLength(1);
+      expect(screen.getByText('No email addresses added').closest('li')).toBe(slot);
+
+      rerender(<AnimatedEmails emails={['grace@example.com', 'ada@example.com']} />);
+      expect(screen.queryByText('No email addresses added')).not.toBeInTheDocument();
+    });
   });
 
   it('marks a wrapping item for its theme hook', () => {

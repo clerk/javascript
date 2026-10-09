@@ -40,7 +40,7 @@ export function mergeRenderList(previous: string[], current: string[]): string[]
  * `useTransition` from `present` and call `onExited` once it unmounts, so a removed item plays
  * its exit before leaving the DOM. A removed item renders with the data it last had.
  */
-export function usePresenceList<T>(items: T[], getKey: (item: T) => string) {
+export function usePresenceList<T>(items: readonly T[], getKey: (item: T) => string) {
   const keys = useMemo(() => items.map(getKey), [items, getKey]);
   const keysRef = useRef(keys);
   keysRef.current = keys;

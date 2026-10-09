@@ -44,6 +44,32 @@ list of values, one `Section.Item` per entry, and each item becomes a list item.
 optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`,
 and `xl` sizes.
 
+`Section.AnimatedItems` is a `Section.Items` list whose rows enter and exit. It takes `items`, a
+`getKey` for each, and a child function that returns a row's media, content, and actions; each entry
+renders as a `Section.Item` inside a list item. A row that leaves `items` collapses in place before
+it unmounts, a row that joins `items` expands into place, and rows present on the first render do not
+enter. `empty` is a row shown while `items` is empty, and `busy` marks a row `aria-busy`. The child
+function also receives `present`, which is `false` for a row that is on its way out. Rows keep the
+order `items` gives, so pair it with `useStableOrder` to hold a list's first-seen order while it is
+mounted.
+
+```tsx
+<Section.AnimatedItems
+  items={emails}
+  getKey={email => email.id}
+  empty={<Section.Description>No email addresses added</Section.Description>}
+>
+  {(email, { present }) => (
+    <>
+      <Section.Content>
+        <Section.Description>{email.address}</Section.Description>
+      </Section.Content>
+      <Section.Actions>{control}</Section.Actions>
+    </>
+  )}
+</Section.AnimatedItems>
+```
+
 When a row offers no action, `Section.Note` takes the place of its `Section.Actions` to say why — it
 sits directly in `Section.Item` and holds the trailing slot itself. Its `icon` prop renders into a
 fixed leading slot sized to the text, for a provider logo or a lock.
@@ -59,22 +85,23 @@ title. See [Panel](/components/panel) and [Heading](/components/heading).
 
 ## Parts
 
-| Part                  | Element     | Class                     | Notes                                                           |
-| --------------------- | ----------- | ------------------------- | --------------------------------------------------------------- |
-| `Section.Root`        | `<section>` | `.cl-section`             | Stacks groups. Unnamed unless given `aria-label`.               |
-| `Section.Group`       | `<div>`     | `.cl-section-group`       | Header and card, with `role='group'` named by its title.        |
-| `Section.Header`      | `<div>`     | `.cl-section-header`      | Content and optional actions.                                   |
-| `Section.Title`       | heading     | `.cl-section-title`       | The group's heading.                                            |
-| `Section.Body`        | `<div>`     | `.cl-section-body`        | The card under the header.                                      |
-| `Section.Row`         | `<div>`     | `.cl-section-row`         | One setting.                                                    |
-| `Section.Items`       | `<ul>`      | `.cl-section-items`       | A list of values.                                               |
-| `Section.Item`        | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`. |
-| `Section.Media`       | `<div>`     | `.cl-section-media`       | Reflects `data-size`.                                           |
-| `Section.Content`     | `<div>`     | `.cl-section-content`     | Label or title, and description.                                |
-| `Section.Label`       | `<div>`     | `.cl-section-label`       |                                                                 |
-| `Section.Description` | `<div>`     | `.cl-section-description` |                                                                 |
-| `Section.Actions`     | `<div>`     | `.cl-section-actions`     |                                                                 |
-| `Section.Error`       | `<p>`       | `.cl-section-error`       | A row-level message, placed beside the item inside the row.     |
+| Part                    | Element     | Class                     | Notes                                                           |
+| ----------------------- | ----------- | ------------------------- | --------------------------------------------------------------- |
+| `Section.Root`          | `<section>` | `.cl-section`             | Stacks groups. Unnamed unless given `aria-label`.               |
+| `Section.Group`         | `<div>`     | `.cl-section-group`       | Header and card, with `role='group'` named by its title.        |
+| `Section.Header`        | `<div>`     | `.cl-section-header`      | Content and optional actions.                                   |
+| `Section.Title`         | heading     | `.cl-section-title`       | The group's heading.                                            |
+| `Section.Body`          | `<div>`     | `.cl-section-body`        | The card under the header.                                      |
+| `Section.Row`           | `<div>`     | `.cl-section-row`         | One setting.                                                    |
+| `Section.Items`         | `<ul>`      | `.cl-section-items`       | A list of values.                                               |
+| `Section.AnimatedItems` | `<ul>`      | `.cl-section-items`       | A list of values whose rows enter and exit.                     |
+| `Section.Item`          | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`. |
+| `Section.Media`         | `<div>`     | `.cl-section-media`       | Reflects `data-size`.                                           |
+| `Section.Content`       | `<div>`     | `.cl-section-content`     | Label or title, and description.                                |
+| `Section.Label`         | `<div>`     | `.cl-section-label`       |                                                                 |
+| `Section.Description`   | `<div>`     | `.cl-section-description` |                                                                 |
+| `Section.Actions`       | `<div>`     | `.cl-section-actions`     |                                                                 |
+| `Section.Error`         | `<p>`       | `.cl-section-error`       | A row-level message, placed beside the item inside the row.     |
 
 Every part takes `xstyle`, `ref`, and `render` along with its element's props. Items and content
 inside `Section.Items` reflect `data-nested`.
@@ -95,6 +122,17 @@ inside `Section.Items` reflect `data-nested`.
 <Story
   name='Cards'
   storyModule={SectionStories}
+/>
+
+### Animated items
+
+<Story
+  name='AnimatedItems'
+  storyModule={SectionStories}
+  composition={[
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Icon', href: '/components/icon', layer: 'Components' },
+  ]}
 />
 
 ### Header description

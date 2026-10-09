@@ -1,9 +1,21 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
-import { sectionNestedItemMarker } from './section.markers.stylex';
+import {
+  colorVars,
+  durationVars,
+  easingVars,
+  focusVars,
+  fontWeightVars,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
+import { sectionAnimatedSlotMarker, sectionNestedItemMarker } from './section.markers.stylex';
 
 const compact = '@container cl-section (width < 26rem)';
+const ring = `calc(${focusVars['--cl-focus-outline-width']} + ${focusVars['--cl-focus-outline-offset']})`;
+const transitioning = ':where([data-starting-style], [data-ending-style])';
+const ending = ':where([data-ending-style])';
 
 export const styles = stylex.create({
   root: {
@@ -94,6 +106,100 @@ export const styles = stylex.create({
     borderBlockStartWidth: {
       default: '0px',
       [stylex.when.siblingBefore(':where(*)', sectionNestedItemMarker)]: '1px',
+    },
+  },
+  animatedSlot: {
+    display: 'grid',
+    gridTemplateRows: {
+      default: 'auto 1fr',
+      [transitioning]: 'auto 0fr',
+    },
+    transitionDelay: durationVars['--cl-duration-base'],
+    transitionDuration: durationVars['--cl-duration-slower'],
+    transitionProperty: {
+      default: 'grid-template-rows',
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    transitionTimingFunction: easingVars['--cl-ease-in-out'],
+  },
+  animatedClip: {
+    marginInline: `calc(-1 * ${ring})`,
+    overflow: 'clip',
+    paddingInline: ring,
+    alignContent: 'start',
+    display: 'grid',
+    gridColumnStart: '1',
+    gridRowEnd: 'span 2',
+    gridRowStart: '1',
+    maskImage: `linear-gradient(to top, transparent, black calc(${space['4']} - ${ring}))`,
+    position: 'relative',
+    minHeight: 0,
+    '::before': {
+      insetInline: ring,
+      borderBlockStartColor: colorVars['--cl-color-border'],
+      borderBlockStartStyle: 'solid',
+      borderBlockStartWidth: {
+        default: '0px',
+        [stylex.when.ancestor(':where([data-open] ~ *)', sectionAnimatedSlotMarker)]: '1px',
+      },
+      content: '""',
+      insetBlockStart: 0,
+      position: 'absolute',
+    },
+  },
+  animatedEmpty: {
+    gridColumnStart: '1',
+    gridRowStart: '1',
+    opacity: {
+      default: 0,
+      [stylex.when.ancestor(transitioning, sectionAnimatedSlotMarker)]: 1,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 0,
+        [stylex.when.ancestor(transitioning, sectionAnimatedSlotMarker)]: 1,
+      },
+    },
+    transitionDelay: {
+      default: durationVars['--cl-duration-instant'],
+      [stylex.when.ancestor(ending, sectionAnimatedSlotMarker)]:
+        `calc(${durationVars['--cl-duration-base']} + ${durationVars['--cl-duration-fast']})`,
+    },
+    transitionDuration: {
+      default: durationVars['--cl-duration-fast'],
+      [stylex.when.ancestor(ending, sectionAnimatedSlotMarker)]: durationVars['--cl-duration-base'],
+    },
+    transitionProperty: {
+      default: 'opacity',
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-exit'],
+      [stylex.when.ancestor(ending, sectionAnimatedSlotMarker)]: easingVars['--cl-ease-enter'],
+    },
+  },
+  animatedRow: {
+    opacity: {
+      default: 1,
+      [transitioning]: 0,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 1,
+        [transitioning]: 1,
+      },
+    },
+    transitionDelay: {
+      default: `calc(${durationVars['--cl-duration-base']} + ${durationVars['--cl-duration-slow']})`,
+      [ending]: durationVars['--cl-duration-base'],
+    },
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      [ending]: durationVars['--cl-duration-fast'],
+    },
+    transitionProperty: {
+      default: 'opacity',
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-enter'],
+      [ending]: easingVars['--cl-ease-exit'],
     },
   },
   mediaBase: {
