@@ -43,12 +43,12 @@ export function UserProfilePictureRowView({
   const errorText = useErrorText();
   const controller = useUserProfilePictureController({ onChange, onRemove });
   const [rejection, setRejection] = useState<LocalizableError>();
-  const error = rejection ?? controller.error;
+  const error = rejection ? errorText(rejection) : controller.error;
   const remove = controller.onRemove;
   const handleRemove = remove
     ? () => {
         setRejection(undefined);
-        return remove();
+        remove();
       }
     : undefined;
   const initials = name
@@ -74,7 +74,7 @@ export function UserProfilePictureRowView({
         const file = files[0];
         if (file) {
           setRejection(undefined);
-          void controller.onChange?.(file);
+          controller.onChange?.(file);
         }
       }}
     >
@@ -98,7 +98,7 @@ export function UserProfilePictureRowView({
           onRemove={handleRemove}
         />
       </Section.Item>
-      <Section.Error>{error ? errorText(error) : undefined}</Section.Error>
+      <Section.Error>{error}</Section.Error>
     </FileUpload.Root>
   );
 }
@@ -110,7 +110,7 @@ function ProfilePictureActions({
 }: {
   hasImage: boolean;
   canChange: boolean;
-  onRemove?: () => Promise<void>;
+  onRemove?: () => void;
 }) {
   const m = useMessages('userProfileAccountSection');
   const { openFilePicker } = FileUpload.useFileUpload();
@@ -121,7 +121,7 @@ function ProfilePictureActions({
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'x', onClick: () => void onRemove() });
+    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
   }
 
   if (actions.length > 0) {

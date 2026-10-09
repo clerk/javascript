@@ -224,8 +224,8 @@ export type SpacingVarName = keyof typeof spacingVars;
 export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';
-export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
-export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-setup.view';
+export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
+export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
 
 export { APIKeysTableView } from '../features/api-keys/api-keys-table.view';
 export { UserProfileEnterpriseAccountsSectionView } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';

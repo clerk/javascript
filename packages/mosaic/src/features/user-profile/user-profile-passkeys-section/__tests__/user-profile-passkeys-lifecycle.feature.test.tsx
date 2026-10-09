@@ -2,6 +2,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { openDialog } from '../../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -380,8 +381,8 @@ describe('Passkey identity and policy at action time', () => {
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
     await user.type(input, 'Blocked rename');
     const environment = clerk.__internal_environment;
@@ -446,8 +447,8 @@ describe('Replacing instance policy while editing', () => {
     );
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
     await user.type(input, 'Blocked rename');
     const nextEnvironment = fapiEnvironment();

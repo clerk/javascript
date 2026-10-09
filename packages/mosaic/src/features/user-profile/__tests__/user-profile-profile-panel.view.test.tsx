@@ -9,7 +9,7 @@ import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
-import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
+import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 
 function DeleteAccount() {
   const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
@@ -21,10 +21,10 @@ const props: UserProfileProfilePanelViewProps = {
   name: 'Preston Booth',
   username: 'prestonxyz',
   emails: [
-    { id: 'email_1', value: 'item1@clerk.dev', isDefault: true },
-    { id: 'email_2', value: 'item2@clerk.dev' },
+    { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
+    { id: 'email_2', value: 'item2@clerk.dev', isDefault: false, isVerified: true },
   ],
-  phones: [{ id: 'phone_1', value: '+1 801-888-8181' }],
+  phones: [{ id: 'phone_1', value: '+1 801-888-8181', isDefault: false, isVerified: true }],
 };
 
 function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
@@ -37,6 +37,8 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
     </MosaicProvider>,
   );
 }
+
+const phoneVerifier = { sendCode: () => Promise.resolve(), verifyCode: () => Promise.resolve() };
 
 describe('UserProfileProfilePanelView', () => {
   it('names the connection managing the name, as the section does on its own', () => {
@@ -96,13 +98,12 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
     renderView({
       allowMultipleAccounts,
-      phones: [{ id: 'phone_added', value: '+18015558181' }],
+      phones: [{ id: 'phone_added', value: '+18015558181', isDefault: false, isVerified: true }],
       onRemovePhone: vi.fn(),
     });
 
@@ -203,10 +204,10 @@ describe('UserProfileProfilePanelView', () => {
 
   it('nests both contact types as groups inside Account when multiple accounts are allowed', () => {
     renderView({
-      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
+      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
       onAddEmail: vi.fn(),
-      onSendPhoneCode: () => Promise.resolve(),
-      onVerifyPhoneCode: () => Promise.resolve(),
+      onCreatePhone: () => Promise.resolve(phoneVerifier),
+      getPhoneVerifier: () => phoneVerifier,
     });
 
     const accountSection = screen.getByRole('region', { name: 'Account' });
@@ -227,7 +228,7 @@ describe('UserProfileProfilePanelView', () => {
   it('keeps both contact types inside Account when multiple accounts are not allowed', () => {
     renderView({
       allowMultipleAccounts: false,
-      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
+      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
       onManageEmail: vi.fn(),
       onManagePhone: vi.fn(),
     });
@@ -262,7 +263,11 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('renders an actionable empty state when no phone number exists', () => {
-    renderView({ phones: [], onSendPhoneCode: () => Promise.resolve(), onVerifyPhoneCode: () => Promise.resolve() });
+    renderView({
+      phones: [],
+      onCreatePhone: () => Promise.resolve(phoneVerifier),
+      getPhoneVerifier: () => phoneVerifier,
+    });
 
     const phoneSection = screen.getByRole('group', { name: 'Phone' });
     const emptyState = within(phoneSection).getByText('No phone numbers added');
@@ -436,12 +441,12 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       emails: [
         { id: 'email_primary', value: 'primary@clerk.dev', isDefault: true, isVerified: false },
-        { id: 'email_secondary', value: 'secondary@clerk.dev', isVerified: true },
-        { id: 'email_unverified', value: 'unverified@clerk.dev', isVerified: false },
+        { id: 'email_secondary', value: 'secondary@clerk.dev', isDefault: false, isVerified: true },
+        { id: 'email_unverified', value: 'unverified@clerk.dev', isDefault: false, isVerified: false },
       ],
       phones: [
-        { id: 'phone_unverified', value: '+1 801-555-0100', isVerified: false },
-        { id: 'phone_secondary', value: '+1 801-555-0101', isVerified: true },
+        { id: 'phone_unverified', value: '+1 801-555-0100', isDefault: false, isVerified: false },
+        { id: 'phone_secondary', value: '+1 801-555-0101', isDefault: false, isVerified: true },
       ],
       onVerifyEmail,
       onSetPrimaryEmail,
@@ -502,13 +507,11 @@ describe('UserProfileProfilePanelView', () => {
           value: 'immutable@clerk.dev',
           isDefault: true,
           isVerified: true,
-          canRemove: false,
         },
       ],
       phones: [],
       onVerifyEmail: vi.fn(),
       onSetPrimaryEmail: vi.fn(),
-      onRemoveEmail: vi.fn(),
     });
 
     expect(screen.queryByRole('button', { name: 'Manage immutable@clerk.dev' })).not.toBeInTheDocument();

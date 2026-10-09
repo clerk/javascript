@@ -1,6 +1,7 @@
 export const errorMessages: { readonly generic: string } & Readonly<Record<string, string>> = {
   generic: 'Something went wrong. Please try again.',
   action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
+  active_device_unavailable: 'This device is no longer available. Please try again.',
   avatar_file_count_exceeded: 'Only one file can be uploaded at a time.',
   avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
   avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
@@ -9,6 +10,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   connected_account_unavailable: 'This connected account is no longer available.',
   enterprise_connection_unavailable: 'This enterprise connection is no longer available.',
   form_new_password_matches_current: 'New password cannot be the same as the current password.',
+  form_param_format_invalid__email_address: 'Email address must be a valid email address.',
+  form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
   form_password_incorrect: 'Your current password is incorrect.',
   form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
   form_password_matches_identifier:
@@ -29,6 +32,12 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
     'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_contact_support:
     'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
+  mfa_account_changed: 'This account changed. Please try again.',
+  mfa_authenticator_unavailable: 'Authenticator is unavailable.',
+  mfa_method_cannot_remove: 'This method cannot be removed.',
+  mfa_phone_unavailable: 'This phone number is unavailable.',
+  mfa_print_unavailable: 'Printing is unavailable in this browser.',
+  mfa_setup_factor_first: 'Set up a verification method first.',
   network_error: 'Unable to reach the server. Check your connection and try again.',
   oauth_access_denied: 'You did not grant access to your account.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
@@ -63,6 +72,10 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   too_many_unverified_identifications:
     'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
   web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
+  web3_provider_unavailable: 'This wallet provider is unavailable.',
+  web3_wallet_creation_failed: 'The wallet could not be created.',
+  web3_verification_message_unavailable: 'The wallet verification message is unavailable.',
+  web3_signature_unavailable: 'The wallet signature is unavailable.',
   web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
   web3_solana_signature_generation_failed:
     'An error occurred while generating the signature. Please try again to continue.',

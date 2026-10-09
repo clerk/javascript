@@ -3,13 +3,15 @@ import { useEffect, useRef, useState } from 'react';
 import { useNow } from '../../hooks/use-now';
 import { useLocale } from '../../localization';
 import { formatDate, formatRelativeTime } from './api-keys-table.format';
-import type { APIKeysTableModel } from './api-keys-table.model';
+import { useAPIKeysTableModel } from './api-keys-table.model';
 import type { APIKey, APIKeyRecord, APIKeysTableMessages } from './api-keys-table.types';
 import { useCreateAPIKeyController } from './create-api-key.controller';
 
 const SEARCH_DEBOUNCE_MS = 500;
 
-export function useAPIKeysTableController(model: APIKeysTableModel, messages: APIKeysTableMessages) {
+export function useAPIKeysTableController(subject: string, messages: APIKeysTableMessages) {
+  const [query, setQuery] = useState('');
+  const model = useAPIKeysTableModel(subject, query);
   const locale = useLocale();
   const now = useNow({ updateInterval: 60_000 });
   const [searchValue, setSearchValue] = useState('');
@@ -34,7 +36,8 @@ export function useAPIKeysTableController(model: APIKeysTableModel, messages: AP
       setSearchValue(value);
       clearTimeout(timer.current);
       timer.current = setTimeout(() => {
-        model.search(value.trim());
+        setQuery(value.trim());
+        model.fetchPage(1);
       }, SEARCH_DEBOUNCE_MS);
     },
     manage: model.canManage

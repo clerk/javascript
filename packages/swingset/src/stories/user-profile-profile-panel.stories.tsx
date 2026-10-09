@@ -4,7 +4,7 @@ import type {
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -35,7 +35,7 @@ export function Default(_args: Record<string, unknown>) {
   const titleRef = useRef<HTMLDivElement>(null);
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
-    { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
+    { id: 'email_2', value: 'item2@clerk.dev', isDefault: false, isVerified: true },
   ]);
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
@@ -46,7 +46,9 @@ export function Default(_args: Record<string, unknown>) {
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
   const emailFlow = createUserProfileAddEmailFixture({
-    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+    onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
   });
 
   return (
@@ -73,7 +75,10 @@ export function Default(_args: Record<string, unknown>) {
       imageUrl={imageUrl}
       phones={phones}
       {...createUserProfileAddPhoneFixture({
-        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+        onCreated: (id, value) =>
+          setPhones(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+        onVerified: id =>
+          setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
       })}
       dangerSlot={<UserProfileDangerPreview />}
       onManageEmail={() => undefined}

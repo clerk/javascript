@@ -63,7 +63,8 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
     if (!firstPage) {
       logger.warnOnce('[Clerk] OrganizationProfile has no pages to show.');
     }
-    const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : (firstPage?.id ?? 'general');
+    const resolvedEntry = entries.find(entry => entry.id === activePage) ?? firstPage;
+    const resolvedPage = resolvedEntry?.id ?? 'general';
 
     return (
       <Profile.Root
@@ -93,7 +94,9 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
             </Profile.NavItem>
           ))}
         </Profile.Nav>
-        <Profile.Content>
+        <Profile.Content
+          pageTitle={resolvedEntry?.custom ? resolvedEntry.custom.label : resolvedEntry && m.pages[resolvedEntry.id]}
+        >
           {entries.map(entry => (
             <Profile.ContentPanel
               key={entry.id}

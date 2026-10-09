@@ -29,6 +29,8 @@ export interface OtpProps extends Omit<ComponentProps<'div'>, 'value' | 'default
   name?: string;
   /** Disable every slot and the picker. @default false */
   disabled?: boolean;
+  /** Keeps disabled slots focusable: read-only and `aria-disabled` rather than natively disabled. @default false */
+  focusableWhenDisabled?: boolean;
   /** Require every slot to be filled before the enclosing form submits. @default false */
   required?: boolean;
   /**
@@ -65,6 +67,7 @@ export function OtpRoot(props: OtpProps) {
     mask = false,
     name,
     disabled = false,
+    focusableWhenDisabled = false,
     required = false,
     id: idProp,
     children,
@@ -108,7 +111,7 @@ export function OtpRoot(props: OtpProps) {
     (index: number) => {
       const clamped = Math.min(Math.max(index, 0), Math.max(length - 1, 0));
       const target = inputRefs.current[clamped];
-      target?.focus();
+      target?.focus({ preventScroll: true });
       target?.select();
     },
     [length],
@@ -168,6 +171,7 @@ export function OtpRoot(props: OtpProps) {
       value,
       length,
       disabled,
+      focusableWhenDisabled,
       required,
       complete,
       pattern,
@@ -188,6 +192,7 @@ export function OtpRoot(props: OtpProps) {
       value,
       length,
       disabled,
+      focusableWhenDisabled,
       required,
       complete,
       pattern,

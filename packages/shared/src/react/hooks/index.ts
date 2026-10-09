@@ -60,6 +60,12 @@ export type {
   UseOrganizationDirectorySyncUsersReturn,
 } from './useOrganizationDirectorySyncUsers';
 export { __internal_useOrganizationDirectorySyncStatus } from './useOrganizationDirectorySyncStatus';
+export { __internal_useOrganizationDirectorySyncGroupRoleMappings } from './useOrganizationDirectorySyncGroupRoleMappings';
+export type {
+  DirectorySyncGroupRoleMappingsData,
+  UseOrganizationDirectorySyncGroupRoleMappingsParams,
+  UseOrganizationDirectorySyncGroupRoleMappingsReturn,
+} from './useOrganizationDirectorySyncGroupRoleMappings';
 export type {
   UseOrganizationDirectorySyncStatusParams,
   UseOrganizationDirectorySyncStatusReturn,

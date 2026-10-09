@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useMessages } from '../../localization';
 import { useAPIKeysTableController } from './api-keys-table.controller';
 import { resolveAPIKeysTableMessages } from './api-keys-table.messages';
-import { PAGE_SIZE, useAPIKeysTableModel } from './api-keys-table.model';
+import { PAGE_SIZE } from './api-keys-table.model';
 import type { APIKeysTableMessages } from './api-keys-table.types';
 import { APIKeysTableView } from './api-keys-table.view';
 
@@ -29,8 +29,7 @@ function SubjectAPIKeysTable({ subject, messages: overrides, fallback }: APIKeys
     isOrganizationId(subject) ? 'organization' : 'user',
     overrides,
   );
-  const model = useAPIKeysTableModel(subject);
-  const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController(model, messages);
+  const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController(subject, messages);
 
   if (!isLoaded || !isAvailable) {
     return fallback ?? null;

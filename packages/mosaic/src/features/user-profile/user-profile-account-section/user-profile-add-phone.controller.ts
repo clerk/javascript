@@ -1,133 +1,129 @@
 import { useEffect } from 'react';
 
-import { useMessages } from '../../../localization';
+import { useForm } from '../../../components/form';
+import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
+import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
+import type { FormError } from '../../../utils/errors';
+import { toFormError } from '../../../utils/errors';
+import type { UserProfilePhoneVerifier } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
 
+export type UserProfileAddPhoneField = 'phoneNumber' | 'code';
+
 export interface UserProfileAddPhoneControllerOptions {
-  initialPhoneNumber?: string;
-  onSend: (phoneNumber: string) => Promise<void>;
-  onVerify: (phoneNumber: string, code: string) => Promise<void>;
+  onCreate?: (phoneNumber: string) => Promise<UserProfilePhoneVerifier>;
 }
 
-interface Context extends UserProfileAddPhoneControllerOptions {
+export interface UserProfileAddPhoneController extends UserProfileAddPhoneDialogProps {
+  onVerifyPhone: (phoneNumber: string, verifier: UserProfilePhoneVerifier) => void;
+}
+
+interface Context {
   phoneNumber: string;
-  code: string;
-  error: unknown;
+  verifier: UserProfilePhoneVerifier | undefined;
+  error: FormError | undefined;
   resendSeconds: number;
 }
 
 type Event =
-  | { type: 'OPEN' }
+  | { type: 'ADD' }
+  | { type: 'START'; phoneNumber: string; verifier: UserProfilePhoneVerifier }
+  | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
   | { type: 'RESEND' }
-  | { type: 'TICK' }
-  | { type: 'TYPE_PHONE'; value: string }
-  | { type: 'TYPE_CODE'; value: string }
-  | { type: 'SUBMIT'; code?: string };
+  | { type: 'TICK' };
 
 const { createMachine, assign, fromPromise } = setup<Context, Event>();
 
 function missingDependency(): Promise<never> {
-  return Promise.reject(new Error('Add phone callbacks are missing'));
+  return Promise.reject(new Error('Phone verification is missing'));
 }
 
-function errorMessage(cause: unknown, fallback: string): string | undefined {
-  if (cause === undefined) {
-    return undefined;
-  }
-  return cause instanceof Error ? cause.message : fallback;
-}
+const CODE_RESEND_SECONDS = 30;
 
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
+const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
+const start = {
+  target: 'sending',
+  actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
+    phoneNumber: event.phoneNumber,
+    verifier: event.verifier,
+    error: undefined,
+    resendSeconds: 0,
+  })),
+};
 
 const machine = createMachine({
   id: 'addPhone',
   initial: 'idle',
   context: {
-    onSend: missingDependency,
-    onVerify: missingDependency,
     phoneNumber: '',
-    code: '',
+    verifier: undefined,
     error: undefined,
     resendSeconds: 0,
   },
   states: {
     idle: {
       on: {
-        OPEN: {
+        ADD: {
           target: 'phone',
-          actions: assign(context => ({
-            phoneNumber: context.initialPhoneNumber ?? '',
-            code: '',
-            error: undefined,
-            resendSeconds: 0,
-          })),
+          actions: assign(() => ({ verifier: undefined, error: undefined, resendSeconds: 0 })),
         },
+        START: start,
       },
     },
     phone: {
-      on: {
-        CANCEL: 'idle',
-        TYPE_PHONE: { actions: assign((_, event) => ({ phoneNumber: event.value, error: undefined })) },
-        SUBMIT: { target: 'sending', actions: assign(() => ({ error: undefined })) },
-      },
+      on: { CANCEL: 'idle', START: start },
     },
     sending: {
-      invoke: fromPromise(context => context.onSend(context.phoneNumber), {
-        onDone: { target: 'verify', actions: assign(() => ({ code: '', resendSeconds: 12 })) },
-        onError: {
-          target: 'phone',
-          actions: assign((_, event) => ({ error: event.error })),
-        },
+      invoke: fromPromise(context => (context.verifier ? context.verifier.sendCode() : missingDependency()), {
+        onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
+        onError: { target: 'verify', actions: fail },
       }),
     },
     verify: {
       on: {
         CANCEL: 'idle',
         TICK: tick,
+        VERIFIED: 'idle',
         RESEND: {
-          target: 'resending',
+          target: 'sending',
           guard: context => context.resendSeconds === 0,
           actions: assign(() => ({ error: undefined })),
         },
-        TYPE_CODE: { actions: assign((_, event) => ({ code: event.value, error: undefined })) },
-        SUBMIT: {
-          target: 'verifying',
-          actions: assign((context, event) => ({ code: event.code ?? context.code, error: undefined })),
-        },
       },
-    },
-    resending: {
-      invoke: fromPromise(context => context.onSend(context.phoneNumber), {
-        onDone: { target: 'verify', actions: assign(() => ({ code: '', resendSeconds: 12 })) },
-        onError: {
-          target: 'verify',
-          actions: assign((_, event) => ({ error: event.error })),
-        },
-      }),
-    },
-    verifying: {
-      on: { TICK: tick },
-      invoke: fromPromise(context => context.onVerify(context.phoneNumber, context.code), {
-        onDone: 'idle',
-        onError: {
-          target: 'verify',
-          actions: assign((_, event) => ({ error: event.error })),
-        },
-      }),
     },
   },
 });
 
-export function useUserProfileAddPhoneController(
-  options: UserProfileAddPhoneControllerOptions,
-): UserProfileAddPhoneDialogProps {
-  const m = useMessages('userProfileAddPhone');
-  const [snapshot, send] = useMachine(machine, { context: options });
-  const { resendSeconds } = snapshot.context;
-  const open = snapshot.value !== 'idle';
+export function useUserProfileAddPhoneController({
+  onCreate,
+}: UserProfileAddPhoneControllerOptions): UserProfileAddPhoneController {
+  const errorText = useErrorText();
+  const [snapshot, send, actor] = useMachine(machine);
+  const { resendSeconds, error } = snapshot.context;
+  const phoneForm = useForm({
+    initialValues: { phoneNumber: '' },
+    onSubmit: async ({ phoneNumber }) => {
+      if (onCreate) {
+        send({ type: 'START', phoneNumber, verifier: await onCreate(phoneNumber) });
+      }
+    },
+  });
+  const codeForm = useForm({
+    initialValues: { code: '' },
+    onSubmit: async ({ code }) => {
+      const { verifier } = actor.getSnapshot().context;
+      if (verifier) {
+        await verifier.verifyCode(code);
+        send({ type: 'VERIFIED' });
+      }
+    },
+  });
+  const state = snapshot.value;
+  const open = state !== 'idle';
   useEffect(() => {
     if (!open || resendSeconds === 0) {
       return;
@@ -136,22 +132,54 @@ export function useUserProfileAddPhoneController(
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
+  const step = state === 'phone' ? 'phone' : 'verify';
+  const form = step === 'phone' ? phoneForm : codeForm;
+  const formError = step === 'phone' ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
+  const machineError = error?.global ? errorText(error.global) : undefined;
+
   return {
     resendSeconds,
-    isResending: snapshot.value === 'resending',
+    isResending: state === 'sending',
     open,
-    step:
-      snapshot.value === 'verify' || snapshot.value === 'verifying' || snapshot.value === 'resending'
-        ? 'verify'
-        : 'phone',
-    phoneNumber: snapshot.context.phoneNumber,
-    code: snapshot.context.code,
-    errorMessage: errorMessage(snapshot.context.error, m.error),
-    isPending: snapshot.value === 'sending' || snapshot.value === 'verifying',
-    onOpenChange: open => send({ type: open ? 'OPEN' : 'CANCEL' }),
-    onPhoneNumberChange: value => send({ type: 'TYPE_PHONE', value }),
-    onCodeChange: value => send({ type: 'TYPE_CODE', value }),
-    onSubmit: code => send({ type: 'SUBMIT', code }),
-    onResend: () => send({ type: 'RESEND' }),
+    step,
+    phoneNumber: step === 'phone' ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
+    code: codeForm.values.code,
+    errorMessage: formError?.message ?? form.error ?? machineError,
+    isPending: form.isSubmitting,
+    onOpenChange: open => {
+      if (form.isSubmitting) {
+        return;
+      }
+      if (open) {
+        phoneForm.reset();
+        codeForm.reset();
+        send({ type: 'ADD' });
+      } else {
+        send({ type: 'CANCEL' });
+      }
+    },
+    onPhoneNumberChange: value => phoneForm.setValue('phoneNumber', value),
+    onCodeChange: value => codeForm.setValue('code', value),
+    onSubmit: code => {
+      const state = actor.getSnapshot().value;
+      if (state === 'phone') {
+        phoneForm.submit();
+      } else if (state === 'verify') {
+        if (code !== undefined) {
+          codeForm.setValue('code', code);
+        }
+        codeForm.submit();
+      }
+    },
+    onResend: () => {
+      if (!codeForm.isSubmitting && actor.can({ type: 'RESEND' })) {
+        codeForm.reset();
+        send({ type: 'RESEND' });
+      }
+    },
+    onVerifyPhone: (phoneNumber, verifier) => {
+      codeForm.reset();
+      send({ type: 'START', phoneNumber, verifier });
+    },
   };
 }

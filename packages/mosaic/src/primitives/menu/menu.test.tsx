@@ -1,5 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Popover } from '../popover';
@@ -820,6 +821,47 @@ describe('Menu', () => {
       await user.click(screen.getByText('Actions'));
 
       expect(document.querySelector('[data-testid="menu-positioner"]')).toHaveAttribute('data-side');
+    });
+  });
+
+  describe('popup', () => {
+    it('holds the items at their last frame while the popup exits', async () => {
+      const user = userEvent.setup();
+
+      function Actions() {
+        const [primary, setPrimary] = React.useState('home');
+        return (
+          <Menu.Root>
+            <Menu.Trigger>Actions</Menu.Trigger>
+            <Menu.Positioner>
+              <Menu.Popup data-testid='menu-popup'>
+                {primary === 'home' ? (
+                  <Menu.Item
+                    label='Set as primary'
+                    onClick={() => setPrimary('work')}
+                  >
+                    Set as primary
+                  </Menu.Item>
+                ) : null}
+                <Menu.Item label='Remove'>Remove</Menu.Item>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Root>
+        );
+      }
+
+      render(<Actions />);
+
+      await user.click(screen.getByText('Actions'));
+      const popup = screen.getByTestId('menu-popup');
+      Object.defineProperty(popup, 'getAnimations', {
+        value: () => [{ finished: new Promise<void>(() => {}) }],
+      });
+
+      await user.click(screen.getByText('Set as primary'));
+
+      expect(popup).toHaveAttribute('data-closed', '');
+      expect(screen.getByText('Set as primary')).toBeInTheDocument();
     });
   });
 

@@ -76,7 +76,7 @@ export async function renderSection(accounts = [google], overrides: FakeFapiSeed
       connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
     />,
   );
-  return { ...view, fapi, titleRef };
+  return { ...view, fapi };
 }
 
 export async function startReconnect(user: ReturnType<typeof userEvent.setup>, provider: string) {

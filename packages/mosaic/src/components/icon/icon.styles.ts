@@ -5,7 +5,7 @@ import { durationVars, space } from '../../tokens.stylex';
 export const styles = stylex.create({
   base: {
     // A container that wants the icon at a different strength than its label writes
-    // `--_cl-icon-color` (see `button.styles.ts`); everywhere else the icon inherits as before.
+    // `--_cl-icon-color` (see `item.styles.ts`); everywhere else the icon inherits as before.
     color: 'var(--_cl-icon-color, currentColor)',
     display: 'inline-block',
     flexShrink: 0,

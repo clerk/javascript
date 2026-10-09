@@ -1,0 +1,18 @@
+export const userProfileBackupCodesMessages = {
+  title: 'Save your backup codes',
+  description: 'Save these somewhere safe. Each code can be used once if you lose access to your verification method.',
+  codesLabel: 'Backup codes',
+  download: 'Download',
+  print: 'Print',
+  copyAndClose: 'Copy and close',
+  cancel: 'Cancel',
+  back: 'Back',
+  retry: 'Try again',
+  generating: 'Generating backup codes',
+  copying: 'Copying backup codes',
+  downloading: 'Downloading backup codes',
+  fileName: '{applicationName}_backup_codes.txt',
+  fileIntro: 'These are your backup codes for {applicationName} account {identifier}.',
+  fileInstructions: 'Store them securely and keep them secret. Each code can only be used once.',
+  printTitle: 'Your backup codes for {applicationName} account {identifier}',
+} as const;

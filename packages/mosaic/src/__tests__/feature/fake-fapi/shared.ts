@@ -1,6 +1,8 @@
 import type { ClientJSON, SessionJSON, UserJSON } from '@clerk/shared/types';
 import { HttpResponse, type JsonBodyType } from 'msw';
 
+export const VERIFICATION_CODE = '424242';
+
 type ClientState = { client: ClientJSON };
 
 export function envelope(response: JsonBodyType, client: ClientJSON | null) {
