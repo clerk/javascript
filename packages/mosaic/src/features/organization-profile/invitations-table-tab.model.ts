@@ -17,6 +17,7 @@ export function useInvitationsTableModel() {
 
   return {
     rows,
+    pageSize: PAGE_SIZE,
     totalCount: invitations?.count ?? 0,
     page: invitations?.page ?? 1,
     isLoading: invitations?.isLoading ?? true,
@@ -32,12 +33,11 @@ export function useInvitationsTableModel() {
           if (!invitation) {
             throw new ClerkRuntimeError('This invitation cannot be revoked.', { code: 'invitation_unavailable' });
           }
-          const page = invitations?.page ?? 1;
-          const lastOnPage = invitations?.data?.length === 1 && page > 1;
+          const lastOnPage = (invitations?.data?.length ?? 0) === 1 && (invitations?.page ?? 1) > 1;
           await invitation.revoke();
           await invitations?.revalidate?.();
           if (lastOnPage) {
-            invitations?.fetchPage?.(page - 1);
+            invitations?.fetchPage?.((invitations?.page ?? 1) - 1);
           }
         }
       : undefined,
@@ -45,6 +45,6 @@ export function useInvitationsTableModel() {
 }
 
 function toInvitation(invitation: OrganizationInvitationResource) {
-  const { id, emailAddress, createdAt, roleName } = invitation;
-  return { id, emailAddress, createdAt, roleName };
+  const { id, emailAddress, createdAt, role, roleName } = invitation;
+  return { id, emailAddress, createdAt, role, roleName };
 }

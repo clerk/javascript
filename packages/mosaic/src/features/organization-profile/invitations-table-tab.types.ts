@@ -8,27 +8,17 @@ export interface OrganizationProfileInvitation {
   roleLabel: string;
 }
 
-export interface InvitationsTableSort {
-  column: 'email' | 'invitedAt' | 'roleLabel';
-  direction: 'ascending' | 'descending';
-}
-
 export interface InvitationsTableTabViewProps {
   invitations: OrganizationProfileInvitation[];
   totalCount: number;
   page: number;
-  pageSize?: number;
-  searchValue?: string;
+  pageSize: number;
   isLoading: boolean;
   isFetching?: boolean;
   isError?: boolean;
   onRetry?: () => void;
   onPageChange: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  onSearchChange?: (value: string) => void;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
   onRevoke?: (id: string) => void | Promise<void>;
   onBulkAction?: (ids: string[]) => void;
-  sort?: InvitationsTableSort | null;
-  onSortChange?: (sort: InvitationsTableSort | null) => void;
 }

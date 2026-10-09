@@ -32,6 +32,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
     'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_contact_support:
     'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
+  invitation_unavailable: 'This invitation is no longer pending.',
   member_unavailable: 'This member is no longer available to manage.',
   mfa_account_changed: 'This account changed. Please try again.',
   mfa_authenticator_unavailable: 'Authenticator is unavailable.',
@@ -42,6 +43,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   network_error: 'Unable to reach the server. Check your connection and try again.',
   oauth_access_denied: 'You did not grant access to your account.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
+  organization_invitation_not_pending: 'This invitation is no longer pending.',
   organization_membership_quota_exceeded:
     'You have reached your limit of organization memberships, including outstanding invitations.',
   organization_not_found_or_unauthorized:
