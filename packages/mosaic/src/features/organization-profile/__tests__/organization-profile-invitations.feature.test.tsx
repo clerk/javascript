@@ -123,8 +123,10 @@ describe('connected organization invitations', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(revoke.requests).toHaveLength(1));
     revoke.fail('network_error', 'Unavailable');
-    expect(await within(screen.getByRole('alertdialog')).findByRole('alert')).toHaveTextContent(
-      'Unable to reach the server. Check your connection and try again.',
+    await waitFor(() =>
+      expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
+        'Unable to reach the server. Check your connection and try again.',
+      ),
     );
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
     const retry = serve(['org:sys_memberships:manage']);
@@ -140,8 +142,10 @@ describe('connected organization invitations', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     fapi.organizationInvitations = [{ ...invitation, status: 'accepted' }];
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
-    expect(await within(screen.getByRole('alertdialog')).findByRole('alert')).toHaveTextContent(
-      'This invitation is no longer pending.',
+    await waitFor(() =>
+      expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
+        'This invitation is no longer pending.',
+      ),
     );
     expect(fapi.organizationInvitations[0]?.status).toBe('accepted');
   });
