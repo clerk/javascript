@@ -60,7 +60,9 @@ describe('enterprise linking server contract', () => {
       await userEvent.setup().click(connect);
       await waitFor(() =>
         expect(screen.getByRole('alert')).toHaveTextContent(
-          change === 'linking disabled' || change === 'feature disabled' ? 'Feature not enabled' : 'not found',
+          change === 'linking disabled' || change === 'feature disabled'
+            ? 'This feature is not enabled on this instance'
+            : 'not found',
         ),
       );
       expect(navigate).not.toHaveBeenCalled();
@@ -92,7 +94,9 @@ describe('enterprise linking server contract', () => {
     const { clerk } = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
     const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Feature not enabled'));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent('This feature is not enabled on this instance'),
+    );
     expect(navigate).not.toHaveBeenCalled();
   });
 

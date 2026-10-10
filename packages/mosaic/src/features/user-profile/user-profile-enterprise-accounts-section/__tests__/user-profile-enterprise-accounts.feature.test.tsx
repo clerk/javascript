@@ -188,7 +188,7 @@ describe('enterprise accounts', () => {
     const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
     expect(encoded).toBeTruthy();
     expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({ componentName: 'UserProfile' });
-    request.fail();
+    request.fail('internal_clerk_error');
   });
 
   it('shows a missing redirect error and allows another attempt', async () => {
@@ -229,7 +229,7 @@ describe('enterprise accounts', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('enterprise_error', 'Acme is unavailable.');
+    request.fail('feature_not_enabled', 'Acme is unavailable.');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Acme is unavailable.'));
     expect(navigate).not.toHaveBeenCalled();
     serveFapi(signedIn());
@@ -307,13 +307,13 @@ describe('enterprise accounts', () => {
     await waitFor(() => expect(request.requests).toHaveLength(1));
     expect(connect).toHaveAttribute('aria-busy', 'true');
     expect(other).toBeDisabled();
-    request.fail('enterprise_error', 'Retry this connection.');
+    request.fail('feature_not_enabled', 'Retry this connection.');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Retry this connection.'));
     const retry = holdRequests('post', '/v1/me/external_accounts');
     await userEvent.setup().click(connect);
     await waitFor(() => expect(retry.requests).toHaveLength(1));
     expect(screen.queryByRole('alert')).toBeNull();
-    retry.fail();
+    retry.fail('internal_clerk_error');
   });
 
   it('releases pending after the redirect grace period', async () => {

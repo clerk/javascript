@@ -64,7 +64,7 @@ describe('Passkey interactions across resource changes', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(held.requests).toHaveLength(1));
     await act(() => clerk.setActive({ session: 'sess_b' }));
-    held.fail('form_param_invalid', 'Alice delayed rename error');
+    held.fail('form_param_value_invalid', 'Alice delayed rename error');
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.getByText('Bob phone')).toBeVisible();
     expect(screen.queryByRole('alert')).toBeNull();

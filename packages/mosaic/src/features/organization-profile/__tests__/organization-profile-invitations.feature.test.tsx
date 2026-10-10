@@ -89,7 +89,7 @@ describe('connected organization invitations', () => {
     const initial = holdRequests('get', '/v1/organizations/:organizationId/invitations');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(initial.requests).toHaveLength(1));
-    initial.fail('network_error', 'Unavailable');
+    initial.fail('internal_clerk_error');
     expect(await screen.findByText('Unable to load invitations')).toBeVisible();
     serve(['org:sys_memberships:manage']);
     const user = userEvent.setup();
@@ -123,10 +123,10 @@ describe('connected organization invitations', () => {
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(revoke.requests).toHaveLength(1));
-    revoke.fail('network_error', 'Unavailable');
+    revoke.fail('internal_clerk_error');
     await waitFor(() =>
       expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
-        'Unable to reach the server. Check your connection and try again.',
+        "There was an internal error on our servers. We've been notified and are working on fixing it.",
       ),
     );
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
@@ -179,7 +179,7 @@ describe('connected organization invitations', () => {
     const refresh = holdRequests('get', '/v1/organizations/:organizationId/invitations');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(refresh.requests).toHaveLength(1));
-    refresh.fail('network_error', 'Unavailable');
+    refresh.fail('internal_clerk_error');
     await waitFor(() => expect(screen.getByText('Unable to load invitations')).toBeVisible());
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.organizationInvitations.find(item => item.id === invitation.id)?.status).toBe('revoked');
@@ -528,7 +528,7 @@ describe('inviting members', () => {
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(roles.requests).toHaveLength(1));
-    roles.fail('network_error', 'Unavailable');
+    roles.fail('internal_clerk_error');
     await userEvent.setup().click(await screen.findByRole('tab', { name: 'Invitations' }));
     expect(await screen.findByText('ada@example.com')).toBeVisible();
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage ada@example.com' })).toBeVisible());

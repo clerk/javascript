@@ -104,7 +104,7 @@ describe('Changing the active passkey account', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
-    creation.fail('form_param_invalid', 'Alice credential failed');
+    creation.fail('form_param_value_invalid', 'Alice credential failed');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Alice credential failed'));
     await act(() => clerk.setActive({ session: 'sess_b' }));
     expect(await screen.findByText('Bob phone')).toBeVisible();
@@ -120,7 +120,7 @@ describe('Changing the active passkey account', () => {
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     await act(() => clerk.setActive({ session: 'sess_b' }));
     expect(await screen.findByText('Bob phone')).toBeVisible();
-    creation.fail('form_param_invalid', 'Alice pending credential failed');
+    creation.fail('form_param_value_invalid', 'Alice pending credential failed');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add passkey' })).toBeEnabled());
     expect(screen.queryByRole('alert')).toBeNull();
   });
@@ -132,7 +132,7 @@ describe('Changing the active passkey account', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
-    creation.fail('form_param_invalid', 'Signed-out account error');
+    creation.fail('form_param_value_invalid', 'Signed-out account error');
     expect(await screen.findByRole('alert')).toBeVisible();
     await act(() => clerk.signOut({ sessionId: 'sess_a' }));
     await act(() => clerk.setActive({ session: 'sess_b' }));
@@ -148,7 +148,7 @@ describe('Changing the active passkey account', () => {
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     await act(() => clerk.signOut());
-    creation.fail('form_param_invalid');
+    creation.fail('form_param_value_invalid');
     await waitFor(() => expect(screen.queryByRole('group', { name: 'Passkeys' })).toBeNull());
     expect(screen.queryByRole('alert')).toBeNull();
   });
@@ -356,7 +356,7 @@ describe('Passkey identity and policy at action time', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
-    creation.fail('form_param_invalid', 'Old session error');
+    creation.fail('form_param_value_invalid', 'Old session error');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Old session error'));
     await act(() => clerk.setActive({ session: 'sess_a2' }));
     expect(clerk.session?.id).toBe('sess_a2');

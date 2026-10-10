@@ -235,7 +235,7 @@ describe('Adding a passkey', () => {
     expect(add).toBeEnabled();
   });
 
-  it.each(['session_reverification_required', 'form_param_invalid'])(
+  it.each(['session_reverification_required', 'form_param_value_invalid'] as const)(
     'shows %s and allows a manual retry',
     async code => {
       const fapi = servePasskeys([]);
@@ -245,7 +245,7 @@ describe('Adding a passkey', () => {
       const user = userEvent.setup();
       await user.click(screen.getByRole('button', { name: 'Add passkey' }));
       await waitFor(() => expect(creation.requests).toHaveLength(1));
-      creation.fail(code);
+      creation.fail(code, code);
       await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(code));
       expect(screen.queryByRole('dialog')).toBeNull();
       expect(creation.requests).toHaveLength(1);
@@ -369,8 +369,8 @@ describe('Renaming a passkey', () => {
     const rename = holdRequests('post', '/v1/me/passkeys/pk_1');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(rename.requests).toHaveLength(1));
-    rename.fail();
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_param_invalid'));
+    rename.fail('form_param_max_length_exceeded');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Name should not exceed 256 characters.'));
     expect(input).toHaveValue('Work laptop');
     await user.type(input, ' updated');
     const retried = serveFapi(fapi);

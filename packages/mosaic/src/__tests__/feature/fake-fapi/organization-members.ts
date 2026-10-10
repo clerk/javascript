@@ -2,16 +2,13 @@ import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
 import { fapiMembership, type FapiOrganizationInvitation, fapiOrganizationInvitation } from '../fapi';
-import { envelope, missing, rejectUnknownParams, requestUser, servedClient } from './shared';
+import { fapiError, fapiErrorJSON, fapiErrorStatus } from './errors';
+import { envelope, rejectUnknownParams, requestUser, servedClient } from './shared';
 
 const INVITATION_STATUSES = ['pending', 'accepted', 'revoked', 'expired'];
 const MEMBERSHIP_REQUEST_STATUSES = ['pending', 'accepted', 'rejected'];
 const MAX_BULK_SIZE = 50;
 const INVITATION_PARAMS = ['email_address', 'role', 'notify'];
-
-function clerkErrors(status: number, ...errors: Array<Record<string, unknown>>) {
-  return HttpResponse.json({ errors }, { status });
-}
 
 async function createInvitations(
   state: FakeFapiState,
@@ -21,10 +18,9 @@ async function createInvitations(
   const body = new URLSearchParams(await request.text());
   const unknown = [...body.keys()].find(key => !key.startsWith('_') && !INVITATION_PARAMS.includes(key));
   if (unknown) {
-    return clerkErrors(422, {
-      code: 'form_param_unknown',
-      message: `${unknown} is not a valid parameter for this request.`,
-      meta: { param_name: unknown },
+    return fapiError('form_param_unknown', {
+      longMessage: `${unknown} is not a valid parameter for this request.`,
+      paramName: unknown,
     });
   }
   const emailAddresses = body.getAll('email_address');
@@ -35,66 +31,40 @@ async function createInvitations(
     ['role', role],
   ] as const) {
     if (!value) {
-      return clerkErrors(422, {
-        code: 'form_param_missing',
-        message: `${name} must be included.`,
-        meta: { param_name: name },
-      });
+      return fapiError('form_param_missing', { longMessage: `${name} must be included.`, paramName: name });
     }
   }
   if (notify !== null && notify !== 'true' && notify !== 'false') {
-    return clerkErrors(422, {
-      code: 'form_param_format_invalid',
-      message: 'notify must be a boolean.',
-      meta: { param_name: 'notify' },
-    });
+    return fapiError('form_param_format_invalid', { longMessage: 'notify must be a boolean.', paramName: 'notify' });
   }
   const organization = state.memberships.find(item => item.organization.id === organizationId)?.organization;
   if (!organization) {
-    return missing();
+    return fapiError('resource_not_found');
   }
   const invalid = emailAddresses.filter(email => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
   if (invalid.length > 0) {
-    return clerkErrors(422, {
-      code: 'form_param_format_invalid',
-      message: 'invalid email addresses',
-      long_message: `The following email addresses are invalid: ${invalid.join(', ')}`,
-      meta: { param_name: 'email_address', email_addresses: invalid },
+    return fapiError('form_param_format_invalid', {
+      longMessage: `The following email addresses are invalid: ${invalid.join(', ')}`,
+      paramName: 'email_address',
+      meta: { email_addresses: invalid },
     });
   }
   if (emailAddresses.length > MAX_BULK_SIZE) {
-    return clerkErrors(400, {
-      code: 'bulk_size_exceeded',
-      message: 'bulk size exceeded',
-      long_message: `Parameters exceed the maximum allowed bulk processing size of ${MAX_BULK_SIZE}.`,
+    return fapiError('bulk_size_exceeded', {
+      longMessage: `Parameters exceed the maximum allowed bulk processing size of ${MAX_BULK_SIZE}.`,
     });
   }
   const selectedRole = state.roles.find(item => item.key === role);
   if (!selectedRole) {
-    return clerkErrors(404, {
-      code: 'resource_not_found',
-      message: 'not found',
-      long_message: 'Organization role not found',
-      meta: { param_name: 'role' },
-    });
+    return fapiError('resource_not_found', { longMessage: 'Organization role not found', paramName: 'role' });
   }
   const user = requestUser(state, request);
   const inviter = user?.organization_memberships?.find(item => item.organization.id === organizationId);
   if (!inviter) {
-    return clerkErrors(403, {
-      code: 'not_a_member_in_organization',
-      message: 'not a member',
-      long_message:
-        'Current user is not a member of the organization. Only organization members can perform this action.',
-    });
+    return fapiError('not_a_member_in_organization');
   }
   if (!inviter.permissions.includes('org:sys_memberships:manage')) {
-    return clerkErrors(403, {
-      code: 'missing_organization_permission',
-      message: 'missing permission',
-      long_message: 'Current user is missing an organization permission.',
-      meta: { permissions: ['org:sys_memberships:manage'] },
-    });
+    return fapiError('missing_organization_permission', { meta: { permissions: ['org:sys_memberships:manage'] } });
   }
   const pending = state.organizationInvitations.filter(
     item => item.organization_id === organizationId && item.status === 'pending',
@@ -106,18 +76,14 @@ async function createInvitations(
     members.some(item => item.public_user_data?.identifier?.toLowerCase() === email),
   );
   if (member) {
-    return clerkErrors(400, {
-      code: 'already_a_member_in_organization',
-      message: 'already a member',
-      long_message: `${member} is already a member of the organization.`,
+    return fapiError('already_a_member_in_organization', {
+      longMessage: `${member} is already a member of the organization.`,
     });
   }
   const maxAllowed = organization.max_allowed_memberships;
   if (maxAllowed > 0 && members.length + pending.length + (normalized.length - replaced.length) > maxAllowed) {
-    return clerkErrors(403, {
-      code: 'organization_membership_quota_exceeded',
-      message: 'organization membership quota exceeded',
-      long_message: `You have reached your limit of ${maxAllowed} organization memberships, including outstanding invitations.`,
+    return fapiError('organization_membership_quota_exceeded', {
+      longMessage: `You have reached your limit of ${maxAllowed} organization memberships, including outstanding invitations.`,
     });
   }
   const now = Date.now();
@@ -152,10 +118,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       }
       const query = url.searchParams.get('query')?.toLowerCase();
       if (query === '') {
-        return HttpResponse.json(
-          { errors: [{ code: 'form_param_missing', message: 'Enter query.', meta: { param_name: 'query' } }] },
-          { status: 422 },
-        );
+        return fapiError('form_param_missing', { longMessage: 'query must be included.', paramName: 'query' });
       }
       const matching = state.memberships.filter(member => {
         if (member.organization.id !== params.organizationId) {
@@ -180,7 +143,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
             { data: state.roles, total_count: state.roles.length, has_role_set_migration: state.hasRoleSetMigration },
             state,
           )
-        : missing();
+        : fapiError('resource_not_found');
     }),
     http.get(fapiUrl('/v1/organizations/:organizationId/invitations'), ({ params, request }) => {
       const url = new URL(request.url);
@@ -191,18 +154,10 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       const statuses = url.searchParams.getAll('status');
       const invalidStatus = statuses.find(status => !INVITATION_STATUSES.includes(status));
       if (invalidStatus) {
-        return HttpResponse.json(
-          {
-            errors: [
-              {
-                code: 'form_param_value_invalid',
-                message: `${invalidStatus} is not a valid value for status.`,
-                meta: { param_name: 'status' },
-              },
-            ],
-          },
-          { status: 422 },
-        );
+        return fapiError('form_param_value_invalid', {
+          longMessage: `${invalidStatus} does not match one of the allowed values for parameter status`,
+          paramName: 'status',
+        });
       }
       const matching = state.organizationInvitations.filter(
         invitation =>
@@ -222,18 +177,10 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       const statuses = url.searchParams.getAll('status').flatMap(status => status.split(','));
       const invalidStatus = statuses.find(status => !MEMBERSHIP_REQUEST_STATUSES.includes(status));
       if (invalidStatus) {
-        return HttpResponse.json(
-          {
-            errors: [
-              {
-                code: 'form_param_value_invalid',
-                message: `${invalidStatus} is not a valid value for status.`,
-                meta: { param_name: 'status' },
-              },
-            ],
-          },
-          { status: 422 },
-        );
+        return fapiError('form_param_value_invalid', {
+          longMessage: `${invalidStatus} does not match one of the allowed values for parameter status`,
+          paramName: 'status',
+        });
       }
       const matching = state.organizationMembershipRequests.filter(
         item =>
@@ -250,7 +197,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       );
       const organization = state.memberships.find(item => item.organization.id === params.organizationId)?.organization;
       if (!request || !organization) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const accepted = { ...request, status: 'accepted' as const };
       state.organizationMembershipRequests = state.organizationMembershipRequests.map(item =>
@@ -270,7 +217,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
           item.organization_id === params.organizationId && item.id === params.requestId && item.status === 'pending',
       );
       if (!request) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const rejected = { ...request, status: 'rejected' as const };
       state.organizationMembershipRequests = state.organizationMembershipRequests.map(item =>
@@ -294,16 +241,10 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
         return HttpResponse.json(
           {
             clerk_trace_id: 'trace_1',
-            errors: [
-              {
-                code: 'organization_invitation_not_pending',
-                message: 'not pending',
-                long_message: "The organization invitation is not in the 'pending' status.",
-              },
-            ],
+            errors: [fapiErrorJSON('organization_invitation_not_pending')],
             meta: { client: servedClient(state) },
           },
-          { status: 404 },
+          { status: fapiErrorStatus('organization_invitation_not_pending') },
         );
       }
       const revoked = { ...invitation, status: 'revoked' as const };
@@ -317,7 +258,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
         item => item.organization.id === params.organizationId && item.public_user_data?.user_id === params.userId,
       );
       if (!member) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const method = new URL(request.url).searchParams.get('_method');
       if (method === 'DELETE') {
@@ -325,15 +266,12 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
         return envelope(member, state);
       }
       if (method !== 'PATCH') {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const body = new URLSearchParams(await request.text());
       const role = body.get('role');
       if (!role) {
-        return HttpResponse.json(
-          { errors: [{ code: 'form_param_missing', message: 'Role is required' }] },
-          { status: 422 },
-        );
+        return fapiError('form_param_missing', { longMessage: 'role must be included.', paramName: 'role' });
       }
       const selected = state.roles.find(item => item.key === role);
       const updated = { ...member, role, role_name: selected?.name ?? role };

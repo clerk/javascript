@@ -123,7 +123,7 @@ describe('connected organization requests', () => {
     const initial = holdRequests('get', '/v1/organizations/:organizationId/membership_requests');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(initial.requests).toHaveLength(1));
-    initial.fail('network_error', 'Unavailable');
+    initial.fail('internal_clerk_error');
     await userEvent.setup().click(await screen.findByRole('tab', { name: 'Requests' }));
     expect(await screen.findByText('Unable to load requests')).toBeVisible();
     serve(['org:sys_memberships:manage']);
@@ -140,7 +140,7 @@ describe('connected organization requests', () => {
     await user.click(await screen.findByRole('button', { name: 'Accept Ada Lovelace' }));
     await waitFor(() => expect(accept.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Decline Ada Lovelace' })).toBeDisabled();
-    accept.fail('organization_membership_quota_exceeded', 'Seat limit reached');
+    accept.fail('organization_membership_quota_exceeded');
     await waitFor(() =>
       expect(
         screen.getByText('You have reached your limit of organization memberships, including outstanding invitations.'),
@@ -172,7 +172,7 @@ describe('connected organization requests', () => {
     const refresh = holdRequests('get', '/v1/organizations/:organizationId/membership_requests');
     await user.click(screen.getByRole('button', { name: 'Decline Ada Lovelace' }));
     await waitFor(() => expect(refresh.requests).toHaveLength(1));
-    refresh.fail('network_error', 'Unavailable');
+    refresh.fail('internal_clerk_error');
     await waitFor(() => expect(screen.getByText('Unable to load requests')).toBeVisible());
     expect(screen.queryByText('Unable to decline this request. Please try again.')).toBeNull();
     expect(screen.queryByText('grace@example.com')).toBeNull();

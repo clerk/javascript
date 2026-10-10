@@ -206,7 +206,11 @@ describe('Changing a password', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('session_reverification_required');
 
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('session_reverification_required'));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'You need to provide additional verification to perform this operation',
+      ),
+    );
     expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
     expect(screen.queryByText('Verification required')).toBeNull();
     expect(update.requests).toHaveLength(1);

@@ -1,9 +1,10 @@
 import type { PasskeyJSON } from '@clerk/shared/types';
-import { http, HttpResponse } from 'msw';
+import { http } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
 import { fapiPasskey } from '../fapi';
-import { envelope, error, missing, requestUser, updateUser } from './shared';
+import { fapiError } from './errors';
+import { envelope, requestUser, updateUser } from './shared';
 
 export interface FakePasskeysSeed {
   name?: string;
@@ -22,10 +23,10 @@ export function passkeyHandlers(
     http.post(fapiUrl('/v1/me/passkeys'), ({ request }) => {
       const user = requestUser(state, request);
       if (!user) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       if (!state.environment.user_settings.attributes.passkey.enabled) {
-        return error('feature_not_enabled', 403);
+        return fapiError('feature_not_enabled');
       }
       if (
         state.environment.user_settings.enterprise_sso.enabled &&
@@ -34,10 +35,10 @@ export function passkeyHandlers(
             account.enterprise_connection?.active && account.enterprise_connection.disable_additional_identifications,
         )
       ) {
-        return error('enterprise_sso_additional_identifications_disabled', 422);
+        return fapiError('enterprise_sso_additional_identifications_disabled');
       }
       if (user.passkeys.length >= 10) {
-        return error('passkey_quota_exceeded', 403);
+        return fapiError('passkey_quota_exceeded');
       }
       const now = Date.now();
       for (const [id, pending] of pendingPasskeys) {
@@ -73,22 +74,22 @@ export function passkeyHandlers(
       const pending = typeof params.id === 'string' ? pendingPasskeys.get(params.id) : undefined;
       const user = requestUser(state, request);
       if (!user || !pending) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       if (pending.userId !== user.id) {
-        return error('resource_forbidden', 403);
+        return fapiError('resource_forbidden');
       }
       const { passkey } = pending;
       const verification = passkey.verification;
       if (!verification || pending.expiresAt <= Date.now()) {
-        return error('verification_expired', 400);
+        return fapiError('verification_expired');
       }
       const body = new URLSearchParams(await request.text());
       if (body.get('strategy') !== 'passkey' || !body.get('public_key_credential')) {
-        return HttpResponse.json(
-          { errors: [{ code: 'form_param_missing', message: 'Passkey credential required.' }] },
-          { status: 400 },
-        );
+        return fapiError('form_param_missing', {
+          longMessage: 'public_key_credential must be included.',
+          paramName: 'public_key_credential',
+        });
       }
       const verified = {
         ...passkey,
@@ -110,14 +111,14 @@ export function passkeyHandlers(
     http.post(fapiUrl('/v1/me/passkeys/:id'), async ({ params, request }) => {
       const user = requestUser(state, request);
       if (!user || typeof params.id !== 'string') {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const pending = pendingPasskeys.get(params.id);
       const passkey =
         user.passkeys.find(candidate => candidate.id === params.id) ??
         (pending?.userId === user.id ? pending.passkey : undefined);
       if (!passkey) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const method = new URL(request.url).searchParams.get('_method');
       if (method === 'DELETE') {
@@ -129,18 +130,7 @@ export function passkeyHandlers(
         const body = new URLSearchParams(await request.text());
         const name = body.get('name');
         if (name !== null && new TextEncoder().encode(name).length > 256) {
-          return HttpResponse.json(
-            {
-              errors: [
-                {
-                  code: 'form_param_max_length_exceeded',
-                  message: 'Passkey name is too long.',
-                  meta: { param_name: 'name' },
-                },
-              ],
-            },
-            { status: 422 },
-          );
+          return fapiError('form_param_max_length_exceeded', { paramName: 'name' });
         }
         const renamed = { ...passkey, name: name ?? passkey.name };
         if (pending?.userId === user.id) {
@@ -153,7 +143,7 @@ export function passkeyHandlers(
         });
         return envelope(renamed, state);
       }
-      return missing();
+      return fapiError('resource_not_found');
     }),
   ];
 }

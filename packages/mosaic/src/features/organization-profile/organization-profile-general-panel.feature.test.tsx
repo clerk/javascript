@@ -1,10 +1,11 @@
 import type { OrganizationJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import { openDialog } from '../../__tests__/feature/dialog';
-import { type FakeFapiSeed, holdRequests, serveFapi } from '../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -122,7 +123,7 @@ describe('OrganizationProfileGeneralPanel', () => {
       );
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
       expect(dialog).toBeVisible();
-      update.fail('form_param_invalid', 'Name is unavailable', 'name');
+      update.fail('form_param_value_invalid', 'Name is unavailable', 'name');
       await waitFor(() => expect(within(dialog).getByText('Name is unavailable')).toBeVisible());
       expect(field).toHaveValue('Rejected');
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
@@ -170,10 +171,12 @@ describe('OrganizationProfileGeneralPanel', () => {
       });
       const field = within(dialog).getByRole('textbox', { name: 'Name' });
       await user.type(field, ' changed');
-      const update = holdRequests('post', '/v1/organizations/:organizationId');
+      worker.use(
+        http.post(fapiUrl('/v1/organizations/:organizationId'), () =>
+          HttpResponse.json({ errors: [] }, { status: 500 }),
+        ),
+      );
       await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
-      await waitFor(() => expect(update.requests).toHaveLength(1));
-      update.fail('', '');
       await waitFor(() =>
         expect(within(dialog).getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
       );
@@ -232,7 +235,7 @@ describe('OrganizationProfileGeneralPanel', () => {
       const update = holdRequests('post', '/v1/organizations/:organizationId');
       await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
       await waitFor(() => expect(update.requests).toHaveLength(1));
-      update.fail('form_param_invalid', 'Slug is taken', 'slug');
+      update.fail('form_identifier_exists', 'Slug is taken', 'slug');
       await waitFor(() => expect(within(dialog).getByText('Slug is taken')).toBeVisible());
       expect(field).toHaveValue('acme-new');
       expect(field).toBeInvalid();
@@ -242,7 +245,10 @@ describe('OrganizationProfileGeneralPanel', () => {
       serveFapi(signedIn());
       await renderWithClerk(
         <MosaicProvider
-          localization={{ locale: 'fr-FR', overrides: { 'errors.slug_taken': 'Ce slug est indisponible.' } }}
+          localization={{
+            locale: 'fr-FR',
+            overrides: { 'errors.form_identifier_exists': 'Ce slug est indisponible.' },
+          }}
         >
           <OrganizationProfileGeneralPanel />
         </MosaicProvider>,
@@ -255,7 +261,7 @@ describe('OrganizationProfileGeneralPanel', () => {
       const update = holdRequests('post', '/v1/organizations/:organizationId');
       await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
       await waitFor(() => expect(update.requests).toHaveLength(1));
-      update.fail('slug_taken', 'Server copy');
+      update.fail('form_identifier_exists', 'Server copy');
       await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Ce slug est indisponible.'));
       expect(field).toHaveValue('new-slug');
       const retry = serveFapi(signedIn());
@@ -333,7 +339,7 @@ describe('OrganizationProfileGeneralPanel', () => {
       await user.upload(input, new File([png], 'logo.png', { type: 'image/png' }));
       await waitFor(() => expect(upload.requests).toHaveLength(1));
       await waitFor(() => expect(container.querySelector('img[alt="Acme"]')?.getAttribute('src')).toMatch(/^blob:/));
-      upload.fail('image_invalid', 'Server rejected logo');
+      upload.fail('request_body_invalid', 'Server rejected logo');
       await waitFor(() => expect(screen.getByRole('button', { name: 'Upload' })).toBeVisible());
       await waitFor(() => expect(screen.getByText('Server rejected logo')).toBeVisible());
       await waitFor(() => expect(container.querySelector('img[alt="Acme"]')).toBeNull());

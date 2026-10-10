@@ -604,14 +604,14 @@ describe('UserButton', () => {
       await user.click(screen.getByRole('button', { name: 'Other' }));
       expect(waiting()).toBe(true);
 
-      touch.fail('session_touch_failed');
+      touch.fail('internal_clerk_error');
 
       await waitFor(() => expect(waiting()).toBe(false), { timeout: 2000 });
       expect(popup()).toBeInTheDocument();
       expect(signOut()).toBeEnabled();
       expect(log).toHaveBeenCalledWith(
         '[Clerk] User button action failed',
-        expect.objectContaining({ errors: [expect.objectContaining({ code: 'session_touch_failed' })] }),
+        expect.objectContaining({ errors: [expect.objectContaining({ code: 'internal_clerk_error' })] }),
       );
     });
 

@@ -144,7 +144,14 @@ in [Test placement](#test-placement).
     test can assert on it (`fapi.client.sessions`) or change it.
   - `holdRequests(method, path)` holds matching requests open. Assert the
     in-flight UI, then `release()` to let them through to `serveFapi`, or
-    `fail(code?, longMessage?, paramName?)` to answer with a 400 Clerk error.
+    `fail(code, longMessage?, paramName?)` to answer with that Clerk error.
+- **`fake-fapi/errors.ts`**: the FAPI error codes a fake may send, each with
+  the status and copy the real server sends (from `clerk_go` `pkg/apierrors`).
+  `fail()` and the fakes only accept these codes, so a test can't send an
+  invented code or a wrong status. For example,
+  `fail('form_identifier_exists', 'Slug is taken', 'slug')` answers 422 with
+  `meta.param_name`. Use `internal_clerk_error` (500) for a generic server
+  failure. Add a code to the catalog with its real status before using it.
 - **`fake-fapi/`**: fakes for larger endpoint families, kept out of
   `fake-fapi.ts` and registered by `serveFapi`.
   Each file seeds through its own `serveFapi` key; read the file for its
@@ -216,11 +223,11 @@ click.
 
 - `setActive` only touches the session when the document has focus. The setup
   focuses the window, so don't blur it by accident.
-- clerk-js treats a **422** from a session touch (`setActive`, focus) or a token
-  request as "unauthenticated" and refetches the client. Answer those with
-  400s, which is what `holdRequests(...).fail()` sends. Form errors on other
-  endpoints are real 422s, for example a wrong password or code, and are
-  handled as ordinary errors.
+- clerk-js treats a **401** or **422** from a session touch (`setActive`,
+  focus) or a token request as "unauthenticated" and refetches the client. To
+  fail those, use a code whose status is neither, such as
+  `internal_clerk_error`. Form errors on other endpoints are real 422s, for
+  example a wrong password or code, and are handled as ordinary errors.
 - After a touch, `getToken` is served from the token the touch returned, so
   there is no tokens request to hold during an organization switch. To observe
   Clerk's transitive state, route the action through navigation and make

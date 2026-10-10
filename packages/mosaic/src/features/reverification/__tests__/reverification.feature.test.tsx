@@ -618,10 +618,10 @@ describe('Reverification', () => {
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
       await pasteCode(user, CODE);
 
-      prepare.fail();
+      prepare.fail('internal_clerk_error', 'Unable to send a code.');
 
       // The error is shown on the step
-      expect(await screen.findByText('form_param_invalid')).toBeInTheDocument();
+      expect(await screen.findByText('Unable to send a code.')).toBeInTheDocument();
       expect(screen.getByText(STEP.emailCode)).toBeVisible();
 
       // The held submit is not sent
@@ -958,13 +958,13 @@ describe('Reverification', () => {
       await useAnotherMethod(user);
       await user.click(await screen.findByRole('button', { name: 'Email code to alice@example.com' }));
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
-      prepare.fail();
+      prepare.fail('internal_clerk_error', 'Unable to send a code.');
 
       // The code step opens for the picked method
       expect(await screen.findByText(STEP.emailCode)).toBeVisible();
 
       // The error is shown on the step
-      expect(await screen.findByText('form_param_invalid')).toBeInTheDocument();
+      expect(await screen.findByText('Unable to send a code.')).toBeInTheDocument();
     });
 
     it('emails the support address from the environment', async () => {
@@ -1026,12 +1026,12 @@ describe('Reverification', () => {
       expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
       expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
-      touch.fail();
+      touch.fail('internal_clerk_error', 'Unable to activate the session.');
 
       // The step is replaced by a generic error card without the server's message
       expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
       expect(screen.getByText('Please try again.')).toBeVisible();
-      expect(screen.queryByText('form_param_invalid')).toBeNull();
+      expect(screen.queryByText('Unable to activate the session.')).toBeNull();
       expect(screen.queryByText(STEP.password)).toBeNull();
 
       // The action is not retried
@@ -1233,10 +1233,10 @@ describe('Reverification', () => {
       await untilClosed();
 
       // The late failure does not reopen the card or show an error
-      attempt.fail();
+      attempt.fail('internal_clerk_error', 'Late attempt failure.');
       await settle();
       expect(screen.queryByText(TITLE)).toBeNull();
-      expect(screen.queryByText('form_param_invalid')).toBeNull();
+      expect(screen.queryByText('Late attempt failure.')).toBeNull();
       expect(outcome()).toBe('rejected: reverification_cancelled');
     });
 

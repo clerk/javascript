@@ -7,6 +7,8 @@ import type {
 } from '@clerk/shared/types';
 import { HttpResponse, type JsonBodyType } from 'msw';
 
+import { fapiError } from './errors';
+
 export const VERIFICATION_CODE = '424242';
 
 type ClientState = { client: ClientJSON };
@@ -48,10 +50,6 @@ export function findSession(state: ClientState, id: unknown): SessionJSON | unde
   return state.client.sessions.find(session => session.id === id);
 }
 
-export function error(code: string, status = 400) {
-  return HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status });
-}
-
 export function requestUser(state: ClientState, request: Request): UserJSON | undefined {
   const sessionId = new URL(request.url).searchParams.get('_clerk_session_id') ?? state.client.last_active_session_id;
   return findSession(state, sessionId)?.user;
@@ -64,10 +62,6 @@ export function updateUser(state: ClientState, user: UserJSON): void {
   };
 }
 
-export function missing() {
-  return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
-}
-
 const paginationParams = ['limit', 'offset', 'paginated'];
 
 export function rejectUnknownParams(url: URL, allowed: readonly string[]) {
@@ -75,17 +69,9 @@ export function rejectUnknownParams(url: URL, allowed: readonly string[]) {
     key => !key.startsWith('_') && !paginationParams.includes(key) && !allowed.includes(key),
   );
   return unknown
-    ? HttpResponse.json(
-        {
-          errors: [
-            {
-              code: 'form_param_unknown',
-              message: `${unknown} is not a valid parameter for this request.`,
-              meta: { param_name: unknown },
-            },
-          ],
-        },
-        { status: 422 },
-      )
+    ? fapiError('form_param_unknown', {
+        longMessage: `${unknown} is not a valid parameter for this request.`,
+        paramName: unknown,
+      })
     : undefined;
 }
