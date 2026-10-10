@@ -60,6 +60,7 @@ type NativeClientBootstrapRegistration = {
   clerkInstance: SyncableClerkInstance | null | undefined;
   generation: number;
   invalidateTracking: () => void;
+  proxyUrl: string | null;
   publishableKey: string;
   tokenCache: TokenCache | undefined;
 };
@@ -1036,6 +1037,7 @@ function waitForClerkInstanceLoad(clerkInstance: SyncableClerkInstance): Promise
 export function useNativeClientBootstrap({
   enabled,
   publishableKey,
+  proxyUrl,
   nativeRefreshFromJsControllerRef,
   suppressTokenCacheNotificationsRef,
   tokenCache,
@@ -1043,6 +1045,7 @@ export function useNativeClientBootstrap({
 }: {
   enabled: boolean;
   publishableKey: string;
+  proxyUrl?: string | ((url: URL) => string);
   nativeRefreshFromJsControllerRef: MutableRefObject<NativeRefreshFromJsController | null>;
   suppressTokenCacheNotificationsRef: MutableRefObject<number>;
   tokenCache: TokenCache | undefined;
@@ -1051,7 +1054,10 @@ export function useNativeClientBootstrap({
   const activeBootstrapRef = useRef<NativeClientBootstrapRegistration | null>(null);
   const bootstrapGenerationRef = useRef(0);
   const isMountedRef = useRef(true);
-  const [readyPublishableKey, setReadyPublishableKey] = useState<string | null>(null);
+  const [readyConfigKey, setReadyConfigKey] = useState<string | null>(null);
+  // Function proxyUrls are browser-only; the singleton already rejects them on native.
+  const nativeProxyUrl = typeof proxyUrl === 'string' && proxyUrl ? proxyUrl : null;
+  const configKey = `${publishableKey}|${nativeProxyUrl ?? ''}`;
 
   useNativeClientBootstrapEffect(() => {
     isMountedRef.current = true;
@@ -1060,26 +1066,29 @@ export function useNativeClientBootstrap({
     const canReuseActiveBootstrap =
       canBootstrap &&
       activeBootstrap?.publishableKey === publishableKey &&
+      activeBootstrap.proxyUrl === nativeProxyUrl &&
       activeBootstrap.clerkInstance === clerkInstance &&
       activeBootstrap.tokenCache === tokenCache;
 
     if (activeBootstrap && !canReuseActiveBootstrap) {
       activeBootstrap.invalidateTracking();
       activeBootstrapRef.current = null;
-      setReadyPublishableKey(null);
+      setReadyConfigKey(null);
     }
 
     if (canBootstrap && !activeBootstrapRef.current) {
       const configuringPublishableKey = publishableKey;
+      const configuringConfigKey = configKey;
       const bootstrapRegistration: NativeClientBootstrapRegistration = {
         clerkInstance,
         generation: ++bootstrapGenerationRef.current,
         invalidateTracking: () => undefined,
+        proxyUrl: nativeProxyUrl,
         publishableKey: configuringPublishableKey,
         tokenCache,
       };
       activeBootstrapRef.current = bootstrapRegistration;
-      setReadyPublishableKey(null);
+      setReadyConfigKey(null);
       const isCurrentConfiguration = () =>
         isMountedRef.current &&
         activeBootstrapRef.current === bootstrapRegistration &&
@@ -1111,7 +1120,21 @@ export function useNativeClientBootstrap({
               return;
             }
 
-            await ClerkExpo.configure(configuringPublishableKey, initialJsDeviceToken);
+            if (typeof ClerkExpo.configureWithOptions === 'function') {
+              await ClerkExpo.configureWithOptions(configuringPublishableKey, {
+                bearerToken: initialJsDeviceToken,
+                proxyUrl: nativeProxyUrl,
+              });
+            } else {
+              // Old binaries reject extra configure args, so OTA-updated JS must use the legacy call.
+              if (nativeProxyUrl && __DEV__) {
+                console.warn(
+                  '[ClerkProvider] The installed Clerk native module does not support proxyUrl. ' +
+                    'Rebuild the app binary to route native components through your proxy.',
+                );
+              }
+              await ClerkExpo.configure(configuringPublishableKey, initialJsDeviceToken);
+            }
 
             if (!isCurrentConfiguration()) {
               return;
@@ -1154,7 +1177,7 @@ export function useNativeClientBootstrap({
             }
 
             if (isCurrentConfiguration()) {
-              setReadyPublishableKey(configuringPublishableKey);
+              setReadyConfigKey(configuringConfigKey);
             }
           }
         } catch (error) {
@@ -1219,6 +1242,8 @@ export function useNativeClientBootstrap({
   }, [
     enabled,
     publishableKey,
+    configKey,
+    nativeProxyUrl,
     nativeRefreshFromJsControllerRef,
     suppressTokenCacheNotificationsRef,
     tokenCache,
@@ -1227,7 +1252,7 @@ export function useNativeClientBootstrap({
 
   return {
     isMountedRef,
-    isNativeClientReady: readyPublishableKey === publishableKey,
+    isNativeClientReady: readyConfigKey === configKey,
   };
 }
 

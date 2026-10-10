@@ -8,6 +8,10 @@ export const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'andro
 export type ClerkExpoNativeModule = {
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
   configure(publishableKey: string, bearerToken: string | null): Promise<void>;
+  configureWithOptions?(
+    publishableKey: string,
+    options: { bearerToken: string | null; proxyUrl: string | null },
+  ): Promise<void>;
   getClientToken(): Promise<string | null>;
   syncClientStateFromJs(
     deviceToken: string | null,
