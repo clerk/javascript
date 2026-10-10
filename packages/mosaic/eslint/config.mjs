@@ -68,6 +68,20 @@ export default [
     },
   },
   {
+    name: 'packages/mosaic - feature tests',
+    files: ['src/**/*.feature.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.property.name='findByRole'][arguments.0.value='alert']",
+          message:
+            "Live regions are always mounted, so findByRole('alert') can resolve before the text arrives. Use `await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(text))`.",
+        },
+      ],
+    },
+  },
+  {
     name: 'packages/mosaic - models',
     files: ['src/**/*.model.{ts,tsx}'],
     rules: {

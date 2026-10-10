@@ -389,7 +389,7 @@ describe('Web3 wallets', () => {
     const { clerk } = await renderWithClerk(<UserProfileWeb3WalletsSection />);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
-    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
     await waitFor(() => expect(screen.getByRole('dialog')).toBeVisible());
 

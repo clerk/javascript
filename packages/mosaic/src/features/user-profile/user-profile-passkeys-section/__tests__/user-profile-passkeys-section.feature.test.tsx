@@ -291,7 +291,9 @@ describe('Adding a passkey', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-    expect(await screen.findByRole('alert')).toBeVisible();
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent('Passkey registration was cancelled or timed out.'),
+    );
     expect(screen.getByText('No passkeys added')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     expect(await screen.findByText('Chrome on macOS')).toBeVisible();

@@ -133,7 +133,7 @@ describe('Changing the active passkey account', () => {
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.fail('form_param_value_invalid', 'Signed-out account error');
-    expect(await screen.findByRole('alert')).toBeVisible();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Signed-out account error'));
     await act(() => clerk.signOut({ sessionId: 'sess_a' }));
     await act(() => clerk.setActive({ session: 'sess_b' }));
     expect(await screen.findByText('Bob phone')).toBeVisible();
@@ -393,7 +393,7 @@ describe('Passkey identity and policy at action time', () => {
     const rename = holdRequests('post', '/v1/me/passkeys/pk_a');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     rename.release();
-    expect(await screen.findByRole('alert')).toBeVisible();
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('This account is no longer available.'));
     expect(rename.requests).toHaveLength(0);
     expect(clerk.user?.passkeys.find(passkey => passkey.id === 'pk_a')?.name).toBe('Alice laptop');
   });

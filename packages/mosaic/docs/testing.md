@@ -166,6 +166,10 @@ in [Test placement](#test-placement).
     rejects: before start, in the wrong status, with a strategy the user
     doesn't have, and an email, phone, or passkey attempt that wasn't
     prepared. Wrong passwords and codes answer 422.
+- **`dialog.ts`** and **`upload.ts`**: `openDialog(user, trigger)` clicks and
+  waits until focus is inside the dialog. `uploadFile(user, container, file)`
+  waits until the file input is enabled, since `user.upload` skips a disabled
+  input without failing.
 - **`render.tsx`**: `renderWithClerk(ui, loadOptions?)` renders inside
   `ClerkContextProvider` and `MosaicProvider`, loads Clerk, and returns
   `{ clerk, navigate, rerender, ... }`.
@@ -214,6 +218,7 @@ click.
   `Card.Banner` are always mounted, so `findByRole('alert')` can return one
   before its text arrives. Use
   `waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(...))`.
+  Lint rejects a bare `findByRole('alert')` in feature tests.
 - **Control time instead of waiting it out.** Don't raise a `waitFor` or
   `findBy*` timeout. If the test waits on a request or a poll, hold it with
   `holdRequests()` and release it when the test is ready.

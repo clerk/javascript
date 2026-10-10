@@ -38,7 +38,9 @@ it('removes the pending registration after cancellation, rather than merely hidi
   await waitFor(() => expect(cleanup.requests).toHaveLength(1));
   expect(new URL(cleanup.requests[0]?.url ?? '').searchParams.get('_method')).toBe('DELETE');
   cleanup.release();
-  expect(await screen.findByRole('alert')).toBeVisible();
+  await waitFor(() =>
+    expect(screen.getByRole('alert')).toHaveTextContent('Passkey registration was cancelled or timed out.'),
+  );
   expect(await pendingResourceStatus()).toBe(404);
 });
 
