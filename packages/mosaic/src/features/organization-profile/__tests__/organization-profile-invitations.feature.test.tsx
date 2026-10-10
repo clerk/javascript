@@ -1,4 +1,4 @@
-import type { OrganizationInvitationJSON, RoleJSON } from '@clerk/shared/types';
+import type { RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -10,6 +10,7 @@ import {
   fapiEnvironment,
   fapiMembership,
   fapiOrganization,
+  fapiOrganizationInvitation,
   fapiSession,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
@@ -18,18 +19,13 @@ import { MosaicLocalizationProvider, resolveLocalization } from '../../../locali
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
 
 const organization = fapiOrganization({ id: 'org_invitations', name: 'Acme' });
-const invitation: OrganizationInvitationJSON = {
-  object: 'organization_invitation',
+const invitation = fapiOrganizationInvitation({
   id: 'orginv_ada',
   email_address: 'ada@example.com',
   organization_id: organization.id,
-  public_metadata: {},
-  status: 'pending',
-  role: 'org:member',
-  role_name: 'Member',
   created_at: 1_785_000_000_000,
   updated_at: 1_785_000_000_000,
-};
+});
 
 function serve(permissions: string[]) {
   const membership = fapiMembership(organization, { permissions });

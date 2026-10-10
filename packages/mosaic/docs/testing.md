@@ -163,6 +163,13 @@ in [Test placement](#test-placement).
   `ClerkContextProvider` and `MosaicProvider`, loads Clerk, and returns
   `{ clerk, navigate, rerender, ... }`.
   `navigate` is the router Clerk was loaded with, called with the path.
+- **`recorded/`**: scrubbed responses recorded from real FAPI.
+  `fake-fapi-recorded.feature.test.tsx` replays each recorded request against
+  `serveFapi` and fails when the response shape drifts from the recording.
+  `KNOWN_DIFFERENCES` in that file lists every deliberate difference with its
+  reason. Fix a new difference in the builder or the fake. Only add it to the
+  list if the fake can't or shouldn't match, for example a field the
+  `@clerk/shared` type doesn't allow.
 
 The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the
 window. Before each test it moves FAPI to a new host, so a request a previous

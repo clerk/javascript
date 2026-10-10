@@ -1,12 +1,47 @@
-import type { ClientJSON, SessionJSON, UserJSON } from '@clerk/shared/types';
+import type {
+  ClientJSON,
+  OrganizationInvitationJSON,
+  OrganizationMembershipJSON,
+  SessionJSON,
+  UserJSON,
+} from '@clerk/shared/types';
 import { HttpResponse, type JsonBodyType } from 'msw';
 
 export const VERIFICATION_CODE = '424242';
 
 type ClientState = { client: ClientJSON };
 
-export function envelope(response: JsonBodyType, client: ClientJSON | null) {
-  return HttpResponse.json({ response, client });
+type ServedState = ClientState & {
+  organizationInvitations: Array<Pick<OrganizationInvitationJSON, 'organization_id' | 'status'>>;
+};
+
+export function servedMembership(
+  state: ServedState,
+  membership: OrganizationMembershipJSON,
+): OrganizationMembershipJSON {
+  const pending = state.organizationInvitations.filter(
+    invitation => invitation.organization_id === membership.organization.id && invitation.status === 'pending',
+  );
+  return { ...membership, organization: { ...membership.organization, pending_invitations_count: pending.length } };
+}
+
+export function servedClient(state: ServedState): ClientJSON {
+  return {
+    ...state.client,
+    sessions: state.client.sessions.map(session => ({
+      ...session,
+      user: {
+        ...session.user,
+        organization_memberships: session.user.organization_memberships.map(membership =>
+          servedMembership(state, membership),
+        ),
+      },
+    })),
+  };
+}
+
+export function envelope(response: JsonBodyType, state: ServedState) {
+  return HttpResponse.json({ response, client: servedClient(state) });
 }
 
 export function findSession(state: ClientState, id: unknown): SessionJSON | undefined {

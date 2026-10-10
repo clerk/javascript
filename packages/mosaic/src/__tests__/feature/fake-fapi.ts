@@ -5,7 +5,6 @@ import type {
   EmailAddressJSON,
   EnterpriseConnectionJSON,
   OAuthProvider,
-  OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationMembershipRequestJSON,
@@ -25,7 +24,16 @@ import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/ente
 import { createMfaState, type FakeMfaState, mfaHandlers } from './fake-fapi/mfa';
 import { organizationMemberHandlers } from './fake-fapi/organization-members';
 import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
-import { envelope, error, findSession, missing, updateUser, VERIFICATION_CODE } from './fake-fapi/shared';
+import {
+  envelope,
+  error,
+  findSession,
+  missing,
+  servedClient,
+  servedMembership,
+  updateUser,
+  VERIFICATION_CODE,
+} from './fake-fapi/shared';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -41,6 +49,7 @@ import {
   fapiExternalAccount,
   fapiMembership,
   fapiOrganization,
+  type FapiOrganizationInvitation,
   fapiPage,
   fapiPhoneNumber,
   fapiToken,
@@ -69,7 +78,7 @@ export interface FakeFapiState {
   roles: RoleJSON[];
   hasRoleSetMigration: boolean;
   invitations: UserOrganizationInvitationJSON[];
-  organizationInvitations: OrganizationInvitationJSON[];
+  organizationInvitations: FapiOrganizationInvitation[];
   organizationMembershipRequests: Array<
     Omit<OrganizationMembershipRequestJSON, 'status'> & { status: 'pending' | 'accepted' | 'rejected' }
   >;
@@ -368,10 +377,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     http.get(fapiUrl('/v1/environment'), () =>
       HttpResponse.json(state.environment, state.country ? { headers: { 'x-country': state.country } } : undefined),
     ),
-    http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
+    http.get(fapiUrl('/v1/client'), () => HttpResponse.json({ response: servedClient(state), client: null })),
     http.get(fapiUrl('/v1/me'), () => {
       const user = activeUser(state);
-      return user ? envelope(user, state.client) : missing();
+      return user ? envelope(user, state) : missing();
     }),
     http.post(fapiUrl('/v1/me/external_accounts'), async ({ request }) => {
       const user = activeUser(state);
@@ -405,7 +414,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
           account,
         ],
       }));
-      return envelope(account, state.client);
+      return envelope(account, state);
     }),
     http.post(fapiUrl('/v1/me/external_accounts/:id/reauthorize'), ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
@@ -427,7 +436,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         ...current,
         external_accounts: current.external_accounts.map(item => (item.id === pending.id ? pending : item)),
       }));
-      return envelope(pending, state.client);
+      return envelope(pending, state);
     }),
     http.post(fapiUrl('/v1/me/external_accounts/:id'), ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
@@ -442,7 +451,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         ...current,
         external_accounts: current.external_accounts.filter(item => item.id !== account.id),
       }));
-      return envelope({ ...account, object: 'external_account' }, state.client);
+      return envelope({ ...account, object: 'external_account' }, state);
     }),
     http.post(fapiUrl('/v1/me/web3_wallets'), async ({ request }) => {
       const user = activeUser(state);
@@ -460,7 +469,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         verification: fapiVerification('', { expire_at: 0 }),
       });
       updateUser(state, { ...user, web3_wallets: [...user.web3_wallets, wallet] });
-      return envelope(wallet, state.client);
+      return envelope(wallet, state);
     }),
     http.post(fapiUrl('/v1/me/web3_wallets/:id/prepare_verification'), async ({ params, request }) => {
       const wallet = findWeb3Wallet(state, params.id);
@@ -476,7 +485,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         }),
       });
       updateWeb3Wallet(state, prepared);
-      return envelope(prepared, state.client);
+      return envelope(prepared, state);
     }),
     http.post(fapiUrl('/v1/me/web3_wallets/:id/attempt_verification'), ({ params }) => {
       const wallet = findWeb3Wallet(state, params.id);
@@ -497,7 +506,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (user && !user.primary_web3_wallet_id) {
         updateUser(state, { ...user, primary_web3_wallet_id: verified.id });
       }
-      return envelope(verified, state.client);
+      return envelope(verified, state);
     }),
     http.post(fapiUrl('/v1/me/web3_wallets/:id'), ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
@@ -517,7 +526,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
             ? (remainingWallets.find(current => current.verification?.status === 'verified')?.id ?? null)
             : user.primary_web3_wallet_id,
       });
-      return envelope({ object: 'web3_wallet', id: wallet.id, deleted: true }, state.client);
+      return envelope({ object: 'web3_wallet', id: wallet.id, deleted: true }, state);
     }),
     http.post(fapiUrl('/v1/client/sessions/:id/tokens'), ({ params }) => {
       const session = findSession(state, params.id);
@@ -544,7 +553,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         last_active_session_id: touched.id,
         sessions: state.client.sessions.map(s => (s.id === touched.id ? touched : s)),
       };
-      return envelope(touched, state.client);
+      return envelope(touched, state);
     }),
     http.post(fapiUrl('/v1/client/sessions/:id/remove'), ({ params }) => {
       const session = findSession(state, params.id);
@@ -553,7 +562,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       const sessions = state.client.sessions.filter(s => s.id !== session.id);
       state.client = { ...state.client, sessions, last_active_session_id: sessions[0]?.id ?? null };
-      return envelope({ ...session, status: 'removed' }, state.client);
+      return envelope({ ...session, status: 'removed' }, state);
     }),
     http.get(fapiUrl('/v1/me/sessions/active'), ({ request }) => {
       if (!state.activeDevices) {
@@ -600,7 +609,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         return HttpResponse.json({ errors: [{ code, message: code }] }, { status: 400 });
       }
       target.status = 'revoked';
-      return envelope({ ...deviceSessionPayload(target), user: requester.user, status: 'revoked' }, state.client);
+      return envelope({ ...deviceSessionPayload(target), user: requester.user, status: 'revoked' }, state);
     }),
     http.post(fapiUrl('/v1/me/change_password'), async ({ request }) => {
       const session = findSession(state, state.client.last_active_session_id);
@@ -613,14 +622,14 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         ...state.client,
         sessions: state.client.sessions.map(item => (item.id === session.id ? { ...item, user: updatedUser } : item)),
       };
-      return envelope(updatedUser, state.client);
+      return envelope(updatedUser, state);
     }),
     http.post(fapiUrl('/v1/client/sessions'), ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
         return undefined;
       }
       state.client = { ...state.client, sessions: [], last_active_session_id: null };
-      return envelope(state.client, state.client);
+      return envelope(state.client, state);
     }),
     http.post(fapiUrl('/v1/me'), async ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
@@ -628,19 +637,19 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       const body = new URLSearchParams(await request.text());
       const user = updateActiveUser(state, user => patchUser(user, body));
-      return user ? envelope(user, state.client) : missing();
+      return user ? envelope(user, state) : missing();
     }),
     http.post(fapiUrl('/v1/me/profile_image'), async ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') === 'DELETE') {
         const user = updateActiveUser(state, user => ({ ...user, image_url: '', has_image: false }));
-        return user ? envelope({ id: 'img_1', name: null, public_url: null }, state.client) : missing();
+        return user ? envelope({ id: 'img_1', name: null, public_url: null }, state) : missing();
       }
       const file = (await request.formData()).get('file');
       if (!(file instanceof File)) {
         return rejected('form_param_missing', 'file is required');
       }
       const user = updateActiveUser(state, user => ({ ...user, image_url: PROFILE_IMAGE_URL, has_image: true }));
-      return user ? envelope({ id: 'img_1', name: file.name, public_url: PROFILE_IMAGE_URL }, state.client) : missing();
+      return user ? envelope({ id: 'img_1', name: file.name, public_url: PROFILE_IMAGE_URL }, state) : missing();
     }),
     http.post(fapiUrl('/v1/me/email_addresses'), async ({ request }) => {
       const body = new URLSearchParams(await request.text());
@@ -649,11 +658,11 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         email_address: body.get('email_address') ?? '',
       });
       const user = updateActiveUser(state, user => ({ ...user, email_addresses: [...user.email_addresses, email] }));
-      return user ? envelope(email, state.client) : missing();
+      return user ? envelope(email, state) : missing();
     }),
     http.get(fapiUrl('/v1/me/email_addresses/:id'), ({ params }) => {
       const email = findEmail(state, params.id);
-      return email ? envelope(email, state.client) : missing();
+      return email ? envelope(email, state) : missing();
     }),
     http.post(fapiUrl('/v1/me/email_addresses/:id/prepare_verification'), async ({ params, request }) => {
       const email = findEmail(state, params.id);
@@ -672,7 +681,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         }),
       };
       replaceEmail(state, prepared);
-      return envelope(prepared, state.client);
+      return envelope(prepared, state);
     }),
     http.post(fapiUrl('/v1/me/email_addresses/:id/attempt_verification'), async ({ params, request }) => {
       const email = findEmail(state, params.id);
@@ -688,7 +697,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         verification: fapiVerification('email_code', { status: 'verified' }),
       };
       replaceEmail(state, verified);
-      return envelope(verified, state.client);
+      return envelope(verified, state);
     }),
     http.post(fapiUrl('/v1/me/email_addresses/:id'), ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
@@ -703,13 +712,13 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         email_addresses: user.email_addresses.filter(e => e.id !== email.id),
         primary_email_address_id: user.primary_email_address_id === email.id ? null : user.primary_email_address_id,
       }));
-      return envelope({ object: 'email_address', id: email.id, deleted: true }, state.client);
+      return envelope({ object: 'email_address', id: email.id, deleted: true }, state);
     }),
     http.post(fapiUrl('/v1/me/phone_numbers'), async ({ request }) => {
       const body = new URLSearchParams(await request.text());
       const phone = fapiPhoneNumber({ id: `idn_${++identifications}`, phone_number: body.get('phone_number') ?? '' });
       const user = updateActiveUser(state, user => ({ ...user, phone_numbers: [...user.phone_numbers, phone] }));
-      return user ? envelope(phone, state.client) : missing();
+      return user ? envelope(phone, state) : missing();
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id/prepare_verification'), ({ params }) => {
       const phone = findPhone(state, params.id);
@@ -718,7 +727,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       const prepared = { ...phone, verification: fapiVerification('phone_code') };
       replacePhone(state, prepared);
-      return envelope(prepared, state.client);
+      return envelope(prepared, state);
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id/attempt_verification'), async ({ params, request }) => {
       const phone = findPhone(state, params.id);
@@ -731,7 +740,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       const verified = { ...phone, verification: fapiVerification('phone_code', { status: 'verified' }) };
       replacePhone(state, verified);
-      return envelope(verified, state.client);
+      return envelope(verified, state);
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id'), ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
@@ -746,18 +755,24 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         phone_numbers: user.phone_numbers.filter(p => p.id !== phone.id),
         primary_phone_number_id: user.primary_phone_number_id === phone.id ? null : user.primary_phone_number_id,
       }));
-      return envelope({ object: 'phone_number', id: phone.id, deleted: true }, state.client);
+      return envelope({ object: 'phone_number', id: phone.id, deleted: true }, state);
     }),
     http.get(fapiUrl('/v1/me/organization_memberships'), ({ request }) =>
-      envelope(page(state.memberships, new URL(request.url)), null),
+      envelope(
+        page(
+          state.memberships.map(membership => servedMembership(state, membership)),
+          new URL(request.url),
+        ),
+        state,
+      ),
     ),
     http.get(fapiUrl('/v1/me/organization_invitations'), ({ request }) => {
       const url = new URL(request.url);
-      return envelope(page(withStatus(state.invitations, url), url), null);
+      return envelope(page(withStatus(state.invitations, url), url), state);
     }),
     http.get(fapiUrl('/v1/me/organization_suggestions'), ({ request }) => {
       const url = new URL(request.url);
-      return envelope(page(withStatus(state.suggestions, url), url), null);
+      return envelope(page(withStatus(state.suggestions, url), url), state);
     }),
     http.post(fapiUrl('/v1/me/organization_memberships/:organizationId'), ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
@@ -769,7 +784,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         return missing();
       }
       leaveOrganization(state, membership.organization.id, user.id);
-      return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
+      return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId'), async ({ params, request }) => {
       const method = new URL(request.url).searchParams.get('_method');
@@ -785,7 +800,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
           ...(body.has('slug') ? { slug: body.get('slug') ?? '' } : {}),
         };
         updateOrganization(state, organization);
-        return envelope(organization, state.client);
+        return envelope(organization, state);
       }
       if (method !== 'DELETE') {
         return undefined;
@@ -795,7 +810,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         return missing();
       }
       deleteOrganization(state, membership.organization.id);
-      return envelope({ object: 'organization', id: membership.organization.id, deleted: true }, state.client);
+      return envelope({ object: 'organization', id: membership.organization.id, deleted: true }, state);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/logo'), ({ params, request }) => {
       const method = new URL(request.url).searchParams.get('_method');
@@ -814,7 +829,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       updateOrganization(state, organization);
       return envelope(
         method === 'DELETE' ? { object: 'image', id: `img_${organization.id}`, deleted: true } : organization,
-        state.client,
+        state,
       );
     }),
     http.post(fapiUrl('/v1/me/organization_invitations/:id/accept'), ({ params }) => {
@@ -825,7 +840,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const accepted = { ...invitation, status: 'accepted' as const };
       state.invitations = state.invitations.map(i => (i.id === accepted.id ? accepted : i));
       state.memberships = [...state.memberships, fapiMembership(fapiOrganization(invitation.public_organization_data))];
-      return envelope(accepted, state.client);
+      return envelope(accepted, state);
     }),
     http.post(fapiUrl('/v1/me/organization_suggestions/:id/accept'), ({ params }) => {
       const suggestion = state.suggestions.find(s => s.id === params.id);
@@ -834,7 +849,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       const accepted = { ...suggestion, status: 'accepted' as const };
       state.suggestions = state.suggestions.map(s => (s.id === accepted.id ? accepted : s));
-      return envelope(accepted, state.client);
+      return envelope(accepted, state);
     }),
     http.get(fapiUrl('/api_keys'), ({ request }) => {
       const url = new URL(request.url);

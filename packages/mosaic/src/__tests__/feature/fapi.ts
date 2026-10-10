@@ -5,6 +5,7 @@ import type {
   AttributesJSON,
   AuthConfigJSON,
   ClientJSON,
+  CommerceSettingsJSON,
   DisplayConfigJSON,
   EmailAddressJSON,
   EnterpriseAccountConnectionJSON,
@@ -13,12 +14,14 @@ import type {
   EnvironmentJSON,
   ExternalAccountJSON,
   OAuthProviders,
+  OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
   OrganizationSettingsJSON,
   OrganizationSuggestionJSON,
   PasskeyJSON,
   PhoneNumberJSON,
+  ProtectConfigJSON,
   PublicKeyCredentialRequestOptionsJSON,
   PublicOrganizationDataJSON,
   SessionJSON,
@@ -43,7 +46,19 @@ export type FapiUserSettings = Omit<Settings<UserSettingsJSON>, 'social' | 'attr
   attributes: Omit<AttributesJSON, 'web3_wallet'> & { web3_wallet: FapiWeb3Attribute };
 };
 
-export type FapiEnvironment = Omit<EnvironmentJSON, 'user_settings' | 'organization_settings'> & {
+export type FapiEnvironment = Omit<
+  EnvironmentJSON,
+  | 'id'
+  | 'object'
+  | 'api_keys_settings'
+  | 'commerce_settings'
+  | 'protect_config'
+  | 'user_settings'
+  | 'organization_settings'
+> & {
+  api_keys_settings: Settings<APIKeysSettingsJSON>;
+  commerce_settings: Settings<CommerceSettingsJSON>;
+  protect_config: Settings<ProtectConfigJSON>;
   user_settings: FapiUserSettings;
   organization_settings: Settings<OrganizationSettingsJSON>;
 };
@@ -88,6 +103,7 @@ function attribute(overrides: Partial<AttributeDataJSON> = {}): AttributeDataJSO
   return {
     enabled: true,
     required: false,
+    immutable: false,
     verifications: [],
     used_for_first_factor: false,
     first_factors: [],
@@ -121,12 +137,10 @@ function attributes(overrides: FapiAttributeOverrides = {}): AttributesJSON {
 
 export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiEnvironment {
   return {
-    object: 'environment',
-    id: 'env_1',
     maintenance_mode: false,
+    client_debug_mode: false,
+    partitioned_cookies: false,
     api_keys_settings: {
-      object: 'api_keys_settings',
-      id: 'api_keys_settings_1',
       user_api_keys_enabled: false,
       orgs_api_keys_enabled: false,
       ...overrides.api_keys_settings,
@@ -140,8 +154,6 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       ...overrides.auth_config,
     },
     commerce_settings: {
-      object: 'commerce_settings',
-      id: 'commerce_settings_1',
       billing: {
         stripe_publishable_key: null,
         organization: { enabled: false, has_paid_plans: false },
@@ -162,7 +174,8 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       captcha_widget_type: null,
       captcha_public_key_invisible: null,
       captcha_provider: 'turnstile',
-      captcha_oauth_bypass: null,
+      captcha_oauth_bypass: [],
+      clerk_js_version: '6',
       home_url: '',
       instance_environment_type: 'production',
       logo_image_url: '',
@@ -219,6 +232,7 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
         captcha_enabled: false,
         mode: 'public',
         legal_consent_enabled: false,
+        mfa: { required: false },
       },
       password_settings: {
         allowed_special_characters: '',
@@ -234,9 +248,10 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       },
       passkey_settings: { allow_autofill: false, show_sign_in_button: false },
       username_settings: { min_length: 4, max_length: 64 },
+      attack_protection: { enumeration_protection: { enabled: false } },
       ...overrides.user_settings,
     },
-    protect_config: { object: 'protect_config', id: 'protect_config_1' },
+    protect_config: {},
   };
 }
 
@@ -338,6 +353,7 @@ export function fapiUser(overrides: Partial<UserJSON> & Pick<UserJSON, 'id'>): U
     create_organizations_limit: null,
     delete_self_enabled: true,
     legal_accepted_at: null,
+    timezone: null,
     created_at: createdAt,
     updated_at: createdAt,
     ...overrides,
@@ -405,7 +421,7 @@ export function fapiSession(overrides: Partial<SessionJSON> & Pick<SessionJSON, 
   return {
     object: 'session',
     status: 'active',
-    factor_verification_age: null,
+    factor_verification_age: [0, -1],
     expire_at: farFuture,
     abandon_at: farFuture,
     last_active_at: createdAt,
@@ -419,7 +435,6 @@ export function fapiSession(overrides: Partial<SessionJSON> & Pick<SessionJSON, 
       image_url: user.image_url,
       has_image: user.has_image,
       identifier: user.username ?? primaryEmail?.email_address ?? '',
-      user_id: user.id,
     },
     created_at: createdAt,
     updated_at: createdAt,
@@ -483,6 +498,7 @@ export function fapiClient(sessions: SessionJSON[] = []): ClientJSON {
     sessions,
     sign_in: null,
     sign_up: null,
+    captcha_bypass: false,
     last_active_session_id: sessions[0]?.id ?? null,
     last_authentication_strategy: null,
     cookie_expires_at: null,
@@ -504,6 +520,7 @@ export function fapiOrganization(
     pending_invitations_count: 0,
     admin_delete_enabled: true,
     max_allowed_memberships: 5,
+    self_serve_sso_enabled: false,
     created_at: createdAt,
     updated_at: createdAt,
     ...overrides,
@@ -551,6 +568,33 @@ export function fapiInvitation(
     public_metadata: {},
     status: 'pending',
     role: 'org:member',
+    created_at: createdAt,
+    updated_at: createdAt,
+    ...overrides,
+  };
+}
+
+export interface FapiOrganizationInvitation extends OrganizationInvitationJSON {
+  inviter_id: string | null;
+  expires_at: number;
+  url: string | null;
+  public_inviter_data: null;
+}
+
+export function fapiOrganizationInvitation(
+  overrides: Partial<FapiOrganizationInvitation> &
+    Pick<FapiOrganizationInvitation, 'id' | 'organization_id' | 'email_address'>,
+): FapiOrganizationInvitation {
+  return {
+    object: 'organization_invitation',
+    public_metadata: {},
+    status: 'pending',
+    role: 'org:member',
+    role_name: 'Member',
+    inviter_id: null,
+    expires_at: farFuture,
+    url: null,
+    public_inviter_data: null,
     created_at: createdAt,
     updated_at: createdAt,
     ...overrides,

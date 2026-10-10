@@ -11,7 +11,7 @@ export interface FakePasskeysSeed {
 }
 
 export function passkeyHandlers(
-  state: Pick<FakeFapiState, 'client' | 'environment'>,
+  state: Pick<FakeFapiState, 'client' | 'environment' | 'organizationInvitations'>,
   fapiUrl: (path: string) => string,
   seed: FakePasskeysSeed = {},
 ) {
@@ -67,7 +67,7 @@ export function passkeyHandlers(
         },
       });
       pendingPasskeys.set(passkey.id, { userId: user.id, passkey, expiresAt });
-      return envelope(passkey, state.client);
+      return envelope(passkey, state);
     }),
     http.post(fapiUrl('/v1/me/passkeys/:id/attempt_verification'), async ({ params, request }) => {
       const pending = typeof params.id === 'string' ? pendingPasskeys.get(params.id) : undefined;
@@ -105,7 +105,7 @@ export function passkeyHandlers(
       };
       pendingPasskeys.delete(passkey.id);
       updateUser(state, { ...user, passkeys: [...user.passkeys, verified] });
-      return envelope(verified, state.client);
+      return envelope(verified, state);
     }),
     http.post(fapiUrl('/v1/me/passkeys/:id'), async ({ params, request }) => {
       const user = requestUser(state, request);
@@ -123,7 +123,7 @@ export function passkeyHandlers(
       if (method === 'DELETE') {
         pendingPasskeys.delete(passkey.id);
         updateUser(state, { ...user, passkeys: user.passkeys.filter(candidate => candidate.id !== passkey.id) });
-        return envelope({ object: 'passkey', id: passkey.id, deleted: true }, state.client);
+        return envelope({ object: 'passkey', id: passkey.id, deleted: true }, state);
       }
       if (method === 'PATCH') {
         const body = new URLSearchParams(await request.text());
@@ -145,13 +145,13 @@ export function passkeyHandlers(
         const renamed = { ...passkey, name: name ?? passkey.name };
         if (pending?.userId === user.id) {
           pendingPasskeys.set(passkey.id, { ...pending, passkey: renamed });
-          return envelope(renamed, state.client);
+          return envelope(renamed, state);
         }
         updateUser(state, {
           ...user,
           passkeys: user.passkeys.map(candidate => (candidate.id === passkey.id ? renamed : candidate)),
         });
-        return envelope(renamed, state.client);
+        return envelope(renamed, state);
       }
       return missing();
     }),

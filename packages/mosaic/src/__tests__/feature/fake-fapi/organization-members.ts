@@ -1,9 +1,8 @@
-import type { OrganizationInvitationJSON } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
-import { fapiMembership } from '../fapi';
-import { envelope, missing, rejectUnknownParams, requestUser } from './shared';
+import { fapiMembership, type FapiOrganizationInvitation, fapiOrganizationInvitation } from '../fapi';
+import { envelope, missing, rejectUnknownParams, requestUser, servedClient } from './shared';
 
 const INVITATION_STATUSES = ['pending', 'accepted', 'revoked', 'expired'];
 const MEMBERSHIP_REQUEST_STATUSES = ['pending', 'accepted', 'rejected'];
@@ -18,7 +17,7 @@ async function createInvitations(
   state: FakeFapiState,
   organizationId: string,
   request: Request,
-): Promise<OrganizationInvitationJSON[] | Response> {
+): Promise<FapiOrganizationInvitation[] | Response> {
   const body = new URLSearchParams(await request.text());
   const unknown = [...body.keys()].find(key => !key.startsWith('_') && !INVITATION_PARAMS.includes(key));
   if (unknown) {
@@ -79,9 +78,8 @@ async function createInvitations(
       meta: { param_name: 'role' },
     });
   }
-  const inviter = requestUser(state, request)?.organization_memberships?.find(
-    item => item.organization.id === organizationId,
-  );
+  const user = requestUser(state, request);
+  const inviter = user?.organization_memberships?.find(item => item.organization.id === organizationId);
   if (!inviter) {
     return clerkErrors(403, {
       code: 'not_a_member_in_organization',
@@ -123,16 +121,14 @@ async function createInvitations(
     });
   }
   const now = Date.now();
-  const created = normalized.map(
-    (email, index): OrganizationInvitationJSON => ({
-      object: 'organization_invitation',
+  const created = normalized.map((email, index) =>
+    fapiOrganizationInvitation({
       id: `orginv_${now}_${state.organizationInvitations.length + index}`,
       email_address: email,
       organization_id: organizationId,
-      public_metadata: {},
-      status: 'pending',
       role: selectedRole.key,
       role_name: selectedRole.name,
+      inviter_id: user?.id ?? null,
       created_at: now,
       updated_at: now,
     }),
@@ -175,14 +171,14 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       });
       const offset = Number(url.searchParams.get('offset') ?? 0);
       const limit = Number(url.searchParams.get('limit') ?? 10);
-      return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, null);
+      return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, state);
     }),
     http.get(fapiUrl('/v1/organizations/:organizationId/roles'), ({ params }) => {
       const organizationExists = state.memberships.some(member => member.organization.id === params.organizationId);
       return organizationExists
         ? envelope(
             { data: state.roles, total_count: state.roles.length, has_role_set_migration: state.hasRoleSetMigration },
-            null,
+            state,
           )
         : missing();
     }),
@@ -215,7 +211,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       );
       const offset = Number(url.searchParams.get('offset') ?? 0);
       const limit = Number(url.searchParams.get('limit') ?? 10);
-      return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, null);
+      return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, state);
     }),
     http.get(fapiUrl('/v1/organizations/:organizationId/membership_requests'), ({ params, request }) => {
       const url = new URL(request.url);
@@ -245,7 +241,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       );
       const offset = Number(url.searchParams.get('offset') ?? 0);
       const limit = Number(url.searchParams.get('limit') ?? 10);
-      return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, null);
+      return envelope({ data: matching.slice(offset, offset + limit), total_count: matching.length }, state);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/membership_requests/:requestId/accept'), ({ params }) => {
       const request = state.organizationMembershipRequests.find(
@@ -266,7 +262,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
           public_user_data: request.public_user_data,
         }),
       );
-      return envelope(accepted, null);
+      return envelope(accepted, state);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/membership_requests/:requestId/reject'), ({ params }) => {
       const request = state.organizationMembershipRequests.find(
@@ -280,15 +276,15 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       state.organizationMembershipRequests = state.organizationMembershipRequests.map(item =>
         item.id === rejected.id ? rejected : item,
       );
-      return envelope(rejected, null);
+      return envelope(rejected, state);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/invitations'), async ({ params, request }) => {
       const created = await createInvitations(state, String(params.organizationId), request);
-      return created instanceof Response ? created : envelope(created[0] ?? null, null);
+      return created instanceof Response ? created : envelope(created[0] ?? null, state);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/invitations/bulk'), async ({ params, request }) => {
       const created = await createInvitations(state, String(params.organizationId), request);
-      return created instanceof Response ? created : envelope(created, null);
+      return created instanceof Response ? created : envelope(created, state);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/invitations/:invitationId/revoke'), ({ params }) => {
       const invitation = state.organizationInvitations.find(
@@ -297,6 +293,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       if (!invitation || invitation.status !== 'pending') {
         return HttpResponse.json(
           {
+            clerk_trace_id: 'trace_1',
             errors: [
               {
                 code: 'organization_invitation_not_pending',
@@ -304,6 +301,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
                 long_message: "The organization invitation is not in the 'pending' status.",
               },
             ],
+            meta: { client: servedClient(state) },
           },
           { status: 404 },
         );
@@ -312,7 +310,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       state.organizationInvitations = state.organizationInvitations.map(item =>
         item.id === revoked.id ? revoked : item,
       );
-      return envelope(revoked, null);
+      return envelope(revoked, state);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId/memberships/:userId'), async ({ params, request }) => {
       const member = state.memberships.find(
@@ -324,7 +322,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       const method = new URL(request.url).searchParams.get('_method');
       if (method === 'DELETE') {
         state.memberships = state.memberships.filter(item => item.id !== member.id);
-        return envelope(member, null);
+        return envelope(member, state);
       }
       if (method !== 'PATCH') {
         return missing();
@@ -340,7 +338,7 @@ export function organizationMemberHandlers(state: FakeFapiState, fapiUrl: (path:
       const selected = state.roles.find(item => item.key === role);
       const updated = { ...member, role, role_name: selected?.name ?? role };
       state.memberships = state.memberships.map(item => (item.id === member.id ? updated : item));
-      return envelope(updated, null);
+      return envelope(updated, state);
     }),
   ];
 }

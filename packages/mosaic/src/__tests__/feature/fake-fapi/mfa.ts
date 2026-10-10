@@ -1,7 +1,8 @@
-import type { ClientJSON, PhoneNumberJSON, UserJSON } from '@clerk/shared/types';
+import type { PhoneNumberJSON, UserJSON } from '@clerk/shared/types';
 import { http, HttpResponse } from 'msw';
 
-import { type FapiEnvironment, fapiPhoneNumber, fapiVerification } from '../fapi';
+import type { FakeFapiState } from '../fake-fapi';
+import { fapiPhoneNumber, fapiVerification } from '../fapi';
 import { envelope, missing, requestUser, updateUser, VERIFICATION_CODE } from './shared';
 
 export interface FakeMfaState {
@@ -31,7 +32,7 @@ export function createMfaState(): FakeMfaState {
 }
 
 export function mfaHandlers(
-  state: { client: ClientJSON; environment: FapiEnvironment; mfa: FakeMfaState },
+  state: Pick<FakeFapiState, 'client' | 'environment' | 'mfa' | 'organizationInvitations'>,
   fapiUrl: (path: string) => string,
 ) {
   const backupEnabled = () =>
@@ -78,7 +79,7 @@ export function mfaHandlers(
             currentUser.phone_numbers.some(phone => phone.reserved_for_second_factor) &&
             currentUser.backup_code_enabled,
         });
-        return envelope({ object: 'deleted', id: 'totp_1' }, state.client);
+        return envelope({ object: 'deleted', id: 'totp_1' }, state);
       }
       if (
         currentUser.totp_enabled ||
@@ -97,7 +98,7 @@ export function mfaHandlers(
           created_at: Date.now(),
           updated_at: Date.now(),
         },
-        state.client,
+        state,
       );
     }),
     http.post(fapiUrl('/v1/me/totp/attempt_verification'), async ({ request }) => {
@@ -132,7 +133,7 @@ export function mfaHandlers(
           created_at: Date.now(),
           updated_at: Date.now(),
         },
-        state.client,
+        state,
       );
     }),
     http.post(fapiUrl('/v1/me/backup_codes/'), ({ request }) => {
@@ -154,7 +155,7 @@ export function mfaHandlers(
           created_at: Date.now(),
           updated_at: Date.now(),
         },
-        state.client,
+        state,
       );
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/'), async ({ request }) => {
@@ -190,7 +191,7 @@ export function mfaHandlers(
         verification: fapiVerification('phone_code'),
       });
       updateUser(state, { ...currentUser, phone_numbers: [...currentUser.phone_numbers, phone] });
-      return envelope(phone, state.client);
+      return envelope(phone, state);
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id/prepare_verification'), ({ params, request }) => {
       const currentUser = requestUser(state, request);
@@ -203,7 +204,7 @@ export function mfaHandlers(
         ...current,
         verification: fapiVerification('phone_code'),
       }));
-      return phone ? envelope(phone, state.client) : missing();
+      return phone ? envelope(phone, state) : missing();
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id/attempt_verification'), async ({ params, request }) => {
       const currentUser = requestUser(state, request);
@@ -220,7 +221,7 @@ export function mfaHandlers(
         ...current,
         verification: fapiVerification('phone_code', { status: 'verified' }),
       }));
-      return phone ? envelope(phone, state.client) : missing();
+      return phone ? envelope(phone, state) : missing();
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id'), async ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
@@ -277,7 +278,7 @@ export function mfaHandlers(
             ? user.backup_code_enabled
             : hasFactor && (user.backup_code_enabled || Boolean(newCodes)),
       });
-      return envelope(phone, state.client);
+      return envelope(phone, state);
     }),
   ];
 }
