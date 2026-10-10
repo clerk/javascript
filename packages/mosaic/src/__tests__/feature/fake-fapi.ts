@@ -117,6 +117,34 @@ export function startWorker() {
   });
 }
 
+const inFlight = new Set<Promise<unknown>>();
+const nativeFetch = window.fetch.bind(window);
+
+function isFapiRequest(input: RequestInfo | URL) {
+  const url = input instanceof Request ? input.url : String(input);
+  return new URL(url, window.location.href).host === fapiHost;
+}
+
+window.fetch = (input, init) => {
+  const response = nativeFetch(input, init);
+  if (isFapiRequest(input)) {
+    const read = response.then(
+      result => result.clone().text(),
+      () => undefined,
+    );
+    inFlight.add(read);
+    void read.finally(() => inFlight.delete(read));
+  }
+  return response;
+};
+
+export async function settleRequests() {
+  do {
+    await Promise.allSettled([...inFlight]);
+    await new Promise(resolve => setTimeout(resolve));
+  } while (inFlight.size > 0);
+}
+
 export function takeUnhandledRequests(): string[] {
   return unhandled.splice(0);
 }

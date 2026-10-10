@@ -169,8 +169,11 @@ window. Before each test it moves FAPI to a new host, so a request a previous
 test's Clerk sends late fails with a network error instead of reaching this
 test's handlers. It also turns off retries on the shared query client, so a
 failed load shows its error at once instead of after three backed-off retries
-(about 7 seconds). After each test it cleans up, resets the handlers and the
-shared query cache, and **fails the test on any FAPI request without a
+(about 7 seconds). After each test it releases any held requests and waits
+until every FAPI response has reached Clerk. Clerk applies a response's
+piggybacked client to the Clerk loaded last, so a response that lands late
+would change the next test's session. Then it cleans up, resets the handlers
+and the shared query cache, and **fails the test on any FAPI request without a
 handler**, or on a `holdRequests` hold never released or failed. When a
 feature needs a new endpoint, add a handler to `serveFapi` that mirrors what
 FAPI returns.

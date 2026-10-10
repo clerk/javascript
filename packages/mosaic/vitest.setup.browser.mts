@@ -4,6 +4,7 @@ import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 
 import {
+  settleRequests,
   startWorker,
   takeUnhandledRequests,
   takeUnsettledHolds,
@@ -62,7 +63,9 @@ beforeEach(() => {
   window.focus();
 });
 
-afterEach(() => {
+afterEach(async () => {
+  const unsettled = takeUnsettledHolds();
+  await settleRequests();
   cleanup();
   __resetClerkQueryClientForTest();
   for (const channel of [...openChannels]) {
@@ -75,7 +78,6 @@ afterEach(() => {
   sessionStorage.clear();
   worker.resetHandlers();
   const unhandled = takeUnhandledRequests();
-  const unsettled = takeUnsettledHolds();
   expect(unhandled, 'Frontend API requests without a handler').toEqual([]);
   expect(unsettled, 'Held Frontend API requests never released or failed').toEqual([]);
 });
