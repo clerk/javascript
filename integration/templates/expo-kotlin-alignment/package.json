@@ -1,0 +1,25 @@
+{
+  "name": "clerk-expo-kotlin-alignment-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "android": "expo run:android --variant release",
+    "prebuild:android": "expo prebuild --clean --platform android"
+  },
+  "dependencies": {
+    "@clerk/expo": "4.7.1",
+    "expo": "58.0.0-preview.8",
+    "expo-auth-session": "58.0.5",
+    "expo-build-properties": "58.0.8",
+    "expo-constants": "58.0.8",
+    "expo-crypto": "58.0.2",
+    "expo-secure-store": "58.0.0",
+    "expo-status-bar": "58.0.1",
+    "expo-web-browser": "58.0.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0-rc.2"
+  },
+  "packageManager": "pnpm@10.34.5"
+}
