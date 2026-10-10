@@ -71,9 +71,12 @@ async function resolveKeyAndVerifyJwt(
       };
     }
 
+    // Callers such as authenticateRequest pass wider option objects; session-only claim options
+    // (issuer, authorizedParties) must not be asserted against machine tokens.
     const { data: payload, errors: verifyErrors } = await verifyJwt(token, {
-      ...options,
       key,
+      audience: options.audience,
+      clockSkewInMs: options.clockSkewInMs,
       ...(headerType ? { headerType } : {}),
     });
 
