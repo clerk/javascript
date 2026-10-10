@@ -1,49 +1,27 @@
-/**
- * Native UI components for Clerk authentication in Expo apps.
- *
- * These components provide pre-built, native authentication experiences powered by:
- * - **iOS**: clerk-ios (SwiftUI) - https://github.com/clerk/clerk-ios
- * - **Android**: clerk-android (Jetpack Compose) - https://github.com/clerk/clerk-android
- *
- * ## Installation
- *
- * Native components require the `@clerk/expo` plugin to be configured in your `app.json`:
- *
- * ```json
- * {
- *   "expo": {
- *     "plugins": ["@clerk/expo"]
- *   }
- * }
- * ```
- *
- * Then run `npx expo prebuild` to generate native code.
- *
- * ## Components
- *
- * - {@link AuthView} - Authentication flow (sign-in/sign-up), renders inline
- * - {@link UserProfileView} - User profile and account management, renders inline
- * - {@link UserButton} - Avatar button that opens the native user profile
- *
- * @module @clerk/expo/native
- */
+import { errorThrower } from '../errorThrower';
+import type { ClerkExpoNativeModule } from './loadClerkExpoNative';
+import { loadClerkExpoNative } from './loadClerkExpoNative';
 
-export { AuthView } from './AuthView';
-export type { AuthViewProps, AuthViewMode } from './AuthView.types';
-export type { EmbeddedNavigationProps } from './EmbeddedNavigation.types';
+// Public types are declared in native/index.d.ts.
+
+const CLERK_EXPO_NATIVE_MISSING_MESSAGE =
+  'Native components have moved to the @clerk/expo-native-components package. ' +
+  'Install it with `npx expo install @clerk/expo-native-components`, add "@clerk/expo-native-components" to the plugins array in your app config, ' +
+  'then rebuild your native app. You can then import them from "@clerk/expo-native-components".';
+
+const clerkExpoNative = loadClerkExpoNative();
+
+function resolveExport<K extends keyof ClerkExpoNativeModule>(name: K) {
+  return (
+    clerkExpoNative?.[name] ??
+    function ClerkExpoNativeMissing(): never {
+      return errorThrower.throw(`\`${name}\` is unavailable. ${CLERK_EXPO_NATIVE_MISSING_MESSAGE}`);
+    }
+  );
+}
+
+export const AuthView = resolveExport('AuthView');
+export const UserButton = resolveExport('UserButton');
+export const UserProfileView = resolveExport('UserProfileView');
 export { useAuthViewState } from './useAuthViewState';
-export type { UseAuthViewStateReturn } from './useAuthViewState';
-export { UserButton } from './UserButton';
-export type { UserButtonProps, UserButtonUserProfileProps } from './UserButton';
-export { useUserProfileCustomPageNavigation } from './UserProfileCustomPages';
-export type {
-  UserProfileCustomPageNavigation,
-  UserProfileCustomDestination,
-  UserProfileCustomPage,
-  UserProfileCustomPageIcon,
-  UserProfileCustomPagePlacement,
-  UserProfileRow,
-  UserProfileSection,
-} from './UserProfileCustomPages';
-export { UserProfileView } from './UserProfileView';
-export type { UserProfileViewProps } from './UserProfileView';
+export const useUserProfileCustomPageNavigation = resolveExport('useUserProfileCustomPageNavigation');

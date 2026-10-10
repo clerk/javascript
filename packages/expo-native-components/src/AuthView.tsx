@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
 import { Text, View } from 'react-native';
 
-import NativeClerkAuthView from '../specs/NativeClerkAuthView';
-import { isNativeSupported } from '../utils/native-module';
 import type { AuthViewProps } from './AuthView.types';
+import NativeClerkAuthView from './specs/NativeClerkAuthView';
+import { isNativeSupported } from './utils/native-module';
 
 type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
 
@@ -24,7 +24,7 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  *
  * @example
  * ```tsx
- * import { AuthView } from '@clerk/expo/native';
+ * import { AuthView } from '@clerk/expo-native-components';
  * import { useAuth } from '@clerk/expo';
  *
  * export default function SignInScreen() {
@@ -63,7 +63,7 @@ export function AuthView({
         <Text style={{ fontSize: 16, color: '#666' }}>
           {!isNativeSupported
             ? 'Native AuthView is only available on iOS and Android'
-            : 'Native AuthView requires the @clerk/expo plugin. Add "@clerk/expo" to your app.json plugins array.'}
+            : 'Native AuthView requires a development build with the @clerk/expo-native-components config plugin. Add "@clerk/expo-native-components" to your app.json plugins array and rebuild your native app.'}
         </Text>
       </View>
     );

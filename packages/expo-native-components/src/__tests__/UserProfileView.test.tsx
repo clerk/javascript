@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('../../specs/NativeClerkUserProfileView', () => {
+vi.mock('../specs/NativeClerkUserProfileView', () => {
   return {
     default: React.forwardRef((props: { children?: React.ReactNode }, ref) => {
       React.useImperativeHandle(ref, () => ({ navigateCustomPage: mocks.navigateCustomPage }));
@@ -24,7 +24,7 @@ vi.mock('../../specs/NativeClerkUserProfileView', () => {
   };
 });
 
-vi.mock('../../utils/native-module', () => {
+vi.mock('../utils/native-module', () => {
   return {
     isNativeSupported: true,
   };
