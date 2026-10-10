@@ -1,4 +1,4 @@
-import { __resetClerkQueryClientForTest } from '@clerk/shared/react';
+import { __resetClerkQueryClientForTest, getClerkQueryClient } from '@clerk/shared/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
@@ -58,6 +58,7 @@ beforeAll(async () => {
 
 beforeEach(() => {
   switchFapiHost();
+  getClerkQueryClient()?.setDefaultOptions({ queries: { retry: false } });
   window.focus();
 });
 

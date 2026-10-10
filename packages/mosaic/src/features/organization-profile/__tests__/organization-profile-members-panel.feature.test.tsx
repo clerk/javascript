@@ -209,11 +209,11 @@ describe('OrganizationProfileMembersPanel', () => {
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(members.requests).toHaveLength(1));
     members.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible(), { timeout: 12_000 });
+    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible());
     serve();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-  }, 20_000);
+  });
 
   it('replaces rows with the table error state and retries when refreshing the current page fails', async () => {
     serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
@@ -225,9 +225,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(await screen.findByRole('option', { name: 'Admin' }));
     await waitFor(() => expect(members.requests).toHaveLength(1));
     members.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible(), {
-      timeout: 12_000,
-    });
+    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible());
     expect(screen.queryByText('Bob Smith')).toBeNull();
     const table = within(screen.getByRole('table', { name: 'Members' }));
     expect(table.getByRole('alert')).toHaveTextContent('Unable to load members');
@@ -235,7 +233,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(table.getByRole('button', { name: 'Try again' }));
     await waitFor(() => expect(screen.queryByText('Unable to load members')).toBeNull());
     expect(screen.getByText('Bob Smith')).toBeVisible();
-  }, 20_000);
+  });
 
   it('does not offer mutation controls for the current or deprovisioned member', async () => {
     const fapi = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);

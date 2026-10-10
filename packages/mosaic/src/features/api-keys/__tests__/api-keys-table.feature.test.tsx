@@ -210,7 +210,7 @@ describe('APIKeysTable', () => {
       await waitFor(() => expect(dialog).toBeVisible());
     });
 
-    it('explains a failed load instead of showing no keys, and loads again on retry', { timeout: 20_000 }, async () => {
+    it('explains a failed load instead of showing no keys, and loads again on retry', async () => {
       let failing = true;
       serveFapi(signedIn());
       worker.use(
@@ -223,7 +223,7 @@ describe('APIKeysTable', () => {
       await renderWithClerk(<APIKeysTable subject={alice.id} />);
       const user = userEvent.setup();
 
-      expect(await screen.findByText('Could not load API keys', undefined, { timeout: 15_000 })).toBeVisible();
+      expect(await screen.findByText('Could not load API keys')).toBeVisible();
       expect(screen.queryByText('No API Keys created')).toBeNull();
 
       failing = false;

@@ -167,7 +167,9 @@ in [Test placement](#test-placement).
 The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the
 window. Before each test it moves FAPI to a new host, so a request a previous
 test's Clerk sends late fails with a network error instead of reaching this
-test's handlers. After each test it cleans up, resets the handlers and the
+test's handlers. It also turns off retries on the shared query client, so a
+failed load shows its error at once instead of after three backed-off retries
+(about 7 seconds). After each test it cleans up, resets the handlers and the
 shared query cache, and **fails the test on any FAPI request without a
 handler**, or on a `holdRequests` hold never released or failed. When a
 feature needs a new endpoint, add a handler to `serveFapi` that mirrors what

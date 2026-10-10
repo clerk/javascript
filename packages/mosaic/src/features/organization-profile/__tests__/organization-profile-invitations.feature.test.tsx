@@ -94,12 +94,12 @@ describe('connected organization invitations', () => {
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(initial.requests).toHaveLength(1));
     initial.fail('network_error', 'Unavailable');
-    expect(await screen.findByText('Unable to load invitations', {}, { timeout: 12_000 })).toBeVisible();
+    expect(await screen.findByText('Unable to load invitations')).toBeVisible();
     serve(['org:sys_memberships:manage']);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText('ada@example.com')).toBeVisible();
-  }, 20_000);
+  });
 
   it('revokes only after confirmation and restores focus after the final row', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
@@ -184,7 +184,7 @@ describe('connected organization invitations', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(refresh.requests).toHaveLength(1));
     refresh.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load invitations')).toBeVisible(), { timeout: 12_000 });
+    await waitFor(() => expect(screen.getByText('Unable to load invitations')).toBeVisible());
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.organizationInvitations.find(item => item.id === invitation.id)?.status).toBe('revoked');
     expect(screen.queryByText('other@example.com')).toBeNull();
@@ -196,7 +196,7 @@ describe('connected organization invitations', () => {
     await waitFor(() => expect(screen.queryByText('Unable to load invitations')).toBeNull());
     expect(screen.getByText('other@example.com')).toBeVisible();
     expect(screen.queryByText('ada@example.com')).toBeNull();
-  }, 20_000);
+  });
 
   it('shows localized role names in invitation rows', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
