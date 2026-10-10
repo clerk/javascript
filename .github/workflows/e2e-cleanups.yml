@@ -30,10 +30,20 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true
+
+      - name: Setup Playwright
+        id: playwright
+        background: true
+        uses: ./.github/actions/setup-playwright
+        with:
+          cache-enabled: true
+          cache-provider: github
 
       - name: Build packages
         run: pnpm turbo build $TURBO_ARGS --only
+
+      - name: Wait for Playwright
+        wait: playwright
 
       - name: Run cleanup
         run: pnpm test:integration:cleanup

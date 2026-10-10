@@ -204,7 +204,14 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true
+
+      - name: Setup Playwright
+        id: playwright
+        background: true
+        uses: ./.github/actions/setup-playwright
+        with:
+          cache-enabled: true
+          cache-provider: blacksmith
 
       - name: Verify jq is installed
         run: |
@@ -213,6 +220,27 @@ jobs:
             sudo apt-get update && sudo apt-get install -y jq
           fi
           jq --version
+
+      # --- SDK from npm: install @latest published versions ---
+      - name: Install @clerk/clerk-js@latest from npm
+        id: install-clerk-js-latest
+        background: true
+        if: ${{ steps.inputs.outputs.sdk-source == 'latest' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir clerk-js && cd clerk-js
+          pnpm init
+          pnpm add @clerk/clerk-js@latest
+
+      - name: Install @clerk/ui@latest from npm
+        id: install-clerk-ui-latest
+        background: true
+        if: ${{ steps.inputs.outputs.sdk-source == 'latest' }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pnpm add @clerk/ui@latest
 
       - name: Build packages
         run: pnpm turbo build $TURBO_ARGS --only
@@ -227,6 +255,8 @@ jobs:
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/clerk-js from local registry
+        id: install-clerk-js-local
+        background: true
         if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
         working-directory: ${{ runner.temp }}
         run: |
@@ -235,29 +265,14 @@ jobs:
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui from local registry
+        id: install-clerk-ui-local
+        background: true
         if: ${{ steps.inputs.outputs.sdk-source == 'ref' }}
         working-directory: ${{ runner.temp }}
         run: |
           mkdir clerk-ui && cd clerk-ui
           pnpm init
           pkglab add @clerk/ui
-
-      # --- SDK from npm: install @latest published versions ---
-      - name: Install @clerk/clerk-js@latest from npm
-        if: ${{ steps.inputs.outputs.sdk-source == 'latest' }}
-        working-directory: ${{ runner.temp }}
-        run: |
-          mkdir clerk-js && cd clerk-js
-          pnpm init
-          pnpm add @clerk/clerk-js@latest
-
-      - name: Install @clerk/ui@latest from npm
-        if: ${{ steps.inputs.outputs.sdk-source == 'latest' }}
-        working-directory: ${{ runner.temp }}
-        run: |
-          mkdir clerk-ui && cd clerk-ui
-          pnpm init
-          pnpm add @clerk/ui@latest
 
       - name: Write all ENV certificates to files in integration/certs
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
@@ -278,6 +293,10 @@ jobs:
             for (const [name, cert] of Object.entries(certs)) {
                 fs.writeFileSync(path.join(process.env.GITHUB_WORKSPACE, 'integration/certs', name), cert);
             }
+
+      - name: Wait for integration test dependencies
+        wait:
+          [playwright, install-clerk-js-local, install-clerk-ui-local, install-clerk-js-latest, install-clerk-ui-latest]
 
       - name: Run Integration Tests
         id: integration-tests
@@ -304,6 +323,7 @@ jobs:
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
 
       - name: Upload test-results
+        background: true
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

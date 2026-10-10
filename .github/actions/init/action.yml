@@ -129,24 +129,9 @@ runs:
       run: echo "${{ github.workspace }}/node_modules/.bin" >> $GITHUB_PATH
       shell: bash
 
-    - name: Get Playwright Version
+    - name: Setup Playwright
       if: inputs.playwright-enabled == 'true'
-      shell: bash
-      id: playwright-version
-      run: |
-        VERSION=$(node -p "require('@playwright/test/package.json').version")
-        echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
-
-    - name: Cache Playwright Binaries
-      if: inputs.playwright-enabled == 'true' && inputs.cache-enabled == 'true'
-      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-      id: playwright-cache
+      uses: ./.github/actions/setup-playwright
       with:
-        path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-playwright-${{ steps.playwright-version.outputs.VERSION }}-v2
-
-    - name: Install Playwright Browsers
-      if: inputs.playwright-enabled == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        pnpm playwright install chromium
+        cache-enabled: ${{ inputs.cache-enabled }}
+        cache-provider: github
