@@ -1,4 +1,5 @@
 import { formMessages } from '../components/form/form.messages';
+import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
 import { invitationsTableTabMessages } from '../features/organization-profile/invitations-table-tab.messages';
 import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
@@ -34,6 +35,7 @@ export const mosaicMessages = {
   errors: errorMessages,
   roles: roleMessages,
   form: formMessages,
+  profile: profileMessages,
   membersTableTab: membersTableTabMessages,
   invitationsTableTab: invitationsTableTabMessages,
   requestsTableTab: requestsTableTabMessages,

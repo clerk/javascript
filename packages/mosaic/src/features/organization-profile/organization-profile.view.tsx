@@ -2,7 +2,7 @@ import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
-import type { ProfileRootProps } from '../../components/profile';
+import type { ProfileRootProps, ProfileSearchPage } from '../../components/profile';
 import { Profile } from '../../components/profile';
 import { useMessages } from '../../localization';
 import {
@@ -10,6 +10,7 @@ import {
   ORGANIZATION_PROFILE_PAGE_ICONS,
   resolveOrganizationProfilePages,
 } from './organization-profile.layout';
+import { useOrganizationProfileSearchSections } from './organization-profile.search';
 import type {
   CustomOrganizationProfilePage,
   OrganizationProfilePageId,
@@ -65,6 +66,23 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
     }
     const resolvedEntry = entries.find(entry => entry.id === activePage) ?? firstPage;
     const resolvedPage = resolvedEntry?.id ?? 'general';
+    const sectionsFor = useOrganizationProfileSearchSections(pages);
+    const navPages = entries.map(
+      (entry): ProfileSearchPage =>
+        entry.custom
+          ? { value: entry.id, label: entry.custom.label, icon: entry.custom.icon }
+          : {
+              value: entry.id,
+              label: m.pages[entry.id],
+              icon: (
+                <Icon
+                  name={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
+                  size='sm'
+                />
+              ),
+              sections: sectionsFor(entry.id),
+            },
+    );
 
     return (
       <Profile.Root
@@ -74,23 +92,14 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
         {...rest}
       >
         <Profile.Title>{label ?? m.label}</Profile.Title>
-        <Profile.Nav>
-          {entries.map(entry => (
+        <Profile.Nav search={navPages}>
+          {navPages.map(page => (
             <Profile.NavItem
-              key={entry.id}
-              value={entry.id}
-              icon={
-                entry.custom ? (
-                  entry.custom.icon
-                ) : (
-                  <Icon
-                    name={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
-                    size='sm'
-                  />
-                )
-              }
+              key={page.value}
+              value={page.value}
+              icon={page.icon}
             >
-              {entry.custom ? entry.custom.label : m.pages[entry.id]}
+              {page.label}
             </Profile.NavItem>
           ))}
         </Profile.Nav>

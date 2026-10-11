@@ -20,9 +20,11 @@ import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { Icon } from '../icon';
 import { SelectPopup } from '../select';
 import { VisuallyHidden } from '../visually-hidden';
-import type { ProfileContextValue, ProfileNavLayout } from './profile.context';
-import { ContentPanelContext, ProfileContext } from './profile.context';
+import type { ProfileNavLayout } from './profile.context';
+import { ContentPanelContext, ProfileContext, useProfileContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
+import type { ProfileSearchPage } from './profile-search';
+import { ProfileSearch, SearchTarget, useSearchReveal } from './profile-search';
 
 // The sentinel's width (1/2/3px) carries the CSS breakpoints into JS; unmeasured is wide.
 function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
@@ -30,14 +32,6 @@ function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
     return 'sheet';
   }
   return sentinelWidth >= 2 ? 'select' : 'column';
-}
-
-function useProfileContext(part: string): ProfileContextValue {
-  const context = React.useContext(ProfileContext);
-  if (!context) {
-    throw new Error(`${part} must be rendered inside Profile.Root`);
-  }
-  return context;
 }
 
 export type ProfileElevation = 'card' | 'flush';
@@ -99,8 +93,10 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     },
     [onValueChange, closeNav],
   );
+  const search = useSearchReveal({ value, selectPage, pageTitleRef });
   const context = React.useMemo(
     () => ({
+      ...search,
       titleId,
       renderBranding,
       compact,
@@ -130,6 +126,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       navItems,
       pageTitleId,
       inline,
+      search,
     ],
   );
   const element = useRender({
@@ -202,7 +199,10 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
   );
 });
 
-export type ProfileNavProps = MosaicComponentProps<'nav'>;
+export interface ProfileNavProps extends MosaicComponentProps<'nav'> {
+  /** The pages and sections the search finds. Without it the nav has no search. */
+  search?: readonly ProfileSearchPage[];
+}
 
 type NavItemMode = 'tab' | 'option';
 
@@ -222,15 +222,17 @@ function NavBranding() {
  * the page title's select, or a tablist in a sheet on a phone.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
-  { children, render, xstyle, ...rest },
+  { search, children, render, xstyle, ...rest },
   ref,
 ) {
+  const [query, setQuery] = React.useState('');
   const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, setNavItems, navTriggerRef, inline } =
     useProfileContext('Profile.Nav');
   useSafeLayoutEffect(() => {
     setNavItems(children);
   }, [children, setNavItems]);
   useSafeLayoutEffect(() => () => setNavItems(null), [setNavItems]);
+  const searching = Boolean(search) && navLayout === 'column' && query.trim() !== '';
   const element = useRender({
     defaultTagName: 'nav',
     render,
@@ -244,7 +246,20 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       ),
       children: (
         <>
-          <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
+          {search && navLayout === 'column' ? (
+            <ProfileSearch
+              pages={search}
+              query={query}
+              onQueryChange={setQuery}
+            />
+          ) : null}
+          <Tabs.List
+            hidden={searching}
+            {...mergeStyleProps(
+              themeProps('profile-nav-list'),
+              stylex.props(reset.base, styles.navList, searching && styles.navListHidden),
+            )}
+          >
             {children}
           </Tabs.List>
           {renderBranding && !compact && !inline ? <NavBranding /> : null}
@@ -539,4 +554,4 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  * </Profile.Root>
  * ```
  */
-export const Profile = { Root, Title, Nav, NavItem, Content, ContentPanel };
+export const Profile = { Root, Title, Nav, NavItem, Content, ContentPanel, SearchTarget };

@@ -8,3 +8,4 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from './profile';
+export type { ProfileSearchPage, ProfileSearchSection, ProfileSearchTargetProps } from './profile-search';

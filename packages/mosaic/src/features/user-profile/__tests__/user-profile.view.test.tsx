@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../../../components/dialog';
@@ -160,5 +161,38 @@ describe('UserProfileView', () => {
 
     expect(warn).toHaveBeenCalledWith('[Clerk] UserProfile has no pages to show.');
     warn.mockRestore();
+  });
+
+  it('finds a section by name and opens its page on it', async () => {
+    const user = userEvent.setup();
+    Element.prototype.scrollIntoView = vi.fn();
+    function Stateful() {
+      const [activePage, setActivePage] = React.useState<UserProfileViewProps['activePage']>('account');
+      return (
+        <UserProfileView
+          activePage={activePage}
+          onPageChange={setActivePage}
+          pages={{
+            account: { emailSlot: <p>Email addresses list</p> },
+            security: { activeDevicesSlot: <p>Devices list</p>, passwordSlot: null },
+          }}
+        />
+      );
+    }
+    render(
+      <MosaicProvider>
+        <Stateful />
+      </MosaicProvider>,
+    );
+
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'pass');
+    expect(screen.getByText('No results')).toBeInTheDocument();
+    await user.clear(screen.getByRole('combobox', { name: 'Search' }));
+    await user.type(screen.getByRole('combobox', { name: 'Search' }), 'devices');
+    await user.click(screen.getByRole('option', { name: 'Active devices' }));
+
+    expect(screen.getByRole('tab', { name: 'Security' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('Devices list').parentElement).toHaveFocus();
+    Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
   });
 });

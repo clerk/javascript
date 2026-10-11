@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import { Panel } from '../../components/panel';
+import { Profile } from '../../components/profile';
 import { useMessages } from '../../localization';
 import { themeProps } from '../../props';
 import type { OrganizationProfileProfileSectionViewProps } from './organization-profile-profile-section/organization-profile-profile-section.view';
@@ -28,18 +29,20 @@ export function OrganizationProfileGeneralPanelView({
     <Panel.Root render={<div {...themeProps('organization-profile-general-panel')} />}>
       <Panel.Title>{m.pages.general}</Panel.Title>
       <Panel.Sections>
-        <OrganizationProfileProfileSectionView
-          name={name}
-          slug={slug}
-          imageUrl={imageUrl}
-          hasImage={hasImage}
-          onLogoChange={onLogoChange}
-          onLogoReject={onLogoReject}
-          onRemoveLogo={onRemoveLogo}
-          onSubmitName={onSubmitName}
-          onSubmitSlug={onSubmitSlug}
-        />
-        {dangerSlot}
+        <Profile.SearchTarget id='profile'>
+          <OrganizationProfileProfileSectionView
+            name={name}
+            slug={slug}
+            imageUrl={imageUrl}
+            hasImage={hasImage}
+            onLogoChange={onLogoChange}
+            onLogoReject={onLogoReject}
+            onRemoveLogo={onRemoveLogo}
+            onSubmitName={onSubmitName}
+            onSubmitSlug={onSubmitSlug}
+          />
+        </Profile.SearchTarget>
+        <Profile.SearchTarget id='danger'>{dangerSlot}</Profile.SearchTarget>
       </Panel.Sections>
     </Panel.Root>
   );

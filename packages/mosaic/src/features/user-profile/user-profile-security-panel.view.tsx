@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import { Panel } from '../../components/panel';
+import { Profile } from '../../components/profile';
 import { Section } from '../../components/section';
 import { themeProps } from '../../props';
 import type { UserProfileDevice } from './user-profile-active-devices-section/user-profile-active-devices-section.view';
@@ -62,12 +63,12 @@ export function UserProfileSecurityPanelView({
       <Panel.Sections>
         {hasAuthentication ? (
           <Section.Root aria-label='Authentication'>
-            {passwordSlot}
-            {passkeysSlot}
-            {selectedMfaNode}
+            <Profile.SearchTarget id='password'>{passwordSlot}</Profile.SearchTarget>
+            <Profile.SearchTarget id='passkeys'>{passkeysSlot}</Profile.SearchTarget>
+            <Profile.SearchTarget id='mfa'>{selectedMfaNode}</Profile.SearchTarget>
           </Section.Root>
         ) : null}
-        {activeDevicesSlot}
+        <Profile.SearchTarget id='active-devices'>{activeDevicesSlot}</Profile.SearchTarget>
       </Panel.Sections>
     </Panel.Root>
   );

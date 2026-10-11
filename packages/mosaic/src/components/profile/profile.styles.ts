@@ -176,6 +176,10 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
+  navListHidden: {
+    display: 'none',
+  },
+
   navItem: {
     borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-md'],

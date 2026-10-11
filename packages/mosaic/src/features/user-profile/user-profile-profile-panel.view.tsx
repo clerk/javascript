@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode, Ref } from 'react';
 
 import { Panel } from '../../components/panel';
+import { Profile } from '../../components/profile';
 import { themeProps } from '../../props';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import type { UserProfileEmail, UserProfilePhone } from './user-profile-contact.types';
@@ -40,13 +41,13 @@ export function UserProfileProfilePanelView({
         Account
       </Panel.Title>
       <Panel.Sections>
-        {profileSlot}
-        {emailSlot}
-        {phoneSlot}
-        {connectedAccountsSlot}
-        {enterpriseAccountsSlot}
-        {web3WalletsSlot}
-        {dangerSlot}
+        <Profile.SearchTarget id='profile'>{profileSlot}</Profile.SearchTarget>
+        <Profile.SearchTarget id='email'>{emailSlot}</Profile.SearchTarget>
+        <Profile.SearchTarget id='phone'>{phoneSlot}</Profile.SearchTarget>
+        <Profile.SearchTarget id='connected-accounts'>{connectedAccountsSlot}</Profile.SearchTarget>
+        <Profile.SearchTarget id='enterprise-accounts'>{enterpriseAccountsSlot}</Profile.SearchTarget>
+        <Profile.SearchTarget id='web3-wallets'>{web3WalletsSlot}</Profile.SearchTarget>
+        <Profile.SearchTarget id='danger'>{dangerSlot}</Profile.SearchTarget>
       </Panel.Sections>
     </Panel.Root>
   );

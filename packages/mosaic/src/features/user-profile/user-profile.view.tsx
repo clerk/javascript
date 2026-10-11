@@ -2,10 +2,11 @@ import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
-import type { ProfileRootProps } from '../../components/profile';
+import type { ProfileRootProps, ProfileSearchPage } from '../../components/profile';
 import { Profile } from '../../components/profile';
 import { useMessages } from '../../localization';
 import { getAvailableUserProfilePages, resolveUserProfilePages, USER_PROFILE_PAGE_ICONS } from './user-profile.layout';
+import { useUserProfileSearchSections } from './user-profile.search';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 import { UserProfileBillingPanelView } from './user-profile-billing-panel.view';
 import { UserProfileProfilePanelView } from './user-profile-profile-panel.view';
@@ -58,6 +59,23 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
   }
   const resolvedEntry = entries.find(entry => entry.id === activePage) ?? firstPage;
   const resolvedPage = resolvedEntry?.id ?? 'account';
+  const sectionsFor = useUserProfileSearchSections(pages);
+  const navPages = entries.map(
+    (entry): ProfileSearchPage =>
+      entry.custom
+        ? { value: entry.id, label: entry.custom.label, icon: entry.custom.icon }
+        : {
+            value: entry.id,
+            label: m.pages[entry.id],
+            icon: (
+              <Icon
+                name={USER_PROFILE_PAGE_ICONS[entry.id]}
+                size='sm'
+              />
+            ),
+            sections: sectionsFor(entry.id),
+          },
+  );
 
   return (
     <Profile.Root
@@ -67,23 +85,14 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
       {...rest}
     >
       <Profile.Title>{label ?? m.label}</Profile.Title>
-      <Profile.Nav>
-        {entries.map(entry => (
+      <Profile.Nav search={navPages}>
+        {navPages.map(page => (
           <Profile.NavItem
-            key={entry.id}
-            value={entry.id}
-            icon={
-              entry.custom ? (
-                entry.custom.icon
-              ) : (
-                <Icon
-                  name={USER_PROFILE_PAGE_ICONS[entry.id]}
-                  size='sm'
-                />
-              )
-            }
+            key={page.value}
+            value={page.value}
+            icon={page.icon}
           >
-            {entry.custom ? entry.custom.label : m.pages[entry.id]}
+            {page.label}
           </Profile.NavItem>
         ))}
       </Profile.Nav>
