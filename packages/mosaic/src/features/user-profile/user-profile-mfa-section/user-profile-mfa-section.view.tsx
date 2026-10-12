@@ -1,5 +1,5 @@
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { type ReactNode, type Ref, useMemo } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
@@ -36,7 +36,6 @@ export function UserProfileMfaSectionView({
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const controller = useUserProfileMfaSectionLeafController({ methods, onRemove, onSetDefault });
-  const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
 
   return (
     <>
@@ -70,7 +69,7 @@ export function UserProfileMfaSectionView({
             key={method.id}
             method={method}
             triggerRef={controller.registerTrigger(method.id)}
-            onRemove={onRemove ? () => controller.openRemoval(() => removeMethod.open(method)) : undefined}
+            onRemove={onRemove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={onSetDefault && !controller.isSettingDefault ? controller.setDefault : undefined}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
@@ -79,12 +78,11 @@ export function UserProfileMfaSectionView({
       <Section.Error>{controller.defaultError}</Section.Error>
       {onRemove ? (
         <Confirmation
-          handle={removeMethod}
+          controller={controller.remove}
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
           description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
           finalFocus={controller.finalRemovalFocus}
-          onConfirm={controller.confirmRemoval}
         />
       ) : null}
     </>
