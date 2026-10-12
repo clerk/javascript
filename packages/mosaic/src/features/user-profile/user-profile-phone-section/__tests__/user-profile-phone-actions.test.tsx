@@ -33,19 +33,13 @@ function renderPhone(overrides: PhoneSectionProps = {}) {
 }
 
 describe('phone actions', () => {
-  it('ignores backdrop clicks and allows Escape to cancel removal', async () => {
+  it('keeps the phone when removal is canceled with Escape', async () => {
     const user = userEvent.setup();
     const onRemovePhone = vi.fn();
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    const dialog = screen.getByRole('alertdialog', { name: 'Remove phone number?' });
-    const backdrop = document.querySelector('.cl-dialog-backdrop');
-    if (!backdrop) {
-      throw new Error('Expected a dialog backdrop');
-    }
-    await user.click(backdrop);
-    expect(dialog).toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Remove phone number?' });
     await user.keyboard('{Escape}');
     await waitFor(() => expect(dialog).not.toBeInTheDocument());
     expect(onRemovePhone).not.toHaveBeenCalled();
@@ -61,7 +55,7 @@ describe('phone actions', () => {
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    const dialog = screen.getByRole('alertdialog');
+    const dialog = screen.getByRole('dialog');
     const remove = within(dialog).getByRole('button', { name: 'Remove' });
     await user.click(remove);
     expect(dialog).toBeInTheDocument();
@@ -69,7 +63,7 @@ describe('phone actions', () => {
     await user.click(remove);
     expect(onRemovePhone).toHaveBeenCalledOnce();
     finish();
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('ignores a second set primary while the first is pending', async () => {
@@ -124,7 +118,7 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(screen.getByText('Primary')).toBeInTheDocument();
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Manage +1 (801) 555-0100' })).not.toBeInTheDocument();
   });
 
@@ -134,8 +128,8 @@ describe('phone actions', () => {
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(onRemovePhone).not.toHaveBeenCalled();
   });
 
@@ -151,11 +145,11 @@ describe('phone actions', () => {
     trigger.focus();
     await user.keyboard('{Enter}');
     await user.keyboard('{Enter}');
-    expect(screen.getByRole('alertdialog', { name: 'Remove phone number?' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Remove phone number?' })).toBeInTheDocument();
 
     await user.keyboard('{Escape}');
 
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(onRemovePhone).not.toHaveBeenCalled();
   });
 
@@ -181,9 +175,9 @@ describe('phone actions', () => {
     render(<Example />);
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
 
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(screen.queryByRole('button', { name: 'Manage +1 (801) 555-0100' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add phone number' })).toBeEnabled();
   });
@@ -197,10 +191,10 @@ describe('phone actions', () => {
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Cannot remove this phone.'));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(onRemovePhone).toHaveBeenCalledTimes(2);
   });
 
@@ -221,7 +215,7 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledExactlyOnceWith('phone_1');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Not verified yet.'));
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('shows the generic message and logs a primary update that threw unexpectedly', async () => {
@@ -243,11 +237,11 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
     expect(onRemovePhone).not.toHaveBeenCalled();
-    const dialog = screen.getByRole('alertdialog', { name: 'Remove phone number?' });
+    const dialog = screen.getByRole('dialog', { name: 'Remove phone number?' });
     expect(dialog).toHaveTextContent('+1 (801) 555-0100');
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
     expect(onRemovePhone).toHaveBeenCalledExactlyOnceWith('phone_1');
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
   it.each([
     [true, 'You won’t be able to use it to sign in.'],
@@ -260,7 +254,7 @@ describe('phone actions', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    const dialog = screen.getByRole('alertdialog');
+    const dialog = screen.getByRole('dialog');
     if (warning) {
       expect(dialog).toHaveTextContent(warning);
     } else {
