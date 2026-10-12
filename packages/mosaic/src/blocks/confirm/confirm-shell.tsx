@@ -136,7 +136,7 @@ export function ConfirmShell<Payload>({
               // Because it's enforced in the controller that this can only open via a function with the
               // same signature/Payload as we expect, it's safe to typecast here. It would be very hard
               // to convince TS of this properly, essentially by copying the Payload into the controller,
-              // so we take the easy way in this case. This only hold while the controller upholds the
+              // so we take the easy way in this case. This only holds while the controller upholds the
               // guarantee.
               // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- See above
               payload={payload as Payload}
