@@ -4,6 +4,7 @@ import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import type {
   ReadyWeb3WalletsModel,
   UserProfileWeb3Provider,
@@ -19,8 +20,10 @@ export function useUserProfileWeb3WalletsController({
   setPrimary,
   remove,
   fallbackFocus,
+  reverification,
 }: Pick<ReadyWeb3WalletsModel, 'wallets' | 'availableProviders' | 'connect' | 'setPrimary' | 'remove'> & {
   fallbackFocus?: () => HTMLElement | null;
+  reverification?: ReverificationController;
 }) {
   const messages = useMessages('userProfileWeb3Wallets');
   const action = usePendingAction({ errorFallback: messages.errors.generic });
@@ -38,6 +41,7 @@ export function useUserProfileWeb3WalletsController({
   // TODO: Share the action lock during removal while preserving errors for the confirmation dialog.
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({
     onConfirm: wallet => removalFocus.remove(wallet.id),
+    reverification,
   });
 
   const onConnect = (id: string) => {

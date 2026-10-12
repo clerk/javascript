@@ -4,6 +4,7 @@ import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfilePasskeysSectionViewProps } from '../user-profile-passkeys-section.view';
 import type { UserProfilePasskeysModel } from './user-profile-passkeys-section.model';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.types';
@@ -19,7 +20,8 @@ export function useUserProfilePasskeysSectionController({
   onRename,
   validateName,
   onRemove,
-}: PasskeysControllerInput): UserProfilePasskeysSectionViewProps {
+  reverification,
+}: PasskeysControllerInput & { reverification?: ReverificationController }): UserProfilePasskeysSectionViewProps {
   const messages = useMessages('userProfilePasskeys');
   const add = usePendingAction<'add'>({ errorFallback: messages.saveError });
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -29,7 +31,10 @@ export function useUserProfilePasskeysSectionController({
     onRemove,
     fallback: () => addButtonRef.current ?? sectionRef.current,
   });
-  const remove = useConfirmController<UserProfilePasskey>({ onConfirm: passkey => removalFocus.remove(passkey.id) });
+  const remove = useConfirmController<UserProfilePasskey>({
+    onConfirm: passkey => removalFocus.remove(passkey.id),
+    reverification,
+  });
 
   return {
     passkeys,
