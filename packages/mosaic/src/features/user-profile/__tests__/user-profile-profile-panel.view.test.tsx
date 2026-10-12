@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
+import { useConfirmController } from '../../../blocks/confirm';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
@@ -12,8 +12,8 @@ import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view'
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 
 function DeleteAccount() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDangerSectionView {...controller} />;
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
 }
 
 function renderView(overrides: UserProfileProfilePanelViewProps = {}) {
