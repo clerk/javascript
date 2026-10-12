@@ -938,10 +938,7 @@ describe('clerkMiddleware(params)', () => {
       });
 
       it('returns 401 when protect is called with authorization params and token in a single argument', async () => {
-        const resp = await protectWith(auth => {
-          const opts = { feature: 'premium', token: tokenType } as any;
-          return auth.protect(opts);
-        });
+        const resp = await protectWith(auth => auth.protect({ feature: 'premium', token: tokenType } as any));
 
         expect(resp?.status).toEqual(401);
       });

@@ -201,8 +201,7 @@ export function createProtect(opts: {
     }
 
     /**
-     * Checking if user is authorized when permission or role is passed.
-     * Machine tokens don't have organization permissions, so their has() always returns false
+     * Checking if user is authorized when permission or role is passed
      */
     if (authObject.has(paramsOrFunction)) {
       return authObject;
