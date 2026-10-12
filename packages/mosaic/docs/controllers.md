@@ -72,10 +72,20 @@ confirm dialog: open, pending, error, and the verify step a reverified action
 swaps in. It is generic over a payload. Create it in the wrapper, pass it to the
 view, and the view hands it to the block as `controller` and opens it from a row
 with `open(payload)`; the copy props read the payload and `onConfirm` receives it.
-A dialog next to its button has no payload and takes the button as `trigger`:
+A dialog next to its button has no payload and takes the button as `trigger`.
+
+An action Clerk may interrupt for step-up verification goes through
+`useReverificationFlow` first. It reads Clerk hooks, so the wrapper calls it next
+to the model and hands the controller the wrapped action together with the
+`reverification` it returns; the controller passes both on, and the block shows
+the verify step inside the same dialog:
 
 ```ts
+// wrapper
 const [revoke, reverification] = useReverificationFlow((id: string) => model.revoke(id));
+const controller = useInvitationsController({ ...model, revoke, reverification });
+
+// controller
 const removalFocus = useListRemovalFocus({ ids, onRemove: revoke, fallback });
 const remove = useConfirmController<Invitation>({
   onConfirm: invitation => removalFocus.remove(invitation.id),
