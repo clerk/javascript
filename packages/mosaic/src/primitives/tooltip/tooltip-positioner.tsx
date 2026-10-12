@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useTooltipContext } from './tooltip-context';
 
 export type TooltipPositionerProps = ComponentProps<'div'>;
@@ -12,7 +13,7 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
     const { render, ...otherProps } = props;
     const { mounted, refs, floatingStyles, placement, getFloatingProps } = useTooltipContext();
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
     const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
 

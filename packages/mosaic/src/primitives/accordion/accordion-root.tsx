@@ -4,7 +4,7 @@ import { Composite } from '@floating-ui/react';
 import React, { type ReactNode, useCallback, useId, useMemo } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import { AccordionContext, type AccordionContextValue } from './accordion-context';
 
 export interface AccordionProps extends ComponentProps<'div'> {
@@ -65,18 +65,11 @@ export function AccordionRoot(props: AccordionProps) {
               const items = Array.from(
                 event.currentTarget.querySelectorAll<HTMLElement>('[aria-expanded]:not([disabled])'),
               );
-              if (items.length === 0) {
-                return;
-              }
-              const target = event.key === 'Home' ? items[0] : items[items.length - 1];
-              target.focus();
+              (event.key === 'Home' ? items.at(0) : items.at(-1))?.focus();
             },
           };
 
-          const merged = mergeProps<'div'>(
-            defaultProps,
-            mergeProps<'div'>(otherProps, restCompositeProps as Record<string, unknown>),
-          );
+          const merged = mergeProps<'div'>(defaultProps, mergeProps<'div'>(otherProps, restCompositeProps));
 
           // Composite may inject a ref via compositeProps; hand it to useRender's ref
           // param (which owns ref-merging) instead of leaving it in props, where
@@ -87,9 +80,7 @@ export function AccordionRoot(props: AccordionProps) {
           return useRender({
             defaultTagName: 'div',
             render,
-            // SAFETY: mergeProps returns Record<string, unknown>; a ref Composite injected
-            // is a valid React ref at runtime.
-            ref: compositeRef as React.Ref<unknown>,
+            ref: isRef(compositeRef) ? compositeRef : undefined,
             props: mergedProps,
           });
         }}

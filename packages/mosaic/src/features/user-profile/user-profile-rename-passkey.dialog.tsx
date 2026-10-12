@@ -1,39 +1,34 @@
-import { useId, useRef } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import { useRef } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
+import type { UseFormResult } from '../../components/form';
 import { Input } from '../../components/input';
 import { useMessages } from '../../localization';
+import type { UserProfileRenamePasskeyValues } from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 
 export interface UserProfileRenamePasskeyDialogProps {
   handle: DialogHandle;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  name: string;
-  onNameChange: (name: string) => void;
-  canSave: boolean;
-  isSaving?: boolean;
-  error?: string;
-  onSubmit: () => void;
+  form: UseFormResult<UserProfileRenamePasskeyValues>;
 }
 
 export function UserProfileRenamePasskeyDialog({
   handle,
   open,
   onOpenChange,
-  name,
-  onNameChange,
-  canSave,
-  isSaving = false,
-  error,
-  onSubmit,
+  form,
 }: UserProfileRenamePasskeyDialogProps) {
   const m = useMessages('userProfilePasskeys');
-  const formId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { ref, ...control } = form.register('name');
+  const mergedRef = useMergeRefs([ref, inputRef]);
+  const feedback = form.fields.name.feedback;
   return (
     <Dialog.Root
       handle={handle}
@@ -53,31 +48,30 @@ export function UserProfileRenamePasskeyDialog({
             role='alert'
             color='negative'
           >
-            {error}
+            {form.error}
           </Card.Banner>
           <Card.Content
             render={
               <form
-                id={formId}
-                onSubmit={event => {
-                  event.preventDefault();
-                  if (canSave && !isSaving) {
-                    onSubmit();
-                  }
-                }}
+                id={form.id}
+                onSubmit={form.handleSubmit}
               />
             }
           >
             <Field.Root
               required
-              disabled={isSaving}
+              invalid={feedback?.type === 'error'}
+              disabled={form.isSubmitting}
             >
               <Field.Label>{m.nameLabel}</Field.Label>
               <Input
-                ref={inputRef}
+                ref={mergedRef}
                 autoComplete='off'
-                value={name}
-                onChange={event => onNameChange(event.target.value)}
+                {...control}
+              />
+              <Field.Feedback
+                feedback={feedback}
+                role={feedback?.type === 'error' ? 'alert' : 'status'}
               />
             </Field.Root>
           </Card.Content>
@@ -87,17 +81,17 @@ export function UserProfileRenamePasskeyDialog({
                 <Button
                   variant='outline'
                   fullWidth
-                  disabled={isSaving}
+                  disabled={form.isSubmitting}
                 >
                   {m.cancel}
                 </Button>
               }
             />
             <SubmitButton
-              form={formId}
+              form={form.id}
               fullWidth
-              isPending={isSaving}
-              disabled={!canSave}
+              isPending={form.isSubmitting}
+              disabled={!form.canSubmit}
               focusableWhenDisabled
             >
               {m.save}

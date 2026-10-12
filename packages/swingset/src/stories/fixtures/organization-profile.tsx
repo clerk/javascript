@@ -1,7 +1,7 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
-import { OrganizationProfileSaveError } from '@clerk/mosaic/features/organization-profile/organization-profile.types';
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
+import { SaveError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -56,7 +56,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     await settleAfter(800);
     const message = failWith?.[field];
     if (message) {
-      throw new OrganizationProfileSaveError(message, field);
+      throw new SaveError({ fields: { [field]: { code: 'fixture_error', message } } });
     }
     apply();
   };

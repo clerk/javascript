@@ -40,7 +40,8 @@ function passwordError(
     return undefined;
   }
   if (first.code === 'form_password_not_strong_enough') {
-    return passwordStrengthMessage(first.meta?.zxcvbn?.suggestions?.map(suggestion => suggestion.code) ?? [], messages);
+    const suggestions: { code: string }[] | undefined = first.meta?.zxcvbn?.suggestions;
+    return passwordStrengthMessage(suggestions?.map(suggestion => suggestion.code) ?? [], messages);
   }
   const failures = errors.flatMap(error => {
     const code = passwordComplexityCodes.get(error.code);
@@ -68,7 +69,8 @@ export function passwordFormError(
   const fields: { currentPassword?: string; newPassword?: string } = {};
   const passwordErrors: ClerkAPIError[] = [];
   let message: string | undefined;
-  for (const item of error.errors) {
+  const items: ClerkAPIError[] = error.errors;
+  for (const item of items) {
     const text = errorText(toLocalizableApiError(item));
     const name = snakeToCamel(item.meta?.paramName);
     if (name === 'currentPassword' && requiresCurrentPassword) {

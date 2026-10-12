@@ -3,7 +3,7 @@
 import { CompositeItem } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import { useAccordionContext, useAccordionItemContext } from './accordion-context';
 
 export type AccordionTriggerProps = ComponentProps<'button'>;
@@ -32,10 +32,7 @@ export function AccordionTrigger(props: AccordionTriggerProps) {
           },
         };
 
-        const merged = mergeProps<'button'>(
-          mergeProps<'button'>(defaultProps, otherProps),
-          compositeProps as Record<string, unknown>,
-        );
+        const merged = mergeProps<'button'>(mergeProps<'button'>(defaultProps, otherProps), compositeProps);
 
         // The wired id is owned by the primitive: a consumer-supplied id must
         // not override it, or the trigger/panel aria pairing would silently break.
@@ -50,9 +47,7 @@ export function AccordionTrigger(props: AccordionTriggerProps) {
         return useRender({
           defaultTagName: 'button',
           render,
-          // SAFETY: mergeProps returns Record<string, unknown>; the ref CompositeItem
-          // injected is a valid React ref at runtime.
-          ref: compositeRef as React.Ref<unknown>,
+          ref: isRef(compositeRef) ? compositeRef : undefined,
           state,
           stateAttributesMapping: {
             open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),

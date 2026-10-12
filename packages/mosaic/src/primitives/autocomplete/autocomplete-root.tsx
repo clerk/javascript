@@ -42,7 +42,7 @@ export interface AutocompleteProps {
 }
 
 function AutocompleteInner(props: AutocompleteProps) {
-  const { placement: placementProp = 'bottom-start', sideOffset = 4, children } = props;
+  const { placement: placementProp = 'bottom-start', sideOffset = 4, children, onValueChange } = props;
 
   const nodeId = useFloatingNodeId();
 
@@ -54,11 +54,7 @@ function AutocompleteInner(props: AutocompleteProps) {
     props.onInputValueChange,
   );
 
-  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>(
-    props.value,
-    props.defaultValue,
-    props.onValueChange as ((value: string | undefined) => void) | undefined,
-  );
+  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>(props.value, props.defaultValue);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -147,12 +143,13 @@ function AutocompleteInner(props: AutocompleteProps) {
   const handleSelect = useCallback(
     (value: string, index: number, label: string) => {
       setSelectedValue(value);
+      onValueChange?.(value);
       setSelectedIndex(index);
       setInputValue(label);
       setActiveIndex(null);
       setOpen(false);
     },
-    [setSelectedValue, setInputValue, setOpen],
+    [setSelectedValue, setInputValue, setOpen, onValueChange],
   );
 
   const handleInputChange = useCallback(

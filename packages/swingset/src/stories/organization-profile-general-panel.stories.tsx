@@ -9,11 +9,10 @@ export { default as __source } from './organization-profile-general-panel.storie
 export const meta: StoryMeta = {
   group: 'Organization Profile',
   status: 'wip',
-  substatus: 'needs wire-up',
   title: 'OrganizationProfileGeneralPanel',
   label: 'General panel',
   navigation: { category: 'Panels' },
-  source: 'packages/mosaic/src/features/organization-profile/organization-profile-general-panel.view.tsx',
+  source: 'packages/mosaic/src/features/organization-profile/organization-profile-general-panel.tsx',
 };
 
 export function Default() {

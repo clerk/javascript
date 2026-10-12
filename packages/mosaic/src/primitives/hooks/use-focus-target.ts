@@ -26,11 +26,13 @@ export type FocusTarget =
  * index disables the focus move). The function form reads the open event floating-ui has
  * already recorded by the time the popup mounts; it must be pure, as re-renders re-invoke it.
  */
+export type ResolvedInitialFocus = number | React.MutableRefObject<HTMLElement | null>;
+
 export function useInitialFocus(
   initialFocus: FocusTarget | undefined,
   open: boolean,
   floatingContext: FloatingContext,
-): number | React.MutableRefObject<HTMLElement | null> {
+): ResolvedInitialFocus {
   const elementRef = React.useRef<HTMLElement | null>(null);
   return React.useMemo(() => {
     if (!open || initialFocus === undefined || initialFocus === true) {

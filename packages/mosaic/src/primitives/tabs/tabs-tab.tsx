@@ -1,9 +1,9 @@
 'use client';
 
 import { CompositeItem } from '@floating-ui/react';
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
 export interface TabsTabProps extends ComponentProps<'button'> {
@@ -18,12 +18,10 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
   const isSelected = selectedValue === tabValue;
   const tabId = `${tabsId}-tab-${tabValue}`;
   const panelId = `${tabsId}-panel-${tabValue}`;
-  const internalRef = useRef<HTMLButtonElement | null>(null);
-
-  useLayoutEffect(() => {
-    registerTab(tabValue, internalRef.current);
-    return () => registerTab(tabValue, null);
-  }, [tabValue, registerTab]);
+  const register = useCallback(
+    (element: HTMLButtonElement | null) => registerTab(tabValue, element),
+    [registerTab, tabValue],
+  );
 
   const state = {
     selected: isSelected,
@@ -32,7 +30,7 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
 
   return (
     <CompositeItem
-      ref={internalRef}
+      ref={register}
       disabled={disabled}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {
@@ -66,10 +64,7 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
 
         // Merge: defaultProps first, then consumer props, then composite props last
         // (composite needs to win on tabIndex, data-active, onFocus, ref)
-        const merged = mergeProps<'button'>(
-          mergeProps<'button'>(defaultProps, otherProps),
-          compositeProps as Record<string, unknown>,
-        );
+        const merged = mergeProps<'button'>(mergeProps<'button'>(defaultProps, otherProps), compositeProps);
 
         // The wired id is owned by the primitive: a consumer-supplied id must not
         // override it, or the tab/panel aria pairing would silently break.
@@ -94,9 +89,7 @@ export const TabsTab = React.forwardRef<HTMLButtonElement, TabsTabProps>(functio
         return useRender({
           defaultTagName: 'button',
           render,
-          // SAFETY: mergeProps returns Record<string, unknown>; the ref CompositeItem
-          // injected is a valid React ref at runtime.
-          ref: [internalRef, compositeRef as React.Ref<unknown>, ref],
+          ref: [register, isRef(compositeRef) ? compositeRef : undefined, ref],
           state,
           stateAttributesMapping: {
             selected: (v: boolean) => (v ? { 'data-selected': '' } : null),

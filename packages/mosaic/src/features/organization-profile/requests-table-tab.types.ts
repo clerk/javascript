@@ -9,26 +9,18 @@ export interface OrganizationProfileRequest {
   pendingAction?: 'accept' | 'decline';
 }
 
-export interface RequestsTableSort {
-  column: 'email' | 'requestedAt';
-  direction: 'ascending' | 'descending';
-}
-
 export interface RequestsTableTabViewProps {
   requests: OrganizationProfileRequest[];
   totalCount: number;
   page: number;
-  pageSize?: number;
-  searchValue: string;
+  pageSize: number;
   isLoading: boolean;
   isFetching?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
   onPageChange: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  onSearchChange: (value: string) => void;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
   onAccept?: (id: string) => void | Promise<void>;
   onDecline?: (id: string) => void | Promise<void>;
   onBulkAction?: (ids: string[]) => void;
-  sort?: RequestsTableSort | null;
-  onSortChange?: (sort: RequestsTableSort | null) => void;
 }

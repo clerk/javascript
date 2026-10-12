@@ -18,7 +18,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
     'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
-    'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
+    'user-profile-profile-section': dynamic(() => import('../stories/user-profile-profile-section.mdx')),
+    'user-profile-email-section': dynamic(() => import('../stories/user-profile-email-section.mdx')),
+    'user-profile-phone-section': dynamic(() => import('../stories/user-profile-phone-section.mdx')),
     'user-profile-password-section': dynamic(() => import('../stories/user-profile-password-section.mdx')),
     'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
     'user-profile-mfa-section': dynamic(() => import('../stories/user-profile-mfa-section.mdx')),
@@ -78,6 +80,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     drawer: dynamic(() => import('../stories/drawer.component.mdx')),
     'empty-state': dynamic(() => import('../stories/empty-state.mdx')),
+    entity: dynamic(() => import('../stories/entity.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
@@ -87,6 +90,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     profile: dynamic(() => import('../stories/profile.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
@@ -153,7 +157,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose prose-headings:scroll-mt-16 mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
         <DocContent />
       </article>
