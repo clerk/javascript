@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
-import { useMemo, useRef, useState } from 'react';
+import type { Ref } from 'react';
+import { useState } from 'react';
 
 import { Destructive } from '../../blocks/destructive';
 import { Button } from '../../components/button';
@@ -10,7 +11,6 @@ import { Spinner } from '../../components/spinner';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -31,9 +31,13 @@ export function APIKeysTableView({
   onPageSizeChange,
   searchValue,
   onSearchChange,
+  searchInputRef,
+  createButtonRef,
   onCreate,
   createDialog,
-  onRevoke,
+  registerTrigger,
+  revoke,
+  finalFocus,
   onBulkAction,
   sort,
   onSortChange,
@@ -42,14 +46,6 @@ export function APIKeysTableView({
   isError = false,
   onRetry,
 }: APIKeysTableViewProps) {
-  const searchInput = useRef<HTMLInputElement>(null);
-  const createButton = useRef<HTMLButtonElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: apiKeys.map(getRowId),
-    onRemove: onRevoke,
-    fallback: () => createButton.current ?? searchInput.current,
-  });
-  const revokeKey = useMemo(() => Destructive.createHandle<APIKey>(), []);
   const { table, sortHeader, pagination } = useServerDataTable({
     data: apiKeys,
     totalCount,
@@ -64,7 +60,7 @@ export function APIKeysTableView({
     searchValue,
     onSearchChange,
   });
-  const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
+  const columnCount = 3 + Number(Boolean(revoke)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
   const emptyState = query
     ? { label: m.empty, description: fill(m.emptyDescription, { query }) }
@@ -74,7 +70,7 @@ export function APIKeysTableView({
       <div {...mergeStyleProps(themeProps('api-keys-table'), stylex.props(styles.root))}>
         <Table.Toolbar>
           <Table.Search
-            ref={searchInput}
+            ref={searchInputRef}
             label={m.search}
             clearLabel={m.clearSearch}
             value={table.globalFilter}
@@ -82,7 +78,7 @@ export function APIKeysTableView({
           />
           {onCreate ? (
             <Button
-              ref={createButton}
+              ref={createButtonRef}
               onClick={onCreate}
             >
               {m.create}
@@ -106,7 +102,7 @@ export function APIKeysTableView({
               <Table.HeaderCell {...sortHeader('name')}>{m.name}</Table.HeaderCell>
               <Table.HeaderCell {...sortHeader('createdAt')}>{m.createdAt}</Table.HeaderCell>
               <Table.HeaderCell {...sortHeader('lastUsed')}>{m.lastUsed}</Table.HeaderCell>
-              {onRevoke ? (
+              {revoke ? (
                 <Table.HeaderCell align='end'>
                   <VisuallyHidden>{m.actions}</VisuallyHidden>
                 </Table.HeaderCell>
@@ -174,13 +170,13 @@ export function APIKeysTableView({
                   <Table.Cell noWrap>
                     <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
                   </Table.Cell>
-                  {onRevoke ? (
+                  {revoke ? (
                     <Table.Cell align='end'>
                       <APIKeyActions
                         messages={m}
                         apiKey={row.original}
-                        registerTrigger={removalFocus.registerTrigger}
-                        onSelect={apiKey => revokeKey.open(apiKey)}
+                        registerTrigger={registerTrigger}
+                        onSelect={apiKey => revoke.open(apiKey)}
                       />
                     </Table.Cell>
                   ) : null}
@@ -200,18 +196,16 @@ export function APIKeysTableView({
         ) : null}
       </div>
       {createDialog ? <CreateAPIKeyDialog {...createDialog} /> : null}
-      {onRevoke ? (
+      {revoke ? (
         <Destructive
-          handle={revokeKey}
+          controller={revoke}
           title={apiKey => fill(m.revokeTitle, { name: apiKey.name })}
           description={m.revokeDescription}
           fieldLabel={apiKey => fill(m.revokeFieldLabel, { name: apiKey.name })}
           confirmationValue={apiKey => apiKey.name}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onDelete={apiKey => removalFocus.remove(apiKey.id)}
-          errorFallback={m.revokeError}
-          finalFocus={removalFocus.finalFocus}
+          finalFocus={finalFocus}
         />
       ) : null}
     </>
@@ -251,10 +245,10 @@ function APIKeyActions({
 }: {
   messages: APIKeysTableMessages;
   apiKey: APIKey;
-  registerTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
+  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
   onSelect: (key: APIKey) => void;
 }) {
-  const [triggerRef] = useState(() => registerTrigger(apiKey.id));
+  const [triggerRef] = useState(() => registerTrigger?.(apiKey.id));
   return (
     <Menu.Root placement='bottom-end'>
       <Menu.Trigger

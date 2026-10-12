@@ -109,10 +109,10 @@ describe('connected organization invitations', () => {
     await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(fapi.organizationInvitations[0]?.status).toBe('revoked'));
     expect(await screen.findByText('No pending invitations')).toBeVisible();
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     await waitFor(() =>
       expect(screen.getByRole('group', { name: 'Invitations' })).toContainElement(document.activeElement),
     );
@@ -125,17 +125,17 @@ describe('connected organization invitations', () => {
     await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(revoke.requests).toHaveLength(1));
     revoke.fail('network_error', 'Unavailable');
     await waitFor(() =>
-      expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
+      expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(
         'Unable to reach the server. Check your connection and try again.',
       ),
     );
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
     const retry = serve(['org:sys_memberships:manage']);
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(retry.organizationInvitations[0]?.status).toBe('revoked'));
   });
 
@@ -146,9 +146,9 @@ describe('connected organization invitations', () => {
     await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     fapi.organizationInvitations = [{ ...invitation, status: 'accepted' }];
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() =>
-      expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
+      expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(
         'This invitation is no longer pending.',
       ),
     );
@@ -162,13 +162,13 @@ describe('connected organization invitations', () => {
     await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
-    const confirm = within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' });
+    const confirm = within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' });
     await user.click(confirm);
     await waitFor(() => expect(revoke.requests).toHaveLength(1));
     confirm.click();
     confirm.click();
     revoke.release();
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(revoke.requests).toHaveLength(1);
   });
 
@@ -181,11 +181,11 @@ describe('connected organization invitations', () => {
     await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     const refresh = holdRequests('get', '/v1/organizations/:organizationId/invitations');
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(refresh.requests).toHaveLength(1));
     refresh.fail('network_error', 'Unavailable');
     await waitFor(() => expect(screen.getByText('Unable to load invitations')).toBeVisible(), { timeout: 12_000 });
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.organizationInvitations.find(item => item.id === invitation.id)?.status).toBe('revoked');
     expect(screen.queryByText('other@example.com')).toBeNull();
     const table = within(screen.getByRole('table', { name: 'Invitations' }));
@@ -247,7 +247,7 @@ describe('connected organization invitations', () => {
     nextPage.release();
     await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
     expect(await screen.findByText('user0@example.com')).toBeVisible();
     expect(screen.queryByText('ada@example.com')).toBeNull();
   });
@@ -266,9 +266,9 @@ describe('connected organization invitations', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
-    expect(await screen.findByRole('alertdialog')).toBeInTheDocument();
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
     await act(() => clerk.setActive({ session: 'sess_second' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
   });
 
@@ -297,11 +297,11 @@ describe('connected organization invitations', () => {
     const actor = userEvent.setup();
     await actor.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await actor.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
-    expect(await screen.findByRole('alertdialog')).toBeInTheDocument();
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
     await act(() => clerk.setActive({ organization: otherOrganization.id }));
     expect(await screen.findByText('other@example.com')).toBeVisible();
     expect(screen.queryByText('ada@example.com')).toBeNull();
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('ignores an old revoke completion after switching organizations', async () => {
@@ -327,14 +327,14 @@ describe('connected organization invitations', () => {
     await actor.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await actor.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
-    await actor.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    await actor.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(revoke.requests).toHaveLength(1));
     await act(() => clerk.setActive({ organization: otherOrganization.id }));
     expect(await screen.findByText('other@example.com')).toBeVisible();
     revoke.release();
     await waitFor(() => expect(fapi.organizationInvitations[0]?.status).toBe('revoked'));
     expect(screen.getByText('other@example.com')).toBeVisible();
-    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.queryByText('ada@example.com')).toBeNull();
   });
 });
