@@ -121,7 +121,7 @@ describe('OrganizationProfileMembersPanel', () => {
     members.release();
     await user.click(await screen.findByRole('button', { name: 'Manage Bob Smith' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
-    const dialog = await screen.findByRole('alertdialog', { name: 'Remove Bob Smith?' });
+    const dialog = await screen.findByRole('dialog', { name: 'Remove Bob Smith?' });
     await user.click(within(dialog).getByRole('button', { name: 'Remove from organization' }));
     await waitFor(() => expect(fapi.memberships.some(item => item.id === bob.id)).toBe(false));
     await waitFor(() => expect(screen.queryByText('Bob Smith')).toBeNull());
@@ -297,7 +297,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(screen.getByRole('button', { name: 'Manage Bob Smith' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
     await user.click(
-      within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }),
+      within(await screen.findByRole('dialog')).getByRole('button', { name: 'Remove from organization' }),
     );
     await waitFor(() => expect(fapi.memberships.some(item => item.id === bob.id)).toBe(false));
     expect(await screen.findByText('Extra0')).toBeVisible();

@@ -1,12 +1,41 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { useConfirmController } from '../../../blocks/confirm';
+import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
+import { useMessages } from '../../../localization';
 import { MosaicProvider } from '../../../mosaic-provider';
-import type { InvitationsTableTabViewProps } from '../invitations-table-tab.types';
+import type { InvitationsTableTabViewProps, OrganizationProfileInvitation } from '../invitations-table-tab.types';
 import { InvitationsTableTabView } from '../invitations-table-tab.view';
 
-function propsFor(overrides: Partial<InvitationsTableTabViewProps> = {}): InvitationsTableTabViewProps {
+type InvitationsProps = Omit<InvitationsTableTabViewProps, 'revoke'> & { onRevoke?: (id: string) => Promise<void> };
+
+function Invitations({ onRevoke, ...props }: InvitationsProps) {
+  const m = useMessages('invitationsTableTab');
+  const inviteButtonRef = useRef<HTMLButtonElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: props.invitations.map(invitation => invitation.id),
+    onRemove: onRevoke,
+    fallback: () => inviteButtonRef.current,
+  });
+  const revoke = useConfirmController<OrganizationProfileInvitation>({
+    onConfirm: invitation => removalFocus.remove(invitation.id),
+    errorFallback: m.revokeError,
+  });
+  return (
+    <InvitationsTableTabView
+      {...props}
+      inviteButtonRef={inviteButtonRef}
+      registerTrigger={removalFocus.registerTrigger}
+      revoke={onRevoke ? revoke : undefined}
+      finalFocus={removalFocus.finalFocus}
+    />
+  );
+}
+
+function propsFor(overrides: Partial<InvitationsProps> = {}): InvitationsProps {
   return {
     invitations: [{ id: 'invite-1', email: 'ada@example.com', invitedAtLabel: 'Sep 1, 2026', roleLabel: 'Admin' }],
     totalCount: 1,
@@ -17,13 +46,13 @@ function propsFor(overrides: Partial<InvitationsTableTabViewProps> = {}): Invita
     ...overrides,
   };
 }
-function renderView(overrides: Partial<InvitationsTableTabViewProps> = {}) {
+function renderView(overrides: Partial<InvitationsProps> = {}) {
   const props = propsFor(overrides);
   return {
     props,
     ...render(
       <MosaicProvider>
-        <InvitationsTableTabView {...props} />
+        <Invitations {...props} />
       </MosaicProvider>,
     ),
   };
@@ -43,13 +72,13 @@ describe('InvitationsTableTabView', () => {
         <MosaicProvider
           localization={{ overrides: { 'invitationsTableTab.revokeError': 'Could not revoke invitation.' } }}
         >
-          <InvitationsTableTabView {...propsFor({ onRevoke: vi.fn().mockRejectedValue(new Error(message)) })} />
+          <Invitations {...propsFor({ onRevoke: vi.fn().mockRejectedValue(new Error(message)) })} />
         </MosaicProvider>,
       );
 
       await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
       await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
-      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
 
       await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not revoke invitation.'));
     },
@@ -60,7 +89,7 @@ describe('InvitationsTableTabView', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading invitations');
     rerender(
       <MosaicProvider>
-        <InvitationsTableTabView
+        <Invitations
           {...props}
           isLoading={false}
         />
@@ -69,7 +98,7 @@ describe('InvitationsTableTabView', () => {
     expect(screen.getByRole('status')).toHaveTextContent('No pending invitations');
     rerender(
       <MosaicProvider>
-        <InvitationsTableTabView
+        <Invitations
           {...propsFor()}
           isFetching
         />
@@ -79,7 +108,7 @@ describe('InvitationsTableTabView', () => {
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
     rerender(
       <MosaicProvider>
-        <InvitationsTableTabView
+        <Invitations
           {...propsFor()}
           isError
           onRetry={vi.fn()}
@@ -111,7 +140,7 @@ describe('InvitationsTableTabView', () => {
     expect(screen.getByRole('button', { name: 'Manage ada@example.com' })).toBeVisible();
     rerender(
       <MosaicProvider>
-        <InvitationsTableTabView
+        <Invitations
           {...props}
           onInvite={undefined}
           onRevoke={undefined}

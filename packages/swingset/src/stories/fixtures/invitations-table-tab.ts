@@ -1,6 +1,11 @@
-import type { InvitationsTableTabViewProps } from '@clerk/mosaic/features/organization-profile/invitations-table-tab.types';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
+import type {
+  InvitationsTableTabViewProps,
+  OrganizationProfileInvitation,
+} from '@clerk/mosaic/features/organization-profile/invitations-table-tab.types';
+import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
 import { useLocale } from '@clerk/mosaic/localization';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
@@ -38,22 +43,37 @@ export function useInvitationsTableFixture({ proposed = false, empty = false } =
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const currentPage = Math.min(page, Math.max(1, Math.ceil(items.length / pageSize)));
+  const pageItems = items.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(item => ({
+    ...item,
+    invitedAtLabel: new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(item.invitedAt),
+  }));
+  const inviteButtonRef = useRef<HTMLButtonElement>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: pageItems.map(item => item.id),
+    onRemove: id => setItems(current => current.filter(item => item.id !== id)),
+    fallback: () => inviteButtonRef.current ?? tableContainerRef.current,
+  });
+  const revoke = useConfirmController<OrganizationProfileInvitation>({
+    onConfirm: invitation => removalFocus.remove(invitation.id),
+  });
   return {
-    invitations: items.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(item => ({
-      ...item,
-      invitedAtLabel: new Intl.DateTimeFormat(locale, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        timeZone: 'UTC',
-      }).format(item.invitedAt),
-    })),
+    invitations: pageItems,
     totalCount: items.length,
     page: currentPage,
     pageSize,
     isLoading: false,
     onPageChange: setPage,
-    onRevoke: id => setItems(current => current.filter(item => item.id !== id)),
+    inviteButtonRef,
+    tableContainerRef,
+    registerTrigger: removalFocus.registerTrigger,
+    revoke,
+    finalFocus: removalFocus.finalFocus,
     onBulkAction: proposed ? () => undefined : undefined,
   };
 }

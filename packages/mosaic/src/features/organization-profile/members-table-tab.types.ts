@@ -1,5 +1,8 @@
 import type { RoleResource } from '@clerk/shared/types';
-import type { MouseEventHandler } from 'react';
+import type { MouseEventHandler, Ref } from 'react';
+
+import type { ConfirmController } from '../../blocks/confirm';
+import type { DialogFocusTarget } from '../../components/dialog';
 
 export type MemberRole = Pick<RoleResource, 'key' | 'name'>;
 
@@ -37,8 +40,12 @@ export interface MembersTableTabViewProps {
   roleError?: string;
   onPageChange: (page: number) => void;
   onSearchChange: (value: string) => void;
+  searchInputRef?: Ref<HTMLInputElement>;
+  inviteButtonRef?: Ref<HTMLButtonElement>;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
-  onRemove?: (id: string) => void | Promise<void>;
+  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  remove?: ConfirmController<OrganizationProfileMember>;
+  finalFocus?: DialogFocusTarget;
   onChangeRole?: (id: string, role: string) => void;
   onBulkAction?: (ids: string[]) => void;
 }
