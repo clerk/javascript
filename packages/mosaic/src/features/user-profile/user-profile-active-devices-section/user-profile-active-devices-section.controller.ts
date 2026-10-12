@@ -6,12 +6,14 @@ import { useConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 export interface UserProfileActiveDevicesControllerOptions {
   devices: UserProfileDevice[];
   revoke?: (id: string) => Promise<void>;
   revokeAll?: () => Promise<void>;
+  reverification?: ReverificationController;
 }
 
 export interface UserProfileActiveDevicesController {
@@ -31,6 +33,7 @@ export function useUserProfileActiveDevicesController({
   devices,
   revoke,
   revokeAll,
+  reverification,
 }: UserProfileActiveDevicesControllerOptions): UserProfileActiveDevicesController {
   const m = useMessages('userProfileActiveDevices');
   const [removedIds, setRemovedIds] = useState<string[]>([]);
@@ -51,10 +54,12 @@ export function useUserProfileActiveDevicesController({
   const signOutDevice = (device: UserProfileDevice) => removalFocus.remove(device.id);
   const signOut = useConfirmController<UserProfileDevice>({
     onConfirm: signOutDevice,
+    reverification,
     errorFallback: m.detailsDialog.signOutError,
   });
   const details = useConfirmController<UserProfileDevice>({
     onConfirm: signOutDevice,
+    reverification,
     errorFallback: m.detailsDialog.signOutError,
   });
   const signOutAll = useConfirmController({
