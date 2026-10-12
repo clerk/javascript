@@ -121,7 +121,7 @@ describe('User profile MFA management', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('This authenticator must remain enabled.'));
     expect(screen.getByText('Authenticator app')).toBeVisible();
   });
@@ -132,10 +132,10 @@ describe('User profile MFA management', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-    expect(screen.getByRole('alertdialog', { name: 'Remove SMS verification' })).toHaveAccessibleDescription(
+    expect(screen.getByRole('dialog', { name: 'Remove SMS verification' })).toHaveAccessibleDescription(
       'You will no longer receive sign-in verification codes at +1 (555) 555-0101. The phone number will remain on your account.',
     );
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByText('+1 (555) 555-0101')).toBeNull());
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: false, default: undefined });
@@ -149,7 +149,7 @@ describe('User profile MFA management', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-    const dialog = screen.getByRole('alertdialog');
+    const dialog = screen.getByRole('dialog');
     const remove = within(dialog).getByRole('button', { name: 'Remove' });
     await user.click(remove);
     await waitFor(() => expect(held.requests).toHaveLength(1));
@@ -163,7 +163,7 @@ describe('User profile MFA management', () => {
     } finally {
       held.release();
     }
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.mfa.phoneUpdates).toHaveLength(1);
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
   });
@@ -175,8 +175,8 @@ describe('User profile MFA management', () => {
     const action = screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' });
     await user.click(action);
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(action).toHaveFocus();
   });
 
@@ -469,7 +469,7 @@ describe('User profile MFA management', () => {
         expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
         await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
         await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-        expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.queryByRole('dialog')).toBeNull();
       } finally {
         held.release();
       }
@@ -487,10 +487,10 @@ describe('User profile MFA management', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(fapi.mfa.totpRemovals).toBe(1));
     expect(fapi.client.sessions[0]?.user.backup_code_enabled).toBe(false);
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('finishes removal when the follow-up account reload fails', async () => {
@@ -505,9 +505,9 @@ describe('User profile MFA management', () => {
         HttpResponse.json({ errors: [{ code: 'unexpected_error', message: 'Reload failed' }] }, { status: 503 }),
       ),
     );
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(fapi.mfa.totpRemovals).toBe(1));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it.each([
