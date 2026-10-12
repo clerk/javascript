@@ -1,31 +1,28 @@
-import { useConfirmationController } from '../../../blocks/confirmation/confirmation.controller';
+import type { ConfirmController } from '../../../blocks/confirm';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { DataList } from '../../../components/data-list';
-import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
+import type { DialogFocusTarget } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 export interface UserProfileDeviceDetailsDialogProps {
-  handle: DialogHandle<UserProfileDevice>;
+  controller: ConfirmController<UserProfileDevice>;
   devices: UserProfileDevice[];
   finalFocus?: DialogFocusTarget;
-  onSignOut?: (device: UserProfileDevice) => void | Promise<void>;
+  canSignOut?: boolean;
 }
 
 export function UserProfileDeviceDetailsDialog({
-  handle,
+  controller,
   devices,
   finalFocus,
-  onSignOut,
+  canSignOut = false,
 }: UserProfileDeviceDetailsDialogProps) {
-  const m = useMessages('userProfileActiveDevices');
-  const controller = useConfirmationController({ errorFallback: m.detailsDialog.signOutError });
-
   return (
     <Dialog.Root
-      handle={handle}
+      handle={controller.handle}
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
     >
@@ -44,8 +41,8 @@ export function UserProfileDeviceDetailsDialog({
           >
             <DeviceDetailsCard
               device={device}
-              onSignOut={onSignOut ? device => controller.onConfirm(async () => onSignOut(device)) : undefined}
-              isSigningOut={controller.isConfirming}
+              onSignOut={canSignOut ? () => controller.confirm(device) : undefined}
+              isSigningOut={controller.isPending}
               errorMessage={controller.errorMessage}
             />
           </Dialog.Popup>
@@ -62,7 +59,7 @@ function DeviceDetailsCard({
   errorMessage,
 }: {
   device: UserProfileDevice;
-  onSignOut?: (device: UserProfileDevice) => void;
+  onSignOut?: () => void;
   isSigningOut: boolean;
   errorMessage: string | undefined;
 }) {
@@ -111,7 +108,7 @@ function DeviceDetailsCard({
             type='button'
             fullWidth
             isPending={isSigningOut}
-            onClick={() => onSignOut(device)}
+            onClick={onSignOut}
           >
             {m.detailsDialog.signOut}
           </SubmitButton>

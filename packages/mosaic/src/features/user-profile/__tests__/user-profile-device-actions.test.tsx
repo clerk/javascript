@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices.types';
+import { useUserProfileActiveDevicesController } from '../user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 
 const current: UserProfileDevice = {
@@ -26,19 +27,26 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+function ActiveDevices({ devices, revokeAll }: { devices: UserProfileDevice[]; revokeAll: () => Promise<void> }) {
+  const controller = useUserProfileActiveDevicesController({ devices, revokeAll });
+  return <UserProfileActiveDevicesSectionView {...controller} />;
+}
+
 describe('signing out of all other devices', () => {
   function renderAll(onSignOutAllOtherDevices: () => void | Promise<void>, devices = [current, mobile]) {
     return render(
       <MosaicProvider>
-        <UserProfileActiveDevicesSectionView
+        <ActiveDevices
           devices={devices}
-          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
+          revokeAll={async () => {
+            await onSignOutAllOtherDevices();
+          }}
         />
       </MosaicProvider>,
     );
   }
 
-  const confirmation = () => screen.getByRole('alertdialog');
+  const confirmation = () => screen.getByRole('dialog');
 
   it('confirms first, naming how many devices it covers', async () => {
     const user = userEvent.setup();
@@ -51,7 +59,7 @@ describe('signing out of all other devices', () => {
 
     await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('leaves the devices alone when the confirmation is cancelled', async () => {
@@ -61,7 +69,7 @@ describe('signing out of all other devices', () => {
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
     await user.click(within(confirmation()).getByRole('button', { name: 'Cancel' }));
 
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(onSignOutAllOtherDevices).not.toHaveBeenCalled();
   });
 
@@ -84,7 +92,7 @@ describe('signing out of all other devices', () => {
     expect(confirmation()).toBeInTheDocument();
 
     await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(onSignOutAllOtherDevices).toHaveBeenCalledTimes(2);
   });
 
@@ -105,6 +113,6 @@ describe('signing out of all other devices', () => {
       signOutAll.resolve();
       await signOutAll.promise;
     });
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 });

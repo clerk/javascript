@@ -138,7 +138,6 @@ describe('Active devices', () => {
     expect(within(screen.getByRole('dialog')).getByText('Paris, France')).toBeInTheDocument();
     expect(within(screen.getByRole('dialog')).queryByText('Original sign in')).toBeNull();
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
-    expect(screen.queryByRole('alertdialog')).toBeNull();
 
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull());
     expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
@@ -239,18 +238,16 @@ describe('Active devices', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    expect(
-      within(screen.getByRole('alertdialog')).getByText(/Safari on iPhone will be signed out/),
-    ).toBeInTheDocument();
+    expect(within(screen.getByRole('dialog')).getByText(/Safari on iPhone will be signed out/)).toBeInTheDocument();
     expect(devices.find(item => item.id === 'sess_other')?.status).toBe('active');
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not revoke device'));
     expect(devices.find(item => item.id === 'sess_other')?.status).toBe('active');
     expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toBeInTheDocument();
 
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
     expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
     expect(devices.find(item => item.id === 'sess_current')?.status).toBe('active');
@@ -292,7 +289,7 @@ describe('Active devices', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Cet appareil est indisponible.'));
     expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toBeVisible();
@@ -433,7 +430,7 @@ describe('Active devices', () => {
     try {
       await user.click(await screen.findByRole('button', { name: 'Manage Safari on Old phone' }));
       await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
       await waitFor(() => expect(requests).toBe(1));
       await act(() => view.clerk.setActive({ session: 'sess_next' }));
       expect(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
@@ -448,7 +445,7 @@ describe('Active devices', () => {
         pending.resolve();
         await response.value;
       });
-      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
       expect(screen.queryByRole('button', { name: 'Manage Safari on Old phone' })).toBeNull();
       expect(screen.getByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
       expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
@@ -508,7 +505,7 @@ describe('Active devices', () => {
       const user = userEvent.setup();
       await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
       await user.click(screen.getByRole('menuitem', { name: surface === 'details' ? 'View details' : 'Sign out' }));
-      const dialog = screen.getByRole(surface === 'details' ? 'dialog' : 'alertdialog');
+      const dialog = screen.getByRole(surface === 'details' ? 'dialog' : 'dialog');
       await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
 
       await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Verification required'));
