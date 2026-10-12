@@ -71,6 +71,25 @@ describe('tokenCache', () => {
     },
   );
 
+  test('keeps the stored token when a read started in the background fails after the app becomes active', async () => {
+    const readError = new Error('User interaction is not allowed.');
+    mocks.appState.currentState = 'background';
+    let rejectRead: (error: Error) => void = () => {};
+    mocks.getItemAsync.mockReturnValue(
+      new Promise<string | null>((_, reject) => {
+        rejectRead = reject;
+      }),
+    );
+    const tokenCache = await loadTokenCache();
+
+    const read = tokenCache.getToken('__clerk_client_jwt');
+    mocks.appState.currentState = 'active';
+    rejectRead(readError);
+
+    await expect(read).rejects.toBe(readError);
+    expect(mocks.deleteItemAsync).not.toHaveBeenCalled();
+  });
+
   test.each(['active', 'extension', null])(
     'removes an unreadable token when the read fails on iOS while the app state is %s',
     async appState => {

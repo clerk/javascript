@@ -20,6 +20,7 @@ const createTokenCache = (): TokenCache => {
 
   return {
     getToken: async (key: string) => {
+      const startedInBackground = isAppInBackgroundOrInactive();
       try {
         const item = await SecureStore.getItemAsync(key, secureStoreOpts);
         return item;
@@ -27,7 +28,7 @@ const createTokenCache = (): TokenCache => {
         // iOS keychain reads also fail temporarily, such as when the app is launched in the
         // background before the device has been unlocked since boot, while the stored item
         // is still valid. Keep it until a read fails while the app is in the foreground.
-        if (Platform.OS === 'ios' && isAppInBackgroundOrInactive()) {
+        if (Platform.OS === 'ios' && (startedInBackground || isAppInBackgroundOrInactive())) {
           throw error;
         }
         await SecureStore.deleteItemAsync(key, secureStoreOpts);
