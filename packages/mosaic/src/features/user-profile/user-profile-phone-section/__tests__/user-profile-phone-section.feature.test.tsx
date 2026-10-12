@@ -161,7 +161,7 @@ describe('the user profile phone section', () => {
     const { actor } = await renderSection(signedIn([HOME, WORK]));
 
     await manage(actor, WORK_LABEL, 'Remove phone number');
-    const dialog = await screen.findByRole('alertdialog', { name: 'Remove phone number?' });
+    const dialog = await screen.findByRole('dialog', { name: 'Remove phone number?' });
     expect(dialog).toHaveTextContent(WORK_LABEL);
     await actor.click(within(dialog).getByRole('button', { name: 'Remove' }));
 
@@ -173,7 +173,7 @@ describe('the user profile phone section', () => {
     const destroy = holdRequests('post', '/v1/me/phone_numbers/:id');
 
     await manage(actor, WORK_LABEL, 'Remove phone number');
-    const dialog = await screen.findByRole('alertdialog', { name: 'Remove phone number?' });
+    const dialog = await screen.findByRole('dialog', { name: 'Remove phone number?' });
     await actor.click(within(dialog).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(destroy.requests).toHaveLength(1));
     destroy.fail('action_blocked', 'Raw server sentence.');
