@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { useConfirmController } from '../../../blocks/confirm';
 import { MosaicProvider } from '../../../mosaic-provider';
+import { useUserProfileActiveDevicesController } from '../user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
@@ -17,6 +18,23 @@ import { UserProfileSecurityPanelView } from '../user-profile-security-panel.vie
 function DeleteAccount() {
   const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
   return <UserProfileDangerSectionView controller={controller} />;
+}
+
+function ActiveDevices({
+  devices,
+  onSignOutDevice,
+  onSignOutAllOtherDevices,
+}: {
+  devices: UserProfileDevice[];
+  onSignOutDevice?: (id: string) => void;
+  onSignOutAllOtherDevices?: () => void;
+}) {
+  const controller = useUserProfileActiveDevicesController({
+    devices,
+    revoke: onSignOutDevice ? async id => onSignOutDevice(id) : undefined,
+    revokeAll: onSignOutAllOtherDevices ? async () => onSignOutAllOtherDevices() : undefined,
+  });
+  return <UserProfileActiveDevicesSectionView {...controller} />;
 }
 
 function Passkeys({ passkeys, onRemove }: { passkeys: UserProfilePasskey[]; onRemove: (id: string) => Promise<void> }) {
@@ -66,7 +84,7 @@ const props: UserProfileSecurityPanelViewProps = {
     { id: 'totp_1', type: 'authenticator' },
     { id: 'backup_1', type: 'backup-codes' },
   ],
-  activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={devices} />,
+  activeDevicesSlot: <ActiveDevices devices={devices} />,
 };
 
 function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) {
@@ -146,7 +164,7 @@ describe('UserProfileSecurityPanelView', () => {
 
     renderView({
       activeDevicesSlot: (
-        <UserProfileActiveDevicesSectionView
+        <ActiveDevices
           devices={devices}
           onSignOutDevice={onSignOutDevice}
           onSignOutAllOtherDevices={onSignOutAllOtherDevices}
@@ -182,7 +200,7 @@ describe('UserProfileSecurityPanelView', () => {
         />
       ),
       mfaMethods: [],
-      activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={[]} />,
+      activeDevicesSlot: <ActiveDevices devices={[]} />,
       onAddMfaMethod: vi.fn(),
       addableMfaMethods: ['sms', 'authenticator'],
     });
@@ -196,7 +214,7 @@ describe('UserProfileSecurityPanelView', () => {
     const user = userEvent.setup();
     renderView({
       activeDevicesSlot: (
-        <UserProfileActiveDevicesSectionView
+        <ActiveDevices
           devices={devices}
           onSignOutDevice={vi.fn()}
         />
