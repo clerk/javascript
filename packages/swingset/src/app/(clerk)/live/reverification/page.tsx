@@ -1,7 +1,7 @@
 'use client';
 
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import { Destructive } from '@clerk/mosaic/blocks/destructive';
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import { Dialog } from '@clerk/mosaic/components/dialog';
@@ -269,8 +269,8 @@ function DialogHarness() {
 function DestructiveHarness() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(true));
-  const destructive = useDestructiveController({
-    onDelete: async () => {
+  const destructive = useConfirmController({
+    onConfirm: async () => {
       setSuccessMessage(null);
       await resetMockDelete();
       try {
@@ -291,16 +291,16 @@ function DestructiveHarness() {
           color='negative'
           onClick={() => {
             setSuccessMessage(null);
-            destructive.openDestructiveDialog();
+            destructive.open();
           }}
-          disabled={destructive.open}
+          disabled={destructive.isOpen}
         >
           Delete account
         </Button>
       </div>
       {successMessage ? <p className='text-sm'>{successMessage}</p> : null}
       <Destructive
-        {...destructive}
+        controller={destructive}
         title='Delete account?'
         description='This mock asks for verification, then waits before a fake success. The account is not deleted.'
         fieldLabel='Type “Delete account” below to continue'
