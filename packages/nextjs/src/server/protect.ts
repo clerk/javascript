@@ -5,6 +5,7 @@ import type {
   InferAuthObjectFromToken,
   InferAuthObjectFromTokenArray,
   RedirectFun,
+  SessionTokenType,
   SignedInAuthObject,
 } from '@clerk/backend/internal';
 import { constants, isTokenTypeAccepted, TokenType } from '@clerk/backend/internal';
@@ -34,6 +35,14 @@ type AuthProtectOptions = {
   unauthenticatedUrl?: string;
 };
 
+type InferProtectedAuthObject<T extends AuthProtectOptions['token']> = T extends TokenType[]
+  ? InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>
+  : T extends TokenType
+    ? InferAuthObjectFromToken<T, SignedInAuthObject, AuthenticatedMachineObject>
+    : T extends 'any'
+      ? SignedInAuthObject | AuthenticatedMachineObject
+      : SignedInAuthObject;
+
 /**
  * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
@@ -52,10 +61,10 @@ export interface AuthProtect {
    * @example
    * auth.protect(has => has({ permission: 'org:admin:example1' }));
    */
-  (
+  <T extends AuthProtectOptions['token'] = SessionTokenType>(
     params?: (has: CheckAuthorizationFromSessionClaims) => boolean,
-    options?: AuthProtectOptions,
-  ): Promise<SignedInAuthObject>;
+    options?: AuthProtectOptions & { token?: T },
+  ): Promise<InferProtectedAuthObject<T>>;
 
   /**
    * @example
@@ -154,30 +163,28 @@ export function createProtect(opts: {
     }
 
     if (authObject.tokenType !== TokenType.SessionToken) {
-      // For machine tokens, we only check if they're authenticated
-      // They don't have session status or organization permissions
+      // Machine tokens don't have session status
       if (!authObject.isAuthenticated) {
         return handleUnauthorized();
       }
-      return authObject;
+    } else {
+      /**
+       * Redirects the user back to the tasks URL if their session status is pending
+       */
+      if (authObject.sessionStatus === 'pending') {
+        return handleUnauthenticated();
+      }
+
+      /**
+       * User is not authenticated
+       */
+      if (!authObject.userId) {
+        return handleUnauthenticated();
+      }
     }
 
     /**
-     * Redirects the user back to the tasks URL if their session status is pending
-     */
-    if (authObject.sessionStatus === 'pending') {
-      return handleUnauthenticated();
-    }
-
-    /**
-     * User is not authenticated
-     */
-    if (!authObject.userId) {
-      return handleUnauthenticated();
-    }
-
-    /**
-     * User is authenticated
+     * User or machine is authenticated
      */
     if (!paramsOrFunction) {
       return authObject;
@@ -194,7 +201,8 @@ export function createProtect(opts: {
     }
 
     /**
-     * Checking if user is authorized when permission or role is passed
+     * Checking if user is authorized when permission or role is passed.
+     * Machine tokens don't have organization permissions, so their has() always returns false
      */
     if (authObject.has(paramsOrFunction)) {
       return authObject;
