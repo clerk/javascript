@@ -442,9 +442,10 @@ describe('createClerkInstance', () => {
     expect(mocks.appStateListeners.size).toBe(0);
   });
 
-  test('clears an unreadable client JWT when the read still fails once the app is active', async () => {
+  test('rejects with the token cache error without clearing it when the read still fails once the app is active', async () => {
     setAppState('background');
-    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(new Error('Unable to decode the data.')));
+    const readError = new Error('Biometric authentication was cancelled.');
+    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(readError));
     const clearToken = vi.fn(() => Promise.resolve());
     const tokenCache: TokenCache = {
       getToken,
@@ -465,21 +466,21 @@ describe('createClerkInstance', () => {
       url: new URL('https://clerk.example.com/v1/client'),
     };
 
-    const pending = beforeRequest(requestInit);
+    const pending = beforeRequest(requestInit).catch((err: unknown) => err);
     await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
-    expect(clearToken).not.toHaveBeenCalled();
 
     setAppState('active');
-    await pending;
 
+    await expect(pending).resolves.toBe(readError);
     expect(getToken).toHaveBeenCalledTimes(2);
-    expect(clearToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY);
-    expect(requestInit.headers.get('authorization')).toBe('');
+    expect(clearToken).not.toHaveBeenCalled();
+    expect(requestInit.headers.has('authorization')).toBe(false);
   });
 
   test('does not wait for the app to become active inside an app extension', async () => {
     setAppState('extension');
-    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(new Error('Unable to decode the data.')));
+    const readError = new Error('Unable to decode the provided data.');
+    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(readError));
     const clearToken = vi.fn(() => Promise.resolve());
     const tokenCache: TokenCache = {
       getToken,
@@ -499,10 +500,10 @@ describe('createClerkInstance', () => {
       headers: new Headers(),
       url: new URL('https://clerk.example.com/v1/client'),
     };
-    await beforeRequest(requestInit);
+    await expect(beforeRequest(requestInit)).rejects.toBe(readError);
 
     expect(getToken).toHaveBeenCalledTimes(2);
-    expect(clearToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY);
+    expect(clearToken).not.toHaveBeenCalled();
     expect(mocks.appStateListeners.size).toBe(0);
   });
 

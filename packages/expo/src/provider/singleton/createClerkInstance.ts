@@ -24,7 +24,7 @@ import type { TokenCache } from '../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { assertValidProxyUrl } from '../../utils/errors';
-import { isNative } from '../../utils/runtime';
+import { isAppInBackgroundOrInactive, isNative } from '../../utils/runtime';
 import type { BuildClerkOptions } from './types';
 
 /**
@@ -50,7 +50,7 @@ const RESOURCE_RETRY_MAX_DELAY_MS = 30_000;
 const RESOURCE_RETRY_MAX_EXPONENT = 4;
 
 function waitUntilAppIsActive(): Promise<void> {
-  if (AppState.currentState !== 'background' && AppState.currentState !== 'inactive') {
+  if (!isAppInBackgroundOrInactive()) {
     return Promise.resolve();
   }
   return new Promise(resolve => {
@@ -82,12 +82,7 @@ async function readClientJwt() {
   } catch {
     await waitUntilAppIsActive();
   }
-  try {
-    return await __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
-  } catch {
-    await __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
-    return null;
-  }
+  return __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
 }
 
 /**

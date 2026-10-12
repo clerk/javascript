@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 import type { TokenCache } from '../cache';
-import { isNative } from '../utils';
+import { isAppInBackgroundOrInactive, isNative } from '../utils';
 
 /**
  * Create a token cache using Expo's SecureStore
@@ -26,8 +26,8 @@ const createTokenCache = (): TokenCache => {
       } catch (error) {
         // iOS keychain reads also fail temporarily, such as when the app is launched in the
         // background before the device has been unlocked since boot, while the stored item
-        // is still valid. Keep it and let the caller decide whether to clear it.
-        if (Platform.OS === 'ios') {
+        // is still valid. Keep it until a read fails while the app is in the foreground.
+        if (Platform.OS === 'ios' && isAppInBackgroundOrInactive()) {
           throw error;
         }
         await SecureStore.deleteItemAsync(key, secureStoreOpts);
