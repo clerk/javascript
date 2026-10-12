@@ -5,5 +5,5 @@
 Fix iOS users being signed out when the keychain can't be read for a moment, for example when the app is launched in the background before the device has been unlocked since a restart.
 
 - On iOS, `getToken()` from the `@clerk/expo/token-cache` `tokenCache` now rejects with the keychain error instead of deleting the stored client token and returning `null`.
-- When reading the client token fails, from this `tokenCache` or a custom one, Clerk now waits until the app is active and reads it again before sending the request. Requests made in the background wait until the app is opened. If the token still can't be read once the app is active, Clerk clears it and starts a new client, as before.
+- When reading the client token fails, from this `tokenCache` or a custom one, Clerk now waits until the app is active and reads it again before sending the request. Requests made in the background wait until the app is opened. If the token still can't be read once the app is active, Clerk clears it and starts a new client. Previously, a custom `tokenCache` that threw made the request fail instead.
 - A custom `tokenCache` that deletes the token and returns `null` when a read fails will still sign users out in this situation. Rethrow the error instead.
