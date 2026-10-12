@@ -4,6 +4,8 @@ import { Card } from '../../../components/card';
 import { DataList } from '../../../components/data-list';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
+import { Flow } from '../../../components/flow';
+import { Reverification } from '../../../features/reverification';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
@@ -20,6 +22,7 @@ export function UserProfileDeviceDetailsDialog({
   finalFocus,
   onSignOut,
 }: UserProfileDeviceDetailsDialogProps) {
+  const { reverification, step } = controller;
   return (
     <Dialog.Root
       handle={controller.handle}
@@ -32,6 +35,14 @@ export function UserProfileDeviceDetailsDialog({
         }
 
         const device = devices.find(candidate => candidate.id === payload.id) ?? payload;
+        const details = (
+          <DeviceDetails
+            device={device}
+            onSignOut={onSignOut ? () => onSignOut(device) : undefined}
+            isSigningOut={controller.isPending}
+            errorMessage={controller.errorMessage}
+          />
+        );
 
         return (
           <Dialog.Popup
@@ -39,12 +50,32 @@ export function UserProfileDeviceDetailsDialog({
             compactPlacement='center'
             finalFocus={finalFocus}
           >
-            <DeviceDetailsCard
-              device={device}
-              onSignOut={onSignOut ? () => onSignOut(device) : undefined}
-              isSigningOut={controller.isPending}
-              errorMessage={controller.errorMessage}
-            />
+            <Card.Root
+              elevation='overlay'
+              renderBranding={false}
+            >
+              {reverification ? (
+                <Flow.Root
+                  value={step}
+                  direction={step === 'verify' ? 1 : -1}
+                  state={step}
+                >
+                  {() => (
+                    <>
+                      <Flow.Step ids={['confirm']}>{details}</Flow.Step>
+                      <Flow.Step ids={['verify']}>
+                        <Reverification
+                          {...reverification}
+                          onClose={() => controller.onOpenChange(false)}
+                        />
+                      </Flow.Step>
+                    </>
+                  )}
+                </Flow.Root>
+              ) : (
+                details
+              )}
+            </Card.Root>
           </Dialog.Popup>
         );
       }}
@@ -52,7 +83,7 @@ export function UserProfileDeviceDetailsDialog({
   );
 }
 
-function DeviceDetailsCard({
+function DeviceDetails({
   device,
   onSignOut,
   isSigningOut,
@@ -74,10 +105,7 @@ function DeviceDetailsCard({
   const details = fields.filter((field): field is { label: string; value: string } => Boolean(field.value));
 
   return (
-    <Card.Root
-      elevation='overlay'
-      renderBranding={false}
-    >
+    <>
       <Card.Header>
         <Card.Title>{device.name}</Card.Title>
         {device.lastActive ? (
@@ -126,6 +154,6 @@ function DeviceDetailsCard({
           </Dialog.Close>
         )}
       </Card.Footer>
-    </Card.Root>
+    </>
   );
 }
