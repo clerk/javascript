@@ -870,6 +870,31 @@ export function takeUnsettledHolds(): string[] {
   return holds.map(hold => hold.name);
 }
 
+/** Answers the next POST to `path` with a reverification demand, then lets later requests through. */
+export function demandReverificationOnce(path: string): void {
+  let demanded = false;
+  worker.use(
+    http.post(fapiUrl(path), () => {
+      if (demanded) {
+        return undefined;
+      }
+      demanded = true;
+      return HttpResponse.json(
+        {
+          errors: [
+            {
+              code: 'session_reverification_required',
+              message: 'Verification required',
+              long_message: 'Verification required',
+            },
+          ],
+        },
+        { status: 403 },
+      );
+    }),
+  );
+}
+
 export function holdRequests(method: 'get' | 'post', path: string): HeldRequests {
   const requests: Request[] = [];
   let resolveGate: (response: Response | undefined) => void = () => {};
