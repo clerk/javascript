@@ -4,7 +4,12 @@ import userEvent from '@testing-library/user-event';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  type FakeFapiSeed,
+  holdRequests,
+  serveFapi,
+} from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -40,11 +45,12 @@ describe('Web3 wallets', () => {
     });
   }
 
-  async function renderWeb3(overrides: Partial<UserJSON> = {}) {
+  async function renderWeb3(overrides: Partial<UserJSON> = {}, seed: FakeFapiSeed = {}) {
     const user = fapiUser({ id: 'user_1', ...overrides });
     const fapi = serveFapi({
       environment: web3Environment(),
       client: fapiClient([fapiSession({ id: 'sess_1', user })]),
+      ...seed,
     });
     await renderWithClerk(<UserProfileWeb3WalletsSection />);
     return fapi;
@@ -551,6 +557,25 @@ describe('Web3 wallets', () => {
     await user.click(confirm);
     await waitFor(() => expect(retryFapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('verifies the session when removal demands it, then removes the wallet', async () => {
+    const fapi = await renderWeb3(
+      { web3_wallets: [fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' })] },
+      { verification: { secrets: { password: 'hunter2' } } },
+    );
+    demandReverificationOnce('/v1/me/web3_wallets/wallet_1');
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('cancels removal, then removes the newly selected wallet', async () => {
