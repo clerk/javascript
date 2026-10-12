@@ -151,6 +151,26 @@ describe('useForm', () => {
     log.mockRestore();
   });
 
+  it('shows errorFallback instead of the generic message', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const rejections = [new Error('Nope'), new SaveError({})];
+    for (const rejection of rejections) {
+      const { result } = renderHook(() =>
+        useForm({
+          initialValues: { username: '' },
+          errorFallback: 'Could not save the username.',
+          onSubmit: () => Promise.reject(rejection),
+        }),
+      );
+      await act(async () => {
+        result.current.submit();
+        await tick();
+      });
+      expect(result.current.error).toBe('Could not save the username.');
+    }
+    log.mockRestore();
+  });
+
   it('falls back to the generic message when a submit error has nothing to show', async () => {
     const empty = renderHook(() =>
       useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new SaveError({})) }),
@@ -212,7 +232,7 @@ describe('useForm', () => {
     expect(result.current.canSubmit).toBe(false);
   });
 
-  it('clears the message on the next submit', async () => {
+  it('holds the message until the next submit settles', async () => {
     let fail = true;
     const { result } = renderHook(() =>
       useForm({
@@ -225,8 +245,19 @@ describe('useForm', () => {
       await tick();
     });
     expect(result.current.error).toBe('Nope');
-    fail = false;
+
     act(() => result.current.submit());
+    expect(result.current.isSubmitting).toBe(true);
+    expect(result.current.error).toBe('Nope');
+
+    await act(async () => tick());
+    expect(result.current.error).toBe('Nope');
+
+    fail = false;
+    await act(async () => {
+      result.current.submit();
+      await tick();
+    });
     expect(result.current.error).toBeUndefined();
   });
 

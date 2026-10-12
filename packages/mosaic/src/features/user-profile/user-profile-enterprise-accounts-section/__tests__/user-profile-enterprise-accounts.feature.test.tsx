@@ -163,7 +163,10 @@ describe('enterprise accounts', () => {
     const body = new URLSearchParams(await request.requests[0]?.text());
     expect(body.get('enterprise_connection_id')).toBe('okta');
     expect(body.get('redirect_url')).toBe(window.location.href);
-    expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toHaveAttribute('aria-busy', 'true');
+    const pending = screen.getByRole('button', { name: 'Connect Acme Okta' });
+    expect(pending).toHaveAttribute('aria-busy', 'true');
+    expect(pending).toHaveTextContent('Connect');
+    expect(screen.getByRole('progressbar', { name: 'Connecting' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Connect Custom SAML' })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Connect Custom SAML' }));
     expect(request.requests).toHaveLength(1);
@@ -210,6 +213,7 @@ describe('enterprise accounts', () => {
       expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
     );
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     serveFapi(signedIn());
     await user.click(screen.getByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() =>

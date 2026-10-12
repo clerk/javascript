@@ -1,5 +1,28 @@
 # Change Log
 
+## 4.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/clerk-js@6.39.0
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+
+## 4.10.0
+
+### Minor Changes
+
+- Add `revokeCurrentDeviceCredential()` to `useBiometricCredentials()`. It revokes this device's biometric credential for the signed-in user, so you no longer need to store the ID from `enroll()`. It returns the revoked credential, or `null` if there is nothing to revoke. Call it before signing out, since it needs a session. ([#10143](https://github.com/clerk/javascript/pull/10143)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```tsx
+  import { useBiometricCredentials } from '@clerk/expo/biometrics';
+
+  const { revokeCurrentDeviceCredential } = useBiometricCredentials();
+
+  await revokeCurrentDeviceCredential();
+  ```
+
 ## 4.9.0
 
 ### Minor Changes

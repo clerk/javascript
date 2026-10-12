@@ -24,18 +24,6 @@ const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${c
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`;
 const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 18%)`;
 
-// An icon rests a step below its label and comes up to it on hover, so the label leads and the icon
-// reads as supporting. Each is an opaque faded form of the cell's own text color, not an alpha of
-// it: a translucent icon would pick up whatever sits behind the button and drift per surface.
-//
-// The achromatic foregrounds (`primary`, `neutral-foreground`) share the house faded gray. The two
-// that carry hue fade toward the tint that belongs to them, and the light-on-fill pairs fade toward
-// their own fill, which is the only backdrop they can ever sit on.
-const iconFadedNeutral = colorVars['--cl-color-foreground-secondary'];
-const iconFadedNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-subtle']} 50%)`;
-const iconFadedOnPrimary = `color-mix(in oklab, ${colorVars['--cl-color-brand-foreground']}, ${colorVars['--cl-color-brand']} 40%)`;
-const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negative-foreground']}, ${colorVars['--cl-color-negative']} 40%)`;
-
 // Interactive states are gated on `:not([data-disabled])`: the button stays hit-testable while
 // disabled so `cursor: not-allowed` renders and a wrapping tooltip still gets the pointer, which
 // means the states have to be suppressed by selector. Disabled keeps its resting fill and only dims.
@@ -62,6 +50,7 @@ const iconFadedOnNegative = `color-mix(in oklab, ${colorVars['--cl-color-negativ
 
 export const styles = stylex.create({
   base: {
+    '--_cl-icon-color': 'currentColor',
     // Handed to `Icon`, which needs its own copy: transitions don't inherit, so without this
     // the icon would still be catching up 0.1s after the button itself has landed.
     '--_cl-icon-duration': {
@@ -153,22 +142,9 @@ export const styles = stylex.create({
 // variant × color, one entry per cell of the design matrix, keyed `<variant>-<color>` so the
 // component can index directly. Each cell is self-contained so it reads — and tunes — against
 // the spec without tracing shared parts.
-//
-// `--_cl-icon-color` lives per cell rather than once in `base`: StyleX resolves a property to the
-// last style that declares it, so a cell setting it would drop `base`'s hover branch wholesale
-// rather than merge with it. `Icon` reads the var (`icon.styles.ts`) — StyleX can't emit a
-// descendant rule, so the value crosses the element boundary as a custom property.
 export const variants = stylex.create({
   // The pressed state stays outside the hover media query so no-hover devices still get one.
   'filled-primary': {
-    '--_cl-icon-color': {
-      default: iconFadedOnPrimary,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-brand-foreground'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-brand-foreground'],
-      },
-    },
     backgroundColor: {
       default: colorVars['--cl-color-brand'],
       ':not([data-disabled]):not([data-pending]):active': primaryActive,
@@ -181,14 +157,6 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-brand-foreground'],
   },
   'filled-neutral': {
-    '--_cl-icon-color': {
-      default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-foreground'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
-      },
-    },
     backgroundColor: {
       default: colorVars['--cl-color-neutral-alpha-100'],
       ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-300'],
@@ -201,14 +169,6 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-foreground'],
   },
   'filled-negative': {
-    '--_cl-icon-color': {
-      default: iconFadedOnNegative,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-negative-foreground'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-negative-foreground'],
-      },
-    },
     backgroundColor: {
       default: colorVars['--cl-color-negative'],
       ':not([data-disabled]):not([data-pending]):active': negativeActive,
@@ -225,14 +185,6 @@ export const variants = stylex.create({
   // rises underneath it. Keeps the border opaque so it can't alpha-fade against an incoming
   // fill, and leaves it independently themeable.
   'outline-primary': {
-    '--_cl-icon-color': {
-      default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-brand'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-brand'],
-      },
-    },
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
@@ -246,14 +198,6 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-brand'],
   },
   'outline-neutral': {
-    '--_cl-icon-color': {
-      default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-foreground'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
-      },
-    },
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
@@ -267,14 +211,6 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-foreground'],
   },
   'outline-negative': {
-    '--_cl-icon-color': {
-      default: iconFadedNegative,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-negative'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-negative'],
-      },
-    },
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
@@ -289,14 +225,6 @@ export const variants = stylex.create({
   },
 
   'ghost-primary': {
-    '--_cl-icon-color': {
-      default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-brand'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-brand'],
-      },
-    },
     backgroundColor: {
       default: 'transparent',
       ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
@@ -309,14 +237,6 @@ export const variants = stylex.create({
     color: colorVars['--cl-color-brand'],
   },
   'ghost-neutral': {
-    '--_cl-icon-color': {
-      default: iconFadedNeutral,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-foreground'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
-      },
-    },
     backgroundColor: {
       default: 'transparent',
       ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
@@ -331,14 +251,6 @@ export const variants = stylex.create({
   // The one ghost that tints instead of graying, so its pressed step walks its own faded
   // fill toward the negative it carries rather than joining the gray ramp.
   'ghost-negative': {
-    '--_cl-icon-color': {
-      default: iconFadedNegative,
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-negative'],
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-negative'],
-      },
-    },
     backgroundColor: {
       default: 'transparent',
       ':not([data-disabled]):not([data-pending]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
@@ -358,13 +270,6 @@ export const variants = stylex.create({
   // so toggling it cannot tween and the exit would snap where every other property fades. A
   // transparent decoration paints nothing and never participates in layout.
   'link-primary': {
-    '--_cl-icon-color': {
-      default: iconFadedNeutral,
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-brand'],
-      },
-    },
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-brand'],
     paddingInlineEnd: 0,
@@ -376,13 +281,6 @@ export const variants = stylex.create({
     height: 'auto',
   },
   'link-neutral': {
-    '--_cl-icon-color': {
-      default: iconFadedNeutral,
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-foreground'],
-      },
-    },
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-foreground'],
     paddingInlineEnd: 0,
@@ -394,13 +292,6 @@ export const variants = stylex.create({
     height: 'auto',
   },
   'link-negative': {
-    '--_cl-icon-color': {
-      default: iconFadedNegative,
-      '@media (hover: hover)': {
-        default: null,
-        ':not([data-disabled]):hover': colorVars['--cl-color-negative'],
-      },
-    },
     backgroundColor: 'transparent',
     color: colorVars['--cl-color-negative'],
     paddingInlineEnd: 0,

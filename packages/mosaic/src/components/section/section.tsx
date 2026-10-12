@@ -13,7 +13,7 @@ import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../.
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
-import { sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
@@ -83,13 +83,7 @@ const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function Sec
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('section-header'),
-        stylex.props(reset.base, styles.header, sectionHeaderMarker, xstyle),
-        rest,
-      ),
-    },
+    props: mergeStyleProps(themeProps('section-header'), stylex.props(reset.base, styles.header, xstyle), rest),
   });
 
   return <SectionHeaderContext.Provider value>{element}</SectionHeaderContext.Provider>;
@@ -353,8 +347,8 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
 });
 
 /**
- * A compound component for a topic of settings. `Section.Root` stacks cards; each `Section.Group`
- * is a card named by the `Section.Title` in its `Section.Header`, with a `Section.Body` holding
+ * A compound component for a topic of settings. `Section.Root` stacks groups; each `Section.Group`
+ * is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding
  * either `Section.Row`s (one setting each) or a `Section.Items` list of values.
  */
 export const Section = {

@@ -173,6 +173,7 @@ function PasswordField({
   return (
     <Field.Root
       disabled={form.isSubmitting}
+      focusableWhenDisabled
       invalid={feedbackType === 'error'}
       required
     >

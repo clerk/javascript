@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
+import { openDialog } from '../../../__tests__/feature/dialog';
 import { fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
@@ -71,9 +72,7 @@ function Host({
 }
 
 async function typeConfirmation(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole('button', { name: 'Open' }));
-  const dialog = await screen.findByRole('dialog');
-  await waitFor(() => expect(dialog).toContainElement(document.activeElement as HTMLElement));
+  await openDialog(user, screen.getByRole('button', { name: 'Open' }));
   await user.type(screen.getByRole('textbox'), 'Delete');
 }
 

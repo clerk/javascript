@@ -34,10 +34,7 @@ function ConfirmationCard({
   errorMessage,
 }: ConfirmationCardProps) {
   return (
-    <Dialog.Popup
-      compactPlacement='sheet'
-      finalFocus={finalFocus}
-    >
+    <Dialog.Popup finalFocus={finalFocus}>
       <Card.Root
         elevation='overlay'
         renderBranding={false}

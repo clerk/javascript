@@ -25,9 +25,11 @@ import {
   trackCompactPlacements,
   trackVariants,
   variants,
+  viewportCompactPlacements,
   viewportVariants,
 } from './dialog.styles';
-import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
+import { acquireKeyboardInset } from './keyboard-inset';
+import { guardKeyboardTouch } from './keyboard-touch';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
@@ -38,7 +40,7 @@ import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
 export type DialogVariant = keyof typeof variants;
 
 /**
- * Where the surface sits in the compact band — the dialog viewport under `48rem`. `center`
+ * Where the surface sits in the compact band — a window under `40rem`. `center`
  * everywhere above it: there is no edge close enough for anchoring to mean anything at those
  * widths.
  */
@@ -116,13 +118,16 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
   /** Which surface the dialog holds, and so the geometry it takes. @default 'card' */
   variant?: DialogVariant;
   /**
-   * Bottom-anchors the surface in the compact band — the dialog viewport under `48rem` — and
-   * slides it up as a sheet, instead of centering it. For a dialog that asks one thing and returns
-   * — a confirmation, a single-field form — where the answer belongs within thumb's reach.
-   * `card` only. @default 'center'
+   * Where the surface sits in the compact band — a window under `40rem`. `sheet` bottom-anchors it
+   * flush to the sides and bottom edge and slides it up, so the answer sits within thumb's reach;
+   * `center` keeps it centered, for a dialog that only shows something. `card` only.
+   * @default 'sheet'
    */
   compactPlacement?: DialogCompactPlacement;
-  /** Where focus moves when the dialog opens. Default: the first tabbable element inside it. */
+  /**
+   * Where focus moves when the dialog opens. Default: the first tabbable element inside it. A ref to a
+   * text field is focused within the opening tap, so on iOS the keyboard opens with the dialog.
+   */
   initialFocus?: DialogFocusTarget;
   /** Where focus returns when the dialog closes. Default: the trigger. */
   finalFocus?: DialogFocusTarget;
@@ -272,14 +277,21 @@ function Viewport({
   compactPlacement: DialogCompactPlacement;
   children: React.ReactNode;
 }) {
+  const trackRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => acquireKeyboardInset(), []);
+  React.useEffect(() => (trackRef.current ? guardKeyboardTouch(trackRef.current) : undefined), []);
   return (
     <Primitive.Viewport
       overlay
       lockScroll
       {...mergeStyleProps(
         themeProps('dialog-viewport', { variant }),
-        stylex.props(reset.base, styles.viewport, viewportVariants[variant]),
+        stylex.props(
+          reset.base,
+          styles.viewport,
+          viewportVariants[variant],
+          viewportCompactPlacements[compactPlacement],
+        ),
       )}
     >
       <div
@@ -287,7 +299,7 @@ function Viewport({
           themeProps('dialog-track', { variant }),
           stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
-        onTouchEnd={focusWithoutScroll}
+        ref={trackRef}
       >
         {children}
       </div>
@@ -320,9 +332,14 @@ function useNestedVariantWarning(isNestedInDialog: boolean, variant: DialogVaria
  * A profile already fills the compact band — it is the page there, not a surface over one — so
  * there is no room for it to be anchored anywhere else.
  */
-function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCompactPlacement) {
+function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCompactPlacement | undefined) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || variant !== 'profile' || placement === 'center') {
+    if (
+      process.env.NODE_ENV === 'production' ||
+      variant !== 'profile' ||
+      placement === undefined ||
+      placement === 'center'
+    ) {
       return;
     }
     console.warn(
@@ -337,7 +354,7 @@ function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCom
  * part a consumer composes, so they stay out of the public API.
  */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
-  { variant = 'card', compactPlacement: compactPlacementProp = 'center', initialFocus, finalFocus, xstyle, ...rest },
+  { variant = 'card', compactPlacement: compactPlacementProp, initialFocus, finalFocus, xstyle, ...rest },
   ref,
 ) {
   // The dialog this one renders inside, read before this popup publishes its own.
@@ -347,7 +364,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
   const isAlert = role === 'alertdialog';
   // A profile has its own compact-band treatment and takes no placement; the warning says so.
-  const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : compactPlacementProp;
+  const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : (compactPlacementProp ?? 'sheet');
   useCompactPlacementWarning(variant, compactPlacementProp);
   useNestedVariantWarning(isNestedInDialog, variant);
 
@@ -449,8 +466,8 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
  *
  * `Dialog.Popup` renders the portal, the scrim and the centering viewport itself, so those are
  * not parts. `role='alertdialog'` on the root makes it an alert dialog — one that interrupts to
- * ask for a decision and waits for one. `compactPlacement='sheet'` bottom-anchors it in the
- * compact band.
+ * ask for a decision and waits for one. In the compact band a card is a bottom sheet unless
+ * `compactPlacement='center'`.
  *
  * Each styled part spreads `themeProps` + `stylex.props` through `mergeStyleProps`, so it
  * carries the public `.cl-<slot>` class and StyleX atoms while the headless part keeps its focus

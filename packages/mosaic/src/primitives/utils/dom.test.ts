@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   autoUpdate,
+  canScrollToward,
   getDimensions,
-  getRectRelativeTo,
   getScale,
   getScrollDimensions,
   isElement,
@@ -134,30 +134,6 @@ describe('getScale', () => {
   });
 });
 
-describe('getRectRelativeTo', () => {
-  it('places the element inside the parent padding box, following its scroll', () => {
-    const parent = create();
-    const element = document.createElement('div');
-    parent.append(element);
-    stubRect(parent, { x: 100, y: 50, width: 300, height: 200 });
-    stub(parent, { clientLeft: 2, clientTop: 1, scrollLeft: 30, scrollTop: 0 });
-    stubRect(element, { x: 140, y: 61, width: 80, height: 20 });
-
-    expect(getRectRelativeTo(element, parent)).toEqual({ x: 68, y: 10, width: 80, height: 20 });
-  });
-
-  it('removes the parent scale', () => {
-    const parent = create();
-    const element = document.createElement('div');
-    parent.append(element);
-    stub(parent, { offsetWidth: 200, offsetHeight: 100 });
-    stubRect(parent, { x: 0, y: 0, width: 100, height: 50 });
-    stubRect(element, { x: 20, y: 10, width: 40, height: 10 });
-
-    expect(getRectRelativeTo(element, parent)).toEqual({ x: 40, y: 20, width: 80, height: 20 });
-  });
-});
-
 describe('autoUpdate', () => {
   it('updates right away and whenever an element resizes', () => {
     let notify = () => {};
@@ -200,5 +176,33 @@ describe('autoUpdate', () => {
     autoUpdate(create(), update)();
 
     expect(update).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('canScrollToward', () => {
+  function scroller(overflowY: string, scrollTop: number) {
+    const element = document.createElement('div');
+    element.style.overflowY = overflowY;
+    document.body.appendChild(element);
+    stub(element, { scrollHeight: 400, clientHeight: 200, scrollTop, scrollWidth: 100, clientWidth: 100 });
+    return element;
+  }
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('follows a drag with room on the axis it moved', () => {
+    expect(canScrollToward(scroller('auto', 0), 0, -1)).toBe(true);
+    expect(canScrollToward(scroller('auto', 0), 0, 1)).toBe(false);
+    expect(canScrollToward(scroller('auto', 200), 0, -1)).toBe(false);
+  });
+
+  it('keeps a vertical scroller when the first move jitters mostly sideways', () => {
+    expect(canScrollToward(scroller('auto', 0), 2, -1)).toBe(true);
+  });
+
+  it('ignores a box that overflows without scrolling', () => {
+    expect(canScrollToward(scroller('hidden', 0), 0, -1)).toBe(false);
   });
 });

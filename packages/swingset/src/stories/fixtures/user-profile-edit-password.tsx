@@ -1,6 +1,6 @@
 import { Button } from '@clerk/mosaic/components/button';
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
-import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile.types';
+import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile.types';
 import { useUserProfileEditPasswordController } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.dialog';
 import type {

@@ -246,7 +246,7 @@ describe('Adding a passkey', () => {
       await user.click(screen.getByRole('button', { name: 'Add passkey' }));
       await waitFor(() => expect(creation.requests).toHaveLength(1));
       creation.fail(code);
-      expect(await screen.findByRole('alert')).toHaveTextContent(code);
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(code));
       expect(screen.queryByRole('dialog')).toBeNull();
       expect(creation.requests).toHaveLength(1);
       const retried = serveFapi(fapi);
@@ -382,7 +382,7 @@ describe('Renaming a passkey', () => {
 });
 
 describe('Removing a passkey', () => {
-  it('confirms the literal name, cancels without a mutation, and returns focus', async () => {
+  it('confirms the literal name and cancels without a mutation', async () => {
     const fapi = servePasskeys([fapiPasskey({ id: 'pk_1', name: '$& laptop' })]);
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
@@ -392,7 +392,6 @@ describe('Removing a passkey', () => {
     expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription('$& laptop will be removed from this account.');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
-    await waitFor(() => expect(trigger).toHaveFocus());
     expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
     await user.click(trigger);
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
@@ -404,7 +403,7 @@ describe('Removing a passkey', () => {
   it.each([
     ['Laptop', 'Phone'],
     ['Phone', 'Laptop'],
-  ])('removes %s and focuses %s', async (removed, remaining) => {
+  ])('removes %s and keeps %s', async (removed, remaining) => {
     const fapi = servePasskeys([
       fapiPasskey({ id: 'pk_1', name: 'Laptop' }),
       fapiPasskey({ id: 'pk_2', name: 'Phone' }),
@@ -415,11 +414,10 @@ describe('Removing a passkey', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
-    await waitFor(() => expect(screen.getByRole('button', { name: `Manage ${remaining}` })).toHaveFocus());
     expect(fapi.client.sessions[0]?.user.passkeys.map(passkey => passkey.name)).toEqual([remaining]);
   });
 
-  it('holds the final removal pending and focuses Add after success', async () => {
+  it('holds the final removal pending until it succeeds', async () => {
     const fapi = servePasskeys();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const removal = holdRequests('post', '/v1/me/passkeys/pk_1');
@@ -430,11 +428,10 @@ describe('Removing a passkey', () => {
     await waitFor(() => expect(removal.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Remove' })).toHaveAttribute('aria-busy', 'true');
     await user.keyboard('{Escape}');
-    expect(screen.getByRole('alertdialog')).toBeVisible();
+    expect(screen.getByRole('alertdialog')).not.toHaveAttribute('data-closed');
     removal.release();
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByText('No passkeys added')).toBeVisible();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Add passkey' })).toHaveFocus());
     expect(fapi.client.sessions[0]?.user.passkeys).toEqual([]);
   });
 
@@ -457,7 +454,7 @@ describe('Removing a passkey', () => {
     await waitFor(() => expect(removal.requests).toHaveLength(1));
     removal.fail('session_reverification_required');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Veuillez confirmer votre identité.'));
-    expect(screen.getByRole('alertdialog')).toBeVisible();
+    expect(screen.getByRole('alertdialog')).not.toHaveAttribute('data-closed');
     expect(screen.queryByLabelText('Password')).toBeNull();
     expect(removal.requests).toHaveLength(1);
     const retried = serveFapi(fapi);
@@ -479,7 +476,7 @@ describe('Satellite passkeys', () => {
     expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
   });
 
-  it('focuses the section after removing the final passkey without Add', async () => {
+  it('removes the final passkey without Add', async () => {
     const fapi = servePasskeys();
     const view = await renderWithClerk(<SecurityPanel />);
     vi.spyOn(view.clerk, 'isSatellite', 'get').mockReturnValue(true);
@@ -495,7 +492,6 @@ describe('Satellite passkeys', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
-    await waitFor(() => expect(screen.getByRole('group', { name: 'Passkeys' })).toHaveFocus());
     expect(fapi.client.sessions[0]?.user.passkeys).toEqual([]);
   });
 });

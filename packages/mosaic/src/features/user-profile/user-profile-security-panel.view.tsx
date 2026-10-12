@@ -3,24 +3,24 @@ import type { ReactElement, ReactNode } from 'react';
 import { Panel } from '../../components/panel';
 import { Section } from '../../components/section';
 import { themeProps } from '../../props';
+import type { UserProfileDevice } from './user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
-  UserProfileActiveDevicesSectionViewProps,
-  UserProfileDevice,
-} from './user-profile-active-devices-section.view';
-import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
-import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
-import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
+  UserProfileMfaAddableMethod,
+  UserProfileMfaMethod,
+} from './user-profile-mfa-section/user-profile-mfa-section.view';
+import { UserProfileMfaSectionView } from './user-profile-mfa-section/user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
-export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
+export interface UserProfileSecurityPanelViewProps {
   passwordSlot?: ReactNode;
   passkeysSlot?: ReactNode;
+  mfaSlot?: ReactNode;
   mfaMethods?: UserProfileMfaMethod[];
   addableMfaMethods?: readonly UserProfileMfaAddableMethod[];
   mfaAddControl?: ReactNode;
-  devices?: UserProfileDevice[];
+  activeDevicesSlot?: ReactNode;
   onAddMfaMethod?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemoveMfaMethod?: (id: string) => void | Promise<void>;
@@ -30,18 +30,31 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
 export function UserProfileSecurityPanelView({
   passwordSlot,
   passkeysSlot,
+  mfaSlot,
   mfaMethods,
   addableMfaMethods,
   mfaAddControl,
-  devices,
+  activeDevicesSlot,
   onAddMfaMethod,
   onRegenerateBackupCodes,
   onRemoveMfaMethod,
   onSetDefaultMfaMethod,
-  onSignOutDevice,
-  onSignOutAllOtherDevices,
 }: UserProfileSecurityPanelViewProps): ReactElement {
-  const hasAuthentication = passwordSlot != null || Boolean(passkeysSlot) || mfaMethods !== undefined;
+  const selectedMfaNode =
+    mfaSlot !== undefined ? (
+      mfaSlot
+    ) : mfaMethods !== undefined ? (
+      <UserProfileMfaSectionView
+        methods={mfaMethods}
+        addableMethods={addableMfaMethods}
+        addControl={mfaAddControl}
+        onAdd={onAddMfaMethod}
+        onRegenerateBackupCodes={onRegenerateBackupCodes}
+        onRemove={onRemoveMfaMethod}
+        onSetDefault={onSetDefaultMfaMethod}
+      />
+    ) : null;
+  const hasAuthentication = passwordSlot != null || Boolean(passkeysSlot) || Boolean(selectedMfaNode);
 
   return (
     <Panel.Root render={<div {...themeProps('user-profile-security-panel')} />}>
@@ -51,26 +64,10 @@ export function UserProfileSecurityPanelView({
           <Section.Root aria-label='Authentication'>
             {passwordSlot}
             {passkeysSlot}
-            {mfaMethods !== undefined ? (
-              <UserProfileMfaSectionView
-                methods={mfaMethods}
-                addableMethods={addableMfaMethods}
-                addControl={mfaAddControl}
-                onAdd={onAddMfaMethod}
-                onRegenerateBackupCodes={onRegenerateBackupCodes}
-                onRemove={onRemoveMfaMethod}
-                onSetDefault={onSetDefaultMfaMethod}
-              />
-            ) : null}
+            {selectedMfaNode}
           </Section.Root>
         ) : null}
-        {devices ? (
-          <UserProfileActiveDevicesSectionView
-            devices={devices}
-            onSignOutAllOtherDevices={onSignOutAllOtherDevices}
-            onSignOutDevice={onSignOutDevice}
-          />
-        ) : null}
+        {activeDevicesSlot}
       </Panel.Sections>
     </Panel.Root>
   );

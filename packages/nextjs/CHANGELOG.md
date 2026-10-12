@@ -1,5 +1,20 @@
 # Change Log
 
+## 7.9.14
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+  - @clerk/backend@3.23.2
+
+## 7.9.13
+
+### Patch Changes
+
+- Export `<HandleSSOCallback />` from `@clerk/nextjs`. Previously, importing it from `@clerk/nextjs` failed, so it could not be used on the SSO callback route of a custom flow. ([#10140](https://github.com/clerk/javascript/pull/10140)) by [@manovotny](https://github.com/manovotny)
+
 ## 7.9.12
 
 ### Patch Changes
