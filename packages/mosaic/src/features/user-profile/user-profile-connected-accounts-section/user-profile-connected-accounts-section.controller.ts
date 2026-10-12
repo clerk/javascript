@@ -7,6 +7,7 @@ import type { DialogFocusTarget } from '../../../components/dialog';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import type {
   ConnectedAccountActionResult,
   UserProfileConnectedAccount,
@@ -20,6 +21,7 @@ export interface UserProfileConnectedAccountsControllerOptions {
   onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onRemove?: (id: string) => void | Promise<void>;
   fallbackFocus?: () => HTMLElement | null;
+  reverification?: ReverificationController;
 }
 
 export interface UserProfileConnectedAccountsController {
@@ -43,6 +45,7 @@ export function useUserProfileConnectedAccountsController({
   onReconnect,
   onRemove,
   fallbackFocus,
+  reverification,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const messages = useMessages('userProfileConnectedAccounts');
   const actions = usePendingAction({ errorFallback: messages.errors.generic });
@@ -58,6 +61,7 @@ export function useUserProfileConnectedAccountsController({
   });
   const remove = useConfirmController<UserProfileConnectedAccount>({
     onConfirm: account => removalFocus.remove(account.id),
+    reverification,
   });
 
   const run = (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) =>
