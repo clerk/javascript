@@ -1,14 +1,15 @@
 // There is no need to execute the complete authenticateRequest to test clerkMiddleware
 // This mock SHOULD exist before the import of authenticateRequest
-import { AuthStatus, constants, TokenType } from '@clerk/backend/internal';
+import { authenticatedMachineObject, AuthStatus, constants, TokenType } from '@clerk/backend/internal';
 import { MalformedURLError } from '@clerk/shared/pathMatcher';
 // used to assert the mock
 import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, type Mock, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
+import type { ClerkMiddlewareAuth } from '../clerkMiddleware';
 import { clerkMiddleware } from '../clerkMiddleware';
 import { createRouteMatcher } from '../routeMatcher';
 import { decryptClerkRequestData } from '../utils';
@@ -114,6 +115,23 @@ describe('ClerkMiddleware type tests', () => {
     clerkMiddlewareMock(async auth => {
       const { getToken } = await auth({ acceptsToken: TokenType.ApiKey });
       await getToken();
+    });
+  });
+
+  it('infers the protect return type from the token option when a predicate is passed', () => {
+    clerkMiddlewareMock(auth => {
+      const predicate = () => true;
+
+      expectTypeOf(auth.protect(predicate)).toEqualTypeOf(auth.protect());
+      expectTypeOf(auth.protect(predicate, { unauthorizedUrl: '/denied' })).toEqualTypeOf(auth.protect());
+      expectTypeOf(auth.protect(predicate, { token: TokenType.SessionToken })).toEqualTypeOf(auth.protect());
+      expectTypeOf(auth.protect(predicate, { token: TokenType.ApiKey })).toEqualTypeOf(
+        auth.protect({ token: TokenType.ApiKey }),
+      );
+      expectTypeOf(auth.protect(predicate, { token: [TokenType.SessionToken, TokenType.M2MToken] })).toEqualTypeOf(
+        auth.protect({ token: [TokenType.SessionToken, TokenType.M2MToken] }),
+      );
+      expectTypeOf(auth.protect(predicate, { token: 'any' })).toEqualTypeOf(auth.protect({ token: 'any' }));
     });
   });
 
@@ -880,6 +898,79 @@ describe('clerkMiddleware(params)', () => {
 
       expect(resp?.status).toEqual(401);
       expect((await clerkClient()).authenticateRequest).toBeCalled();
+    });
+
+    describe.each([
+      [TokenType.ApiKey, 'ak_123', 'user_123'],
+      [TokenType.M2MToken, 'mt_123', 'mch_123'],
+      [TokenType.OAuthToken, 'oat_123', 'user_123'],
+    ] as const)('when the request is authenticated with a valid %s', (tokenType, token, subject) => {
+      const protectWith = async (protect: (auth: ClerkMiddlewareAuth) => Promise<unknown>) => {
+        const req = mockRequest({
+          url: '/api/protected',
+          headers: new Headers({ [constants.Headers.Authorization]: `Bearer ${token}` }),
+        });
+
+        authenticateRequestMock.mockResolvedValueOnce({
+          publishableKey,
+          status: AuthStatus.SignedIn,
+          headers: new Headers(),
+          toAuth: () => authenticatedMachineObject(tokenType, token, { id: token, subject, scopes: [] } as any),
+        });
+
+        return clerkMiddleware(async auth => {
+          await protect(auth);
+        })(req, {} as NextFetchEvent);
+      };
+
+      it('returns 401 when protect is called with a role', async () => {
+        const resp = await protectWith(auth => auth.protect({ role: 'org:admin' }, { token: 'any' }));
+
+        expect(resp?.status).toEqual(401);
+      });
+
+      it('returns 401 when protect is called with a permission and an array of token types', async () => {
+        const resp = await protectWith(auth =>
+          auth.protect({ permission: 'org:settings:manage' }, { token: [TokenType.SessionToken, tokenType] }),
+        );
+
+        expect(resp?.status).toEqual(401);
+      });
+
+      it('returns 401 when protect is called with authorization params and token in a single argument', async () => {
+        const resp = await protectWith(auth => {
+          const opts = { feature: 'premium', token: tokenType } as any;
+          return auth.protect(opts);
+        });
+
+        expect(resp?.status).toEqual(401);
+      });
+
+      it('returns 401 when protect is called with a predicate that returns false', async () => {
+        const predicate = vi.fn().mockReturnValue(false);
+        const resp = await protectWith(auth => auth.protect(predicate, { token: tokenType }));
+
+        expect(predicate).toHaveBeenCalledOnce();
+        expect(resp?.status).toEqual(401);
+      });
+
+      it('returns 401 when protect is called with a predicate that relies on has()', async () => {
+        const resp = await protectWith(auth => auth.protect(has => has({ role: 'org:admin' }), { token: tokenType }));
+
+        expect(resp?.status).toEqual(401);
+      });
+
+      it('does not throw when protect is called with a predicate that returns true', async () => {
+        const resp = await protectWith(auth => auth.protect(() => true, { token: tokenType }));
+
+        expect(resp?.status).toEqual(200);
+      });
+
+      it('does not throw when protect is called without authorization params', async () => {
+        const resp = await protectWith(auth => auth.protect({ token: tokenType }));
+
+        expect(resp?.status).toEqual(200);
+      });
     });
   });
 
