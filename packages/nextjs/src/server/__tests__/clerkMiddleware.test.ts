@@ -923,8 +923,14 @@ describe('clerkMiddleware(params)', () => {
         })(req, {} as NextFetchEvent);
       };
 
-      it('returns 401 when protect is called with a role', async () => {
-        const resp = await protectWith(auth => auth.protect({ role: 'org:admin' }, { token: 'any' }));
+      it.each([
+        { role: 'org:admin' },
+        { permission: 'org:settings:manage' },
+        { feature: 'premium' },
+        { plan: 'pro' },
+        { reverification: 'strict' },
+      ] as const)('returns 401 when protect is called with %o', async params => {
+        const resp = await protectWith(auth => auth.protect(params, { token: 'any' }));
 
         expect(resp?.status).toEqual(401);
       });
