@@ -12,6 +12,7 @@ export function useUserProfileMfaSectionLeafController({
   onAdd,
   onRemove,
   onSetDefault,
+  reverification,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -21,7 +22,10 @@ export function useUserProfileMfaSectionLeafController({
     fallback: () =>
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
   });
-  const remove = useConfirmController<UserProfileMfaMethod>({ onConfirm: method => removalFocus.remove(method.id) });
+  const remove = useConfirmController<UserProfileMfaMethod>({
+    onConfirm: method => removalFocus.remove(method.id),
+    reverification,
+  });
   const [pickerOpen, setPickerOpen] = useState(false);
   const defaultAction = usePendingAction<'default'>({ errorFallback: m.setDefaultError });
 
