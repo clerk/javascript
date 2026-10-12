@@ -1,4 +1,4 @@
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import { UserProfileDangerSectionView } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section.view';
 import { useState } from 'react';
 
@@ -20,8 +20,8 @@ export const meta: StoryMeta = {
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 function DangerSectionHarness({ onDelete }: { onDelete: () => Promise<void> }) {
-  const controller = useDestructiveController({ onDelete });
-  return <UserProfileDangerSectionView {...controller} />;
+  const controller = useConfirmController({ onConfirm: onDelete });
+  return <UserProfileDangerSectionView controller={controller} />;
 }
 
 export function Default() {
