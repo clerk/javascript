@@ -50,7 +50,7 @@ const RESOURCE_RETRY_MAX_DELAY_MS = 30_000;
 const RESOURCE_RETRY_MAX_EXPONENT = 4;
 
 function waitUntilAppIsActive(): Promise<void> {
-  if (AppState.currentState === 'active') {
+  if (AppState.currentState !== 'background' && AppState.currentState !== 'inactive') {
     return Promise.resolve();
   }
   return new Promise(resolve => {
@@ -61,20 +61,6 @@ function waitUntilAppIsActive(): Promise<void> {
       }
     });
   });
-}
-
-async function readClientJwt(tokenCache: TokenCache) {
-  try {
-    return await tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
-  } catch {
-    await waitUntilAppIsActive();
-  }
-  try {
-    return await tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
-  } catch {
-    await tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
-    return null;
-  }
 }
 
 function hasOwnOption<Key extends keyof BuildClerkOptions>(
@@ -89,6 +75,20 @@ let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
 let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
+
+async function readClientJwt() {
+  try {
+    return await __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+  } catch {
+    await waitUntilAppIsActive();
+  }
+  try {
+    return await __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+  } catch {
+    await __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
+    return null;
+  }
+}
 
 /**
  * Resolves the next native singleton config while preserving existing values for omitted options.
@@ -317,7 +317,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
-        const jwt = await readClientJwt(__internal_tokenCache);
+        const jwt = await readClientJwt();
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
         // Instructs the backend that the request is from a mobile device.

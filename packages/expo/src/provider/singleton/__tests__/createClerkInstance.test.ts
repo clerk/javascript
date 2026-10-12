@@ -477,6 +477,75 @@ describe('createClerkInstance', () => {
     expect(requestInit.headers.get('authorization')).toBe('');
   });
 
+  test('does not wait for the app to become active inside an app extension', async () => {
+    setAppState('extension');
+    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(new Error('Unable to decode the data.')));
+    const clearToken = vi.fn(() => Promise.resolve());
+    const tokenCache: TokenCache = {
+      getToken,
+      saveToken: vi.fn(() => Promise.resolve()),
+      clearToken,
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache,
+    }) as unknown as MockClerk;
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const requestInit = {
+      headers: new Headers(),
+      url: new URL('https://clerk.example.com/v1/client'),
+    };
+    await beforeRequest(requestInit);
+
+    expect(getToken).toHaveBeenCalledTimes(2);
+    expect(clearToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY);
+    expect(mocks.appStateListeners.size).toBe(0);
+  });
+
+  test('retries with the latest tokenCache when it changes while waiting for the app to become active', async () => {
+    setAppState('background');
+    const initialTokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.reject(new Error('User interaction is not allowed.'))),
+      saveToken: vi.fn(() => Promise.resolve()),
+      clearToken: vi.fn(() => Promise.resolve()),
+    };
+    const latestTokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.resolve('latest-token')),
+      saveToken: vi.fn(() => Promise.resolve()),
+      clearToken: vi.fn(() => Promise.resolve()),
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: initialTokenCache,
+    }) as unknown as MockClerk;
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const requestInit = {
+      headers: new Headers(),
+      url: new URL('https://clerk.example.com/v1/client'),
+    };
+    const pending = beforeRequest(requestInit);
+    await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
+
+    getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: latestTokenCache,
+    });
+    setAppState('active');
+    await pending;
+
+    expect(requestInit.headers.get('authorization')).toBe('latest-token');
+    expect(initialTokenCache.clearToken).not.toHaveBeenCalled();
+    expect(latestTokenCache.clearToken).not.toHaveBeenCalled();
+  });
+
   test('uses the latest explicit tokenCache for request authorization when the singleton is reused', async () => {
     const initialTokenCache: TokenCache = {
       getToken: vi.fn(() => Promise.resolve(null)),
