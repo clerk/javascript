@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 
+import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
@@ -19,6 +20,7 @@ export function useUserProfileMfaSectionLeafController({
     fallback: () =>
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
   });
+  const remove = useConfirmController<UserProfileMfaMethod>({ onConfirm: method => removalFocus.remove(method.id) });
   const [pickerOpen, setPickerOpen] = useState(false);
   const defaultAction = usePendingAction<'default'>({ errorFallback: m.setDefaultError });
 
@@ -36,14 +38,14 @@ export function useUserProfileMfaSectionLeafController({
     onPickerOpenChange: setPickerOpen,
     closePicker: () => setPickerOpen(false),
     registerTrigger: removalFocus.registerTrigger,
-    openRemoval: (open: () => void) => {
+    openRemoval: (method: UserProfileMfaMethod) => {
       if (defaultAction.isPending) {
         return;
       }
       defaultAction.reset();
-      open();
+      remove.open(method);
     },
-    confirmRemoval: (method: UserProfileMfaMethod) => removalFocus.remove(method.id),
+    remove,
     finalRemovalFocus: removalFocus.finalFocus,
     isSettingDefault: defaultAction.isPending,
     defaultError: defaultAction.error,
