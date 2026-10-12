@@ -35,12 +35,12 @@ function Web3Wallets({
   model: ReadyWeb3WalletsModel;
   fallbackFocus?: () => HTMLElement | null;
 }) {
-  const controller = useUserProfileWeb3WalletsController(model);
+  const controller = useUserProfileWeb3WalletsController({ ...model, fallbackFocus });
   return (
     <>
       <UserProfileWeb3WalletsSectionView
-        fallbackFocus={fallbackFocus}
         wallets={controller.wallets}
+        sectionRef={controller.sectionRef}
         availableProviders={controller.availableProviders}
         pendingId={controller.pendingId}
         onConnect={id => {
@@ -49,7 +49,9 @@ function Web3Wallets({
         onSetPrimary={id => {
           void controller.onSetPrimary(id);
         }}
-        onRemove={controller.onRemove}
+        registerTrigger={controller.registerTrigger}
+        remove={controller.remove}
+        finalFocus={controller.finalFocus}
       />
       <UserProfileSolanaWalletDialog
         open={controller.solanaPickerOpen}

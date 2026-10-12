@@ -49,13 +49,9 @@ function ConnectedAccounts({
     availableProviders: model.availableProviders,
     onConnect: model.connect,
     onReconnect: model.reconnect,
+    onRemove: model.remove,
+    fallbackFocus,
   });
 
-  return (
-    <UserProfileConnectedAccountsSectionView
-      {...controller}
-      fallbackFocus={fallbackFocus}
-      onRemove={model.remove}
-    />
-  );
+  return <UserProfileConnectedAccountsSectionView {...controller} />;
 }

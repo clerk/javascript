@@ -8,13 +8,25 @@ import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
+import type { UserProfilePasskey } from '../user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
+import { useUserProfilePasskeysSectionController } from '../user-profile-passkeys-section/user-profile-passkeys-section.controller';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 function DeleteAccount() {
   const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
   return <UserProfileDangerSectionView controller={controller} />;
+}
+
+function Passkeys({ passkeys, onRemove }: { passkeys: UserProfilePasskey[]; onRemove: (id: string) => Promise<void> }) {
+  const controller = useUserProfilePasskeysSectionController({
+    passkeys,
+    onRename: () => Promise.resolve(),
+    validateName: () => undefined,
+    onRemove,
+  });
+  return <UserProfilePasskeysSectionView {...controller} />;
 }
 const devices: UserProfileDevice[] = [
   {
@@ -148,14 +160,14 @@ describe('UserProfileSecurityPanelView', () => {
       signOutAll,
     );
     await user.click(signOutAll);
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
     const activeDevices = screen.getByRole('group', { name: 'Active devices' });
     await user.click(within(activeDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
@@ -227,7 +239,7 @@ describe('UserProfileSecurityPanelView', () => {
     const { rerender } = renderView({
       mfaMethods: undefined,
       passkeysSlot: (
-        <UserProfilePasskeysSectionView
+        <Passkeys
           passkeys={passkeys}
           onRemove={onRemovePasskey}
         />
@@ -236,13 +248,13 @@ describe('UserProfileSecurityPanelView', () => {
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
 
     rerender(
       <MosaicProvider>
         <UserProfileSecurityPanelView
           passkeysSlot={
-            <UserProfilePasskeysSectionView
+            <Passkeys
               passkeys={[]}
               onRemove={onRemovePasskey}
             />
@@ -251,13 +263,13 @@ describe('UserProfileSecurityPanelView', () => {
       </MosaicProvider>,
     );
     expect(screen.getByRole('region', { name: 'Authentication' })).toBeInTheDocument();
-    expect(screen.getByRole('alertdialog', { name: 'Remove passkey' })).toBeVisible();
+    expect(screen.getByRole('dialog', { name: 'Remove passkey' })).toBeVisible();
 
     await act(async () => {
       removal.resolve();
       await removal.promise;
     });
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Passkeys' })).toBeVisible();
     expect(screen.getByText('No passkeys added')).toBeVisible();
@@ -288,13 +300,13 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
     expect(screen.queryByRole('menuitem', { name: 'Manage' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
-    const dialog = screen.getByRole('alertdialog', { name: 'Remove SMS verification' });
+    const dialog = screen.getByRole('dialog', { name: 'Remove SMS verification' });
     expect(dialog).toHaveAccessibleDescription(
       'This phone number will no longer receive sign-in verification codes. It will remain on your account.',
     );
     expect(onRemoveMfaMethod).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
     expect(screen.queryByRole('menuitem', { name: 'Remove method' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
