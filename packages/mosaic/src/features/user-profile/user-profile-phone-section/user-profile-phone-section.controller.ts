@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfilePhone } from '../user-profile-contact.types';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
 import type { ReadyPhoneSectionModel, UserProfilePhoneSectionViewProps } from './user-profile-phone-section.types';
@@ -15,7 +16,10 @@ export function useUserProfilePhoneSectionController({
   getPhoneVerifier,
   onSetPrimaryPhone,
   onRemovePhone,
-}: Omit<ReadyPhoneSectionModel, 'status' | 'userId'>): UserProfilePhoneSectionViewProps {
+  reverification,
+}: Omit<ReadyPhoneSectionModel, 'status' | 'userId'> & {
+  reverification?: ReverificationController;
+}): UserProfilePhoneSectionViewProps {
   const verification = useUserProfileAddPhoneController({ onCreate: onCreatePhone });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
@@ -24,7 +28,10 @@ export function useUserProfilePhoneSectionController({
     onRemove: onRemovePhone,
     fallback: () => rowRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? rowRef.current,
   });
-  const remove = useConfirmController<UserProfilePhone>({ onConfirm: phone => removalFocus.remove(phone.id) });
+  const remove = useConfirmController<UserProfilePhone>({
+    onConfirm: phone => removalFocus.remove(phone.id),
+    reverification,
+  });
 
   return {
     phones: phones.map(phone => ({ ...phone, value: stringToFormattedPhoneString(phone.value) })),

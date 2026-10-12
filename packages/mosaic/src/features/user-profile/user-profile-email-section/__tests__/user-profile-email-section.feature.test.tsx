@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  demandReverificationOnce,
   type FakeFapiSeed,
   holdRequests,
   serveFapi,
@@ -248,4 +249,25 @@ describe('email reverification', () => {
   it.todo('confirms it is the user before an email address is added, then adds it');
   it.todo('confirms it is the user before an email address becomes the primary one');
   it.todo('leaves the add dialog open and untouched when the confirmation is dismissed');
+});
+
+describe('Removing an address', () => {
+  it('verifies the session when the removal demands it, then removes the address', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection({
+      ...signedInWithEmails([PRIMARY, second]),
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me/email_addresses/idn_second');
+
+    await manageEmail(actor, 'bob@example.com', 'Remove email');
+    const dialog = await screen.findByRole('dialog', { name: 'Remove email address?' });
+    await actor.click(within(dialog).getByRole('button', { name: 'Remove' }));
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await actor.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(emailsListed()).toEqual(['alice@example.com']));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
 });

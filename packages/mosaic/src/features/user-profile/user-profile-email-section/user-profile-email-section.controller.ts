@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfileEmail } from '../user-profile-contact.types';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
 import type { ReadyEmailSectionModel, UserProfileEmailSectionViewProps } from './user-profile-email-section.types';
@@ -14,7 +15,10 @@ export function useUserProfileEmailSectionController({
   getEmailVerifier,
   onSetPrimaryEmail,
   onRemoveEmail,
-}: Omit<ReadyEmailSectionModel, 'status' | 'userId'>): UserProfileEmailSectionViewProps {
+  reverification,
+}: Omit<ReadyEmailSectionModel, 'status' | 'userId'> & {
+  reverification?: ReverificationController;
+}): UserProfileEmailSectionViewProps {
   const verification = useUserProfileAddEmailController({ username, onCreate: onCreateEmail });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
@@ -23,7 +27,10 @@ export function useUserProfileEmailSectionController({
     onRemove: onRemoveEmail,
     fallback: () => rowRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? rowRef.current,
   });
-  const remove = useConfirmController<UserProfileEmail>({ onConfirm: email => removalFocus.remove(email.id) });
+  const remove = useConfirmController<UserProfileEmail>({
+    onConfirm: email => removalFocus.remove(email.id),
+    reverification,
+  });
 
   return {
     emails,

@@ -3,7 +3,13 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-import { type FakeFapiSeed, holdRequests, serveFapi, VERIFICATION_CODE } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  type FakeFapiSeed,
+  holdRequests,
+  serveFapi,
+  VERIFICATION_CODE,
+} from '../../../../__tests__/feature/fake-fapi';
 import type { FapiAttributeOverrides } from '../../../../__tests__/feature/fapi';
 import {
   fapiClient,
@@ -251,4 +257,23 @@ describe('phone reverification', () => {
   it.todo('confirms it is the user before a phone number is added, then adds it');
   it.todo('confirms it is the user before a phone number becomes the primary one');
   it.todo('leaves the add dialog open and untouched when the confirmation is dismissed');
+});
+
+describe('Removing a number', () => {
+  it('verifies the session when the removal demands it, then removes the number', async () => {
+    const { actor } = await renderSection(
+      signedIn([HOME, WORK], { verification: { secrets: { password: 'hunter2' } } }),
+    );
+    demandReverificationOnce('/v1/me/phone_numbers/idn_work');
+
+    await manage(actor, WORK_LABEL, 'Remove phone number');
+    const dialog = await screen.findByRole('dialog', { name: 'Remove phone number?' });
+    await actor.click(within(dialog).getByRole('button', { name: 'Remove' }));
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await actor.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(listed()).toEqual([HOME_LABEL]));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
 });
