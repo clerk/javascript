@@ -9,7 +9,29 @@ import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+import { useUserProfileWeb3WalletsController } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
+import type { UserProfileWeb3Wallet } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
+
+function Web3Wallets({
+  wallets,
+  fallbackFocus,
+  onRemove,
+}: {
+  wallets: UserProfileWeb3Wallet[];
+  fallbackFocus: () => HTMLElement | null;
+  onRemove: (id: string) => Promise<void>;
+}) {
+  const controller = useUserProfileWeb3WalletsController({
+    wallets,
+    availableProviders: [],
+    connect: () => Promise.resolve(),
+    setPrimary: () => Promise.resolve(),
+    remove: onRemove,
+    fallbackFocus,
+  });
+  return <UserProfileWeb3WalletsSectionView {...controller} />;
+}
 
 function DeleteAccount() {
   const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
@@ -58,7 +80,7 @@ describe('UserProfileProfilePanelView', () => {
     const { rerender } = renderView({
       titleRef,
       web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
+        <Web3Wallets
           wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
           fallbackFocus={() => titleRef.current}
           onRemove={onRemoveWeb3Wallet}
@@ -67,13 +89,13 @@ describe('UserProfileProfilePanelView', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
     rerender(
       <MosaicProvider>
         <UserProfileProfilePanelView
           titleRef={titleRef}
           web3WalletsSlot={
-            <UserProfileWeb3WalletsSectionView
+            <Web3Wallets
               wallets={[]}
               fallbackFocus={() => titleRef.current}
               onRemove={onRemoveWeb3Wallet}
@@ -83,12 +105,12 @@ describe('UserProfileProfilePanelView', () => {
       </MosaicProvider>,
     );
     expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
-    expect(screen.getByRole('alertdialog')).toHaveTextContent('0x1234');
+    expect(screen.getByRole('dialog')).toHaveTextContent('0x1234');
     await act(async () => {
       removal.resolve();
       await removal.promise;
     });
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('renders the danger zone when provided', () => {
@@ -163,7 +185,6 @@ describe('UserProfileProfilePanelView', () => {
           availableProviders={[{ id: 'disconnected', provider: 'Coinbase Wallet' }]}
           onConnect={vi.fn()}
           onSetPrimary={vi.fn()}
-          onRemove={vi.fn()}
         />
       ),
     });

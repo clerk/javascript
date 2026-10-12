@@ -76,9 +76,9 @@ describe('Web3 wallets', () => {
       await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
       const warning = 'You will no longer be able to sign in using this web3 wallet.';
       if (status === 'verified') {
-        expect(screen.getByRole('alertdialog')).toHaveTextContent(warning);
+        expect(screen.getByRole('dialog')).toHaveTextContent(warning);
       } else {
-        expect(screen.getByRole('alertdialog')).not.toHaveTextContent(warning);
+        expect(screen.getByRole('dialog')).not.toHaveTextContent(warning);
       }
     },
   );
@@ -521,8 +521,8 @@ describe('Web3 wallets', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-    expect(screen.getByRole('alertdialog')).toHaveTextContent('0x1234...cdef');
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    expect(screen.getByRole('dialog')).toHaveTextContent('0x1234...cdef');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
     expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBeNull();
@@ -537,20 +537,20 @@ describe('Web3 wallets', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-    const confirm = within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' });
+    const confirm = within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' });
     await user.click(confirm);
     await waitFor(() => expect(hold.requests).toHaveLength(1));
     expect(confirm).toHaveAttribute('aria-busy', 'true');
     hold.fail('wallet_removal_failed');
 
     await waitFor(() =>
-      expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent('wallet_removal_failed'),
+      expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent('wallet_removal_failed'),
     );
     await waitFor(() => expect(confirm).not.toHaveAttribute('aria-busy', 'true'));
     const retryFapi = serveFapi(fapi);
     await user.click(confirm);
     await waitFor(() => expect(retryFapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('cancels removal, then removes the newly selected wallet', async () => {
@@ -567,13 +567,13 @@ describe('Web3 wallets', () => {
     await user.keyboard('{Enter}');
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
     await user.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(2);
     await user.click(screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-    expect(screen.getByRole('alertdialog')).toHaveTextContent('0xabcd...7890');
+    expect(screen.getByRole('dialog')).toHaveTextContent('0xabcd...7890');
     await user.click(screen.getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual(['wallet_1']);
     expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_1');
     expect(screen.getByText('Primary')).toBeInTheDocument();
