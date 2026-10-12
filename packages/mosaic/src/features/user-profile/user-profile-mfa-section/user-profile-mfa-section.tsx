@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { useReverificationFlow } from '../../reverification';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { useUserProfileMfaController } from './user-profile-mfa-section.controller';
 import { useUserProfileMfaModel } from './user-profile-mfa-section.model';
@@ -32,11 +33,13 @@ export function mfaSectionNode(model: UserProfileMfaModel, fallback: ReactNode =
 }
 
 function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'ready' }> }) {
-  const controller = useUserProfileMfaController(model);
+  const [remove, reverification] = useReverificationFlow(model.remove);
+  const controller = useUserProfileMfaController({ ...model, remove });
 
   return (
     <UserProfileMfaSectionView
       {...controller.sectionProps}
+      reverification={reverification}
       addControl={
         controller.showAddControl ? (
           <UserProfileAddMfaDialog

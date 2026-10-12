@@ -4,6 +4,7 @@ import type { ReactNode, Ref } from 'react';
 import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import { UserProfileSecurityList } from '../user-profile-security-list';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
@@ -22,6 +23,7 @@ export interface UserProfileMfaSectionViewProps {
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
+  reverification?: ReverificationController;
 }
 
 export function UserProfileMfaSectionView({
@@ -33,9 +35,10 @@ export function UserProfileMfaSectionView({
   onRegenerateBackupCodes,
   onRemove,
   onSetDefault,
+  reverification,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const controller = useUserProfileMfaSectionLeafController({ methods, onAdd, onRemove, onSetDefault });
+  const controller = useUserProfileMfaSectionLeafController({ methods, onAdd, onRemove, onSetDefault, reverification });
 
   return (
     <>

@@ -4,7 +4,13 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import { clerkApiError } from '../../../../__tests__/clerk-errors';
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  fapiUrl,
+  holdRequests,
+  serveFapi,
+  worker,
+} from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
@@ -124,6 +130,26 @@ describe('User profile MFA management', () => {
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('This authenticator must remain enabled.'));
     expect(screen.getByText('Authenticator app')).toBeVisible();
+  });
+
+  it('verifies the session when removing an authenticator demands it, then removes it', async () => {
+    const fapi = await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, two_factor_enabled: true }),
+      mfaEnvironment(),
+      { verification: { secrets: { password: 'hunter2' } } },
+    );
+    demandReverificationOnce('/v1/me/totp');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user.totp_enabled).toBe(false);
+    expect(screen.queryByRole('button', { name: 'Manage Authenticator app' })).toBeNull();
   });
 
   it('removes SMS MFA while retaining the phone number', async () => {
