@@ -28,8 +28,8 @@ export const meta: StoryMeta = {
 
 export function Default(_args: Record<string, unknown>) {
   const titleRef = useRef<HTMLDivElement>(null);
-  const connections = useConnectedAccountsFixture();
-  const wallets = useWeb3WalletsFixture();
+  const connections = useConnectedAccountsFixture({ fallbackFocus: () => titleRef.current });
+  const wallets = useWeb3WalletsFixture({ fallbackFocus: () => titleRef.current });
   const profile = useUserProfileProfileFixture();
   const emails = useUserProfileEmailsFixture({ username: profile.username });
   const phones = useUserProfilePhonesFixture();
@@ -40,18 +40,8 @@ export function Default(_args: Record<string, unknown>) {
       profileSlot={<UserProfileProfileSectionView {...profile} />}
       emailSlot={<UserProfileEmailSectionView {...emails} />}
       phoneSlot={<UserProfilePhoneSectionView {...phones} />}
-      connectedAccountsSlot={
-        <UserProfileConnectedAccountsSectionView
-          {...connections}
-          fallbackFocus={() => titleRef.current}
-        />
-      }
-      web3WalletsSlot={
-        <UserProfileWeb3WalletsSectionView
-          {...wallets}
-          fallbackFocus={() => titleRef.current}
-        />
-      }
+      connectedAccountsSlot={<UserProfileConnectedAccountsSectionView {...connections} />}
+      web3WalletsSlot={<UserProfileWeb3WalletsSectionView {...wallets} />}
       dangerSlot={<UserProfileDangerPreview />}
     />
   );

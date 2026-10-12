@@ -99,9 +99,9 @@ describe('Passkey interactions across resource changes', () => {
     await waitFor(() => expect(held.requests).toHaveLength(1));
     await user.keyboard('{Enter}{Enter}{Escape}');
     expect(held.requests).toHaveLength(1);
-    expect(screen.getByRole('alertdialog')).toBeVisible();
+    expect(screen.getByRole('dialog')).toBeVisible();
     held.release();
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.getByText('No passkeys added')).toBeVisible();
   });
 });

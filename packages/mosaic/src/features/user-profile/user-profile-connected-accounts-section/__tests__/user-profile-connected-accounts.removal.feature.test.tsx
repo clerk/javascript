@@ -11,7 +11,7 @@ import { github, google, renderSection, signedIn } from './user-profile-connecte
 async function openRemoval(user: ReturnType<typeof userEvent.setup>, provider: string) {
   await user.click(screen.getByRole('button', { name: `Manage ${provider}` }));
   await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
-  return screen.getByRole('alertdialog');
+  return screen.getByRole('dialog');
 }
 
 describe('connected accounts', () => {
@@ -29,7 +29,7 @@ describe('connected accounts', () => {
     await waitFor(() => expect(request.requests).toHaveLength(1));
     request.release();
 
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.queryByRole('button', { name: 'Manage GitHub' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Manage Google' })).toBeVisible();
     expect(fapi.client.sessions[0]?.user.external_accounts.map(account => account.id)).toEqual(['idn_google']);
@@ -47,7 +47,7 @@ describe('connected accounts', () => {
     expect(fapi.client.sessions[0]?.user.external_accounts).toHaveLength(2);
 
     request.release();
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.external_accounts).toHaveLength(1);
   });
 
@@ -66,7 +66,7 @@ describe('connected accounts', () => {
 
     serveFapi(signedIn([google]));
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('keeps the confirmation open when removal needs reverification', async () => {
@@ -79,7 +79,7 @@ describe('connected accounts', () => {
     request.fail('session_reverification_required', 'Verify your session.');
     expect(await within(dialog).findByText('Verify your session.')).toBeInTheDocument();
     expect(dialog).toHaveAccessibleName('Remove connected account');
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getAllByRole('dialog')).toEqual([dialog]);
     expect(within(dialog).queryByRole('textbox')).toBeNull();
     expect(within(dialog).queryByLabelText('Password')).toBeNull();
     expect(within(dialog).getByRole('button', { name: 'Remove' })).not.toHaveAttribute('aria-busy', 'true');
@@ -92,12 +92,12 @@ describe('connected accounts', () => {
     const first = await openRemoval(user, 'Google');
     expect(first).toHaveAccessibleDescription(/Google will be removed/);
     await user.click(within(first).getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 
     const second = await openRemoval(user, 'GitHub');
     expect(second).toHaveAccessibleDescription(/GitHub will be removed/);
     await user.click(within(second).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.external_accounts.map(account => account.id)).toEqual(['idn_google']);
   });
 
@@ -125,7 +125,7 @@ describe('connected accounts', () => {
     const user = userEvent.setup();
     const dialog = await openRemoval(user, 'Google');
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.queryByRole('group', { name: 'Connected accounts' })).toBeNull();
   });
 
@@ -146,7 +146,7 @@ describe('connected accounts', () => {
     const destroy = vi.spyOn(original, 'destroy');
     await openRemoval(userEvent.setup(), 'Google');
     await act(() => (change === 'switch' ? clerk.setActive({ session: 'sess_2' }) : clerk.signOut()));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(clerk.user?.id).toBe(change === 'switch' ? 'user_2' : undefined);
     expect(destroy).not.toHaveBeenCalled();
     if (change === 'switch') {

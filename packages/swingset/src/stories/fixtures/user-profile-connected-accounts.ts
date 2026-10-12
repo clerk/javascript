@@ -1,3 +1,4 @@
+import { useUserProfileConnectedAccountsController } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.controller';
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
@@ -23,10 +24,12 @@ export function useConnectedAccountsFixture({
   initialAccounts = [connectedAccount],
   providers: initialProviders = connectionProviders,
   removalState,
+  fallbackFocus,
 }: {
   initialAccounts?: UserProfileConnectedAccount[];
   providers?: UserProfileConnectionProvider[];
   removalState?: 'pending' | 'error';
+  fallbackFocus?: () => HTMLElement | null;
 } = {}) {
   const [hasRemovalFailed, setHasRemovalFailed] = useState(false);
   const seed = useChaosFixture(initialAccounts, items =>
@@ -42,10 +45,11 @@ export function useConnectedAccountsFixture({
   );
   const availableProviders = providers.filter(provider => !accounts.some(account => account.id === provider.id));
 
-  return {
+  return useUserProfileConnectedAccountsController({
     accounts,
     availableProviders,
-    onConnect: (id: string) => {
+    fallbackFocus,
+    onConnect: async (id: string) => {
       const provider = providers.find(item => item.id === id);
       if (provider) {
         setAccounts(current => [
@@ -60,7 +64,7 @@ export function useConnectedAccountsFixture({
         ]);
       }
     },
-    onReconnect: (id: string) =>
+    onReconnect: async (id: string) =>
       setAccounts(current =>
         current.map(account =>
           account.id === id
@@ -78,5 +82,5 @@ export function useConnectedAccountsFixture({
       }
       setAccounts(current => current.filter(item => item.id !== id));
     },
-  };
+  });
 }
