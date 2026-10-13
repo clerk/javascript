@@ -196,6 +196,28 @@ describe('a launch the host fixture starts', () => {
     ]);
   });
 
+  it('says the app is about to launch again before the second try of a failed open, after the new sign-in ticket of that try', async () => {
+    const calls: string[] = [];
+    let tickets = 0;
+    const launch = appLauncher(
+      E2E_HOST,
+      {
+        installApp: async () => {},
+        signInTicket: async () => (calls.push(`ticket ${(tickets += 1)}`), new Secret('ticket', `ticket_${tickets}`)),
+        aboutToLaunch: async () => void calls.push('about to launch'),
+        openApp: async () => {
+          calls.push('open');
+          if (calls.filter((call) => call === 'open').length === 1) throw new Error('xcrun timed out');
+        },
+        adb: async () => {},
+      },
+      new Set<string>(),
+      () => 'id',
+    );
+    await launch({ signedInAs: user });
+    assert.deepEqual(calls, ['ticket 1', 'about to launch', 'open', 'ticket 2', 'about to launch', 'open']);
+  });
+
   it('installs the build the settings name before the first launch of a worker, and not again', async () => {
     const installedBuilds = new Set<string>();
     const named = { ...E2E_HOST, buildPath: '/builds/E2EHost.app' };

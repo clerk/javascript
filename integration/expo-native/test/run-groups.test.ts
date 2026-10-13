@@ -92,6 +92,10 @@ fs.appendFileSync('order.log', 'e2e opens the app with no arguments\\n');
       launchRefused = ready.ok ? null : (await ready.json()).errors[0].long_message;
       fs.appendFileSync('order.log', (launchRefused === null ? 'launches for ' : 'does not launch for ') + path.basename(file) + '\\n');
     }
+    if (plan.retriesTheOpen) {
+      const again = await fetch(process.env.CLERK_E2E_API_URL + '/about_to_launch', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
+      fs.appendFileSync('order.log', 'retries the open for ' + path.basename(file) + ', answered ' + again.status + ' ' + (await again.text()) + '\\n');
+    }
     const password = require('node:crypto').randomBytes(12).toString('hex') + 'Aa1!';
     const seeded = await fetch(process.env.CLERK_E2E_API_URL + '/users', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: JSON.stringify({ email_address: [emailOf()], ...(plan.password === true ? { password, bypass_client_trust: true } : { skip_password_requirement: true }) }) });
     const body = await seeded.json();
@@ -129,6 +133,7 @@ interface FakeE2EPlan {
   readonly exitCode?: number;
   readonly password?: boolean;
   readonly launches?: boolean;
+  readonly retriesTheOpen?: boolean;
   readonly driver?: {
     readonly refusesALeftoverRegistration?: boolean;
     readonly daemonFailsToStartIn?: readonly string[];
@@ -259,6 +264,14 @@ describe('a run whose spec files declare different settings', () => {
         'e2e opens the app with no arguments',
         'launches for choose-organization.e2e.ts',
       ]);
+      assert.deepEqual(record.videos, [join(dir, 'video.mp4')]);
+      assert.deepEqual(r.videoLines(), []);
+    });
+
+    it('keeps the one recording when a test opens the app a second time after a failed open: it closes nothing and starts no second recorder', async () => {
+      const r = recorded({ launches: true, retriesTheOpen: true });
+      const { record, dir } = await runVerb(r.deps, { ...RUN_ALL, video: true });
+      assert.deepEqual(r.order(), ['e2e opens the app with no arguments', r.close, 'recorder starts', 'launches for auth-start.e2e.ts', 'retries the open for auth-start.e2e.ts, answered 200 {}']);
       assert.deepEqual(record.videos, [join(dir, 'video.mp4')]);
       assert.deepEqual(r.videoLines(), []);
     });
