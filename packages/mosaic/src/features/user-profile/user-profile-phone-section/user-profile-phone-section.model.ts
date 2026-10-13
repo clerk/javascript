@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneNumberResource } from '@clerk/shared/types';
+import { useMemo } from 'react';
 
 import { toCountryIso } from '../../../components/phone-input';
 import { save } from '../../../utils/errors';
@@ -21,6 +22,11 @@ function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
 export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel {
   const clerk = useClerk();
   const model = useUserProfileUserModel();
+  const readyUser = model.status === 'ready' ? model.user : undefined;
+  const phones = useMemo(
+    () => (readyUser ? toContacts(readyUser.phoneNumbers, readyUser.primaryPhoneNumberId, phone => phone.phoneNumber) : []),
+    [readyUser],
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -40,7 +46,7 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
   return {
     status: 'ready',
     userId: user.id,
-    phones: toContacts(user.phoneNumbers, user.primaryPhoneNumberId, phone => phone.phoneNumber),
+    phones,
     defaultPhoneCountry: toCountryIso(clerk.__internal_country),
     onCreatePhone: access.canCreate
       ? async phoneNumber => {

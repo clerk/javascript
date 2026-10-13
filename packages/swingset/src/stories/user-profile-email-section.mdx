@@ -24,6 +24,21 @@ the verified address.
   ]}
 />
 
+## Motion
+
+A new email address expands into the list and a removed one collapses out of it, each fading at its
+bottom edge; the empty state takes the last row's place without expanding or collapsing itself. The
+list keeps the order it was first shown in, so setting a primary moves the badge between rows rather
+than the rows themselves. **Set as primary** resolves after a short simulated request; when the
+request outlasts a short delay, a spinner shows where the badge will land, and the badge waits for
+the spinner to go.
+
+## Set primary pending
+
+Setting a primary takes a few seconds here, so the pending spinner is easy to see.
+
+<Story name='SetPrimaryPending' storyModule={Stories} />
+
 ## Email verification error
 
 This example rejects every verification attempt so the error remains visible and the user can retry.

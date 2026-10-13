@@ -7,6 +7,7 @@ export const userProfileContactMessages = {
   unverified: 'Unverified',
   add: 'Add',
   setPrimary: 'Set as primary',
+  settingPrimary: 'Setting as primary',
   completeVerification: 'Complete verification',
 
   manageValue: 'Manage {value}',

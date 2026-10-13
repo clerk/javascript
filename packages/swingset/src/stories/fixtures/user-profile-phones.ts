@@ -33,9 +33,12 @@ export function useUserProfilePhonesFixture({
   return useUserProfilePhoneSectionController({
     phones,
     ...flow,
-    onSetPrimaryPhone: id => {
-      setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })));
-      return Promise.resolve();
+    onSetPrimaryPhone: async id => {
+      await new Promise(resolve => setTimeout(resolve, 700));
+      setPhones(current => {
+        const next = current.map(phone => ({ ...phone, isDefault: phone.id === id }));
+        return [...next.filter(phone => phone.isDefault), ...next.filter(phone => !phone.isDefault)];
+      });
     },
     onRemovePhone: async id => {
       if (removalState === 'pending') {

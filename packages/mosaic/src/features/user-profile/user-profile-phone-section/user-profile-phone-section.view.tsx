@@ -8,6 +8,7 @@ import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfilePhone } from '../user-profile-contact.types';
+import { removalFallback } from '../user-profile-contact.utils';
 import { UserProfileContactListRowView } from '../user-profile-contact-list-row.view';
 import { UserProfileAddPhoneDialog } from './user-profile-add-phone.dialog';
 import type { UserProfilePhoneSectionViewProps } from './user-profile-phone-section.types';
@@ -18,6 +19,8 @@ export function UserProfilePhoneSectionView({
   canAdd,
   verification,
   error,
+  pendingId,
+  shownPendingId,
   onVerify,
   onSetPrimary,
   onRemove,
@@ -27,7 +30,7 @@ export function UserProfilePhoneSectionView({
   const removalFocus = useListRemovalFocus({
     ids: phones.map(phone => phone.id),
     onRemove,
-    fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
+    fallback: () => removalFallback(row.current),
   });
   const verificationDialog = useMemo(() => Dialog.createHandle(), []);
   const removePhoneConfirmation = useMemo(() => Confirmation.createHandle<UserProfilePhone>(), []);
@@ -64,6 +67,8 @@ export function UserProfilePhoneSectionView({
         addAction={addPhoneAction}
         onRemove={onRemove ? phone => removePhoneConfirmation.open(phone) : undefined}
         onSetPrimary={onSetPrimary}
+        pendingId={pendingId}
+        shownPendingId={shownPendingId}
         onVerify={id => {
           verifyingId.current = id;
           onVerify(id);

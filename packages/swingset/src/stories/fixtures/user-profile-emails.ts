@@ -11,7 +11,14 @@ import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 export const exampleEmails: UserProfileEmail[] = [
   { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
   { id: 'email_2', value: 'item2@clerk.dev', isDefault: false, isVerified: true },
+  { id: 'email_3', value: 'item3@clerk.dev', isDefault: false, isVerified: true },
+  { id: 'email_4', value: 'item4@clerk.dev', isDefault: false, isVerified: true },
+  { id: 'email_5', value: 'item5@clerk.dev', isDefault: false, isVerified: true },
 ];
+
+function primaryFirst<T extends UserProfileEmail>(items: T[]): T[] {
+  return [...items.filter(item => item.isDefault), ...items.filter(item => !item.isDefault)];
+}
 
 export interface UserProfileEmailsFixtureOptions {
   initialEmails?: UserProfileEmail[];
@@ -19,6 +26,7 @@ export interface UserProfileEmailsFixtureOptions {
   method?: UserProfileEmailVerification['method'];
   failVerification?: boolean;
   removalState?: 'pending' | 'error';
+  setPrimaryDelay?: number;
 }
 
 export function useUserProfileEmailsFixture({
@@ -27,6 +35,7 @@ export function useUserProfileEmailsFixture({
   method,
   failVerification = false,
   removalState,
+  setPrimaryDelay = 700,
 }: UserProfileEmailsFixtureOptions = {}): UserProfileEmailSectionViewProps {
   const [emails, setEmails] = useState(initialEmails);
   const [removalFailed, setRemovalFailed] = useState(false);
@@ -42,9 +51,9 @@ export function useUserProfileEmailsFixture({
     emails,
     username,
     ...flow,
-    onSetPrimaryEmail: id => {
-      setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })));
-      return Promise.resolve();
+    onSetPrimaryEmail: async id => {
+      await new Promise(resolve => setTimeout(resolve, setPrimaryDelay));
+      setEmails(current => primaryFirst(current.map(email => ({ ...email, isDefault: email.id === id }))));
     },
     onRemoveEmail: async id => {
       if (removalState === 'pending') {

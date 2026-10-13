@@ -1,6 +1,7 @@
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
+import { useMemo } from 'react';
 
-import { usePendingAction } from '../../../hooks/use-pending-action';
+import { useContactList } from '../use-contact-list';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
 import type { ReadyPhoneSectionModel, UserProfilePhoneSectionViewProps } from './user-profile-phone-section.types';
 
@@ -13,21 +14,27 @@ export function useUserProfilePhoneSectionController({
   onRemovePhone,
 }: Omit<ReadyPhoneSectionModel, 'status' | 'userId'>): UserProfilePhoneSectionViewProps {
   const verification = useUserProfileAddPhoneController({ onCreate: onCreatePhone });
-  const setPrimary = usePendingAction();
+  const formattedPhones = useMemo(
+    () => phones.map(phone => ({ ...phone, value: stringToFormattedPhoneString(phone.value) })),
+    [phones],
+  );
+  const list = useContactList({ items: formattedPhones, onSetPrimary: onSetPrimaryPhone });
 
   return {
-    phones: phones.map(phone => ({ ...phone, value: stringToFormattedPhoneString(phone.value) })),
+    phones: list.items,
     defaultPhoneCountry,
     canAdd: Boolean(onCreatePhone),
     verification,
-    error: setPrimary.error,
+    error: list.error,
+    pendingId: list.pendingId,
+    shownPendingId: list.shownPendingId,
     onVerify: id => {
       const phone = phones.find(phone => phone.id === id);
       if (phone) {
         verification.onVerifyPhone(phone.value, getPhoneVerifier(id));
       }
     },
-    onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryPhone(id)),
+    onSetPrimary: list.setPrimary,
     onRemove: onRemovePhone,
   };
 }

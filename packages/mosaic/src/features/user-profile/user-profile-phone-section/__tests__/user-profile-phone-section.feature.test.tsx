@@ -153,8 +153,9 @@ describe('the user profile phone section', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
 
-    await waitFor(() => expect(listed()).toEqual([WORK_LABEL, HOME_LABEL]));
-    expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary');
+    await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary'));
+    expect(within(row()).getByText(HOME_LABEL).parentElement).not.toHaveTextContent('Primary');
+    expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
   });
 
   it('removes a number once the removal is confirmed', async () => {
