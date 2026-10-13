@@ -38,7 +38,10 @@ export type UserCountParams = {
 
 /** @generateWithEmptyComment */
 export type UserListParams = ClerkPaginationRequest<{
-  /** The ID of the user after which to start returning results. Use the last user's ID from the previous page to fetch the next page. */
+  /**
+   * The ID of the last user on the previous page. Only valid when `orderBy` is `created_at`, `+created_at`,
+   * or `-created_at` and `offset` is omitted or `0`.
+   */
   startingAfter?: string;
   /** Filters users with the specified email addresses. Accepts up to 100 email addresses. */
   emailAddress?: string[];
