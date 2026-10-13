@@ -131,7 +131,7 @@ describe('useForm', () => {
 
   it('shows the generic message and logs the cause for an unrecognized rejection', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const causes: unknown[] = [new Error('Nope'), 'boom'];
+    const causes: unknown[] = [new Error('Nope'), 'boom', undefined, null, 0];
     for (const cause of causes) {
       const { result } = renderHook(() =>
         useForm({

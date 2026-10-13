@@ -255,7 +255,7 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
           },
           onError: [
             {
-              guard: (_, e) => isReverificationCancelledError(e.error),
+              guard: (_, e) => Boolean(e.error) && isReverificationCancelledError(e.error),
               target: 'editing',
               actions: assign(() => ({ error: undefined })),
             },
