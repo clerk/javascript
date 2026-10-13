@@ -6,7 +6,7 @@ import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { useFlowContext } from './flow-context';
-import { FlowStepContext, type FlowStepContextValue } from './flow-step-context';
+import { FlowStepContext, type FlowStepContextValue, useFlowStepActive } from './flow-step-context';
 
 export interface FlowStepProps extends ComponentProps<'div'> {
   ids: readonly string[];
@@ -29,15 +29,8 @@ function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | nu
 
 export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(props, forwardedRef) {
   const { render, ids, children, ...otherProps } = props;
-  const {
-    value,
-    direction,
-    rootRef,
-    registerActiveStep,
-    unregisterActiveStep,
-    registerExitingStep,
-    unregisterExitingStep,
-  } = useFlowContext();
+  const parentActive = useFlowStepActive();
+  const { value, direction, rootRef, registerActiveStep, unregisterActiveStep } = useFlowContext();
   const open = ids.includes(value);
   const stepRef = useRef<HTMLDivElement | null>(null);
   const activeChildrenRef = useRef(children);
@@ -63,18 +56,6 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     return () => unregisterActiveStep(element);
   }, [open, registerActiveStep, unregisterActiveStep]);
 
-  const exiting = mounted && !open;
-
-  useLayoutEffect(() => {
-    const element = stepRef.current;
-    if (!exiting || !element) {
-      return;
-    }
-
-    registerExitingStep(element);
-    return () => unregisterExitingStep(element);
-  }, [exiting, registerExitingStep, unregisterExitingStep]);
-
   // A layout effect, so focus moves in the commit that makes the leaving step inert: field to field,
   // which iOS does without dropping the keyboard. A passive effect would leave a frame with none.
   useLayoutEffect(() => {
@@ -98,8 +79,8 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     focusTargetsRef.current.delete(element);
   }, []);
   const stepContext = useMemo<FlowStepContextValue>(
-    () => ({ registerFocusTarget, unregisterFocusTarget }),
-    [registerFocusTarget, unregisterFocusTarget],
+    () => ({ active: open && parentActive, registerFocusTarget, unregisterFocusTarget }),
+    [open, parentActive, registerFocusTarget, unregisterFocusTarget],
   );
 
   const effectiveTransitionProps = !hasBeenClosed.current
