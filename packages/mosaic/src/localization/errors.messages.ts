@@ -78,6 +78,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   protect_check_timed_out: "Verification didn't complete in time. Please try again.",
   protect_check_unsupported_environment:
     "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
+  reverification_incomplete: 'Your request was not completed. Please try verifying again.',
   role_unavailable: 'This role is no longer available.',
   sso_bypass_domain_not_served:
     'This member could not be added because their email address is not served by a connection.',

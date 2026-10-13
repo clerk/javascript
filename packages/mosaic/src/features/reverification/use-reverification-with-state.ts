@@ -1,3 +1,4 @@
+import { isReverificationHint } from '@clerk/shared/authorization-errors';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useReverification, useSafeLayoutEffect, useSession } from '@clerk/shared/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -42,6 +43,14 @@ function requestAlreadyInProgressError(): ClerkRuntimeError {
   });
 }
 
+const REVERIFICATION_INCOMPLETE_CODE = 'reverification_incomplete';
+
+function reverificationIncompleteError(): ClerkRuntimeError {
+  return new ClerkRuntimeError('The action still requires verification after it was verified.', {
+    code: REVERIFICATION_INCOMPLETE_CODE,
+  });
+}
+
 /**
  * Wraps useReverification without the default UI. Returns [handler, state]: call handler
  * to run the action, and render your own UI from state.phase ('inactive' | 'active' |
@@ -51,6 +60,9 @@ function requestAlreadyInProgressError(): ClerkRuntimeError {
  * UI that was showing can be held until the caller moves on. 'settled' ends when the handler
  * is called again, or when the third return value, reset, is called. A run that was never
  * interrupted stays 'inactive' throughout.
+ *
+ * A retry that is asked to reverify again rejects with a ClerkRuntimeError with code
+ * 'reverification_incomplete', so the handler never resolves with a reverification hint.
  *
  * The handler runs one call at a time. A call made while another is pending rejects with a
  * ClerkRuntimeError with code 'request_already_in_progress'.
@@ -132,7 +144,14 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
 
       setReverificationState(releaseSettled);
 
-      const invocation = Promise.resolve().then(() => wrapped(...args));
+      const invocation = Promise.resolve()
+        .then(() => wrapped(...args))
+        .then(result => {
+          if (isReverificationHint(result)) {
+            throw reverificationIncompleteError();
+          }
+          return result;
+        });
       runtimeRef.current.operation = { status: 'requesting', promise: invocation };
       void invocation
         .finally(() => {
