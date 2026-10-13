@@ -15,11 +15,10 @@ const settle = () =>
     await new Promise(resolve => setTimeout(resolve, 0));
   });
 
-function Confirm({ onOpenChange, ...rest }: Partial<DialogRootProps> = {}) {
+function Confirm({ onOpenChange }: Pick<DialogRootProps, 'onOpenChange'> = {}) {
   return (
     <Dialog.Root
       defaultOpen
-      {...rest}
       role='alertdialog'
       onOpenChange={onOpenChange}
     >

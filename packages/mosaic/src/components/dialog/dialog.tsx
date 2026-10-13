@@ -136,29 +136,44 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
 type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 'closedBy'>;
 
 /**
- * `role` is the whole dismissal API: it decides how the dialog announces itself AND what closes it,
- * with no prop to contradict either.
+ * `role` decides how the dialog announces itself; `shouldCloseOnInteractOutside` decides whether
+ * an outside press closes it. Escape always closes.
  *
  * - `alertdialog` announces as an interruption rather than as a surface the user navigated to, and
- *   cannot be dismissed by an outside press. A dialog asking a question it needs an answer to must
- *   not be answerable by clicking next to it. Escape still closes, which is the keyboard's
- *   equivalent of the cancel button that is always present;
- * - `dialog` dismisses on an outside press as well.
+ *   never closes on an outside press. A dialog asking a question it needs an answer to must not be
+ *   answerable by clicking next to it. Escape is the keyboard's equivalent of the cancel button
+ *   that is always present;
+ * - `dialog` closes on an outside press unless `shouldCloseOnInteractOutside` is `false`, for a
+ *   task an accidental press would throw away, such as entering a verification code.
  *
  * It says nothing about the variant: an alert is a `Card` like every other dialog.
  */
-export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> & {
-  /** The popup's ARIA role, and with it what dismisses the dialog. @default 'dialog' */
-  role?: DialogRole;
-};
+export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> &
+  (
+    | {
+        /** The popup's ARIA role. @default 'dialog' */
+        role?: 'dialog';
+        /** Whether an outside press closes the dialog. @default true */
+        shouldCloseOnInteractOutside?: boolean;
+      }
+    | {
+        role: 'alertdialog';
+        shouldCloseOnInteractOutside?: false;
+      }
+  );
 
 /** Owns the open state and the decisions — role, dismissal — every part reads. */
-function Root<Payload = unknown>({ role = 'dialog', children, ...rest }: DialogRootProps<Payload>) {
+function Root<Payload = unknown>({
+  role = 'dialog',
+  shouldCloseOnInteractOutside = role === 'dialog',
+  children,
+  ...rest
+}: DialogRootProps<Payload>) {
   return (
     <Primitive.Root<Payload>
       {...rest}
       role={role}
-      closedBy={role === 'alertdialog' ? 'closerequest' : 'any'}
+      closedBy={shouldCloseOnInteractOutside ? 'any' : 'closerequest'}
     >
       {children}
     </Primitive.Root>
