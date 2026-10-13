@@ -108,7 +108,7 @@ drops the fallback instead of holding the space open. Keep the two apart.
   (`user-profile-profile-section.model.ts`). `save` lets reverification errors
   through, so the callback can be wrapped in `useReverificationFlow`. A model
   that formats its own errors does the same with `isReverificationError` from
-  the same file.
+  the same file (`user-profile-password-section.model.ts`).
 - No local UI state. What is open and what is in flight belong to the controller.
 - No React state machinery beyond the Clerk hooks themselves; the model is a
   derivation of what Clerk currently says. The exception is what to fetch: a

@@ -4,8 +4,7 @@ import { Card } from '../../../components/card';
 import { DataList } from '../../../components/data-list';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
-import { Flow } from '../../../components/flow';
-import { Reverification } from '../../../features/reverification';
+import { ReverificationFlow } from '../../../features/reverification';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
@@ -54,27 +53,14 @@ export function UserProfileDeviceDetailsDialog({
               elevation='overlay'
               renderBranding={false}
             >
-              {reverification ? (
-                <Flow.Root
-                  value={step}
-                  direction={step === 'verify' ? 1 : -1}
-                  state={step}
-                >
-                  {() => (
-                    <>
-                      <Flow.Step ids={['confirm']}>{details}</Flow.Step>
-                      <Flow.Step ids={['verify']}>
-                        <Reverification
-                          {...reverification}
-                          onClose={() => controller.onOpenChange(false)}
-                        />
-                      </Flow.Step>
-                    </>
-                  )}
-                </Flow.Root>
-              ) : (
-                details
-              )}
+              <ReverificationFlow
+                contentId='confirm'
+                isVerifying={step === 'verify'}
+                reverification={reverification}
+                onClose={() => controller.onOpenChange(false)}
+              >
+                {details}
+              </ReverificationFlow>
             </Card.Root>
           </Dialog.Popup>
         );

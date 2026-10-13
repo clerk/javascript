@@ -306,7 +306,8 @@ One path, so every error a user sees goes through the `errors.*` catalog:
   error as a `SaveError` with each error routed to the field it names. The form
   machine turns a `SaveError` into field and global errors. A controller can also
   reject a submit with `FormSubmitError` (`components/form`) to set field errors
-  itself.
+  itself. A submit that rejects because the user cancelled a reverification
+  is not an error: the form returns to editing with its values and no message.
 - **Owners hold an `ErrorDescription`.** It is either a `LocalizableError`
   (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`, the original
   failure). `toLocalizableError` logs the second as

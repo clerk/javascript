@@ -150,7 +150,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM so it takes the dialog's opening focus, as in `Card.Header`. */}
-          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <Dialog.CloseButton /> : null}
+          {isInDialog(dialog) && dialog.showCloseButton ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),

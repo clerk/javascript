@@ -9,6 +9,7 @@ import type { FieldFeedback } from '../../../components/form';
 import { FormSubmitError } from '../../../components/form';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
+import { isReverificationError } from '../../../utils/errors';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValue, UserProfilePasswordPolicy } from './user-profile-password-section.types';
@@ -50,9 +51,8 @@ function getPasswordPolicy(
     return { status: 'hidden' };
   }
 
-  // TODO: When session reverification is supported, require the current password only when reverification is disabled.
   const policy: UserProfilePasswordPolicy = user.passwordEnabled
-    ? { mode: 'change', requiresCurrentPassword: true }
+    ? { mode: 'change', requiresCurrentPassword: !environment.authConfig.reverification }
     : { mode: 'set', requiresCurrentPassword: false };
 
   const enterpriseAccount = user.enterpriseAccounts.find(account => account.active);
@@ -126,7 +126,6 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     sessionId,
     identifier: session.publicUserData.identifier ?? '',
     validatePassword,
-    // TODO: Add session reverification for password updates; surface API errors until then.
     updatePassword: async ({ currentPassword, newPassword, signOutOfOtherSessions }) => {
       const currentUser = clerk.user;
       if (
@@ -147,6 +146,9 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
           ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
         });
       } catch (error) {
+        if (isReverificationError(error)) {
+          throw error;
+        }
         throw passwordFormError(
           error,
           policy.requiresCurrentPassword,
