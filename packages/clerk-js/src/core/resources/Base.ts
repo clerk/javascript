@@ -157,6 +157,9 @@ export abstract class BaseResource {
         await BaseResource.clerk.__internal_handleUnauthenticatedDevBrowser();
       } else if (status === 401 && code !== 'requires_captcha') {
         await BaseResource.clerk.handleUnauthenticated();
+      } else if (status === 422 && errors?.[0]?.meta?.remaining_attempts === 0) {
+        // The password confirmation limit ended the session and invalidated this client.
+        await BaseResource.clerk.__internal_handleSessionEnded();
       }
 
       assertProductionKeysOnDev(status, errors);

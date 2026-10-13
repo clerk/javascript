@@ -4230,6 +4230,36 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('__internal_handleSessionEnded', () => {
+    afterEach(() => {
+      (window as any).__internal_onAfterSetActive = null;
+    });
+
+    it('signs out and notifies other tabs after the server ended the session', async () => {
+      const mockOnAfterSetActive = vi.fn().mockReturnValue(Promise.resolve());
+      (window as any).__internal_onAfterSetActive = mockOnAfterSetActive;
+      const eventBusSpy = vi.spyOn(eventBus, 'emit');
+      const mockSession = {
+        id: 'session_1',
+        status: 'active',
+        user: { id: 'user_1' },
+        lastActiveToken: { getRawString: () => 'token_1' },
+      };
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.updateClient({ sessions: [mockSession], signedInSessions: [mockSession] } as any);
+      // The failed confirmation's response carries the client without the ended session.
+      sut.updateClient({ sessions: [], signedInSessions: [] } as any);
+
+      await sut.__internal_handleSessionEnded();
+
+      expect(sut.session).toBeNull();
+      expect(eventBusSpy).toHaveBeenCalledWith(events.UserSignOut, null);
+      expect(mockOnAfterSetActive).toHaveBeenCalled();
+      eventBusSpy.mockRestore();
+    });
+  });
+
   describe('__internal_attemptToEnableEnvironmentSetting', () => {
     afterEach(() => {
       mockEnvironmentFetch.mockReset();
