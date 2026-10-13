@@ -9,7 +9,7 @@ Introduce `@clerk/expo-native-components`, a new package that the native compone
 npx expo install @clerk/expo-native-components
 ```
 
-If it's missing, rendering a native component throws an error with these same steps.
+If it's missing, rendering a native component throws an error with these same steps. Install the package before you ship this version in an over-the-air update, because the error is thrown at runtime and not at build time.
 
 Import the native components and their hooks from `@clerk/expo/native-components`. `@clerk/expo/native` is deprecated. It still works and logs a warning in development.
 
