@@ -64,7 +64,7 @@ export const useSessionTasksContext = (): SessionTasksContextType => {
 
     // If there's no custom taskUrl, and we are not using virtual routing
     // we can just navigate to the task endpoint directly.
-    const signInUrl = clerk.buildSignInUrl();
+    const signInUrl = clerk.buildSignInUrl({ redirectUrl: redirectUrlComplete });
     return navigate(buildTaskUrl(currentTask, { base: signInUrl }));
   };
 
