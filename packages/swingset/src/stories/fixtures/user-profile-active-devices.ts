@@ -1,5 +1,5 @@
-import { useUserProfileActiveDevicesController } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import type { UserProfileDevice } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices.types';
+import { useUserProfileActiveDevicesController } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
