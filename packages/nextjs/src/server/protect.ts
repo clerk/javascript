@@ -5,6 +5,7 @@ import type {
   InferAuthObjectFromToken,
   InferAuthObjectFromTokenArray,
   RedirectFun,
+  SessionTokenType,
   SignedInAuthObject,
 } from '@clerk/backend/internal';
 import { constants, isTokenTypeAccepted, TokenType } from '@clerk/backend/internal';
@@ -34,6 +35,14 @@ type AuthProtectOptions = {
   unauthenticatedUrl?: string;
 };
 
+type InferProtectedAuthObject<T extends AuthProtectOptions['token']> = T extends TokenType[]
+  ? InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>
+  : T extends TokenType
+    ? InferAuthObjectFromToken<T, SignedInAuthObject, AuthenticatedMachineObject>
+    : T extends 'any'
+      ? SignedInAuthObject | AuthenticatedMachineObject
+      : SignedInAuthObject;
+
 /**
  * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
@@ -52,10 +61,10 @@ export interface AuthProtect {
    * @example
    * auth.protect(has => has({ permission: 'org:admin:example1' }));
    */
-  (
+  <T extends AuthProtectOptions['token'] = SessionTokenType>(
     params?: (has: CheckAuthorizationFromSessionClaims) => boolean,
-    options?: AuthProtectOptions,
-  ): Promise<SignedInAuthObject>;
+    options?: AuthProtectOptions & { token?: T },
+  ): Promise<InferProtectedAuthObject<T>>;
 
   /**
    * @example
