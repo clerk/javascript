@@ -579,6 +579,4 @@ describe('Changing a password', () => {
 
 describe('Deferred password behavior', () => {
   it.todo('shows a password section skeleton while loading without a custom fallback');
-  it.todo('reverifies the session and retries the password update when Clerk requires verification');
-  it.todo('omits the current password when session reverification is enabled');
 });
