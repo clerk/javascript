@@ -17,7 +17,7 @@ export const UNEXPECTED_ERROR: LocalizableError = { code: 'generic' };
 const REVERIFICATION_REQUIRED_CODE = 'session_reverification_required';
 
 /** Whether a failure belongs to the reverification flow rather than to the user: a required step-up, or a cancelled one. */
-function isReverificationError(cause: unknown): boolean {
+export function isReverificationError(cause: unknown): boolean {
   if (isReverificationCancelledError(cause)) {
     return true;
   }
