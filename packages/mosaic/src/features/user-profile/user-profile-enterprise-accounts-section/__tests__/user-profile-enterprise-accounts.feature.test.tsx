@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
@@ -194,15 +194,16 @@ describe('enterprise accounts', () => {
   it('shows a missing redirect error and allows another attempt', async () => {
     serveFapi(signedIn());
     worker.use(
-      http.post(fapiUrl('/v1/me/external_accounts'), () =>
-        HttpResponse.json({
+      http.post(fapiUrl('/v1/me/external_accounts'), async () => {
+        await delay(300);
+        return HttpResponse.json({
           response: {
             object: 'external_account',
             verification: fapiVerification('saml', { status: 'unverified' }),
           },
           client: null,
-        }),
-      ),
+        });
+      }),
     );
     const { clerk } = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
     const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
@@ -213,7 +214,7 @@ describe('enterprise accounts', () => {
       expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
     );
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('progressbar')).not.toBeInTheDocument());
     serveFapi(signedIn());
     await user.click(screen.getByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() =>
