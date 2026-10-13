@@ -596,6 +596,23 @@ describe('Profile', () => {
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
+    it('follows showCloseButton on the dialog', () => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root
+            defaultOpen
+            showCloseButton={false}
+          >
+            <Dialog.Popup variant='profile'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+
+      expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
+    });
+
     it('carries no dismiss standalone', () => {
       renderSurface();
 
