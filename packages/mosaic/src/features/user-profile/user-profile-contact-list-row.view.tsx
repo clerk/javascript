@@ -56,15 +56,15 @@ function SlotItem({
   const element = useRef<HTMLSpanElement>(null);
   const entrance = useRef<boolean | null>(null);
   const { mounted, transitionProps } = useTransition({ open, ref: element });
-  if (mounted && entrance.current === null) {
+  if (!mounted) {
+    entrance.current = null;
+    return null;
+  }
+  if (entrance.current === null) {
     entrance.current = appear;
   }
 
-  if (!mounted) {
-    return null;
-  }
-
-  return children(element, withoutEntrance(transitionProps, entrance.current ?? appear));
+  return children(element, withoutEntrance(transitionProps, entrance.current));
 }
 
 function ContactListItem({

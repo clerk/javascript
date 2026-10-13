@@ -1,5 +1,5 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -234,6 +234,38 @@ describe('UserProfileContactListRowView', () => {
     });
     expect(screen.queryByText('+1 (801) 555-0100')).not.toBeInTheDocument();
     expect(screen.getByText('No phone numbers added').closest('li')).not.toHaveAttribute('data-ending-style');
+  });
+
+  it('enters the badge again on a first-load primary row after it has left', async () => {
+    const exit = holdExits();
+    const items = [
+      { id: 'contact_1', value: 'first@example.com', isDefault: true, isVerified: true },
+      { id: 'contact_2', value: 'second@example.com', isDefault: false, isVerified: true },
+    ];
+    const view = (first: boolean) => (
+      <UserProfileContactListRowView
+        kind='email'
+        label='Emails'
+        items={[
+          { ...items[0], isDefault: first },
+          { ...items[1], isDefault: !first },
+        ]}
+      />
+    );
+    const { rerender } = render(view(true));
+    expect(screen.getByText('Primary').closest('.cl-badge')).not.toHaveAttribute('data-starting-style');
+
+    rerender(view(false));
+    await act(async () => {
+      exit.resolve();
+      await exit.promise;
+    });
+    await waitFor(() => expect(screen.getAllByText('Primary')).toHaveLength(1));
+
+    rerender(view(true));
+    const badges = screen.getAllByText('Primary').map(label => label.closest<HTMLElement>('.cl-badge'));
+    expect(badges[0]?.closest('.cl-section-item')).toHaveTextContent('first@example.com');
+    expect(badges[0]).toHaveAttribute('data-starting-style');
   });
 
   it('transitions the primary badge out when another item becomes primary', () => {
