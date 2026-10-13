@@ -257,7 +257,7 @@ describe('Changing a password', () => {
     expect(fapi.passwordUpdates).toHaveLength(0);
   });
 
-  it('keeps focus on the popup close button when the save fails after verifying', async () => {
+  it('returns focus to the form when the verification header is removed after a save error', async () => {
     const { fapi, user } = await renderWithReverification();
     const update = holdRequests('post', '/v1/me/change_password');
 
@@ -272,7 +272,7 @@ describe('Changing a password', () => {
     expect(field).toHaveValue('new-password-123');
     expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
     await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
-    expect(close).toHaveFocus();
+    await waitFor(() => expect(field).toHaveFocus());
     expect(fapi.passwordUpdates).toHaveLength(0);
   });
 
