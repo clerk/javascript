@@ -307,7 +307,7 @@ describe('getAuthDataFromRequest', () => {
     const mockM2MJwt = [
       toBase64Url(JSON.stringify({ alg: 'RS256', typ: 'JWT' })),
       toBase64Url(JSON.stringify({ sub: 'mch_testmachine123', exp: 9999999999, iat: 1666648250 })),
-      'c2lnbmF0dXJl',
+      toBase64Url('signature'),
     ].join('.');
 
     it('returns signed-out when JWT-format M2M token is sent to a session-only endpoint', () => {
@@ -356,8 +356,8 @@ describe('getAuthDataFromRequest', () => {
 
     const mockOAuthJwt = [
       toBase64Url(JSON.stringify({ alg: 'RS256', typ: 'at+jwt' })),
-      toBase64Url(JSON.stringify({ sub: 'user_123', scope: 'profile email', exp: 9999999999, iat: 1666648250 })),
-      'c2lnbmF0dXJl',
+      toBase64Url(JSON.stringify({ sub: 'user_123', exp: 9999999999, iat: 1666648250 })),
+      toBase64Url('signature'),
     ].join('.');
 
     const mockVerifiedRequestWithPaddedHeader = (token: string, tokenType: MachineTokenType) =>

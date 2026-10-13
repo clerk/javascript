@@ -86,16 +86,11 @@ describe('getAuth(req)', () => {
     expect(() => getAuth(req, { secretKey: mockSecretKey })).toThrowError();
   });
 
-  const toBase64Url = (value: object) =>
-    btoa(JSON.stringify(value)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-  const mockOAuthJwt = [
-    toBase64Url({ alg: 'RS256', typ: 'at+jwt' }),
-    toBase64Url({ sub: 'user_123', scope: 'profile email' }),
-    'c2lnbmF0dXJl',
-  ].join('.');
-  const mockM2MJwt = [toBase64Url({ alg: 'RS256', typ: 'JWT' }), toBase64Url({ sub: 'mch_123' }), 'c2lnbmF0dXJl'].join(
-    '.',
-  );
+  const toBase64Url = (str: string) => btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  const mockJwt = (header: object, payload: object) =>
+    [JSON.stringify(header), JSON.stringify(payload), 'signature'].map(toBase64Url).join('.');
+  const mockOAuthJwt = mockJwt({ alg: 'RS256', typ: 'at+jwt' }, { sub: 'user_123' });
+  const mockM2MJwt = mockJwt({ alg: 'RS256', typ: 'JWT' }, { sub: 'mch_123' });
 
   it.each([
     ['a JWT-format OAuth token', mockOAuthJwt],
