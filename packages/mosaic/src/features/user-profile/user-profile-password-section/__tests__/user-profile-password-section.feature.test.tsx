@@ -1,9 +1,8 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEmailAddress,
@@ -24,25 +23,14 @@ async function renderPassword(user = alice, environment = fapiEnvironment()) {
   return fapi;
 }
 
-async function renderWithReverification() {
+async function renderWithReverification(prepare?: () => void) {
   const fapi = serveFapi({
     environment: fapiEnvironment({ auth_config: { reverification: true } }),
     client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]),
     verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
   });
-  let required = false;
-  worker.use(
-    http.post(fapiUrl('/v1/me/change_password'), () => {
-      if (required) {
-        return undefined;
-      }
-      required = true;
-      return HttpResponse.json(
-        { errors: [{ code: 'session_reverification_required', message: 'Verification required' }] },
-        { status: 403 },
-      );
-    }),
-  );
+  prepare?.();
+  demandReverificationOnce('/v1/me/change_password');
   await renderWithClerk(<UserProfilePasswordSection />);
   const user = userEvent.setup();
   await user.click(screen.getByRole('button', { name: 'Change password' }));
@@ -249,6 +237,51 @@ describe('Changing a password', () => {
     await user.click(screen.getByRole('button', { name: 'Change password' }));
     expect(screen.getByLabelText('New password')).toHaveValue('');
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeVisible();
+  });
+
+  it('returns to the form with the field error when the save fails after verifying', async () => {
+    const updates: Array<ReturnType<typeof holdRequests>> = [];
+    const { fapi, user } = await renderWithReverification(() => {
+      updates.push(holdRequests('post', '/v1/me/change_password'));
+    });
+    const update = updates[0];
+
+    await user.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    update.fail('form_password_pwned', undefined, 'new_password');
+
+    const field = await screen.findByLabelText('New password', undefined, { timeout: 3000 });
+    expect(field).toHaveValue('new-password-123');
+    await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
+    await waitFor(() => expect(field).toHaveFocus());
+    expect(fapi.passwordUpdates).toHaveLength(0);
+  });
+
+  it('says the password was not saved when Clerk asks to verify again after verifying', async () => {
+    const { fapi, user } = await renderWithReverification(() => demandReverificationOnce('/v1/me/change_password'));
+
+    await user.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+
+    await waitFor(
+      () =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Your password was not saved. Please try verifying again.'),
+      { timeout: 3000 },
+    );
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+    expect(fapi.passwordUpdates).toHaveLength(0);
+  });
+
+  it('closes the dialog from the verification error card', async () => {
+    const { fapi, user } = await renderWithReverification(() =>
+      holdRequests('post', '/v1/client/sessions/sess_1/verify').fail('some_new_error', 'Nope'),
+    );
+
+    expect(await screen.findByText('Something went wrong')).toBeVisible();
+    const buttons = screen.getAllByRole('button', { name: 'Close' });
+    await user.click(buttons[buttons.length - 1]);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(0);
   });
 
   it('shows a direct API error and keeps the draft without retrying automatically', async () => {
