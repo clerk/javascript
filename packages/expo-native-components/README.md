@@ -25,58 +25,28 @@
 
 </div>
 
+> [!NOTE]
+> Install this package to use `AuthView`, `UserButton`, and `UserProfileView` from `@clerk/expo/native-components`. Its JavaScript API is used by `@clerk/expo` and isn't meant to be imported directly.
+
 ## Getting Started
 
-`@clerk/expo-native-components` adds Clerk's prebuilt native components to an Expo app that uses [`@clerk/expo`](https://github.com/clerk/javascript/tree/main/packages/expo). It contains the native modules built on the Clerk iOS and Android SDKs:
-
-- **iOS**: [clerk-ios](https://github.com/clerk/clerk-ios) (SwiftUI)
-- **Android**: [clerk-android](https://github.com/clerk/clerk-android) (Jetpack Compose)
-
-Install it only if you use `AuthView`, `UserProfileView`, `UserButton`, or biometric credentials. Apps that only use `@clerk/expo` do not include the Clerk native SDKs.
+`@clerk/expo-native-components` contains the native code behind Clerk's prebuilt native components for Expo apps that use [`@clerk/expo`](https://github.com/clerk/javascript/tree/main/packages/expo). The components are built on the Clerk iOS and Android SDKs. Apps that don't install it don't include those SDKs.
 
 ### Prerequisites
 
 - `@clerk/expo`
-- Expo 54 or later, with a [development build](https://docs.expo.dev/develop/development-builds/introduction/) (Expo Go is not supported)
+- Expo 54 or later, in a [development build](https://docs.expo.dev/develop/development-builds/introduction/) (the components are not available in Expo Go)
 - iOS 17 or later
 
 ### Installation
 
 ```sh
-npx expo install @clerk/expo @clerk/expo-native-components
+npx expo install @clerk/expo-native-components
 ```
 
-Add the config plugin alongside `@clerk/expo` in your app config, then rebuild your native app:
-
-```json
-{
-  "expo": {
-    "plugins": ["@clerk/expo", "@clerk/expo-native-components"]
-  }
-}
-```
-
-The plugin accepts the following options:
-
-- `keychainService`: keychain service identifier to share the session with app extensions.
-- `theme`: path to a JSON file with `colors`, `darkColors`, and `design` keys that styles the native components.
+Then rebuild your native app.
 
 ## Usage
-
-```tsx
-import { useAuth } from '@clerk/expo';
-import { AuthView } from '@clerk/expo-native-components';
-
-export default function SignInScreen() {
-  const { isSignedIn } = useAuth();
-
-  if (isSignedIn) {
-    return null;
-  }
-
-  return <AuthView />;
-}
-```
 
 For further information, guides, and examples visit the [Expo reference documentation](https://clerk.com/docs/references/expo/overview?utm_source=github&utm_medium=clerk_expo_native_components).
 
