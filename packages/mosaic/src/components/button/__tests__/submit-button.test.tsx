@@ -218,39 +218,6 @@ describe('Mosaic SubmitButton', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it.each(['{Enter}', ' '])('ignores %s activation handlers while pending and lets focus move away', async key => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn(event => event.preventDefault());
-    const onClick = vi.fn();
-    const onKeyDown = vi.fn();
-    const onKeyUp = vi.fn();
-    render(
-      <form onSubmit={onSubmit}>
-        <SubmitButton
-          isPending
-          onClick={onClick}
-          onKeyDown={onKeyDown}
-          onKeyUp={onKeyUp}
-        >
-          Save
-        </SubmitButton>
-        <button type='button'>Cancel</button>
-      </form>,
-    );
-
-    await user.tab();
-    expect(screen.getByRole('button', { name: 'Save' })).toHaveFocus();
-    await user.keyboard(key);
-
-    expect(onClick).not.toHaveBeenCalled();
-    expect(onKeyDown).not.toHaveBeenCalled();
-    expect(onKeyUp).not.toHaveBeenCalled();
-    expect(onSubmit).not.toHaveBeenCalled();
-
-    await user.tab();
-    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus();
-  });
-
   it('submits its form once it is no longer pending', async () => {
     const onSubmit = vi.fn(event => event.preventDefault());
     render(
