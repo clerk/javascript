@@ -3,8 +3,7 @@ import type { ReactNode } from 'react';
 import { Card } from '../../components/card';
 import type { DialogFocusTarget, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
-import { Flow } from '../../components/flow';
-import { Reverification } from '../../features/reverification';
+import { ReverificationFlow } from '../../features/reverification';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import type { ConfirmController } from './confirm.controller';
 
@@ -77,27 +76,14 @@ function ConfirmCard<Payload>({
       elevation='overlay'
       renderBranding={false}
     >
-      {reverification ? (
-        <Flow.Root
-          value={step}
-          direction={step === 'verify' ? 1 : -1}
-          state={step}
-        >
-          {() => (
-            <>
-              <Flow.Step ids={['confirm']}>{confirmStep}</Flow.Step>
-              <Flow.Step ids={['verify']}>
-                <Reverification
-                  controller={reverification}
-                  onClose={() => controller.onOpenChange(false)}
-                />
-              </Flow.Step>
-            </>
-          )}
-        </Flow.Root>
-      ) : (
-        confirmStep
-      )}
+      <ReverificationFlow
+        contentId='confirm'
+        isVerifying={step === 'verify'}
+        reverification={reverification}
+        onClose={() => controller.onOpenChange(false)}
+      >
+        {confirmStep}
+      </ReverificationFlow>
     </Card.Root>
   );
 }

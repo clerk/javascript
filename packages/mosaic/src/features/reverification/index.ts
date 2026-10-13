@@ -1,3 +1,4 @@
+export { ReverificationFlow } from './reverification-flow.view';
 export { Reverification, useReverificationFlow } from './reverification';
 export type { ReverificationController } from './reverification.controller';
 export type { UseReverificationFlowResult } from './reverification';

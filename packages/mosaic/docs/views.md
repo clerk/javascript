@@ -42,6 +42,14 @@ Two shapes, chosen by whether the slice fetches its own data:
   (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController`
   with its `onSubmit`). Still no Clerk — the effect arrives from above.
 
+For a dialog that swaps its content for step-up verification, use
+`ReverificationFlow` from `src/features/reverification/`. The host keeps its
+`Dialog`, `Card.Root`, controller and close behavior. Pass the controller's
+verification state and an `onClose` callback. See the password dialog for an
+example. Fields inside the flow register with `useFlowAutoFocus` from
+`components/flow` so focus follows step entry without taking focus from a
+control outside the flow.
+
 ## Where the strings live
 
 Every string a view renders comes from the feature's `*.messages.ts`, shaped the
