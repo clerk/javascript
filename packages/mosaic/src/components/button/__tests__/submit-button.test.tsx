@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { InputGroup } from '../../input-group';
 import { SubmitButton } from '../submit-button';
 
 const consumerAtoms = stylex.create({
@@ -87,6 +88,67 @@ describe('Mosaic SubmitButton', () => {
     expect(button).not.toHaveAttribute('aria-busy');
   });
 
+  it.each([
+    { disabled: true, groupDisabled: false, focusableWhenDisabled: false },
+    { disabled: true, groupDisabled: false, focusableWhenDisabled: true },
+    { disabled: false, groupDisabled: true, focusableWhenDisabled: false },
+    { disabled: false, groupDisabled: true, focusableWhenDisabled: true },
+  ])('preserves independent disabled settings across pending changes: %j', props => {
+    const button = (isPending: boolean) => (
+      <InputGroup.Root disabled={props.groupDisabled}>
+        <InputGroup.End>
+          <SubmitButton
+            disabled={props.disabled}
+            focusableWhenDisabled={props.focusableWhenDisabled}
+            isPending={isPending}
+          >
+            Save
+          </SubmitButton>
+        </InputGroup.End>
+      </InputGroup.Root>
+    );
+    const { rerender } = render(button(false));
+
+    for (const isPending of [false, true, false]) {
+      rerender(button(isPending));
+      const submit = screen.getByRole('button', { name: 'Save' });
+      expect(submit).toHaveAttribute('data-disabled');
+      if (isPending) {
+        expect(submit).toHaveAttribute('aria-busy', 'true');
+        expect(submit).toHaveAttribute('aria-disabled', 'true');
+      }
+      if (props.focusableWhenDisabled) {
+        expect(submit).toBeEnabled();
+        expect(submit).toHaveAttribute('aria-disabled', 'true');
+      } else {
+        expect(submit).toBeDisabled();
+      }
+    }
+  });
+
+  it('uses focusable disabled behavior while pending and restores enabled behavior afterward', () => {
+    const { rerender } = render(<SubmitButton>Save</SubmitButton>);
+    const button = screen.getByRole('button', { name: 'Save' });
+    button.focus();
+
+    for (const isPending of [true, false]) {
+      rerender(<SubmitButton isPending={isPending}>Save</SubmitButton>);
+      expect(button).toHaveFocus();
+      expect(button).toBeEnabled();
+      if (isPending) {
+        expect(button).toHaveAttribute('data-disabled');
+        expect(button).toHaveAttribute('data-pending');
+        expect(button).toHaveAttribute('aria-disabled', 'true');
+        expect(button).toHaveAttribute('aria-busy', 'true');
+      } else {
+        expect(button).not.toHaveAttribute('data-disabled');
+        expect(button).not.toHaveAttribute('data-pending');
+        expect(button).not.toHaveAttribute('aria-disabled');
+        expect(button).not.toHaveAttribute('aria-busy');
+      }
+    }
+  });
+
   it('renders the spinner and reflects the pending state', () => {
     render(<SubmitButton isPending>Save</SubmitButton>);
     const button = screen.getByRole('button');
@@ -161,6 +223,39 @@ describe('Mosaic SubmitButton', () => {
     await userEvent.click(screen.getByRole('button'));
     expect(onClick).not.toHaveBeenCalled();
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it.each(['{Enter}', ' '])('ignores %s activation handlers while pending and lets focus move away', async key => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn(event => event.preventDefault());
+    const onClick = vi.fn();
+    const onKeyDown = vi.fn();
+    const onKeyUp = vi.fn();
+    render(
+      <form onSubmit={onSubmit}>
+        <SubmitButton
+          isPending
+          onClick={onClick}
+          onKeyDown={onKeyDown}
+          onKeyUp={onKeyUp}
+        >
+          Save
+        </SubmitButton>
+        <button type='button'>Cancel</button>
+      </form>,
+    );
+
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveFocus();
+    await user.keyboard(key);
+
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onKeyDown).not.toHaveBeenCalled();
+    expect(onKeyUp).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus();
   });
 
   it('submits its form once it is no longer pending', async () => {
