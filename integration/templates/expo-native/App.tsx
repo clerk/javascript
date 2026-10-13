@@ -1,5 +1,5 @@
 import { ClerkProvider, useAuth, useUser } from '@clerk/expo';
-import { AuthView, UserButton, UserProfileView } from '@clerk/expo/native';
+import { AuthView, UserButton, UserProfileView } from '@clerk/expo/native-components';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
