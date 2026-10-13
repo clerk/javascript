@@ -16,9 +16,9 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { getModule } from '@/lib/registry';
 
 import { AppSidebar } from './app-sidebar';
-import { CommandPalette } from './CommandPalette';
 import { ChaosProvider } from './ChaosProvider';
 import { ChaosToggle } from './ChaosToggle';
+import { CommandPalette } from './CommandPalette';
 import { DirectionProvider } from './DirectionProvider';
 import { DirectionToggle } from './DirectionToggle';
 import { ThemeToggle } from './ThemeToggle';
