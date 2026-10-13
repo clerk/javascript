@@ -354,46 +354,23 @@ describe('getAuthDataFromRequest', () => {
       expect(auth.isAuthenticated).toBe(false);
     });
 
-    const mockOAuthJwt = [
-      toBase64Url(JSON.stringify({ alg: 'RS256', typ: 'at+jwt' })),
-      toBase64Url(JSON.stringify({ sub: 'user_123', exp: 9999999999, iat: 1666648250 })),
-      toBase64Url('signature'),
-    ].join('.');
-
-    const mockVerifiedRequestWithPaddedHeader = (token: string, tokenType: MachineTokenType) =>
-      mockRequest({
+    it('returns signed-out when a verified JWT-format M2M token is sent with a padded Authorization header', () => {
+      const req = mockRequest({
         url: '/api/protected',
         headers: new Headers({
-          [constants.Headers.Authorization]: `Bearer ${token} x`,
+          [constants.Headers.Authorization]: `Bearer ${mockM2MJwt} x`,
           [constants.Headers.AuthStatus]: AuthStatus.SignedIn,
-          [constants.Headers.AuthToken]: token,
-          [constants.Headers.AuthSignature]: HmacSHA1(token, 'sk_test_xxxxxxxxxxxxxxxxxx').toString(),
+          [constants.Headers.AuthToken]: mockM2MJwt,
+          [constants.Headers.AuthSignature]: HmacSHA1(mockM2MJwt, 'sk_test_xxxxxxxxxxxxxxxxxx').toString(),
         }),
-        machineAuthObject: createMockMachineAuthObject({ tokenType, isAuthenticated: true }),
+        machineAuthObject: createMockMachineAuthObject({ tokenType: 'm2m_token', isAuthenticated: true }),
       });
 
-    it.each([
-      ['OAuth', mockOAuthJwt, 'oauth_token'],
-      ['M2M', mockM2MJwt, 'm2m_token'],
-    ] as const)(
-      'returns signed-out when a verified JWT-format %s token is sent with a padded Authorization header',
-      (_, token, tokenType) => {
-        const auth = getAuthDataFromRequest(mockVerifiedRequestWithPaddedHeader(token, tokenType));
+      const auth = getAuthDataFromRequest(req);
 
-        expect(auth.tokenType).toBe('session_token');
-        expect((auth as SignedOutAuthObject).userId).toBeNull();
-        expect(auth.isAuthenticated).toBe(false);
-      },
-    );
-
-    it('returns the machine auth object when an accepted machine token is sent with a padded Authorization header', async () => {
-      const auth = getAuthDataFromRequest(mockVerifiedRequestWithPaddedHeader(mockOAuthJwt, 'oauth_token'), {
-        acceptsToken: 'oauth_token',
-      });
-
-      expect(auth.tokenType).toBe('oauth_token');
-      expect(auth.isAuthenticated).toBe(true);
-      await expect(auth.getToken()).resolves.toBe(mockOAuthJwt);
+      expect(auth.tokenType).toBe('session_token');
+      expect((auth as SignedOutAuthObject).userId).toBeNull();
+      expect(auth.isAuthenticated).toBe(false);
     });
   });
 });

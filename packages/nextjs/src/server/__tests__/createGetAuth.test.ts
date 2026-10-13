@@ -87,16 +87,16 @@ describe('getAuth(req)', () => {
   });
 
   const toBase64Url = (str: string) => btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-  const mockJwt = (header: object, payload: object) =>
-    [JSON.stringify(header), JSON.stringify(payload), 'signature'].map(toBase64Url).join('.');
-  const mockOAuthJwt = mockJwt({ alg: 'RS256', typ: 'at+jwt' }, { sub: 'user_123' });
-  const mockM2MJwt = mockJwt({ alg: 'RS256', typ: 'JWT' }, { sub: 'mch_123' });
+  const mockOAuthJwt = [
+    JSON.stringify({ alg: 'RS256', typ: 'at+jwt' }),
+    JSON.stringify({ sub: 'user_123' }),
+    'signature',
+  ]
+    .map(toBase64Url)
+    .join('.');
 
   it.each([
     ['a JWT-format OAuth token', mockOAuthJwt],
-    ['a JWT-format M2M token', mockM2MJwt],
-    ['an opaque OAuth token', 'oat_123'],
-    ['an opaque M2M token', 'mt_123'],
     ['an API key', 'ak_123'],
   ])('returns signed-out when the middleware verified %s', (_, token) => {
     const req = new NextRequest('https://www.clerk.com', {

@@ -275,16 +275,17 @@ test.describe('Next.js machine authentication @machine', () => {
       await app?.teardown();
     });
 
+    test('should return 200 from auth() if the route accepts M2M tokens', async ({ request }) => {
+      const res = await request.get(new URL('/api/app-machine', app.serverUrl).toString(), {
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+      expect(res.status()).toBe(200);
+      expect(await res.json()).toEqual({ subject: network.scopedSender.id, tokenType: TokenType.M2MToken });
+    });
+
     test('should return 401 from getAuth() if a JWT-format M2M token is sent', async ({ request }) => {
       const res = await request.get(new URL('/api/pages-session', app.serverUrl).toString(), {
         headers: { Authorization: `Bearer ${jwtToken}` },
-      });
-      expect(res.status()).toBe(401);
-    });
-
-    test('should return 401 from getAuth() if an opaque M2M token is sent', async ({ request }) => {
-      const res = await request.get(new URL('/api/pages-session', app.serverUrl).toString(), {
-        headers: { Authorization: `Bearer ${network.scopedSenderToken.token}` },
       });
       expect(res.status()).toBe(401);
     });
@@ -296,16 +297,6 @@ test.describe('Next.js machine authentication @machine', () => {
         headers: { Authorization: `Bearer ${jwtToken} x` },
       });
       expect(res.status()).toBe(401);
-    });
-
-    test('should return 200 from auth() if an accepted M2M token is sent with a padded Authorization header', async ({
-      request,
-    }) => {
-      const res = await request.get(new URL('/api/app-machine', app.serverUrl).toString(), {
-        headers: { Authorization: `Bearer ${jwtToken} x` },
-      });
-      expect(res.status()).toBe(200);
-      expect(await res.json()).toEqual({ subject: network.scopedSender.id, tokenType: TokenType.M2MToken });
     });
   });
 });

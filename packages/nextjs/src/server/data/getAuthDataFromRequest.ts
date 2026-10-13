@@ -44,16 +44,6 @@ const getAuthHeaders = (req: RequestLike) => {
   };
 };
 
-const getBearerToken = (req: RequestLike) => {
-  const [scheme, token] = getHeader(req, constants.Headers.Authorization)?.split(' ', 2) ?? [];
-
-  if (!token) {
-    return scheme;
-  }
-
-  return scheme === 'Bearer' ? token : undefined;
-};
-
 /**
  * Creates auth options object with fallbacks from encrypted request data
  */
@@ -128,7 +118,7 @@ export const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRe
   const encryptedRequestData = getHeader(req, constants.Headers.ClerkRequestData);
   const decryptedRequestData = decryptClerkRequestData(encryptedRequestData);
 
-  const bearerToken = getBearerToken(req);
+  const bearerToken = getHeader(req, constants.Headers.Authorization)?.replace('Bearer ', '');
   const acceptsToken = opts.acceptsToken || TokenType.SessionToken;
 
   const options = createAuthOptions(req, opts);
