@@ -49,6 +49,7 @@ export function useConnectedAccountsFixture({
     accounts,
     availableProviders,
     fallbackFocus,
+    // eslint-disable-next-line @typescript-eslint/require-await
     onConnect: async (id: string) => {
       const provider = providers.find(item => item.id === id);
       if (provider) {
@@ -64,6 +65,7 @@ export function useConnectedAccountsFixture({
         ]);
       }
     },
+    // eslint-disable-next-line @typescript-eslint/require-await
     onReconnect: async (id: string) =>
       setAccounts(current =>
         current.map(account =>
