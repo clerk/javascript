@@ -8,6 +8,8 @@ export interface UserProfilePhoneSectionViewProps {
   canAdd: boolean;
   verification: UserProfileAddPhoneController;
   error: string | undefined;
+  pendingId?: string;
+  shownPendingId?: string;
   onVerify: (id: string) => void;
   onSetPrimary: (id: string) => void;
   onRemove?: (id: string) => Promise<void>;

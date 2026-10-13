@@ -1,5 +1,6 @@
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import type { EmailAddressResource } from '@clerk/shared/types';
+import { useMemo } from 'react';
 
 import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
@@ -84,6 +85,11 @@ function toEmailVerifier(
 export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
   const model = useUserProfileUserModel();
   const router = useMosaicRouter();
+  const readyUser = model.status === 'ready' ? model.user : undefined;
+  const emails = useMemo(
+    () => (readyUser ? toContacts(readyUser.emailAddresses, readyUser.primaryEmailAddressId, email => email.emailAddress) : []),
+    [readyUser],
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -107,7 +113,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
   return {
     status: 'ready',
     userId: user.id,
-    emails: toContacts(user.emailAddresses, user.primaryEmailAddressId, email => email.emailAddress),
+    emails,
     username: user.username ?? undefined,
     onCreateEmail: access.canCreate
       ? async emailAddress => {

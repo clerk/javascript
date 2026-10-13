@@ -67,3 +67,11 @@ export function toContacts<T extends Identification>(
     isVerified: item.verification.status === 'verified',
   }));
 }
+
+export function removalFallback(root: HTMLElement | null): HTMLElement | null {
+  return (
+    Array.from(root?.querySelectorAll<HTMLButtonElement>('button:not([disabled])') ?? []).find(
+      button => !button.closest('[aria-hidden="true"]'),
+    ) ?? root
+  );
+}

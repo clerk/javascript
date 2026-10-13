@@ -8,6 +8,7 @@ import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileEmail } from '../user-profile-contact.types';
+import { removalFallback } from '../user-profile-contact.utils';
 import { UserProfileContactListRowView } from '../user-profile-contact-list-row.view';
 import { UserProfileAddEmailDialog } from './user-profile-add-email.dialog';
 import type { UserProfileEmailSectionViewProps } from './user-profile-email-section.types';
@@ -17,6 +18,8 @@ export function UserProfileEmailSectionView({
   canAdd,
   verification,
   error,
+  pendingId,
+  shownPendingId,
   onVerify,
   onSetPrimary,
   onRemove,
@@ -26,7 +29,7 @@ export function UserProfileEmailSectionView({
   const removalFocus = useListRemovalFocus({
     ids: emails.map(email => email.id),
     onRemove,
-    fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
+    fallback: () => removalFallback(row.current),
   });
   const verificationDialog = useMemo(() => Dialog.createHandle(), []);
   const removeEmailConfirmation = useMemo(() => Confirmation.createHandle<UserProfileEmail>(), []);
@@ -63,6 +66,8 @@ export function UserProfileEmailSectionView({
         addAction={addEmailAction}
         onRemove={onRemove ? email => removeEmailConfirmation.open(email) : undefined}
         onSetPrimary={onSetPrimary}
+        pendingId={pendingId}
+        shownPendingId={shownPendingId}
         onVerify={id => {
           verifyingId.current = id;
           onVerify(id);

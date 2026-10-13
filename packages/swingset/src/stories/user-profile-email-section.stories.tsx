@@ -26,6 +26,10 @@ export function Default() {
   return <EmailSection />;
 }
 
+export function SetPrimaryPending() {
+  return <EmailSection setPrimaryDelay={2500} />;
+}
+
 export function AddEmailFails() {
   return <EmailSection failVerification />;
 }
