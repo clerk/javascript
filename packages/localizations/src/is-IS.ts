@@ -2010,16 +2010,7 @@ export const isIS: LocalizationResource = {
       actionText: 'Skráður inn sem {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Endurstilla lykilorð',
-    signOut: {
-      actionLink: 'Skrá út',
-      actionText: 'Skráður inn sem {{identifier}}',
-    },
-    subtitle: 'Reikningurinn þinn krefst nýs lykilorðs áður en þú getur haldið áfram',
-    title: 'Endurstilla lykilorðið þitt',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2028,6 +2019,15 @@ export const isIS: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Endurstilla lykilorð',
+    signOut: {
+      actionLink: 'Skrá út',
+      actionText: 'Skráður inn sem {{identifier}}',
+    },
+    subtitle: 'Reikningurinn þinn krefst nýs lykilorðs áður en þú getur haldið áfram',
+    title: 'Endurstilla lykilorðið þitt',
   },
   taskSetupMfa: {
     badge: 'Uppsetning tveggja þrepa auðkenningar',

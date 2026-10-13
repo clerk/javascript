@@ -2012,16 +2012,7 @@ export const huHU: LocalizationResource = {
       actionText: 'Bejelentkezve: {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Jelszó visszaállítása',
-    signOut: {
-      actionLink: 'Kijelentkezés',
-      actionText: 'Bejelentkezve: {{identifier}}',
-    },
-    subtitle: 'A fiókodhoz új jelszó szükséges, mielőtt folytathatnád',
-    title: 'Jelszó visszaállítása',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2030,6 +2021,15 @@ export const huHU: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Jelszó visszaállítása',
+    signOut: {
+      actionLink: 'Kijelentkezés',
+      actionText: 'Bejelentkezve: {{identifier}}',
+    },
+    subtitle: 'A fiókodhoz új jelszó szükséges, mielőtt folytathatnád',
+    title: 'Jelszó visszaállítása',
   },
   taskSetupMfa: {
     badge: 'Kétlépcsős azonosítás beállítása',

@@ -2007,7 +2007,8 @@ export const csCZ: LocalizationResource = {
       actionText: 'Přihlášen jako {{identifier}}',
     },
   },
-  taskResetPassword: {
+  taskForceEnterpriseSso: {
+    connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
@@ -2016,8 +2017,7 @@ export const csCZ: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
-  taskSetupEnterpriseSso: {
-    connectionUnavailable: undefined,
+  taskResetPassword: {
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,

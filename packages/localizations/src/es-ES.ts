@@ -2005,7 +2005,8 @@ export const esES: LocalizationResource = {
       actionText: 'Sesión iniciada como {{identifier}}',
     },
   },
-  taskResetPassword: {
+  taskForceEnterpriseSso: {
+    connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
@@ -2014,8 +2015,7 @@ export const esES: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
-  taskSetupEnterpriseSso: {
-    connectionUnavailable: undefined,
+  taskResetPassword: {
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,

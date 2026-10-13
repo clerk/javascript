@@ -2044,16 +2044,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Signed in as {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Reset Password',
-    signOut: {
-      actionLink: 'Sign out',
-      actionText: 'Signed in as {{identifier}}',
-    },
-    subtitle: 'Your account requires a new password before you can continue',
-    title: 'Reset your password',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: "Your organization's SSO connection isn't available. Contact your administrator.",
     formButtonPrimary: 'Continue with {{connectionName}}',
     signOut: {
@@ -2062,6 +2053,15 @@ export const enUS: LocalizationResource = {
     },
     subtitle: '{{organizationName}} requires you to sign in with your organization account to continue.',
     title: 'Continue with SSO',
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Reset Password',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+    subtitle: 'Your account requires a new password before you can continue',
+    title: 'Reset your password',
   },
   taskSetupMfa: {
     badge: 'Two-step verification setup',

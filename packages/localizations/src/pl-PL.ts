@@ -2001,16 +2001,7 @@ export const plPL: LocalizationResource = {
       actionText: 'Zalogowano jako {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Zresetuj hasło',
-    signOut: {
-      actionLink: 'Wyloguj',
-      actionText: 'Zalogowano jako {{identifier}}',
-    },
-    subtitle: undefined,
-    title: 'Zresetuj hasło',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2019,6 +2010,15 @@ export const plPL: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Zresetuj hasło',
+    signOut: {
+      actionLink: 'Wyloguj',
+      actionText: 'Zalogowano jako {{identifier}}',
+    },
+    subtitle: undefined,
+    title: 'Zresetuj hasło',
   },
   taskSetupMfa: {
     badge: undefined,

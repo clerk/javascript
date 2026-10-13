@@ -1997,7 +1997,8 @@ export const trTR: LocalizationResource = {
       actionText: '{{identifier}} olarak giriş yapıldı',
     },
   },
-  taskResetPassword: {
+  taskForceEnterpriseSso: {
+    connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
@@ -2006,8 +2007,7 @@ export const trTR: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
-  taskSetupEnterpriseSso: {
-    connectionUnavailable: undefined,
+  taskResetPassword: {
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,

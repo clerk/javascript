@@ -2013,16 +2013,7 @@ export const taIN: LocalizationResource = {
       actionText: '{{identifier}} என உள்நுழைந்துள்ளீர்கள்',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'கடவுச்சொல்லை மீட்டமை',
-    signOut: {
-      actionLink: 'வெளியேறு',
-      actionText: '{{identifier}} ஆக உள்நுழைந்துள்ளீர்கள்',
-    },
-    subtitle: 'நீங்கள் தொடரும் முன் உங்கள் கணக்கிற்கு புதிய கடவுச்சொல் தேவை',
-    title: 'உங்கள் கடவுச்சொல்லை மீட்டமைக்கவும்',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2031,6 +2022,15 @@ export const taIN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'கடவுச்சொல்லை மீட்டமை',
+    signOut: {
+      actionLink: 'வெளியேறு',
+      actionText: '{{identifier}} ஆக உள்நுழைந்துள்ளீர்கள்',
+    },
+    subtitle: 'நீங்கள் தொடரும் முன் உங்கள் கணக்கிற்கு புதிய கடவுச்சொல் தேவை',
+    title: 'உங்கள் கடவுச்சொல்லை மீட்டமைக்கவும்',
   },
   taskSetupMfa: {
     badge: 'இரு-படி சரிபார்ப்பு அமைப்பு',

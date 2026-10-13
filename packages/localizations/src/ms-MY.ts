@@ -2013,16 +2013,7 @@ export const msMY: LocalizationResource = {
       actionText: 'Log masuk sebagai {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Tetapkan Semula Kata Laluan',
-    signOut: {
-      actionLink: 'Log keluar',
-      actionText: 'Log masuk sebagai {{identifier}}',
-    },
-    subtitle: 'Akaun anda memerlukan kata laluan baharu sebelum anda boleh meneruskan',
-    title: 'Tetapkan semula kata laluan anda',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2031,6 +2022,15 @@ export const msMY: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Tetapkan Semula Kata Laluan',
+    signOut: {
+      actionLink: 'Log keluar',
+      actionText: 'Log masuk sebagai {{identifier}}',
+    },
+    subtitle: 'Akaun anda memerlukan kata laluan baharu sebelum anda boleh meneruskan',
+    title: 'Tetapkan semula kata laluan anda',
   },
   taskSetupMfa: {
     badge: 'Persediaan pengesahan dua langkah',

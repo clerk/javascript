@@ -1997,7 +1997,8 @@ export const nlBE: LocalizationResource = {
       actionText: 'Ingelogd als {{identifier}}',
     },
   },
-  taskResetPassword: {
+  taskForceEnterpriseSso: {
+    connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
@@ -2006,8 +2007,7 @@ export const nlBE: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
-  taskSetupEnterpriseSso: {
-    connectionUnavailable: undefined,
+  taskResetPassword: {
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,

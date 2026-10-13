@@ -1991,16 +1991,7 @@ export const koKR: LocalizationResource = {
       actionText: '{{identifier}}로 로그인됨',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: '비밀번호 재설정',
-    signOut: {
-      actionLink: '로그아웃',
-      actionText: '{{identifier}}로 로그인됨',
-    },
-    subtitle: '계속하려면 비밀번호를 새로 설정해야 해요',
-    title: '비밀번호 재설정',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2009,6 +2000,15 @@ export const koKR: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: '비밀번호 재설정',
+    signOut: {
+      actionLink: '로그아웃',
+      actionText: '{{identifier}}로 로그인됨',
+    },
+    subtitle: '계속하려면 비밀번호를 새로 설정해야 해요',
+    title: '비밀번호 재설정',
   },
   taskSetupMfa: {
     badge: undefined,

@@ -1994,7 +1994,8 @@ export const srRS: LocalizationResource = {
       actionText: 'Prijavljen kao {{identifier}}',
     },
   },
-  taskResetPassword: {
+  taskForceEnterpriseSso: {
+    connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,
@@ -2003,8 +2004,7 @@ export const srRS: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
-  taskSetupEnterpriseSso: {
-    connectionUnavailable: undefined,
+  taskResetPassword: {
     formButtonPrimary: undefined,
     signOut: {
       actionLink: undefined,

@@ -2007,16 +2007,7 @@ export const bnIN: LocalizationResource = {
       actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'পাসওয়ার্ড রিসেট করুন',
-    signOut: {
-      actionLink: 'সাইন আউট',
-      actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
-    },
-    subtitle: 'আপনি চালিয়ে যাওয়ার আগে আপনার অ্যাকাউন্টের একটি নতুন পাসওয়ার্ড প্রয়োজন',
-    title: 'আপনার পাসওয়ার্ড রিসেট করুন',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2025,6 +2016,15 @@ export const bnIN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'পাসওয়ার্ড রিসেট করুন',
+    signOut: {
+      actionLink: 'সাইন আউট',
+      actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',
+    },
+    subtitle: 'আপনি চালিয়ে যাওয়ার আগে আপনার অ্যাকাউন্টের একটি নতুন পাসওয়ার্ড প্রয়োজন',
+    title: 'আপনার পাসওয়ার্ড রিসেট করুন',
   },
   taskSetupMfa: {
     badge: 'দুই-ধাপ যাচাইকরণ সেটআপ',

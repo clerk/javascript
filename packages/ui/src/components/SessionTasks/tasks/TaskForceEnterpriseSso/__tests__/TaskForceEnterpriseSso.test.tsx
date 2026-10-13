@@ -5,7 +5,7 @@ import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 import { SessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 
-import { TaskSetupEnterpriseSSO } from '..';
+import { TaskForceEnterpriseSSO } from '..';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
@@ -20,7 +20,7 @@ const ssoConnection = {
 const renderTask = (wrapper: Parameters<typeof render>[1]['wrapper']) =>
   render(
     <SessionTasksContext.Provider value={{ redirectUrlComplete: '/', redirectOnActiveSession: { current: true } }}>
-      <TaskSetupEnterpriseSSO />
+      <TaskForceEnterpriseSSO />
     </SessionTasksContext.Provider>,
     { wrapper },
   );
@@ -30,7 +30,7 @@ const studentWithTask = {
   organization_memberships: [{ name: 'University of Phoenix', id: 'org_uop', role: 'basic_member' }],
 };
 
-describe('TaskSetupEnterpriseSSO', () => {
+describe('TaskForceEnterpriseSSO', () => {
   it('does not render without the session task', async () => {
     const { wrapper } = await createFixtures(f => f.withUser(studentWithTask));
 
@@ -41,7 +41,7 @@ describe('TaskSetupEnterpriseSSO', () => {
 
   it("starts SSO through the active organization's connection", async () => {
     const { wrapper, fixtures } = await createFixtures(f =>
-      f.withUser({ ...studentWithTask, tasks: [{ key: 'setup-enterprise-sso' }] }),
+      f.withUser({ ...studentWithTask, tasks: [{ key: 'force-enterprise-sso' }] }),
     );
     const organization = fixtures.clerk.user?.organizationMemberships[0].organization;
     organization?.getEnterpriseConnections.mockResolvedValue([ssoConnection]);
@@ -60,7 +60,7 @@ describe('TaskSetupEnterpriseSSO', () => {
 
   it('explains when the organization has no SSO connection to continue with', async () => {
     const { wrapper, fixtures } = await createFixtures(f =>
-      f.withUser({ ...studentWithTask, tasks: [{ key: 'setup-enterprise-sso' }] }),
+      f.withUser({ ...studentWithTask, tasks: [{ key: 'force-enterprise-sso' }] }),
     );
     fixtures.clerk.user?.organizationMemberships[0].organization.getEnterpriseConnections.mockResolvedValue([
       { ...ssoConnection, allowOrganizationAccountLinking: false } as EnterpriseConnectionResource,

@@ -2008,16 +2008,7 @@ export const hiIN: LocalizationResource = {
       actionText: '{{identifier}} के रूप में साइन इन किया गया',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'पासवर्ड रीसेट करें',
-    signOut: {
-      actionLink: 'साइन आउट',
-      actionText: '{{identifier}} के रूप में साइन इन किया गया',
-    },
-    subtitle: 'जारी रखने से पहले आपके खाते को एक नए पासवर्ड की आवश्यकता है',
-    title: 'अपना पासवर्ड रीसेट करें',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2026,6 +2017,15 @@ export const hiIN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'पासवर्ड रीसेट करें',
+    signOut: {
+      actionLink: 'साइन आउट',
+      actionText: '{{identifier}} के रूप में साइन इन किया गया',
+    },
+    subtitle: 'जारी रखने से पहले आपके खाते को एक नए पासवर्ड की आवश्यकता है',
+    title: 'अपना पासवर्ड रीसेट करें',
   },
   taskSetupMfa: {
     badge: 'दो-चरणीय सत्यापन सेटअप',

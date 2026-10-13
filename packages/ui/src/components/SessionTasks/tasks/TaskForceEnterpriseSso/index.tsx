@@ -17,7 +17,7 @@ import { withTaskGuard } from '../shared';
 const isSSORequiredConnection = (connection: EnterpriseConnectionResource) =>
   connection.active && connection.allowOrganizationAccountLinking && !!connection.samlConnection;
 
-const TaskSetupEnterpriseSSOInternal = () => {
+const TaskForceEnterpriseSSOInternal = () => {
   const clerk = useClerk();
   const { user } = useUser();
   const card = useCardState();
@@ -82,14 +82,14 @@ const TaskSetupEnterpriseSSOInternal = () => {
   }
 
   return (
-    <Flow.Root flow='taskSetupEnterpriseSso'>
+    <Flow.Root flow='taskForceEnterpriseSso'>
       <Flow.Part part='start'>
         <Card.Root>
           <Card.Content>
             <Header.Root showLogo>
-              <Header.Title localizationKey={localizationKeys('taskSetupEnterpriseSso.title')} />
+              <Header.Title localizationKey={localizationKeys('taskForceEnterpriseSso.title')} />
               <Header.Subtitle
-                localizationKey={localizationKeys('taskSetupEnterpriseSso.subtitle', {
+                localizationKey={localizationKeys('taskForceEnterpriseSso.subtitle', {
                   organizationName: organization?.name ?? '',
                 })}
               />
@@ -107,14 +107,14 @@ const TaskSetupEnterpriseSSOInternal = () => {
                   onClick={() => {
                     void continueWithSSO(connection.id);
                   }}
-                  localizationKey={localizationKeys('taskSetupEnterpriseSso.formButtonPrimary', {
+                  localizationKey={localizationKeys('taskForceEnterpriseSso.formButtonPrimary', {
                     connectionName: connection.name,
                   })}
                 />
               ) : (
                 <Text
                   colorScheme='secondary'
-                  localizationKey={localizationKeys('taskSetupEnterpriseSso.connectionUnavailable')}
+                  localizationKey={localizationKeys('taskForceEnterpriseSso.connectionUnavailable')}
                 />
               )}
             </Col>
@@ -130,7 +130,7 @@ const TaskSetupEnterpriseSSOInternal = () => {
               {identifier && (
                 <Card.ActionText
                   truncate
-                  localizationKey={localizationKeys('taskSetupEnterpriseSso.signOut.actionText', {
+                  localizationKey={localizationKeys('taskForceEnterpriseSso.signOut.actionText', {
                     identifier,
                   })}
                 />
@@ -140,7 +140,7 @@ const TaskSetupEnterpriseSSOInternal = () => {
                 onClick={() => {
                   void handleSignOut();
                 }}
-                localizationKey={localizationKeys('taskSetupEnterpriseSso.signOut.actionLink')}
+                localizationKey={localizationKeys('taskForceEnterpriseSso.signOut.actionLink')}
               />
             </Card.Action>
           </Card.Footer>
@@ -150,6 +150,6 @@ const TaskSetupEnterpriseSSOInternal = () => {
   );
 };
 
-export const TaskSetupEnterpriseSSO = withCoreSessionSwitchGuard(
-  withTaskGuard(withCardStateProvider(TaskSetupEnterpriseSSOInternal), 'setup-enterprise-sso'),
+export const TaskForceEnterpriseSSO = withCoreSessionSwitchGuard(
+  withTaskGuard(withCardStateProvider(TaskForceEnterpriseSSOInternal), 'force-enterprise-sso'),
 );

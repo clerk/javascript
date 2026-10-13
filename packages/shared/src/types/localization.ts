@@ -2410,16 +2410,7 @@ export type __internal_LocalizationResource = {
       organizationAlreadyExists: LocalizationValue<'organizationDomain' | 'organizationName'>;
     };
   };
-  taskResetPassword: {
-    title: LocalizationValue;
-    subtitle: LocalizationValue;
-    signOut: {
-      actionLink: LocalizationValue;
-      actionText: LocalizationValue<'identifier'>;
-    };
-    formButtonPrimary: LocalizationValue;
-  };
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     title: LocalizationValue;
     subtitle: LocalizationValue<'organizationName'>;
     formButtonPrimary: LocalizationValue<'connectionName'>;
@@ -2428,6 +2419,15 @@ export type __internal_LocalizationResource = {
       actionLink: LocalizationValue;
       actionText: LocalizationValue<'identifier'>;
     };
+  };
+  taskResetPassword: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    signOut: {
+      actionLink: LocalizationValue;
+      actionText: LocalizationValue<'identifier'>;
+    };
+    formButtonPrimary: LocalizationValue;
   };
   taskSetupMfa: {
     badge: LocalizationValue;

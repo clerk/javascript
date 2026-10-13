@@ -2006,16 +2006,7 @@ export const viVN: LocalizationResource = {
       actionText: 'Đã đăng nhập với {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Đặt lại mật khẩu',
-    signOut: {
-      actionLink: 'Đăng xuất',
-      actionText: 'Đã đăng nhập với tư cách {{identifier}}',
-    },
-    subtitle: 'Tài khoản của bạn yêu cầu mật khẩu mới trước khi bạn có thể tiếp tục',
-    title: 'Đặt lại mật khẩu của bạn',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2024,6 +2015,15 @@ export const viVN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Đặt lại mật khẩu',
+    signOut: {
+      actionLink: 'Đăng xuất',
+      actionText: 'Đã đăng nhập với tư cách {{identifier}}',
+    },
+    subtitle: 'Tài khoản của bạn yêu cầu mật khẩu mới trước khi bạn có thể tiếp tục',
+    title: 'Đặt lại mật khẩu của bạn',
   },
   taskSetupMfa: {
     badge: 'Thiết lập xác minh hai bước',

@@ -2010,16 +2010,7 @@ export const hrHR: LocalizationResource = {
       actionText: 'Prijavljen kao {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Resetiraj lozinku',
-    signOut: {
-      actionLink: 'Odjavi se',
-      actionText: 'Prijavljen kao {{identifier}}',
-    },
-    subtitle: 'Vaš račun zahtijeva novu lozinku prije nego što možete nastaviti',
-    title: 'Resetirajte svoju lozinku',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2028,6 +2019,15 @@ export const hrHR: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Resetiraj lozinku',
+    signOut: {
+      actionLink: 'Odjavi se',
+      actionText: 'Prijavljen kao {{identifier}}',
+    },
+    subtitle: 'Vaš račun zahtijeva novu lozinku prije nego što možete nastaviti',
+    title: 'Resetirajte svoju lozinku',
   },
   taskSetupMfa: {
     badge: 'Postavljanje dvostupanjske verifikacije',

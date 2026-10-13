@@ -1986,16 +1986,7 @@ export const zhTW: LocalizationResource = {
       actionText: '已登入為 {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: '重設密碼',
-    signOut: {
-      actionLink: '登出',
-      actionText: '已登入為 {{identifier}}',
-    },
-    subtitle: '您的帳戶需要新的密碼才能繼續',
-    title: '重設您的密碼',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2004,6 +1995,15 @@ export const zhTW: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: '重設密碼',
+    signOut: {
+      actionLink: '登出',
+      actionText: '已登入為 {{identifier}}',
+    },
+    subtitle: '您的帳戶需要新的密碼才能繼續',
+    title: '重設您的密碼',
   },
   taskSetupMfa: {
     badge: '兩步驟驗證設定',

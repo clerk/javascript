@@ -2009,16 +2009,7 @@ export const fiFI: LocalizationResource = {
       actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Nollaa salasana',
-    signOut: {
-      actionLink: 'Kirjaudu ulos',
-      actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
-    },
-    subtitle: 'Tilisi vaatii uuden salasanan ennen kuin voit jatkaa',
-    title: 'Nollaa salasanasi',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2027,6 +2018,15 @@ export const fiFI: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Nollaa salasana',
+    signOut: {
+      actionLink: 'Kirjaudu ulos',
+      actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
+    },
+    subtitle: 'Tilisi vaatii uuden salasanan ennen kuin voit jatkaa',
+    title: 'Nollaa salasanasi',
   },
   taskSetupMfa: {
     badge: 'Kaksivaiheisen todennuksen asennus',

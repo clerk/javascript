@@ -12,7 +12,7 @@ const NavigateToNextTask = ({ redirectUrlComplete }: { redirectUrlComplete: stri
   const { navigateOnSetActive } = useSessionTasksContext();
   useEffect(() => {
     void navigateOnSetActive({
-      session: { currentTask: { key: 'setup-enterprise-sso' } } as SessionResource,
+      session: { currentTask: { key: 'force-enterprise-sso' } } as SessionResource,
       redirectUrlComplete,
       decorateUrl: url => url,
     });
@@ -23,7 +23,7 @@ const NavigateToNextTask = ({ redirectUrlComplete }: { redirectUrlComplete: stri
 describe('navigateOnSetActive', () => {
   it("sends the next task to the flow's destination, not back to the task that just finished", async () => {
     const { wrapper, fixtures } = await createFixtures(f =>
-      f.withUser({ email_addresses: ['bart@gmail.com'], tasks: [{ key: 'setup-enterprise-sso' }] }),
+      f.withUser({ email_addresses: ['bart@gmail.com'], tasks: [{ key: 'force-enterprise-sso' }] }),
     );
     vi.spyOn(fixtures.clerk, 'buildSignInUrl').mockImplementation(
       (options?: { redirectUrl?: string }) =>
@@ -39,7 +39,7 @@ describe('navigateOnSetActive', () => {
 
     await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalled());
     const nextTaskUrl = new URL(fixtures.router.navigate.mock.calls[0][0]);
-    expect(nextTaskUrl.pathname + nextTaskUrl.hash).toBe('/sign-in#/tasks/setup-enterprise-sso');
+    expect(nextTaskUrl.pathname + nextTaskUrl.hash).toBe('/sign-in#/tasks/force-enterprise-sso');
     expect(nextTaskUrl.searchParams.get('redirect_url')).toBe('http://localhost/dashboard');
   });
 });

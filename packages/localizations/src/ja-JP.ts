@@ -2008,16 +2008,7 @@ export const jaJP: LocalizationResource = {
       actionText: '{{identifier}} としてサインイン中',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'パスワードをリセット',
-    signOut: {
-      actionLink: 'サインアウト',
-      actionText: '{{identifier}} としてサインイン中',
-    },
-    subtitle: '続行するには、アカウントの新しいパスワードを設定する必要があります',
-    title: 'パスワードをリセット',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2026,6 +2017,15 @@ export const jaJP: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'パスワードをリセット',
+    signOut: {
+      actionLink: 'サインアウト',
+      actionText: '{{identifier}} としてサインイン中',
+    },
+    subtitle: '続行するには、アカウントの新しいパスワードを設定する必要があります',
+    title: 'パスワードをリセット',
   },
   taskSetupMfa: {
     badge: '二段階認証の設定',

@@ -2007,16 +2007,7 @@ export const ptPT: LocalizationResource = {
       actionText: 'Sessão iniciada como {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Repor palavra-passe',
-    signOut: {
-      actionLink: 'Terminar sessão',
-      actionText: 'Sessão iniciada como {{identifier}}',
-    },
-    subtitle: 'A sua conta requer uma nova palavra-passe antes de poder continuar',
-    title: 'Reponha a sua palavra-passe',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2025,6 +2016,15 @@ export const ptPT: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Repor palavra-passe',
+    signOut: {
+      actionLink: 'Terminar sessão',
+      actionText: 'Sessão iniciada como {{identifier}}',
+    },
+    subtitle: 'A sua conta requer uma nova palavra-passe antes de poder continuar',
+    title: 'Reponha a sua palavra-passe',
   },
   taskSetupMfa: {
     badge: 'Configuração da verificação em duas etapas',

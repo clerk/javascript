@@ -496,7 +496,7 @@ export interface SessionTask {
   /**
    * A unique identifier for the task
    */
-  key: 'choose-organization' | 'reset-password' | 'setup-mfa' | 'setup-enterprise-sso';
+  key: 'choose-organization' | 'reset-password' | 'setup-mfa' | 'force-enterprise-sso';
 }
 
 /** @generateWithEmptyComment */

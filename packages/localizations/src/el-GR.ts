@@ -2007,16 +2007,7 @@ export const elGR: LocalizationResource = {
       actionText: 'Συνδεδεμένος ως {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Επαναφορά κωδικού πρόσβασης',
-    signOut: {
-      actionLink: 'Αποσύνδεση',
-      actionText: 'Συνδεδεμένος ως {{identifier}}',
-    },
-    subtitle: 'Για λόγους ασφαλείας, παρακαλώ επαναφέρετε τον κωδικό πρόσβασής σας',
-    title: 'Επαναφορά κωδικού πρόσβασης',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2025,6 +2016,15 @@ export const elGR: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Επαναφορά κωδικού πρόσβασης',
+    signOut: {
+      actionLink: 'Αποσύνδεση',
+      actionText: 'Συνδεδεμένος ως {{identifier}}',
+    },
+    subtitle: 'Για λόγους ασφαλείας, παρακαλώ επαναφέρετε τον κωδικό πρόσβασής σας',
+    title: 'Επαναφορά κωδικού πρόσβασης',
   },
   taskSetupMfa: {
     badge: undefined,

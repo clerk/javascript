@@ -2011,16 +2011,7 @@ export const teIN: LocalizationResource = {
       actionText: '{{identifier}}గా సైన్ ఇన్ చేయబడింది',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'పాస్‌వర్డ్‌ను రీసెట్ చేయి',
-    signOut: {
-      actionLink: 'సైన్ అవుట్',
-      actionText: '{{identifier}}గా సైన్ ఇన్ చేయబడింది',
-    },
-    subtitle: 'మీరు కొనసాగడానికి ముందు మీ ఖాతాకు కొత్త పాస్‌వర్డ్ అవసరం',
-    title: 'మీ పాస్‌వర్డ్‌ను రీసెట్ చేయండి',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2029,6 +2020,15 @@ export const teIN: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'పాస్‌వర్డ్‌ను రీసెట్ చేయి',
+    signOut: {
+      actionLink: 'సైన్ అవుట్',
+      actionText: '{{identifier}}గా సైన్ ఇన్ చేయబడింది',
+    },
+    subtitle: 'మీరు కొనసాగడానికి ముందు మీ ఖాతాకు కొత్త పాస్‌వర్డ్ అవసరం',
+    title: 'మీ పాస్‌వర్డ్‌ను రీసెట్ చేయండి',
   },
   taskSetupMfa: {
     badge: 'రెండు-దశల ధృవీకరణ సెటప్',

@@ -2010,16 +2010,7 @@ export const nbNO: LocalizationResource = {
       actionText: 'Innlogget som {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Tilbakestill passord',
-    signOut: {
-      actionLink: 'Logg ut',
-      actionText: 'Innlogget som {{identifier}}',
-    },
-    subtitle: 'Kontoen din krever et nytt passord før du kan fortsette',
-    title: 'Tilbakestill passordet ditt',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2028,6 +2019,15 @@ export const nbNO: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Tilbakestill passord',
+    signOut: {
+      actionLink: 'Logg ut',
+      actionText: 'Innlogget som {{identifier}}',
+    },
+    subtitle: 'Kontoen din krever et nytt passord før du kan fortsette',
+    title: 'Tilbakestill passordet ditt',
   },
   taskSetupMfa: {
     badge: 'Oppsett av to-trinns verifisering',

@@ -645,7 +645,7 @@ describe('Clerk singleton', () => {
     });
 
     describe('when switching organization leaves the session pending', () => {
-      const pendingTask = { key: 'setup-enterprise-sso' } as const;
+      const pendingTask = { key: 'force-enterprise-sso' } as const;
       const createSession = () => {
         const session: any = {
           id: '1',
@@ -678,7 +678,7 @@ describe('Clerk singleton', () => {
         await sut.setActive({ organization: 'org_id', redirectUrl: '/dashboard' });
 
         expect(sut.navigate).toHaveBeenCalledTimes(1);
-        expect(vi.mocked(sut.navigate).mock.calls[0][0]).toContain('/sign-in#/tasks/setup-enterprise-sso');
+        expect(vi.mocked(sut.navigate).mock.calls[0][0]).toContain('/sign-in#/tasks/force-enterprise-sso');
       });
 
       it('navigates to the task even without a redirect url', async () => {
@@ -690,7 +690,7 @@ describe('Clerk singleton', () => {
         await sut.load({ signInUrl: '/sign-in' });
         await sut.setActive({ organization: 'org_id' });
 
-        expect(vi.mocked(sut.navigate).mock.calls[0][0]).toContain('/sign-in#/tasks/setup-enterprise-sso');
+        expect(vi.mocked(sut.navigate).mock.calls[0][0]).toContain('/sign-in#/tasks/force-enterprise-sso');
       });
 
       it('navigates to the `taskUrls` option for the task', async () => {
@@ -699,7 +699,7 @@ describe('Clerk singleton', () => {
 
         const sut = new Clerk(productionPublishableKey);
         sut.navigate = vi.fn();
-        await sut.load({ taskUrls: { 'setup-enterprise-sso': '/sso' } });
+        await sut.load({ taskUrls: { 'force-enterprise-sso': '/sso' } });
         await sut.setActive({ organization: 'org_id' });
 
         expect(sut.navigate).toHaveBeenCalledWith('/sso');

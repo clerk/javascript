@@ -2010,16 +2010,7 @@ export const ptBR: LocalizationResource = {
       actionText: 'Conectado como {{identifier}}',
     },
   },
-  taskResetPassword: {
-    formButtonPrimary: 'Resetar Senha',
-    signOut: {
-      actionLink: 'Sair',
-      actionText: 'Conectado como {{identifier}}',
-    },
-    subtitle: 'Sua conta requer uma nova senha antes de continuar',
-    title: 'Resetar senha',
-  },
-  taskSetupEnterpriseSso: {
+  taskForceEnterpriseSso: {
     connectionUnavailable: undefined,
     formButtonPrimary: undefined,
     signOut: {
@@ -2028,6 +2019,15 @@ export const ptBR: LocalizationResource = {
     },
     subtitle: undefined,
     title: undefined,
+  },
+  taskResetPassword: {
+    formButtonPrimary: 'Resetar Senha',
+    signOut: {
+      actionLink: 'Sair',
+      actionText: 'Conectado como {{identifier}}',
+    },
+    subtitle: 'Sua conta requer uma nova senha antes de continuar',
+    title: 'Resetar senha',
   },
   taskSetupMfa: {
     badge: undefined,
