@@ -4,11 +4,12 @@ import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
-import type { UserProfileMfaMethod } from './user-profile-mfa-section.types';
+import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 
 export function useUserProfileMfaSectionLeafController({
   methods,
+  onAdd,
   onRemove,
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
@@ -36,7 +37,12 @@ export function useUserProfileMfaSectionLeafController({
     sectionRef,
     pickerOpen,
     onPickerOpenChange: setPickerOpen,
-    closePicker: () => setPickerOpen(false),
+    addMethod: onAdd
+      ? (type: UserProfileMfaAddableMethod) => {
+          onAdd(type);
+          setPickerOpen(false);
+        }
+      : undefined,
     registerTrigger: removalFocus.registerTrigger,
     openRemoval: (method: UserProfileMfaMethod) => {
       if (defaultAction.isPending) {
@@ -47,8 +53,7 @@ export function useUserProfileMfaSectionLeafController({
     },
     remove,
     finalRemovalFocus: removalFocus.finalFocus,
-    isSettingDefault: defaultAction.isPending,
     defaultError: defaultAction.error,
-    setDefault,
+    setDefault: onSetDefault && !defaultAction.isPending ? setDefault : undefined,
   };
 }

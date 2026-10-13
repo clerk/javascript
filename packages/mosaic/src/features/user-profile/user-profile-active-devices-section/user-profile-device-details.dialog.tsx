@@ -11,14 +11,14 @@ export interface UserProfileDeviceDetailsDialogProps {
   controller: ConfirmController<UserProfileDevice>;
   devices: UserProfileDevice[];
   finalFocus?: DialogFocusTarget;
-  canSignOut?: boolean;
+  onSignOut?: (device: UserProfileDevice) => void;
 }
 
 export function UserProfileDeviceDetailsDialog({
   controller,
   devices,
   finalFocus,
-  canSignOut = false,
+  onSignOut,
 }: UserProfileDeviceDetailsDialogProps) {
   return (
     <Dialog.Root
@@ -41,7 +41,7 @@ export function UserProfileDeviceDetailsDialog({
           >
             <DeviceDetailsCard
               device={device}
-              onSignOut={canSignOut ? () => controller.confirm(device) : undefined}
+              onSignOut={onSignOut ? () => onSignOut(device) : undefined}
               isSigningOut={controller.isPending}
               errorMessage={controller.errorMessage}
             />
