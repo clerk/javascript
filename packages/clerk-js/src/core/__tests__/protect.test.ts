@@ -81,7 +81,7 @@ describe('Protect.load', () => {
     expect(localStorage.getItem('__clerk_protect_pid')).toBeNull();
   });
 
-  it('substitutes the placeholders it recognises and leaves the rest verbatim', async () => {
+  it('substitutes the placeholders it recognizes and leaves the rest verbatim', async () => {
     const protect = new Protect();
     protect.load(
       environment([

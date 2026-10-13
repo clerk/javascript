@@ -60,7 +60,7 @@ const Harness = ({ items, asPortal, ariaLabel, triggerLabel = 'Open menu' }: Har
 );
 
 describe('Menu', () => {
-  describe('Regression — existing click behaviour', () => {
+  describe('Regression — existing click behavior', () => {
     it('opens the menu when the trigger is clicked', async () => {
       const { wrapper } = await createFixtures();
       const { getByRole, userEvent, queryByRole } = render(

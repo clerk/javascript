@@ -44,7 +44,7 @@ function preventDefaultUnlessTab(event: React.KeyboardEvent): void {
 }
 
 /**
- * A button with the disabled behaviour a native `<button>` cannot express: staying
+ * A button with the disabled behavior a native `<button>` cannot express: staying
  * focusable while inert, and behaving like a button on elements that aren't one.
  *
  * @example

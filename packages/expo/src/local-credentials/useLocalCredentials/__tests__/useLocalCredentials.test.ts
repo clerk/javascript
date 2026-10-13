@@ -97,7 +97,7 @@ describe('useLocalCredentials', () => {
     expect(mocks.store.get(passwordKey)).toBe('hunter2');
   });
 
-  test('does not report credentials when the biometric prompt is cancelled', async () => {
+  test('does not report credentials when the biometric prompt is canceled', async () => {
     mocks.rejectProtectedWrites = true;
     const { result } = renderHook(() => useLocalCredentials());
 
@@ -115,7 +115,7 @@ describe('useLocalCredentials', () => {
     expect(remounted.result.current.hasCredentials).toBe(false);
   });
 
-  test('keeps the existing credentials when a password update is cancelled', async () => {
+  test('keeps the existing credentials when a password update is canceled', async () => {
     mocks.store.set(identifierKey, 'user@example.com');
     mocks.store.set(passwordKey, 'hunter2');
     mocks.rejectProtectedWrites = true;

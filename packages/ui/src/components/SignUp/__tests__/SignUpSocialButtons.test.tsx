@@ -80,7 +80,7 @@ describe('SignUpSocialButtons', () => {
     });
     props.setProps({ oauthFlow: 'popup' } as any);
     registerOAuthTransport(fixtures.clerk);
-    fixtures.signUp.authenticateWithRedirect.mockRejectedValue(new Error('cancelled'));
+    fixtures.signUp.authenticateWithRedirect.mockRejectedValue(new Error('canceled'));
 
     const { userEvent } = render(
       <CardStateProvider>

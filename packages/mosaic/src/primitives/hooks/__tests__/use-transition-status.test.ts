@@ -119,7 +119,7 @@ describe('useTransitionStatus', () => {
     expect(result.current.mounted).toBe(true);
     expect(result.current.transitionStatus).toBe('ending');
 
-    // The rAF from opening should be cancelled, not interfere
+    // The rAF from opening should be canceled, not interfere
     act(() => flushRaf());
     expect(result.current.transitionStatus).toBe('ending');
   });

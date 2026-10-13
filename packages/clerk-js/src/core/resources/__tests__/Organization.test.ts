@@ -224,7 +224,7 @@ describe('Organization', () => {
 
       // @ts-ignore
       const callBody = BaseResource._fetch.mock.calls[0][0].body;
-      // Backwards-compatible: an omitted (or empty) `domains` is not sent.
+      // Backward-compatible: an omitted (or empty) `domains` is not sent.
       expect('domains' in callBody).toBe(false);
     });
 

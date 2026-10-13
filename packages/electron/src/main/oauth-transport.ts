@@ -150,7 +150,7 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
   });
 
   return () => {
-    disposePendingOAuthFlow(new Error('Clerk: OAuth flow was cancelled.'));
+    disposePendingOAuthFlow(new Error('Clerk: OAuth flow was canceled.'));
     app.removeListener('open-url', openUrlListener);
     app.removeListener('second-instance', secondInstanceListener);
     ipcMain.removeHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);

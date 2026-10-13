@@ -144,8 +144,8 @@ export type OneTapSuccessResponse = {
 /**
  * Response when the user cancels the sign-in flow.
  */
-export type CancelledResponse = {
-  type: 'cancelled';
+export type CanceledResponse = {
+  type: 'canceled';
   data: null;
 };
 
@@ -160,12 +160,12 @@ export type NoSavedCredentialFound = {
 /**
  * Union type for all possible One Tap responses.
  */
-export type OneTapResponse = OneTapSuccessResponse | CancelledResponse | NoSavedCredentialFound;
+export type OneTapResponse = OneTapSuccessResponse | CanceledResponse | NoSavedCredentialFound;
 
 /**
  * Error codes that can be thrown by the Google Sign-In module.
  *
- * - `SIGN_IN_CANCELLED`: User cancelled the sign-in flow
+ * - `SIGN_IN_CANCELLED`: User canceled the sign-in flow
  * - `NO_SAVED_CREDENTIAL_FOUND`: No saved credentials available for One Tap
  * - `NOT_CONFIGURED`: Module not configured before use
  * - `GOOGLE_SIGN_IN_ERROR`: Generic Google Sign-In error, including Android provider failures such as an unregistered OAuth client

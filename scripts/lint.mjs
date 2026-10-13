@@ -9,11 +9,12 @@ $.env = {
 $.stdio = 'inherit';
 $.verbose = !!process.env.VERBOSE;
 
-const [github, integration, scripts, dashboardLinks] = await Promise.allSettled([
+const [github, integration, scripts, dashboardLinks, americanSpelling] = await Promise.allSettled([
   $`echo "SKIPPING: pnpm eslint .github/workflows"`,
   $`pnpm eslint integration`,
   $`pnpm eslint scripts`,
   $`pnpm lint:dashboard-links`,
+  $`pnpm lint:american-spelling`,
 ]);
 
 let packages;
@@ -39,6 +40,7 @@ logLintResult(github.status, 'GitHub Actions', 'pnpm eslint .github/workflows');
 logLintResult(integration.status, 'Integration directory', 'pnpm eslint integration');
 logLintResult(scripts.status, 'Scripts directory', 'pnpm eslint scripts');
 logLintResult(dashboardLinks.status, 'Dashboard links', 'pnpm lint:dashboard-links');
+logLintResult(americanSpelling.status, 'American spelling', 'pnpm lint:american-spelling');
 
 if (packages?.exitCode) {
   console.log('');
@@ -46,6 +48,11 @@ if (packages?.exitCode) {
   console.log(`Run '${chalk.bold('pnpm turbo lint')}' to reproduce the error`);
 }
 
-if (integration.status === 'rejected' || dashboardLinks.status === 'rejected' || packages?.exitCode) {
+if (
+  integration.status === 'rejected' ||
+  dashboardLinks.status === 'rejected' ||
+  americanSpelling.status === 'rejected' ||
+  packages?.exitCode
+) {
   process.exit(1);
 }

@@ -86,7 +86,7 @@ get wrong:
 produced it.** No "not a `size`, because…", no rejected alternatives, no history
 of what the prop used to be. A reader is there to learn what the thing does, and
 every sentence of rationale is a sentence they have to skim past to find it.
-State the behaviour plainly and briefly, then stop.
+State the behavior plainly and briefly, then stop.
 
 ```mdx
 <!-- no -->

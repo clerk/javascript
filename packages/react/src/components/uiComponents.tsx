@@ -291,7 +291,7 @@ const _UserButton = withClerk(
             hideRootHtmlElement={!!props.__experimental_asProvider}
             rootProps={rendererRootProps}
           >
-            {/*This mimics the previous behaviour before asProvider existed*/}
+            {/*This mimics the previous behavior before asProvider existed*/}
             {props.__experimental_asProvider ? sanitizedChildren : null}
             <CustomPortalsRenderer {...portalProps} />
           </ClerkHostRenderer>
@@ -468,7 +468,7 @@ const _OrganizationSwitcher = withClerk(
               {...passableProps}
               hideRootHtmlElement={!!props.__experimental_asProvider}
             >
-              {/*This mimics the previous behaviour before asProvider existed*/}
+              {/*This mimics the previous behavior before asProvider existed*/}
               {props.__experimental_asProvider ? sanitizedChildren : null}
               <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
             </ClerkHostRenderer>

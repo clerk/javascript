@@ -129,7 +129,7 @@ describe('Profile', () => {
     expect(screen.getByTestId('security-badge')).toHaveAttribute('data-color', 'warning');
   });
 
-  it('is a labelled navigation of tabs beside the selected page', () => {
+  it('is a labeled navigation of tabs beside the selected page', () => {
     renderSurface();
 
     const title = screen.getByRole('heading', { level: 2, name: 'User profile' });

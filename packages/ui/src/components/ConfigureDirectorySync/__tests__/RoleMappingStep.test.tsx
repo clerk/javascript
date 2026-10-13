@@ -228,7 +228,7 @@ describe('RoleMappingStep', () => {
     expect(dir.replaceGroupRoleMappings).not.toHaveBeenCalled();
   });
 
-  it('leaves role sync off when enabling is cancelled', async () => {
+  it('leaves role sync off when enabling is canceled', async () => {
     const { userEvent } = await renderRolesStep(directory({ groupRoleMappingEnabled: false }));
     await screen.findByTestId('role-mapping-row-dirgrp_leads');
 
@@ -287,7 +287,7 @@ describe('RoleMappingStep', () => {
     );
   });
 
-  it('leaves role sync on when disabling is cancelled', async () => {
+  it('leaves role sync on when disabling is canceled', async () => {
     const { userEvent } = await renderRolesStep(directory({ groupRoleMappingEnabled: true }));
     await screen.findByTestId('role-mapping-row-dirgrp_leads');
 

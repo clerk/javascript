@@ -124,7 +124,7 @@ export function useSnapPoints(opts: UseSnapPointsOptions): SnapController | null
       const speed = Math.abs(v);
       const down = v === 0 ? dist > 0 : v > 0;
 
-      // Fast flick: skip straight to the neighbouring snap point (or dismiss).
+      // Fast flick: skip straight to the neighboring snap point (or dismiss).
       if (speed > SNAP_SKIP_VELOCITY) {
         if (down) {
           if (activeIndex === 0) {

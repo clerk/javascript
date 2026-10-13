@@ -130,7 +130,7 @@ export async function executeGoogleAuthenticationFlow(
       nonce,
     });
 
-    // User cancelled
+    // User canceled
     if (!isSuccessResponse(response)) {
       return {
         createdSessionId: null,

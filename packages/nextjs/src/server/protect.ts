@@ -92,7 +92,7 @@ export function createProtect(opts: {
   /**
    * middleware and pages throw a notFound error if signed out
    * but the middleware needs to throw an error it can catch
-   * use this callback to customise the behavior
+   * use this callback to customize the behavior
    */
   notFound: () => never;
   /**
@@ -106,7 +106,7 @@ export function createProtect(opts: {
   /**
    * protect() in middleware redirects to signInUrl if signed out
    * protect() in pages throws a notFound error if signed out
-   * use this callback to customise the behavior
+   * use this callback to customize the behavior
    */
   redirectToSignIn: RedirectFun<unknown>;
 }): AuthProtect {

@@ -23,7 +23,7 @@ type SignInFactorTwoEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShow
   onFactorPrepare: () => void;
 };
 
-// Retained for backwards compatibility.
+// Retained for backward compatibility.
 const isNewDevice = (resource: SignInResource) => resource.clientTrustState === 'new';
 
 export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCardProps) => {

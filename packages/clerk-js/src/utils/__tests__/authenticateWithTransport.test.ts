@@ -232,7 +232,7 @@ describe('_authenticateWithTransport', () => {
     const clerk = makeClerk();
     const transport = {
       getRedirectUrl: vi.fn().mockResolvedValue('myapp://sso-callback'),
-      open: vi.fn().mockRejectedValue(new Error('cancelled')),
+      open: vi.fn().mockRejectedValue(new Error('canceled')),
     };
     const resource = { reload: vi.fn() } as any;
     const authenticateMethod = vi.fn(async (_params, navigate) => navigate('https://provider.example/auth'));
@@ -246,7 +246,7 @@ describe('_authenticateWithTransport', () => {
         params: {} as any,
         callbackParams: {},
       }),
-    ).rejects.toThrow('cancelled');
+    ).rejects.toThrow('canceled');
 
     expect(clerk.__internal_handleResourceCallback).not.toHaveBeenCalled();
   });

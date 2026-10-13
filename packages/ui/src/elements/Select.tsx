@@ -326,7 +326,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
   const { isOpen, floating, styles, nodeId, context } = popoverCtx;
   const containerRef = React.useRef<HTMLDivElement>(null);
   const effectiveListboxId = id ?? generatedListboxId;
-  const effectiveAriaLabelledBy = ariaLabelledBy ?? (ariaLabel ? undefined : triggerId);
+  const effectiveAriaLabeledBy = ariaLabelledBy ?? (ariaLabel ? undefined : triggerId);
   const optionId = (index: number) => `${effectiveListboxId}-option-${index}`;
 
   React.useEffect(() => {
@@ -421,7 +421,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
           direction='col'
           role='listbox'
           aria-label={ariaLabel}
-          aria-labelledby={effectiveAriaLabelledBy}
+          aria-labelledby={effectiveAriaLabeledBy}
           aria-activedescendant={comparator ? undefined : activeDescendant}
           tabIndex={comparator ? undefined : 0}
           sx={[

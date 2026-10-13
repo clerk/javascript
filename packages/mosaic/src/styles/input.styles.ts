@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, durationVars, easingVars } from '../tokens.stylex';
 
-// Focus is marked with a border colour change and a soft box-shadow rather than the
+// Focus is marked with a border color change and a soft box-shadow rather than the
 // system focus ring, so a text-entry field reads as a field rather than a control.
 const hoverBorderColor = 'light-dark(#bebebe, #525252)';
 const focusShadow = '0 0 0 3px light-dark(rgb(23 23 23 / 8%), rgb(255 255 255 / 8%))';

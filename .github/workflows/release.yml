@@ -261,6 +261,7 @@ jobs:
 
       - name: Generate notification payload
         id: notification
+        # american-spelling-ignore-next-line: cancelled -- GitHub Actions status function
         if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' }}
         env:
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
@@ -275,6 +276,7 @@ jobs:
 
       - name: Send commit log to Slack
         id: slack
+        # american-spelling-ignore-next-line: cancelled -- GitHub Actions status function
         if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' && steps.notification.outcome == 'success' }}
         uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:

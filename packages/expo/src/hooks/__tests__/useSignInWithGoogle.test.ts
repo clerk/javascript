@@ -204,7 +204,7 @@ describe('useSignInWithGoogle', () => {
 
     test('should handle user cancellation gracefully', async () => {
       mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({
-        type: 'cancelled',
+        type: 'canceled',
         data: null,
       });
       mocks.isSuccessResponse.mockReturnValue(false);

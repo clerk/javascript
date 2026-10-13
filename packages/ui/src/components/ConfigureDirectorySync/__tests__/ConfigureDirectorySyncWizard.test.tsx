@@ -140,7 +140,7 @@ describe('ConfigureDirectorySyncWizard configure step', () => {
     expect(screen.getByText('Not configured')).toBeInTheDocument();
   });
 
-  it('sends the uploaded key and admin email, and does not keep the key afterwards', async () => {
+  it('sends the uploaded key and admin email, and does not keep the key afterward', async () => {
     const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
     fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
     const existing = googleDirectory();

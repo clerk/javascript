@@ -16,9 +16,9 @@ describe('Mosaic focus outline', () => {
     expect(colorVars).toMatchObject({ '--cl-color-ring': 'var(--cl-color-ring)' });
   });
 
-  // The colour has ONE public name. A `--cl-focus-outline-color` alias would let a consumer
+  // The color has ONE public name. A `--cl-focus-outline-color` alias would let a consumer
   // override one and not the other, and the ring would then depend on which they picked.
-  it('keeps the ring colour out of the focus token group', () => {
+  it('keeps the ring color out of the focus token group', () => {
     expect(Object.keys(focusVars)).not.toContain('--cl-focus-outline-color');
   });
 

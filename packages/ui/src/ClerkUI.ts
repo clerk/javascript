@@ -85,7 +85,7 @@ export class ClerkUI implements ClerkUIInstance {
    * Ensures the UI component renderer is mounted and ready.
    *
    * Returns a promise that resolves with {@link ComponentControls} once the
-   * renderer is fully initialised. Subsequent calls return the same promise.
+   * renderer is fully initialized. Subsequent calls return the same promise.
    *
    * @param opts - Optional hints for the renderer.
    * @param opts.preloadHint - An optional component name to preload assets for (e.g. `"SignIn"`).

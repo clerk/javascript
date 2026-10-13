@@ -112,7 +112,7 @@ export type UserButtonMode = 'combined' | 'organization' | 'user';
 
 /**
  * How the header carries its actions: `inline` trails the lead with them, the gear as an icon;
- * `stacked` runs them under it as full-width labelled buttons.
+ * `stacked` runs them under it as full-width labeled buttons.
  */
 export type UserButtonHeaderLayout = 'inline' | 'stacked';
 

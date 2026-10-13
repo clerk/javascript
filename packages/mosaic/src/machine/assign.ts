@@ -2,7 +2,7 @@ import type { AssignAction, EventObject } from './types';
 import { ASSIGN } from './types';
 
 /**
- * Context-update action creator. The returned object is recognised by the
+ * Context-update action creator. The returned object is recognized by the
  * runtime, which shallow-merges the returned partial into context.
  *
  * ```ts

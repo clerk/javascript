@@ -151,7 +151,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
       return;
     }
 
-    let cancelled = false;
+    let canceled = false;
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const scheduleNext = () => {
@@ -165,14 +165,14 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
         logger.warnOnce(`Clerk: failed to attempt organization domain ownership verification: ${error}`);
         return undefined;
       });
-      if (cancelled) {
+      if (canceled) {
         return;
       }
 
       // Refetch the domains list after every attempt so the UI reflects the
       // latest ownership status
       await revalidate();
-      if (cancelled) {
+      if (canceled) {
         return;
       }
 
@@ -180,7 +180,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
       if (verifiedDomains.length) {
         await onOwnershipVerifiedRef.current?.(verifiedDomains);
       }
-      if (cancelled) {
+      if (canceled) {
         return;
       }
 
@@ -197,7 +197,7 @@ function useOrganizationDomains(params: UseOrganizationDomainsParams = {}): UseO
     scheduleNext();
 
     return () => {
-      cancelled = true;
+      canceled = true;
       clearTimeout(timeoutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

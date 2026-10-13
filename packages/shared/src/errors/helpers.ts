@@ -92,11 +92,16 @@ export function isKnownError(error: any): error is ClerkAPIResponseError | Clerk
 }
 
 /**
- * Checks if the provided error is a Clerk runtime error indicating a reverification was cancelled.
+ * Checks if the provided error is a Clerk runtime error indicating a reverification was canceled.
  */
-export function isReverificationCancelledError(err: any) {
+export function isReverificationCanceledError(err: any) {
   return isClerkRuntimeError(err) && err.code === 'reverification_cancelled';
 }
+
+/**
+ * @deprecated Use `isReverificationCanceledError` instead. This alias will be removed in a future major version.
+ */
+export const isReverificationCancelledError = isReverificationCanceledError;
 
 /**
  * Checks if the provided error is a Metamask error.

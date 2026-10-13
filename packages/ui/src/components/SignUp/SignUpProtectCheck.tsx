@@ -62,8 +62,8 @@ function SignUpProtectCheckInternal({
     // `handleComplete`) as well as routing to the next missing-field / verification / chained-
     // challenge step, so both the normal success and the `protect_check_already_resolved` reload
     // land correctly.
-    onResolved: async (updatedSignUp, isCancelled) => {
-      if (isCancelled()) {
+    onResolved: async (updatedSignUp, isCanceled) => {
+      if (isCanceled()) {
         return;
       }
       await completeSignUpFlow({

@@ -57,7 +57,7 @@ If you need to ship something that is not yet stable:
 
 All three are described in `docs/CONTRIBUTING.md` (the "Experimental and internal APIs" section),
 which states the SemVer carve-out explicitly for the `/experimental` subpath; the `__internal_` /
-`__experimental_` prefixes are conventions signalling the same no-guarantee expectation. All are
+`__experimental_` prefixes are conventions signaling the same no-guarantee expectation. All are
 exempt from the breaking-change rules above.
 
 ## What CI enforces

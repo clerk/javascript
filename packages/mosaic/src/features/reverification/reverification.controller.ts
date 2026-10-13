@@ -424,7 +424,7 @@ function viewStep(value: string, method: ReverificationMethod | null): Reverific
  * retried, so it keeps the last factor pending and has no `onCancel`. The factor machine runs
  * while the model is active and resets when the model returns to inactive.
  *
- * When the run ends after reverification was shown (completed, failed or cancelled), the model is
+ * When the run ends after reverification was shown (completed, failed or canceled), the model is
  * 'settled' and the controller keeps returning the last frame, pending and without `onCancel`,
  * until the next run starts or `reset` is called. Hosts decide when to stop rendering it.
  */

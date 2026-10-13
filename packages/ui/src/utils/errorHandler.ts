@@ -76,7 +76,7 @@ export const handleError: HandleError = (err, fieldStates, setGlobalError) => {
   }
 
   if (isClerkRuntimeError(err) && err.code === 'reverification_cancelled') {
-    // Don't log or display an error for cancelled reverification, the user simply closed the modal.
+    // Don't log or display an error for canceled reverification, the user simply closed the modal.
     return;
   }
 

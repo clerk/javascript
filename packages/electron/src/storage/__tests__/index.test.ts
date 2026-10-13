@@ -373,7 +373,7 @@ describe('setItem', () => {
   });
 
   it('resolves the cipher lazily and retries when it was initially unavailable (e.g. before app ready)', async () => {
-    // Unavailable on the first probe (pre-`ready`), available afterwards.
+    // Unavailable on the first probe (pre-`ready`), available afterward.
     ss.isEncryptionAvailable = vi.fn().mockReturnValueOnce(false).mockReturnValue(true);
     ss.encryptString = vi.fn((value: string) => Buffer.from(`enc(${value})`));
     ss.decryptString = vi.fn();

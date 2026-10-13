@@ -878,7 +878,7 @@ export function NativeClientSync({
         const lastRecovery = lastUnauthenticatedRecoveryRef.current;
         if (lastRecovery !== undefined) {
           const elapsed = Date.now() - lastRecovery;
-          // A backwards clock jump makes elapsed negative; treat it as expired instead of waiting out the gap.
+          // A backward clock jump makes elapsed negative; treat it as expired instead of waiting out the gap.
           if (elapsed >= 0 && elapsed < unauthenticatedRecoveryCooldownMs) {
             return await originalHandleUnauthenticated(options);
           }

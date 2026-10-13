@@ -18,8 +18,8 @@ const ProtectCheckModalCard = withCardStateProvider(
       getResource: () => resource,
       reload: () => resource.reload(),
       submitProtectCheck: params => resource.submitProtectCheck(params),
-      onResolved: (updated, isCancelled) => {
-        if (!isCancelled() && !updated.protectCheck) {
+      onResolved: (updated, isCanceled) => {
+        if (!isCanceled() && !updated.protectCheck) {
           onResolved();
         }
         return Promise.resolve();

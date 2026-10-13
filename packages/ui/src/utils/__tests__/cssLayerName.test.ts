@@ -25,7 +25,7 @@ const rangeEdges = [...new Set(NON_ASCII_IDENT_RANGES.flatMap(([lo, hi]) => [lo,
   cp,
   label: hex(cp),
 }));
-const rangeNeighbours = [...new Set(NON_ASCII_IDENT_RANGES.flatMap(([lo, hi]) => [lo - 1, hi + 1]))]
+const rangeNeighbors = [...new Set(NON_ASCII_IDENT_RANGES.flatMap(([lo, hi]) => [lo - 1, hi + 1]))]
   .filter(cp => cp <= 0x10ffff && !inNonAsciiIdentRanges(cp))
   .map(cp => ({ cp, label: hex(cp) }));
 
@@ -66,7 +66,7 @@ describe('cssLayerName', () => {
     expect(isValidCssLayerName(`a${char}`)).toBe(true);
   });
 
-  it.each(rangeNeighbours)('rejects excluded code point $label as start and continuation', ({ cp }) => {
+  it.each(rangeNeighbors)('rejects excluded code point $label as start and continuation', ({ cp }) => {
     const char = String.fromCodePoint(cp);
     expect(isValidCssLayerName(char)).toBe(false);
     expect(isValidCssLayerName(`a${char}`)).toBe(false);

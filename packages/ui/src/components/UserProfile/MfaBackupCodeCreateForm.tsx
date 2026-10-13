@@ -1,4 +1,4 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
+import { isReverificationCanceledError } from '@clerk/shared/error';
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { BackupCodeResource } from '@clerk/shared/types';
 import React from 'react';
@@ -30,7 +30,7 @@ export const MfaBackupCodeCreateForm = withCardStateProvider((props: MfaBackupCo
     void createBackupCode()
       .then(backupCode => setBackupCode(backupCode))
       .catch(err => {
-        if (isReverificationCancelledError(err)) {
+        if (isReverificationCanceledError(err)) {
           return onReset();
         }
 

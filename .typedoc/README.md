@@ -75,9 +75,9 @@ The `.typedoc/docs` folder is inside the `.gitignore` on purpose. Its contents w
 
 ### Adding a package to the Typedoc output
 
-Make sure that the package directory is listed inside [`typedoc.config.mjs`](../typedoc.config.mjs) `config.entryPoints`. Afterwards Typedoc will inspect the `exports` map and `main` key inside `package.json` to determine the entrypoints for the package.
+Make sure that the package directory is listed inside [`typedoc.config.mjs`](../typedoc.config.mjs) `config.entryPoints`. Afterward Typedoc will inspect the `exports` map and `main` key inside `package.json` to determine the entrypoints for the package.
 
-If for some reason this doesn't work, spend time investigating it. If afterwards it still doesn't work, you can add a `typedoc.json` file to the package and define the `entryPoints` there.
+If for some reason this doesn't work, spend time investigating it. If afterward it still doesn't work, you can add a `typedoc.json` file to the package and define the `entryPoints` there.
 
 > [!IMPORTANT]
 > If you're generating documentation for files/APIs that are not exported/accessible to a user, it's an error. Unless you want to limit the entry points (e.g. a package exports internal functionality) or modify things like the `compilerOptions`, you probably should not define a custom `typedoc.json` file inside a package.

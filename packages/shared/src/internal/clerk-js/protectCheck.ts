@@ -73,7 +73,7 @@ function resolveLoadTimeoutMs(configured: number | undefined): number {
  * host-side wall over execution aborts legitimate challenges and reports them as timeouts, and
  * since a re-run restarts the work, retrying cannot win on any connection slow enough to trip it.
  *
- * The abort signal is raced too. A stalled import cannot itself be cancelled, but without this the
+ * The abort signal is raced too. A stalled import cannot itself be canceled, but without this the
  * caller's abort would not settle anything: an unmounted component would keep this promise, its
  * closures and its timer alive for the whole load bound, and then report a load failure for what
  * was really a cancellation.

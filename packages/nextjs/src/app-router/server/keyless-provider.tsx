@@ -77,7 +77,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
       const keylessService = await import('../../server/keyless-node.js').then(mod => mod.keyless());
 
       /**
-       * Notifying the dashboard should run once. We are controlling this behaviour by caching the result of the request.
+       * Notifying the dashboard should run once. We are controlling this behavior by caching the result of the request.
        * If the request fails, it will be considered stale after 10 minutes, otherwise it is cached for 24 hours.
        */
       await clerkDevelopmentCache?.run(() => keylessService.completeOnboarding(), {

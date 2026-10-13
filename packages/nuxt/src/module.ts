@@ -77,7 +77,7 @@ export default defineNuxtModule<ModuleOptions>({
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
           proxyUrl: options.proxyUrl,
           // Deprecated: use NUXT_CLERK_API_URL and NUXT_CLERK_API_VERSION instead.
-          // Kept for backwards compatibility with NUXT_PUBLIC_CLERK_API_URL / NUXT_PUBLIC_CLERK_API_VERSION.
+          // Kept for backward compatibility with NUXT_PUBLIC_CLERK_API_URL / NUXT_PUBLIC_CLERK_API_VERSION.
           apiUrl: undefined,
           apiVersion: undefined,
         },

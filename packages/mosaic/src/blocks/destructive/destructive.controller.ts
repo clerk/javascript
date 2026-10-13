@@ -1,4 +1,4 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
+import { isReverificationCanceledError } from '@clerk/shared/error';
 import { useState } from 'react';
 
 import type { ReverificationController } from '../../features/reverification';
@@ -61,7 +61,7 @@ export function useDestructiveController({
           await onDelete();
           setDestructiveState({ status: 'closed' });
         } catch (error: unknown) {
-          if (isReverificationCancelledError(error)) {
+          if (isReverificationCanceledError(error)) {
             setDestructiveState({ status: 'closed' });
             return;
           }

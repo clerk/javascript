@@ -48,7 +48,7 @@ export const styles = stylex.create({
     // the popup. Falls back to `center` for the first frame, which is still `opacity: 0`.
     transformOrigin: 'var(--cl-anchor-origin, center)',
     // The exit is shorter than the entrance: an arrival earns a moment to settle, a
-    // dismissal is an acknowledgement and wants to be out of the way.
+    // dismissal is an acknowledgment and wants to be out of the way.
     //
     // On the way in the fade finishes first (positional, so `fast` is opacity and `base`
     // is transform). It lands opaque just as the scale reaches full size, leaving the
@@ -73,7 +73,7 @@ export const styles = stylex.create({
       default: 'opacity, transform',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
-    // Positional against `transitionProperty`; the entrance curve run backwards would
+    // Positional against `transitionProperty`; the entrance curve run backward would
     // stall the exit and turn the overshoot into a wobble.
     transitionTimingFunction: {
       default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,

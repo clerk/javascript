@@ -143,7 +143,7 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
   /**
    * Delayed transitions — each key is a delay in milliseconds. The matching
    * transition fires automatically after the delay unless the state is exited
-   * first (by an explicit event, `always`, or `invoke`). Timers are cancelled
+   * first (by an explicit event, `always`, or `invoke`). Timers are canceled
    * on exit and on `stop()`, so they never outlive the state or the actor.
    *
    * ```ts

@@ -694,7 +694,7 @@ describe('Mosaic Field', () => {
     expect(screen.queryByText('Enter a valid email.')).toBeNull();
   });
 
-  it('renders a span label that focuses a control which cannot be natively labelled', async () => {
+  it('renders a span label that focuses a control which cannot be natively labeled', async () => {
     const user = userEvent.setup();
     const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(

@@ -96,13 +96,15 @@ If you want to run the `dev` script of an individual package, navigate to the fo
 
 The repo ships configuration for AI coding agents, picked up automatically from the checkout with no setup:
 
-- [`AGENTS.md`](../AGENTS.md) holds the hard rules (package manager, changesets, commit conventions, backwards compatibility) and is read by most agents.
+- [`AGENTS.md`](../AGENTS.md) holds the hard rules (package manager, changesets, commit conventions, backward compatibility) and is read by most agents.
 - Claude Code also loads the `clerk-monorepo` skill from [`.claude/skills/`](../.claude/skills/README.md). It activates on its own for monorepo questions, or explicitly via `/clerk-monorepo`. The README in that directory explains how skills work and how to maintain them.
 - Cursor reads the rules in `.cursor/rules/`.
 
 ### Documenting your changes
 
 Updating documentation is an important part of the contribution process. If you are changing existing behavior or adding a new feature, make sure [Clerk's documentation](https://github.com/clerk/clerk-docs) is also updated.
+
+Write in American English (`color`, `canceled`, `toward`), in code as well as prose. `pnpm lint:american-spelling` flags British spellings in CI, and `pnpm lint:american-spelling --fix` rewrites them. To keep a direct quotation or a name you don't own, put an `american-spelling-ignore-next-line` comment on the line above it that lists the words to allow after a colon, with an optional `--` reason.
 
 To improve the in-editor experience when using Clerk's SDKs, we do our best to add [JSDoc comments](https://jsdoc.app/about-getting-started.html) to our package's public exports. The JSDoc comments should not attempt to duplicate any existing type information, but should provide meaningful additional context or references. If you are adding a new export, make sure it has a JSDoc comment. If you are updating an existing export, make sure any existing comments are updated appropriately.
 
@@ -190,7 +192,7 @@ As explained in [documenting your changes](#documenting-your-changes), we use JS
 
 For a comprehensive guide on **authoring** JSDoc/Typedoc comments, see [this guide](https://www.notion.so/clerkdev/Typedoc-JSDoc-1df2b9ab44fe808a8cf2c9cca324ea89?source=copy_link).
 
-To review your changes locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterwards, you can inspect the MDX files inside `.typedoc/docs`. But if you want to preview how the Typedoc output will look in Clerk Docs, there's a few things you need to do first:
+To review your changes locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterward, you can inspect the MDX files inside `.typedoc/docs`. But if you want to preview how the Typedoc output will look in Clerk Docs, there's a few things you need to do first:
 
 Create a PR that includes your changes to any Typedoc comments. Once the PR has been merged and a release is published, the release workflow automatically opens a PR in Clerk's docs repository with the Typedoc changes.
 

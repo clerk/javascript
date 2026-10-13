@@ -32,7 +32,7 @@ export const styles = stylex.create({
     height: space['14'],
     width: '100%',
   },
-  // The success cell restates the focus shadow so a verified code keeps its colour
+  // The success cell restates the focus shadow so a verified code keeps its color
   // while focused, mirroring how the shared surface handles `aria-invalid`.
   success: {
     borderColor: {

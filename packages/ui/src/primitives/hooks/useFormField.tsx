@@ -51,7 +51,7 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
 
   // Track whether any feedback message has been rendered.
   // We use this to append its id the `aria-describedby` of the `input`.
-  // Use legacy pattern for errors (backwards compatible), new pattern for other types
+  // Use legacy pattern for errors (backward compatible), new pattern for other types
   const feedbackMessageId = debounced.feedback
     ? debounced.feedbackType === 'error'
       ? `error-${propsId}`

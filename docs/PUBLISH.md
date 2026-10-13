@@ -50,7 +50,7 @@ Notes:
 
 If a PR got merged into `main` that should also be released in older versions (e.g. critical security fixes), you'll need to backport said PR. You can do this by using the [`backport` script](https://github.com/clerk/javascript/blob/main/scripts/backport.mjs) inside `scripts`.
 
-Duplicate the `.env.example` file inside `scripts` and rename it to `.env`. Fill out the `GITHUB_ACCESS_TOKEN` variable. Afterwards, you'll be able to run the CLI like so:
+Duplicate the `.env.example` file inside `scripts` and rename it to `.env`. Fill out the `GITHUB_ACCESS_TOKEN` variable. Afterward, you'll be able to run the CLI like so:
 
 ```shell
 node backport.mjs release/v4 1234

@@ -70,7 +70,7 @@ export const SingleSessionActions = (props: SingleSessionActionsProps) => {
         let itemDescriptors;
 
         // We are using different element descriptors for default menu items vs custom items
-        // to maintain backwards compatibility and avoid breaking existing descriptor usage.
+        // to maintain backward compatibility and avoid breaking existing descriptor usage.
         // This check ensures that default items use their specific descriptors, while custom
         // items use the generic custom item descriptors.
         if (isDefaultItem) {
@@ -222,7 +222,7 @@ export const MultiSessionActions = (props: MultiSessionActionsProps) => {
             let itemDescriptors;
 
             // We are using different element descriptors for default menu items vs custom items
-            // to maintain backwards compatibility and avoid breaking existing descriptor usage.
+            // to maintain backward compatibility and avoid breaking existing descriptor usage.
             // This check ensures that default items use their specific descriptors, while custom
             // items use the generic custom item descriptors.
             if (isDefaultItem) {

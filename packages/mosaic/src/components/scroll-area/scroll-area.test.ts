@@ -11,7 +11,7 @@ describe('Mosaic scroll area styles', () => {
   });
 
   // The atoms carry the gutter, so the two have to be distinguishable — an accidental
-  // collapse would silently give every scroll surface the same overflow behaviour.
+  // collapse would silently give every scroll surface the same overflow behavior.
   it('varies the gutter atom by argument', () => {
     expect(scrollAreaViewport('stable')).not.toEqual(scrollAreaViewport('auto'));
   });
@@ -60,7 +60,7 @@ describe('Mosaic scroll area styles', () => {
 
   // The counterpart to the assertion above: `--_cl-` is the marker for plumbing, so it must not
   // drift into the themable `--cl-` namespace the way a rename easily could.
-  it('keeps the thumb colour carrier out of the public token namespace', () => {
+  it('keeps the thumb color carrier out of the public token namespace', () => {
     expect(scrollbarThumbVars).toMatchObject({
       '--_cl-scrollbar-thumb-color': 'var(--_cl-scrollbar-thumb-color)',
     });

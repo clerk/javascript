@@ -3,7 +3,7 @@
  *
  * Pure storage: no timers, no BroadcastChannel, and no JWT knowledge. The cache
  * layers proactive-refresh scheduling and cross-tab synchronization on top.
- * Synchronous by design — the in-memory path never needs to be async — modelled
+ * Synchronous by design — the in-memory path never needs to be async — modeled
  * on auth0-spa-js's synchronous cache interface.
  */
 export interface TokenStore<V> {

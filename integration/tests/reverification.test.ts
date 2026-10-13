@@ -128,7 +128,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       await expect(u.page.locator('.cl-profileSectionItem__phoneNumbers')).toContainText(formatedPhoneNumber);
     });
 
-    test('reverification prompt can be cancelled when adding email', async ({ page, context }) => {
+    test('reverification prompt can be canceled when adding email', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();

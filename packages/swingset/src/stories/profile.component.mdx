@@ -70,7 +70,7 @@ reaches the page title instead.
 | ---------------------- | ----------------------- | -------------------------- |
 | `Profile.Root`         | `div` (the container)   | `cl-profile`               |
 | —                      | `span` (query sentinel) | `cl-profile-sentinel`      |
-| `Profile.Nav`          | `nav` (labelled)        | `cl-profile-nav`           |
+| `Profile.Nav`          | `nav` (labeled)         | `cl-profile-nav`           |
 | —                      | tablist                 | `cl-profile-nav-list`      |
 | `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`      |
 | `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`       |
@@ -105,7 +105,7 @@ tall as its content, holding the tablist. A choice closes either. The root
 reads the layout off a sentinel it renders: `1px` wide, `2px` once the query matches, `3px` on a
 phone's viewport as well.
 
-## Customising the marks
+## Customizing the marks
 
 The selected and hover fills are plain backgrounds on `.cl-profile-nav-item[data-selected]` and
 `:hover`. The tablist is positioned and isolated so a consumer can hang marks off it: below, the

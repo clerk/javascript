@@ -175,15 +175,15 @@ describe('createPasskeys', () => {
     it('does not retry natively when the user cancels in the renderer', async () => {
       const bridge = makeBridge();
       stubEnvironment({ bridge });
-      const cancelled = {
+      const canceled = {
         publicKeyCredential: null,
-        error: Object.assign(new Error('cancelled'), { code: 'passkey_registration_cancelled' }),
+        error: Object.assign(new Error('canceled'), { code: 'passkey_registration_cancelled' }),
       };
-      vi.mocked(webAuthnCreateCredential).mockResolvedValue(cancelled as never);
+      vi.mocked(webAuthnCreateCredential).mockResolvedValue(canceled as never);
 
       const result = await createPasskeys().create(creationOptions());
 
-      expect(result).toBe(cancelled);
+      expect(result).toBe(canceled);
       expect(bridge.create).not.toHaveBeenCalled();
     });
 
@@ -209,6 +209,7 @@ describe('createPasskeys', () => {
         create: vi.fn(() =>
           Promise.resolve({
             ok: false as const,
+            // american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits
             error: { code: 'cancelled' as const, message: 'user cancelled' },
           }),
         ),

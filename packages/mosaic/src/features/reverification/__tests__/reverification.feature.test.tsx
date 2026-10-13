@@ -378,7 +378,7 @@ describe('Reverification', () => {
       expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible();
       expect(outcome()).toBe('');
 
-      // Closing it rejects the action as cancelled
+      // Closing it rejects the action as canceled
       await user.click(screen.getByRole('button', { name: 'Close' }));
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       await untilClosed();
@@ -1038,7 +1038,7 @@ describe('Reverification', () => {
       expect(action).toHaveBeenCalledTimes(1);
       expect(outcome()).toBe('');
 
-      // Dismissing it rejects the action as cancelled
+      // Dismissing it rejects the action as canceled
       await dismiss(user);
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
@@ -1227,7 +1227,7 @@ describe('Reverification', () => {
       await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
       await waitFor(() => expect(attempt.requests).toHaveLength(1));
 
-      // The card closes and the action is rejected as cancelled
+      // The card closes and the action is rejected as canceled
       await dismiss(user);
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       await untilClosed();
@@ -1251,7 +1251,7 @@ describe('Reverification', () => {
       await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
       await waitFor(() => expect(attempt.requests).toHaveLength(1));
 
-      // The card closes and the action is rejected as cancelled
+      // The card closes and the action is rejected as canceled
       await dismiss(user);
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       await untilClosed();
@@ -1331,7 +1331,7 @@ describe('Reverification', () => {
       // The card closes
       await untilClosed();
 
-      // The action is rejected as cancelled
+      // The action is rejected as canceled
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
     });
 

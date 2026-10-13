@@ -124,4 +124,4 @@ Tests green, then a changeset and a conventional commit. See the `clerk-monorepo
 skill for the dev loop and the hard rules, including which changeset to write.
 The commit scope is `mosaic`. If the migration removes or changes legacy code in
 `packages/ui`, remember non-major `packages/ui` changes load into older SDKs in
-the wild, so keep its public surface backwards compatible.
+the wild, so keep its public surface backward compatible.

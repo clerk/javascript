@@ -59,7 +59,7 @@ package. The whole file is exactly two delimiters and nothing else:
 
 Write it with the Write tool like any other file. If you must use the shell,
 `printf -- '---\n---\n' > .changeset/<name>.md` produces the same bytes, but there is no reason to
-verify it with `cat -A` or `od -c` afterwards. The format has no hidden characters.
+verify it with `cat -A` or `od -c` afterward. The format has no hidden characters.
 
 ## Which packages to list
 

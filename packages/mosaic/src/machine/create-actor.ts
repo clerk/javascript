@@ -86,7 +86,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   const listeners: SnapshotListener<TContext>[] = [];
 
   /**
-   * Normalise a raw `Transition` value into a `TransitionConfig[]` the runtime
+   * Normalize a raw `Transition` value into a `TransitionConfig[]` the runtime
    * can process uniformly. Handles all four arms of the `Transition` union:
    * - string → `{ target: string }`
    * - `TransitionConfig` → as-is

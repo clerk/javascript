@@ -56,8 +56,8 @@ function SignInProtectCheckInternal(): JSX.Element | null {
     // Routes on the resolved resource. This single path finalizes `complete` from both the normal
     // success and the `protect_check_already_resolved` reload, so neither strands the user with an
     // unactivated session.
-    onResolved: async (updatedSignIn, isCancelled) => {
-      if (isCancelled()) {
+    onResolved: async (updatedSignIn, isCanceled) => {
+      if (isCanceled()) {
         return;
       }
       if (updatedSignIn.status === 'complete' && updatedSignIn.createdSessionId) {

@@ -32,7 +32,7 @@ const passkeyJSON = (authenticatorAttachment?: 'platform' | 'cross-platform') =>
     },
   }) as unknown as PasskeyJSON;
 
-const cancelledError = new ClerkWebAuthnError('Passkey registration was cancelled or timed out.', {
+const canceledError = new ClerkWebAuthnError('Passkey registration was canceled or timed out.', {
   code: 'passkey_registration_cancelled',
 });
 
@@ -66,12 +66,12 @@ describe('Passkey', () => {
   });
 
   describe('registerPasskey', () => {
-    it('deletes the pending passkey when the browser prompt is cancelled', async () => {
-      setupClerk(() => Promise.resolve({ publicKeyCredential: null, error: cancelledError }));
+    it('deletes the pending passkey when the browser prompt is canceled', async () => {
+      setupClerk(() => Promise.resolve({ publicKeyCredential: null, error: canceledError }));
       const fetchMock = vi.fn().mockResolvedValue({ response: passkeyJSON() });
       (BaseResource as any)._fetch = fetchMock;
 
-      await expect(Passkey.registerPasskey()).rejects.toBe(cancelledError);
+      await expect(Passkey.registerPasskey()).rejects.toBe(canceledError);
 
       expect(fetchMock).toHaveBeenCalledWith(deleteCall);
       expect(fetchMock).not.toHaveBeenCalledWith(
@@ -80,7 +80,7 @@ describe('Passkey', () => {
     });
 
     it('surfaces the original error when the cleanup itself fails', async () => {
-      setupClerk(() => Promise.resolve({ publicKeyCredential: null, error: cancelledError }));
+      setupClerk(() => Promise.resolve({ publicKeyCredential: null, error: canceledError }));
       const fetchMock = vi.fn().mockImplementation(({ method }) => {
         if (method === 'DELETE') {
           return Promise.reject(new Error('session_reverification_required'));
@@ -89,7 +89,7 @@ describe('Passkey', () => {
       });
       (BaseResource as any)._fetch = fetchMock;
 
-      await expect(Passkey.registerPasskey()).rejects.toBe(cancelledError);
+      await expect(Passkey.registerPasskey()).rejects.toBe(canceledError);
     });
 
     it('deletes the pending passkey when the device lacks a platform authenticator', async () => {
@@ -105,7 +105,7 @@ describe('Passkey', () => {
     });
 
     it('does not attempt a delete when the created passkey has no id', async () => {
-      setupClerk(() => Promise.resolve({ publicKeyCredential: null, error: cancelledError }));
+      setupClerk(() => Promise.resolve({ publicKeyCredential: null, error: canceledError }));
       const fetchMock = vi.fn().mockResolvedValue(null);
       (BaseResource as any)._fetch = fetchMock;
 

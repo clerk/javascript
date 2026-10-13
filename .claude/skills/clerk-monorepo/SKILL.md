@@ -46,8 +46,8 @@ The ~10 packages people touch most. Full 25-package table, the dependency pyrami
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@clerk/shared`        | Utilities used everywhere (storage, events, React helpers). Most-depended-on; changes fan out to ~20 packages. Types live here too (`@clerk/shared/types`). |
 | `@clerk/backend`       | Server-side: JWT verification, the Backend API REST client, webhooks. Used by every framework adapter.                                                      |
-| `@clerk/clerk-js`      | ⚠️ The browser runtime loaded via script tag. **Backwards-compat sensitive** (see rules).                                                                   |
-| `@clerk/ui`            | ⚠️ The React components powering the hosted sign-in / sign-up UI. **Backwards-compat sensitive**.                                                           |
+| `@clerk/clerk-js`      | ⚠️ The browser runtime loaded via script tag. **Backward-compat sensitive** (see rules).                                                                    |
+| `@clerk/ui`            | ⚠️ The React components powering the hosted sign-in / sign-up UI. **Backward-compat sensitive**.                                                            |
 | `@clerk/mosaic`        | Experimental next-generation components (`UserButton` today). Independently releasable; reads Clerk context from the host SDK.                              |
 | `@clerk/react`         | Shared React hooks/context (`useAuth`, `useUser`, ...) consumed by the React-based adapters.                                                                |
 | `@clerk/nextjs`        | Next.js SDK: middleware, route handlers, server components.                                                                                                 |
@@ -155,7 +155,7 @@ Each rule below restates `AGENTS.md`; the parenthetical is how it is enforced.
   `commit-msg` hook. Valid `scope` = any `packages/*` short name **and** its `clerk-`-stripped form
   (so `clerk-js` accepts `clerk-js` or `js`), plus `repo`, `release`, `e2e`, `ci`, `*`. `docs` is a
   valid **type**, not a scope. Source of truth: `commitlint.config.ts`.
-- **`clerk-js` and `ui` must stay backwards-compatible across non-major releases.** A new `clerk-js`
+- **`clerk-js` and `ui` must stay backward-compatible across non-major releases.** A new `clerk-js`
   runtime loads into apps still pinned to an _older_ framework SDK (`@clerk/nextjs`, etc.), so
   removing or renaming anything an older SDK calls breaks those apps in production. (`break-check`
   flags API-surface changes in `api-changes.yml`, but that check is informational; shipping such a

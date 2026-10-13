@@ -64,7 +64,7 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (isPending) {
       // `aria-disabled` is advisory — it doesn't stop the native submit — so the press is
-      // cancelled here instead. The `disabled` attribute would do both, but it drops the button
+      // canceled here instead. The `disabled` attribute would do both, but it drops the button
       // out of the tab order mid-action, taking focus with it just as the spinner is announced.
       //
       // TODO: fold this into the headless button's `focusableWhenDisabled` once it lands

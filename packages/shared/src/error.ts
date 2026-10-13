@@ -26,6 +26,7 @@ export {
   isNetworkError,
   isPasswordPwnedError,
   isPasswordCompromisedError,
+  isReverificationCanceledError,
   isReverificationCancelledError,
   isUnauthenticatedError,
   isUnauthorizedError,

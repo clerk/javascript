@@ -152,7 +152,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
 ): Promise<RequestState<TokenType> | UnauthenticatedState<null>> => {
   const authenticateContext = await createAuthenticateContext(createClerkRequest(request), options);
 
-  // Default tokenType is session_token for backwards compatibility.
+  // Default tokenType is session_token for backward compatibility.
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
   // machine-to-machine tokens can accept a machine secret or a secret key

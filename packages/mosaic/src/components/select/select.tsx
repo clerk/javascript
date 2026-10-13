@@ -110,7 +110,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
   const id = fieldProps?.id ?? idProp ?? generatedId;
   // A combobox takes no name from its content, so the value is named explicitly, after any label.
   // An `aria-label` is kept by naming the trigger itself.
-  const labelledBy = fieldProps?.['aria-labelledby'] ?? ariaLabelledBy ?? (ariaLabel ? id : undefined);
+  const labeledBy = fieldProps?.['aria-labelledby'] ?? ariaLabelledBy ?? (ariaLabel ? id : undefined);
   const trigger: SelectTriggerProps['render'] =
     render ??
     (props => (
@@ -129,7 +129,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       id={id}
       disabled={fieldProps?.disabled ?? disabledProp}
       aria-label={ariaLabel}
-      aria-labelledby={mergeIds(labelledBy, children === undefined ? valueId : undefined)}
+      aria-labelledby={mergeIds(labeledBy, children === undefined ? valueId : undefined)}
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
       aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
       aria-required={ariaRequired ?? (fieldProps?.required ? true : undefined)}

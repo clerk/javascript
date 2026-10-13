@@ -159,7 +159,7 @@ function DialogInner<Payload>(props: DialogProps<Payload> & { isNested: boolean 
 
   // The floating reference is the ACTIVE trigger — return focus and outside-press exclusion
   // both read `elements.domReference`. With no active trigger the first
-  // registered one stands in, preserving single-trigger behaviour for `defaultOpen` dialogs.
+  // registered one stands in, preserving single-trigger behavior for `defaultOpen` dialogs.
   //
   // Subscribed imperatively rather than through `useSyncExternalStore`, so triggers mounting
   // and unmounting re-resolve the reference without re-rendering the root.

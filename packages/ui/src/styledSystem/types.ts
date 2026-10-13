@@ -8,7 +8,7 @@ type StyleRule = Exclude<_Interpolation<InternalTheme>, string | number | boolea
 
 /**
  * Primitives can override their styles using the css prop.
- * For customising layout/theme, prefer using the props defined on the component.
+ * For customizing layout/theme, prefer using the props defined on the component.
  */
 type ThemableCssProp = ((params: InternalTheme) => StyleRule) | StyleRule;
 type CssProp = { css?: ThemableCssProp };

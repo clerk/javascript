@@ -34,7 +34,7 @@ export type MenuTriggerProps = MosaicComponentProps<'button'> & {
 
 /**
  * Opens the menu. Renders a ghost `Button` holding an ellipsis glyph by default;
- * pass `children` for a labelled trigger, or `render` to supply your own element.
+ * pass `children` for a labeled trigger, or `render` to supply your own element.
  */
 export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(function MosaicMenuTrigger(
   { render, xstyle, children, focusableWhenDisabled, ...rest },

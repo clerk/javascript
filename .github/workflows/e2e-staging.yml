@@ -35,7 +35,7 @@ concurrency:
   # Key on the clerk_go commit being validated rather than the (effectively always "main")
   # ref, so distinct staging deploys no longer cancel each other and each commit can report
   # its own result. Duplicate dispatches for the SAME commit still de-dupe; manual dispatches
-  # without a commit SHA fall back to the unique run_id and are never cancelled.
+  # without a commit SHA fall back to the unique run_id and are never canceled.
   group: ${{ github.workflow }}-${{ github.event.inputs.clerk-go-commit-sha || github.event.client_payload.clerk-go-commit-sha || github.run_id }}
   cancel-in-progress: true
 
@@ -304,6 +304,7 @@ jobs:
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
 
       - name: Upload test-results
+        # american-spelling-ignore-next-line: cancelled -- GitHub Actions status function
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -318,6 +319,7 @@ jobs:
       # integration/playwright-report/. Keep that prefix here. `warn` (not `ignore`)
       # so a future path regression surfaces in the logs instead of failing silently.
       - name: Upload Playwright JSON report
+        # american-spelling-ignore-next-line: cancelled -- GitHub Actions status function
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

@@ -991,7 +991,7 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   object: 'commerce_subscription';
   id: string;
   /**
-   * Describes the details for the next payment cycle. It is `undefined` for subscription items that are cancelled or on the free plan, and `null` when there is no upcoming payment.
+   * Describes the details for the next payment cycle. It is `undefined` for subscription items that are canceled or on the free plan, and `null` when there is no upcoming payment.
    */
   next_payment?: BillingSubscriptionNextPaymentJSON | null;
   /**
@@ -1170,7 +1170,7 @@ export interface BillingCheckoutTotalsJSON {
   per_unit_totals?: BillingPerUnitTotalJSON[];
   total_due_now: BillingMoneyAmountJSON;
   /**
-   * Legacy credit field. Kept for backwards compatibility; prefer the unified `credits` breakdown.
+   * Legacy credit field. Kept for backward compatibility; prefer the unified `credits` breakdown.
    */
   credit: BillingMoneyAmountJSON | null;
   credits: BillingCreditsJSON | null;
@@ -1183,7 +1183,7 @@ export interface BillingCheckoutTotalsJSON {
   discounts: BillingDiscountsJSON | null;
   /**
    * The expected recurring payment for each future billing period.
-   * Kept for backwards compatibility. Prefer `totals_due_per_period` for the full breakdown.
+   * Kept for backward compatibility. Prefer `totals_due_per_period` for the full breakdown.
    */
   total_due_per_period: BillingMoneyAmountJSON;
   /**

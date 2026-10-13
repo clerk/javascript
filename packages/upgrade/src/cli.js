@@ -231,7 +231,7 @@ async function main() {
   });
 
   if (isInteractive && !(await promptConfirm('Ready to upgrade?', true))) {
-    renderError('Upgrade cancelled. Exiting...');
+    renderError('Upgrade canceled. Exiting...');
     process.exit(0);
   }
 

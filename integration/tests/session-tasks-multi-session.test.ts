@@ -59,7 +59,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.page.waitForAppUrl('/');
 
       // Create second user, to initiate a pending session
-      // Don't resolve task and switch to active session afterwards
+      // Don't resolve task and switch to active session afterward
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(user2.email);
       await u.po.signIn.continue();

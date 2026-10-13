@@ -153,7 +153,7 @@ describe('UserProfileDangerSection', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('clears the phrase when the dialog is cancelled', async () => {
+  it('clears the phrase when the dialog is canceled', async () => {
     const user = userEvent.setup();
     renderSection();
     const dialog = await openDialog(user);

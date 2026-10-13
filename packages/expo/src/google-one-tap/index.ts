@@ -1,6 +1,6 @@
 export {
   ClerkGoogleOneTapSignIn,
-  isCancelledResponse,
+  isCanceledResponse,
   isNoSavedCredentialFoundResponse,
   isSuccessResponse,
   isErrorWithCode,
@@ -13,7 +13,7 @@ export type {
   ExplicitSignInParams,
   OneTapResponse,
   OneTapSuccessResponse,
-  CancelledResponse,
+  CanceledResponse,
   NoSavedCredentialFound,
   GoogleUser,
   GoogleSignInError,

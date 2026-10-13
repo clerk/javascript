@@ -98,7 +98,7 @@ export class OrganizationDomain extends BaseResource implements OrganizationDoma
           expiresAt: unixEpochToDate(affiliationVerificationJSON.expires_at),
         };
         this.affiliationVerification = affiliationVerification;
-        // Deprecated alias, kept in sync for backwards compatibility.
+        // Deprecated alias, kept in sync for backward compatibility.
         this.verification = affiliationVerification;
       } else {
         this.affiliationVerification = null;

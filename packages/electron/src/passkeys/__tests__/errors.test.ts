@@ -5,7 +5,9 @@ import { mapPasskeyIpcError } from '../shared/errors';
 
 describe('mapPasskeyIpcError', () => {
   it.each<[PasskeyNativeErrorCode, 'create' | 'get', string]>([
+    // american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits
     ['cancelled', 'create', 'passkey_registration_cancelled'],
+    // american-spelling-ignore-next-line: cancelled -- code the @clerk/electron-passkeys native addon emits
     ['cancelled', 'get', 'passkey_retrieval_cancelled'],
     ['invalid_rp', 'create', 'passkey_invalid_rpID_or_domain'],
     ['invalid_rp', 'get', 'passkey_invalid_rpID_or_domain'],

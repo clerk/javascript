@@ -14,9 +14,9 @@ export interface ProtectCheckRunnerParams<TResource> extends ProtectCheckRunnerR
    * Continues the flow once the gate clears (or a chained challenge / already-resolved is
    * detected). Receives the resource to route on (the `submitProtectCheck` result, or the live
    * resource after a reload) and must finalize (`setActive`) the `complete` case itself.
-   * `isCancelled` lets the continuation bail if the component unmounted mid-await.
+   * `isCanceled` lets the continuation bail if the component unmounted mid-await.
    */
-  onResolved: (resource: TResource, isCancelled: () => boolean) => Promise<unknown>;
+  onResolved: (resource: TResource, isCanceled: () => boolean) => Promise<unknown>;
   onError?: (error: unknown) => void;
 }
 
@@ -24,7 +24,7 @@ export interface ProtectCheckRunnerState {
   containerRef: React.MutableRefObject<HTMLDivElement | null>;
   isRunning: boolean;
   /**
-   * Whether the challenge script has signalled (via the `setWidgetVisible` init callback) that
+   * Whether the challenge script has signaled (via the `setWidgetVisible` init callback) that
    * it is showing a widget in the container. While true, the widget owns the progress UI —
    * callers should hide their own spinner and give the container layout space.
    */
@@ -59,7 +59,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const paramsRef = React.useRef(params);
   paramsRef.current = params;
 
-  // `handleError` re-throws what it does not recognise, and this runner awaits caller code that
+  // `handleError` re-throws what it does not recognize, and this runner awaits caller code that
   // raises plain errors (a transient fetch failure, an OAuth continuation that did not complete).
   const reportError = (err: any) => {
     const { onError } = paramsRef.current;
@@ -82,7 +82,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const [isWidgetVisible, setIsWidgetVisibleState] = React.useState(false);
   const [retryNonce, setRetryNonce] = React.useState(0);
 
-  // Tracks real unmount, distinct from the per-run `cancelled` flag below. Clearing `protectCheck`
+  // Tracks real unmount, distinct from the per-run `canceled` flag below. Clearing `protectCheck`
   // (e.g. an expired-challenge reload that advances the flow) flips the token dependency and
   // re-runs/cancels the main effect — but that re-run is exactly our cue to route, so the routing
   // must key on actual unmount, not on the effect's cancel flag.
@@ -106,15 +106,15 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     }
 
     const abortController = new AbortController();
-    let cancelled = false;
+    let canceled = false;
     // Routing after the gate clears must survive the effect re-run that
     // clearing `protectCheck` triggers — that re-run is our cue to route, not a
     // reason to bail. So the onResolved paths below key on REAL unmount, not the
-    // effect's per-run `cancelled` flag (which the re-run's cleanup sets).
+    // effect's per-run `canceled` flag (which the re-run's cleanup sets).
     const isUnmounted = () => !mountedRef.current;
 
     const cleanup = () => {
-      cancelled = true;
+      canceled = true;
       abortController.abort();
       // Reset the guard so the next mount / token change / retry can re-run; this is what makes
       // chained challenges work correctly across re-renders.
@@ -130,7 +130,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     // best-effort, so a zombie script from a timed-out, retried, or superseded run can still
     // call it late — those signals must not flip visibility under the active run.
     const setWidgetVisible = (visible: boolean): Promise<void> => {
-      if (cancelled || abortController.signal.aborted || !mountedRef.current) {
+      if (canceled || abortController.signal.aborted || !mountedRef.current) {
         return Promise.resolve();
       }
       flushSync(() => setIsWidgetVisibleState(visible));
@@ -174,12 +174,12 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     const runId = ++runIdRef.current;
 
     // Whether this run still owns the card's error and spinner. Until the gate clears, that ends
-    // with the run's cancellation. Afterwards the continuation (`onResolved`) is still this run's
-    // even though clearing the gate cancelled it, so it only stops owning them on unmount or when a
-    // newer challenge has started a run of its own. Keying the continuation on `cancelled` swallowed
+    // with the run's cancellation. Afterward the continuation (`onResolved`) is still this run's
+    // even though clearing the gate canceled it, so it only stops owning them on unmount or when a
+    // newer challenge has started a run of its own. Keying the continuation on `canceled` swallowed
     // its failures and left the spinner running with no error.
     let continuing = false;
-    const ownsOutcome = () => (continuing ? !isUnmounted() && runIdRef.current === runId : !cancelled);
+    const ownsOutcome = () => (continuing ? !isUnmounted() && runIdRef.current === runId : !canceled);
 
     const runChallenge = async () => {
       try {

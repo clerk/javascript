@@ -58,7 +58,7 @@ describe('useListRemovalFocus', () => {
     expect(result.current.finalFocus()).toBe(buttons.get('c'));
   });
 
-  it('targets nothing when no row was removed, so a cancelled confirmation keeps its default', () => {
+  it('targets nothing when no row was removed, so a canceled confirmation keeps its default', () => {
     const { result } = setup(['a', 'b'], vi.fn());
 
     expect(result.current.finalFocus()).toBeNull();

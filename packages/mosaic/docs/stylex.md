@@ -66,7 +66,7 @@ Keys starting with `--` emit verbatim (the public `--cl-*` handles, see
   `--cl-color-brand-hover-12`.
 - **DON'T** mint a per-step derivative token for something a `calc()`/`color-mix()`
   can express from an existing token.
-- **DON'T** give one value two public names. The focus ring's colour is
+- **DON'T** give one value two public names. The focus ring's color is
   `--cl-color-ring` and nothing else — a `--cl-focus-outline-color` alias beside it
   would let a consumer override one and not the other, and the ring's appearance
   would then depend on which they picked.
@@ -191,7 +191,7 @@ a bare `:active` stays single — and the hover wins while the button is pressed
 }
 ```
 
-The symptom is a hovered button that never shows its pressed colour on a mouse
+The symptom is a hovered button that never shows its pressed color on a mouse
 device, while touch devices look correct.
 
 - **DO** write the hover branch as `':hover:not(:active)'`. It stops the hover rule
@@ -216,7 +216,7 @@ device, while touch devices look correct.
   `styles/focus-outline.styles.ts` into the element's `stylex.props(...)`:
   `focusOutline.visible` for the element's own keyboard focus, `focusOutline.within`
   for a **container** that should ring when a child is focused. The ring is one
-  decision for the whole system — width, style, colour and offset all come from
+  decision for the whole system — width, style, color and offset all come from
   `--cl-focus-outline-*` and `--cl-color-ring`, so a theme retargets every ring at
   once.
 

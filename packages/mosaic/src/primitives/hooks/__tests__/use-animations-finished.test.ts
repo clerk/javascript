@@ -94,12 +94,12 @@ describe('useAnimationsFinished', () => {
     expect(firstCallback).not.toHaveBeenCalled();
   });
 
-  it('re-checks animations when one is cancelled', async () => {
+  it('re-checks animations when one is canceled', async () => {
     let rejectAnim!: () => void;
-    const cancelledAnim = new Promise<void>((_, reject) => {
+    const canceledAnim = new Promise<void>((_, reject) => {
       rejectAnim = reject;
     });
-    const el = createMockElement([{ finished: cancelledAnim }]);
+    const el = createMockElement([{ finished: canceledAnim }]);
     const ref = { current: el } as RefObject<HTMLElement | null>;
 
     const { result } = renderHook(() => useAnimationsFinished(ref, false));

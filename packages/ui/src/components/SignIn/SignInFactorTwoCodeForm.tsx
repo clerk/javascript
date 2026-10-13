@@ -50,7 +50,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
 
   // Only show the new device verification notice if the user is new
   // and no attributes are explicitly used for second factor.
-  // Retained for backwards compatibility.
+  // Retained for backward compatibility.
   const showNewDeviceVerificationNotice = useMemo(() => {
     const anyAttributeUsedForSecondFactor = Object.values(env.userSettings.attributes).some(
       attr => attr.used_for_second_factor,

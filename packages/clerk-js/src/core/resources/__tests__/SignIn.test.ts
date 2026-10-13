@@ -2371,7 +2371,7 @@ describe('SignIn', () => {
         const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
         const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
           publicKeyCredential: null,
-          error: new Error('User cancelled'),
+          error: new Error('User canceled'),
         });
 
         SignIn.clerk = {

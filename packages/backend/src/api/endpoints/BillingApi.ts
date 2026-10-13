@@ -54,7 +54,7 @@ export class BillingAPI extends AbstractAPI {
    * Cancels the given Subscription Item.
    * @param subscriptionItemId - The ID of the Subscription Item to cancel.
    * @param params - The parameters for the request.
-   * @returns The cancelled [`BillingSubscriptionItem`](https://clerk.com/docs/reference/backend/types/billing-subscription-item) object.
+   * @returns The canceled [`BillingSubscriptionItem`](https://clerk.com/docs/reference/backend/types/billing-subscription-item) object.
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   public async cancelSubscriptionItem(subscriptionItemId: string, params?: CancelSubscriptionItemParams) {

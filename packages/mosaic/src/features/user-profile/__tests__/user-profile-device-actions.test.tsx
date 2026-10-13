@@ -54,7 +54,7 @@ describe('signing out of all other devices', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
-  it('leaves the devices alone when the confirmation is cancelled', async () => {
+  it('leaves the devices alone when the confirmation is canceled', async () => {
     const user = userEvent.setup();
     const onSignOutAllOtherDevices = vi.fn();
     renderAll(onSignOutAllOtherDevices);

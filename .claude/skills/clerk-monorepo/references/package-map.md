@@ -14,14 +14,14 @@ The 25 active, git-tracked packages, the dependency shape, and the full "change 
 Categories: **foundational** (depended on by most others), **browser-runtime** (ships to the
 browser directly), **adapter** (framework SDK), **ui/i18n**, **tooling**. The "BC" column marks the
 two packages whose runtime is pushed into apps pinned to older SDKs, so they carry the strict
-backwards-compatibility contract (see `breaking-changes.md`).
+backward-compatibility contract (see `breaking-changes.md`).
 
 | Package                       | Category        | BC  | Purpose                                                                                                                                                                                                                                                            |
 | ----------------------------- | --------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `@clerk/shared`               | foundational    |     | Internal utilities used by all SDKs (storage, events, React helpers). Hosts the shared types as `@clerk/shared/types`. Most-depended-on package.                                                                                                                   |
 | `@clerk/backend`              | foundational    |     | Backend API REST client, JWT verification, webhook helpers. Used by every server adapter.                                                                                                                                                                          |
-| `@clerk/clerk-js`             | browser-runtime | ⚠️  | The browser runtime (script tag). Backwards-compat sensitive.                                                                                                                                                                                                      |
-| `@clerk/ui`                   | ui              | ⚠️  | React components for the hosted sign-in / sign-up flows (`packages/ui/src/components`). Consumed by the react/astro/vue/chrome-extension adapters. Backwards-compat sensitive.                                                                                     |
+| `@clerk/clerk-js`             | browser-runtime | ⚠️  | The browser runtime (script tag). Backward-compat sensitive.                                                                                                                                                                                                       |
+| `@clerk/ui`                   | ui              | ⚠️  | React components for the hosted sign-in / sign-up flows (`packages/ui/src/components`). Consumed by the react/astro/vue/chrome-extension adapters. Backward-compat sensitive.                                                                                      |
 | `@clerk/mosaic`               | ui              |     | Experimental next-generation React components. Public ESM package (`UserButton` + `styles.css`). Ships unstyled, accessible primitives (dialog, menu, popover, ...) internally under `src/primitives/`. Reads Clerk context from the host SDK via `@clerk/shared`. |
 | `@clerk/react`                | adapter (core)  |     | React hooks and context (`useAuth`, `useUser`, `useOrganization`, ...). Shared by the React-based adapters.                                                                                                                                                        |
 | `@clerk/nextjs`               | adapter         |     | Next.js SDK: middleware, route handlers, server components.                                                                                                                                                                                                        |
@@ -82,7 +82,7 @@ error traces back to it, rebuild shared: `pnpm turbo build --filter=@clerk/share
 - **The hosted sign-in / sign-up UI (components, layout)**: `packages/ui/src/components` (`@clerk/ui`).
   Strings live in `packages/localizations/src`. `@clerk/ui` is consumed by the
   `react`/`astro`/`vue`/`chrome-extension` adapters; its compiled runtime is delivered alongside
-  `clerk-js` (both are backwards-compat sensitive), though `clerk-js` does not declare it as a package
+  `clerk-js` (both are backward-compat sensitive), though `clerk-js` does not declare it as a package
   dependency. Watch with `pnpm dev:fe-libs`. For the theming/appearance system specifically, read the
   repo-root `references/theming-architecture.md` (not this skill's own `references/` dir).
 - **Backend token verification / JWT / Backend API client**: `packages/backend/src` (JWT logic under

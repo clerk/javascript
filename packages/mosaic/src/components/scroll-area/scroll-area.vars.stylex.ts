@@ -9,7 +9,7 @@ export const scrollAreaVars = stylex.defineVars({
   '--cl-scroll-area-progress-end': stylex.types.number(0),
 });
 
-// The animated carrier for the scrollbar thumb's colour. `::-webkit-scrollbar-thumb` cannot
+// The animated carrier for the scrollbar thumb's color. `::-webkit-scrollbar-thumb` cannot
 // transition properties of its own, so the transition is declared on the SCROLLER against this
 // property and the pseudo-element only ever reads it — `inherits: true`, which StyleX hardcodes
 // for typed vars, is what carries the animating value down into it. Same primitive as the

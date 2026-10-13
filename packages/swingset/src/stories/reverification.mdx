@@ -46,7 +46,7 @@ const step = isRunning && reverification.visible ? 'verify' : 'confirm';
 
 ### When the run ends
 
-The reverification card does not disappear when the action settles. If the user was shown a card during the run, the run ends in a settled state, whether it succeeded, failed, or was cancelled. The controller keeps returning the last card, inert: it is pending and has no `onCancel`. `visible` stays true unless the last thing shown was the pending card.
+The reverification card does not disappear when the action settles. If the user was shown a card during the run, the run ends in a settled state, whether it succeeded, failed, or was canceled. The controller keeps returning the last card, inert: it is pending and has no `onCancel`. `visible` stays true unless the last thing shown was the pending card.
 
 This lets the parent finish its own work after the action returns, such as refetching or closing a dialog, without the screen falling back to an earlier step in between. The parent leaves the card by unmounting `<Reverification>` or changing its own step when it is done.
 
@@ -59,11 +59,11 @@ The settled card is released by whichever happens first.
 
 Call `reset()` when a parent leaves the flow without running the action again and wants a clean state, so the next render does not show a stale card.
 
-### Cancelling
+### Canceling
 
 `reverification.onCancel` is a request. It is undefined when the user cannot cancel, which is the case while the action is being retried and once the run has settled. Calling it rejects the action with a `reverification_cancelled` error and settles the card.
 
-The parent decides what cancelling means for its own flow. Pass `onClose` to `<Reverification>` to run that instead of `onCancel` when the user presses the Close button on the error card. The parent is then responsible for calling `onCancel` itself, as `Destructive` does when its dialog closes. This lets the parent close or leave the step at the moment of the click, instead of waiting for its own action to unwind.
+The parent decides what canceling means for its own flow. Pass `onClose` to `<Reverification>` to run that instead of `onCancel` when the user presses the Close button on the error card. The parent is then responsible for calling `onCancel` itself, as `Destructive` does when its dialog closes. This lets the parent close or leave the step at the moment of the click, instead of waiting for its own action to unwind.
 
 ```tsx
 <Reverification
