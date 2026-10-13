@@ -12,6 +12,9 @@ export const createOrganizationProfileComponentPageObject = (testArgs: { page: E
     switchToBillingTab: async () => {
       await page.getByRole('button', { name: /^Billing$/i }).click();
     },
+    switchToSecurityTab: async () => {
+      await page.getByRole('button', { name: /^Security$/i }).click();
+    },
     switchToMembersTab: async () => {
       await page.getByRole('button', { name: /^Members$/i }).click();
     },

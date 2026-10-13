@@ -147,6 +147,10 @@ const base = environmentConfig()
   .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
   .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
+const withSelfServeSso = process.env.E2E_KEYCLOAK_URL
+  ? await withInstanceKeys('with-self-serve-sso', base.clone().setId('withSelfServeSso'))
+  : base.clone().setId('withSelfServeSso');
+
 const withKeyless = base
   .clone()
   // Creates keyless applications in our staging database.
@@ -323,6 +327,7 @@ const withPasskeys = await withInstanceKeys('with-passkeys', base.clone().setId(
 
 export const envs = {
   base,
+  withSelfServeSso,
   sessionsProd1,
   withAPIKeys,
   withAPCore3ClerkLatest,
