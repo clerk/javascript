@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
@@ -25,10 +23,9 @@ export function UserProfilePhoneSectionView({
   onSetPrimary,
 }: UserProfilePhoneSectionViewProps) {
   const m = useMessages('userProfileContact');
-  const verificationDialog = useMemo(() => Dialog.createHandle(), []);
   const addPhoneAction = canAdd ? (
     <Dialog.Trigger
-      handle={verificationDialog}
+      handle={verification.handle}
       render={
         <Button
           aria-label={m.phone.add}
@@ -65,7 +62,6 @@ export function UserProfilePhoneSectionView({
       <UserProfileAddPhoneDialog
         {...verification}
         defaultCountry={defaultPhoneCountry}
-        handle={verificationDialog}
         finalFocus={verificationFinalFocus}
       />
       {remove ? (
