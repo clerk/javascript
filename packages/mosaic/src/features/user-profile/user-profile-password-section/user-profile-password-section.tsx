@@ -49,7 +49,6 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
     policy: model,
     validatePassword: model.validatePassword,
     onSubmit: updatePassword,
-    formatError: model.formatError,
     reverification,
   });
 

@@ -26,7 +26,6 @@ export interface UserProfileEditPasswordControllerOptions {
   policy: UserProfilePasswordPolicy;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<unknown>;
   validatePassword?: (password: string) => Promise<FieldFeedback | undefined>;
-  formatError?: (error: unknown) => unknown;
   reverification?: ReverificationController;
 }
 
@@ -43,7 +42,6 @@ export function useUserProfileEditPasswordController({
   policy,
   onSubmit,
   validatePassword,
-  formatError = error => error,
   reverification,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
   const requiresCurrentPassword = policy.requiresCurrentPassword;
@@ -81,7 +79,7 @@ export function useUserProfileEditPasswordController({
         if (isReverificationCancelledError(error)) {
           return;
         }
-        throw formatError(error);
+        throw error;
       }
       // TODO: Discuss confirming the password was set or updated and other devices were signed out with a success page or toast. https://github.com/clerk/javascript/pull/9930#discussion_r4151641473
       setIsOpen(false);

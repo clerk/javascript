@@ -9,6 +9,7 @@ import type { FieldFeedback } from '../../../components/form';
 import { FormSubmitError } from '../../../components/form';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
+import { isReverificationError } from '../../../utils/errors';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValue, UserProfilePasswordPolicy } from './user-profile-password-section.types';
@@ -30,8 +31,7 @@ export type UserProfilePasswordModel =
       sessionId: string;
       identifier: string;
       validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
-      updatePassword: (input: UserProfileEditPasswordValue) => Promise<unknown>;
-      formatError: (error: unknown) => unknown;
+      updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
     });
 
 type PasswordPolicyResult =
@@ -139,22 +139,25 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
         throw new FormSubmitError({ message: m.errors.unavailable });
       }
 
-      return currentUser.updatePassword({
-        newPassword,
-        signOutOfOtherSessions,
-        ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
-      });
+      try {
+        await currentUser.updatePassword({
+          newPassword,
+          signOutOfOtherSessions,
+          ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
+        });
+      } catch (error) {
+        if (isReverificationError(error)) {
+          throw error;
+        }
+        throw passwordFormError(
+          error,
+          policy.requiresCurrentPassword,
+          environment.userSettings.passwordSettings,
+          m,
+          locale,
+          errorText,
+        );
+      }
     },
-    formatError: error =>
-      error instanceof FormSubmitError
-        ? error
-        : passwordFormError(
-            error,
-            policy.requiresCurrentPassword,
-            environment.userSettings.passwordSettings,
-            m,
-            locale,
-            errorText,
-          ),
   };
 }
