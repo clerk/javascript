@@ -13,6 +13,13 @@ import {
   Organization as APIKeysTableOrganization,
   ProposedTable as APIKeysTableProposedTable,
 } from '../stories/api-keys-table.stories';
+import {
+  Default as OAuthConsentDefault,
+  LoadError as OAuthConsentLoadError,
+  meta as oauthConsentMeta,
+  OfflineAccess as OAuthConsentOfflineAccess,
+  ScopeList as OAuthConsentScopeList,
+} from '../stories/oauth-consent.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -921,6 +928,14 @@ const apiKeysTableModule: StoryModule = {
   Empty: APIKeysTableEmpty,
 };
 
+const oauthConsentModule: StoryModule = {
+  meta: oauthConsentMeta,
+  Default: OAuthConsentDefault,
+  ScopeList: OAuthConsentScopeList,
+  OfflineAccess: OAuthConsentOfflineAccess,
+  LoadError: OAuthConsentLoadError,
+};
+
 const reverificationModule: StoryModule = {
   meta: reverificationMeta,
   Default: ReverificationDefault,
@@ -991,6 +1006,7 @@ export const registry: StoryModule[] = [
   organizationProfileDangerSectionModule,
   // API Keys
   apiKeysTableModule,
+  oauthConsentModule,
   // Reverification
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.

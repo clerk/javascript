@@ -1,0 +1,59 @@
+import * as Stories from './oauth-consent.stories';
+
+# OAuthConsent
+
+Asks the signed-in user whether an OAuth application may access their account. `OAuthConsent` reads the client, scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props set them, and posts the answer to Clerk with every URL parameter forwarded. When the application asks for `user:org:read`, the user picks which organization to grant. Each scope can show a checkbox with a label and a description; a required scope stays checked. It renders `fallback` until the consent details load, and nothing when nobody is signed in.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Checkbox', href: '/components/checkbox', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'Text', href: '/components/text', layer: 'Components' },
+    { name: 'Tooltip', href: '/components/tooltip', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { OAuthConsent } from '@clerk/mosaic/features/oauth-consent/oauth-consent';
+
+<OAuthConsent fallback={<Spinner />} />;
+```
+
+## Props
+
+| Prop            | Type        | Default                      |
+| --------------- | ----------- | ---------------------------- |
+| `oauthClientId` | `string`    | The `client_id` parameter    |
+| `scope`         | `string`    | The `scope` parameter        |
+| `redirectUrl`   | `string`    | The `redirect_uri` parameter |
+| `fallback`      | `ReactNode` | `null`                       |
+
+## Examples
+
+### Scope list
+
+Without `scopeSelection`, the scopes render as a list with no checkboxes. This is what `OAuthConsent` renders today.
+
+<Story name='ScopeList' storyModule={Stories} />
+
+### Offline access
+
+Requesting `offline_access` hides that scope from the list and adds a note that the user stays signed in.
+
+<Story name='OfflineAccess' storyModule={Stories} />
+
+### Error
+
+<Story name='LoadError' storyModule={Stories} />
