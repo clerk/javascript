@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
+import type { DialogHandle } from '../../../components/dialog';
+import { Dialog } from '../../../components/dialog';
 import { useForm } from '../../../components/form';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
@@ -23,6 +25,7 @@ export interface UserProfileAddEmailControllerOptions {
 }
 
 export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
+  handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
   onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => void;
 }
@@ -162,6 +165,7 @@ export function useUserProfileAddEmailController({
   onCreate,
 }: UserProfileAddEmailControllerOptions): UserProfileAddEmailController {
   const errorText = useErrorText();
+  const handle = useMemo(() => Dialog.createHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
   const { resendSeconds, error, verification } = snapshot.context;
   const emailForm = useForm({
@@ -201,6 +205,7 @@ export function useUserProfileAddEmailController({
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
+    handle,
     resendSeconds,
     isResending: state === 'sending',
     open,

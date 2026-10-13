@@ -1,5 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
+import type { DialogHandle } from '../../../components/dialog';
+import { Dialog } from '../../../components/dialog';
 import { useForm } from '../../../components/form';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
@@ -17,6 +19,7 @@ export interface UserProfileAddPhoneControllerOptions {
 }
 
 export interface UserProfileAddPhoneController extends UserProfileAddPhoneDialogProps {
+  handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
   onVerifyPhone: (phone: Pick<UserProfilePhone, 'id' | 'value'>, verifier: UserProfilePhoneVerifier) => void;
 }
@@ -106,6 +109,7 @@ export function useUserProfileAddPhoneController({
   onCreate,
 }: UserProfileAddPhoneControllerOptions): UserProfileAddPhoneController {
   const errorText = useErrorText();
+  const handle = useMemo(() => Dialog.createHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
   const { resendSeconds, error } = snapshot.context;
   const phoneForm = useForm({
@@ -142,6 +146,7 @@ export function useUserProfileAddPhoneController({
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
+    handle,
     resendSeconds,
     isResending: state === 'sending',
     open,

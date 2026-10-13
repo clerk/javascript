@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
@@ -24,10 +22,9 @@ export function UserProfileEmailSectionView({
   onSetPrimary,
 }: UserProfileEmailSectionViewProps) {
   const m = useMessages('userProfileContact');
-  const verificationDialog = useMemo(() => Dialog.createHandle(), []);
   const addEmailAction = canAdd ? (
     <Dialog.Trigger
-      handle={verificationDialog}
+      handle={verification.handle}
       render={
         <Button
           aria-label={m.email.add}
@@ -63,7 +60,6 @@ export function UserProfileEmailSectionView({
       </UserProfileContactListRowView>
       <UserProfileAddEmailDialog
         {...verification}
-        handle={verificationDialog}
         finalFocus={verificationFinalFocus}
       />
       {remove ? (

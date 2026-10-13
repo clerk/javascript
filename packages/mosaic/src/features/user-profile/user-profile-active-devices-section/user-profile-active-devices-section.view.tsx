@@ -26,6 +26,7 @@ export function UserProfileActiveDevicesSectionView({
   registerTrigger,
   finalFocus,
   details,
+  signOutFromDetails,
   signOut,
   signOutAll,
   signOutAllFinalFocus,
@@ -103,7 +104,7 @@ export function UserProfileActiveDevicesSectionView({
         controller={details}
         devices={devices}
         finalFocus={finalFocus}
-        canSignOut={signOut !== undefined}
+        onSignOut={signOutFromDetails}
       />
       {signOut ? (
         <Confirmation

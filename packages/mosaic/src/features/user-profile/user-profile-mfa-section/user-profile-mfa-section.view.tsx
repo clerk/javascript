@@ -35,7 +35,7 @@ export function UserProfileMfaSectionView({
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const controller = useUserProfileMfaSectionLeafController({ methods, onRemove, onSetDefault });
+  const controller = useUserProfileMfaSectionLeafController({ methods, onAdd, onRemove, onSetDefault });
 
   return (
     <>
@@ -43,7 +43,7 @@ export function UserProfileMfaSectionView({
         sectionRef={controller.sectionRef}
         addControl={
           addControl ??
-          (onAdd && addableMethods?.length ? (
+          (controller.addMethod && addableMethods?.length ? (
             <UserProfileAddMfaDialog
               triggerRef={addButtonRef}
               open={controller.pickerOpen}
@@ -51,10 +51,7 @@ export function UserProfileMfaSectionView({
             >
               <UserProfileAddMfaView
                 methods={addableMethods}
-                onSelect={type => {
-                  onAdd(type);
-                  controller.closePicker();
-                }}
+                onSelect={controller.addMethod}
               />
             </UserProfileAddMfaDialog>
           ) : null)
@@ -70,7 +67,7 @@ export function UserProfileMfaSectionView({
             method={method}
             triggerRef={controller.registerTrigger(method.id)}
             onRemove={onRemove ? () => controller.openRemoval(method) : undefined}
-            onSetDefault={onSetDefault && !controller.isSettingDefault ? controller.setDefault : undefined}
+            onSetDefault={controller.setDefault}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
         ))}
