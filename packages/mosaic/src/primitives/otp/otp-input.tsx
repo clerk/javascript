@@ -17,6 +17,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     value,
     length,
     disabled,
+    focusableWhenDisabled,
     required,
     pattern,
     mask,
@@ -63,7 +64,8 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
     // single characters handled by onChange/onPaste.
     maxLength: index === 0 ? length : 1,
     tabIndex: tabStop === index ? 0 : -1,
-    disabled,
+    disabled: disabled && !focusableWhenDisabled,
+    ...(disabled && focusableWhenDisabled ? { readOnly: true, 'aria-disabled': true } : null),
     // Constraint validation rides on the visible slots: the hidden input is `readOnly`,
     // which bars it from validation entirely.
     required,
@@ -197,7 +199,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
         return;
       }
       event.preventDefault();
-      const inserted = sanitize(event.clipboardData?.getData('text') ?? '', pattern, length);
+      const inserted = sanitize(event.clipboardData.getData('text'), pattern, length);
       if (inserted === '') {
         return;
       }

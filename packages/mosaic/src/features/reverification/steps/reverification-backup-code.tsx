@@ -59,6 +59,7 @@ export function ReverificationBackupCode({
             required
             invalid={Boolean(errorMessage)}
             disabled={isPending}
+            focusableWhenDisabled
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Input

@@ -29,7 +29,9 @@ export function UserProfileSecurityList({
       tabIndex={-1}
     >
       <Section.Header>
-        <Section.Title>{label}</Section.Title>
+        <Section.Content>
+          <Section.Title>{label}</Section.Title>
+        </Section.Content>
         {addControl ? (
           <Section.Actions>{addControl}</Section.Actions>
         ) : onAdd ? (

@@ -8,7 +8,7 @@ import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
 
 const pages: UserProfileViewProps['pages'] = {
-  account: { name: 'Preston Booth', username: 'prestonxyz' },
+  account: {},
   security: {},
   billing: {
     subscription: {
@@ -151,5 +151,14 @@ describe('UserProfileView', () => {
     const popup = screen.getByRole('dialog', { name: 'User profile' });
     expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
     expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+  });
+
+  it('warns when there are no pages to show', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    renderView({ pages: {} });
+
+    expect(warn).toHaveBeenCalledWith('[Clerk] UserProfile has no pages to show.');
+    warn.mockRestore();
   });
 });

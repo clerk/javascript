@@ -11,9 +11,10 @@ import type { BannerRootProps } from '../banner';
 import { Banner } from '../banner';
 import { Branding } from '../branding';
 import { Button } from '../button';
+import type { DialogContextValue } from '../dialog';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Icon } from '../icon';
-import { cardContentMarker } from './card.markers.stylex';
+import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
 
 type CardElevation = 'card' | 'flush' | 'overlay';
@@ -22,7 +23,9 @@ export type CardSize = keyof typeof slots.sizes;
 
 const DEFAULT_ELEVATION: CardElevation = 'card';
 
-const CardElevationContext = React.createContext<CardElevation>(DEFAULT_ELEVATION);
+// The enclosing card and the dialog it was rendered in. Context crosses portals, so a card in a
+// dialog opened from inside another card is still the dialog's outermost one.
+const CardContext = React.createContext<{ elevation: CardElevation; dialog: DialogContextValue | null } | null>(null);
 
 function CardBranding() {
   return (
@@ -50,6 +53,10 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
   { elevation = DEFAULT_ELEVATION, size = 'md', renderBranding = true, render, xstyle, children, ...rest },
   ref,
 ) {
+  const dialog = React.useContext(DialogContext);
+  const enclosing = React.useContext(CardContext);
+  const isSurface = (enclosing === null || enclosing.dialog !== dialog) && elevation !== 'flush';
+  const context = React.useMemo(() => ({ elevation, dialog }), [elevation, dialog]);
   const element = useRender({
     defaultTagName: 'div',
     render,
@@ -57,7 +64,14 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     props: {
       ...mergeStyleProps(
         themeProps('card-root', { elevation, size }),
-        stylex.props(reset.base, slots.root.base, slots.root[elevation], slots.sizes[size], xstyle),
+        stylex.props(
+          reset.base,
+          slots.root.base,
+          slots.root[elevation],
+          slots.sizes[size],
+          isSurface && slots.surface.root,
+          xstyle,
+        ),
         rest,
       ),
       children: (
@@ -69,7 +83,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     },
   });
 
-  return <CardElevationContext.Provider value={elevation}>{element}</CardElevationContext.Provider>;
+  return <CardContext.Provider value={context}>{element}</CardContext.Provider>;
 });
 
 /**
@@ -110,10 +124,11 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
-              Not outside a dialog, where there is nothing to close, and not in an alert dialog. */}
+              Not outside a dialog, where there is nothing to close, and not where the dialog's
+              `showCloseButton` is off, which is the default for an alert dialog. */}
           {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
               without answering one. The cancel action in the footer is the way out. */}
-          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <HeaderCloseButton /> : null}
+          {isInDialog(dialog) && dialog.showCloseButton ? <HeaderCloseButton /> : null}
           <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
             {children}
           </div>
@@ -230,7 +245,7 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   { render, xstyle, ...rest },
   ref,
 ) {
-  const elevation = React.useContext(CardElevationContext);
+  const elevation = React.useContext(CardContext)?.elevation ?? DEFAULT_ELEVATION;
   return useRender({
     defaultTagName: 'div',
     render,
@@ -238,7 +253,7 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     props: {
       ...mergeStyleProps(
         themeProps('card-footer', { elevation }),
-        stylex.props(reset.base, slots.footer.base, xstyle),
+        stylex.props(reset.base, slots.footer.base, cardFooterMarker, xstyle),
         rest,
       ),
     },

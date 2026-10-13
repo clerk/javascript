@@ -13,7 +13,7 @@ import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../.
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
-import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
@@ -83,13 +83,7 @@ const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function Sec
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('section-header'),
-        stylex.props(reset.base, styles.header, sectionHeaderMarker, xstyle),
-        rest,
-      ),
-    },
+    props: mergeStyleProps(themeProps('section-header'), stylex.props(reset.base, styles.header, xstyle), rest),
   });
 
   return <SectionHeaderContext.Provider value>{element}</SectionHeaderContext.Provider>;
@@ -205,6 +199,7 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
   ref,
 ) {
   const nested = React.useContext(SectionItemsContext);
+  const inHeader = React.useContext(SectionHeaderContext);
 
   return useRender({
     defaultTagName: 'div',
@@ -212,7 +207,7 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
     ref,
     props: mergeStyleProps(
       themeProps('section-content', { nested }),
-      stylex.props(reset.base, styles.content, xstyle),
+      stylex.props(reset.base, styles.content, inHeader && styles.headerContent, xstyle),
       rest,
     ),
   });
@@ -237,21 +232,13 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
   { render, xstyle, ...rest },
   ref,
 ) {
-  const inHeader = React.useContext(SectionHeaderContext);
-
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: mergeStyleProps(
       themeProps('section-description'),
-      stylex.props(
-        reset.base,
-        styles.description,
-        inHeader && styles.headerDescription,
-        inHeader && sectionHeaderDescriptionMarker,
-        xstyle,
-      ),
+      stylex.props(reset.base, styles.description, xstyle),
       rest,
     ),
   });
@@ -360,8 +347,8 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
 });
 
 /**
- * A compound component for a topic of settings. `Section.Root` stacks cards; each `Section.Group`
- * is a card named by the `Section.Title` in its `Section.Header`, with a `Section.Body` holding
+ * A compound component for a topic of settings. `Section.Root` stacks groups; each `Section.Group`
+ * is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding
  * either `Section.Row`s (one setting each) or a `Section.Items` list of values.
  */
 export const Section = {

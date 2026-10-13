@@ -24,7 +24,9 @@ export function UserProfilePasswordSectionView({
   return (
     <Section.Group>
       <Section.Header>
-        <Section.Title>{m.label}</Section.Title>
+        <Section.Content>
+          <Section.Title>{m.label}</Section.Title>
+        </Section.Content>
       </Section.Header>
       <Section.Body>
         <UserProfilePasswordRowView

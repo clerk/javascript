@@ -27,7 +27,9 @@ export function UserProfileEnterpriseAccountsSectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>{m.title}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.title}</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           {accounts.map(account => (

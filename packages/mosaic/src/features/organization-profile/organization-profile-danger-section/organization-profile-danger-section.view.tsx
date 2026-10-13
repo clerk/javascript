@@ -28,7 +28,9 @@ export function OrganizationProfileDangerSectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>{m.sectionTitle}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.sectionTitle}</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           {leave ? (

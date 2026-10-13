@@ -2,10 +2,28 @@ import { cleanup, render, renderHook, screen } from '@testing-library/react';
 import * as React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { mergeProps, useRender } from './use-render';
+import { isRef, mergeProps, useRender } from './use-render';
 
 afterEach(() => {
   cleanup();
+});
+
+describe('isRef', () => {
+  it.each([
+    ['null', null],
+    ['a callback ref', () => {}],
+    ['a ref object', React.createRef()],
+  ])('accepts %s', (_, value) => {
+    expect(isRef(value)).toBe(true);
+  });
+
+  it.each([
+    ['undefined', undefined],
+    ['a string', 'ref'],
+    ['an object without current', {}],
+  ])('rejects %s', (_, value) => {
+    expect(isRef(value)).toBe(false);
+  });
 });
 
 describe('mergeProps', () => {

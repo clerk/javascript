@@ -15,6 +15,8 @@ import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
 import { Profile } from './profile';
 
+const pageTitles: Record<string, string> = { account: 'Account', security: 'Security' };
+
 function Surface(rootProps: Partial<ProfileRootProps>) {
   return (
     <Profile.Root
@@ -31,7 +33,7 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
         </Profile.NavItem>
         <Profile.NavItem value='security'>Security</Profile.NavItem>
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle={pageTitles[rootProps.value ?? 'account']}>
         <Profile.ContentPanel value='account'>
           <Panel.Root>
             <Panel.Title>Account</Panel.Title>
@@ -39,7 +41,9 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
               <Section.Root>
                 <Section.Group>
                   <Section.Header>
-                    <Section.Title>Email addresses</Section.Title>
+                    <Section.Content>
+                      <Section.Title>Email addresses</Section.Title>
+                    </Section.Content>
                   </Section.Header>
                 </Section.Group>
               </Section.Root>
@@ -80,7 +84,7 @@ describe('Profile', () => {
             Account
           </Profile.NavItem>
         </Profile.Nav>
-        <Profile.Content>
+        <Profile.Content pageTitle='Account'>
           <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
         </Profile.Content>
       </Profile.Root>,
@@ -114,7 +118,7 @@ describe('Profile', () => {
             Security
           </Profile.NavItem>
         </Profile.Nav>
-        <Profile.Content>
+        <Profile.Content pageTitle='Account'>
           <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
           <Profile.ContentPanel value='security'>Security content</Profile.ContentPanel>
         </Profile.Content>
@@ -508,7 +512,7 @@ describe('Profile', () => {
             <Profile.Nav>
               <Profile.NavItem value='account'>Account</Profile.NavItem>
             </Profile.Nav>
-            <Profile.Content>
+            <Profile.Content pageTitle='Account'>
               <Profile.ContentPanel value='account'>
                 <Panel.Title ref={titleRef}>Account</Panel.Title>
               </Profile.ContentPanel>
@@ -590,6 +594,23 @@ describe('Profile', () => {
       expect(screen.getByRole('alertdialog', { name: 'User profile' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    });
+
+    it('follows showCloseButton on the dialog', () => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root
+            defaultOpen
+            showCloseButton={false}
+          >
+            <Dialog.Popup variant='profile'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+
+      expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
     });
 
     it('carries no dismiss standalone', () => {

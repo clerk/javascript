@@ -160,6 +160,21 @@ function membershipSubtitle(membership: UserButtonMembership, m: Messages, local
   return joinDetails(membership.planLabel, members);
 }
 
+function headerSubtitle(lead: LeadSelection, identifier: string, m: Messages, locale: string): string {
+  if (lead.kind === 'organization') {
+    return membershipSubtitle(lead.organization, m, locale);
+  }
+  if (lead.kind === 'none') {
+    // No selection is not the account, so it carries no identifier line.
+    return '';
+  }
+  if (lead.badge) {
+    return lead.badge.name;
+  }
+  // An account with no name is titled by its identifier, and repeating it underneath says nothing.
+  return identifier === lead.name ? '' : identifier;
+}
+
 // ─── Presentational leaves ──────────────────────────────────────────────────
 
 /**
@@ -437,14 +452,7 @@ function Header() {
   const lead = leadSelection(data, m);
   const { name } = lead;
   const organization = leadOrganization(lead);
-  // An account with no name is titled by its identifier, and repeating it underneath says nothing.
-  // No selection is not the account, so it carries no identifier line either.
-  const subtitle =
-    lead.kind === 'organization'
-      ? membershipSubtitle(lead.organization, m, locale)
-      : lead.kind === 'user' && identifier !== name
-        ? identifier
-        : '';
+  const subtitle = headerSubtitle(lead, identifier, m, locale);
 
   const actions: HeaderAction[] = [];
   for (const action of data.layout.actions.header) {

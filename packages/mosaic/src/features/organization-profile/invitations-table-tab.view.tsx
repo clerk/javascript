@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { useMemo, useRef } from 'react';
+import { type Ref, useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { ActionMenu } from '../../components/action-menu';
@@ -10,17 +10,13 @@ import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { Spinner } from '../../components/spinner';
-import { Table, type TableHeaderCellProps } from '../../components/table';
+import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill, useMessages } from '../../localization';
-import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
-import type {
-  InvitationsTableSort,
-  InvitationsTableTabViewProps,
-  OrganizationProfileInvitation,
-} from './invitations-table-tab.types';
+import type { InvitationsTableTabViewProps, OrganizationProfileInvitation } from './invitations-table-tab.types';
 import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (invitation: OrganizationProfileInvitation) => invitation.id;
@@ -31,89 +27,46 @@ export function InvitationsTableTabView({
   onRevoke,
   totalCount,
   page,
-  pageSize = 10,
-  searchValue,
-  onSearchChange,
+  pageSize,
   onPageChange,
-  onPageSizeChange,
   onBulkAction,
-  sort,
-  onSortChange,
   isLoading,
   isFetching = false,
+  isError = false,
+  onRetry,
 }: InvitationsTableTabViewProps) {
   const m = useMessages('invitationsTableTab');
-  const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
-  const query = searchValue.trim();
-  const searchInput = useRef<HTMLInputElement>(null);
   const inviteButton = useRef<HTMLButtonElement>(null);
+  const tableContainer = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: invitations.map(getRowId),
     onRemove: onRevoke,
-    fallback: () => inviteButton.current ?? searchInput.current,
+    fallback: () => inviteButton.current ?? tableContainer.current,
   });
   const revokeDialog = useMemo(() => Confirmation.createHandle<OrganizationProfileInvitation>(), []);
-  const pagination = { pageIndex: page - 1, pageSize };
-  const table = useDataTable({
+  const { table, pagination } = useServerDataTable({
     data: invitations,
     totalCount,
     getRowId,
-    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
-    onSortingChange: onSortChange
-      ? update => {
-          const next = typeof update === 'function' ? update(table.sorting) : update;
-          const active = next[0];
-          table.setRowSelection({});
-          onSortChange(
-            active && (active.id === 'email' || active.id === 'invitedAt' || active.id === 'roleLabel')
-              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
-              : null,
-          );
-        }
-      : undefined,
-    pagination,
-    onPaginationChange: update => {
-      const next = typeof update === 'function' ? update(pagination) : update;
-      table.setRowSelection({});
-      if (next.pageSize !== pageSize) {
-        onPageSizeChange?.(next.pageSize);
-      }
-      onPageChange(next.pageIndex + 1);
-    },
-    globalFilter: searchValue,
-    onGlobalFilterChange: update => {
-      table.setRowSelection({});
-      onSearchChange(typeof update === 'function' ? update(searchValue) : update);
-    },
+    sortableColumns: [],
+    page,
+    pageSize,
+    onPageChange,
+    searchValue: '',
+    onSearchChange: () => {},
   });
-  const sortHeader = (column: InvitationsTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
-    const active = table.sorting[0];
-    return {
-      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
-      onSort: onSortChange
-        ? () =>
-            table.setSorting(current => {
-              const active = current[0];
-              if (active?.id !== column) {
-                return [{ id: column, desc: false }];
-              }
-              return active.desc ? [] : [{ id: column, desc: true }];
-            })
-        : undefined,
-    };
-  };
+  const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
   return (
     <>
-      <div {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(tableTabStyles.root))}>
-        <Table.Toolbar>
-          <Table.Search
-            ref={searchInput}
-            label={m.search}
-            clearLabel={m.clearSearch}
-            value={table.globalFilter}
-            onValueChange={table.setGlobalFilter}
-          />
-          {onInvite ? (
+      <div
+        {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(tableTabStyles.root))}
+        ref={tableContainer}
+        tabIndex={-1}
+        role='group'
+        aria-label={m.title}
+      >
+        {onInvite ? (
+          <Table.Toolbar>
             <Button
               ref={inviteButton}
               onClick={onInvite}
@@ -121,8 +74,8 @@ export function InvitationsTableTabView({
               <Icon name='plus' />
               {m.invite}
             </Button>
-          ) : null}
-        </Table.Toolbar>
+          </Table.Toolbar>
+        ) : null}
         <Table.Root
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
@@ -137,9 +90,9 @@ export function InvitationsTableTabView({
                   onChange={table.toggleAllRowsSelected}
                 />
               ) : null}
-              <Table.HeaderCell {...sortHeader('email')}>{m.email}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('invitedAt')}>{m.invitedAt}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('roleLabel')}>{m.roleLabel}</Table.HeaderCell>
+              <Table.HeaderCell>{m.email}</Table.HeaderCell>
+              <Table.HeaderCell>{m.invitedAt}</Table.HeaderCell>
+              <Table.HeaderCell>{m.roleLabel}</Table.HeaderCell>
               {onRevoke ? (
                 <Table.HeaderCell align='end'>
                   <VisuallyHidden>{m.actions}</VisuallyHidden>
@@ -147,93 +100,24 @@ export function InvitationsTableTabView({
               ) : null}
             </Table.Row>
           </Table.Header>
-          <Table.Body>
-            {isLoading ? (
-              <Table.Empty colSpan={columnCount}>
-                <span role='status'>
-                  <Spinner />
-                  <VisuallyHidden>{m.loading}</VisuallyHidden>
-                </span>
-              </Table.Empty>
-            ) : table.rows.length === 0 ? (
-              <Table.Empty colSpan={columnCount}>
-                <EmptyState.Root role='status'>
-                  <EmptyState.Icon name='envelope' />
-                  <EmptyState.Label>{query ? m.empty : m.noInvitations}</EmptyState.Label>
-                  <EmptyState.Description>
-                    {query ? fill(m.emptyDescription, { query }) : m.noInvitationsDescription}
-                  </EmptyState.Description>
-                </EmptyState.Root>
-              </Table.Empty>
-            ) : (
-              table.rows.map(row => (
-                <Table.Row
-                  key={row.id}
-                  selected={Boolean(onBulkAction) && row.getIsSelected()}
-                >
-                  {onBulkAction ? (
-                    <Table.SelectCell
-                      aria-label={fill(m.select, { name: row.original.email })}
-                      checked={row.getIsSelected()}
-                      onToggleSelected={row.toggleSelected}
-                    />
-                  ) : null}
-                  <Table.Cell>
-                    <Item.Root>
-                      <Item.Media>
-                        <Avatar.Root
-                          size='fit'
-                          aria-hidden
-                        >
-                          {row.original.imageUrl ? (
-                            <Avatar.Image
-                              src={row.original.imageUrl}
-                              alt=''
-                            />
-                          ) : null}
-                          <Avatar.Fallback />
-                        </Avatar.Root>
-                      </Item.Media>
-                      <Item.Content>
-                        <Item.Label>{row.original.email}</Item.Label>
-                      </Item.Content>
-                    </Item.Root>
-                  </Table.Cell>
-                  <Table.Cell noWrap>{row.original.invitedAtLabel}</Table.Cell>
-                  <Table.Cell>{row.original.roleLabel}</Table.Cell>
-                  {onRevoke ? (
-                    <Table.Cell align='end'>
-                      <ActionMenu
-                        label={fill(m.manage, { name: row.original.email })}
-                        triggerRef={removalFocus.registerTrigger(row.original.id)}
-                        actions={[
-                          {
-                            label: m.revoke,
-                            color: 'negative',
-                            onClick: () => revokeDialog.open(row.original),
-                          },
-                        ]}
-                      />
-                    </Table.Cell>
-                  ) : null}
-                </Table.Row>
-              ))
-            )}
-          </Table.Body>
+          <InvitationsTableBody
+            rows={table.rows}
+            columnCount={columnCount}
+            isLoading={isLoading}
+            isError={isError}
+            onRetry={onRetry}
+            hasBulkAction={Boolean(onBulkAction)}
+            onRevokeClick={onRevoke ? invitation => revokeDialog.open(invitation) : undefined}
+            registerTrigger={removalFocus.registerTrigger}
+          />
         </Table.Root>
-        {table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange) ? (
+        {pagination ? (
           <Pagination
-            page={table.pagination.pageIndex + 1}
-            pageSize={table.pagination.pageSize}
-            totalItems={totalCount}
+            {...pagination}
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
             nextPageLabel={m.nextPage}
-            onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
-            onPageSizeChange={
-              onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
-            }
           />
         ) : null}
       </div>
@@ -250,5 +134,130 @@ export function InvitationsTableTabView({
         />
       ) : null}
     </>
+  );
+}
+
+function InvitationsTableBody({
+  rows,
+  columnCount,
+  isLoading,
+  isError,
+  onRetry,
+  hasBulkAction,
+  onRevokeClick,
+  registerTrigger,
+}: {
+  rows: Array<{
+    id: string;
+    original: OrganizationProfileInvitation;
+    getIsSelected: () => boolean;
+    toggleSelected: () => void;
+  }>;
+  columnCount: number;
+  isLoading: boolean;
+  isError: boolean;
+  onRetry?: () => void;
+  hasBulkAction: boolean;
+  onRevokeClick?: (invitation: OrganizationProfileInvitation) => void;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+}) {
+  const m = useMessages('invitationsTableTab');
+  if (isLoading) {
+    return (
+      <Table.Body>
+        <Table.Empty colSpan={columnCount}>
+          <span role='status'>
+            <Spinner />
+            <VisuallyHidden>{m.loading}</VisuallyHidden>
+          </span>
+        </Table.Empty>
+      </Table.Body>
+    );
+  }
+  if (isError) {
+    return (
+      <Table.Body>
+        <Table.Empty colSpan={columnCount}>
+          <EmptyState.Root role='alert'>
+            <EmptyState.Icon name='exclamation-circle' />
+            <EmptyState.Label>{m.loadError}</EmptyState.Label>
+            {onRetry ? (
+              <EmptyState.Actions>
+                <Button onClick={onRetry}>{m.retry}</Button>
+              </EmptyState.Actions>
+            ) : null}
+          </EmptyState.Root>
+        </Table.Empty>
+      </Table.Body>
+    );
+  }
+  if (rows.length === 0) {
+    return (
+      <Table.Body>
+        <Table.Empty colSpan={columnCount}>
+          <EmptyState.Root role='status'>
+            <EmptyState.Icon name='envelope' />
+            <EmptyState.Label>{m.noInvitations}</EmptyState.Label>
+            <EmptyState.Description>{m.noInvitationsDescription}</EmptyState.Description>
+          </EmptyState.Root>
+        </Table.Empty>
+      </Table.Body>
+    );
+  }
+  return (
+    <Table.Body>
+      {rows.map(row => (
+        <Table.Row
+          key={row.id}
+          selected={hasBulkAction && row.getIsSelected()}
+        >
+          {hasBulkAction ? (
+            <Table.SelectCell
+              aria-label={fill(m.select, { name: row.original.email })}
+              checked={row.getIsSelected()}
+              onToggleSelected={row.toggleSelected}
+            />
+          ) : null}
+          <Table.Cell>
+            <Item.Root>
+              <Item.Media>
+                <Avatar.Root
+                  size='fit'
+                  aria-hidden
+                >
+                  {row.original.imageUrl ? (
+                    <Avatar.Image
+                      src={row.original.imageUrl}
+                      alt=''
+                    />
+                  ) : null}
+                  <Avatar.Fallback />
+                </Avatar.Root>
+              </Item.Media>
+              <Item.Content>
+                <Item.Label>{row.original.email}</Item.Label>
+              </Item.Content>
+            </Item.Root>
+          </Table.Cell>
+          <Table.Cell noWrap>{row.original.invitedAtLabel}</Table.Cell>
+          <Table.Cell>{row.original.roleLabel}</Table.Cell>
+          {onRevokeClick ? (
+            <Table.Cell align='end'>
+              <ActionMenu
+                label={fill(m.manage, { name: row.original.email })}
+                triggerRef={registerTrigger(row.original.id)}
+                actions={[
+                  {
+                    label: m.revoke,
+                    color: 'negative',
+                    onClick: () => onRevokeClick(row.original),
+                  },
+                ]}
+              />
+            </Table.Cell>
+          ) : null}
+        </Table.Row>
+      ))}
+    </Table.Body>
   );
 }

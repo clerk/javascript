@@ -1,5 +1,30 @@
 # @clerk/electron
 
+## 0.1.0
+
+### Minor Changes
+
+- - OAuth sign-in without the `renderer` option in `createClerkBridge()` now throws a Clerk error that asks for it. Previously it failed with Electron's "No handler registered" error. ([#10000](https://github.com/clerk/javascript/pull/10000)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  - Telemetry now reports `@clerk/electron` instead of `@clerk/react`.
+  - Add a `@clerk/electron/react/experimental` entry point that re-exports `@clerk/react/experimental`.
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/clerk-js@6.39.0
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+
+## 0.0.52
+
+### Patch Changes
+
+- Updated dependencies [[`fc7d050`](https://github.com/clerk/javascript/commit/fc7d0506c59ca01f7d86bea1a9999a1fe4dd81ff), [`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/clerk-js@6.38.1
+  - @clerk/react@6.17.7
+  - @clerk/shared@4.39.1
+
 ## 0.0.51
 
 ### Patch Changes

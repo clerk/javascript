@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
-import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionNestedItemMarker } from './section.markers.stylex';
 
 const compact = '@container cl-section (width < 26rem)';
 
@@ -13,11 +13,6 @@ export const styles = stylex.create({
     width: '100%',
   },
   group: {
-    borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-xl'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    backgroundColor: colorVars['--cl-color-background'],
     containerName: 'cl-section',
     containerType: 'inline-size',
     display: 'flex',
@@ -25,42 +20,36 @@ export const styles = stylex.create({
     width: '100%',
   },
   header: {
-    marginInline: space['4'],
-    paddingBlock: space['3'],
-    alignContent: 'center',
     alignItems: 'center',
     columnGap: space['3'],
-    display: 'grid',
-    gridTemplateColumns: 'minmax(50%, 1fr) minmax(0, max-content)',
-    minHeight: space['13'],
-    width: 'auto',
+    display: 'flex',
+    flexWrap: 'wrap',
+    marginBlockEnd: space['3'],
+    rowGap: space['3'],
+    width: '100%',
   },
   title: {
-    gridColumn: '1',
     color: colorVars['--cl-color-foreground'],
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
-  headerDescription: {
-    gridColumn: '1',
-    marginTop: space['0.5'],
+  headerContent: {
+    flexBasis: '50%',
+    flexGrow: 9999,
   },
   headerActions: {
-    gridColumn: '2',
-    gridRowEnd: {
-      default: 'auto',
-      [stylex.when.siblingBefore(':where(*)', sectionHeaderDescriptionMarker)]: 'span 2',
-    },
-    gridRowStart: '1',
+    flexBasis: 'auto',
+    flexGrow: 1,
+    flexShrink: 1,
+    justifyContent: 'start',
     maxWidth: 'none',
   },
   body: {
-    marginInline: space['4'],
-    borderBlockStartColor: colorVars['--cl-color-border'],
-    borderBlockStartStyle: 'solid',
-    borderBlockStartWidth: {
-      default: '0px',
-      [stylex.when.siblingBefore(':where(*)', sectionHeaderMarker)]: '1px',
-    },
+    borderColor: colorVars['--cl-color-border'],
+    borderRadius: radiusVars['--cl-radius-xl'],
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    paddingInline: space['4'],
+    backgroundColor: colorVars['--cl-color-background'],
     display: 'flex',
     flexDirection: 'column',
     width: 'auto',
