@@ -120,6 +120,7 @@ import type {
   ResumeAfterProtectCheckParams,
   SDKMetadata,
   SessionResource,
+  SessionTask,
   SessionTouchParams,
   SetActiveParams,
   SignedInSessionResource,
@@ -2011,7 +2012,7 @@ export class Clerk implements ClerkInterface {
         await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
       }
 
-      const taskUrl =
+      let taskUrl =
         newSession?.status === 'pending' &&
         newSession?.currentTask &&
         this.#options.taskUrls?.[newSession?.currentTask.key];
@@ -2061,6 +2062,16 @@ export class Clerk implements ClerkInterface {
         newSession = this.#getSessionFromClient(newSession?.id, updatedClient);
       }
 
+      if (
+        !taskUrl &&
+        !setActiveNavigate &&
+        shouldSwitchOrganization &&
+        newSession?.status === 'pending' &&
+        newSession.currentTask
+      ) {
+        taskUrl = this.#buildTaskUrl(newSession.currentTask);
+      }
+
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
       try {
         const token = await newSession?.getToken();
@@ -2085,7 +2096,7 @@ export class Clerk implements ClerkInterface {
       //   automatic reloading when reloading shouldn't be happening.
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
-      if (shouldNavigate) {
+      if (shouldNavigate || taskUrl) {
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
@@ -2421,7 +2432,11 @@ export class Clerk implements ClerkInterface {
       return '';
     }
 
-    const customTaskUrl = this.#options.taskUrls?.[currentTask.key];
+    return this.#buildTaskUrl(currentTask, options);
+  }
+
+  #buildTaskUrl(task: SessionTask, options?: TasksRedirectOptions): string {
+    const customTaskUrl = this.#options.taskUrls?.[task.key];
     if (customTaskUrl) {
       return customTaskUrl;
     }
@@ -2429,7 +2444,7 @@ export class Clerk implements ClerkInterface {
     return buildURL(
       {
         base: this.buildSignInUrl(options),
-        hashPath: getTaskEndpoint(currentTask),
+        hashPath: getTaskEndpoint(task),
       },
       {
         stringify: true,

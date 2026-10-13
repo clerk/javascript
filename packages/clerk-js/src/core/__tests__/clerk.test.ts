@@ -644,6 +644,82 @@ describe('Clerk singleton', () => {
       });
     });
 
+    describe('when switching organization leaves the session pending', () => {
+      const pendingTask = { key: 'setup-enterprise-sso' } as const;
+      const createSession = () => {
+        const session: any = {
+          id: '1',
+          remove: vi.fn(),
+          status: 'active',
+          user: {},
+          getToken: vi.fn(),
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+          tasks: null,
+          currentTask: undefined,
+        };
+        const becomePending = () => {
+          session.status = 'pending';
+          session.tasks = [pendingTask];
+          session.currentTask = pendingTask;
+          return Promise.resolve();
+        };
+        session.touch = vi.fn(becomePending);
+        session.__internal_touch = vi.fn(becomePending);
+        return session;
+      };
+
+      it('navigates to the task on the sign-in page instead of the redirect url', async () => {
+        const mockSession = createSession();
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = vi.fn();
+        await sut.load({ signInUrl: '/sign-in' });
+        await sut.setActive({ organization: 'org_id', redirectUrl: '/dashboard' });
+
+        expect(sut.navigate).toHaveBeenCalledTimes(1);
+        expect(vi.mocked(sut.navigate).mock.calls[0][0]).toContain('/sign-in#/tasks/setup-enterprise-sso');
+      });
+
+      it('navigates to the task even without a redirect url', async () => {
+        const mockSession = createSession();
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = vi.fn();
+        await sut.load({ signInUrl: '/sign-in' });
+        await sut.setActive({ organization: 'org_id' });
+
+        expect(vi.mocked(sut.navigate).mock.calls[0][0]).toContain('/sign-in#/tasks/setup-enterprise-sso');
+      });
+
+      it('navigates to the `taskUrls` option for the task', async () => {
+        const mockSession = createSession();
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = vi.fn();
+        await sut.load({ taskUrls: { 'setup-enterprise-sso': '/sso' } });
+        await sut.setActive({ organization: 'org_id' });
+
+        expect(sut.navigate).toHaveBeenCalledWith('/sso');
+      });
+
+      it('leaves navigation to the `navigate` callback', async () => {
+        const mockSession = createSession();
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
+        const navigate = vi.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = vi.fn();
+        await sut.load({ signInUrl: '/sign-in' });
+        await sut.setActive({ organization: 'org_id', navigate });
+
+        expect(navigate).toHaveBeenCalled();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+    });
+
     describe('with force organization selection enabled', () => {
       const mockSession = {
         id: '1',

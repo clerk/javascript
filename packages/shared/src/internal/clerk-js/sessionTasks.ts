@@ -10,6 +10,7 @@ export const INTERNAL_SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], stri
   'choose-organization': 'choose-organization',
   'reset-password': 'reset-password',
   'setup-mfa': 'setup-mfa',
+  'setup-enterprise-sso': 'setup-enterprise-sso',
 } as const;
 
 /**
