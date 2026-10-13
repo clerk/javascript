@@ -38,6 +38,8 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | A confirm step before an action                                         | `useConfirmController` (`src/blocks/confirm/`) with `Confirmation` (`src/blocks/confirmation/`)               |
 | A delete that needs the user to type a phrase                           | `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)                 |
 | An action that may need step-up verification                            | `useReverificationFlow` (`src/features/reverification/`) in the wrapper, passed to `useConfirmController`     |
+| Switching dialog content to a step-up challenge                         | `ReverificationFlow` (`src/features/reverification/`); the host owns its dialog and close callback            |
+| Preserving step-up and cancellation errors in a custom model mapper     | Rethrow errors matched by `isReverificationError` (`src/utils/errors.ts`) before mapping user errors          |
 | Showing any error to the user                                           | One of the owners above. They call `toLocalizableError` and resolve copy with `useErrorText`                  |
 | Moving focus after a list row is removed                                | `useListRemovalFocus` (`src/hooks/`)                                                                          |
 | A debounced, abortable async check as the user types                    | `useDebouncedAsync` (`src/hooks/`)                                                                            |

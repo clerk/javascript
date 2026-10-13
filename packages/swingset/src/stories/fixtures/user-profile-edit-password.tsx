@@ -47,6 +47,7 @@ export function useUserProfileEditPasswordFixture({
     action: (
       <UserProfileEditPasswordDialog
         form={controller.form}
+        step={controller.step}
         passwordFeedback={controller.passwordFeedback}
         hasPassword={hasPassword}
         open={controller.isOpen}
