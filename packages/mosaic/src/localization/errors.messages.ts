@@ -1,10 +1,12 @@
 export const errorMessages: { readonly generic: string } & Readonly<Record<string, string>> = {
   generic: 'Something went wrong. Please try again.',
+  already_a_member_in_organization: 'Some of these email addresses already belong to members of this organization.',
   action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
   active_device_unavailable: 'This device is no longer available. Please try again.',
   avatar_file_count_exceeded: 'Only one file can be uploaded at a time.',
   avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
   avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
+  bulk_size_exceeded: 'You can invite up to 50 email addresses at a time.',
   captcha_unavailable:
     'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
   connected_account_unavailable: 'This connected account is no longer available.',
@@ -12,6 +14,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_new_password_matches_current: 'New password cannot be the same as the current password.',
   form_param_format_invalid__email_address: 'Email address must be a valid email address.',
   form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
+  form_param_value_invalid__role: 'This role cannot be assigned here.',
   form_password_incorrect: 'Your current password is incorrect.',
   form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
   form_password_matches_identifier:
@@ -28,12 +31,17 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_password_validation_failed: 'Incorrect Password',
   form_username_invalid_length: 'Your username must be between {min_length} and {max_length} characters long.',
   form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
+  insufficient_seats:
+    'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_change_plan:
     'Your organization does not have enough seats to invite the desired number of members. Please change to a plan that supports the number of members you are attempting to invite.',
   insufficient_seats_contact_support:
     'Your organization does not have enough seats to invite the desired number of members. Please contact support.',
   invitation_unavailable: 'This invitation is no longer pending.',
+  invitations_not_supported_in_organization:
+    "This organization doesn't support email invitations. Please contact support to enable this feature.",
   member_unavailable: 'This member is no longer available to manage.',
+  missing_organization_permission: 'You do not have permission to perform this action.',
   mfa_account_changed: 'This account changed. Please try again.',
   mfa_authenticator_unavailable: 'Authenticator is unavailable.',
   mfa_method_cannot_remove: 'This method cannot be removed.',
@@ -41,8 +49,12 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   mfa_print_unavailable: 'Printing is unavailable in this browser.',
   mfa_setup_factor_first: 'Set up a verification method first.',
   network_error: 'Unable to reach the server. Check your connection and try again.',
+  not_a_member_in_organization: 'You are no longer a member of this organization.',
+  not_allowed_access: 'Some of these email addresses are not allowed to access this application.',
   oauth_access_denied: 'You did not grant access to your account.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
+  organization_changed: 'The active organization changed. Please try again.',
+  organization_invitation_not_unique: 'An invitation is already pending for this email address.',
   organization_invitation_not_pending: 'This invitation is no longer pending.',
   organization_membership_quota_exceeded:
     'You have reached your limit of organization memberships, including outstanding invitations.',
@@ -69,6 +81,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   role_unavailable: 'This role is no longer available.',
   sso_bypass_domain_not_served:
     'This member could not be added because their email address is not served by a connection.',
+  resource_not_found__role: 'This role is no longer available.',
   ticket_expired_code: 'This link has expired. Please start again or request a new link.',
   ticket_invalid_code:
     'This link is no longer valid or has already been used. Please start again or request a new link.',

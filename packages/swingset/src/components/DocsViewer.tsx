@@ -80,6 +80,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     drawer: dynamic(() => import('../stories/drawer.component.mdx')),
     'empty-state': dynamic(() => import('../stories/empty-state.mdx')),
+    entity: dynamic(() => import('../stories/entity.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
@@ -128,6 +129,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     // Headless hooks — alphabetical.
     'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
     'use-form': dynamic(() => import('../stories/use-form.mdx')),
+    'use-server-data-table': dynamic(() => import('../stories/use-server-data-table.mdx')),
   },
   localization: {
     localization: dynamic(() => import('../stories/localization.mdx')),

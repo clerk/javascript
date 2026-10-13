@@ -82,6 +82,13 @@ import {
   NoResults as EmptyStateNoResults,
 } from '../stories/empty-state.stories';
 import {
+  Default as EntityDefault,
+  LabelOnly as EntityLabelOnly,
+  meta as entityMeta,
+  Truncation as EntityTruncation,
+  WithBadge as EntityWithBadge,
+} from '../stories/entity.stories';
+import {
   Default as FieldDefault,
   meta as fieldMeta,
   VisuallyHiddenLabel as FieldVisuallyHiddenLabel,
@@ -302,6 +309,10 @@ import {
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
+import {
+  Default as UseServerDataTableDefault,
+  meta as useServerDataTableMeta,
+} from '../stories/use-server-data-table.stories';
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
@@ -593,6 +604,14 @@ const dataListModule: StoryModule = {
   Plain: DataListPlain,
 };
 
+const entityModule: StoryModule = {
+  meta: entityMeta,
+  Default: EntityDefault,
+  WithBadge: EntityWithBadge,
+  LabelOnly: EntityLabelOnly,
+  Truncation: EntityTruncation,
+};
+
 const itemModule: StoryModule = {
   meta: itemMeta,
   Default: ItemDefault,
@@ -720,6 +739,8 @@ const scrollAreaModule: StoryModule = {
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
+
+const useServerDataTableModule: StoryModule = { meta: useServerDataTableMeta, Default: UseServerDataTableDefault };
 
 const localizationModule: StoryModule = {
   meta: localizationMeta,
@@ -994,6 +1015,7 @@ export const registry: StoryModule[] = [
   dialogComponentModule,
   drawerComponentModule,
   emptyStateModule,
+  entityModule,
   headingModule,
   iconModule,
   iconFrameModule,
@@ -1036,6 +1058,7 @@ export const registry: StoryModule[] = [
   // Hooks
   useDataTableModule,
   useFormModule,
+  useServerDataTableModule,
   // Localization
   localizationModule,
 ];

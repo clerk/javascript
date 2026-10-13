@@ -118,7 +118,6 @@ export { SegmentedControl } from '../components/segmented-control';
 export type { SegmentedControlItemProps, SegmentedControlRootProps } from '../components/segmented-control';
 export { Tabs } from '../components/tabs';
 export type {
-  TabsIndicatorProps,
   TabsListProps,
   TabsPanelProps,
   TabsPanelsProps,

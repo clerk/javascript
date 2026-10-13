@@ -164,6 +164,57 @@ describe('Mosaic Dialog', () => {
   });
 });
 
+describe('shouldCloseOnInteractOutside', () => {
+  function Verify({ shouldCloseOnInteractOutside }: { shouldCloseOnInteractOutside?: boolean }) {
+    return (
+      <Dialog.Root
+        defaultOpen
+        shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
+      >
+        <Dialog.Popup>
+          <Surface title='Verify it is you' />
+        </Dialog.Popup>
+      </Dialog.Root>
+    );
+  }
+
+  it('closes on an outside press by default', async () => {
+    const user = userEvent.setup();
+    render(<Verify />);
+
+    await user.click(document.querySelector('.cl-dialog-backdrop') as HTMLElement);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('stays open on an outside press when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.click(document.querySelector('.cl-dialog-backdrop') as HTMLElement);
+
+    expect(screen.getByRole('dialog', { name: 'Verify it is you' })).toBeInTheDocument();
+  });
+
+  it('still closes on Escape when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('keeps the corner dismiss when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+});
+
 // A `profile` dialog (account profile) opening a `card` dialog (add an email address) is a real
 // shape, so the `FloatingTree` nesting the headless README claims is exercised here rather than
 // assumed. Dismissal must reach the topmost dialog only, and the body must stay locked until the

@@ -8,8 +8,8 @@ import { Badge } from '../../components/badge';
 import { Banner } from '../../components/banner';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
+import { Entity } from '../../components/entity';
 import { Icon } from '../../components/icon';
-import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { Select } from '../../components/select';
 import { Spinner } from '../../components/spinner';
@@ -317,8 +317,8 @@ function MemberRow({
         />
       ) : null}
       <Table.Cell>
-        <Item.Root>
-          <Item.Media>
+        <Entity.Root>
+          <Entity.Media>
             <Avatar.Root
               size='fit'
               aria-hidden
@@ -331,9 +331,9 @@ function MemberRow({
               ) : null}
               <Avatar.Fallback />
             </Avatar.Root>
-          </Item.Media>
-          <Item.Content>
-            <Item.Label xstyle={styles.name}>
+          </Entity.Media>
+          <Entity.Content>
+            <Entity.Label>
               {member.name}
               {member.isCurrentUser ? (
                 <Badge>{m.you}</Badge>
@@ -342,10 +342,10 @@ function MemberRow({
               ) : member.isBanned ? (
                 <Badge color='negative'>{m.banned}</Badge>
               ) : null}
-            </Item.Label>
-            <Item.Description>{member.email}</Item.Description>
-          </Item.Content>
-        </Item.Root>
+            </Entity.Label>
+            <Entity.Description>{member.email}</Entity.Description>
+          </Entity.Content>
+        </Entity.Root>
       </Table.Cell>
       <Table.Cell noWrap>{member.joinedAtLabel}</Table.Cell>
       <Table.Cell>

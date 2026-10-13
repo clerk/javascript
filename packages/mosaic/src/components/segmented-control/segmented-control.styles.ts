@@ -12,6 +12,7 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 
+// Literals: StyleX cannot import them. Must match `tabs.styles.ts`.
 const anchors = '@supports (anchor-scope: all) and (not (-moz-appearance: none))' as const;
 const noAnchors = '@supports not ((anchor-scope: all) and (not (-moz-appearance: none)))' as const;
 const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
