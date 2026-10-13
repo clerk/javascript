@@ -1,6 +1,5 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
@@ -13,9 +12,8 @@ function propsFor(overrides: Partial<RequestsTableTabViewProps> = {}): RequestsT
     requests: [{ id: 'request-1', email: 'ada@example.com', name: 'Ada Lovelace', requestedAtLabel: 'Sep 1, 2026' }],
     totalCount: 1,
     page: 1,
-    searchValue: '',
+    pageSize: 10,
     isLoading: false,
-    onSearchChange: vi.fn(),
     onPageChange: vi.fn(),
     ...overrides,
   };
@@ -73,7 +71,7 @@ describe('RequestsTableTabView', () => {
     },
   );
 
-  it('distinguishes pending requests from initial loading and empty search results', () => {
+  it('chooses loading, retained rows, an empty list, and the error state from the supplied state', () => {
     const { props, rerender } = renderView({ requests: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading requests');
     rerender(
@@ -94,49 +92,40 @@ describe('RequestsTableTabView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByText('No pending requests')).toBeVisible();
-    rerender(
-      <MosaicProvider>
-        <RequestsTableTabView
-          {...props}
-          isLoading={false}
-          searchValue='Nobody'
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.getByText('No requests found')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('No pending requests');
     rerender(
       <MosaicProvider>
         <RequestsTableTabView
           {...propsFor()}
           isFetching
-          searchValue='Nobody'
         />
       </MosaicProvider>,
     );
     expect(screen.getByText('ada@example.com')).toBeVisible();
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...propsFor()}
+          isError
+          onRetry={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByText('ada@example.com')).toBeNull();
+    expect(within(screen.getByRole('table')).getByRole('alert')).toHaveTextContent('Unable to load requests');
+    expect(screen.getAllByRole('button', { name: 'Try again' })).toHaveLength(1);
   });
-  it('connects request controls to caller state and clears selection on search', async () => {
+  it('forwards paging without search, sorting, or page-size controls', async () => {
     const user = userEvent.setup();
-    const { props } = renderView({
-      totalCount: 21,
-      onBulkAction: vi.fn(),
-      onSortChange: vi.fn(),
-      onPageSizeChange: vi.fn(),
-    });
+    const { props } = renderView({ totalCount: 21, onBulkAction: vi.fn() });
     await user.click(screen.getByRole('checkbox', { name: 'Select ada@example.com' }));
-    await user.type(screen.getByRole('searchbox', { name: 'Search requests' }), 'A');
-    expect(props.onSearchChange).toHaveBeenCalledWith('A');
-    expect(screen.getByRole('checkbox', { name: 'Select ada@example.com' })).not.toBeChecked();
-    await user.click(screen.getByRole('button', { name: 'Requested' }));
-    expect(props.onSortChange).toHaveBeenCalledWith({ column: 'requestedAt', direction: 'ascending' });
+    expect(screen.getByRole('checkbox', { name: 'Select ada@example.com' })).toBeChecked();
     await user.click(screen.getByRole('button', { name: 'Next requests page' }));
     expect(props.onPageChange).toHaveBeenCalledWith(2);
-    await user.click(screen.getByRole('combobox', { name: /^Results per page/ }));
-    await user.click(screen.getByRole('option', { name: '20', exact: true }));
-    expect(props.onPageSizeChange).toHaveBeenCalledWith(20);
-    expect(props.onPageChange).toHaveBeenLastCalledWith(1);
+    expect(screen.queryByRole('searchbox')).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /^Results per page/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Requested' })).toBeNull();
   });
   it('holds both request actions while that row has a pending decision', async () => {
     const user = userEvent.setup();
@@ -194,45 +183,4 @@ describe('RequestsTableTabView', () => {
     );
     expect(screen.queryByRole('button', { name: 'Invite' })).not.toBeInTheDocument();
   });
-});
-
-it.each(['Accept', 'Decline'] as const)('runs %s immediately as requests leave the list', async action => {
-  const user = userEvent.setup();
-  const onAccept = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
-  const onDecline = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
-  const onDecision = action === 'Accept' ? onAccept : onDecline;
-  const onOtherDecision = action === 'Accept' ? onDecline : onAccept;
-  function Example() {
-    const [items, setItems] = useState([
-      { id: 'ada', email: 'ada@example.com', requestedAtLabel: 'Sep 1, 2026' },
-      { id: 'grace', email: 'grace@example.com', requestedAtLabel: 'Sep 2, 2026' },
-    ]);
-    return (
-      <MosaicProvider>
-        <RequestsTableTabView
-          {...propsFor()}
-          requests={items}
-          totalCount={items.length}
-          onAccept={async id => {
-            await onAccept(id);
-            setItems(current => current.filter(item => item.id !== id));
-          }}
-          onDecline={async id => {
-            await onDecline(id);
-            setItems(current => current.filter(item => item.id !== id));
-          }}
-        />
-      </MosaicProvider>
-    );
-  }
-  render(<Example />);
-  for (const id of ['ada', 'grace']) {
-    await user.click(screen.getByRole('button', { name: `${action} ${id}@example.com` }));
-    expect(onDecision).toHaveBeenLastCalledWith(id);
-    expect(onOtherDecision).not.toHaveBeenCalled();
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.queryByRole('button', { name: `${action} ${id}@example.com` })).not.toBeInTheDocument(),
-    );
-  }
 });

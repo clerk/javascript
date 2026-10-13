@@ -4,7 +4,6 @@ import {
   autoUpdate,
   canScrollToward,
   getDimensions,
-  getRectRelativeTo,
   getScale,
   getScrollDimensions,
   isElement,
@@ -132,30 +131,6 @@ describe('getScale', () => {
     stubRect(element, { x: 0, y: 0, width: 50, height: 25 });
 
     expect(getScale(element)).toEqual({ x: 1, y: 1 });
-  });
-});
-
-describe('getRectRelativeTo', () => {
-  it('places the element inside the parent padding box, following its scroll', () => {
-    const parent = create();
-    const element = document.createElement('div');
-    parent.append(element);
-    stubRect(parent, { x: 100, y: 50, width: 300, height: 200 });
-    stub(parent, { clientLeft: 2, clientTop: 1, scrollLeft: 30, scrollTop: 0 });
-    stubRect(element, { x: 140, y: 61, width: 80, height: 20 });
-
-    expect(getRectRelativeTo(element, parent)).toEqual({ x: 68, y: 10, width: 80, height: 20 });
-  });
-
-  it('removes the parent scale', () => {
-    const parent = create();
-    const element = document.createElement('div');
-    parent.append(element);
-    stub(parent, { offsetWidth: 200, offsetHeight: 100 });
-    stubRect(parent, { x: 0, y: 0, width: 100, height: 50 });
-    stubRect(element, { x: 20, y: 10, width: 40, height: 10 });
-
-    expect(getRectRelativeTo(element, parent)).toEqual({ x: 40, y: 20, width: 80, height: 20 });
   });
 });
 

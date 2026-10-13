@@ -24,6 +24,7 @@ export interface OrganizationProfileInviteMembersDialogProps {
   roles: SelectItem[];
   role: string | null;
   onRoleChange: (role: string | null) => void;
+  isRoleDisabled?: boolean;
   isPending: boolean;
   error: string | null;
   onSubmit: () => void | Promise<void>;
@@ -39,6 +40,7 @@ export function OrganizationProfileInviteMembersDialog({
   roles,
   role,
   onRoleChange,
+  isRoleDisabled = false,
   isPending,
   error,
   onSubmit,
@@ -102,6 +104,7 @@ export function OrganizationProfileInviteMembersDialog({
               <TagInput
                 ref={emailInput}
                 name='emailAddresses'
+                delimiters={[',', ' ']}
                 value={emailAddresses}
                 onValueChange={onEmailAddressesChange}
                 validate={isValid}
@@ -113,7 +116,7 @@ export function OrganizationProfileInviteMembersDialog({
             </Field.Root>
             <Field.Root
               required
-              disabled={isPending}
+              disabled={isPending || isRoleDisabled}
             >
               <Field.Label>{m.roleLabel}</Field.Label>
               <Select.Root

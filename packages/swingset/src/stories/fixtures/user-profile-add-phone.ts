@@ -1,5 +1,5 @@
-import type { UserProfilePhoneVerifier } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
-import type { UserProfileAccountSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
+import type { UserProfilePhoneVerifier } from '@clerk/mosaic/features/user-profile/user-profile-contact.types';
+import type { ReadyPhoneSectionModel } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.types';
 
 interface FixtureOptions {
   fail?: 'create' | 'verify';
@@ -10,7 +10,7 @@ interface FixtureOptions {
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function createUserProfileAddPhoneFixture({ fail, onCreated, onVerified }: FixtureOptions = {}): Pick<
-  UserProfileAccountSectionViewProps,
+  ReadyPhoneSectionModel,
   'onCreatePhone' | 'getPhoneVerifier'
 > {
   const verifier = (id: string): UserProfilePhoneVerifier => ({

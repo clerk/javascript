@@ -5,10 +5,13 @@ import type {
   EmailAddressJSON,
   EnterpriseConnectionJSON,
   OAuthProvider,
+  OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
+  OrganizationMembershipRequestJSON,
   OrganizationSuggestionJSON,
   PhoneNumberJSON,
+  RoleJSON,
   SessionJSON,
   SessionWithActivitiesJSON,
   UserJSON,
@@ -20,6 +23,7 @@ import { setupWorker } from 'msw/browser';
 
 import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
 import { createMfaState, type FakeMfaState, mfaHandlers } from './fake-fapi/mfa';
+import { organizationMemberHandlers } from './fake-fapi/organization-members';
 import { type FakePasskeysSeed, passkeyHandlers } from './fake-fapi/passkeys';
 import { envelope, error, findSession, missing, updateUser, VERIFICATION_CODE } from './fake-fapi/shared';
 import {
@@ -44,17 +48,31 @@ import {
   fapiWeb3Wallet,
 } from './fapi';
 
-export const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
-const FAPI = 'https://clerk.abcef.12345.prod.lclclerk.com';
+const FAPI_DOMAIN = '12345.prod.lclclerk.com';
+let fapiRun = 0;
+let fapiHost = `clerk.run${fapiRun}.${FAPI_DOMAIN}`;
 
-export const fapiUrl = (path: string) => `${FAPI}${path}`;
+export function switchFapiHost() {
+  fapiRun += 1;
+  fapiHost = `clerk.run${fapiRun}.${FAPI_DOMAIN}`;
+}
+
+export const publishableKey = () => `pk_live_${btoa(`${fapiHost}$`)}`;
+
+export const fapiUrl = (path: string) => `https://${fapiHost}${path}`;
 
 export interface FakeFapiState {
   environment: FapiEnvironment;
   client: ClientJSON;
   country?: string;
   memberships: OrganizationMembershipJSON[];
+  roles: RoleJSON[];
+  hasRoleSetMigration: boolean;
   invitations: UserOrganizationInvitationJSON[];
+  organizationInvitations: OrganizationInvitationJSON[];
+  organizationMembershipRequests: Array<
+    Omit<OrganizationMembershipRequestJSON, 'status'> & { status: 'pending' | 'accepted' | 'rejected' }
+  >;
   suggestions: OrganizationSuggestionJSON[];
   apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
@@ -82,13 +100,17 @@ export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpr
 
 const unhandled: string[] = [];
 
-export const worker = setupWorker();
+export const worker = setupWorker(
+  http.all(`https://*.${FAPI_DOMAIN}/*`, ({ request }) =>
+    new URL(request.url).host === fapiHost ? undefined : HttpResponse.error(),
+  ),
+);
 
 export function startWorker() {
   return worker.start({
     quiet: true,
     onUnhandledRequest: request => {
-      if (new URL(request.url).origin === FAPI) {
+      if (new URL(request.url).host === fapiHost) {
         unhandled.push(`${request.method} ${request.url}`);
       }
     },
@@ -286,7 +308,11 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     environment: fapiEnvironment(),
     client: fapiClient(),
     memberships: [],
+    roles: [],
+    hasRoleSetMigration: false,
     invitations: [],
+    organizationInvitations: [],
+    organizationMembershipRequests: [],
     suggestions: [],
     apiKeys: [],
     passwordUpdates: [],
@@ -306,6 +332,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   let identifications = 0;
 
   worker.use(
+    ...organizationMemberHandlers(state, fapiUrl),
     ...verificationHandlers(state, fapiUrl),
     ...enterpriseHandlers(state, fapiUrl),
     ...passkeyHandlers(state, fapiUrl, passkeys),
