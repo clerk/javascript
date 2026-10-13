@@ -12,15 +12,16 @@ const mocks = vi.hoisted(() => {
 
 vi.mock('react-native', () => {
   return {
+    AppState: mocks.appState,
     Platform: mocks.platform,
   };
 });
 
-vi.mock('../../utils', () => {
+vi.mock('../../utils', async () => {
+  const runtime = await vi.importActual<typeof import('../../utils/runtime')>('../../utils/runtime');
   return {
     isNative: () => true,
-    isAppInBackgroundOrInactive: () =>
-      mocks.appState.currentState === 'background' || mocks.appState.currentState === 'inactive',
+    isAppInBackgroundOrInactive: runtime.isAppInBackgroundOrInactive,
   };
 });
 
