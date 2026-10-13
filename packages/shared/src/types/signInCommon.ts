@@ -28,6 +28,7 @@ import type {
   ResetPasswordPhoneCodeFactorConfig,
   TOTPAttempt,
   TOTPFactor,
+  TrustedDeviceAttempt,
   Web3Attempt,
   Web3SignatureConfig,
   Web3SignatureFactor,
@@ -53,6 +54,7 @@ import type {
   ResetPasswordPhoneCodeStrategy,
   TicketStrategy,
   TOTPStrategy,
+  TrustedDeviceStrategy,
   Web3Strategy,
 } from './strategies';
 import type { StartEmailLinkFlowParams } from './verification';
@@ -113,7 +115,8 @@ export type AttemptFirstFactorParams =
   | PasswordAttempt
   | Web3Attempt
   | ResetPasswordPhoneCodeAttempt
-  | ResetPasswordEmailCodeAttempt;
+  | ResetPasswordEmailCodeAttempt
+  | TrustedDeviceAttempt;
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig | EmailLinkConfig;
 
@@ -147,6 +150,13 @@ export type SignInCreateParams = (
     }
   | { strategy: PasskeyStrategy }
   | {
+      /**
+       * @experimental
+       */
+      strategy: TrustedDeviceStrategy;
+      trustedDeviceId: string;
+    }
+  | {
       strategy:
         | PhoneCodeStrategy
         | EmailCodeStrategy
@@ -169,6 +179,10 @@ export type SignInCreateParams = (
 ) & {
   transfer?: boolean;
   signUpIfMissing?: boolean;
+  /**
+   * An IANA timezone for this sign-in. Defaults to the browser's timezone when omitted, if available.
+   */
+  timezone?: string;
 };
 
 export type ResetPasswordParams = {
@@ -197,7 +211,8 @@ export type SignInStrategy =
   | TOTPStrategy
   | BackupCodeStrategy
   | OAuthStrategy
-  | EnterpriseSSOStrategy;
+  | EnterpriseSSOStrategy
+  | TrustedDeviceStrategy;
 
 export interface SignInAuthenticateWithSolanaParams {
   walletName: string;

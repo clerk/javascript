@@ -2,10 +2,12 @@ import type {
   UserProfileMfaAddableMethod,
   UserProfileMfaMethod,
   UserProfileMfaSectionViewProps,
-} from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
-import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-mfa-setup.view';
-import { stringToFormattedPhoneString } from '@clerk/shared/phone';
+} from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
+import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
 import { useEffect, useState } from 'react';
+
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosRows } from '@/lib/chaos';
 
 import { authenticatorSetup } from './user-profile-authenticator';
 
@@ -57,6 +59,12 @@ export const mfaDemoOptions: FixtureOptions = {
   },
 };
 
+const examplePhones = [
+  { id: 'personal', phoneNumber: '+18015550100', verified: true, enrolled: true },
+  { id: 'work', phoneNumber: '+14165550100', verified: false, enrolled: false },
+  { id: 'other', phoneNumber: '+18015550200', verified: true, enrolled: false },
+];
+
 const pause = () => new Promise(resolve => setTimeout(resolve, 600));
 
 export function useUserProfileMfaFixture({
@@ -77,12 +85,9 @@ export function useUserProfileMfaFixture({
   sms: UserProfileMfaSetupViewProps['sms'];
   backupCodes: UserProfileMfaSetupViewProps['backupCodes'];
 } {
+  const phones = useChaosFixture(examplePhones, items => chaosRows(items, 12));
   const [account, setAccount] = useState({
-    phones: [
-      { id: 'personal', phoneNumber: '+18015550100', verified: true, enrolled: true },
-      { id: 'work', phoneNumber: '+14165550100', verified: false, enrolled: false },
-      { id: 'other', phoneNumber: '+18015550200', verified: true, enrolled: false },
-    ],
+    phones,
     authenticator: false,
     defaultPhoneId: 'personal',
     hasBackupCodes: initialFlow === 'backup-codes' && Boolean(enrollmentBackupCodes?.length),
@@ -123,7 +128,7 @@ export function useUserProfileMfaFixture({
       return {
         id: phone.id,
         type: 'sms' as const,
-        description: stringToFormattedPhoneString(phone.phoneNumber),
+        description: phone.phoneNumber,
         isDefault,
         canSetDefault: !isDefault,
       };
@@ -327,7 +332,6 @@ export function useUserProfileMfaFixture({
     section: {
       methods,
       addableMethods,
-      sectionTitle: 'Authentication',
       onAdd: open,
       onRegenerateBackupCodes:
         account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes('regenerate') : undefined,

@@ -1,8 +1,8 @@
 import { describe, expectTypeOf, test } from 'vitest';
 
 import { assign } from './assign';
-import { createActor } from './createActor';
-import { createMachine } from './createMachine';
+import { createActor } from './create-actor';
+import { createMachine } from './create-machine';
 import { setup } from './setup';
 import type { Snapshot, StateMachine } from './types';
 

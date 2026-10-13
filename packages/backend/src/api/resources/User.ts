@@ -83,6 +83,8 @@ export class User {
 
     /** The locale of the user in BCP-47 format. */
     readonly locale: string | null,
+    /** The timezone of the user. */
+    readonly timezone: string | null = null,
   ) {}
 
   static fromJSON(data: UserJSON): User {
@@ -120,6 +122,7 @@ export class User {
       data.delete_self_enabled,
       data.legal_accepted_at,
       data.locale,
+      data.timezone,
     );
     res._raw = data;
     return res;

@@ -1,5 +1,6 @@
 import { useClerk, useUser } from '@clerk/react';
 import { useSignIn } from '@clerk/react/legacy';
+import { deprecated } from '@clerk/shared/deprecated';
 import type { SignInResource } from '@clerk/shared/types';
 import { AuthenticationType, isEnrolledAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
 import {
@@ -109,13 +110,20 @@ const useUserOwnsCredentials = ({ storeKey }: { storeKey: string }) => {
 /**
  * Exposes utilities that allow for storing and accessing an identifier, and it's password securely on the device.
  * In order to access the stored credentials, the end user will be prompted to verify themselves via biometrics.
+ *
+ * @deprecated Store the credentials with `expo-secure-store` and its `requireAuthentication` option instead, then sign in with the stored identifier and password. This hook will be removed in the next major version.
  */
 export const useLocalCredentials = (): LocalCredentialsReturn => {
+  deprecated(
+    'useLocalCredentials',
+    'Store the credentials with `expo-secure-store` and its `requireAuthentication` option instead, then sign in with the stored identifier and password. See https://docs.expo.dev/versions/latest/sdk/securestore/',
+  );
   const { isLoaded, signIn } = useSignIn();
   const { publishableKey } = useClerk();
 
-  const key = `__clerk_local_auth_${publishableKey}_identifier`;
-  const pkey = `__clerk_local_auth_${publishableKey}_password`;
+  const storeKeyBase = publishableKey.split('=').join('');
+  const key = `__clerk_local_auth_${storeKeyBase}_identifier`;
+  const pkey = `__clerk_local_auth_${storeKeyBase}_password`;
   const [hasLocalAuthCredentials, setHasLocalAuthCredentials] = useState(!!getItem(key));
   const [userOwnsCredentials, setUserOwnsCredentials] = useUserOwnsCredentials({ storeKey: key });
   const hasEnrolledBiometric = useEnrolledBiometric();
@@ -134,23 +142,24 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
       );
     }
 
-    if (creds.identifier) {
-      await setItemAsync(key, creds.identifier);
-    }
+    const identifier = creds.identifier ?? (await getItemAsync(key).catch(() => null));
 
-    const storedIdentifier = await getItemAsync(key).catch(() => null);
-
-    if (!storedIdentifier) {
+    if (!identifier) {
       return errorThrower.throw(
         `useLocalCredentials: setCredentials() an identifier should already be set in order to update its password.`,
       );
     }
 
-    setHasLocalAuthCredentials(true);
     await setItemAsync(pkey, creds.password, {
       keychainAccessible: WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
       requireAuthentication: true,
     });
+
+    if (creds.identifier) {
+      await setItemAsync(key, creds.identifier);
+    }
+
+    setHasLocalAuthCredentials(true);
   };
 
   const clearCredentials = async () => {

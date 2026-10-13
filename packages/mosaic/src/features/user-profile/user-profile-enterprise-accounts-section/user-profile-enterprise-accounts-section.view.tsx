@@ -9,14 +9,14 @@ import type {
 export interface UserProfileEnterpriseAccountsSectionViewProps {
   accounts: UserProfileEnterpriseAccount[];
   connections?: UserProfileEnterpriseConnection[];
-  pendingConnectionId?: string;
+  pendingId?: string;
   onConnect?: (id: string) => void;
 }
 
 export function UserProfileEnterpriseAccountsSectionView({
   accounts,
   connections = [],
-  pendingConnectionId,
+  pendingId,
   onConnect,
 }: UserProfileEnterpriseAccountsSectionViewProps) {
   const m = useMessages('userProfileEnterpriseAccountsSection');
@@ -25,25 +25,31 @@ export function UserProfileEnterpriseAccountsSectionView({
   }
   return (
     <Section.Root>
-      <Section.Title>{m.title}</Section.Title>
       <Section.Group>
-        {accounts.map(account => (
-          <UserProfileEnterpriseAccountRowView
-            key={account.id}
-            account={account}
-          />
-        ))}
-        {onConnect
-          ? connections.map(connection => (
-              <UserProfileEnterpriseAccountRowView
-                key={connection.id}
-                account={connection}
-                onConnect={onConnect}
-                isPending={pendingConnectionId === connection.id}
-                disabled={pendingConnectionId !== undefined}
-              />
-            ))
-          : null}
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>{m.title}</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          {accounts.map(account => (
+            <UserProfileEnterpriseAccountRowView
+              key={account.id}
+              account={account}
+            />
+          ))}
+          {onConnect
+            ? connections.map(connection => (
+                <UserProfileEnterpriseAccountRowView
+                  key={connection.id}
+                  account={connection}
+                  onConnect={onConnect}
+                  isPending={pendingId === connection.id}
+                  disabled={pendingId !== undefined}
+                />
+              ))
+            : null}
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );

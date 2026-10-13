@@ -5,8 +5,8 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
 import { shapes, sizes, styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';

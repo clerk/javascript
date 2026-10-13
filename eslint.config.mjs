@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import pluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments';
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
@@ -12,6 +13,7 @@ import pluginReact from 'eslint-plugin-react';
 import pluginReactHooks from 'eslint-plugin-react-hooks';
 import pluginStylex from '@stylexjs/eslint-plugin';
 import pluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
+import pluginSonarjs from 'eslint-plugin-sonarjs';
 import pluginTurbo from 'eslint-plugin-turbo';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import pluginYml from 'eslint-plugin-yml';
@@ -209,6 +211,30 @@ const noUnstableMethods = {
   },
 };
 
+const noRawInert = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow the raw `inert` JSX attribute',
+      recommended: false,
+    },
+    messages: {
+      useInertProps:
+        "Use `{...inertProps(active)}` from '@clerk/shared/inert' instead of a raw `inert` attribute. React 18 and 19 need different `inert` values.",
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      JSXAttribute(node) {
+        if (node.name.type === 'JSXIdentifier' && node.name.name === 'inert') {
+          context.report({ node, messageId: 'useInertProps' });
+        }
+      },
+    };
+  },
+};
+
 const noPhysicalCssProperties = {
   meta: {
     type: 'problem',
@@ -363,6 +389,7 @@ export default tseslint.config([
           'no-navigate-useClerk': noNavigateUseClerk,
           'no-unstable-methods': noUnstableMethods,
           'no-physical-css-properties': noPhysicalCssProperties,
+          'no-raw-inert': noRawInert,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -381,6 +408,7 @@ export default tseslint.config([
     },
     rules: {
       'custom-rules/no-unstable-methods': 'error',
+      'custom-rules/no-raw-inert': 'error',
       'no-label-var': 'error',
       'no-undef-init': 'warn',
       'no-restricted-imports': [
@@ -579,9 +607,40 @@ export default tseslint.config([
     // Tests assert on style values they receive; they are not authoring styles.
     ignores: ['packages/mosaic/src/__tests__/**', 'packages/mosaic/src/**/*.test.{ts,tsx}'],
     plugins: {
+      '@eslint-community/eslint-comments': pluginEslintComments,
       '@stylexjs': pluginStylex,
+      sonarjs: pluginSonarjs,
     },
     rules: {
+      '@eslint-community/eslint-comments/require-description': ['error', { ignore: ['eslint-enable'] }],
+      'sonarjs/cognitive-complexity': ['error', 15],
+      'sonarjs/no-collapsible-if': 'error',
+      'sonarjs/no-identical-functions': 'error',
+      'sonarjs/no-redundant-jump': 'error',
+      'sonarjs/prefer-single-boolean-return': 'error',
+      '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/ban-ts-comment': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
+      '@typescript-eslint/only-throw-error': 'error',
+      '@typescript-eslint/prefer-promise-reject-errors': 'error',
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
+      'react-hooks/exhaustive-deps': 'error',
+      'react-hooks/rules-of-hooks': 'error',
+      'max-lines': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],
+      'no-restricted-properties': [
+        'error',
+        { object: 'Reflect', property: 'get', message: 'Use typed property access or parse at the boundary.' },
+        { object: 'Reflect', property: 'apply', message: 'Call the function directly.' },
+      ],
       '@stylexjs/enforce-extension': 'error',
       '@stylexjs/no-legacy-contextual-styles': 'error',
       '@stylexjs/no-lookahead-selectors': 'error',

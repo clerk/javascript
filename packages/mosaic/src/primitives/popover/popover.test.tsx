@@ -139,8 +139,6 @@ describe('Popover', () => {
     });
 
     it('keeps positioner aria-labelledby/aria-describedby wired to the correct elements', () => {
-      // The primitive owns the ids on Title and Description (id is omitted from
-      // their public props) — the aria pairing must always resolve correctly.
       renderPopover({ defaultOpen: true });
 
       const title = document.querySelector('[data-testid="popover-title"]');
@@ -154,8 +152,6 @@ describe('Popover', () => {
     });
 
     it('omits aria-labelledby and aria-describedby when no Title or Description is rendered', () => {
-      // Title and Description are optional. When absent, the positioner must not
-      // emit dangling idrefs pointing at elements that were never rendered.
       render(
         <Popover.Root defaultOpen>
           <Popover.Trigger>Open popover</Popover.Trigger>
@@ -247,9 +243,7 @@ describe('Popover', () => {
       expect(positioner).toHaveAttribute('data-side', 'bottom');
     });
 
-    // jsdom reports a zero-sized viewport, which leaves `shift` no room and pins the alignment
-    // axis to its padding whatever the offset asked for. Giving it a viewport is what lets the
-    // offset show up in the transform at all.
+    // jsdom's zero-sized viewport leaves `shift` no room, which would hide the offset.
     async function transformWithViewport(props: Partial<React.ComponentProps<typeof Popover.Root>>) {
       vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
       vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
@@ -279,7 +273,6 @@ describe('Popover', () => {
       renderPopover();
 
       await user.click(screen.getByRole('button', { name: 'Open popover' }));
-      // FloatingFocusManager schedules focus via requestAnimationFrame
       await new Promise(r => requestAnimationFrame(r));
 
       const positioner = document.querySelector('[data-testid="popover-positioner"]');
@@ -299,9 +292,7 @@ describe('Popover', () => {
     it('focuses the first tabbable element when opened with the keyboard', async () => {
       renderPopover();
 
-      // A button handles Enter/Space itself, so keyboard activation reaches the popover
-      // as a click with no pointer behind it. userEvent stamps its synthetic keyboard
-      // click with a pointerType, which browsers do not.
+      // userEvent stamps keyboard clicks with a pointerType; browsers send `detail: 0` and none.
       fireEvent.click(screen.getByRole('button', { name: 'Open popover' }), { detail: 0 });
       await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
     });

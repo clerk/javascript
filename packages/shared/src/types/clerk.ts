@@ -342,6 +342,17 @@ export interface Clerk {
    */
   __internal_protectChallengeLoadTimeoutMs?: number;
 
+  /**
+   * Resolves a pending `protect_check` on the client's current sign-in or sign-up through Clerk's
+   * Protect modal. Callback pages need it because the gate arrives with the client, not on a request.
+   * Does nothing once either attempt is `complete`. Pass `flow` to resolve only that attempt's gate,
+   * so a callback for one flow does not open the challenge of a stale attempt on the other. Without
+   * `flow`, the sign-in gate is resolved before the sign-up gate.
+   *
+   * @internal
+   */
+  __internal_resolvePendingProtectCheck?: (flow?: ProtectCheckFlow) => Promise<void>;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -1382,6 +1393,11 @@ export type HandleOAuthCallbackParams = TransferableOption &
      */
     signUpProtectCheckUrl?: string | null;
     /**
+     * The full URL or path to navigate to if the sign-up must choose between several enterprise connections
+     * (`enterprise_sso` is missing). Defaults to the `enterprise-connections` route on the sign-up URL.
+     */
+    enterpriseConnectionsUrl?: string | null;
+    /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
     reloadResource?: 'signIn' | 'signUp';
@@ -1978,6 +1994,14 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
+
+export type ProtectCheckFlow = 'signIn' | 'signUp';
+
+export type __internal_ProtectCheckModalProps = {
+  resource: SignInResource | SignUpResource;
+  onResolved: () => void;
+  onFailed: (error: unknown) => void;
+};
 
 export type __internal_EnableOrganizationsPromptProps = {
   onSuccess?: () => void;

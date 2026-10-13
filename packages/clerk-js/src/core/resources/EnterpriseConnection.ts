@@ -21,6 +21,11 @@ function samlNestedFromJSON(data: EnterpriseSamlConnectionNestedJSON): Enterpris
     idpCertificate: data.idp_certificate,
     idpCertificateIssuedAt: data.idp_certificate_issued_at,
     idpCertificateExpiresAt: data.idp_certificate_expires_at,
+    idpCertificates: (data.idp_certificates ?? []).map(certificate => ({
+      certificate: certificate.certificate,
+      issuedAt: certificate.issued_at,
+      expiresAt: certificate.expires_at,
+    })),
     idpMetadataUrl: data.idp_metadata_url,
     idpMetadata: data.idp_metadata,
     acsUrl: data.acs_url,
@@ -42,6 +47,11 @@ function samlNestedToJSON(data: EnterpriseSamlConnectionNestedResource): Enterpr
     idp_certificate: data.idpCertificate,
     idp_certificate_issued_at: data.idpCertificateIssuedAt,
     idp_certificate_expires_at: data.idpCertificateExpiresAt,
+    idp_certificates: data.idpCertificates.map(certificate => ({
+      certificate: certificate.certificate,
+      issued_at: certificate.issuedAt,
+      expires_at: certificate.expiresAt,
+    })),
     idp_metadata_url: data.idpMetadataUrl,
     idp_metadata: data.idpMetadata,
     acs_url: data.acsUrl,

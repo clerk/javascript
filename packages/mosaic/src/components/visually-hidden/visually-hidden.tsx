@@ -4,8 +4,8 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { visuallyHidden } from '../../utils/visually-hidden.styles';
+import { reset } from '../../styles/reset.styles';
+import { visuallyHidden } from '../../styles/visually-hidden.styles';
 
 export type VisuallyHiddenProps = MosaicComponentProps<'span'>;
 

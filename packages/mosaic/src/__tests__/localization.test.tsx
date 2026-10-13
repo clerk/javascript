@@ -3,7 +3,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { mosaicMessages, resolveLocalization, useLocale, useMessages } from '../localization';
-import { MosaicProvider } from '../MosaicProvider';
+import { MosaicProvider } from '../mosaic-provider';
 
 describe('resolveLocalization', () => {
   it('returns the base messages untouched when nothing is overridden', () => {
@@ -22,14 +22,14 @@ describe('resolveLocalization', () => {
   it('expands dot paths', () => {
     const { messages } = resolveLocalization({ messages: { 'userButton.popup.label': 'Konto' } });
     expect(messages.userButton.popup.label).toBe('Konto');
-    expect(messages.userButton.workspaces.personal).toBe(mosaicMessages.userButton.workspaces.personal);
+    expect(messages.userButton.organizations.personal).toBe(mosaicMessages.userButton.organizations.personal);
   });
 
   it('merges plural forms per category', () => {
     const { messages } = resolveLocalization({
-      messages: { 'userButton.workspaces.members': { few: '{count} Mitglieder' } },
+      messages: { 'userButton.organizations.members': { few: '{count} Mitglieder' } },
     });
-    expect(messages.userButton.workspaces.members).toEqual({
+    expect(messages.userButton.organizations.members).toEqual({
       one: '{count} member',
       few: '{count} Mitglieder',
       other: '{count} members',

@@ -24,7 +24,6 @@ export function UserProfileSecurityIcon({ name }: { name: UserProfileSecurityIco
       {...mergeStyleProps(stylex.props(styles.media), { style: { height: space['9'], width: space['9'] } })}
     >
       <Icon
-        aria-hidden
         name={icons[name]}
         size='lg'
         xstyle={styles.icon}

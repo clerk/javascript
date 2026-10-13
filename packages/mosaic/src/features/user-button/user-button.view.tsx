@@ -4,13 +4,10 @@ import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
 
-import type { AvatarProps } from '../../components/avatar';
-import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Icon } from '../../components/icon';
-import { Item } from '../../components/item';
 import { Menu } from '../../components/menu';
 import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
@@ -20,11 +17,12 @@ import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
+import { themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { rtl } from '../../styles/rtl.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import { applyOrder } from '../../utils/apply-order';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { rtl } from '../../utils/rtl.styles';
-import { truncationStyles } from '../../utils/typography.styles';
-import type { UserButtonLayout } from './user-button.layout';
+import type { UserButtonAction, UserButtonLayout, UserButtonSlot } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
 import { styles } from './user-button.styles';
 import type {
@@ -32,12 +30,25 @@ import type {
   UserButtonBusyState,
   UserButtonCallbacks,
   UserButtonData,
+  UserButtonHeaderLayout,
   UserButtonMembership,
   UserButtonMenuItemId,
   UserButtonMenuProps,
   UserButtonModeProps,
   UserButtonSession,
 } from './user-button.types';
+import { RowAvatar, UserButtonAvatar } from './user-button-avatar.view';
+import { UserButtonHeader } from './user-button-header.view';
+import {
+  UserButtonGroup,
+  UserButtonItem,
+  UserButtonItemContent,
+  UserButtonItemDescription,
+  UserButtonItemLabel,
+  UserButtonItemMedia,
+  UserButtonItemTrailing,
+  UserButtonSeparator,
+} from './user-button-item.view';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
 // what the model and the view agree on, so neither file owns them.
@@ -50,7 +61,7 @@ export type * from './user-button.types';
 export const userButtonBusyKeys = {
   selectOrganization: (organizationId: string | null) => `select-org:${organizationId ?? 'personal'}`,
   switchSession: (sessionId: string) => `switch:${sessionId}`,
-  signOutSession: (sessionId: string) => `sign-out:${sessionId}`,
+  signOutSession: (sessionId: string, from: UserButtonSlot) => `sign-out:${from}:${sessionId}`,
   signOutAll: () => 'sign-out-all',
   acceptSuggestion: (suggestionId: string) => `accept-suggestion:${suggestionId}`,
   acceptInvitation: (invitationId: string) => `accept-invitation:${invitationId}`,
@@ -87,7 +98,7 @@ function useBusy(key?: string): { busy: boolean; disabled: boolean } {
   return { busy: pendingKey === key, disabled: pendingKey !== key };
 }
 
-type ActiveWorkspace =
+type LeadSelection =
   | {
       kind: 'organization';
       name: string;
@@ -95,80 +106,76 @@ type ActiveWorkspace =
       shape: 'square';
       organization: UserButtonMembership;
     }
-  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle' }
+  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle'; badge?: UserButtonMembership }
   | { kind: 'none'; name: string; imageUrl?: string; shape: 'square' };
 
 /**
  * What the surface leads with: named in the trigger and headed in the popup, so the two always
- * agree. An organization-led surface with no org and no personal workspace is no selection.
+ * agree. An organization-led surface with no org and no personal account is no selection.
  */
 type Messages = MosaicMessages['userButton'];
 
-function leadWorkspace(
-  { layout, activeOrganization, activeSession, hidePersonal }: UserButtonContextValue,
+function leadSelection(
+  { layout, activeOrganization, activeSession }: UserButtonContextValue,
   m: Messages,
-): ActiveWorkspace {
-  if (layout.leadWith === 'organization') {
-    if (activeOrganization) {
-      return {
-        kind: 'organization',
-        name: activeOrganization.name,
-        imageUrl: activeOrganization.imageUrl,
-        shape: 'square',
-        organization: activeOrganization,
-      };
-    }
-    if (hidePersonal) {
-      return { kind: 'none', name: m.workspaces.notSelected, shape: 'square' };
-    }
+): LeadSelection {
+  if (layout.lead === 'organization' && activeOrganization) {
+    return {
+      kind: 'organization',
+      name: activeOrganization.name,
+      imageUrl: activeOrganization.imageUrl,
+      shape: 'square',
+      organization: activeOrganization,
+    };
   }
-  return { kind: 'user', name: activeSession.name, imageUrl: activeSession.imageUrl, shape: 'circle' };
+  if (layout.lead === 'none') {
+    return { kind: 'none', name: m.organizations.notSelected, shape: 'square' };
+  }
+  return {
+    kind: 'user',
+    name: activeSession.name,
+    imageUrl: activeSession.imageUrl,
+    shape: 'circle',
+    badge: layout.lead === 'member' && activeOrganization ? activeOrganization : undefined,
+  };
+}
+
+/** The organization a lead shows: the one it is, or the one badging the account. */
+function leadOrganization(lead: LeadSelection): UserButtonMembership | undefined {
+  if (lead.kind === 'organization') {
+    return lead.organization;
+  }
+  return lead.kind === 'user' ? lead.badge : undefined;
+}
+
+function joinDetails(...parts: Array<string | undefined>): string {
+  return parts.filter(Boolean).join(' · ');
 }
 
 function membershipSubtitle(membership: UserButtonMembership, m: Messages, locale: string): string {
-  const parts: string[] = [];
-  if (membership.membersCount !== undefined) {
-    parts.push(plural(m.workspaces.members, membership.membersCount, locale));
-  }
-  if (membership.planLabel) {
-    parts.push(membership.planLabel);
-  }
-  return parts.join(' · ');
+  const members =
+    membership.membersCount === undefined
+      ? undefined
+      : plural(m.organizations.members, membership.membersCount, locale);
+  return joinDetails(membership.planLabel, members);
 }
 
-function initials(name: string): string {
-  const [first = '', second = ''] = name.trim().split(/\s+/);
-  return `${first.charAt(0)}${second.charAt(0)}`.toUpperCase() || '?';
+function headerSubtitle(lead: LeadSelection, identifier: string, m: Messages, locale: string): string {
+  if (lead.kind === 'organization') {
+    return membershipSubtitle(lead.organization, m, locale);
+  }
+  if (lead.kind === 'none') {
+    // No selection is not the account, so it carries no identifier line.
+    return '';
+  }
+  if (lead.badge) {
+    return lead.badge.name;
+  }
+  // An account with no name is titled by its identifier, and repeating it underneath says nothing.
+  return identifier === lead.name ? '' : identifier;
 }
 
 // ─── Presentational leaves ──────────────────────────────────────────────────
-
-interface RowAvatarProps {
-  name: string;
-  imageUrl?: string;
-  shape: 'circle' | 'square';
-  size: AvatarProps['size'];
-}
-
-function RowAvatar({ name, imageUrl, shape, size }: RowAvatarProps) {
-  return (
-    // Decorative: the same name is always in text alongside. Held at the root so the whole mark
-    // stays out of the accessible name however the image resolves.
-    <Avatar.Root
-      aria-hidden
-      size={size}
-      shape={shape}
-    >
-      {imageUrl ? (
-        <Avatar.Image
-          src={imageUrl}
-          alt=''
-        />
-      ) : null}
-      <Avatar.Fallback>{initials(name)}</Avatar.Fallback>
-    </Avatar.Root>
-  );
-}
 
 /**
  * Renders `<button>` so a whole row is one click target. Rows with their own controls skip it.
@@ -188,9 +195,20 @@ const rowButton = (disabled = false) => (
   />
 );
 
-/** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
-function Trailing({ children }: { children: ReactNode }) {
-  return <Item.Actions xstyle={styles.trailing}>{children}</Item.Actions>;
+// Focus stays on the row for the length of the action, so the row is what gets re-read when it
+// changes. A decorative spinner changes nothing there and the wait passes in silence, so the
+// indicator is named in its own right — the pairing `SubmitButton` makes, and the reason its
+// pending state is spoken where this one was not.
+function PendingSpinner() {
+  const m = useMessages('userButton');
+  return (
+    <Spinner
+      role='progressbar'
+      aria-hidden={undefined}
+      aria-label={m.organizations.pending}
+      size='sm'
+    />
+  );
 }
 
 interface SwitcherRowProps {
@@ -204,7 +222,7 @@ interface SwitcherRowProps {
   avatarName?: string;
   imageUrl?: string;
   shape: 'circle' | 'square';
-  /** Names the title element, for a control in the row that has to point at the workspace it acts on. */
+  /** Names the title element, for a control in the row that has to point at the organization it acts on. */
   labelId?: string;
   active?: boolean;
   onSelect?: () => void;
@@ -226,15 +244,13 @@ function SwitcherRow({
   busy,
   disabled,
 }: SwitcherRowProps) {
-  const m = useMessages('userButton');
   // Selecting what is already selected does nothing, so the active row is not a button at all. A
   // row that is merely waiting stays one, disabled.
   const select = active ? undefined : onSelect;
   const waiting = Boolean(busy || disabled);
 
   return (
-    <Item.Root
-      size='xs'
+    <UserButtonItem
       // The check is decorative, so without this the active row reads like the ones you can switch to.
       aria-current={active ? 'true' : undefined}
       // Every row stands down `aria-disabled` together, so on its own that reads as unavailable
@@ -243,41 +259,33 @@ function SwitcherRow({
       render={select ? rowButton(waiting) : undefined}
       onClick={select}
     >
-      <Item.Media>
+      <UserButtonItemMedia>
         <RowAvatar
           name={avatarName}
           imageUrl={imageUrl}
           shape={shape}
           size='fit'
+          xstyle={styles.rowAvatar}
         />
-      </Item.Media>
-      <Item.Content>
-        <Item.Label id={labelId}>{name}</Item.Label>
-      </Item.Content>
+      </UserButtonItemMedia>
+      <UserButtonItemContent>
+        <UserButtonItemLabel id={labelId}>{name}</UserButtonItemLabel>
+      </UserButtonItemContent>
       {busy ? (
-        <Trailing>
-          <Spinner
-            // Focus stays on the row for the length of the action, so the row is what gets re-read
-            // when it changes. A decorative spinner changes nothing there and the wait passes in
-            // silence, so the indicator is named in its own right — the pairing `SubmitButton`
-            // makes, and the reason its pending state is spoken where this one was not.
-            role='progressbar'
-            aria-hidden={undefined}
-            aria-label={m.workspaces.pending}
-            size='sm'
-          />
-        </Trailing>
+        <UserButtonItemTrailing>
+          <PendingSpinner />
+        </UserButtonItemTrailing>
       ) : trailing ? (
-        <Item.Actions>{trailing}</Item.Actions>
+        <UserButtonItemTrailing>{trailing}</UserButtonItemTrailing>
       ) : active ? (
-        <Trailing>
+        <UserButtonItemTrailing>
           <Icon
             name='checkmark'
             size='sm'
           />
-        </Trailing>
+        </UserButtonItemTrailing>
       ) : null}
-    </Item.Root>
+    </UserButtonItem>
   );
 }
 
@@ -307,222 +315,219 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
   const { busy, disabled } = useBusy(busyKey);
 
   return (
-    <Item.Root
-      size='xs'
+    <UserButtonItem
       // A link is the browser's navigation rather than one of the surface's one-shot actions, so it
       // has nothing to wait behind and never stands down.
+      aria-busy={busy || undefined}
       render={href ? asAnchor(href) : rowButton(busy || disabled)}
       onClick={onClick}
     >
-      <Item.Media>{busy ? <Spinner size='sm' /> : icon}</Item.Media>
-      <Item.Content>
-        <Item.Label variant='interactive'>{label}</Item.Label>
-      </Item.Content>
-    </Item.Root>
+      <UserButtonItemMedia>{busy ? <PendingSpinner /> : icon}</UserButtonItemMedia>
+      <UserButtonItemContent>
+        <UserButtonItemLabel variant='interactive'>{label}</UserButtonItemLabel>
+      </UserButtonItemContent>
+    </UserButtonItem>
   );
 }
 
 // ─── Sections ───────────────────────────────────────────────────────────────
 
-interface HeaderAction {
+interface HeaderMenuItem {
   label: string;
-  /** An icon renders a square, icon-only button that labels itself through `aria-label`. */
-  icon?: IconName;
+  icon: IconName;
   onClick: () => void;
+}
+
+interface HeaderAction {
+  id: UserButtonAction;
+  label: string;
+  icon: IconName;
+  /** Inline, the button is square and shows the icon alone, labelling itself through `aria-label`. */
+  iconOnly?: boolean;
+  /** Shows the icon ahead of the label even inline, where a labelled button otherwise has none. */
+  leadingIcon?: boolean;
+  onClick?: () => void;
+  /** Opens a menu of these rather than acting itself. */
+  items?: HeaderMenuItem[];
   /** Key from `userButtonBusyKeys` when the action is one-shot; omitted for navigations. */
   busyKey?: string;
 }
 
 // Hooks cannot run inside a `.map`, so each button is its own component to read its own busy state.
-function HeaderActionButton({ label, icon, onClick, busyKey }: HeaderAction) {
-  const { busy, disabled } = useBusy(busyKey);
-  // On an icon button the spinner takes the icon's place; on a labelled one it leads the label, so
-  // the button keeps its width while the action runs.
-  const spinner = busy ? <Spinner size='sm' /> : null;
-
-  return (
-    <Button
-      variant='outline'
-      color='neutral'
-      size='sm'
-      shape={icon ? 'square' : 'default'}
-      aria-label={icon ? label : undefined}
-      disabled={busy || disabled}
-      onClick={onClick}
-    >
-      {icon ? (
-        (spinner ?? (
-          <Icon
-            name={icon}
-            size='sm'
-          />
-        ))
-      ) : (
-        <>
-          {spinner}
-          {label}
-        </>
-      )}
-    </Button>
-  );
-}
-
-/** The active workspace: who you are signed in as, and what you can do about it. */
-function Header() {
+function HeaderActionButton({
+  layout,
+  label,
+  icon,
+  iconOnly,
+  leadingIcon,
+  onClick,
+  items,
+  busyKey,
+}: HeaderAction & { layout: UserButtonHeaderLayout }) {
   const m = useMessages('userButton');
-  const locale = useLocale();
-  const data = useUserButtonContext();
-  const signOutSession = data.onSignOutSession;
-  const { sessionId, identifier } = data.activeSession;
-  const workspace = leadWorkspace(data, m);
-  const { name, imageUrl, shape } = workspace;
-  const organization = workspace.kind === 'organization' ? workspace.organization : undefined;
-  // An account with no name is titled by its identifier, and repeating it underneath says nothing.
-  // No selection is not the account, so it carries no identifier line either.
-  const accountSubtitle = identifier === name ? '' : identifier;
-  const subtitle =
-    workspace.kind === 'organization'
-      ? membershipSubtitle(workspace.organization, m, locale)
-      : workspace.kind === 'user'
-        ? accountSubtitle
-        : '';
+  const { busy, disabled } = useBusy(busyKey);
+  const stacked = layout === 'stacked';
+  const compact = !stacked && iconOnly;
+  const buttonProps = {
+    variant: 'outline',
+    color: 'neutral',
+    size: 'sm',
+    shape: compact ? 'square' : 'default',
+    fullWidth: stacked,
+    'aria-label': compact ? label : undefined,
+    disabled,
+  } as const;
+  const leading =
+    stacked || compact || leadingIcon ? (
+      <Icon
+        name={icon}
+        size='sm'
+      />
+    ) : null;
+  const text = compact ? null : label;
 
-  const actions: HeaderAction[] = [];
-  for (const action of data.layout.actions.header) {
-    if (action === 'inviteMembers' && data.onInviteMembers) {
-      actions.push({ label: m.manage.invite, onClick: data.onInviteMembers });
-    }
-    // Every other mode hangs "Sign out" off the organization heading. An account-only one has no
-    // such heading, so it takes the labelled slot **Invite** occupies elsewhere, left of the gear.
-    if (action === 'signOut' && signOutSession) {
-      actions.push({
-        label: m.accounts.signOut,
-        onClick: () => signOutSession(sessionId),
-        busyKey: userButtonBusyKeys.signOutSession(sessionId),
-      });
-    }
-    // The gear manages whatever the header names, which is settled by the data rather than the mode.
-    if (action === 'manageLead') {
-      const manage = organization
-        ? { label: m.manage.organization, onClick: data.onManageOrganization }
-        : { label: m.manage.account, onClick: data.onManageAccount };
-      if (manage.onClick) {
-        actions.push({ label: manage.label, icon: 'cog-6-teeth', onClick: manage.onClick });
-      }
-    }
-  }
-
-  return (
-    <Item.Group>
-      <Item.Root>
-        <Item.Media>
-          <RowAvatar
-            name={name}
-            imageUrl={imageUrl}
-            shape={shape}
-            size='fit'
-          />
-        </Item.Media>
-        <Item.Content>
-          <Item.Label>{name}</Item.Label>
-          {subtitle ? <Item.Description>{subtitle}</Item.Description> : null}
-        </Item.Content>
-        <Item.Actions>
-          {actions.map(a => (
-            <HeaderActionButton
-              key={a.label}
-              {...a}
-            />
-          ))}
-        </Item.Actions>
-      </Item.Root>
-    </Item.Group>
-  );
-}
-
-interface RowAction {
-  label: string;
-  onClick: () => void;
-  color?: 'negative';
-}
-
-/** The `⋯` that hangs off a row's trailing edge. Renders nothing when it would be empty. */
-function ActionMenu({ label, actions, disabled }: { label: string; actions: RowAction[]; disabled?: boolean }) {
-  if (actions.length === 0) {
-    return null;
-  }
-
-  return (
-    <Trailing>
-      <Menu.Root>
-        <Menu.Trigger
-          aria-label={label}
-          disabled={disabled}
-        />
+  if (items) {
+    return (
+      <Menu.Root placement='bottom-start'>
+        <Menu.Trigger render={<Button {...buttonProps} />}>
+          {leading}
+          {text}
+        </Menu.Trigger>
         <Menu.Popup>
-          {actions.map(a => (
+          {items.map(item => (
             <Menu.Item
-              key={a.label}
-              label={a.label}
-              color={a.color}
-              onClick={a.onClick}
+              key={item.label}
+              label={item.label}
+              onClick={item.onClick}
             >
-              <Menu.Label>{a.label}</Menu.Label>
+              <Menu.Media>
+                <Icon
+                  name={item.icon}
+                  size='sm'
+                />
+              </Menu.Media>
+              <Menu.Label>{item.label}</Menu.Label>
             </Menu.Item>
           ))}
         </Menu.Popup>
       </Menu.Root>
-    </Trailing>
-  );
-}
+    );
+  }
 
-/**
- * Heads the organization list, named by the active account's identifier: these are the workspaces
- * that account can switch between. Carries the account-wide actions, the way the "Accounts" heading
- * below carries the ones that act on every account.
- */
-function OrganizationsHeading() {
-  const m = useMessages('userButton');
-  const data = useUserButtonContext();
-  const signOutSession = data.onSignOutSession;
-  const { identifier, sessionId } = data.activeSession;
-  // Its actions live in a menu that closes on click, so the row itself carries their spinner.
-  const { busy, disabled } = useBusy(userButtonBusyKeys.signOutSession(sessionId));
-
-  const actions: RowAction[] = [];
-  for (const action of data.layout.actions.organizationsHeading) {
-    if (action === 'createOrganization' && data.onCreateOrganization) {
-      actions.push({ label: m.manage.createOrganization, onClick: data.onCreateOrganization });
-    }
-    if (action === 'manageAccount' && data.onManageAccount) {
-      actions.push({ label: m.manage.account, onClick: data.onManageAccount });
-    }
-    if (action === 'signOut' && signOutSession) {
-      actions.push({
-        label: m.accounts.signOut,
-        color: 'negative',
-        onClick: () => signOutSession(sessionId),
-      });
-    }
+  if (busyKey === undefined) {
+    return (
+      <Button
+        {...buttonProps}
+        onClick={onClick}
+      >
+        {leading}
+        {text}
+      </Button>
+    );
   }
 
   return (
-    <Item.Root size='xs'>
-      <Item.Content>
-        <Item.Description xstyle={styles.accountIdentifier}>{identifier}</Item.Description>
-      </Item.Content>
-      {busy ? (
-        <Trailing>
-          <Spinner size='sm' />
-        </Trailing>
-      ) : (
-        <ActionMenu
-          label={fill(m.accounts.actionsFor, { identifier })}
-          actions={actions}
-          disabled={disabled}
+    <SubmitButton
+      {...buttonProps}
+      onClick={onClick}
+      type='button'
+      isPending={busy}
+      pendingLabel={m.organizations.pending}
+      spinDelay={{ delay: 0 }}
+    >
+      {leading}
+      {text}
+    </SubmitButton>
+  );
+}
+
+/** The lead: who you are signed in as, and what you can do about it. */
+function Header() {
+  const m = useMessages('userButton');
+  const locale = useLocale();
+  const data = useUserButtonContext();
+  const layout = data.layout.headerLayout;
+  const userLed = data.layout.lead === 'user';
+  const { identifier } = data.activeSession;
+  const lead = leadSelection(data, m);
+  const { name } = lead;
+  const organization = leadOrganization(lead);
+  const subtitle = headerSubtitle(lead, identifier, m, locale);
+
+  const actions: HeaderAction[] = [];
+  for (const action of data.layout.actions.header) {
+    if (action === 'inviteMembers' && data.onInviteMembers) {
+      actions.push({ id: action, label: m.manage.invite, icon: 'users-add-right', onClick: data.onInviteMembers });
+    }
+    // The gear manages the header's organization, named or badged, and the account wherever the
+    // account leads. With both to manage it opens a menu of the two. It reads "Settings" when
+    // stacked, or when the account leads on its own; otherwise inline it is the icon alone, named
+    // for what it manages.
+    if (action === 'manageLead') {
+      const settings: Array<HeaderMenuItem & { name: string }> = [];
+      if (organization && data.onManageOrganization) {
+        settings.push({
+          name: m.manage.organization,
+          label: m.manage.organizationSettings,
+          icon: 'building',
+          onClick: data.onManageOrganization,
+        });
+      }
+      if (lead.kind !== 'organization' && data.onManageAccount) {
+        settings.push({
+          name: m.manage.account,
+          label: m.manage.profileSettings,
+          icon: 'user-circle',
+          onClick: data.onManageAccount,
+        });
+      }
+      const [only] = settings;
+      if (settings.length > 1) {
+        actions.push({ id: action, label: m.manage.settings, icon: 'cog-6-teeth', iconOnly: true, items: settings });
+      } else if (only) {
+        actions.push({
+          id: action,
+          label: layout === 'stacked' || userLed ? m.manage.settings : only.name,
+          icon: 'cog-6-teeth',
+          iconOnly: !userLed,
+          leadingIcon: userLed,
+          onClick: only.onClick,
+        });
+      }
+    }
+  }
+  // Inline, the gear trails the labelled actions; stacked, it leads them.
+  const ordered =
+    layout === 'stacked'
+      ? [...actions.filter(a => a.id === 'manageLead'), ...actions.filter(a => a.id !== 'manageLead')]
+      : actions;
+
+  return (
+    <UserButtonHeader
+      layout={layout}
+      avatar={
+        <UserButtonAvatar
+          name={lead.name}
+          imageUrl={lead.imageUrl}
+          shape={lead.shape}
+          size='md'
+          badge={lead.kind === 'user' ? lead.badge : undefined}
         />
-      )}
-    </Item.Root>
+      }
+      title={name}
+      description={subtitle}
+      actions={
+        ordered.length > 0
+          ? ordered.map(a => (
+              <HeaderActionButton
+                key={a.id}
+                layout={layout}
+                {...a}
+              />
+            ))
+          : undefined
+      }
+    />
   );
 }
 
@@ -550,7 +555,7 @@ function MembershipRow({ membership, active, onSelect }: MembershipRowProps) {
 }
 
 /**
- * The account's own workspace, which is what "no active organization" is. Listed alongside the
+ * The personal account, which is what "no active organization" is. Listed alongside the
  * organizations so switching into one is not a one-way door: `null` is how you leave.
  *
  * Named for what it is among organizations rather than for the account, the way the existing
@@ -569,7 +574,7 @@ function PersonalRow() {
 
   return (
     <SwitcherRow
-      name={m.workspaces.personal}
+      name={m.organizations.personal}
       imageUrl={data.activeSession.imageUrl}
       shape='circle'
       active={!data.activeOrganization}
@@ -580,21 +585,43 @@ function PersonalRow() {
   );
 }
 
-/** The organizations the active account belongs to. Its own workspace is the row above. */
+/** The active organization, which leads the list whichever page of memberships it is on. */
+function ActiveMembershipRow() {
+  const data = useUserButtonContext();
+  const active = data.activeOrganization;
+  const selectOrganization = data.onSelectOrganization;
+
+  if (!active) {
+    return null;
+  }
+
+  return (
+    <MembershipRow
+      membership={active}
+      onSelect={selectOrganization ? () => selectOrganization(active.organizationId) : undefined}
+      active
+    />
+  );
+}
+
+/** The other organizations the active account belongs to. */
 function MembershipRows() {
   const data = useUserButtonContext();
   const selectOrganization = data.onSelectOrganization;
+  const activeId = data.activeOrganization?.organizationId;
 
   return (
     <>
-      {data.memberships.map(m => (
-        <MembershipRow
-          key={m.organizationId}
-          membership={m}
-          onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
-          active={m.organizationId === data.activeOrganization?.organizationId}
-        />
-      ))}
+      {data.memberships
+        .filter(m => m.organizationId !== activeId)
+        .map(m => (
+          <MembershipRow
+            key={m.organizationId}
+            membership={m}
+            onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
+            active={false}
+          />
+        ))}
     </>
   );
 }
@@ -609,11 +636,11 @@ interface PendingRowProps {
   note?: string;
 }
 
-/** A workspace on offer: joined from its own trailing button rather than by clicking the row. */
+/** An organization on offer: joined from its own trailing button rather than by clicking the row. */
 function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: PendingRowProps) {
   const m = useMessages('userButton');
   const { busy, disabled } = useBusy(busyKey);
-  // The button reads the same on every offer and the workspace it acts on is the label beside it,
+  // The button reads the same on every offer and the organization it acts on is the label beside it,
   // so pressing tab through the list gives no way to tell them apart without this.
   const labelId = React.useId();
 
@@ -625,7 +652,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
       labelId={labelId}
       trailing={
         note ? (
-          <Item.Description>{note}</Item.Description>
+          <UserButtonItemDescription>{note}</UserButtonItemDescription>
         ) : onAccept ? (
           // Every other affordance here swaps its icon for a spinner, but this one is a labelled
           // button, so the spinner goes inside it rather than taking the row's trailing edge — the
@@ -637,7 +664,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
             color='neutral'
             size='sm'
             isPending={busy}
-            pendingLabel={m.workspaces.pending}
+            pendingLabel={m.organizations.pending}
             spinDelay={{ delay: 0 }}
             disabled={disabled}
             aria-describedby={labelId}
@@ -659,7 +686,7 @@ function PendingRows() {
   const acceptInvitation = data.onAcceptInvitation;
   const selectOrganization = data.onSelectOrganization;
 
-  // Accepting an invitation joins the organization, so an accepted one is a workspace the surface
+  // Accepting an invitation joins the organization, so an accepted one is an organization the surface
   // may already be showing. It stays listed only for as long as the membership list has yet to
   // catch up with it, which is what keeps it reachable in the meantime.
   const listed = new Set(data.memberships.map(m => m.organizationId));
@@ -673,7 +700,7 @@ function PendingRows() {
       {/* Invitations first: one is addressed to this account and joins on accept, where a
           suggestion only files a request. Same order as the existing OrganizationSwitcher. */}
       {invitations.map(i =>
-        // Already joined, so it is a workspace like any other: click the row to switch to it.
+        // Already joined, so it is an organization like any other: click the row to switch to it.
         i.status === 'accepted' ? (
           <MembershipRow
             key={i.id}
@@ -692,7 +719,7 @@ function PendingRows() {
             busyKey={userButtonBusyKeys.acceptInvitation(i.id)}
             name={i.organizationName}
             imageUrl={i.imageUrl}
-            actionLabel={m.workspaces.accept}
+            actionLabel={m.organizations.accept}
             onAccept={acceptInvitation ? () => acceptInvitation(i.id) : undefined}
           />
         ),
@@ -703,9 +730,9 @@ function PendingRows() {
           busyKey={userButtonBusyKeys.acceptSuggestion(s.id)}
           name={s.name}
           imageUrl={s.imageUrl}
-          actionLabel={m.workspaces.join}
+          actionLabel={m.organizations.join}
           // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
-          note={s.status === 'accepted' ? m.workspaces.requested : undefined}
+          note={s.status === 'accepted' ? m.organizations.requested : undefined}
           onAccept={acceptSuggestion ? () => acceptSuggestion(s.id) : undefined}
         />
       ))}
@@ -715,7 +742,7 @@ function PendingRows() {
 
 /**
  * A signed-in account inside the accounts flyout: a menu item you pick to switch to, checked where
- * it is already the active one. Its workspaces cannot be listed here — they are scoped to the
+ * it is already the active one. Its organizations cannot be listed here — they are scoped to the
  * session that fetches them — so switching is all it offers.
  */
 function SessionMenuItem({ session, active }: { session: UserButtonSession; active: boolean }) {
@@ -738,6 +765,7 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
           imageUrl={session.imageUrl}
           shape='circle'
           size='fit'
+          xstyle={styles.rowAvatar}
         />
       </Menu.Media>
       <Menu.Label>{session.identifier}</Menu.Label>
@@ -754,18 +782,20 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
 }
 
 /**
- * The accounts affordance at the foot: a row that opens a flyout of every signed-in account, and
- * of the way to add one more.
+ * The accounts affordance at the foot: a row that opens a flyout of every signed-in account, the
+ * way to add one more, and the way to sign out of all of them.
  *
- * The flyout closes on pick, so the row itself carries the switch's spinner, the way the
- * organizations heading carries the spinner for what its own `⋯` opens.
+ * The flyout closes on pick, so the row itself carries the switch's spinner.
  */
 function SwitchAccountRow() {
   const m = useMessages('userButton');
   const data = useUserButtonContext();
   const addAccount = data.onAddAccount;
+  const signOutAll = data.onSignOutAll;
   const { pendingKey } = data;
-  const busy = data.additionalSessions.some(s => pendingKey === userButtonBusyKeys.switchSession(s.sessionId));
+  const busy =
+    pendingKey === userButtonBusyKeys.signOutAll() ||
+    data.additionalSessions.some(s => pendingKey === userButtonBusyKeys.switchSession(s.sessionId));
   const { disabled } = useBusy();
 
   return (
@@ -779,34 +809,29 @@ function SwitchAccountRow() {
       fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
     >
       <Menu.Trigger
-        disabled={disabled}
-        render={
-          <Item.Root
-            size='xs'
-            render={<button type='button' />}
-          />
-        }
+        aria-busy={busy || undefined}
+        render={<UserButtonItem render={rowButton(disabled)} />}
       >
-        <Item.Media>
+        <UserButtonItemMedia>
           {busy ? (
-            <Spinner size='sm' />
+            <PendingSpinner />
           ) : (
             <Icon
-              name='arrow-left-right'
+              name='switch-account'
               size='sm'
             />
           )}
-        </Item.Media>
-        <Item.Content>
-          <Item.Label variant='interactive'>{m.accounts.switch}</Item.Label>
-        </Item.Content>
-        <Trailing>
+        </UserButtonItemMedia>
+        <UserButtonItemContent>
+          <UserButtonItemLabel variant='interactive'>{m.accounts.switch}</UserButtonItemLabel>
+        </UserButtonItemContent>
+        <UserButtonItemTrailing>
           <Icon
             name='chevron-right'
             xstyle={rtl.mirror}
             size='sm'
           />
-        </Trailing>
+        </UserButtonItemTrailing>
       </Menu.Trigger>
       <Menu.Popup>
         {/* The account it is on leads, checked: the flyout is the full set of accounts rather than
@@ -836,6 +861,24 @@ function SwitchAccountRow() {
             <Menu.Label>{m.accounts.add}</Menu.Label>
           </Menu.Item>
         ) : null}
+        {signOutAll ? (
+          <>
+            <Menu.Separator />
+            <Menu.Item
+              label={m.accounts.signOutAll}
+              onClick={signOutAll}
+            >
+              <Menu.Media>
+                <Icon
+                  name='sign-out'
+                  size='sm'
+                  xstyle={rtl.mirror}
+                />
+              </Menu.Media>
+              <Menu.Label>{m.accounts.signOutAll}</Menu.Label>
+            </Menu.Item>
+          </>
+        ) : null}
       </Menu.Popup>
     </Menu.Root>
   );
@@ -847,28 +890,22 @@ function OrganizationListLoadingRow() {
   return (
     // Plain text rather than a live region: it mounts with its copy already in it, so there is no
     // change for one to report, and the popup it lands in is read on open either way.
-    <Item.Root size='xs'>
-      <Item.Media>
+    <UserButtonItem>
+      <UserButtonItemMedia>
         <Spinner size='sm' />
-      </Item.Media>
-      <Item.Content>
-        <Item.Description>{m.workspaces.loading}</Item.Description>
-      </Item.Content>
-    </Item.Root>
+      </UserButtonItemMedia>
+      <UserButtonItemContent>
+        <UserButtonItemDescription>{m.organizations.loading}</UserButtonItemDescription>
+      </UserButtonItemContent>
+    </UserButtonItem>
   );
 }
 
-/**
- * The workspaces the active account can switch between, under the account's own heading. This is
- * the group that scrolls.
- *
- * The heading can render without the list: an account with no organizations still needs somewhere
- * to manage and sign out of itself.
- */
+/** The organizations the active account can switch between. This is the group that scrolls. */
 function OrganizationSection() {
   const m = useMessages('userButton');
   const data = useUserButtonContext();
-  const { showOrganizations, showOrganizationsHeading } = data.layout;
+  const { showOrganizations } = data.layout;
 
   const actions: ReactNode[] = [];
   for (const action of data.layout.actions.organizationsFooter) {
@@ -889,18 +926,17 @@ function OrganizationSection() {
     }
   }
 
-  if (!showOrganizations && !showOrganizationsHeading && actions.length === 0) {
+  if (!showOrganizations && actions.length === 0) {
     return null;
   }
 
   return (
     <>
-      <Item.Separator />
+      <UserButtonSeparator />
       {/* `auto` rather than `stable`: a reserved gutter insets the rows whether or not the list
           overflows, so short lists would sit their avatars and icons off the edge the header and
           footer align to. */}
-      <Item.Group xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
-        {showOrganizationsHeading ? <OrganizationsHeading /> : null}
+      <UserButtonGroup xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
             placeholder stands in for all of them until the last one is in. */}
@@ -909,19 +945,17 @@ function OrganizationSection() {
             <OrganizationListLoadingRow />
           ) : (
             <>
-              {/* What is on offer leads the list: an invitation or suggestion is the one row here
-                  that goes away if it is not acted on, and the workspaces held are not going
-                  anywhere. This is the order the existing OrganizationSwitcher lists them in. */}
-              <PendingRows />
+              <ActiveMembershipRow />
               <PersonalRow />
               <MembershipRows />
+              <PendingRows />
               {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
             </>
           ))}
         {/* Trails the rows rather than sitting at the foot of the surface: what it offers is one
-            more of the workspaces above it, not an action on the account. */}
+            more of the organizations above it, not an action on the account. */}
         {actions}
-      </Item.Group>
+      </UserButtonGroup>
     </>
   );
 }
@@ -936,6 +970,8 @@ interface FooterRow {
 function Footer() {
   const m = useMessages('userButton');
   const data = useUserButtonContext();
+  const signOutSession = data.onSignOutSession;
+  const { sessionId } = data.activeSession;
 
   const builtIn: FooterRow[] = [];
   for (const action of data.layout.actions.footer) {
@@ -961,21 +997,20 @@ function Footer() {
         ),
       });
     }
-    if (action === 'signOutAll' && data.onSignOutAll) {
+    if (action === 'signOut' && signOutSession) {
       builtIn.push({
-        id: 'signOutAll',
+        id: 'signOut',
         node: (
           <ActionRow
             icon={
               <Icon
-                name='log-out'
+                name='sign-out'
                 size='sm'
-                xstyle={rtl.mirror}
               />
             }
-            label={m.accounts.signOutAll}
-            onClick={data.onSignOutAll}
-            busyKey={userButtonBusyKeys.signOutAll()}
+            label={m.accounts.signOut}
+            onClick={() => signOutSession(sessionId, 'footer')}
+            busyKey={userButtonBusyKeys.signOutSession(sessionId, 'footer')}
           />
         ),
       });
@@ -996,12 +1031,12 @@ function Footer() {
 
   return (
     <>
-      <Item.Separator />
-      <Item.Group>
+      <UserButtonSeparator />
+      <UserButtonGroup>
         {rows.map(r => (
           <React.Fragment key={r.id}>{r.node}</React.Fragment>
         ))}
-      </Item.Group>
+      </UserButtonGroup>
     </>
   );
 }
@@ -1030,20 +1065,10 @@ export interface UserButtonRootProps
  * the data through context.
  */
 export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
-  const {
-    children,
-    mode = 'combined',
-    modePriority = 'organization',
-    open,
-    defaultOpen,
-    onOpenChange,
-    placement,
-    sideOffset,
-    ...data
-  } = props;
+  const { children, mode = 'combined', open, defaultOpen, onOpenChange, placement, sideOffset, ...data } = props;
   // Resolved here so the sections below never read `mode` again: which affordance lands in which
   // slot is settled once, in one table, rather than re-derived by each part that renders one.
-  const layout = resolveUserButtonLayout(mode, modePriority, data);
+  const layout = resolveUserButtonLayout(mode, data);
 
   return (
     <Popover.Root
@@ -1060,15 +1085,15 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
 
 export interface UserButtonTriggerProps {
   /**
-   * Names the active workspace beside its avatar — the organization wherever one heads the
-   * trigger, no selection when personal is hidden and none is active, the account otherwise.
-   * Turn it off for the avatar alone.
+   * Names the lead beside its avatar — the organization wherever one heads the
+   * trigger, no selection when personal is hidden and none is active, the account otherwise, with
+   * its active organization beneath it. Turn it off for the avatar alone.
    *
    * @default true
    */
   renderTriggerLabel?: boolean;
   /**
-   * Carries the active organization's plan beside its name. Part of the label, so it needs
+   * Carries the active organization's plan beside the label. Part of the label, so it needs
    * `renderTriggerLabel`: a plan badge with nothing to qualify says nothing.
    *
    * @default true
@@ -1076,40 +1101,48 @@ export interface UserButtonTriggerProps {
   renderTriggerBadge?: boolean;
 }
 
-/** The trigger: the active workspace's avatar, and what it is called. */
+/** The trigger: the lead's avatar, and what it is called. */
 export function UserButtonTrigger({
   renderTriggerLabel = true,
   renderTriggerBadge = true,
 }: UserButtonTriggerProps = {}): ReactElement {
   const m = useMessages('userButton');
   const data = useUserButtonContext();
-  const workspace = leadWorkspace(data, m);
-  const { name, imageUrl, shape } = workspace;
-  const planLabel =
-    renderTriggerBadge && workspace.kind === 'organization' ? workspace.organization.planLabel : undefined;
+  const lead = leadSelection(data, m);
+  const { name, shape } = lead;
+  const planLabel = renderTriggerBadge ? leadOrganization(lead)?.planLabel : undefined;
+  const badge = lead.kind === 'user' ? lead.badge : undefined;
+  const ringsAvatar = !renderTriggerLabel && badge !== undefined;
 
   return (
     <Popover.Trigger
+      {...themeProps('user-button-trigger')}
       aria-label={fill(m.trigger.open, { name })}
       xstyle={[
-        focusOutline.visible,
+        ringsAvatar ? styles.triggerRinglessAvatar : focusOutline.visible,
         styles.trigger,
         renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
-      <RowAvatar
-        name={name}
-        imageUrl={imageUrl}
-        shape={shape}
-        size={renderTriggerLabel ? 'xs' : 'sm'}
+      <UserButtonAvatar
+        name={lead.name}
+        imageUrl={lead.imageUrl}
+        shape={lead.shape}
+        size={renderTriggerLabel && !badge ? 'xs' : 'sm'}
+        badge={badge}
+        focusRing={ringsAvatar}
       />
       {renderTriggerLabel ? (
         <>
-          <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
+          <span {...stylex.props(styles.triggerText)}>
+            <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
+            {badge ? (
+              <span {...stylex.props(styles.triggerOrganization, truncationStyles.singleLine)}>{badge.name}</span>
+            ) : null}
+          </span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
           <Icon
-            aria-hidden
             name='chevron-down'
             size='sm'
             xstyle={styles.triggerCaret}
@@ -1126,7 +1159,11 @@ export function UserButtonPopup(): ReactElement {
   const { renderBranding } = useUserButtonContext();
 
   return (
-    <Popover.Popup aria-label={m.popup.label}>
+    <Popover.Popup
+      {...themeProps('user-button-popover')}
+      aria-label={m.popup.label}
+      xstyle={styles.popup}
+    >
       <Card.Root renderBranding={renderBranding}>
         <Header />
         <OrganizationSection />

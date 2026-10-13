@@ -16,16 +16,7 @@ export const styles = stylex.create({
     height: '100%',
     width: '100%',
   },
-  label: {
-    gap: space['2'],
-    alignItems: 'center',
-    display: 'flex',
-    minWidth: 0,
-  },
   text: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
     minWidth: 0,
   },
   icon: {

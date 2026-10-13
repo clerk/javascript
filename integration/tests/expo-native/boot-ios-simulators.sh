@@ -14,14 +14,14 @@ boot() {
     udids+=("$(xcrun simctl create "$model $i" "$device_type" "$runtime")")
     xcrun simctl boot "${udids[$((i - 1))]}"
   done
-  MAESTRO_UDID=$(IFS=,; echo "${udids[*]}")
-  echo "Booting $count x $model on $runtime: $MAESTRO_UDID"
-  if [ -n "${GITHUB_ENV:-}" ]; then echo "MAESTRO_UDID=$MAESTRO_UDID" >> "$GITHUB_ENV"; fi
+  CLERK_TEST_DEVICES=$(IFS=,; echo "${udids[*]}")
+  echo "Booting $count x $model on $runtime: $CLERK_TEST_DEVICES"
+  if [ -n "${GITHUB_ENV:-}" ]; then echo "CLERK_TEST_DEVICES=$CLERK_TEST_DEVICES" >> "$GITHUB_ENV"; fi
 }
 
 wait_ready() {
   local udid key
-  IFS=, read -r -a udids <<< "${MAESTRO_UDID:?MAESTRO_UDID is required}"
+  IFS=, read -r -a udids <<< "${CLERK_TEST_DEVICES:?CLERK_TEST_DEVICES is required}"
   for udid in "${udids[@]}"; do
     xcrun simctl bootstatus "$udid" -b &
     local pid=$! elapsed=0

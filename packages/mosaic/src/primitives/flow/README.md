@@ -80,6 +80,8 @@ The initially active step does not receive `data-starting-style`. An exiting ste
 
 `Flow.Root` carries `data-initial` through the first measured frame. Styled adapters can use it to disable viewport transitions so the initial step never animates.
 
+`Flow.Root` carries `data-transitioning` while any step is exiting. Styled adapters should only transition the viewport height under it, so a resize inside the active step (for example a field message animating open) is tracked as-is instead of being animated a second time.
+
 ## CSS variable
 
 | CSS variable                     | Element     | Description                                   |

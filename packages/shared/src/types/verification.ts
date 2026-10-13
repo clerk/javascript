@@ -1,3 +1,4 @@
+import type { TrustedDeviceChallengeResource } from './biometricCredential';
 import type { ClerkAPIError } from './errors';
 import type { PublicKeyCredentialCreationOptionsWithoutExtensions } from './passkey';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
@@ -16,6 +17,11 @@ export interface VerificationResource extends ClerkResource {
   verifiedAtClient: string | null;
   verifiedFromTheSameClient: () => boolean;
   channel?: PhoneCodeChannel;
+  /**
+   * The challenge to sign when the verification uses the `trusted_device` strategy.
+   * @experimental
+   */
+  trustedDeviceChallenge?: TrustedDeviceChallengeResource | null;
   __internal_toSnapshot: () => VerificationJSONSnapshot;
 }
 

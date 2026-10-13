@@ -13,7 +13,7 @@ export { default as __source } from './input-group.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'InputGroup',
   source: 'packages/mosaic/src/components/input-group/input-group.tsx',
   styles: {

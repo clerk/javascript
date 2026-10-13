@@ -106,7 +106,6 @@ class ContentSecurityPolicyDirectiveManager {
       'https://api.stripe.com',
       'https://maps.googleapis.com',
       'https://img.clerk.com',
-      'https://images.clerkstage.dev',
       clerkProtectionConnectOrigin,
     ],
     'default-src': ['self'],

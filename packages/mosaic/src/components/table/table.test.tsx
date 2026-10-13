@@ -32,12 +32,65 @@ function renderTable(props: Partial<React.ComponentProps<typeof Table.Root>> = {
 }
 
 describe('Mosaic Table', () => {
+  it('reports search changes and returns focus to the input when cleared', async () => {
+    const user = userEvent.setup();
+    const ref = React.createRef<HTMLInputElement>();
+    const onValueChange = vi.fn();
+    function Example() {
+      const [value, setValue] = React.useState('');
+      return (
+        <Table.Toolbar>
+          <Table.Search
+            ref={ref}
+            label='Search members'
+            clearLabel='Clear member search'
+            value={value}
+            onValueChange={next => {
+              onValueChange(next);
+              setValue(next);
+            }}
+          />
+        </Table.Toolbar>
+      );
+    }
+    render(<Example />);
+    const input = screen.getByRole('searchbox', { name: 'Search members' });
+    expect(ref.current).toBe(input);
+    expect(screen.queryByRole('button', { name: 'Clear member search' })).not.toBeInTheDocument();
+    await user.type(input, 'Ada');
+    expect(onValueChange).toHaveBeenLastCalledWith('Ada');
+    await user.click(screen.getByRole('button', { name: 'Clear member search' }));
+    expect(onValueChange).toHaveBeenLastCalledWith('');
+    expect(input).toHaveValue('');
+    expect(input).toHaveFocus();
+    expect(screen.queryByRole('button', { name: 'Clear member search' })).not.toBeInTheDocument();
+  });
+
   it('renders a table inside a scrolling shell', () => {
     renderTable();
     const table = screen.getByRole('table');
     expect(table).toHaveClass('cl-table');
     expect(table.parentElement).toHaveClass('cl-table-viewport');
     expect(table.parentElement?.parentElement).toHaveClass('cl-table-shell');
+  });
+
+  it('opts cells into no-wrap styling without changing neighboring cells', () => {
+    render(
+      <Table.Root>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell noWrap>September 23, 2026</Table.Cell>
+            <Table.Cell>A longer description can wrap</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table.Root>,
+    );
+    const date = screen.getByRole('cell', { name: 'September 23, 2026' });
+    const description = screen.getByRole('cell', { name: 'A longer description can wrap' });
+    expect(date).toHaveAttribute('data-no-wrap', '');
+    expect(date).toHaveClass(stylex.props(styles.noWrap).className ?? '');
+    expect(description).not.toHaveAttribute('data-no-wrap');
+    expect(description).not.toHaveClass(stylex.props(styles.noWrap).className ?? '');
   });
 
   it('lets the keyboard reach the scrolling viewport', () => {

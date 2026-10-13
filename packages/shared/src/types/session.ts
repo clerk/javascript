@@ -11,6 +11,8 @@ import type {
   PhoneCodeConfig,
   PhoneCodeSecondFactorConfig,
   TOTPAttempt,
+  TrustedDeviceAttempt,
+  TrustedDeviceConfig,
 } from './factors';
 import type { ActClaim, AgentActClaim } from './jwtv2';
 import type {
@@ -532,13 +534,33 @@ export type SessionVerifyPrepareFirstFactorParams =
   /**
    * @experimental
    */
-  | Omit<EnterpriseSSOConfig, 'actionCompleteRedirectUrl'>;
+  | Omit<EnterpriseSSOConfig, 'actionCompleteRedirectUrl'>
+  /**
+   * @experimental
+   */
+  | TrustedDeviceConfig;
 
 export type SessionVerifyAttemptFirstFactorParams =
   | EmailCodeAttempt
   | PhoneCodeAttempt
   | PasswordAttempt
-  | PasskeyAttempt;
+  | PasskeyAttempt
+  /**
+   * @experimental
+   */
+  | TrustedDeviceAttempt;
 
-export type SessionVerifyPrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
-export type SessionVerifyAttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
+export type SessionVerifyPrepareSecondFactorParams =
+  | PhoneCodeSecondFactorConfig
+  /**
+   * @experimental
+   */
+  | TrustedDeviceConfig;
+export type SessionVerifyAttemptSecondFactorParams =
+  | PhoneCodeAttempt
+  | TOTPAttempt
+  | BackupCodeAttempt
+  /**
+   * @experimental
+   */
+  | TrustedDeviceAttempt;

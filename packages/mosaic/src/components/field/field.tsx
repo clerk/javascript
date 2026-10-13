@@ -1,4 +1,3 @@
-import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -7,10 +6,13 @@ import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
-import { visuallyHidden } from '../../utils/visually-hidden.styles';
-import { Icon } from '../icon';
+import { feedbackHeight, feedbackStyles } from '../../styles/feedback.styles';
+import { reset } from '../../styles/reset.styles';
+import { sizes as typographySizes, styles as typographyStyles } from '../../styles/typography.styles';
+import { visuallyHidden } from '../../styles/visually-hidden.styles';
+import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
+import type { FieldFeedback as FormFieldFeedback } from '../form';
+import type { FieldOrientation } from './field.context';
 import {
   FieldMessageProvider,
   FieldProvider,
@@ -18,25 +20,42 @@ import {
   useRegisterFieldMessage,
   useRegisterFieldPartId,
 } from './field.context';
-import { dynamic, styles } from './field.styles';
+import { styles } from './field.styles';
 
 function useNativeLabelWarning(label: HTMLElement | null) {
   React.useEffect(() => {
     if (process.env.NODE_ENV !== 'production' && label && label.tagName !== 'LABEL') {
-      console.warn('[clerk] <Field.Label> must render a native `<label>` element.');
+      console.warn('[Clerk] <Field.Label> must render a native `<label>` element.');
     }
   }, [label]);
 }
 
 /** Props for a field container that associates exactly one form control. */
 export interface FieldRootProps extends MosaicComponentProps<'div'> {
+  /** `horizontal` places the control beside a `Field.Content` that stacks the label and supporting text. */
+  orientation?: FieldOrientation;
   disabled?: boolean;
+  /**
+   * Keeps a disabled control focusable: read-only and `aria-disabled` rather than natively
+   * `disabled`, so focus stays put. For a field disabled while its form submits, where losing focus
+   * would drop a screen reader's place and close an on-screen keyboard. Text controls only.
+   */
+  focusableWhenDisabled?: boolean;
   required?: boolean;
   invalid?: boolean;
 }
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFieldRoot(
-  { render, xstyle, disabled = false, required = false, invalid = false, ...rest },
+  {
+    render,
+    xstyle,
+    orientation = 'vertical',
+    disabled = false,
+    focusableWhenDisabled = false,
+    required = false,
+    invalid = false,
+    ...rest
+  },
   ref,
 ) {
   const element = useRender({
@@ -44,13 +63,24 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('field-root', { orientation }),
+        stylex.props(
+          reset.base,
+          styles.root,
+          orientation === 'horizontal' && [typographySizes.sm, styles.horizontal],
+          xstyle,
+        ),
+        rest,
+      ),
     },
   });
 
   return (
     <FieldProvider
+      orientation={orientation}
       disabled={disabled}
+      focusableWhenDisabled={focusableWhenDisabled}
       required={required}
       invalid={invalid}
     >
@@ -110,6 +140,21 @@ const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFiel
   });
 });
 
+/** Props for the container that stacks a horizontal field's label and supporting text. */
+export type FieldContentProps = MosaicComponentProps<'div'>;
+
+const Content = React.forwardRef<HTMLDivElement, FieldContentProps>(function MosaicFieldContent(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('field-content'), stylex.props(reset.base, styles.content, xstyle), rest),
+  });
+});
+
 /** Props for supporting field text. */
 export type FieldDescriptionProps = MosaicComponentProps<'p'>;
 
@@ -139,29 +184,6 @@ const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps
 /** Props for the container that animates field feedback height and crossfades its messages. */
 export type FieldMessageProps = MosaicComponentProps<'div'>;
 
-function useMessageHeight(active: HTMLElement | null) {
-  const [height, setHeight] = React.useState(0);
-
-  useSafeLayoutEffect(() => {
-    if (!active) {
-      return undefined;
-    }
-
-    const measure = () => setHeight(active.offsetHeight);
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(active);
-    return () => observer.disconnect();
-  }, [active]);
-
-  return height;
-}
-
 const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function MosaicFieldMessage(
   { render, xstyle, children, ...rest },
   ref,
@@ -186,7 +208,7 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
     props: {
       ...mergeStyleProps(
         themeProps('field-message'),
-        stylex.props(reset.base, styles.messageRoot, dynamic.messageHeight(height), xstyle),
+        stylex.props(reset.base, feedbackStyles.collapse, feedbackHeight.measured(height), xstyle),
         { role: 'status', ...transitionProps },
         rest,
       ),
@@ -197,22 +219,19 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
   return <FieldMessageProvider register={register}>{rendered}</FieldMessageProvider>;
 });
 
-type FieldFeedbackKind = 'error' | 'success';
+type FieldFeedbackKind = 'error' | 'success' | 'info';
 
-const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon: IconName; color: stylex.StyleXStyles }> = {
-  error: { slot: 'field-error', icon: 'exclamation-circle', color: styles.error },
-  success: { slot: 'field-success', icon: 'checkmark', color: styles.success },
+const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon?: IconName; color: stylex.StyleXStyles }> = {
+  error: { slot: 'field-error', icon: 'exclamation-circle', color: feedbackStyles.error },
+  success: { slot: 'field-success', icon: 'checkmark', color: feedbackStyles.success },
+  info: { slot: 'field-info', color: feedbackStyles.info },
 };
 
-interface FieldFeedbackProps extends MosaicComponentProps<'p'> {
+interface FieldFeedbackPartProps extends MosaicComponentProps<'p'> {
   kind: FieldFeedbackKind;
 }
 
-function hasMessage(children: React.ReactNode) {
-  return React.Children.toArray(children).some(child => child !== '');
-}
-
-const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>(function MosaicFieldFeedback(
+const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackPartProps>(function MosaicFieldFeedback(
   { render, xstyle, id: idProp, children, kind, ...rest },
   ref,
 ) {
@@ -223,10 +242,7 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
   const open = hasMessage(children);
   const element = React.useRef<HTMLElement | null>(null);
   const { mounted, transitionProps } = useTransition({ open, ref: element });
-  const lastMessage = React.useRef(children);
-  if (open) {
-    lastMessage.current = children;
-  }
+  const message = useHeldMessage(children, open);
   useRegisterFieldPartId(open ? id : undefined, context?.setMessageIds);
   const registerMessage = useRegisterFieldMessage(open);
   return useRender({
@@ -237,30 +253,12 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
     props: {
       ...mergeStyleProps(
         themeProps(slot),
-        stylex.props(
-          reset.base,
-          typographyStyles.base,
-          typographySizes.xs,
-          styles.message,
-          styles.feedback,
-          color,
-          xstyle,
-        ),
+        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, feedbackStyles.message, color, xstyle),
         { 'aria-hidden': open ? undefined : true, ...transitionProps },
         rest,
       ),
       id,
-      children: (
-        <>
-          <Icon
-            name={icon}
-            size='sm'
-            aria-hidden='true'
-            xstyle={styles.feedbackIcon}
-          />
-          <span>{lastMessage.current}</span>
-        </>
-      ),
+      children: icon ? <FeedbackBody icon={icon}>{message}</FeedbackBody> : message,
     },
   });
 });
@@ -291,5 +289,47 @@ const FieldSuccess = React.forwardRef<HTMLParagraphElement, FieldSuccessProps>(f
   );
 });
 
+export type FieldHintProps = MosaicComponentProps<'p'>;
+
+const FieldHint = React.forwardRef<HTMLParagraphElement, FieldHintProps>(function MosaicFieldHint(props, ref) {
+  return (
+    <FieldFeedback
+      ref={ref}
+      kind='info'
+      {...props}
+    />
+  );
+});
+
+export interface FieldFeedbackProps extends Omit<FieldMessageProps, 'children'> {
+  feedback?: FormFieldFeedback;
+}
+
+const Feedback = React.forwardRef<HTMLDivElement, FieldFeedbackProps>(function MosaicFieldFeedbackValue(
+  { feedback, ...props },
+  ref,
+) {
+  return (
+    <Message
+      ref={ref}
+      {...props}
+    >
+      <FieldError>{feedback?.type === 'error' ? feedback.message : null}</FieldError>
+      <FieldHint>{feedback?.type === 'info' || feedback?.type === 'warning' ? feedback.message : null}</FieldHint>
+      <FieldSuccess>{feedback?.type === 'success' ? feedback.message : null}</FieldSuccess>
+    </Message>
+  );
+});
+
 /** Styled parts for composing an automatically associated single-control field. */
-export const Field = { Root, Label, Description, Message, Error: FieldError, Success: FieldSuccess };
+export const Field = {
+  Root,
+  Label,
+  Content,
+  Description,
+  Message,
+  Feedback,
+  Error: FieldError,
+  Success: FieldSuccess,
+  Hint: FieldHint,
+};

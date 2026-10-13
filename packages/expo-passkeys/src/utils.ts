@@ -104,6 +104,10 @@ export function mapNativeErrorToClerkWebAuthnErrorCode(
     return new ClerkWebAuthnError(message, { code: 'passkey_operation_aborted' });
   }
 
+  if (code === '1006') {
+    return new ClerkWebAuthnError(message, { code: 'passkey_already_exists' });
+  }
+
   return new ClerkWebAuthnError(message, {
     code: action === 'create' ? 'passkey_registration_failed' : 'passkey_retrieval_failed',
   });

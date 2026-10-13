@@ -24,12 +24,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await app.teardown();
   });
 
-  test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.signOut();
-    await u.page.context().clearCookies();
-  });
-
   test('Clerk client loads and sign in button renders', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToAppHome();

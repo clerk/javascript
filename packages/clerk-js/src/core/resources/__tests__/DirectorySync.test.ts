@@ -1,4 +1,4 @@
-import type { DirectorySyncJSON } from '@clerk/shared/types';
+import type { DirectorySyncJSON, RoleJSON } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource, DirectorySync } from '../internal';
@@ -19,6 +19,17 @@ const directoryJSON: DirectorySyncJSON = {
   created_at: 1700000000000,
   updated_at: 1700000000000,
 };
+
+const roleJSON = (key: string, name: string): RoleJSON => ({
+  object: 'role',
+  id: `role_${key}`,
+  key,
+  name,
+  description: '',
+  permissions: [],
+  created_at: 1700000000000,
+  updated_at: 1700000000000,
+});
 
 function createDirectorySync(): DirectorySync {
   return new DirectorySync(directoryJSON, ORG_ID);
@@ -67,6 +78,144 @@ describe('DirectorySync', () => {
     // @ts-ignore
     expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'POST', path: `${DIRECTORY_PATH}/rotate_api_key` });
     expect(result.apiKey).toBe('ak_new');
+  });
+
+  it('stores pull credentials and reflects the activated directory', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: { ...directoryJSON, provider: 'google', enabled: true, credentials_configured: true },
+      }),
+    );
+
+    const result = await createDirectorySync().setCredentials({
+      serviceAccountJson: '{"type":"service_account"}',
+      subjectEmail: 'admin@example.com',
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'POST',
+      path: `${DIRECTORY_PATH}/credentials`,
+      body: {
+        service_account_json: '{"type":"service_account"}',
+        subject_email: 'admin@example.com',
+      },
+    });
+    expect(result.credentialsConfigured).toBe(true);
+    expect(result.enabled).toBe(true);
+  });
+
+  it('surfaces the provider validation message unchanged when the credential is refused', async () => {
+    // This message is the only thing telling the admin what is wrong with their
+    // Workspace setup, so it must reach the caller intact rather than being
+    // replaced by a generic failure.
+    const refusal = new Error(
+      "Domain-wide delegation isn't set up for this service account, or its granted scopes don't match the required read-only scopes.",
+    );
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockRejectedValue(refusal);
+
+    await expect(
+      createDirectorySync().setCredentials({
+        serviceAccountJson: '{"type":"service_account"}',
+        subjectEmail: 'admin@example.com',
+      }),
+    ).rejects.toThrow(
+      "Domain-wide delegation isn't set up for this service account, or its granted scopes don't match the required read-only scopes.",
+    );
+  });
+
+  it('never retains the uploaded credential on the resource or its snapshot', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi
+      .fn()
+      .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, credentials_configured: true } }));
+
+    const directory = createDirectorySync();
+    const result = await directory.setCredentials({
+      serviceAccountJson: '{"private_key":"-----BEGIN PRIVATE KEY-----"}',
+      subjectEmail: 'admin@example.com',
+    });
+
+    // The key is an input only. Snapshots can be persisted, so a private key
+    // must never be reachable from one. Check the receiver as well as the
+    // returned resource: setCredentials returns a fresh instance, so a leak
+    // would sit on the object the method was called on.
+    for (const target of [directory, result]) {
+      expect(JSON.stringify(target)).not.toContain('PRIVATE KEY');
+      expect(JSON.stringify(target.__internal_toSnapshot())).not.toContain('PRIVATE KEY');
+    }
+  });
+
+  it('reports credentialsConfigured as null for push providers, which have no credential', () => {
+    const directory = createDirectorySync();
+
+    expect(directory.credentialsConfigured).toBeNull();
+  });
+
+  it('triggers a sync', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: null }));
+
+    await createDirectorySync().sync();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'POST', path: `${DIRECTORY_PATH}/sync` });
+  });
+
+  it('reads the last sync result', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: {
+          last_synced_at: 1700000000000,
+          last_sync_status: 'failed',
+          last_sync_error: 'delegation denied',
+          last_sync_changed_user_count: 0,
+        },
+      }),
+    );
+
+    const result = await createDirectorySync().getSyncStatus();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: `${DIRECTORY_PATH}/sync_status` });
+    expect(result.lastSyncedAt).toEqual(new Date(1700000000000));
+    expect(result.lastSyncStatus).toBe('failed');
+    expect(result.lastSyncError).toBe('delegation denied');
+    expect(result.lastSyncChangedUserCount).toBe(0);
+  });
+
+  it('reads a missing changed-user count as null, not zero', async () => {
+    // A backend that predates the field omits it, and zero would read as
+    // "the sync changed nobody" — a settled answer the caller would act on.
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: { last_synced_at: 1700000000000, last_sync_status: 'succeeded', last_sync_error: null },
+      }),
+    );
+
+    const result = await createDirectorySync().getSyncStatus();
+
+    expect(result.lastSyncChangedUserCount).toBeNull();
+  });
+
+  it('reads an unsynced directory as null rather than an epoch date', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi
+      .fn()
+      .mockReturnValue(
+        Promise.resolve({ response: { last_synced_at: null, last_sync_status: null, last_sync_error: null } }),
+      );
+
+    const result = await createDirectorySync().getSyncStatus();
+
+    expect(result.lastSyncedAt).toBeNull();
+    expect(result.lastSyncStatus).toBeNull();
+    expect(result.lastSyncError).toBeNull();
+    expect(result.lastSyncChangedUserCount).toBeNull();
   });
 
   it('deletes the directory', async () => {
@@ -119,5 +268,106 @@ describe('DirectorySync', () => {
     expect(result.data[0].userId).toBe('user_1');
     expect(result.data[0].identifier).toBe('ada@example.com');
     expect(result.data[0].active).toBe(true);
+  });
+
+  it('turns group role mapping on through update', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi
+      .fn()
+      .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, group_role_mapping_enabled: true } }));
+
+    const result = await createDirectorySync().update({ groupRoleMappingEnabled: true });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'PATCH',
+      path: DIRECTORY_PATH,
+      body: { group_role_mapping_enabled: true },
+    });
+    expect(result.groupRoleMappingEnabled).toBe(true);
+  });
+
+  it('lists directory groups with cursor pagination', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: {
+          data: [{ object: 'directory_group', id: 'dirgrp_1', display_name: 'Engineering', updated_at: 1700000000000 }],
+          cursor: { starting_after: 'dirgrp_1', ending_before: null, has_next_page: true },
+        },
+      }),
+    );
+
+    const page = await createDirectorySync().getGroups({ limit: 1, startingAfter: 'dirgrp_0' });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'GET',
+      path: `${DIRECTORY_PATH}/groups`,
+      search: { limit: '1', starting_after: 'dirgrp_0' },
+    });
+    expect(page.data).toEqual([{ id: 'dirgrp_1', displayName: 'Engineering', updatedAt: new Date(1700000000000) }]);
+    expect(page.startingAfter).toBe('dirgrp_1');
+    expect(page.hasNextPage).toBe(true);
+  });
+
+  const mappingsResponse = {
+    data: [
+      {
+        object: 'directory_group_role_mapping',
+        id: 'dgrm_1',
+        directory_id: 'scimdir_1',
+        directory_group_id: 'dirgrp_1',
+        directory_group_display_name: 'Engineering',
+        role: roleJSON('org:admin', 'Admin'),
+        precedence: 1,
+        created_at: 1700000000000,
+        updated_at: 1700000000000,
+      },
+    ],
+    total_count: 1,
+    default_role: roleJSON('org:member', 'Member'),
+  };
+
+  it('reads the group role mappings and the default role', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: mappingsResponse }));
+
+    const result = await createDirectorySync().getGroupRoleMappings();
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: `${DIRECTORY_PATH}/group_role_mappings` });
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0]).toMatchObject({
+      directoryGroupId: 'dirgrp_1',
+      directoryGroupDisplayName: 'Engineering',
+      precedence: 1,
+      role: { key: 'org:admin', name: 'Admin' },
+    });
+    expect(result.defaultRole).toMatchObject({ key: 'org:member', name: 'Member' });
+  });
+
+  it('replaces the group role mappings, serializing them as JSON in priority order', async () => {
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: mappingsResponse }));
+
+    await createDirectorySync().replaceGroupRoleMappings({
+      mappings: [
+        { directoryGroupId: 'dirgrp_2', role: 'org:member' },
+        { directoryGroupId: 'dirgrp_1', role: 'org:admin' },
+      ],
+    });
+
+    // @ts-ignore
+    expect(BaseResource._fetch).toHaveBeenCalledWith({
+      method: 'PUT',
+      path: `${DIRECTORY_PATH}/group_role_mappings`,
+      body: {
+        mappings: JSON.stringify([
+          { directory_group_id: 'dirgrp_2', role: 'org:member' },
+          { directory_group_id: 'dirgrp_1', role: 'org:admin' },
+        ]),
+      },
+    });
   });
 });

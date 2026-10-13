@@ -8,6 +8,7 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
+  assertOAuthAudienceClaim,
   assertSubClaim,
 } from '../assertions';
 
@@ -109,6 +110,28 @@ describe('assertAudienceClaim(audience?, aud?)', () => {
     expect(() => assertAudienceClaim(audience.slice(0, -2), [audience, otherAudience])).toThrow(
       `Invalid JWT audience claim (aud) "${audience.slice(0, -2)}". Is not included in "${JSON.stringify([audience, otherAudience])}".`,
     );
+  });
+});
+
+describe('assertOAuthAudienceClaim(aud, audience?)', () => {
+  const audience = 'https://resource.example.com';
+  const otherAudience = 'https://other.example.com';
+
+  it.each([
+    { aud: audience, expected: audience },
+    { aud: [otherAudience, audience], expected: audience },
+    { aud: audience, expected: [otherAudience, audience] },
+    { aud: [otherAudience, audience], expected: [audience] },
+  ])('accepts aud=$aud with expected audience=$expected', ({ aud, expected }) => {
+    expect(() => assertOAuthAudienceClaim(aud, expected)).not.toThrow();
+  });
+
+  it.each([undefined, null, '', []])('rejects missing or empty aud=%j when an audience is expected', aud => {
+    expect(() => assertOAuthAudienceClaim(aud, audience)).toThrow('Invalid OAuth audience claim');
+  });
+
+  it.each([undefined, '', []])('skips audience validation when expected audience=%j', expected => {
+    expect(() => assertOAuthAudienceClaim(undefined, expected)).not.toThrow();
   });
 });
 

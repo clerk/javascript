@@ -1,5 +1,5 @@
 export { useAnimationsFinished } from './use-animations-finished';
-export { useDataTable } from './use-data-table';
+export { functionalUpdate, useDataTable } from './use-data-table';
 export type {
   ColumnFiltersState,
   DataTableRow,
@@ -12,6 +12,7 @@ export type {
   UseDataTableReturn,
 } from './use-data-table';
 export { useControllableState } from './use-controllable-state';
+export { useLayoutAnimation } from './use-layout-animation';
 export {
   type TransitionProps,
   useTransition,

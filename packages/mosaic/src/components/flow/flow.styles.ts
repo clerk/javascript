@@ -11,7 +11,8 @@ export const styles = stylex.create({
       ':where([data-initial])': durationVars['--cl-duration-instant'],
     },
     transitionProperty: {
-      default: 'height',
+      default: 'none',
+      ':where([data-transitioning])': 'height',
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
     transitionTimingFunction: easingVars['--cl-ease-enter'],

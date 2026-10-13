@@ -14,7 +14,7 @@ import React from 'react';
 
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
 import { Combobox } from '../combobox';
 import { Field } from '../field';
@@ -33,6 +33,11 @@ function getCountry(iso: CountryIso | undefined): CountryEntry {
     throw new Error('PhoneInput requires at least one country');
   }
   return country ?? fallback;
+}
+
+export function toCountryIso(value: string | null | undefined): CountryIso | undefined {
+  const iso = value?.toLowerCase();
+  return iso ? countryOptions.find(country => country.iso === iso)?.iso : undefined;
 }
 
 function getInitialCountry(value: string | undefined, defaultCountry: CountryIso | undefined): CountryIso {
@@ -222,7 +227,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 <Icon
                   name='chevron-down'
                   size='md'
-                  aria-hidden='true'
                 />
               </span>
             </Popover.Trigger>
@@ -255,7 +259,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                     <Icon
                       name='magnifying-glass'
                       size='sm'
-                      aria-hidden='true'
                     />
                   </InputGroup.Start>
                   <Combobox.Input

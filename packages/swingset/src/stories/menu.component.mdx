@@ -20,11 +20,11 @@ import { Menu } from '@clerk/mosaic/components/menu';
 <Menu.Root>
   <Menu.Trigger />
   <Menu.Popup>
-    <Menu.Item label='Add workspace'>
+    <Menu.Item label='Add organization'>
       <Menu.Media>
         <Icon name='plus' />
       </Menu.Media>
-      <Menu.Label>Add workspace</Menu.Label>
+      <Menu.Label>Add organization</Menu.Label>
     </Menu.Item>
     <Menu.Item
       label='Sign out'
@@ -114,7 +114,7 @@ text no longer starts on one line.
 ### Label
 
 `Menu.Label` takes the space between the media and whatever trails it, and truncates its text to one
-line. Items whose text is a name — an account, a workspace — need it most: a long name would widen
+line. Items whose text is a name — an account, an organization — need it most: a long name would widen
 the menu instead of ellipsing. It is also what pushes a trailing mark to the end of the row. Use it
 for every composed item, so rows built from parts all read the same.
 

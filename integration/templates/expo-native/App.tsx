@@ -4,6 +4,7 @@ import { tokenCache } from '@clerk/expo/token-cache';
 import { useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 
+import { BiometricAvailabilityButton } from './components/BiometricAvailabilityButton';
 import { GoogleSignInButton } from './components/GoogleSignInButton';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -64,6 +65,7 @@ function NativeBuildFixture() {
         onPress={() => setIsAuthOpen(true)}
       />
       {!isSignedIn && <GoogleSignInButton />}
+      {!isSignedIn && <BiometricAvailabilityButton />}
       {isSignedIn && (
         <Button
           testID='open-embedded-profile-button'

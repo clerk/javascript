@@ -5,38 +5,39 @@ import { Button } from '../../components/button';
 import { Field } from '../../components/field';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
-import { fill } from '../../localization/messages';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { fill, useMessages } from '../../localization';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 import { styles } from './user-profile-passkeys-section.styles';
+import type {
+  UserProfilePasskey,
+  UserProfilePasskeyNameValidator,
+} from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 
-export interface UserProfilePasskey {
-  id: string;
-  name: string;
-  createdAtLabel?: string;
-  lastUsedAtLabel?: string;
-}
+export type { UserProfilePasskey } from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 
 export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
-  sectionTitle?: string;
   onAdd?: () => void;
+  isAdding?: boolean;
   addError?: string;
   onRename?: (id: string, name: string) => void | Promise<void>;
+  validateName?: UserProfilePasskeyNameValidator;
   onRemove?: (id: string) => void | Promise<void>;
 }
 
 export function UserProfilePasskeysSectionView({
   passkeys,
-  sectionTitle,
   onAdd,
+  isAdding,
   addError,
   onRename,
+  validateName,
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
+  const m = useMessages('userProfilePasskeys');
   const addButton = useRef<HTMLButtonElement>(null);
-  const section = useRef<HTMLElement>(null);
+  const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: passkeys.map(passkey => passkey.id),
     onRemove,
@@ -46,74 +47,72 @@ export function UserProfilePasskeysSectionView({
 
   return (
     <>
-      <Section.Root
+      <Section.Group
         ref={section}
         tabIndex={-1}
-        aria-label={sectionTitle ? undefined : m.label}
       >
-        {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
-        <Section.Group>
-          <Section.Row>
-            <Section.Item>
-              <Section.Content>
-                <Section.Label>{m.label}</Section.Label>
-              </Section.Content>
-              {onAdd ? (
-                <Section.Actions>
-                  <Button
-                    ref={addButton}
-                    aria-label={m.addLabel}
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    onClick={onAdd}
-                  >
-                    <Icon
-                      name='plus'
-                      placement='inline-start'
-                      size='sm'
-                    />
-                    {m.add}
-                  </Button>
-                </Section.Actions>
-              ) : null}
-            </Section.Item>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>{m.label}</Section.Title>
             <Field.Message
               role={addError ? 'alert' : 'status'}
               xstyle={styles.addError}
             >
               <Field.Error>{addError}</Field.Error>
             </Field.Message>
+          </Section.Content>
+          {onAdd ? (
+            <Section.Actions>
+              <Button
+                ref={addButton}
+                aria-label={m.addLabel}
+                color='neutral'
+                size='sm'
+                variant='outline'
+                disabled={isAdding}
+                aria-busy={isAdding}
+                onClick={onAdd}
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
+                  size='sm'
+                />
+                {m.add}
+              </Button>
+            </Section.Actions>
+          ) : null}
+        </Section.Header>
+        <Section.Body>
+          <Section.Items>
             {passkeys.length > 0 ? (
-              <Section.Items>
-                {passkeys.map(passkey => (
-                  <UserProfilePasskeyRowView
-                    key={passkey.id}
-                    passkey={passkey}
-                    triggerRef={removalFocus.registerTrigger(passkey.id)}
-                    onRename={onRename}
-                    onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
-                  />
-                ))}
-              </Section.Items>
+              passkeys.map(passkey => (
+                <UserProfilePasskeyRowView
+                  key={passkey.id}
+                  passkey={passkey}
+                  triggerRef={removalFocus.registerTrigger(passkey.id)}
+                  onRename={onRename}
+                  validateName={validateName}
+                  onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
+                />
+              ))
             ) : (
-              <Section.Items>
-                <Section.Item>
-                  <Section.Content>
-                    <Section.Description>{m.empty}</Section.Description>
-                  </Section.Content>
-                </Section.Item>
-              </Section.Items>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Description>{m.empty}</Section.Description>
+                </Section.Content>
+              </Section.Item>
             )}
-          </Section.Row>
-        </Section.Group>
-      </Section.Root>
+          </Section.Items>
+        </Section.Body>
+      </Section.Group>
       {onRemove ? (
         <Confirmation
           handle={removePasskey}
           title={m.removeTitle}
           description={passkey => fill(m.removeDescription, { name: passkey.name })}
           actionLabel={m.remove}
+          cancelLabel={m.cancel}
           finalFocus={removalFocus.finalFocus}
           onConfirm={passkey => removalFocus.remove(passkey.id)}
         />

@@ -8,7 +8,9 @@ export type {
   TableHeaderProps,
   TableProps,
   TableRowProps,
+  TableSearchProps,
   TableSelectAllCellProps,
   TableSelectCellProps,
   TableSort,
+  TableToolbarProps,
 } from './table';

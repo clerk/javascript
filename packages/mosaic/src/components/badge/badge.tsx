@@ -4,7 +4,9 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
+import { withTruncatableLabel } from '../../utils/truncatable-label';
+import { BadgeContext } from './badge.context';
 import { colors, styles } from './badge.styles';
 
 export type BadgeProps = MosaicComponentProps<'span'> & {
@@ -30,9 +32,11 @@ export type BadgeProps = MosaicComponentProps<'span'> & {
  * <Badge render={<a href='/billing' />}>Upgrade</Badge>
  */
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function MosaicBadge(
-  { color = 'primary', render, xstyle, ...rest },
+  { children, color: colorProp, render, xstyle, ...rest },
   ref,
 ) {
+  const defaults = React.useContext(BadgeContext);
+  const color = colorProp ?? defaults.color ?? 'primary';
   return useRender({
     defaultTagName: 'span',
     render,
@@ -43,6 +47,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function Mosa
         stylex.props(reset.base, styles.base, colors[color], xstyle),
         rest,
       ),
+      children: withTruncatableLabel(children),
     },
   });
 });

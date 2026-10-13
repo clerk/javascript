@@ -47,6 +47,7 @@ export const ERROR_CODES = {
   FRAUD_DEVICE_BLOCKED: 'device_blocked',
   FRAUD_ACTION_BLOCKED: 'action_blocked',
   PROTECT_CHECK_ALREADY_RESOLVED: 'protect_check_already_resolved',
+  PROTECT_CHECK_REQUIRED: 'protect_check_required',
   PROTECT_CHECK_TIMED_OUT: 'protect_check_timed_out',
   PROTECT_CHECK_UNSUPPORTED_ENVIRONMENT: 'protect_check_unsupported_environment',
   SIGNUP_RATE_LIMIT_EXCEEDED: 'signup_rate_limit_exceeded',

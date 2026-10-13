@@ -59,6 +59,17 @@ export type {
   UseOrganizationDirectorySyncUsersParams,
   UseOrganizationDirectorySyncUsersReturn,
 } from './useOrganizationDirectorySyncUsers';
+export { __internal_useOrganizationDirectorySyncStatus } from './useOrganizationDirectorySyncStatus';
+export { __internal_useOrganizationDirectorySyncGroupRoleMappings } from './useOrganizationDirectorySyncGroupRoleMappings';
+export type {
+  DirectorySyncGroupRoleMappingsData,
+  UseOrganizationDirectorySyncGroupRoleMappingsParams,
+  UseOrganizationDirectorySyncGroupRoleMappingsReturn,
+} from './useOrganizationDirectorySyncGroupRoleMappings';
+export type {
+  UseOrganizationDirectorySyncStatusParams,
+  UseOrganizationDirectorySyncStatusReturn,
+} from './useOrganizationDirectorySyncStatus';
 export { __internal_useOrganizationEnterpriseConnectionTestRuns } from './useOrganizationEnterpriseConnectionTestRuns';
 export type {
   UseOrganizationEnterpriseConnectionTestRunsParams,

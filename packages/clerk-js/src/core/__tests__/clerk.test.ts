@@ -13,10 +13,12 @@ import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { mockJwt } from '@/test/core-fixtures';
+import { restoreDocument, setDocumentVisibilityState } from '@/test/document-helpers';
 
 import { mockNativeRuntime } from '../../test/utils';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
+import { ProtectCheckGate } from '../protectCheckGate';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 
@@ -124,6 +126,7 @@ describe('Clerk singleton', () => {
     };
 
     Object.defineProperty(global.window, 'addEventListener', {
+      configurable: true,
       value: mockAddEventListener,
     });
 
@@ -251,6 +254,32 @@ describe('Clerk singleton', () => {
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
+      });
+
+      it('mounts OAuthConsent when mounted while navigating to redirectUrl', async () => {
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({ signedInSessions: [mockSession], isEligibleForTouch: () => false }),
+        );
+        const mountComponent = vi.fn();
+        const mockClerkUICtor = vi.fn(function () {
+          return { ensureMounted: () => Promise.resolve({ mountComponent }) };
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({ ui: { ClerkUI: mockClerkUICtor } });
+        const node = document.createElement('div');
+        sut.navigate = vi.fn(async () => {
+          sut.mountOAuthConsent(node);
+        });
+
+        await sut.setActive({
+          session: mockSession as any as ActiveSessionResource,
+          redirectUrl: '/oauth-consent',
+        });
+
+        await waitFor(() => {
+          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'OAuthConsent', node }));
+        });
       });
 
       describe('with `touchSession` set to false', () => {
@@ -2793,6 +2822,421 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('redirects user to factor-one to choose between multiple enterprise connections', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/factor-one');
+      });
+    });
+
+    it('redirects user to sign-in when a single bare enterprise_sso factor needs the first factor', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [{ strategy: 'enterprise_sso' }],
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in');
+      });
+    });
+
+    it('redirects user to the enterprise connections url if the sign-up is missing enterprise_sso', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['enterprise_sso'],
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/enterprise-connections');
+      });
+    });
+
+    it('builds the enterprise connections url from the signUpUrl param when provided', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['enterprise_sso'],
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ signUpUrl: '/custom-sign-up' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-sign-up#/enterprise-connections');
+      });
+    });
+
+    it('completes a sign-up callback instead of resuming a pending enterprise connection sign-in', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp({
+            status: 'complete',
+            missing_fields: [],
+            created_session_id: 'sess_123',
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const mockSetActive = vi.fn();
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive;
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: 'sess_123' }));
+      });
+      expect(mockNavigate).not.toHaveBeenCalledWith('/sign-in#/factor-one');
+    });
+
+    it('continues a sign-up callback instead of resuming a pending enterprise connection sign-in', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['first_name'],
+            created_session_id: null,
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/continue');
+      });
+    });
+
+    it('does not resume a pending enterprise connection sign-in on a sign-up callback', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ reloadResource: 'signUp' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in');
+      });
+    });
+
+    it('redirects user to the enterpriseConnectionsUrl param if the sign-up is missing enterprise_sso', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['enterprise_sso'],
+            created_session_id: null,
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ enterpriseConnectionsUrl: '/custom-chooser' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-chooser');
+      });
+    });
+
+    it('redirects a transferred sign-up missing enterprise_sso to the enterprise connections url', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: null,
+            },
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSignUpCreate = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ status: 'missing_requirements', missingFields: ['enterprise_sso'] }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/enterprise-connections');
+      });
+    });
+
+    it('redirects user to the protect-check url before the enterprise connections url if the sign-up is protect-gated', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['protect_check', 'enterprise_sso'],
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/protect-check');
+      });
+    });
+
     it('redirects user to the verify-email-address url if the external account has unverified email and there are no missing requirements', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
@@ -3977,6 +4421,124 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('protect check modal', () => {
+    beforeEach(() => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => true,
+          isDevelopmentOrStaging: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+        }),
+      );
+    });
+
+    const gatedSignIn = () => ({
+      protectCheck: { status: 'pending', token: 'tok', sdkUrl: 'https://p.example.com/sdk.js' },
+    });
+
+    it('resolves at once when Clerk was loaded without UI components', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await expect(sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any })).resolves.toBeUndefined();
+    });
+
+    it('resolves at once and leaves the gate when the UI predates the Protect modal', async () => {
+      const openModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openModal, closeModal: vi.fn() }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const resource = gatedSignIn() as any;
+
+      await expect(sut.__internal_openProtectCheckModal({ resource })).resolves.toBeUndefined();
+      expect(openModal).not.toHaveBeenCalled();
+      expect(resource.protectCheck).not.toBeNull();
+    });
+
+    it('closes the modal and rejects with the error the modal reports', async () => {
+      const openProtectCheckModal = vi.fn();
+      const closeModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openProtectCheckModal, closeModal }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const blocked = new Error('blocked');
+
+      const pending = sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any });
+      await vi.waitFor(() => expect(openProtectCheckModal).toHaveBeenCalled());
+      openProtectCheckModal.mock.calls[0][0].onFailed(blocked);
+
+      await expect(pending).rejects.toBe(blocked);
+      expect(closeModal).toHaveBeenCalledWith('protectCheck');
+    });
+
+    const loadWithClient = async (client: { signIn: Record<string, unknown>; signUp: Record<string, unknown> }) => {
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [], ...client }));
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      return sut;
+    };
+
+    it('resolves gates the client carries on its sign-in and sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signIn);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      resolve.mockRestore();
+    });
+
+    it('leaves every gate alone once the sign-in is complete', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: { status: 'complete' }, signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).not.toHaveBeenCalled();
+      resolve.mockRestore();
+    });
+
+    it('resolves only the sign-up gate when the callback is a sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck('signUp');
+
+      expect(resolve).toHaveBeenCalledTimes(1);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      resolve.mockRestore();
+    });
+
+    it('reports a failed gate on the resource that carries it and rejects', async () => {
+      const blocked = new Error('blocked');
+      const resolve = vi
+        .spyOn(ProtectCheckGate.prototype, 'resolve')
+        .mockResolvedValueOnce(undefined)
+        .mockRejectedValueOnce(blocked);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+      const emit = vi.spyOn(eventBus, 'emit');
+
+      await expect(sut.__internal_resolvePendingProtectCheck()).rejects.toBe(blocked);
+
+      expect(emit).toHaveBeenCalledTimes(1);
+      expect(emit).toHaveBeenCalledWith(events.ResourceError, { resource: sut.client?.signUp, error: blocked });
+      emit.mockRestore();
+      resolve.mockRestore();
+    });
+  });
+
   describe('ui.ClerkUI option', () => {
     beforeEach(() => {
       mockEnvironmentFetch.mockReturnValue(
@@ -4038,6 +4600,119 @@ describe('Clerk singleton', () => {
       } as any);
 
       expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+  });
+
+  describe('page focus session touch', () => {
+    const windowListeners = new Map<string, Array<(event: any) => void>>();
+
+    const firePageFocus = () => {
+      for (const listener of windowListeners.get('focus') ?? []) {
+        listener(new Event('focus'));
+      }
+    };
+
+    const mockSession = {
+      id: 'sess_1',
+      status: 'active',
+      user: {},
+      touch: vi.fn(() => Promise.resolve()),
+      getToken: vi.fn(),
+      lastActiveToken: { getRawString: () => 'mocked-token' },
+    };
+
+    beforeEach(() => {
+      windowListeners.clear();
+      const recordWindowListener = (type: string, callback: (e: any) => void) => {
+        const listeners = windowListeners.get(type) ?? [];
+        listeners.push(callback);
+        windowListeners.set(type, listeners);
+
+        if (type === 'message') {
+          callback({
+            origin: 'https://' + productionPublishableKey,
+            data: {
+              browserToken: 'hey',
+            },
+          });
+        }
+      };
+      Object.defineProperty(global.window, 'addEventListener', {
+        configurable: true,
+        value: recordWindowListener,
+      });
+
+      mockSession.touch.mockReset();
+      mockSession.touch.mockResolvedValue(undefined);
+      setDocumentVisibilityState('visible');
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: { singleSessionMode: true },
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => true,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [mockSession],
+          lastActiveSessionId: mockSession.id,
+        }),
+      );
+    });
+
+    afterEach(() => {
+      restoreDocument();
+    });
+
+    it('does not surface a failed focus touch as an unhandled rejection', async () => {
+      const unhandled: unknown[] = [];
+      const onUnhandledRejection = (reason: unknown) => {
+        unhandled.push(reason);
+      };
+      process.on('unhandledRejection', onUnhandledRejection);
+
+      try {
+        mockSession.touch.mockRejectedValue(
+          new Error(
+            'ClerkJS: Network error at "https://clerk.example.com/v1/client/sessions/sess_1/touch" - TypeError: NetworkError when attempting to fetch resource. Please try again.',
+          ),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        firePageFocus();
+
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'focus' });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(unhandled).toEqual([]);
+      } finally {
+        process.off('unhandledRejection', onUnhandledRejection);
+      }
+    });
+
+    it('still handles an unauthenticated focus touch', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+      const handleUnauthenticated = vi.spyOn(sut, 'handleUnauthenticated').mockResolvedValue(undefined);
+      mockSession.touch.mockRejectedValue({ status: 401 });
+
+      firePageFocus();
+
+      await waitFor(() => {
+        expect(handleUnauthenticated).toHaveBeenCalled();
+      });
+    });
+
+    it('does not touch the session on focus when touchSession is false', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ touchSession: false });
+
+      firePageFocus();
+
+      expect(mockSession.touch).not.toHaveBeenCalled();
     });
   });
 });

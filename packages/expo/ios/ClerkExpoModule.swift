@@ -100,6 +100,26 @@ public class ClerkExpoModule: Module {
         promise: promise
       )
     }
+
+    AsyncFunction("reverifyWithBiometrics") {
+      (sessionId: String, level: String, reason: String?, promise: Promise) in
+      Task { @MainActor in
+        do {
+          let verification = try await ClerkNativeBridge.shared.reverifyWithBiometrics(
+            sessionId: sessionId,
+            level: level,
+            reason: reason
+          )
+          promise.resolve(verification)
+        } catch {
+          self.rejectBiometricCredentialError(
+            error,
+            fallbackCode: "E_BIOMETRIC_REVERIFICATION_FAILED",
+            promise: promise
+          )
+        }
+      }
+    }
   }
 
   // MARK: - configure
