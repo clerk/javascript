@@ -13,6 +13,8 @@ import * as DialogStories from './dialog.component.stories';
   meta={DialogStories.meta}
   extra={[
     { name: 'role', type: "'dialog' | 'alertdialog'", default: "'dialog'" },
+    { name: 'shouldCloseOnInteractOutside', type: 'boolean', default: "true (always false for 'alertdialog')" },
+    { name: 'showCloseButton', type: 'boolean', default: "true for 'dialog', false for 'alertdialog'" },
     { name: 'open', type: 'boolean' },
     { name: 'defaultOpen', type: 'boolean', default: 'false' },
     { name: 'onOpenChange', type: '(open: boolean, details: DialogOpenChangeDetails) => void' },
@@ -143,7 +145,8 @@ What follows from the role:
 - No outside-press dismissal; Escape still cancels.
 - A name **and** a description are required — `Card.Title` and `Card.Description`; both warn in dev
   when missing.
-- `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns.
+- `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns, unless the root sets
+  `showCloseButton`.
 
 ### Confirming a discard
 
@@ -178,14 +181,15 @@ the DOM. Point `initialFocus` on `Dialog.Popup` at the field that should have it
 
 ### Dismissal
 
-`role` decides what closes the dialog. There is no prop for it.
+Escape always closes. `shouldCloseOnInteractOutside={false}` keeps a `dialog` open on an outside
+press, for a task an accidental press would throw away, such as entering a verification code. An
+`alertdialog` never closes on an outside press.
 
-| Role          | Escape | Outside press | Programmatic |
-| ------------- | ------ | ------------- | ------------ |
-| `dialog`      | ✅     | ✅            | ✅           |
-| `alertdialog` | ✅     | ❌            | ✅           |
-
-The two map to the native [`<dialog closedby>`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/closedBy) values `any` and `closerequest`.
+| Root                                                 | Escape | Outside press | Programmatic |
+| ---------------------------------------------------- | ------ | ------------- | ------------ |
+| `role='dialog'`                                      | ✅     | ✅            | ✅           |
+| `role='dialog' shouldCloseOnInteractOutside={false}` | ✅     | ❌            | ✅           |
+| `role='alertdialog'`                                 | ✅     | ❌            | ✅           |
 
 ### Keyboard
 

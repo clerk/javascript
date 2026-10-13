@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { useAnimationsFinished } from '../use-animations-finished';
 
 function createMockElement(
-  animations: Array<{ finished: Promise<void> }> = [],
+  animations: Array<{ finished: Promise<void>; transitionProperty?: string; animationName?: string }> = [],
   attributes: Record<string, string> = {},
 ): HTMLElement {
   const el = document.createElement('div');
@@ -118,6 +118,66 @@ describe('useAnimationsFinished', () => {
     });
 
     expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  describe('with a filter', () => {
+    const neverFinishes = new Promise<void>(() => {});
+    const isHeightTransition = (animation: Animation) =>
+      'transitionProperty' in animation && animation.transitionProperty === 'height';
+
+    it('fires callback immediately when only unmatched animations are running', () => {
+      const el = createMockElement([{ animationName: 'pulse', finished: neverFinishes }]);
+      const ref = { current: el } as RefObject<HTMLElement | null>;
+
+      const { result } = renderHook(() => useAnimationsFinished(ref, false, isHeightTransition));
+
+      const callback = vi.fn();
+      act(() => result.current(callback));
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('waits only for matched animations', async () => {
+      let resolveHeight!: () => void;
+      const heightFinished = new Promise<void>(r => {
+        resolveHeight = r;
+      });
+      const el = createMockElement([
+        { transitionProperty: 'height', finished: heightFinished },
+        { animationName: 'pulse', finished: neverFinishes },
+      ]);
+      const ref = { current: el } as RefObject<HTMLElement | null>;
+
+      const { result } = renderHook(() => useAnimationsFinished(ref, false, isHeightTransition));
+
+      const callback = vi.fn();
+      act(() => result.current(callback));
+      expect(callback).not.toHaveBeenCalled();
+
+      await act(() => resolveHeight());
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('re-checks only matched animations when one is cancelled', async () => {
+      let rejectHeight!: () => void;
+      const cancelledHeight = new Promise<void>((_, reject) => {
+        rejectHeight = reject;
+      });
+      const el = createMockElement([{ transitionProperty: 'height', finished: cancelledHeight }]);
+      const ref = { current: el } as RefObject<HTMLElement | null>;
+
+      const { result } = renderHook(() => useAnimationsFinished(ref, false, isHeightTransition));
+
+      const callback = vi.fn();
+      act(() => result.current(callback));
+
+      el.getAnimations = vi.fn(() => [{ animationName: 'pulse', finished: neverFinishes }] as unknown as Animation[]);
+      await act(async () => {
+        rejectHeight();
+        await new Promise(r => setTimeout(r, 0));
+      });
+
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('waits for starting-style attribute removal when open=true', async () => {

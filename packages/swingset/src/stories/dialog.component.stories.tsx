@@ -348,86 +348,6 @@ export function Stacked() {
 
 const accountTrigger = (props: RenderProps) => <Button {...props}>Open account</Button>;
 
-/** The "add email address" dialog the account profile opens, driven by `open` rather than a trigger. */
-function AddEmailDialog({
-  open,
-  onOpenChange,
-  onAdd,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onAdd: (value: string) => void;
-}) {
-  const [value, setValue] = React.useState('');
-  const inputRef = React.useRef<HTMLInputElement>(null);
-
-  return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={next => {
-        onOpenChange(next);
-        if (!next) {
-          setValue('');
-        }
-      }}
-    >
-      <Dialog.Popup initialFocus={inputRef}>
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
-        >
-          <Card.Header>
-            <Card.Title>Add email address</Card.Title>
-            <Card.Description>A verification code will be sent to this address.</Card.Description>
-          </Card.Header>
-          <Card.Content
-            render={
-              <form
-                id='profile-add-email'
-                onSubmit={event => {
-                  event.preventDefault();
-                  onAdd(value.trim());
-                  setValue('');
-                  onOpenChange(false);
-                }}
-              />
-            }
-          >
-            <Input
-              ref={inputRef}
-              type='email'
-              required
-              aria-label='Email address'
-              placeholder='you@example.com'
-              value={value}
-              onChange={event => setValue(event.target.value)}
-            />
-          </Card.Content>
-          <Card.Footer>
-            <Dialog.Close
-              render={
-                <Button
-                  variant='outline'
-                  fullWidth
-                />
-              }
-            >
-              Cancel
-            </Dialog.Close>
-            <Button
-              type='submit'
-              form='profile-add-email'
-              fullWidth
-            >
-              Add email
-            </Button>
-          </Card.Footer>
-        </Card.Root>
-      </Dialog.Popup>
-    </Dialog.Root>
-  );
-}
-
 /**
  * The real user page inside a `profile` dialog. The dialog positions it and the page paints
  * itself — the same composition as a `Card` inside a `card` dialog — so the page names the
@@ -436,10 +356,7 @@ function AddEmailDialog({
  * page's own.
  */
 export function Nested() {
-  const [addEmailOpen, setAddEmailOpen] = React.useState(false);
-  const { activePage, setActivePage, pages, addEmail } = useUserProfileFixture({
-    onAddEmail: () => setAddEmailOpen(true),
-  });
+  const { activePage, setActivePage, pages } = useUserProfileFixture();
   return (
     <Dialog.Root>
       <Dialog.Trigger render={accountTrigger} />
@@ -448,11 +365,6 @@ export function Nested() {
           activePage={activePage}
           pages={pages}
           onPageChange={setActivePage}
-        />
-        <AddEmailDialog
-          open={addEmailOpen}
-          onOpenChange={setAddEmailOpen}
-          onAdd={addEmail}
         />
       </Dialog.Popup>
     </Dialog.Root>
@@ -469,10 +381,7 @@ export function Nested() {
  * dragging the host below `48rem` collapses the sidebar without the browser window moving.
  */
 export function Standalone() {
-  const [addEmailOpen, setAddEmailOpen] = React.useState(false);
-  const { activePage, setActivePage, pages, addEmail } = useUserProfileFixture({
-    onAddEmail: () => setAddEmailOpen(true),
-  });
+  const { activePage, setActivePage, pages } = useUserProfileFixture();
   return (
     <div
       style={{
@@ -490,11 +399,6 @@ export function Standalone() {
         activePage={activePage}
         pages={pages}
         onPageChange={setActivePage}
-      />
-      <AddEmailDialog
-        open={addEmailOpen}
-        onOpenChange={setAddEmailOpen}
-        onAdd={addEmail}
       />
     </div>
   );

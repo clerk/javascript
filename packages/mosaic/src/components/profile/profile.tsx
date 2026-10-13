@@ -36,7 +36,7 @@ function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
 }
 
 function dismissOf(dialog: DialogContextValue | null, backInNav: boolean): ProfileDismiss {
-  if (!isInDialog(dialog) || dialog.role === 'alertdialog') {
+  if (!isInDialog(dialog) || !dialog.showCloseButton) {
     return 'none';
   }
   return backInNav ? 'back' : 'corner';

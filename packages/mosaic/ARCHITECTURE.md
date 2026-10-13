@@ -430,7 +430,7 @@ branch on rather than two.
 A controller whose own state is a single boolean is the same layer with `useState`
 inside it — still no Clerk, still returning plain props. The async part goes to a
 shared hook (`useForm` here) rather than a hand-rolled pending flag. From
-`features/user-profile/user-profile-account-section/user-profile-edit-username.controller.ts`:
+`features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts`:
 
 ```tsx
 export function useUserProfileEditUsernameController({ username = '', required = false, onSubmit }) {
