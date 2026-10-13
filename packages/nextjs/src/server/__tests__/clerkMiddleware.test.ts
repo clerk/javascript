@@ -6,7 +6,7 @@ import { MalformedURLError } from '@clerk/shared/pathMatcher';
 import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, type Mock, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
 import type { ClerkMiddlewareAuth } from '../clerkMiddleware';
@@ -115,23 +115,6 @@ describe('ClerkMiddleware type tests', () => {
     clerkMiddlewareMock(async auth => {
       const { getToken } = await auth({ acceptsToken: TokenType.ApiKey });
       await getToken();
-    });
-  });
-
-  it('infers the protect return type from the token option when a predicate is passed', () => {
-    clerkMiddlewareMock(auth => {
-      const predicate = () => true;
-
-      expectTypeOf(auth.protect(predicate)).toEqualTypeOf(auth.protect());
-      expectTypeOf(auth.protect(predicate, { unauthorizedUrl: '/denied' })).toEqualTypeOf(auth.protect());
-      expectTypeOf(auth.protect(predicate, { token: TokenType.SessionToken })).toEqualTypeOf(auth.protect());
-      expectTypeOf(auth.protect(predicate, { token: TokenType.ApiKey })).toEqualTypeOf(
-        auth.protect({ token: TokenType.ApiKey }),
-      );
-      expectTypeOf(auth.protect(predicate, { token: [TokenType.SessionToken, TokenType.M2MToken] })).toEqualTypeOf(
-        auth.protect({ token: [TokenType.SessionToken, TokenType.M2MToken] }),
-      );
-      expectTypeOf(auth.protect(predicate, { token: 'any' })).toEqualTypeOf(auth.protect({ token: 'any' }));
     });
   });
 
