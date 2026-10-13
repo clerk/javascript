@@ -1,10 +1,8 @@
-import { isReverificationHint } from '@clerk/shared/authorization-errors';
-import { isReverificationCancelledError } from '@clerk/shared/error';
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import { useState } from 'react';
 
 import type { UseFormResult } from '../../../components/form';
-import { FormSubmitError, useForm } from '../../../components/form';
+import { useForm } from '../../../components/form';
 import type { FieldFeedback } from '../../../components/form/form-submit-error';
 import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import { useMessages } from '../../../localization';
@@ -63,23 +61,11 @@ export function useUserProfileEditPasswordController({
       (!requiresCurrentPassword || values.currentPassword !== ''),
     onSubmit: async values => {
       reverification?.reset();
-      try {
-        const result = await onSubmit({
-          currentPassword: requiresCurrentPassword ? values.currentPassword : undefined,
-          newPassword: values.newPassword,
-          signOutOfOtherSessions: values.signOutOfOtherSessions,
-        });
-        // TODO: Should we handle repeated reverification hints in useReverificationWithState
-        // so every Mosaic consumer rejects incomplete verification?
-        if (isReverificationHint(result)) {
-          throw new FormSubmitError({ message: m.errors.verificationIncomplete });
-        }
-      } catch (error) {
-        if (isReverificationCancelledError(error)) {
-          return;
-        }
-        throw error;
-      }
+      await onSubmit({
+        currentPassword: requiresCurrentPassword ? values.currentPassword : undefined,
+        newPassword: values.newPassword,
+        signOutOfOtherSessions: values.signOutOfOtherSessions,
+      });
       // TODO: Discuss confirming the password was set or updated and other devices were signed out with a success page or toast. https://github.com/clerk/javascript/pull/9930#discussion_r4151641473
       setIsOpen(false);
     },

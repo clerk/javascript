@@ -283,7 +283,9 @@ describe('Changing a password', () => {
 
     await waitFor(
       () =>
-        expect(screen.getByRole('alert')).toHaveTextContent('Your password was not saved. Please try verifying again.'),
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          'Your request was not completed. Please try verifying again.',
+        ),
       { timeout: 3000 },
     );
     expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');

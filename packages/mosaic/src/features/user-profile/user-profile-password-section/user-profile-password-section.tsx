@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { Button } from '../../../components/button';
 import { useMessages } from '../../../localization';
+import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
@@ -44,7 +45,7 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
   const controller = useUserProfileEditPasswordController({
     policy: model,
     validatePassword: model.validatePassword,
-    onSubmit: updatePassword,
+    onSubmit: value => save(() => updatePassword(value)),
     reverification,
   });
 
