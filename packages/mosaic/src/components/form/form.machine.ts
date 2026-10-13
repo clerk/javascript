@@ -1,3 +1,5 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
+
 import type { LocalizableError } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { TransitionResult } from '../../machine/types';
@@ -251,10 +253,17 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
             target: 'editing',
             actions: assign(() => ({ error: undefined })),
           },
-          onError: {
-            target: 'editing',
-            actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
-          },
+          onError: [
+            {
+              guard: (_, e) => isReverificationCancelledError(e.error),
+              target: 'editing',
+              actions: assign(() => ({ error: undefined })),
+            },
+            {
+              target: 'editing',
+              actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
+            },
+          ],
         }),
       },
     },
