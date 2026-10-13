@@ -14,6 +14,7 @@ import * as DialogStories from './dialog.component.stories';
   extra={[
     { name: 'role', type: "'dialog' | 'alertdialog'", default: "'dialog'" },
     { name: 'shouldCloseOnInteractOutside', type: 'boolean', default: "true (always false for 'alertdialog')" },
+    { name: 'showCloseButton', type: 'boolean', default: "true for 'dialog', false for 'alertdialog'" },
     { name: 'open', type: 'boolean' },
     { name: 'defaultOpen', type: 'boolean', default: 'false' },
     { name: 'onOpenChange', type: '(open: boolean, details: DialogOpenChangeDetails) => void' },
@@ -139,7 +140,8 @@ What follows from the role:
 - No outside-press dismissal; Escape still cancels.
 - A name **and** a description are required — `Card.Title` and `Card.Description`; both warn in dev
   when missing.
-- `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns.
+- `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns, unless the root sets
+  `showCloseButton`.
 
 ### Confirming a discard
 
