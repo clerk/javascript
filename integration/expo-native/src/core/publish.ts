@@ -205,8 +205,10 @@ export async function postToPullRequest(bundle: EvidenceBundle, host: HostAdapte
 
   let current = await readDescription(runner, host.githubRepo, pr);
   const there = blockIn(current.body, platform);
-  const uploadedThere = there?.match(UPLOADED) ?? [];
-  if (uploadedThere.length === files.length && there === laidOutWith(uploadedThere)) return { verb: 'attach', via: 'gh', prUrl: current.url, posted: paths, alreadyPosted: true };
+  const anUpload = 'https://github.com/user-attachments/assets/00000000-0000-0000-0000-000000000000';
+  if (there !== null && there.match(UPLOADED)?.length === files.length && there.replace(UPLOADED, anUpload) === laidOutWith(files.map(() => anUpload))) {
+    return { verb: 'attach', via: 'gh', prUrl: current.url, posted: paths, alreadyPosted: true };
+  }
   let next: string | null = null;
   for (let attempt = 0; attempt < 2 && next === null; attempt += 1) {
     const edit = withEvidenceBlock(current.body, platform, listed);

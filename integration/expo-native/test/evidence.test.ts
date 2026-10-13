@@ -586,6 +586,24 @@ describe('attach', () => {
     assert.ok(otherRun.pr.body.endsWith(`Run \`r20261009-020202-bbbb\` on \`verify-ios-1\` at \`606639a63448\`, 1 of 1 passed.\n\n![profile](${asset(1)})\n\n<!-- /verify-evidence:ios -->`), 'the list that names another run is left as it is');
   });
 
+  it('says already posted for a repeated attach with a before run, with screenshots alone and with a video too', async () => {
+    const gh = fakeGh();
+    const { deps, sealed } = checkout(gh);
+    const before = sealed({ called: 'before', failed: true });
+    const { run } = sealed({ called: 'after' });
+    const pair = () => attach(deps, { verb: 'attach', run, pr: 9, media: still, before: before.run });
+    const first = await pair();
+    assert.equal(gh.edits.length, 2);
+    assert.deepEqual(await pair(), { ...first, alreadyPosted: true });
+    assert.equal(gh.edits.length, 2);
+
+    const both = () => attach(deps, { verb: 'attach', run, pr: 9, media: { screenshots: ['profile'], video: true }, before: before.run });
+    const withVideo = await both();
+    assert.equal(gh.edits.length, 4);
+    assert.deepEqual(await both(), { ...withVideo, alreadyPosted: true });
+    assert.equal(gh.edits.length, 4);
+  });
+
   it('says already posted only while the description holds the block it would write, and writes when the block there is another one or is gone', async () => {
     const gh = fakeGh();
     const { deps, sealed } = checkout(gh);
