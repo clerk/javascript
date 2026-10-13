@@ -109,10 +109,10 @@ available, **Settings** opens it directly.
 `mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
 Everything else is data.
 
-| Mode                 | Popup                                | Leads with                               |
-| -------------------- | ------------------------------------ | ---------------------------------------- |
-| `combined` (default) | Organizations and accounts together. | The active org, badged with the account. |
-| `user`               | Accounts only; never shows an org.   | The account.                             |
+| Mode                 | Popup                                | Leads with                                             |
+| -------------------- | ------------------------------------ | ------------------------------------------------------ |
+| `combined` (default) | Organizations and accounts together. | The active org, badged with the account in the header. |
+| `user`               | Accounts only; never shows an org.   | The account.                                           |
 
 What a mode leads with is named in the trigger and heads the popup — the two always agree.
 
@@ -211,7 +211,7 @@ than an error, so one order can cover every mode.
 | ----------------- | -------------------------------------------------------------------------------- |
 | `SwitcherRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`.     |
 | `SwitcherTrigger` | The trigger: the active account or organization's avatar, and what it is called. |
-| `SwitcherPopup`   | The popover surface: header, organization list, footer.                          |
+| `SwitcherPopup`   | The popover surface: header, organization list, Settings group, footer.          |
 
 ## Styling
 
@@ -223,6 +223,8 @@ than an error, so one order can cover every mode.
 | `.cl-user-button-header-content`     |                                         |
 | `.cl-user-button-header-title`       |                                         |
 | `.cl-user-button-header-description` |                                         |
+| `.cl-user-button-avatar`             |                                         |
+| `.cl-user-button-avatar-badge`       |                                         |
 | `.cl-user-button-group`              |                                         |
 | `.cl-user-button-separator`          |                                         |
 | `.cl-user-button-item`               | `data-interactive`                      |
