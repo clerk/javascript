@@ -8,7 +8,7 @@ import {
   useSignUp,
   useUser,
 } from '@clerk/expo';
-import { AuthView, useAuthViewState } from '@clerk/expo/native';
+import { AuthView, useAuthViewState } from '@clerk/expo/native-components';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { type ReactElement, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';

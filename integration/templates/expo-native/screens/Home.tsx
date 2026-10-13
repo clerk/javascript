@@ -1,5 +1,5 @@
 import { useAuth, useSession, useUser } from '@clerk/expo';
-import { AuthView, type AuthViewMode, UserButton } from '@clerk/expo/native';
+import { AuthView, type AuthViewMode, UserButton } from '@clerk/expo/native-components';
 import { type ReactElement, useState } from 'react';
 import { Button, Modal, StyleSheet, Text, View } from 'react-native';
 

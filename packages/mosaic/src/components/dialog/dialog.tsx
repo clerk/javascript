@@ -74,9 +74,13 @@ export interface DialogContextValue {
    * the one way out an alert must not offer.
    */
   role: DialogRole;
+  /** Whether `Card.Header` renders its dismiss. From `showCloseButton` on the root. */
+  showCloseButton: boolean;
 }
 
 export const DialogContext = React.createContext<DialogContextValue | null>(null);
+
+const ShowCloseButtonContext = React.createContext(true);
 
 /**
  * In a dialog, as opposed to standalone. A surface that can be rendered either way — `Card`,
@@ -136,32 +140,55 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
 type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 'closedBy'>;
 
 /**
- * `role` is the whole dismissal API: it decides how the dialog announces itself AND what closes it,
- * with no prop to contradict either.
+ * `role` decides how the dialog announces itself; `shouldCloseOnInteractOutside` decides whether
+ * an outside press closes it; `showCloseButton` decides whether the surface renders its dismiss.
+ * Escape always closes.
  *
  * - `alertdialog` announces as an interruption rather than as a surface the user navigated to, and
- *   cannot be dismissed by an outside press. A dialog asking a question it needs an answer to must
- *   not be answerable by clicking next to it. Escape still closes, which is the keyboard's
- *   equivalent of the cancel button that is always present;
- * - `dialog` dismisses on an outside press as well.
+ *   never closes on an outside press. A dialog asking a question it needs an answer to must not be
+ *   answerable by clicking next to it. Escape is the keyboard's equivalent of the cancel button
+ *   that is always present;
+ * - `dialog` closes on an outside press unless `shouldCloseOnInteractOutside` is `false`, for a
+ *   task an accidental press would throw away, such as entering a verification code.
  *
  * It says nothing about the variant: an alert is a `Card` like every other dialog.
  */
-export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> & {
-  /** The popup's ARIA role, and with it what dismisses the dialog. @default 'dialog' */
-  role?: DialogRole;
-};
+export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> &
+  (
+    | {
+        /** The popup's ARIA role. @default 'dialog' */
+        role?: 'dialog';
+        /** Whether an outside press closes the dialog. @default true */
+        shouldCloseOnInteractOutside?: boolean;
+        /** Whether the surface renders its dismiss. @default true */
+        showCloseButton?: boolean;
+      }
+    | {
+        role: 'alertdialog';
+        shouldCloseOnInteractOutside?: false;
+        /** Whether the surface renders its dismiss, for a step past the question. @default false */
+        showCloseButton?: boolean;
+      }
+  );
 
 /** Owns the open state and the decisions — role, dismissal — every part reads. */
-function Root<Payload = unknown>({ role = 'dialog', children, ...rest }: DialogRootProps<Payload>) {
+function Root<Payload = unknown>({
+  role = 'dialog',
+  shouldCloseOnInteractOutside = role === 'dialog',
+  showCloseButton = role === 'dialog',
+  children,
+  ...rest
+}: DialogRootProps<Payload>) {
   return (
-    <Primitive.Root<Payload>
-      {...rest}
-      role={role}
-      closedBy={role === 'alertdialog' ? 'closerequest' : 'any'}
-    >
-      {children}
-    </Primitive.Root>
+    <ShowCloseButtonContext.Provider value={showCloseButton}>
+      <Primitive.Root<Payload>
+        {...rest}
+        role={role}
+        closedBy={shouldCloseOnInteractOutside ? 'any' : 'closerequest'}
+      >
+        {children}
+      </Primitive.Root>
+    </ShowCloseButtonContext.Provider>
   );
 }
 
@@ -191,8 +218,8 @@ const Close = React.forwardRef<HTMLButtonElement, DialogCloseProps>(function Dia
 });
 
 /**
- * Warns when the corner dismiss is rendered inside an alert dialog, where a corner X is a way out
- * without answering the question.
+ * Warns when the corner dismiss is rendered inside an alert dialog that has not opted in with
+ * `showCloseButton`, where a corner X is a way out without answering the question.
  */
 function useCloseButtonWarning(isAlert: boolean) {
   React.useEffect(() => {
@@ -219,9 +246,10 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
   ref,
 ) {
   const surface = React.useContext(DialogContext);
+  const showCloseButton = React.useContext(ShowCloseButtonContext);
   const { role } = useHeadlessDialogContext();
   const variant = surface?.variant ?? 'card';
-  useCloseButtonWarning(role === 'alertdialog');
+  useCloseButtonWarning(role === 'alertdialog' && !showCloseButton);
   return (
     <span {...stylex.props(styles.closeButton, closeInsets[variant])}>
       <Primitive.Close
@@ -362,6 +390,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   // The headless flag, not the stack check below — the variant rule is about opening a dialog inside
   // ANY dialog, which is broader than the card-on-card case the stacking styles cover.
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
+  const showCloseButton = React.useContext(ShowCloseButtonContext);
   const isAlert = role === 'alertdialog';
   // A profile has its own compact-band treatment and takes no placement; the warning says so.
   const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : (compactPlacementProp ?? 'sheet');
@@ -369,8 +398,8 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   useNestedVariantWarning(isNestedInDialog, variant);
 
   const surface = React.useMemo(
-    () => ({ labelId, descriptionId, variant, role }),
-    [labelId, descriptionId, variant, role],
+    () => ({ labelId, descriptionId, variant, role, showCloseButton }),
+    [labelId, descriptionId, variant, role, showCloseButton],
   );
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
