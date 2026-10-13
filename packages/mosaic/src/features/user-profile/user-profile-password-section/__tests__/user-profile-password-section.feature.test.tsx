@@ -257,6 +257,25 @@ describe('Changing a password', () => {
     expect(fapi.passwordUpdates).toHaveLength(0);
   });
 
+  it('keeps focus on the popup close button when the save fails after verifying', async () => {
+    const { fapi, user } = await renderWithReverification();
+    const update = holdRequests('post', '/v1/me/change_password');
+
+    await user.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    const close = screen.getByRole('button', { name: 'Close' });
+    await act(() => close.focus());
+    expect(close).toHaveFocus();
+    update.fail('form_password_pwned', undefined, 'new_password');
+
+    const field = await screen.findByLabelText('New password');
+    expect(field).toHaveValue('new-password-123');
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+    await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
+    expect(close).toHaveFocus();
+    expect(fapi.passwordUpdates).toHaveLength(0);
+  });
+
   it('says the password was not saved when Clerk asks to verify again after verifying', async () => {
     const { fapi, user } = await renderWithReverification(() => demandReverificationOnce('/v1/me/change_password'));
 

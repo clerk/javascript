@@ -85,6 +85,27 @@ describe('connected accounts', () => {
     expect(fapi.client.sessions[0]?.user.external_accounts).toHaveLength(0);
   });
 
+  it('keeps the account and confirmation open when removal asks to verify again after verifying', async () => {
+    const { fapi } = await renderSection([google], { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/external_accounts/idn_google');
+    demandReverificationOnce('/v1/me/external_accounts/idn_google');
+    const user = userEvent.setup();
+    const dialog = await openRemoval(user, 'Google');
+
+    await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
+    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(within(dialog).getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() =>
+      expect(within(dialog).getByRole('alert')).toHaveTextContent(
+        'Your request was not completed. Please try verifying again.',
+      ),
+    );
+    expect(screen.getByRole('dialog')).toBe(dialog);
+    expect(within(dialog).getByRole('button', { name: 'Remove' })).toBeVisible();
+    expect(fapi.client.sessions[0]?.user.external_accounts).toEqual([google]);
+  });
+
   it('targets the account selected after canceling another removal', async () => {
     const { fapi } = await renderSection([google, github]);
     const user = userEvent.setup();
