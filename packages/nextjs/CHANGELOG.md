@@ -1,5 +1,13 @@
 # Change Log
 
+## 7.9.15
+
+### Patch Changes
+
+- Fix `auth.protect()` skipping authorization checks for machine tokens. The `role`, `permission`, `feature`, `plan`, and `reverification` params and the predicate callback are now evaluated for API key, OAuth token, and M2M token requests. Param-based checks respond with a 401 for those requests. ([#10198](https://github.com/clerk/javascript/pull/10198)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `getAuth()` and `auth()` returning OAuth and M2M tokens as signed-in user sessions. They now return a signed-out state for machine tokens. To authenticate OAuth or M2M tokens on a route, use `auth({ acceptsToken })`. ([#10213](https://github.com/clerk/javascript/pull/10213)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 7.9.14
 
 ### Patch Changes
