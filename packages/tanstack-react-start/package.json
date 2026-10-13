@@ -85,13 +85,13 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@tanstack/react-router": "1.170.41",
-    "@tanstack/react-start": "1.168.60",
+    "@tanstack/react-router": "1.170.44",
+    "@tanstack/react-start": "1.169.1",
     "esbuild-plugin-file-path-extensions": "^2.1.4"
   },
   "peerDependencies": {
-    "@tanstack/react-router": "^1.170.7",
-    "@tanstack/react-start": "^1.168.10",
+    "@tanstack/react-router": "^1.170.43",
+    "@tanstack/react-start": "^1.169.0",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },
