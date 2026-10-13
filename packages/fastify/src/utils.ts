@@ -61,33 +61,3 @@ export const requestToProxyRequest = (req: FastifyRequest): Request => {
     duplex: hasBody ? 'half' : undefined,
   });
 };
-
-/**
- * Removes handshake artifacts from a request before authentication. Handshake cookies and
- * query params share the same names (`QueryParameters` aliases `Cookies` in `@clerk/backend`),
- * so one list covers both.
- */
-export const stripHandshakeCookiesAndParams = (req: Request, names: string[]): Request => {
-  const url = new URL(req.url);
-  for (const name of names) {
-    url.searchParams.delete(name);
-  }
-
-  const headers = new Headers(req.headers);
-  const cookieHeader = headers.get('cookie');
-  if (cookieHeader) {
-    const filtered = cookieHeader
-      .split(';')
-      .map(c => c.trim())
-      .filter(c => !names.some(name => c === name || c.startsWith(`${name}=`)))
-      .join('; ');
-    if (filtered) {
-      headers.set('cookie', filtered);
-    } else {
-      headers.delete('cookie');
-    }
-  }
-
-  // The body is dropped; this request is only passed to `authenticateRequest`, which never reads it.
-  return new Request(url.toString(), { method: req.method, headers });
-};
