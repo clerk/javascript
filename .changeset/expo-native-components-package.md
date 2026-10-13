@@ -9,6 +9,8 @@ Introduce `@clerk/expo-native-components`, a new package that the native compone
 npx expo install @clerk/expo-native-components
 ```
 
-If it's missing, rendering a native component throws an error with these same steps. Imports from `@clerk/expo/native` don't change.
+If it's missing, rendering a native component throws an error with these same steps.
 
-Apps that don't install it no longer include the Clerk iOS and Android SDKs and no longer require iOS 17. On Android, those apps also stop migrating biometric credentials enrolled with earlier versions of `@clerk/expo`, so users who weren't migrated by an earlier release need to enroll again.
+Import the native components and their hooks from `@clerk/expo/native-components`. `@clerk/expo/native` is deprecated. It still works and logs a warning in development.
+
+Apps that don't install the package no longer include the Clerk iOS and Android SDKs and no longer require iOS 17. On Android, those apps also stop migrating biometric credentials enrolled with earlier versions of `@clerk/expo`, so users who weren't migrated by an earlier release need to enroll again.

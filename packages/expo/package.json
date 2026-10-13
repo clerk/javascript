@@ -29,6 +29,10 @@
       "default": "./dist/index.js"
     },
     "./app.plugin.js": "./app.plugin.js",
+    "./native-components": {
+      "types": "./native-components/index.d.ts",
+      "default": "./dist/native-components/index.js"
+    },
     "./native": {
       "types": "./native/index.d.ts",
       "default": "./dist/native/index.js"
@@ -89,6 +93,7 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "native-components",
     "native",
     "web",
     "local-credentials",
