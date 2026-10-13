@@ -1,5 +1,5 @@
 import type { OAuthConsentInfoJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, onTestFinished } from 'vitest';
@@ -304,6 +304,36 @@ describe('OAuthConsent', () => {
       expect(submits[0]?.data.get('consented')).toBe('false');
       expect(submits[0]?.data.get('state')).toBe('st_1');
     });
+
+    it('shows the chosen button as pending, locks the other, and submits only once', async () => {
+      visitConsent();
+      const { user } = await renderConsent();
+      const submits = captureSubmits();
+
+      await ready();
+      await user.click(screen.getByRole('button', { name: 'Allow' }));
+      await user.keyboard('{Enter}');
+
+      expect(submits).toHaveLength(1);
+      expect(submits[0]?.data.get('consented')).toBe('true');
+      expect(screen.getByRole('button', { name: 'Allow' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('button', { name: 'Deny' })).toBeDisabled();
+    });
+
+    it('unlocks when the browser restores the page from history', async () => {
+      visitConsent();
+      const { user } = await renderConsent();
+      captureSubmits();
+
+      await ready();
+      await user.click(screen.getByRole('button', { name: 'Deny' }));
+      act(() => {
+        window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+      });
+
+      expect(screen.getByRole('button', { name: 'Allow' })).toBeEnabled();
+      expect(screen.getByRole('button', { name: 'Deny' })).not.toHaveAttribute('aria-busy');
+    });
   });
 
   describe('organization', () => {
@@ -324,6 +354,16 @@ describe('OAuthConsent', () => {
       const select = screen.getByRole('combobox', { name: /^Grant access for:/ });
       expect(select).toHaveTextContent('Acme');
       expect((await submitAllow(user))?.get('organization_id')).toBe('org_1');
+    });
+
+    it('locks the organization once the form submits', async () => {
+      visitConsent();
+      const { user } = await renderConsent(signedIn(orgScopes));
+
+      await ready();
+      await submitAllow(user);
+
+      expect(screen.getByRole('combobox', { name: /^Grant access for:/ })).toBeDisabled();
     });
 
     it('defaults to the last active organization', async () => {

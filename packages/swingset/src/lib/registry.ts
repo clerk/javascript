@@ -13,13 +13,6 @@ import {
   Organization as APIKeysTableOrganization,
   ProposedTable as APIKeysTableProposedTable,
 } from '../stories/api-keys-table.stories';
-import {
-  Default as OAuthConsentDefault,
-  LoadError as OAuthConsentLoadError,
-  meta as oauthConsentMeta,
-  OfflineAccess as OAuthConsentOfflineAccess,
-  ScopeList as OAuthConsentScopeList,
-} from '../stories/oauth-consent.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -157,6 +150,13 @@ import {
 } from '../stories/localization.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OAuthConsentDefault,
+  LoadError as OAuthConsentLoadError,
+  meta as oauthConsentMeta,
+  OfflineAccess as OAuthConsentOfflineAccess,
+  ScopeList as OAuthConsentScopeList,
+} from '../stories/oauth-consent.stories';
 import {
   Default as OrganizationProfileDefault,
   meta as organizationProfileMeta,

@@ -11,7 +11,9 @@ export const oauthConsentMessages = {
   redirectUrlTitle: 'Redirect URL',
   redirectUrlDescription: 'Make sure you trust {applicationName} and that this URL belongs to {applicationName}.',
   allow: 'Allow',
+  allowing: 'Allowing access',
   deny: 'Deny',
+  denying: 'Denying access',
   signedInAs: 'Signed in as {identifier}',
   loadError: 'Could not load consent information.',
 } as const;

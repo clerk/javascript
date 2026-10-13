@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { type ReactNode, useId } from 'react';
 
 import { Badge } from '../../components/badge';
-import { Button } from '../../components/button';
+import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Checkbox } from '../../components/checkbox';
 import { Dialog } from '../../components/dialog';
@@ -52,7 +52,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
         </Card.Header>
         <Card.Content>
           {props.organizations.length > 0 ? (
-            <Field.Root>
+            <Field.Root disabled={props.pendingAction !== undefined}>
               <Field.Label>{m.organizationLabel}</Field.Label>
               <Select.Root
                 items={props.organizations}
@@ -90,6 +90,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
                       <ScopeOption
                         item={item}
                         selection={props.scopeSelection}
+                        disabled={props.pendingAction !== undefined}
                         requiredLabel={m.required}
                       />
                     ) : (
@@ -119,23 +120,29 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
             />
           ) : null}
           <div {...stylex.props(styles.actions)}>
-            <Button
-              type='submit'
+            <SubmitButton
               name='consented'
               value='false'
+              disabled={props.pendingAction === 'allow'}
+              isPending={props.pendingAction === 'deny'}
+              pendingLabel={m.denying}
+              onClick={props.onDeny}
               variant='outline'
               fullWidth
             >
               {m.deny}
-            </Button>
-            <Button
-              type='submit'
+            </SubmitButton>
+            <SubmitButton
               name='consented'
               value='true'
+              disabled={props.pendingAction === 'deny'}
+              isPending={props.pendingAction === 'allow'}
+              pendingLabel={m.allowing}
+              onClick={props.onAllow}
               fullWidth
             >
               {m.allow}
-            </Button>
+            </SubmitButton>
           </div>
           <Text
             size='xs'
@@ -189,15 +196,17 @@ function ScopeOption({
   item,
   selection,
   requiredLabel,
+  disabled,
 }: {
   item: OAuthConsentScopeItem;
   selection: OAuthConsentScopeSelection;
   requiredLabel: string;
+  disabled: boolean;
 }) {
   return (
     <Field.Root
       orientation='horizontal'
-      disabled={item.required}
+      disabled={item.required === true || disabled}
     >
       <Checkbox
         checked={item.required === true || selection.checked.includes(item.scope)}

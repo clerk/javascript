@@ -57,6 +57,9 @@ export interface OAuthConsentViewProps {
   redirectDomain: string;
   isRedirectUrlOpen: boolean;
   onRedirectUrlOpenChange: (open: boolean) => void;
+  pendingAction?: 'allow' | 'deny';
+  onAllow: () => void;
+  onDeny: () => void;
   actionUrl: string;
   forwardedParams: [string, string][];
   renderBranding: boolean;

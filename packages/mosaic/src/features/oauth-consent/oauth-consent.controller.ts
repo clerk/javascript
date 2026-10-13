@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { fill } from '../../localization';
 import type { OAuthConsentMessages, OAuthConsentReadyModel, OAuthConsentViewProps } from './oauth-consent.types';
@@ -11,6 +11,17 @@ export function useOAuthConsentController(
 ): OAuthConsentViewProps {
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
   const [isRedirectUrlOpen, setIsRedirectUrlOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'allow' | 'deny'>();
+
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setPendingAction(undefined);
+      }
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
 
   return {
     ...model,
@@ -26,5 +37,8 @@ export function useOAuthConsentController(
     onOrganizationChange: setSelectedOrganizationId,
     isRedirectUrlOpen,
     onRedirectUrlOpenChange: setIsRedirectUrlOpen,
+    pendingAction,
+    onAllow: () => setPendingAction('allow'),
+    onDeny: () => setPendingAction('deny'),
   };
 }

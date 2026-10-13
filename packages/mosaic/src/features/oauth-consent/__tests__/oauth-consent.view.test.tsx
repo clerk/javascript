@@ -24,6 +24,8 @@ function propsFor(overrides: Partial<OAuthConsentViewProps> = {}): OAuthConsentV
     redirectUrl: 'https://app.linear.example.com/oauth/callback',
     redirectDomain: 'example.com',
     isRedirectUrlOpen: false,
+    onAllow: vi.fn(),
+    onDeny: vi.fn(),
     onRedirectUrlOpenChange: vi.fn(),
     actionUrl: '#',
     forwardedParams: [],
@@ -66,6 +68,12 @@ describe('OAuthConsentView', () => {
       await user.click(screen.getByRole('checkbox', { name: /Read your projects/ }));
 
       expect(onCheckedChange).toHaveBeenCalledWith('projects', false);
+    });
+
+    it('locks every checkbox while the form submits', () => {
+      renderView({ pendingAction: 'allow', scopeSelection: { checked: ['projects'], onCheckedChange: vi.fn() } });
+
+      expect(screen.getByRole('checkbox', { name: /Read your projects/ })).toBeDisabled();
     });
 
     it('lists the scopes without checkboxes when there is no selection', () => {
