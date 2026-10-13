@@ -51,6 +51,7 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
   const { toggleSidebar } = useSidebar();
   const [query, setQuery] = React.useState('');
   const [activeIndex, setActiveIndex] = React.useState(0);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
 
   const entries = [
@@ -80,6 +81,14 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
       setQuery('');
       setActiveIndex(0);
     }
+  }, [open]);
+
+  React.useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const frame = requestAnimationFrame(() => inputRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
   }, [open]);
 
   React.useEffect(() => {
@@ -128,7 +137,7 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
           <div className='flex items-center gap-2 border-b px-3'>
             <SearchIcon className='text-muted-foreground size-4 shrink-0' />
             <input
-              autoFocus
+              ref={inputRef}
               type='text'
               value={query}
               onChange={event => setQuery(event.target.value)}

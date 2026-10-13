@@ -29,6 +29,12 @@ export function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar> & { onSearchOpen: () => void }) {
   const pathname = usePathname();
+  const [isMac, setIsMac] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMac(navigator.platform.toLowerCase().includes('mac'));
+  }, []);
+
   const navigationGroups: NavigationGroup[] = groups.map(({ group, groupSlug, components }) => ({
     label: group,
     separatorBefore: group === 'Blocks',
@@ -101,7 +107,13 @@ export function AppSidebar({
           <SearchIcon className='size-3.5 shrink-0' />
           <span>Search…</span>
           <kbd className='bg-muted ml-auto flex shrink-0 items-center gap-0.5 rounded border px-1 py-0.5 font-mono text-[10px]'>
-            <span className='text-[11px]'>⌘</span>K
+            {isMac ? (
+              <>
+                <span className='text-[11px]'>⌘</span>K
+              </>
+            ) : (
+              'Ctrl K'
+            )}
           </kbd>
         </button>
       </div>
