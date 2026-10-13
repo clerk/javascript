@@ -1,9 +1,9 @@
-import type { Web3Strategy } from '@clerk/shared/types';
 import { useUserProfileWeb3WalletsController } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
 } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
+import type { Web3Strategy } from '@clerk/shared/types';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -71,6 +71,7 @@ export function useWeb3WalletsFixture({
       provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
     ),
     fallbackFocus,
+    // eslint-disable-next-line @typescript-eslint/require-await
     connect: async (id: Web3Strategy) => {
       const provider = connectionProviders.find(item => item.id === id);
       if (!provider) {
@@ -97,6 +98,7 @@ export function useWeb3WalletsFixture({
         ];
       });
     },
+    // eslint-disable-next-line @typescript-eslint/require-await
     setPrimary: async (id: string) => {
       if (primaryError && !primaryFailed.current) {
         primaryFailed.current = true;
