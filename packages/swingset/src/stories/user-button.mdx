@@ -3,8 +3,9 @@ import * as UserButtonStories from './user-button.stories';
 # UserButton
 
 The account & organization switcher behind the user avatar. The active organization heads the surface,
-badged with the account, carrying **Settings** and **Invite**. The account's organizations sit under it: every one it belongs to, plus
-**suggested** and **invited** ones it can Join. **Switch account** at the foot opens the signed-in
+badged with the account. The account's organizations sit under it: every one it belongs to, plus
+**suggested** and **invited** ones it can Join. **Settings** and **Invite members** follow them, and
+**Switch account** at the foot opens the signed-in
 accounts as a flyout — the active one checked — so an account never reads as an organization. The
 flyout also adds an account and signs out of all of them. With nobody to switch to, that row is
 **Add account** instead. The foot signs out of the active account. `mode` narrows all of it;
@@ -23,7 +24,7 @@ it with `useSwitcherController()` and needs no props.
 A working prototype over mock accounts — try it. Nothing is instant: the clicked row spins, the rest
 stand down, and the surface stays open so you land on the result. Only picking an organization closes it.
 `pendingKey` drives that, and the connected `UserButton` sets it from the action in flight. Actions
-that would navigate (Manage, Invite, Create organization, Add account) only close the popover here.
+that would navigate (Settings, Invite members, Add organization, Add account) only close the popover here.
 
 <Story
   name='Combined'
@@ -75,7 +76,7 @@ Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use 
 ## Trigger
 
 The avatar and name of whatever leads the popup. With an organization active, it leads with the
-organization, badged with the account, and names the account's identifier beneath it.
+organization alone; the account's badge is kept for the popup's header.
 
 `renderTriggerLabel={false}` leaves the avatar alone. A user's avatar on its own rounds the trigger
 fully to match it; see [User only](#user-only).
@@ -94,13 +95,14 @@ fully to match it; see [User only](#user-only).
 
 ## Header
 
-The header names whatever leads and carries what you can do about it, stacked under it as
-full-width labelled buttons. An organization is described by its plan and member count, and carries
-**Settings** with **Invite**. An account is described by its identifier, and so is an organization the account badges. Where **Settings** is the only
-action, as it is for an account, it trails the account inline.
+The header names whatever leads, and carries no actions of its own. An organization is described by
+its plan and member count. An account is described by its identifier, and so is an organization the
+account badges.
 
-With an organization active in `combined`, **Settings** opens a menu of **Organization settings** and
-**Profile settings**. Where only one of them is available, **Settings** opens it directly.
+What you can do about the lead sits in its own group, under the organizations: **Settings**, plus
+**Invite members** where an organization leads. With an organization active in `combined`,
+**Settings** opens a menu of **Manage profile** and **Manage organization**. Where only one of them is
+available, **Settings** opens it directly.
 
 ## Modes
 
@@ -116,8 +118,8 @@ What a mode leads with is named in the trigger and heads the popup — the two a
 
 ### Combined
 
-The active org heads it, badged with the account, with **Settings** and **Invite**. The organizations
-sit under it, with **Create organization** at their foot. **Switch account** opens the signed-in
+The active org heads it, badged with the account. The organizations sit under it, with **Add
+organization** at their foot, then **Settings** and **Invite members**. **Switch account** opens the signed-in
 accounts, with **Add account** and **Sign out of all accounts**, and **Sign out** at the foot signs
 out of the active account.
 
@@ -140,8 +142,8 @@ With one account signed in, the foot is **Add account** and **Sign out**.
 
 ### User only
 
-The account heads it, with **Settings** inline. No organizations are listed, so **Switch account** and
-**Sign out** at the foot are the whole of it.
+The account heads it. No organizations are listed, so **Settings**, then **Switch account** and
+**Sign out** at the foot, are the whole of it.
 
 <Story
   name='User'
@@ -188,18 +190,15 @@ all accounts**. The foot keeps **Sign out**.
 
 ## Menu items
 
-`customMenuItems` adds the app's own rows to the foot of the popup, ahead of Clerk's own. A row with
-`onClick` is an action and closes the popup on the way out; a row with `href` is a link and navigates
-on its own, so it stays followable while another action is in flight. The `icon` is optional — a row
-without one still holds the column, so labels stay in line.
+`customMenuItems` adds the app's own rows to the group with **Settings** and **Invite members**, after
+Clerk's own. A row with `onClick` is an action and closes the popup on the way out; a row with `href`
+is a link and navigates on its own, so it stays followable while another action is in flight. The
+`icon` is optional — a row without one still holds the column, so labels stay in line.
 
-`menuItemOrder` names the foot's rows by id, and whatever it leaves out follows what it named. The
-ids it knows are `switchAccount`, `addAccount`, `signOut`, and each custom item's `id`.
-Those are the only actions the foot lists as rows; the rest live in the header or with the organizations, where there is no list for an order to run in.
-
-In `combined`, the accounts row is `switchAccount` where there is somebody to switch to and
-`addAccount` where there is not. Name both ids to place a row whichever way it resolves. An id the surface has not got
-is ignored rather than an error, so one order can cover every mode.
+`menuItemOrder` names that group's rows by id, and whatever it leaves out follows what it named. The
+ids it knows are `settings`, `inviteMembers`, and each custom item's `id`. The organizations above
+and the account rows at the foot keep their own order. An id the group has not got is ignored rather
+than an error, so one order can cover every mode.
 
 <Story
   name='CustomMenuItems'
@@ -220,11 +219,10 @@ is ignored rather than an error, so one order can cover every mode.
 | ------------------------------------ | --------------------------------------- |
 | `.cl-user-button-trigger`            |                                         |
 | `.cl-user-button-popover`            |                                         |
-| `.cl-user-button-header`             | `data-layout="inline \| stacked"`       |
+| `.cl-user-button-header`             |                                         |
 | `.cl-user-button-header-content`     |                                         |
 | `.cl-user-button-header-title`       |                                         |
 | `.cl-user-button-header-description` |                                         |
-| `.cl-user-button-header-actions`     |                                         |
 | `.cl-user-button-group`              |                                         |
 | `.cl-user-button-separator`          |                                         |
 | `.cl-user-button-item`               | `data-interactive`                      |

@@ -105,12 +105,6 @@ export interface SwitcherCallbacks {
 
 export type SwitcherMode = 'combined' | 'user' | 'organization';
 
-/**
- * How the header carries its actions: `inline` trails the lead with them, the gear as an icon;
- * `stacked` runs them under it as full-width labelled buttons.
- */
-export type SwitcherHeaderLayout = 'inline' | 'stacked';
-
 /** Whether the surface signs itself with Clerk's mark. */
 export interface SwitcherBrandingProps {
   /**
@@ -133,15 +127,11 @@ export interface SwitcherBusyState {
 // ─── Menu items ─────────────────────────────────────────────────────────────
 
 /**
- * A built-in action the foot of the popup lists as a row of its own, named by the id `menuItemOrder`
- * knows it by. The surface's other actions live in its header, where there is no list for an order
- * to run in.
- *
- * `switchAccount` and `addAccount` share a slot: the foot carries the flyout of signed-in accounts
- * where there is more than one, and the row it would have opened onto where there is not. Name both
- * to place that slot whichever way it resolves. `signOut` signs out of the active account.
+ * A built-in row of the group your own rows join, named by the id `menuItemOrder` knows it by.
+ * `settings` manages the lead, and `inviteMembers` invites to an organization that leads. The
+ * organizations above and the account rows at the foot keep their own order.
  */
-export type SwitcherMenuItemId = 'switchAccount' | 'addAccount' | 'signOut';
+export type SwitcherMenuItemId = 'settings' | 'inviteMembers';
 
 interface SwitcherMenuItemBase {
   /** Identifies the row, for ordering. */
@@ -151,13 +141,13 @@ interface SwitcherMenuItemBase {
   icon?: ReactNode;
 }
 
-/** An action of your own at the foot of the popup. */
+/** An action of your own, beside Settings. */
 export interface SwitcherMenuAction extends SwitcherMenuItemBase {
   onClick: () => void;
   href?: never;
 }
 
-/** A row at the foot of the popup that leaves for somewhere else. */
+/** A row of your own, beside Settings, that leaves for somewhere else. */
 export interface SwitcherMenuLink extends SwitcherMenuItemBase {
   /** Where the row goes. */
   href: string;
@@ -166,14 +156,14 @@ export interface SwitcherMenuLink extends SwitcherMenuItemBase {
 
 export type SwitcherMenuItem = SwitcherMenuAction | SwitcherMenuLink;
 
-/** The app's own actions at the foot of the popup, and the order the foot's rows run in. */
+/** The app's own rows, beside Settings, and the order that group runs in. */
 export interface SwitcherMenuProps {
-  /** Actions and links of your own, added to the foot of the popup ahead of Clerk's own rows. */
+  /** Actions and links of your own, added to the group with Settings, after Clerk's own rows. */
   customMenuItems?: SwitcherMenuItem[];
   /**
-   * The order the foot's rows run in, by id: a built-in row's id, or a custom item's `id`. Anything
-   * left out follows the rows named here. An id the surface does not carry as a row is ignored,
-   * since which rows the foot has depends on its mode.
+   * The order the Settings group runs in, by id: a built-in row's id, or a custom item's `id`.
+   * Anything left out follows the rows named here. An id the group does not carry as a row is
+   * ignored, since which rows it has depends on the mode and on what leads.
    */
   menuItemOrder?: (SwitcherMenuItemId | (string & {}))[];
 }

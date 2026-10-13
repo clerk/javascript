@@ -47,10 +47,8 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   }
 
   async function openProfileSettings(page: Page) {
-    await popup(page)
-      .getByRole('button', { name: /^(Settings|Manage account)$/ })
-      .click();
-    const profileSettings = page.getByRole('menuitem', { name: 'Profile settings' });
+    await popup(page).getByRole('button', { name: 'Settings' }).click();
+    const profileSettings = page.getByRole('menuitem', { name: 'Manage profile' });
     await profileSettings.or(page.locator('.cl-userProfile-root')).first().waitFor();
     if (await profileSettings.isVisible()) {
       await profileSettings.click();

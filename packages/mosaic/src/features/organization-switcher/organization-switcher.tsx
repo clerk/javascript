@@ -48,7 +48,7 @@ export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
  *
  * @example
  * `customPages` adds your own pages to the organization profile; `customMenuItems` adds your own rows
- * to the foot of the menu, each one either an `onClick` action or an `href` link.
+ * beside Settings, each one either an `onClick` action or an `href` link.
  * ```tsx
  * <OrganizationSwitcher
  *   organizationProfileProps={{

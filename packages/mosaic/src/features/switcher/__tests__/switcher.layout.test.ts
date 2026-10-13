@@ -21,26 +21,26 @@ function resolve(mode: SwitcherMode, data: Partial<SwitcherData> = {}) {
 }
 
 describe('resolveSwitcherLayout, where each action lands', () => {
-  it('spreads them across all three slots in combined mode', () => {
+  it('spreads them across the three slots below the header in combined mode', () => {
     expect(resolve('combined').actions).toEqual({
-      header: ['inviteMembers', 'manageLead'],
       organizationsFooter: ['createOrganization'],
+      manage: ['settings', 'inviteMembers'],
       footer: ['switchAccount', 'signOut'],
     });
   });
 
   it('carries no account actions at all in organization mode', () => {
     expect(resolve('organization').actions).toEqual({
-      header: ['inviteMembers', 'manageLead'],
       organizationsFooter: ['createOrganization'],
+      manage: ['settings', 'inviteMembers'],
       footer: [],
     });
   });
 
-  it('takes the account actions into the header and the foot in user mode', () => {
+  it('takes the account actions into the manage group and the foot in user mode', () => {
     expect(resolve('user').actions).toEqual({
-      header: ['manageLead'],
       organizationsFooter: [],
+      manage: ['settings'],
       footer: ['switchAccount', 'signOut'],
     });
   });
@@ -58,21 +58,21 @@ describe('resolveSwitcherLayout, what the data settles', () => {
     const layout = resolve('combined', { activeOrganization: null });
 
     expect(layout.lead).toBe('user');
-    expect(layout.actions.header).toEqual(['manageLead']);
+    expect(layout.actions.manage).toEqual(['settings']);
   });
 
   it('leads with no selection where no organization is active and personal is hidden', () => {
     const layout = resolve('organization', { activeOrganization: null, hidePersonal: true });
 
     expect(layout.lead).toBe('none');
-    expect(layout.actions.header).toEqual([]);
+    expect(layout.actions.manage).toEqual([]);
   });
 
   it('leads with the personal account, managing nothing, where no organization is active in organization mode', () => {
     const layout = resolve('organization', { activeOrganization: null });
 
     expect(layout.lead).toBe('personal');
-    expect(layout.actions.header).toEqual([]);
+    expect(layout.actions.manage).toEqual([]);
   });
 
   // With no second account the flyout would open onto one row, so the foot offers that row instead.
@@ -90,25 +90,14 @@ describe('resolveSwitcherLayout, a combined surface', () => {
 
     expect(layout.lead).toBe('organization');
     expect(layout.userBadge).toBe(true);
-    expect(layout.actions.header).toEqual(['inviteMembers', 'manageLead']);
+    expect(layout.actions.manage).toEqual(['settings', 'inviteMembers']);
   });
 
   it('leads with the account alone where no organization is active, even with personal hidden', () => {
     const layout = resolve('combined', { activeOrganization: null, hidePersonal: true });
 
     expect(layout.lead).toBe('user');
-    expect(layout.actions.header).toEqual(['manageLead']);
-  });
-});
-
-describe('resolveSwitcherLayout, how the header carries its actions', () => {
-  it('stacks them wherever a labelled action joins the gear', () => {
-    expect(resolve('combined').headerLayout).toBe('stacked');
-    expect(resolve('organization').headerLayout).toBe('stacked');
-  });
-
-  it('runs the gear inline where it is the only action', () => {
-    expect(resolve('user').headerLayout).toBe('inline');
+    expect(layout.actions.manage).toEqual(['settings']);
   });
 });
 

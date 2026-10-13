@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, focusVars, radiusVars, space, spacingVars } from '../../tokens.stylex';
+import { space, spacingVars } from '../../tokens.stylex';
 
 const GAP_PX = 1;
 
@@ -8,13 +8,9 @@ const step = (multiple: number) => `calc(${spacingVars['--cl-spacing']} * ${mult
 
 const cutout = `url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><circle cx='1' cy='1' r='1'/></svg>")`;
 
-const dimensions = (multiple: number) => ({
+const square = (multiple: number) => ({
   height: step(multiple),
   width: step(multiple),
-});
-
-const square = (multiple: number) => ({
-  ...dimensions(multiple),
   fontSize: `calc(${step(multiple)} * 0.4)`,
 });
 
@@ -32,33 +28,23 @@ const lead = (box: number, badgeSize: number) => ({
   maskSize: `100% 100%, ${cutoutSize(badgeSize)} ${cutoutSize(badgeSize)}`,
 });
 
+const BOX = 10.5;
+const BADGE = 4;
+
 export const styles = stylex.create({
   root: {
     alignItems: 'flex-start',
     display: 'inline-flex',
     flexShrink: 0,
     position: 'relative',
-  },
-
-  labelled: {
-    transform: `translateY(${step(0.5)})`,
+    height: space['10.5'],
+    width: space['10.5'],
   },
 
   lead: {
+    ...lead(BOX, BADGE),
     maskComposite: 'exclude',
     maskRepeat: 'no-repeat',
-  },
-
-  ring: {
-    borderRadius: radiusVars['--cl-radius-md'],
-    insetBlockStart: 0,
-    insetInlineStart: 0,
-    outlineColor: { default: null, ':is(:focus-visible *)': colorVars['--cl-color-ring'] },
-    outlineOffset: { default: null, ':is(:focus-visible *)': focusVars['--cl-focus-outline-offset'] },
-    outlineStyle: { default: null, ':is(:focus-visible *)': focusVars['--cl-focus-outline-style'] },
-    outlineWidth: { default: null, ':is(:focus-visible *)': focusVars['--cl-focus-outline-width'] },
-    pointerEvents: 'none',
-    position: 'absolute',
   },
 
   badge: {
@@ -67,24 +53,6 @@ export const styles = stylex.create({
     insetInlineEnd: 0,
     position: 'absolute',
   },
-});
 
-export const sizes = stylex.create({
-  sm: { height: space['8'], width: space['8'] },
-  md: { height: space['9.5'], width: space['9.5'] },
-});
-
-export const leadSizes = stylex.create({
-  sm: lead(8, 3.5),
-  md: lead(9.5, 4),
-});
-
-export const ringSizes = stylex.create({
-  sm: dimensions(7),
-  md: dimensions(8.5),
-});
-
-export const badgeSizes = stylex.create({
-  sm: square(3.5),
-  md: square(4),
+  badgeAvatar: square(BADGE),
 });

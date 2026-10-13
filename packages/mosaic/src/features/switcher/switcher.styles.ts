@@ -23,7 +23,8 @@ export const styles = stylex.create({
   },
 
   triggerLabelled: {
-    padding: space['1'],
+    padding: space['1.5'],
+    borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['1']})`,
     gap: space['1.5'],
     backgroundColor: {
       default: 'transparent',
@@ -33,12 +34,6 @@ export const styles = stylex.create({
       },
     },
     transitionProperty: 'background-color',
-  },
-
-  triggerLabelledBadged: {
-    borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['1']})`,
-    paddingBlock: space['0.5'],
-    paddingInline: space['1.5'],
   },
 
   triggerAvatarOnly: {
@@ -52,19 +47,8 @@ export const styles = stylex.create({
     transitionProperty: 'opacity',
   },
 
-  triggerRinglessAvatar: {
-    outlineStyle: 'none',
-  },
-
   triggerRound: {
     borderRadius: radiusVars['--cl-radius-full'],
-  },
-
-  triggerText: {
-    display: 'flex',
-    flexDirection: 'column',
-    textAlign: 'start',
-    minWidth: 0,
   },
 
   // Matches `SwitcherItemLabel`, so the trigger names an organization the same way its row does. Capped,
@@ -74,13 +58,6 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    maxWidth: '12rem',
-  },
-
-  triggerDescription: {
-    color: colorVars['--cl-color-foreground-secondary'],
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
     maxWidth: '12rem',
   },
 

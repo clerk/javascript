@@ -41,12 +41,11 @@ const esES: MosaicCatalog = {
       signOutAll: 'Cerrar sesión en todas las cuentas',
     },
     manage: {
-      invite: 'Invitar',
-      account: 'Gestionar cuenta',
+      invite: 'Invitar miembros',
+      settings: 'Configuración',
+      profile: 'Gestionar perfil',
       organization: 'Gestionar organización',
-      organizationSettings: 'Configuración de la organización',
-      profileSettings: 'Configuración del perfil',
-      createOrganization: 'Crear organización',
+      createOrganization: 'Añadir organización',
     },
   },
 };
