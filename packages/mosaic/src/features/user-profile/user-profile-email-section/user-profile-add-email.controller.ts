@@ -7,7 +7,11 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
-import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../user-profile-contact.types';
+import type {
+  UserProfileEmail,
+  UserProfileEmailVerification,
+  UserProfileEmailVerifier,
+} from '../user-profile-contact.types';
 import type { UserProfileAddEmailDialogProps } from './user-profile-add-email.dialog';
 
 export type UserProfileAddEmailField = 'emailAddress' | 'code';
@@ -19,10 +23,12 @@ export interface UserProfileAddEmailControllerOptions {
 }
 
 export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
-  onVerifyEmail: (emailAddress: string, verifier: UserProfileEmailVerifier) => void;
+  verifyingId: string | undefined;
+  onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => void;
 }
 
 interface Context {
+  verifyingId: string | undefined;
   emailAddress: string;
   verifier: UserProfileEmailVerifier | undefined;
   verification: UserProfileEmailVerification | undefined;
@@ -32,7 +38,7 @@ interface Context {
 
 type Event =
   | { type: 'ADD' }
-  | { type: 'START'; emailAddress: string; verifier: UserProfileEmailVerifier }
+  | { type: 'START'; id?: string; emailAddress: string; verifier: UserProfileEmailVerifier }
   | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
   | { type: 'CONNECT' }
@@ -58,6 +64,7 @@ const resend = {
 const start = {
   target: 'starting',
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
+    verifyingId: event.id,
     emailAddress: event.emailAddress,
     verifier: event.verifier,
     verification: undefined,
@@ -70,6 +77,7 @@ const machine = createMachine({
   id: 'addEmail',
   initial: 'idle',
   context: {
+    verifyingId: undefined,
     emailAddress: '',
     verifier: undefined,
     verification: undefined,
@@ -81,7 +89,13 @@ const machine = createMachine({
       on: {
         ADD: {
           target: 'email',
-          actions: assign(() => ({ verifier: undefined, verification: undefined, error: undefined, resendSeconds: 0 })),
+          actions: assign(() => ({
+            verifyingId: undefined,
+            verifier: undefined,
+            verification: undefined,
+            error: undefined,
+            resendSeconds: 0,
+          })),
         },
         START: start,
       },
@@ -228,9 +242,10 @@ export function useUserProfileAddEmailController({
       }
     },
     onConnect: () => send({ type: 'CONNECT' }),
-    onVerifyEmail: (emailAddress, verifier) => {
+    verifyingId: snapshot.context.verifyingId,
+    onVerifyEmail: (email, verifier) => {
       codeForm.reset();
-      send({ type: 'START', emailAddress, verifier });
+      send({ type: 'START', id: email.id, emailAddress: email.value, verifier });
     },
   };
 }

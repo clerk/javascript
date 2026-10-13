@@ -18,7 +18,6 @@ export function useUserProfileEmailSectionController({
   const verification = useUserProfileAddEmailController({ username, onCreate: onCreateEmail });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
-  const verifyingId = useRef<string | undefined>(undefined);
   const removalFocus = useListRemovalFocus({
     ids: emails.map(email => email.id),
     onRemove: onRemoveEmail,
@@ -35,16 +34,11 @@ export function useUserProfileEmailSectionController({
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemoveEmail ? remove : undefined,
     finalFocus: removalFocus.finalFocus,
-    verificationFinalFocus: () => {
-      const id = verifyingId.current;
-      verifyingId.current = undefined;
-      return id ? removalFocus.trigger(id) : null;
-    },
+    verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
     onVerify: id => {
-      verifyingId.current = id;
       const email = emails.find(email => email.id === id);
       if (email) {
-        verification.onVerifyEmail(email.value, getEmailVerifier(id));
+        verification.onVerifyEmail(email, getEmailVerifier(id));
       }
     },
     onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryEmail(id)),
