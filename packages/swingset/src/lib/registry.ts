@@ -153,6 +153,7 @@ import { meta as menuMeta } from '../stories/menu.stories';
 import {
   Default as OAuthConsentDefault,
   LoadError as OAuthConsentLoadError,
+  ManyScopes as OAuthConsentManyScopes,
   meta as oauthConsentMeta,
   OfflineAccess as OAuthConsentOfflineAccess,
   ScopeList as OAuthConsentScopeList,
@@ -932,6 +933,7 @@ const oauthConsentModule: StoryModule = {
   meta: oauthConsentMeta,
   Default: OAuthConsentDefault,
   ScopeList: OAuthConsentScopeList,
+  ManyScopes: OAuthConsentManyScopes,
   OfflineAccess: OAuthConsentOfflineAccess,
   LoadError: OAuthConsentLoadError,
 };

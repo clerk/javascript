@@ -2,7 +2,7 @@ import { OAuthConsentErrorView, OAuthConsentView } from '@clerk/mosaic/features/
 
 import type { StoryMeta } from '@/lib/types';
 
-import { useOAuthConsentFixture, useOAuthConsentScopeSelectionFixture } from './fixtures/oauth-consent';
+import { manyScopes, useOAuthConsentFixture, useOAuthConsentScopeSelectionFixture } from './fixtures/oauth-consent';
 
 export { default as __source } from './oauth-consent.stories?raw';
 
@@ -27,6 +27,11 @@ export function Default() {
 
 export function ScopeList() {
   const props = useOAuthConsentFixture();
+  return <OAuthConsentView {...props} />;
+}
+
+export function ManyScopes() {
+  const props = useOAuthConsentScopeSelectionFixture({}, manyScopes);
   return <OAuthConsentView {...props} />;
 }
 

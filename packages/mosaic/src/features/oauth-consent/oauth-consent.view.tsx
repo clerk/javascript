@@ -9,6 +9,7 @@ import { Dialog } from '../../components/dialog';
 import { EmptyState } from '../../components/empty-state';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
+import { scrollAreaViewport } from '../../components/scroll-area';
 import { Select } from '../../components/select';
 import { Text } from '../../components/text';
 import { Tooltip } from '../../components/tooltip';
@@ -79,7 +80,7 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
               </Text>
               <ul
                 aria-labelledby={scopeListTitleId}
-                {...stylex.props(reset.base, styles.scopeList)}
+                {...stylex.props(reset.base, scrollAreaViewport(), styles.scopeList)}
               >
                 {props.scopes.map(item => (
                   <li
