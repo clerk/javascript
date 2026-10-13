@@ -1,5 +1,12 @@
 # @clerk/swingset
 
+## 0.0.58
+
+### Patch Changes
+
+- Updated dependencies [[`f5ba9b0`](https://github.com/clerk/javascript/commit/f5ba9b03c3887be389f9f3c414923380bedf42a5), [`dd522cf`](https://github.com/clerk/javascript/commit/dd522cf619327fcf7d8246b9a8cce14b69788b18)]:
+  - @clerk/nextjs@7.9.15
+
 ## 0.0.57
 
 ### Patch Changes

@@ -85,4 +85,32 @@ describe('getAuth(req)', () => {
 
     expect(() => getAuth(req, { secretKey: mockSecretKey })).toThrowError();
   });
+
+  const toBase64Url = (str: string) => btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  const mockOAuthJwt = [
+    JSON.stringify({ alg: 'RS256', typ: 'at+jwt' }),
+    JSON.stringify({ sub: 'user_123' }),
+    'signature',
+  ]
+    .map(toBase64Url)
+    .join('.');
+
+  it.each([
+    ['a JWT-format OAuth token', mockOAuthJwt],
+    ['an API key', 'ak_123'],
+  ])('returns signed-out when the middleware verified %s', (_, token) => {
+    const req = new NextRequest('https://www.clerk.com', {
+      headers: new Headers({
+        [constants.Headers.AuthStatus]: AuthStatus.SignedIn,
+        [constants.Headers.AuthToken]: token,
+        [constants.Headers.AuthSignature]: HmacSHA1(token, mockSecretKey).toString(),
+      }),
+    });
+
+    const auth = getAuth(req, { secretKey: mockSecretKey });
+
+    expect(auth.tokenType).toBe('session_token');
+    expect(auth.userId).toBeNull();
+    expect(auth.isAuthenticated).toBe(false);
+  });
 });

@@ -310,6 +310,10 @@ import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
 import {
+  Default as UseServerDataTableDefault,
+  meta as useServerDataTableMeta,
+} from '../stories/use-server-data-table.stories';
+import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
   Organizations as UserButtonOrganizations,
@@ -736,6 +740,8 @@ const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
 
+const useServerDataTableModule: StoryModule = { meta: useServerDataTableMeta, Default: UseServerDataTableDefault };
+
 const localizationModule: StoryModule = {
   meta: localizationMeta,
   Overrides: LocalizationOverrides,
@@ -1052,6 +1058,7 @@ export const registry: StoryModule[] = [
   // Hooks
   useDataTableModule,
   useFormModule,
+  useServerDataTableModule,
   // Localization
   localizationModule,
 ];

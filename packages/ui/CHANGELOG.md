@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.40.1
+
+### Patch Changes
+
+- Fix localization strings whose `link("…")` labels contain apostrophes, quotes, commas or parentheses. Previously, a custom label such as `link("Conditions d'utilisation")` rendered as "Conditions dutilisation"; quoted labels now render exactly as written. ([#10091](https://github.com/clerk/javascript/pull/10091)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 1.40.0
 
 ### Minor Changes
