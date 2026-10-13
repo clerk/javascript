@@ -72,6 +72,8 @@ export function useUserProfileEditPasswordController({
           newPassword: values.newPassword,
           signOutOfOtherSessions: values.signOutOfOtherSessions,
         });
+        // TODO: Should we handle repeated reverification hints in useReverificationWithState
+        // so every Mosaic consumer rejects incomplete verification?
         if (isReverificationHint(result)) {
           throw new FormSubmitError({ message: m.errors.verificationIncomplete });
         }
