@@ -13,6 +13,7 @@ import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import type { MosaicMessages } from '../../../localization';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
+import { useStableOrder } from '../../../primitives/hooks';
 import { UserProfileSecurityIcon } from '../user-profile-security-icon';
 import { styles } from '../user-profile-security-panel.styles';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
@@ -26,6 +27,8 @@ export interface UserProfileActiveDevicesSectionViewProps {
   onSignOutAllOtherDevices?: () => void | Promise<void>;
 }
 
+const byId = (device: UserProfileDevice) => device.id;
+
 export function UserProfileActiveDevicesSectionView({
   devices,
   onSignOutDevice,
@@ -37,6 +40,11 @@ export function UserProfileActiveDevicesSectionView({
   const signOutDevice = useMemo(() => Confirmation.createHandle<UserProfileDevice>(), []);
   const currentDevices = devices.filter(device => device.isCurrent);
   const otherDevices = devices.filter(device => !device.isCurrent);
+  const ordered = useStableOrder(
+    useMemo(() => [...devices].sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent)), [devices]),
+    byId,
+  );
+  const currentDeviceId = currentDevices[0]?.id;
 
   const currentDeviceTrigger = useRef<HTMLButtonElement>(null);
   const removalFocus = useListRemovalFocus({
@@ -87,33 +95,32 @@ export function UserProfileActiveDevicesSectionView({
             ) : null}
           </Section.Header>
           <Section.Body>
-            <Section.Items>
-              {currentDevices.length > 0 ? (
-                currentDevices.map(device => (
+            <Section.AnimatedItems
+              items={ordered}
+              getKey={byId}
+              empty={
+                <Section.Content>
+                  <Section.Description>{m.emptyCurrent}</Section.Description>
+                </Section.Content>
+              }
+            >
+              {(device, { present }) =>
+                device.isCurrent ? (
                   <DeviceItem
-                    key={device.id}
                     device={device}
-                    triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTrigger : undefined}
+                    triggerRef={device.id === currentDeviceId ? currentDeviceTrigger : undefined}
                     onViewDetails={device => deviceDetails.open(device)}
                   />
-                ))
-              ) : (
-                <Section.Item>
-                  <Section.Content>
-                    <Section.Description>{m.emptyCurrent}</Section.Description>
-                  </Section.Content>
-                </Section.Item>
-              )}
-              {otherDevices.map(device => (
-                <DeviceItem
-                  key={device.id}
-                  device={device}
-                  triggerRef={removalFocus.registerTrigger(device.id)}
-                  onSignOut={signOutActions?.open}
-                  onViewDetails={device => deviceDetails.open(device)}
-                />
-              ))}
-            </Section.Items>
+                ) : (
+                  <DeviceItem
+                    device={device}
+                    triggerRef={present ? removalFocus.registerTrigger(device.id) : undefined}
+                    onSignOut={signOutActions?.open}
+                    onViewDetails={device => deviceDetails.open(device)}
+                  />
+                )
+              }
+            </Section.AnimatedItems>
           </Section.Body>
         </Section.Group>
       </Section.Root>
@@ -188,7 +195,7 @@ function DeviceItem({
   }
 
   return (
-    <Section.Item>
+    <>
       <UserProfileSecurityIcon name={device.type} />
       <Section.Content>
         <Section.Label>
@@ -211,6 +218,6 @@ function DeviceItem({
           triggerRef={triggerRef}
         />
       </Section.Actions>
-    </Section.Item>
+    </>
   );
 }
