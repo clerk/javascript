@@ -7,7 +7,7 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
-import type { UserProfilePhoneVerifier } from '../user-profile-contact.types';
+import type { UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
 
 export type UserProfileAddPhoneField = 'phoneNumber' | 'code';
@@ -17,10 +17,12 @@ export interface UserProfileAddPhoneControllerOptions {
 }
 
 export interface UserProfileAddPhoneController extends UserProfileAddPhoneDialogProps {
-  onVerifyPhone: (phoneNumber: string, verifier: UserProfilePhoneVerifier) => void;
+  verifyingId: string | undefined;
+  onVerifyPhone: (phone: Pick<UserProfilePhone, 'id' | 'value'>, verifier: UserProfilePhoneVerifier) => void;
 }
 
 interface Context {
+  verifyingId: string | undefined;
   phoneNumber: string;
   verifier: UserProfilePhoneVerifier | undefined;
   error: FormError | undefined;
@@ -29,7 +31,7 @@ interface Context {
 
 type Event =
   | { type: 'ADD' }
-  | { type: 'START'; phoneNumber: string; verifier: UserProfilePhoneVerifier }
+  | { type: 'START'; id?: string; phoneNumber: string; verifier: UserProfilePhoneVerifier }
   | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
   | { type: 'RESEND' }
@@ -48,6 +50,7 @@ const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.
 const start = {
   target: 'sending',
   actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
+    verifyingId: event.id,
     phoneNumber: event.phoneNumber,
     verifier: event.verifier,
     error: undefined,
@@ -59,6 +62,7 @@ const machine = createMachine({
   id: 'addPhone',
   initial: 'idle',
   context: {
+    verifyingId: undefined,
     phoneNumber: '',
     verifier: undefined,
     error: undefined,
@@ -69,7 +73,7 @@ const machine = createMachine({
       on: {
         ADD: {
           target: 'phone',
-          actions: assign(() => ({ verifier: undefined, error: undefined, resendSeconds: 0 })),
+          actions: assign(() => ({ verifyingId: undefined, verifier: undefined, error: undefined, resendSeconds: 0 })),
         },
         START: start,
       },
@@ -177,9 +181,10 @@ export function useUserProfileAddPhoneController({
         send({ type: 'RESEND' });
       }
     },
-    onVerifyPhone: (phoneNumber, verifier) => {
+    verifyingId: snapshot.context.verifyingId,
+    onVerifyPhone: (phone, verifier) => {
       codeForm.reset();
-      send({ type: 'START', phoneNumber, verifier });
+      send({ type: 'START', id: phone.id, phoneNumber: phone.value, verifier });
     },
   };
 }

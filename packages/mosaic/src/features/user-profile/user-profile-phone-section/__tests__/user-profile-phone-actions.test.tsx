@@ -307,4 +307,24 @@ describe('phone actions', () => {
     expect(getPhoneVerifier).toHaveBeenCalledExactlyOnceWith('phone_unverified');
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
+
+  it('returns focus to the row that opened verification when the dialog closes', async () => {
+    const user = userEvent.setup();
+    renderPhone({
+      phones: [
+        { id: 'phone_1', value: '+18015550100', isDefault: true, isVerified: true },
+        { id: 'phone_2', value: '+18015550101', isDefault: false, isVerified: false },
+      ],
+    });
+    const trigger = screen.getByRole('button', { name: 'Manage +1 (801) 555-0101' });
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Verify phone number' }));
+    expect(await screen.findByRole('dialog', { name: 'Verify your phone number' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
 });

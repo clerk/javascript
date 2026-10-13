@@ -19,7 +19,6 @@ export function useUserProfilePhoneSectionController({
   const verification = useUserProfileAddPhoneController({ onCreate: onCreatePhone });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
-  const verifyingId = useRef<string | undefined>(undefined);
   const removalFocus = useListRemovalFocus({
     ids: phones.map(phone => phone.id),
     onRemove: onRemovePhone,
@@ -37,16 +36,11 @@ export function useUserProfilePhoneSectionController({
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemovePhone ? remove : undefined,
     finalFocus: removalFocus.finalFocus,
-    verificationFinalFocus: () => {
-      const id = verifyingId.current;
-      verifyingId.current = undefined;
-      return id ? removalFocus.trigger(id) : null;
-    },
+    verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
     onVerify: id => {
-      verifyingId.current = id;
       const phone = phones.find(phone => phone.id === id);
       if (phone) {
-        verification.onVerifyPhone(phone.value, getPhoneVerifier(id));
+        verification.onVerifyPhone(phone, getPhoneVerifier(id));
       }
     },
     onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryPhone(id)),
