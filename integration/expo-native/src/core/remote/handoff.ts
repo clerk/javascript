@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Platform } from '../types.ts';
+import { everyFile, type Platform } from '../types.ts';
 
-export const HANDOFF_VERSION = 1 as const;
+export const HANDOFF_VERSION = 2 as const;
 
 export const HANDOFF = {
   artifact: 'verify-evidence',
@@ -33,6 +33,15 @@ export interface HandoffFile {
   readonly sha256: string;
 }
 
+export interface HandoffBefore {
+  readonly run: string;
+  readonly commit: string;
+  readonly passed: number;
+  readonly flaky: number;
+  readonly total: number;
+  readonly files: readonly HandoffFile[];
+}
+
 export interface HandoffManifest {
   readonly v: typeof HANDOFF_VERSION;
   readonly pr: number;
@@ -44,6 +53,7 @@ export interface HandoffManifest {
   readonly flaky: number;
   readonly total: number;
   readonly files: readonly HandoffFile[];
+  readonly before: HandoffBefore | null;
 }
 
 const SHAPE = {
@@ -54,7 +64,8 @@ const SHAPE = {
   fileName: /^[A-Za-z0-9][A-Za-z0-9._-]{0,95}\.(png|jpg|mp4)$/,
 } as const;
 
-const MANIFEST_KEYS = ['v', 'pr', 'run', 'platform', 'device', 'commit', 'passed', 'flaky', 'total', 'files'];
+const MANIFEST_KEYS = ['v', 'pr', 'run', 'platform', 'device', 'commit', 'passed', 'flaky', 'total', 'files', 'before'];
+const BEFORE_KEYS = ['run', 'commit', 'passed', 'flaky', 'total', 'files'];
 const FILE_KEYS = ['name', 'bytes', 'sha256'];
 
 export class HandoffRefused extends Error {
@@ -71,11 +82,16 @@ const refuse = (message: string): never => {
   throw new HandoffRefused(400, message);
 };
 
-function record(value: unknown, keys: readonly string[], what: string): Record<string, unknown> {
+function anObject(value: unknown, what: string): Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return refuse(`${what} is not an object`);
-  const extra = Object.keys(value).filter((key) => !keys.includes(key));
-  if (extra.length > 0 || Object.keys(value).length !== keys.length) return refuse(`${what} must have exactly the keys ${keys.join(', ')}`);
   return value as Record<string, unknown>;
+}
+
+function record(value: unknown, keys: readonly string[], what: string): Record<string, unknown> {
+  const raw = anObject(value, what);
+  const extra = Object.keys(raw).filter((key) => !keys.includes(key));
+  if (extra.length > 0 || Object.keys(raw).length !== keys.length) return refuse(`${what} must have exactly the keys ${keys.join(', ')}`);
+  return raw;
 }
 
 function whole(value: unknown, min: number, max: number, what: string): number {
@@ -90,6 +106,33 @@ function shaped(value: unknown, pattern: RegExp, what: string): string {
 
 export const isVideo = (name: string): boolean => name.endsWith('.mp4');
 
+function parseFiles(list: unknown, what: string): HandoffFile[] {
+  if (!Array.isArray(list) || list.length < 1 || list.length > HANDOFF_LIMITS.files) return refuse(`${what} must be a list of 1 to ${HANDOFF_LIMITS.files}`);
+  const files = (list as unknown[]).map((entry, i): HandoffFile => {
+    const file = record(entry, FILE_KEYS, `file ${i + 1}`);
+    const name = shaped(file.name, SHAPE.fileName, `the name of file ${i + 1}`);
+    return { name, bytes: whole(file.bytes, 1, isVideo(name) ? HANDOFF_LIMITS.videoBytes : HANDOFF_LIMITS.imageBytes, `the size of ${name}`), sha256: shaped(file.sha256, SHAPE.sha256, `the sha256 of ${name}`) };
+  });
+  if (files.filter((file) => isVideo(file.name)).length > HANDOFF_LIMITS.videos) refuse(`at most ${HANDOFF_LIMITS.videos} video`);
+  return files;
+}
+
+function parseBefore(value: unknown, run: unknown, files: readonly HandoffFile[]): HandoffBefore {
+  const raw = record(value, BEFORE_KEYS, 'before');
+  const before: HandoffBefore = {
+    run: shaped(raw.run, SHAPE.run, 'the run of before'),
+    commit: shaped(raw.commit, SHAPE.commit, 'the commit of before'),
+    passed: whole(raw.passed, 0, HANDOFF_LIMITS.tests, 'passed of before'),
+    flaky: whole(raw.flaky, 0, HANDOFF_LIMITS.tests, 'flaky of before'),
+    total: whole(raw.total, 1, HANDOFF_LIMITS.tests, 'total of before'),
+    files: parseFiles(raw.files, 'the files of before'),
+  };
+  if (before.run === run) refuse('before is the run itself');
+  if (before.passed + before.flaky > before.total) refuse('passed and flaky of before must count at most total');
+  if (before.files.length !== files.length || before.files.some((file, i) => isVideo(file.name) !== isVideo(files[i]!.name))) refuse('before must have one file for each file, of the same kind');
+  return before;
+}
+
 export function parseHandoffManifest(text: string): HandoffManifest {
   if (Buffer.byteLength(text) > HANDOFF_LIMITS.manifestBytes) refuse(`the manifest is over ${HANDOFF_LIMITS.manifestBytes} bytes`);
   let parsed: unknown;
@@ -98,18 +141,19 @@ export function parseHandoffManifest(text: string): HandoffManifest {
   } catch {
     return refuse('the manifest is not JSON');
   }
+  const { v } = anObject(parsed, 'the manifest');
+  if (v !== HANDOFF_VERSION) {
+    const found = typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 999 ? `version ${v}` : 'of no version this session knows';
+    refuse(`the manifest is ${found}, and this session takes only version ${HANDOFF_VERSION}`);
+  }
   const raw = record(parsed, MANIFEST_KEYS, 'the manifest');
-  if (raw.v !== HANDOFF_VERSION) refuse(`manifest version ${String(raw.v)} is not ${HANDOFF_VERSION}`);
   if (raw.platform !== 'ios' && raw.platform !== 'android') refuse('platform must be ios or android');
-  if (!Array.isArray(raw.files) || raw.files.length < 1 || raw.files.length > HANDOFF_LIMITS.files) refuse(`files must be a list of 1 to ${HANDOFF_LIMITS.files}`);
-  const files = (raw.files as unknown[]).map((entry, i): HandoffFile => {
-    const file = record(entry, FILE_KEYS, `file ${i + 1}`);
-    const name = shaped(file.name, SHAPE.fileName, `the name of file ${i + 1}`);
-    return { name, bytes: whole(file.bytes, 1, isVideo(name) ? HANDOFF_LIMITS.videoBytes : HANDOFF_LIMITS.imageBytes, `the size of ${name}`), sha256: shaped(file.sha256, SHAPE.sha256, `the sha256 of ${name}`) };
-  });
-  if (new Set(files.map((file) => file.name.toLowerCase())).size !== files.length) refuse('two files have the same name');
-  if (files.filter((file) => isVideo(file.name)).length > HANDOFF_LIMITS.videos) refuse(`at most ${HANDOFF_LIMITS.videos} video`);
-  if (files.reduce((sum, file) => sum + file.bytes, 0) > HANDOFF_LIMITS.totalBytes) refuse(`the files are over ${HANDOFF_LIMITS.totalBytes} bytes in all`);
+  const files = parseFiles(raw.files, 'files');
+  const before = raw.before === null ? null : parseBefore(raw.before, raw.run, files);
+  const all = everyFile({ files, before });
+  if (all.length > HANDOFF_LIMITS.files) refuse(`at most ${HANDOFF_LIMITS.files} files in all`);
+  if (new Set(all.map((file) => file.name.toLowerCase())).size !== all.length) refuse('two files have the same name');
+  if (all.reduce((sum, file) => sum + file.bytes, 0) > HANDOFF_LIMITS.totalBytes) refuse(`the files are over ${HANDOFF_LIMITS.totalBytes} bytes in all`);
   const manifest: HandoffManifest = {
     v: HANDOFF_VERSION,
     pr: whole(raw.pr, 1, HANDOFF_LIMITS.pr, 'pr'),
@@ -121,6 +165,7 @@ export function parseHandoffManifest(text: string): HandoffManifest {
     flaky: whole(raw.flaky, 0, HANDOFF_LIMITS.tests, 'flaky'),
     total: whole(raw.total, 1, HANDOFF_LIMITS.tests, 'total'),
     files,
+    before,
   };
   if (manifest.passed + manifest.flaky < 1 || manifest.passed + manifest.flaky > manifest.total) refuse('passed and flaky must count at least one test and at most total');
   return manifest;
@@ -186,7 +231,7 @@ export function evidenceReceiver(work: string): EvidenceReceiver {
       rmSync(staging, { recursive: true, force: true });
       mkdirSync(staging, { recursive: true });
       writeFileSync(join(staging, HANDOFF.manifestFile), `${JSON.stringify(manifest)}\n`);
-      receiving = { manifest, sizes: new Map(manifest.files.map((file) => [file.name, 0])) };
+      receiving = { manifest, sizes: new Map(everyFile(manifest).map((file) => [file.name, 0])) };
       return { ok: true };
     },
 
@@ -199,7 +244,7 @@ export function evidenceReceiver(work: string): EvidenceReceiver {
       } catch (error) {
         throw error instanceof HandoffRefused ? error : new HandoffRefused(400, 'the chunk is not JSON');
       }
-      const declared = receiving.manifest.files.find((file) => file.name === raw.name);
+      const declared = everyFile(receiving.manifest).find((file) => file.name === raw.name);
       if (declared === undefined) throw new HandoffRefused(400, 'the manifest names no such file');
       const have = receiving.sizes.get(declared.name)!;
       if (raw.offset !== have) throw new HandoffRefused(409, `${declared.name} is at ${have} bytes`, have);
@@ -215,7 +260,8 @@ export function evidenceReceiver(work: string): EvidenceReceiver {
     commit() {
       if (receiving === null) throw new HandoffRefused(409, 'no hand-off has begun');
       const { manifest, sizes } = receiving;
-      for (const file of manifest.files) {
+      const files = everyFile(manifest);
+      for (const file of files) {
         if (sizes.get(file.name) !== file.bytes) throw new HandoffRefused(409, `${file.name} has ${sizes.get(file.name)} of ${file.bytes} bytes`);
         if (sha256File(join(staging, file.name)) !== file.sha256) throw new HandoffRefused(409, `${file.name} does not have the sha256 its manifest declares`);
       }
@@ -223,7 +269,7 @@ export function evidenceReceiver(work: string): EvidenceReceiver {
       renameSync(staging, kept);
       receiving = null;
       heldRun = manifest.run;
-      return { ok: true, run: manifest.run, files: manifest.files.length, bytes: manifest.files.reduce((sum, file) => sum + file.bytes, 0) };
+      return { ok: true, run: manifest.run, files: files.length, bytes: files.reduce((sum, file) => sum + file.bytes, 0) };
     },
 
     held: () => (heldRun !== null && existsSync(kept) ? heldRun : null),

@@ -69,7 +69,7 @@ export type Command =
       readonly waitSeconds: number;
     }
   | { readonly verb: 'screen'; readonly platform?: Platform; readonly png: boolean }
-  | { readonly verb: 'attach'; readonly run: RunId; readonly pr: number; readonly screenshots: 'all' | readonly string[] }
+  | { readonly verb: 'attach'; readonly run: RunId; readonly pr: number; readonly media: MediaChoice; readonly before: RunId | null }
   | { readonly verb: 'down'; readonly platform?: Platform; readonly stale: boolean; readonly dryRun: boolean };
 
 export type Verb = Command['verb'];
@@ -189,11 +189,24 @@ export interface EvidenceSummary {
   readonly total: number;
 }
 
+export interface MediaChoice {
+  readonly screenshots: readonly string[];
+  readonly video: boolean;
+}
+
+export interface EvidenceFile {
+  readonly name: string;
+  readonly path: EvidencePath;
+}
+
 export interface EvidenceBundle {
   readonly pr: number;
   readonly summary: EvidenceSummary;
-  readonly files: readonly { readonly name: string; readonly path: EvidencePath }[];
+  readonly files: readonly EvidenceFile[];
+  readonly before: { readonly summary: EvidenceSummary; readonly files: readonly EvidenceFile[] } | null;
 }
+
+export const everyFile = <F>(evidence: { readonly files: readonly F[]; readonly before: { readonly files: readonly F[] } | null }): readonly F[] => [...evidence.files, ...(evidence.before?.files ?? [])];
 
 export interface HandOffReceipt {
   readonly sessionRun: string;

@@ -5,7 +5,7 @@ import { test as base } from '@e2e-dev/mobile';
 import { expect, type Locator } from 'e2e';
 import { app as testApp } from './app.ts';
 import { busyWaits, onceTheRunnerIsFree, type BusyWait } from './support/busy-runner.ts';
-import { testUsers } from './support/clerk.ts';
+import { aboutToLaunch, testUsers } from './support/clerk.ts';
 import { ASSERTION_TIMEOUT_MS, PACKAGE_DIR } from './support/config.ts';
 import { agentDevice, deviceCommand } from './support/device.ts';
 import { fillField } from './support/fill.ts';
@@ -74,6 +74,7 @@ export const test = base.extend<{ host: HostFixture }>({
       {
         installApp: (path) => device.installApp(path),
         signInTicket: users.signInTicket,
+        aboutToLaunch: () => aboutToLaunch(clerk.access),
         openApp: (id, options) => (options === undefined ? device.openApp(id) : device.openApp(id, { relaunch: true, launchArguments: [...options.launchArguments] })),
         adb: (args) => adb(target, args),
       },

@@ -33,12 +33,19 @@ const USAGE_FIX = [
   '{cli} up [--platform p] [--backend auto|local|remote] [--runner <label>] [--wait <seconds>]',
   '{cli} run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--backend auto|local|remote] [--runner <label>] [--grep re] [--retries <n>] [--github-report] [--no-video] [--wait <seconds>]',
   '{cli} screen [--platform p] [--png]',
-  '{cli} attach <run-id> --pr <n> [--screenshot label]...',
+  '{cli} attach <run-id> --pr <n> [--screenshot <label>]... [--video] [--before <run-id>], with at least one of --screenshot and --video',
   '{cli} down [--platform p] [--stale] [--dry-run]',
   'every verb takes --json',
 ].join('; ');
 
 const usage = (message: string) => new VerifyFailure('USAGE', message, USAGE_FIX);
+
+const nothingToShow = () =>
+  new VerifyFailure(
+    'USAGE',
+    '{cli} attach posts what you choose and nothing by default: screenshots show a still change such as wording, and the video shows behavior, movement or a flow',
+    '{cli} attach <run-id> --pr <n> --screenshot <label> [--screenshot <label>]..., or {cli} attach <run-id> --pr <n> --video; add --before <run-id> to either when the change is to something that already exists, and pass both flags only when one kind does not show the change',
+  );
 
 type FlagSpec = Readonly<Record<string, 'value' | 'bool' | 'list'>>;
 
@@ -47,7 +54,7 @@ const FLAGS: Readonly<Record<Verb, FlagSpec>> = {
   up: { platform: 'value', backend: 'value', runner: 'value', wait: 'value' },
   run: { platform: 'value', backend: 'value', runner: 'value', all: 'bool', grep: 'value', retries: 'value', 'github-report': 'bool', 'no-video': 'bool', wait: 'value' },
   screen: { platform: 'value', png: 'bool' },
-  attach: { pr: 'value', screenshot: 'list' },
+  attach: { pr: 'value', screenshot: 'list', video: 'bool', before: 'value' },
   down: { platform: 'value', stale: 'bool', 'dry-run': 'bool' },
 };
 
@@ -156,8 +163,12 @@ export function parseArgv(argv: readonly string[]): Invocation {
       break;
     case 'attach': {
       if (positionals.length !== 1) throw usage('{cli} attach takes exactly one run id');
-      const shots = lists.get('screenshot');
-      command = { verb, run: parseRunId(positionals[0]!), pr: positiveInt('pr', values.get('pr'), undefined), screenshots: shots ?? 'all' };
+      const run = parseRunId(positionals[0]!);
+      const pr = positiveInt('pr', values.get('pr'), undefined);
+      const media = { screenshots: lists.get('screenshot') ?? [], video: bools.has('video') };
+      if (media.screenshots.length === 0 && !media.video) throw nothingToShow();
+      const before = values.get('before');
+      command = { verb, run, pr, media, before: before === undefined ? null : parseRunId(before) };
       break;
     }
     case 'down':

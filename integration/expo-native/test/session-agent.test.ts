@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
 import { coreVersion } from '../src/core/manifest.ts';
-import { HANDOFF_LIMITS, parseHandoffManifest } from '../src/core/remote/handoff.ts';
+import { HANDOFF_LIMITS, parseHandoffManifest, type HandoffManifest } from '../src/core/remote/handoff.ts';
 import { sendEvidence } from '../src/core/remote/session.ts';
 import { plan } from '../src/core/remote/session-agent.ts';
 import { sha256Hex, type SessionHealth, type SessionRequest } from '../src/core/remote/protocol.ts';
@@ -410,7 +410,7 @@ describe('session agent', () => {
     writeFileSync(join(dir, 'token'), token);
     const sha256 = (data: Buffer) => createHash('sha256').update(data).digest('hex');
     const manifest = parseHandoffManifest(
-      JSON.stringify({ v: 1, pr: 669, run: 'r20261008-052713-253e', platform: 'ios', device: 'Test Phone on test-runner', commit: 'a'.repeat(40), passed: 1, flaky: 0, total: 1, files: [{ name: 'video.mp4', bytes: video.length, sha256: sha256(video) }, { name: 'profile.png', bytes: shot.length, sha256: sha256(shot) }] }),
+      JSON.stringify({ v: 2, before: null, pr: 669, run: 'r20261008-052713-253e', platform: 'ios', device: 'Test Phone on test-runner', commit: 'a'.repeat(40), passed: 1, flaky: 0, total: 1, files: [{ name: 'video.mp4', bytes: video.length, sha256: sha256(video) }, { name: 'profile.png', bytes: shot.length, sha256: sha256(shot) }] }),
     );
     for (const step of ['begin', 'chunk', 'commit']) assert.equal((await agent.call(`/__sim/evidence/${step}`, { method: 'POST', bearer: null, body: '{}' })).status, 403, step);
     assert.equal((await agent.call('/__sim/evidence/begin', { method: 'POST', body: JSON.stringify({ ...manifest, run: 'nope' }) })).status, 400);
@@ -430,7 +430,17 @@ describe('session agent', () => {
       return response;
     };
     try {
-      await sendEvidence({ baseUrl: 'https://fake-session-host.trycloudflare.com', tokenFile: join(dir, 'token') }, manifest, new Map([['video.mp4', join(dir, 'video.mp4')], ['profile.png', join(dir, 'profile.png')]]), (line) => void lines.push(line), 10);
+      const session = { baseUrl: 'https://fake-session-host.trycloudflare.com', tokenFile: join(dir, 'token') };
+      const paths = new Map([['video.mp4', join(dir, 'video.mp4')], ['profile.png', join(dir, 'profile.png')]]);
+      const { before: _, ...versionOne } = { ...manifest, v: 1 };
+      await assert.rejects(sendEvidence(session, versionOne as unknown as HandoffManifest, paths, (line) => void lines.push(line), 10), {
+        code: 'NOT_READY',
+        message: 'the session refused the manifest of run r20261008-052713-253e: the manifest is version 1, and this session takes only version 2',
+        fix: '{cli} down, then {cli} up, so that the session runs the verify code of this checkout, then {cli} run again and attach',
+      });
+      assert.equal(lines.length, 0, 'no file was sent');
+      assert.equal(existsSync(join(agent.work, 'evidence.partial')), false, 'a refused manifest starts no hand-off');
+      await sendEvidence(session, manifest, paths, (line) => void lines.push(line), 10);
     } finally {
       globalThis.fetch = realFetch;
     }

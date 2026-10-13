@@ -61,20 +61,27 @@ export function loggedUserIds(dir: EvidencePath): readonly string[] {
   return [...new Set([...readFileSync(file, 'utf8').matchAll(/"userId"\s*:\s*"([^"]+)"/g)].map((match) => match[1]!))];
 }
 
+export type Showable = Brand<EvidenceRecord, 'Showable' | 'Publishable'>;
 export type Publishable = Brand<EvidenceRecord, 'Publishable'>;
 
-export function assertPublishable(record: EvidenceRecord, loggedUsers: readonly string[]): Publishable {
-  const refuse = (message: string, fix: string): never => {
-    throw new VerifyFailure('EVIDENCE_UNSAFE', message, fix);
-  };
+const refuse = (message: string, fix: string): never => {
+  throw new VerifyFailure('EVIDENCE_UNSAFE', message, fix);
+};
+
+export function assertShowable(record: EvidenceRecord, loggedUsers: readonly string[]): Showable {
   if (record.tainted.length > 0) refuse(`run ${record.run} has secret values in ${record.tainted.join(', ')}`, 'do not attach this run; rerun and attach the new run');
-  const failed = record.results.filter((r) => r.status === 'failed' || r.status === 'interrupted');
-  if (failed.length > 0) refuse(`run ${record.run} has ${failed.length} failing spec(s)`, 'fix the failures and attach a passing run');
-  const incomplete = record.settings.filter((group) => group.held === false || group.e2eReport === null);
-  if (incomplete.length > 0) refuse(`run ${record.run} has ${count(incomplete.length, 'group')} that did not run in full on its settings: ${incomplete.map((group) => group.label).join('; ')}`, 'attach a run in which every group ran on the settings it declares');
-  if (!record.results.some((r) => r.status === 'passed' || r.status === 'flaky')) refuse(`run ${record.run} passed no specs`, 'attach a run whose specs ran and passed');
   const own = new Set(record.identities.flatMap((i) => (i.userId === null ? [] : [i.userId])));
   const foreign = loggedUsers.filter((userId) => !own.has(userId));
   if (foreign.length > 0) refuse(`the app log of run ${record.run} names user(s) the run did not create: ${foreign.join(', ')}`, 'sign in only users from host.seedUser or host.newEmail');
+  return record as Showable;
+}
+
+export function assertPublishable(record: EvidenceRecord, loggedUsers: readonly string[]): Publishable {
+  assertShowable(record, loggedUsers);
+  const failed = record.results.filter((r) => r.status === 'failed' || r.status === 'interrupted');
+  if (failed.length > 0) refuse(`run ${record.run} has ${failed.length} failing spec(s)`, 'fix the failures and attach a passing run; a failing run can only be the --before of a passing one');
+  const incomplete = record.settings.filter((group) => group.held === false || group.e2eReport === null);
+  if (incomplete.length > 0) refuse(`run ${record.run} has ${count(incomplete.length, 'group')} that did not run in full on its settings: ${incomplete.map((group) => group.label).join('; ')}`, 'attach a run in which every group ran on the settings it declares');
+  if (!record.results.some((r) => r.status === 'passed' || r.status === 'flaky')) refuse(`run ${record.run} passed no specs`, 'attach a run whose specs ran and passed');
   return record as Publishable;
 }

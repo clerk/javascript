@@ -52,14 +52,32 @@ describe('parseArgv', () => {
       verb: 'attach',
       run: 'r20261002-141210-7c1e',
       pr: 412,
-      screenshots: ['a', 'b'],
+      media: { screenshots: ['a', 'b'], video: false },
+      before: null,
     });
-    assert.deepEqual(parseArgv(['attach', 'r20261002-141210-7c1e', '--pr=7']).command, { verb: 'attach', run: 'r20261002-141210-7c1e', pr: 7, screenshots: 'all' });
+    assert.deepEqual(parseArgv(['attach', 'r20261002-141210-7c1e', '--pr=7', '--video', '--before', 'r20261002-140000-0a1b']).command, {
+      verb: 'attach',
+      run: 'r20261002-141210-7c1e',
+      pr: 7,
+      media: { screenshots: [], video: true },
+      before: 'r20261002-140000-0a1b',
+    });
+    assert.deepEqual((parseArgv(['attach', 'r20261002-141210-7c1e', '--pr=7', '--video', '--screenshot', 'a']).command as Extract<Command, { verb: 'attach' }>).media, { screenshots: ['a'], video: true });
     assert.deepEqual(parseArgv(['down', '--stale', '--dry-run']).command, { verb: 'down', stale: true, dryRun: true });
   });
 
+  it('makes attach choose what to show, and says how to choose when it is given neither --screenshot nor --video', () => {
+    const neither = usageError(['attach', 'r20261002-141210-7c1e', '--pr', '412']);
+    assert.equal(neither.message, '{cli} attach posts what you choose and nothing by default: screenshots show a still change such as wording, and the video shows behavior, movement or a flow');
+    assert.equal(
+      neither.fix,
+      '{cli} attach <run-id> --pr <n> --screenshot <label> [--screenshot <label>]..., or {cli} attach <run-id> --pr <n> --video; add --before <run-id> to either when the change is to something that already exists, and pass both flags only when one kind does not show the change',
+    );
+    assert.equal(usageError(['attach', 'r20261002-141210-7c1e', '--pr', '412', '--before', 'r20261002-140000-0a1b']).message, neither.message);
+  });
+
   it('reads --json on every verb', () => {
-    for (const argv of [['doctor'], ['up'], ['run', 'x'], ['screen'], ['attach', 'r20261002-141210-7c1e', '--pr', '1'], ['down']]) {
+    for (const argv of [['doctor'], ['up'], ['run', 'x'], ['screen'], ['attach', 'r20261002-141210-7c1e', '--pr', '1', '--video'], ['down']]) {
       assert.equal(parseArgv([...argv, '--json']).json, true, argv[0]);
       assert.equal(parseArgv(argv).json, false, argv[0]);
     }
@@ -77,9 +95,11 @@ describe('parseArgv', () => {
       ['run', 'x', '--all'],
       ['run', 'x', '--video'],
       ['screen', 'extra'],
-      ['attach', 'r20261002-141210-7c1e'],
-      ['attach', 'not-a-run', '--pr', '1'],
-      ['attach', 'r20261002-141210-7c1e', '--pr', 'abc'],
+      ['attach', 'r20261002-141210-7c1e', '--video'],
+      ['attach', 'not-a-run', '--pr', '1', '--video'],
+      ['attach', 'r20261002-141210-7c1e', '--pr', 'abc', '--video'],
+      ['attach', 'r20261002-141210-7c1e', '--pr', '1', '--video', '--before', 'the-run-before'],
+      ['attach', 'r20261002-141210-7c1e', '--pr', '1', '--video=yes'],
       ['down', '--platform', 'windows'],
       ['up', '--backend', 'cloud'],
       ['up', '--wait'],

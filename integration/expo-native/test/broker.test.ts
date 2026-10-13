@@ -5,11 +5,11 @@ import net from 'node:net';
 import { networkInterfaces, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
-import { TEST_PHONES, newTestEmail, runEmailPrefix, testUsers } from '../specs/support/clerk.ts';
+import { TEST_PHONES, aboutToLaunch, newTestEmail, runEmailPrefix, testUsers } from '../specs/support/clerk.ts';
 import { Secret, usedSecretValues } from '../specs/support/secret.ts';
 import { startBroker, type Broker } from '../src/core/broker.ts';
 import { REPLACE_AT_USERS } from '../src/core/clerk.ts';
-import type { PublishableKey, RunId } from '../src/core/types.ts';
+import { VerifyFailure, type PublishableKey, type RunId } from '../src/core/types.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
 
 const SECRET_KEY = 'sk_test_standInUnitTest0123456789';
@@ -33,7 +33,7 @@ const emptyClerk: Clerk = (request) => {
   return { status: 200, body: { object: 'user', id: 'user_created_1', email_addresses: [{ email_address: 'private@example.com' }] } };
 };
 
-async function standIn(clerk: Clerk = emptyClerk) {
+async function standIn(clerk: Clerk = emptyClerk, beforeLaunch: () => Promise<void> = async () => undefined) {
   const dir = mkdtempSync(join(tmpdir(), 'verify-stand-in-'));
   const workspace = openWorkspace({ packageDir: dir, worktree: dir, home: join(dir, 'home') });
   const { run, scratch } = workspace.newRun();
@@ -50,14 +50,15 @@ async function standIn(clerk: Clerk = emptyClerk) {
     const answer = clerk(request);
     return new Response(JSON.stringify(answer.body), { status: answer.status });
   }) as typeof fetch;
-  const broker = await startBroker(run, workspace, scratch, { keys: () => keys, fetch: bapi });
+  const broker = await startBroker(run, workspace, scratch, { keys: () => keys, fetch: bapi, beforeLaunch });
   const ask = async (method: string, path: string, body?: unknown, token: string = readFileSync(broker.tokenFile, 'utf8')) => {
     const response = await fetch(`${broker.url}${path}`, { method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, ...(body === undefined ? {} : { body: typeof body === 'string' ? body : JSON.stringify(body) }) });
     const text = await response.text();
     return { status: response.status, json: (text === '' ? null : JSON.parse(text)) as { errors?: { code: string; long_message: string }[] } & Record<string, unknown> };
   };
-  const users = testUsers({ publishableKey: keys.pk, access: { kind: 'stand-in', url: broker.url, tokenFile: broker.tokenFile } }, run);
-  return { broker, workspace, run, forwarded, ask, users };
+  const access = { kind: 'stand-in', url: broker.url, tokenFile: broker.tokenFile } as const;
+  const users = testUsers({ publishableKey: keys.pk, access }, run);
+  return { broker, workspace, run, forwarded, ask, users, access };
 }
 
 const stopping = async <T>(broker: Broker, body: () => Promise<T>): Promise<T> => {
@@ -127,6 +128,48 @@ describe("the CLI's stand-in for the Backend API", () => {
       assert.equal((await s.ask('POST', '/users', body, SECRET_KEY)).status, 401);
       assert.equal((await fetch(`${s.broker.url}/users`, { method: 'POST', body: JSON.stringify(body) })).status, 401);
       assert.deepEqual(s.forwarded, []);
+    });
+  });
+
+  it('lets the CLI get ready each time a test is about to launch the app, answers when it is, and sends Clerk nothing', async () => {
+    const launches: string[] = [];
+    const s = await standIn(emptyClerk, async () => {
+      launches.push('asked');
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      launches.push('ready');
+    });
+    await stopping(s.broker, async () => {
+      await aboutToLaunch(s.access);
+      launches.push('launch 1');
+      await aboutToLaunch(s.access);
+      launches.push('launch 2');
+      assert.deepEqual(launches, ['asked', 'ready', 'launch 1', 'asked', 'ready', 'launch 2']);
+      assert.equal((await s.ask('POST', '/about_to_launch', undefined, 'not-the-token')).status, 401);
+      assert.equal(launches.length, 6, 'a process without the run token starts nothing');
+      assert.deepEqual(s.forwarded, []);
+    });
+  });
+
+  it('stops the launch with the reason and the fix when the CLI could not get ready', async () => {
+    const s = await standIn(emptyClerk, async () => Promise.reject(new VerifyFailure('NOT_READY', 'simctl recordVideo exited 1: no such device', 'rerun with --no-video')));
+    await stopping(s.broker, async () => {
+      await assert.rejects(aboutToLaunch(s.access), { message: 'the verify CLI was not ready for the app to launch: simctl recordVideo exited 1: no such device (fix: rerun with --no-video)' });
+    });
+    const other = await standIn(emptyClerk, async () => Promise.reject(new Error('spawn xcrun ENOENT')));
+    await stopping(other.broker, async () => {
+      await assert.rejects(aboutToLaunch(other.access), { message: 'the verify CLI was not ready for the app to launch: spawn xcrun ENOENT' });
+    });
+  });
+
+  it('asks nothing of anyone before a launch in a run by hand, which has a secret key and no CLI', async () => {
+    const asked: string[] = [];
+    const recording = (async (url: string | URL, init?: RequestInit) => (asked.push(`${init?.method} ${String(url)} ${new Headers(init?.headers).get('authorization')}`), new Response('{}'))) as typeof fetch;
+    await aboutToLaunch({ kind: 'secret-key', key: new Secret('clerk-secret-key', SECRET_KEY) }, recording);
+    assert.deepEqual(asked, []);
+    const s = await standIn();
+    await stopping(s.broker, async () => {
+      await aboutToLaunch(s.access, recording);
+      assert.deepEqual(asked, [`POST ${s.broker.url}/about_to_launch Bearer ${readFileSync(s.broker.tokenFile, 'utf8')}`]);
     });
   });
 

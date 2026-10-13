@@ -18,6 +18,7 @@ import {
 import { recordVideo, showLogs } from './simulator.ts';
 
 const TEMPLATE_NAME = 'Clerk Verify Template iOS';
+const CREATE_TEMPLATE = `xcrun simctl create "${TEMPLATE_NAME}" "iPhone Air"`;
 const LANE_NAME = /^verify-ios-(\d+)$/;
 
 interface Simulator {
@@ -104,7 +105,7 @@ export function localIosBackend(options: { readonly os?: NodeJS.Platform } = {})
     async acquire(request) {
       const template = (await listSimulators()).find((d) => d.name === TEMPLATE_NAME);
       if (template === undefined) {
-        throw new VerifyFailure('NOT_READY', `no simulator named ${TEMPLATE_NAME}`, `xcrun simctl clone "iPhone Air" "${TEMPLATE_NAME}"`);
+        throw new VerifyFailure('NOT_READY', `no simulator named ${TEMPLATE_NAME}`, CREATE_TEMPLATE);
       }
       if (template.state !== 'Shutdown') {
         throw new VerifyFailure('NOT_READY', `${TEMPLATE_NAME} is ${template.state}; it can only be cloned while shut down`, `xcrun simctl shutdown "${TEMPLATE_NAME}"`);
@@ -231,7 +232,7 @@ export function localIosBackend(options: { readonly os?: NodeJS.Platform } = {})
       const template = xcode.code === 0 ? (await listSimulators()).find((d) => d.name === TEMPLATE_NAME) : undefined;
       const device: DoctorCheck[] = [
         template === undefined
-          ? { id: 'template', ok: false, detail: `no simulator named ${TEMPLATE_NAME}`, fix: `xcrun simctl clone "iPhone Air" "${TEMPLATE_NAME}", then boot it once, trust your proxy CA, and shut it down` }
+          ? { id: 'template', ok: false, detail: `no simulator named ${TEMPLATE_NAME}`, fix: `${CREATE_TEMPLATE}, then boot it once, trust your proxy CA, and shut it down` }
           : template.state === 'Shutdown'
             ? { id: 'template', ok: true, detail: `${TEMPLATE_NAME} (${template.runtime.replace(/^.*SimRuntime\./, '')})` }
             : { id: 'template', ok: false, detail: `${TEMPLATE_NAME} is ${template.state}; lanes clone it only while it is shut down`, fix: `xcrun simctl shutdown "${TEMPLATE_NAME}"` },

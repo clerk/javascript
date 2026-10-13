@@ -1575,7 +1575,7 @@ describe('the broker of a run', () => {
     const w = world();
     await w.instances.ensure(NOTHING_NEW, quiet);
     const { run, scratch } = w.workspace.newRun();
-    const broker = await startBroker(run, w.workspace, scratch as ScratchPath, { keys: () => w.instances.keys(), fetch: w.clerk.fetch });
+    const broker = await startBroker(run, w.workspace, scratch as ScratchPath, { keys: () => w.instances.keys(), fetch: w.clerk.fetch, beforeLaunch: async () => undefined });
     const create = async () => {
       const response = await fetch(`${broker.url}/users`, { method: 'POST', headers: { Authorization: `Bearer ${readFileSync(broker.tokenFile, 'utf8')}` }, body: JSON.stringify({ email_address: [newTestEmail(run)], skip_password_requirement: true }) });
       return { status: response.status, json: (await response.json()) as Record<string, unknown> };

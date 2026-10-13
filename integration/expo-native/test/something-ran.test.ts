@@ -42,6 +42,9 @@ describe('a run in which nothing executed', () => {
   });
 
   it('suggests attach after a run with a passing spec', () => {
-    assert.match(nextStep(run, dir, results([{ status: 'passed' }]), 'auth-start'), /^\{cli\} attach r20261003-000000-abcd/);
+    assert.equal(
+      nextStep(run, dir, results([{ status: 'passed' }]), 'auth-start'),
+      '{cli} attach r20261003-000000-abcd --pr <n> --screenshot <label> for a still change, or --video for behavior or a flow; add --before <run-id> when the change is to something that exists',
+    );
   });
 });

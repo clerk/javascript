@@ -1,18 +1,19 @@
 import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { exitCodeFor } from '../src/core/cli.ts';
 import { assertPublishable, readRecord } from '../src/core/evidence.ts';
+import type { Runner } from '../src/core/exec.ts';
 import { createInstances } from '../src/core/instances/instances.ts';
 import { SettingsRefused, settingsFileOf } from '../src/core/instances/settings.ts';
 import { summarize } from '../src/core/publish.ts';
 import { runVerb, type Deps } from '../src/core/verbs.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
-import { VerifyFailure, type BuildKey, type Command, type DeviceBackend, type HostAdapter, type InstanceSettings, type LocalLease, type ScratchPath } from '../src/core/types.ts';
+import { VerifyFailure, type BuildKey, type Command, type DeviceBackend, type EvidencePath, type HostAdapter, type InstanceSettings, type LocalLease, type ScratchPath } from '../src/core/types.ts';
 import { PLATFORM_KEY, fakeClerk, type FakeClerkOptions } from '../testing/fake-clerk.ts';
 import { LEFT_OUT, linesLeftOut, watchDriver } from '../src/core/driver.ts';
 import { readAgent } from '../specs/support/agent.ts';
@@ -36,6 +37,7 @@ const output = args[args.indexOf('--output') + 1];
 const specs = args.slice(1, args.indexOf('--config'));
 const plan = JSON.parse(fs.readFileSync('fake-e2e.json', 'utf8'));
 fs.appendFileSync('invocations.jsonl', JSON.stringify({ specs, output, args }) + '\\n');
+fs.appendFileSync('order.log', 'e2e opens the app with no arguments\\n');
 (async () => {
   const token = fs.readFileSync(process.env.CLERK_E2E_API_TOKEN_FILE, 'utf8');
   const [, runTime, runTag] = process.env.CLERK_E2E_RUN_ID.split('-');
@@ -84,6 +86,12 @@ fs.appendFileSync('invocations.jsonl', JSON.stringify({ specs, output, args }) +
   for (const [index, file] of specs.entries()) {
     console.log('fake e2e runs ' + file);
     if ((plan.silent || []).includes(file)) continue;
+    let launchRefused = null;
+    if (plan.launches) {
+      const ready = await fetch(process.env.CLERK_E2E_API_URL + '/about_to_launch', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
+      launchRefused = ready.ok ? null : (await ready.json()).errors[0].long_message;
+      fs.appendFileSync('order.log', (launchRefused === null ? 'launches for ' : 'does not launch for ') + path.basename(file) + '\\n');
+    }
     const password = require('node:crypto').randomBytes(12).toString('hex') + 'Aa1!';
     const seeded = await fetch(process.env.CLERK_E2E_API_URL + '/users', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: JSON.stringify({ email_address: [emailOf()], ...(plan.password === true ? { password, bypass_client_trust: true } : { skip_password_requirement: true }) }) });
     const body = await seeded.json();
@@ -94,7 +102,8 @@ fs.appendFileSync('invocations.jsonl', JSON.stringify({ specs, output, args }) +
       fs.writeFileSync(path.join(output, 'trace.txt'), 'fill ' + password);
       body.message = 'the field shows ' + password;
     }
-    const passed = seeded.ok && !plan.password;
+    const passed = seeded.ok && !plan.password && launchRefused === null;
+    if (launchRefused !== null) body.message = launchRefused;
     const shot = 'ios/' + index + '/attempt-0/screenshots/001-home.png';
     fs.mkdirSync(path.dirname(path.join(output, 'artifacts', shot)), { recursive: true });
     fs.writeFileSync(path.join(output, 'artifacts', shot), path.basename(output));
@@ -119,6 +128,7 @@ interface FakeE2EPlan {
   readonly edit?: string;
   readonly exitCode?: number;
   readonly password?: boolean;
+  readonly launches?: boolean;
   readonly driver?: {
     readonly refusesALeftoverRegistration?: boolean;
     readonly daemonFailsToStartIn?: readonly string[];
@@ -216,6 +226,98 @@ describe('a run whose spec files declare different settings', () => {
     } finally {
       if (actions !== undefined) process.env.GITHUB_ACTIONS = actions;
     }
+  });
+
+  describe('with video', () => {
+    function recorded(plan: FakeE2EPlan, specs: Readonly<Record<string, InstanceSettings | null>> = { [AUTH_START]: null }) {
+      const w = world({ specs, plan });
+      const note = (line: string) => appendFileSync(join(w.dir, 'order.log'), `${line}\n`);
+      const deps = w.deps();
+      const backend = deps.host.backends[0] as { startRecording: DeviceBackend['startRecording'] };
+      backend.startRecording = async (_lease, into) => {
+        note('recorder starts');
+        return { process: null, stop: async () => (writeFileSync(join(into, 'video.mp4'), 'frames'), join(into, 'video.mp4') as EvidencePath) };
+      };
+      const runner: Runner = async (command, args) => {
+        if (command === join(w.dir, 'node_modules', '.bin', 'agent-device')) note(`agent-device ${args.join(' ')}`);
+        return { code: 0, stdout: '', stderr: '' };
+      };
+      const close = `agent-device close com.clerk.E2EHost --platform ios --udid UDID-1 --session verify-ios-${w.workspace.worktreeId}`;
+      const order = () => readFileSync(join(w.dir, 'order.log'), 'utf8').trim().split('\n');
+      const videoLines = () => w.lines.filter((line) => line.startsWith('video'));
+      return { w, deps: { ...deps, runner }, backend, close, order, videoLines };
+    }
+
+    it('records from the first time a test launches the app, after it closes the app that e2e opened, and once for all the groups of the run', async () => {
+      const r = recorded({ launches: true }, { [AUTH_START]: null, [CHOOSE_ORG]: FORCED_ORG });
+      const { record, dir } = await runVerb(r.deps, { ...RUN_ALL, video: true });
+      assert.deepEqual(r.order(), [
+        'e2e opens the app with no arguments',
+        r.close,
+        'recorder starts',
+        'launches for auth-start.e2e.ts',
+        'e2e opens the app with no arguments',
+        'launches for choose-organization.e2e.ts',
+      ]);
+      assert.deepEqual(record.videos, [join(dir, 'video.mp4')]);
+      assert.deepEqual(r.videoLines(), []);
+    });
+
+    it('records nothing and says so in one line when no test launches the app', async () => {
+      const r = recorded({});
+      const { record } = await runVerb(r.deps, { ...RUN_ALL, video: true });
+      assert.deepEqual(r.order(), ['e2e opens the app with no arguments']);
+      assert.deepEqual(record.videos, []);
+      assert.deepEqual(r.videoLines(), ['video   no test launched the app, so this run has no video']);
+    });
+
+    it('lets the app launch at once, as it was left, in a run with --no-video', async () => {
+      const r = recorded({ launches: true });
+      const { record } = await runVerb(r.deps, RUN_ALL);
+      assert.deepEqual(r.order(), ['e2e opens the app with no arguments', 'launches for auth-start.e2e.ts']);
+      assert.deepEqual(record.videos, []);
+      assert.deepEqual(r.videoLines(), []);
+    });
+
+    it('records all the same when the app could not be closed, and says what the video may open on', async () => {
+      const r = recorded({ launches: true });
+      const refusing: Runner = async (command, args) => (command.endsWith('agent-device') ? { code: 1, stdout: '', stderr: 'DEVICE_IN_USE\n' } : r.deps.runner(command, args));
+      await runVerb({ ...r.deps, runner: refusing }, { ...RUN_ALL, video: true });
+      assert.deepEqual(r.order(), ['e2e opens the app with no arguments', 'recorder starts', 'launches for auth-start.e2e.ts']);
+      assert.deepEqual(r.videoLines(), ['video   the app could not be closed before the recording, so the video may open on the screen it was showing: DEVICE_IN_USE']);
+    });
+
+    it('gives the close before the recording 30 seconds, and records all the same when it runs out', async () => {
+      const r = recorded({ launches: true });
+      const limits: (number | undefined)[] = [];
+      const hanging: Runner = async (command, args, options) => {
+        if (!command.endsWith('agent-device')) return r.deps.runner(command, args, options);
+        limits.push(options?.timeoutMs);
+        return { code: 124, stdout: '', stderr: 'timed out after 30000ms\n' };
+      };
+      await runVerb({ ...r.deps, runner: hanging }, { ...RUN_ALL, video: true });
+      assert.deepEqual(limits, [30_000]);
+      assert.deepEqual(r.order(), ['e2e opens the app with no arguments', 'recorder starts', 'launches for auth-start.e2e.ts']);
+      assert.deepEqual(r.videoLines(), ['video   the app could not be closed before the recording, so the video may open on the screen it was showing: timed out after 30000ms']);
+    });
+
+    it('launches nothing when the recorder cannot start: each test that would launch fails with the reason and the fix, and the recorder is tried once', async () => {
+      const r = recorded({ launches: true }, { [AUTH_START]: null, [SIGN_UP]: null });
+      let tries = 0;
+      r.backend.startRecording = async () => {
+        tries += 1;
+        throw new VerifyFailure('NOT_READY', 'simctl recordVideo exited 1: no such device', 'rerun with --no-video');
+      };
+      const { record } = await runVerb(r.deps, { ...RUN_ALL, video: true });
+      assert.deepEqual(r.order(), ['e2e opens the app with no arguments', r.close, 'does not launch for auth-start.e2e.ts', 'does not launch for complete.e2e.ts']);
+      assert.deepEqual(record.results.map((result) => [result.status, result.error]), [
+        ['failed', 'simctl recordVideo exited 1: no such device (fix: rerun with --no-video)'],
+        ['failed', 'simctl recordVideo exited 1: no such device (fix: rerun with --no-video)'],
+      ]);
+      assert.equal(tries, 1);
+      assert.deepEqual(record.videos, []);
+      assert.deepEqual(r.videoLines(), []);
+    });
   });
 
   it('drives each group on one application, in one e2e invocation each, and records what it did', async () => {

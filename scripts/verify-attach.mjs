@@ -22,7 +22,7 @@ const LIMITS = {
 const ARTIFACT = 'verify-evidence';
 const MANIFEST_FILE = 'manifest.json';
 const SESSION_WORKFLOW = '.github/workflows/verify-remote.yml';
-const MANIFEST_VERSION = 1;
+const MANIFEST_VERSION = 2;
 
 const SHAPE = {
   run: /^r\d{8}-\d{6}-[0-9a-f]{4}$/,
@@ -35,7 +35,8 @@ const SHAPE = {
   actor: /^[A-Za-z0-9][A-Za-z0-9_-]{0,99}(\[bot\])?$/,
 };
 
-const MANIFEST_KEYS = ['v', 'pr', 'run', 'platform', 'device', 'commit', 'passed', 'flaky', 'total', 'files'];
+const MANIFEST_KEYS = ['v', 'pr', 'run', 'platform', 'device', 'commit', 'passed', 'flaky', 'total', 'files', 'before'];
+const BEFORE_KEYS = ['run', 'commit', 'passed', 'flaky', 'total', 'files'];
 const FILE_KEYS = ['name', 'bytes', 'sha256'];
 
 class Refused extends Error {}
@@ -46,6 +47,8 @@ function refuse(message) {
 }
 
 const isVideo = name => name.endsWith('.mp4');
+
+const everyFile = manifest => [...manifest.files, ...(manifest.before?.files ?? [])];
 
 function sessionRunMismatch(run, repo) {
   if (run.event !== 'workflow_dispatch') {
@@ -200,11 +203,15 @@ function readEntry(zip, entry, directoryAt) {
   return data;
 }
 
-function record(value, keys, what) {
+function anObject(value, what) {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     refuse(`${what} is not an object`);
   }
-  const own = Object.keys(value);
+  return value;
+}
+
+function record(value, keys, what) {
+  const own = Object.keys(anObject(value, what));
   if (own.length !== keys.length || own.some(key => !keys.includes(key))) {
     refuse(`${what} must have exactly the keys ${keys.join(', ')}`);
   }
@@ -225,6 +232,50 @@ function shaped(value, pattern, what) {
   return value;
 }
 
+function parseFiles(list, what) {
+  if (!Array.isArray(list) || list.length < 1 || list.length > LIMITS.files) {
+    refuse(`${what} must be a list of 1 to ${LIMITS.files}`);
+  }
+  const files = list.map((entry, i) => {
+    const file = record(entry, FILE_KEYS, `file ${i + 1}`);
+    const name = shaped(file.name, SHAPE.fileName, `the name of file ${i + 1}`);
+    return {
+      name,
+      bytes: whole(file.bytes, 1, isVideo(name) ? LIMITS.videoBytes : LIMITS.imageBytes, `the size of file ${i + 1}`),
+      sha256: shaped(file.sha256, SHAPE.sha256, `the sha256 of file ${i + 1}`),
+    };
+  });
+  if (files.filter(file => isVideo(file.name)).length > LIMITS.videos) {
+    refuse(`at most ${LIMITS.videos} video`);
+  }
+  return files;
+}
+
+function parseBefore(value, run, files) {
+  const raw = record(value, BEFORE_KEYS, 'before');
+  const before = {
+    run: shaped(raw.run, SHAPE.run, 'the run of before'),
+    commit: shaped(raw.commit, SHAPE.commit, 'the commit of before'),
+    passed: whole(raw.passed, 0, LIMITS.tests, 'passed of before'),
+    flaky: whole(raw.flaky, 0, LIMITS.tests, 'flaky of before'),
+    total: whole(raw.total, 1, LIMITS.tests, 'total of before'),
+    files: parseFiles(raw.files, 'the files of before'),
+  };
+  if (before.run === run) {
+    refuse('before is the run itself');
+  }
+  if (before.passed + before.flaky > before.total) {
+    refuse('passed and flaky of before must count at most total');
+  }
+  if (
+    before.files.length !== files.length ||
+    before.files.some((file, i) => isVideo(file.name) !== isVideo(files[i].name))
+  ) {
+    refuse('before must have one file for each file, of the same kind');
+  }
+  return before;
+}
+
 function parseManifest(text) {
   if (Buffer.byteLength(text) > LIMITS.manifestBytes) {
     refuse(`the manifest is over ${LIMITS.manifestBytes} bytes`);
@@ -235,32 +286,25 @@ function parseManifest(text) {
   } catch {
     return refuse('the manifest is not JSON');
   }
-  const raw = record(parsed, MANIFEST_KEYS, 'the manifest');
-  if (raw.v !== MANIFEST_VERSION) {
-    refuse(`the manifest is not version ${MANIFEST_VERSION}`);
+  const { v } = anObject(parsed, 'the manifest');
+  if (v !== MANIFEST_VERSION) {
+    const found = Number.isInteger(v) && v >= 0 && v <= 999 ? `version ${v}` : 'of no version this script knows';
+    refuse(`the manifest is ${found}, and this script publishes only version ${MANIFEST_VERSION}`);
   }
+  const raw = record(parsed, MANIFEST_KEYS, 'the manifest');
   if (raw.platform !== 'ios' && raw.platform !== 'android') {
     refuse('platform must be ios or android');
   }
-  if (!Array.isArray(raw.files) || raw.files.length < 1 || raw.files.length > LIMITS.files) {
-    refuse(`files must be a list of 1 to ${LIMITS.files}`);
+  const files = parseFiles(raw.files, 'files');
+  const before = raw.before === null ? null : parseBefore(raw.before, raw.run, files);
+  const all = everyFile({ files, before });
+  if (all.length > LIMITS.files) {
+    refuse(`at most ${LIMITS.files} files in all`);
   }
-  const files = raw.files.map((entry, i) => {
-    const file = record(entry, FILE_KEYS, `file ${i + 1}`);
-    const name = shaped(file.name, SHAPE.fileName, `the name of file ${i + 1}`);
-    return {
-      name,
-      bytes: whole(file.bytes, 1, isVideo(name) ? LIMITS.videoBytes : LIMITS.imageBytes, `the size of file ${i + 1}`),
-      sha256: shaped(file.sha256, SHAPE.sha256, `the sha256 of file ${i + 1}`),
-    };
-  });
-  if (new Set(files.map(file => file.name.toLowerCase())).size !== files.length) {
+  if (new Set(all.map(file => file.name.toLowerCase())).size !== all.length) {
     refuse('two files have the same name');
   }
-  if (files.filter(file => isVideo(file.name)).length > LIMITS.videos) {
-    refuse(`at most ${LIMITS.videos} video`);
-  }
-  if (files.reduce((sum, file) => sum + file.bytes, 0) > LIMITS.totalBytes) {
+  if (all.reduce((sum, file) => sum + file.bytes, 0) > LIMITS.totalBytes) {
     refuse(`the files are over ${LIMITS.totalBytes} bytes in all`);
   }
   const manifest = {
@@ -274,6 +318,7 @@ function parseManifest(text) {
     flaky: whole(raw.flaky, 0, LIMITS.tests, 'flaky'),
     total: whole(raw.total, 1, LIMITS.tests, 'total'),
     files,
+    before,
   };
   if (manifest.passed + manifest.flaky < 1 || manifest.passed + manifest.flaky > manifest.total) {
     refuse('passed and flaky must count at least one test and at most total');
@@ -301,10 +346,10 @@ function validateBundle(zip) {
     refuse(`the archive has no ${MANIFEST_FILE}`);
   }
   const manifest = parseManifest(readEntry(zip, manifestEntry, directoryAt).toString('utf8'));
-  if (entries.length !== manifest.files.length + 1) {
+  if (entries.length !== everyFile(manifest).length + 1) {
     refuse('the archive and its manifest name different files');
   }
-  const files = manifest.files.map((file, i) => {
+  const files = everyFile(manifest).map((file, i) => {
     const entry = entries.find(candidate => candidate.name === file.name);
     if (entry === undefined) {
       return refuse('the archive and its manifest name different files');
@@ -352,26 +397,85 @@ const evidenceMarkers = platform => ({
   end: `<!-- /verify-evidence:${platform} -->`,
 });
 
-const BLOCK_LINE_START = 'verify run `';
+const BLOCK_LINE_START = '**Verified on ';
+const A_BLOCK_STARTS = /^(\*\*Verified on |verify run `)/;
+const WHERE = { ios: 'an iOS simulator', android: 'an Android emulator' };
 const NEWER_COMMITS = 'The pull request has newer commits.';
+const UPLOADED = /https:\/\/github\.com\/user-attachments\/assets\/[0-9a-f-]{36}/g;
+const IMAGE_WIDTH = 280;
+const ACROSS = 2;
+const CENTERED = ':---:';
 
 const sessionRunUrl = (repo, runId) => `https://github.com/${repo}/actions/runs/${runId}`;
+const commitUrl = (repo, commit) => `https://github.com/${repo}/commit/${commit}`;
 
-function evidenceBlock(manifest, session, onDisk = file => file.name) {
+const stem = name => name.replace(/\.[a-z0-9]+$/, '');
+const counted = run =>
+  `${run.passed} of ${run.total} passed${run.flaky === 0 ? '' : `, ${run.flaky} flaky (passed only on a retry)`}`;
+const table = (header, rows) =>
+  [header, header.map(() => CENTERED), ...rows].map(cells => `| ${cells.join(' | ')} |`).join('\n');
+const inTables = block => block.includes(CENTERED);
+
+function mediaTables(files, hasBefore, uploaded) {
+  const shown = files.map((name, at) => {
+    const label = stem(name);
+    const cell = (url, alt) => (isVideo(name) ? url : `<img src="${url}" width="${IMAGE_WIDTH}" alt="${alt}">`);
+    return {
+      video: isVideo(name),
+      label,
+      after: cell(uploaded[at], hasBefore ? `After: ${label}` : label),
+      before: hasBefore ? cell(uploaded[files.length + at], `Before: ${label}`) : '',
+    };
+  });
+  return [false, true].flatMap(video => {
+    const some = shown.filter(item => item.video === video);
+    if (some.length === 0) {
+      return [];
+    }
+    if (hasBefore) {
+      return [
+        table(
+          ['Before', 'After'],
+          some.map(item => [item.before, item.after]),
+        ),
+      ];
+    }
+    const rows = Array.from({ length: Math.ceil(some.length / ACROSS) }, (_, row) =>
+      some.slice(row * ACROSS, (row + 1) * ACROSS),
+    );
+    return rows.map(row =>
+      table(
+        row.map(item => `\`${item.label}\``),
+        [row.map(item => item.after)],
+      ),
+    );
+  });
+}
+
+// `gh pr edit --attach` rewrites only a markdown reference to a file, so the files go up as a list first, and the tables are written from the addresses GitHub gave them.
+function evidenceBlock(manifest, session, onDisk = file => file.name, uploaded = null) {
   const { start, end } = evidenceMarkers(manifest.platform);
-  const flaky = manifest.flaky === 0 ? '' : `, ${manifest.flaky} flaky (passed only on a retry),`;
+  const { before } = manifest;
+  const was =
+    before === null
+      ? ''
+      : ` The session reports the before as run \`${before.run}\` at [\`${before.commit.slice(0, 12)}\`](${commitUrl(session.repo, before.commit)}), ${counted(before)}.`;
   const since = session.pullHead === manifest.commit ? '' : ` ${NEWER_COMMITS}`;
-  const line = `${BLOCK_LINE_START}${manifest.run}\`, as reported by [the session](${sessionRunUrl(session.repo, session.runId)}) that \`${session.actor}\` started: ${manifest.passed} of ${manifest.total} passed${flaky} on \`${manifest.device}\` at \`${manifest.commit.slice(0, 12)}\`.${since}`;
-  const media = manifest.files.flatMap(file => [
-    '',
-    `![${isVideo(file.name) ? file.name : file.name.replace(/\.[a-z0-9]+$/, '')}](./${onDisk(file)})`,
-  ]);
-  return [start, '', line, ...media, '', end].join('\n');
+  const line = `${BLOCK_LINE_START}${WHERE[manifest.platform]}**, as reported by [the session](${sessionRunUrl(session.repo, session.runId)}) that \`${session.actor}\` started. Run \`${manifest.run}\` on \`${manifest.device}\` at \`${manifest.commit.slice(0, 12)}\`, ${counted(manifest)}.${was}${since}`;
+  const media =
+    uploaded === null
+      ? everyFile(manifest).map(file => `![${isVideo(file.name) ? file.name : stem(file.name)}](./${onDisk(file)})`)
+      : mediaTables(
+          manifest.files.map(file => file.name),
+          before !== null,
+          uploaded,
+        );
+  return [start, '', line, ...media.flatMap(part => ['', part]), '', end].join('\n');
 }
 
 function withNewerCommitsNote(old, { start, end }) {
   const lines = old.replaceAll('\r\n', '\n').split('\n');
-  const at = lines.findIndex(line => line.trimStart().startsWith(BLOCK_LINE_START));
+  const at = lines.findIndex(line => A_BLOCK_STARTS.test(line.trimStart()));
   lines[at] = `${lines[at].trimEnd()} ${NEWER_COMMITS}`;
   return `${start}${lines.join('\n')}${end}`;
 }
@@ -441,7 +545,7 @@ function withEvidenceBlock(body, platform, lines) {
     return { ok: false, why: 'has the end marker before the start marker' };
   }
   const old = body.slice(starts[0] + start.length, ends[0]);
-  if (!old.trimStart().startsWith(BLOCK_LINE_START)) {
+  if (!A_BLOCK_STARTS.test(old.trimStart())) {
     return { ok: false, why: 'has text between the markers that is not an evidence block' };
   }
   return {
@@ -462,13 +566,15 @@ function settings(env) {
   return { repo, runId, work, filesDir: path.join(work, 'files'), manifestFile: path.join(work, MANIFEST_FILE) };
 }
 
+const apiHeaders = token => ({
+  Accept: 'application/vnd.github+json',
+  'X-GitHub-Api-Version': '2022-11-28',
+  'User-Agent': 'verify-attach',
+  Authorization: `Bearer ${token}`,
+});
+
 async function downloadArtifact({ fetch, api, token, repo, runId }) {
-  const headers = {
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'verify-attach',
-    Authorization: `Bearer ${token}`,
-  };
+  const headers = apiHeaders(token);
   const listed = await fetch(`${api}/repos/${repo}/actions/runs/${runId}/artifacts?name=${ARTIFACT}&per_page=100`, {
     headers,
   });
@@ -501,6 +607,24 @@ async function downloadArtifact({ fetch, api, token, repo, runId }) {
   return Buffer.concat(chunks);
 }
 
+async function assertBeforeCommitInHistory({ fetch, api, token, repo }, { before, commit }) {
+  const compared = await fetch(`${api}/repos/${repo}/compare/${before.commit}...${commit}?per_page=1`, {
+    headers: apiHeaders(token),
+  });
+  if (compared.status === 404) {
+    refuse('the commit of before, or the commit of the run, is not a commit of this repository');
+  }
+  if (compared.status !== 200) {
+    throw new Failed(
+      `GitHub answered ${compared.status} to the comparison of the commit of before with the commit of the run`,
+    );
+  }
+  const status = (await compared.json())?.status;
+  if (status !== 'ahead' && status !== 'identical') {
+    refuse('the commit of before is not the commit of the run or a commit before it in its history');
+  }
+}
+
 async function fetchStep({ env, say, fetch, zipFile }) {
   const { repo, runId, work, filesDir, manifestFile } = settings(env);
   const mismatch = sessionRunMismatch({ event: env.RUN_EVENT, path: env.RUN_PATH, headRepo: env.RUN_HEAD_REPO }, repo);
@@ -511,21 +635,21 @@ async function fetchStep({ env, say, fetch, zipFile }) {
     );
     return false;
   }
-  const zip =
-    zipFile !== undefined
-      ? fs.readFileSync(zipFile)
-      : await downloadArtifact({
-          fetch,
-          api: (env.GITHUB_API_URL ?? 'https://api.github.com').replace(/\/$/, ''),
-          token: env.GITHUB_TOKEN ?? '',
-          repo,
-          runId,
-        });
+  const github = {
+    fetch,
+    api: (env.GITHUB_API_URL ?? 'https://api.github.com').replace(/\/$/, ''),
+    token: env.GITHUB_TOKEN ?? '',
+    repo,
+  };
+  const zip = zipFile !== undefined ? fs.readFileSync(zipFile) : await downloadArtifact({ ...github, runId });
   if (zip === null) {
     say('notice', `Run ${runId} handed off no evidence.`);
     return false;
   }
   const { manifest, files } = validateBundle(zip);
+  if (manifest.before !== null) {
+    await assertBeforeCommitInHistory(github, manifest);
+  }
   if (fs.existsSync(work) && fs.readdirSync(work).length > 0) {
     throw new Failed('WORK must be a new or empty directory');
   }
@@ -589,9 +713,10 @@ function publishStep({ env, say, gh = realGh, dryRun = false, pullFile, commitsF
     refuse('HEAD_BRANCH is missing');
   }
   const manifest = parseManifest(fs.readFileSync(manifestFile, 'utf8'));
+  const files = everyFile(manifest);
   const prefix = `evidence-${nonce()}`;
-  const onDisk = file => `${prefix}-${manifest.files.indexOf(file) + 1}${path.extname(file.name)}`;
-  for (const file of manifest.files) {
+  const onDisk = file => `${prefix}-${files.indexOf(file) + 1}${path.extname(file.name)}`;
+  for (const file of files) {
     const stat = fs.lstatSync(path.join(filesDir, file.name));
     if (!stat.isFile() || stat.size !== file.bytes) {
       refuse('a file is not the one the first step wrote');
@@ -680,7 +805,7 @@ function publishStep({ env, say, gh = realGh, dryRun = false, pullFile, commitsF
     }
     const held =
       edit.old !== null &&
-      !edit.old.includes('](./') &&
+      inTables(edit.old) &&
       edit.old.includes(`\`${manifest.run}\``) &&
       edit.old.includes(`(${sessionRunUrl(repo, runId)})`);
     const lacksTheNote = held && head !== manifest.commit && !edit.old.includes(NEWER_COMMITS);
@@ -697,7 +822,7 @@ function publishStep({ env, say, gh = realGh, dryRun = false, pullFile, commitsF
           ).body,
           files: [],
         }
-      : { body: edit.body, files: manifest.files };
+      : { body: edit.body, files };
     pull = readPull();
     const movedSince = pullRequestMismatch(pull, session);
     if (movedSince !== null) {
@@ -715,16 +840,8 @@ function publishStep({ env, say, gh = realGh, dryRun = false, pullFile, commitsF
 
   const bodyFile = path.join(work, 'body.md');
   fs.writeFileSync(bodyFile, next.body, { mode: 0o600 });
-  const args = [
-    'pr',
-    'edit',
-    String(manifest.pr),
-    '--repo',
-    repo,
-    '--body-file',
-    bodyFile,
-    ...next.files.flatMap(file => ['--attach', `./${onDisk(file)}`]),
-  ];
+  const editBody = ['pr', 'edit', String(manifest.pr), '--repo', repo, '--body-file', bodyFile];
+  const args = [...editBody, ...next.files.flatMap(file => ['--attach', `./${onDisk(file)}`])];
   if (dryRun) {
     say('plain', `would run, in ${filesDir}:\ngh ${args.map(quoted).join(' ')}`);
     return 'dry run';
@@ -740,9 +857,28 @@ function publishStep({ env, say, gh = realGh, dryRun = false, pullFile, commitsF
     );
     return 'noted';
   }
+  pull = readPull();
+  const listed = withEvidenceBlock(bodyOf(pull), manifest.platform, '');
+  const list = (listed.ok && listed.old) || '';
+  const uploaded = list.includes(`\`${manifest.run}\``) ? (list.match(UPLOADED) ?? []) : [];
+  if (pullRequestMismatch(pull, session) !== null || uploaded.length !== files.length) {
+    say(
+      'notice',
+      `Put verify run ${manifest.run} in the description of pull request #${manifest.pr} as a list of ${files.length} files. The pull request changed before they could be laid out. A rerun of this job uploads them again and lays them out.`,
+    );
+    return 'listed';
+  }
+  const laidOut = evidenceBlock(manifest, { repo, runId, actor, pullHead: pull.head.sha }, onDisk, uploaded);
+  fs.writeFileSync(bodyFile, withEvidenceBlock(bodyOf(pull), manifest.platform, laidOut).body, { mode: 0o600 });
+  const arranged = gh(editBody, { cwd: filesDir });
+  if (arranged.status !== 0) {
+    throw new Failed(
+      `gh pr edit failed to lay out the files in pull request #${manifest.pr}\n${printable(arranged.stderr)}`,
+    );
+  }
   say(
     'notice',
-    `Put verify run ${manifest.run} in the description of pull request #${manifest.pr}: ${manifest.files.length} files.`,
+    `Put verify run ${manifest.run} in the description of pull request #${manifest.pr}: ${files.length} files.`,
   );
   return 'published';
 }

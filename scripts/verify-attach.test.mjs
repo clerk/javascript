@@ -37,7 +37,7 @@ const JPG = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.from('t
 const MP4 = Buffer.concat([Buffer.from([0, 0, 0, 0x18]), Buffer.from('ftypmp42'), Buffer.alloc(4096, 'v')]);
 
 const manifestFor = (files, change = {}) => ({
-  v: 1,
+  v: 2,
   pr: 669,
   run: 'r20261008-052713-253e',
   platform: 'ios',
@@ -47,6 +47,7 @@ const manifestFor = (files, change = {}) => ({
   flaky: 0,
   total: 3,
   files: files.map(([name, data]) => ({ name, bytes: data.length, sha256: sha256(data) })),
+  before: null,
   ...change,
 });
 
@@ -135,6 +136,24 @@ const refusal = attempt => {
   }
   return null;
 };
+
+const BEFORE_COMMIT = '5e126375065188df5bec4e4e75d61db03834f395';
+const WAS_MP4 = Buffer.concat([MP4, Buffer.from('before')]);
+const WAS_PNG = Buffer.concat([PNG, Buffer.from('before')]);
+const WAS_MEDIA = [
+  ['before-video.mp4', WAS_MP4],
+  ['before-profile.png', WAS_PNG],
+];
+const beforeFor = (files, change = {}) => ({
+  run: 'r20261008-051500-0a1b',
+  commit: BEFORE_COMMIT,
+  passed: 0,
+  flaky: 0,
+  total: 3,
+  files: files.map(([name, data]) => ({ name, bytes: data.length, sha256: sha256(data) })),
+  ...change,
+});
+const WITH_BEFORE = manifestFor(MEDIA, { before: beforeFor(WAS_MEDIA) });
 
 describe('the archive of a session', () => {
   it('accepts a manifest with the files it names, deflated or stored, and returns their bytes', () => {
@@ -339,6 +358,38 @@ describe('the archive of a session', () => {
     );
   });
 
+  it('accepts the files of a before run beside the files of the run, and holds them to the same checks', () => {
+    const accepted = validateBundle(bundle(WITH_BEFORE, [...MEDIA, ...WAS_MEDIA]));
+    assert.deepEqual(accepted.manifest, WITH_BEFORE);
+    assert.deepEqual(
+      accepted.files,
+      [...MEDIA, ...WAS_MEDIA].map(([name, data]) => ({ name, data })),
+    );
+    assert.match(
+      refusal(() => validateBundle(bundle(WITH_BEFORE, MEDIA))),
+      /name different files/,
+    );
+    assert.match(
+      refusal(() => validateBundle(bundle(WITH_BEFORE, [...MEDIA, WAS_MEDIA[0], ['before-profile.png', PNG]]))),
+      /file 4 is not the size its manifest declares/,
+    );
+    const sameSize = Buffer.concat([PNG, Buffer.from('BEFORE')]);
+    assert.match(
+      refusal(() => validateBundle(bundle(WITH_BEFORE, [...MEDIA, WAS_MEDIA[0], ['before-profile.png', sameSize]]))),
+      /file 4 does not have the sha256 its manifest declares/,
+    );
+    const notAnImage = [
+      ['before-video.mp4', WAS_MP4],
+      ['before-profile.png', Buffer.from('<svg onload=alert(1)>')],
+    ];
+    assert.match(
+      refusal(() =>
+        validateBundle(bundle(manifestFor(MEDIA, { before: beforeFor(notAnImage) }), [...MEDIA, ...notAnImage])),
+      ),
+      /file 4 does not start with the bytes of its type/,
+    );
+  });
+
   it('refuses an archive with no manifest, with a file the manifest does not name, and without a file it does name', () => {
     assert.match(
       refusal(() => validateBundle(zip([{ name: 'video.mp4', data: MP4 }]))),
@@ -439,7 +490,6 @@ describe('the manifest', () => {
   const refused = [
     ['text that is not JSON', () => parseManifest('{')],
     ['a list', () => parseManifest('[]')],
-    ['another version', () => parse({ v: 2 })],
     ['a key the schema does not have', () => parse({ note: 'free text for the description' })],
     ['a missing key', () => parseManifest(JSON.stringify({ ...GOOD, device: undefined }))],
     ['a run id of another shape', () => parse({ run: 'r20261008-052713-253e`; rm -rf /' })],
@@ -502,6 +552,164 @@ describe('the manifest', () => {
       assert.throws(attempt, Refused);
     });
   }
+
+  it('refuses a manifest of another version before it reads anything else of it, and names both versions', () => {
+    const { before: _, ...versionOne } = { ...GOOD, v: 1 };
+    assert.equal(
+      refusal(() => parseManifest(JSON.stringify(versionOne))),
+      'the manifest is version 1, and this script publishes only version 2',
+    );
+    assert.equal(
+      refusal(() => parseManifest(JSON.stringify({ ...GOOD, v: 3, layout: 'a key of a later version' }))),
+      'the manifest is version 3, and this script publishes only version 2',
+    );
+    for (const v of ['2', 2.5, -1, 1000, null, '<img src=x>\n::error::pwned']) {
+      assert.equal(
+        refusal(() => parse({ v })),
+        'the manifest is of no version this script knows, and this script publishes only version 2',
+        JSON.stringify(v),
+      );
+    }
+    assert.equal(
+      refusal(() => parseManifest(JSON.stringify({ device: 'x' }))),
+      'the manifest is of no version this script knows, and this script publishes only version 2',
+    );
+  });
+
+  it('accepts a before run, which may have passed nothing, with one file of the same kind for each file of the run', () => {
+    assert.deepEqual(parseManifest(JSON.stringify(WITH_BEFORE)), WITH_BEFORE);
+  });
+
+  const before = change => parse({ before: { ...WITH_BEFORE.before, ...change } });
+  const [wasVideo, wasShot] = WITH_BEFORE.before.files;
+  const refusedBefore = [
+    [
+      'a manifest with no before key',
+      () => parseManifest(JSON.stringify({ ...GOOD, before: undefined })),
+      /the manifest must have exactly the keys/,
+    ],
+    ['a before that is text', () => parse({ before: 'r20261008-051500-0a1b' }), /before is not an object/],
+    [
+      'a before with a key the schema does not have',
+      () => before({ note: '<img src=x>' }),
+      /before must have exactly the keys run, commit, passed, flaky, total, files/,
+    ],
+    [
+      'a before run id with markdown in it',
+      () => before({ run: 'r20261008-051500-0a1b` [x](http://evil) `' }),
+      /the run of before is missing or malformed/,
+    ],
+    ['a before that is the run itself', () => before({ run: GOOD.run }), /before is the run itself/],
+    ['a short before commit', () => before({ commit: 'abc1234' }), /the commit of before is missing or malformed/],
+    [
+      'a negative before count',
+      () => before({ passed: -1 }),
+      /passed of before must be a whole number from 0 to 10000/,
+    ],
+    [
+      'a before count past the cap',
+      () => before({ total: LIMITS.tests + 1 }),
+      /total of before must be a whole number from 1 to 10000/,
+    ],
+    [
+      'more passing before tests than tests',
+      () => before({ passed: 3, flaky: 1 }),
+      /passed and flaky of before must count at most total/,
+    ],
+    ['a before with no files', () => before({ files: [] }), /the files of before must be a list of 1 to 50/],
+    [
+      'a before with fewer files than the run',
+      () => before({ files: [wasVideo] }),
+      /before must have one file for each file, of the same kind/,
+    ],
+    [
+      'a before screenshot where the run has a video',
+      () => before({ files: [wasShot, wasVideo] }),
+      /before must have one file for each file, of the same kind/,
+    ],
+    [
+      'a before file named as a file of the run is',
+      () => before({ files: [wasVideo, { ...wasShot, name: 'PROFILE.png' }] }),
+      /two files have the same name/,
+    ],
+    [
+      'a before file with a path in its name',
+      () => before({ files: [wasVideo, { ...wasShot, name: '../before-profile.png' }] }),
+      /the name of file 2 is missing or malformed/,
+    ],
+    [
+      'a before file of another type',
+      () => before({ files: [wasVideo, { ...wasShot, name: 'before-profile.svg' }] }),
+      /the name of file 2 is missing or malformed/,
+    ],
+    [
+      'a before image over its cap',
+      () => before({ files: [wasVideo, { ...wasShot, bytes: LIMITS.imageBytes + 1 }] }),
+      /the size of file 2 must be a whole number/,
+    ],
+    [
+      'a before file with a key the schema does not have',
+      () => before({ files: [wasVideo, { ...wasShot, path: '/etc/passwd' }] }),
+      /file 2 must have exactly the keys name, bytes, sha256/,
+    ],
+  ];
+  for (const [what, attempt, why] of refusedBefore) {
+    it(`refuses ${what}`, () => {
+      assert.throws(attempt, error => error instanceof Refused && why.test(error.message));
+    });
+  }
+
+  it('refuses a run id or a commit, of the run or of the before run, with any character of markup in any place', () => {
+    const MARKUP = ['|', '"', '<', '>', "'", '&', '`', '@', ':', ';', '$', '{', '}', '[', ']', '(', ')', '*', '_', '!'];
+    const OTHER = [' ', '\n', '\r', '\t', '\0', '\\', '/', '#', '.', 'é', 'G', 'R'];
+    const fields = [
+      ['run', GOOD.run, run => parse({ run })],
+      ['commit', GOOD.commit, commit => parse({ commit })],
+      ['the run of before', WITH_BEFORE.before.run, run => before({ run })],
+      ['the commit of before', WITH_BEFORE.before.commit, commit => before({ commit })],
+    ];
+    for (const [what, good, attempt] of fields) {
+      assert.equal(
+        refusal(() => attempt(good)),
+        null,
+        what,
+      );
+      for (const char of [...MARKUP, ...OTHER]) {
+        const hostile = [
+          ...Array.from(good, (_, at) => `${good.slice(0, at)}${char}${good.slice(at + 1)}`),
+          `${good}${char}`,
+          `${char}${good}`,
+          `${good}-->`,
+        ];
+        for (const value of hostile) {
+          assert.equal(
+            refusal(() => attempt(value)),
+            `${what} is missing or malformed`,
+            JSON.stringify(value),
+          );
+        }
+      }
+    }
+  });
+
+  it('counts the files of the before run toward the cap on files and the cap on bytes', () => {
+    const shots = (prefix, count, bytes = 1) =>
+      Array.from({ length: count }, (_, i) => ({ name: `${prefix}${i}.png`, bytes, sha256: sha256('x') }));
+    const paired = (count, bytes) =>
+      parse({
+        files: shots('s', count, bytes),
+        before: { ...WITH_BEFORE.before, files: shots('before-s', count, bytes) },
+      });
+    assert.equal(paired(LIMITS.files / 2).before.files.length, LIMITS.files / 2);
+    assert.throws(() => paired(LIMITS.files / 2 + 1), /at most 50 files in all/);
+    assert.throws(() => paired(8, LIMITS.imageBytes), /the files are over 157286400 bytes in all/);
+    const video = name => ({ name, bytes: LIMITS.videoBytes, sha256: sha256('x') });
+    assert.throws(
+      () =>
+        parse({ files: [video('video.mp4')], before: { ...WITH_BEFORE.before, files: [video('before-video.mp4')] } }),
+      /the files are over 157286400 bytes in all/,
+    );
+  });
 });
 
 describe('which runs and which pull request', () => {
@@ -557,26 +765,35 @@ describe('which runs and which pull request', () => {
 
 const SESSION = { repo: REPO, runId: '37731397352', actor: 'octocat', pullHead: COMMIT };
 const blockOf = (manifest, onDisk) => evidenceBlock(manifest, SESSION, onDisk);
-const LOCAL_BLOCK = [
-  '<!-- verify-evidence:ios -->',
-  '',
+const localBlock = line =>
+  [
+    '<!-- verify-evidence:ios -->',
+    '',
+    line,
+    '',
+    '| `profile` |',
+    '| :---: |',
+    '| <img src="https://github.com/user-attachments/assets/1" width="280" alt="profile"> |',
+    '',
+    '<!-- /verify-evidence:ios -->',
+  ].join('\n');
+const LOCAL_BLOCK = localBlock(
+  '**Verified on an iOS simulator.** Run `r20261007-010101-aaaa` on `iPhone 17 Pro` at `0f50b597b1c2`, 3 of 3 passed.',
+);
+const OLDER_BLOCK = localBlock(
   'verify run `r20261007-010101-aaaa` on `iPhone 17 Pro` at `0f50b597b1c2`, 3 of 3 passed.',
-  '',
-  '![video.mp4](https://github.com/user-attachments/assets/1)',
-  '',
-  '<!-- /verify-evidence:ios -->',
-].join('\n');
+);
 
 describe('the evidence block of a pull request description', () => {
   const block = blockOf(GOOD);
 
-  it('is one line that says the session reported the result, links its run and names who started it, then each file alone in its own paragraph, between the markers of its platform', () => {
+  it('is one line that leads with the result in bold, says in the same sentence that the session reported it, links its run and names who started it, then each file alone in its own paragraph, between the markers of its platform', () => {
     assert.equal(
       block,
       [
         '<!-- verify-evidence:ios -->',
         '',
-        'verify run `r20261008-052713-253e`, as reported by [the session](https://github.com/clerk/clerk-ios/actions/runs/37731397352) that `octocat` started: 3 of 3 passed on `iPhone Air on xcode-27` at `0f50b597b1c2`.',
+        '**Verified on an iOS simulator**, as reported by [the session](https://github.com/clerk/clerk-ios/actions/runs/37731397352) that `octocat` started. Run `r20261008-052713-253e` on `iPhone Air on xcode-27` at `0f50b597b1c2`, 3 of 3 passed.',
         '',
         '![video.mp4](./video.mp4)',
         '',
@@ -587,13 +804,30 @@ describe('the evidence block of a pull request description', () => {
     );
     assert.match(
       blockOf(manifestFor(MEDIA, { passed: 1, flaky: 1, total: 2 })),
-      / started: 1 of 2 passed, 1 flaky \(passed only on a retry\), on `iPhone Air on xcode-27` at `0f50b597b1c2`\.$/m,
+      / started\. Run `r20261008-052713-253e` on `iPhone Air on xcode-27` at `0f50b597b1c2`, 1 of 2 passed, 1 flaky \(passed only on a retry\)\.$/m,
+    );
+    assert.match(
+      blockOf(manifestFor(MEDIA, { platform: 'android' })),
+      /^\*\*Verified on an Android emulator\*\*, as reported by /m,
+    );
+  });
+
+  it('says that the before run is what the session reports, links its commit so a reader can open it, and says how that run went, ahead of the note about newer commits', () => {
+    const line = block => block.split('\n')[2];
+    assert.equal(
+      line(blockOf(WITH_BEFORE)),
+      '**Verified on an iOS simulator**, as reported by [the session](https://github.com/clerk/clerk-ios/actions/runs/37731397352) that `octocat` started. Run `r20261008-052713-253e` on `iPhone Air on xcode-27` at `0f50b597b1c2`, 3 of 3 passed. The session reports the before as run `r20261008-051500-0a1b` at [`5e1263750651`](https://github.com/clerk/clerk-ios/commit/5e126375065188df5bec4e4e75d61db03834f395), 0 of 3 passed.',
+    );
+    assert.ok(
+      line(evidenceBlock(WITH_BEFORE, { ...SESSION, repo: 'clerk/clerk-android', pullHead: 'b'.repeat(40) })).endsWith(
+        ' The session reports the before as run `r20261008-051500-0a1b` at [`5e1263750651`](https://github.com/clerk/clerk-android/commit/5e126375065188df5bec4e4e75d61db03834f395), 0 of 3 passed. The pull request has newer commits.',
+      ),
     );
   });
 
   it('says that the pull request has newer commits when its head is not the commit of the run', () => {
     const moved = evidenceBlock(GOOD, { ...SESSION, pullHead: 'b'.repeat(40) });
-    assert.match(moved, / at `0f50b597b1c2`\. The pull request has newer commits\.$/m);
+    assert.match(moved, / at `0f50b597b1c2`, 3 of 3 passed\. The pull request has newer commits\.$/m);
     assert.equal(block.includes('newer commits'), false);
   });
 
@@ -606,14 +840,15 @@ describe('the evidence block of a pull request description', () => {
     });
     assert.ok(
       elsewhere.includes(
-        '](https://github.com/clerk/clerk-android/actions/runs/41) that `someone-else` started: 3 of 3 passed',
+        '](https://github.com/clerk/clerk-android/actions/runs/41) that `someone-else` started. Run `r20261008-052713-253e`',
       ),
     );
     assert.equal(/actions\/runs|octocat|someone-else/.test(JSON.stringify(GOOD)), false);
   });
 
-  it('replaces the block that attach writes from a machine whose gh can attach', () => {
+  it('replaces the block that attach writes from a machine whose gh can attach, in the layout of this version or of the one before it', () => {
     assert.equal(withEvidenceBlock(`intro\n\n${LOCAL_BLOCK}\n`, 'ios', block).body, `intro\n\n${block}\n`);
+    assert.equal(withEvidenceBlock(`intro\n\n${OLDER_BLOCK}\n`, 'ios', block).body, `intro\n\n${block}\n`);
   });
 
   it('goes after a description that has no block, and leaves that description as it was', () => {
@@ -783,6 +1018,7 @@ const ENV = {
   HEAD_SHA: COMMIT,
   RUN_ACTOR: 'octocat',
 };
+const beforeIsInTheHistory = () => Promise.resolve(Response.json({ status: 'ahead' }));
 
 describe('the step that fetches the evidence', () => {
   const artifact = (id, change = {}) => ({
@@ -860,9 +1096,59 @@ describe('the step that fetches the evidence', () => {
     assert.deepEqual(fs.readdirSync(work).sort(), ['files', 'manifest.json']);
     assert.deepEqual(fs.readdirSync(path.join(work, 'files')).sort(), ['profile.png', 'video.mp4']);
     assert.deepEqual(fs.readFileSync(path.join(work, 'files', 'video.mp4')), MP4);
+    const withBefore = workDir();
+    fs.writeFileSync(zipFile, bundle(WITH_BEFORE, [...MEDIA, ...WAS_MEDIA]));
+    await fetchStep({ env: { ...ENV, WORK: withBefore }, say: () => undefined, fetch: beforeIsInTheHistory, zipFile });
+    assert.deepEqual(fs.readdirSync(path.join(withBefore, 'files')).sort(), [
+      'before-profile.png',
+      'before-video.mp4',
+      'profile.png',
+      'video.mp4',
+    ]);
+    assert.deepEqual(fs.readFileSync(path.join(withBefore, 'files', 'before-profile.png')), WAS_PNG);
     assert.deepEqual(said, [
       'notice: Run 37731397352 handed off the evidence of verify run r20261008-052713-253e for pull request #669: 2 files.',
     ]);
+  });
+
+  it('takes a before run only when GitHub says its commit is the commit of the run or one before it in its history', async () => {
+    const zipFile = path.join(path.dirname(workDir()), 'evidence.zip');
+    const attempt = async (answer, media = [...MEDIA, ...WAS_MEDIA], manifest = WITH_BEFORE) => {
+      fs.writeFileSync(zipFile, bundle(manifest, media));
+      const work = workDir();
+      const asked = [];
+      const fetch = (url, init) => {
+        asked.push(`${init.headers.Authorization} ${url}`);
+        return Promise.resolve(answer());
+      };
+      const env = { ...ENV, WORK: work, GITHUB_TOKEN: 'actions-token', GITHUB_API_URL: 'https://api.github.test/' };
+      const outcome = await fetchStep({ env, say: () => undefined, fetch, zipFile }).then(
+        found => `found ${found}`,
+        error => `${error instanceof Refused ? 'refused' : 'failed'}: ${error.message}`,
+      );
+      return { outcome, asked, wrote: fs.existsSync(work) };
+    };
+    const compared = status => () => Response.json({ status });
+    const comparison =
+      'Bearer actions-token https://api.github.test/repos/clerk/clerk-ios/compare/5e126375065188df5bec4e4e75d61db03834f395...0f50b597b1c2d3e4f5a60718293a4b5c6d7e8f90?per_page=1';
+
+    assert.deepEqual(await attempt(compared('ahead')), { outcome: 'found true', asked: [comparison], wrote: true });
+    assert.deepEqual(await attempt(compared('identical')), { outcome: 'found true', asked: [comparison], wrote: true });
+    const outside = 'refused: the commit of before is not the commit of the run or a commit before it in its history';
+    for (const answer of [compared('behind'), compared('diverged'), compared(undefined), () => Response.json(null)]) {
+      assert.deepEqual(await attempt(answer), { outcome: outside, asked: [comparison], wrote: false });
+    }
+    assert.deepEqual(await attempt(() => Response.json({ message: 'Not Found' }, { status: 404 })), {
+      outcome: 'refused: the commit of before, or the commit of the run, is not a commit of this repository',
+      asked: [comparison],
+      wrote: false,
+    });
+    assert.deepEqual(await attempt(() => Response.json({ status: 'ahead' }, { status: 502 })), {
+      outcome: 'failed: GitHub answered 502 to the comparison of the commit of before with the commit of the run',
+      asked: [comparison],
+      wrote: false,
+    });
+    assert.deepEqual(await attempt(compared('behind'), MEDIA, GOOD), { outcome: 'found true', asked: [], wrote: true });
   });
 
   it('writes only into a directory that is new or empty', async () => {
@@ -920,12 +1206,22 @@ describe('the step that edits the description', () => {
     const work = workDir();
     const zipFile = path.join(path.dirname(work), 'evidence.zip');
     fs.writeFileSync(zipFile, bundle(manifest, media));
-    await fetchStep({ env: { ...ENV, WORK: work }, say: () => undefined, zipFile });
+    await fetchStep({ env: { ...ENV, WORK: work }, say: () => undefined, fetch: beforeIsInTheHistory, zipFile });
     return { ...ENV, WORK: work };
   }
 
+  const asset = n =>
+    `https://github.com/user-attachments/assets/00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+
   function fakeGh(pull = PULL, onRead = () => undefined, commits = COMMITS) {
-    const state = { pull: structuredClone(pull), reads: 0, calls: [], writtenBody: null };
+    const state = {
+      pull: structuredClone(pull),
+      reads: 0,
+      calls: [],
+      writtenBody: null,
+      laidOutBody: null,
+      uploads: 0,
+    };
     const gh = (args, options) => {
       state.calls.push({ args, cwd: options.cwd });
       const page = /\/commits\?per_page=100&page=(\d+)$/.exec(args[1] ?? '');
@@ -940,7 +1236,12 @@ describe('the step that edits the description', () => {
         fs.writeFileSync(options.stdoutFile, JSON.stringify(state.pull));
         return { status: 0, stderr: '' };
       }
-      state.writtenBody = fs.readFileSync(args[args.indexOf('--body-file') + 1], 'utf8');
+      const body = fs.readFileSync(args[args.indexOf('--body-file') + 1], 'utf8');
+      state[state.writtenBody === null ? 'writtenBody' : 'laidOutBody'] = body;
+      state.pull.body = body.replace(/!\[([^\]]*)\]\(\.\/([^)]+)\)/g, (_, alt, file) => {
+        state.uploads += 1;
+        return file.endsWith('.mp4') ? asset(state.uploads) : `![${alt}](${asset(state.uploads)})`;
+      });
       return { status: 0, stderr: '' };
     };
     return { gh, state };
@@ -960,6 +1261,22 @@ describe('the step that edits the description', () => {
   const onDisk = manifest => file => `evidence-n0nce-${manifest.files.indexOf(file) + 1}${path.extname(file.name)}`;
   const PLACED = blockOf(GOOD, onDisk(GOOD));
   const COMMITS = [{ sha: 'a'.repeat(40) }, { sha: COMMIT }];
+  const SAID =
+    '**Verified on an iOS simulator**, as reported by [the session](https://github.com/clerk/clerk-ios/actions/runs/37731397352) that `octocat` started. Run `r20261008-052713-253e` on `iPhone Air on xcode-27` at `0f50b597b1c2`, 3 of 3 passed.';
+  const WAS =
+    ' The session reports the before as run `r20261008-051500-0a1b` at [`5e1263750651`](https://github.com/clerk/clerk-ios/commit/5e126375065188df5bec4e4e75d61db03834f395), 0 of 3 passed.';
+  const laidOut = (...lines) =>
+    ['<!-- verify-evidence:ios -->', '', ...lines, '', '<!-- /verify-evidence:ios -->'].join('\n');
+  const AFTER_ONLY = [
+    '',
+    '| `profile` |',
+    '| :---: |',
+    `| <img src="${asset(2)}" width="280" alt="profile"> |`,
+    '',
+    '| `video` |',
+    '| :---: |',
+    `| ${asset(1)} |`,
+  ];
 
   it('adds the block after the description and attaches the files from their own directory, under names the description could not have guessed', async () => {
     const env = await fetched();
@@ -971,6 +1288,8 @@ describe('the step that edits the description', () => {
       [
         'api repos/clerk/clerk-ios/pulls/669',
         'api repos/clerk/clerk-ios/pulls/669/commits?per_page=100&page=1',
+        'api repos/clerk/clerk-ios/pulls/669',
+        'pr edit',
         'api repos/clerk/clerk-ios/pulls/669',
         'pr edit',
       ],
@@ -995,6 +1314,9 @@ describe('the step that edits the description', () => {
     assert.ok(
       PLACED.includes('![video.mp4](./evidence-n0nce-1.mp4)') && PLACED.includes('![profile](./evidence-n0nce-2.png)'),
     );
+    assert.deepEqual(fake.state.calls[5].args, edit.args.slice(0, 7));
+    assert.equal(fake.state.calls[5].cwd, edit.cwd);
+    assert.equal(fake.state.laidOutBody, `${PULL.body}\r\n${laidOut(SAID, ...AFTER_ONLY).replaceAll('\n', '\r\n')}`);
     assert.deepEqual(said, [
       'notice: Put verify run r20261008-052713-253e in the description of pull request #669: 2 files.',
     ]);
@@ -1006,6 +1328,10 @@ describe('the step that edits the description', () => {
     const fake = fakeGh({ ...PULL, body: `intro\r\n\r\n${earlier}\r\n\r\noutro` });
     assert.equal(publish(env, fake).outcome, 'published');
     assert.equal(fake.state.writtenBody, `intro\r\n\r\n${PLACED.replaceAll('\n', '\r\n')}\r\n\r\noutro`);
+    assert.equal(
+      fake.state.laidOutBody,
+      `intro\r\n\r\n${laidOut(SAID, ...AFTER_ONLY).replaceAll('\n', '\r\n')}\r\n\r\noutro`,
+    );
   });
 
   it('names no file the way a description can name one, so gh rewrites no reference outside the block', async () => {
@@ -1058,10 +1384,271 @@ describe('the step that edits the description', () => {
     );
   });
 
+  const SHOT = [['profile.png', PNG]];
+  const WAS_SHOT = [['before-profile.png', WAS_PNG]];
+  const CLIP = [['video.mp4', MP4]];
+  const WAS_CLIP = [['before-video.mp4', WAS_MP4]];
+  const published = async (media, wasMedia) => {
+    const manifest = manifestFor(media, wasMedia === undefined ? {} : { before: beforeFor(wasMedia) });
+    const fake = fakeGh({ ...PULL, body: '' });
+    const { outcome } = publish(await fetched(manifest, [...media, ...(wasMedia ?? [])]), fake);
+    assert.equal(outcome, 'published');
+    return fake.state.pull.body;
+  };
+
+  it('lays out a still change to something that exists as before and after screenshots, side by side at a fixed width', async () => {
+    assert.equal(
+      await published(SHOT, WAS_SHOT),
+      laidOut(
+        `${SAID}${WAS}`,
+        '',
+        '| Before | After |',
+        '| :---: | :---: |',
+        `| <img src="${asset(2)}" width="280" alt="Before: profile"> | <img src="${asset(1)}" width="280" alt="After: profile"> |`,
+      ),
+    );
+  });
+
+  it('lays out a still change that is new as its screenshots alone, two across under their names', async () => {
+    assert.equal(
+      await published([
+        ['start.png', PNG],
+        ['profile.jpg', JPG],
+        ['security.png', PNG],
+      ]),
+      laidOut(
+        SAID,
+        '',
+        '| `start` | `profile` |',
+        '| :---: | :---: |',
+        `| <img src="${asset(1)}" width="280" alt="start"> | <img src="${asset(2)}" width="280" alt="profile"> |`,
+        '',
+        '| `security` |',
+        '| :---: |',
+        `| <img src="${asset(3)}" width="280" alt="security"> |`,
+      ),
+    );
+  });
+
+  it('lays out a change to a flow that exists as the before and after videos, side by side', async () => {
+    assert.equal(
+      await published(CLIP, WAS_CLIP),
+      laidOut(`${SAID}${WAS}`, '', '| Before | After |', '| :---: | :---: |', `| ${asset(2)} | ${asset(1)} |`),
+    );
+  });
+
+  it('lays out a flow that is new as its video alone, in a table that keeps it from the full width', async () => {
+    assert.equal(await published(CLIP), laidOut(SAID, '', '| `video` |', '| :---: |', `| ${asset(1)} |`));
+  });
+
+  it('lays out both kinds when the hand-off holds both: the screenshots first, then the video, each as it is alone', async () => {
+    assert.equal(
+      await published([...CLIP, ...SHOT], [...WAS_CLIP, ...WAS_SHOT]),
+      laidOut(
+        `${SAID}${WAS}`,
+        '',
+        '| Before | After |',
+        '| :---: | :---: |',
+        `| <img src="${asset(4)}" width="280" alt="Before: profile"> | <img src="${asset(2)}" width="280" alt="After: profile"> |`,
+        '',
+        '| Before | After |',
+        '| :---: | :---: |',
+        `| ${asset(3)} | ${asset(1)} |`,
+      ),
+    );
+    assert.equal(await published([...CLIP, ...SHOT]), laidOut(SAID, ...AFTER_ONLY));
+  });
+
+  const ASCII = Array.from({ length: 128 }, (_, code) => String.fromCharCode(code));
+  const ADDRESS = 'https://github\\.com/user-attachments/assets/[0-9a-f-]{36}';
+  const LABEL = '[A-Za-z0-9._-]+';
+  const COUNTS = '\\d+ of \\d+ passed(, \\d+ flaky \\(passed only on a retry\\))?';
+  const CELL = `(${ADDRESS}|<img src="${ADDRESS}" width="280" alt="((Before|After): )?${LABEL}">)`;
+  const TEMPLATE = [
+    /^$/,
+    /^<!-- \/?verify-evidence:ios -->$/,
+    new RegExp(
+      `^\\*\\*Verified on an iOS simulator\\*\\*, as reported by \\[the session\\]\\(https://github\\.com/clerk/clerk-ios/actions/runs/\\d+\\) that \`[A-Za-z0-9_-]+\` started\\. Run \`r[0-9a-f-]+\` on \`[A-Za-z0-9 ._()-]+\` at \`[0-9a-f]{12}\`, ${COUNTS}\\.( The session reports the before as run \`r[0-9a-f-]+\` at \\[\`[0-9a-f]{12}\`\\]\\(https://github\\.com/clerk/clerk-ios/commit/[0-9a-f]{40}\\), ${COUNTS}\\.)?$`,
+    ),
+    new RegExp(`^\\| (Before \\| After|\`${LABEL}\`( \\| \`${LABEL}\`)?) \\|$`),
+    /^\| :---: (\| :---: )?\|$/,
+    new RegExp(`^\\| ${CELL}( \\| ${CELL})? \\|$`),
+  ];
+  const outsideTheTemplate = body => body.split('\n').filter(line => !TEMPLATE.some(pattern => pattern.test(line)));
+  const publishedWith = async (manifest, media) => {
+    let env;
+    try {
+      env = await fetched(manifest, media);
+    } catch (error) {
+      if (error instanceof Refused) {
+        return null;
+      }
+      throw error;
+    }
+    const fake = fakeGh({ ...PULL, body: '' });
+    assert.equal(publish(env, fake).outcome, 'published');
+    return fake.state.pull.body;
+  };
+
+  it('writes nothing but its template around a file name, and takes in a name only letters, digits, a dot, an underscore and a dash', async () => {
+    const taken = [];
+    for (const char of ASCII) {
+      const media = [
+        [`a${char}b.png`, PNG],
+        [`c${char}d.mp4`, MP4],
+      ];
+      const wasMedia = media.map(([name, data]) => [`before-${name}`, data]);
+      const alone = await publishedWith(manifestFor(media), media);
+      const paired = await publishedWith(manifestFor(media, { before: beforeFor(wasMedia) }), [...media, ...wasMedia]);
+      assert.equal(alone === null, paired === null, JSON.stringify(char));
+      if (alone !== null) {
+        taken.push(char);
+        assert.deepEqual(outsideTheTemplate(alone), [], JSON.stringify(char));
+        assert.deepEqual(outsideTheTemplate(paired), [], JSON.stringify(char));
+        assert.ok(
+          alone.includes(`| \`a${char}b\` |`) && paired.includes(`alt="Before: a${char}b">`),
+          JSON.stringify(char),
+        );
+      }
+    }
+    assert.equal(taken.join(''), '-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz');
+  });
+
+  it('writes nothing but its template around a device, and takes in a device only letters, digits, a space, a dot, an underscore, parentheses and a dash', async () => {
+    const taken = [];
+    for (const char of ASCII) {
+      const body = await publishedWith(manifestFor(MEDIA, { device: `a${char}b` }), MEDIA);
+      if (body !== null) {
+        taken.push(char);
+        assert.deepEqual(outsideTheTemplate(body), [], JSON.stringify(char));
+        assert.ok(body.includes(` on \`a${char}b\` at `), JSON.stringify(char));
+      }
+    }
+    assert.equal(taken.join(''), ' ()-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz');
+  });
+
+  it('counts as outside its template a line that markup in a name or a device would make', () => {
+    const made = [
+      '| `a|b` |',
+      '| a |',
+      '| www.evil.example |',
+      '| <img src="https://github.com/user-attachments/assets/00000000-0000-4000-8000-000000000001" width="280" alt="a" onerror="alert(1)"> |',
+      '| <img src="https://evil.example/user-attachments/assets/00000000-0000-4000-8000-000000000001" width="280" alt="a"> |',
+      SAID.replace('`iPhone Air on xcode-27`', '`iPhone` [approved](https://evil.example) `Air`'),
+      '<!-- /verify-evidence:ios --> text after the marker',
+    ];
+    assert.deepEqual(outsideTheTemplate(made.join('\n')), made);
+    assert.deepEqual(outsideTheTemplate(laidOut(`${SAID}${WAS}`, ...AFTER_ONLY)), []);
+  });
+
+  it('attaches the files of the before run after the files of the run, under the same unguessable names, though the commit of the before run is no commit of the pull request', async () => {
+    const env = await fetched(WITH_BEFORE, [...MEDIA, ...WAS_MEDIA]);
+    const fake = fakeGh();
+    const { said } = publish(env, fake);
+    const names = ['evidence-n0nce-1.mp4', 'evidence-n0nce-2.png', 'evidence-n0nce-3.mp4', 'evidence-n0nce-4.png'];
+    assert.deepEqual(
+      fake.state.calls[3].args.filter((_, i, args) => args[i - 1] === '--attach'),
+      names.map(name => `./${name}`),
+    );
+    assert.deepEqual(fs.readdirSync(path.join(env.WORK, 'files')).sort(), names);
+    assert.deepEqual(fs.readFileSync(path.join(env.WORK, 'files', names[3])), WAS_PNG);
+    assert.ok(
+      fake.state.writtenBody.endsWith('![before-profile](./evidence-n0nce-4.png)\r\n\r\n<!-- /verify-evidence:ios -->'),
+    );
+    assert.deepEqual(said, [
+      'notice: Put verify run r20261008-052713-253e in the description of pull request #669: 4 files.',
+    ]);
+  });
+
+  const changedBeforeTheLayout = [
+    ['the block is gone from the description', state => void (state.pull.body = 'Rewritten by a reviewer.\n')],
+    [
+      'the block names another run',
+      state => void (state.pull.body = state.pull.body.replace(GOOD.run, 'r20261009-020202-bbbb')),
+    ],
+    [
+      'the block shows one address fewer',
+      state => void (state.pull.body = state.pull.body.replace(asset(1), 'removed')),
+    ],
+    [
+      'the block shows an address that is not an upload',
+      state =>
+        void (state.pull.body = state.pull.body.replace(asset(2), 'https://example.com/x.png" onerror="alert(1)')),
+    ],
+    ...[
+      ['on another host', asset(2).replace('github.com', 'evil.example')],
+      ['on a host that only starts like GitHub', asset(2).replace('github.com', 'github.com.evil.example')],
+      ['under another path of GitHub', asset(2).replace('user-attachments/assets', 'evil/user-attachments/assets')],
+      ['with an id one character short', asset(2).slice(0, -1)],
+      ['with a capital in its id', asset(2).replace('4000', 'A000')],
+    ].map(([how, address]) => [
+      `the block shows an upload address ${how}`,
+      state => void (state.pull.body = state.pull.body.replace(asset(2), address)),
+    ]),
+    ['the markers are broken', state => void (state.pull.body += '\n<!-- verify-evidence:ios -->\n')],
+    ['the pull request is closed', state => void (state.pull.state = 'closed')],
+  ];
+  for (const [what, change] of changedBeforeTheLayout) {
+    it(`leaves the files as a list, writes nothing more and says so, when ${what} after the upload`, async () => {
+      const fake = fakeGh(PULL, state => void (state.reads === 3 && change(state)));
+      const { outcome, said } = publish(await fetched(), fake);
+      assert.equal(outcome, 'listed');
+      assert.equal(fake.state.laidOutBody, null);
+      assert.equal(fake.state.calls.filter(call => call.args[0] === 'pr').length, 1);
+      assert.deepEqual(said, [
+        'notice: Put verify run r20261008-052713-253e in the description of pull request #669 as a list of 2 files. The pull request changed before they could be laid out. A rerun of this job uploads them again and lays them out.',
+      ]);
+    });
+  }
+
+  it('writes an upload address as its 36 characters of id and nothing that follows them', async () => {
+    for (const tail of ['f', '-0', '" onerror="alert(1)', '?download=1', '/../../evil', '#x']) {
+      const fake = fakeGh(
+        PULL,
+        state =>
+          void (state.reads === 3 && (state.pull.body = state.pull.body.replace(asset(2), `${asset(2)}${tail}`))),
+      );
+      assert.equal(publish(await fetched(), fake).outcome, 'published', tail);
+      assert.equal(
+        fake.state.laidOutBody,
+        `${PULL.body}\r\n${laidOut(SAID, ...AFTER_ONLY).replaceAll('\n', '\r\n')}`,
+        tail,
+      );
+    }
+  });
+
+  it('keeps an edit that someone saves outside the block between the upload and the layout', async () => {
+    const fake = fakeGh(
+      PULL,
+      state =>
+        void (
+          state.reads === 3 && (state.pull.body = `Reviewed.\r\n\r\n${state.pull.body}\r\nA note under the block.`)
+        ),
+    );
+    assert.equal(publish(await fetched(), fake).outcome, 'published');
+    assert.equal(
+      fake.state.laidOutBody,
+      `Reviewed.\r\n\r\n${PULL.body}\r\n${laidOut(SAID, ...AFTER_ONLY).replaceAll('\n', '\r\n')}\r\nA note under the block.`,
+    );
+  });
+
+  it('fails with what gh said when the write that lays the files out fails', async () => {
+    const env = await fetched();
+    const fake = fakeGh();
+    const failing = {
+      gh: (args, options) =>
+        args[0] === 'pr' && !args.includes('--attach') ? { status: 1, stderr: 'HTTP 502\n' } : fake.gh(args, options),
+    };
+    assert.throws(
+      () => publish(env, failing),
+      error => error.message === 'gh pr edit failed to lay out the files in pull request #669\ngh: HTTP 502',
+    );
+  });
+
   it('names the person the workflow says started the session, and publishes nothing under a name that is not a login', async () => {
     const fake = fakeGh();
     publish({ ...(await fetched()), RUN_ACTOR: 'hubot-9[bot]' }, fake);
-    assert.match(fake.state.writtenBody, /\/actions\/runs\/37731397352\) that `hubot-9\[bot\]` started: 3 of 3 passed/);
+    assert.match(fake.state.writtenBody, /\/actions\/runs\/37731397352\) that `hubot-9\[bot\]` started\. Run `/);
     for (const name of [undefined, '', 'mallory` [approved](https://example.com) `', 'a\nb', 'a b']) {
       const refusing = fakeGh();
       const env = { ...(await fetched()), RUN_ACTOR: name };
@@ -1086,7 +1673,14 @@ describe('the step that edits the description', () => {
     const fake = fakeGh({ ...PULL, head: { ...PULL.head, sha: NEWER } }, undefined, [{ sha: COMMIT }, { sha: NEWER }]);
     const { outcome } = publish(await fetched(), fake);
     assert.equal(outcome, 'published');
-    assert.match(fake.state.writtenBody, / at `0f50b597b1c2`\. The pull request has newer commits\.\r\n/);
+    assert.match(
+      fake.state.writtenBody,
+      / at `0f50b597b1c2`, 3 of 3 passed\. The pull request has newer commits\.\r\n/,
+    );
+    assert.match(
+      fake.state.laidOutBody,
+      /, 3 of 3 passed\. The pull request has newer commits\.\r\n\r\n\| `profile` \|/,
+    );
   });
 
   it('says that the pull request has newer commits when its head moves while the evidence is being placed', async () => {
@@ -1099,7 +1693,7 @@ describe('the step that edits the description', () => {
     assert.equal(publish(await fetched(), fake).outcome, 'published');
     assert.match(
       fake.state.writtenBody,
-      /^Edited\.\n\n<!-- verify-evidence:ios -->\n\nverify run .* newer commits\.\n/,
+      /^Edited\.\n\n<!-- verify-evidence:ios -->\n\n\*\*Verified on .* newer commits\.\n/,
     );
   });
 
@@ -1110,16 +1704,22 @@ describe('the step that edits the description', () => {
       { sha: NEWER },
     ]);
     assert.equal(publish(await fetched(), fake).outcome, 'published');
-    assert.equal(fake.state.reads, 3);
-    assert.match(fake.state.writtenBody, / at `0f50b597b1c2`\. The pull request has newer commits\.\r\n/);
+    assert.equal(fake.state.reads, 4);
+    assert.match(
+      fake.state.writtenBody,
+      / at `0f50b597b1c2`, 3 of 3 passed\. The pull request has newer commits\.\r\n/,
+    );
+    assert.match(
+      fake.state.laidOutBody,
+      /, 3 of 3 passed\. The pull request has newer commits\.\r\n\r\n\| `profile` \|/,
+    );
   });
 
   it('adds that the pull request has newer commits to a run it already published, and uploads nothing again', async () => {
     const NEWER = 'b'.repeat(40);
-    const uploaded = blockOf(GOOD).replaceAll('./', 'https://github.com/user-attachments/assets/');
     const moved = {
       ...PULL,
-      body: `intro\r\n\r\n${uploaded.replaceAll('\n', '\r\n')}\r\noutro`,
+      body: `intro\r\n\r\n${laidOut(SAID, ...AFTER_ONLY).replaceAll('\n', '\r\n')}\r\noutro`,
       head: { ...PULL.head, sha: NEWER },
     };
     const fake = fakeGh(moved, undefined, [{ sha: COMMIT }, { sha: NEWER }]);
@@ -1127,7 +1727,7 @@ describe('the step that edits the description', () => {
     assert.equal(outcome, 'noted');
     assert.equal(
       fake.state.writtenBody,
-      moved.body.replace('at `0f50b597b1c2`.', 'at `0f50b597b1c2`. The pull request has newer commits.'),
+      moved.body.replace('3 of 3 passed.', '3 of 3 passed. The pull request has newer commits.'),
     );
     assert.equal(fake.state.calls.at(-1).args.includes('--attach'), false);
     assert.deepEqual(said, [
@@ -1151,12 +1751,8 @@ describe('the step that edits the description', () => {
       assert.equal(outcome, 'published', head);
       assert.equal(fake.state.writtenBody.includes('/actions/runs/11111111111)'), false, head);
       assert.equal(fake.state.writtenBody.includes('mallory'), false, head);
-      assert.match(
-        fake.state.writtenBody,
-        /\/actions\/runs\/37731397352\) that `octocat` started: 3 of 3 passed/,
-        head,
-      );
-      assert.equal(fake.state.calls.at(-1).args.includes('--attach'), true, head);
+      assert.match(fake.state.writtenBody, /\/actions\/runs\/37731397352\) that `octocat` started\. Run `/, head);
+      assert.equal(fake.state.calls.at(-3).args.includes('--attach'), true, head);
     }
   });
 
@@ -1265,17 +1861,29 @@ describe('the step that edits the description', () => {
     assert.equal(fake.state.writtenBody, null);
   });
 
-  it('does not upload a run that the description already holds', async () => {
-    const fake = fakeGh({
-      ...PULL,
-      body: `intro\n\n${blockOf(GOOD).replaceAll('./', 'https://github.com/user-attachments/assets/')}\n`,
-    });
+  it('does not upload a run that the description already holds in its tables', async () => {
+    const fake = fakeGh({ ...PULL, body: `intro\n\n${laidOut(SAID, ...AFTER_ONLY)}\n` });
     const { outcome, said } = publish(await fetched(), fake);
     assert.equal(outcome, 'already there');
     assert.equal(fake.state.writtenBody, null);
     assert.deepEqual(said, [
       'notice: The description of pull request #669 already holds verify run r20261008-052713-253e.',
     ]);
+  });
+
+  it('uploads a run again and lays it out when an earlier publish left its files as a list', async () => {
+    const leftAsAList = fakeGh(PULL, state => void (state.reads === 3 && (state.pull.state = 'closed')));
+    assert.equal(publish(await fetched(), leftAsAList).outcome, 'listed');
+    const list = leftAsAList.state.pull.body;
+    assert.ok(list.endsWith(`\r\n${asset(1)}\r\n\r\n![profile](${asset(2)})\r\n\r\n<!-- /verify-evidence:ios -->`));
+
+    const rerun = fakeGh({ ...PULL, body: list });
+    assert.equal(publish(await fetched(), rerun).outcome, 'published');
+    assert.deepEqual(
+      rerun.state.calls.filter(call => call.args[0] === 'pr').map(call => call.args.includes('--attach')),
+      [true, false],
+    );
+    assert.equal(rerun.state.pull.body, `${PULL.body}\r\n${laidOut(SAID, ...AFTER_ONLY).replaceAll('\n', '\r\n')}`);
   });
 
   it('uploads a run again when an earlier upload left a file reference that was never rewritten', async () => {
@@ -1288,8 +1896,9 @@ describe('the step that edits the description', () => {
   it('builds on the newer description when someone edits it between the read and the write', async () => {
     const fake = fakeGh(PULL, state => void (state.reads === 2 && (state.pull.body = 'Rewritten by a reviewer.\n')));
     assert.equal(publish(await fetched(), fake).outcome, 'published');
-    assert.equal(fake.state.reads, 3);
+    assert.equal(fake.state.reads, 4);
     assert.equal(fake.state.writtenBody, `Rewritten by a reviewer.\n\n${PLACED}`);
+    assert.equal(fake.state.laidOutBody, `Rewritten by a reviewer.\n\n${laidOut(SAID, ...AFTER_ONLY)}`);
   });
 
   it('writes nothing when the description changes twice, and says so', async () => {

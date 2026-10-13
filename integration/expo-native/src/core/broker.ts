@@ -2,7 +2,7 @@ import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { join } from 'node:path';
-import { BACKEND_API_URL, BACKEND_CALLS, TICKET_SECONDS, parseTestEmail, parseTestPhone, runEmailPrefix, typedPassword, type BackendCall } from '../../specs/support/clerk.ts';
+import { ABOUT_TO_LAUNCH, BACKEND_API_URL, BACKEND_CALLS, TICKET_SECONDS, parseTestEmail, parseTestPhone, runEmailPrefix, typedPassword, type BackendCall } from '../../specs/support/clerk.ts';
 import { protect } from '../../specs/support/secret.ts';
 import { ownKeyRefused, userLimitReached } from './clerk.ts';
 import type { InstanceKeys } from './keys.ts';
@@ -16,6 +16,7 @@ const BODY_LIMIT_BYTES = 64 * 1024;
 export interface BrokerDeps {
   readonly keys: () => InstanceKeys;
   readonly fetch: typeof fetch;
+  readonly beforeLaunch: () => Promise<void>;
 }
 
 export interface Broker {
@@ -139,8 +140,18 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
     return { status: response.status, body: await response.text() };
   }
 
+  async function readyToLaunch(): Promise<Answer> {
+    try {
+      await deps.beforeLaunch();
+      return { status: 200, body: '{}' };
+    } catch (error) {
+      return error instanceof VerifyFailure ? failure(503, 'verify_not_ready_to_launch', error) : clerkError(503, 'verify_not_ready_to_launch', (error as Error).message ?? String(error));
+    }
+  }
+
   async function answer(request: IncomingMessage): Promise<Answer> {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1');
+    if (request.method === ABOUT_TO_LAUNCH.method && url.pathname === `${STAND_IN_PATH}${ABOUT_TO_LAUNCH.path}`) return readyToLaunch();
     const guard = guardFor(request.method, url.pathname);
     if (guard === undefined) return clerkError(404, 'verify_stand_in_unknown_call', `the verify CLI's stand-in for the Backend API has no ${request.method} ${url.pathname}; the tests make ${Object.values(BACKEND_CALLS).map((call) => `${call.method} ${call.path}`).join(', ')}`);
     let text = '';

@@ -1,5 +1,5 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { isOrphaned, readClaims } from './claims.ts';
 import { check, type AppliedInstance, type Instances } from './instances/instances.ts';
 import { STANDARD, SettingsRefused, planGroups, readSpecText, settingsFileOf, sourceHash, straySettingsFile, type SettingsGroup } from './instances/settings.ts';
@@ -15,17 +15,18 @@ import { backendFor, computeBuildKey, describeChoice, deviceOf, ensureLease, lea
 import { assertSomethingRan, collectScreenshots, e2eOutputDir, invokeE2E, parseE2EReport, planE2E, resolveSpecs } from './e2e.ts';
 import { startBroker, type Broker } from './broker.ts';
 import { watchDriver, type DriverWatch } from './driver.ts';
-import { assertPublishable, loggedUserIds, readRecord, sealEvidence } from './evidence.ts';
+import { assertPublishable, assertShowable, loggedUserIds, readRecord, sealEvidence, type Showable } from './evidence.ts';
 import { protectGitHubTokens, reportToGitHub } from './github-report.ts';
 import { isRunning, type Runner } from './exec.ts';
 import { ledgerAgentDeviceDaemon, processesIn, readDaemonInfo, stopProcesses, type ProcessEntry } from './ledgers.ts';
 import { SHARED_ROOTS, manifestDrift } from './manifest.ts';
-import { CannotPostHere, chooseFiles, missingAttach, postToPullRequest, summarize } from './publish.ts';
+import { CannotPostHere, chooseEvidence, missingAttach, postToPullRequest } from './publish.ts';
 import { redact } from '../../specs/support/secret.ts';
 import { count } from './state.ts';
 import { newEntryId, parseRunId, type Workspace } from './workspace.ts';
 import {
   VerifyFailure,
+  everyFile,
   type AttachResult,
   type BackendKind,
   type Command,
@@ -178,6 +179,13 @@ async function startRuntime(deps: Deps, lease: Lease): Promise<string | null> {
 }
 
 const agentDeviceSession = (workspace: Workspace, platform: Platform) => `verify-${platform}-${workspace.worktreeId}`;
+const CLOSE_BEFORE_RECORDING_MS = 30_000;
+
+function agentDeviceFor(deps: Deps, lease: Lease, platform: Platform) {
+  const target = agentDeviceOn(deviceOf(lease), platform);
+  const env = { ...withoutClerkKeys(deps.env), AGENT_DEVICE_STATE_DIR: deps.workspace.agentDeviceDir, ...target.env };
+  return { selector: target.selector, call: (args: readonly string[], limit: { readonly timeoutMs?: number } = {}) => deps.runner(join(deps.workspace.packageDir, 'node_modules', '.bin', 'agent-device'), args, { env, ...limit }) };
+}
 
 const targetOf = (deps: Deps, outcome: RuntimeOutcome): Target => ({
   platform: outcome.lease.platform,
@@ -246,7 +254,7 @@ export function nextStep(run: RunId, dir: EvidencePath, results: readonly SpecRe
   const failed = results.filter((r) => r.status === 'failed' || r.status === 'interrupted');
   if (failed.length > 0) return failed[0]?.failurePage ?? join(dir, 'e2e.log');
   if (ran === 'all-left-out') return 'nothing ran: every selected spec was left out by platform, so the run proves nothing to post';
-  return `{cli} attach ${run} --pr <n>`;
+  return `{cli} attach ${run} --pr <n> --screenshot <label> for a still change, or --video for behavior or a flow; add --before <run-id> when the change is to something that exists`;
 }
 
 export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Extract<Command, { verb: 'run' }>, instances: { readonly willChange: boolean }, drive: (outcome: RuntimeOutcome) => Promise<T>): Promise<T> {
@@ -271,6 +279,11 @@ export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Ex
     drive,
     (owner) => deps.progress(`wait    another {cli} in this worktree (pid ${owner.pid}) is building ${key} or leasing the device; waiting for it, with no time limit`),
   );
+}
+
+interface Recorder {
+  readonly recording: Recording;
+  readonly recorderEntry: string | null;
 }
 
 interface GroupRun {
@@ -437,30 +450,40 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
         if (declaration !== null) writeFileSync(join(dir, settingsFileOf(spec.path)), declaration);
       }
 
-      const broker = await startBroker(run, workspace, scratch, { keys: () => deps.instances.keys(), fetch: deps.fetch ?? fetch });
+      let recorder = null as Promise<Recorder> | null;
+      const startRecorder = async (): Promise<Recorder> => {
+        const device = agentDeviceFor(deps, lease, platform);
+        const closed = await device.call(['close', host.appId(platform), ...device.selector, '--session', agentDeviceSession(workspace, platform)], { timeoutMs: CLOSE_BEFORE_RECORDING_MS });
+        if (closed.code !== 0) deps.progress(`video   the app could not be closed before the recording, so the video may open on the screen it was showing: ${redact(closed.stderr.trim() || closed.stdout.trim())}`);
+        const recording = await backend.startRecording(lease, dir);
+        if (recording.process === null) return { recording, recorderEntry: null };
+        const recorderEntry = newEntryId();
+        workspace.append({ id: recorderEntry, kind: 'process', what: 'recorder', pid: recording.process.pid, startedAt: new Date(recording.process.startedAt).toISOString(), platform });
+        return { recording, recorderEntry };
+      };
+      const broker = await startBroker(run, workspace, scratch, {
+        keys: () => deps.instances.keys(),
+        fetch: deps.fetch ?? fetch,
+        beforeLaunch: async () => {
+          if (command.video) await (recorder ??= startRecorder());
+        },
+      });
 
-      let recording: Recording | null = null;
-      let recorderEntry: string | null = null;
       const outcomes: GroupOutcome[] = [];
       let endFailure: unknown = null;
       try {
-        if (command.video) {
-          recording = await backend.startRecording(lease, dir);
-          if (recording.process !== null) {
-            recorderEntry = newEntryId();
-            workspace.append({ id: recorderEntry, kind: 'process', what: 'recorder', pid: recording.process.pid, startedAt: new Date(recording.process.startedAt).toISOString(), platform });
-          }
-        }
         const the: GroupRun = { run, dir, log: join(dir, 'e2e.log') as EvidencePath, target: targetOf(deps, outcome), broker, driver, command, agent };
         for (const [index, group] of groups.entries()) {
           const stopped = outcomes.find((done) => done.stopsTheRun)?.failure ?? null;
           outcomes.push(await runGroup(deps, the, group, index, outcomes.flatMap((done) => done.identities), stopped));
         }
       } finally {
-        await endRun(workspace, { recording, recorderEntry, broker, scratch })
+        const started = (await recorder?.catch(() => null)) ?? { recording: null, recorderEntry: null };
+        await endRun(workspace, { ...started, broker, scratch })
           .catch((error: unknown) => void (endFailure = error))
           .finally(() => deps.instances.stopDriving());
       }
+      if (command.video && recorder === null) deps.progress('video   no test launched the app, so this run has no video');
 
       driver.collect();
       const appLog = join(dir, 'app.log') as EvidencePath;
@@ -546,13 +569,9 @@ async function screen(deps: Deps, command: Extract<Command, { verb: 'screen' }>)
   const platform = platformOf(deps.host, command.platform);
   const { lease, backend } = heldLease(deps, platform);
   if ((await backend.check(lease)) === 'lost') throw new VerifyFailure('LEASE_LOST', `${backend.describe(lease)} is gone`, '{cli} up');
-  const env = withoutClerkKeys(deps.env);
-  const target = agentDeviceOn(deviceOf(lease), platform);
-  const agentDevice = (args: readonly string[]) =>
-    deps.runner(join(deps.workspace.packageDir, 'node_modules', '.bin', 'agent-device'), args, { env: { ...env, AGENT_DEVICE_STATE_DIR: deps.workspace.agentDeviceDir, ...target.env } });
+  const { selector, call: agentDevice } = agentDeviceFor(deps, lease, platform);
   const screenWait = { seconds: 10, busyFix: 'let the run in this worktree finish, then rerun {cli} screen' };
   return deps.workspace.withDevice(platform, screenWait, async () => {
-    const selector = target.selector;
     const session = ['--session', `${agentDeviceSession(deps.workspace, platform)}-screen`];
     const attachedWithoutRelaunch = await agentDevice(['open', deps.host.appId(platform), '--json', ...selector, ...session]);
     if (attachedWithoutRelaunch.code !== 0) throw new VerifyFailure('NOT_READY', `agent-device open failed: ${redact(attachedWithoutRelaunch.stdout.trim() || attachedWithoutRelaunch.stderr.trim())}`, '{cli} up, then retry');
@@ -580,23 +599,34 @@ export async function attach(deps: Deps, command: Extract<Command, { verb: 'atta
   if (!existsSync(dir)) throw new VerifyFailure('USAGE', `no run ${run} in ${deps.workspace.root}/runs`, 'pass a run id that `{cli} run` printed');
   const record = readRecord(dir);
   const publishable = assertPublishable(record, loggedUserIds(dir));
+  const bundle = chooseEvidence(command.pr, publishable, command.before === null ? null : beforeRun(deps, command.before, record), command.media);
   try {
-    return await postToPullRequest(publishable, dir, deps.host, command.pr, command.screenshots, deps.runner);
+    return await postToPullRequest(bundle, deps.host, deps.runner);
   } catch (error) {
     if (!(error instanceof CannotPostHere) || record.backend !== 'remote') throw error;
     const unattached = `name run ${run} in the PR and say that the evidence was not attached`;
     const session = sessionToHandOffTo(deps, record);
     if (typeof session === 'string') throw new VerifyFailure('NOT_READY', `${error.message}, and ${session}`, `${unattached}; to attach it, {cli} run again and {cli} attach before {cli} down`);
-    const { videos, shots } = chooseFiles(publishable, command.screenshots);
-    const files = [...videos, ...shots.map((shot) => shot.path)];
     try {
-      const receipt = await session.handOff({ pr: command.pr, summary: summarize(publishable), files: files.map((path) => ({ name: basename(path), path })) }, deps.progress);
-      return { verb: 'attach', via: 'runner', pr: command.pr, handedOff: files, because: error.why, ...receipt };
+      const receipt = await session.handOff(bundle, deps.progress);
+      return { verb: 'attach', via: 'runner', pr: command.pr, handedOff: everyFile(bundle).map((file) => file.path), because: error.why, ...receipt };
     } catch (failure) {
       if (!(failure instanceof VerifyFailure)) throw failure;
       throw new VerifyFailure(failure.code, `${error.message}, and ${failure.message}`, `${failure.fix}; until then, ${unattached}`);
     }
   }
+}
+
+function beforeRun(deps: Deps, run: RunId, after: EvidenceRecord): Showable {
+  const dir = deps.workspace.runDir(run);
+  const without = 'attach without --before, and name the before run in the PR';
+  if (run === after.run) throw new VerifyFailure('USAGE', `--before names run ${run} itself`, `pass the run of the same spec on the build without the change, or ${without}`);
+  if (!existsSync(dir)) {
+    throw new VerifyFailure('USAGE', `no run ${run} in ${deps.workspace.root}/runs, so its files cannot be shown as the before`, `pass a run that \`{cli} run\` made in this checkout, whose directory is still there, or ${without}`);
+  }
+  const record = readRecord(dir);
+  if (record.platform !== after.platform) throw new VerifyFailure('USAGE', `run ${run} is an ${record.platform} run and run ${after.run} is an ${after.platform} run`, `pass a before run of the same platform, or ${without}`);
+  return assertShowable(record, loggedUserIds(dir));
 }
 
 function sessionToHandOffTo(deps: Deps, record: EvidenceRecord): { readonly handOff: (bundle: EvidenceBundle, progress: (line: string) => void) => Promise<HandOffReceipt> } | string {

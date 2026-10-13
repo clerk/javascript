@@ -120,19 +120,21 @@ describe('a launch the host fixture starts', () => {
 
   function device(app: LaunchedApp = E2E_HOST, installedBuilds = new Set<string>()) {
     const calls: string[] = [];
+    const said: string[][] = [];
     let ids = 0;
     const launch = appLauncher(
       app,
       {
         installApp: async (path) => void calls.push(`install ${path}`),
         signInTicket: async (who) => (calls.push(`ticket for ${who.id}`), new Secret('ticket', `ticket_of_${who.id}`)),
+        aboutToLaunch: async () => void said.push([...calls]),
         openApp: async (appId, options) => void calls.push(options === undefined ? `open ${appId}` : `open ${appId} ${options.launchArguments.join(' ')}`),
         adb: async (args) => void calls.push(`adb ${args.join(' ')}`),
       },
       installedBuilds,
       () => `id${(ids += 1)}`,
     );
-    return { calls, launch };
+    return { calls, said, launch };
   }
 
   const always = `-verifyPublishableKey ${SAMPLE_PUBLISHABLE_KEY} -verifyRunId ${SAMPLE_RUN}`;
@@ -177,6 +179,7 @@ describe('a launch the host fixture starts', () => {
       {
         installApp: async () => {},
         signInTicket: async () => new Secret('ticket', `ticket_${(tickets += 1)}`),
+        aboutToLaunch: async () => {},
         openApp: async (appId, options) => {
           calls.push(`open ${appId} ${options?.launchArguments.join(' ')}`);
           if ((opens += 1) === 1) throw new Error('xcrun timed out');
@@ -205,11 +208,22 @@ describe('a launch the host fixture starts', () => {
     await nextTest.launch({});
     assert.deepEqual(nextTest.calls.map((call) => call.split(' ')[0]), ['open']);
     const afterAFailure = new Set<string>();
-    const failing = appLauncher(named, { installApp: async () => Promise.reject(new Error('install failed')), signInTicket: async () => assert.fail('no ticket'), openApp: async () => assert.fail('opened'), adb: async () => {} }, afterAFailure, () => 'id');
+    const failing = appLauncher(named, { installApp: async () => Promise.reject(new Error('install failed')), signInTicket: async () => assert.fail('no ticket'), aboutToLaunch: async () => assert.fail('about to launch'), openApp: async () => assert.fail('opened'), adb: async () => {} }, afterAFailure, () => 'id');
     await assert.rejects(failing({}), /install failed/);
     const retry = device(named, afterAFailure);
     await retry.launch({});
     assert.deepEqual(retry.calls.map((call) => call.split(' ')[0]), ['install', 'open'], 'a build that failed to install is installed at the next launch');
+  });
+
+  it('says the app is about to launch once everything before the launch is done, on every launch, and not for a launch that cannot start', async () => {
+    const { calls, said, launch } = device({ ...E2E_HOST, buildPath: '/builds/E2EHost.app' });
+    await launch({ signedInAs: user });
+    await launch({});
+    assert.deepEqual(said, [['install /builds/E2EHost.app', 'ticket for user_1'], [calls[0], calls[1], calls[2]]]);
+    assert.equal(calls.length, 4);
+    const unstartable = device({ ...E2E_HOST, entry: devClient });
+    await assert.rejects(unstartable.launch({}), /cannot use openLink yet/);
+    assert.deepEqual(unstartable.said, []);
   });
 
   it('starts a dev client through adb on Android with the same launch inputs', async () => {

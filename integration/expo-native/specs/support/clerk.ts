@@ -16,6 +16,8 @@ export const BACKEND_CALLS = {
 
 export type BackendCall = keyof typeof BACKEND_CALLS;
 
+export const ABOUT_TO_LAUNCH = { method: 'POST', path: '/about_to_launch' } as const;
+
 export const TICKET_SECONDS = 120;
 
 // Node gives each address of a host 250 ms to connect before it tries the next, and fails the request when
@@ -88,6 +90,17 @@ function refusal(call: BackendCall, reply: Reply): Error {
 function endpoint(access: ClerkAccess): { readonly baseUrl: string; readonly bearer: SecretLike } {
   if (access.kind === 'secret-key') return { baseUrl: BACKEND_API_URL, bearer: access.key };
   return { baseUrl: access.url, bearer: new Secret('stand-in-token', readFileSync(access.tokenFile, 'utf8')) };
+}
+
+export async function aboutToLaunch(access: ClerkAccess, fetchImpl: typeof fetch = fetch): Promise<void> {
+  if (access.kind !== 'stand-in') return;
+  const { baseUrl, bearer } = endpoint(access);
+  const response = await bearer.use('bapi-authorization', (plain) =>
+    fetchImpl(`${baseUrl}${ABOUT_TO_LAUNCH.path}`, { method: ABOUT_TO_LAUNCH.method, headers: { Authorization: `Bearer ${plain}` }, signal: AbortSignal.timeout(60_000) }),
+  );
+  if (response.ok) return;
+  const said = errorsOf({ status: response.status, json: await response.json().catch(() => null) }).map((error) => error.long_message ?? error.message ?? error.code);
+  throw new Error(`the verify CLI was not ready for the app to launch: ${said.join('; ') || `it answered ${response.status}`}`);
 }
 
 export function testUsers(clerk: ClerkInstance, run: RunId, fetchImpl: typeof fetch = fetch): TestUsers {

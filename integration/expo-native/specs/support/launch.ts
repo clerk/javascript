@@ -115,6 +115,7 @@ export interface LaunchedApp {
 export interface LaunchDriver extends AppStartDriver {
   installApp(path: string): Promise<unknown>;
   signInTicket(user: SeededUser): Promise<SecretLike>;
+  aboutToLaunch(): Promise<void>;
 }
 
 export function appLauncher(app: LaunchedApp, driver: LaunchDriver, installedBuilds: Set<string>, newId: () => string): (options: LaunchOptions) => Promise<LaunchId> {
@@ -140,7 +141,9 @@ export function appLauncher(app: LaunchedApp, driver: LaunchDriver, installedBui
         ...(options.debugLogs === true ? { verifyLogLevel: 'debug' as const } : {}),
         ...(ticket === undefined ? {} : { verifySignInTicket: ticket }),
       });
-      return appStart(app.platform, app.id, app.entry, launchArguments);
+      const start = appStart(app.platform, app.id, app.entry, launchArguments);
+      await driver.aboutToLaunch();
+      return start;
     };
     await performAppStart(nextStart, app.id, driver);
     if (latest.launchId === undefined) throw new Error('the app start never minted a launch id');
