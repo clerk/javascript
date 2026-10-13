@@ -35,6 +35,7 @@ describe('useEnabledThirdPartyProviders', () => {
       'oauth_atlassian',
       'oauth_bitbucket',
       'oauth_box',
+      'oauth_chatgpt',
       'oauth_coinbase',
       'oauth_discord',
       'oauth_dropbox',
