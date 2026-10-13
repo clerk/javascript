@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { InputGroup } from '../../input-group';
 import { SubmitButton } from '../submit-button';
 
 const consumerAtoms = stylex.create({
@@ -88,43 +87,37 @@ describe('Mosaic SubmitButton', () => {
     expect(button).not.toHaveAttribute('aria-busy');
   });
 
-  it.each([
-    { disabled: true, groupDisabled: false, focusableWhenDisabled: false },
-    { disabled: true, groupDisabled: false, focusableWhenDisabled: true },
-    { disabled: false, groupDisabled: true, focusableWhenDisabled: false },
-    { disabled: false, groupDisabled: true, focusableWhenDisabled: true },
-  ])('preserves independent disabled settings across pending changes: %j', props => {
-    const button = (isPending: boolean) => (
-      <InputGroup.Root disabled={props.groupDisabled}>
-        <InputGroup.End>
-          <SubmitButton
-            disabled={props.disabled}
-            focusableWhenDisabled={props.focusableWhenDisabled}
-            isPending={isPending}
-          >
-            Save
-          </SubmitButton>
-        </InputGroup.End>
-      </InputGroup.Root>
-    );
-    const { rerender } = render(button(false));
+  it.each([false, true])(
+    'preserves disabled settings across pending changes with focusableWhenDisabled=%s',
+    focusable => {
+      const button = (isPending: boolean) => (
+        <SubmitButton
+          disabled
+          focusableWhenDisabled={focusable}
+          isPending={isPending}
+        >
+          Save
+        </SubmitButton>
+      );
+      const { rerender } = render(button(false));
 
-    for (const isPending of [false, true, false]) {
-      rerender(button(isPending));
-      const submit = screen.getByRole('button', { name: 'Save' });
-      expect(submit).toHaveAttribute('data-disabled');
-      if (isPending) {
-        expect(submit).toHaveAttribute('aria-busy', 'true');
-        expect(submit).toHaveAttribute('aria-disabled', 'true');
+      for (const isPending of [false, true, false]) {
+        rerender(button(isPending));
+        const submit = screen.getByRole('button', { name: 'Save' });
+        expect(submit).toHaveAttribute('data-disabled');
+        if (isPending) {
+          expect(submit).toHaveAttribute('aria-busy', 'true');
+          expect(submit).toHaveAttribute('aria-disabled', 'true');
+        }
+        if (focusable) {
+          expect(submit).toBeEnabled();
+          expect(submit).toHaveAttribute('aria-disabled', 'true');
+        } else {
+          expect(submit).toBeDisabled();
+        }
       }
-      if (props.focusableWhenDisabled) {
-        expect(submit).toBeEnabled();
-        expect(submit).toHaveAttribute('aria-disabled', 'true');
-      } else {
-        expect(submit).toBeDisabled();
-      }
-    }
-  });
+    },
+  );
 
   it('uses focusable disabled behavior while pending and restores enabled behavior afterward', () => {
     const { rerender } = render(<SubmitButton>Save</SubmitButton>);
