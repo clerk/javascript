@@ -34,7 +34,6 @@ export interface UserProfileEditPasswordController {
   onOpenChange: (open: boolean) => void;
   form: UseFormResult<UserProfileEditPasswordValues>;
   passwordFeedback: FieldFeedback | undefined;
-  reverification?: ReverificationController;
   step: 'edit' | 'verify';
 }
 
@@ -111,5 +110,5 @@ export function useUserProfileEditPasswordController({
     setIsOpen(open);
   };
 
-  return { isOpen, onOpenChange, form, passwordFeedback, reverification, step };
+  return { isOpen, onOpenChange, form, passwordFeedback, step };
 }

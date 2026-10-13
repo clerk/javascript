@@ -60,7 +60,7 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
           onOpenChange={controller.onOpenChange}
           hasPassword={hasPassword}
           requiresCurrentPassword={model.requiresCurrentPassword}
-          reverification={controller.reverification}
+          reverification={reverification}
           step={controller.step}
           trigger={
             <Button
