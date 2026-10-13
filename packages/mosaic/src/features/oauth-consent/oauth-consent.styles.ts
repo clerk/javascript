@@ -19,7 +19,7 @@ export const styles = stylex.create({
     borderBlockEndWidth: '1px',
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
-  scopeList: { listStyleType: 'none', maxBlockSize: '12.5rem' },
+  scopeList: { listStyleType: 'none', maxBlockSize: '20rem' },
   scopeRow: {
     paddingBlock: space['2'],
     paddingInline: space['3'],
