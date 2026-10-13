@@ -157,7 +157,10 @@ export function UserProfileEditPasswordDialog({
         <>
           <Flow.Step ids={['edit']}>{edit}</Flow.Step>
           <Flow.Step ids={['verify']}>
-            <Reverification {...reverification} />
+            <Reverification
+              {...reverification}
+              onClose={() => onOpenChange(false)}
+            />
           </Flow.Step>
         </>
       )}
