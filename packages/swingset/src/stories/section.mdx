@@ -44,6 +44,11 @@ list of values, one `Section.Item` per entry, and each item becomes a list item.
 optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`,
 and `xl` sizes.
 
+`Section.CollapsibleDescription` is a description that opens and closes on its content. Render it
+with the content rather than behind a conditional: empty content closes it, and the last content
+stays in place until it has closed. Content present when it first mounts shows at once. `truncate`
+keeps the text to one line with an ellipsis; pass `title` with it so the full text stays reachable.
+
 When a row offers no action, `Section.Note` takes the place of its `Section.Actions` to say why — it
 sits directly in `Section.Item` and holds the trailing slot itself. Its `icon` prop renders into a
 fixed leading slot sized to the text, for a provider logo or a lock.
@@ -59,22 +64,23 @@ title. See [Panel](/components/panel) and [Heading](/components/heading).
 
 ## Parts
 
-| Part                  | Element     | Class                     | Notes                                                           |
-| --------------------- | ----------- | ------------------------- | --------------------------------------------------------------- |
-| `Section.Root`        | `<section>` | `.cl-section`             | Stacks groups. Unnamed unless given `aria-label`.               |
-| `Section.Group`       | `<div>`     | `.cl-section-group`       | Header and card, with `role='group'` named by its title.        |
-| `Section.Header`      | `<div>`     | `.cl-section-header`      | Content and optional actions.                                   |
-| `Section.Title`       | heading     | `.cl-section-title`       | The group's heading.                                            |
-| `Section.Body`        | `<div>`     | `.cl-section-body`        | The card under the header.                                      |
-| `Section.Row`         | `<div>`     | `.cl-section-row`         | One setting.                                                    |
-| `Section.Items`       | `<ul>`      | `.cl-section-items`       | A list of values.                                               |
-| `Section.Item`        | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`. |
-| `Section.Media`       | `<div>`     | `.cl-section-media`       | Reflects `data-size`.                                           |
-| `Section.Content`     | `<div>`     | `.cl-section-content`     | Label or title, and description.                                |
-| `Section.Label`       | `<div>`     | `.cl-section-label`       |                                                                 |
-| `Section.Description` | `<div>`     | `.cl-section-description` |                                                                 |
-| `Section.Actions`     | `<div>`     | `.cl-section-actions`     |                                                                 |
-| `Section.Error`       | `<p>`       | `.cl-section-error`       | A row-level message, placed beside the item inside the row.     |
+| Part                             | Element     | Class                     | Notes                                                                                          |
+| -------------------------------- | ----------- | ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `Section.Root`                   | `<section>` | `.cl-section`             | Stacks groups. Unnamed unless given `aria-label`.                                              |
+| `Section.Group`                  | `<div>`     | `.cl-section-group`       | Header and card, with `role='group'` named by its title.                                       |
+| `Section.Header`                 | `<div>`     | `.cl-section-header`      | Content and optional actions.                                                                  |
+| `Section.Title`                  | heading     | `.cl-section-title`       | The group's heading.                                                                           |
+| `Section.Body`                   | `<div>`     | `.cl-section-body`        | The card under the header.                                                                     |
+| `Section.Row`                    | `<div>`     | `.cl-section-row`         | One setting.                                                                                   |
+| `Section.Items`                  | `<ul>`      | `.cl-section-items`       | A list of values.                                                                              |
+| `Section.Item`                   | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`.                                |
+| `Section.Media`                  | `<div>`     | `.cl-section-media`       | Reflects `data-size`.                                                                          |
+| `Section.Content`                | `<div>`     | `.cl-section-content`     | Label or title, and description.                                                               |
+| `Section.Label`                  | `<div>`     | `.cl-section-label`       |                                                                                                |
+| `Section.Description`            | `<div>`     | `.cl-section-description` |                                                                                                |
+| `Section.CollapsibleDescription` | `<div>`     | `.cl-section-description` | Reflects `data-collapsible`. Opens and closes on its content; `truncate` keeps it to one line. |
+| `Section.Actions`                | `<div>`     | `.cl-section-actions`     |                                                                                                |
+| `Section.Error`                  | `<p>`       | `.cl-section-error`       | A row-level message, placed beside the item inside the row.                                    |
 
 Every part takes `xstyle`, `ref`, and `render` along with its element's props. Items and content
 inside `Section.Items` reflect `data-nested`.

@@ -13,6 +13,7 @@ export interface UserProfileConnectionProvider extends ConnectedAccountProviderD
 
 export interface UserProfileConnectedAccount extends ConnectedAccountProviderDisplay {
   id: string;
+  providerId?: string;
   identifier?: string;
   status: 'connected' | 'reconnect' | 'error';
   verificationError?: string;

@@ -3,14 +3,13 @@ import { useMemo, useRef } from 'react';
 import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
+import { useProviderRows } from '../../../hooks/use-provider-rows';
 import { fill, useMessages } from '../../../localization';
-import {
-  UserProfileConnectedAccountRowView,
-  UserProfileConnectProviderRowView,
-} from './user-profile-connected-account-row.view';
+import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectedAccountsSectionViewProps,
+  UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';
 
 export type {
@@ -18,6 +17,9 @@ export type {
   UserProfileConnectedAccountsSectionViewProps,
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';
+
+const providerOf = (account: UserProfileConnectedAccount) => account.providerId;
+const noProviders: UserProfileConnectionProvider[] = [];
 
 export function UserProfileConnectedAccountsSectionView({
   accounts,
@@ -42,6 +44,7 @@ export function UserProfileConnectedAccountsSectionView({
   const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
   const isBusy = pendingId !== undefined;
+  const rows = useProviderRows(accounts, onConnect ? availableProviders : noProviders, providerOf);
 
   return (
     <>
@@ -57,27 +60,19 @@ export function UserProfileConnectedAccountsSectionView({
               </Section.Content>
             </Section.Header>
             <Section.Body>
-              {accounts.map(account => (
+              {rows.map(({ key, connected: account, provider }) => (
                 <UserProfileConnectedAccountRowView
-                  key={account.id}
+                  key={key}
                   account={account}
-                  triggerRef={removalFocus.registerTrigger(account.id)}
+                  provider={provider}
+                  triggerRef={account ? removalFocus.registerTrigger(account.id) : undefined}
+                  isPending={provider !== undefined && pendingId === provider.id}
                   isDisabled={isBusy}
+                  onConnect={onConnect}
                   onReconnect={onReconnect}
                   onRemove={onRemove ? account => removeAccount.open(account) : undefined}
                 />
               ))}
-              {onConnect
-                ? availableProviders.map(provider => (
-                    <UserProfileConnectProviderRowView
-                      key={provider.id}
-                      provider={provider}
-                      isPending={pendingId === provider.id}
-                      isDisabled={isBusy}
-                      onConnect={onConnect}
-                    />
-                  ))
-                : null}
             </Section.Body>
           </Section.Group>
         </Section.Root>

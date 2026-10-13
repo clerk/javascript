@@ -7,10 +7,6 @@ import { useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosText } from '@/lib/chaos';
 
-interface DemoWallet extends UserProfileWeb3Wallet {
-  providerId?: string;
-}
-
 const providers: UserProfileWeb3Provider[] = [
   { id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
   {
@@ -20,7 +16,7 @@ const providers: UserProfileWeb3Provider[] = [
   },
 ];
 
-export const primaryWallet: DemoWallet = {
+export const primaryWallet: UserProfileWeb3Wallet = {
   id: 'wallet_1',
   providerId: 'web3_metamask_signature',
   provider: 'MetaMask',
@@ -30,7 +26,7 @@ export const primaryWallet: DemoWallet = {
   isVerified: true,
 };
 
-export const secondaryWallet: DemoWallet = {
+export const secondaryWallet: UserProfileWeb3Wallet = {
   id: 'wallet_2',
   providerId: 'web3_coinbase_wallet_signature',
   provider: 'Coinbase Wallet',
@@ -45,7 +41,7 @@ export function useWeb3WalletsFixture({
   primaryError = false,
   removalState,
 }: {
-  initialWallets?: DemoWallet[];
+  initialWallets?: UserProfileWeb3Wallet[];
   availableProviders?: UserProfileWeb3Provider[];
   primaryError?: boolean;
   removalState?: 'pending' | 'error';
