@@ -1,9 +1,10 @@
 import type { MachineAuthObject } from '@clerk/backend';
 import type { AuthenticatedMachineObject, MachineTokenType, SignedOutAuthObject } from '@clerk/backend/internal';
-import { constants } from '@clerk/backend/internal';
+import { AuthStatus, constants } from '@clerk/backend/internal';
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { HmacSHA1 } from '../../vendor/crypto-es';
 import { getAuthDataFromRequest } from '../data/getAuthDataFromRequest';
 import { encryptClerkRequestData } from '../utils';
 
@@ -306,7 +307,7 @@ describe('getAuthDataFromRequest', () => {
     const mockM2MJwt = [
       toBase64Url(JSON.stringify({ alg: 'RS256', typ: 'JWT' })),
       toBase64Url(JSON.stringify({ sub: 'mch_testmachine123', exp: 9999999999, iat: 1666648250 })),
-      'fakesignature',
+      'c2lnbmF0dXJl',
     ].join('.');
 
     it('returns signed-out when JWT-format M2M token is sent to a session-only endpoint', () => {
@@ -351,6 +352,48 @@ describe('getAuthDataFromRequest', () => {
       const auth = getAuthDataFromRequest(req, { acceptsToken: ['api_key', 'm2m_token'] });
 
       expect(auth.isAuthenticated).toBe(false);
+    });
+
+    const mockOAuthJwt = [
+      toBase64Url(JSON.stringify({ alg: 'RS256', typ: 'at+jwt' })),
+      toBase64Url(JSON.stringify({ sub: 'user_123', scope: 'profile email', exp: 9999999999, iat: 1666648250 })),
+      'c2lnbmF0dXJl',
+    ].join('.');
+
+    const mockVerifiedRequestWithPaddedHeader = (token: string, tokenType: MachineTokenType) =>
+      mockRequest({
+        url: '/api/protected',
+        headers: new Headers({
+          [constants.Headers.Authorization]: `Bearer ${token} x`,
+          [constants.Headers.AuthStatus]: AuthStatus.SignedIn,
+          [constants.Headers.AuthToken]: token,
+          [constants.Headers.AuthSignature]: HmacSHA1(token, 'sk_test_xxxxxxxxxxxxxxxxxx').toString(),
+        }),
+        machineAuthObject: createMockMachineAuthObject({ tokenType, isAuthenticated: true }),
+      });
+
+    it.each([
+      ['OAuth', mockOAuthJwt, 'oauth_token'],
+      ['M2M', mockM2MJwt, 'm2m_token'],
+    ] as const)(
+      'returns signed-out when a verified JWT-format %s token is sent with a padded Authorization header',
+      (_, token, tokenType) => {
+        const auth = getAuthDataFromRequest(mockVerifiedRequestWithPaddedHeader(token, tokenType));
+
+        expect(auth.tokenType).toBe('session_token');
+        expect((auth as SignedOutAuthObject).userId).toBeNull();
+        expect(auth.isAuthenticated).toBe(false);
+      },
+    );
+
+    it('returns the machine auth object when an accepted machine token is sent with a padded Authorization header', async () => {
+      const auth = getAuthDataFromRequest(mockVerifiedRequestWithPaddedHeader(mockOAuthJwt, 'oauth_token'), {
+        acceptsToken: 'oauth_token',
+      });
+
+      expect(auth.tokenType).toBe('oauth_token');
+      expect(auth.isAuthenticated).toBe(true);
+      await expect(auth.getToken()).resolves.toBe(mockOAuthJwt);
     });
   });
 });
