@@ -154,30 +154,28 @@ export function createProtect(opts: {
     }
 
     if (authObject.tokenType !== TokenType.SessionToken) {
-      // For machine tokens, we only check if they're authenticated
-      // They don't have session status or organization permissions
+      // Machine tokens don't have session status
       if (!authObject.isAuthenticated) {
         return handleUnauthorized();
       }
-      return authObject;
+    } else {
+      /**
+       * Redirects the user back to the tasks URL if their session status is pending
+       */
+      if (authObject.sessionStatus === 'pending') {
+        return handleUnauthenticated();
+      }
+
+      /**
+       * User is not authenticated
+       */
+      if (!authObject.userId) {
+        return handleUnauthenticated();
+      }
     }
 
     /**
-     * Redirects the user back to the tasks URL if their session status is pending
-     */
-    if (authObject.sessionStatus === 'pending') {
-      return handleUnauthenticated();
-    }
-
-    /**
-     * User is not authenticated
-     */
-    if (!authObject.userId) {
-      return handleUnauthenticated();
-    }
-
-    /**
-     * User is authenticated
+     * User or machine is authenticated
      */
     if (!paramsOrFunction) {
       return authObject;
