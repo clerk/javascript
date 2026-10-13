@@ -44,6 +44,7 @@ android {
     versionCode 1
     versionName "1.0.0"
     buildConfigField "String", "CLERK_EXPO_VERSION", "\"${clerkExpoVersion}\""
+    consumerProguardFiles "proguard-rules.pro"
   }
 
   buildTypes {
