@@ -2017,6 +2017,16 @@ export const ruRU: LocalizationResource = {
     subtitle: undefined,
     title: undefined,
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: undefined,
     signOut: {

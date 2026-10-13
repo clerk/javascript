@@ -2022,6 +2022,16 @@ export const taIN: LocalizationResource = {
     subtitle: 'நீங்கள் தொடரும் முன் உங்கள் கணக்கிற்கு புதிய கடவுச்சொல் தேவை',
     title: 'உங்கள் கடவுச்சொல்லை மீட்டமைக்கவும்',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'இரு-படி சரிபார்ப்பு அமைப்பு',
     signOut: {

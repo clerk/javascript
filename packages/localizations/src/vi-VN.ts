@@ -2015,6 +2015,16 @@ export const viVN: LocalizationResource = {
     subtitle: 'Tài khoản của bạn yêu cầu mật khẩu mới trước khi bạn có thể tiếp tục',
     title: 'Đặt lại mật khẩu của bạn',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'Thiết lập xác minh hai bước',
     signOut: {

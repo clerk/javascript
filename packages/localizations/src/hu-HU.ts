@@ -2021,6 +2021,16 @@ export const huHU: LocalizationResource = {
     subtitle: 'A fiókodhoz új jelszó szükséges, mielőtt folytathatnád',
     title: 'Jelszó visszaállítása',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'Kétlépcsős azonosítás beállítása',
     signOut: {

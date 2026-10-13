@@ -2017,6 +2017,16 @@ export const hiIN: LocalizationResource = {
     subtitle: 'जारी रखने से पहले आपके खाते को एक नए पासवर्ड की आवश्यकता है',
     title: 'अपना पासवर्ड रीसेट करें',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'दो-चरणीय सत्यापन सेटअप',
     signOut: {

@@ -2019,6 +2019,16 @@ export const ptBR: LocalizationResource = {
     subtitle: 'Sua conta requer uma nova senha antes de continuar',
     title: 'Resetar senha',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: undefined,
     signOut: {

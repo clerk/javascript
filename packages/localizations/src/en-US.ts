@@ -2053,6 +2053,16 @@ export const enUS: LocalizationResource = {
     subtitle: 'Your account requires a new password before you can continue',
     title: 'Reset your password',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: "Your organization's SSO connection isn't available. Contact your administrator.",
+    formButtonPrimary: 'Continue with {{connectionName}}',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+    subtitle: '{{organizationName}} requires you to sign in with your organization account to continue.',
+    title: 'Continue with SSO',
+  },
   taskSetupMfa: {
     badge: 'Two-step verification setup',
     signOut: {

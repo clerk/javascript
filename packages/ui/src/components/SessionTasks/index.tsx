@@ -18,6 +18,7 @@ import {
 import { Route, Switch, useRouter } from '../../router';
 import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
 import { TaskResetPassword } from './tasks/TaskResetPassword';
+import { TaskSetupEnterpriseSSO } from './tasks/TaskSetupEnterpriseSso';
 import { TaskSetupMFA } from './tasks/TaskSetupMfa';
 
 const SessionTasksStart = () => {
@@ -107,6 +108,9 @@ function SessionTasksRoutes(): JSX.Element {
           >
             <TaskSetupMFA />
           </TaskSetupMFAContext.Provider>
+        </Route>
+        <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['setup-enterprise-sso']}>
+          <TaskSetupEnterpriseSSO />
         </Route>
         <Route index>
           <SessionTasksStart />

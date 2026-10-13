@@ -2016,6 +2016,16 @@ export const ptPT: LocalizationResource = {
     subtitle: 'A sua conta requer uma nova palavra-passe antes de poder continuar',
     title: 'Reponha a sua palavra-passe',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'Configuração da verificação em duas etapas',
     signOut: {

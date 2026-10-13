@@ -2019,6 +2019,16 @@ export const hrHR: LocalizationResource = {
     subtitle: 'Vaš račun zahtijeva novu lozinku prije nego što možete nastaviti',
     title: 'Resetirajte svoju lozinku',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'Postavljanje dvostupanjske verifikacije',
     signOut: {

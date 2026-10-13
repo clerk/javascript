@@ -2017,6 +2017,16 @@ export const jaJP: LocalizationResource = {
     subtitle: '続行するには、アカウントの新しいパスワードを設定する必要があります',
     title: 'パスワードをリセット',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: '二段階認証の設定',
     signOut: {

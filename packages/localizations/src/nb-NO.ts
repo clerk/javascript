@@ -2019,6 +2019,16 @@ export const nbNO: LocalizationResource = {
     subtitle: 'Kontoen din krever et nytt passord før du kan fortsette',
     title: 'Tilbakestill passordet ditt',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'Oppsett av to-trinns verifisering',
     signOut: {

@@ -1995,6 +1995,16 @@ export const zhTW: LocalizationResource = {
     subtitle: '您的帳戶需要新的密碼才能繼續',
     title: '重設您的密碼',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: '兩步驟驗證設定',
     signOut: {

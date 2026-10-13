@@ -2019,6 +2019,16 @@ export const isIS: LocalizationResource = {
     subtitle: 'Reikningurinn þinn krefst nýs lykilorðs áður en þú getur haldið áfram',
     title: 'Endurstilla lykilorðið þitt',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'Uppsetning tveggja þrepa auðkenningar',
     signOut: {

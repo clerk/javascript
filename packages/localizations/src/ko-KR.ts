@@ -2000,6 +2000,16 @@ export const koKR: LocalizationResource = {
     subtitle: '계속하려면 비밀번호를 새로 설정해야 해요',
     title: '비밀번호 재설정',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: undefined,
     signOut: {

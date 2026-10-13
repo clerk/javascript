@@ -2022,6 +2022,16 @@ export const msMY: LocalizationResource = {
     subtitle: 'Akaun anda memerlukan kata laluan baharu sebelum anda boleh meneruskan',
     title: 'Tetapkan semula kata laluan anda',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'Persediaan pengesahan dua langkah',
     signOut: {

@@ -2018,6 +2018,16 @@ export const fiFI: LocalizationResource = {
     subtitle: 'Tilisi vaatii uuden salasanan ennen kuin voit jatkaa',
     title: 'Nollaa salasanasi',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'Kaksivaiheisen todennuksen asennus',
     signOut: {

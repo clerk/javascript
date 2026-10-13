@@ -2419,6 +2419,16 @@ export type __internal_LocalizationResource = {
     };
     formButtonPrimary: LocalizationValue;
   };
+  taskSetupEnterpriseSso: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue<'organizationName'>;
+    formButtonPrimary: LocalizationValue<'connectionName'>;
+    connectionUnavailable: LocalizationValue;
+    signOut: {
+      actionLink: LocalizationValue;
+      actionText: LocalizationValue<'identifier'>;
+    };
+  };
   taskSetupMfa: {
     badge: LocalizationValue;
     start: {

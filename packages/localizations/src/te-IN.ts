@@ -2020,6 +2020,16 @@ export const teIN: LocalizationResource = {
     subtitle: 'మీరు కొనసాగడానికి ముందు మీ ఖాతాకు కొత్త పాస్‌వర్డ్ అవసరం',
     title: 'మీ పాస్‌వర్డ్‌ను రీసెట్ చేయండి',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'రెండు-దశల ధృవీకరణ సెటప్',
     signOut: {

@@ -2016,6 +2016,16 @@ export const elGR: LocalizationResource = {
     subtitle: 'Για λόγους ασφαλείας, παρακαλώ επαναφέρετε τον κωδικό πρόσβασής σας',
     title: 'Επαναφορά κωδικού πρόσβασης',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: undefined,
     signOut: {

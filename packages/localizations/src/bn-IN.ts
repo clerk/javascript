@@ -2016,6 +2016,16 @@ export const bnIN: LocalizationResource = {
     subtitle: 'আপনি চালিয়ে যাওয়ার আগে আপনার অ্যাকাউন্টের একটি নতুন পাসওয়ার্ড প্রয়োজন',
     title: 'আপনার পাসওয়ার্ড রিসেট করুন',
   },
+  taskSetupEnterpriseSso: {
+    connectionUnavailable: undefined,
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   taskSetupMfa: {
     badge: 'দুই-ধাপ যাচাইকরণ সেটআপ',
     signOut: {
