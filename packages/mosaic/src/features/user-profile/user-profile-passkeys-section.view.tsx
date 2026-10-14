@@ -26,7 +26,7 @@ export interface UserProfilePasskeysSectionViewProps {
   addError?: string;
   onRename?: (id: string, name: string) => void | Promise<void>;
   validateName?: UserProfilePasskeyNameValidator;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<UserProfilePasskey>;
   finalFocus?: DialogFocusTarget;
 }
@@ -91,7 +91,7 @@ export function UserProfilePasskeysSectionView({
                 <UserProfilePasskeyRowView
                   key={passkey.id}
                   passkey={passkey}
-                  triggerRef={registerTrigger?.(passkey.id)}
+                  triggerRef={registerTrigger(passkey.id)}
                   onRename={onRename}
                   validateName={validateName}
                   onRemove={remove ? () => remove.open(passkey) : undefined}

@@ -245,10 +245,10 @@ function APIKeyActions({
 }: {
   messages: APIKeysTableMessages;
   apiKey: APIKey;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   onSelect: (key: APIKey) => void;
 }) {
-  const [triggerRef] = useState(() => registerTrigger?.(apiKey.id));
+  const [triggerRef] = useState(() => registerTrigger(apiKey.id));
   return (
     <Menu.Root placement='bottom-end'>
       <Menu.Trigger

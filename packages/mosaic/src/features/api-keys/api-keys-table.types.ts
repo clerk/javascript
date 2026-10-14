@@ -47,7 +47,7 @@ export interface APIKeysTableViewProps {
   createButtonRef?: Ref<HTMLButtonElement>;
   onCreate?: MouseEventHandler<HTMLButtonElement>;
   createDialog?: CreateAPIKeyDialogProps;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   revoke?: ConfirmController<APIKey>;
   finalFocus?: DialogFocusTarget;
   onBulkAction?: (ids: string[]) => void;

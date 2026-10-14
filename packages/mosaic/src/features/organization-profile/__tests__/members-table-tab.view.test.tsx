@@ -49,6 +49,7 @@ function propsFor(overrides: Partial<MembersTableTabViewProps> = {}): MembersTab
     isLoading: false,
     onSearchChange: vi.fn(),
     onPageChange: vi.fn(),
+    registerTrigger: () => null,
     ...overrides,
   };
 }

@@ -80,6 +80,7 @@ describe('Composing connected authentication sections', () => {
       <UserProfileSecurityPanelView
         passkeysSlot={
           <UserProfilePasskeysSectionView
+            registerTrigger={() => null}
             passkeys={[]}
             onAdd={vi.fn()}
           />

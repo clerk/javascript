@@ -214,7 +214,7 @@ function MembersTableBody({
   onChangeRole?: MembersTableTabViewProps['onChangeRole'];
   isChangingRole: boolean;
   onRemoveClick?: (member: OrganizationProfileMember) => void;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('membersTableTab');
   if (isLoading) {
@@ -273,7 +273,7 @@ function MembersTableBody({
           onChangeRole={onChangeRole}
           isChangingRole={isChangingRole}
           onRemoveClick={onRemoveClick ? () => onRemoveClick(row.original) : undefined}
-          triggerRef={registerTrigger?.(row.original.id)}
+          triggerRef={registerTrigger(row.original.id)}
         />
       ))}
     </Table.Body>

@@ -38,7 +38,7 @@ export function UserProfileWeb3WalletsSectionView({
                 <UserProfileWeb3WalletRowView
                   key={wallet.id}
                   wallet={wallet}
-                  triggerRef={registerTrigger?.(wallet.id)}
+                  triggerRef={registerTrigger(wallet.id)}
                   isDisabled={isBusy}
                   onSetPrimary={onSetPrimary}
                   onRemove={remove ? wallet => remove.open(wallet) : undefined}

@@ -46,7 +46,7 @@ export function UserProfileConnectedAccountsSectionView({
                 <UserProfileConnectedAccountRowView
                   key={account.id}
                   account={account}
-                  triggerRef={registerTrigger?.(account.id)}
+                  triggerRef={registerTrigger(account.id)}
                   isDisabled={isBusy}
                   onReconnect={onReconnect}
                   onRemove={remove ? account => remove.open(account) : undefined}

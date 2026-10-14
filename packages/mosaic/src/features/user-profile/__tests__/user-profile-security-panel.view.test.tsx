@@ -78,7 +78,12 @@ const passkeys = [
 ];
 
 const props: UserProfileSecurityPanelViewProps = {
-  passkeysSlot: <UserProfilePasskeysSectionView passkeys={passkeys} />,
+  passkeysSlot: (
+    <UserProfilePasskeysSectionView
+      registerTrigger={() => null}
+      passkeys={passkeys}
+    />
+  ),
   mfaMethods: [
     { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
     { id: 'totp_1', type: 'authenticator' },
@@ -195,6 +200,7 @@ describe('UserProfileSecurityPanelView', () => {
     renderView({
       passkeysSlot: (
         <UserProfilePasskeysSectionView
+          registerTrigger={() => null}
           passkeys={[]}
           onAdd={vi.fn()}
         />
@@ -239,7 +245,14 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('keeps the passkeys card in the authentication section when passkeys are empty and Add is unavailable', () => {
-    renderView({ passkeysSlot: <UserProfilePasskeysSectionView passkeys={[]} /> });
+    renderView({
+      passkeysSlot: (
+        <UserProfilePasskeysSectionView
+          registerTrigger={() => null}
+          passkeys={[]}
+        />
+      ),
+    });
 
     const section = screen.getByRole('region', { name: 'Authentication' });
     expect(within(section).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
