@@ -2,10 +2,11 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type {
+  SelectMultipleProps as PrimitiveSelectMultipleProps,
   SelectOptionProps as PrimitiveSelectOptionProps,
   SelectPopupProps as PrimitiveSelectPopupProps,
   SelectPortalProps,
-  SelectProps as PrimitiveSelectProps,
+  SelectSingleProps as PrimitiveSelectSingleProps,
 } from '../../primitives/select';
 import { Select as Primitive } from '../../primitives/select';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
@@ -32,7 +33,7 @@ export interface SelectItem {
   disabled?: boolean;
 }
 
-export interface SelectProps extends Omit<PrimitiveSelectProps, 'items'> {
+interface SelectItemsProps {
   /**
    * Every choice. Required, unlike the primitive's: the options only mount while the listbox is
    * open, so this is what lets the closed trigger show the selected label. `Select.Popup`
@@ -40,6 +41,10 @@ export interface SelectProps extends Omit<PrimitiveSelectProps, 'items'> {
    */
   items: SelectItem[];
 }
+
+export type SelectProps =
+  | (Omit<PrimitiveSelectSingleProps, 'items'> & SelectItemsProps)
+  | (Omit<PrimitiveSelectMultipleProps, 'items'> & SelectItemsProps);
 
 const ItemsContext = React.createContext<SelectItem[]>([]);
 
@@ -51,7 +56,7 @@ export function SelectRoot({ items, alignItemWithTrigger, children, ...rest }: S
     <ItemsContext.Provider value={items}>
       <Primitive.Root
         items={items}
-        alignItemWithTrigger={alignItemWithTrigger ?? !described}
+        alignItemWithTrigger={alignItemWithTrigger ?? !(described || rest.multiple)}
         {...rest}
       >
         {children}
@@ -62,7 +67,7 @@ export function SelectRoot({ items, alignItemWithTrigger, children, ...rest }: S
 
 export type SelectTriggerVariant = 'outline' | 'ghost';
 
-export type SelectTriggerProps = MosaicComponentProps<'button'> & {
+export type SelectTriggerProps = Omit<MosaicComponentProps<'button'>, 'children'> & {
   /**
    * `outline` is the bordered form control; `ghost` drops the border for triggers that sit in
    * dense surfaces such as table rows.
@@ -72,6 +77,11 @@ export type SelectTriggerProps = MosaicComponentProps<'button'> & {
   variant?: SelectTriggerVariant;
   /** Shown in place of the selected label while nothing is selected. */
   placeholder?: React.ReactNode;
+  /**
+   * Content that replaces the selected label. A function renders inside the value slot and
+   * receives the selected values; anything else replaces the value slot entirely.
+   */
+  children?: React.ReactNode | ((value: string[]) => React.ReactNode);
 };
 
 /**
@@ -108,6 +118,8 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
     labelElementType: 'span',
   });
   const id = fieldProps?.id ?? idProp ?? generatedId;
+  const renderValue = typeof children === 'function' ? children : undefined;
+  const content = typeof children === 'function' ? undefined : children;
   // A combobox takes no name from its content, so the value is named explicitly, after any label.
   // An `aria-label` is kept by naming the trigger itself.
   const labelledBy = fieldProps?.['aria-labelledby'] ?? ariaLabelledBy ?? (ariaLabel ? id : undefined);
@@ -129,13 +141,13 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       id={id}
       disabled={fieldProps?.disabled ?? disabledProp}
       aria-label={ariaLabel}
-      aria-labelledby={mergeIds(labelledBy, children === undefined ? valueId : undefined)}
+      aria-labelledby={mergeIds(labelledBy, content === undefined ? valueId : undefined)}
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
       aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
       aria-required={ariaRequired ?? (fieldProps?.required ? true : undefined)}
       {...mergeStyleProps(themeProps('select-trigger', { variant }), stylex.props(xstyle), rest)}
     >
-      {children ?? (
+      {content ?? (
         <Primitive.Value
           id={valueId}
           placeholder={placeholder}
@@ -143,7 +155,9 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
             themeProps('select-value'),
             stylex.props(reset.base, truncationStyles.singleLine, slots.value.base),
           )}
-        />
+        >
+          {renderValue}
+        </Primitive.Value>
       )}
       <Icon
         name='chevron-down'
