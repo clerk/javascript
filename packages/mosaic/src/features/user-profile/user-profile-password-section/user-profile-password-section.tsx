@@ -14,10 +14,6 @@ export interface UserProfilePasswordSectionProps {
 
 export function UserProfilePasswordSection({ fallback = null }: UserProfilePasswordSectionProps) {
   const model = useUserProfilePasswordModel();
-  return renderPasswordSection(model, fallback);
-}
-
-export function renderPasswordSection(model: UserProfilePasswordModel, fallback: ReactNode): ReactNode {
   if (model.status === 'loading') {
     return fallback || null;
   }
