@@ -232,7 +232,7 @@ const ImpersonationFabInternal = () => {
           zIndex: t.zIndices.$fab,
           boxShadow: t.shadows.$fabShadow,
           borderRadius: t.radii.$halfHeight, //to match the circular eye perfectly
-          backgroundColor: t.colors.$white,
+          backgroundColor: t.colors.$colorBackground,
           fontFamily: t.fonts.$main,
           ':hover': {
             cursor: 'grab',
