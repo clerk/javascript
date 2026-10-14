@@ -53,12 +53,16 @@ export function useUserProfileActiveDevicesController({
     onConfirm: signOutDevice,
     errorFallback: m.detailsDialog.signOutError,
   });
+  // Details card has a "Sign out" when the device is not the current one,
+  // that "Sign out" needs reverification etc so we borrow the confirm
+  // controller and pretend the "Sign out" is the confirm.
   const details = useConfirmController<UserProfileDevice>({
     onConfirm: signOutDevice,
     errorFallback: m.detailsDialog.signOutError,
   });
   const signOutAll = useConfirmController({
     onConfirm: async () => {
+      // revokeAll is always defined here but it's annoying to convince TS of that, hence the ?.
       await revokeAll?.();
       signedOutAll.current = true;
     },
