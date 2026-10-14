@@ -1,3 +1,4 @@
+import { reverificationError } from '@clerk/shared/authorization-errors';
 import { ClerkRuntimeError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import type * as SharedReact from '@clerk/shared/react';
 import type { SessionVerificationLevel } from '@clerk/shared/types';
@@ -120,6 +121,32 @@ describe('useReverificationWithState', () => {
     });
     await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
     expect(challengeCancel).not.toHaveBeenCalled();
+  });
+
+  it('rejects when the retry is asked to reverify again', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockResolvedValueOnce(reverificationError());
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+
+    let pending!: Promise<unknown>;
+    act(() => {
+      pending = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].complete();
+    });
+
+    await act(async () => {
+      await expect(pending).rejects.toSatisfy(
+        error => isClerkRuntimeError(error) && error.code === 'reverification_incomplete',
+      );
+    });
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
+    expect(fetcher).toHaveBeenCalledTimes(2);
   });
 
   it('settles when the delayed retry fails', async () => {
