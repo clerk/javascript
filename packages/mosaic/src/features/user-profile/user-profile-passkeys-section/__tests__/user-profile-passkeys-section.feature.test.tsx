@@ -503,5 +503,4 @@ describe('Passkey reverification', () => {
 
 describe('Passkey follow-ups', () => {
   it.todo('rerenders passkey eligibility when a replaced or fetched environment changes policy');
-  it.todo('focuses a surviving passkey row during React cleanup after removal');
 });
