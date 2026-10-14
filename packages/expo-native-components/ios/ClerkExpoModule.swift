@@ -43,7 +43,6 @@ public class ClerkExpoModule: Module {
       }
     }
 
-    // Keeps the pre-proxy signature so OTA-updated JS on older binaries keeps working.
     AsyncFunction("configure") { (publishableKey: String, bearerToken: String?, promise: Promise) in
       self.configure(publishableKey, bearerToken: bearerToken, proxyUrl: nil, promise: promise)
     }

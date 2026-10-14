@@ -264,7 +264,6 @@ class ClerkExpoModule : Module() {
             clientStateObserverJob = null
         }
 
-        // Keeps the pre-proxy signature so OTA-updated JS on older binaries keeps working.
         AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
             configure(pubKey, bearerToken, null, promise)
         }

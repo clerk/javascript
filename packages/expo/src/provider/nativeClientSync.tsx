@@ -1055,7 +1055,6 @@ export function useNativeClientBootstrap({
   const bootstrapGenerationRef = useRef(0);
   const isMountedRef = useRef(true);
   const [readyConfigKey, setReadyConfigKey] = useState<string | null>(null);
-  // Function proxyUrls are browser-only; the singleton already rejects them on native.
   const nativeProxyUrl = typeof proxyUrl === 'string' && proxyUrl ? proxyUrl : null;
   const configKey = `${publishableKey}|${nativeProxyUrl ?? ''}`;
 
@@ -1126,7 +1125,6 @@ export function useNativeClientBootstrap({
                 proxyUrl: nativeProxyUrl,
               });
             } else {
-              // Old binaries reject extra configure args, so OTA-updated JS must use the legacy call.
               if (nativeProxyUrl && __DEV__) {
                 console.warn(
                   '[ClerkProvider] The installed Clerk native module does not support proxyUrl. ' +
