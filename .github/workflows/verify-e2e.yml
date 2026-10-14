@@ -14,8 +14,6 @@ on:
       - 'packages/expo-biometrics/**'
       - 'packages/expo-google-signin/**'
       - 'packages/expo-native-components/**'
-  schedule:
-    - cron: '0 7 * * *'
   workflow_dispatch:
 
 permissions:
@@ -27,7 +25,7 @@ concurrency:
 
 jobs:
   plan:
-    if: github.head_ref != 'changeset-release/main' && (github.event_name != 'schedule' || github.repository == 'clerk/javascript')
+    if: ${{ github.head_ref != 'changeset-release/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
