@@ -23,6 +23,9 @@ disableMotion.textContent = `
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
+  [data-starting-style] {
+    opacity: 1 !important;
+  }
 `;
 document.head.append(disableMotion);
 
