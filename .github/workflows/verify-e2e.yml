@@ -1,31 +1,20 @@
 name: Verify end-to-end tests
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - main
-    paths:
-      - 'integration/expo-native/**'
-      - '!integration/expo-native/**/*.md'
-      - '.github/workflows/verify-e2e.yml'
-      - 'integration/templates/expo-native/**'
-      - 'packages/expo/**'
-      - 'packages/expo-biometrics/**'
-      - 'packages/expo-google-signin/**'
-      - 'packages/expo-native-components/**'
+  schedule:
+    - cron: '0 7 * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: verify-e2e-${{ github.head_ref || github.ref }}
+  group: verify-e2e-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   plan:
-    if: ${{ github.head_ref != 'changeset-release/main' }}
+    if: github.event_name != 'schedule' || github.repository == 'clerk/javascript'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -34,18 +23,12 @@ jobs:
       - name: Decide whether the end-to-end tests can run
         id: plan
         env:
-          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           HAS_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY != '' }}
-          DRAFT: ${{ github.event.pull_request.draft == true }}
         run: |
           set -euo pipefail
 
           skip_reason=""
-          if [ "$DRAFT" = "true" ]; then
-            skip_reason="The end-to-end tests did not run. This pull request is a draft. They run when it is marked ready for review."
-          elif [ "$HEAD_REPOSITORY" != "$GITHUB_REPOSITORY" ]; then
-            skip_reason="The end-to-end tests did not run. They need a repository secret, and this pull request comes from a fork ($HEAD_REPOSITORY)."
-          elif [ "$HAS_PLATFORM_API_KEY" != "true" ]; then
+          if [ "$HAS_PLATFORM_API_KEY" != "true" ]; then
             skip_reason="The end-to-end tests did not run. The MOBILE_VERIFICATION_PLATFORM_API_KEY secret is not set for this repository."
           fi
 
@@ -64,7 +47,6 @@ jobs:
     permissions:
       contents: read
       actions: read
-      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -156,7 +138,7 @@ jobs:
         timeout-minutes: 5
         env:
           GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ github.head_ref || github.ref_name }}
+          BRANCH: ${{ github.ref_name }}
           NATIVE_ID: ${{ steps.native.outputs.id }}
           NATIVE_DIR: ${{ steps.native.outputs.dir }}
           NATIVE_APP: ${{ steps.native.outputs.app }}
