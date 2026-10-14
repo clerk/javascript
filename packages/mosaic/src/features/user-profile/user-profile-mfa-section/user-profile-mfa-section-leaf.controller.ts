@@ -51,7 +51,7 @@ export function useUserProfileMfaSectionLeafController({
       defaultAction.reset();
       remove.open(method);
     },
-    remove,
+    remove: onRemove ? remove : undefined,
     finalRemovalFocus: removalFocus.finalFocus,
     defaultError: defaultAction.error,
     setDefault: onSetDefault && !defaultAction.isPending ? setDefault : undefined,
