@@ -5,15 +5,38 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../mosaic-provider';
+import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
+import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
-function DeleteAccount({ onDelete = () => Promise.resolve() }: { onDelete?: () => Promise<void> }) {
-  const controller = useDestructiveController({ onDelete });
+function DeleteAccount() {
+  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
   return <UserProfileDangerSectionView {...controller} />;
 }
+const devices: UserProfileDevice[] = [
+  {
+    id: 'current',
+    name: 'Safari on macOS',
+    description: 'Salt Lake City, UT, United States',
+    type: 'desktop',
+    isCurrent: true,
+  },
+  {
+    id: 'mobile',
+    name: 'Safari on iOS',
+    description: 'Last seen 2 weeks ago · Orem, UT, United States',
+    type: 'mobile',
+  },
+  {
+    id: 'desktop',
+    name: 'Clerk App on macOS',
+    description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
+    type: 'desktop',
+  },
+];
 
 const passkeys = [
   {
@@ -31,27 +54,7 @@ const props: UserProfileSecurityPanelViewProps = {
     { id: 'totp_1', type: 'authenticator' },
     { id: 'backup_1', type: 'backup-codes' },
   ],
-  devices: [
-    {
-      id: 'current',
-      name: 'Safari on macOS',
-      description: 'Salt Lake City, UT, United States',
-      type: 'desktop',
-      isCurrent: true,
-    },
-    {
-      id: 'mobile',
-      name: 'Safari on iOS',
-      description: 'Last seen 2 weeks ago · Orem, UT, United States',
-      type: 'mobile',
-    },
-    {
-      id: 'desktop',
-      name: 'Clerk App on macOS',
-      description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
-      type: 'desktop',
-    },
-  ],
+  activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={devices} />,
 };
 
 function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) {
@@ -77,14 +80,15 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByText('Password')).toBeVisible();
   });
 
-  it('composes authentication, active devices, and the danger zone', () => {
-    renderView({ dangerSlot: <DeleteAccount /> });
+  it('composes authentication and active devices without rendering a supplied danger zone', () => {
+    const staleSecurityProps = { ...props, dangerSlot: <DeleteAccount /> };
+    renderView(staleSecurityProps);
 
     expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
     const authentication = screen.getByRole('region', { name: 'Authentication' });
     expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Active devices' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 3, name: 'Danger zone' })).not.toBeInTheDocument();
     expect(within(authentication).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeInTheDocument();
     expect(within(authentication).getByRole('heading', { level: 3, name: '2-step verification' })).toBeInTheDocument();
     expect(within(authentication).getByRole('group', { name: 'Passkeys' })).toBeInTheDocument();
@@ -93,9 +97,14 @@ describe('UserProfileSecurityPanelView', () => {
     expect(within(activeDevices).getAllByRole('listitem')).toHaveLength(3);
     expect(screen.queryByRole('button', { name: 'Sign out of all devices' })).not.toBeInTheDocument();
     expect(screen.getByText('This device')).toBeInTheDocument();
-    expect(
-      screen.getByText('Permanently delete this account and all its data. This cannot be undone.'),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Delete account' })).not.toBeInTheDocument();
+  });
+
+  it('omits active devices when no slot is supplied', () => {
+    renderView({ activeDevicesSlot: undefined });
+
+    expect(screen.queryByRole('heading', { name: 'Active devices' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Security' })).toBeInTheDocument();
   });
 
   it('adds an available MFA method through the picker', async () => {
@@ -121,13 +130,16 @@ describe('UserProfileSecurityPanelView', () => {
   it('forwards security actions', async () => {
     const onSignOutDevice = vi.fn();
     const onSignOutAllOtherDevices = vi.fn();
-    const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
 
     renderView({
-      onSignOutDevice,
-      onSignOutAllOtherDevices,
-      dangerSlot: <DeleteAccount onDelete={onDeleteAccount} />,
+      activeDevicesSlot: (
+        <UserProfileActiveDevicesSectionView
+          devices={devices}
+          onSignOutDevice={onSignOutDevice}
+          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
+        />
+      ),
     });
 
     const signOutAll = screen.getByRole('button', { name: 'Sign out of all devices' });
@@ -145,15 +157,8 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
-    // The danger zone confirms in a modal, so it goes last: nothing else is clickable while it is open.
-    await user.click(screen.getByRole('button', { name: 'Delete account' }));
-    const deleteDialog = screen.getByRole('dialog');
-    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
-    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
-
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
-    expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
   it('keeps supported empty MFA methods and devices actionable', () => {
@@ -165,7 +170,7 @@ describe('UserProfileSecurityPanelView', () => {
         />
       ),
       mfaMethods: [],
-      devices: [],
+      activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={[]} />,
       onAddMfaMethod: vi.fn(),
       addableMfaMethods: ['sms', 'authenticator'],
     });
@@ -177,7 +182,14 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('withholds sign out from the current device', async () => {
     const user = userEvent.setup();
-    renderView({ onSignOutDevice: vi.fn() });
+    renderView({
+      activeDevicesSlot: (
+        <UserProfileActiveDevicesSectionView
+          devices={devices}
+          onSignOutDevice={vi.fn()}
+        />
+      ),
+    });
 
     await user.click(screen.getByRole('button', { name: 'Manage Safari on macOS' }));
     expect(screen.getByRole('menuitem', { name: 'View details' })).toBeInTheDocument();

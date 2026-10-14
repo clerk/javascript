@@ -4,6 +4,7 @@ import { FloatingFocusManager, FloatingList, FloatingOverlay } from '@floating-u
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useSelectContext } from './select-context';
 
 export type SelectPositionerProps = ComponentProps<'div'>;
@@ -25,7 +26,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       alignItemWithTrigger,
     } = useSelectContext();
 
-    const side = alignItemWithTrigger ? 'none' : placement.split('-')[0];
+    const side = alignItemWithTrigger ? 'none' : parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps({
       onKeyDown(event: React.KeyboardEvent<HTMLElement>) {

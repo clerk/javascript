@@ -1,5 +1,5 @@
 import type { FormEvent, ReactNode } from 'react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
@@ -73,6 +73,7 @@ function DestructiveCard({
     }
   }, [open]);
 
+  const inputRef = useRef<HTMLInputElement>(null);
   const isConfirmed = typedValue === confirmationValue;
   // The action sits in the footer, outside the form, so `form={formId}` associates the two.
   // That is what makes Enter in the field submit. Both guards are re-checked here because
@@ -100,6 +101,7 @@ function DestructiveCard({
           <Field.Root invalid={Boolean(errorMessage)}>
             <Field.Label>{fieldLabel}</Field.Label>
             <Input
+              ref={inputRef}
               // Not a credential, so 1Password is told to leave it alone rather than
               // cover it with an autofill overlay.
               data-1p-ignore
@@ -149,14 +151,12 @@ function DestructiveCard({
         <>
           <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
           <Flow.Step ids={['verify']}>
-            {reverification ? (
-              <Reverification
-                {...reverification}
-                // This onClose isn't strictly necessary, but make sure we close as soon as possible
-                // instead of after the reverification has been reset
-                onClose={onClose}
-              />
-            ) : null}
+            <Reverification
+              {...reverification}
+              // This onClose isn't strictly necessary, but make sure we close as soon as possible
+              // instead of after the reverification has been reset
+              onClose={onClose}
+            />
           </Flow.Step>
         </>
       )}
@@ -168,6 +168,7 @@ function DestructiveCard({
   return (
     <Dialog.Popup
       variant='card'
+      initialFocus={inputRef}
       finalFocus={finalFocus}
     >
       <Card.Root

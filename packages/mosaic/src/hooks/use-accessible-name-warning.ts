@@ -37,7 +37,7 @@ export function useAccessibleNameWarning(node: HTMLElement | null, component: st
       const named = labelledBy
         ?.split(/\s+/)
         .filter(Boolean)
-        .some(id => node.ownerDocument.getElementById(id)?.textContent?.trim());
+        .some(id => node.ownerDocument.getElementById(id)?.textContent.trim());
       if (named) {
         return;
       }

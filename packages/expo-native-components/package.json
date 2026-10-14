@@ -56,7 +56,6 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@clerk/react": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {

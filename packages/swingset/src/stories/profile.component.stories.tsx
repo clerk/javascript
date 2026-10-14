@@ -183,7 +183,7 @@ function Surface({
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle={pages.find(item => item.id === page)?.label}>
         {pages.map(item => (
           <Profile.ContentPanel
             key={item.id}
@@ -318,7 +318,8 @@ export function Transitions() {
             display: grid;
           }
           .cl-profile-content-panel {
-            grid-area: 1 / 1;
+            grid-row: 2;
+            grid-column: 1;
             /* Seven tenths of the scale's steps: quick enough to feel like a swap, slow enough to see. */
             --enter: calc(var(--cl-duration-slow) * 0.7);
             --exit: calc(var(--cl-duration-base) * 0.7);

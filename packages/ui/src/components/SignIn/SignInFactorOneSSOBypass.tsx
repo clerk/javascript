@@ -11,7 +11,7 @@ import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Button, Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { useRouter } from '../../router';
 import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
-import { hasMultipleEnterpriseConnections } from './shared';
+import { getEnterpriseConnectionFactors, hasMultipleEnterpriseConnections } from './shared';
 import { SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
 type Step = 'sso' | 'code';
@@ -108,7 +108,7 @@ export const SignInFactorOneSSOBypass = (props: SignInFactorOneSSOBypassProps) =
   );
 
   if (hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
-    const enterpriseConnections = signIn.supportedFirstFactors.map(factor => ({
+    const enterpriseConnections = getEnterpriseConnectionFactors(signIn.supportedFirstFactors).map(factor => ({
       id: factor.enterpriseConnectionId,
       name: factor.enterpriseConnectionName,
       logoPublicUrl: factor.enterpriseConnectionLogoPublicUrl,

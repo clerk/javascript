@@ -32,7 +32,7 @@ export const confirmationMachine = createMachine({
     },
     confirming: {
       on: {
-        CONFIRM: { target: 'pending', actions: assign((_, event) => ({ run: event.run })) },
+        CONFIRM: { target: 'pending', actions: assign((_, event) => ({ run: event.run, error: undefined })) },
         CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined })) },
       },
     },
