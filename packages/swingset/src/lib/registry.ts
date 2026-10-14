@@ -82,6 +82,13 @@ import {
   NoResults as EmptyStateNoResults,
 } from '../stories/empty-state.stories';
 import {
+  Default as EntityDefault,
+  LabelOnly as EntityLabelOnly,
+  meta as entityMeta,
+  Truncation as EntityTruncation,
+  WithBadge as EntityWithBadge,
+} from '../stories/entity.stories';
+import {
   Default as FieldDefault,
   meta as fieldMeta,
   VisuallyHiddenLabel as FieldVisuallyHiddenLabel,
@@ -252,6 +259,11 @@ import {
   meta as sectionMeta,
 } from '../stories/section.stories';
 import {
+  Default as SegmentedControlDefault,
+  Disabled as SegmentedControlDisabled,
+  meta as segmentedControlMeta,
+} from '../stories/segmented-control.stories';
+import {
   Controlled as SelectComponentControlled,
   Default as SelectComponentDefault,
   Descriptions as SelectComponentDescriptions,
@@ -261,6 +273,15 @@ import {
   Placeholder as SelectComponentPlaceholder,
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
+import {
+  Elements as SkeletonElements,
+  HoldSpace as SkeletonHoldSpace,
+  meta as skeletonMeta,
+  NotShown as SkeletonNotShown,
+  Primary as SkeletonPrimary,
+  Shapes as SkeletonShapes,
+  TextContent as SkeletonTextContent,
+} from '../stories/skeleton.stories';
 import {
   Default as TableDefault,
   Empty as TableEmpty,
@@ -298,6 +319,10 @@ import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
 import {
+  Default as UseServerDataTableDefault,
+  meta as useServerDataTableMeta,
+} from '../stories/use-server-data-table.stories';
+import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
   Organizations as UserButtonOrganizations,
@@ -308,22 +333,6 @@ import {
   meta as userProfileMeta,
   Overlay as UserProfileOverlay,
 } from '../stories/user-profile.stories';
-import {
-  AddEmailFails as UserProfileAccountSectionAddEmailFails,
-  AddPhoneFails as UserProfileAccountSectionAddPhoneFails,
-  Default as UserProfileAccountSectionDefault,
-  EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
-  EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
-  EmailRemovalError as UserProfileAccountSectionEmailRemovalError,
-  EmailRemovalPending as UserProfileAccountSectionEmailRemovalPending,
-  EmailSsoConnectFails as UserProfileAccountSectionEmailSsoConnectFails,
-  EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
-  meta as userProfileAccountSectionMeta,
-  MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
-  NameManagedByConnection as UserProfileAccountSectionNameManagedByConnection,
-  PhoneRemovalError as UserProfileAccountSectionPhoneRemovalError,
-  PhoneRemovalPending as UserProfileAccountSectionPhoneRemovalPending,
-} from '../stories/user-profile-account-section.stories';
 import {
   Default as UserProfileActiveDevicesSectionDefault,
   Impersonation as UserProfileActiveDevicesSectionImpersonation,
@@ -361,6 +370,17 @@ import {
   WithError as UserProfileDangerSectionWithError,
 } from '../stories/user-profile-danger-section.stories';
 import {
+  AddEmailFails as UserProfileEmailSectionAddEmailFails,
+  Default as UserProfileEmailSectionDefault,
+  EmailLinkFails as UserProfileEmailSectionEmailLinkFails,
+  EmailLinkVerification as UserProfileEmailSectionEmailLinkVerification,
+  EmailRemovalError as UserProfileEmailSectionEmailRemovalError,
+  EmailRemovalPending as UserProfileEmailSectionEmailRemovalPending,
+  EmailSsoFails as UserProfileEmailSectionEmailSsoFails,
+  EmailSsoVerification as UserProfileEmailSectionEmailSsoVerification,
+  meta as userProfileEmailSectionMeta,
+} from '../stories/user-profile-email-section.stories';
+import {
   ConnectionError as UserProfileEnterpriseAccountsSectionConnectionError,
   ConnectOnly as UserProfileEnterpriseAccountsSectionConnectOnly,
   Default as UserProfileEnterpriseAccountsSectionDefault,
@@ -393,9 +413,23 @@ import {
   meta as userProfilePaymentMethodsSectionMeta,
 } from '../stories/user-profile-payment-methods-section.stories';
 import {
+  AddPhoneFails as UserProfilePhoneSectionAddPhoneFails,
+  Default as UserProfilePhoneSectionDefault,
+  meta as userProfilePhoneSectionMeta,
+  PhoneRemovalError as UserProfilePhoneSectionPhoneRemovalError,
+  PhoneRemovalPending as UserProfilePhoneSectionPhoneRemovalPending,
+} from '../stories/user-profile-phone-section.stories';
+import {
   Default as UserProfileProfilePanelDefault,
   meta as userProfileProfilePanelMeta,
 } from '../stories/user-profile-profile-panel.stories';
+import {
+  Default as UserProfileProfileSectionDefault,
+  EditNameFails as UserProfileProfileSectionEditNameFails,
+  EditUsernameFails as UserProfileProfileSectionEditUsernameFails,
+  meta as userProfileProfileSectionMeta,
+  NameManagedByConnection as UserProfileProfileSectionNameManagedByConnection,
+} from '../stories/user-profile-profile-section.stories';
 import {
   Default as UserProfileSecurityPanelDefault,
   meta as userProfileSecurityPanelMeta,
@@ -507,6 +541,16 @@ const avatarModule: StoryModule = {
   Shapes: AvatarShapes,
 };
 
+const skeletonModule: StoryModule = {
+  meta: skeletonMeta,
+  Primary: SkeletonPrimary,
+  TextContent: SkeletonTextContent,
+  Elements: SkeletonElements,
+  Shapes: SkeletonShapes,
+  HoldSpace: SkeletonHoldSpace,
+  NotShown: SkeletonNotShown,
+};
+
 const badgeModule: StoryModule = {
   meta: badgeMeta,
   Primary: BadgePrimary,
@@ -577,6 +621,14 @@ const dataListModule: StoryModule = {
   meta: dataListMeta,
   Default: DataListDefault,
   Plain: DataListPlain,
+};
+
+const entityModule: StoryModule = {
+  meta: entityMeta,
+  Default: EntityDefault,
+  WithBadge: EntityWithBadge,
+  LabelOnly: EntityLabelOnly,
+  Truncation: EntityTruncation,
 };
 
 const itemModule: StoryModule = {
@@ -707,6 +759,8 @@ const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
 const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
 
+const useServerDataTableModule: StoryModule = { meta: useServerDataTableMeta, Default: UseServerDataTableDefault };
+
 const localizationModule: StoryModule = {
   meta: localizationMeta,
   Overrides: LocalizationOverrides,
@@ -725,6 +779,12 @@ const tableModule: StoryModule = {
   Selection: TableSelection,
   Empty: TableEmpty,
   Overflow: TableOverflow,
+};
+
+const segmentedControlModule: StoryModule = {
+  meta: segmentedControlMeta,
+  Default: SegmentedControlDefault,
+  Disabled: SegmentedControlDisabled,
 };
 
 const tabsComponentModule: StoryModule = {
@@ -746,21 +806,32 @@ const userProfileModule: StoryModule = {
   Overlay: UserProfileOverlay,
 };
 
-const userProfileAccountSectionModule: StoryModule = {
-  meta: userProfileAccountSectionMeta,
-  Default: UserProfileAccountSectionDefault,
-  MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
-  NameManagedByConnection: UserProfileAccountSectionNameManagedByConnection,
-  AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
-  AddEmailFails: UserProfileAccountSectionAddEmailFails,
-  EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,
-  EmailLinkResendFails: UserProfileAccountSectionEmailLinkResendFails,
-  EmailSsoVerification: UserProfileAccountSectionEmailSsoVerification,
-  EmailSsoConnectFails: UserProfileAccountSectionEmailSsoConnectFails,
-  EmailRemovalPending: UserProfileAccountSectionEmailRemovalPending,
-  EmailRemovalError: UserProfileAccountSectionEmailRemovalError,
-  PhoneRemovalPending: UserProfileAccountSectionPhoneRemovalPending,
-  PhoneRemovalError: UserProfileAccountSectionPhoneRemovalError,
+const userProfileProfileSectionModule: StoryModule = {
+  meta: userProfileProfileSectionMeta,
+  Default: UserProfileProfileSectionDefault,
+  NameManagedByConnection: UserProfileProfileSectionNameManagedByConnection,
+  EditNameFails: UserProfileProfileSectionEditNameFails,
+  EditUsernameFails: UserProfileProfileSectionEditUsernameFails,
+};
+
+const userProfileEmailSectionModule: StoryModule = {
+  meta: userProfileEmailSectionMeta,
+  Default: UserProfileEmailSectionDefault,
+  AddEmailFails: UserProfileEmailSectionAddEmailFails,
+  EmailLinkVerification: UserProfileEmailSectionEmailLinkVerification,
+  EmailLinkFails: UserProfileEmailSectionEmailLinkFails,
+  EmailSsoVerification: UserProfileEmailSectionEmailSsoVerification,
+  EmailSsoFails: UserProfileEmailSectionEmailSsoFails,
+  EmailRemovalPending: UserProfileEmailSectionEmailRemovalPending,
+  EmailRemovalError: UserProfileEmailSectionEmailRemovalError,
+};
+
+const userProfilePhoneSectionModule: StoryModule = {
+  meta: userProfilePhoneSectionMeta,
+  Default: UserProfilePhoneSectionDefault,
+  AddPhoneFails: UserProfilePhoneSectionAddPhoneFails,
+  PhoneRemovalPending: UserProfilePhoneSectionPhoneRemovalPending,
+  PhoneRemovalError: UserProfilePhoneSectionPhoneRemovalError,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
@@ -914,7 +985,9 @@ export const registry: StoryModule[] = [
   userProfileBillingPanelModule,
   userProfileApiKeysPanelModule,
   // User Profile · Sections
-  userProfileAccountSectionModule,
+  userProfileProfileSectionModule,
+  userProfileEmailSectionModule,
+  userProfilePhoneSectionModule,
   userProfilePasswordSectionModule,
   userProfilePasskeysSectionModule,
   userProfileMfaSectionModule,
@@ -946,6 +1019,7 @@ export const registry: StoryModule[] = [
   actionBarModule,
   avatarModule,
   badgeModule,
+  skeletonModule,
   bannerModule,
   buttonModule,
   cardComponentModule,
@@ -961,6 +1035,7 @@ export const registry: StoryModule[] = [
   dialogComponentModule,
   drawerComponentModule,
   emptyStateModule,
+  entityModule,
   headingModule,
   iconModule,
   iconFrameModule,
@@ -971,6 +1046,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   sectionModule,
+  segmentedControlModule,
   selectComponentModule,
   tableModule,
   tabsComponentModule,
@@ -1002,6 +1078,7 @@ export const registry: StoryModule[] = [
   // Hooks
   useDataTableModule,
   useFormModule,
+  useServerDataTableModule,
   // Localization
   localizationModule,
 ];

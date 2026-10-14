@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "4.10.0",
+  "version": "4.11.0",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -29,8 +29,12 @@
       "default": "./dist/index.js"
     },
     "./app.plugin.js": "./app.plugin.js",
+    "./native-components": {
+      "types": "./native-components/index.d.ts",
+      "default": "./dist/native-components/index.js"
+    },
     "./native": {
-      "types": "./dist/native/index.d.ts",
+      "types": "./native/index.d.ts",
       "default": "./dist/native/index.js"
     },
     "./web": {
@@ -89,8 +93,7 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "android",
-    "ios",
+    "native-components",
     "native",
     "web",
     "local-credentials",
@@ -104,9 +107,6 @@
     "hosted-auth",
     "experimental",
     "legacy",
-    "src/specs",
-    "expo-module.config.json",
-    "react-native.config.js",
     "app.plugin.js",
     "app.plugin.d.ts"
   ],
@@ -133,6 +133,7 @@
   "devDependencies": {
     "@clerk/expo-biometrics": "workspace:*",
     "@clerk/expo-google-signin": "workspace:*",
+    "@clerk/expo-native-components": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
@@ -149,6 +150,7 @@
   "peerDependencies": {
     "@clerk/expo-biometrics": ">=0.1.0",
     "@clerk/expo-google-signin": ">=0.1.0",
+    "@clerk/expo-native-components": ">=0.1.0",
     "@clerk/expo-passkeys": ">=0.0.6",
     "expo": "catalog:peer-expo",
     "expo-apple-authentication": ">=7.0.0",
@@ -167,6 +169,9 @@
       "optional": true
     },
     "@clerk/expo-google-signin": {
+      "optional": true
+    },
+    "@clerk/expo-native-components": {
       "optional": true
     },
     "@clerk/expo-passkeys": {
@@ -202,10 +207,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "codegenConfig": {
-    "name": "ClerkExpoSpec",
-    "type": "all",
-    "jsSrcsDir": "src/specs"
   }
 }

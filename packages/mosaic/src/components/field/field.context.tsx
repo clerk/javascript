@@ -16,6 +16,7 @@ interface FieldContextValue {
   labelElementType: FieldLabelElementType;
   orientation: FieldOrientation;
   disabled: boolean;
+  focusableWhenDisabled: boolean;
   required: boolean;
   invalid: boolean;
   labelIds: string[];
@@ -35,11 +36,19 @@ export function mergeIds(...values: Array<string | undefined>): string | undefin
 interface FieldProviderProps extends React.PropsWithChildren {
   orientation: FieldOrientation;
   disabled: boolean;
+  focusableWhenDisabled: boolean;
   required: boolean;
   invalid: boolean;
 }
 
-export function FieldProvider({ children, orientation, disabled, required, invalid }: FieldProviderProps) {
+export function FieldProvider({
+  children,
+  orientation,
+  disabled,
+  focusableWhenDisabled,
+  required,
+  invalid,
+}: FieldProviderProps) {
   const generatedId = React.useId();
   const defaultControlId = `cl-field-${generatedId}`;
   const [controlId, setControlId] = React.useState(defaultControlId);
@@ -79,6 +88,7 @@ export function FieldProvider({ children, orientation, disabled, required, inval
       labelElementType,
       orientation,
       disabled,
+      focusableWhenDisabled,
       required,
       invalid,
       labelIds,
@@ -87,7 +97,18 @@ export function FieldProvider({ children, orientation, disabled, required, inval
       setLabelIds,
       setMessageIds,
     }),
-    [controlId, labelElementType, orientation, disabled, required, invalid, labelIds, messageIds, registerControlId],
+    [
+      controlId,
+      labelElementType,
+      orientation,
+      disabled,
+      focusableWhenDisabled,
+      required,
+      invalid,
+      labelIds,
+      messageIds,
+      registerControlId,
+    ],
   );
 
   return <FieldContext.Provider value={context}>{children}</FieldContext.Provider>;
@@ -173,6 +194,7 @@ export function useOptionalFieldControlProps({
   return {
     id: context.controlId,
     disabled: disabled ?? context.disabled,
+    focusableWhenDisabled: context.focusableWhenDisabled,
     required: required ?? context.required,
     'aria-invalid': ariaInvalid ?? (context.invalid ? true : undefined),
     'aria-labelledby': mergeIds(ariaLabelledBy, ...context.labelIds),

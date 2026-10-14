@@ -15,41 +15,23 @@ import * as UserProfileProfilePanelStories from './user-profile-profile-panel.st
 
 ## Usage
 
+Each section arrives as a slot, so the panel only arranges them under the Account title.
+
 ```tsx
 import { useRef } from 'react';
 import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
+import { UserProfileProfileSection } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section';
+import { UserProfileEmailSection } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section';
+import { UserProfilePhoneSection } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section';
 import { UserProfileConnectedAccountsSection } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section';
-import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 
 const titleRef = useRef<HTMLDivElement>(null);
 
 <UserProfileProfilePanelView
-  allowMultipleAccounts={allowMultipleAccounts}
-  imageUrl={user.imageUrl}
-  name={user.fullName ?? ''}
-  username={user.username ?? ''}
-  emails={user.emailAddresses.map(email => ({
-    id: email.id,
-    value: email.emailAddress,
-    isDefault: email.id === user.primaryEmailAddressId,
-    isVerified: email.verification.status === 'verified',
-  }))}
-  phones={user.phoneNumbers.map(phone => ({
-    id: phone.id,
-    value: phone.phoneNumber,
-    isDefault: phone.id === user.primaryPhoneNumberId,
-    isVerified: phone.verification.status === 'verified',
-  }))}
   titleRef={titleRef}
+  profileSlot={<UserProfileProfileSection />}
+  emailSlot={<UserProfileEmailSection />}
+  phoneSlot={<UserProfilePhoneSection />}
   connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
-  web3WalletsSlot={<UserProfileWeb3WalletsSectionView wallets={wallets} onRemove={removeWeb3Wallet} fallbackFocus={() => titleRef.current} />}
-  onVerifyEmail={verifyEmail}
-  onSendEmailCode={sendEmailCode}
-  onVerifyEmailCode={verifyEmailCode}
-  onSetPrimaryEmail={setPrimaryEmail}
-  onRemoveEmail={removeEmail}
-  onVerifyPhone={verifyPhone}
-  onSetPrimaryPhone={setPrimaryPhone}
-  onRemovePhone={removePhone}
 />
 ```

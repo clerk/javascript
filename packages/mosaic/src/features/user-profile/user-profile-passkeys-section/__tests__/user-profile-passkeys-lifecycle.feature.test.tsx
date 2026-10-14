@@ -2,6 +2,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { openDialog } from '../../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -104,7 +105,7 @@ describe('Changing the active passkey account', () => {
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.fail('form_param_invalid', 'Alice credential failed');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Alice credential failed');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Alice credential failed'));
     await act(() => clerk.setActive({ session: 'sess_b' }));
     expect(await screen.findByText('Bob phone')).toBeVisible();
     expect(screen.queryByRole('alert')).toBeNull();
@@ -252,7 +253,7 @@ describe('Submitting passkey actions', () => {
     );
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Création annulée.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Création annulée.'));
   });
 });
 
@@ -356,7 +357,7 @@ describe('Passkey identity and policy at action time', () => {
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.fail('form_param_invalid', 'Old session error');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Old session error');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Old session error'));
     await act(() => clerk.setActive({ session: 'sess_a2' }));
     expect(clerk.session?.id).toBe('sess_a2');
     expect(screen.queryByRole('alert')).toBeNull();
@@ -380,8 +381,8 @@ describe('Passkey identity and policy at action time', () => {
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
     await user.type(input, 'Blocked rename');
     const environment = clerk.__internal_environment;
@@ -446,8 +447,8 @@ describe('Replacing instance policy while editing', () => {
     );
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
     await user.type(input, 'Blocked rename');
     const nextEnvironment = fapiEnvironment();

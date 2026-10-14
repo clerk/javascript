@@ -185,7 +185,8 @@ describe('Changing a password', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(update.requests).toHaveLength(1));
-    expect(screen.getByLabelText('New password')).toBeDisabled();
+    expect(screen.getByLabelText('New password')).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByLabelText('New password')).toHaveAttribute('readonly');
     expect(screen.getByRole('button', { name: 'Save changes' })).toHaveAttribute('aria-busy', 'true');
     expect(screen.getByRole('button', { name: 'Save changes' })).toHaveAttribute('aria-disabled', 'true');
     await user.keyboard('{Enter}');

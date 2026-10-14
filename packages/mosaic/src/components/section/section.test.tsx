@@ -4,6 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { HeadingLevelProvider } from '../heading';
+import { Skeleton } from '../skeleton';
 import { Section } from './section';
 
 const overrides = stylex.create({
@@ -420,7 +421,7 @@ describe('Section', () => {
     expect(screen.getByTestId('item')).toHaveAttribute('data-wrap', '');
   });
 
-  it('turns a skeleton card into inert placeholders', () => {
+  it('makes a skeleton card inert and shows the skeletons inside it', () => {
     render(
       <Section.Root>
         <Section.Group
@@ -428,19 +429,18 @@ describe('Section', () => {
           data-testid='group'
         >
           <Section.Header>
-            <Section.Title>Account</Section.Title>
+            <Section.Title>
+              <Skeleton>Account</Skeleton>
+            </Section.Title>
           </Section.Header>
           <Section.Body>
             <Section.Items>
               <Section.Item>
-                <Section.Media>media</Section.Media>
                 <Section.Content>
-                  <Section.Label>Name</Section.Label>
-                  <Section.Description>Description</Section.Description>
+                  <Section.Label>
+                    <Skeleton>Name</Skeleton>
+                  </Section.Label>
                 </Section.Content>
-                <Section.Actions>
-                  <button type='button'>Edit</button>
-                </Section.Actions>
               </Section.Item>
             </Section.Items>
           </Section.Body>
@@ -452,19 +452,19 @@ describe('Section', () => {
     expect(group).toHaveAttribute('aria-hidden', 'true');
     expect(group).toHaveAttribute('inert');
     expect(group).not.toHaveAttribute('role');
-    expect(group.querySelector('button')).toBeNull();
-    expect(screen.getByText('Name')).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.getByText('Description')).toHaveAttribute('aria-hidden', 'true');
-    expect(group.querySelectorAll('[data-skeleton]')).toHaveLength(5);
+    expect(group.querySelectorAll('.cl-skeleton')).toHaveLength(2);
   });
 
-  it('lets a part opt out of its card skeleton', () => {
+  it('renders skeleton content as-is in a card that is not loading', () => {
     render(
-      <Section.Group skeleton>
-        <Section.Label skeleton={false}>Name</Section.Label>
+      <Section.Group>
+        <Section.Label>
+          <Skeleton>Name</Skeleton>
+        </Section.Label>
       </Section.Group>,
     );
 
-    expect(screen.getByText('Name')).not.toHaveAttribute('data-skeleton');
+    expect(screen.getByText('Name')).not.toHaveClass('cl-skeleton');
+    expect(document.querySelector('.cl-skeleton')).toBeNull();
   });
 });

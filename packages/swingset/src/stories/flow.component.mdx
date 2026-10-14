@@ -11,6 +11,15 @@ import * as FlowStories from './flow.component.stories';
   storyModule={FlowStories}
 />
 
+## Customized
+
+Steps animate with CSS transitions on `[data-starting-style]` and `[data-ending-style]`, so the motion can be replaced from a stylesheet. This example slides steps sideways, using `--cl-flow-transition-direction` to pick the side.
+
+<Story
+  name='Customized'
+  storyModule={FlowStories}
+/>
+
 ## Usage
 
 Keep `Card.Root` outside `Flow.Root` so the card remains stable while Flow clips and animates its step viewport.
@@ -48,4 +57,4 @@ import { Flow } from '@clerk/mosaic/components/flow';
 
 ## Styling
 
-`Flow.Root` reflects its controlled value through `data-value`. The active `Flow.Step` carries `data-open` and reflects the first grouped id through `data-step`; an outgoing step carries `data-closed` until its transition finishes. Both parts accept `className`, `style`, and the Mosaic `render` prop.
+`Flow.Root` reflects its controlled value through `data-value`. The active `Flow.Step` carries `data-open` and reflects the first grouped id through `data-step`; an outgoing step carries `data-closed` until its transition finishes. Each step reads `--cl-flow-transition-direction` (`1` forward, `-1` back). Both parts accept `className`, `style`, and the Mosaic `render` prop.

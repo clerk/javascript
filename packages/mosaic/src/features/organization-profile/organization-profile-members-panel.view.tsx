@@ -79,7 +79,6 @@ export function OrganizationProfileMembersPanelView({
                 {tab.label}
               </Tabs.Tab>
             ))}
-            <Tabs.Indicator />
           </Tabs.List>
           {tabs.map(tab => (
             <Tabs.Panel

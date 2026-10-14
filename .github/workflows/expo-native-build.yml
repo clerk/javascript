@@ -13,6 +13,7 @@ on:
       - 'packages/expo/**'
       - 'packages/expo-biometrics/**'
       - 'packages/expo-google-signin/**'
+      - 'packages/expo-native-components/**'
   workflow_dispatch:
 
 permissions:
@@ -88,6 +89,7 @@ jobs:
               packages/expo \
               packages/expo-biometrics \
               packages/expo-google-signin \
+              packages/expo-native-components \
               packages/react \
               packages/shared \
               "$FIXTURE_DIR" |
@@ -128,6 +130,7 @@ jobs:
           mkdir -p "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"
+          pnpm --filter @clerk/expo-native-components pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-biometrics pack --pack-destination "$SDK_PACK_DIR"
 
       - name: Install fixture dependencies
@@ -139,11 +142,12 @@ jobs:
         run: |
           cp "package.sdk-$EXPO_SDK.json" package.json
           pnpm install --no-frozen-lockfile
-          # [0-9] keeps this glob off the clerk-expo-google-signin tarball.
+          # [0-9] keeps this glob off the other clerk-expo-* tarballs.
           SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"
           GOOGLE_SIGNIN_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
+          NATIVE_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-native-components-*.tgz)"
           BIOMETRICS_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-biometrics-*.tgz)"
-          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" "$BIOMETRICS_TARBALL" -w
+          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" "$NATIVE_TARBALL" "$BIOMETRICS_TARBALL" -w
           # expo-dev-client makes even release builds boot into the dev
           # launcher (unreachable Metro in CI), which stalls every e2e
           # flow on a blank screen. Skip it on e2e jobs only.

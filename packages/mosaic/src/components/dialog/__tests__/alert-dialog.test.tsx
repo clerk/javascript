@@ -15,11 +15,10 @@ const settle = () =>
     await new Promise(resolve => setTimeout(resolve, 0));
   });
 
-function Confirm({ onOpenChange, ...rest }: Partial<DialogRootProps> = {}) {
+function Confirm({ onOpenChange }: Pick<DialogRootProps, 'onOpenChange'> = {}) {
   return (
     <Dialog.Root
       defaultOpen
-      {...rest}
       role='alertdialog'
       onOpenChange={onOpenChange}
     >
@@ -371,6 +370,89 @@ describe('stacked on another dialog', () => {
     const popups = document.querySelectorAll('.cl-dialog-popup');
     expect(popups[0]).toHaveAttribute('data-stack-base', '');
     expect(popups[1]).toHaveAttribute('data-stacked', '');
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+});
+
+describe('showCloseButton', () => {
+  function Verify({ showCloseButton }: { showCloseButton?: boolean }) {
+    return (
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+        showCloseButton={showCloseButton}
+      >
+        <Dialog.Popup>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Verify it is you</Card.Title>
+              <Card.Description>Enter the code sent to your email.</Card.Description>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>
+    );
+  }
+
+  it('renders the card header dismiss in an alert dialog that opts in', async () => {
+    const user = userEvent.setup();
+    render(<Verify showCloseButton />);
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('shows and hides the dismiss as the prop changes while open', () => {
+    const { rerender } = render(<Verify />);
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+
+    rerender(<Verify showCloseButton />);
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+
+    rerender(<Verify showCloseButton={false} />);
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+  });
+
+  it('hides the card header dismiss in a plain dialog that opts out', () => {
+    render(
+      <Dialog.Root
+        defaultOpen
+        showCloseButton={false}
+      >
+        <Dialog.Popup>
+          <Card.Root elevation='overlay'>
+            <Card.Header>
+              <Card.Title>Add email address</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+  });
+
+  it('does not warn about Dialog.CloseButton in an alert dialog that opts in', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dialog.Root
+        defaultOpen
+        role='alertdialog'
+        showCloseButton
+      >
+        <Dialog.Popup>
+          <Dialog.CloseButton />
+          <Card.Root elevation='overlay'>
+            <Card.Title>Verify it is you</Card.Title>
+            <Card.Description>Enter the code sent to your email.</Card.Description>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+    await settle();
+
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });

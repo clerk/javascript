@@ -24,6 +24,10 @@ vi.mock('@wallet-standard/core', () => {
   registry.loadModule();
   return { getWallets: registry.getWallets };
 });
+vi.mock('../../../reverification', async importOriginal => ({
+  ...(await importOriginal<typeof import('../../../reverification')>()),
+  useReverificationFlow: (fetcher: unknown) => [fetcher, { status: 'idle', visible: false, reset: () => {} }],
+}));
 vi.mock('../user-profile-web3-wallets-section.model', () => ({
   useUserProfileWeb3WalletsModel: () =>
     ({

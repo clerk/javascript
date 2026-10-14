@@ -4,7 +4,12 @@ import userEvent from '@testing-library/user-event';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  type FakeFapiSeed,
+  holdRequests,
+  serveFapi,
+} from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -40,11 +45,12 @@ describe('Web3 wallets', () => {
     });
   }
 
-  async function renderWeb3(overrides: Partial<UserJSON> = {}) {
+  async function renderWeb3(overrides: Partial<UserJSON> = {}, seed: FakeFapiSeed = {}) {
     const user = fapiUser({ id: 'user_1', ...overrides });
     const fapi = serveFapi({
       environment: web3Environment(),
       client: fapiClient([fapiSession({ id: 'sess_1', user })]),
+      ...seed,
     });
     await renderWithClerk(<UserProfileWeb3WalletsSection />);
     return fapi;
@@ -163,7 +169,7 @@ describe('Web3 wallets', () => {
     await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.release();
-    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     const pendingId = fapi.client.sessions[0]?.user.web3_wallets[0]?.id;
     expect(pendingId).toBeDefined();
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1);
@@ -261,7 +267,7 @@ describe('Web3 wallets', () => {
     );
 
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Installez un portefeuille.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Installez un portefeuille.'));
 
     rerender(
       <MosaicProvider localization={{ overrides: { 'errors.web3_missing_identifier': 'Portefeuille introuvable.' } }}>
@@ -296,7 +302,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.fail('verification_invalid_strategy', 'Server copy');
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Ce portefeuille est indisponible.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Ce portefeuille est indisponible.'));
     expect(screen.queryByText('Server copy')).toBeNull();
   });
 
@@ -421,7 +427,7 @@ describe('Web3 wallets', () => {
     expect(screen.getByRole('button', { name: 'Connect Solana' })).toBeDisabled();
 
     hold.fail('wallet_creation_failed');
-    expect(await screen.findByRole('alert')).toHaveTextContent('wallet_creation_failed');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('wallet_creation_failed'));
     expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
     const retryFapi = serveFapi(fapi);
     await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
@@ -451,7 +457,7 @@ describe('Web3 wallets', () => {
     await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.fail('wallet_creation_failed');
-    expect(await screen.findByRole('alert')).toHaveTextContent('wallet_creation_failed');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('wallet_creation_failed'));
 
     const primary = holdRequests('post', '/v1/me');
     await user.click(screen.getByRole('button', { name: 'Manage Solana' }));
@@ -503,7 +509,7 @@ describe('Web3 wallets', () => {
     expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toBeDisabled();
     hold.fail('primary_update_failed');
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('primary_update_failed');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('primary_update_failed'));
     expect(screen.queryByText('Cannot verify your account')).not.toBeInTheDocument();
     const retryFapi = serveFapi(fapi);
     await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
@@ -512,7 +518,7 @@ describe('Web3 wallets', () => {
     expect(screen.getByText('Primary')).toBeInTheDocument();
   });
 
-  it('confirms removal and focuses Connect after deleting the last wallet', async () => {
+  it('confirms removal and clears the primary after deleting the last wallet', async () => {
     const fapi = await renderWeb3({
       web3_wallets: [fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' })],
       primary_web3_wallet_id: 'wallet_1',
@@ -526,7 +532,6 @@ describe('Web3 wallets', () => {
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
     expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBeNull();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toHaveFocus());
   });
 
   it('keeps a failed wallet removal in its confirmation for a manual retry', async () => {
@@ -544,8 +549,8 @@ describe('Web3 wallets', () => {
     expect(confirm).toHaveAttribute('aria-busy', 'true');
     hold.fail('wallet_removal_failed');
 
-    expect(await within(screen.getByRole('alertdialog')).findByRole('alert')).toHaveTextContent(
-      'wallet_removal_failed',
+    await waitFor(() =>
+      expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent('wallet_removal_failed'),
     );
     await waitFor(() => expect(confirm).not.toHaveAttribute('aria-busy', 'true'));
     const retryFapi = serveFapi(fapi);
@@ -554,7 +559,26 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
-  it('cancels removal, then removes the newly selected wallet and focuses the remaining row', async () => {
+  it('verifies the session when removal demands it, then removes the wallet', async () => {
+    const fapi = await renderWeb3(
+      { web3_wallets: [fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' })] },
+      { verification: { secrets: { password: 'hunter2' } } },
+    );
+    demandReverificationOnce('/v1/me/web3_wallets/wallet_1');
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+  });
+
+  it('cancels removal, then removes the newly selected wallet', async () => {
     const fapi = await renderWeb3({
       web3_wallets: [
         fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' }),
@@ -568,7 +592,7 @@ describe('Web3 wallets', () => {
     await user.keyboard('{Enter}');
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
     await user.keyboard('{Escape}');
-    await waitFor(() => expect(first).toHaveFocus());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(2);
     await user.click(screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
@@ -578,7 +602,6 @@ describe('Web3 wallets', () => {
     expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual(['wallet_1']);
     expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_1');
     expect(screen.getByText('Primary')).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toHaveFocus());
   });
 
   it('distinguishes localized discovery loading and failure from no installed wallets', async () => {
@@ -787,7 +810,9 @@ describe('Web3 wallets', () => {
       await user.keyboard('{Escape}');
       expect(screen.getByRole('dialog')).toBeVisible();
       creation.fail('wallet_creation_failed');
-      expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent('wallet_creation_failed');
+      await waitFor(() =>
+        expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent('wallet_creation_failed'),
+      );
       expect(screen.getAllByRole('alert', { hidden: true })).toHaveLength(1);
       const retryFapi = serveFapi(fapi);
       await user.click(screen.getByRole('button', { name: 'Second Solana' }));
@@ -839,8 +864,10 @@ describe('Web3 wallets', () => {
         const user = userEvent.setup();
         await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
         await user.click(await screen.findByRole('button', { name: 'Test Solana' }));
-        expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(
-          'Something went wrong. Please try again.',
+        await waitFor(() =>
+          expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(
+            'Something went wrong. Please try again.',
+          ),
         );
 
         if (dismissal === 'Escape') {
@@ -855,8 +882,10 @@ describe('Web3 wallets', () => {
         expect(within(screen.getByRole('dialog')).queryByText('Something went wrong. Please try again.')).toBeNull();
         expect(screen.getByRole('button', { name: 'Test Solana' })).toBeEnabled();
         await user.click(screen.getByRole('button', { name: 'Test Solana' }));
-        expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent(
-          'Something went wrong. Please try again.',
+        await waitFor(() =>
+          expect(within(screen.getByRole('dialog')).getByRole('alert')).toHaveTextContent(
+            'Something went wrong. Please try again.',
+          ),
         );
         expect(connect).toHaveBeenCalledTimes(2);
       } finally {

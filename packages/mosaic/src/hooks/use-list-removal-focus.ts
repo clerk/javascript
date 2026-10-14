@@ -40,5 +40,7 @@ export function useListRemovalFocus({
     return (next ? triggers.current.get(next) : undefined) ?? fallback();
   };
 
-  return { registerTrigger, remove, finalFocus };
+  const trigger = (id: string) => triggers.current.get(id) ?? null;
+
+  return { registerTrigger, trigger, remove, finalFocus };
 }

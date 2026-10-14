@@ -232,7 +232,7 @@ describe('useForm', () => {
     expect(result.current.canSubmit).toBe(false);
   });
 
-  it('clears the message on the next submit', async () => {
+  it('holds the message until the next submit settles', async () => {
     let fail = true;
     const { result } = renderHook(() =>
       useForm({
@@ -245,8 +245,19 @@ describe('useForm', () => {
       await tick();
     });
     expect(result.current.error).toBe('Nope');
-    fail = false;
+
     act(() => result.current.submit());
+    expect(result.current.isSubmitting).toBe(true);
+    expect(result.current.error).toBe('Nope');
+
+    await act(async () => tick());
+    expect(result.current.error).toBe('Nope');
+
+    fail = false;
+    await act(async () => {
+      result.current.submit();
+      await tick();
+    });
     expect(result.current.error).toBeUndefined();
   });
 

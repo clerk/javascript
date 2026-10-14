@@ -83,6 +83,7 @@ export const Otp = React.forwardRef<HTMLInputElement, OtpProps>(function MosaicO
       {...rest}
       length={length}
       disabled={disabled}
+      focusableWhenDisabled={fieldProps?.focusableWhenDisabled}
       required={required}
       id={fieldProps?.id ?? id}
       {...mergeStyleProps(themeProps('otp', { status, disabled }), stylex.props(reset.base, styles.root, xstyle))}

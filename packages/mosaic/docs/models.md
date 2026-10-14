@@ -105,7 +105,7 @@ drops the fallback instead of holding the space open. Keep the two apart.
 - A callback that backs a form wraps its Clerk call in `save(run, fields, params)`
   from `utils/errors.ts`. It rethrows a Clerk error as a `SaveError` routed to
   the form fields it names, which the form renders
-  (`user-profile-account-section.model.ts`).
+  (`user-profile-profile-section.model.ts`).
 - No local UI state. What is open and what is in flight belong to the controller.
 - No React state machinery beyond the Clerk hooks themselves; the model is a
   derivation of what Clerk currently says. The exception is what to fetch: a
