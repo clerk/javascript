@@ -16,7 +16,7 @@ export function TabsList(props: TabsListProps) {
   return (
     <Composite
       orientation={orientation}
-      rtl={orientation === 'horizontal' && rtl}
+      rtl={orientation === 'horizontal' ? rtl : false}
       render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
         const defaultProps: Record<string, unknown> = {
           role: 'tablist' as const,

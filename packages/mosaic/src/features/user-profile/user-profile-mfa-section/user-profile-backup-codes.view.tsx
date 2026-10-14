@@ -140,7 +140,7 @@ export function UserProfileBackupCodesView({
           type='button'
           fullWidth
           isPending={pendingAction === 'copy'}
-          disabled={showSaveActions && (!hasCodes || pendingAction === 'download')}
+          disabled={showSaveActions ? !hasCodes || pendingAction === 'download' : false}
           focusableWhenDisabled
           ref={actionRef}
           pendingLabel={m.copying}

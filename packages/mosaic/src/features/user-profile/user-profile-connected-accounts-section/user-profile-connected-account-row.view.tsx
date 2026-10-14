@@ -80,7 +80,7 @@ export function UserProfileConnectProviderRowView({
             color='neutral'
             aria-label={fill(m.connectLabel, { provider: provider.provider })}
             isPending={isPending}
-            disabled={isDisabled && !isPending}
+            disabled={isDisabled ? !isPending : false}
             onClick={() => onConnect(provider.id)}
           >
             {m.connect}

@@ -153,7 +153,7 @@ export function APIKeysTableView({
               table.rows.map(row => (
                 <Table.Row
                   key={row.id}
-                  selected={Boolean(onBulkAction) && row.getIsSelected()}
+                  selected={onBulkAction ? row.getIsSelected() : false}
                 >
                   {onBulkAction ? (
                     <Table.SelectCell

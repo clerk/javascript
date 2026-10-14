@@ -44,7 +44,7 @@ export function UserProfileWeb3WalletRowView({
   }
 
   return (
-    <Section.Row xstyle={onConnect && styles.connectRow}>
+    <Section.Row xstyle={onConnect ? styles.connectRow : undefined}>
       <Section.Item>
         {wallet.provider || iconUrl ? (
           <Section.Media size='lg'>
@@ -94,7 +94,7 @@ export function UserProfileWeb3WalletRowView({
               size='sm'
               variant='outline'
               isPending={isPending}
-              disabled={isDisabled && !isPending}
+              disabled={isDisabled ? !isPending : false}
               aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
               onClick={() => onConnect(wallet.id)}
             >

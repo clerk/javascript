@@ -302,16 +302,26 @@ function MemberRow({
 }) {
   const m = useMessages('membersTableTab');
   const manageable = canManageMember(member);
+  const isSelected = Boolean(onToggleSelected) && manageable && selected;
+  const rowStyle = member.isDeprovisioned && styles.deprovisionedRow;
+  let badge = null;
+  if (member.isCurrentUser) {
+    badge = <Badge>{m.you}</Badge>;
+  } else if (member.isDeprovisioned) {
+    badge = <Badge>{m.deprovisioned}</Badge>;
+  } else if (member.isBanned) {
+    badge = <Badge color='negative'>{m.banned}</Badge>;
+  }
   return (
     <Table.Row
-      selected={Boolean(onToggleSelected) && manageable && selected}
+      selected={isSelected}
       aria-disabled={member.isDeprovisioned || undefined}
-      xstyle={member.isDeprovisioned && styles.deprovisionedRow}
+      xstyle={rowStyle}
     >
       {onToggleSelected ? (
         <Table.SelectCell
           aria-label={fill(m.select, { name: member.name })}
-          checked={manageable && selected}
+          checked={isSelected}
           disabled={!manageable}
           onToggleSelected={manageable ? onToggleSelected : undefined}
         />
@@ -335,13 +345,7 @@ function MemberRow({
           <Entity.Content>
             <Entity.Label>
               {member.name}
-              {member.isCurrentUser ? (
-                <Badge>{m.you}</Badge>
-              ) : member.isDeprovisioned ? (
-                <Badge>{m.deprovisioned}</Badge>
-              ) : member.isBanned ? (
-                <Badge color='negative'>{m.banned}</Badge>
-              ) : null}
+              {badge}
             </Entity.Label>
             <Entity.Description>{member.email}</Entity.Description>
           </Entity.Content>

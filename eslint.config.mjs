@@ -633,6 +633,7 @@ export default tseslint.config([
       '@typescript-eslint/only-throw-error': 'error',
       '@typescript-eslint/prefer-promise-reject-errors': 'error',
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
+      'react/jsx-no-leaked-render': ['error', { validStrategies: ['ternary'] }],
       'react-hooks/exhaustive-deps': 'error',
       'react-hooks/rules-of-hooks': 'error',
       'max-lines': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],

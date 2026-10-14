@@ -209,7 +209,7 @@ function InvitationsTableBody({
       {rows.map(row => (
         <Table.Row
           key={row.id}
-          selected={hasBulkAction && row.getIsSelected()}
+          selected={hasBulkAction ? row.getIsSelected() : false}
         >
           {hasBulkAction ? (
             <Table.SelectCell

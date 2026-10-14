@@ -227,7 +227,7 @@ function RequestsTableBody({
         return (
           <Table.Row
             key={request.id}
-            selected={hasBulkAction && row.getIsSelected()}
+            selected={hasBulkAction ? row.getIsSelected() : false}
           >
             {hasBulkAction ? (
               <Table.SelectCell
