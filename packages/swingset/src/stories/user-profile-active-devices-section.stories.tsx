@@ -1,4 +1,4 @@
-import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
+import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -15,7 +15,8 @@ export const meta: StoryMeta = {
   title: 'UserProfileActiveDevicesSection',
   label: 'Active devices',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-active-devices-section.view.tsx',
+  source:
+    'packages/mosaic/src/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view.tsx',
 };
 
 export function Default() {
@@ -37,8 +38,8 @@ export function Impersonation() {
 
   return (
     <UserProfileActiveDevicesSectionView
-      devices={devices.devices}
-      onSignOutDevice={devices.onSignOutDevice}
+      {...devices}
+      signOutAll={undefined}
     />
   );
 }

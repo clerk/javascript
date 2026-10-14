@@ -170,7 +170,7 @@ function MembersProfile({
           Members
         </Profile.NavItem>
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle='Members'>
         <Profile.ContentPanel value='members'>
           <Panel.Root>
             <Panel.Title>Members</Panel.Title>
