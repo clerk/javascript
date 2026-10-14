@@ -15,7 +15,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })(
     const cleanups: Array<() => Promise<unknown>> = [];
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       cleanups.push(() => fakeUser.deleteIfExists());
       const user = await u.services.users.createBapiUser(fakeUser);
@@ -40,7 +40,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })(
     const popup = (page: Page) => page.getByRole('dialog', { name: 'Organizations' });
 
     async function signIn({ page, context }: { page: Page; context: BrowserContext }) {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.page.goToRelative(path);
@@ -50,7 +50,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })(
     }
 
     test('renders nothing when signed out', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative(path);
       await u.page.waitForClerkJsLoaded();
 
