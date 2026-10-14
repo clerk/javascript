@@ -15,5 +15,6 @@ export const oauthConsentMessages = {
   deny: 'Deny',
   denying: 'Denying access',
   signedInAs: 'Signed in as {identifier}',
+  loading: 'Loading consent information',
   loadError: 'Could not load consent information.',
 } as const;

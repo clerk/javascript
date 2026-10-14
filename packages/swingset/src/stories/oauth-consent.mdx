@@ -2,15 +2,20 @@ import * as Stories from './oauth-consent.stories';
 
 # OAuthConsent
 
-Asks the signed-in user whether an OAuth application may access their account. `OAuthConsent` reads the client, scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props set them, and posts the answer to Clerk with every URL parameter forwarded. When the application asks for `user:org:read`, the user picks which organization to grant. Each scope can show a checkbox with a label and a description; a required scope stays checked. It renders `fallback` until the consent details load, and nothing when nobody is signed in.
+Asks the signed-in user whether an OAuth application may access their account. `OAuthConsent` reads the client, scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props set them, and posts the answer to Clerk with every URL parameter forwarded. When the application asks for `user:org:read`, the user picks which organization to grant. Each scope can show a checkbox with a label and a description; a required scope stays checked. It shows a loading card until the consent details load, and nothing when nobody is signed in.
 
 ## Example
+
+Switch between loading, the consent screen and an error to see the card animate between them.
 
 <Story
   name='Default'
   storyModule={Stories}
   composition={[
     { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
+    { name: 'EmptyState', href: '/components/empty-state', layer: 'Components' },
     { name: 'Checkbox', href: '/components/checkbox', layer: 'Components' },
     { name: 'Badge', href: '/components/badge', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
@@ -28,17 +33,16 @@ Asks the signed-in user whether an OAuth application may access their account. `
 ```tsx
 import { OAuthConsent } from '@clerk/mosaic/features/oauth-consent/oauth-consent';
 
-<OAuthConsent fallback={<Spinner />} />;
+<OAuthConsent />;
 ```
 
 ## Props
 
-| Prop            | Type        | Default                      |
-| --------------- | ----------- | ---------------------------- |
-| `oauthClientId` | `string`    | The `client_id` parameter    |
-| `scope`         | `string`    | The `scope` parameter        |
-| `redirectUrl`   | `string`    | The `redirect_uri` parameter |
-| `fallback`      | `ReactNode` | `null`                       |
+| Prop            | Type     | Default                      |
+| --------------- | -------- | ---------------------------- |
+| `oauthClientId` | `string` | The `client_id` parameter    |
+| `scope`         | `string` | The `scope` parameter        |
+| `redirectUrl`   | `string` | The `redirect_uri` parameter |
 
 ## Examples
 
@@ -59,7 +63,3 @@ A long scope list scrolls inside its box, with the edges fading while there is m
 Requesting `offline_access` hides that scope from the list and adds a note that the user stays signed in.
 
 <Story name='OfflineAccess' storyModule={Stories} />
-
-### Error
-
-<Story name='LoadError' storyModule={Stories} />

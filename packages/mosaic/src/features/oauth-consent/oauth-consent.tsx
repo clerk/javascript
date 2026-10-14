@@ -1,23 +1,22 @@
 'use client';
 
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
+import { Card } from '../../components/card';
+import { Flow } from '../../components/flow';
 import { useErrorText, useMessages } from '../../localization';
 import { useOAuthConsentController } from './oauth-consent.controller';
 import type { OAuthConsentModelOptions } from './oauth-consent.model';
 import { useOAuthConsentModel } from './oauth-consent.model';
 import type { OAuthConsentMessages, OAuthConsentReadyModel } from './oauth-consent.types';
-import { OAuthConsentErrorView, OAuthConsentView } from './oauth-consent.view';
+import { OAuthConsentError, OAuthConsentPending, OAuthConsentView } from './oauth-consent.view';
 
-export interface OAuthConsentProps extends OAuthConsentModelOptions {
-  /** Rendered while Clerk and the consent details load. */
-  fallback?: ReactNode;
-}
+export type OAuthConsentProps = OAuthConsentModelOptions;
 
 /**
  * Asks the signed-in user whether an OAuth application may access their account. It reads the client,
  * scopes and redirect URI from the `client_id`, `scope` and `redirect_uri` URL parameters unless props
- * set them, and posts the answer to Clerk with every URL parameter forwarded. It renders `fallback`
+ * set them, and posts the answer to Clerk with every URL parameter forwarded. It shows a loading card
  * until the consent details load, and nothing at all when nobody is signed in.
  *
  * @example
@@ -33,29 +32,45 @@ export interface OAuthConsentProps extends OAuthConsentModelOptions {
  *   oauthClientId='client_123'
  *   scope='openid profile email'
  *   redirectUrl='https://app.example.com/oauth/callback'
- *   fallback={<Spinner />}
  * />
  * ```
  */
-export function OAuthConsent({ fallback, ...options }: OAuthConsentProps): ReactElement | null {
+export function OAuthConsent(options: OAuthConsentProps): ReactElement | null {
   const messages = useMessages('oauthConsent');
   const errorText = useErrorText();
   const model = useOAuthConsentModel(options);
 
-  if (model.status === 'loading') {
-    return <>{fallback ?? null}</>;
-  }
   if (model.status === 'hidden') {
     return null;
   }
-  if (model.status === 'error') {
-    return <OAuthConsentErrorView message={errorText(model.error, messages.loadError)} />;
-  }
   return (
-    <ReadyOAuthConsent
-      model={model}
-      messages={messages}
-    />
+    <Card.Root renderBranding={model.status === 'ready' && model.renderBranding}>
+      <Flow.Root
+        value={model.status}
+        state={model}
+      >
+        {current => (
+          <>
+            <Flow.Step ids={['loading']}>
+              <OAuthConsentPending label={messages.loading} />
+            </Flow.Step>
+            <Flow.Step ids={['ready']}>
+              {current.status === 'ready' ? (
+                <ReadyOAuthConsent
+                  model={current}
+                  messages={messages}
+                />
+              ) : null}
+            </Flow.Step>
+            <Flow.Step ids={['error']}>
+              {current.status === 'error' ? (
+                <OAuthConsentError message={errorText(current.error, messages.loadError)} />
+              ) : null}
+            </Flow.Step>
+          </>
+        )}
+      </Flow.Root>
+    </Card.Root>
   );
 }
 

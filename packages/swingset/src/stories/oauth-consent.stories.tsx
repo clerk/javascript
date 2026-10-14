@@ -1,4 +1,12 @@
-import { OAuthConsentErrorView, OAuthConsentView } from '@clerk/mosaic/features/oauth-consent/oauth-consent.view';
+import { Card } from '@clerk/mosaic/components/card';
+import { Flow } from '@clerk/mosaic/components/flow';
+import { SegmentedControl } from '@clerk/mosaic/components/segmented-control';
+import {
+  OAuthConsentError,
+  OAuthConsentPending,
+  OAuthConsentView,
+} from '@clerk/mosaic/features/oauth-consent/oauth-consent.view';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -14,6 +22,13 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/features/oauth-consent/oauth-consent.tsx',
 };
 
+const statuses = ['loading', 'ready', 'error'] as const;
+type Status = (typeof statuses)[number];
+
+function isStatus(value: unknown): value is Status {
+  return statuses.some(status => status === value);
+}
+
 export function Default() {
   const props = useOAuthConsentScopeSelectionFixture({
     organizations: [
@@ -22,24 +37,69 @@ export function Default() {
     ],
     defaultOrganizationId: 'org_1',
   });
-  return <OAuthConsentView {...props} />;
+  const [status, setStatus] = useState<Status>('ready');
+  return (
+    <div style={{ display: 'grid', gap: 16, justifyItems: 'center' }}>
+      <SegmentedControl.Root
+        aria-label='Status'
+        value={status}
+        onValueChange={value => {
+          if (isStatus(value)) {
+            setStatus(value);
+          }
+        }}
+      >
+        <SegmentedControl.Item value='loading'>Loading</SegmentedControl.Item>
+        <SegmentedControl.Item value='ready'>Consent</SegmentedControl.Item>
+        <SegmentedControl.Item value='error'>Error</SegmentedControl.Item>
+      </SegmentedControl.Root>
+      <Card.Root>
+        <Flow.Root
+          value={status}
+          state={props}
+        >
+          {state => (
+            <>
+              <Flow.Step ids={['loading']}>
+                <OAuthConsentPending label='Loading consent information' />
+              </Flow.Step>
+              <Flow.Step ids={['ready']}>
+                <OAuthConsentView {...state} />
+              </Flow.Step>
+              <Flow.Step ids={['error']}>
+                <OAuthConsentError message='Could not load consent information.' />
+              </Flow.Step>
+            </>
+          )}
+        </Flow.Root>
+      </Card.Root>
+    </div>
+  );
 }
 
 export function ScopeList() {
   const props = useOAuthConsentFixture();
-  return <OAuthConsentView {...props} />;
+  return (
+    <Card.Root>
+      <OAuthConsentView {...props} />
+    </Card.Root>
+  );
 }
 
 export function ManyScopes() {
   const props = useOAuthConsentScopeSelectionFixture({}, manyScopes);
-  return <OAuthConsentView {...props} />;
+  return (
+    <Card.Root>
+      <OAuthConsentView {...props} />
+    </Card.Root>
+  );
 }
 
 export function OfflineAccess() {
   const props = useOAuthConsentScopeSelectionFixture({ hasOfflineAccess: true });
-  return <OAuthConsentView {...props} />;
-}
-
-export function LoadError() {
-  return <OAuthConsentErrorView message='The redirect URI is missing.' />;
+  return (
+    <Card.Root>
+      <OAuthConsentView {...props} />
+    </Card.Root>
+  );
 }

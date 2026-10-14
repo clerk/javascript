@@ -11,8 +11,10 @@ import { Field } from '../../components/field';
 import { Input } from '../../components/input';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Select } from '../../components/select';
+import { Spinner } from '../../components/spinner';
 import { Text } from '../../components/text';
 import { Tooltip } from '../../components/tooltip';
+import { VisuallyHidden } from '../../components/visually-hidden';
 import { fill, rich } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
@@ -33,8 +35,16 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
 
   return (
     <>
-      <Card.Root
-        renderBranding={props.renderBranding}
+      <Card.Header xstyle={styles.centered}>
+        <Card.Title>{fill(m.title, { oauthApplicationName, applicationName: props.applicationName })}</Card.Title>
+        <Card.Description>
+          {rich(m.subtitle, {
+            values: { oauthApplicationName, domain: props.redirectDomain },
+            components: { nowrap: renderNowrap },
+          })}
+        </Card.Description>
+      </Card.Header>
+      <Card.Content
         render={
           <form
             method='post'
@@ -42,127 +52,116 @@ export function OAuthConsentView(props: OAuthConsentViewProps) {
           />
         }
       >
-        <Card.Header xstyle={styles.centered}>
-          <Card.Title>{fill(m.title, { oauthApplicationName, applicationName: props.applicationName })}</Card.Title>
-          <Card.Description>
-            {rich(m.subtitle, {
-              values: { oauthApplicationName, domain: props.redirectDomain },
-              components: { nowrap: renderNowrap },
-            })}
-          </Card.Description>
-        </Card.Header>
-        <Card.Content>
-          {props.organizations.length > 0 ? (
-            <Field.Root disabled={props.pendingAction !== undefined}>
-              <Field.Label>{m.organizationLabel}</Field.Label>
-              <Select.Root
-                items={props.organizations}
-                value={organizationId ?? undefined}
-                onValueChange={value => {
-                  if (typeof value === 'string') {
-                    props.onOrganizationChange(value);
-                  }
-                }}
-              >
-                <Select.Trigger />
-                <Select.Popup />
-              </Select.Root>
-            </Field.Root>
-          ) : null}
-          {props.scopes.length > 0 ? (
-            <div {...mergeStyleProps(themeProps('oauth-consent-scopes'), stylex.props(styles.scopes))}>
-              <Text
-                id={scopeListTitleId}
-                size='sm'
-                xstyle={styles.scopesTitle}
-              >
-                {fill(m.scopeListTitle, { applicationName: oauthApplicationName })}
-              </Text>
-              <ul
-                aria-labelledby={scopeListTitleId}
-                {...stylex.props(reset.base, scrollAreaViewport(), styles.scopeList)}
-              >
-                {props.scopes.map(item => (
-                  <li
-                    key={item.scope}
-                    {...stylex.props(styles.scopeRow)}
-                  >
-                    {props.scopeSelection ? (
-                      <ScopeOption
-                        item={item}
-                        selection={props.scopeSelection}
-                        disabled={props.pendingAction !== undefined}
-                        requiredLabel={m.required}
-                      />
-                    ) : (
-                      <ScopeText
-                        item={item}
-                        requiredLabel={m.required}
-                      />
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          {props.forwardedParams.map(([name, value]) => (
-            <input
-              key={name}
-              type='hidden'
-              name={name}
-              value={value}
-            />
-          ))}
-          {organizationId !== null && props.organizations.length > 0 ? (
-            <input
-              type='hidden'
-              name='organization_id'
-              value={organizationId}
-            />
-          ) : null}
-          <div {...stylex.props(styles.actions)}>
-            <SubmitButton
-              name='consented'
-              value='false'
-              disabled={props.pendingAction === 'allow'}
-              isPending={props.pendingAction === 'deny'}
-              pendingLabel={m.denying}
-              onClick={props.onDeny}
-              variant='outline'
-              fullWidth
+        {props.organizations.length > 0 ? (
+          <Field.Root disabled={props.pendingAction !== undefined}>
+            <Field.Label>{m.organizationLabel}</Field.Label>
+            <Select.Root
+              items={props.organizations}
+              value={organizationId ?? undefined}
+              onValueChange={value => {
+                if (typeof value === 'string') {
+                  props.onOrganizationChange(value);
+                }
+              }}
             >
-              {m.deny}
-            </SubmitButton>
-            <SubmitButton
-              name='consented'
-              value='true'
-              disabled={props.pendingAction === 'deny'}
-              isPending={props.pendingAction === 'allow'}
-              pendingLabel={m.allowing}
-              onClick={props.onAllow}
-              fullWidth
+              <Select.Trigger />
+              <Select.Popup />
+            </Select.Root>
+          </Field.Root>
+        ) : null}
+        {props.scopes.length > 0 ? (
+          <div {...mergeStyleProps(themeProps('oauth-consent-scopes'), stylex.props(styles.scopes))}>
+            <Text
+              id={scopeListTitleId}
+              size='sm'
+              xstyle={styles.scopesTitle}
             >
-              {m.allow}
-            </SubmitButton>
+              {fill(m.scopeListTitle, { applicationName: oauthApplicationName })}
+            </Text>
+            <ul
+              aria-labelledby={scopeListTitleId}
+              {...stylex.props(reset.base, scrollAreaViewport(), styles.scopeList)}
+            >
+              {props.scopes.map(item => (
+                <li
+                  key={item.scope}
+                  {...stylex.props(styles.scopeRow)}
+                >
+                  {props.scopeSelection ? (
+                    <ScopeOption
+                      item={item}
+                      selection={props.scopeSelection}
+                      disabled={props.pendingAction !== undefined}
+                      requiredLabel={m.required}
+                    />
+                  ) : (
+                    <ScopeText
+                      item={item}
+                      requiredLabel={m.required}
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
-          <Text
-            size='xs'
-            color='foreground-secondary'
-            xstyle={styles.centered}
+        ) : null}
+        {props.forwardedParams.map(([name, value]) => (
+          <input
+            key={name}
+            type='hidden'
+            name={name}
+            value={value}
+          />
+        ))}
+        {organizationId !== null && props.organizations.length > 0 ? (
+          <input
+            type='hidden'
+            name='organization_id'
+            value={organizationId}
+          />
+        ) : null}
+        <div {...stylex.props(styles.actions)}>
+          <SubmitButton
+            name='consented'
+            value='false'
+            disabled={props.pendingAction === 'allow'}
+            isPending={props.pendingAction === 'deny'}
+            pendingLabel={m.denying}
+            onClick={props.onDeny}
+            variant='outline'
+            fullWidth
           >
-            {rich(m.redirectNotice, { values: { domain } })}
-            {props.hasOfflineAccess ? ` ${m.offlineAccessNotice}` : null}
-          </Text>
-        </Card.Content>
-        <Card.Footer xstyle={styles.centered}>
-          <Text
-            size='sm'
-            color='foreground-secondary'
+            {m.deny}
+          </SubmitButton>
+          <SubmitButton
+            name='consented'
+            value='true'
+            disabled={props.pendingAction === 'deny'}
+            isPending={props.pendingAction === 'allow'}
+            pendingLabel={m.allowing}
+            onClick={props.onAllow}
+            fullWidth
           >
-            {fill(m.signedInAs, { identifier: props.identifier })}
-          </Text>
-        </Card.Footer>
-      </Card.Root>
+            {m.allow}
+          </SubmitButton>
+        </div>
+        <Text
+          size='xs'
+          color='foreground-secondary'
+          xstyle={styles.centered}
+        >
+          {rich(m.redirectNotice, { values: { domain } })}
+          {props.hasOfflineAccess ? ` ${m.offlineAccessNotice}` : null}
+        </Text>
+      </Card.Content>
+      <Card.Footer xstyle={styles.centered}>
+        <Text
+          size='sm'
+          color='foreground-secondary'
+        >
+          {fill(m.signedInAs, { identifier: props.identifier })}
+        </Text>
+      </Card.Footer>
       <Dialog.Root
         open={props.isRedirectUrlOpen}
         onOpenChange={props.onRedirectUrlOpenChange}
@@ -267,19 +266,24 @@ function RedirectDomainButton({ domain, label, onClick }: { domain: string; labe
   );
 }
 
-export interface OAuthConsentErrorViewProps {
-  message: string;
+export function OAuthConsentPending({ label }: { label: string }) {
+  return (
+    <Card.Content xstyle={styles.pending}>
+      <span role='status'>
+        <Spinner />
+        <VisuallyHidden>{label}</VisuallyHidden>
+      </span>
+    </Card.Content>
+  );
 }
 
-export function OAuthConsentErrorView({ message }: OAuthConsentErrorViewProps) {
+export function OAuthConsentError({ message }: { message: string }) {
   return (
-    <Card.Root>
-      <Card.Content>
-        <EmptyState.Root role='alert'>
-          <EmptyState.Icon name='exclamation-circle' />
-          <EmptyState.Label>{message}</EmptyState.Label>
-        </EmptyState.Root>
-      </Card.Content>
-    </Card.Root>
+    <Card.Content>
+      <EmptyState.Root role='alert'>
+        <EmptyState.Icon name='exclamation-circle' />
+        <EmptyState.Label>{message}</EmptyState.Label>
+      </EmptyState.Root>
+    </Card.Content>
   );
 }

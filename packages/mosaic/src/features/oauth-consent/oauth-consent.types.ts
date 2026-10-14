@@ -62,5 +62,4 @@ export interface OAuthConsentViewProps {
   onDeny: () => void;
   actionUrl: string;
   forwardedParams: [string, string][];
-  renderBranding: boolean;
 }

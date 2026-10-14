@@ -33,4 +33,5 @@ export const styles = stylex.create({
   actions: { gap: space['3'], display: 'flex' },
   inlineLink: { fontSize: 'inherit', lineHeight: 'inherit', verticalAlign: 'baseline' },
   nowrap: { whiteSpace: 'nowrap' },
+  pending: { alignItems: 'center', display: 'flex', justifyContent: 'center', minBlockSize: '20rem' },
 });

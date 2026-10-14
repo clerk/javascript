@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Card } from '../../../components/card';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { oauthConsentMessages } from '../oauth-consent.messages';
 import type { OAuthConsentViewProps } from '../oauth-consent.types';
@@ -29,7 +30,6 @@ function propsFor(overrides: Partial<OAuthConsentViewProps> = {}): OAuthConsentV
     onRedirectUrlOpenChange: vi.fn(),
     actionUrl: '#',
     forwardedParams: [],
-    renderBranding: false,
     ...overrides,
   };
 }
@@ -37,7 +37,9 @@ function propsFor(overrides: Partial<OAuthConsentViewProps> = {}): OAuthConsentV
 function renderView(overrides: Partial<OAuthConsentViewProps> = {}) {
   render(
     <MosaicProvider>
-      <OAuthConsentView {...propsFor(overrides)} />
+      <Card.Root renderBranding={false}>
+        <OAuthConsentView {...propsFor(overrides)} />
+      </Card.Root>
     </MosaicProvider>,
   );
   return userEvent.setup();

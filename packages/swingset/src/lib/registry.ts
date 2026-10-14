@@ -152,7 +152,6 @@ import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../s
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
   Default as OAuthConsentDefault,
-  LoadError as OAuthConsentLoadError,
   ManyScopes as OAuthConsentManyScopes,
   meta as oauthConsentMeta,
   OfflineAccess as OAuthConsentOfflineAccess,
@@ -935,7 +934,6 @@ const oauthConsentModule: StoryModule = {
   ScopeList: OAuthConsentScopeList,
   ManyScopes: OAuthConsentManyScopes,
   OfflineAccess: OAuthConsentOfflineAccess,
-  LoadError: OAuthConsentLoadError,
 };
 
 const reverificationModule: StoryModule = {

@@ -431,22 +431,22 @@ describe('OAuthConsent', () => {
   describe('availability', () => {
     it('renders nothing when signed out', async () => {
       visitConsent();
-      const { fapi } = await renderConsent({ oauthConsent: consent() }, { fallback: <p>Loading</p> });
+      const { fapi } = await renderConsent({ oauthConsent: consent() });
 
-      await waitFor(() => expect(screen.queryByText('Loading')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('status')).toBeNull());
       expect(screen.queryByRole('heading')).toBeNull();
       expect(fapi.oauthConsentRequests).toEqual([]);
     });
 
-    it('shows the fallback while consent loads', async () => {
+    it('shows a loading card while consent loads', async () => {
       visitConsent();
       const held = holdRequests('get', CONSENT_PATH);
-      await renderConsent(signedIn(), { fallback: <p>Loading</p> });
+      await renderConsent();
 
-      expect(await screen.findByText('Loading')).toBeVisible();
+      expect(await screen.findByRole('status')).toHaveTextContent('Loading consent information');
       held.release();
       await ready();
-      expect(screen.queryByText('Loading')).toBeNull();
+      await waitFor(() => expect(screen.queryByRole('status')).toBeNull());
     });
 
     it('explains a missing client ID without asking the Frontend API', async () => {
