@@ -43,8 +43,8 @@ describe('the tests are an e2e project of their own', () => {
       'e2e.config.ts': "import { app } from './specs/app.ts';\nimport './src/core/keys.ts';\n",
       'specs/app.ts': "export { app } from './support/inputs.ts';\n",
       'specs/support/inputs.cts': "import keys = require('../../src/core/keys.ts');\n",
-      'specs/golden/sign-in/complete.e2e.tsx': "import '../../fixtures.ts';\nexport const load = (name: string) => import(`../../../testing/${name}.ts`);\n",
-      'specs/golden/sign-in/complete.settings.json': '{ "extends": "../../../src/core/instances/base.json" }\n',
+      'specs/features/sign-in/complete.e2e.tsx': "import '../../fixtures.ts';\nexport const load = (name: string) => import(`../../../testing/${name}.ts`);\n",
+      'specs/features/sign-in/complete.settings.json': '{ "extends": "../../../src/core/instances/base.json" }\n',
       'src/core/keys.ts': "import '../../specs/support/inputs.cts';\n",
     };
     for (const [file, text] of Object.entries(files)) {
@@ -53,8 +53,8 @@ describe('the tests are an e2e project of their own', () => {
     }
     assert.deepEqual([...pathsThatLeaveTheTests(packageDir)].sort(), [
       'e2e.config.ts names src/core/keys.ts',
-      'specs/golden/sign-in/complete.e2e.tsx names testing/${name}.ts',
-      'specs/golden/sign-in/complete.settings.json names src/core/instances/base.json',
+      'specs/features/sign-in/complete.e2e.tsx names testing/${name}.ts',
+      'specs/features/sign-in/complete.settings.json names src/core/instances/base.json',
       'specs/support/inputs.cts names src/core/keys.ts',
     ]);
   });

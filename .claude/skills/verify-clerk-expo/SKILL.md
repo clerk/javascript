@@ -103,7 +103,7 @@ With the remote backend, plain `doctor` starts nothing and pushes nothing, and `
 Input reaches the app only through specs. A spec is a TypeScript file that uses the `host` fixture from `specs/fixtures.ts` and e2e's `screen` locators.
 
 ```console
-$ integration/expo-native/bin/control-clerk-expo run native-auth-view --platform ios          # one feature: every spec in specs/golden/native-auth-view/
+$ integration/expo-native/bin/control-clerk-expo run native-auth-view --platform ios          # one feature: every spec in specs/features/native-auth-view/
 $ integration/expo-native/bin/control-clerk-expo run custom-flow-sign-in/complete             # one golden spec, on iOS
 $ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts             # a spec you wrote
 $ integration/expo-native/bin/control-clerk-expo run native-auth-view native-js-sync          # several targets in one run, with one video
@@ -158,13 +158,13 @@ A spec file that needs other settings than the standard ones has a settings file
 
 ### Check your work
 
-Golden specs under `specs/golden/<feature>/` are committed and cover the feature map in `features/`, which starts at `features/README.md`. Prove your own change, on both platforms when the change is not specific to one, and leave the rest of the golden specs to PR CI (`.github/workflows/verify-e2e.yml`), which runs every one of them once the pull request is ready for review. When your change is to behavior a golden spec already covers, that spec is your proof: run it. A spec covers a behavior only when it asserts on it. A spec that passes through the screen you changed without checking what you changed is not your proof. Run another feature's specs yourself only when you changed code that feature shares and want to know before CI does. For new work:
+Golden specs under `specs/features/<feature>/` are committed and cover the feature map in `features/`, which starts at `features/README.md`. Prove your own change, on both platforms when the change is not specific to one, and leave the rest of the golden specs to PR CI (`.github/workflows/verify-e2e.yml`), which runs every one of them once the pull request is ready for review. When your change is to behavior a golden spec already covers, that spec is your proof: run it. A spec covers a behavior only when it asserts on it. A spec that passes through the screen you changed without checking what you changed is not your proof. Run another feature's specs yourself only when you changed code that feature shares and want to know before CI does. For new work:
 
 1. Write a spec under `specs/explored/`, which is gitignored. It imports the fixture as `'../fixtures.ts'`.
 2. Run it by path.
 3. Run `screen` after the run, pass or fail. It prints the tree that the app is on now, with each node's role, label, and testID.
 4. Fix the locators from that output until the spec passes.
-5. When the change adds or changes what `@clerk/expo` does, move the spec to `specs/golden/<feature>/`, change its import to `'../../fixtures.ts'`, `git add` it, and update the feature's page and its line in `features/README.md`. A change to wording or appearance alone does not earn a golden spec, because a spec that pins a label fails on the next change of wording: leave that spec in `specs/explored/`. The run directory keeps a copy of every spec the run used.
+5. When the change adds or changes what `@clerk/expo` does, move the spec to `specs/features/<feature>/`, change its import to `'../../fixtures.ts'`, `git add` it, and update the feature's page and its line in `features/README.md`. A change to wording or appearance alone does not earn a golden spec, because a spec that pins a label fails on the next change of wording: leave that spec in `specs/explored/`. The run directory keeps a copy of every spec the run used.
 
 A failing spec prints `FAIL`, the first assertion message, and the path of its failure page, and `run` exits 1. The failure page (`.verify/runs/<run-id>/e2e/failures/*.md`) lists every step, the screen tree at the failure, and a screenshot. A run in which no test executed, such as a `--grep` that matches nothing, fails with `NO_SPECS` and exits 3, because it proved nothing. A run in which every selected spec is limited to the other platform is the one exception. It exits 0, prints `skip` for each spec, and its `next` line says `nothing ran: every selected spec was left out by platform, so the run proves nothing to post`. Read that line, because the exit code alone looks like a pass.
 

@@ -32,13 +32,13 @@ const FORCED_ORG: InstanceSettings = { config: { organization_settings: { force_
 const MFA_LABEL = 'auth_multi_factor.required_for_sign_up=true';
 const ORG_LABEL = 'organization_settings.force_organization_selection=true';
 const MFA_BODY = { ...standardFile().config, auth_multi_factor: { ...(standardFile().config.auth_multi_factor as object), required_for_sign_up: true } };
-const MFA_SPEC = 'specs/golden/session-tasks/setup-mfa.e2e.ts';
-const MFA_FILE = 'specs/golden/session-tasks/setup-mfa.settings.json';
-const ORG_SPEC = 'specs/golden/session-tasks/choose-organization.e2e.ts';
-const STANDARD_SPEC = 'specs/golden/auth-start/auth-start.e2e.ts';
+const MFA_SPEC = 'specs/features/session-tasks/setup-mfa.e2e.ts';
+const MFA_FILE = 'specs/features/session-tasks/setup-mfa.settings.json';
+const ORG_SPEC = 'specs/features/session-tasks/choose-organization.e2e.ts';
+const STANDARD_SPEC = 'specs/features/auth-start/auth-start.e2e.ts';
 
 const groupOf = (declared: InstanceSettings | null, path: string): SettingsGroup =>
-  planGroups([{ spec: { kind: 'golden', path, feature: null }, source: "test('x', () => {});\n", declaration: declared === null ? null : JSON.stringify(declared) }], null)[0]!;
+  planGroups([{ spec: { kind: 'committed', path, feature: null }, source: "test('x', () => {});\n", declaration: declared === null ? null : JSON.stringify(declared) }], null)[0]!;
 const keyRefused = (error: VerifyFailure): boolean =>
   error.code === 'NOT_READY' &&
   error.message === "api.clerk.com answered 401 to the instance's own secret key; the likely cause is a cloud environment whose API credential for api.clerk.com has no path prefix, so it replaces the key on every request to that host" &&

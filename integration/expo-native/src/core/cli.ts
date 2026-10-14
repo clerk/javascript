@@ -202,10 +202,10 @@ function rel(packageDir: string, path: string): string {
 function renderRun(result: RunResult, packageDir: string): string[] {
   const r = result.record;
   const lines: string[] = [];
-  const width = Math.max(0, ...r.results.map((x) => x.spec.path.replace(/^specs\/(golden\/)?/, '').length));
+  const width = Math.max(0, ...r.results.map((x) => x.spec.path.replace(/^specs\/(features\/)?/, '').length));
   for (const x of r.results) {
     const label = { passed: 'pass', failed: 'FAIL', skipped: 'skip', flaky: 'flaky', interrupted: 'INTR' }[x.status];
-    const name = x.spec.path.replace(/^specs\/(golden\/)?/, '');
+    const name = x.spec.path.replace(/^specs\/(features\/)?/, '');
     const tail = x.status === 'skipped' ? (x.skipReason ?? '') : `${x.seconds}s`;
     lines.push(`  ${pad(label, 5)} ${pad(name, width)}  ${x.title}  ${tail}`);
     if (x.error !== null) lines.push(`        ${x.status === 'flaky' ? `passed on attempt ${x.attempts}; the attempt before it failed: ` : ''}${x.error}`);

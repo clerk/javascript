@@ -11,7 +11,7 @@ const MFA: InstanceSettings = { config: { auth_multi_factor: { required_for_sign
 const FORCED_ORG: InstanceSettings = { config: { organization_settings: { force_organization_selection: true } }, environment: { 'organization_settings.force_organization_selection': true } };
 
 const SPEC_SOURCE = "import { test } from '../../fixtures.ts';\n\ntest('x', async ({ host }) => { await host.launch({}); });\n";
-const spec = (path: string): SpecRef => ({ kind: 'golden', path, feature: null });
+const spec = (path: string): SpecRef => ({ kind: 'committed', path, feature: null });
 const text = (declaration: InstanceSettings | string | null, source = SPEC_SOURCE) => ({ source, declaration: declaration === null || typeof declaration === 'string' ? declaration : JSON.stringify(declaration) });
 const file = (path: string, declared: InstanceSettings | string | null = null) => ({ spec: spec(path), ...text(declared) });
 const usage = (pattern: RegExp) => (error: VerifyFailure) => error instanceof VerifyFailure && error.code === 'USAGE' && pattern.test(error.message);
@@ -38,7 +38,7 @@ describe('the standard file', () => {
 
 describe('reading a declaration from the settings file beside a spec', () => {
   it('names the settings file after the spec file', () => {
-    assert.equal(settingsFileOf('specs/golden/session-tasks/setup-mfa.e2e.ts'), 'specs/golden/session-tasks/setup-mfa.settings.json');
+    assert.equal(settingsFileOf('specs/features/session-tasks/setup-mfa.e2e.ts'), 'specs/features/session-tasks/setup-mfa.settings.json');
     assert.equal(settingsFileOf(ODD), ODD_FILE);
   });
 
@@ -88,13 +88,13 @@ describe('reading a declaration from the settings file beside a spec', () => {
   it('finds a JSON file under specs that is not the settings file of a spec beside it, and none when each has its spec', () => {
     const dir = mkdtempSync(join(tmpdir(), 'verify-settings-'));
     assert.equal(straySettingsFile(dir), null, 'a package with no specs directory has none');
-    mkdirSync(join(dir, 'specs/golden/session-tasks'), { recursive: true });
-    for (const name of ['setup-mfa.e2e.ts', 'setup-mfa.settings.json']) writeFileSync(join(dir, 'specs/golden/session-tasks', name), '');
+    mkdirSync(join(dir, 'specs/features/session-tasks'), { recursive: true });
+    for (const name of ['setup-mfa.e2e.ts', 'setup-mfa.settings.json']) writeFileSync(join(dir, 'specs/features/session-tasks', name), '');
     assert.equal(straySettingsFile(dir), null);
-    writeFileSync(join(dir, 'specs/golden/session-tasks/setup-mfa.e2e.settings.json'), '');
+    writeFileSync(join(dir, 'specs/features/session-tasks/setup-mfa.e2e.settings.json'), '');
     const stray = straySettingsFile(dir);
     assert.equal(stray?.code, 'USAGE');
-    assert.equal(stray?.message, 'specs/golden/session-tasks/setup-mfa.e2e.settings.json is not the settings file of a spec, so no run reads it');
+    assert.equal(stray?.message, 'specs/features/session-tasks/setup-mfa.e2e.settings.json is not the settings file of a spec, so no run reads it');
     assert.equal(stray?.fix, 'name a settings file after its spec file, with .settings.json in place of .e2e.ts, or delete it');
     for (const misnamed of ['setup-mfa.setting.json', 'setup-mfa-settings.json', 'settings.json', 'setup-mfa.settings.jsonc']) {
       const other = mkdtempSync(join(tmpdir(), 'verify-settings-'));
@@ -204,10 +204,10 @@ describe('checking a declaration against the standard file', () => {
 });
 
 describe('planning a run in groups', () => {
-  const golden = [file('specs/golden/auth-start/auth-start.e2e.ts'), file('specs/golden/session-tasks/choose-organization.e2e.ts', FORCED_ORG), file('specs/golden/session-tasks/complete-setup-mfa.e2e.ts', MFA), file('specs/golden/session-tasks/setup-mfa.e2e.ts', MFA), file('specs/golden/sign-up/complete.e2e.ts')];
+  const committed = [file('specs/features/auth-start/auth-start.e2e.ts'), file('specs/features/session-tasks/choose-organization.e2e.ts', FORCED_ORG), file('specs/features/session-tasks/complete-setup-mfa.e2e.ts', MFA), file('specs/features/session-tasks/setup-mfa.e2e.ts', MFA), file('specs/features/sign-up/complete.e2e.ts')];
   const mfaKey = settingsOf(MFA, 'x').key;
   const orgKey = settingsOf(FORCED_ORG, 'x').key;
-  const order = (applied: string | null, specs = golden) => planGroups(specs, applied).map((group) => group.settings.label);
+  const order = (applied: string | null, specs = committed) => planGroups(specs, applied).map((group) => group.settings.label);
 
   it('puts the group already applied first, so a run changes the instance once less than it has groups', () => {
     assert.deepEqual(order(STANDARD.key), ['standard', 'organization_settings.force_organization_selection=true', 'auth_multi_factor.required_for_sign_up=true']);
@@ -220,10 +220,10 @@ describe('planning a run in groups', () => {
   });
 
   it('is stable: the same files in the same order plan the same groups, each with its files in order', () => {
-    const plan = planGroups(golden, STANDARD.key);
-    assert.deepEqual(plan, planGroups(golden, STANDARD.key));
+    const plan = planGroups(committed, STANDARD.key);
+    assert.deepEqual(plan, planGroups(committed, STANDARD.key));
     assert.deepEqual(plan.map((group) => group.specs.map((s) => s.path.split('/').at(-1))), [['auth-start.e2e.ts', 'complete.e2e.ts'], ['choose-organization.e2e.ts'], ['complete-setup-mfa.e2e.ts', 'setup-mfa.e2e.ts']]);
-    assert.equal(plan[2]!.settings.askedBy, 'specs/golden/session-tasks/complete-setup-mfa.e2e.ts', 'the first spec of a group is the one that asked');
+    assert.equal(plan[2]!.settings.askedBy, 'specs/features/session-tasks/complete-setup-mfa.e2e.ts', 'the first spec of a group is the one that asked');
     assert.equal(plan[0]!.settings, STANDARD);
     assert.match(plan[0]!.specs[0]!.sourceHash, /^[0-9a-f]{64}$/);
     assert.notEqual(plan[0]!.specs[0]!.sourceHash, plan[1]!.specs[0]!.sourceHash);

@@ -160,17 +160,17 @@ describe('the clerk-expo host', () => {
 
 describe('the golden specs of this repository', () => {
   const dir = join(import.meta.dirname, '..');
-  const golden = resolveSpecs(dir, { all: true }).map(spec => ({ spec, ...readSpecText(dir, spec.path) }));
+  const committed = resolveSpecs(dir, { all: true }).map(spec => ({ spec, ...readSpecText(dir, spec.path) }));
 
   it('declare settings in one spec file, so a run of all of them is the standard group and then the biometric sign-in group', () => {
-    const declaring = golden
+    const declaring = committed
       .filter(({ spec, ...text }) => declaredIn(text, spec.path) !== null)
       .map(({ spec }) => spec.path);
-    assert.deepEqual(declaring, ['specs/golden/native-modules/biometric-availability.e2e.ts']);
-    const plan = planGroups(golden, STANDARD.key);
+    assert.deepEqual(declaring, ['specs/features/native-modules/biometric-availability.e2e.ts']);
+    const plan = planGroups(committed, STANDARD.key);
     assert.equal(plan.length, 2);
     assert.equal(plan[0]!.settings, STANDARD);
-    assert.equal(plan[0]!.specs.length, golden.length - 1);
+    assert.equal(plan[0]!.specs.length, committed.length - 1);
     assert.deepEqual(
       plan[1]!.specs.map(spec => spec.path),
       declaring,

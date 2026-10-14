@@ -18,9 +18,9 @@ interface Row {
 }
 
 const ALL: readonly Row[] = [
-  { file: 'specs/golden/auth-start/opens.e2e.ts', title: 'opens', status: 'passed' },
-  { file: 'specs/golden/sign-up/complete.e2e.ts', title: 'completes', status: 'flaky' },
-  { file: 'specs/golden/session-tasks/setup-mfa.e2e.ts', title: 'stops on the task', status: 'passed' },
+  { file: 'specs/features/auth-start/opens.e2e.ts', title: 'opens', status: 'passed' },
+  { file: 'specs/features/sign-up/complete.e2e.ts', title: 'completes', status: 'flaky' },
+  { file: 'specs/features/session-tasks/setup-mfa.e2e.ts', title: 'stops on the task', status: 'passed' },
 ];
 
 function attempt(index: number, status: 'passed' | 'failed') {

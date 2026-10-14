@@ -11,7 +11,7 @@ import { SAMPLE_INPUTS } from '../testing/sample-inputs.ts';
 
 function packageDir(): string {
   const dir = mkdtempSync(join(tmpdir(), 'verify-specs-'));
-  for (const file of ['specs/golden/auth-start/opens.e2e.ts', 'specs/golden/sign-up/request-code.e2e.ts', 'specs/explored/probe.e2e.ts', 'specs/fixtures.ts']) {
+  for (const file of ['specs/features/auth-start/opens.e2e.ts', 'specs/features/sign-up/request-code.e2e.ts', 'specs/explored/probe.e2e.ts', 'specs/fixtures.ts']) {
     mkdirSync(join(dir, file, '..'), { recursive: true });
     writeFileSync(join(dir, file), '');
   }
@@ -21,10 +21,10 @@ function packageDir(): string {
 describe('resolveSpecs', () => {
   it('expands features, feature/spec, paths, and --all', () => {
     const dir = packageDir();
-    assert.deepEqual(resolveSpecs(dir, { selectors: ['auth-start'] }), [{ kind: 'golden', path: 'specs/golden/auth-start/opens.e2e.ts', feature: 'auth-start' }]);
-    assert.deepEqual(resolveSpecs(dir, { selectors: ['sign-up/request-code'] }).map((s) => s.path), ['specs/golden/sign-up/request-code.e2e.ts']);
+    assert.deepEqual(resolveSpecs(dir, { selectors: ['auth-start'] }), [{ kind: 'committed', path: 'specs/features/auth-start/opens.e2e.ts', feature: 'auth-start' }]);
+    assert.deepEqual(resolveSpecs(dir, { selectors: ['sign-up/request-code'] }).map((s) => s.path), ['specs/features/sign-up/request-code.e2e.ts']);
     assert.deepEqual(resolveSpecs(dir, { selectors: ['specs/explored/probe.e2e.ts'] }, dir), [{ kind: 'explored', path: 'specs/explored/probe.e2e.ts', feature: null }]);
-    assert.deepEqual(resolveSpecs(dir, { all: true }).map((s) => s.path), ['specs/golden/auth-start/opens.e2e.ts', 'specs/golden/sign-up/request-code.e2e.ts']);
+    assert.deepEqual(resolveSpecs(dir, { all: true }).map((s) => s.path), ['specs/features/auth-start/opens.e2e.ts', 'specs/features/sign-up/request-code.e2e.ts']);
   });
 
   it('lists every feature for an unknown selector', () => {
@@ -34,9 +34,9 @@ describe('resolveSpecs', () => {
 
 describe('planE2E', () => {
   it('passes selection flags through and points output inside the run', () => {
-    const plan = planE2E(SAMPLE_INPUTS, [{ kind: 'golden', path: 'specs/golden/a/b.e2e.ts', feature: null }], { verb: 'run', selection: { all: true }, grep: 'x', video: true, retries: 1, githubReport: false, waitSeconds: 0 }, '/package', e2eOutputDir('/package/.verify/runs/r20261002-141210-7c1e' as EvidencePath, 0));
+    const plan = planE2E(SAMPLE_INPUTS, [{ kind: 'committed', path: 'specs/features/a/b.e2e.ts', feature: null }], { verb: 'run', selection: { all: true }, grep: 'x', video: true, retries: 1, githubReport: false, waitSeconds: 0 }, '/package', e2eOutputDir('/package/.verify/runs/r20261002-141210-7c1e' as EvidencePath, 0));
     assert.deepEqual(plan.args, [
-      'run', 'specs/golden/a/b.e2e.ts', '--config', 'e2e.config.ts', '--target', 'ios',
+      'run', 'specs/features/a/b.e2e.ts', '--config', 'e2e.config.ts', '--target', 'ios',
       '--output', '.verify/runs/r20261002-141210-7c1e/e2e', '--reporter', 'list,markdown,junit', '--retries', '1',
       '--grep', 'x', '--pass-with-no-tests',
     ]);
@@ -64,19 +64,19 @@ describe('parseE2EReport', () => {
     run: {
       results: [
         {
-          id: 'aaaaaaaa11', kind: 'test', titlePath: ['opens'], file: 'specs/golden/auth-start/opens.e2e.ts', platform: 'ios', tags: [], status: 'passed',
+          id: 'aaaaaaaa11', kind: 'test', titlePath: ['opens'], file: 'specs/features/auth-start/opens.e2e.ts', platform: 'ios', tags: [], status: 'passed',
           attempts: [{ status: 'passed', durationMs: 9100, artifacts: [{ kind: 'screenshot', path: 'ios/x/attempt-0/screenshots/001-auth.png', producer: { kind: 'step', stepId: 's1' } }], steps: [{ id: 's1', api: 'app.screenshot', label: 'auth' }] }],
         },
         {
-          id: 'bbbbbbbb22', kind: 'test', titlePath: ['completes'], file: 'specs/golden/sign-up/complete.e2e.ts', platform: 'ios', tags: [], status: 'skipped',
+          id: 'bbbbbbbb22', kind: 'test', titlePath: ['completes'], file: 'specs/features/sign-up/complete.e2e.ts', platform: 'ios', tags: [], status: 'skipped',
           skip: { cause: 'filtered', reason: 'title does not match --grep' }, attempts: [],
         },
         {
-          id: 'ffffffff66', kind: 'test', titlePath: ['ios-only screen'], file: 'specs/golden/sign-up/request-code.e2e.ts', platform: 'android', tags: [], status: 'skipped',
+          id: 'ffffffff66', kind: 'test', titlePath: ['ios-only screen'], file: 'specs/features/sign-up/request-code.e2e.ts', platform: 'android', tags: [], status: 'skipped',
           skip: { cause: 'platform-unavailable', reason: 'test declares platforms [ios]' }, attempts: [],
         },
         {
-          id: 'dddddddd44', kind: 'test', titlePath: ['never ran'], file: 'specs/golden/auth-start/opens.e2e.ts', platform: 'ios', tags: [], status: 'skipped',
+          id: 'dddddddd44', kind: 'test', titlePath: ['never ran'], file: 'specs/features/auth-start/opens.e2e.ts', platform: 'ios', tags: [], status: 'skipped',
           skip: { cause: 'infrastructure-unavailable', reason: 'the device could not be opened' }, attempts: [],
         },
         {
@@ -90,7 +90,7 @@ describe('parseE2EReport', () => {
   it('keeps the failed attempt of a test that passed on a retry: its error, its failure page, and its screenshot', () => {
     const dir = e2eOutputDir(mkdtempSync(join(tmpdir(), 'verify-report-')) as EvidencePath, 0);
     mkdirSync(join(dir, 'failures'), { recursive: true });
-    writeFileSync(join(dir, 'failures', 'specs_golden_auth-start_opens-opens-eeeeeeee.md'), '');
+    writeFileSync(join(dir, 'failures', 'specs_features_auth-start_opens-opens-eeeeeeee.md'), '');
     mkdirSync(join(dir, 'artifacts', 'ios/o/attempt-0'), { recursive: true });
     writeFileSync(join(dir, 'artifacts', 'ios/o/attempt-0/screen.txt'), '');
     const attempt = (path: string) => ({ failure: { screen: 'screen', screenshot: 'shot' }, artifacts: [{ id: 'screen', kind: 'other', path: `${path}/screen.txt` }, { id: 'shot', kind: 'screenshot', path: `${path}/screenshots/001-failure.png` }] });
@@ -99,20 +99,20 @@ describe('parseE2EReport', () => {
       run: {
         results: [
           {
-            id: 'eeeeeeee55', kind: 'test', titlePath: ['opens'], file: 'specs/golden/auth-start/opens.e2e.ts', platform: 'ios', tags: [], status,
+            id: 'eeeeeeee55', kind: 'test', titlePath: ['opens'], file: 'specs/features/auth-start/opens.e2e.ts', platform: 'ios', tags: [], status,
             attempts: [{ status: 'failed', durationMs: 4000, error: { message: 'tap failed\nthe runner session ended' }, ...attempt('ios/o/attempt-0') }, { durationMs: 6000, ...second }],
           },
         ],
       },
     });
 
-    const opens: readonly SpecRef[] = [{ kind: 'golden', path: 'specs/golden/auth-start/opens.e2e.ts', feature: null }];
+    const opens: readonly SpecRef[] = [{ kind: 'committed', path: 'specs/features/auth-start/opens.e2e.ts', feature: null }];
     const [flaky] = parseE2EReport(retried('flaky', { status: 'passed' }), opens, dir);
     assert.equal(flaky!.status, 'flaky');
     assert.equal(flaky!.attempts, 2);
     assert.equal(flaky!.seconds, 10);
     assert.equal(flaky!.error, 'tap failed; the runner session ended');
-    assert.equal(flaky!.failurePage, join(dir, 'failures', 'specs_golden_auth-start_opens-opens-eeeeeeee.md'));
+    assert.equal(flaky!.failurePage, join(dir, 'failures', 'specs_features_auth-start_opens-opens-eeeeeeee.md'));
     assert.equal(flaky!.failureScreen, join(dir, 'artifacts', 'ios/o/attempt-0/screen.txt'));
     assert.equal(flaky!.failureScreenshot, join(dir, 'artifacts', 'ios/o/attempt-0/screenshots/001-failure.png'));
 
@@ -131,7 +131,7 @@ describe('parseE2EReport', () => {
     writeFileSync(join(dir, 'failures', 'specs_explored_probe-fails-cccccccc.md'), '');
     mkdirSync(join(dir, 'artifacts', 'ios/p/attempt-0'), { recursive: true });
     writeFileSync(join(dir, 'artifacts', 'ios/p/attempt-0/screen.txt'), '');
-    const results = parseE2EReport(report, ['specs/golden/auth-start/opens.e2e.ts', 'specs/golden/sign-up/complete.e2e.ts', 'specs/golden/sign-up/request-code.e2e.ts', 'specs/explored/probe.e2e.ts'].map((path) => ({ kind: 'golden', path, feature: null })), dir);
+    const results = parseE2EReport(report, ['specs/features/auth-start/opens.e2e.ts', 'specs/features/sign-up/complete.e2e.ts', 'specs/features/sign-up/request-code.e2e.ts', 'specs/explored/probe.e2e.ts'].map((path) => ({ kind: 'committed', path, feature: null })), dir);
     assert.deepEqual(results.map((r) => r.status), ['passed', 'skipped', 'skipped', 'failed', 'failed']);
     assert.equal(results[3]!.error, 'not run: infrastructure-unavailable the device could not be opened');
     assert.equal(results[0]!.seconds, 9.1);
@@ -143,8 +143,8 @@ describe('parseE2EReport', () => {
     assert.equal(results[4]!.error, 'expect.toBeVisible failed; observed: no node');
     assert.equal(results[4]!.failureScreen, join(dir, 'artifacts', 'ios/p/attempt-0/screen.txt'));
     assert.equal(results[4]!.failureScreenshot, join(dir, 'artifacts', 'ios/p/attempt-0/screenshots/001-failure.png'), 'the full path, never truncated');
-    const selected = parseE2EReport(report, [{ kind: 'golden', path: 'specs/golden/auth-start/opens.e2e.ts', feature: null }], dir);
-    assert.deepEqual(selected.map((r) => r.spec.path), ['specs/golden/auth-start/opens.e2e.ts', 'specs/golden/auth-start/opens.e2e.ts'], 'files e2e lists but the run did not select are dropped');
+    const selected = parseE2EReport(report, [{ kind: 'committed', path: 'specs/features/auth-start/opens.e2e.ts', feature: null }], dir);
+    assert.deepEqual(selected.map((r) => r.spec.path), ['specs/features/auth-start/opens.e2e.ts', 'specs/features/auth-start/opens.e2e.ts'], 'files e2e lists but the run did not select are dropped');
     assert.equal(results[4]!.failurePage, join(dir, 'failures', 'specs_explored_probe-fails-cccccccc.md'));
   });
 

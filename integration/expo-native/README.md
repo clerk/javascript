@@ -20,7 +20,7 @@ export CLERK_E2E_DEVICE=<the id of a booted simulator, from the list above>
 export CLERK_E2E_APP_PATH=<the path on the last line that the build printed>
 export CLERK_PUBLISHABLE_KEY=pk_test_...
 export CLERK_SECRET_KEY=sk_test_...
-npx e2e run specs/golden/custom-flow-sign-in/complete.e2e.ts
+npx e2e run specs/features/custom-flow-sign-in/complete.e2e.ts
 ```
 
 `node src/fixture.ts ios` runs `pnpm install`, builds the packages the test app uses, and builds the test app in `integration/templates/expo-native` as a standalone app. A standalone app carries its JavaScript, so the run needs no Metro server. `node src/fixture.ts android` builds the APK for an emulator.
@@ -50,7 +50,7 @@ Every run creates users with addresses like `1412107c1ek3x9+clerk_test@example.c
 
 This test file has a `.settings.json` file beside it, and passes only on an instance with those settings:
 
-- `specs/golden/native-modules/biometric-availability.e2e.ts`
+- `specs/features/native-modules/biometric-availability.e2e.ts`
 
 The CLI's `run` puts the instance on the declared settings before the file starts, and e2e alone does not. Run them through the CLI, for example `integration/expo-native/bin/control-clerk-expo run native-modules` from the repo root.
 
@@ -65,7 +65,7 @@ The CLI's `run` puts the instance on the declared settings before the file start
 
 ## Layout
 
-- `e2e.config.ts` and `specs/` are the e2e project. `specs/golden/` has the tests, `specs/fixtures.ts` has the `host` fixture they use, `specs/app.ts` names the test app, and `specs/support/` is the tests' support code. `specs/support/inputs.ts` is the only file that reads the settings above.
+- `e2e.config.ts` and `specs/` are the e2e project. `specs/features/` has the tests, `specs/fixtures.ts` has the `host` fixture they use, `specs/app.ts` names the test app, and `specs/support/` is the tests' support code. `specs/support/inputs.ts` is the only file that reads the settings above.
 - `bin/` and `src/` are the CLI. Under the CLI the test process gets the same settings, with one difference: in place of the secret key it gets the address and token of a stand-in that the CLI runs on this machine. The stand-in forwards the three Backend API calls the tests make, for this run's test users only, so the test process never holds the key.
 - `test/` and `testing/` are the unit tests of both. `npm test` runs them, with no device, key, or network.
 - `src/core/`, `specs/support/`, `specs/fixtures.ts`, and `e2e.config.ts` are the same files, byte for byte, in clerk-ios, clerk-android, and clerk/javascript. `src/core/MANIFEST` lists them, and the CLI's `doctor` fails when they differ from it.

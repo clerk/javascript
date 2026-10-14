@@ -14,9 +14,9 @@ const dir = mkdtempSync(join(tmpdir(), 'verify-ran-')) as EvidencePath;
 function results(rows: readonly { tags?: string[]; status: string; skip?: { cause: string; reason: string } }[]) {
   const report = {
     schemaVersion: 'report-1',
-    run: { results: rows.map((row, i) => ({ id: `0000000${i}aa`, kind: 'test', titlePath: [`t${i}`], file: 'specs/golden/auth-start/a.e2e.ts', platform: 'ios', tags: row.tags ?? [], status: row.status, skip: row.skip, attempts: [] })) },
+    run: { results: rows.map((row, i) => ({ id: `0000000${i}aa`, kind: 'test', titlePath: [`t${i}`], file: 'specs/features/auth-start/a.e2e.ts', platform: 'ios', tags: row.tags ?? [], status: row.status, skip: row.skip, attempts: [] })) },
   };
-  return parseE2EReport(report, [{ kind: 'golden', path: 'specs/golden/auth-start/a.e2e.ts', feature: null }], dir);
+  return parseE2EReport(report, [{ kind: 'committed', path: 'specs/features/auth-start/a.e2e.ts', feature: null }], dir);
 }
 
 describe('a run in which nothing executed', () => {

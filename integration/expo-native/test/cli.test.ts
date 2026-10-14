@@ -148,8 +148,8 @@ describe('run output', () => {
     next: 'next',
     record: {
       results: [
-        { spec: { kind: 'golden', path: 'specs/golden/auth-start/opens.e2e.ts', feature: null }, title: 'opens', platform: 'ios', status: 'passed', seconds: 5, attempts: 1, error: null, skipReason: null, skippedBy: null, tags: [], failurePage: null, failureScreen: null, failureScreenshot: null },
-        { spec: { kind: 'golden', path: 'specs/golden/sign-up/complete.e2e.ts', feature: null }, title: 'completes', platform: 'ios', status, seconds: 41.5, attempts: 2, error, skipReason: null, skippedBy: null, tags: [], failurePage: '/tmp/failures/complete.md' as EvidencePath, failureScreen: null, failureScreenshot: null },
+        { spec: { kind: 'committed', path: 'specs/features/auth-start/opens.e2e.ts', feature: null }, title: 'opens', platform: 'ios', status: 'passed', seconds: 5, attempts: 1, error: null, skipReason: null, skippedBy: null, tags: [], failurePage: null, failureScreen: null, failureScreenshot: null },
+        { spec: { kind: 'committed', path: 'specs/features/sign-up/complete.e2e.ts', feature: null }, title: 'completes', platform: 'ios', status, seconds: 41.5, attempts: 2, error, skipReason: null, skippedBy: null, tags: [], failurePage: '/tmp/failures/complete.md' as EvidencePath, failureScreen: null, failureScreenshot: null },
       ],
       videos: [],
       screenshots: [],

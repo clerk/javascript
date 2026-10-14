@@ -33,20 +33,20 @@ const toPosix = (path: string) => path.split(sep).join('/');
 
 function specRef(packageDir: string, absolute: string): SpecRef | null {
   const path = toPosix(relative(packageDir, absolute));
-  const golden = /^specs\/golden\/([^/]+)\/.+\.e2e\.ts$/.exec(path);
-  if (golden !== null) return { kind: 'golden', path, feature: golden[1] as FeatureName };
+  const committed = /^specs\/features\/([^/]+)\/.+\.e2e\.ts$/.exec(path);
+  if (committed !== null) return { kind: 'committed', path, feature: committed[1] as FeatureName };
   if (/^specs\/explored\/.+\.e2e\.ts$/.test(path)) return { kind: 'explored', path, feature: null };
   return null;
 }
 
 export function resolveSpecs(packageDir: string, selection: SpecSelection, cwd: string = process.cwd()): readonly SpecRef[] {
-  const goldenDir = join(packageDir, 'specs', 'golden');
-  const features = existsSync(goldenDir) ? readdirSync(goldenDir).filter((name) => statSync(join(goldenDir, name)).isDirectory()).sort() : [];
+  const featuresDir = join(packageDir, 'specs', 'features');
+  const features = existsSync(featuresDir) ? readdirSync(featuresDir).filter((name) => statSync(join(featuresDir, name)).isDirectory()).sort() : [];
   const toRefs = (paths: readonly string[]) => paths.flatMap((p) => specRef(packageDir, p) ?? []).sort((a, b) => a.path.localeCompare(b.path));
 
   if ('all' in selection) {
-    const refs = toRefs(walk(goldenDir));
-    if (refs.length === 0) throw new VerifyFailure('NO_SPECS', 'there are no golden specs under specs/golden/', 'write one under specs/golden/<feature>/, or run an explored spec by path');
+    const refs = toRefs(walk(featuresDir));
+    if (refs.length === 0) throw new VerifyFailure('NO_SPECS', 'there are no golden specs under specs/features/', 'write one under specs/features/<feature>/, or run an explored spec by path');
     return refs;
   }
 
@@ -58,15 +58,15 @@ export function resolveSpecs(packageDir: string, selection: SpecSelection, cwd: 
       const file = candidates.find((c) => existsSync(c));
       if (file !== undefined) {
         const ref = specRef(packageDir, file);
-        if (ref === null) throw new VerifyFailure('NO_SPECS', `${selector} is not under specs/golden/<feature>/ or specs/explored/`, 'move the spec under specs/explored/ and run it by that path');
+        if (ref === null) throw new VerifyFailure('NO_SPECS', `${selector} is not under specs/features/<feature>/ or specs/explored/`, 'move the spec under specs/explored/ and run it by that path');
         refs = [ref];
       }
     } else if (selector.includes('/')) {
       const [feature, spec] = selector.split('/', 2);
-      const file = join(goldenDir, feature ?? '', `${(spec ?? '').replace(/\.e2e\.ts$/, '')}${SPEC_SUFFIX}`);
+      const file = join(featuresDir, feature ?? '', `${(spec ?? '').replace(/\.e2e\.ts$/, '')}${SPEC_SUFFIX}`);
       if (existsSync(file)) refs = toRefs([file]);
     } else if (features.includes(selector)) {
-      refs = toRefs(walk(join(goldenDir, selector)));
+      refs = toRefs(walk(join(featuresDir, selector)));
     }
     if (refs.length === 0) {
       throw new VerifyFailure(

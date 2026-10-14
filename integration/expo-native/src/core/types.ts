@@ -242,7 +242,7 @@ export interface DeletionTarget {
 
 export type VerbResult = DoctorReport | UpResult | RunResult | ScreenResult | AttachResult | DownResult;
 
-export type SpecKind = 'golden' | 'explored';
+export type SpecKind = 'committed' | 'explored';
 export interface SpecRef {
   readonly kind: SpecKind;
   readonly path: string;

@@ -125,8 +125,8 @@ describe('the users a test asks for', () => {
   });
 
   it('type one text made from the run id in the golden tests, the password the run knows', () => {
-    const golden = join(import.meta.dirname, '..', 'specs', 'golden');
-    const sources = readdirSync(golden, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.e2e.ts')).map((file) => readFileSync(join(golden, file), 'utf8'));
+    const committed = join(import.meta.dirname, '..', 'specs', 'features');
+    const sources = readdirSync(committed, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.e2e.ts')).map((file) => readFileSync(join(committed, file), 'utf8'));
     const filled = sources.flatMap((source) => [...source.matchAll(/host\.fill\([^;]*?(`[^`]*\$\{host\.runId\}[^`]*`)\);/g)].map((match) => match[1]));
     assert.deepEqual([...new Set(filled)], ['`Verify-${host.runId}-Pw1!`']);
     assert.equal(runPassword(SAMPLE_RUN).use('device-input', (plain) => plain), `Verify-${SAMPLE_RUN}-Pw1!`);

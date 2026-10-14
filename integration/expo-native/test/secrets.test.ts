@@ -48,7 +48,7 @@ describe('redact', () => {
   });
 
   it('leaves text alone that only looks a little like a JWT', () => {
-    for (const text of ['eyJhbGciOiJSUzI1NiJ9', 'eyJhbGciOiJSUzI1NiJ9.notapayloadatall.signaturesignature', 'a.b.c', 'pk_test_ZmFrZS0xLmNsZXJrLmFjY291bnRzLmRldiQ', 'specs/golden/sign-up/complete.e2e.ts']) {
+    for (const text of ['eyJhbGciOiJSUzI1NiJ9', 'eyJhbGciOiJSUzI1NiJ9.notapayloadatall.signaturesignature', 'a.b.c', 'pk_test_ZmFrZS0xLmNsZXJrLmFjY291bnRzLmRldiQ', 'specs/features/sign-up/complete.e2e.ts']) {
       assert.equal(redact(text), text);
     }
   });
