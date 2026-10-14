@@ -53,6 +53,9 @@ private fun debugLog(tag: String, message: String) {
     }
 }
 
+internal fun clientSignedOut(previous: Client?, current: Client?): Boolean =
+    previous?.sessions.orEmpty().isNotEmpty() && current?.sessions.orEmpty().isEmpty()
+
 internal fun biometricCredentialAvailabilityPayload(
     availability: BiometricCredentialAvailability
 ): Map<String, Any?> {
@@ -961,6 +964,7 @@ class ClerkExpoModule : Module() {
                         }
                         is ClerkResult.Success -> {
                             val newClientState = clientStateSnapshot()
+                            clearRestoreCredentialAfterSignOut(previousClientState, newClientState)
                             emitSyncedClientChanged(
                                 sourceId,
                                 ClientStateChanges(
@@ -976,6 +980,7 @@ class ClerkExpoModule : Module() {
                 }
 
                 val newClientState = clientStateSnapshot()
+                clearRestoreCredentialAfterSignOut(previousClientState, newClientState)
                 emitSyncedClientChanged(
                     sourceId,
                     ClientStateChanges(
@@ -990,6 +995,16 @@ class ClerkExpoModule : Module() {
             } finally {
                 jsOriginatedClientSyncDepth = maxOf(0, jsOriginatedClientSyncDepth - 1)
             }
+        }
+    }
+
+    private suspend fun clearRestoreCredentialAfterSignOut(
+        previous: ClientStateSnapshot,
+        current: ClientStateSnapshot
+    ) {
+        if (!clientSignedOut(previous.client, current.client)) return
+        if (Clerk.restoreCredentials.clear() is ClerkResult.Failure) {
+            debugLog(TAG, "syncClientStateFromJs - restore credential cleanup did not complete")
         }
     }
 
