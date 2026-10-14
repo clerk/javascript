@@ -4,6 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { HeadingLevelProvider } from '../heading';
+import { Skeleton } from '../skeleton';
 import { Section } from './section';
 
 const overrides = stylex.create({
@@ -418,5 +419,52 @@ describe('Section', () => {
     );
 
     expect(screen.getByTestId('item')).toHaveAttribute('data-wrap', '');
+  });
+
+  it('makes a skeleton card inert and shows the skeletons inside it', () => {
+    render(
+      <Section.Root>
+        <Section.Group
+          skeleton
+          data-testid='group'
+        >
+          <Section.Header>
+            <Section.Title>
+              <Skeleton>Account</Skeleton>
+            </Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>
+                    <Skeleton>Name</Skeleton>
+                  </Section.Label>
+                </Section.Content>
+              </Section.Item>
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const group = screen.getByTestId('group');
+    expect(group).toHaveAttribute('aria-hidden', 'true');
+    expect(group).toHaveAttribute('inert');
+    expect(group).not.toHaveAttribute('role');
+    expect(group.querySelectorAll('.cl-skeleton')).toHaveLength(2);
+  });
+
+  it('renders skeleton content as-is in a card that is not loading', () => {
+    render(
+      <Section.Group>
+        <Section.Label>
+          <Skeleton>Name</Skeleton>
+        </Section.Label>
+      </Section.Group>,
+    );
+
+    expect(screen.getByText('Name')).not.toHaveClass('cl-skeleton');
+    expect(document.querySelector('.cl-skeleton')).toBeNull();
   });
 });

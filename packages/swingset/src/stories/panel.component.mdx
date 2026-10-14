@@ -8,6 +8,9 @@ children, `Panel.Title` renders the page's heading, and `Panel.Sections` stacks 
 [Profile](/components/profile) page, `Panel.Title` renders nothing: the profile renders the page title,
 and a ref on `Panel.Title` reaches it.
 
+Wrap the title in [Skeleton](/components/skeleton) for a loading state:
+`<Panel.Title><Skeleton show={loading}>Account</Skeleton></Panel.Title>`.
+
 ## Example
 
 <Story

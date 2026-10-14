@@ -338,7 +338,7 @@ How it holds that state is a complexity call. `UserButton` earns a machine — a
 action is async, `open` and `pendingKey` constrain each other, and dismissing
 must not abandon an in-flight invoke — so the machine is declared in the same
 file with `setup<Context, Event>()`, and its context carries the injected effect.
-Abridged from `features/user-button/user-button.controller.tsx`:
+Abridged from `features/switcher/switcher.controller.tsx`:
 
 ```tsx
 const { createMachine, assign, fromPromise } = setup<UserButtonMachineContext, UserButtonMachineEvent>();

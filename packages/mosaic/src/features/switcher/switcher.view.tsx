@@ -5,7 +5,7 @@ import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
 
 import { Badge } from '../../components/badge';
-import { Button, SubmitButton } from '../../components/button';
+import { SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Icon } from '../../components/icon';
 import { Menu } from '../../components/menu';
@@ -13,7 +13,6 @@ import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
-import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
@@ -22,65 +21,66 @@ import { focusOutline } from '../../styles/focus-outline.styles';
 import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { applyOrder } from '../../utils/apply-order';
-import type { UserButtonAction, UserButtonLayout, UserButtonSlot } from './user-button.layout';
-import { resolveUserButtonLayout } from './user-button.layout';
-import { styles } from './user-button.styles';
+import type { SwitcherLayout, SwitcherSlot } from './switcher.layout';
+import { resolveSwitcherLayout } from './switcher.layout';
+import { styles } from './switcher.styles';
 import type {
-  UserButtonBrandingProps,
-  UserButtonBusyState,
-  UserButtonCallbacks,
-  UserButtonData,
-  UserButtonHeaderLayout,
-  UserButtonMembership,
-  UserButtonMenuItemId,
-  UserButtonMenuProps,
-  UserButtonModeProps,
-  UserButtonSession,
-} from './user-button.types';
-import { RowAvatar, UserButtonAvatar } from './user-button-avatar.view';
-import { UserButtonHeader } from './user-button-header.view';
+  SwitcherBrandingProps,
+  SwitcherBusyState,
+  SwitcherCallbacks,
+  SwitcherData,
+  SwitcherMembership,
+  SwitcherMenuItemId,
+  SwitcherMenuProps,
+  SwitcherMode,
+  SwitcherSession,
+} from './switcher.types';
+import { BadgedAvatar, RowAvatar } from './switcher-avatar.view';
+import { SwitcherHeader } from './switcher-header.view';
 import {
-  UserButtonGroup,
-  UserButtonItem,
-  UserButtonItemContent,
-  UserButtonItemDescription,
-  UserButtonItemLabel,
-  UserButtonItemMedia,
-  UserButtonItemTrailing,
-  UserButtonSeparator,
-} from './user-button-item.view';
+  SwitcherGroup,
+  SwitcherItem,
+  SwitcherItemContent,
+  SwitcherItemDescription,
+  SwitcherItemLabel,
+  SwitcherItemMedia,
+  SwitcherItemTrailing,
+  SwitcherSeparator,
+} from './switcher-item.view';
+import type { SwitcherMessages } from './switcher-surface';
+import { surfaceForMode, SwitcherSurfaceProvider, useSlot, useSwitcherMessages } from './switcher-surface';
 
-// The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
+// The data contract, the mode flags, and the menu item shapes live in `switcher.types`; they are
 // what the model and the view agree on, so neither file owns them.
-export type * from './user-button.types';
+export type * from './switcher.types';
 
 /**
  * Stable keys naming which affordance owns the single in-flight action. Shared by the connected
  * container (which sets `pendingKey`) and the view (which matches against it).
  */
-export const userButtonBusyKeys = {
+export const switcherBusyKeys = {
   selectOrganization: (organizationId: string | null) => `select-org:${organizationId ?? 'personal'}`,
   switchSession: (sessionId: string) => `switch:${sessionId}`,
-  signOutSession: (sessionId: string, from: UserButtonSlot) => `sign-out:${from}:${sessionId}`,
+  signOutSession: (sessionId: string, from: SwitcherSlot) => `sign-out:${from}:${sessionId}`,
   signOutAll: () => 'sign-out-all',
   acceptSuggestion: (suggestionId: string) => `accept-suggestion:${suggestionId}`,
   acceptInvitation: (invitationId: string) => `accept-invitation:${invitationId}`,
 } as const;
 
-type UserButtonContextValue = UserButtonData &
-  UserButtonCallbacks &
-  UserButtonBusyState &
-  UserButtonBrandingProps &
-  UserButtonMenuProps & { layout: UserButtonLayout };
+type SwitcherContextValue = SwitcherData &
+  SwitcherCallbacks &
+  SwitcherBusyState &
+  SwitcherBrandingProps &
+  SwitcherMenuProps & { layout: SwitcherLayout };
 
 // ─── Context ────────────────────────────────────────────────────────────────
 
-const UserButtonContext = React.createContext<UserButtonContextValue | null>(null);
+const SwitcherContext = React.createContext<SwitcherContextValue | null>(null);
 
-function useUserButtonContext(): UserButtonContextValue {
-  const value = React.useContext(UserButtonContext);
+function useSwitcherContext(): SwitcherContextValue {
+  const value = React.useContext(SwitcherContext);
   if (!value) {
-    throw new Error('UserButton parts must be rendered inside <UserButtonRoot>');
+    throw new Error('Switcher parts must be rendered inside <SwitcherRoot>');
   }
   return value;
 }
@@ -91,7 +91,7 @@ function useUserButtonContext(): UserButtonContextValue {
  * it never spins, but it still waits.
  */
 function useBusy(key?: string): { busy: boolean; disabled: boolean } {
-  const { pendingKey } = useUserButtonContext();
+  const { pendingKey } = useSwitcherContext();
   if (!pendingKey) {
     return { busy: false, disabled: false };
   }
@@ -104,19 +104,20 @@ type LeadSelection =
       name: string;
       imageUrl?: string;
       shape: 'square';
-      organization: UserButtonMembership;
+      organization: SwitcherMembership;
+      user?: SwitcherSession;
     }
-  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle'; badge?: UserButtonMembership }
+  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle' }
   | { kind: 'none'; name: string; imageUrl?: string; shape: 'square' };
 
 /**
  * What the surface leads with: named in the trigger and headed in the popup, so the two always
  * agree. An organization-led surface with no org and no personal account is no selection.
  */
-type Messages = MosaicMessages['userButton'];
+type Messages = SwitcherMessages;
 
 function leadSelection(
-  { layout, activeOrganization, activeSession }: UserButtonContextValue,
+  { layout, activeOrganization, activeSession }: SwitcherContextValue,
   m: Messages,
 ): LeadSelection {
   if (layout.lead === 'organization' && activeOrganization) {
@@ -126,33 +127,29 @@ function leadSelection(
       imageUrl: activeOrganization.imageUrl,
       shape: 'square',
       organization: activeOrganization,
+      user: layout.userBadge ? activeSession : undefined,
     };
   }
   if (layout.lead === 'none') {
     return { kind: 'none', name: m.organizations.notSelected, shape: 'square' };
   }
-  return {
-    kind: 'user',
-    name: activeSession.name,
-    imageUrl: activeSession.imageUrl,
-    shape: 'circle',
-    badge: layout.lead === 'member' && activeOrganization ? activeOrganization : undefined,
-  };
+  return { kind: 'user', name: activeSession.name, imageUrl: activeSession.imageUrl, shape: 'circle' };
 }
 
-/** The organization a lead shows: the one it is, or the one badging the account. */
-function leadOrganization(lead: LeadSelection): UserButtonMembership | undefined {
-  if (lead.kind === 'organization') {
-    return lead.organization;
-  }
-  return lead.kind === 'user' ? lead.badge : undefined;
+/** The organization a lead shows. */
+function leadOrganization(lead: LeadSelection): SwitcherMembership | undefined {
+  return lead.kind === 'organization' ? lead.organization : undefined;
+}
+
+function leadUser(lead: LeadSelection): SwitcherSession | undefined {
+  return lead.kind === 'organization' ? lead.user : undefined;
 }
 
 function joinDetails(...parts: Array<string | undefined>): string {
   return parts.filter(Boolean).join(' · ');
 }
 
-function membershipSubtitle(membership: UserButtonMembership, m: Messages, locale: string): string {
+function membershipSubtitle(membership: SwitcherMembership, m: Messages, locale: string): string {
   const members =
     membership.membersCount === undefined
       ? undefined
@@ -162,14 +159,11 @@ function membershipSubtitle(membership: UserButtonMembership, m: Messages, local
 
 function headerSubtitle(lead: LeadSelection, identifier: string, m: Messages, locale: string): string {
   if (lead.kind === 'organization') {
-    return membershipSubtitle(lead.organization, m, locale);
+    return lead.user ? identifier : membershipSubtitle(lead.organization, m, locale);
   }
   if (lead.kind === 'none') {
     // No selection is not the account, so it carries no identifier line.
     return '';
-  }
-  if (lead.badge) {
-    return lead.badge.name;
   }
   // An account with no name is titled by its identifier, and repeating it underneath says nothing.
   return identifier === lead.name ? '' : identifier;
@@ -200,7 +194,7 @@ const rowButton = (disabled = false) => (
 // indicator is named in its own right — the pairing `SubmitButton` makes, and the reason its
 // pending state is spoken where this one was not.
 function PendingSpinner() {
-  const m = useMessages('userButton');
+  const m = useSwitcherMessages();
   return (
     <Spinner
       role='progressbar'
@@ -250,7 +244,7 @@ function SwitcherRow({
   const waiting = Boolean(busy || disabled);
 
   return (
-    <UserButtonItem
+    <SwitcherItem
       // The check is decorative, so without this the active row reads like the ones you can switch to.
       aria-current={active ? 'true' : undefined}
       // Every row stands down `aria-disabled` together, so on its own that reads as unavailable
@@ -259,7 +253,7 @@ function SwitcherRow({
       render={select ? rowButton(waiting) : undefined}
       onClick={select}
     >
-      <UserButtonItemMedia>
+      <SwitcherItemMedia>
         <RowAvatar
           name={avatarName}
           imageUrl={imageUrl}
@@ -267,25 +261,25 @@ function SwitcherRow({
           size='fit'
           xstyle={styles.rowAvatar}
         />
-      </UserButtonItemMedia>
-      <UserButtonItemContent>
-        <UserButtonItemLabel id={labelId}>{name}</UserButtonItemLabel>
-      </UserButtonItemContent>
+      </SwitcherItemMedia>
+      <SwitcherItemContent>
+        <SwitcherItemLabel id={labelId}>{name}</SwitcherItemLabel>
+      </SwitcherItemContent>
       {busy ? (
-        <UserButtonItemTrailing>
+        <SwitcherItemTrailing>
           <PendingSpinner />
-        </UserButtonItemTrailing>
+        </SwitcherItemTrailing>
       ) : trailing ? (
-        <UserButtonItemTrailing>{trailing}</UserButtonItemTrailing>
+        <SwitcherItemTrailing>{trailing}</SwitcherItemTrailing>
       ) : active ? (
-        <UserButtonItemTrailing>
+        <SwitcherItemTrailing>
           <Icon
             name='checkmark'
             size='sm'
           />
-        </UserButtonItemTrailing>
+        </SwitcherItemTrailing>
       ) : null}
-    </UserButtonItem>
+    </SwitcherItem>
   );
 }
 
@@ -306,7 +300,7 @@ interface ActionRowProps {
   /** Where the row goes, for a row that leaves rather than acting. */
   href?: string;
   onClick?: () => void;
-  /** Key from `userButtonBusyKeys` when the action is one-shot; omitted for navigations. */
+  /** Key from `switcherBusyKeys` when the action is one-shot; omitted for navigations. */
   busyKey?: string;
 }
 
@@ -315,231 +309,64 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
   const { busy, disabled } = useBusy(busyKey);
 
   return (
-    <UserButtonItem
+    <SwitcherItem
       // A link is the browser's navigation rather than one of the surface's one-shot actions, so it
       // has nothing to wait behind and never stands down.
       aria-busy={busy || undefined}
       render={href ? asAnchor(href) : rowButton(busy || disabled)}
       onClick={onClick}
     >
-      <UserButtonItemMedia>{busy ? <PendingSpinner /> : icon}</UserButtonItemMedia>
-      <UserButtonItemContent>
-        <UserButtonItemLabel variant='interactive'>{label}</UserButtonItemLabel>
-      </UserButtonItemContent>
-    </UserButtonItem>
+      <SwitcherItemMedia>{busy ? <PendingSpinner /> : icon}</SwitcherItemMedia>
+      <SwitcherItemContent>
+        <SwitcherItemLabel variant='interactive'>{label}</SwitcherItemLabel>
+      </SwitcherItemContent>
+    </SwitcherItem>
   );
 }
 
 // ─── Sections ───────────────────────────────────────────────────────────────
 
-interface HeaderMenuItem {
-  label: string;
-  icon: IconName;
-  onClick: () => void;
-}
-
-interface HeaderAction {
-  id: UserButtonAction;
-  label: string;
-  icon: IconName;
-  /** Inline, the button is square and shows the icon alone, labelling itself through `aria-label`. */
-  iconOnly?: boolean;
-  /** Shows the icon ahead of the label even inline, where a labelled button otherwise has none. */
-  leadingIcon?: boolean;
-  onClick?: () => void;
-  /** Opens a menu of these rather than acting itself. */
-  items?: HeaderMenuItem[];
-  /** Key from `userButtonBusyKeys` when the action is one-shot; omitted for navigations. */
-  busyKey?: string;
-}
-
-// Hooks cannot run inside a `.map`, so each button is its own component to read its own busy state.
-function HeaderActionButton({
-  layout,
-  label,
-  icon,
-  iconOnly,
-  leadingIcon,
-  onClick,
-  items,
-  busyKey,
-}: HeaderAction & { layout: UserButtonHeaderLayout }) {
-  const m = useMessages('userButton');
-  const { busy, disabled } = useBusy(busyKey);
-  const stacked = layout === 'stacked';
-  const compact = !stacked && iconOnly;
-  const buttonProps = {
-    variant: 'outline',
-    color: 'neutral',
-    size: 'sm',
-    shape: compact ? 'square' : 'default',
-    fullWidth: stacked,
-    'aria-label': compact ? label : undefined,
-    disabled,
-  } as const;
-  const leading =
-    stacked || compact || leadingIcon ? (
-      <Icon
-        name={icon}
-        size='sm'
-      />
-    ) : null;
-  const text = compact ? null : label;
-
-  if (items) {
-    return (
-      <Menu.Root placement='bottom-start'>
-        <Menu.Trigger render={<Button {...buttonProps} />}>
-          {leading}
-          {text}
-        </Menu.Trigger>
-        <Menu.Popup>
-          {items.map(item => (
-            <Menu.Item
-              key={item.label}
-              label={item.label}
-              onClick={item.onClick}
-            >
-              <Menu.Media>
-                <Icon
-                  name={item.icon}
-                  size='sm'
-                />
-              </Menu.Media>
-              <Menu.Label>{item.label}</Menu.Label>
-            </Menu.Item>
-          ))}
-        </Menu.Popup>
-      </Menu.Root>
-    );
-  }
-
-  if (busyKey === undefined) {
-    return (
-      <Button
-        {...buttonProps}
-        onClick={onClick}
-      >
-        {leading}
-        {text}
-      </Button>
-    );
-  }
-
-  return (
-    <SubmitButton
-      {...buttonProps}
-      onClick={onClick}
-      type='button'
-      isPending={busy}
-      pendingLabel={m.organizations.pending}
-      spinDelay={{ delay: 0 }}
-    >
-      {leading}
-      {text}
-    </SubmitButton>
-  );
-}
-
-/** The lead: who you are signed in as, and what you can do about it. */
+/** The lead: who you are signed in as, or the organization you are on. */
 function Header() {
-  const m = useMessages('userButton');
+  const m = useSwitcherMessages();
   const locale = useLocale();
-  const data = useUserButtonContext();
-  const layout = data.layout.headerLayout;
-  const userLed = data.layout.lead === 'user';
-  const { identifier } = data.activeSession;
+  const data = useSwitcherContext();
   const lead = leadSelection(data, m);
-  const { name } = lead;
-  const organization = leadOrganization(lead);
-  const subtitle = headerSubtitle(lead, identifier, m, locale);
-
-  const actions: HeaderAction[] = [];
-  for (const action of data.layout.actions.header) {
-    if (action === 'inviteMembers' && data.onInviteMembers) {
-      actions.push({ id: action, label: m.manage.invite, icon: 'users-add-right', onClick: data.onInviteMembers });
-    }
-    // The gear manages the header's organization, named or badged, and the account wherever the
-    // account leads. With both to manage it opens a menu of the two. It reads "Settings" when
-    // stacked, or when the account leads on its own; otherwise inline it is the icon alone, named
-    // for what it manages.
-    if (action === 'manageLead') {
-      const settings: Array<HeaderMenuItem & { name: string }> = [];
-      if (organization && data.onManageOrganization) {
-        settings.push({
-          name: m.manage.organization,
-          label: m.manage.organizationSettings,
-          icon: 'building',
-          onClick: data.onManageOrganization,
-        });
-      }
-      if (lead.kind !== 'organization' && data.onManageAccount) {
-        settings.push({
-          name: m.manage.account,
-          label: m.manage.profileSettings,
-          icon: 'user-circle',
-          onClick: data.onManageAccount,
-        });
-      }
-      const [only] = settings;
-      if (settings.length > 1) {
-        actions.push({ id: action, label: m.manage.settings, icon: 'cog-6-teeth', iconOnly: true, items: settings });
-      } else if (only) {
-        actions.push({
-          id: action,
-          label: layout === 'stacked' || userLed ? m.manage.settings : only.name,
-          icon: 'cog-6-teeth',
-          iconOnly: !userLed,
-          leadingIcon: userLed,
-          onClick: only.onClick,
-        });
-      }
-    }
-  }
-  // Inline, the gear trails the labelled actions; stacked, it leads them.
-  const ordered =
-    layout === 'stacked'
-      ? [...actions.filter(a => a.id === 'manageLead'), ...actions.filter(a => a.id !== 'manageLead')]
-      : actions;
+  const user = leadUser(lead);
 
   return (
-    <UserButtonHeader
-      layout={layout}
+    <SwitcherHeader
       avatar={
-        <UserButtonAvatar
-          name={lead.name}
-          imageUrl={lead.imageUrl}
-          shape={lead.shape}
-          size='md'
-          badge={lead.kind === 'user' ? lead.badge : undefined}
-        />
+        user ? (
+          <BadgedAvatar
+            name={lead.name}
+            imageUrl={lead.imageUrl}
+            badge={user}
+          />
+        ) : (
+          <RowAvatar
+            name={lead.name}
+            imageUrl={lead.imageUrl}
+            shape={lead.shape}
+            size='md'
+          />
+        )
       }
-      title={name}
-      description={subtitle}
-      actions={
-        ordered.length > 0
-          ? ordered.map(a => (
-              <HeaderActionButton
-                key={a.id}
-                layout={layout}
-                {...a}
-              />
-            ))
-          : undefined
-      }
+      title={lead.name}
+      description={headerSubtitle(lead, data.activeSession.identifier, m, locale)}
     />
   );
 }
 
 interface MembershipRowProps {
-  membership: UserButtonMembership;
+  membership: SwitcherMembership;
   active: boolean;
   onSelect?: () => void;
 }
 
 // Hooks cannot run inside a `.map`, so each row is its own component to read its own busy state.
 function MembershipRow({ membership, active, onSelect }: MembershipRowProps) {
-  const { busy, disabled } = useBusy(userButtonBusyKeys.selectOrganization(membership.organizationId));
+  const { busy, disabled } = useBusy(switcherBusyKeys.selectOrganization(membership.organizationId));
 
   return (
     <SwitcherRow
@@ -563,10 +390,10 @@ function MembershipRow({ membership, active, onSelect }: MembershipRowProps) {
  * what they are about.
  */
 function PersonalRow() {
-  const m = useMessages('userButton');
-  const data = useUserButtonContext();
+  const m = useSwitcherMessages();
+  const data = useSwitcherContext();
   const selectOrganization = data.onSelectOrganization;
-  const { busy, disabled } = useBusy(userButtonBusyKeys.selectOrganization(null));
+  const { busy, disabled } = useBusy(switcherBusyKeys.selectOrganization(null));
 
   if (data.hidePersonal) {
     return null;
@@ -585,43 +412,22 @@ function PersonalRow() {
   );
 }
 
-/** The active organization, which leads the list whichever page of memberships it is on. */
-function ActiveMembershipRow() {
-  const data = useUserButtonContext();
-  const active = data.activeOrganization;
-  const selectOrganization = data.onSelectOrganization;
-
-  if (!active) {
-    return null;
-  }
-
-  return (
-    <MembershipRow
-      membership={active}
-      onSelect={selectOrganization ? () => selectOrganization(active.organizationId) : undefined}
-      active
-    />
-  );
-}
-
-/** The other organizations the active account belongs to. */
+/** The organizations the active account belongs to, in the order they come. */
 function MembershipRows() {
-  const data = useUserButtonContext();
+  const data = useSwitcherContext();
   const selectOrganization = data.onSelectOrganization;
   const activeId = data.activeOrganization?.organizationId;
 
   return (
     <>
-      {data.memberships
-        .filter(m => m.organizationId !== activeId)
-        .map(m => (
-          <MembershipRow
-            key={m.organizationId}
-            membership={m}
-            onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
-            active={false}
-          />
-        ))}
+      {data.memberships.map(m => (
+        <MembershipRow
+          key={m.organizationId}
+          membership={m}
+          onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
+          active={m.organizationId === activeId}
+        />
+      ))}
     </>
   );
 }
@@ -638,7 +444,7 @@ interface PendingRowProps {
 
 /** An organization on offer: joined from its own trailing button rather than by clicking the row. */
 function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: PendingRowProps) {
-  const m = useMessages('userButton');
+  const m = useSwitcherMessages();
   const { busy, disabled } = useBusy(busyKey);
   // The button reads the same on every offer and the organization it acts on is the label beside it,
   // so pressing tab through the list gives no way to tell them apart without this.
@@ -652,7 +458,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
       labelId={labelId}
       trailing={
         note ? (
-          <UserButtonItemDescription>{note}</UserButtonItemDescription>
+          <SwitcherItemDescription>{note}</SwitcherItemDescription>
         ) : onAccept ? (
           // Every other affordance here swaps its icon for a spinner, but this one is a labelled
           // button, so the spinner goes inside it rather than taking the row's trailing edge — the
@@ -680,8 +486,8 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
 
 /** What the active account has been asked to join but has not joined yet. */
 function PendingRows() {
-  const m = useMessages('userButton');
-  const data = useUserButtonContext();
+  const m = useSwitcherMessages();
+  const data = useSwitcherContext();
   const acceptSuggestion = data.onAcceptSuggestion;
   const acceptInvitation = data.onAcceptInvitation;
   const selectOrganization = data.onSelectOrganization;
@@ -716,7 +522,7 @@ function PendingRows() {
         ) : (
           <PendingRow
             key={i.id}
-            busyKey={userButtonBusyKeys.acceptInvitation(i.id)}
+            busyKey={switcherBusyKeys.acceptInvitation(i.id)}
             name={i.organizationName}
             imageUrl={i.imageUrl}
             actionLabel={m.organizations.accept}
@@ -727,7 +533,7 @@ function PendingRows() {
       {data.suggestions.map(s => (
         <PendingRow
           key={s.id}
-          busyKey={userButtonBusyKeys.acceptSuggestion(s.id)}
+          busyKey={switcherBusyKeys.acceptSuggestion(s.id)}
           name={s.name}
           imageUrl={s.imageUrl}
           actionLabel={m.organizations.join}
@@ -745,8 +551,8 @@ function PendingRows() {
  * it is already the active one. Its organizations cannot be listed here — they are scoped to the
  * session that fetches them — so switching is all it offers.
  */
-function SessionMenuItem({ session, active }: { session: UserButtonSession; active: boolean }) {
-  const data = useUserButtonContext();
+function SessionMenuItem({ session, active }: { session: SwitcherSession; active: boolean }) {
+  const data = useSwitcherContext();
   const switchSession = data.onSwitchSession;
 
   return (
@@ -781,6 +587,58 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
   );
 }
 
+interface FlyoutRowProps {
+  icon: IconName;
+  label: string;
+  busy?: boolean;
+  children: ReactNode;
+}
+
+/** A row that opens a flyout of menu items beside the surface rather than acting itself. */
+function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
+  const { disabled } = useBusy();
+
+  return (
+    // It opens out of the popup, so the opposite side is the popup itself. Where the viewport is too
+    // narrow for either side — a phone — it goes above the row instead of under the card. Sideways it
+    // clears the row but not the card, so it overlaps the card's edge by what is left of the row's inset.
+    // Above the row there is nothing to overlap, so that gap is the plain one.
+    <Menu.Root
+      openOnHover
+      placement='right-start'
+      sideOffset={{ x: 4, y: 8 }}
+      fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
+    >
+      <Menu.Trigger
+        aria-busy={busy || undefined}
+        render={<SwitcherItem render={rowButton(disabled)} />}
+      >
+        <SwitcherItemMedia>
+          {busy ? (
+            <PendingSpinner />
+          ) : (
+            <Icon
+              name={icon}
+              size='sm'
+            />
+          )}
+        </SwitcherItemMedia>
+        <SwitcherItemContent>
+          <SwitcherItemLabel variant='interactive'>{label}</SwitcherItemLabel>
+        </SwitcherItemContent>
+        <SwitcherItemTrailing>
+          <Icon
+            name='chevron-right'
+            xstyle={rtl.mirror}
+            size='sm'
+          />
+        </SwitcherItemTrailing>
+      </Menu.Trigger>
+      <Menu.Popup>{children}</Menu.Popup>
+    </Menu.Root>
+  );
+}
+
 /**
  * The accounts affordance at the foot: a row that opens a flyout of every signed-in account, the
  * way to add one more, and the way to sign out of all of them.
@@ -789,122 +647,90 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
  */
 function SwitchAccountRow() {
   const m = useMessages('userButton');
-  const data = useUserButtonContext();
+  const data = useSwitcherContext();
   const addAccount = data.onAddAccount;
   const signOutAll = data.onSignOutAll;
   const { pendingKey } = data;
   const busy =
-    pendingKey === userButtonBusyKeys.signOutAll() ||
-    data.additionalSessions.some(s => pendingKey === userButtonBusyKeys.switchSession(s.sessionId));
-  const { disabled } = useBusy();
+    pendingKey === switcherBusyKeys.signOutAll() ||
+    data.additionalSessions.some(s => pendingKey === switcherBusyKeys.switchSession(s.sessionId));
 
   return (
-    // It opens out of the popup, so the opposite side is the popup itself. Where the viewport is
-    // too narrow for either side — a phone — it goes above the row instead of under the card.
-    // The row is inset 8px, so the sideways gap clears that before it clears the card's edge. Above
-    // the row there is nothing to clear, so that gap is the plain one.
-    <Menu.Root
-      placement='right-start'
-      sideOffset={{ x: 12, y: 8 }}
-      fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
+    <FlyoutRow
+      icon='switch-account'
+      label={m.accounts.switch}
+      busy={busy}
     >
-      <Menu.Trigger
-        aria-busy={busy || undefined}
-        render={<UserButtonItem render={rowButton(disabled)} />}
-      >
-        <UserButtonItemMedia>
-          {busy ? (
-            <PendingSpinner />
-          ) : (
+      {/* The account it is on leads, checked: the flyout is the full set of accounts rather than
+            a list of somewhere else to go. */}
+      <SessionMenuItem
+        session={data.activeSession}
+        active
+      />
+      {data.additionalSessions.map(s => (
+        <SessionMenuItem
+          key={s.sessionId}
+          session={s}
+          active={false}
+        />
+      ))}
+      {addAccount ? (
+        <Menu.Item
+          label={m.accounts.add}
+          onClick={addAccount}
+        >
+          <Menu.Media>
             <Icon
-              name='switch-account'
+              name='plus'
               size='sm'
             />
-          )}
-        </UserButtonItemMedia>
-        <UserButtonItemContent>
-          <UserButtonItemLabel variant='interactive'>{m.accounts.switch}</UserButtonItemLabel>
-        </UserButtonItemContent>
-        <UserButtonItemTrailing>
-          <Icon
-            name='chevron-right'
-            xstyle={rtl.mirror}
-            size='sm'
-          />
-        </UserButtonItemTrailing>
-      </Menu.Trigger>
-      <Menu.Popup>
-        {/* The account it is on leads, checked: the flyout is the full set of accounts rather than
-            a list of somewhere else to go. */}
-        <SessionMenuItem
-          session={data.activeSession}
-          active
-        />
-        {data.additionalSessions.map(s => (
-          <SessionMenuItem
-            key={s.sessionId}
-            session={s}
-            active={false}
-          />
-        ))}
-        {addAccount ? (
+          </Menu.Media>
+          <Menu.Label>{m.accounts.add}</Menu.Label>
+        </Menu.Item>
+      ) : null}
+      {signOutAll ? (
+        <>
+          <Menu.Separator />
           <Menu.Item
-            label={m.accounts.add}
-            onClick={addAccount}
+            label={m.accounts.signOutAll}
+            onClick={signOutAll}
           >
             <Menu.Media>
               <Icon
-                name='plus'
+                name='sign-out'
                 size='sm'
+                xstyle={rtl.mirror}
               />
             </Menu.Media>
-            <Menu.Label>{m.accounts.add}</Menu.Label>
+            <Menu.Label>{m.accounts.signOutAll}</Menu.Label>
           </Menu.Item>
-        ) : null}
-        {signOutAll ? (
-          <>
-            <Menu.Separator />
-            <Menu.Item
-              label={m.accounts.signOutAll}
-              onClick={signOutAll}
-            >
-              <Menu.Media>
-                <Icon
-                  name='sign-out'
-                  size='sm'
-                  xstyle={rtl.mirror}
-                />
-              </Menu.Media>
-              <Menu.Label>{m.accounts.signOutAll}</Menu.Label>
-            </Menu.Item>
-          </>
-        ) : null}
-      </Menu.Popup>
-    </Menu.Root>
+        </>
+      ) : null}
+    </FlyoutRow>
   );
 }
 
 /** Holds the organization list's place until its first page lands. */
 function OrganizationListLoadingRow() {
-  const m = useMessages('userButton');
+  const m = useSwitcherMessages();
   return (
     // Plain text rather than a live region: it mounts with its copy already in it, so there is no
     // change for one to report, and the popup it lands in is read on open either way.
-    <UserButtonItem>
-      <UserButtonItemMedia>
+    <SwitcherItem>
+      <SwitcherItemMedia>
         <Spinner size='sm' />
-      </UserButtonItemMedia>
-      <UserButtonItemContent>
-        <UserButtonItemDescription>{m.organizations.loading}</UserButtonItemDescription>
-      </UserButtonItemContent>
-    </UserButtonItem>
+      </SwitcherItemMedia>
+      <SwitcherItemContent>
+        <SwitcherItemDescription>{m.organizations.loading}</SwitcherItemDescription>
+      </SwitcherItemContent>
+    </SwitcherItem>
   );
 }
 
 /** The organizations the active account can switch between. This is the group that scrolls. */
 function OrganizationSection() {
-  const m = useMessages('userButton');
-  const data = useUserButtonContext();
+  const m = useSwitcherMessages();
+  const data = useSwitcherContext();
   const { showOrganizations } = data.layout;
 
   const actions: ReactNode[] = [];
@@ -932,11 +758,11 @@ function OrganizationSection() {
 
   return (
     <>
-      <UserButtonSeparator />
+      <SwitcherSeparator />
       {/* `auto` rather than `stable`: a reserved gutter insets the rows whether or not the list
           overflows, so short lists would sit their avatars and icons off the edge the header and
           footer align to. */}
-      <UserButtonGroup xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
+      <SwitcherGroup xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
             placeholder stands in for all of them until the last one is in. */}
@@ -945,7 +771,6 @@ function OrganizationSection() {
             <OrganizationListLoadingRow />
           ) : (
             <>
-              <ActiveMembershipRow />
               <PersonalRow />
               <MembershipRows />
               <PendingRows />
@@ -956,75 +781,120 @@ function OrganizationSection() {
         {/* Trails the rows rather than sitting at the foot of the surface: what it offers is one
             more of the organizations above it, not an action on the account. */}
         {actions}
-      </UserButtonGroup>
+      </SwitcherGroup>
     </>
   );
 }
 
-/** One row at the foot: whatever it renders, and the id `menuItemOrder` places it by. */
-interface FooterRow {
-  id: UserButtonMenuItemId | (string & {});
+interface SettingsTarget {
+  label: string;
+  icon: IconName;
+  onClick: () => void;
+}
+
+/** Settings: with more than one thing to manage it opens a menu of them, otherwise it opens the one. */
+function SettingsRow({ targets }: { targets: SettingsTarget[] }) {
+  const m = useSwitcherMessages();
+  const [only] = targets;
+
+  if (targets.length === 1 && only) {
+    return (
+      <ActionRow
+        icon={
+          <Icon
+            name='cog-6-teeth'
+            size='sm'
+          />
+        }
+        label={m.manage.settings}
+        onClick={only.onClick}
+      />
+    );
+  }
+
+  return (
+    <FlyoutRow
+      icon='cog-6-teeth'
+      label={m.manage.settings}
+    >
+      {targets.map(target => (
+        <Menu.Item
+          key={target.label}
+          label={target.label}
+          onClick={target.onClick}
+        >
+          <Menu.Media>
+            <Icon
+              name={target.icon}
+              size='sm'
+            />
+          </Menu.Media>
+          <Menu.Label>{target.label}</Menu.Label>
+        </Menu.Item>
+      ))}
+    </FlyoutRow>
+  );
+}
+
+/** What Settings manages: the account wherever the account leads or badges it, and the lead's organization. */
+function settingsTargets(data: SwitcherContextValue, lead: LeadSelection, m: Messages): SettingsTarget[] {
+  const targets: SettingsTarget[] = [];
+  if ((lead.kind !== 'organization' || leadUser(lead)) && data.onManageAccount) {
+    targets.push({ label: m.manage.profile, icon: 'user-circle', onClick: data.onManageAccount });
+  }
+  if (lead.kind === 'organization' && data.onManageOrganization) {
+    targets.push({ label: m.manage.organization, icon: 'building', onClick: data.onManageOrganization });
+  }
+  return targets;
+}
+
+/** One row the app can order: whatever it renders, and the id `menuItemOrder` places it by. */
+interface MenuRow {
+  id: SwitcherMenuItemId | (string & {});
   node: ReactNode;
 }
 
-/** The actions that close out the surface. */
-function Footer() {
-  const m = useMessages('userButton');
-  const data = useUserButtonContext();
-  const signOutSession = data.onSignOutSession;
-  const { sessionId } = data.activeSession;
+/** What can be done about the lead (manage it, and invite to an organization that leads), and the app's own rows. */
+function ManageSection() {
+  const m = useSwitcherMessages();
+  const data = useSwitcherContext();
+  const targets = settingsTargets(data, leadSelection(data, m), m);
 
-  const builtIn: FooterRow[] = [];
-  for (const action of data.layout.actions.footer) {
-    // The only foot row that is not a plain action: it opens rather than doing, so it brings its
-    // own element instead of an `ActionRow`'s props.
-    if (action === 'switchAccount') {
-      builtIn.push({ id: 'switchAccount', node: <SwitchAccountRow /> });
+  const builtIn: MenuRow[] = [];
+  for (const action of data.layout.actions.manage) {
+    if (action === 'settings' && targets.length > 0) {
+      builtIn.push({ id: 'settings', node: <SettingsRow targets={targets} /> });
     }
-    if (action === 'addAccount' && data.onAddAccount) {
+    if (action === 'inviteMembers' && data.onInviteMembers) {
       builtIn.push({
-        id: 'addAccount',
+        id: 'inviteMembers',
         node: (
           <ActionRow
             icon={
               <Icon
-                name='plus'
+                name='users-add-right'
                 size='sm'
               />
             }
-            label={m.accounts.add}
-            onClick={data.onAddAccount}
-          />
-        ),
-      });
-    }
-    if (action === 'signOut' && signOutSession) {
-      builtIn.push({
-        id: 'signOut',
-        node: (
-          <ActionRow
-            icon={
-              <Icon
-                name='sign-out'
-                size='sm'
-              />
-            }
-            label={m.accounts.signOut}
-            onClick={() => signOutSession(sessionId, 'footer')}
-            busyKey={userButtonBusyKeys.signOutSession(sessionId, 'footer')}
+            label={m.manage.invite}
+            onClick={data.onInviteMembers}
           />
         ),
       });
     }
   }
 
-  const custom: FooterRow[] = (data.customMenuItems ?? []).map(({ id, ...item }) => ({
+  const custom: MenuRow[] = (data.customMenuItems ?? []).map(({ id, ...item }) => ({
     id,
     node: <ActionRow {...item} />,
   }));
 
-  // Custom rows lead by default, the way the existing UserButton lists them above "Add account".
-  const rows = applyOrder<FooterRow>(data.menuItemOrder, [...custom, ...builtIn], r => r.id);
+  const builtInIds = new Set(builtIn.map(r => r.id));
+  const rows = applyOrder<MenuRow>(
+    data.menuItemOrder,
+    [...builtIn.map(r => custom.find(c => c.id === r.id) ?? r), ...custom.filter(r => !builtInIds.has(r.id))],
+    r => r.id,
+  );
 
   if (rows.length === 0) {
     return null;
@@ -1032,27 +902,81 @@ function Footer() {
 
   return (
     <>
-      <UserButtonSeparator />
-      <UserButtonGroup>
+      <SwitcherSeparator />
+      <SwitcherGroup>
         {rows.map(r => (
           <React.Fragment key={r.id}>{r.node}</React.Fragment>
         ))}
-      </UserButtonGroup>
+      </SwitcherGroup>
+    </>
+  );
+}
+
+/** The actions that close out the surface. */
+function Footer() {
+  const m = useMessages('userButton');
+  const data = useSwitcherContext();
+  const signOutSession = data.onSignOutSession;
+  const { sessionId } = data.activeSession;
+
+  const rows: ReactNode[] = [];
+  for (const action of data.layout.actions.footer) {
+    // The only foot row that is not a plain action: it opens rather than doing, so it brings its
+    // own element instead of an `ActionRow`'s props.
+    if (action === 'switchAccount') {
+      rows.push(<SwitchAccountRow key='switchAccount' />);
+    }
+    if (action === 'addAccount' && data.onAddAccount) {
+      rows.push(
+        <ActionRow
+          key='addAccount'
+          icon={
+            <Icon
+              name='plus'
+              size='sm'
+            />
+          }
+          label={m.accounts.add}
+          onClick={data.onAddAccount}
+        />,
+      );
+    }
+    if (action === 'signOut' && signOutSession) {
+      rows.push(
+        <ActionRow
+          key='signOut'
+          icon={
+            <Icon
+              name='sign-out'
+              size='sm'
+            />
+          }
+          label={m.accounts.signOut}
+          onClick={() => signOutSession(sessionId, 'footer')}
+          busyKey={switcherBusyKeys.signOutSession(sessionId, 'footer')}
+        />,
+      );
+    }
+  }
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      <SwitcherSeparator />
+      <SwitcherGroup>{rows}</SwitcherGroup>
     </>
   );
 }
 
 // ─── Public parts ───────────────────────────────────────────────────────────
 
-export interface UserButtonRootProps
-  extends
-    UserButtonData,
-    UserButtonCallbacks,
-    UserButtonBusyState,
-    UserButtonBrandingProps,
-    UserButtonMenuProps,
-    UserButtonModeProps {
+export interface SwitcherRootProps
+  extends SwitcherData, SwitcherCallbacks, SwitcherBusyState, SwitcherBrandingProps, SwitcherMenuProps {
   children: ReactNode;
+  mode?: SwitcherMode;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -1065,11 +989,11 @@ export interface UserButtonRootProps
  * the headless `Popover.Root` — it does not keep a second controllable-state copy. Leaves consume
  * the data through context.
  */
-export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
+export function SwitcherRoot(props: SwitcherRootProps): ReactElement {
   const { children, mode = 'combined', open, defaultOpen, onOpenChange, placement, sideOffset, ...data } = props;
   // Resolved here so the sections below never read `mode` again: which affordance lands in which
   // slot is settled once, in one table, rather than re-derived by each part that renders one.
-  const layout = resolveUserButtonLayout(mode, data);
+  const layout = resolveSwitcherLayout(mode, data);
 
   return (
     <Popover.Root
@@ -1079,16 +1003,17 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
       placement={placement ?? 'bottom-start'}
       sideOffset={sideOffset}
     >
-      <UserButtonContext.Provider value={{ ...data, layout }}>{children}</UserButtonContext.Provider>
+      <SwitcherSurfaceProvider value={surfaceForMode(mode)}>
+        <SwitcherContext.Provider value={{ ...data, layout }}>{children}</SwitcherContext.Provider>
+      </SwitcherSurfaceProvider>
     </Popover.Root>
   );
 }
 
-export interface UserButtonTriggerProps {
+export interface SwitcherTriggerProps {
   /**
-   * Names the lead beside its avatar — the organization wherever one heads the
-   * trigger, no selection when personal is hidden and none is active, the account otherwise, with
-   * its active organization beneath it. Turn it off for the avatar alone.
+   * Names the lead beside its avatar — the organization wherever one heads the trigger, no
+   * selection when personal is hidden and none is active, the account otherwise. Turn it off for the avatar alone.
    *
    * @default true
    */
@@ -1103,45 +1028,39 @@ export interface UserButtonTriggerProps {
 }
 
 /** The trigger: the lead's avatar, and what it is called. */
-export function UserButtonTrigger({
+export function SwitcherTrigger({
   renderTriggerLabel = true,
   renderTriggerBadge = true,
-}: UserButtonTriggerProps = {}): ReactElement {
-  const m = useMessages('userButton');
-  const data = useUserButtonContext();
+}: SwitcherTriggerProps = {}): ReactElement {
+  const m = useSwitcherMessages();
+  const slot = useSlot();
+  const data = useSwitcherContext();
   const lead = leadSelection(data, m);
   const { name, shape } = lead;
   const planLabel = renderTriggerBadge ? leadOrganization(lead)?.planLabel : undefined;
-  const badge = lead.kind === 'user' ? lead.badge : undefined;
-  const ringsAvatar = !renderTriggerLabel && badge !== undefined;
+  const user = leadUser(lead);
 
   return (
     <Popover.Trigger
-      {...themeProps('user-button-trigger')}
-      aria-label={fill(m.trigger.open, { name })}
+      {...themeProps(slot('trigger'))}
+      aria-label={fill(m.trigger.open, { name: user?.name ?? name })}
       xstyle={[
-        ringsAvatar ? styles.triggerRinglessAvatar : focusOutline.visible,
+        focusOutline.visible,
         styles.trigger,
         renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
-      <UserButtonAvatar
+      <RowAvatar
         name={lead.name}
         imageUrl={lead.imageUrl}
-        shape={lead.shape}
-        size={renderTriggerLabel && !badge ? 'xs' : 'sm'}
-        badge={badge}
-        focusRing={ringsAvatar}
+        shape={shape}
+        size={renderTriggerLabel ? 'fit' : 'sm'}
+        xstyle={renderTriggerLabel ? styles.rowAvatar : undefined}
       />
       {renderTriggerLabel ? (
         <>
-          <span {...stylex.props(styles.triggerText)}>
-            <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
-            {badge ? (
-              <span {...stylex.props(styles.triggerOrganization, truncationStyles.singleLine)}>{badge.name}</span>
-            ) : null}
-          </span>
+          <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
           <Icon
             name='chevron-down'
@@ -1154,40 +1073,42 @@ export function UserButtonTrigger({
   );
 }
 
-/** The popover surface: header, organizations, and footer. */
-export function UserButtonPopup(): ReactElement {
-  const m = useMessages('userButton');
-  const { renderBranding } = useUserButtonContext();
+/** The popover surface: header, organizations, what can be done about the lead, and footer. */
+export function SwitcherPopup(): ReactElement {
+  const m = useSwitcherMessages();
+  const slot = useSlot();
+  const { renderBranding } = useSwitcherContext();
 
   return (
     <Popover.Popup
-      {...themeProps('user-button-popover')}
+      {...themeProps(slot('popover'))}
       aria-label={m.popup.label}
       xstyle={styles.popup}
     >
       <Card.Root renderBranding={renderBranding}>
         <Header />
         <OrganizationSection />
+        <ManageSection />
         <Footer />
       </Card.Root>
     </Popover.Popup>
   );
 }
 
-export type UserButtonProps = Omit<UserButtonRootProps, 'children'> & UserButtonTriggerProps;
+export type SwitcherViewProps = Omit<SwitcherRootProps, 'children'> & SwitcherTriggerProps;
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
- * connected, Clerk-backed `UserButton` lives in `user-button.tsx` and wraps this view.
+ * connected, Clerk-backed `Switcher` lives in `switcher.tsx` and wraps this view.
  */
-export function UserButtonView({ renderTriggerLabel, renderTriggerBadge, ...root }: UserButtonProps): ReactElement {
+export function SwitcherView({ renderTriggerLabel, renderTriggerBadge, ...root }: SwitcherViewProps): ReactElement {
   return (
-    <UserButtonRoot {...root}>
-      <UserButtonTrigger
+    <SwitcherRoot {...root}>
+      <SwitcherTrigger
         renderTriggerLabel={renderTriggerLabel}
         renderTriggerBadge={renderTriggerBadge}
       />
-      <UserButtonPopup />
-    </UserButtonRoot>
+      <SwitcherPopup />
+    </SwitcherRoot>
   );
 }

@@ -8,7 +8,6 @@ export const styles = stylex.create({
     gap: space['3'],
     alignItems: 'center',
     display: 'flex',
-    flexWrap: 'wrap',
   },
 
   content: {
@@ -31,19 +30,5 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
-  },
-
-  actions: {
-    gap: space['2'],
-    alignItems: 'center',
-    display: 'flex',
-    flexShrink: 0,
-  },
-
-  actionsStacked: {
-    display: 'grid',
-    flexBasis: '100%',
-    gridAutoColumns: 'minmax(0, 1fr)',
-    gridAutoFlow: 'column',
   },
 });

@@ -21,7 +21,7 @@ test.describe('sign-in-or-up component initialization flow @nextjs', () => {
   });
 
   test('flows are combined', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in-or-up');
     await expect(u.page.getByText(`Continue to`)).toBeVisible();
   });

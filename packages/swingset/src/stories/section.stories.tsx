@@ -1,10 +1,14 @@
+import { ActionMenu } from '@clerk/mosaic/components/action-menu';
 import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 import { Section } from '@clerk/mosaic/components/section';
+import { Skeleton } from '@clerk/mosaic/components/skeleton';
+import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
+import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -13,6 +17,14 @@ export { default as __source } from './section.stories?raw';
 const styles = stylex.create({
   rootMax: {
     maxWidth: 560,
+  },
+  loadingStack: {
+    alignItems: 'flex-start',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: space['4'],
+    maxWidth: 560,
+    width: '100%',
   },
   descriptionFlex: {
     alignItems: 'center',
@@ -540,5 +552,81 @@ export function ContainedHeader() {
         ))}
       </Section.Root>
     </>
+  );
+}
+
+const loadingItems = [
+  { icon: 'device-laptop', label: 'Chrome on macOS', description: 'San Francisco, US · Active now' },
+  { icon: 'device-phone', label: 'Safari on iOS', description: 'San Francisco, US · 2 hours ago' },
+  { icon: 'device-laptop', label: 'Firefox on Windows', description: 'Denver, US · 3 days ago' },
+] as const;
+
+export function Loading() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!loading) {
+      return;
+    }
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  return (
+    <div {...stylex.props(styles.loadingStack)}>
+      <Button
+        color='neutral'
+        size='sm'
+        variant='outline'
+        disabled={loading}
+        onClick={() => setLoading(true)}
+      >
+        Reload
+      </Button>
+      <VisuallyHidden role='status'>{loading ? 'Loading active devices' : 'Active devices loaded'}</VisuallyHidden>
+      <Section.Root>
+        <Section.Group skeleton={loading}>
+          <Section.Header>
+            <Section.Title>
+              <Skeleton>Active devices</Skeleton>
+            </Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              {loadingItems.map(item => (
+                <Section.Item key={item.label}>
+                  <Skeleton>
+                    <Section.Media size='lg'>
+                      <IconFrame>
+                        <Icon
+                          name={item.icon}
+                          size='lg'
+                        />
+                      </IconFrame>
+                    </Section.Media>
+                  </Skeleton>
+                  <Section.Content>
+                    <Section.Label>
+                      <Skeleton>{item.label}</Skeleton>
+                    </Section.Label>
+                    <Section.Description>
+                      <Skeleton>{item.description}</Skeleton>
+                    </Section.Description>
+                  </Section.Content>
+                  <Section.Actions>
+                    <Skeleton visible={false}>
+                      <ActionMenu
+                        label={`Manage ${item.label}`}
+                        actions={[{ label: 'View details', onClick: () => undefined }]}
+                      />
+                    </Skeleton>
+                  </Section.Actions>
+                </Section.Item>
+              ))}
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>
+    </div>
   );
 }
