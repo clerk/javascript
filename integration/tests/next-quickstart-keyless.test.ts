@@ -13,12 +13,6 @@ const commonSetup = appConfigs.next.appRouterQuickstart.clone();
 test.describe('Keyless mode @quickstart', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test.use({
-    extraHTTPHeaders: {
-      'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET || '',
-    },
-  });
-
   let app: Application;
 
   test.beforeAll(async () => {
