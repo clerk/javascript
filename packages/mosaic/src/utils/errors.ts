@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import type { ClerkAPIError } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
@@ -10,6 +10,19 @@ export interface FormError<TField extends string = string> {
 }
 
 export const UNEXPECTED_ERROR: LocalizableError = { code: 'generic' };
+
+// TODO: This is not exported from shared currently. Keeping it here for now to not
+//       trigger a shared changeset from this PR and also to figure out in what form
+//       we want to export it.
+const REVERIFICATION_REQUIRED_CODE = 'session_reverification_required';
+
+/** Whether a failure belongs to the reverification flow rather than to the user: a required step-up, or a cancelled one. */
+function isReverificationError(cause: unknown): boolean {
+  if (isReverificationCancelledError(cause)) {
+    return true;
+  }
+  return isClerkAPIResponseError(cause) && cause.errors.some(error => error.code === REVERIFICATION_REQUIRED_CODE);
+}
 
 /** What a save rejects with when the failure is the user's to fix; anything else propagates. */
 export class SaveError<TField extends string = string> extends Error {
@@ -85,6 +98,13 @@ export async function save<TField extends string = never>(
   try {
     await run();
   } catch (cause) {
+    // We rethrow reverification errors so it's possible to call save() both inside and after a
+    // useReverification wrap has happened. Normally useReverification() would get called first,
+    // catch the error and save would be called after, but there are times when it's convenient
+    // to call save() inside.
+    if (isReverificationError(cause)) {
+      throw cause;
+    }
     const formError = toClerkFormError(cause, fields, params);
     if (!formError) {
       throw cause;

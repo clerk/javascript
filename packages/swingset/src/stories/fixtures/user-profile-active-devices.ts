@@ -1,4 +1,5 @@
 import type { UserProfileDevice } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices.types';
+import { useUserProfileActiveDevicesController } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -108,15 +109,15 @@ export function useUserProfileActiveDevicesFixture({
     }
   };
 
-  return {
+  return useUserProfileActiveDevicesController({
     devices,
-    onSignOutDevice: async (id: string) => {
+    revoke: async (id: string) => {
       await settle('device');
       setDevices(current => current.filter(device => device.id !== id));
     },
-    onSignOutAllOtherDevices: async () => {
+    revokeAll: async () => {
       await settle('all');
       setDevices(current => current.filter(device => device.isCurrent));
     },
-  };
+  });
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { useReverificationFlow } from '../../reverification';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
 import type {
   AdditionalOAuthScopes,
@@ -44,18 +45,16 @@ function ConnectedAccounts({
   model: Extract<UserProfileConnectedAccountsModel, { status: 'ready' }>;
   fallbackFocus?: () => HTMLElement | null;
 }) {
+  const [remove, reverification] = useReverificationFlow((id: string) => model.remove(id));
   const controller = useUserProfileConnectedAccountsController({
     accounts: model.accounts,
     availableProviders: model.availableProviders,
     onConnect: model.connect,
     onReconnect: model.reconnect,
+    onRemove: remove,
+    fallbackFocus,
+    reverification,
   });
 
-  return (
-    <UserProfileConnectedAccountsSectionView
-      {...controller}
-      fallbackFocus={fallbackFocus}
-      onRemove={model.remove}
-    />
-  );
+  return <UserProfileConnectedAccountsSectionView {...controller} />;
 }
