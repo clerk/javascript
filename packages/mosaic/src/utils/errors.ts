@@ -101,7 +101,7 @@ export async function save<TField extends string = never>(
     // We rethrow reverification errors so it's possible to call save() both inside and after a
     // useReverification wrap has happened. Normally useReverification() would get called first,
     // catch the error and save would be called after, but there are times when it's convenient
-    // to call save(} inside.
+    // to call save() inside.
     if (isReverificationError(cause)) {
       throw cause;
     }
