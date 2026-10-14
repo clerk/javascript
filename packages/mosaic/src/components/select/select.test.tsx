@@ -398,6 +398,21 @@ describe('Mosaic Select', () => {
       expect(positioner()).not.toHaveAttribute('data-side', 'none');
     });
 
+    it('hangs below the trigger by default when multiple', () => {
+      render(
+        <Select.Root
+          items={roles}
+          multiple
+          defaultValue={['admin']}
+          defaultOpen
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>,
+      );
+      expect(positioner()).not.toHaveAttribute('data-side', 'none');
+    });
+
     it('lets an explicit alignItemWithTrigger override the derived default', () => {
       renderSelect({ items: describedRoles, defaultValue: 'member', defaultOpen: true, alignItemWithTrigger: true });
       expect(positioner()).toHaveAttribute('data-side', 'none');

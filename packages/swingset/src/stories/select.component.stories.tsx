@@ -183,7 +183,6 @@ export function Multiple() {
       items={languages}
       multiple
       defaultValue={['javascript', 'typescript']}
-      alignItemWithTrigger={false}
     >
       <Select.Trigger>{renderLanguages}</Select.Trigger>
       <Select.Popup />

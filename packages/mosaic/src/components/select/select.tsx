@@ -56,7 +56,7 @@ export function SelectRoot({ items, alignItemWithTrigger, children, ...rest }: S
     <ItemsContext.Provider value={items}>
       <Primitive.Root
         items={items}
-        alignItemWithTrigger={alignItemWithTrigger ?? !described}
+        alignItemWithTrigger={alignItemWithTrigger ?? !(described || rest.multiple)}
         {...rest}
       >
         {children}
