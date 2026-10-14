@@ -15,6 +15,7 @@ export interface CompositionPiece {
 // Matches the sidebar group names.
 const LAYER_ORDER = [
   'User Button',
+  'Organization Switcher',
   'User Profile',
   'Organization Profile',
   'API Keys',

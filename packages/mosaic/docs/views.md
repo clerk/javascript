@@ -67,29 +67,37 @@ use, and takes the rest as props. There are two:
   and compares it.
 - `blocks/confirmation` (`Confirmation`) is a confirm step with no typed phrase.
 
-`open`, the pending flag and `errorMessage` come from the block's own controller
-(`useDestructiveController`, `useConfirmationController`), because those decide
-whether the dialog closes or explains itself. Spread the controller onto the
-block rather than wiring that state by hand:
+Both take a `controller` from `useConfirmController` (`blocks/confirm/`), which
+decides whether the dialog closes or explains itself. The hook runs in the
+wrapper or controller, never in the view; the view receives the controller as a
+prop. A dialog next to its button takes the button as `trigger`:
 
 ```tsx
-const destructive = useDestructiveController({ onDelete, reverification });
-
 <Destructive
-  {...destructive}
+  controller={deleteAccount}
   trigger={<Button color='negative'>{m.actionLabel}</Button>}
   title={m.dialogTitle}
   confirmationValue={m.fieldPlaceholder}
-/>;
+/>
 ```
 
-When one dialog serves every row in a list, use the handle form: create a handle
-with `Confirmation.createHandle<Row>()` (or `Destructive.createHandle`), pass it
-to each row's trigger and to the block's `handle` prop, and the clicked row
-arrives as the payload of `onConfirm` / `onDelete`. In this form the block runs
-its own controller, so pass the effect and `errorFallback` straight to it.
-`user-profile-mfa-section.view.tsx` and `api-keys-table.view.tsx` are worked
-examples.
+When one dialog serves every row in a list, the controller carries the row as
+its payload. Mount the block once after the list, open it from a row with
+`controller.open(row)`, and derive the copy from the payload. `onConfirm` in the
+wrapper receives the same row. See "Removing a row takes focus with it" in
+`controllers.md` for the focus hand-off that comes with a removal:
+
+```tsx
+<ActionMenu actions={[{ label: m.remove, onClick: () => remove.open(row) }]} />
+
+<Confirmation
+  controller={remove}
+  title={member => fill(m.removeTitle, { name: member.name })}
+  description={m.removeDescription}
+  actionLabel={m.remove}
+  finalFocus={finalFocus}
+/>
+```
 
 ## Pure derivation belongs beside the view, not in it
 
@@ -99,43 +107,11 @@ rearranges a list, are decisions with no React in them. They live in
 
 ## Removing a row takes focus with it
 
-A dialog returns focus to its trigger on close. When the action removes the row
-that trigger sits on — signing a device out, removing an email — the trigger
-unmounts and focus falls to `<body>`. Nothing catches it: the menu item that
-opened the dialog unmounted with the menu, and a dialog mounted at the section
-rather than inside the menu has no floating-tree ancestor to walk back to. A
-keyboard user loses their place mid-list and a screen reader announces nothing.
-
-Hand focus to a surviving element with `useListRemovalFocus` (`hooks/`). It
-records which row was removed and, through `finalFocus`, picks the row that took
-its place, the last row when it was the last, or `fallback()` once the list is
-empty. `finalFocus` on `Dialog.Popup` and on the `Confirmation` block takes a
-function resolved when the dialog closes, after the row has gone:
-
-```tsx
-const removalFocus = useListRemovalFocus({
-  ids: methods.map(method => method.id),
-  onRemove,
-  fallback: () => section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? section.current,
-});
-
-// each row's trigger
-triggerRef={removalFocus.registerTrigger(method.id)}
-
-// the dialog
-finalFocus={removalFocus.finalFocus}
-onConfirm={method => removalFocus.remove(method.id)}
-```
-
-A cancelled or failed removal keeps its own trigger, so `finalFocus` returns
-`null` and the dialog's default (the trigger) applies.
-
-Prefer the row that took the removed one's place, the last row when it was the
-last, and a control that outlives the list once it is empty.
-
-Test the removal, not just the cancel: `toHaveFocus()` on the row that should
-have caught it. A suite that only asserts focus after cancelling passes while
-every successful removal drops focus on the floor.
+When a confirmed action removes the row its trigger sits on, focus has to be
+handed to a surviving element. The bookkeeping lives in the controller, with
+`useListRemovalFocus`; see `controllers.md`. The view's part is to register each
+row's trigger with the `registerTrigger` it is given and pass `finalFocus` to the
+block.
 
 ## Testing
 

@@ -3,18 +3,48 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
+import { useConfirmController } from '../../../blocks/confirm';
 import { MosaicProvider } from '../../../mosaic-provider';
+import { useUserProfileActiveDevicesController } from '../user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
+import type { UserProfilePasskey } from '../user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
+import { useUserProfilePasskeysSectionController } from '../user-profile-passkeys-section/user-profile-passkeys-section.controller';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 function DeleteAccount() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDangerSectionView {...controller} />;
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
+}
+
+function ActiveDevices({
+  devices,
+  onSignOutDevice,
+  onSignOutAllOtherDevices,
+}: {
+  devices: UserProfileDevice[];
+  onSignOutDevice?: (id: string) => void;
+  onSignOutAllOtherDevices?: () => void;
+}) {
+  const controller = useUserProfileActiveDevicesController({
+    devices,
+    revoke: onSignOutDevice ? async id => onSignOutDevice(id) : undefined,
+    revokeAll: onSignOutAllOtherDevices ? async () => onSignOutAllOtherDevices() : undefined,
+  });
+  return <UserProfileActiveDevicesSectionView {...controller} />;
+}
+
+function Passkeys({ passkeys, onRemove }: { passkeys: UserProfilePasskey[]; onRemove: (id: string) => Promise<void> }) {
+  const controller = useUserProfilePasskeysSectionController({
+    passkeys,
+    onRename: () => Promise.resolve(),
+    validateName: () => undefined,
+    onRemove,
+  });
+  return <UserProfilePasskeysSectionView {...controller} />;
 }
 const devices: UserProfileDevice[] = [
   {
@@ -48,13 +78,18 @@ const passkeys = [
 ];
 
 const props: UserProfileSecurityPanelViewProps = {
-  passkeysSlot: <UserProfilePasskeysSectionView passkeys={passkeys} />,
+  passkeysSlot: (
+    <UserProfilePasskeysSectionView
+      registerTrigger={() => null}
+      passkeys={passkeys}
+    />
+  ),
   mfaMethods: [
     { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
     { id: 'totp_1', type: 'authenticator' },
     { id: 'backup_1', type: 'backup-codes' },
   ],
-  activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={devices} />,
+  activeDevicesSlot: <ActiveDevices devices={devices} />,
 };
 
 function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) {
@@ -134,7 +169,7 @@ describe('UserProfileSecurityPanelView', () => {
 
     renderView({
       activeDevicesSlot: (
-        <UserProfileActiveDevicesSectionView
+        <ActiveDevices
           devices={devices}
           onSignOutDevice={onSignOutDevice}
           onSignOutAllOtherDevices={onSignOutAllOtherDevices}
@@ -165,12 +200,13 @@ describe('UserProfileSecurityPanelView', () => {
     renderView({
       passkeysSlot: (
         <UserProfilePasskeysSectionView
+          registerTrigger={() => null}
           passkeys={[]}
           onAdd={vi.fn()}
         />
       ),
       mfaMethods: [],
-      activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={[]} />,
+      activeDevicesSlot: <ActiveDevices devices={[]} />,
       onAddMfaMethod: vi.fn(),
       addableMfaMethods: ['sms', 'authenticator'],
     });
@@ -184,7 +220,7 @@ describe('UserProfileSecurityPanelView', () => {
     const user = userEvent.setup();
     renderView({
       activeDevicesSlot: (
-        <UserProfileActiveDevicesSectionView
+        <ActiveDevices
           devices={devices}
           onSignOutDevice={vi.fn()}
         />
@@ -209,7 +245,14 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('keeps the passkeys card in the authentication section when passkeys are empty and Add is unavailable', () => {
-    renderView({ passkeysSlot: <UserProfilePasskeysSectionView passkeys={[]} /> });
+    renderView({
+      passkeysSlot: (
+        <UserProfilePasskeysSectionView
+          registerTrigger={() => null}
+          passkeys={[]}
+        />
+      ),
+    });
 
     const section = screen.getByRole('region', { name: 'Authentication' });
     expect(within(section).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
@@ -227,7 +270,7 @@ describe('UserProfileSecurityPanelView', () => {
     const { rerender } = renderView({
       mfaMethods: undefined,
       passkeysSlot: (
-        <UserProfilePasskeysSectionView
+        <Passkeys
           passkeys={passkeys}
           onRemove={onRemovePasskey}
         />
@@ -242,7 +285,7 @@ describe('UserProfileSecurityPanelView', () => {
       <MosaicProvider>
         <UserProfileSecurityPanelView
           passkeysSlot={
-            <UserProfilePasskeysSectionView
+            <Passkeys
               passkeys={[]}
               onRemove={onRemovePasskey}
             />

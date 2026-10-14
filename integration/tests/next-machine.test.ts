@@ -154,7 +154,7 @@ test.describe('Next.js machine authentication @machine', () => {
       await app.withEnv(appConfigs.envs.withAPIKeys.clone());
       await app.dev();
 
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
       fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);

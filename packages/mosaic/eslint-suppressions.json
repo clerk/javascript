@@ -39,11 +39,6 @@
       "count": 1
     }
   },
-  "src/features/user-button/user-button.view.tsx": {
-    "sonarjs/cognitive-complexity": {
-      "count": 1
-    }
-  },
   "src/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.model.ts": {
     "@typescript-eslint/no-restricted-imports": {
       "count": 1

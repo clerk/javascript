@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { type Ref, useMemo, useRef } from 'react';
+import type { Ref } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { ActionMenu } from '../../components/action-menu';
@@ -12,7 +12,6 @@ import { Pagination } from '../../components/pagination';
 import { Spinner } from '../../components/spinner';
 import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill, useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -23,8 +22,12 @@ const getRowId = (invitation: OrganizationProfileInvitation) => invitation.id;
 
 export function InvitationsTableTabView({
   invitations,
+  inviteButtonRef,
+  tableContainerRef,
   onInvite,
-  onRevoke,
+  registerTrigger,
+  revoke,
+  finalFocus,
   totalCount,
   page,
   pageSize,
@@ -36,14 +39,6 @@ export function InvitationsTableTabView({
   onRetry,
 }: InvitationsTableTabViewProps) {
   const m = useMessages('invitationsTableTab');
-  const inviteButton = useRef<HTMLButtonElement>(null);
-  const tableContainer = useRef<HTMLDivElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: invitations.map(getRowId),
-    onRemove: onRevoke,
-    fallback: () => inviteButton.current ?? tableContainer.current,
-  });
-  const revokeDialog = useMemo(() => Confirmation.createHandle<OrganizationProfileInvitation>(), []);
   const { table, pagination } = useServerDataTable({
     data: invitations,
     totalCount,
@@ -55,12 +50,12 @@ export function InvitationsTableTabView({
     searchValue: '',
     onSearchChange: () => {},
   });
-  const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
+  const columnCount = 3 + Number(Boolean(revoke)) + Number(Boolean(onBulkAction));
   return (
     <>
       <div
         {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(tableTabStyles.root))}
-        ref={tableContainer}
+        ref={tableContainerRef}
         tabIndex={-1}
         role='group'
         aria-label={m.title}
@@ -68,7 +63,7 @@ export function InvitationsTableTabView({
         {onInvite ? (
           <Table.Toolbar>
             <Button
-              ref={inviteButton}
+              ref={inviteButtonRef}
               onClick={onInvite}
             >
               <Icon name='plus' />
@@ -93,7 +88,7 @@ export function InvitationsTableTabView({
               <Table.HeaderCell>{m.email}</Table.HeaderCell>
               <Table.HeaderCell>{m.invitedAt}</Table.HeaderCell>
               <Table.HeaderCell>{m.roleLabel}</Table.HeaderCell>
-              {onRevoke ? (
+              {revoke ? (
                 <Table.HeaderCell align='end'>
                   <VisuallyHidden>{m.actions}</VisuallyHidden>
                 </Table.HeaderCell>
@@ -107,8 +102,8 @@ export function InvitationsTableTabView({
             isError={isError}
             onRetry={onRetry}
             hasBulkAction={Boolean(onBulkAction)}
-            onRevokeClick={onRevoke ? invitation => revokeDialog.open(invitation) : undefined}
-            registerTrigger={removalFocus.registerTrigger}
+            onRevokeClick={revoke ? invitation => revoke.open(invitation) : undefined}
+            registerTrigger={registerTrigger}
           />
         </Table.Root>
         {pagination ? (
@@ -121,16 +116,14 @@ export function InvitationsTableTabView({
           />
         ) : null}
       </div>
-      {onRevoke ? (
+      {revoke ? (
         <Confirmation
-          handle={revokeDialog}
+          controller={revoke}
           title={invitation => fill(m.revokeTitle, { name: invitation.email })}
           description={m.revokeDescription}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onConfirm={invitation => removalFocus.remove(invitation.id)}
-          errorFallback={m.revokeError}
-          finalFocus={removalFocus.finalFocus}
+          finalFocus={finalFocus}
         />
       ) : null}
     </>
