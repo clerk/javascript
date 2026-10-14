@@ -291,7 +291,8 @@ handle also has `open()` / `close()` / `isOpen` for opens with no trigger elemen
 ### Multiple triggers
 
 Several triggers can share one dialog through a handle. Give each an `id` and a `payload`, and make
-the root's children a function of `{ payload }`. Type it with `Dialog.createHandle<Payload>()`.
+the root's children a function of `{ payload }`. Type it with `Dialog.createHandle<Payload>()`, and
+every trigger on that handle must pass a payload.
 
 <Story
   name='MultipleTriggers'

@@ -15,6 +15,7 @@ it('places the connected enterprise section before Web3 wallets in the profile h
       enterpriseAccountsSlot={<UserProfileEnterpriseAccountsSection />}
       web3WalletsSlot={
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
         />
       }

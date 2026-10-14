@@ -197,6 +197,26 @@ describe('email actions', () => {
     expect(onRemoveEmail).toHaveBeenCalledWith('email_secondary');
   });
 
+  it('returns focus to the row that opened verification when the dialog closes', async () => {
+    const user = userEvent.setup();
+    renderEmail({
+      emails: [
+        { id: 'email_1', value: 'primary@clerk.dev', isDefault: true, isVerified: true },
+        { id: 'email_2', value: 'unverified@clerk.dev', isDefault: false, isVerified: false },
+      ],
+    });
+    const trigger = screen.getByRole('button', { name: 'Manage unverified@clerk.dev' });
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+    expect(await screen.findByRole('dialog', { name: 'Verify your email' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
   it.each([
     ['email_primary', 'primary@clerk.dev', true, 'Complete verification'],
     ['email_unverified', 'unverified@clerk.dev', false, 'Verify'],

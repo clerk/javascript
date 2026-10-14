@@ -20,6 +20,7 @@ function verifier(
 }
 
 const created = () => Promise.resolve(verifier());
+const other = { id: 'email_2', value: 'other@example.com' };
 
 function saveError(message: string, field?: 'emailAddress' | 'code') {
   return new SaveError(field ? { fields: { [field]: { message } } } : { global: { message } });
@@ -182,7 +183,7 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier();
     const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate }));
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     expect(result.current.open).toBe(true);
     expect(result.current.step).toBe('verify');
     expect(result.current.emailAddress).toBe('other@example.com');
@@ -194,6 +195,27 @@ describe('useUserProfileAddEmailController', () => {
     expect(onCreate).not.toHaveBeenCalled();
   });
 
+  it('owns which address is being verified until the next add', async () => {
+    const email = verifier();
+    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate: created }));
+    expect(result.current.verifyingId).toBeUndefined();
+
+    act(() => result.current.onVerifyEmail(other, email));
+    expect(result.current.verifyingId).toBe('email_2');
+    await waitFor(() => expect(result.current.step).toBe('verify'));
+
+    act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
+    expect(result.current.verifyingId).toBe('email_2');
+    expect(result.current.emailAddress).toBe('other@example.com');
+
+    act(() => result.current.onOpenChange(false));
+    expect(result.current.open).toBe(false);
+    expect(result.current.verifyingId).toBe('email_2');
+
+    act(() => result.current.onOpenChange(true));
+    expect(result.current.verifyingId).toBeUndefined();
+  });
+
   it('stays on the code step when sending fails, and lets the user resend at once', async () => {
     const email = verifier();
     email.start.mockImplementationOnce(() => ({
@@ -202,7 +224,7 @@ describe('useUserProfileAddEmailController', () => {
     }));
     const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate: created }));
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.errorMessage).toBe('Too many requests'));
     expect(result.current.step).toBe('verify');
     expect(result.current.resendSeconds).toBe(0);
@@ -226,9 +248,7 @@ describe('useUserProfileAddEmailController', () => {
     const verified = createDeferredPromise();
     const { result } = renderHook(() => useUserProfileAddEmailController({}));
 
-    act(() =>
-      result.current.onVerifyEmail('other@example.com', verifier(sentLink(verified.promise.then(() => undefined)))),
-    );
+    act(() => result.current.onVerifyEmail(other, verifier(sentLink(verified.promise.then(() => undefined)))));
     expect(result.current.step).toBe('link');
     expect(result.current.resendSeconds).toBe(60);
 
@@ -244,12 +264,12 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier(sentLink(new Promise(() => {}), cancel));
     const { result, unmount } = renderHook(() => useUserProfileAddEmailController({}));
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.step).toBe('link'));
     act(() => result.current.onOpenChange(false));
     expect(cancel).toHaveBeenCalledOnce();
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.step).toBe('link'));
     unmount();
     expect(cancel).toHaveBeenCalledTimes(2);
@@ -259,7 +279,7 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier(sentLink(Promise.reject(saveError('Link expired'))));
     const { result } = renderHook(() => useUserProfileAddEmailController({}));
 
-    act(() => result.current.onVerifyEmail('other@example.com', email));
+    act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.errorMessage).toBe('Link expired'));
     expect(result.current.step).toBe('link');
     expect(result.current.open).toBe(true);
@@ -270,7 +290,7 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier(() => ({ method: 'sso', connect }));
     const { result } = renderHook(() => useUserProfileAddEmailController({}));
 
-    act(() => result.current.onVerifyEmail('person@acme.co', email));
+    act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
     expect(result.current.step).toBe('sso');
     expect(result.current.resendSeconds).toBe(0);
 

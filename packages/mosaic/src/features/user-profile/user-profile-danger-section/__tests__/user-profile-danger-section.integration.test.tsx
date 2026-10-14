@@ -45,7 +45,7 @@ function renderSection(fallback?: React.ReactNode) {
 
 async function openDialog(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Delete account' }));
-  return screen.getByRole('dialog');
+  return screen.getByRole('alertdialog');
 }
 
 describe('UserProfileDangerSection', () => {
@@ -81,7 +81,7 @@ describe('UserProfileDangerSection', () => {
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
 
     const dialog = await openDialog(user);
     expect(within(dialog).getByText('Type “Delete account” below to continue')).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe('UserProfileDangerSection', () => {
 
     await waitFor(() => expect(deleteUser).toHaveBeenCalledOnce());
     expect(setActive).toHaveBeenCalledWith({ session: null, redirectUrl: '/signed-out' });
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('uses the single-session sign-out url when another account is still signed in', async () => {
@@ -131,7 +131,7 @@ describe('UserProfileDangerSection', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
 
     expect(await screen.findByText('Your subscription is still active.')).toBeInTheDocument();
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     expect(setActive).not.toHaveBeenCalled();
   });
 
@@ -147,10 +147,10 @@ describe('UserProfileDangerSection', () => {
 
     expect(within(dialog).getByRole('button', { name: 'Delete account' })).toHaveAttribute('aria-busy', 'true');
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
 
     pending.resolve();
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('clears the phrase when the dialog is cancelled', async () => {
@@ -160,7 +160,7 @@ describe('UserProfileDangerSection', () => {
 
     await user.type(within(dialog).getByRole('textbox'), 'Delete account');
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
     const reopened = await openDialog(user);
     expect(within(reopened).getByRole('textbox')).toHaveValue('');

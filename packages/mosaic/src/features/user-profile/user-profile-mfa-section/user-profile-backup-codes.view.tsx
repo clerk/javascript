@@ -4,11 +4,14 @@ import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
+import { Skeleton } from '../../../components/skeleton';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
 import { mergeStyleProps, themeProps } from '../../../props';
 import { reset } from '../../../styles/reset.styles';
 import { styles } from './user-profile-backup-codes.styles';
+
+const PLACEHOLDER_CODE = 'xxxxxxxx';
 
 export interface UserProfileBackupCodesViewProps {
   onCancel: () => void;
@@ -83,10 +86,9 @@ export function UserProfileBackupCodesView({
                 aria-hidden='true'
                 {...stylex.props(reset.base, styles.cell)}
               >
-                <Text
-                  render={<span />}
-                  xstyle={styles.skeleton}
-                />
+                <Text render={<span />}>
+                  <Skeleton>{PLACEHOLDER_CODE}</Skeleton>
+                </Text>
               </div>
             ))}
           </div>

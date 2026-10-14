@@ -1,4 +1,4 @@
-import { serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -34,8 +34,9 @@ export function mfaEnvironment() {
 export async function renderMfa(
   user = fapiUser({ id: 'user_1', phone_numbers: [phone] }),
   environment = mfaEnvironment(),
+  overrides: FakeFapiSeed = {},
 ) {
-  const fapi = serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
+  const fapi = serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]), ...overrides });
   await renderWithClerk(<UserProfileMfaSection />);
   return fapi;
 }
