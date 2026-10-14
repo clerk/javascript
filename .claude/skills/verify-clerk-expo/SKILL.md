@@ -65,7 +65,7 @@ A Mac has four iOS lanes and two Android lanes, shared by every worktree on it. 
 
 ### Borrow a device on a CI runner
 
-A machine that is not a Mac cannot run the simulator, and a machine with no hardware virtualization cannot run the emulator. There the CLI leases a device on a GitHub Actions runner and drives it through a tunnel. That machine needs Node 24.8.0 or newer on 24, the Platform API key, and access to GitHub, and `doctor` checks each. In the worktree it needs `npm ci --prefix integration/expo-native` and no `pnpm install`, because the runner builds the app. The session builds a pushed commit, never your working tree, so commit and push before `up` or `run`.
+A machine that is not a Mac cannot run the simulator, and a machine with no hardware virtualization cannot run the emulator. There the CLI leases a device on a GitHub Actions runner and drives it through a tunnel. That machine needs Node 24.8.0 or newer on 24, the Platform API key, and access to GitHub, and `doctor` checks each. In the worktree it needs `npm ci --prefix integration/expo-native` and no `pnpm install`, because the runner builds the app. The session builds a pushed commit. When the app sources differ from it, `up` and `run` send the difference with it, and the session builds the commit with your changes on top.
 
 ```console
 $ git push
@@ -225,7 +225,7 @@ On a machine whose `gh` can attach, `attach` edits the description itself and pr
 
 When this machine cannot attach and there is no session to hand the files to, or the hand-off fails, `attach` fails and says which. Then name the run id in the PR and say that the evidence was not attached. A run on a local device has no session, so its fix is a newer `gh`. [Remote devices](references/remote.md) has what the repository needs before a hand-off can be published, and its limits.
 
-`attach` writes only to an open pull request, and fails on one that is closed or merged. It refuses a run that is tainted, that has a failing spec or no passing one, or whose `app.log` names a user that the run did not create. A before run can have failing specs. `attach` refuses a before run that is tainted, that was never sealed, or whose `app.log` names a user that the run did not create.
+`attach` writes only to an open pull request, and fails on one that is closed or merged. It refuses a run that is tainted, that ran on a session build with uncommitted changes, that has a failing spec or no passing one, or whose `app.log` names a user that the run did not create. A before run can have failing specs. `attach` refuses a before run that is tainted, that ran on a session build with uncommitted changes, that was never sealed, or whose `app.log` names a user that the run did not create.
 
 Work in this order, with one `up` for both runs: make the branch and `git push` it, `up`, `run` the spec without your change when it changes something that exists, make the change, commit, `git push`, `run` the spec again, open the pull request, `attach` with the before run as `--before <run-id>`, `down`. Open the pull request after the last run, so that it is not left open without its evidence. Commit before the second `run`, so that the line `attach` writes names a commit the pull request holds. In the pull request, name the run id and the specs you ran, and say what you did not run.
 
