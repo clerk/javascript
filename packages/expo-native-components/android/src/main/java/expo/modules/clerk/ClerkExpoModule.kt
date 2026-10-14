@@ -29,6 +29,8 @@ import com.clerk.api.ui.ClerkTheme
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.kotlin.records.Field
+import expo.modules.kotlin.records.Record
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -55,6 +57,12 @@ private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
         Log.d(tag, message)
     }
+}
+
+internal class ConfigureOptions : Record {
+    @Field val bearerToken: String? = null
+
+    @Field val proxyUrl: String? = null
 }
 
 internal fun biometricCredentialAvailabilityPayload(
@@ -214,6 +222,7 @@ class ClerkExpoModule : Module() {
         schedule = { flush -> mainHandler.post(flush) },
         emit = { sendEvent(NATIVE_CLIENT_INVALIDATED_EVENT, emptyMap<String, Any?>()) }
     )
+    private var configuredProxyUrl: String? = null
 
     private data class AuthFlowStateSnapshot(
         val isLoaded: Boolean,
@@ -269,15 +278,19 @@ class ClerkExpoModule : Module() {
         }
 
         AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
-            configure(pubKey, bearerToken, promise)
+            configure(pubKey, bearerToken, null, promise)
+        }
+
+        AsyncFunction("configureWithOptions") { pubKey: String, options: ConfigureOptions, promise: Promise ->
+            configure(pubKey, options.bearerToken, options.proxyUrl, promise)
         }
 
         AsyncFunction("getClientToken") { promise: Promise ->
             getClientToken(promise)
         }
 
-        AsyncFunction("configureNative") { pubKey: String, seedDeviceToken: String?, promise: Promise ->
-            configureNative(pubKey, seedDeviceToken, promise)
+        AsyncFunction("configureNative") { pubKey: String, seedDeviceToken: String?, proxyUrl: String?, promise: Promise ->
+            configureNative(pubKey, seedDeviceToken, proxyUrl, promise)
         }
 
         AsyncFunction("getDeviceToken") { promise: Promise ->
@@ -355,7 +368,7 @@ class ClerkExpoModule : Module() {
     private val reactContext: Context?
         get() = appContext.reactContext
 
-    private fun clerkConfigurationOptions(): ClerkConfigurationOptions {
+    private fun clerkConfigurationOptions(proxyUrl: String?): ClerkConfigurationOptions {
         val hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim()
         val customHeaders = buildMap {
             put(HOST_SDK_HEADER, HOST_SDK)
@@ -365,7 +378,7 @@ class ClerkExpoModule : Module() {
         }
 
         // JS owns client state. The native foreground refresh races SSO completion and mints duplicate clients (#9217).
-        return ClerkConfigurationOptions()
+        return ClerkConfigurationOptions(proxyUrl = proxyUrl)
             .withForegroundRefreshDisabled()
             .withCustomHeaders(customHeaders)
     }
@@ -484,7 +497,7 @@ class ClerkExpoModule : Module() {
 
     // MARK: - configure
 
-    private fun configure(pubKey: String, bearerToken: String?, promise: Promise) {
+    private fun configure(pubKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) {
         val context = reactContext ?: run {
             promise.reject("E_INIT_FAILED", "React context is not available", null)
             return
@@ -493,6 +506,7 @@ class ClerkExpoModule : Module() {
         coroutineScope.launch {
             try {
                 val normalizedBearerToken = bearerToken?.trim()?.takeIf { it.isNotEmpty() }
+                val normalizedProxyUrl = proxyUrl?.trim()?.takeIf { it.isNotEmpty() }
 
                 if (!Clerk.isInitialized.value) {
                     // First-time initialization — write the bearer token to SharedPreferences
@@ -504,7 +518,7 @@ class ClerkExpoModule : Module() {
                             .apply()
                     }
 
-                    Clerk.initialize(context, pubKey, clerkConfigurationOptions())
+                    Clerk.initialize(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                     startClientStateObserver()
                     // clerk-android registers ActivityLifecycleCallbacks during
                     // initialize(), but in React Native MainActivity has already passed
@@ -549,6 +563,7 @@ class ClerkExpoModule : Module() {
                         promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}", null)
                     } else {
                         configuredPublishableKey = pubKey
+                        configuredProxyUrl = normalizedProxyUrl
                         lastObservedClientState = clientStateSnapshot()
                         promise.resolve(null)
                     }
@@ -556,8 +571,9 @@ class ClerkExpoModule : Module() {
                 }
 
                 val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
-                if (activePublishableKey != null && activePublishableKey != pubKey) {
-                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions())
+                val activeProxyUrl = configuredProxyUrl ?: Clerk.proxyUrl
+                if (activePublishableKey != null && (activePublishableKey != pubKey || activeProxyUrl != normalizedProxyUrl)) {
+                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                     startClientStateObserver()
                     appContext.currentActivity?.let { Clerk.attachActivity(it) }
                     loadThemeFromAssets(context)
@@ -602,6 +618,7 @@ class ClerkExpoModule : Module() {
                     }
 
                     configuredPublishableKey = pubKey
+                    configuredProxyUrl = normalizedProxyUrl
                     lastObservedClientState = clientStateSnapshot()
                     promise.resolve(null)
                     return@launch
@@ -646,7 +663,7 @@ class ClerkExpoModule : Module() {
 
     // MARK: - single-token client sync
 
-    private fun configureNative(pubKey: String, seedDeviceToken: String?, promise: Promise) {
+    private fun configureNative(pubKey: String, seedDeviceToken: String?, proxyUrl: String?, promise: Promise) {
         val context = reactContext ?: run {
             promise.reject("E_CONFIGURE_FAILED", "React context is not available", null)
             return
@@ -654,20 +671,23 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
+                val normalizedProxyUrl = proxyUrl?.trim()?.takeIf { it.isNotEmpty() }
                 val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
+                val activeProxyUrl = configuredProxyUrl ?: Clerk.proxyUrl
                 val didConfigure = when {
                     activePublishableKey == null -> {
-                        Clerk.initialize(context, pubKey, clerkConfigurationOptions())
+                        Clerk.initialize(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                         true
                     }
-                    activePublishableKey != pubKey -> {
-                        Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions())
+                    activePublishableKey != pubKey || activeProxyUrl != normalizedProxyUrl -> {
+                        Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
                         true
                     }
                     else -> false
                 }
                 if (didConfigure) {
                     configuredPublishableKey = pubKey
+                    configuredProxyUrl = normalizedProxyUrl
                     appContext.currentActivity?.let { Clerk.attachActivity(it) }
                     // Must follow initialize(), which resets customTheme.
                     loadThemeFromAssets(context)

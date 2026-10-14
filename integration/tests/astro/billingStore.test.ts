@@ -23,7 +23,7 @@ test.describe('Astro billingStore @astro @billing', () => {
   });
 
   test('should render plans from getPlans()', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/billing/billing-store');
 
     await u.page.waitForClerkJsLoaded();

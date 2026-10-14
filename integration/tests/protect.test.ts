@@ -15,7 +15,7 @@ testAgainstRunningApps({
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     fakeAdmin = m.services.users.createFakeUser(test);
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
@@ -36,7 +36,7 @@ testAgainstRunningApps({
   });
 
   test('Protect in RSCs and RCCs as `admin`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -79,7 +79,7 @@ testAgainstRunningApps({
   });
 
   test('Protect in RSCs and RCCs as `signed-out user`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     /**
      * Soft navigations
@@ -117,7 +117,7 @@ testAgainstRunningApps({
   });
 
   test('Protect in RSCs and RCCs as `viewer`', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();

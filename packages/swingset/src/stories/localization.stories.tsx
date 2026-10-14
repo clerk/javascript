@@ -1,4 +1,4 @@
-import { UserButtonView } from '@clerk/mosaic/features/user-button/user-button.view';
+import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
 import type { MosaicCatalog } from '@clerk/mosaic/localization';
 import { fill, plural, rich, useLocale, useMessages } from '@clerk/mosaic/localization';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
@@ -41,12 +41,11 @@ const esES: MosaicCatalog = {
       signOutAll: 'Cerrar sesión en todas las cuentas',
     },
     manage: {
-      invite: 'Invitar',
-      account: 'Gestionar cuenta',
+      invite: 'Invitar miembros',
+      settings: 'Configuración',
+      profile: 'Gestionar perfil',
       organization: 'Gestionar organización',
-      organizationSettings: 'Configuración de la organización',
-      profileSettings: 'Configuración del perfil',
-      createOrganization: 'Crear organización',
+      createOrganization: 'Añadir organización',
     },
   },
 };
@@ -86,7 +85,7 @@ const clerkCloud = {
 function OrganizationUserButton() {
   const [open, setOpen] = useState(false);
   return (
-    <UserButtonView
+    <SwitcherView
       open={open}
       onOpenChange={setOpen}
       activeSession={colin}
