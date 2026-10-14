@@ -144,7 +144,14 @@ in [Test placement](#test-placement).
     test can assert on it (`fapi.client.sessions`) or change it.
   - `holdRequests(method, path)` holds matching requests open. Assert the
     in-flight UI, then `release()` to let them through to `serveFapi`, or
-    `fail(code?, longMessage?, paramName?)` to answer with a 400 Clerk error.
+    `fail(code, longMessage?, paramName?)` to answer with that Clerk error.
+- **`fake-fapi/errors.ts`**: the FAPI error codes a fake may send, each with
+  the status and copy the real server sends (from `clerk_go` `pkg/apierrors`).
+  `fail()` and the fakes only accept these codes, so a test can't send an
+  invented code or a wrong status. For example,
+  `fail('form_identifier_exists', 'Slug is taken', 'slug')` answers 422 with
+  `meta.param_name`. Use `internal_clerk_error` (500) for a generic server
+  failure. Add a code to the catalog with its real status before using it.
 - **`fake-fapi/`**: fakes for larger endpoint families, kept out of
   `fake-fapi.ts` and registered by `serveFapi`.
   Each file seeds through its own `serveFapi` key; read the file for its
@@ -159,16 +166,32 @@ in [Test placement](#test-placement).
     rejects: before start, in the wrong status, with a strategy the user
     doesn't have, and an email, phone, or passkey attempt that wasn't
     prepared. Wrong passwords and codes answer 422.
+- **`dialog.ts`** and **`upload.ts`**: `openDialog(user, trigger)` clicks and
+  waits until focus is inside the dialog. `uploadFile(user, container, file)`
+  waits until the file input is enabled, since `user.upload` skips a disabled
+  input without failing.
 - **`render.tsx`**: `renderWithClerk(ui, loadOptions?)` renders inside
   `ClerkContextProvider` and `MosaicProvider`, loads Clerk, and returns
   `{ clerk, navigate, rerender, ... }`.
   `navigate` is the router Clerk was loaded with, called with the path.
+- **`recorded/`**: scrubbed responses recorded from real FAPI.
+  `fake-fapi-recorded.feature.test.tsx` replays each recorded request against
+  `serveFapi` and fails when the response shape drifts from the recording.
+  `KNOWN_DIFFERENCES` in that file lists every deliberate difference with its
+  reason. Fix a new difference in the builder or the fake. Only add it to the
+  list if the fake can't or shouldn't match, for example a field the
+  `@clerk/shared` type doesn't allow.
 
 The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the
 window. Before each test it moves FAPI to a new host, so a request a previous
 test's Clerk sends late fails with a network error instead of reaching this
-test's handlers. After each test it cleans up, resets the handlers and the
-shared query cache, and **fails the test on any FAPI request without a
+test's handlers. It also turns off retries on the shared query client, so a
+failed load shows its error at once instead of after three backed-off retries
+(about 7 seconds). After each test it releases any held requests and waits
+until every FAPI response has reached Clerk. Clerk applies a response's
+piggybacked client to the Clerk loaded last, so a response that lands late
+would change the next test's session. Then it cleans up, resets the handlers
+and the shared query cache, and **fails the test on any FAPI request without a
 handler**, or on a `holdRequests` hold never released or failed. When a
 feature needs a new endpoint, add a handler to `serveFapi` that mirrors what
 FAPI returns.
@@ -195,6 +218,7 @@ click.
   `Card.Banner` are always mounted, so `findByRole('alert')` can return one
   before its text arrives. Use
   `waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(...))`.
+  Lint rejects a bare `findByRole('alert')` in feature tests.
 - **Control time instead of waiting it out.** Don't raise a `waitFor` or
   `findBy*` timeout. If the test waits on a request or a poll, hold it with
   `holdRequests()` and release it when the test is ready.
@@ -204,11 +228,11 @@ click.
 
 - `setActive` only touches the session when the document has focus. The setup
   focuses the window, so don't blur it by accident.
-- clerk-js treats a **422** from a session touch (`setActive`, focus) or a token
-  request as "unauthenticated" and refetches the client. Answer those with
-  400s, which is what `holdRequests(...).fail()` sends. Form errors on other
-  endpoints are real 422s, for example a wrong password or code, and are
-  handled as ordinary errors.
+- clerk-js treats a **401** or **422** from a session touch (`setActive`,
+  focus) or a token request as "unauthenticated" and refetches the client. To
+  fail those, use a code whose status is neither, such as
+  `internal_clerk_error`. Form errors on other endpoints are real 422s, for
+  example a wrong password or code, and are handled as ordinary errors.
 - After a touch, `getToken` is served from the token the touch returned, so
   there is no tokens request to hold during an organization switch. To observe
   Clerk's transitive state, route the action through navigation and make

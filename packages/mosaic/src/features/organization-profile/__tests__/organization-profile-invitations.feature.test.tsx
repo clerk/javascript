@@ -1,4 +1,4 @@
-import type { OrganizationInvitationJSON, RoleJSON } from '@clerk/shared/types';
+import type { RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -10,6 +10,7 @@ import {
   fapiEnvironment,
   fapiMembership,
   fapiOrganization,
+  fapiOrganizationInvitation,
   fapiSession,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
@@ -18,18 +19,13 @@ import { MosaicLocalizationProvider, resolveLocalization } from '../../../locali
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
 
 const organization = fapiOrganization({ id: 'org_invitations', name: 'Acme' });
-const invitation: OrganizationInvitationJSON = {
-  object: 'organization_invitation',
+const invitation = fapiOrganizationInvitation({
   id: 'orginv_ada',
   email_address: 'ada@example.com',
   organization_id: organization.id,
-  public_metadata: {},
-  status: 'pending',
-  role: 'org:member',
-  role_name: 'Member',
   created_at: 1_785_000_000_000,
   updated_at: 1_785_000_000_000,
-};
+});
 
 function serve(permissions: string[]) {
   const membership = fapiMembership(organization, { permissions });
@@ -93,13 +89,13 @@ describe('connected organization invitations', () => {
     const initial = holdRequests('get', '/v1/organizations/:organizationId/invitations');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(initial.requests).toHaveLength(1));
-    initial.fail('network_error', 'Unavailable');
-    expect(await screen.findByText('Unable to load invitations', {}, { timeout: 12_000 })).toBeVisible();
+    initial.fail('internal_clerk_error');
+    expect(await screen.findByText('Unable to load invitations')).toBeVisible();
     serve(['org:sys_memberships:manage']);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText('ada@example.com')).toBeVisible();
-  }, 20_000);
+  });
 
   it('revokes only after confirmation and restores focus after the final row', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
@@ -127,10 +123,10 @@ describe('connected organization invitations', () => {
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(revoke.requests).toHaveLength(1));
-    revoke.fail('network_error', 'Unavailable');
+    revoke.fail('internal_clerk_error');
     await waitFor(() =>
       expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
-        'Unable to reach the server. Check your connection and try again.',
+        "There was an internal error on our servers. We've been notified and are working on fixing it.",
       ),
     );
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
@@ -183,8 +179,8 @@ describe('connected organization invitations', () => {
     const refresh = holdRequests('get', '/v1/organizations/:organizationId/invitations');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(refresh.requests).toHaveLength(1));
-    refresh.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load invitations')).toBeVisible(), { timeout: 12_000 });
+    refresh.fail('internal_clerk_error');
+    await waitFor(() => expect(screen.getByText('Unable to load invitations')).toBeVisible());
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.organizationInvitations.find(item => item.id === invitation.id)?.status).toBe('revoked');
     expect(screen.queryByText('other@example.com')).toBeNull();
@@ -196,7 +192,7 @@ describe('connected organization invitations', () => {
     await waitFor(() => expect(screen.queryByText('Unable to load invitations')).toBeNull());
     expect(screen.getByText('other@example.com')).toBeVisible();
     expect(screen.queryByText('ada@example.com')).toBeNull();
-  }, 20_000);
+  });
 
   it('shows localized role names in invitation rows', async () => {
     const fapi = serve(['org:sys_memberships:manage']);
@@ -532,7 +528,7 @@ describe('inviting members', () => {
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(roles.requests).toHaveLength(1));
-    roles.fail('network_error', 'Unavailable');
+    roles.fail('internal_clerk_error');
     await userEvent.setup().click(await screen.findByRole('tab', { name: 'Invitations' }));
     expect(await screen.findByText('ada@example.com')).toBeVisible();
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage ada@example.com' })).toBeVisible());

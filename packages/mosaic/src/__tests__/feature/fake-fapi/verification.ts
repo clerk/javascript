@@ -10,6 +10,7 @@ import type {
 import { http, HttpResponse } from 'msw';
 
 import { fapiSessionVerification, fapiVerification } from '../fapi';
+import { fapiError } from './errors';
 
 export type VerificationSecretStrategy = 'password' | 'email_code' | 'phone_code' | 'totp' | 'backup_code';
 
@@ -51,10 +52,6 @@ function findSession(state: VerificationHost, id: unknown): SessionJSON | undefi
   return state.client.sessions.find(session => session.id === id);
 }
 
-function missing() {
-  return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
-}
-
 type Stage = 'first' | 'second';
 
 type VerificationRequest = { params: Record<string, unknown>; request: Request };
@@ -62,69 +59,25 @@ type VerificationRequest = { params: Record<string, unknown>; request: Request }
 const REVERIFICATION_LEVELS: readonly string[] = ['first_factor', 'second_factor', 'multi_factor'];
 const PREPARABLE_STRATEGIES: readonly string[] = ['email_code', 'phone_code', 'passkey'];
 
-function apiError(status: number, code: string, message: string, longMessage = message, paramName?: string) {
-  return HttpResponse.json(
-    {
-      errors: [
-        {
-          code,
-          message,
-          long_message: longMessage,
-          ...(paramName ? { meta: { param_name: paramName } } : {}),
-        },
-      ],
-    },
-    { status },
-  );
-}
-
 const verificationErrors = {
-  notStarted: () =>
-    apiError(
-      400,
-      'session_reverification_missing',
-      'is missing',
-      'You need to start a new session verification flow first',
-    ),
+  notStarted: () => fapiError('session_reverification_missing'),
   invalidState: (action: string, resolution: string) =>
-    apiError(
-      400,
-      'invalid_action_for_session_reverification',
-      'Invalid action for session reverification',
-      `We were unable to ${action} for this session, as it's not ready for ${resolution}.`,
-    ),
+    fapiError('invalid_action_for_session_reverification', {
+      longMessage: `We were unable to ${action} for this session, as it's not ready for ${resolution}.`,
+    }),
   invalidParam: (param: string, value: string | null) =>
-    apiError(
-      422,
-      'form_param_value_invalid',
-      'is invalid',
-      `${value} does not match one of the allowed values for parameter ${param}`,
-      param,
-    ),
+    fapiError('form_param_value_invalid', {
+      longMessage: `${value} does not match one of the allowed values for parameter ${param}`,
+      paramName: param,
+    }),
   missingResource: (param: string) =>
-    apiError(
-      422,
-      'form_resource_not_found',
-      'is missing',
-      `The resource associated with the supplied ${param} was not found.`,
-      param,
-    ),
-  notSent: () =>
-    apiError(
-      400,
-      'verification_not_sent',
-      'not sent',
-      'You need to send a verification code before attempting to verify.',
-    ),
-  passwordIncorrect: () =>
-    apiError(
-      422,
-      'form_password_incorrect',
-      'Password is incorrect. Try again, or use another method.',
-      undefined,
-      'password',
-    ),
-  codeIncorrect: () => apiError(422, 'form_code_incorrect', 'is incorrect', 'Incorrect code', 'code'),
+    fapiError('form_resource_not_found', {
+      longMessage: `The resource associated with the supplied ${param} was not found.`,
+      paramName: param,
+    }),
+  notSent: () => fapiError('verification_not_sent'),
+  passwordIncorrect: () => fapiError('form_password_incorrect', { paramName: 'password' }),
+  codeIncorrect: () => fapiError('form_code_incorrect', { paramName: 'code' }),
 };
 
 function verificationReply(state: VerificationHost, session: SessionJSON) {
@@ -154,7 +107,7 @@ function setStageVerification(state: VerificationHost, stage: Stage, verificatio
 export function verificationHandlers(state: VerificationHost, url: (path: string) => string) {
   const guard = (stage: Stage, action: string, session: SessionJSON | undefined, strategy: string | null) => {
     if (!session) {
-      return missing();
+      return fapiError('resource_not_found');
     }
     const { status, firstFactors, secondFactors } = state.verification;
     if (status === null) {
@@ -237,7 +190,7 @@ export function verificationHandlers(state: VerificationHost, url: (path: string
     http.post(url('/v1/client/sessions/:id/verify'), async ({ params, request }) => {
       const session = findSession(state, params.id);
       if (!session) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const requested = new URLSearchParams(await request.text()).get('level');
       if (!requested || !REVERIFICATION_LEVELS.includes(requested)) {

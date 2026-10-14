@@ -1,8 +1,10 @@
-import type { ClientJSON, PhoneNumberJSON, UserJSON } from '@clerk/shared/types';
-import { http, HttpResponse } from 'msw';
+import type { PhoneNumberJSON, UserJSON } from '@clerk/shared/types';
+import { http } from 'msw';
 
-import { type FapiEnvironment, fapiPhoneNumber, fapiVerification } from '../fapi';
-import { envelope, missing, requestUser, updateUser, VERIFICATION_CODE } from './shared';
+import type { FakeFapiState } from '../fake-fapi';
+import { fapiPhoneNumber, fapiVerification } from '../fapi';
+import { fapiError } from './errors';
+import { envelope, requestUser, updateUser, VERIFICATION_CODE } from './shared';
 
 export interface FakeMfaState {
   totpCreations: number;
@@ -31,7 +33,7 @@ export function createMfaState(): FakeMfaState {
 }
 
 export function mfaHandlers(
-  state: { client: ClientJSON; environment: FapiEnvironment; mfa: FakeMfaState },
+  state: Pick<FakeFapiState, 'client' | 'environment' | 'mfa' | 'organizationInvitations'>,
   fapiUrl: (path: string) => string,
 ) {
   const backupEnabled = () =>
@@ -41,8 +43,6 @@ export function mfaHandlers(
     Number(user.totp_enabled) +
     user.phone_numbers.filter(phone => phone.reserved_for_second_factor && phone.verification?.status === 'verified')
       .length;
-  const error = (code: string, message: string, status = 400) =>
-    HttpResponse.json({ errors: [{ code, message, long_message: message }] }, { status });
   const updatePhone = (user: UserJSON, id: string, transform: (phone: PhoneNumberJSON) => PhoneNumberJSON) => {
     const phone = user.phone_numbers.find(phone => phone.id === id);
     if (!phone) {
@@ -60,14 +60,14 @@ export function mfaHandlers(
     http.post(fapiUrl('/v1/me/totp'), ({ request }) => {
       const currentUser = requestUser(state, request);
       if (!currentUser) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       if (new URL(request.url).searchParams.get('_method') === 'DELETE') {
         if (
           !currentUser.totp_enabled ||
           (state.environment.user_settings.sign_up.mfa?.required && usableFactors(currentUser) <= 1)
         ) {
-          return error('second_factor_deletion_not_allowed', 'This method cannot be removed.');
+          return fapiError('second_factor_deletion_not_allowed');
         }
         state.mfa.totpRemovals += 1;
         updateUser(state, {
@@ -78,13 +78,13 @@ export function mfaHandlers(
             currentUser.phone_numbers.some(phone => phone.reserved_for_second_factor) &&
             currentUser.backup_code_enabled,
         });
-        return envelope({ object: 'deleted', id: 'totp_1' }, state.client);
+        return envelope({ object: 'deleted', id: 'totp_1' }, state);
       }
       if (
         currentUser.totp_enabled ||
         !state.environment.user_settings.attributes.authenticator_app.used_for_second_factor
       ) {
-        return error('form_param_value_invalid', 'Authenticator is unavailable.', 422);
+        return fapiError('form_param_value_invalid', { longMessage: 'Authenticator is unavailable.' });
       }
       state.mfa.totpCreations += 1;
       return envelope(
@@ -97,24 +97,21 @@ export function mfaHandlers(
           created_at: Date.now(),
           updated_at: Date.now(),
         },
-        state.client,
+        state,
       );
     }),
     http.post(fapiUrl('/v1/me/totp/attempt_verification'), async ({ request }) => {
       const currentUser = requestUser(state, request);
       if (!currentUser) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       if (state.mfa.totpCreations === 0 || currentUser.totp_enabled) {
-        return error('form_param_value_invalid', 'No authenticator setup is pending.', 422);
+        return fapiError('form_param_value_invalid', { longMessage: 'No authenticator setup is pending.' });
       }
       const code = new URLSearchParams(await request.text()).get('code') ?? '';
       state.mfa.totpAttempts.push(code);
       if (code !== '123456') {
-        return HttpResponse.json(
-          { errors: [{ code: 'form_code_incorrect', message: 'Incorrect code', long_message: 'Incorrect code' }] },
-          { status: 422 },
-        );
+        return fapiError('form_code_incorrect', { paramName: 'code' });
       }
       const newCodes = backupEnabled() && !currentUser.backup_code_enabled;
       updateUser(state, {
@@ -132,13 +129,13 @@ export function mfaHandlers(
           created_at: Date.now(),
           updated_at: Date.now(),
         },
-        state.client,
+        state,
       );
     }),
     http.post(fapiUrl('/v1/me/backup_codes/'), ({ request }) => {
       const currentUser = requestUser(state, request);
       if (!currentUser || usableFactors(currentUser) === 0 || !backupEnabled()) {
-        return error('form_param_value_invalid', 'Set up a verification method first.', 422);
+        return fapiError('form_param_value_invalid', { longMessage: 'Set up a verification method first.' });
       }
       state.mfa.backupCodeCreations += 1;
       state.mfa.codes = Array.from(
@@ -154,30 +151,21 @@ export function mfaHandlers(
           created_at: Date.now(),
           updated_at: Date.now(),
         },
-        state.client,
+        state,
       );
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/'), async ({ request }) => {
       const currentUser = requestUser(state, request);
       if (!currentUser) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const number = new URLSearchParams(await request.text()).get('phone_number') ?? '';
       state.mfa.phoneCreations.push(number);
       if (currentUser.phone_numbers.some(phone => phone.phone_number === number)) {
-        return HttpResponse.json(
-          {
-            errors: [
-              {
-                code: 'form_identifier_exists',
-                message: 'This phone number already exists.',
-                long_message: 'This phone number already exists.',
-                meta: { param_name: 'phone_number' },
-              },
-            ],
-          },
-          { status: 422 },
-        );
+        return fapiError('form_identifier_exists', {
+          longMessage: 'That phone number is taken. Please try another.',
+          paramName: 'phone_number',
+        });
       }
       const existingIds = new Set(currentUser.phone_numbers.map(phone => phone.id));
       let nextPhoneNumber = state.mfa.phoneCreations.length;
@@ -190,12 +178,12 @@ export function mfaHandlers(
         verification: fapiVerification('phone_code'),
       });
       updateUser(state, { ...currentUser, phone_numbers: [...currentUser.phone_numbers, phone] });
-      return envelope(phone, state.client);
+      return envelope(phone, state);
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id/prepare_verification'), ({ params, request }) => {
       const currentUser = requestUser(state, request);
       if (!currentUser) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const id = String(params.id);
       state.mfa.phonePreparations.push(id);
@@ -203,24 +191,24 @@ export function mfaHandlers(
         ...current,
         verification: fapiVerification('phone_code'),
       }));
-      return phone ? envelope(phone, state.client) : missing();
+      return phone ? envelope(phone, state) : fapiError('resource_not_found');
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id/attempt_verification'), async ({ params, request }) => {
       const currentUser = requestUser(state, request);
       if (!currentUser) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       const id = String(params.id);
       const code = new URLSearchParams(await request.text()).get('code') ?? '';
       state.mfa.phoneAttempts.push({ id, code });
       if (code !== VERIFICATION_CODE) {
-        return error('form_code_incorrect', 'Incorrect code');
+        return fapiError('form_code_incorrect', { paramName: 'code' });
       }
       const phone = updatePhone(currentUser, id, current => ({
         ...current,
         verification: fapiVerification('phone_code', { status: 'verified' }),
       }));
-      return phone ? envelope(phone, state.client) : missing();
+      return phone ? envelope(phone, state) : fapiError('resource_not_found');
     }),
     http.post(fapiUrl('/v1/me/phone_numbers/:id'), async ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
@@ -236,16 +224,13 @@ export function mfaHandlers(
       const user = requestUser(state, request);
       const existingPhone = user?.phone_numbers.find(phone => phone.id === id);
       if (!user || !existingPhone) {
-        return missing();
+        return fapiError('resource_not_found');
       }
       if (reserved === true && existingPhone.verification?.status !== 'verified') {
-        return error(
-          'identification_update_second_factor_unverified',
-          'Cannot update second factor attributes for unverified identification',
-        );
+        return fapiError('identification_update_second_factor_unverified');
       }
       if (reserved === false && state.environment.user_settings.sign_up.mfa?.required && usableFactors(user) <= 1) {
-        return error('second_factor_deletion_not_allowed', 'This method cannot be removed.');
+        return fapiError('second_factor_deletion_not_allowed');
       }
       const firstReservedPhone = !user.phone_numbers.some(item => item.reserved_for_second_factor);
       const newCodes = reserved && backupEnabled() && !user.backup_code_enabled;
@@ -277,7 +262,7 @@ export function mfaHandlers(
             ? user.backup_code_enabled
             : hasFactor && (user.backup_code_enabled || Boolean(newCodes)),
       });
-      return envelope(phone, state.client);
+      return envelope(phone, state);
     }),
   ];
 }

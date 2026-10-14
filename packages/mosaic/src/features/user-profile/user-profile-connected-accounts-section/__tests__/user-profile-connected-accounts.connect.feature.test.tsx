@@ -126,7 +126,7 @@ describe('connected accounts', () => {
 
     await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('oauth_error', 'GitHub is unavailable right now.');
+    request.fail('oauth_provider_not_enabled', 'GitHub is unavailable right now.');
 
     expect(await screen.findByText('GitHub is unavailable right now.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Connect GitHub' })).toBeEnabled();
@@ -146,7 +146,7 @@ describe('connected accounts', () => {
     await user.click(screen.getByRole('button', { name: 'Connect Google' }));
     expect(request.requests).toHaveLength(1);
     expect(githubButton).toHaveAttribute('aria-busy', 'true');
-    request.fail();
+    request.fail('internal_clerk_error');
   });
 
   it('shows a verification-required Connect error', async () => {
@@ -195,7 +195,7 @@ describe('connected accounts', () => {
       componentName: 'UserProfile',
       socialProvider: 'github',
     });
-    request.fail();
+    request.fail('internal_clerk_error');
   });
 
   it('opens the OAuth transport and reloads the user with the callback nonce', async () => {
@@ -517,7 +517,7 @@ describe('connected accounts', () => {
     await userEvent.setup().click(first.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
     expect(second.getByRole('button', { name: 'Connect GitHub' })).not.toHaveAttribute('aria-busy', 'true');
-    request.fail('oauth_error', 'Provider unavailable');
+    request.fail('oauth_provider_not_enabled', 'Provider unavailable');
     expect(await first.findByText('Provider unavailable')).toBeInTheDocument();
     expect(second.queryByText('Provider unavailable')).toBeNull();
   });
@@ -550,7 +550,7 @@ describe('connected accounts', () => {
       <MosaicProvider
         localization={{
           locale: 'fr-FR',
-          overrides: { 'errors.verification_invalid_strategy': 'Cette connexion est indisponible.' },
+          overrides: { 'errors.feature_not_enabled': 'Cette connexion est indisponible.' },
         }}
       >
         <UserProfileConnectedAccountsSection />
@@ -559,7 +559,7 @@ describe('connected accounts', () => {
     const request = holdRequests('post', '/v1/me/external_accounts');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('verification_invalid_strategy', 'Server copy');
+    request.fail('feature_not_enabled', 'Server copy');
     expect(await screen.findByText('Cette connexion est indisponible.')).toBeInTheDocument();
     expect(screen.queryByText('Server copy')).toBeNull();
   });

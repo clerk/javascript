@@ -122,7 +122,7 @@ describe('connected accounts', () => {
     const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
     expect(encoded).toBeTruthy();
     expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({ componentName: 'UserProfile' });
-    request.fail();
+    request.fail('internal_clerk_error');
   });
 
   it('reauthorizes a connected account when it lacks requested scopes', async () => {
@@ -154,7 +154,7 @@ describe('connected accounts', () => {
 
     await startReconnect(user, 'Google');
     await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('oauth_error', 'Calendar access was denied.');
+    request.fail('external_account_missing_refresh_token', 'Calendar access was denied.');
     expect(await screen.findByText('Calendar access was denied.')).toBeInTheDocument();
 
     serveFapi(signedIn([google]));

@@ -68,7 +68,11 @@ describe('Registering passkeys against the backend contract', () => {
     vi.spyOn(Date, 'now').mockReturnValue(Date.now() + minutes * 60_000);
     verification.release();
     if (expired) {
-      expect(await screen.findByRole('alert')).toBeVisible();
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          'This verification has expired. You must create a new one.',
+        ),
+      );
       expect(fapi.client.sessions[0]?.user.passkeys).toEqual([]);
     } else {
       expect(await screen.findByText('Chrome on macOS')).toBeVisible();

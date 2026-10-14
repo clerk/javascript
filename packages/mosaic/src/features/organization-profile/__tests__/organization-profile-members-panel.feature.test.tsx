@@ -138,7 +138,7 @@ describe('OrganizationProfileMembersPanel', () => {
     const getRoles = vi.spyOn(activeOrganization, 'getRoles');
     rerender(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(roles.requests).toHaveLength(1));
-    roles.fail('roles_unavailable', 'Roles unavailable');
+    roles.fail('internal_clerk_error');
     await act(async () => {
       await expect(getRoles.mock.results[0]?.value).rejects.toThrow();
     });
@@ -208,12 +208,12 @@ describe('OrganizationProfileMembersPanel', () => {
     const members = holdRequests('get', '/v1/organizations/:organizationId/memberships');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     await waitFor(() => expect(members.requests).toHaveLength(1));
-    members.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible(), { timeout: 12_000 });
+    members.fail('internal_clerk_error');
+    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible());
     serve();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-  }, 20_000);
+  });
 
   it('replaces rows with the table error state and retries when refreshing the current page fails', async () => {
     serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
@@ -224,10 +224,8 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ }));
     await user.click(await screen.findByRole('option', { name: 'Admin' }));
     await waitFor(() => expect(members.requests).toHaveLength(1));
-    members.fail('network_error', 'Unavailable');
-    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible(), {
-      timeout: 12_000,
-    });
+    members.fail('internal_clerk_error');
+    await waitFor(() => expect(screen.getByText('Unable to load members')).toBeVisible());
     expect(screen.queryByText('Bob Smith')).toBeNull();
     const table = within(screen.getByRole('table', { name: 'Members' }));
     expect(table.getByRole('alert')).toHaveTextContent('Unable to load members');
@@ -235,7 +233,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await user.click(table.getByRole('button', { name: 'Try again' }));
     await waitFor(() => expect(screen.queryByText('Unable to load members')).toBeNull());
     expect(screen.getByText('Bob Smith')).toBeVisible();
-  }, 20_000);
+  });
 
   it('does not offer mutation controls for the current or deprovisioned member', async () => {
     const fapi = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
@@ -315,7 +313,7 @@ describe('OrganizationProfileMembersPanel', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     expect(role).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeDisabled();
-    update.fail('role_rejected', 'Role rejected by server');
+    update.fail('organization_minimum_permissions_needed', 'Role rejected by server');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Role rejected by server'));
     expect(screen.getByRole('alert')).toHaveAttribute('data-color', 'negative');
     const retry = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);

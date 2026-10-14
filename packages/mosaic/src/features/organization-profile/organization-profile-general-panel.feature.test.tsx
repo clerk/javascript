@@ -1,10 +1,11 @@
 import type { OrganizationJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import { openDialog } from '../../__tests__/feature/dialog';
-import { type FakeFapiSeed, holdRequests, serveFapi } from '../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -14,6 +15,7 @@ import {
   fapiUser,
 } from '../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../__tests__/feature/render';
+import { uploadFile } from '../../__tests__/feature/upload';
 import { MosaicProvider } from '../../mosaic-provider';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
 
@@ -122,7 +124,7 @@ describe('OrganizationProfileGeneralPanel', () => {
       );
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
       expect(dialog).toBeVisible();
-      update.fail('form_param_invalid', 'Name is unavailable', 'name');
+      update.fail('form_param_value_invalid', 'Name is unavailable', 'name');
       await waitFor(() => expect(within(dialog).getByText('Name is unavailable')).toBeVisible());
       expect(field).toHaveValue('Rejected');
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
@@ -170,10 +172,12 @@ describe('OrganizationProfileGeneralPanel', () => {
       });
       const field = within(dialog).getByRole('textbox', { name: 'Name' });
       await user.type(field, ' changed');
-      const update = holdRequests('post', '/v1/organizations/:organizationId');
+      worker.use(
+        http.post(fapiUrl('/v1/organizations/:organizationId'), () =>
+          HttpResponse.json({ errors: [] }, { status: 500 }),
+        ),
+      );
       await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
-      await waitFor(() => expect(update.requests).toHaveLength(1));
-      update.fail('', '');
       await waitFor(() =>
         expect(within(dialog).getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
       );
@@ -232,7 +236,7 @@ describe('OrganizationProfileGeneralPanel', () => {
       const update = holdRequests('post', '/v1/organizations/:organizationId');
       await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
       await waitFor(() => expect(update.requests).toHaveLength(1));
-      update.fail('form_param_invalid', 'Slug is taken', 'slug');
+      update.fail('form_identifier_exists', 'Slug is taken', 'slug');
       await waitFor(() => expect(within(dialog).getByText('Slug is taken')).toBeVisible());
       expect(field).toHaveValue('acme-new');
       expect(field).toBeInvalid();
@@ -242,7 +246,10 @@ describe('OrganizationProfileGeneralPanel', () => {
       serveFapi(signedIn());
       await renderWithClerk(
         <MosaicProvider
-          localization={{ locale: 'fr-FR', overrides: { 'errors.slug_taken': 'Ce slug est indisponible.' } }}
+          localization={{
+            locale: 'fr-FR',
+            overrides: { 'errors.form_identifier_exists': 'Ce slug est indisponible.' },
+          }}
         >
           <OrganizationProfileGeneralPanel />
         </MosaicProvider>,
@@ -255,7 +262,7 @@ describe('OrganizationProfileGeneralPanel', () => {
       const update = holdRequests('post', '/v1/organizations/:organizationId');
       await user.click(within(dialog).getByRole('button', { name: 'Save changes' }));
       await waitFor(() => expect(update.requests).toHaveLength(1));
-      update.fail('slug_taken', 'Server copy');
+      update.fail('form_identifier_exists', 'Server copy');
       await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Ce slug est indisponible.'));
       expect(field).toHaveValue('new-slug');
       const retry = serveFapi(signedIn());
@@ -269,12 +276,8 @@ describe('OrganizationProfileGeneralPanel', () => {
     it('uploads and removes a logo while holding each pending action', async () => {
       const { container, fapi } = await renderPanel();
       const user = userEvent.setup();
-      const input = container.querySelector('input[type="file"]');
-      if (!input) {
-        throw new Error('Logo upload input is missing');
-      }
       const upload = holdRequests('post', '/v1/organizations/:organizationId/logo');
-      await user.upload(input, new File(['image'], 'logo.png', { type: 'image/png' }));
+      const input = await uploadFile(user, container, new File(['image'], 'logo.png', { type: 'image/png' }));
       await waitFor(() => expect(upload.requests).toHaveLength(1));
       expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
       expect(screen.queryByRole('button', { name: 'Manage logo' })).toBeNull();
@@ -306,12 +309,12 @@ describe('OrganizationProfileGeneralPanel', () => {
         </MosaicProvider>,
       );
       const user = userEvent.setup();
-      const input = container.querySelector('input[type="file"]');
-      if (!input) {
-        throw new Error('Logo upload input is missing');
-      }
       const upload = holdRequests('post', '/v1/organizations/:organizationId/logo');
-      await user.upload(input, new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'logo.png', { type: 'image/png' }));
+      await uploadFile(
+        user,
+        container,
+        new File([new Uint8Array(10 * 1000 * 1000 + 1)], 'logo.png', { type: 'image/png' }),
+      );
       await waitFor(() => expect(screen.getByText('Image trop grande.')).toBeVisible());
       expect(upload.requests).toHaveLength(0);
       upload.release();
@@ -320,25 +323,21 @@ describe('OrganizationProfileGeneralPanel', () => {
     it('rolls back a rejected logo preview and permits another upload', async () => {
       const { container } = await renderPanel();
       const user = userEvent.setup();
-      const input = container.querySelector('input[type="file"]');
-      if (!input) {
-        throw new Error('Logo upload input is missing');
-      }
       expect(container.querySelector('img[alt="Acme"]')).toBeNull();
       const png = Uint8Array.from(
         atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/zXcAAAAASUVORK5CYII='),
         character => character.charCodeAt(0),
       );
       const upload = holdRequests('post', '/v1/organizations/:organizationId/logo');
-      await user.upload(input, new File([png], 'logo.png', { type: 'image/png' }));
+      await uploadFile(user, container, new File([png], 'logo.png', { type: 'image/png' }));
       await waitFor(() => expect(upload.requests).toHaveLength(1));
       await waitFor(() => expect(container.querySelector('img[alt="Acme"]')?.getAttribute('src')).toMatch(/^blob:/));
-      upload.fail('image_invalid', 'Server rejected logo');
+      upload.fail('request_body_invalid', 'Server rejected logo');
       await waitFor(() => expect(screen.getByRole('button', { name: 'Upload' })).toBeVisible());
       await waitFor(() => expect(screen.getByText('Server rejected logo')).toBeVisible());
       await waitFor(() => expect(container.querySelector('img[alt="Acme"]')).toBeNull());
       const retry = serveFapi(signedIn());
-      await user.upload(input, new File(['image2'], 'second.png', { type: 'image/png' }));
+      await uploadFile(user, container, new File(['image2'], 'second.png', { type: 'image/png' }));
       await waitFor(() => expect(retry.memberships[0]?.organization.has_image).toBe(true));
       expect(await screen.findByRole('button', { name: 'Manage logo' })).toBeVisible();
     });

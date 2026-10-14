@@ -1,6 +1,6 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
@@ -188,21 +188,22 @@ describe('enterprise accounts', () => {
     const encoded = new URL(body.get('redirect_url') || '').searchParams.get('__clerk_modal_state');
     expect(encoded).toBeTruthy();
     expect(JSON.parse(window.atob(encoded || ''))).toMatchObject({ componentName: 'UserProfile' });
-    request.fail();
+    request.fail('internal_clerk_error');
   });
 
   it('shows a missing redirect error and allows another attempt', async () => {
     serveFapi(signedIn());
     worker.use(
-      http.post(fapiUrl('/v1/me/external_accounts'), () =>
-        HttpResponse.json({
+      http.post(fapiUrl('/v1/me/external_accounts'), async () => {
+        await delay(300);
+        return HttpResponse.json({
           response: {
             object: 'external_account',
             verification: fapiVerification('saml', { status: 'unverified' }),
           },
           client: null,
-        }),
-      ),
+        });
+      }),
     );
     const { clerk } = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
     const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
@@ -213,7 +214,7 @@ describe('enterprise accounts', () => {
       expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
     );
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('progressbar')).not.toBeInTheDocument());
     serveFapi(signedIn());
     await user.click(screen.getByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() =>
@@ -229,7 +230,7 @@ describe('enterprise accounts', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('enterprise_error', 'Acme is unavailable.');
+    request.fail('feature_not_enabled', 'Acme is unavailable.');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Acme is unavailable.'));
     expect(navigate).not.toHaveBeenCalled();
     serveFapi(signedIn());
@@ -307,13 +308,13 @@ describe('enterprise accounts', () => {
     await waitFor(() => expect(request.requests).toHaveLength(1));
     expect(connect).toHaveAttribute('aria-busy', 'true');
     expect(other).toBeDisabled();
-    request.fail('enterprise_error', 'Retry this connection.');
+    request.fail('feature_not_enabled', 'Retry this connection.');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Retry this connection.'));
     const retry = holdRequests('post', '/v1/me/external_accounts');
     await userEvent.setup().click(connect);
     await waitFor(() => expect(retry.requests).toHaveLength(1));
     expect(screen.queryByRole('alert')).toBeNull();
-    retry.fail();
+    retry.fail('internal_clerk_error');
   });
 
   it('releases pending after the redirect grace period', async () => {

@@ -1,0 +1,1303 @@
+{
+  "scenario": "organization-invitations",
+  "steps": [
+    {
+      "name": "initial-resources",
+      "exchanges": [
+        {
+          "request": "GET /v1/client",
+          "query": {
+            "__clerk_api_version": "2026-05-12"
+          },
+          "body": null,
+          "status": 200,
+          "response": {
+            "client": null,
+            "response": {
+              "captcha_bypass": false,
+              "cookie_expires_at": null,
+              "created_at": 1767225600000,
+              "id": "client_1",
+              "last_active_session_id": "sess_1",
+              "last_authentication_strategy": "ticket",
+              "object": "client",
+              "sessions": [
+                {
+                  "abandon_at": 1767225600000,
+                  "actor": null,
+                  "created_at": 1767225600000,
+                  "expire_at": 1767225600000,
+                  "factor_verification_age": [0, -1],
+                  "id": "sess_1",
+                  "last_active_at": 1767225600000,
+                  "last_active_organization_id": "org_acme",
+                  "last_active_token": {
+                    "jwt": "<jwt>",
+                    "object": "token"
+                  },
+                  "object": "session",
+                  "public_user_data": {
+                    "first_name": "Ada",
+                    "has_image": false,
+                    "identifier": "ada+clerk_test@example.com",
+                    "image_url": "https://img.clerk.com/default",
+                    "last_name": "Lovelace",
+                    "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                    "username": null
+                  },
+                  "status": "active",
+                  "updated_at": 1767225600000,
+                  "user": {
+                    "backup_code_enabled": false,
+                    "banned": false,
+                    "bypass_client_trust": false,
+                    "create_organization_enabled": true,
+                    "created_at": 1767225600000,
+                    "delete_self_enabled": true,
+                    "deprovisioned": false,
+                    "email_addresses": [
+                      {
+                        "created_at": 1767225600000,
+                        "email_address": "ada+clerk_test@example.com",
+                        "id": "idn_1",
+                        "linked_to": [],
+                        "matches_sso_connection": false,
+                        "object": "email_address",
+                        "reserved": false,
+                        "updated_at": 1767225600000,
+                        "verification": {
+                          "attempts": null,
+                          "expire_at": null,
+                          "object": "verification_admin",
+                          "status": "verified",
+                          "strategy": "admin"
+                        }
+                      }
+                    ],
+                    "enterprise_accounts": [],
+                    "external_accounts": [],
+                    "external_id": null,
+                    "first_name": "Ada",
+                    "has_image": false,
+                    "id": "user_ada",
+                    "image_url": "https://img.clerk.com/default",
+                    "last_active_at": 1767225600000,
+                    "last_name": "Lovelace",
+                    "last_sign_in_at": 1767225600000,
+                    "legal_accepted_at": null,
+                    "locale": null,
+                    "locked": false,
+                    "lockout_expires_in_seconds": null,
+                    "mfa_disabled_at": null,
+                    "mfa_enabled_at": null,
+                    "object": "user",
+                    "organization_memberships": [
+                      {
+                        "created_at": 1767225600000,
+                        "id": "orgmem_ada",
+                        "object": "organization_membership",
+                        "organization": {
+                          "admin_delete_enabled": true,
+                          "created_at": 1767225600000,
+                          "has_image": false,
+                          "id": "org_acme",
+                          "image_url": "https://img.clerk.com/default",
+                          "logo_url": null,
+                          "max_allowed_memberships": 5,
+                          "members_count": 1,
+                          "name": "Acme",
+                          "object": "organization",
+                          "pending_invitations_count": 1,
+                          "public_metadata": {},
+                          "self_serve_sso_enabled": false,
+                          "slug": "acme",
+                          "updated_at": 1767225600000
+                        },
+                        "permissions": [
+                          "org:billing:manage",
+                          "org:billing:read",
+                          "org:posts:delete",
+                          "org:posts:manage",
+                          "org:posts:read",
+                          "org:sys_billing:manage",
+                          "org:sys_billing:read",
+                          "org:sys_domains:manage",
+                          "org:sys_domains:read",
+                          "org:sys_entconns_sso_bypass:manage",
+                          "org:sys_entconns:manage",
+                          "org:sys_memberships:manage",
+                          "org:sys_memberships:read",
+                          "org:sys_profile:delete",
+                          "org:sys_profile:manage"
+                        ],
+                        "public_metadata": {},
+                        "role": "org:admin",
+                        "role_name": "Admin",
+                        "updated_at": 1767225600000
+                      }
+                    ],
+                    "passkeys": [],
+                    "password_enabled": false,
+                    "password_last_updated_at": null,
+                    "phone_numbers": [],
+                    "primary_email_address_id": "idn_1",
+                    "primary_phone_number_id": null,
+                    "primary_web3_wallet_id": null,
+                    "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                    "public_metadata": {},
+                    "saml_accounts": [],
+                    "timezone": null,
+                    "totp_enabled": false,
+                    "two_factor_enabled": false,
+                    "unsafe_metadata": {},
+                    "updated_at": 1767225600000,
+                    "username": null,
+                    "verification_attempts_remaining": 100,
+                    "web3_wallets": []
+                  }
+                }
+              ],
+              "sign_in": null,
+              "sign_up": null,
+              "updated_at": 1767225600000
+            }
+          }
+        },
+        {
+          "request": "GET /v1/environment",
+          "query": {
+            "__clerk_api_version": "2026-05-12",
+            "_clerk_session_id": "sess_1"
+          },
+          "body": null,
+          "status": 200,
+          "response": {
+            "api_keys_settings": {
+              "enabled": false,
+              "orgs_api_keys_enabled": false,
+              "user_api_keys_enabled": false
+            },
+            "auth_config": {
+              "claimed_at": null,
+              "cookieless_dev": true,
+              "email_address": "on",
+              "email_address_verification_strategies": ["email_code"],
+              "enhanced_email_deliverability": false,
+              "first_factors": ["oauth_google", "password", "reset_password_email_code", "ticket"],
+              "first_name": "off",
+              "id": "aac_1",
+              "identification_requirements": [["email_address", "oauth_google"], []],
+              "identification_strategies": ["email_address", "oauth_google"],
+              "last_name": "off",
+              "native_settings": {
+                "api_enabled": true,
+                "object": "native_settings",
+                "trusted_device_enrollment_prompt_after_sign_in_enabled": false,
+                "trusted_device_enrollment_prompt_after_sign_up_enabled": false,
+                "trusted_device_sign_in_enabled": false
+              },
+              "object": "auth_config",
+              "password": "required",
+              "phone_number": "off",
+              "reverification": true,
+              "second_factors": [],
+              "session_minter": true,
+              "single_session_mode": true,
+              "test_mode": true,
+              "url_based_session_syncing": true,
+              "username": "off"
+            },
+            "client_debug_mode": false,
+            "commerce_settings": {
+              "billing": {
+                "free_trial_requires_payment_method": true,
+                "organization": {
+                  "enabled": false,
+                  "has_paid_plans": false
+                },
+                "stripe_publishable_key": null,
+                "user": {
+                  "enabled": false,
+                  "has_paid_plans": false
+                }
+              }
+            },
+            "display_config": {
+              "after_create_organization_url": "http://localhost:3000",
+              "after_join_waitlist_url": "http://localhost:3000",
+              "after_leave_organization_url": "http://localhost:3000",
+              "after_sign_in_url": "http://localhost:3000",
+              "after_sign_out_all_url": "https://acme.accounts.dev/sign-in",
+              "after_sign_out_one_url": "https://acme.accounts.dev/sign-in/choose",
+              "after_sign_up_url": "http://localhost:3000",
+              "after_switch_session_url": "http://localhost:3000",
+              "application_name": "Acme",
+              "branded": true,
+              "captcha_oauth_bypass": [],
+              "captcha_provider": null,
+              "captcha_public_key": null,
+              "captcha_public_key_invisible": null,
+              "captcha_widget_type": null,
+              "clerk_js_version": "6",
+              "create_organization_url": "https://acme.accounts.dev/create-organization",
+              "experimental_force_oauth_first": false,
+              "favicon_image": null,
+              "favicon_image_url": "",
+              "favicon_url": null,
+              "google_one_tap_client_id": null,
+              "help_url": null,
+              "home_url": "http://localhost:3000",
+              "id": "display_1",
+              "instance_environment_type": "development",
+              "logo_image": null,
+              "logo_image_url": "",
+              "logo_link_url": "http://localhost:3000",
+              "logo_url": null,
+              "oauth_consent_url": "https://acme.accounts.dev/oauth-consent",
+              "oauth_device_verification_url": "https://acme.accounts.dev/device",
+              "object": "display_config",
+              "organization_profile_url": "https://acme.accounts.dev/organization",
+              "preferred_sign_in_strategy": "password",
+              "privacy_policy_url": null,
+              "show_devmode_warning": true,
+              "sign_in_url": "https://acme.accounts.dev/sign-in",
+              "sign_up_url": "https://acme.accounts.dev/sign-up",
+              "support_email": null,
+              "terms_url": null,
+              "theme": {
+                "accounts": {
+                  "background_color": "#ffffff"
+                },
+                "buttons": {
+                  "font_color": "#ffffff",
+                  "font_family": "\"Source Sans Pro\", sans-serif",
+                  "font_weight": "600"
+                },
+                "general": {
+                  "background_color": "#ffffff",
+                  "border_radius": "0.5em",
+                  "box_shadow": "0 2px 8px rgba(0, 0, 0, 0.2)",
+                  "color": "#6c47ff",
+                  "font_color": "#151515",
+                  "font_family": "\"Source Sans Pro\", sans-serif",
+                  "label_font_weight": "600",
+                  "padding": "1em"
+                }
+              },
+              "user_profile_url": "https://acme.accounts.dev/user",
+              "waitlist_url": "https://acme.accounts.dev/waitlist"
+            },
+            "fraud_settings": {
+              "native": {
+                "device_attestation_mode": "disabled"
+              },
+              "object": "fraud_settings"
+            },
+            "maintenance_mode": false,
+            "organization_settings": {
+              "actions": {
+                "admin_delete": true
+              },
+              "creator_role": "org:admin",
+              "domains": {
+                "default_role": "org:viewer",
+                "enabled": false,
+                "enrollment_modes": []
+              },
+              "enabled": true,
+              "force_organization_selection": false,
+              "max_allowed_memberships": 5,
+              "organization_creation_defaults": {
+                "automatic_organization_creation": {
+                  "enabled": false
+                },
+                "detect_from_email_domain": {
+                  "enabled": false
+                },
+                "enabled": false,
+                "fallback": {
+                  "name": ""
+                },
+                "organization_name_template": {
+                  "enabled": false,
+                  "template": ""
+                }
+              },
+              "slug": {
+                "disabled": false
+              }
+            },
+            "partitioned_cookies": false,
+            "protect_config": {
+              "loaders": [
+                {
+                  "attributes": {
+                    "src": "https://cdn.protect.clerk.com/ins_1/c/{cid}/bootstrap.js?v={sdkver}",
+                    "type": "module"
+                  },
+                  "target": "head",
+                  "type": "script"
+                }
+              ]
+            },
+            "user_settings": {
+              "actions": {
+                "create_organization": true,
+                "create_organizations_limit": null,
+                "delete_self": true
+              },
+              "attack_protection": {
+                "email_link": {
+                  "require_same_client": false
+                },
+                "enumeration_protection": {
+                  "enabled": false
+                },
+                "pii": {
+                  "enabled": true
+                },
+                "user_lockout": {
+                  "duration_in_minutes": 60,
+                  "enabled": true,
+                  "max_attempts": 100
+                }
+              },
+              "attributes": {
+                "authenticator_app": {
+                  "enabled": false,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "backup_code": {
+                  "enabled": false,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "email_address": {
+                  "enabled": true,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": true,
+                  "second_factors": [],
+                  "used_for_first_factor": true,
+                  "used_for_second_factor": false,
+                  "verifications": ["email_code"],
+                  "verify_at_sign_up": true
+                },
+                "first_name": {
+                  "enabled": false,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "last_name": {
+                  "enabled": false,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "passkey": {
+                  "enabled": false,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "password": {
+                  "enabled": true,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": true,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "phone_number": {
+                  "enabled": false,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "ticket": {
+                  "enabled": true,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "username": {
+                  "enabled": false,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                },
+                "web3_wallet": {
+                  "enabled": false,
+                  "first_factors": [],
+                  "immutable": false,
+                  "required": false,
+                  "second_factors": [],
+                  "used_for_first_factor": false,
+                  "used_for_second_factor": false,
+                  "verifications": [],
+                  "verify_at_sign_up": false
+                }
+              },
+              "enterprise_sso": {
+                "enabled": false,
+                "self_serve_directory_sync": true,
+                "self_serve_sso": true
+              },
+              "passkey_settings": {
+                "allow_autofill": true,
+                "satisfies_second_factor": true,
+                "show_sign_in_button": true
+              },
+              "password_settings": {
+                "allowed_special_characters": "!\"#$%&'()*+,-./:;<=>?@[]^_`{|}~",
+                "disable_hibp": true,
+                "disable_password_reverification": false,
+                "enforce_hibp_on_sign_in": false,
+                "max_length": 0,
+                "min_length": 8,
+                "min_zxcvbn_strength": 0,
+                "require_lowercase": false,
+                "require_numbers": false,
+                "require_special_char": false,
+                "require_uppercase": false,
+                "show_zxcvbn": false
+              },
+              "restrictions": {
+                "allowlist": {
+                  "enabled": false
+                },
+                "allowlist_blocklist_disabled_on_sign_in": {
+                  "enabled": false
+                },
+                "block_disposable_email_domains": {
+                  "enabled": false
+                },
+                "block_email_subaddresses": {
+                  "enabled": false
+                },
+                "blocklist": {
+                  "enabled": false
+                }
+              },
+              "saml": {
+                "enabled": false
+              },
+              "sign_in": {
+                "second_factor": {
+                  "required": false
+                }
+              },
+              "sign_up": {
+                "captcha_enabled": false,
+                "captcha_widget_type": "smart",
+                "custom_action_required": false,
+                "legal_consent_enabled": false,
+                "mfa": {
+                  "required": false
+                },
+                "mode": "public",
+                "progressive": true
+              },
+              "social": {
+                "oauth_google": {
+                  "authenticatable": true,
+                  "block_email_subaddresses": false,
+                  "deprecated": false,
+                  "enabled": true,
+                  "logo_url": "https://img.clerk.com/static/google.png",
+                  "name": "Google",
+                  "not_selectable": false,
+                  "required": false,
+                  "strategy": "oauth_google"
+                }
+              },
+              "username_settings": {
+                "allow_extended_special_characters": false,
+                "allow_numeric_usernames": false,
+                "max_length": 64,
+                "min_length": 4
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "list-pending-invitations",
+      "exchanges": [
+        {
+          "request": "GET /v1/organizations/org_acme/invitations",
+          "query": {
+            "__clerk_api_version": "2026-05-12",
+            "_clerk_session_id": "sess_1",
+            "limit": "10",
+            "offset": "0",
+            "status": "pending"
+          },
+          "body": null,
+          "status": 200,
+          "response": {
+            "client": {
+              "captcha_bypass": false,
+              "cookie_expires_at": null,
+              "created_at": 1767225600000,
+              "id": "client_1",
+              "last_active_session_id": "sess_1",
+              "last_authentication_strategy": "ticket",
+              "object": "client",
+              "sessions": [
+                {
+                  "abandon_at": 1767225600000,
+                  "actor": null,
+                  "created_at": 1767225600000,
+                  "expire_at": 1767225600000,
+                  "factor_verification_age": [0, -1],
+                  "id": "sess_1",
+                  "last_active_at": 1767225600000,
+                  "last_active_organization_id": "org_acme",
+                  "last_active_token": {
+                    "jwt": "<jwt>",
+                    "object": "token"
+                  },
+                  "object": "session",
+                  "public_user_data": {
+                    "first_name": "Ada",
+                    "has_image": false,
+                    "identifier": "ada+clerk_test@example.com",
+                    "image_url": "https://img.clerk.com/default",
+                    "last_name": "Lovelace",
+                    "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                    "username": null
+                  },
+                  "status": "active",
+                  "updated_at": 1767225600000,
+                  "user": {
+                    "backup_code_enabled": false,
+                    "banned": false,
+                    "bypass_client_trust": false,
+                    "create_organization_enabled": true,
+                    "created_at": 1767225600000,
+                    "delete_self_enabled": true,
+                    "deprovisioned": false,
+                    "email_addresses": [
+                      {
+                        "created_at": 1767225600000,
+                        "email_address": "ada+clerk_test@example.com",
+                        "id": "idn_1",
+                        "linked_to": [],
+                        "matches_sso_connection": false,
+                        "object": "email_address",
+                        "reserved": false,
+                        "updated_at": 1767225600000,
+                        "verification": {
+                          "attempts": null,
+                          "expire_at": null,
+                          "object": "verification_admin",
+                          "status": "verified",
+                          "strategy": "admin"
+                        }
+                      }
+                    ],
+                    "enterprise_accounts": [],
+                    "external_accounts": [],
+                    "external_id": null,
+                    "first_name": "Ada",
+                    "has_image": false,
+                    "id": "user_ada",
+                    "image_url": "https://img.clerk.com/default",
+                    "last_active_at": 1767225600000,
+                    "last_name": "Lovelace",
+                    "last_sign_in_at": 1767225600000,
+                    "legal_accepted_at": null,
+                    "locale": null,
+                    "locked": false,
+                    "lockout_expires_in_seconds": null,
+                    "mfa_disabled_at": null,
+                    "mfa_enabled_at": null,
+                    "object": "user",
+                    "organization_memberships": [
+                      {
+                        "created_at": 1767225600000,
+                        "id": "orgmem_ada",
+                        "object": "organization_membership",
+                        "organization": {
+                          "admin_delete_enabled": true,
+                          "created_at": 1767225600000,
+                          "has_image": false,
+                          "id": "org_acme",
+                          "image_url": "https://img.clerk.com/default",
+                          "logo_url": null,
+                          "max_allowed_memberships": 5,
+                          "members_count": 1,
+                          "name": "Acme",
+                          "object": "organization",
+                          "pending_invitations_count": 1,
+                          "public_metadata": {},
+                          "self_serve_sso_enabled": false,
+                          "slug": "acme",
+                          "updated_at": 1767225600000
+                        },
+                        "permissions": [
+                          "org:billing:manage",
+                          "org:billing:read",
+                          "org:posts:delete",
+                          "org:posts:manage",
+                          "org:posts:read",
+                          "org:sys_billing:manage",
+                          "org:sys_billing:read",
+                          "org:sys_domains:manage",
+                          "org:sys_domains:read",
+                          "org:sys_entconns_sso_bypass:manage",
+                          "org:sys_entconns:manage",
+                          "org:sys_memberships:manage",
+                          "org:sys_memberships:read",
+                          "org:sys_profile:delete",
+                          "org:sys_profile:manage"
+                        ],
+                        "public_metadata": {},
+                        "role": "org:admin",
+                        "role_name": "Admin",
+                        "updated_at": 1767225600000
+                      }
+                    ],
+                    "passkeys": [],
+                    "password_enabled": false,
+                    "password_last_updated_at": null,
+                    "phone_numbers": [],
+                    "primary_email_address_id": "idn_1",
+                    "primary_phone_number_id": null,
+                    "primary_web3_wallet_id": null,
+                    "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                    "public_metadata": {},
+                    "saml_accounts": [],
+                    "timezone": null,
+                    "totp_enabled": false,
+                    "two_factor_enabled": false,
+                    "unsafe_metadata": {},
+                    "updated_at": 1767225600000,
+                    "username": null,
+                    "verification_attempts_remaining": 100,
+                    "web3_wallets": []
+                  }
+                }
+              ],
+              "sign_in": null,
+              "sign_up": null,
+              "updated_at": 1767225600000
+            },
+            "response": {
+              "data": [
+                {
+                  "created_at": 1767225600000,
+                  "email_address": "bob+clerk_test@example.com",
+                  "expires_at": 1767225600000,
+                  "id": "orginv_bob",
+                  "inviter_id": "user_ada",
+                  "object": "organization_invitation",
+                  "organization_id": "org_acme",
+                  "public_inviter_data": null,
+                  "public_metadata": {},
+                  "role": "org:viewer",
+                  "role_name": "Viewer",
+                  "status": "pending",
+                  "updated_at": 1767225600000,
+                  "url": null
+                }
+              ],
+              "total_count": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "list-revoked-invitations",
+      "exchanges": [
+        {
+          "request": "GET /v1/organizations/org_acme/invitations",
+          "query": {
+            "__clerk_api_version": "2026-05-12",
+            "_clerk_session_id": "sess_1",
+            "limit": "10",
+            "offset": "0",
+            "status": "revoked"
+          },
+          "body": null,
+          "status": 200,
+          "response": {
+            "client": {
+              "captcha_bypass": false,
+              "cookie_expires_at": null,
+              "created_at": 1767225600000,
+              "id": "client_1",
+              "last_active_session_id": "sess_1",
+              "last_authentication_strategy": "ticket",
+              "object": "client",
+              "sessions": [
+                {
+                  "abandon_at": 1767225600000,
+                  "actor": null,
+                  "created_at": 1767225600000,
+                  "expire_at": 1767225600000,
+                  "factor_verification_age": [0, -1],
+                  "id": "sess_1",
+                  "last_active_at": 1767225600000,
+                  "last_active_organization_id": "org_acme",
+                  "last_active_token": {
+                    "jwt": "<jwt>",
+                    "object": "token"
+                  },
+                  "object": "session",
+                  "public_user_data": {
+                    "first_name": "Ada",
+                    "has_image": false,
+                    "identifier": "ada+clerk_test@example.com",
+                    "image_url": "https://img.clerk.com/default",
+                    "last_name": "Lovelace",
+                    "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                    "username": null
+                  },
+                  "status": "active",
+                  "updated_at": 1767225600000,
+                  "user": {
+                    "backup_code_enabled": false,
+                    "banned": false,
+                    "bypass_client_trust": false,
+                    "create_organization_enabled": true,
+                    "created_at": 1767225600000,
+                    "delete_self_enabled": true,
+                    "deprovisioned": false,
+                    "email_addresses": [
+                      {
+                        "created_at": 1767225600000,
+                        "email_address": "ada+clerk_test@example.com",
+                        "id": "idn_1",
+                        "linked_to": [],
+                        "matches_sso_connection": false,
+                        "object": "email_address",
+                        "reserved": false,
+                        "updated_at": 1767225600000,
+                        "verification": {
+                          "attempts": null,
+                          "expire_at": null,
+                          "object": "verification_admin",
+                          "status": "verified",
+                          "strategy": "admin"
+                        }
+                      }
+                    ],
+                    "enterprise_accounts": [],
+                    "external_accounts": [],
+                    "external_id": null,
+                    "first_name": "Ada",
+                    "has_image": false,
+                    "id": "user_ada",
+                    "image_url": "https://img.clerk.com/default",
+                    "last_active_at": 1767225600000,
+                    "last_name": "Lovelace",
+                    "last_sign_in_at": 1767225600000,
+                    "legal_accepted_at": null,
+                    "locale": null,
+                    "locked": false,
+                    "lockout_expires_in_seconds": null,
+                    "mfa_disabled_at": null,
+                    "mfa_enabled_at": null,
+                    "object": "user",
+                    "organization_memberships": [
+                      {
+                        "created_at": 1767225600000,
+                        "id": "orgmem_ada",
+                        "object": "organization_membership",
+                        "organization": {
+                          "admin_delete_enabled": true,
+                          "created_at": 1767225600000,
+                          "has_image": false,
+                          "id": "org_acme",
+                          "image_url": "https://img.clerk.com/default",
+                          "logo_url": null,
+                          "max_allowed_memberships": 5,
+                          "members_count": 1,
+                          "name": "Acme",
+                          "object": "organization",
+                          "pending_invitations_count": 1,
+                          "public_metadata": {},
+                          "self_serve_sso_enabled": false,
+                          "slug": "acme",
+                          "updated_at": 1767225600000
+                        },
+                        "permissions": [
+                          "org:billing:manage",
+                          "org:billing:read",
+                          "org:posts:delete",
+                          "org:posts:manage",
+                          "org:posts:read",
+                          "org:sys_billing:manage",
+                          "org:sys_billing:read",
+                          "org:sys_domains:manage",
+                          "org:sys_domains:read",
+                          "org:sys_entconns_sso_bypass:manage",
+                          "org:sys_entconns:manage",
+                          "org:sys_memberships:manage",
+                          "org:sys_memberships:read",
+                          "org:sys_profile:delete",
+                          "org:sys_profile:manage"
+                        ],
+                        "public_metadata": {},
+                        "role": "org:admin",
+                        "role_name": "Admin",
+                        "updated_at": 1767225600000
+                      }
+                    ],
+                    "passkeys": [],
+                    "password_enabled": false,
+                    "password_last_updated_at": null,
+                    "phone_numbers": [],
+                    "primary_email_address_id": "idn_1",
+                    "primary_phone_number_id": null,
+                    "primary_web3_wallet_id": null,
+                    "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                    "public_metadata": {},
+                    "saml_accounts": [],
+                    "timezone": null,
+                    "totp_enabled": false,
+                    "two_factor_enabled": false,
+                    "unsafe_metadata": {},
+                    "updated_at": 1767225600000,
+                    "username": null,
+                    "verification_attempts_remaining": 100,
+                    "web3_wallets": []
+                  }
+                }
+              ],
+              "sign_in": null,
+              "sign_up": null,
+              "updated_at": 1767225600000
+            },
+            "response": {
+              "data": [
+                {
+                  "created_at": 1767225600000,
+                  "email_address": "carol+clerk_test@example.com",
+                  "expires_at": 1767225600000,
+                  "id": "orginv_carol",
+                  "inviter_id": "user_ada",
+                  "object": "organization_invitation",
+                  "organization_id": "org_acme",
+                  "public_inviter_data": null,
+                  "public_metadata": {},
+                  "role": "org:viewer",
+                  "role_name": "Viewer",
+                  "status": "revoked",
+                  "updated_at": 1767225600000,
+                  "url": null
+                }
+              ],
+              "total_count": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "revoke-non-pending-invitation",
+      "exchanges": [
+        {
+          "request": "POST /v1/organizations/org_acme/invitations/orginv_carol/revoke",
+          "query": {
+            "__clerk_api_version": "2026-05-12",
+            "_clerk_session_id": "sess_1"
+          },
+          "body": {},
+          "status": 404,
+          "response": {
+            "clerk_trace_id": "trace_1",
+            "errors": [
+              {
+                "code": "organization_invitation_not_pending",
+                "long_message": "The organization invitation is not in the 'pending' status.",
+                "message": "not pending"
+              }
+            ],
+            "meta": {
+              "client": {
+                "captcha_bypass": false,
+                "cookie_expires_at": null,
+                "created_at": 1767225600000,
+                "id": "client_1",
+                "last_active_session_id": "sess_1",
+                "last_authentication_strategy": "ticket",
+                "object": "client",
+                "sessions": [
+                  {
+                    "abandon_at": 1767225600000,
+                    "actor": null,
+                    "created_at": 1767225600000,
+                    "expire_at": 1767225600000,
+                    "factor_verification_age": [0, -1],
+                    "id": "sess_1",
+                    "last_active_at": 1767225600000,
+                    "last_active_organization_id": "org_acme",
+                    "last_active_token": {
+                      "jwt": "<jwt>",
+                      "object": "token"
+                    },
+                    "object": "session",
+                    "public_user_data": {
+                      "first_name": "Ada",
+                      "has_image": false,
+                      "identifier": "ada+clerk_test@example.com",
+                      "image_url": "https://img.clerk.com/default",
+                      "last_name": "Lovelace",
+                      "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                      "username": null
+                    },
+                    "status": "active",
+                    "updated_at": 1767225600000,
+                    "user": {
+                      "backup_code_enabled": false,
+                      "banned": false,
+                      "bypass_client_trust": false,
+                      "create_organization_enabled": true,
+                      "created_at": 1767225600000,
+                      "delete_self_enabled": true,
+                      "deprovisioned": false,
+                      "email_addresses": [
+                        {
+                          "created_at": 1767225600000,
+                          "email_address": "ada+clerk_test@example.com",
+                          "id": "idn_1",
+                          "linked_to": [],
+                          "matches_sso_connection": false,
+                          "object": "email_address",
+                          "reserved": false,
+                          "updated_at": 1767225600000,
+                          "verification": {
+                            "attempts": null,
+                            "expire_at": null,
+                            "object": "verification_admin",
+                            "status": "verified",
+                            "strategy": "admin"
+                          }
+                        }
+                      ],
+                      "enterprise_accounts": [],
+                      "external_accounts": [],
+                      "external_id": null,
+                      "first_name": "Ada",
+                      "has_image": false,
+                      "id": "user_ada",
+                      "image_url": "https://img.clerk.com/default",
+                      "last_active_at": 1767225600000,
+                      "last_name": "Lovelace",
+                      "last_sign_in_at": 1767225600000,
+                      "legal_accepted_at": null,
+                      "locale": null,
+                      "locked": false,
+                      "lockout_expires_in_seconds": null,
+                      "mfa_disabled_at": null,
+                      "mfa_enabled_at": null,
+                      "object": "user",
+                      "organization_memberships": [
+                        {
+                          "created_at": 1767225600000,
+                          "id": "orgmem_ada",
+                          "object": "organization_membership",
+                          "organization": {
+                            "admin_delete_enabled": true,
+                            "created_at": 1767225600000,
+                            "has_image": false,
+                            "id": "org_acme",
+                            "image_url": "https://img.clerk.com/default",
+                            "logo_url": null,
+                            "max_allowed_memberships": 5,
+                            "members_count": 1,
+                            "name": "Acme",
+                            "object": "organization",
+                            "pending_invitations_count": 1,
+                            "public_metadata": {},
+                            "self_serve_sso_enabled": false,
+                            "slug": "acme",
+                            "updated_at": 1767225600000
+                          },
+                          "permissions": [
+                            "org:billing:manage",
+                            "org:billing:read",
+                            "org:posts:delete",
+                            "org:posts:manage",
+                            "org:posts:read",
+                            "org:sys_billing:manage",
+                            "org:sys_billing:read",
+                            "org:sys_domains:manage",
+                            "org:sys_domains:read",
+                            "org:sys_entconns_sso_bypass:manage",
+                            "org:sys_entconns:manage",
+                            "org:sys_memberships:manage",
+                            "org:sys_memberships:read",
+                            "org:sys_profile:delete",
+                            "org:sys_profile:manage"
+                          ],
+                          "public_metadata": {},
+                          "role": "org:admin",
+                          "role_name": "Admin",
+                          "updated_at": 1767225600000
+                        }
+                      ],
+                      "passkeys": [],
+                      "password_enabled": false,
+                      "password_last_updated_at": null,
+                      "phone_numbers": [],
+                      "primary_email_address_id": "idn_1",
+                      "primary_phone_number_id": null,
+                      "primary_web3_wallet_id": null,
+                      "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                      "public_metadata": {},
+                      "saml_accounts": [],
+                      "timezone": null,
+                      "totp_enabled": false,
+                      "two_factor_enabled": false,
+                      "unsafe_metadata": {},
+                      "updated_at": 1767225600000,
+                      "username": null,
+                      "verification_attempts_remaining": 100,
+                      "web3_wallets": []
+                    }
+                  }
+                ],
+                "sign_in": null,
+                "sign_up": null,
+                "updated_at": 1767225600000
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "revoke-pending-invitation",
+      "exchanges": [
+        {
+          "request": "POST /v1/organizations/org_acme/invitations/orginv_bob/revoke",
+          "query": {
+            "__clerk_api_version": "2026-05-12",
+            "_clerk_session_id": "sess_1"
+          },
+          "body": {},
+          "status": 200,
+          "response": {
+            "client": {
+              "captcha_bypass": false,
+              "cookie_expires_at": null,
+              "created_at": 1767225600000,
+              "id": "client_1",
+              "last_active_session_id": "sess_1",
+              "last_authentication_strategy": "ticket",
+              "object": "client",
+              "sessions": [
+                {
+                  "abandon_at": 1767225600000,
+                  "actor": null,
+                  "created_at": 1767225600000,
+                  "expire_at": 1767225600000,
+                  "factor_verification_age": [0, -1],
+                  "id": "sess_1",
+                  "last_active_at": 1767225600000,
+                  "last_active_organization_id": "org_acme",
+                  "last_active_token": {
+                    "jwt": "<jwt>",
+                    "object": "token"
+                  },
+                  "object": "session",
+                  "public_user_data": {
+                    "first_name": "Ada",
+                    "has_image": false,
+                    "identifier": "ada+clerk_test@example.com",
+                    "image_url": "https://img.clerk.com/default",
+                    "last_name": "Lovelace",
+                    "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                    "username": null
+                  },
+                  "status": "active",
+                  "updated_at": 1767225600000,
+                  "user": {
+                    "backup_code_enabled": false,
+                    "banned": false,
+                    "bypass_client_trust": false,
+                    "create_organization_enabled": true,
+                    "created_at": 1767225600000,
+                    "delete_self_enabled": true,
+                    "deprovisioned": false,
+                    "email_addresses": [
+                      {
+                        "created_at": 1767225600000,
+                        "email_address": "ada+clerk_test@example.com",
+                        "id": "idn_1",
+                        "linked_to": [],
+                        "matches_sso_connection": false,
+                        "object": "email_address",
+                        "reserved": false,
+                        "updated_at": 1767225600000,
+                        "verification": {
+                          "attempts": null,
+                          "expire_at": null,
+                          "object": "verification_admin",
+                          "status": "verified",
+                          "strategy": "admin"
+                        }
+                      }
+                    ],
+                    "enterprise_accounts": [],
+                    "external_accounts": [],
+                    "external_id": null,
+                    "first_name": "Ada",
+                    "has_image": false,
+                    "id": "user_ada",
+                    "image_url": "https://img.clerk.com/default",
+                    "last_active_at": 1767225600000,
+                    "last_name": "Lovelace",
+                    "last_sign_in_at": 1767225600000,
+                    "legal_accepted_at": null,
+                    "locale": null,
+                    "locked": false,
+                    "lockout_expires_in_seconds": null,
+                    "mfa_disabled_at": null,
+                    "mfa_enabled_at": null,
+                    "object": "user",
+                    "organization_memberships": [
+                      {
+                        "created_at": 1767225600000,
+                        "id": "orgmem_ada",
+                        "object": "organization_membership",
+                        "organization": {
+                          "admin_delete_enabled": true,
+                          "created_at": 1767225600000,
+                          "has_image": false,
+                          "id": "org_acme",
+                          "image_url": "https://img.clerk.com/default",
+                          "logo_url": null,
+                          "max_allowed_memberships": 5,
+                          "members_count": 1,
+                          "name": "Acme",
+                          "object": "organization",
+                          "pending_invitations_count": 0,
+                          "public_metadata": {},
+                          "self_serve_sso_enabled": false,
+                          "slug": "acme",
+                          "updated_at": 1767225600000
+                        },
+                        "permissions": [
+                          "org:billing:manage",
+                          "org:billing:read",
+                          "org:posts:delete",
+                          "org:posts:manage",
+                          "org:posts:read",
+                          "org:sys_billing:manage",
+                          "org:sys_billing:read",
+                          "org:sys_domains:manage",
+                          "org:sys_domains:read",
+                          "org:sys_entconns_sso_bypass:manage",
+                          "org:sys_entconns:manage",
+                          "org:sys_memberships:manage",
+                          "org:sys_memberships:read",
+                          "org:sys_profile:delete",
+                          "org:sys_profile:manage"
+                        ],
+                        "public_metadata": {},
+                        "role": "org:admin",
+                        "role_name": "Admin",
+                        "updated_at": 1767225600000
+                      }
+                    ],
+                    "passkeys": [],
+                    "password_enabled": false,
+                    "password_last_updated_at": null,
+                    "phone_numbers": [],
+                    "primary_email_address_id": "idn_1",
+                    "primary_phone_number_id": null,
+                    "primary_web3_wallet_id": null,
+                    "profile_image_url": "https://www.gravatar.com/avatar?d=mp",
+                    "public_metadata": {},
+                    "saml_accounts": [],
+                    "timezone": null,
+                    "totp_enabled": false,
+                    "two_factor_enabled": false,
+                    "unsafe_metadata": {},
+                    "updated_at": 1767225600000,
+                    "username": null,
+                    "verification_attempts_remaining": 100,
+                    "web3_wallets": []
+                  }
+                }
+              ],
+              "sign_in": null,
+              "sign_up": null,
+              "updated_at": 1767225600000
+            },
+            "response": {
+              "created_at": 1767225600000,
+              "email_address": "bob+clerk_test@example.com",
+              "expires_at": 1767225600000,
+              "id": "orginv_bob",
+              "inviter_id": "user_ada",
+              "object": "organization_invitation",
+              "organization_id": "org_acme",
+              "public_inviter_data": null,
+              "public_metadata": {},
+              "role": "org:viewer",
+              "role_name": "Viewer",
+              "status": "revoked",
+              "updated_at": 1767225600000,
+              "url": null
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

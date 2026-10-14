@@ -59,7 +59,7 @@ describe('connected accounts', () => {
 
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('last_identification', 'You cannot remove your last sign-in method.');
+    request.fail('identification_deletion_failed', 'You cannot remove your last sign-in method.');
     await waitFor(() =>
       expect(within(dialog).getByRole('alert')).toHaveTextContent('You cannot remove your last sign-in method.'),
     );

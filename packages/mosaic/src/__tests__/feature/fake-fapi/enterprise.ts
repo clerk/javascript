@@ -2,6 +2,7 @@ import type { ExternalAccountJSON, VerificationJSON } from '@clerk/shared/types'
 import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
+import { fapiError } from './errors';
 
 export type EnterpriseExternalAccount = Omit<ExternalAccountJSON, 'provider'> & { provider: string };
 
@@ -16,19 +17,12 @@ export interface FakeEnterpriseLinking {
   pendingExternalAccounts: { userId: string; connectionId: string; account: EnterpriseExternalAccount }[];
 }
 
-function rejected(code: 'resource_not_found' | 'feature_not_enabled') {
-  return HttpResponse.json(
-    { errors: [{ code, message: code === 'resource_not_found' ? 'not found' : 'Feature not enabled' }] },
-    { status: code === 'resource_not_found' ? 404 : 403 },
-  );
-}
-
 export function enterpriseHandlers(state: FakeFapiState, url: (path: string) => string) {
   return [
     http.get(url('/v1/me/enterprise_connections'), ({ request }) => {
       const user = state.client.sessions.find(session => session.id === state.client.last_active_session_id)?.user;
       if (!user) {
-        return rejected('resource_not_found');
+        return fapiError('resource_not_found');
       }
       const withLinking = new URL(request.url).searchParams.get('with_organization_account_linking') === 'true';
       const connections = withLinking
@@ -50,7 +44,7 @@ export function enterpriseHandlers(state: FakeFapiState, url: (path: string) => 
     http.post(url('/v1/me/external_accounts'), async ({ request }) => {
       const user = state.client.sessions.find(session => session.id === state.client.last_active_session_id)?.user;
       if (!user) {
-        return rejected('resource_not_found');
+        return fapiError('resource_not_found');
       }
       const body = new URLSearchParams(await request.clone().text());
       const connectionId = body.get('enterprise_connection_id');
@@ -58,19 +52,19 @@ export function enterpriseHandlers(state: FakeFapiState, url: (path: string) => 
         return undefined;
       }
       if (!state.enterpriseLinking.enabled) {
-        return rejected('feature_not_enabled');
+        return fapiError('feature_not_enabled');
       }
       const connection = state.enterpriseConnections.find(item => item.id === connectionId);
       if (!connection?.active || !connection.organization_id) {
-        return rejected('resource_not_found');
+        return fapiError('resource_not_found');
       }
       if (!connection.allow_organization_account_linking) {
-        return rejected('feature_not_enabled');
+        return fapiError('feature_not_enabled');
       }
       if (
         !user.organization_memberships.some(membership => membership.organization.id === connection.organization_id)
       ) {
-        return rejected('resource_not_found');
+        return fapiError('resource_not_found');
       }
       const preparation = state.enterpriseLinking.preparations[connection.id];
       if (!preparation) {
@@ -86,25 +80,16 @@ export function enterpriseHandlers(state: FakeFapiState, url: (path: string) => 
         }
         const primaryEmail = user.email_addresses.find(email => email.id === user.primary_email_address_id);
         if (!primaryEmail) {
-          return rejected('resource_not_found');
+          return fapiError('resource_not_found');
         }
         if (
           state.enterpriseLinking.verifiedLinks.some(
             link => link.userId === user.id && link.connectionId === connection.id,
           )
         ) {
-          return HttpResponse.json(
-            {
-              errors: [
-                {
-                  code: 'enterprise_sso_account_already_connected',
-                  message: 'Already connected',
-                  long_message: `An enterprise account is already connected for this connection email: ${primaryEmail.email_address}`,
-                },
-              ],
-            },
-            { status: 400 },
-          );
+          return fapiError('enterprise_sso_account_already_connected', {
+            longMessage: `An enterprise account is already connected for this connection email: ${primaryEmail.email_address}`,
+          });
         }
         return HttpResponse.json({
           response: { object: 'external_account', verification: preparation.verification },

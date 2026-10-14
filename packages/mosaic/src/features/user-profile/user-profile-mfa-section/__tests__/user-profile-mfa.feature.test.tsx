@@ -336,7 +336,7 @@ describe('User profile MFA', () => {
     const prepare = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
     await user.click(screen.getByRole('button', { name: 'Send code' }));
     await waitFor(() => expect(prepare.requests).toHaveLength(1));
-    prepare.fail('phone_number_invalid', 'Unable to send a code.');
+    prepare.fail('form_param_format_invalid', 'Unable to send a code.');
     await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
     expect(fapi.mfa.phoneCreations).toHaveLength(1);
     serveFapi(fapi);
@@ -387,7 +387,7 @@ describe('User profile MFA', () => {
     const prepare = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
     await user.click(screen.getByRole('button', { name: 'Send code' }));
     await waitFor(() => expect(prepare.requests).toHaveLength(1));
-    prepare.fail('phone_number_invalid', 'Unable to send a code.');
+    prepare.fail('form_param_format_invalid', 'Unable to send a code.');
     await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
     serveFapi(fapi);
     const number = screen.getByRole('textbox', { name: 'Phone' });
@@ -415,7 +415,7 @@ describe('User profile MFA', () => {
       const prepare = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
       await user.click(screen.getByRole('button', { name: 'Send code' }));
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
-      prepare.fail('phone_number_invalid', 'Unable to send a code.');
+      prepare.fail('form_param_format_invalid', 'Unable to send a code.');
       await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
       serveFapi(fapi);
       await user.clear(number);
@@ -445,7 +445,7 @@ describe('User profile MFA', () => {
       const prepare = holdRequests('post', `/v1/me/phone_numbers/${id}/prepare_verification`);
       await user.click(screen.getByRole('button', { name: 'Send code' }));
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
-      prepare.fail('phone_number_invalid', 'Unable to send a code.');
+      prepare.fail('form_param_format_invalid', 'Unable to send a code.');
       await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
       await waitFor(() => expect(number).not.toHaveAttribute('readonly'));
       serveFapi(fapi);
