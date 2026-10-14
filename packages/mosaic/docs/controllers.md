@@ -11,7 +11,7 @@ where its effects come from.
 
 Worked examples:
 
-- `packages/mosaic/src/features/user-button/user-button.controller.tsx` — wraps a model
+- `packages/mosaic/src/features/switcher/switcher.controller.tsx` — wraps a model
 - `packages/mosaic/src/features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts`
   — takes its one effect as a prop
 

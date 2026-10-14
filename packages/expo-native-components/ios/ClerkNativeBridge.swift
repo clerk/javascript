@@ -419,6 +419,7 @@ final class ClerkNativeBridge {
 
   private static var clerkConfigured = false
   private static var configuredPublishableKey: String?
+  private static var configuredProxyUrl: String?
 
   /// Parsed light and dark themes from Info.plist "ClerkTheme" dictionary.
   var lightTheme: ClerkTheme?
@@ -466,16 +467,20 @@ final class ClerkNativeBridge {
   /// Configures ClerkKit without waiting for the client to load. ClerkKit's stored device token
   /// wins; `seedDeviceToken` is only adopted when ClerkKit has none.
   @MainActor
-  func configureNative(publishableKey: String, seedDeviceToken: String?) async throws {
+  func configureNative(publishableKey: String, seedDeviceToken: String?, proxyUrl: String? = nil) async throws {
     configurationDepth += 1
     defer { endConfiguration() }
+
+    let normalizedProxyUrl = Self.normalizedProxyUrl(proxyUrl)
 
     loadThemes()
 
     var didConfigure = true
-    if Self.shouldReconfigure(for: publishableKey) {
-      try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+    if Self.shouldReconfigure(for: publishableKey, proxyUrl: normalizedProxyUrl) {
+      try await Clerk.reconfigure(
+        publishableKey: publishableKey, options: Self.makeClerkOptions(proxyUrl: normalizedProxyUrl))
       Self.configuredPublishableKey = publishableKey
+      Self.configuredProxyUrl = normalizedProxyUrl
       startAuthFlowObserver(reset: true)
     } else if Self.clerkConfigured {
       didConfigure = false
@@ -483,7 +488,8 @@ final class ClerkNativeBridge {
     } else {
       Self.clerkConfigured = true
       Self.configuredPublishableKey = publishableKey
-      Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
+      Self.configuredProxyUrl = normalizedProxyUrl
+      Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions(proxyUrl: normalizedProxyUrl))
       startAuthFlowObserver()
     }
 
@@ -653,17 +659,24 @@ final class ClerkNativeBridge {
     ]
   }
 
-  private static func shouldReconfigure(for publishableKey: String) -> Bool {
+  private static func shouldReconfigure(for publishableKey: String, proxyUrl: String?) -> Bool {
     guard clerkConfigured, let configuredPublishableKey else { return false }
-    return configuredPublishableKey != publishableKey
+    return configuredPublishableKey != publishableKey || configuredProxyUrl != proxyUrl
   }
 
-  private static func makeClerkOptions() -> Clerk.Options {
+  private static func normalizedProxyUrl(_ proxyUrl: String?) -> String? {
+    guard let trimmed = proxyUrl?.trimmingCharacters(in: .whitespacesAndNewlines), !trimmed.isEmpty else {
+      return nil
+    }
+    return trimmed
+  }
+
+  private static func makeClerkOptions(proxyUrl: String?) -> Clerk.Options {
     let middleware = Clerk.Options.MiddlewareConfig(request: [ClerkExpoHeaderMiddleware()])
     guard let service = keychainService else {
-      return .init(middleware: middleware)
+      return .init(proxyUrl: proxyUrl, middleware: middleware)
     }
-    return .init(keychainConfig: .init(service: service), middleware: middleware)
+    return .init(keychainConfig: .init(service: service), proxyUrl: proxyUrl, middleware: middleware)
   }
 
   @MainActor

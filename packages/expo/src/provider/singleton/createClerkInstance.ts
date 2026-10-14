@@ -24,7 +24,7 @@ import type { TokenCache } from '../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { assertValidProxyUrl } from '../../utils/errors';
-import { isNative } from '../../utils/runtime';
+import { isNative, waitUntilAppIsActive } from '../../utils/runtime';
 import type { ClientTokenCache } from '../nativeClientSync';
 import type { BuildClerkOptions } from './types';
 
@@ -62,6 +62,15 @@ let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
 let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
+
+async function readClientJwt(): Promise<string | null | undefined> {
+  try {
+    return await __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+  } catch {
+    await waitUntilAppIsActive();
+  }
+  return __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+}
 
 /**
  * Resolves the next native singleton config while preserving existing values for omitted options.
@@ -124,7 +133,6 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         void __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
-      const getToken = (key: string) => __internal_tokenCache.getToken(key);
       const saveClientToken = (token: string, requestToken: string | null) => {
         const tokenCache = __internal_tokenCache as TokenCache & Partial<ClientTokenCache>;
         return tokenCache.saveClientToken
@@ -297,7 +305,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
-        const jwt = await getToken(CLERK_CLIENT_JWT_KEY);
+        const jwt = await readClientJwt();
         requestTokens.set(requestInit, jwt ?? null);
         (requestInit.headers as Headers).set('authorization', jwt || '');
 

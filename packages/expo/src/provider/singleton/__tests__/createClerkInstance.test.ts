@@ -8,14 +8,31 @@ import type { TokenCache } from '../../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../../constants';
 
 const mocks = vi.hoisted(() => {
+  const appStateListeners = new Set<(state: string) => void>();
   return {
     constructorSpy: vi.fn(),
     requestInitialResources: vi.fn<() => Promise<void>>(),
+    appStateListeners,
+    appState: {
+      currentState: 'active' as string,
+      addEventListener: (_type: 'change', listener: (state: string) => void) => {
+        appStateListeners.add(listener);
+        return { remove: () => appStateListeners.delete(listener) };
+      },
+    },
   };
 });
 
+const setAppState = (state: string) => {
+  mocks.appState.currentState = state;
+  for (const listener of [...mocks.appStateListeners]) {
+    listener(state);
+  }
+};
+
 vi.mock('react-native', () => {
   return {
+    AppState: mocks.appState,
     Platform: {
       OS: 'ios',
     },
@@ -74,11 +91,31 @@ const loadCreateClerkInstance = async () => {
   return mod.createClerkInstance;
 };
 
+const setUpBeforeRequest = async (tokenCache: TokenCache) => {
+  const createClerkInstance = await loadCreateClerkInstance();
+  const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+  const clerk = getClerkInstance({
+    publishableKey: 'pk_test_123',
+    tokenCache,
+  }) as unknown as MockClerk;
+
+  return {
+    beforeRequest: clerk.__internal_onBeforeRequest.mock.calls[0][0],
+    getClerkInstance,
+    requestInit: {
+      headers: new Headers(),
+      url: new URL('https://clerk.example.com/v1/client'),
+    },
+  };
+};
+
 describe('createClerkInstance', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
     mocks.requestInitialResources.mockResolvedValue(undefined);
+    mocks.appState.currentState = 'active';
+    mocks.appStateListeners.clear();
   });
 
   test('passes proxyUrl to the native Clerk constructor', async () => {
@@ -347,6 +384,91 @@ describe('createClerkInstance', () => {
     });
 
     await expect(tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('fresh-token');
+  });
+
+  test('waits until the app is active and retries when the token cache read fails in the background', async () => {
+    setAppState('background');
+    const getToken = vi
+      .fn<TokenCache['getToken']>()
+      .mockRejectedValueOnce(new Error('User interaction is not allowed.'))
+      .mockResolvedValueOnce('cached-token');
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({ getToken, saveToken: vi.fn() });
+
+    let settled = false;
+    const pending = beforeRequest(requestInit).finally(() => {
+      settled = true;
+    });
+    await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
+    setAppState('inactive');
+    await Promise.resolve();
+    expect(settled).toBe(false);
+    expect(getToken).toHaveBeenCalledTimes(1);
+
+    setAppState('active');
+    await pending;
+
+    expect(getToken).toHaveBeenCalledTimes(2);
+    expect(requestInit.headers.get('authorization')).toBe('cached-token');
+    expect(mocks.appStateListeners.size).toBe(0);
+  });
+
+  test('retries immediately when the token cache read fails while the app is active', async () => {
+    const getToken = vi
+      .fn<TokenCache['getToken']>()
+      .mockRejectedValueOnce(new Error('Keychain is busy.'))
+      .mockResolvedValueOnce('cached-token');
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({ getToken, saveToken: vi.fn() });
+
+    await beforeRequest(requestInit);
+
+    expect(getToken).toHaveBeenCalledTimes(2);
+    expect(requestInit.headers.get('authorization')).toBe('cached-token');
+    expect(mocks.appStateListeners.size).toBe(0);
+  });
+
+  test('rejects with the token cache error when the read still fails once the app is active', async () => {
+    setAppState('background');
+    const readError = new Error('Biometric authentication was cancelled.');
+    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(readError));
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({ getToken, saveToken: vi.fn() });
+
+    const pending = beforeRequest(requestInit).catch((err: unknown) => err);
+    await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
+    setAppState('active');
+
+    await expect(pending).resolves.toBe(readError);
+    expect(getToken).toHaveBeenCalledTimes(2);
+    expect(requestInit.headers.has('authorization')).toBe(false);
+  });
+
+  test('does not wait for the app to become active inside an app extension', async () => {
+    setAppState('extension');
+    const readError = new Error('Unable to decode the provided data.');
+    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(readError));
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({ getToken, saveToken: vi.fn() });
+
+    await expect(beforeRequest(requestInit)).rejects.toBe(readError);
+    expect(getToken).toHaveBeenCalledTimes(2);
+    expect(mocks.appStateListeners.size).toBe(0);
+  });
+
+  test('retries with the latest tokenCache when it changes while waiting for the app to become active', async () => {
+    setAppState('background');
+    const { beforeRequest, getClerkInstance, requestInit } = await setUpBeforeRequest({
+      getToken: () => Promise.reject(new Error('User interaction is not allowed.')),
+      saveToken: vi.fn(),
+    });
+
+    const pending = beforeRequest(requestInit);
+    await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
+    getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache: { getToken: () => Promise.resolve('latest-token'), saveToken: vi.fn() },
+    });
+    setAppState('active');
+    await pending;
+
+    expect(requestInit.headers.get('authorization')).toBe('latest-token');
   });
 
   test('uses the latest explicit tokenCache for request authorization when the singleton is reused', async () => {

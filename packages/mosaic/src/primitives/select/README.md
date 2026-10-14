@@ -4,7 +4,7 @@ A dropdown select component with keyboard navigation, typeahead, and optional it
 
 ## When to Use
 
-- Picking a single value from a predefined list of options.
+- Picking one or several values from a predefined list of options.
 - When you need typeahead, keyboard navigation, and full styling control.
 - Prefer Select over Autocomplete when the user should choose from a fixed list without typing to filter.
 
@@ -48,6 +48,24 @@ const [value, setValue] = useState('apple');
   {/* ... */}
 </Select.Root>;
 ```
+
+### Multiple
+
+`multiple` makes the value a `string[]`. Picking an option adds or removes it and keeps the popup open.
+
+```tsx
+<Select.Root
+  multiple
+  defaultValue={['apple', 'cherry']}
+>
+  <Select.Trigger>
+    <Select.Value placeholder='Choose fruits...'>{value => `${value.length} selected`}</Select.Value>
+  </Select.Trigger>
+  {/* ... */}
+</Select.Root>
+```
+
+`Select.Value` shows the selected labels joined with commas unless given children.
 
 ### With `items` for SSR label resolution
 
@@ -94,9 +112,10 @@ By default, the selected option visually aligns with the trigger. Disable this f
 
 | Prop                   | Type                      | Default          | Description                                                        |
 | ---------------------- | ------------------------- | ---------------- | ------------------------------------------------------------------ |
-| `value`                | `string`                  | —                | Controlled selected value                                          |
-| `defaultValue`         | `string`                  | —                | Initial selected value (uncontrolled)                              |
-| `onValueChange`        | `(value: string) => void` | —                | Called when selection changes                                      |
+| `multiple`             | `boolean`                 | `false`          | Allow selecting several options                                    |
+| `value`                | `string \| string[]`      | —                | Controlled selected value; an array when `multiple`                |
+| `defaultValue`         | `string \| string[]`      | —                | Initial selected value (uncontrolled); an array when `multiple`    |
+| `onValueChange`        | `(value) => void`         | —                | Called with the new value when the selection changes               |
 | `open`                 | `boolean`                 | —                | Controlled open state                                              |
 | `defaultOpen`          | `boolean`                 | `false`          | Initial open state (uncontrolled)                                  |
 | `onOpenChange`         | `(open: boolean) => void` | —                | Called when open state changes                                     |
@@ -107,9 +126,10 @@ By default, the selected option visually aligns with the trigger. Disable this f
 
 ### `Select.Value`
 
-| Prop          | Type        | Default | Description                     |
-| ------------- | ----------- | ------- | ------------------------------- |
-| `placeholder` | `ReactNode` | —       | Shown when no value is selected |
+| Prop          | Type                                            | Default | Description                                                           |
+| ------------- | ----------------------------------------------- | ------- | --------------------------------------------------------------------- |
+| `placeholder` | `ReactNode`                                     | —       | Shown when no value is selected                                       |
+| `children`    | `ReactNode \| ((value: string[]) => ReactNode)` | —       | Replaces the selected labels; a function receives the selected values |
 
 ### `Select.Option`
 
@@ -129,13 +149,13 @@ Accepts all `FloatingArrow` props. `ref` and `context` are injected automaticall
 
 ## Keyboard Navigation
 
-| Key               | Action                                |
-| ----------------- | ------------------------------------- |
-| `ArrowDown`       | Move to next option                   |
-| `ArrowUp`         | Move to previous option               |
-| `Enter` / `Space` | Select the active option, close popup |
-| `Escape`          | Close the popup                       |
-| Type a character  | Jump to matching option (typeahead)   |
+| Key               | Action                                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| `ArrowDown`       | Move to next option                                                                              |
+| `ArrowUp`         | Move to previous option                                                                          |
+| `Enter` / `Space` | Select the active option and close the popup; with `multiple`, toggle it and keep the popup open |
+| `Escape`          | Close the popup                                                                                  |
+| Type a character  | Jump to matching option (typeahead)                                                              |
 
 Typeahead is active only while the popup is open. It highlights the matching option; pressing Enter or Space then selects it.
 
@@ -144,7 +164,7 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 | Attribute                   | Applies To | Description                                                                       |
 | --------------------------- | ---------- | --------------------------------------------------------------------------------- |
 | `data-open` / `data-closed` | Trigger    | Popup open state                                                                  |
-| `data-selected`             | Option     | The currently selected option                                                     |
+| `data-selected`             | Option     | Each selected option                                                              |
 | `data-active`               | Option     | The keyboard-highlighted option                                                   |
 | `data-disabled`             | Option     | Disabled option                                                                   |
 | `data-side`                 | Positioner | Resolved placement side, or `none` while the selected option overlays the trigger |
@@ -158,6 +178,6 @@ Typeahead is active only while the popup is open. It highlights the matching opt
 
 ## ARIA
 
-- Popup: `role="listbox"`
+- Popup: `role="listbox"`, `aria-multiselectable` when `multiple`
 - Option: `role="option"`, `aria-selected`, `aria-disabled`
 - Trigger: `aria-expanded`, `aria-haspopup="listbox"`, `aria-controls`

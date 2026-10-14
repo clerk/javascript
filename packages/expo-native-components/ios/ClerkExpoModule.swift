@@ -36,12 +36,14 @@ public class ClerkExpoModule: Module {
       }
     }
 
-    AsyncFunction("configureNative") { (publishableKey: String, seedDeviceToken: String?, promise: Promise) in
+    AsyncFunction("configureNative") {
+      (publishableKey: String, seedDeviceToken: String?, proxyUrl: String?, promise: Promise) in
       Task { @MainActor in
         do {
           try await ClerkNativeBridge.shared.configureNative(
             publishableKey: publishableKey,
-            seedDeviceToken: seedDeviceToken
+            seedDeviceToken: seedDeviceToken,
+            proxyUrl: proxyUrl
           )
           promise.resolve()
         } catch {

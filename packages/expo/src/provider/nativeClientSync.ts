@@ -4,6 +4,7 @@ import { MemoryTokenCache } from '../cache/MemoryTokenCache';
 import type { TokenCache } from '../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import type { ClerkExpoNativeModule } from '../utils/native-module';
+import { waitUntilAppIsActive } from '../utils/runtime';
 
 const CONFIGURE_TIMEOUT_MS = 3_000;
 const IDLE_TIMEOUT_MS = 5_000;
@@ -37,7 +38,7 @@ type Engine = {
 
 const noop = () => undefined;
 
-let configuration: { publishableKey: string; ready: Promise<boolean> } | null = null;
+let configuration: { publishableKey: string; proxyUrl: string | null; ready: Promise<boolean> } | null = null;
 let activeEngine: Engine | null = null;
 
 function warn(message: string, error?: unknown): void {
@@ -103,15 +104,34 @@ function fingerprint(clerk: SyncableClerk): string {
   ]);
 }
 
-function configureOnce(native: ClerkExpoNativeModule, publishableKey: string, tokenCache: TokenCache) {
-  if (configuration?.publishableKey !== publishableKey) {
+async function readSeedDeviceToken(tokenCache: TokenCache): Promise<string | null> {
+  try {
+    return (await tokenCache.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+  } catch {
+    await waitUntilAppIsActive();
+  }
+  return (await tokenCache.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+}
+
+function configureOnce(
+  native: ClerkExpoNativeModule,
+  publishableKey: string,
+  proxyUrl: string | null,
+  tokenCache: TokenCache,
+) {
+  if (configuration?.publishableKey !== publishableKey || configuration.proxyUrl !== proxyUrl) {
     const ready = (async () => {
-      const seed = (await tokenCache.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-      await native.configureNative(publishableKey, seed);
+      const seed = await readSeedDeviceToken(tokenCache);
+      await withTimeout(
+        native.configureNative(publishableKey, seed, proxyUrl),
+        CONFIGURE_TIMEOUT_MS,
+        () => new Error('Timed out configuring the native Clerk SDK.'),
+      );
     })();
     configuration = {
       publishableKey,
-      ready: withTimeout(ready, CONFIGURE_TIMEOUT_MS, () => new Error('Timed out configuring the native Clerk SDK.'))
+      proxyUrl,
+      ready: ready
         .then(() => true)
         .catch(error => {
           warn('Native client sync is disabled because the native Clerk SDK failed to configure.', error);
@@ -129,10 +149,11 @@ function configureOnce(native: ClerkExpoNativeModule, publishableKey: string, to
 export function createNativeClientSync(
   native: ClerkExpoNativeModule,
   publishableKey: string,
+  proxyUrl: string | null,
   getUserTokenCache: () => TokenCache | undefined,
 ) {
   const fallback = () => getUserTokenCache() ?? MemoryTokenCache;
-  const ready = () => configureOnce(native, publishableKey, fallback());
+  const ready = () => configureOnce(native, publishableKey, proxyUrl, fallback());
   let mirroredToken: string | null = null;
   let lastFingerprint: string | undefined;
   let refreshFailure: { error: unknown } | null = null;

@@ -14,6 +14,7 @@ Read the guide for the task you are doing. Paths below are relative to this pack
 | Author a headless primitive               | [Headless primitives](docs/headless.md)                                           |
 | Style a component or change the CSS build | [StyleX](docs/stylex.md)                                                          |
 | Add or debug motion                       | [Motion](docs/motion.md)                                                          |
+| Build a loading skeleton                  | [Skeletons](docs/skeletons.md)                                                    |
 | Write a model                             | [Models](docs/models.md)                                                          |
 | Write a controller                        | [Controllers](docs/controllers.md)                                                |
 | Author or debug a state machine           | [Controllers](docs/controllers.md), then [Machine runtime](src/machine/README.md) |
@@ -42,6 +43,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Moving focus after a list row is removed                                | `useListRemovalFocus` (`src/hooks/`)                                                                          |
 | A debounced, abortable async check as the user types                    | `useDebouncedAsync` (`src/hooks/`)                                                                            |
 | A spinner that should not flash or flicker                              | `useSpinDelay` (`src/hooks/`)                                                                                 |
+| A placeholder for content that is still loading                         | `Skeleton` (`src/components/skeleton/`), see [Skeletons](docs/skeletons.md)                                   |
 | A date shown to the user                                                | `formatDate` (`src/utils/format-date.ts`)                                                                     |
 | Current time for display labels                                         | `useNow` + `MosaicProvider` ([#10098](https://github.com/clerk/javascript/pull/10098), once available)        |
 | Whether enterprise SSO permits adding another identification            | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                |
