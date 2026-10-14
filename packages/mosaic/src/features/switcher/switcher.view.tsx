@@ -604,6 +604,7 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
     // clears the row but not the card, so it overlaps the card's edge by what is left of the row's inset.
     // Above the row there is nothing to overlap, so that gap is the plain one.
     <Menu.Root
+      openOnHover
       placement='right-start'
       sideOffset={{ x: 4, y: 8 }}
       fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
