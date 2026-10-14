@@ -557,8 +557,7 @@ describe('ClerkProvider native client sync', () => {
     consoleError.mockRestore();
   });
 
-  test('finishes bootstrap with the cached token once the app is active when the token cache cannot be read in the background', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  test('configures native with the cached token once a background launch becomes active', async () => {
     setAppState('background');
     mocks.tokenCache.getToken.mockImplementation(rejectUnlessAppIsActive('client-token'));
     mocks.getClientToken.mockResolvedValue('client-token');
@@ -599,11 +598,9 @@ describe('ClerkProvider native client sync', () => {
     await waitFor(() =>
       expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token'),
     );
-    consoleError.mockRestore();
   });
 
-  test('applies a native client change once the app is active when the token cache cannot be read in the background', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  test('applies a native client change from the background once the app becomes active', async () => {
     mocks.tokenCache.getToken.mockImplementation(rejectUnlessAppIsActive('client-token'));
     mocks.getClientToken.mockResolvedValue('client-token');
 
@@ -615,9 +612,6 @@ describe('ClerkProvider native client sync', () => {
     );
 
     await waitFor(() => expect(mocks.configure).toHaveBeenCalledWith('pk_test_123', 'client-token'));
-    await act(async () => {
-      await Promise.resolve();
-    });
 
     setAppState('background');
     mocks.nativeClientEvent = {
@@ -645,7 +639,6 @@ describe('ClerkProvider native client sync', () => {
       expect(mocks.tokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'native-client-token'),
     );
     expect(mocks.clerkInstance.__internal_reloadInitialResources).toHaveBeenCalled();
-    consoleError.mockRestore();
   });
 
   test('disables synchronization when switching publishable keys fails to configure native', async () => {

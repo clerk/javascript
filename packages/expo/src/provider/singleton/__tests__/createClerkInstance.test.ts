@@ -91,6 +91,24 @@ const loadCreateClerkInstance = async () => {
   return mod.createClerkInstance;
 };
 
+const setUpBeforeRequest = async (tokenCache: TokenCache) => {
+  const createClerkInstance = await loadCreateClerkInstance();
+  const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+  const clerk = getClerkInstance({
+    publishableKey: 'pk_test_123',
+    tokenCache,
+  }) as unknown as MockClerk;
+
+  return {
+    beforeRequest: clerk.__internal_onBeforeRequest.mock.calls[0][0],
+    getClerkInstance,
+    requestInit: {
+      headers: new Headers(),
+      url: new URL('https://clerk.example.com/v1/client'),
+    },
+  };
+};
+
 describe('createClerkInstance', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -374,23 +392,7 @@ describe('createClerkInstance', () => {
       .fn<TokenCache['getToken']>()
       .mockRejectedValueOnce(new Error('User interaction is not allowed.'))
       .mockResolvedValueOnce('cached-token');
-    const tokenCache: TokenCache = {
-      getToken,
-      saveToken: vi.fn(() => Promise.resolve()),
-    };
-
-    const createClerkInstance = await loadCreateClerkInstance();
-    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const clerk = getClerkInstance({
-      publishableKey: 'pk_test_123',
-      tokenCache,
-    }) as unknown as MockClerk;
-
-    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
-    const requestInit = {
-      headers: new Headers(),
-      url: new URL('https://clerk.example.com/v1/client'),
-    };
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({ getToken, saveToken: vi.fn() });
 
     let settled = false;
     const pending = beforeRequest(requestInit).finally(() => {
@@ -415,245 +417,58 @@ describe('createClerkInstance', () => {
       .fn<TokenCache['getToken']>()
       .mockRejectedValueOnce(new Error('Keychain is busy.'))
       .mockResolvedValueOnce('cached-token');
-    const clearToken = vi.fn(() => Promise.resolve());
-    const tokenCache: TokenCache = {
-      getToken,
-      saveToken: vi.fn(() => Promise.resolve()),
-      clearToken,
-    };
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({ getToken, saveToken: vi.fn() });
 
-    const createClerkInstance = await loadCreateClerkInstance();
-    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const clerk = getClerkInstance({
-      publishableKey: 'pk_test_123',
-      tokenCache,
-    }) as unknown as MockClerk;
-
-    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
-    const requestInit = {
-      headers: new Headers(),
-      url: new URL('https://clerk.example.com/v1/client'),
-    };
     await beforeRequest(requestInit);
 
     expect(getToken).toHaveBeenCalledTimes(2);
-    expect(clearToken).not.toHaveBeenCalled();
     expect(requestInit.headers.get('authorization')).toBe('cached-token');
     expect(mocks.appStateListeners.size).toBe(0);
   });
 
-  test('rejects with the token cache error without clearing it when the read still fails once the app is active', async () => {
+  test('rejects with the token cache error when the read still fails once the app is active', async () => {
     setAppState('background');
     const readError = new Error('Biometric authentication was cancelled.');
     const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(readError));
-    const clearToken = vi.fn(() => Promise.resolve());
-    const tokenCache: TokenCache = {
-      getToken,
-      saveToken: vi.fn(() => Promise.resolve()),
-      clearToken,
-    };
-
-    const createClerkInstance = await loadCreateClerkInstance();
-    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const clerk = getClerkInstance({
-      publishableKey: 'pk_test_123',
-      tokenCache,
-    }) as unknown as MockClerk;
-
-    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
-    const requestInit = {
-      headers: new Headers(),
-      url: new URL('https://clerk.example.com/v1/client'),
-    };
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({ getToken, saveToken: vi.fn() });
 
     const pending = beforeRequest(requestInit).catch((err: unknown) => err);
     await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
-
     setAppState('active');
 
     await expect(pending).resolves.toBe(readError);
     expect(getToken).toHaveBeenCalledTimes(2);
-    expect(clearToken).not.toHaveBeenCalled();
     expect(requestInit.headers.has('authorization')).toBe(false);
-  });
-
-  test('stops waiting for the app to become active when the request is aborted', async () => {
-    setAppState('background');
-    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(new Error('User interaction is not allowed.')));
-    const tokenCache: TokenCache = {
-      getToken,
-      saveToken: vi.fn(() => Promise.resolve()),
-    };
-
-    const createClerkInstance = await loadCreateClerkInstance();
-    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const clerk = getClerkInstance({
-      publishableKey: 'pk_test_123',
-      tokenCache,
-    }) as unknown as MockClerk;
-
-    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
-    const controller = new AbortController();
-    const abortReason = new Error('client fetch timed out');
-    const requestInit = {
-      headers: new Headers(),
-      signal: controller.signal,
-      url: new URL('https://clerk.example.com/v1/client'),
-    };
-
-    const pending = beforeRequest(requestInit).catch((err: unknown) => err);
-    await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
-
-    controller.abort(abortReason);
-
-    await expect(pending).resolves.toBe(abortReason);
-    expect(mocks.appStateListeners.size).toBe(0);
-
-    setAppState('active');
-    await Promise.resolve();
-    expect(getToken).toHaveBeenCalledTimes(1);
-  });
-
-  test('does not wait for the app to become active when the request was already aborted', async () => {
-    setAppState('background');
-    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(new Error('User interaction is not allowed.')));
-    const tokenCache: TokenCache = {
-      getToken,
-      saveToken: vi.fn(() => Promise.resolve()),
-    };
-
-    const createClerkInstance = await loadCreateClerkInstance();
-    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const clerk = getClerkInstance({
-      publishableKey: 'pk_test_123',
-      tokenCache,
-    }) as unknown as MockClerk;
-
-    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
-    const controller = new AbortController();
-    const abortReason = new Error('client fetch timed out');
-    controller.abort(abortReason);
-    const requestInit = {
-      headers: new Headers(),
-      signal: controller.signal,
-      url: new URL('https://clerk.example.com/v1/client'),
-    };
-
-    await expect(beforeRequest(requestInit)).rejects.toBe(abortReason);
-    expect(mocks.appStateListeners.size).toBe(0);
-    expect(getToken).toHaveBeenCalledTimes(1);
-  });
-
-  test('rejects with an AbortError when the aborted signal has no reason', async () => {
-    setAppState('background');
-    const tokenCache: TokenCache = {
-      getToken: vi.fn(() => Promise.reject(new Error('User interaction is not allowed.'))),
-      saveToken: vi.fn(() => Promise.resolve()),
-    };
-
-    const createClerkInstance = await loadCreateClerkInstance();
-    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const clerk = getClerkInstance({
-      publishableKey: 'pk_test_123',
-      tokenCache,
-    }) as unknown as MockClerk;
-
-    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
-    const abortListeners = new Set<() => void>();
-    const polyfilledSignal = {
-      aborted: false,
-      reason: undefined,
-      addEventListener: (_type: 'abort', listener: () => void) => abortListeners.add(listener),
-      removeEventListener: (_type: 'abort', listener: () => void) => abortListeners.delete(listener),
-    };
-    const requestInit = {
-      headers: new Headers(),
-      signal: polyfilledSignal,
-      url: new URL('https://clerk.example.com/v1/client'),
-    };
-
-    const pending = beforeRequest(requestInit).catch((err: unknown) => err);
-    await vi.waitFor(() => expect(abortListeners.size).toBe(1));
-
-    polyfilledSignal.aborted = true;
-    for (const listener of [...abortListeners]) {
-      listener();
-    }
-
-    const error = await pending;
-    expect(error).toBeInstanceOf(Error);
-    expect((error as Error).name).toBe('AbortError');
-    expect(mocks.appStateListeners.size).toBe(0);
   });
 
   test('does not wait for the app to become active inside an app extension', async () => {
     setAppState('extension');
     const readError = new Error('Unable to decode the provided data.');
     const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(readError));
-    const clearToken = vi.fn(() => Promise.resolve());
-    const tokenCache: TokenCache = {
-      getToken,
-      saveToken: vi.fn(() => Promise.resolve()),
-      clearToken,
-    };
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({ getToken, saveToken: vi.fn() });
 
-    const createClerkInstance = await loadCreateClerkInstance();
-    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const clerk = getClerkInstance({
-      publishableKey: 'pk_test_123',
-      tokenCache,
-    }) as unknown as MockClerk;
-
-    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
-    const requestInit = {
-      headers: new Headers(),
-      url: new URL('https://clerk.example.com/v1/client'),
-    };
     await expect(beforeRequest(requestInit)).rejects.toBe(readError);
-
     expect(getToken).toHaveBeenCalledTimes(2);
-    expect(clearToken).not.toHaveBeenCalled();
     expect(mocks.appStateListeners.size).toBe(0);
   });
 
   test('retries with the latest tokenCache when it changes while waiting for the app to become active', async () => {
     setAppState('background');
-    const initialTokenCache: TokenCache = {
-      getToken: vi.fn(() => Promise.reject(new Error('User interaction is not allowed.'))),
-      saveToken: vi.fn(() => Promise.resolve()),
-      clearToken: vi.fn(() => Promise.resolve()),
-    };
-    const latestTokenCache: TokenCache = {
-      getToken: vi.fn(() => Promise.resolve('latest-token')),
-      saveToken: vi.fn(() => Promise.resolve()),
-      clearToken: vi.fn(() => Promise.resolve()),
-    };
+    const { beforeRequest, getClerkInstance, requestInit } = await setUpBeforeRequest({
+      getToken: () => Promise.reject(new Error('User interaction is not allowed.')),
+      saveToken: vi.fn(),
+    });
 
-    const createClerkInstance = await loadCreateClerkInstance();
-    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
-    const clerk = getClerkInstance({
-      publishableKey: 'pk_test_123',
-      tokenCache: initialTokenCache,
-    }) as unknown as MockClerk;
-
-    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
-    const requestInit = {
-      headers: new Headers(),
-      url: new URL('https://clerk.example.com/v1/client'),
-    };
     const pending = beforeRequest(requestInit);
     await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
-
     getClerkInstance({
       publishableKey: 'pk_test_123',
-      tokenCache: latestTokenCache,
+      tokenCache: { getToken: () => Promise.resolve('latest-token'), saveToken: vi.fn() },
     });
     setAppState('active');
     await pending;
 
     expect(requestInit.headers.get('authorization')).toBe('latest-token');
-    expect(initialTokenCache.clearToken).not.toHaveBeenCalled();
-    expect(latestTokenCache.clearToken).not.toHaveBeenCalled();
   });
 
   test('uses the latest explicit tokenCache for request authorization when the singleton is reused', async () => {

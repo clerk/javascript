@@ -12,35 +12,17 @@ function isAppInBackgroundOrInactive(): boolean {
   return AppState.currentState === 'background' || AppState.currentState === 'inactive';
 }
 
-function getAbortReason(signal?: AbortSignal): Error {
-  if (signal?.reason instanceof Error) {
-    return signal.reason;
-  }
-  const abortError = new Error('The operation was aborted.');
-  abortError.name = 'AbortError';
-  return abortError;
-}
-
-export function waitUntilAppIsActive(signal?: AbortSignal): Promise<void> {
-  if (signal?.aborted) {
-    return Promise.reject(getAbortReason(signal));
-  }
+export function waitUntilAppIsActive(): Promise<void> {
   if (!isAppInBackgroundOrInactive()) {
     return Promise.resolve();
   }
-  return new Promise((resolve, reject) => {
-    const handleAbort = () => {
-      subscription.remove();
-      reject(getAbortReason(signal));
-    };
+  return new Promise(resolve => {
     const subscription = AppState.addEventListener('change', state => {
       if (state === 'active') {
         subscription.remove();
-        signal?.removeEventListener('abort', handleAbort);
         resolve();
       }
     });
-    signal?.addEventListener('abort', handleAbort, { once: true });
   });
 }
 

@@ -62,11 +62,11 @@ let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
 
-async function readClientJwt(signal?: AbortSignal): Promise<string | null | undefined> {
+async function readClientJwt(): Promise<string | null | undefined> {
   try {
     return await __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
   } catch {
-    await waitUntilAppIsActive(signal);
+    await waitUntilAppIsActive();
   }
   return __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
 }
@@ -298,7 +298,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
-        const jwt = await readClientJwt(requestInit.signal ?? undefined);
+        const jwt = await readClientJwt();
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
         // Instructs the backend that the request is from a mobile device.

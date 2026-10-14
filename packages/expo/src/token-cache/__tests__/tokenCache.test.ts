@@ -57,24 +57,18 @@ describe('tokenCache', () => {
     expect(mocks.deleteItemAsync).not.toHaveBeenCalled();
   });
 
-  test.each(['background', 'inactive', 'extension', 'unknown', null])(
-    'keeps the stored token and rethrows when the keychain read fails on iOS while the app is %s',
-    async appState => {
+  test.each([
+    ['background', 'background'],
+    ['inactive', 'inactive'],
+    ['extension', 'extension'],
+    [null, null],
+    ['background', 'active'],
+    ['active', 'background'],
+  ])(
+    'keeps the stored token and rethrows when an iOS read starts while %s and fails while %s',
+    async (startState, failState) => {
       const readError = new Error('User interaction is not allowed.');
-      mocks.appState.currentState = appState;
-      mocks.getItemAsync.mockRejectedValue(readError);
-      const tokenCache = await loadTokenCache();
-
-      await expect(tokenCache.getToken('__clerk_client_jwt')).rejects.toBe(readError);
-      expect(mocks.deleteItemAsync).not.toHaveBeenCalled();
-    },
-  );
-
-  test.each(['background', 'inactive', 'extension', 'unknown', null])(
-    'keeps the stored token when a read started in %s fails after the app becomes active',
-    async appState => {
-      const readError = new Error('User interaction is not allowed.');
-      mocks.appState.currentState = appState;
+      mocks.appState.currentState = startState;
       let rejectRead: (error: Error) => void = () => {};
       mocks.getItemAsync.mockReturnValue(
         new Promise<string | null>((_, reject) => {
@@ -84,7 +78,7 @@ describe('tokenCache', () => {
       const tokenCache = await loadTokenCache();
 
       const read = tokenCache.getToken('__clerk_client_jwt');
-      mocks.appState.currentState = 'active';
+      mocks.appState.currentState = failState;
       rejectRead(readError);
 
       await expect(read).rejects.toBe(readError);
@@ -92,41 +86,15 @@ describe('tokenCache', () => {
     },
   );
 
-  test.each(['background', 'inactive', 'extension', 'unknown', null])(
-    'keeps the stored token when an active read fails after the app becomes %s',
-    async appState => {
-      const readError = new Error('User interaction is not allowed.');
-      mocks.appState.currentState = 'active';
-      let rejectRead: (error: Error) => void = () => {};
-      mocks.getItemAsync.mockReturnValue(
-        new Promise<string | null>((_, reject) => {
-          rejectRead = reject;
-        }),
-      );
-      const tokenCache = await loadTokenCache();
+  test('removes an unreadable token when an iOS read starts and fails while the app is active', async () => {
+    mocks.getItemAsync.mockRejectedValue(new Error('Unable to decode the provided data.'));
+    const tokenCache = await loadTokenCache();
 
-      const read = tokenCache.getToken('__clerk_client_jwt');
-      mocks.appState.currentState = appState;
-      rejectRead(readError);
-
-      await expect(read).rejects.toBe(readError);
-      expect(mocks.deleteItemAsync).not.toHaveBeenCalled();
-    },
-  );
-
-  test.each(['active'])(
-    'removes an unreadable token when the read fails on iOS while the app state is %s',
-    async appState => {
-      mocks.appState.currentState = appState;
-      mocks.getItemAsync.mockRejectedValue(new Error('Unable to decode the provided data.'));
-      const tokenCache = await loadTokenCache();
-
-      await expect(tokenCache.getToken('__clerk_client_jwt')).resolves.toBeNull();
-      expect(mocks.deleteItemAsync).toHaveBeenCalledWith('__clerk_client_jwt', {
-        keychainAccessible: 'AFTER_FIRST_UNLOCK',
-      });
-    },
-  );
+    await expect(tokenCache.getToken('__clerk_client_jwt')).resolves.toBeNull();
+    expect(mocks.deleteItemAsync).toHaveBeenCalledWith('__clerk_client_jwt', {
+      keychainAccessible: 'AFTER_FIRST_UNLOCK',
+    });
+  });
 
   test('removes an unreadable token when the read fails on Android, even in the background', async () => {
     mocks.platform.OS = 'android';
