@@ -46,7 +46,7 @@ export function resolveSpecs(packageDir: string, selection: SpecSelection, cwd: 
 
   if ('all' in selection) {
     const refs = toRefs(walk(featuresDir));
-    if (refs.length === 0) throw new VerifyFailure('NO_SPECS', 'there are no golden specs under specs/features/', 'write one under specs/features/<feature>/, or run an explored spec by path');
+    if (refs.length === 0) throw new VerifyFailure('NO_SPECS', 'there are no specs under specs/features/', 'write one under specs/features/<feature>/, or run an explored spec by path');
     return refs;
   }
 

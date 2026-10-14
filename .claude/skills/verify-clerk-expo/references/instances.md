@@ -15,7 +15,7 @@ The CLI checks those 62 leaves and the leaves a settings file declares, and no o
 
 ## Declare other settings
 
-A spec file that runs on the standard settings declares nothing. One golden spec of this repository declares settings, `specs/features/native-modules/biometric-availability.e2e.ts`, which turns biometric sign-in on. A spec file that needs other settings has a settings file beside it, with the same name and `.settings.json` in place of `.e2e.ts`. For `specs/features/<feature>/<name>.e2e.ts`, that file is `specs/features/<feature>/<name>.settings.json`:
+A spec file that runs on the standard settings declares nothing. One committed spec of this repository declares settings, `specs/features/native-modules/biometric-availability.e2e.ts`, which turns biometric sign-in on. A spec file that needs other settings has a settings file beside it, with the same name and `.settings.json` in place of `.e2e.ts`. For `specs/features/<feature>/<name>.e2e.ts`, that file is `specs/features/<feature>/<name>.settings.json`:
 
 ```json
 {

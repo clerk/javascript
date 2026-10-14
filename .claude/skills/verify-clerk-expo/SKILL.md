@@ -1,6 +1,6 @@
 ---
 name: verify-clerk-expo
-description: Drive @clerk/expo and @clerk/expo-native-components in the expo-native test app (native AuthView, UserButton, UserProfileView, custom useSignIn and useSignUp flows, token cache, the Google and biometrics native modules) on an iOS simulator or Android emulator against a real Clerk development instance that the session creates and deletes, and capture video, screenshots, and the app log as evidence. The device runs on this Mac, or on a CI runner when the machine cannot run it. Use it to prove any change to packages/expo or the test app works before calling it done, to reproduce a UI bug, or to run the golden regression specs.
+description: Drive @clerk/expo and @clerk/expo-native-components in the expo-native test app (native AuthView, UserButton, UserProfileView, custom useSignIn and useSignUp flows, token cache, the Google and biometrics native modules) on an iOS simulator or Android emulator against a real Clerk development instance that the session creates and deletes, and capture video, screenshots, and the app log as evidence. The device runs on this Mac, or on a CI runner when the machine cannot run it. Use it to prove any change to packages/expo or the test app works before calling it done, to reproduce a UI bug, or to run the e2e tests.
 ---
 
 # verify-clerk-expo
@@ -104,13 +104,13 @@ Input reaches the app only through specs. A spec is a TypeScript file that uses 
 
 ```console
 $ integration/expo-native/bin/control-clerk-expo run native-auth-view --platform ios          # one feature: every spec in specs/features/native-auth-view/
-$ integration/expo-native/bin/control-clerk-expo run custom-flow-sign-in/complete             # one golden spec, on iOS
+$ integration/expo-native/bin/control-clerk-expo run custom-flow-sign-in/complete             # one spec, on iOS
 $ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts             # a spec you wrote
 $ integration/expo-native/bin/control-clerk-expo run native-auth-view native-js-sync          # several targets in one run, with one video
 $ integration/expo-native/bin/control-clerk-expo screen --platform ios                        # the UI tree that is on screen now; --png adds a screenshot
 ```
 
-`run --all` runs every golden spec. `run` also takes `--grep <regex>`, `--retries <n>`, `--no-video`, and `--wait <seconds>`. `--retries <n>` runs a failed test again, up to `n` more times. The default is 0, so a run of your own change shows exactly what happened. The wait covers a free lane and another `run` in this worktree that holds the device. A spec limited to one platform with `test(title, { platforms: ['ios'] }, fn)` reports as skipped on the other.
+`run --all` runs every committed spec. `run` also takes `--grep <regex>`, `--retries <n>`, `--no-video`, and `--wait <seconds>`. `--retries <n>` runs a failed test again, up to `n` more times. The default is 0, so a run of your own change shows exactly what happened. The wait covers a free lane and another `run` in this worktree that holds the device. A spec limited to one platform with `test(title, { platforms: ['ios'] }, fn)` reports as skipped on the other.
 
 For a JS change on a local device, edit the source and `run` the spec, with no `up` in between. For a change to a native input, the same `run` rebuilds the dev client first. On a remote device, commit and push, then `run`.
 
@@ -158,13 +158,13 @@ A spec file that needs other settings than the standard ones has a settings file
 
 ### Check your work
 
-Golden specs under `specs/features/<feature>/` are committed and cover the feature map in `features/`, which starts at `features/README.md`. Prove your own change, on both platforms when the change is not specific to one, and leave the rest of the golden specs to PR CI (`.github/workflows/verify-e2e.yml`), which runs every one of them once the pull request is ready for review. When your change is to behavior a golden spec already covers, that spec is your proof: run it. A spec covers a behavior only when it asserts on it. A spec that passes through the screen you changed without checking what you changed is not your proof. Run another feature's specs yourself only when you changed code that feature shares and want to know before CI does. For new work:
+The specs under `specs/features/<feature>/` are committed and cover the feature map in `features/`, which starts at `features/README.md`. Prove your own change, on both platforms when the change is not specific to one, and leave the rest of the committed specs to PR CI (`.github/workflows/verify-e2e.yml`), which runs every one of them once the pull request is ready for review. When your change is to behavior a committed spec already covers, that spec is your proof: run it. A spec covers a behavior only when it asserts on it. A spec that passes through the screen you changed without checking what you changed is not your proof. Run another feature's specs yourself only when you changed code that feature shares and want to know before CI does. For new work:
 
 1. Write a spec under `specs/explored/`, which is gitignored. It imports the fixture as `'../fixtures.ts'`.
 2. Run it by path.
 3. Run `screen` after the run, pass or fail. It prints the tree that the app is on now, with each node's role, label, and testID.
 4. Fix the locators from that output until the spec passes.
-5. When the change adds or changes what `@clerk/expo` does, move the spec to `specs/features/<feature>/`, change its import to `'../../fixtures.ts'`, `git add` it, and update the feature's page and its line in `features/README.md`. A change to wording or appearance alone does not earn a golden spec, because a spec that pins a label fails on the next change of wording: leave that spec in `specs/explored/`. The run directory keeps a copy of every spec the run used.
+5. When the change adds or changes what `@clerk/expo` does, move the spec to `specs/features/<feature>/`, change its import to `'../../fixtures.ts'`, `git add` it, and update the feature's page and its line in `features/README.md`. A change to wording or appearance alone does not earn a committed spec, because a spec that pins a label fails on the next change of wording: leave that spec in `specs/explored/`. The run directory keeps a copy of every spec the run used.
 
 A failing spec prints `FAIL`, the first assertion message, and the path of its failure page, and `run` exits 1. The failure page (`.verify/runs/<run-id>/e2e/failures/*.md`) lists every step, the screen tree at the failure, and a screenshot. A run in which no test executed, such as a `--grep` that matches nothing, fails with `NO_SPECS` and exits 3, because it proved nothing. A run in which every selected spec is limited to the other platform is the one exception. It exits 0, prints `skip` for each spec, and its `next` line says `nothing ran: every selected spec was left out by platform, so the run proves nothing to post`. Read that line, because the exit code alone looks like a pass.
 
@@ -172,7 +172,7 @@ With `--retries`, a test that fails and then passes prints `flaky` and the error
 
 ### Agent steps
 
-e2e has a built-in agent, which a test drives with `agent.act(...)` and `agent.assert(...)`. The CLI configures it only when the machine has a Vercel AI Gateway key. The model is `anthropic/claude-haiku-5.5`, and `openai/gpt-6-luna-fast` is the gateway's backup. Supply the key in `AI_GATEWAY_API_KEY_FILE`, a file that only you can read, or in `AI_GATEWAY_API_KEY`. The `agent` line of `doctor` shows the model and where the key came from. Committed golden specs do not use agent steps.
+e2e has a built-in agent, which a test drives with `agent.act(...)` and `agent.assert(...)`. The CLI configures it only when the machine has a Vercel AI Gateway key. The model is `anthropic/claude-haiku-5.5`, and `openai/gpt-6-luna-fast` is the gateway's backup. Supply the key in `AI_GATEWAY_API_KEY_FILE`, a file that only you can read, or in `AI_GATEWAY_API_KEY`. The `agent` line of `doctor` shows the model and where the key came from. Committed specs do not use agent steps.
 
 ## Evidence
 
@@ -229,7 +229,7 @@ Work in this order, with one `up` for both runs: make the branch and `git push` 
 
 On a local device `attach` writes the description itself, and no run needs a push. A remote session builds only the commit it was started on and later commits of the branch, so its before run comes before the push of the change. Its evidence reaches the description about a minute after `down`.
 
-Attach the run of your own change. Run your new or changed spec on its own and attach that run, so the screenshots or the video show only what the change is about. You do not owe a regression run: PR CI (`.github/workflows/verify-e2e.yml`) runs every golden spec on the pull request and reports them there. If you ran other golden specs anyway, cite that run's id in the PR and leave its video in `.verify/runs/`.
+Attach the run of your own change. Run your new or changed spec on its own and attach that run, so the screenshots or the video show only what the change is about. You do not owe a regression run: PR CI (`.github/workflows/verify-e2e.yml`) runs every committed spec on the pull request and reports them there. If you ran other committed specs anyway, cite that run's id in the PR and leave its video in `.verify/runs/`.
 
 ## Cleanup
 

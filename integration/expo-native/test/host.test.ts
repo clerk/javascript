@@ -158,7 +158,7 @@ describe('the clerk-expo host', () => {
   });
 });
 
-describe('the golden specs of this repository', () => {
+describe('the committed specs of this repository', () => {
   const dir = join(import.meta.dirname, '..');
   const committed = resolveSpecs(dir, { all: true }).map(spec => ({ spec, ...readSpecText(dir, spec.path) }));
 

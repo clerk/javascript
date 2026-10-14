@@ -124,7 +124,7 @@ describe('the users a test asks for', () => {
     assert.equal(redact(`input text ${password.slice(0, 16)} then ${password.slice(16)}`), 'input text <redacted> then <redacted>');
   });
 
-  it('type one text made from the run id in the golden tests, the password the run knows', () => {
+  it('type one text made from the run id in the e2e tests, the password the run knows', () => {
     const committed = join(import.meta.dirname, '..', 'specs', 'features');
     const sources = readdirSync(committed, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.e2e.ts')).map((file) => readFileSync(join(committed, file), 'utf8'));
     const filled = sources.flatMap((source) => [...source.matchAll(/host\.fill\([^;]*?(`[^`]*\$\{host\.runId\}[^`]*`)\);/g)].map((match) => match[1]));

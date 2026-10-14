@@ -1,6 +1,6 @@
 # @clerk/expo verification map
 
-This directory is the maintained source for verifying the user-facing behavior of `@clerk/expo` through the `expo-native` test app in `integration/templates/expo-native`. On a local device the test app runs as a Debug dev client that loads its JS, and `packages/expo` with it, from a local Metro server. On a remote device it runs as a standalone Release build of a pushed commit, with the JS embedded. Read this index before driving the app, then use the matching feature file as the recipe. Every recipe runs through `integration/expo-native/bin/control-clerk-expo` and the golden specs under `specs/features/<feature>/`.
+This directory is the maintained source for verifying the user-facing behavior of `@clerk/expo` through the `expo-native` test app in `integration/templates/expo-native`. On a local device the test app runs as a Debug dev client that loads its JS, and `packages/expo` with it, from a local Metro server. On a remote device it runs as a standalone Release build of a pushed commit, with the JS embedded. Read this index before driving the app, then use the matching feature file as the recipe. Every recipe runs through `integration/expo-native/bin/control-clerk-expo` and the specs under `specs/features/<feature>/`.
 
 ## Test users and sign-in
 
@@ -39,7 +39,7 @@ The iOS identifiers come from `Sources/ClerkKitUI/Components/Auth/ClerkAccessibi
 
 ## Feature entry contract
 
-Each feature file starts with an H1 title and one paragraph describing the user-visible behavior, then exactly four H2 sections in this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with verify`, and `Gotchas`. `Driving it with verify` starts with `Preconditions:` and names the golden specs that prove each sub-feature. A feature file lists only entry points that a spec drives.
+Each feature file starts with an H1 title and one paragraph describing the user-visible behavior, then exactly four H2 sections in this order: `Sub-features`, `How to get to it (user POV)`, `Driving it with verify`, and `Gotchas`. `Driving it with verify` starts with `Preconditions:` and names the specs that prove each sub-feature. A feature file lists only entry points that a spec drives.
 
 ## Features
 

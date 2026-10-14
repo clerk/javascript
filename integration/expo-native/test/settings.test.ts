@@ -28,7 +28,7 @@ const refuses = (declarations: Readonly<Record<string, string>>, why: RegExp = /
 };
 
 describe('the standard file', () => {
-  it('pins a standard value for every setting the two golden declarations change', () => {
+  it('pins a standard value for every setting the two committed declarations change', () => {
     const pinned = configLeaves(standardFile().config);
     assert.equal(pinned['auth_multi_factor.required_for_sign_up'], false);
     assert.equal(pinned['organization_settings.force_organization_selection'], false);
