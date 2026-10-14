@@ -150,6 +150,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
           fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
+          focusableWhenDisabled
         >
           {m.add}
         </SubmitButton>
