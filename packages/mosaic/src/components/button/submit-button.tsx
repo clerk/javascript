@@ -9,6 +9,7 @@ import { withTruncatableLabel } from '../../utils/truncatable-label';
 import { Spinner } from '../spinner';
 import type { ButtonProps } from './button';
 import { Button } from './button';
+import { ButtonContext } from './button.context';
 import { styles } from './submit-button.styles';
 
 export interface SubmitButtonProps extends ButtonProps {
@@ -52,39 +53,38 @@ const spinnerSizes = { xs: 'sm', sm: 'sm', md: 'md', lg: 'md' } as const;
  * <SubmitButton color='negative' isPending={isDeleting}>Delete</SubmitButton>
  */
 export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProps>(function MosaicSubmitButton(
-  { isPending = false, pendingLabel = 'pending', size = 'md', spinDelay, xstyle, children, onClick, ...rest },
+  {
+    isPending = false,
+    pendingLabel = 'pending',
+    size = 'md',
+    spinDelay,
+    disabled: disabledProp,
+    focusableWhenDisabled = false,
+    xstyle,
+    children,
+    ...rest
+  },
   ref,
 ) {
+  const defaults = React.useContext(ButtonContext);
+  const disabled = defaults.disabled || disabledProp || false;
   // `isPending` drives the semantics, this drives the pixels. The split is deliberate: the button
   // has to go inert and start announcing the moment the action does, or a fast action gets
   // submitted twice and assistive tech misses it — but drawing a spinner that fast only produces
   // a flash, so the visual waits out the delay and then sticks around long enough to be read.
   const showPending = useSpinDelay(isPending || null, spinDelay) !== null;
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (isPending) {
-      // `aria-disabled` is advisory — it doesn't stop the native submit — so the press is
-      // cancelled here instead. The `disabled` attribute would do both, but it drops the button
-      // out of the tab order mid-action, taking focus with it just as the spinner is announced.
-      //
-      // TODO: fold this into the headless button's `focusableWhenDisabled` once it lands
-      // (clerk/javascript#9319, #9320), which owns the same behavior one layer down.
-      event.preventDefault();
-      return;
-    }
-    onClick?.(event);
-  };
-
   return (
     <Button
       ref={ref}
       type='submit'
       size={size}
+      disabled={disabled || isPending}
+      focusableWhenDisabled={disabled ? focusableWhenDisabled : isPending || focusableWhenDisabled}
       // Spread rather than set to `undefined`: `mergeProps` copies every key the caller passes,
       // so an explicit `aria-disabled={undefined}` would erase the one `focusableWhenDisabled`
       // puts there when the button is disabled but not pending.
       {...(isPending ? { 'aria-busy': true, 'aria-disabled': true, 'data-pending': '' } : null)}
-      onClick={handleClick}
       xstyle={[styles.root, isPending && styles.rootPending, xstyle]}
       {...rest}
     >
