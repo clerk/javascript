@@ -66,14 +66,14 @@ export function UserProfileMfaSectionView({
             key={method.id}
             method={method}
             triggerRef={controller.registerTrigger(method.id)}
-            onRemove={onRemove ? () => controller.openRemoval(method) : undefined}
+            onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
         ))}
       </UserProfileSecurityList>
       <Section.Error>{controller.defaultError}</Section.Error>
-      {onRemove ? (
+      {controller.remove ? (
         <Confirmation
           controller={controller.remove}
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
