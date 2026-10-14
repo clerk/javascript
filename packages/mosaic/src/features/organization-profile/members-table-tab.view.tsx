@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { type Ref, useMemo, useRef } from 'react';
+import type { Ref } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { ActionMenu } from '../../components/action-menu';
@@ -15,22 +15,25 @@ import { Select } from '../../components/select';
 import { Spinner } from '../../components/spinner';
 import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill, useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './members-table-tab.styles';
 import type { MembersTableTabViewProps, OrganizationProfileMember } from './members-table-tab.types';
+import { canManageMember } from './members-table-tab.utils';
 import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (member: OrganizationProfileMember) => member.id;
-const canManageMember = (member: OrganizationProfileMember) => !member.isCurrentUser && !member.isDeprovisioned;
 
 export function MembersTableTabView({
   members,
   roles,
+  searchInputRef,
+  inviteButtonRef,
   onInvite,
-  onRemove,
+  registerTrigger,
+  remove,
+  finalFocus,
   onChangeRole,
   totalCount,
   page,
@@ -48,14 +51,6 @@ export function MembersTableTabView({
   roleError,
 }: MembersTableTabViewProps) {
   const m = useMessages('membersTableTab');
-  const searchInput = useRef<HTMLInputElement>(null);
-  const inviteButton = useRef<HTMLButtonElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: members.filter(canManageMember).map(getRowId),
-    onRemove,
-    fallback: () => inviteButton.current ?? searchInput.current,
-  });
-  const removeDialog = useMemo(() => Confirmation.createHandle<OrganizationProfileMember>(), []);
   const { table, pagination } = useServerDataTable({
     data: members,
     totalCount,
@@ -68,14 +63,23 @@ export function MembersTableTabView({
     searchValue,
     onSearchChange,
   });
-  const columnCount = 3 + Number(Boolean(onRemove)) + Number(Boolean(onBulkAction));
+  const columnCount = 3 + Number(Boolean(remove)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
+  const removeAndClearSelection = remove
+    ? {
+        ...remove,
+        confirm: (member: OrganizationProfileMember) => {
+          table.setRowSelection({});
+          remove.confirm(member);
+        },
+      }
+    : undefined;
   return (
     <>
       <div {...mergeStyleProps(themeProps('members-table-tab'), stylex.props(tableTabStyles.root))}>
         <Table.Toolbar>
           <Table.Search
-            ref={searchInput}
+            ref={searchInputRef}
             label={m.search}
             clearLabel={m.clearSearch}
             value={table.globalFilter}
@@ -83,7 +87,7 @@ export function MembersTableTabView({
           />
           {onInvite ? (
             <Button
-              ref={inviteButton}
+              ref={inviteButtonRef}
               onClick={onInvite}
             >
               <Icon name='plus' />
@@ -112,7 +116,7 @@ export function MembersTableTabView({
               <Table.HeaderCell>{m.name}</Table.HeaderCell>
               <Table.HeaderCell>{m.joinedAt}</Table.HeaderCell>
               <Table.HeaderCell>{m.role}</Table.HeaderCell>
-              {onRemove ? (
+              {remove ? (
                 <Table.HeaderCell align='end'>
                   <VisuallyHidden>{m.actions}</VisuallyHidden>
                 </Table.HeaderCell>
@@ -130,8 +134,8 @@ export function MembersTableTabView({
             hasBulkAction={Boolean(onBulkAction)}
             onChangeRole={onChangeRole}
             isChangingRole={isChangingRole}
-            onRemoveClick={onRemove ? member => removeDialog.open(member) : undefined}
-            registerTrigger={removalFocus.registerTrigger}
+            onRemoveClick={remove ? member => remove.open(member) : undefined}
+            registerTrigger={registerTrigger}
           />
         </Table.Root>
         {pagination ? (
@@ -144,19 +148,14 @@ export function MembersTableTabView({
           />
         ) : null}
       </div>
-      {onRemove ? (
+      {removeAndClearSelection ? (
         <Confirmation
-          handle={removeDialog}
+          controller={removeAndClearSelection}
           title={member => fill(m.removeTitle, { name: member.name })}
           description={m.removeDescription}
           actionLabel={m.remove}
           cancelLabel={m.cancel}
-          onConfirm={member => {
-            table.setRowSelection({});
-            return removalFocus.remove(member.id);
-          }}
-          errorFallback={m.removeError}
-          finalFocus={removalFocus.finalFocus}
+          finalFocus={finalFocus}
         />
       ) : null}
     </>
@@ -298,7 +297,7 @@ function MemberRow({
   onChangeRole?: MembersTableTabViewProps['onChangeRole'];
   isChangingRole: boolean;
   onRemoveClick?: () => void;
-  triggerRef: Ref<HTMLButtonElement>;
+  triggerRef?: Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('membersTableTab');
   const manageable = canManageMember(member);

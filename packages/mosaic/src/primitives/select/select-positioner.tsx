@@ -82,7 +82,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     return (
       <>
         {/* An overlay on the trigger only works while the page holds still beneath it. */}
-        {alignItemWithTrigger && <FloatingOverlay lockScroll />}
+        {alignItemWithTrigger ? <FloatingOverlay lockScroll /> : null}
         <FloatingFocusManager
           context={floatingContext}
           modal={false}
