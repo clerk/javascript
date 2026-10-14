@@ -126,7 +126,8 @@ export function withEvidenceBlock(body: string, platform: Platform, lines: strin
   }
   if (starts.length !== 1 || ends.length !== 1) return { ok: false, why: `has \`${start}\` ${starts.length} times and \`${end}\` ${ends.length} times`, fix: ONE_PAIR_OF_MARKERS };
   if (ends[0]! < starts[0]!) return { ok: false, why: `has \`${end}\` before \`${start}\``, fix: ONE_PAIR_OF_MARKERS };
-  if (!A_BLOCK_STARTS.test(body.slice(starts[0]! + start.length, ends[0]!).trimStart())) return { ok: false, why: `has text between \`${start}\` and \`${end}\` that is not an evidence block`, fix: ONE_PAIR_OF_MARKERS };
+  const between = body.slice(starts[0]! + start.length, ends[0]!).trimStart();
+  if (between !== '' && !A_BLOCK_STARTS.test(between)) return { ok: false, why: `has text between \`${start}\` and \`${end}\` that is not an evidence block`, fix: ONE_PAIR_OF_MARKERS };
   return { ok: true, body: `${body.slice(0, starts[0]!)}${block}${body.slice(ends[0]! + end.length)}`, was: 'replaced' };
 }
 

@@ -115,6 +115,41 @@ describe('lease flow', () => {
     });
   });
 
+  it('doctor warns when gh can attach but cannot use the GitHub GraphQL API, as in a Claude Code cloud session, and names the hand-off', async () => {
+    const { deps } = setup(0);
+    const calls: { readonly args: readonly string[]; readonly timeoutMs: number | undefined }[] = [];
+    const gh = async (graphql: { readonly code: number; readonly stderr: string }) =>
+      (
+        await doctor(
+          {
+            ...deps,
+            runner: async (command, args, options) => {
+              if (command !== 'gh') return { code: 0, stdout: '', stderr: '' };
+              calls.push({ args, timeoutMs: options?.timeoutMs });
+              return args[0] === 'api' ? { ...graphql, stdout: '' } : { code: 0, stdout: '  -a, --attach file   Attach a file', stderr: '' };
+            },
+          },
+          { verb: 'doctor', live: false },
+        )
+      ).checks.find((c) => c.id === 'gh-attach')!;
+    const fix = "attach a remote run before {cli} down, so that attach hands its evidence to the session's runner, or check `gh auth status`";
+    const cannotPost = "so `{cli} attach` cannot put a run's video and screenshots in a pull request description from this machine";
+
+    assert.deepEqual(await gh({ code: 1, stderr: 'HTTP 403: Forbidden (https://api.github.com/graphql)\n' }), {
+      id: 'gh-attach',
+      ok: true,
+      state: 'warning',
+      detail: `gh cannot use the GitHub GraphQL API (HTTP 403: Forbidden (https://api.github.com/graphql)), which \`gh pr view\` and \`gh pr edit\` need, ${cannotPost}`,
+      fix,
+    });
+    assert.deepEqual(calls, [
+      { args: ['pr', 'edit', '--help'], timeoutMs: undefined },
+      { args: ['api', 'graphql', '-f', 'query={viewer{login}}'], timeoutMs: 10_000 },
+    ]);
+    assert.equal((await gh({ code: 124, stderr: '' })).detail, `gh cannot use the GitHub GraphQL API (no answer in 10 seconds), which \`gh pr view\` and \`gh pr edit\` need, ${cannotPost}`);
+    assert.deepEqual(await gh({ code: 0, stderr: '' }), { id: 'gh-attach', ok: true, detail: 'gh pr edit supports --attach, and gh can use the GitHub GraphQL API' });
+  });
+
   it('refuses --runner with the local backend as a usage error, before it builds, leases, or checks anything', async () => {
     const { deps, events } = setup(0);
     const usage = (error: VerifyFailure) => error.code === 'USAGE' && error.message === '--runner names a CI runner and the local backend has none' && error.fix === 'drop --runner, or pass --backend remote';

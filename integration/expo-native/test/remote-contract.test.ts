@@ -51,6 +51,11 @@ describe('the session workflow and the driver agree', () => {
     assert.match(agentStep, /^ {10}GITHUB_TOKEN: \$\{\{ github\.token \}\}$/m);
   });
 
+  it('tells the session agent the default branch of the repository, on which it builds no uncommitted changes', () => {
+    const agentStep = workflow.split(/\n(?= {6}- )/).find((step) => step.includes('session-agent.ts" serve'))!;
+    assert.match(agentStep, /^ {10}VERIFY_SESSION_DEFAULT_BRANCH: \$\{\{ github\.event\.repository\.default_branch \}\}$/m);
+  });
+
   it('gives the agent the files and variables it waits on', () => {
     for (const needle of ['VERIFY_SESSION_REQUEST', 'VERIFY_SESSION_WORK', 'VERIFY_SESSION_DEVICE_ID', 'VERIFY_SESSION_DEVICE_MODULE', 'VERIFY_SESSION_CLOUDFLARED', '$WORK/tunnel', 'device-ready', '$VERIFY_SESSION_WORK/ended', 'persist-credentials: false']) {
       assert.ok(workflow.includes(needle), needle);
@@ -119,11 +124,12 @@ describe('a borrowed device as the tests are told of it', () => {
     assert.equal(JSON.stringify(config).includes('f'.repeat(64)), false, 'the token is not in the composed config');
     const provider = engineDevice(target.device);
     assert.ok(!Array.isArray(provider) && 'acquire' in provider);
-    assert.deepEqual(await provider.acquire({} as unknown as Parameters<typeof provider.acquire>[0]), {
+    assert.deepEqual(await provider.acquire({ env: { AGENT_DEVICE_STATE_DIR: '/state' } } as unknown as Parameters<typeof provider.acquire>[0]), {
       id: 'AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE',
       deviceId: 'AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE',
       device: 'AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE',
       daemon: { baseUrl: 'https://x.trycloudflare.com/agent-device', authToken: 'f'.repeat(64) },
+      client: { cwd: '/state' },
     });
     assert.ok(usedSecretValues().includes('f'.repeat(64)));
   });

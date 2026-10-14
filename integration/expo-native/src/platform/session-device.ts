@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import type { CommandLine } from '../core/exec.ts';
 import type { SessionDevice, SessionDeviceFactory } from '../core/remote/protocol.ts';
 import type { Platform } from '../core/types.ts';
-import { artifact } from '../fixture.ts';
+import { artifact, buildInputs } from '../fixture.ts';
 import {
   collectRecordingArgs,
   installArgs,
@@ -24,6 +24,7 @@ const buildStandalone = (platform: Platform): CommandLine => ({
 
 function simulator(udid: string): SessionDevice {
   return {
+    inputs: buildInputs('ios', 'standalone'),
     build: () => [buildStandalone('ios'), waitForBoot(udid), installApp(udid, artifact('ios', 'standalone'))],
     record: { start: file => recordVideo(udid, file) },
     logs: (since, predicate) => showLogs(udid, since, predicate),
@@ -33,6 +34,7 @@ function simulator(udid: string): SessionDevice {
 function emulator(serial: string): SessionDevice {
   const adb = (args: readonly string[]): CommandLine => ({ command: 'adb', args: ['-s', serial, ...args] });
   return {
+    inputs: buildInputs('android', 'standalone'),
     build: work => [buildStandalone('android'), waitForLane(work), adb(installArgs(artifact('android', 'standalone')))],
     record: {
       start: () => adb(screenrecordArgs(RECORDING)),

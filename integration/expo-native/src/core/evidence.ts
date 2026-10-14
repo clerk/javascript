@@ -69,6 +69,13 @@ const refuse = (message: string, fix: string): never => {
 };
 
 export function assertShowable(record: EvidenceRecord, loggedUsers: readonly string[]): Showable {
+  const patch = record.remote?.builtPatch;
+  if (typeof patch === 'string') {
+    refuse(
+      `run ${record.run} ran on a session build of ${(record.remote?.builtSha ?? record.gitHead).slice(0, 12)} with uncommitted changes (${patch.slice(0, 12)}), so no commit holds the app it shows`,
+      'commit and push the changes, {cli} run again, and attach the new run',
+    );
+  }
   if (record.tainted.length > 0) refuse(`run ${record.run} has secret values in ${record.tainted.join(', ')}`, 'do not attach this run; rerun and attach the new run');
   const own = new Set(record.identities.flatMap((i) => (i.userId === null ? [] : [i.userId])));
   const foreign = loggedUsers.filter((userId) => !own.has(userId));

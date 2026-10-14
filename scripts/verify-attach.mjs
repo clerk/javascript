@@ -556,7 +556,7 @@ function withEvidenceBlock(body, platform, lines) {
     return { ok: false, why: 'has the end marker before the start marker' };
   }
   const old = body.slice(starts[0] + start.length, ends[0]);
-  if (!A_BLOCK_STARTS.test(old.trimStart())) {
+  if (old.trim() !== '' && !A_BLOCK_STARTS.test(old.trimStart())) {
     return { ok: false, why: 'has text between the markers that is not an evidence block' };
   }
   return {

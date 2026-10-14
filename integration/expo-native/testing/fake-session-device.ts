@@ -5,6 +5,7 @@ const node = process.execPath;
 const write = (file: string, text: string) => ({ command: node, args: ['-e', `require('fs').writeFileSync(${JSON.stringify(file)}, ${JSON.stringify(text)})`] });
 
 const fake: SessionDeviceFactory = ({ id: deviceId, platform }) => ({
+  inputs: ['app.txt', 'extra.txt', 'Sources'],
   build: (work) => [{ command: node, args: ['-e', `require('fs').writeFileSync(${JSON.stringify(join(work, 'built'))}, require('fs').readFileSync('app.txt', 'utf8'))`] }],
   record:
     process.env.FAKE_DEVICE_RECORDER === 'on-device'

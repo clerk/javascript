@@ -332,7 +332,7 @@ describe('the receiver in the session job', () => {
   });
 });
 
-const LEASE: RemoteLease = { backend: 'remote', provider: 'github-actions', platform: 'ios', session: 'ios0000aa', providerRef: '37731397352', baseUrl: 'https://session.trycloudflare.com', tokenFile: '', deviceId: 'UDID', deviceName: 'iPhone Air', runner: 'xcode-27', expiresAt: '2026-10-08T06:00:00Z', builtSha: COMMIT, acquiredAt: '2026-10-08T05:00:00.000Z', installedBuild: null };
+const LEASE: RemoteLease = { backend: 'remote', provider: 'github-actions', platform: 'ios', session: 'ios0000aa', providerRef: '37731397352', baseUrl: 'https://session.trycloudflare.com', tokenFile: '', deviceId: 'UDID', deviceName: 'iPhone Air', runner: 'xcode-27', expiresAt: '2026-10-08T06:00:00Z', builtSha: COMMIT, builtPatch: null, acquiredAt: '2026-10-08T05:00:00.000Z', installedBuild: null };
 
 function remoteRun(options: { readonly backend?: EvidenceRecord['backend']; readonly lease?: Lease | null; readonly startedAt?: string; readonly handOff?: DeviceBackend['handOffEvidence'] | null; readonly gh?: (args: readonly string[]) => { readonly code: number; readonly stdout: string; readonly stderr: string } } = {}) {
   const packageDir = mkdtempSync(join(tmpdir(), 'verify-handoff-verb-'));
@@ -353,7 +353,7 @@ function remoteRun(options: { readonly backend?: EvidenceRecord['backend']; read
       dirty: false,
       platform: 'ios',
       backend,
-      remote: backend === 'remote' ? { provider: 'github-actions', runner: 'xcode-27', builtSha: COMMIT } : null,
+      remote: backend === 'remote' ? { provider: 'github-actions', runner: 'xcode-27', builtSha: COMMIT, builtPatch: null } : null,
       device: 'iPhone Air on xcode-27',
       build: 'ios-000000000000' as BuildKey,
       results: [{ spec: { kind: 'explored', path: 'specs/explored/a.e2e.ts', feature: null }, title: 'a', platform: 'ios', status: 'passed', seconds: 1, attempts: 1, error: null, skipReason: null, skippedBy: null, tags: [], failurePage: null, failureScreen: null, failureScreenshot: null }],

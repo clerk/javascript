@@ -315,6 +315,15 @@ describe("a remote session's device recipe", () => {
     ]);
   });
 
+  it('lets a patch change exactly the paths the CLI sends from the tree', () => {
+    for (const platform of ['ios', 'android'] as const)
+      assert.deepEqual(
+        answer(sessionDevice({ id: 'device-1', platform }), { op: 'inputs' }),
+        host.buildInputs(platform, 'remote'),
+        platform,
+      );
+  });
+
   it('reads the same logcat tags as the local lane', () => {
     const logs = answer(emulator, {
       op: 'logs',
@@ -336,6 +345,10 @@ describe('the session workflow serves both platforms', () => {
     assert.ok(
       workflow.includes('VERIFY_SESSION_DEVICE_MODULE: integration/expo-native/src/platform/session-device.ts'),
     );
+  });
+
+  it('tells the session agent the default branch, so it refuses uncommitted changes in a session on it', () => {
+    assert.ok(workflow.includes('VERIFY_SESSION_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}'));
   });
 
   it('installs the image the lane AVD names and waits on the boot files this code writes', () => {

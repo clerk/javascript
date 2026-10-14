@@ -116,16 +116,18 @@ export function readBuiltApp(workspace: Workspace, key: BuildKey): LocalBuild | 
 async function ensureBuild(host: HostAdapter, platform: Platform, workspace: Workspace, backend: DeviceBackend, held: Lease | null, heldIsAlive: boolean, progress: (line: string) => void): Promise<{ app: BuiltApp; view: BuildView }> {
   const key = await computeBuildKey(host, platform, backend.kind, workspace.worktree);
   if (backend.sourceCommit !== undefined) {
-    const builtForThisApp = held !== null && held.backend === 'remote' && held.installedBuild === key ? held.builtSha : null;
+    const builtForThisApp = held !== null && held.backend === 'remote' && held.installedBuild === key && held.builtPatch === null ? held.builtSha : null;
     const onSession = heldIsAlive ? builtForThisApp : null;
-    const sourceSha =
-      onSession ??
-      (await backend.sourceCommit({ worktree: workspace.worktree, inputs: host.buildInputs(platform, backend.kind) }).catch((error: unknown) => {
-        if (builtForThisApp !== null && error instanceof VerifyFailure && error.code === 'BUILD_FAILED') return builtForThisApp;
-        throw error;
-      }));
-    const app: BuiltApp = { platform, key, appId: host.appId(platform), path: null, source: 'github-actions', sourceSha };
-    return { app, view: { platform, key, source: app.source, reused: onSession !== null, seconds: 0 } };
+    const source =
+      onSession === null
+        ? await backend.sourceCommit({ worktree: workspace.worktree, inputs: host.buildInputs(platform, backend.kind) }).catch((error: unknown) => {
+            if (builtForThisApp !== null && error instanceof VerifyFailure && error.code === 'BUILD_FAILED') return { sha: builtForThisApp, patch: null };
+            throw error;
+          })
+        : { sha: onSession, patch: null };
+    const app: BuiltApp = { platform, key, appId: host.appId(platform), path: null, source: 'github-actions', sourceSha: source.sha, patch: source.patch };
+    const onTheSession = heldIsAlive && held?.backend === 'remote' && held.installedBuild === key && held.builtSha === source.sha && held.builtPatch === (source.patch?.sha256 ?? null);
+    return { app, view: { platform, key, source: app.source, reused: onTheSession, seconds: 0 } };
   }
   const existing = readBuiltApp(workspace, key);
   if (existing !== null) return { app: existing, view: { platform, key, source: existing.source, reused: true, seconds: 0 } };
@@ -178,12 +180,12 @@ export async function ensureLease(
 
   const state = held === null ? 'held' : await backend.check(held);
   const { app, view: build } = await ensureBuild(host, platform, workspace, backend, held, state === 'held', options.progress);
-  const builtBy = app.source === 'local' ? (build.reused ? 'reused' : `built in ${build.seconds}s`) : `commit ${app.sourceSha.slice(0, 12)}  ${build.reused ? 'already on the session' : 'the session builds it'}`;
+  const builtBy = app.source === 'local' ? (build.reused ? 'reused' : `built in ${build.seconds}s`) : `commit ${app.sourceSha.slice(0, 12)}${app.patch === null ? '' : ` with uncommitted changes ${app.patch.sha256.slice(0, 12)}`}  ${build.reused ? 'already on the session' : 'the session builds it'}`;
   options.progress(`build   ${build.key}  ${build.source}  ${builtBy}`);
 
   let lease: Lease | null = held;
   let renewed = false;
-  if (lease !== null && state !== 'held') {
+  if (lease !== null && (state === 'lost' || state === 'expiring')) {
     options.progress(`${(state === 'expiring' ? 'ending' : 'lost').padEnd(7)} ${backend.describe(lease)}  renewing`);
     await releaseLease(workspace, backend, lease);
     lease = null;
@@ -210,7 +212,8 @@ export async function ensureLease(
     lease = acquired;
   }
 
-  if (lease.installedBuild !== app.key) {
+  const sessionHasOtherSource = app.source === 'github-actions' && lease.backend === 'remote' && (lease.builtSha !== app.sourceSha || lease.builtPatch !== (app.patch?.sha256 ?? null));
+  if (lease.installedBuild !== app.key || sessionHasOtherSource || state === 'other-app') {
     const target = lease;
     options.progress(`install ${app.key}  on ${backend.describe(target)}`);
     const wait = {

@@ -2,7 +2,7 @@ import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import http from 'node:http';
 import net from 'node:net';
 import { tmpdir } from 'node:os';
@@ -10,9 +10,11 @@ import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
 import { coreVersion } from '../src/core/manifest.ts';
 import { HANDOFF_LIMITS, parseHandoffManifest, type HandoffManifest } from '../src/core/remote/handoff.ts';
+import { workingPatch } from '../src/core/remote/backend.ts';
 import { sendEvidence } from '../src/core/remote/session.ts';
 import { plan } from '../src/core/remote/session-agent.ts';
-import { sha256Hex, type SessionHealth, type SessionRequest } from '../src/core/remote/protocol.ts';
+import { BUILD_LOG_START, sha256Hex, type SessionHealth, type SessionRequest } from '../src/core/remote/protocol.ts';
+import type { TreePatch } from '../src/core/types.ts';
 
 const here = import.meta.dirname;
 const token = 'b'.repeat(64);
@@ -89,7 +91,9 @@ async function gitHubWith(repo: { readonly sha: string; comesBefore(earlier: str
     const path = (req.url ?? '').replace(/^\/repos\/clerk\/sample/, '');
     const [, base, head] = /^\/compare\/([0-9a-f]{40})\.\.\.([0-9a-f]{40})$/.exec(path) ?? [];
     const found =
-      path === '/git/ref/heads/feature/change'
+      path === ''
+        ? { default_branch: 'main' }
+        : path === '/git/ref/heads/feature/change'
         ? { object: { sha: branchHead } }
         : base !== undefined && head !== undefined
           ? { status: base === head ? 'identical' : comesBefore(base, head) ? 'ahead' : comesBefore(head, base) ? 'behind' : 'diverged' }
@@ -103,7 +107,7 @@ async function gitHubWith(repo: { readonly sha: string; comesBefore(earlier: str
     authorizations,
     push: (sha: string) => (branchHead = sha),
     stop: () => new Promise((stopped) => server.close(stopped)),
-    env: { GITHUB_API_URL: `http://127.0.0.1:${port}`, GITHUB_REPOSITORY: 'clerk/sample', GITHUB_SHA: repo.sha, GITHUB_REF: 'refs/heads/feature/change', GITHUB_TOKEN },
+    env: { GITHUB_API_URL: `http://127.0.0.1:${port}`, GITHUB_REPOSITORY: 'clerk/sample', GITHUB_SHA: repo.sha, GITHUB_REF: 'refs/heads/feature/change', GITHUB_TOKEN, VERIFY_SESSION_DEFAULT_BRANCH: 'main' },
   };
 }
 
@@ -293,6 +297,168 @@ describe('session agent', () => {
     const failed = await built(missing);
     assert.equal(failed.state, 'failed');
     assert.doesNotMatch(failed.state === 'failed' ? failed.tail : '', /GitHub does not show/, 'the fetch failed, not the question to GitHub');
+    await agent.call('/__sim/stop', { method: 'POST' });
+    await agent.exited;
+  });
+
+  it('builds the changes it is sent on a clean checkout of the commit, never on changes it was sent before, and refuses changes that do not apply', async () => {
+    const repo = repoWithCommit();
+    const github = await gitHubWith(repo);
+    const agent = await startAgent({ ...base, sha: repo.sha }, { cwd: repo.dir, env: github.env });
+    const settled = (patch: string | null) => until(async () => { const b = (await agent.health()).build; return b.state !== 'building' && b.state !== 'none' && b.patch === patch ? b : null; }, `the build with ${patch ?? 'no changes'}`);
+    const send = (patch: TreePatch | null, sha256 = patch?.sha256) =>
+      agent.call(`/__sim/build?sha=${repo.sha}${patch === null ? '' : `&patch=${sha256}`}`, { method: 'POST', ...(patch === null ? {} : { body: JSON.stringify({ patch: patch.bytes.toString('base64') }) }) });
+    const checkout = (file: string) => (existsSync(join(repo.dir, file)) ? readFileSync(join(repo.dir, file), 'utf8') : null);
+    assert.equal((await settled(null)).state, 'built');
+
+    const client = mkdtempSync(join(tmpdir(), 'verify-agent-client-'));
+    execFileSync('git', ['clone', '-q', repo.dir, client]);
+    writeFileSync(join(client, 'app.txt'), 'edited');
+    writeFileSync(join(client, 'extra.txt'), 'added');
+    const first = workingPatch(client, ['.'])!;
+    assert.equal(existsSync(join(agent.work, 'patched')), false, 'a build of the commit leaves no mark');
+    assert.equal((await send(first)).status, 202);
+    assert.equal((await settled(first.sha256)).state, 'built');
+    assert.deepEqual([readFileSync(join(agent.work, 'built'), 'utf8'), checkout('extra.txt')], ['edited', 'added']);
+    assert.equal(readFileSync(join(agent.work, 'patched'), 'utf8'), `${first.sha256}\n`, 'the mark that keeps the job from storing what it built');
+
+    rmSync(join(client, 'extra.txt'));
+    writeFileSync(join(client, 'app.txt'), 'edited again');
+    const second = workingPatch(client, ['.'])!;
+    assert.equal((await send(second, 'd'.repeat(64))).status, 400, 'a patch that does not hash to what was sent with it');
+    assert.equal((await send(second)).status, 202);
+    const rebuilt = await settled(second.sha256);
+    assert.equal(rebuilt.state === 'built' && rebuilt.incremental, true);
+    assert.deepEqual([readFileSync(join(agent.work, 'built'), 'utf8'), checkout('extra.txt')], ['edited again', null], 'the file the first changes added is gone');
+
+    execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@example.com', 'commit', '-q', '-am', 'not pushed'], { cwd: client });
+    writeFileSync(join(client, 'app.txt'), 'edited on a commit the session does not have');
+    const elsewhere = workingPatch(client, ['.'])!;
+    await send(elsewhere);
+    const refused = await settled(elsewhere.sha256);
+    assert.equal(refused.state, 'failed');
+    assert.match(refused.state === 'failed' ? refused.tail : '', new RegExp(`the uncommitted changes ${elsewhere.sha256.slice(0, 12)} do not apply to ${repo.sha.slice(0, 12)}\\. Commit and push them, then run again\\.$`));
+    assert.deepEqual([repo.git('status', '--porcelain'), checkout('app.txt')], ['', 'one'], 'the checkout is the commit, with nothing half applied');
+
+    await send(null);
+    assert.equal((await settled(null)).state, 'built');
+    assert.equal(readFileSync(join(agent.work, 'built'), 'utf8'), 'one');
+    assert.ok(existsSync(join(agent.work, 'patched')), 'a later build of the commit does not take the mark away');
+    await agent.call('/__sim/stop', { method: 'POST' });
+    await agent.exited;
+  });
+
+  it('marks the job as soon as it accepts changes, before any of the work that can fail', async () => {
+    const repo = repoWithCommit();
+    const github = await gitHubWith(repo);
+    const agent = await startAgent({ ...base, sha: repo.sha }, { cwd: repo.dir, env: github.env });
+    await until(async () => ((await agent.health()).build.state === 'built' ? true : null), 'the build of the commit');
+    const client = mkdtempSync(join(tmpdir(), 'verify-agent-client-'));
+    execFileSync('git', ['clone', '-q', repo.dir, client]);
+    writeFileSync(join(client, 'app.txt'), 'edited');
+    execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@example.com', 'commit', '-q', '-am', 'not pushed'], { cwd: client });
+    writeFileSync(join(client, 'app.txt'), 'edited on a commit the session does not have');
+    const changes = workingPatch(client, ['.'])!;
+    const sent = await agent.call(`/__sim/build?sha=${repo.sha}&patch=${changes.sha256}`, { method: 'POST', body: JSON.stringify({ patch: changes.bytes.toString('base64') }) });
+    assert.equal(sent.status, 202);
+    assert.equal(readFileSync(join(agent.work, 'patched'), 'utf8'), `${changes.sha256}\n`, 'marked when the agent answered, before the checkout');
+    const failed = await until(async () => { const b = (await agent.health()).build; return b.state === 'failed' && b.patch === changes.sha256 ? b : null; }, 'the changes to fail');
+    assert.match(failed.state === 'failed' ? failed.tail : '', /do not apply/);
+    assert.equal(readFileSync(join(agent.work, 'patched'), 'utf8'), `${changes.sha256}\n`, 'changes that did not apply keep the mark');
+    await agent.call('/__sim/stop', { method: 'POST' });
+    await agent.exited;
+  });
+
+  it('builds no uncommitted changes in a session on the default branch, or in one that does not know its branch or the default branch', async () => {
+    const repo = repoWithCommit();
+    const github = await gitHubWith(repo);
+    const client = mkdtempSync(join(tmpdir(), 'verify-agent-client-'));
+    execFileSync('git', ['clone', '-q', repo.dir, client]);
+    writeFileSync(join(client, 'app.txt'), 'edited');
+    const changes = workingPatch(client, ['.'])!;
+    const onMain = 'this session runs on main, the default branch, so it builds no uncommitted changes. Work on a branch: commit to a new branch and push it, then run down and up from that branch.';
+    const refusals = [
+      [{ GITHUB_REF: 'refs/heads/main' }, onMain],
+      [{ GITHUB_REF: 'refs/heads/main', VERIFY_SESSION_DEFAULT_BRANCH: '' }, onMain],
+      [{ VERIFY_SESSION_DEFAULT_BRANCH: '', GITHUB_REPOSITORY: 'clerk/unknown' }, 'this session could not learn the default branch of the repository, so it builds no uncommitted changes. Commit and push them to a branch, then run again.'],
+      [{ GITHUB_REF: '' }, 'this session does not know the branch it was started on, so it builds no uncommitted changes. Commit and push them to a branch, then run again.'],
+      [{ GITHUB_REF: 'refs/tags/v1' }, 'this session was started on refs/tags/v1, which is not a branch, so it builds no uncommitted changes. Commit and push them to a branch, then run again.'],
+    ] as const;
+    for (const [env, error] of refusals) {
+      const agent = await startAgent({ ...base, sha: repo.sha }, { cwd: repo.dir, env: { ...github.env, ...env } });
+      await until(async () => ((await agent.health()).build.state === 'built' ? true : null), 'the build of the commit');
+      const sent = await agent.call(`/__sim/build?sha=${repo.sha}&patch=${changes.sha256}`, { method: 'POST', body: JSON.stringify({ patch: changes.bytes.toString('base64') }) });
+      assert.deepEqual([sent.status, await sent.json()], [409, { error }]);
+      const build = (await agent.health()).build;
+      assert.deepEqual([build.state, build.state === 'built' && build.patch, readdirSync(agent.work).filter((name) => name.startsWith('patch-'))], ['built', null, []], 'the changes were not kept or built');
+      assert.equal((await agent.call(`/__sim/build?sha=${repo.sha}`, { method: 'POST' })).status, 202, 'the commit itself still builds');
+      await agent.call('/__sim/stop', { method: 'POST' });
+      await agent.exited;
+    }
+  });
+
+  it('refuses changes to anything but the app sources, by what git would write, before it applies any of them', async () => {
+    const repo = repoWithCommit();
+    writeFileSync(join(repo.dir, 'outside.txt'), 'kept');
+    const started = repo.commit('two');
+    const github = await gitHubWith({ ...repo, sha: started });
+    const agent = await startAgent({ ...base, sha: started }, { cwd: repo.dir, env: github.env });
+    const settled = (patch: string | null) => until(async () => { const b = (await agent.health()).build; return b.state !== 'building' && b.state !== 'none' && b.patch === patch ? b : null; }, `the build with ${patch ?? 'no changes'}`);
+    const send = (patch: TreePatch) => agent.call(`/__sim/build?sha=${started}&patch=${patch.sha256}`, { method: 'POST', body: JSON.stringify({ patch: patch.bytes.toString('base64') }) });
+    assert.equal((await settled(null)).state, 'built');
+
+    const client = mkdtempSync(join(tmpdir(), 'verify-agent-client-'));
+    execFileSync('git', ['clone', '-q', repo.dir, client]);
+    writeFileSync(join(client, 'app.txt'), 'edited');
+    mkdirSync(join(client, 'e2e-tests'));
+    writeFileSync(join(client, 'e2e-tests', 'recipe.ts'), 'a new file outside the app sources');
+    const added = workingPatch(client, ['.'])!;
+    rmSync(join(client, 'e2e-tests'), { recursive: true });
+    execFileSync('git', ['checkout', '-q', '--', 'app.txt'], { cwd: client });
+    execFileSync('git', ['mv', 'outside.txt', 'extra.txt'], { cwd: client });
+    const renamedBytes = execFileSync('git', ['diff', '--cached', '--binary', '-M', 'HEAD'], { cwd: client });
+    const renamed: TreePatch = { sha256: createHash('sha256').update(renamedBytes).digest('hex'), bytes: renamedBytes };
+    assert.match(renamedBytes.toString(), /^rename from outside\.txt$/m, 'git writes the rename source without the patch naming it as a file');
+
+    for (const [patch, path] of [[added, 'e2e-tests/recipe.ts'], [renamed, 'outside.txt']] as const) {
+      assert.equal((await send(patch)).status, 202);
+      const refused = await settled(patch.sha256);
+      assert.equal(refused.state, 'failed', path);
+      assert.equal(refused.state === 'failed' ? refused.tail.split('\n').at(-1) : '', `the uncommitted changes ${patch.sha256.slice(0, 12)} change ${path}, and a session builds changes only to app.txt, extra.txt, Sources. Commit and push that change, then run again.`);
+      assert.deepEqual([repo.git('status', '--porcelain', '--ignored'), readFileSync(join(repo.dir, 'app.txt'), 'utf8'), readFileSync(join(agent.work, 'built'), 'utf8')], ['', 'two', 'two'], `nothing of the changes to ${path} was applied or built`);
+    }
+    await agent.call('/__sim/stop', { method: 'POST' });
+    await agent.exited;
+  });
+
+  it('returns the build log from the byte it is asked for, and all of it when that byte is past the end', async () => {
+    const repo = repoWithCommit();
+    const github = await gitHubWith(repo);
+    const agent = await startAgent({ ...base, sha: repo.sha }, { cwd: repo.dir, env: github.env });
+    await until(async () => ((await agent.health()).build.state === 'built' ? true : null), 'the build');
+    const log = readFileSync(join(agent.work, 'build.log'));
+    assert.match(log.toString(), /^\n\$ git fetch --no-tags --depth=1 origin /);
+    const read = async (from: number) => {
+      const answer = await agent.call(`/__sim/build/log?from=${from}`);
+      return [answer.status, answer.headers.get(BUILD_LOG_START), Buffer.from(await answer.arrayBuffer()).toString()];
+    };
+    assert.deepEqual(await read(0), [200, '0', log.toString()]);
+    assert.deepEqual(await read(10), [200, '10', log.subarray(10).toString()]);
+    assert.deepEqual(await read(log.length), [200, String(log.length), '']);
+    assert.deepEqual(await read(log.length + 5), [200, '0', log.toString()], 'a log that was started again since the last read');
+    await agent.call('/__sim/stop', { method: 'POST' });
+    await agent.exited;
+  });
+
+  it('keeps serving when the build log cannot be read', async () => {
+    const repo = repoWithCommit();
+    const github = await gitHubWith(repo);
+    const agent = await startAgent({ ...base, sha: repo.sha }, { cwd: repo.dir, env: github.env });
+    await until(async () => ((await agent.health()).build.state === 'built' ? true : null), 'the build');
+    rmSync(join(agent.work, 'build.log'));
+    mkdirSync(join(agent.work, 'build.log'));
+    await agent.call('/__sim/build/log?from=0').then((answer) => answer.arrayBuffer()).catch(() => null);
+    assert.equal((await agent.call('/__sim/health')).status, 200, 'the agent still answers after a failed read of the log');
     await agent.call('/__sim/stop', { method: 'POST' });
     await agent.exited;
   });

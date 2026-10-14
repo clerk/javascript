@@ -909,6 +909,21 @@ describe('the evidence block of a pull request description', () => {
     });
   });
 
+  it('writes the block in place of an empty pair of markers, so a description may say where the block goes', () => {
+    const { start, end } = evidenceMarkers('ios');
+    assert.deepEqual(withEvidenceBlock(`## Verification\n\n${start}\n\n${end}\n\n## Notes\n`, 'ios', block), {
+      ok: true,
+      body: `## Verification\n\n${block}\n\n## Notes\n`,
+      was: 'replaced',
+      old: '\n\n',
+    });
+    assert.equal(
+      withEvidenceBlock(`intro\r\n${start}\r\n \t\r\n${end}\r\noutro`, 'ios', block).body,
+      `intro\r\n${block.replaceAll('\n', '\r\n')}\r\noutro`,
+    );
+    assert.equal(withEvidenceBlock(`${start}\n${end}`, 'ios', block).body, block);
+  });
+
   it('takes no marker from inside a code fence, so a description may show a whole example block', () => {
     const example = blockOf(manifestFor(MEDIA, { run: 'r20261007-010101-aaaa' }));
     for (const [open, close] of [
@@ -2047,6 +2062,17 @@ describe('the step that edits the description', () => {
     const env = await fetched();
     assert.throws(() => publish(env, fake), /has text between the markers that is not an evidence block/);
     assert.equal(fake.state.writtenBody, null);
+  });
+
+  it('publishes into an empty pair of markers and keeps the text around them', async () => {
+    const env = await fetched();
+    const fake = fakeGh({
+      ...PULL,
+      body: '## Verification\n\n<!-- verify-evidence:ios -->\n\n<!-- /verify-evidence:ios -->\n\n## Notes\n',
+    });
+    assert.equal(publish(env, fake).outcome, 'published');
+    assert.equal(fake.state.writtenBody, `## Verification\n\n${PLACED}\n\n## Notes\n`);
+    assert.equal(fake.state.laidOutBody, `## Verification\n\n${laidOut(SAID, ...AFTER_ONLY)}\n\n## Notes\n`);
   });
 
   it('refuses files that changed after the first step wrote them', async () => {

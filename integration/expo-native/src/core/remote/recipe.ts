@@ -4,6 +4,8 @@ import type { RecipeAnswers, RecipeRequest, SessionDevice, SessionDeviceFactory,
 
 export function answer(device: SessionDevice, request: RecipeRequest): RecipeAnswers[RecipeRequest['op']] {
   switch (request.op) {
+    case 'inputs':
+      return device.inputs;
     case 'build':
       return device.build(request.work);
     case 'record':

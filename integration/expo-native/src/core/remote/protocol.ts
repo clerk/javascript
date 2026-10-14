@@ -71,7 +71,7 @@ export function parseRequest(text: string): SessionRequest {
   return request;
 }
 
-export const sha256Hex = (value: string): string => createHash('sha256').update(value).digest('hex');
+export const sha256Hex = (value: string | Buffer): string => createHash('sha256').update(value).digest('hex');
 
 export function matchesToken(tokenSha256: string, presented: string): boolean {
   const given = Buffer.from(sha256Hex(presented), 'hex');
@@ -85,14 +85,24 @@ export const STEP = {
 
 export const RUN_TITLE = /(?:^|[ /])([a-f0-9]{12})\/([a-z0-9]{4,24})$/;
 
+interface BuildOf {
+  readonly sha: string;
+  readonly patch: string | null;
+  readonly seconds: number;
+}
+
 export type BuildState =
   | { readonly state: 'none' }
-  | { readonly state: 'building'; readonly sha: string; readonly seconds: number }
-  | { readonly state: 'built'; readonly sha: string; readonly seconds: number; readonly incremental: boolean }
-  | { readonly state: 'failed'; readonly sha: string; readonly seconds: number; readonly tail: string }
-  | { readonly state: 'timed-out'; readonly sha: string; readonly seconds: number; readonly tail: string };
+  | (BuildOf & { readonly state: 'building' })
+  | (BuildOf & { readonly state: 'built'; readonly incremental: boolean })
+  | (BuildOf & { readonly state: 'failed'; readonly tail: string })
+  | (BuildOf & { readonly state: 'timed-out'; readonly tail: string });
 
 export const BUILD_TIMEOUT_MINUTES = 45;
+
+export const PATCH_LIMIT_BYTES = 16 * 1024 * 1024;
+
+export const BUILD_LOG_START = 'x-log-start';
 
 export type EndReason = 'stop' | 'idle' | 'cap' | 'tunnel-lost' | 'signal';
 
@@ -106,6 +116,7 @@ export interface SessionHealth {
 }
 
 export interface SessionDevice {
+  readonly inputs: readonly string[];
   build(work: string): readonly CommandLine[];
   readonly record: {
     start(file: string): CommandLine;
@@ -121,11 +132,13 @@ export interface SessionDeviceRef {
 export type SessionDeviceFactory = (device: SessionDeviceRef) => SessionDevice;
 
 export type RecipeRequest =
+  | { readonly op: 'inputs' }
   | { readonly op: 'build'; readonly work: string }
   | { readonly op: 'record'; readonly file: string }
   | { readonly op: 'logs'; readonly since: string; readonly predicate: string | null };
 
 export interface RecipeAnswers {
+  readonly inputs: readonly string[];
   readonly build: readonly CommandLine[];
   readonly record: { readonly start: CommandLine; readonly stop: readonly CommandLine[] | null; readonly collect: readonly CommandLine[] };
   readonly logs: CommandLine;

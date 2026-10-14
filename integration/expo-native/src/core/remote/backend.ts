@@ -1,16 +1,18 @@
-import { createWriteStream, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { copyFileSync, createWriteStream, existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import type { ReadableStream } from 'node:stream/web';
 import { run, sleep } from '../exec.ts';
-import { VerifyFailure, everyFile, type AcquireRequest, type DeviceBackend, type EvidenceFile, type EvidencePath, type Recording, type RemoteLease } from '../types.ts';
+import { VerifyFailure, everyFile, type AcquireRequest, type DeviceBackend, type EvidenceFile, type EvidencePath, type Recording, type RemoteLease, type TreePatch } from '../types.ts';
 import { apiMessage, currentBranch, endSession, liveRuns, openGitHub, startRun, viewRun, waitForStep, waitReporter, type GitHub } from './github.ts';
 import { HANDOFF_VERSION, HandoffRefused, describeFile, parseHandoffManifest, pullRequestMismatch, type HandoffManifest } from './handoff.ts';
 import { coreVersion } from '../manifest.ts';
 import { withEvidenceBlock } from '../publish.ts';
 import { remoteDoctorChecks } from './preflight.ts';
-import { BUILD_TIMEOUT_MINUTES, STEP, type SessionHealth } from './protocol.ts';
+import { BUILD_LOG_START, BUILD_TIMEOUT_MINUTES, PATCH_LIMIT_BYTES, STEP, sha256Hex, type SessionHealth } from './protocol.ts';
 import { firstHealth, sendEvidence, sessionCall, sessionHealth, tunnelUrl, type SessionRef } from './session.ts';
 import { forgetSession, newSessionRequest, saveToken, savedDriverId, type RemoteDeps, type RemoteSettings } from './settings.ts';
 
@@ -30,6 +32,33 @@ async function pullRequestCommits(hub: GitHub, pr: number): Promise<readonly str
   }
   return shas;
 }
+
+const COMMIT_THE_CHANGES = 'git commit the changes and git push, then rerun';
+
+export function workingPatch(worktree: string, inputs: readonly string[]): TreePatch | null {
+  const scratch = mkdtempSync(join(tmpdir(), 'verify-patch-'));
+  try {
+    const index = join(scratch, 'index');
+    const git = (args: readonly string[]): Buffer => {
+      try {
+        return execFileSync('git', [...args], { cwd: worktree, env: { ...process.env, GIT_INDEX_FILE: index }, maxBuffer: PATCH_LIMIT_BYTES, stdio: ['ignore', 'pipe', 'pipe'] });
+      } catch (error) {
+        const failed = error as NodeJS.ErrnoException & { readonly stderr?: Buffer };
+        if (failed.code === 'ENOBUFS') throw new VerifyFailure('BUILD_FAILED', `the uncommitted changes to the app make a patch larger than the ${PATCH_LIMIT_BYTES / 1024 / 1024} MiB a session takes`, COMMIT_THE_CHANGES);
+        throw new VerifyFailure('BUILD_FAILED', `git could not read the uncommitted changes to the app: ${failed.stderr?.toString().trim() || failed.message}`, COMMIT_THE_CHANGES);
+      }
+    };
+    const own = resolve(worktree, execFileSync('git', ['rev-parse', '--git-path', 'index'], { cwd: worktree, encoding: 'utf8' }).trim());
+    if (existsSync(own)) copyFileSync(own, index);
+    git(['add', '--all', '--', ...inputs]);
+    const bytes = git(['diff', '--cached', '--binary', '--no-color', '--no-ext-diff', '--no-renames', '--no-relative', '--src-prefix=a/', '--dst-prefix=b/', 'HEAD', '--', ...inputs]);
+    return bytes.length === 0 ? null : { sha256: sha256Hex(bytes), bytes };
+  } finally {
+    rmSync(scratch, { recursive: true, force: true });
+  }
+}
+
+const describeSource = (sha: string, patch: string | null): string => `${sha.slice(0, 12)}${patch === null ? '' : ` with uncommitted changes ${patch.slice(0, 12)}`}`;
 
 async function baseHolds(hub: GitHub, pr: number, base: unknown, commit: string): Promise<boolean | 'unknown'> {
   if (typeof base !== 'string' || !/^[0-9a-f]{40}$/.test(base)) return false;
@@ -59,29 +88,43 @@ export function remoteBackend(settings: RemoteSettings, deps: RemoteDeps = { env
   function describeBuild(health: SessionHealth): string {
     const build = health.build;
     if (build.state === 'none') return 'no build';
-    return `build ${build.sha.slice(0, 12)} ${build.state}${build.state === 'building' ? ` ${build.seconds}s` : ''}`;
+    return `build ${describeSource(build.sha, build.patch)} ${build.state}${build.state === 'building' ? ` ${build.seconds}s` : ''}`;
   }
 
-  async function waitForBuild(lease: RemoteLease, sha: string, progress: (line: string) => void): Promise<Extract<SessionHealth['build'], { state: 'built' }>> {
+  async function waitForBuild(lease: RemoteLease, sha: string, patch: string | null, progress: (line: string) => void): Promise<Extract<SessionHealth['build'], { state: 'built' }>> {
     const deadline = Date.now() + READY_DEADLINE_MS;
+    const what = describeSource(sha, patch);
+    const fix = patch === null ? 'fix the build error above, commit, push, then rerun {cli} up' : 'fix the build error above, then rerun {cli} up, which sends the uncommitted changes again';
     let last = '';
+    let shown = 0;
+    const showLog = async (): Promise<void> => {
+      const answer = await sessionCall(lease, `/__sim/build/log?from=${shown}`, { timeoutMs: 15_000 }).catch(() => null);
+      if (answer?.status !== 200) return;
+      const start = Number(answer.headers.get(BUILD_LOG_START) ?? shown);
+      const bytes = Buffer.from(await answer.arrayBuffer());
+      const whole = bytes.lastIndexOf(0x0a) + 1;
+      for (const line of bytes.subarray(0, whole).toString().split('\n')) if (line.trim() !== '') progress(`build   | ${line}`);
+      shown = start + whole;
+    };
     for (;;) {
       const health = await sessionHealth(lease);
       if (health === null) {
         const state = await viewRun(await github(), lease.providerRef);
         if (state.status === 'completed') throw new VerifyFailure('LEASE_LOST', `the session ended (${state.conclusion ?? 'no conclusion'}) while it was building`, `read ${runUrl(lease.providerRef)} for why, then {cli} up`);
       } else {
-        if (health.build.state === 'failed' && health.build.sha === sha) {
-          throw new VerifyFailure('BUILD_FAILED', `the session could not build ${sha.slice(0, 12)}:\n${health.build.tail}`, 'fix the build error above, commit, push, then rerun {cli} up');
+        const ours = health.build.state !== 'none' && health.build.sha === sha && health.build.patch === patch;
+        if (ours) await showLog();
+        if (ours && health.build.state === 'failed') {
+          throw new VerifyFailure('BUILD_FAILED', `the session could not build ${what}:\n${health.build.tail}`, fix);
         }
-        if (health.build.state === 'timed-out' && health.build.sha === sha) {
+        if (ours && health.build.state === 'timed-out') {
           throw new VerifyFailure(
             'NOT_READY',
-            `the session stopped the build of ${sha.slice(0, 12)} after ${BUILD_TIMEOUT_MINUTES} minutes on ${lease.runner}, the longest it lets one build run. The build reported no error before that. Its last lines:\n${health.build.tail}`,
+            `the session stopped the build of ${what} after ${BUILD_TIMEOUT_MINUTES} minutes on ${lease.runner}, the longest it lets one build run. The build reported no error before that. Its last lines:\n${health.build.tail}`,
             'rerun {cli} up, and the same session builds again from what the stopped build left; if that build is stopped too, {cli} down, then {cli} up --runner <a faster runner label>',
           );
         }
-        if (health.build.state === 'built' && health.build.sha === sha && health.device?.ready === true && health.daemon) return health.build;
+        if (ours && health.build.state === 'built' && health.device?.ready === true && health.daemon) return health.build;
         const line = `wait    ${describeBuild(health)}; device ${health.device?.ready === true ? 'ready' : 'booting'}; agent-device ${health.daemon ? 'up' : 'starting'}`;
         const coarse = line.replace(/ \d+s/, '');
         if (coarse !== last) progress(line);
@@ -102,21 +145,13 @@ export function remoteBackend(settings: RemoteSettings, deps: RemoteDeps = { env
     availability: () => ({ usable: true, why: `the device runs on a CI runner (${settings.runner} unless --runner names another), started through ${settings.workflow} on ${settings.repo}` }),
 
     async sourceCommit(input) {
-      const status = await deps.runner('git', ['status', '--porcelain', '--', ...input.inputs], { cwd: input.worktree });
-      const files = status.stdout.split('\n').filter((line) => line.length > 3).map((line) => line.slice(3));
-      if (files.length > 0) {
-        throw new VerifyFailure(
-          'BUILD_FAILED',
-          `a remote session builds a pushed commit, and this tree has uncommitted changes to the app: ${files.slice(0, 5).join(', ')}${files.length > 5 ? `, and ${files.length - 5} more` : ''}`,
-          'git commit the changes and git push, then rerun',
-        );
-      }
       const sha = (await deps.runner('git', ['rev-parse', 'HEAD'], { cwd: input.worktree })).stdout.trim();
+      const patch = workingPatch(input.worktree, input.inputs);
       const found = await (await github()).api('GET', `/commits/${sha}`);
       if (found.status !== 200) {
         throw new VerifyFailure('BUILD_FAILED', `a remote session builds a pushed commit, and GitHub does not have ${sha.slice(0, 12)} (${found.status})`, 'git push, then rerun');
       }
-      return sha;
+      return { sha, patch };
     },
 
     async acquire(request: AcquireRequest) {
@@ -149,6 +184,7 @@ export function remoteBackend(settings: RemoteSettings, deps: RemoteDeps = { env
           runner: order.runner,
           expiresAt: health.capAt,
           builtSha: null,
+          builtPatch: null,
           acquiredAt: new Date().toISOString(),
           installedBuild: null,
         };
@@ -174,17 +210,23 @@ export function remoteBackend(settings: RemoteSettings, deps: RemoteDeps = { env
       }
       if (health.ending !== null) return 'lost';
       assertSameCore(health);
-      return Date.parse(lease.expiresAt) - Date.now() < EXPIRING_MS ? 'expiring' : 'held';
+      if (Date.parse(lease.expiresAt) - Date.now() < EXPIRING_MS) return 'expiring';
+      const { build } = health;
+      return lease.builtSha === null || (build.state === 'built' && build.sha === lease.builtSha && build.patch === lease.builtPatch) ? 'held' : 'other-app';
     },
 
     async install(lease, app, progress) {
       if (app.source === 'local') throw new VerifyFailure('BUILD_FAILED', 'a remote session builds a pushed commit and this build names none', '{cli} down, then {cli} up');
-      const sha = app.sourceSha;
-      const started = await sessionCall(lease, `/__sim/build?sha=${sha}`, { method: 'POST' });
-      if (started.status !== 202) throw new VerifyFailure('BUILD_FAILED', `the session refused to build ${sha.slice(0, 12)}: ${started.status} ${await started.text()}`, '{cli} down, then {cli} up');
-      const built = await waitForBuild(lease, sha, progress);
-      progress(`build   ${app.key}  github-actions  ${sha.slice(0, 12)} ${built.incremental ? 'rebuilt' : 'built'} in ${built.seconds}s on ${lease.runner}`);
-      return { ...lease, builtSha: sha };
+      const { sourceSha: sha, patch } = app;
+      const builtPatch = patch?.sha256 ?? null;
+      const started = await sessionCall(lease, `/__sim/build?sha=${sha}${patch === null ? '' : `&patch=${patch.sha256}`}`, {
+        method: 'POST',
+        ...(patch === null ? {} : { json: { patch: patch.bytes.toString('base64') }, timeoutMs: 120_000 }),
+      });
+      if (started.status !== 202) throw new VerifyFailure('BUILD_FAILED', `the session refused to build ${describeSource(sha, builtPatch)}: ${started.status} ${await started.text()}`, '{cli} down, then {cli} up');
+      const built = await waitForBuild(lease, sha, builtPatch, progress);
+      progress(`build   ${app.key}  github-actions  ${describeSource(sha, builtPatch)} ${built.incremental ? 'rebuilt' : 'built'} in ${built.seconds}s on ${lease.runner}`);
+      return { ...lease, builtSha: sha, builtPatch };
     },
 
     async release(lease) {
@@ -212,6 +254,7 @@ export function remoteBackend(settings: RemoteSettings, deps: RemoteDeps = { env
           runner: '',
           expiresAt: live.createdAt,
           builtSha: null,
+          builtPatch: null,
           acquiredAt: live.createdAt,
           installedBuild: null,
         }));

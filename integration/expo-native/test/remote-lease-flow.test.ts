@@ -8,7 +8,7 @@ import { heldInstances } from '../testing/fake-instances.ts';
 import { describe, it } from 'node:test';
 import { doctor, down, up, type Deps } from '../src/core/verbs.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
-import { VerifyFailure, type BuiltApp, type DeviceBackend, type HostAdapter, type RemoteLease } from '../src/core/types.ts';
+import { VerifyFailure, type BuiltApp, type DeviceBackend, type HostAdapter, type RemoteLease, type SessionSource } from '../src/core/types.ts';
 
 const shaOf = (app: BuiltApp): string | null => (app.source === 'local' ? null : app.sourceSha);
 
@@ -20,10 +20,11 @@ function setup() {
   const progress: string[] = [];
   const finished: string[] = [];
   let sha = 'a'.repeat(40);
-  let health: 'held' | 'lost' = 'held';
+  let health: 'held' | 'lost' | 'other-app' = 'held';
   let pushed = true;
   let stuck = false;
-  const lease = (session: string): RemoteLease => ({ backend: 'remote', provider: 'github-actions', platform: 'ios', session, providerRef: '1', baseUrl: 'https://x.trycloudflare.com', tokenFile: join(dir, 'token'), deviceId: 'UDID', deviceName: 'iPhone Air', runner: 'mac-runner', expiresAt: '2026-10-05T01:00:00Z', builtSha: null, acquiredAt: '', installedBuild: null });
+  let patch: string | null = null;
+  const lease = (session: string): RemoteLease => ({ backend: 'remote', provider: 'github-actions', platform: 'ios', session, providerRef: '1', baseUrl: 'https://x.trycloudflare.com', tokenFile: join(dir, 'token'), deviceId: 'UDID', deviceName: 'iPhone Air', runner: 'mac-runner', expiresAt: '2026-10-05T01:00:00Z', builtSha: null, builtPatch: null, acquiredAt: '', installedBuild: null });
   let sessions = 0;
   const inputsAskedFor: string[] = [];
   const remote = {
@@ -31,9 +32,9 @@ function setup() {
     platform: 'ios',
     requirement: 'a pushed branch',
     availability: () => ({ usable: true, why: 'a device on a runner' }),
-    async sourceCommit(): Promise<string> {
+    async sourceCommit(): Promise<SessionSource> {
       if (!pushed) throw new VerifyFailure('BUILD_FAILED', 'GitHub does not have HEAD', 'git push, then rerun');
-      return sha;
+      return { sha, patch: patch === null ? null : { sha256: patch, bytes: Buffer.from(patch) } };
     },
     reapable: async () => [],
     check: async () => health,
@@ -43,8 +44,10 @@ function setup() {
       return { ...lease(`s${sessions}`), ...(request.runner === undefined ? {} : { runner: request.runner }) };
     },
     async install(held: RemoteLease, app: BuiltApp): Promise<RemoteLease> {
-      events.push(`install ${held.session} sha=${shaOf(app)?.slice(0, 1)}`);
-      return { ...held, builtSha: shaOf(app) };
+      const sent = app.source === 'local' ? null : app.patch?.sha256 ?? null;
+      events.push(`install ${held.session} sha=${shaOf(app)?.slice(0, 1)}${sent === null ? '' : ` patch=${sent}`}`);
+      if (health === 'other-app') health = 'held';
+      return { ...held, builtSha: shaOf(app), builtPatch: sent };
     },
     async release(held: RemoteLease) {
       events.push(`release ${held.session}`);
@@ -74,11 +77,12 @@ function setup() {
     progress: (line: string) => void progress.push(line),
     instances: heldInstances({ finish: async (ledger) => (finished.push(ledger.worktree), []) }),
   };
-  const edit = (text: string, newSha: string) => {
+  const edit = (text: string, newSha: string, uncommitted: string | null = null) => {
     writeFileSync(join(dir, 'app.swift'), text);
     sha = newSha.repeat(40);
+    patch = uncommitted;
   };
-  return { deps, events, progress, edit, commit: (newSha: string) => (sha = newSha.repeat(40)), lose: () => (health = 'lost'), unpush: () => (pushed = false), stick: () => (stuck = true), finished, inputsAskedFor };
+  return { deps, events, progress, edit, commit: (newSha: string) => (sha = newSha.repeat(40)), lose: () => (health = 'lost'), cutShort: () => (health = 'other-app'), unpush: () => (pushed = false), stick: () => (stuck = true), finished, inputsAskedFor };
 }
 
 describe('lease flow with a backend that builds the app', () => {
@@ -104,6 +108,41 @@ describe('lease flow with a backend that builds the app', () => {
     await up(deps, { verb: 'up', waitSeconds: 0 });
     assert.deepEqual(events.slice(2), ['install s1 sha=b']);
     assert.equal((deps.workspace.readLease('ios') as RemoteLease).builtSha, 'b'.repeat(40));
+  });
+
+  it('asks the session for the commit once the uncommitted changes it built are committed, though the app sources are the same', async () => {
+    const { deps, events, edit } = setup();
+    await up(deps, { verb: 'up', waitSeconds: 0 });
+    edit('two', 'a', 'p1');
+    await up(deps, { verb: 'up', waitSeconds: 0 });
+    edit('two', 'b');
+    await up(deps, { verb: 'up', waitSeconds: 0 });
+    await up(deps, { verb: 'up', waitSeconds: 0 });
+    assert.deepEqual(events.slice(2), ['install s1 sha=a patch=p1', 'install s1 sha=b']);
+    const held = deps.workspace.readLease('ios') as RemoteLease;
+    assert.deepEqual([held.builtSha, held.builtPatch], ['b'.repeat(40), null]);
+  });
+
+  it('installs on the held session what the tree needs when the session holds a build the lease does not name, as after an install that was cut short', async () => {
+    const { deps, events, progress, cutShort } = setup();
+    await up(deps, { verb: 'up', waitSeconds: 0 });
+    cutShort();
+    const result = await up(deps, { verb: 'up', waitSeconds: 0 });
+    assert.deepEqual(events.slice(2), ['install s1 sha=a']);
+    assert.equal(result.leases[0]!.renewed, false);
+    assert.ok(progress.includes(`build   ${result.builds[0]!.key}  github-actions  commit ${'a'.repeat(12)}  the session builds it`), progress.join('\n'));
+    const held = deps.workspace.readLease('ios') as RemoteLease;
+    assert.deepEqual([held.session, held.builtSha, held.builtPatch], ['s1', 'a'.repeat(40), null]);
+  });
+
+  it('says that the build with uncommitted changes is already on the session when it installs nothing', async () => {
+    const { deps, events, progress, edit } = setup();
+    await up(deps, { verb: 'up', waitSeconds: 0 });
+    edit('two', 'a', 'p1');
+    await up(deps, { verb: 'up', waitSeconds: 0 });
+    const result = await up(deps, { verb: 'up', waitSeconds: 0 });
+    assert.deepEqual(events.slice(2), ['install s1 sha=a patch=p1']);
+    assert.equal(progress.filter((line) => line.startsWith('build   ')).at(-1), `build   ${result.builds[0]!.key}  github-actions  commit ${'a'.repeat(12)} with uncommitted changes p1  already on the session`);
   });
 
   it('leases a new session when the held one has stopped itself', async () => {

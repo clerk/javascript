@@ -11,9 +11,9 @@ import type { Runner } from '../src/core/exec.ts';
 import { createInstances } from '../src/core/instances/instances.ts';
 import { SettingsRefused, settingsFileOf } from '../src/core/instances/settings.ts';
 import { summarize } from '../src/core/publish.ts';
-import { runVerb, type Deps } from '../src/core/verbs.ts';
+import { attach, runVerb, type Deps } from '../src/core/verbs.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
-import { VerifyFailure, type BuildKey, type Command, type DeviceBackend, type EvidencePath, type HostAdapter, type InstanceSettings, type LocalLease, type ScratchPath } from '../src/core/types.ts';
+import { VerifyFailure, type BuildKey, type BuiltApp, type Command, type DeviceBackend, type EvidencePath, type HostAdapter, type InstanceSettings, type LocalLease, type RemoteLease, type ScratchPath } from '../src/core/types.ts';
 import { PLATFORM_KEY, fakeClerk, type FakeClerkOptions } from '../testing/fake-clerk.ts';
 import { LEFT_OUT, linesLeftOut, watchDriver } from '../src/core/driver.ts';
 import { readAgent } from '../specs/support/agent.ts';
@@ -146,7 +146,9 @@ interface FakeE2EPlan {
 const SPEC_SOURCE = "import { test } from '../../fixtures.ts';\n\ntest('x', async ({ host }) => {\n  await host.seedUser();\n});\n";
 const settingsText = (declared: InstanceSettings): string => `${JSON.stringify(declared, null, 2)}\n`;
 
-function world(options: { readonly specs?: Readonly<Record<string, InstanceSettings | null>>; readonly plan?: FakeE2EPlan; readonly env?: Record<string, string>; readonly clerk?: FakeClerkOptions; readonly logs?: () => Promise<string> } = {}) {
+const SESSION_COMMIT = 'a'.repeat(40);
+
+function world(options: { readonly specs?: Readonly<Record<string, InstanceSettings | null>>; readonly plan?: FakeE2EPlan; readonly env?: Record<string, string>; readonly clerk?: FakeClerkOptions; readonly logs?: () => Promise<string>; readonly session?: { readonly patch: string | null } } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'verify-run-'));
   execFileSync('git', ['init', '-q'], { cwd: dir });
   writeFileSync(join(dir, 'app.swift'), 'app');
@@ -186,10 +188,24 @@ function world(options: { readonly specs?: Readonly<Record<string, InstanceSetti
     logs: options.logs ?? (async () => ''),
     describe: (lease: LocalLease) => lease.deviceName,
   } as unknown as DeviceBackend;
+  const patch = options.session?.patch ?? null;
+  const session = {
+    kind: 'remote',
+    platform: 'ios',
+    availability: () => ({ usable: true, why: 'test' }),
+    reapable: async () => [],
+    check: async () => 'held',
+    sourceCommit: async () => ({ sha: SESSION_COMMIT, patch: patch === null ? null : { sha256: patch, bytes: Buffer.from('uncommitted') } }),
+    acquire: async (): Promise<RemoteLease> => ({ backend: 'remote', provider: 'github-actions', platform: 'ios', session: 'ios0000aa', providerRef: '1', baseUrl: 'https://quick-fox.trycloudflare.com', tokenFile: join(dir, 'token'), deviceId: 'UDID-1', deviceName: 'iPhone Air', runner: 'xcode-27', expiresAt: '2099-01-01T00:00:00Z', builtSha: null, builtPatch: null, acquiredAt: '', installedBuild: null }),
+    install: async (lease: RemoteLease, app: BuiltApp) => ({ ...lease, builtSha: app.source === 'local' ? null : app.sourceSha, builtPatch: app.source === 'local' ? null : (app.patch?.sha256 ?? null) }),
+    release: async () => undefined,
+    logs: async () => '',
+    describe: (lease: RemoteLease) => lease.deviceName,
+  } as unknown as DeviceBackend;
   const host = {
     repo: 'clerk-ios',
     platforms: ['ios'],
-    backends: [backend],
+    backends: [options.session === undefined ? backend : session],
     appId: () => 'com.clerk.E2EHost',
     buildInputs: () => ['app.swift'],
     async build(platform: 'ios', key: BuildKey, into: ScratchPath) {
@@ -298,6 +314,14 @@ describe('a run whose spec files declare different settings', () => {
       await runVerb({ ...r.deps, runner: refusing }, { ...RUN_ALL, video: true });
       assert.deepEqual(r.order(), ['e2e opens the app with no arguments', 'recorder starts', 'launches for auth-start.e2e.ts']);
       assert.deepEqual(r.videoLines(), ['video   the app could not be closed before the recording, so the video may open on the screen it was showing: DEVICE_IN_USE']);
+    });
+
+    it('runs agent-device in its state folder, so a file it writes to its working folder stays out of the checkout', async () => {
+      const r = recorded({ launches: true });
+      const folders: (string | undefined)[] = [];
+      const watching: Runner = async (command, args, options) => (command.endsWith('agent-device') && folders.push(options?.cwd), r.deps.runner(command, args, options));
+      await runVerb({ ...r.deps, runner: watching }, { ...RUN_ALL, video: true });
+      assert.deepEqual(folders, [r.w.workspace.agentDeviceDir]);
     });
 
     it('gives the close before the recording 30 seconds, and records all the same when it runs out', async () => {
@@ -777,5 +801,30 @@ describe('the driver logs in the evidence of a run', () => {
     assert.deepEqual(readdirSync(join(dir, 'driver')), ['summary.txt']);
     assert.match(readFileSync(join(dir, 'driver', 'summary.txt'), 'utf8'), /\nThere is no daemon\.log, so no agent-device daemon on this machine wrote one\.\n/);
     assert.deepEqual(record.tainted, []);
+  });
+});
+
+describe('a run on a session that built uncommitted changes', () => {
+  const PATCH = 'c'.repeat(64);
+
+  it('names the changes the session built in the run.json it writes, and names none for a session that built the commit', async () => {
+    const remoteOf = async (patch: string | null) => {
+      const { dir } = await runVerb(world({ specs: { [AUTH_START]: null }, session: { patch } }).deps(), RUN_ALL);
+      return (JSON.parse(readFileSync(join(dir, 'run.json'), 'utf8')) as { remote: unknown }).remote;
+    };
+    assert.deepEqual(await remoteOf(PATCH), { provider: 'github-actions', runner: 'xcode-27', builtSha: SESSION_COMMIT, builtPatch: PATCH });
+    assert.deepEqual(await remoteOf(null), { provider: 'github-actions', runner: 'xcode-27', builtSha: SESSION_COMMIT, builtPatch: null });
+  });
+
+  it('is refused by attach from what run.json says, before attach runs anything', async () => {
+    const w = world({ specs: { [AUTH_START]: null }, session: { patch: PATCH } });
+    const { record } = await runVerb(w.deps(), RUN_ALL);
+    const ran: string[] = [];
+    const deps = { ...w.deps(), runner: async (command: string) => (ran.push(command), { code: 0, stdout: '', stderr: '' }) };
+    await assert.rejects(attach(deps, { verb: 'attach', run: record.run, pr: 9, media: { screenshots: ['home'], video: false }, before: null }), {
+      code: 'EVIDENCE_UNSAFE',
+      message: `run ${record.run} ran on a session build of ${SESSION_COMMIT.slice(0, 12)} with uncommitted changes (${PATCH.slice(0, 12)}), so no commit holds the app it shows`,
+    });
+    assert.deepEqual(ran, []);
   });
 });

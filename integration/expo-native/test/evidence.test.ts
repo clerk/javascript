@@ -224,6 +224,13 @@ describe('the evidence block of a pull request description', () => {
     assert.deepEqual(withEvidenceBlock(notes, 'ios', block), { ok: false, why: `has text between \`${start}\` and \`${end}\` that is not an evidence block`, fix: 'leave one pair of those markers in the description, or none' });
   });
 
+  it('writes the block in place of an empty pair of markers, so a description may say where the block goes', () => {
+    const { start, end } = evidenceMarkers('ios');
+    assert.deepEqual(withEvidenceBlock(`## Verification\n\n${start}\n\n${end}\n\n## Notes\n`, 'ios', block), { ok: true, body: `## Verification\n\n${block}\n\n## Notes\n`, was: 'replaced' });
+    assert.deepEqual(withEvidenceBlock(`intro\r\n${start}\r\n \t\r\n${end}\r\noutro`, 'ios', block), { ok: true, body: `intro\r\n${block.replaceAll('\n', '\r\n')}\r\noutro`, was: 'replaced' });
+    assert.deepEqual(withEvidenceBlock(`${start}\n${end}`, 'ios', block), { ok: true, body: block, was: 'replaced' });
+  });
+
   it('takes no marker from inside a code fence, so a description may show a whole example block', () => {
     const example = evidenceBlock({ ...summary, run: 'r20261007-010101-aaaa' as RunId }, null, media);
     const later = evidenceBlock({ ...summary, run: 'r20261009-020202-bbbb' as RunId }, null, media);
@@ -365,6 +372,18 @@ describe('attach', () => {
     const { run } = sealed({ called: 'after', log: hostLogLine('user_foreign') });
     await assert.rejects(attach(deps, { verb: 'attach', run, pr: 9, media: still, before: null }), { code: 'EVIDENCE_UNSAFE' });
     assert.equal(calls.length, 0);
+  });
+
+  it('refuses a run on a session build with uncommitted changes, as the run or as its before, calls no gh, and says to commit, push and run again', async () => {
+    const calls: string[] = [];
+    const { deps, sealed } = checkout({ runner: async (command) => (calls.push(command), { code: 0, stdout: '', stderr: '' }) });
+    const onSession = (builtPatch: string | null): Partial<EvidenceRecord> => ({ backend: 'remote', remote: { provider: 'github-actions', runner: 'xcode-27', builtSha: AFTER_COMMIT, builtPatch } });
+    const patched = sealed({ called: 'after', change: onSession('c'.repeat(64)) });
+    const committed = sealed({ called: 'after', change: onSession(null) });
+    const refusal = { code: 'EVIDENCE_UNSAFE', message: `run ${patched.run} ran on a session build of ${AFTER_COMMIT.slice(0, 12)} with uncommitted changes (cccccccccccc), so no commit holds the app it shows`, fix: 'commit and push the changes, {cli} run again, and attach the new run' };
+    await assert.rejects(attach(deps, { verb: 'attach', run: patched.run, pr: 9, media: still, before: null }), refusal);
+    await assert.rejects(attach(deps, { verb: 'attach', run: committed.run, pr: 9, media: still, before: patched.run }), refusal);
+    assert.deepEqual(calls, []);
   });
 
   it('shows a still change to something that exists as before and after screenshots, side by side at a fixed width, and no video', async () => {

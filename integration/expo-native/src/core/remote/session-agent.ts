@@ -1,14 +1,18 @@
-import { spawn, type ChildProcess } from 'node:child_process';
+import { execFile, spawn, type ChildProcess } from 'node:child_process';
 import { Resolver } from 'node:dns/promises';
-import { appendFileSync, createReadStream, existsSync, mkdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, createReadStream, existsSync, mkdirSync, rmSync, statSync, writeFileSync, type ReadStream } from 'node:fs';
 import http, { type IncomingMessage, type ServerResponse } from 'node:http';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 import {
+  BUILD_LOG_START,
   BUILD_TIMEOUT_MINUTES,
+  PATCH_LIMIT_BYTES,
   RequestError,
   matchesToken,
   parseRequest,
+  sha256Hex,
   type BuildState,
   type EndReason,
   type RecipeAnswers,
@@ -28,6 +32,12 @@ const COMMAND_TIMEOUT_MS = 30_000;
 const PUBLIC_RESOLVERS = ['1.1.1.1', '8.8.8.8'];
 const RECIPE = fileURLToPath(new URL('./recipe.ts', import.meta.url));
 const PINNED_AGENT_DEVICE = fileURLToPath(new URL('../../../node_modules/.bin/agent-device', import.meta.url));
+const execFileAsync = promisify(execFile);
+
+function send(stream: ReadStream, res: ServerResponse): void {
+  stream.on('error', () => res.destroy());
+  stream.pipe(res);
+}
 
 function setOutputs(file: string | undefined, values: Readonly<Record<string, string>>): void {
   const text = Object.entries(values).map(([key, value]) => `${key}=${value}\n`).join('');
@@ -39,6 +49,7 @@ type Env = Readonly<Record<string, string | undefined>>;
 type GitHubGet = (path: string) => Promise<unknown>;
 
 const COMMIT = /^[0-9a-f]{40}$/;
+const PATCH_HASH = /^[0-9a-f]{64}$/;
 
 function githubOf(env: Env): GitHubGet {
   const base = `${(env.GITHUB_API_URL ?? 'https://api.github.com').replace(/\/$/, '')}/repos/${env.GITHUB_REPOSITORY ?? ''}`;
@@ -175,11 +186,19 @@ function readBody(req: IncomingMessage, limit: number): Promise<string | null> {
   });
 }
 
+async function changesRefusal(ref: string, named: string, get: GitHubGet): Promise<string | null> {
+  if (!ref.startsWith('refs/heads/')) return `this session ${ref === '' ? 'does not know the branch it was started on' : `was started on ${ref}, which is not a branch`}, so it builds no uncommitted changes. Commit and push them to a branch, then run again.`;
+  const defaultBranch = named !== '' ? named : ((await get('')) as { readonly default_branch?: unknown } | null)?.default_branch;
+  if (typeof defaultBranch !== 'string' || defaultBranch === '') return 'this session could not learn the default branch of the repository, so it builds no uncommitted changes. Commit and push them to a branch, then run again.';
+  return ref === `refs/heads/${defaultBranch}` ? `this session runs on ${defaultBranch}, the default branch, so it builds no uncommitted changes. Work on a branch: commit to a new branch and push it, then run down and up from that branch.` : null;
+}
+
 async function serve(env: NodeJS.ProcessEnv): Promise<void> {
   const request = parseRequest(env.VERIFY_SESSION_REQUEST ?? '');
   const dispatched = env.GITHUB_SHA ?? '';
   const dispatchedRef = env.GITHUB_REF ?? '';
   const github = takeGitHub(env);
+  const refusesChanges = changesRefusal(dispatchedRef, env.VERIFY_SESSION_DEFAULT_BRANCH ?? '', github);
   const work = resolve(env.VERIFY_SESSION_WORK ?? 'verify-remote-work');
   const port = Number(env.VERIFY_SESSION_PORT ?? 3199);
   const agentPort = Number(env.VERIFY_SESSION_AGENT_PORT ?? 4310);
@@ -211,6 +230,7 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
   let builtOnce = false;
 
   const logFile = (name: 'agent-device-proxy' | 'build' | 'tunnel') => join(work, `${name}.log`);
+  const patchFile = (patch: string) => join(work, `patch-${patch}.diff`);
   const scrub = (text: string): string => (token === null ? text : text.split(token).join('<token>'));
   const log = (name: Parameters<typeof logFile>[0], chunk: Buffer | string): void => appendFileSync(logFile(name), scrub(chunk.toString()));
 
@@ -280,9 +300,21 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
     }, Promise.resolve(0));
   }
 
-  function startBuild(sha: string): void {
+  async function pathsThePatchWrites(sha: string, patch: string): Promise<readonly string[] | null> {
+    const env = { ...process.env, GIT_INDEX_FILE: join(work, 'patch-index') };
+    try {
+      await execFileAsync('git', ['read-tree', sha], { env });
+      await execFileAsync('git', ['apply', '--cached', '--binary', '--whitespace=nowarn', patchFile(patch)], { env });
+      const { stdout } = await execFileAsync('git', ['diff', '--cached', '--no-renames', '--name-only', '-z', sha], { env, maxBuffer: 2 * PATCH_LIMIT_BYTES });
+      return stdout.split('\0').filter((path) => path !== '');
+    } catch {
+      return null;
+    }
+  }
+
+  function startBuild(sha: string, patch: string | null): void {
     if (device === null) return;
-    if ((build.state === 'building' || build.state === 'built') && build.sha === sha) return;
+    if ((build.state === 'building' || build.state === 'built') && build.sha === sha && build.patch === patch) return;
     buildGeneration += 1;
     stopGroup(buildChild);
     const generation = buildGeneration;
@@ -297,21 +329,41 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
       timedOut = true;
       stopGroup(buildChild);
     }, BUILD_TIMEOUT_MINUTES * minuteMs);
-    build = { state: 'building', sha, seconds: 0 };
+    build = { state: 'building', sha, patch, seconds: 0 };
     rmSync(logFile('build'), { force: true });
-    const checkout: CommandLine[] = [
+    const cleanCheckout: CommandLine[] = [
       { command: 'git', args: ['fetch', '--no-tags', '--depth=1', 'origin', sha] },
       { command: 'git', args: ['checkout', '--force', '--detach', sha] },
+      { command: 'git', args: ['clean', '-d', '--force'] },
     ];
     const target = device;
+    const doesNotApply = (changes: string): string => `the uncommitted changes ${changes.slice(0, 12)} do not apply to ${sha.slice(0, 12)}. Commit and push them, then run again.`;
     const checkoutThenBuild = async (): Promise<number> => {
       if (sha !== dispatched && !(await isALaterCommitOfTheBranch(sha, dispatched, dispatchedRef, github))) {
         tail.push(`this session builds ${dispatched}, the commit it was started on, and later commits of ${dispatchedRef}. GitHub does not show ${sha} as one. Push it to that branch, or run down and then up to start a session on it.`);
         return 1;
       }
-      const checkedOut = await runCommands(checkout, stopped, tail);
+      const checkedOut = await runCommands(cleanCheckout, stopped, tail);
       if (checkedOut !== 0) return checkedOut;
       try {
+        if (patch !== null) {
+          const inputs = await recipe(target, { op: 'inputs' });
+          const written = await pathsThePatchWrites(sha, patch);
+          if (written === null) {
+            tail.push(doesNotApply(patch));
+            return 1;
+          }
+          const outside = written.find((path) => !inputs.some((input) => path === input || path.startsWith(`${input}/`)));
+          if (outside !== undefined) {
+            tail.push(`the uncommitted changes ${patch.slice(0, 12)} change ${outside}, and a session builds changes only to ${inputs.join(', ')}. Commit and push that change, then run again.`);
+            return 1;
+          }
+          const applied = await runCommands([{ command: 'git', args: ['apply', '--binary', '--whitespace=nowarn', patchFile(patch)] }], stopped, tail);
+          if (applied !== 0) {
+            tail.push(doesNotApply(patch));
+            return applied;
+          }
+        }
         return await runCommands(await recipe(target, { op: 'build', work }), stopped, tail);
       } catch (error) {
         tail.push((error as Error).message);
@@ -324,9 +376,9 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
       const seconds = Math.round((Date.now() - began) / 1000);
       if (code === 0 && !timedOut) {
         builtOnce = true;
-        build = { state: 'built', sha, seconds, incremental };
+        build = { state: 'built', sha, patch, seconds, incremental };
       } else {
-        build = { state: timedOut ? 'timed-out' : 'failed', sha, seconds, tail: scrub(tail.join('\n')) };
+        build = { state: timedOut ? 'timed-out' : 'failed', sha, patch, seconds, tail: scrub(tail.join('\n')) };
       }
     });
   }
@@ -381,10 +433,40 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
         return json(res, 200, health());
       case 'POST /build': {
         const sha = url.searchParams.get('sha') ?? '';
+        const patch = url.searchParams.get('patch');
         if (!/^[0-9a-f]{40}$/.test(sha)) return json(res, 400, { error: 'sha must be a full commit id' });
+        if (patch !== null && !PATCH_HASH.test(patch)) return json(res, 400, { error: 'patch must be the sha256 of the patch' });
         if (device === null) return json(res, 409, { error: 'this session has no device to build for' });
-        startBuild(sha);
+        if (patch !== null) {
+          const refusal = await refusesChanges;
+          if (refusal !== null) return json(res, 409, { error: refusal });
+          const body = await readBody(req, Math.ceil(PATCH_LIMIT_BYTES / 3) * 4 + 64);
+          if (body === null) return json(res, 413, { error: `the patch is larger than ${PATCH_LIMIT_BYTES} bytes` });
+          let bytes: Buffer;
+          try {
+            bytes = Buffer.from(String((JSON.parse(body) as { readonly patch?: unknown }).patch), 'base64');
+          } catch {
+            return json(res, 400, { error: 'the body must be a JSON object with the patch in base64' });
+          }
+          if (sha256Hex(bytes) !== patch) return json(res, 400, { error: 'the patch that arrived does not have the sha256 it was sent with' });
+          appendFileSync(join(work, 'patched'), `${patch}\n`);
+          writeFileSync(patchFile(patch), bytes);
+        }
+        startBuild(sha, patch);
         return json(res, 202, health());
+      }
+      case 'GET /build/log': {
+        const file = logFile('build');
+        const size = existsSync(file) ? statSync(file).size : 0;
+        const from = Number(url.searchParams.get('from') ?? 0);
+        const start = Number.isInteger(from) && from >= 0 && from <= size ? from : 0;
+        res.writeHead(200, { 'content-type': 'text/plain; charset=utf-8', [BUILD_LOG_START]: String(start) });
+        if (start === size) {
+          res.end();
+          return;
+        }
+        send(createReadStream(file, { start, end: size - 1 }), res);
+        return;
       }
       case 'POST /record/start': {
         if (device === null) return json(res, 409, { error: 'this session has no device to record' });
@@ -403,7 +485,7 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
         const file = join(work, 'recording.mp4');
         if (!existsSync(file)) return json(res, 404, { error: 'no recording' });
         res.writeHead(200, { 'content-type': 'video/mp4', 'content-length': String(statSync(file).size) });
-        createReadStream(file).pipe(res);
+        send(createReadStream(file), res);
         return;
       }
       case 'GET /logs': {
@@ -475,7 +557,7 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
 
   server.listen(port, '127.0.0.1', () => {
     console.log(`verify-remote session ${request.session} on :${port}, idle stop ${request.idleMinutes} min, cap ${request.capMinutes} min`);
-    if (request.sha !== null) startBuild(request.sha);
+    if (request.sha !== null) startBuild(request.sha, null);
   });
 }
 
