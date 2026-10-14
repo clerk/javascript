@@ -58,7 +58,14 @@ describe('resolveSwitcherLayout, what the data settles', () => {
     const layout = resolve('organization', { activeOrganization: null, hidePersonal: true });
 
     expect(layout.lead).toBe('none');
-    expect(layout.actions.header).toEqual(['manageLead']);
+    expect(layout.actions.header).toEqual([]);
+  });
+
+  it('leads with the personal account, managing nothing, where no organization is active in organization mode', () => {
+    const layout = resolve('organization', { activeOrganization: null });
+
+    expect(layout.lead).toBe('personal');
+    expect(layout.actions.header).toEqual([]);
   });
 
   // With no second account the flyout would open onto one row, so the foot offers that row instead.
@@ -94,7 +101,6 @@ describe('resolveSwitcherLayout, how the header carries its actions', () => {
 
   it('runs the gear inline where it is the only action', () => {
     expect(resolve('user').headerLayout).toBe('inline');
-    expect(resolve('organization', { activeOrganization: null, hidePersonal: true }).headerLayout).toBe('inline');
   });
 });
 

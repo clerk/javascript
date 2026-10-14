@@ -42,16 +42,18 @@ export type SwitcherAction =
 
 /**
  * What the trigger names and the header leads with. `member` is the account, badged with the
- * organization it is active in. `none` is an organization-led surface with no organization active
- * and no personal account to fall back to.
+ * organization it is active in. `personal` and `none` are an organization-led surface with no
+ * organization active, falling back to the personal account or to nothing. Neither has an
+ * organization to manage, and an organization-led surface never manages the account.
  */
-export type SwitcherLead = 'organization' | 'member' | 'user' | 'none';
+export type SwitcherLead = 'organization' | 'member' | 'user' | 'personal' | 'none';
 
 const headers = {
   organization: ['inviteMembers', 'manageLead'],
   member: ['inviteMembers', 'manageLead'],
   user: ['manageLead'],
-  none: ['manageLead'],
+  personal: [],
+  none: [],
 } as const satisfies Record<SwitcherLead, readonly SwitcherAction[]>;
 
 /** One mode's whole surface below the header, top to bottom. */
@@ -109,7 +111,7 @@ function resolveLead(mode: SwitcherMode, data: SwitcherData): SwitcherLead {
   if (data.activeOrganization) {
     return 'organization';
   }
-  return data.hidePersonal ? 'none' : 'user';
+  return data.hidePersonal ? 'none' : 'personal';
 }
 
 export function resolveSwitcherLayout(mode: SwitcherMode, data: SwitcherData): SwitcherLayout {

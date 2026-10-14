@@ -141,12 +141,12 @@ describe('OrganizationSwitcher', () => {
     expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
   });
 
-  it('falls back to the account where no organization is active', async () => {
+  it('falls back to the account, with nothing to manage, where no organization is active', async () => {
     await renderSwitcher({}, signedIn({ client: fapiClient([personalSession]) }));
     await open();
 
     expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
-    expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
+    expect(within(requiredPopup()).queryByRole('button', { name: 'Settings' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
   });
 
@@ -159,6 +159,7 @@ describe('OrganizationSwitcher', () => {
     expect(within(requiredPopup()).getByText('No organization selected')).toBeInTheDocument();
     expect(within(requiredPopup()).queryByText('Alice Smith')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Manage account' })).toBeNull();
   });
 
   it('carries no account rows, and trails the organizations with create-organization', async () => {
