@@ -186,6 +186,14 @@ describe('parseE2EReport', () => {
   });
 });
 
+describe('the spec files', () => {
+  it('all sit under specs/features/ or specs/explored/, because run --all skips a spec anywhere else and says nothing', () => {
+    const specs = join(import.meta.dirname, '..', 'specs');
+    const stray = readdirSync(specs, { recursive: true, encoding: 'utf8' }).filter((path) => path.endsWith('.e2e.ts') && !/^(features|explored)\//.test(path));
+    assert.deepEqual(stray, [], `run --all would skip specs/${stray.join(' and specs/')}: move it under specs/features/<feature>/ or specs/explored/`);
+  });
+});
+
 describe('the screenshot labels of the committed specs', () => {
   it('are each used once, because a run keeps one screenshot for a label', () => {
     const features = join(import.meta.dirname, '..', 'specs', 'features');
