@@ -96,6 +96,7 @@ const [open, setOpen] = useState(false);
 | `onOpenChange` | `(open: boolean) => void` | —                                                 | Called when open state changes     |
 | `placement`    | `Placement`               | `"bottom-start"` (root), `"right-start"` (nested) | Floating UI placement              |
 | `sideOffset`   | `number`                  | `4` (root), `0` (nested)                          | Gap between trigger and popup (px) |
+| `openOnHover`  | `boolean`                 | `false`                                           | Open when a mouse rests on trigger |
 
 ### `Menu.Item`
 
@@ -133,6 +134,12 @@ Accepts all `FloatingArrow` props. `ref` and `context` are injected automaticall
 | `data-active`               | Item              | Keyboard-focused item   |
 | `data-disabled`             | Item              | Disabled item           |
 | `data-side`                 | Positioner, Arrow | Resolved placement side |
+
+## Open on Hover
+
+- `openOnHover` opens a top-level menu on mouse hover (75ms delay) with the same `safePolygon` safe zone as nested menus. Touch is ignored for hover; a tap opens it as usual.
+- A press on the trigger of a hover-opened menu keeps it open; a second press closes it. A menu opened by a press stays open when the mouse leaves.
+- A hover open leaves focus where it was, like a nested menu.
 
 ## Nested Menu Behavior
 

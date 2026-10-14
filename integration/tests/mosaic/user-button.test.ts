@@ -10,23 +10,22 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
 
   let fakeUser: FakeUser;
   let organization: Organization;
+  const cleanups: Array<() => Promise<unknown>> = [];
 
   test.beforeAll(async () => {
     const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
+    cleanups.push(() => fakeUser.deleteIfExists());
     const user = await u.services.users.createBapiUser(fakeUser);
     organization = await u.services.clerk.organizations.createOrganization({
       name: `Mosaic ${Date.now()}`,
       createdBy: user.id,
     });
+    cleanups.push(() => u.services.clerk.organizations.deleteOrganization(organization.id));
   });
 
   test.afterAll(async () => {
-    const u = await createTestUtils({ app });
-    const results = await Promise.allSettled([
-      u.services.clerk.organizations.deleteOrganization(organization.id),
-      fakeUser.deleteIfExists(),
-    ]);
+    const results = await Promise.allSettled(cleanups.map(cleanup => cleanup()));
     await app.teardown();
     const failures = results.flatMap(result => (result.status === 'rejected' ? [result.reason] : []));
     if (failures.length > 0) {
