@@ -6,7 +6,8 @@ import { AuthView } from '../AuthView';
 
 const mocks = vi.hoisted(() => {
   return {
-    NativeClerkAuthView: vi.fn(() => null),
+    NativeClerkAuthView: vi.fn((_props: Record<string, any>) => null),
+    platform: { OS: 'android' },
   };
 });
 
@@ -24,6 +25,7 @@ vi.mock('../utils/native-module', () => {
 
 vi.mock('react-native', () => {
   return {
+    Platform: mocks.platform,
     Text: ({ children }: { children?: React.ReactNode }) => React.createElement('span', null, children),
     View: ({ children }: { children?: React.ReactNode }) => React.createElement('div', null, children),
   };
@@ -32,12 +34,33 @@ vi.mock('react-native', () => {
 describe('AuthView', () => {
   beforeEach(() => {
     mocks.NativeClerkAuthView.mockClear();
+    mocks.platform.OS = 'android';
   });
 
   test('passes logoMaxHeight to the native auth view', () => {
     render(<AuthView logoMaxHeight={64} />);
 
     expect(mocks.NativeClerkAuthView.mock.calls[0]?.[0]).toMatchObject({ logoMaxHeight: 64 });
+  });
+
+  test('turns off restore credentials by default on Android', () => {
+    render(<AuthView />);
+
+    expect(mocks.NativeClerkAuthView.mock.calls[0]?.[0]).toMatchObject({ enableRestoreCredentials: false });
+  });
+
+  test('passes enableRestoreCredentials to the native auth view on Android', () => {
+    render(<AuthView enableRestoreCredentials />);
+
+    expect(mocks.NativeClerkAuthView.mock.calls[0]?.[0]).toMatchObject({ enableRestoreCredentials: true });
+  });
+
+  test('does not pass enableRestoreCredentials to the native auth view on iOS', () => {
+    mocks.platform.OS = 'ios';
+
+    render(<AuthView enableRestoreCredentials />);
+
+    expect(mocks.NativeClerkAuthView.mock.calls[0]?.[0].enableRestoreCredentials).toBeUndefined();
   });
 
   test('calls onDismiss when the native auth view emits dismissed', () => {
