@@ -7,7 +7,7 @@ import type {
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
 } from '@clerk/shared/types';
-import { AppState, Platform } from 'react-native';
+import { Platform } from 'react-native';
 
 import packageJson from '../../../package.json';
 import {
@@ -24,7 +24,7 @@ import type { TokenCache } from '../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { assertValidProxyUrl } from '../../utils/errors';
-import { isAppInBackgroundOrInactive, isNative } from '../../utils/runtime';
+import { isNative, waitUntilAppIsActive } from '../../utils/runtime';
 import type { BuildClerkOptions } from './types';
 
 /**
@@ -49,20 +49,6 @@ type ResolvedClerkRuntimeOptions = Omit<ClerkRuntimeOptions, 'publishableKey'> &
 const RESOURCE_RETRY_MAX_DELAY_MS = 30_000;
 const RESOURCE_RETRY_MAX_EXPONENT = 4;
 
-function waitUntilAppIsActive(): Promise<void> {
-  if (!isAppInBackgroundOrInactive()) {
-    return Promise.resolve();
-  }
-  return new Promise(resolve => {
-    const subscription = AppState.addEventListener('change', state => {
-      if (state === 'active') {
-        subscription.remove();
-        resolve();
-      }
-    });
-  });
-}
-
 function hasOwnOption<Key extends keyof BuildClerkOptions>(
   options: BuildClerkOptions | undefined,
   key: Key,
@@ -76,11 +62,11 @@ let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
 
-async function readClientJwt() {
+async function readClientJwt(signal?: AbortSignal): Promise<string | null | undefined> {
   try {
     return await __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
   } catch {
-    await waitUntilAppIsActive();
+    await waitUntilAppIsActive(signal);
   }
   return __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
 }
@@ -312,7 +298,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
-        const jwt = await readClientJwt();
+        const jwt = await readClientJwt(requestInit.signal ?? undefined);
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
         // Instructs the backend that the request is from a mobile device.

@@ -477,6 +477,115 @@ describe('createClerkInstance', () => {
     expect(requestInit.headers.has('authorization')).toBe(false);
   });
 
+  test('stops waiting for the app to become active when the request is aborted', async () => {
+    setAppState('background');
+    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(new Error('User interaction is not allowed.')));
+    const tokenCache: TokenCache = {
+      getToken,
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache,
+    }) as unknown as MockClerk;
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const controller = new AbortController();
+    const abortReason = new Error('client fetch timed out');
+    const requestInit = {
+      headers: new Headers(),
+      signal: controller.signal,
+      url: new URL('https://clerk.example.com/v1/client'),
+    };
+
+    const pending = beforeRequest(requestInit).catch((err: unknown) => err);
+    await vi.waitFor(() => expect(mocks.appStateListeners.size).toBe(1));
+
+    controller.abort(abortReason);
+
+    await expect(pending).resolves.toBe(abortReason);
+    expect(mocks.appStateListeners.size).toBe(0);
+
+    setAppState('active');
+    await Promise.resolve();
+    expect(getToken).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not wait for the app to become active when the request was already aborted', async () => {
+    setAppState('background');
+    const getToken = vi.fn<TokenCache['getToken']>(() => Promise.reject(new Error('User interaction is not allowed.')));
+    const tokenCache: TokenCache = {
+      getToken,
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache,
+    }) as unknown as MockClerk;
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const controller = new AbortController();
+    const abortReason = new Error('client fetch timed out');
+    controller.abort(abortReason);
+    const requestInit = {
+      headers: new Headers(),
+      signal: controller.signal,
+      url: new URL('https://clerk.example.com/v1/client'),
+    };
+
+    await expect(beforeRequest(requestInit)).rejects.toBe(abortReason);
+    expect(mocks.appStateListeners.size).toBe(0);
+    expect(getToken).toHaveBeenCalledTimes(1);
+  });
+
+  test('rejects with an AbortError when the aborted signal has no reason', async () => {
+    setAppState('background');
+    const tokenCache: TokenCache = {
+      getToken: vi.fn(() => Promise.reject(new Error('User interaction is not allowed.'))),
+      saveToken: vi.fn(() => Promise.resolve()),
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      tokenCache,
+    }) as unknown as MockClerk;
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const abortListeners = new Set<() => void>();
+    const polyfilledSignal = {
+      aborted: false,
+      reason: undefined,
+      addEventListener: (_type: 'abort', listener: () => void) => abortListeners.add(listener),
+      removeEventListener: (_type: 'abort', listener: () => void) => abortListeners.delete(listener),
+    };
+    const requestInit = {
+      headers: new Headers(),
+      signal: polyfilledSignal,
+      url: new URL('https://clerk.example.com/v1/client'),
+    };
+
+    const pending = beforeRequest(requestInit).catch((err: unknown) => err);
+    await vi.waitFor(() => expect(abortListeners.size).toBe(1));
+
+    polyfilledSignal.aborted = true;
+    for (const listener of [...abortListeners]) {
+      listener();
+    }
+
+    const error = await pending;
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).name).toBe('AbortError');
+    expect(mocks.appStateListeners.size).toBe(0);
+  });
+
   test('does not wait for the app to become active inside an app extension', async () => {
     setAppState('extension');
     const readError = new Error('Unable to decode the provided data.');

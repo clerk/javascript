@@ -17,11 +17,9 @@ vi.mock('react-native', () => {
   };
 });
 
-vi.mock('../../utils', async () => {
-  const runtime = await vi.importActual<typeof import('../../utils/runtime')>('../../utils/runtime');
+vi.mock('../../utils', () => {
   return {
     isNative: () => true,
-    isAppInBackgroundOrInactive: runtime.isAppInBackgroundOrInactive,
   };
 });
 

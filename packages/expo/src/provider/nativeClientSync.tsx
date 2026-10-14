@@ -7,6 +7,7 @@ import type { TokenCache } from '../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../constants';
 import { type NativeClientEvent, useNativeClientEvents } from '../hooks/useNativeClientEvents';
 import { ClerkExpoModule as NativeClerkModule } from '../utils/native-module';
+import { waitUntilAppIsActive } from '../utils/runtime';
 import {
   registerNativeToJsSyncHandler,
   synchronizeNativeClientToJs,
@@ -502,6 +503,15 @@ async function getCachedDeviceToken(tokenCache: TokenCache | undefined): Promise
     return null;
   }
 
+  try {
+    return await readCachedDeviceToken(tokenCache);
+  } catch {
+    await waitUntilAppIsActive();
+  }
+  return readCachedDeviceToken(tokenCache);
+}
+
+async function readCachedDeviceToken(tokenCache: TokenCache): Promise<string | null | undefined> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   try {
     const result = await Promise.race([
