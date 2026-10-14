@@ -176,6 +176,7 @@ function DialogHarness() {
       {successMessage ? <p className='text-sm'>{successMessage}</p> : null}
       <Dialog.Root
         open={open}
+        shouldCloseOnInteractOutside={step !== 'verify'}
         onOpenChange={next => {
           if (next) {
             return;
