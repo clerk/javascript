@@ -12,5 +12,6 @@ export type {
   TableSelectAllCellProps,
   TableSelectCellProps,
   TableSort,
+  TableSticky,
   TableToolbarProps,
 } from './table';
