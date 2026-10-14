@@ -408,7 +408,7 @@ describe('the native project a remote session generates', () => {
     const at = checkout();
     const worktree = at.site.worktree;
     execFileSync('git', ['-C', worktree, 'add', '-A']);
-    execFileSync('git', ['-C', worktree, 'commit', '-q', '-m', 'base']);
+    execFileSync('git', ['-C', worktree, '-c', 'user.name=t', '-c', 'user.email=t@example.com', 'commit', '-q', '-m', 'base']);
     const committed = await nativeProjectKey('ios', worktree);
     await build(at, null, committed);
     at.write('packages/expo/src/index.ts', 'js two');
