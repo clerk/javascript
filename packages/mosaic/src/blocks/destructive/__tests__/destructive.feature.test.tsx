@@ -53,8 +53,9 @@ async function renderAccount(options: ConfirmControllerOptions<void>) {
     </Host>,
   );
   const user = userEvent.setup();
-  const open = () => openDialog(user, screen.getByRole('button', { name: 'Delete my account' }), { name: TITLE });
-  const closed = () => waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  const open = () =>
+    openDialog(user, screen.getByRole('button', { name: 'Delete my account' }), { role: 'alertdialog', name: TITLE });
+  const closed = () => waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   return { user, ref, open, closed };
 }
 
@@ -93,11 +94,23 @@ describe('Destructive', () => {
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await user.keyboard('{Escape}');
     act(() => ref.current?.onOpenChange(false));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     expect(onConfirm).toHaveBeenCalledOnce();
 
     run.resolve();
     await closed();
+  });
+
+  it('is an alert dialog: no corner dismiss, and an outside press leaves it open', async () => {
+    const onConfirm = vi.fn(() => Promise.resolve());
+    const { user, open } = await renderAccount({ onConfirm });
+    const dialog = await open();
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+
+    await user.click(document.body);
+
+    expect(dialog).toBeInTheDocument();
+    expect(onConfirm).not.toHaveBeenCalled();
   });
 
   it('marks the field invalid and keeps the phrase on failure, starts the next open clean, and lets a retry succeed', async () => {
@@ -174,14 +187,14 @@ describe('Destructive shared by rows', () => {
 
     await user.click(screen.getByRole('button', { name: 'Actions for Production' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
-    expect(await screen.findByRole('dialog')).toHaveAccessibleName('Delete Production?');
+    expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Delete Production?');
     await user.type(screen.getByRole('textbox', { name: 'Type Production to continue' }), 'Production');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
 
     await user.click(screen.getByRole('button', { name: 'Actions for Staging' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
-    expect(await screen.findByRole('dialog')).toHaveAccessibleName('Delete Staging?');
+    expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Delete Staging?');
     const stagingField = screen.getByRole('textbox', { name: 'Type Staging to continue' });
     expect(stagingField).toHaveValue('');
     await user.type(stagingField, 'Production{Enter}');
@@ -190,7 +203,7 @@ describe('Destructive shared by rows', () => {
     await user.type(stagingField, 'Staging');
     await user.click(screen.getByRole('button', { name: 'Delete project' }));
     expect(onConfirm).toHaveBeenCalledExactlyOnceWith(projects[1]);
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 });
 
@@ -223,7 +236,10 @@ describe('Destructive with reverification', () => {
     });
     await renderWithClerk(<ReverifiedHost action={action} />);
     const user = userEvent.setup();
-    await openDialog(user, screen.getByRole('button', { name: 'Delete my account' }), { name: TITLE });
+    await openDialog(user, screen.getByRole('button', { name: 'Delete my account' }), {
+      role: 'alertdialog',
+      name: TITLE,
+    });
     await user.type(field(), 'Delete{Enter}');
 
     const password = await screen.findByLabelText('Password');
@@ -231,7 +247,7 @@ describe('Destructive with reverification', () => {
     await user.type(password, 'hunter2{Enter}');
 
     expect(await screen.findByText('Your subscription is still active.')).toBeInTheDocument();
-    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getAllByRole('alertdialog')).toHaveLength(1);
     expect(field()).toHaveValue('Delete');
     expect(field()).toHaveAttribute('aria-invalid', 'true');
     expect(action).toHaveBeenCalledTimes(2);

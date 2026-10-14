@@ -65,8 +65,8 @@ async function renderAccount(
   );
   const user = userEvent.setup();
   const trigger = () => screen.getByRole('button', { name: 'Remove Google' });
-  const open = () => openDialog(user, trigger(), { name: TITLE });
-  const closed = () => waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  const open = () => openDialog(user, trigger(), { role: 'alertdialog', name: TITLE });
+  const closed = () => waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   return { user, ref, trigger, open, closed };
 }
 
@@ -77,7 +77,7 @@ describe('Confirmation', () => {
     const run = deferred<void>();
     const onConfirm = vi.fn(() => run.promise);
     const { user, trigger, open, closed } = await renderAccount({ onConfirm });
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByRole('alertdialog')).toBeNull();
 
     const dialog = await open();
     expect(dialog).toHaveAccessibleDescription('Google will be removed from this account.');
@@ -112,8 +112,6 @@ describe('Confirmation', () => {
   it.each([
     ['Cancel', (user: User) => user.click(screen.getByRole('button', { name: 'Cancel' }))],
     ['Escape', (user: User) => user.keyboard('{Escape}')],
-    ['the corner dismiss', (user: User) => user.click(screen.getByRole('button', { name: 'Close' }))],
-    ['an outside press', (user: User) => user.click(document.body)],
   ])('cancels from %s without running the action', async (_, dismiss) => {
     const onConfirm = vi.fn(() => Promise.resolve());
     const { user, open, closed } = await renderAccount({ onConfirm });
@@ -122,6 +120,18 @@ describe('Confirmation', () => {
     await dismiss(user);
 
     await closed();
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('is an alert dialog: no corner dismiss, and an outside press leaves it open', async () => {
+    const onConfirm = vi.fn(() => Promise.resolve());
+    const { user, open } = await renderAccount({ onConfirm });
+    const dialog = await open();
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+
+    await user.click(document.body);
+
+    expect(dialog).toBeInTheDocument();
     expect(onConfirm).not.toHaveBeenCalled();
   });
 
@@ -138,7 +148,7 @@ describe('Confirmation', () => {
     await user.click(document.body);
     act(() => ref.current?.onOpenChange(false));
 
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     expect(onConfirm).toHaveBeenCalledOnce();
 
     run.resolve();
@@ -156,7 +166,7 @@ describe('Confirmation', () => {
     await user.click(confirmButton());
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Google is your only way to sign in.'));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     expect(confirmButton()).not.toHaveAttribute('aria-busy', 'true');
 
     await user.click(confirmButton());
@@ -260,26 +270,26 @@ describe('Confirmation shared by rows', () => {
       </Host>,
     );
     const user = userEvent.setup();
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByRole('alertdialog')).toBeNull();
 
     const firstTrigger = screen.getByRole('button', { name: 'Actions for Preston' });
     await user.click(firstTrigger);
     await user.click(await screen.findByRole('menuitem', { name: 'Remove' }));
-    expect(await screen.findByRole('dialog')).toHaveAccessibleName('Remove Preston?');
+    expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Remove Preston?');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     await waitFor(() => expect(firstTrigger).toHaveFocus());
 
     const secondTrigger = screen.getByRole('button', { name: 'Actions for Jane' });
     await user.click(secondTrigger);
     await user.click(await screen.findByRole('menuitem', { name: 'Remove' }));
-    const dialog = await screen.findByRole('dialog');
+    const dialog = await screen.findByRole('alertdialog');
     expect(dialog).toHaveAccessibleName('Remove Jane?');
     expect(dialog).toHaveAccessibleDescription('Jane will be removed from the organization.');
     expect(screen.getByText('Jane').tagName).toBe('STRONG');
     await user.click(screen.getByRole('button', { name: 'Remove member' }));
     expect(onConfirm).toHaveBeenCalledExactlyOnceWith(members[1]);
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(secondTrigger).toHaveFocus();
   });
 });
@@ -342,7 +352,7 @@ async function renderReverified(props: Parameters<typeof ReverifiedHost>[0]) {
 }
 
 async function confirmIntoVerification(user: User) {
-  await openDialog(user, screen.getByRole('button', { name: 'Remove Google' }), { name: TITLE });
+  await openDialog(user, screen.getByRole('button', { name: 'Remove Google' }), { role: 'alertdialog', name: TITLE });
   await user.click(confirmButton());
 }
 
@@ -387,7 +397,7 @@ describe('Confirmation with reverification', () => {
 
     start.release();
     expect(await screen.findByLabelText('Password')).toBeVisible();
-    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getAllByRole('alertdialog')).toHaveLength(1);
     await untilConfirmStepIsGone();
   });
 
@@ -403,13 +413,13 @@ describe('Confirmation with reverification', () => {
     const stopWatching = watchForConfirmStep();
     const buttons = screen.getAllByRole('button', { name: 'Close' });
     await user.click(buttons[buttons.length - 1]);
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(stopWatching()).toEqual([]);
     expect(screen.getByLabelText('Outcome')).toHaveTextContent('closed');
   });
 
   for (const cleanupMs of [undefined, 400]) {
-    it(`closes from the factor card without going back to the confirm step (host cleans up after ${cleanupMs ?? 0}ms)`, async () => {
+    it(`closes from the factor card's corner dismiss without going back to the confirm step (host cleans up after ${cleanupMs ?? 0}ms)`, async () => {
       serveFapi(passwordVerification);
       const { user } = await renderReverified({ action: interruptedOnce(), cleanupMs });
       await confirmIntoVerification(user);
@@ -418,7 +428,7 @@ describe('Confirmation with reverification', () => {
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
       expect(stopWatching()).toEqual([]);
       expect(screen.getByLabelText('Outcome')).toHaveTextContent('closed');
     });
@@ -434,13 +444,13 @@ describe('Confirmation with reverification', () => {
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.type(field, 'hunter2{Enter}');
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull(), { timeout: 3000 });
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull(), { timeout: 3000 });
       expect(stopWatching()).toEqual([]);
       expect(screen.getByLabelText('Outcome')).toHaveTextContent('closed');
     });
   }
 
-  it('cannot be closed while the verified action is retrying', async () => {
+  it('cannot be closed while the verified action is retrying, and withholds the corner dismiss', async () => {
     const retry = deferred<{ done: true }>();
     const action = vi.fn().mockResolvedValueOnce(reverificationError()).mockReturnValueOnce(retry.promise);
     serveFapi(passwordVerification);
@@ -450,13 +460,14 @@ describe('Confirmation with reverification', () => {
 
     await user.type(field, 'hunter2{Enter}');
     await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
     await user.keyboard('{Escape}');
-    await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.click(document.body);
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     expect(screen.getByLabelText('Outcome')).toHaveTextContent('open');
 
     retry.resolve({ done: true });
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 
   it('does not show the previous attempt again when the host starts the next run after a delay', async () => {
@@ -470,9 +481,9 @@ describe('Confirmation with reverification', () => {
     await confirmIntoVerification(user);
     expect(await screen.findByLabelText('Password')).toBeVisible();
     await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
 
-    await openDialog(user, screen.getByRole('button', { name: 'Remove Google' }), { name: TITLE });
+    await openDialog(user, screen.getByRole('button', { name: 'Remove Google' }), { role: 'alertdialog', name: TITLE });
     const stopWatching = watchForConfirmStep();
     await user.click(confirmButton());
     await new Promise(resolve => setTimeout(resolve, 150));

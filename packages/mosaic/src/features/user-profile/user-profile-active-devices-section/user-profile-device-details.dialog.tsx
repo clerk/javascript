@@ -28,6 +28,8 @@ export function UserProfileDeviceDetailsDialog({
       handle={controller.handle}
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
+      shouldCloseOnInteractOutside={step !== 'verify'}
+      showCloseButton={step !== 'verify' || controller.canClose}
     >
       {({ payload }) => {
         if (payload === undefined) {

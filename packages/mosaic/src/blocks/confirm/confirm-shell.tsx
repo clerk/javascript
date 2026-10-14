@@ -117,6 +117,8 @@ export function ConfirmShell<Payload>({
 }: ConfirmShellProps<Payload>) {
   return (
     <Dialog.Root
+      role='alertdialog'
+      showCloseButton={controller.step === 'verify' && controller.canClose}
       handle={controller.handle}
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}

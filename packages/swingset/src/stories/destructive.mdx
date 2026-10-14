@@ -19,7 +19,7 @@ import * as Stories from './destructive.stories';
 
 A confirmation for a destructive action that warrants making the user type. Deleting an account, deleting a project, revoking an API key. For actions that do not warrant typing, use [Confirmation](/components/confirmation).
 
-The block holds the typed phrase and compares it to `confirmationValue`. Everything else comes from a controller from `useConfirmController`, which owns whether the dialog is open, pending, or explaining a failure. Resolve `onConfirm` and the dialog closes. Reject it and the dialog stays open. A dialog that sits next to its button takes the button as `trigger`.
+The block holds the typed phrase and compares it to `confirmationValue`. Everything else comes from a controller from `useConfirmController`, which owns whether the dialog is open, pending, or explaining a failure. Resolve `onConfirm` and the dialog closes. Reject it and the dialog stays open. A dialog that sits next to its button takes the button as `trigger`. It is an alert dialog: Escape and the footer's Cancel action cancel, an outside press does not, and the confirm step has no corner dismiss.
 
 ```tsx
 import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
@@ -50,7 +50,7 @@ A rejection leaves the dialog up. A Clerk error is localized by its code. Anythi
 
 ## Reverification
 
-Wrap the action with `useReverificationFlow` and pass the result to the controller. The controller decides which step is showing, cancels the verification when the dialog closes, and blocks closing while the action is being retried. Confirmation and verification stay in the same dialog and card, and the typed phrase survives the round trip.
+Wrap the action with `useReverificationFlow` and pass the result to the controller. The controller decides which step is showing, cancels the verification when the dialog closes, and blocks closing while the action is being retried. Confirmation and verification stay in the same dialog and card, and the typed phrase survives the round trip. The verification steps show a corner dismiss, which cancels the verification; it is withheld while the action is being retried.
 
 ```tsx
 import { useReverificationFlow } from '@clerk/mosaic/features/reverification';

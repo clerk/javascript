@@ -46,7 +46,7 @@ describe('signing out of all other devices', () => {
     );
   }
 
-  const confirmation = () => screen.getByRole('dialog');
+  const confirmation = () => screen.getByRole('alertdialog');
 
   it('confirms first, naming how many devices it covers', async () => {
     const user = userEvent.setup();
@@ -59,7 +59,7 @@ describe('signing out of all other devices', () => {
 
     await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('leaves the devices alone when the confirmation is cancelled', async () => {
@@ -69,7 +69,7 @@ describe('signing out of all other devices', () => {
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
     await user.click(within(confirmation()).getByRole('button', { name: 'Cancel' }));
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onSignOutAllOtherDevices).not.toHaveBeenCalled();
   });
 
@@ -92,7 +92,7 @@ describe('signing out of all other devices', () => {
     expect(confirmation()).toBeInTheDocument();
 
     await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onSignOutAllOtherDevices).toHaveBeenCalledTimes(2);
   });
 
@@ -113,6 +113,6 @@ describe('signing out of all other devices', () => {
       signOutAll.resolve();
       await signOutAll.promise;
     });
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 });

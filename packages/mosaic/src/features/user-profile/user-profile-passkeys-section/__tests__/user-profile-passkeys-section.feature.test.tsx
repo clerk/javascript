@@ -125,7 +125,7 @@ describe('Seeing passkeys', () => {
 
     await user.click(screen.getByRole('button', { name: 'Gérer Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Supprimer la clé' }));
-    const removal = screen.getByRole('dialog', { name: 'Supprimer la clé' });
+    const removal = screen.getByRole('alertdialog', { name: 'Supprimer la clé' });
     expect(removal).toHaveAccessibleDescription('Laptop sera supprimée de ce compte.');
     await waitFor(() => expect(within(removal).getByRole('button', { name: 'Supprimer' })).toBeVisible());
     expect(within(removal).getByRole('button', { name: 'Annuler' })).toBeVisible();
@@ -402,14 +402,14 @@ describe('Removing a passkey', () => {
     const trigger = screen.getByRole('button', { name: 'Manage $& laptop' });
     await user.click(trigger);
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
-    expect(screen.getByRole('dialog')).toHaveAccessibleDescription('$& laptop will be removed from this account.');
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription('$& laptop will be removed from this account.');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
     await user.click(trigger);
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(0);
   });
 
@@ -426,7 +426,7 @@ describe('Removing a passkey', () => {
     await user.click(screen.getByRole('button', { name: `Manage ${removed}` }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.passkeys.map(passkey => passkey.name)).toEqual([remaining]);
   });
 
@@ -441,9 +441,9 @@ describe('Removing a passkey', () => {
     await waitFor(() => expect(removal.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Remove' })).toHaveAttribute('aria-busy', 'true');
     await user.keyboard('{Escape}');
-    expect(screen.getByRole('dialog')).not.toHaveAttribute('data-closed');
+    expect(screen.getByRole('alertdialog')).not.toHaveAttribute('data-closed');
     removal.release();
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(fapi.client.sessions[0]?.user.passkeys).toEqual([]);
   });
@@ -460,7 +460,7 @@ describe('Removing a passkey', () => {
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
     await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(0);
   });
 });
@@ -490,7 +490,7 @@ describe('Satellite passkeys', () => {
     await waitFor(() => expect(removal.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Remove' })).toHaveAttribute('aria-busy', 'true');
     removal.release();
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
     expect(fapi.client.sessions[0]?.user.passkeys).toEqual([]);

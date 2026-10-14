@@ -89,7 +89,7 @@ describe('UserProfileProfilePanelView', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     rerender(
       <MosaicProvider>
         <UserProfileProfilePanelView
@@ -105,12 +105,12 @@ describe('UserProfileProfilePanelView', () => {
       </MosaicProvider>,
     );
     expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
-    expect(screen.getByRole('dialog')).toHaveTextContent('0x1234');
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('0x1234');
     await act(async () => {
       removal.resolve();
       await removal.promise;
     });
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('renders the danger zone when provided', () => {
