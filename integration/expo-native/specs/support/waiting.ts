@@ -86,6 +86,8 @@ export const onScreen =
   async (see) =>
     shown(await see(what, element));
 
+export const untilVisible = (element: ScreenElement, what: string, screen: WaitScreen, pace: WaitPace): Promise<void> => until(onScreen(element, what), what, screen, pace);
+
 async function homeShows(read: ReadHome): Promise<string> {
   const heading = await read('signedIn');
   const userId = await read('userId');

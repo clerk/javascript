@@ -2,7 +2,7 @@ import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { newTestEmail } from '../specs/support/clerk.ts';
-import { SAVE_PASSWORD_PROMPT, errorScreenElseSavePasswordPrompt, onScreen, signedInAs, signedOut, until, type Home, type ScreenElement, type Sight, type WaitPace, type WaitScreen } from '../specs/support/waiting.ts';
+import { SAVE_PASSWORD_PROMPT, errorScreenElseSavePasswordPrompt, onScreen, signedInAs, signedOut, until, untilVisible, type Home, type ScreenElement, type Sight, type WaitPace, type WaitScreen } from '../specs/support/waiting.ts';
 import type { SeededUser } from '../src/core/types.ts';
 import { SAMPLE_RUN } from '../testing/sample-inputs.ts';
 
@@ -96,6 +96,7 @@ function device(start: Showing, simulated: Simulated = {}) {
     dismissals: () => dismissals,
     waits: () => waits,
     wait: (sight: Sight, timeoutMs = 30_000): Promise<void> => until(sight, WAITING_FOR, screen, pace(timeoutMs)),
+    waitVisible: (element: ScreenElement, what: string, timeoutMs: number): Promise<void> => untilVisible(element, what, screen, pace(timeoutMs)),
   };
 }
 
@@ -314,6 +315,14 @@ describe('a wait for a launch to land on a control', () => {
     const message = await failure(phone.wait(onScreen(phone.home.signedIn, 'the heading'), 0));
     assert.ok(message.includes('within 0ms; the home shows user ID user_1, session ID sess_1; passes: 1; '), message);
     assert.deepEqual(phone.reads, ['heading', 'user ID', 'session ID', 'signed out', 'in the way']);
+  });
+});
+
+describe('a wait for an element the spec names', () => {
+  it('names the element in its message when it runs out', async () => {
+    const phone = device(SIGNED_IN);
+    const message = await failure(phone.waitVisible(phone.signIn, 'the "Sign in" button', 1_000));
+    assert.equal(message, `the app did not show the "Sign in" button within 1000ms; the home shows "${HEADING}", user ID user_1, session ID sess_1; passes: 3; reads: 10, the slowest 100ms (the "Sign in" button)`);
   });
 });
 
