@@ -41,7 +41,7 @@ export function UserProfileActiveDevicesSectionView({
 
   return (
     <div {...stylex.props(styles.sectionCards)}>
-      {skeleton ? <VisuallyHidden role='status'>{m.loading}</VisuallyHidden> : null}
+      <VisuallyHidden role='status'>{skeleton ? m.loading : m.loaded}</VisuallyHidden>
       <Section.Root>
         <Section.Group skeleton={skeleton}>
           <Section.Header>
@@ -184,7 +184,7 @@ function DeviceItem({
         ) : null}
       </Section.Content>
       <Section.Actions>
-        <Skeleton>
+        <Skeleton visible={false}>
           <ActionMenu
             actions={actions}
             label={fill(m.manageLabel, { name: device.name })}

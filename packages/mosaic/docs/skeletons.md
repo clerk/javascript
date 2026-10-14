@@ -16,9 +16,8 @@ shows bones beside sections that have already loaded, and a table moving to anot
 page turns its rows into bones while its headers and controls stay. Whether a table's
 controls are bones on first load is still open.
 
-Actions (buttons, menus) are wrapped like any other content and draw a block the
-size of the control. Use `visible={false}` instead to keep their space without
-drawing them.
+Row actions in a section (menus, buttons) are wrapped with `visible={false}`: they
+keep their space, so the row holds its height, but no bone is drawn for them.
 
 ## When not to use one
 
@@ -72,9 +71,11 @@ own.
   exactly `min(pageSize, total − offset)` rows. A first load or a new search can't
   know, so it uses the typical count and accepts a shift. The page size is a
   maximum, not a count.
-- **Announce it.** The skeleton is hidden from assistive technology, so the view
-  renders a `VisuallyHidden` `role='status'` message ("Loading active devices")
-  while `skeleton` is set.
+- **Announce it, start and finish.** The view always renders one `VisuallyHidden`
+  `role='status'` message: "Loading active devices" while `skeleton` is set, then
+  "Active devices loaded". A live region only announces changes to an element that
+  already exists, so the completion is announced only if that element survives the
+  swap (see "When to show it").
 - **A component's own loading state** (not a skeleton), such as `Avatar.Fallback`
   while an image loads, takes `skeletonStyles.shimmer` from
   `src/styles/skeleton.styles.ts` for the same highlight.
@@ -113,7 +114,10 @@ peaking in the middle, sweeps left to right across two bone widths, over 1.6s
 
 ## When to show it
 
-Not decided by the skeleton. The wiring around a panel owns it. The planned gate is
+Not decided by the skeleton. The wiring around a panel owns it. Keep the same view
+mounted and flip its `skeleton` prop, feeding it placeholder data while loading;
+don't swap a separate skeleton component for the real one. A swap remounts the
+status message, so screen readers never hear that loading finished. The planned gate is
 `useSpinDelay(loading, { delay: 150, minDuration: 500 })` with the skeleton mounted
 but `visibility: hidden` until the delay passes, so a fast load never flashes it and
 nothing shifts when it appears.
