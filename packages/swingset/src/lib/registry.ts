@@ -279,6 +279,15 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  Elements as SkeletonElements,
+  HoldSpace as SkeletonHoldSpace,
+  meta as skeletonMeta,
+  NotShown as SkeletonNotShown,
+  Primary as SkeletonPrimary,
+  Shapes as SkeletonShapes,
+  TextContent as SkeletonTextContent,
+} from '../stories/skeleton.stories';
+import {
   Default as TableDefault,
   Empty as TableEmpty,
   meta as tableMeta,
@@ -534,6 +543,16 @@ const avatarModule: StoryModule = {
   Fallback: AvatarFallbackStory,
   Sizes: AvatarSizes,
   Shapes: AvatarShapes,
+};
+
+const skeletonModule: StoryModule = {
+  meta: skeletonMeta,
+  Primary: SkeletonPrimary,
+  TextContent: SkeletonTextContent,
+  Elements: SkeletonElements,
+  Shapes: SkeletonShapes,
+  HoldSpace: SkeletonHoldSpace,
+  NotShown: SkeletonNotShown,
 };
 
 const badgeModule: StoryModule = {
@@ -1011,6 +1030,7 @@ export const registry: StoryModule[] = [
   actionBarModule,
   avatarModule,
   badgeModule,
+  skeletonModule,
   bannerModule,
   buttonModule,
   cardComponentModule,

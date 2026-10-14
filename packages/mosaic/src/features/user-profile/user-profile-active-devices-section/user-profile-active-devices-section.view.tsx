@@ -7,6 +7,8 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { Skeleton } from '../../../components/skeleton';
+import { VisuallyHidden } from '../../../components/visually-hidden';
 import type { MosaicMessages } from '../../../localization';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
 import { UserProfileSecurityIcon } from '../user-profile-security-icon';
@@ -17,7 +19,7 @@ import { UserProfileDeviceDetailsDialog } from './user-profile-device-details.di
 
 export type { UserProfileDevice };
 
-export type UserProfileActiveDevicesSectionViewProps = UserProfileActiveDevicesController;
+export type UserProfileActiveDevicesSectionViewProps = UserProfileActiveDevicesController & { skeleton?: boolean };
 
 export function UserProfileActiveDevicesSectionView({
   devices,
@@ -30,6 +32,7 @@ export function UserProfileActiveDevicesSectionView({
   signOut,
   signOutAll,
   signOutAllFinalFocus,
+  skeleton = false,
 }: UserProfileActiveDevicesSectionViewProps) {
   const m = useMessages('userProfileActiveDevices');
   const locale = useLocale();
@@ -38,11 +41,14 @@ export function UserProfileActiveDevicesSectionView({
 
   return (
     <div {...stylex.props(styles.sectionCards)}>
+      <VisuallyHidden role='status'>{skeleton ? m.loading : m.loaded}</VisuallyHidden>
       <Section.Root>
-        <Section.Group>
+        <Section.Group skeleton={skeleton}>
           <Section.Header>
             <Section.Content>
-              <Section.Title>{m.title}</Section.Title>
+              <Section.Title>
+                <Skeleton>{m.title}</Skeleton>
+              </Section.Title>
             </Section.Content>
             {signOutAll && otherDevices.length > 0 ? (
               <Section.Actions>
@@ -65,6 +71,7 @@ export function UserProfileActiveDevicesSectionView({
                   <DeviceItem
                     key={device.id}
                     device={device}
+                    skeleton={skeleton}
                     triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTriggerRef : undefined}
                     onViewDetails={device => details.open(device)}
                   />
@@ -80,6 +87,7 @@ export function UserProfileActiveDevicesSectionView({
                 <DeviceItem
                   key={device.id}
                   device={device}
+                  skeleton={skeleton}
                   triggerRef={registerTrigger(device.id)}
                   onSignOut={signOut ? device => signOut.open(device) : undefined}
                   onViewDetails={device => details.open(device)}
@@ -89,7 +97,7 @@ export function UserProfileActiveDevicesSectionView({
           </Section.Body>
         </Section.Group>
       </Section.Root>
-      {signOutAll ? (
+      {signOutAll && !skeleton ? (
         <Confirmation
           controller={signOutAll}
           color='primary'
@@ -100,13 +108,15 @@ export function UserProfileActiveDevicesSectionView({
           cancelLabel={m.signOutAllDialog.cancel}
         />
       ) : null}
-      <UserProfileDeviceDetailsDialog
-        controller={details}
-        devices={devices}
-        finalFocus={finalFocus}
-        onSignOut={signOutFromDetails}
-      />
-      {signOut ? (
+      {skeleton ? null : (
+        <UserProfileDeviceDetailsDialog
+          controller={details}
+          devices={devices}
+          finalFocus={finalFocus}
+          onSignOut={signOutFromDetails}
+        />
+      )}
+      {signOut && !skeleton ? (
         <Confirmation
           color='primary'
           controller={signOut}
@@ -135,11 +145,13 @@ function DeviceItem({
   triggerRef,
   onViewDetails,
   onSignOut,
+  skeleton,
 }: {
   device: UserProfileDevice;
   triggerRef?: Ref<HTMLButtonElement>;
   onViewDetails: (device: UserProfileDevice) => void;
   onSignOut?: (device: UserProfileDevice) => void;
+  skeleton: boolean;
 }) {
   const m = useMessages('userProfileActiveDevices');
   const actions: ActionMenuAction[] = [{ label: m.viewDetails, onClick: () => onViewDetails(device) }];
@@ -150,11 +162,13 @@ function DeviceItem({
 
   return (
     <Section.Item>
-      <UserProfileSecurityIcon name={device.type} />
+      <Skeleton>
+        <UserProfileSecurityIcon name={device.type} />
+      </Skeleton>
       <Section.Content>
         <Section.Label>
-          {device.name}
-          {deviceBadges(device, m).map(label => (
+          <Skeleton>{device.name}</Skeleton>
+          {(skeleton ? [] : deviceBadges(device, m)).map(label => (
             <Badge
               key={label}
               color='neutral'
@@ -163,14 +177,20 @@ function DeviceItem({
             </Badge>
           ))}
         </Section.Label>
-        {device.description ? <Section.Description>{device.description}</Section.Description> : null}
+        {device.description ? (
+          <Section.Description>
+            <Skeleton>{device.description}</Skeleton>
+          </Section.Description>
+        ) : null}
       </Section.Content>
       <Section.Actions>
-        <ActionMenu
-          actions={actions}
-          label={fill(m.manageLabel, { name: device.name })}
-          triggerRef={triggerRef}
-        />
+        <Skeleton visible={false}>
+          <ActionMenu
+            actions={actions}
+            label={fill(m.manageLabel, { name: device.name })}
+            triggerRef={triggerRef}
+          />
+        </Skeleton>
       </Section.Actions>
     </Section.Item>
   );
