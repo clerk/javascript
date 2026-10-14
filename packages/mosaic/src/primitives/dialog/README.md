@@ -64,8 +64,9 @@ const feedbackDialog = Dialog.createHandle();
 
 Each trigger can carry an `id` and a `payload`. The root's children can be a function receiving
 the active payload, so one dialog renders per-trigger content. Type the payload through
-the handle: `Dialog.createHandle<Payload>()`. The payload is captured when the trigger opens the
-dialog; for data that can change while it is open, carry an id and read live state inside.
+the handle: `Dialog.createHandle<Payload>()`, and every trigger on that handle must pass one. The
+payload is captured when the trigger opens the dialog; for data that can change while it is open,
+carry an id and read live state inside.
 
 ```tsx
 const detail = Dialog.createHandle<{ name: string }>();
@@ -203,11 +204,11 @@ root, and `initialFocus={false}` on the popup so mounting does not steal focus.
 
 ### `Dialog.Trigger`
 
-| Prop      | Type           | Default | Description                                              |
-| --------- | -------------- | ------- | -------------------------------------------------------- |
-| `handle`  | `DialogHandle` | —       | Drives a root elsewhere in the tree (detached trigger)   |
-| `id`      | `string`       | auto    | Names this trigger for the root's `triggerId`            |
-| `payload` | `Payload`      | —       | Delivered to the root's children render function on open |
+| Prop      | Type           | Default | Description                                                                                                |
+| --------- | -------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| `handle`  | `DialogHandle` | —       | Drives a root elsewhere in the tree (detached trigger)                                                     |
+| `id`      | `string`       | auto    | Names this trigger for the root's `triggerId`                                                              |
+| `payload` | `Payload`      | —       | Delivered to the root's children render function on open; required when the handle is typed with a payload |
 
 ### `Dialog.Popup`
 

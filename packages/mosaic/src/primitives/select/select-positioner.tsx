@@ -24,6 +24,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       returnFocusRef,
       setActiveIndex,
       alignItemWithTrigger,
+      multiple,
     } = useSelectContext();
 
     const side = alignItemWithTrigger ? 'none' : parsePlacement(placement).side;
@@ -53,6 +54,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
 
     const ownProps = {
       'data-side': side,
+      'aria-multiselectable': multiple || undefined,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 
@@ -82,7 +84,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     return (
       <>
         {/* An overlay on the trigger only works while the page holds still beneath it. */}
-        {alignItemWithTrigger && <FloatingOverlay lockScroll />}
+        {alignItemWithTrigger ? <FloatingOverlay lockScroll /> : null}
         <FloatingFocusManager
           context={floatingContext}
           modal={false}

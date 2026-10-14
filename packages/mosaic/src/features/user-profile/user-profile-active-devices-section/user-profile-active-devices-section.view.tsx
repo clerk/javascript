@@ -1,85 +1,63 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
-import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
-import { useConfirmationController } from '../../../blocks/confirmation/confirmation.controller';
 import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
-import { Dialog } from '../../../components/dialog';
 import { Section } from '../../../components/section';
-import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
+import { Skeleton } from '../../../components/skeleton';
+import { VisuallyHidden } from '../../../components/visually-hidden';
 import type { MosaicMessages } from '../../../localization';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
 import { UserProfileSecurityIcon } from '../user-profile-security-icon';
 import { styles } from '../user-profile-security-panel.styles';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
+import type { UserProfileActiveDevicesController } from './user-profile-active-devices-section.controller';
 import { UserProfileDeviceDetailsDialog } from './user-profile-device-details.dialog';
 
 export type { UserProfileDevice };
 
-export interface UserProfileActiveDevicesSectionViewProps {
-  devices: UserProfileDevice[];
-  onSignOutDevice?: (id: string) => void | Promise<void>;
-  onSignOutAllOtherDevices?: () => void | Promise<void>;
-}
+export type UserProfileActiveDevicesSectionViewProps = UserProfileActiveDevicesController & { skeleton?: boolean };
 
 export function UserProfileActiveDevicesSectionView({
   devices,
-  onSignOutDevice,
-  onSignOutAllOtherDevices,
+  currentDeviceTriggerRef,
+  signOutAllTriggerRef,
+  registerTrigger,
+  finalFocus,
+  details,
+  signOutFromDetails,
+  signOut,
+  signOutAll,
+  signOutAllFinalFocus,
+  skeleton = false,
 }: UserProfileActiveDevicesSectionViewProps) {
   const m = useMessages('userProfileActiveDevices');
   const locale = useLocale();
-  const deviceDetails = useMemo(() => Dialog.createHandle<UserProfileDevice>(), []);
-  const signOutDevice = useMemo(() => Confirmation.createHandle<UserProfileDevice>(), []);
   const currentDevices = devices.filter(device => device.isCurrent);
   const otherDevices = devices.filter(device => !device.isCurrent);
 
-  const currentDeviceTrigger = useRef<HTMLButtonElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: otherDevices.map(device => device.id),
-    onRemove: onSignOutDevice,
-    fallback: () => currentDeviceTrigger.current,
-  });
-  const signOutActions = onSignOutDevice
-    ? {
-        open: (device: UserProfileDevice) => signOutDevice.open(device),
-        remove: (device: UserProfileDevice) => removalFocus.remove(device.id),
-      }
-    : undefined;
-
-  const signOutAll = useConfirmationController({ errorFallback: m.signOutAllError });
-  const signedOutAll = useRef(false);
-  const signOutAllTrigger = useRef<HTMLButtonElement>(null);
-
-  // Confirming removes the other devices and the trigger with them — hence the dialog mounted
-  // outside the card, and the current device as the place focus lands. Cancelling keeps the
-  // trigger, so focus goes back to it.
-  const focusAfterSignOutAll = () => {
-    const signedOut = signedOutAll.current;
-    signedOutAll.current = false;
-    return signedOut ? currentDeviceTrigger.current : signOutAllTrigger.current;
-  };
-
   return (
     <div {...stylex.props(styles.sectionCards)}>
+      <VisuallyHidden role='status'>{skeleton ? m.loading : m.loaded}</VisuallyHidden>
       <Section.Root>
-        <Section.Group>
+        <Section.Group skeleton={skeleton}>
           <Section.Header>
             <Section.Content>
-              <Section.Title>{m.title}</Section.Title>
+              <Section.Title>
+                <Skeleton>{m.title}</Skeleton>
+              </Section.Title>
             </Section.Content>
-            {onSignOutAllOtherDevices && otherDevices.length > 0 ? (
+            {signOutAll && otherDevices.length > 0 ? (
               <Section.Actions>
                 <Button
-                  ref={signOutAllTrigger}
+                  ref={signOutAllTriggerRef}
                   color='neutral'
                   size='sm'
                   variant='outline'
-                  onClick={() => signOutAll.onOpenChange(true)}
+                  onClick={() => signOutAll.open()}
                 >
                   {m.signOutAll}
                 </Button>
@@ -93,8 +71,9 @@ export function UserProfileActiveDevicesSectionView({
                   <DeviceItem
                     key={device.id}
                     device={device}
-                    triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTrigger : undefined}
-                    onViewDetails={device => deviceDetails.open(device)}
+                    skeleton={skeleton}
+                    triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTriggerRef : undefined}
+                    onViewDetails={device => details.open(device)}
                   />
                 ))
               ) : (
@@ -108,52 +87,44 @@ export function UserProfileActiveDevicesSectionView({
                 <DeviceItem
                   key={device.id}
                   device={device}
-                  triggerRef={removalFocus.registerTrigger(device.id)}
-                  onSignOut={signOutActions?.open}
-                  onViewDetails={device => deviceDetails.open(device)}
+                  skeleton={skeleton}
+                  triggerRef={registerTrigger(device.id)}
+                  onSignOut={signOut ? device => signOut.open(device) : undefined}
+                  onViewDetails={device => details.open(device)}
                 />
               ))}
             </Section.Items>
           </Section.Body>
         </Section.Group>
       </Section.Root>
-      {onSignOutAllOtherDevices ? (
+      {signOutAll && !skeleton ? (
         <Confirmation
-          open={signOutAll.isOpen}
-          onOpenChange={signOutAll.onOpenChange}
+          controller={signOutAll}
           color='primary'
-          finalFocus={focusAfterSignOutAll}
+          finalFocus={signOutAllFinalFocus}
           title={m.signOutAllDialog.title}
           description={plural(m.signOutAllDialog.description, otherDevices.length, locale)}
           actionLabel={m.signOutAllDialog.confirm}
           cancelLabel={m.signOutAllDialog.cancel}
-          onConfirm={() =>
-            signOutAll.onConfirm(async () => {
-              await onSignOutAllOtherDevices();
-              signedOutAll.current = true;
-            })
-          }
-          isConfirming={signOutAll.isConfirming}
-          errorMessage={signOutAll.errorMessage}
         />
       ) : null}
-      <UserProfileDeviceDetailsDialog
-        handle={deviceDetails}
-        devices={devices}
-        finalFocus={removalFocus.finalFocus}
-        onSignOut={signOutActions?.remove}
-      />
-      {onSignOutDevice ? (
+      {skeleton ? null : (
+        <UserProfileDeviceDetailsDialog
+          controller={details}
+          devices={devices}
+          finalFocus={finalFocus}
+          onSignOut={signOutFromDetails}
+        />
+      )}
+      {signOut && !skeleton ? (
         <Confirmation
           color='primary'
-          handle={signOutDevice}
+          controller={signOut}
           title={m.signOutDialog.title}
           description={device => fill(m.signOutDialog.description, { name: device.name })}
           actionLabel={m.signOutDialog.confirm}
           cancelLabel={m.signOutDialog.cancel}
-          finalFocus={removalFocus.finalFocus}
-          onConfirm={device => signOutActions?.remove(device)}
-          errorFallback={m.detailsDialog.signOutError}
+          finalFocus={finalFocus}
         />
       ) : null}
     </div>
@@ -174,11 +145,13 @@ function DeviceItem({
   triggerRef,
   onViewDetails,
   onSignOut,
+  skeleton,
 }: {
   device: UserProfileDevice;
   triggerRef?: Ref<HTMLButtonElement>;
   onViewDetails: (device: UserProfileDevice) => void;
   onSignOut?: (device: UserProfileDevice) => void;
+  skeleton: boolean;
 }) {
   const m = useMessages('userProfileActiveDevices');
   const actions: ActionMenuAction[] = [{ label: m.viewDetails, onClick: () => onViewDetails(device) }];
@@ -189,11 +162,13 @@ function DeviceItem({
 
   return (
     <Section.Item>
-      <UserProfileSecurityIcon name={device.type} />
+      <Skeleton>
+        <UserProfileSecurityIcon name={device.type} />
+      </Skeleton>
       <Section.Content>
         <Section.Label>
-          {device.name}
-          {deviceBadges(device, m).map(label => (
+          <Skeleton>{device.name}</Skeleton>
+          {(skeleton ? [] : deviceBadges(device, m)).map(label => (
             <Badge
               key={label}
               color='neutral'
@@ -202,14 +177,20 @@ function DeviceItem({
             </Badge>
           ))}
         </Section.Label>
-        {device.description ? <Section.Description>{device.description}</Section.Description> : null}
+        {device.description ? (
+          <Section.Description>
+            <Skeleton>{device.description}</Skeleton>
+          </Section.Description>
+        ) : null}
       </Section.Content>
       <Section.Actions>
-        <ActionMenu
-          actions={actions}
-          label={fill(m.manageLabel, { name: device.name })}
-          triggerRef={triggerRef}
-        />
+        <Skeleton visible={false}>
+          <ActionMenu
+            actions={actions}
+            label={fill(m.manageLabel, { name: device.name })}
+            triggerRef={triggerRef}
+          />
+        </Skeleton>
       </Section.Actions>
     </Section.Item>
   );

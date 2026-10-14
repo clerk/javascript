@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withNeedsClientTrust] })(
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
@@ -23,7 +23,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withNeedsClientTrust] })(
     });
 
     test('sign in with email and password results in needs_client_trust', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in with a new device
       await u.po.signIn.goTo();
@@ -63,7 +63,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withNeedsClientTrust] })(
     });
 
     test('can navigate back to the sign-in start from the client trust step', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Sign in with email and password on a new device to reach the client-trust step.
       await u.po.signIn.goTo();

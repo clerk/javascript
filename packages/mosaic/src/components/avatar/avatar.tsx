@@ -7,6 +7,7 @@ import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
+import { skeletonStyles } from '../../styles/skeleton.styles';
 import { shapes, sizes, styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
@@ -145,11 +146,11 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
     return () => clearTimeout(timer);
   }, [delayMs]);
 
+  const pending = canRender && status === 'loading';
+
   if (!canRender || status === 'loaded') {
     return null;
   }
-
-  const pending = status === 'loading';
 
   return (
     <span
@@ -160,7 +161,7 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
           reset.base,
           styles.fallback,
           bordered && styles.overlay,
-          pending && styles.fallbackPending,
+          pending && skeletonStyles.shimmer,
           xstyle,
         ),
         rest,
@@ -193,7 +194,7 @@ const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function M
 /**
  * Compound avatar. `Avatar.Root` positions and sizes the box; `Avatar.Image` renders
  * once its source loads; `Avatar.Fallback` holds the space until then, as a blank
- * placeholder that pulses only while an image is actually on its way; `Avatar.Icon`
+ * placeholder that shimmers only while an image is actually on its way; `Avatar.Icon`
  * adds an optional corner affordance.
  */
 export const Avatar = {

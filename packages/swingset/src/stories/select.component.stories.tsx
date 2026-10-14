@@ -153,6 +153,43 @@ export function Controlled() {
   );
 }
 
+const languages = [
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'python', label: 'Python' },
+  { value: 'java', label: 'Java' },
+  { value: 'csharp', label: 'C#' },
+  { value: 'php', label: 'PHP' },
+  { value: 'cpp', label: 'C++' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'go', label: 'Go' },
+  { value: 'swift', label: 'Swift' },
+];
+
+function renderLanguages(value: string[]) {
+  if (value.length === 0) {
+    return 'Select languages';
+  }
+
+  const firstLanguage = languages.find(language => language.value === value[0])?.label;
+  const additionalLanguages = value.length > 1 ? ` (+${value.length - 1} more)` : '';
+  return `${firstLanguage}${additionalLanguages}`;
+}
+
+/** Picking an option adds or removes it and keeps the list open. */
+export function Multiple() {
+  return (
+    <Select.Root
+      items={languages}
+      multiple
+      defaultValue={['javascript', 'typescript']}
+    >
+      <Select.Trigger>{renderLanguages}</Select.Trigger>
+      <Select.Popup />
+    </Select.Root>
+  );
+}
+
 const timezones = Array.from({ length: 27 }, (_, index) => {
   const offset = index - 12;
   const sign = offset < 0 ? '-' : '+';

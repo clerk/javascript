@@ -87,6 +87,7 @@ async function fillCreate(user: User, dialog: HTMLElement, name: string, expirat
 async function startRevoke(user: User, name: string) {
   await user.click(await screen.findByRole('button', { name: `Manage ${name}` }));
   return openDialog(user, await screen.findByRole('menuitem', { name: 'Revoke key' }), {
+    role: 'alertdialog',
     name: `Revoke ${name}?`,
   });
 }
@@ -206,7 +207,7 @@ describe('APIKeysTable', () => {
       expect(screen.getByRole('searchbox', { name: 'Find a key' })).toBeVisible();
       await user.click(screen.getByRole('button', { name: 'Manage Web app' }));
       await user.click(await screen.findByRole('menuitem', { name: 'Revoke key' }));
-      const dialog = await screen.findByRole('dialog', { name: 'Retirer Web app ?' });
+      const dialog = await screen.findByRole('alertdialog', { name: 'Retirer Web app ?' });
       await waitFor(() => expect(dialog).toBeVisible());
     });
 
@@ -500,7 +501,7 @@ describe('APIKeysTable', () => {
 
       await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
 
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
       await waitFor(() => expect(within(table()).queryByText('Web app')).toBeNull());
       expect(within(table()).getByText('CI pipeline')).toBeVisible();
       expect(fapi.apiKeys.find(key => key.id === webApp.id)?.revoked).toBe(true);
@@ -517,7 +518,7 @@ describe('APIKeysTable', () => {
       expect(within(dialog).getByRole('button', { name: 'Revoke key' })).toHaveAttribute('aria-disabled', 'true');
 
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
       expect(fapi.apiKeys.find(key => key.id === webApp.id)?.revoked).toBeFalsy();
     });
 
@@ -531,7 +532,7 @@ describe('APIKeysTable', () => {
       expect(within(dialog).getByRole('button', { name: 'Revoke key' })).toHaveAttribute('aria-busy', 'true');
 
       revoke.release();
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     });
 
     it('explains a failed revoke, keeps the dialog open, and revokes on retry', async () => {
@@ -547,7 +548,7 @@ describe('APIKeysTable', () => {
       expect(within(dialog).getByRole('textbox')).toHaveValue('Web app');
 
       await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
       expect(fapi.apiKeys.find(key => key.id === webApp.id)?.revoked).toBe(true);
     });
 
@@ -560,7 +561,7 @@ describe('APIKeysTable', () => {
         expect(within(first).getByRole('textbox')).toHaveAccessibleDescription('api_key_revoke_failed'),
       );
       await user.click(within(first).getByRole('button', { name: 'Cancel' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
 
       const second = await startRevoke(user, 'CI pipeline');
 

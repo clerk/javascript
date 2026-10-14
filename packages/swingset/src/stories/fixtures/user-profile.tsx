@@ -1,4 +1,4 @@
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
@@ -34,8 +34,8 @@ import { useUserProfileProfileFixture } from './user-profile-profile';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export function UserProfileDangerPreview() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDangerSectionView {...controller} />;
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
 }
 
 const exampleEmails: UserProfileEmail[] = [
@@ -64,8 +64,8 @@ const examplePaymentMethods: UserProfilePaymentMethod[] = [
  */
 export function useUserProfileFixture() {
   const titleRef = useRef<HTMLDivElement>(null);
-  const connections = useConnectedAccountsFixture();
-  const wallets = useWeb3WalletsFixture();
+  const connections = useConnectedAccountsFixture({ fallbackFocus: () => titleRef.current });
+  const wallets = useWeb3WalletsFixture({ fallbackFocus: () => titleRef.current });
   const profile = useUserProfileProfileFixture();
   const editPassword = useUserProfileEditPasswordFixture();
   const mfa = useUserProfileMfaExample();
@@ -111,18 +111,8 @@ export function useUserProfileFixture() {
       profileSlot: <UserProfileProfileSectionView {...profile} />,
       emailSlot: <UserProfileEmailSectionView {...emails} />,
       phoneSlot: <UserProfilePhoneSectionView {...phones} />,
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          {...connections}
-          fallbackFocus={() => titleRef.current}
-        />
-      ),
-      web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
-          {...wallets}
-          fallbackFocus={() => titleRef.current}
-        />
-      ),
+      connectedAccountsSlot: <UserProfileConnectedAccountsSectionView {...connections} />,
+      web3WalletsSlot: <UserProfileWeb3WalletsSectionView {...wallets} />,
       dangerSlot: <UserProfileDangerPreview />,
     },
     security: {

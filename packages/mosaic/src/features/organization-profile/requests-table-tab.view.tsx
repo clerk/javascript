@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
-import { useRef, useState } from 'react';
+import type { Ref } from 'react';
+import { useState } from 'react';
 
 import { Avatar } from '../../components/avatar';
 import { Button, SubmitButton } from '../../components/button';
@@ -11,7 +12,6 @@ import { Section } from '../../components/section';
 import { Spinner } from '../../components/spinner';
 import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../hooks/use-pending-action';
 import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill, useMessages } from '../../localization';
@@ -24,7 +24,11 @@ const getRowId = (request: OrganizationProfileRequest) => request.id;
 
 export function RequestsTableTabView({
   requests,
+  inviteButtonRef,
+  tableContainerRef,
   onInvite,
+  registerAcceptTrigger,
+  registerDeclineTrigger,
   onAccept,
   onDecline,
   totalCount,
@@ -38,18 +42,6 @@ export function RequestsTableTabView({
   onRetry,
 }: RequestsTableTabViewProps) {
   const m = useMessages('requestsTableTab');
-  const inviteButton = useRef<HTMLButtonElement>(null);
-  const tableContainer = useRef<HTMLDivElement>(null);
-  const acceptFocus = useListRemovalFocus({
-    ids: requests.map(getRowId),
-    onRemove: onAccept,
-    fallback: () => inviteButton.current ?? tableContainer.current,
-  });
-  const declineFocus = useListRemovalFocus({
-    ids: requests.map(getRowId),
-    onRemove: onDecline,
-    fallback: () => inviteButton.current ?? tableContainer.current,
-  });
   const { table, pagination } = useServerDataTable({
     data: requests,
     totalCount,
@@ -66,7 +58,7 @@ export function RequestsTableTabView({
   return (
     <div
       {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(tableTabStyles.root))}
-      ref={tableContainer}
+      ref={tableContainerRef}
       tabIndex={-1}
       role='group'
       aria-label={m.title}
@@ -74,7 +66,7 @@ export function RequestsTableTabView({
       {onInvite ? (
         <Table.Toolbar>
           <Button
-            ref={inviteButton}
+            ref={inviteButtonRef}
             onClick={onInvite}
           >
             <Icon name='plus' />
@@ -116,16 +108,8 @@ export function RequestsTableTabView({
           hasBulkAction={Boolean(onBulkAction)}
           onAccept={onAccept}
           onDecline={onDecline}
-          onAcceptRow={async id => {
-            await acceptFocus.remove(id);
-            acceptFocus.finalFocus()?.focus();
-          }}
-          onDeclineRow={async id => {
-            await declineFocus.remove(id);
-            declineFocus.finalFocus()?.focus();
-          }}
-          registerAcceptTrigger={acceptFocus.registerTrigger}
-          registerDeclineTrigger={declineFocus.registerTrigger}
+          registerAcceptTrigger={registerAcceptTrigger}
+          registerDeclineTrigger={registerDeclineTrigger}
         />
       </Table.Root>
       {pagination ? (
@@ -152,8 +136,6 @@ function RequestsTableBody({
   hasBulkAction,
   onAccept,
   onDecline,
-  onAcceptRow,
-  onDeclineRow,
   registerAcceptTrigger,
   registerDeclineTrigger,
 }: {
@@ -172,10 +154,8 @@ function RequestsTableBody({
   hasBulkAction: boolean;
   onAccept?: RequestsTableTabViewProps['onAccept'];
   onDecline?: RequestsTableTabViewProps['onDecline'];
-  onAcceptRow: (id: string) => Promise<void>;
-  onDeclineRow: (id: string) => Promise<void>;
-  registerAcceptTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
-  registerDeclineTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
+  registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('requestsTableTab');
   if (isLoading || (isFetching && rows.length === 0)) {
@@ -263,8 +243,8 @@ function RequestsTableBody({
               <Table.Cell align='end'>
                 <RequestActions
                   request={request}
-                  onAccept={onAccept ? () => onAcceptRow(request.id) : undefined}
-                  onDecline={onDecline ? () => onDeclineRow(request.id) : undefined}
+                  onAccept={onAccept ? () => onAccept(request.id) : undefined}
+                  onDecline={onDecline ? () => onDecline(request.id) : undefined}
                   registerAcceptTrigger={registerAcceptTrigger}
                   registerDeclineTrigger={registerDeclineTrigger}
                 />
@@ -287,12 +267,12 @@ function RequestActions({
   request: OrganizationProfileRequest;
   onAccept?: () => void | Promise<void>;
   onDecline?: () => void | Promise<void>;
-  registerAcceptTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
-  registerDeclineTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
+  registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('requestsTableTab');
-  const [acceptRef] = useState(() => registerAcceptTrigger(request.id));
-  const [declineRef] = useState(() => registerDeclineTrigger(request.id));
+  const [acceptRef] = useState(() => registerAcceptTrigger?.(request.id));
+  const [declineRef] = useState(() => registerDeclineTrigger?.(request.id));
   const actions = usePendingAction<'accept' | 'decline'>();
   const pendingAction = request.pendingAction ?? actions.pendingKey;
   const decide = (key: 'accept' | 'decline', action: () => void | Promise<void>, errorFallback: string) => {
