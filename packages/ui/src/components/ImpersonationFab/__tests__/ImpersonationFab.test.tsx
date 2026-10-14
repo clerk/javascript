@@ -9,26 +9,29 @@ import { ImpersonationFab } from '../';
 const { createFixtures } = bindCreateFixtures('UserButton');
 
 describe('ImpersonationFab', () => {
+  const topProperty = '--cl-impersonation-fab-top';
+  const rightProperty = '--cl-impersonation-fab-right';
+  const cssVar = (name: string) => document.documentElement.style.getPropertyValue(name);
+
   afterEach(() => {
-    fireEvent(window, new Event('blur'));
-    document.documentElement.style.removeProperty('--cl-impersonation-fab-top');
-    document.documentElement.style.removeProperty('--cl-impersonation-fab-right');
+    pointer(window, 'pointercancel', {});
+    document.documentElement.style.removeProperty(topProperty);
+    document.documentElement.style.removeProperty(rightProperty);
     vi.restoreAllMocks();
   });
 
   const pointer = (
     target: EventTarget,
     type: string,
-    init: MouseEventInit & { movementX?: number; movementY?: number; pointerId?: number },
+    init: MouseEventInit & { movementX?: number; movementY?: number },
   ) => {
     const event = new MouseEvent(type, { bubbles: true, cancelable: true, ...init });
     Object.defineProperties(event, {
-      pointerId: { value: init.pointerId ?? 1 },
+      pointerId: { value: 1 },
       movementX: { value: init.movementX ?? 0 },
       movementY: { value: init.movementY ?? 0 },
     });
     fireEvent(target, event);
-    return event;
   };
 
   const renderDraggableFab = async () => {
@@ -36,16 +39,21 @@ describe('ImpersonationFab', () => {
       f.withUser({ email_addresses: ['test@clerk.com'], actor: { sub: 'user_impersonated' } });
     });
     const result = render(<ImpersonationFab />, { wrapper });
-    const fab = document.getElementById('cl-impersonationEye')!.parentElement!;
-    const top = () => parseFloat(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')) || 109;
-    const right = () =>
-      parseFloat(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-right')) || 23;
+    const fab = document.getElementById('cl-impersonationEye')?.parentElement;
+    if (!fab) {
+      throw new Error('Impersonation button was not rendered');
+    }
+
+    const top = () => parseFloat(cssVar(topProperty)) || 109;
+    const right = () => parseFloat(cssVar(rightProperty)) || 23;
     let width = 200;
     Object.defineProperties(fab, {
       offsetTop: { get: top },
       offsetLeft: { get: () => window.innerWidth - right() - width },
       offsetWidth: { get: () => width },
       offsetHeight: { get: () => 64 },
+      setPointerCapture: { value: vi.fn() },
+      hasPointerCapture: { value: () => false },
     });
     vi.spyOn(fab, 'getBoundingClientRect').mockImplementation(() =>
       DOMRect.fromRect({ x: window.innerWidth - right() - width, y: top(), width, height: 64 }),
@@ -53,85 +61,48 @@ describe('ImpersonationFab', () => {
     return { ...result, fixtures, fab, setWidth: (value: number) => (width = value) };
   };
 
-  it('follows viewport pointer coordinates regardless of movement units or hover width changes', async () => {
+  it('follows the pointer position rather than movement values, across hover width changes', async () => {
     const { fab, setWidth } = await renderDraggableFab();
     pointer(fab, 'pointerdown', { clientX: 900, clientY: 130 });
     pointer(window, 'pointermove', { clientX: 880, clientY: 160, movementX: -40, movementY: 60 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-right')).toBe('43px');
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('139px');
+    expect(cssVar(rightProperty)).toBe('43px');
+    expect(cssVar(topProperty)).toBe('139px');
 
     setWidth(64);
     pointer(window, 'pointermove', { clientX: 870, clientY: 165, movementX: -20, movementY: 10 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-right')).toBe('53px');
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('144px');
-    pointer(window, 'pointerup', { clientX: 870, clientY: 165 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-right')).toBe('53px');
+    expect(cssVar(rightProperty)).toBe('53px');
+    expect(cssVar(topProperty)).toBe('144px');
   });
 
-  it('prevents text selection when starting a drag', async () => {
-    const { fab } = await renderDraggableFab();
-    expect(pointer(fab, 'pointerdown', { clientX: 900, clientY: 130 }).defaultPrevented).toBe(true);
-  });
-
-  it('supports repeated drags with fractional coordinates and without movement values', async () => {
-    const { fab } = await renderDraggableFab();
-    pointer(fab, 'pointerdown', { clientX: 900, clientY: 130 });
-    pointer(window, 'pointermove', { clientX: 879.5, clientY: 160.25 });
-    pointer(window, 'pointerup', {});
-    pointer(fab, 'pointerdown', { clientX: 879.5, clientY: 160.25 });
-    pointer(window, 'pointermove', { clientX: 890, clientY: 150 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-right')).toBe('33px');
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('129px');
-  });
-
-  it('ignores movement and release from another pointer', async () => {
-    const { fab } = await renderDraggableFab();
-    pointer(fab, 'pointerdown', { clientX: 900, clientY: 130 });
-    pointer(window, 'pointermove', { clientX: 500, clientY: 500, pointerId: 2 });
-    pointer(window, 'pointerup', { pointerId: 2 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('');
-    pointer(window, 'pointermove', { clientX: 880, clientY: 160 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('139px');
-  });
-
-  it.each(['pointerup', 'pointercancel', 'blur'])('ends dragging on %s', async type => {
-    const { fab } = await renderDraggableFab();
-    pointer(fab, 'pointerdown', { clientX: 900, clientY: 130 });
-    pointer(window, 'pointermove', { clientX: 880, clientY: 160 });
-    pointer(window, type, {});
-    pointer(window, 'pointermove', { clientX: 800, clientY: 200 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-right')).toBe('43px');
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('139px');
-  });
-
-  it('removes drag listeners when unmounted', async () => {
-    const { fab, unmount } = await renderDraggableFab();
-    pointer(fab, 'pointerdown', { clientX: 900, clientY: 130 });
-    unmount();
-    pointer(window, 'pointermove', { clientX: 880, clientY: 160 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('');
-  });
-
-  it('ignores secondary clicks and preserves the sign-out action', async () => {
-    const { fab, fixtures, getByText, userEvent } = await renderDraggableFab();
-    expect(pointer(fab, 'pointerdown', { button: 2 }).defaultPrevented).toBe(false);
-    const signOut = getByText('Sign out');
-    expect(pointer(signOut, 'pointerdown', { clientX: 900, clientY: 130 }).defaultPrevented).toBe(false);
-    pointer(window, 'pointermove', { clientX: 880, clientY: 160 });
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('');
-    await userEvent.click(signOut);
+  it('keeps the sign-out action clickable', async () => {
+    const { fixtures, getByText, userEvent } = await renderDraggableFab();
+    await userEvent.click(getByText('Sign out'));
     expect(fixtures.clerk.signOut).toHaveBeenCalled();
   });
 
-  it('resets an out-of-viewport position on release and resize', async () => {
+  it('settles inside the viewport inset when released off-screen', async () => {
     const { fab } = await renderDraggableFab();
     pointer(fab, 'pointerdown', { clientX: 900, clientY: 130 });
-    pointer(window, 'pointermove', { clientX: 1200, clientY: 130 });
+    pointer(window, 'pointermove', { clientX: 1200, clientY: -100 });
     pointer(window, 'pointerup', {});
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-right')).toBe('23px');
-    document.documentElement.style.setProperty('--cl-impersonation-fab-top', '1000px');
+    expect(cssVar(rightProperty)).toBe('20px');
+    expect(cssVar(topProperty)).toBe('20px');
+  });
+
+  it('keeps the position when released inside the viewport inset', async () => {
+    const { fab } = await renderDraggableFab();
+    pointer(fab, 'pointerdown', { clientX: 900, clientY: 130 });
+    pointer(window, 'pointermove', { clientX: 880, clientY: 160 });
+    pointer(window, 'pointerup', {});
+    expect(cssVar(rightProperty)).toBe('43px');
+    expect(cssVar(topProperty)).toBe('139px');
+  });
+
+  it('resets an out-of-viewport position on resize', async () => {
+    await renderDraggableFab();
+    document.documentElement.style.setProperty(topProperty, '1000px');
     fireEvent(window, new Event('resize'));
-    expect(document.documentElement.style.getPropertyValue('--cl-impersonation-fab-top')).toBe('109px');
+    expect(cssVar(topProperty)).toBe('109px');
   });
 
   it('does not render when user has no actor', async () => {

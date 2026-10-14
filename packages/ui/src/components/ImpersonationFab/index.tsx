@@ -1,7 +1,6 @@
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SignedInSessionResource } from '@clerk/shared/types';
-import type { PointerEventHandler } from 'react';
 import { useEffect, useRef } from 'react';
 
 import { useSignOutContext, withCoreUserGuard } from '../../contexts';
@@ -18,7 +17,9 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { Portal } from '../../elements/Portal';
+import { useDragGesture } from '../../hooks/useDragGesture';
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { Eye } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { InternalThemeProvider, mqu } from '../../styledSystem';
@@ -115,7 +116,7 @@ const ImpersonationFabInternal = () => {
   const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);
-  const dragCleanupRef = useRef<(() => void) | null>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const actor = session?.actor;
   const agent = session?.agent;
   const isImpersonating = !!actor && !agent;
@@ -127,6 +128,7 @@ const ImpersonationFabInternal = () => {
   const rightProperty = '--cl-impersonation-fab-right';
   const defaultTop = 109;
   const defaultRight = 23;
+  const viewportInset = 20;
 
   const handleResize = () => {
     const current = containerRef.current;
@@ -145,62 +147,60 @@ const ImpersonationFabInternal = () => {
     }
   };
 
-  const onPointerDown: PointerEventHandler = e => {
-    if (e.button !== 0 || (e.target as HTMLElement).closest('a')) {
-      return;
-    }
-
+  const settleIntoViewport = () => {
     const current = containerRef.current;
     if (!current) {
       return;
     }
 
-    e.preventDefault();
-    dragCleanupRef.current?.();
-
     const bounds = current.getBoundingClientRect();
-    const startRight = window.innerWidth - bounds.right;
-    const { clientX, clientY, pointerId } = e;
+    const from = { top: bounds.top, offsetRight: window.innerWidth - bounds.right };
+    const to = {
+      top: Math.min(Math.max(from.top, viewportInset), window.innerHeight - bounds.height - viewportInset),
+      offsetRight: Math.min(
+        Math.max(from.offsetRight, viewportInset),
+        window.innerWidth - bounds.width - viewportInset,
+      ),
+    };
+    if (from.top === to.top && from.offsetRight === to.offsetRight) {
+      return;
+    }
 
-    const onPointerMove = (moveEvent: PointerEvent) => {
-      if (moveEvent.pointerId !== pointerId) {
+    document.documentElement.style.setProperty(rightProperty, `${to.offsetRight}px`);
+    document.documentElement.style.setProperty(topProperty, `${to.top}px`);
+    if (!prefersReducedMotion) {
+      current.animate(
+        [
+          // eslint-disable-next-line custom-rules/no-physical-css-properties -- Complex JS-based positioning via CSS custom properties
+          { top: `${from.top}px`, right: `${from.offsetRight}px` },
+          // eslint-disable-next-line custom-rules/no-physical-css-properties -- Complex JS-based positioning via CSS custom properties
+          { top: `${to.top}px`, right: `${to.offsetRight}px` },
+        ],
+        { duration: 350, easing: 'cubic-bezier(0.34, 1.2, 0.64, 1)' },
+      );
+    }
+  };
+
+  const dragStart = useRef<{ top: number; offsetRight: number } | null>(null);
+  const { onPointerDown } = useDragGesture({
+    onDragStart: () => {
+      const bounds = containerRef.current?.getBoundingClientRect();
+      dragStart.current = bounds ? { top: bounds.top, offsetRight: window.innerWidth - bounds.right } : null;
+    },
+    onDrag: ({ x, y }) => {
+      if (!dragStart.current) {
         return;
       }
-      moveEvent.stopPropagation();
-      moveEvent.preventDefault();
-      document.documentElement.style.setProperty(rightProperty, `${startRight - (moveEvent.clientX - clientX)}px`);
-      document.documentElement.style.setProperty(topProperty, `${bounds.top + moveEvent.clientY - clientY}px`);
-    };
-
-    const onPointerEnd = (endEvent: PointerEvent) => {
-      if (endEvent.pointerId === pointerId) {
-        endDrag();
-      }
-    };
-
-    const endDrag = () => {
-      dragCleanupRef.current?.();
-      handleResize();
-    };
-
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerEnd);
-    window.addEventListener('pointercancel', onPointerEnd);
-    window.addEventListener('blur', endDrag);
-    dragCleanupRef.current = () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerEnd);
-      window.removeEventListener('pointercancel', onPointerEnd);
-      window.removeEventListener('blur', endDrag);
-      dragCleanupRef.current = null;
-    };
-  };
+      document.documentElement.style.setProperty(rightProperty, `${dragStart.current.offsetRight - x}px`);
+      document.documentElement.style.setProperty(topProperty, `${dragStart.current.top + y}px`);
+    },
+    onDragEnd: settleIntoViewport,
+  });
 
   const repositionFabOnResize = () => {
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
-      dragCleanupRef.current?.();
     };
   };
 
@@ -224,7 +224,6 @@ const ImpersonationFabInternal = () => {
         align='center'
         sx={t => ({
           touchAction: 'none', //for drag to work on mobile consistently
-          userSelect: 'none',
           position: 'fixed',
           overflow: 'hidden',
           top: `var(${topProperty}, ${defaultTop}px)`,
@@ -233,7 +232,7 @@ const ImpersonationFabInternal = () => {
           zIndex: t.zIndices.$fab,
           boxShadow: t.shadows.$fabShadow,
           borderRadius: t.radii.$halfHeight, //to match the circular eye perfectly
-          backgroundColor: t.colors.$white,
+          backgroundColor: t.colors.$colorBackground,
           fontFamily: t.fonts.$main,
           ':hover': {
             cursor: 'grab',
