@@ -600,12 +600,12 @@ function FlyoutRow({ icon, label, busy = false, children }: FlyoutRowProps) {
 
   return (
     // It opens out of the popup, so the opposite side is the popup itself. Where the viewport is too
-    // narrow for either side — a phone — it goes above the row instead of under the card. The row is
-    // inset 8px, so the sideways gap clears that before it clears the card's edge. Above the row there
-    // is nothing to clear, so that gap is the plain one.
+    // narrow for either side — a phone — it goes above the row instead of under the card. Sideways it
+    // clears the row but not the card, so it overlaps the card's edge by what is left of the row's inset.
+    // Above the row there is nothing to overlap, so that gap is the plain one.
     <Menu.Root
       placement='right-start'
-      sideOffset={{ x: 12, y: 8 }}
+      sideOffset={{ x: 4, y: 8 }}
       fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
     >
       <Menu.Trigger
