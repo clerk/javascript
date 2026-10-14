@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, type Hash } from 'node:crypto';
 import {
   chmodSync,
   closeSync,
@@ -38,28 +38,28 @@ export interface FingerprintInputs {
   readonly installed: string;
 }
 
-export async function nativeFingerprint(spec: FingerprintInputs): Promise<string> {
-  const listed = await run(
-    'git',
-    ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...spec.inputs],
-    {
-      cwd: spec.worktree,
-    },
-  );
+export async function hashInputFiles(worktree: string, inputs: readonly string[], hash: Hash): Promise<void> {
+  const listed = await run('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...inputs], {
+    cwd: worktree,
+  });
   if (listed.code !== 0)
     throw new VerifyFailure(
       'NOT_READY',
       `git ls-files failed: ${listed.stderr.trim()}`,
       'run {cli} from inside a git worktree',
     );
-  const hash = createHash('sha256');
-  hash.update(spec.platform).update('\0').update(spec.toolchain).update('\0').update(spec.installed).update('\0');
   const tracked = [...new Set(listed.stdout.split('\0').filter(file => file.length > 0))].sort();
   for (const file of tracked) {
-    const path = join(spec.worktree, file);
+    const path = join(worktree, file);
     hash.update(file).update('\0');
     hash.update(existsSync(path) ? readFileSync(path) : 'deleted').update('\0');
   }
+}
+
+export async function nativeFingerprint(spec: FingerprintInputs): Promise<string> {
+  const hash = createHash('sha256');
+  hash.update(spec.platform).update('\0').update(spec.toolchain).update('\0').update(spec.installed).update('\0');
+  await hashInputFiles(spec.worktree, spec.inputs, hash);
   for (const file of spec.files) {
     hash.update(basename(file)).update('\0');
     hash.update(existsSync(file) ? readFileSync(file) : 'missing').update('\0');

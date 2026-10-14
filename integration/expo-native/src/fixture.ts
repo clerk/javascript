@@ -9,6 +9,7 @@ import { VerifyFailure, type Platform } from './core/types.ts';
 import {
   embedJavaScript,
   expoFingerprint,
+  hashInputFiles,
   installedNativeInputs,
   keepNativeBuild,
   keptNativeBuild,
@@ -378,10 +379,10 @@ export async function buildFixture(build: FixtureBuild, site: FixtureSite = THIS
   return built;
 }
 
-async function committedNativeKey(platform: Platform): Promise<string> {
-  const listed = await run('git', ['ls-tree', '-r', 'HEAD', '--', ...nativeInputs(platform)], { cwd: WORKTREE });
-  if (listed.code !== 0) throw new VerifyFailure('NOT_READY', `git ls-tree failed: ${listed.stderr.trim()}`, 'retry');
-  return createHash('sha256').update(listed.stdout).digest('hex').slice(0, 12);
+export async function nativeProjectKey(platform: Platform, worktree: string = WORKTREE): Promise<string> {
+  const hash = createHash('sha256');
+  await hashInputFiles(worktree, nativeInputs(platform), hash);
+  return hash.digest('hex').slice(0, 12);
 }
 
 export async function buildStandalone(
@@ -427,7 +428,7 @@ if (import.meta.main) {
   }
   try {
     if (first === 'native') await printKeptNativeBuild(platform);
-    else await buildStandalone(platform, await committedNativeKey(platform), line => console.log(line));
+    else await buildStandalone(platform, await nativeProjectKey(platform), line => console.log(line));
   } catch (error) {
     console.error((error as Error).message);
     process.exit(1);

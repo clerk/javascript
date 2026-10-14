@@ -12,6 +12,7 @@ import {
   buildStandalone,
   locateNativeBuild,
   nativeCacheDir,
+  nativeProjectKey,
   type FixtureSite,
 } from '../src/fixture.ts';
 import { VerifyFailure } from '../src/core/types.ts';
@@ -387,6 +388,32 @@ describe('the standalone build that a person or a remote session starts', () => 
       'build   turbo build took 3s',
     ]);
     rmSync(at.site.worktree, { recursive: true, force: true });
+  });
+});
+
+describe('the native project a remote session generates', () => {
+  it('is generated again when uncommitted changes touch a native input, and not for a JS-only change', async () => {
+    const at = checkout();
+    const worktree = at.site.worktree;
+    execFileSync('git', ['-C', worktree, 'add', '-A']);
+    execFileSync('git', ['-C', worktree, 'commit', '-q', '-m', 'base']);
+    const committed = await nativeProjectKey('ios', worktree);
+    await build(at, null, committed);
+    at.write('packages/expo/src/index.ts', 'js two');
+    assert.equal(await nativeProjectKey('ios', worktree), committed);
+    at.steps.length = 0;
+    await build(at, null, committed);
+    assert.deepEqual(at.steps, ['xcodebuild']);
+    at.write('packages/expo-native-components/ios/ClerkExpo.swift', 'native two');
+    const edited = await nativeProjectKey('ios', worktree);
+    assert.notEqual(edited, committed);
+    at.write('packages/expo-native-components/ios/Added.swift', 'native three');
+    const added = await nativeProjectKey('ios', worktree);
+    assert.notEqual(added, edited);
+    at.steps.length = 0;
+    await build(at, null, added);
+    assert.deepEqual(at.steps, NATIVE_BUILD);
+    rmSync(worktree, { recursive: true, force: true });
   });
 });
 
