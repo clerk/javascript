@@ -5,7 +5,7 @@ Mosaic flow that may import Clerk hooks or call Clerk resource methods** — the
 controller (`controllers.md`) and the view (`views.md`) stay Clerk-free, which is
 what makes both testable without a Clerk fixture.
 
-Worked example: `packages/mosaic/src/features/user-button/user-button.model.tsx`. See
+Worked example: `packages/mosaic/src/features/switcher/switcher.model.tsx`. See
 `packages/mosaic/ARCHITECTURE.md` → "Models" for the layer contract.
 
 ## Shape

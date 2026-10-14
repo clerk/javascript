@@ -74,9 +74,10 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   const nativeModule = isNative() && !__experimental_disableNativeClientSync ? ClerkExpoModule : null;
   const tokenCacheRef = useRef(tokenCache);
   tokenCacheRef.current = tokenCache;
+  const nativeProxyUrl = typeof proxyUrl === 'string' && proxyUrl ? proxyUrl : null;
   const nativeClientSync = useMemo(
-    () => (nativeModule ? createNativeClientSync(nativeModule, pk, () => tokenCacheRef.current) : null),
-    [nativeModule, pk],
+    () => (nativeModule ? createNativeClientSync(nativeModule, pk, nativeProxyUrl, () => tokenCacheRef.current) : null),
+    [nativeModule, pk, nativeProxyUrl],
   );
 
   const clerkInstance = isNative()

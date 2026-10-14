@@ -1,17 +1,19 @@
-import type { UserButtonData, UserButtonHeaderLayout, UserButtonMode } from './user-button.types';
+import type { SwitcherData, SwitcherMode } from './switcher.types';
 
 /*
- * Which mode puts what where. The surface is three slots deep, in this order, and each mode fills
- * them differently:
+ * Which mode puts what where. Under the header the surface is three slots deep, in this order, and
+ * each mode fills them differently:
  *
  *  combined                       organization                 user
  *  ┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
- *  │ Alice ᶠ                    │ │ Foundry                  │ │ Alice                   ⚙  │ header
- *  │ [⚙ Settings ▾] [Invite]    │ │ [⚙ Settings] [Invite]    │ │                            │
+ *  │ Foundry ᵃ                  │ │ Foundry                  │ │ Alice                      │ header
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
  *  │ Personal account           │ │ Personal account         │ │                            │ ┐
  *  │ ✓ Foundry                  │ │ ✓ Foundry                │ │                            │ ┘ organization rows
- *  │ + Create organization      │ │ + Create organization    │ │                            │ organizationsFooter
+ *  │ + Add organization         │ │ + Add organization       │ │                            │ organizationsFooter
+ *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
+ *  │ ⚙ Settings              ›  │ │ ⚙ Settings               │ │ ⚙ Settings                 │ ┐
+ *  │ ⊕ Invite members           │ │ ⊕ Invite members         │ │                            │ ┘ manage
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
  *  │ ⇄ Switch account        ›  │ │                          │ │ ⇄ Switch account        ›  │ ┐
  *  │ ⤴ Sign out                 │ │                          │ │ ⤴ Sign out                 │ ┘ footer
@@ -21,38 +23,40 @@ import type { UserButtonData, UserButtonHeaderLayout, UserButtonMode } from './u
  * switch between. The other signed-in accounts are not: they are one row at the foot that opens a
  * flyout of them, so the surface stays about the organization it is on.
  *
- * The header is about whatever leads, not the mode: an organization is managed and invited to, an
- * account is managed, and signed out of at the foot. A combined surface always leads with the account. With an
- * organization active, the account is badged with it, invites to it, and its Settings opens onto
- * both the organization's settings and the account's.
+ * The header only names whatever leads; what can be done about it is the manage group, which the
+ * app's own rows join. An
+ * organization is managed and invited to, an account is managed, and signed out of at the foot. A
+ * combined surface leads with the account until an organization is active. Then it leads with the
+ * organization, badged with the account, invites to it, and its Settings opens onto both the
+ * organization's settings and the account's.
  */
 
-/** The three places an action can land. Every mode has a header and a footer; the list's varies. */
-export type UserButtonSlot = 'header' | 'organizationsFooter' | 'footer';
+/** The three places an action can land. Which of them a mode fills varies. */
+export type SwitcherSlot = 'organizationsFooter' | 'manage' | 'footer';
 
-export type UserButtonAction =
+export type SwitcherAction =
   | 'addAccount'
   | 'createOrganization'
   | 'inviteMembers'
-  /** The gear. Manages the header's organization and, where it badges the account, the account too. */
-  | 'manageLead'
+  /** Settings. Manages the lead's organization and, where it badges the account, the account too. */
+  | 'settings'
   | 'signOut'
   /** The flyout of signed-in accounts, adding one, and signing out of all of them. */
   | 'switchAccount';
 
 /**
- * What the trigger names and the header leads with. `member` is the account, badged with the
- * organization it is active in. `none` is an organization-led surface with no organization active
- * and no personal account to fall back to.
+ * What the trigger names and the header leads with. `personal` and `none` are an organization-led
+ * surface with no organization active, falling back to the personal account or to nothing. Neither
+ * has an organization to manage, and an organization-led surface never manages the account.
  */
-export type UserButtonLead = 'organization' | 'member' | 'user' | 'none';
+export type SwitcherLead = 'organization' | 'user' | 'personal' | 'none';
 
-const headers = {
-  organization: ['inviteMembers', 'manageLead'],
-  member: ['inviteMembers', 'manageLead'],
-  user: ['manageLead'],
-  none: ['manageLead'],
-} as const satisfies Record<UserButtonLead, readonly UserButtonAction[]>;
+const manage = {
+  organization: ['settings', 'inviteMembers'],
+  user: ['settings'],
+  personal: [],
+  none: [],
+} as const satisfies Record<SwitcherLead, readonly SwitcherAction[]>;
 
 /** One mode's whole surface below the header, top to bottom. */
 interface ModeLayout {
@@ -61,12 +65,12 @@ interface ModeLayout {
    * `false` is a list the mode does not carry at all. `footer` trails the rows, inside the list,
    * since what it offers is one more organization.
    */
-  organizations: { footer: readonly UserButtonAction[] } | false;
+  organizations: { footer: readonly SwitcherAction[] } | false;
   /**
    * With a second account the foot switches between them, or signs out of every one. With just the
    * one there is nothing to switch between or to sign out of "all" of.
    */
-  footer: { multiSession: readonly UserButtonAction[]; singleSession: readonly UserButtonAction[] };
+  footer: { multiSession: readonly SwitcherAction[]; singleSession: readonly SwitcherAction[] };
 }
 
 const modes = {
@@ -84,35 +88,36 @@ const modes = {
     organizations: false,
     footer: { multiSession: ['switchAccount', 'signOut'], singleSession: ['addAccount', 'signOut'] },
   },
-} as const satisfies Record<UserButtonMode, ModeLayout>;
+} as const satisfies Record<SwitcherMode, ModeLayout>;
 
 /**
  * Where each of the surface's actions landed, resolved once from `mode` and the data, so no
  * section has to read either again.
  */
-export interface UserButtonLayout {
-  lead: UserButtonLead;
+export interface SwitcherLayout {
+  lead: SwitcherLead;
+  /** The organization lead is badged with the user, and its gear manages both. */
+  userBadge: boolean;
   /** The organization rows: the personal account, the organizations, and what is on offer. */
   showOrganizations: boolean;
-  headerLayout: UserButtonHeaderLayout;
   /** What each slot carries, in the order it renders. */
-  actions: Record<UserButtonSlot, UserButtonAction[]>;
+  actions: Record<SwitcherSlot, SwitcherAction[]>;
 }
 
-function resolveLead(mode: UserButtonMode, data: UserButtonData): UserButtonLead {
+function resolveLead(mode: SwitcherMode, data: SwitcherData): SwitcherLead {
   if (mode === 'user') {
     return 'user';
   }
   if (mode === 'combined') {
-    return data.activeOrganization ? 'member' : 'user';
+    return data.activeOrganization ? 'organization' : 'user';
   }
   if (data.activeOrganization) {
     return 'organization';
   }
-  return data.hidePersonal ? 'none' : 'user';
+  return data.hidePersonal ? 'none' : 'personal';
 }
 
-export function resolveUserButtonLayout(mode: UserButtonMode, data: UserButtonData): UserButtonLayout {
+export function resolveSwitcherLayout(mode: SwitcherMode, data: SwitcherData): SwitcherLayout {
   const declared: ModeLayout = modes[mode];
   const organizationsFooter = declared.organizations === false ? [] : declared.organizations.footer;
 
@@ -122,15 +127,14 @@ export function resolveUserButtonLayout(mode: UserButtonMode, data: UserButtonDa
   const hasOrganizations = data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
 
   const lead = resolveLead(mode, data);
-  const header = [...headers[lead]];
 
   return {
     lead,
+    userBadge: mode === 'combined' && lead === 'organization',
     showOrganizations: declared.organizations !== false && hasOrganizations,
-    headerLayout: header.some(action => action !== 'manageLead') ? 'stacked' : 'inline',
     actions: {
-      header,
       organizationsFooter: [...organizationsFooter],
+      manage: [...manage[lead]],
       footer: [...(hasOtherSessions ? declared.footer.multiSession : declared.footer.singleSession)],
     },
   };

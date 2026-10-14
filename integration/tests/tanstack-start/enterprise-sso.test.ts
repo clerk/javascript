@@ -15,7 +15,7 @@ const FAKE_IDP_CERTIFICATE =
  * The Clerk API requires creating the connection first (inactive), then activating via update.
  */
 async function createActiveEnterpriseConnection(
-  clerk: ReturnType<typeof createTestUtils>['services']['clerk'],
+  clerk: Awaited<ReturnType<typeof createTestUtils>>['services']['clerk'],
   opts: { name: string; domain: string; idpEntityId: string; idpSsoUrl: string },
 ): Promise<EnterpriseConnection> {
   const conn = await clerk.enterpriseConnections.createEnterpriseConnection({
@@ -45,7 +45,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
     let enterpriseConnection: EnterpriseConnection | undefined;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       enterpriseConnection = await createActiveEnterpriseConnection(u.services.clerk, {
         name: `E2E Test SAML Connection ${runId}`,
         domain: testDomain,
@@ -55,7 +55,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       // Guard against a failed beforeAll: without this, the TypeError here masks
       // the real error from beforeAll in the Playwright report.
       if (enterpriseConnection) {
@@ -65,7 +65,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
     });
 
     test('sign-in with enterprise domain email initiates SSO redirect', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Capture the redirect to the fake IdP (proves enterprise SSO kicked in)
       const idpRequestPromise = page.waitForRequest(req => req.url().includes(fakeIdpHost));
@@ -80,7 +80,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
     });
 
     test('non-managed domain email does not trigger SSO redirect', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier('testuser@regular-domain.com');
