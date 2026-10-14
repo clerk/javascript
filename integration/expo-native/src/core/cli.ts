@@ -31,7 +31,7 @@ const VERBS: readonly Verb[] = ['doctor', 'up', 'run', 'screen', 'attach', 'down
 const USAGE_FIX = [
   '{cli} doctor [--platform p] [--backend auto|local|remote] [--live [--runner <label>]]',
   '{cli} up [--platform p] [--backend auto|local|remote] [--runner <label>] [--wait <seconds>]',
-  '{cli} run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--backend auto|local|remote] [--runner <label>] [--grep re] [--retries <n>] [--github-report] [--no-video] [--wait <seconds>]',
+  '{cli} run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--backend auto|local|remote] [--runner <label>] [--grep re] [--retries <n>] [--max-failures <n>] [--github-report] [--no-video] [--wait <seconds>]',
   '{cli} screen [--platform p] [--png]',
   '{cli} attach <run-id> --pr <n> [--screenshot <label>]... [--video] [--before <run-id>], with at least one of --screenshot and --video',
   '{cli} down [--platform p] [--stale] [--dry-run]',
@@ -52,7 +52,7 @@ type FlagSpec = Readonly<Record<string, 'value' | 'bool' | 'list'>>;
 const FLAGS: Readonly<Record<Verb, FlagSpec>> = {
   doctor: { platform: 'value', backend: 'value', runner: 'value', live: 'bool' },
   up: { platform: 'value', backend: 'value', runner: 'value', wait: 'value' },
-  run: { platform: 'value', backend: 'value', runner: 'value', all: 'bool', grep: 'value', retries: 'value', 'github-report': 'bool', 'no-video': 'bool', wait: 'value' },
+  run: { platform: 'value', backend: 'value', runner: 'value', all: 'bool', grep: 'value', retries: 'value', 'max-failures': 'value', 'github-report': 'bool', 'no-video': 'bool', wait: 'value' },
   screen: { platform: 'value', png: 'bool' },
   attach: { pr: 'value', screenshot: 'list', video: 'bool', before: 'value' },
   down: { platform: 'value', stale: 'bool', 'dry-run': 'bool' },
@@ -145,6 +145,8 @@ export function parseArgv(argv: readonly string[]): Invocation {
       if (!all && positionals.length === 0) throw usage('{cli} run needs a feature, feature/spec, path.e2e.ts, or --all');
       const grep = values.get('grep');
       const retries = positiveInt('retries', values.get('retries'), 0);
+      const maxFailures = values.has('max-failures') ? positiveInt('max-failures', values.get('max-failures'), undefined) : undefined;
+      if (maxFailures === 0) throw usage('--max-failures must be 1 or more');
       command = {
         verb,
         ...base,
@@ -152,6 +154,7 @@ export function parseArgv(argv: readonly string[]): Invocation {
         ...(grep === undefined ? {} : { grep }),
         video: !bools.has('no-video'),
         retries,
+        ...(maxFailures === undefined ? {} : { maxFailures }),
         githubReport: bools.has('github-report'),
         waitSeconds: positiveInt('wait', values.get('wait'), 0),
       };

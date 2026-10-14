@@ -239,7 +239,7 @@ jobs:
           CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          "$CLI" run --all --platform "$PLATFORM" --backend local --retries 1 --github-report
+          "$CLI" run --all --platform "$PLATFORM" --backend local --retries 1 --max-failures 5 --github-report
 
       - name: Release the device and delete the Clerk application
         if: always() && steps.install.outcome == 'success'

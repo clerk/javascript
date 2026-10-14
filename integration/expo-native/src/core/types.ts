@@ -65,6 +65,7 @@ export type Command =
       readonly grep?: string;
       readonly video: boolean;
       readonly retries: number;
+      readonly maxFailures?: number;
       readonly githubReport: boolean;
       readonly waitSeconds: number;
     }

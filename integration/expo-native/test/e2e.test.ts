@@ -34,11 +34,11 @@ describe('resolveSpecs', () => {
 
 describe('planE2E', () => {
   it('passes selection flags through and points output inside the run', () => {
-    const plan = planE2E(SAMPLE_INPUTS, [{ kind: 'committed', path: 'specs/features/a/b.e2e.ts', feature: null }], { verb: 'run', selection: { all: true }, grep: 'x', video: true, retries: 1, githubReport: false, waitSeconds: 0 }, '/package', e2eOutputDir('/package/.verify/runs/r20261002-141210-7c1e' as EvidencePath, 0));
+    const plan = planE2E(SAMPLE_INPUTS, [{ kind: 'committed', path: 'specs/features/a/b.e2e.ts', feature: null }], { verb: 'run', selection: { all: true }, grep: 'x', video: true, retries: 1, maxFailures: 5, githubReport: false, waitSeconds: 0 }, '/package', e2eOutputDir('/package/.verify/runs/r20261002-141210-7c1e' as EvidencePath, 0));
     assert.deepEqual(plan.args, [
       'run', 'specs/features/a/b.e2e.ts', '--config', 'e2e.config.ts', '--target', 'ios',
       '--output', '.verify/runs/r20261002-141210-7c1e/e2e', '--reporter', 'list,markdown,junit', '--retries', '1',
-      '--grep', 'x', '--pass-with-no-tests',
+      '--grep', 'x', '--max-failures', '5', '--pass-with-no-tests',
     ]);
     assert.deepEqual(plan.env, {
       CLERK_E2E_PLATFORM: 'ios',
@@ -54,6 +54,7 @@ describe('planE2E', () => {
     const later = planE2E(SAMPLE_INPUTS, [], { verb: 'run', selection: { all: true }, video: true, retries: 0, githubReport: false, waitSeconds: 0 }, '/package', e2eOutputDir('/package/.verify/runs/r20261002-141210-7c1e' as EvidencePath, 2));
     assert.equal(later.args[later.args.indexOf('--output') + 1], '.verify/runs/r20261002-141210-7c1e/e2e-3', 'a later group of the run writes beside the first');
     assert.equal(later.args[later.args.indexOf('--retries') + 1], '0', 'e2e retries once by default when CI is set, so the run always says how many it wants');
+    assert.equal(later.args.includes('--max-failures'), false, 'a run that names no limit runs every test');
     assert.equal(later.args.includes('--pass-with-no-tests'), true, 'every invocation is one group of a run, and a group with nothing left to run must not fail it');
   });
 });
@@ -146,6 +147,28 @@ describe('parseE2EReport', () => {
     const selected = parseE2EReport(report, [{ kind: 'committed', path: 'specs/features/auth-start/opens.e2e.ts', feature: null }], dir);
     assert.deepEqual(selected.map((r) => r.spec.path), ['specs/features/auth-start/opens.e2e.ts', 'specs/features/auth-start/opens.e2e.ts'], 'files e2e lists but the run did not select are dropped');
     assert.equal(results[4]!.failurePage, join(dir, 'failures', 'specs_explored_probe-fails-cccccccc.md'));
+  });
+
+  it('reports a test that --max-failures stopped before it started as failed and not run, never as passed or skipped', () => {
+    const test = (id: string, file: string, rest: object) => ({ id, kind: 'test', titlePath: [id], file, platform: 'ios', tags: [], ...rest });
+    const stopped = {
+      schemaVersion: 'report-1',
+      run: {
+        results: [
+          test('aaaaaaaa11', 'specs/features/auth-start/opens.e2e.ts', { status: 'failed', attempts: [{ status: 'failed', durationMs: 60_000, error: { message: 'the app did not show the "Sign in" button on the home' } }] }),
+          test('bbbbbbbb22', 'specs/features/sign-up/complete.e2e.ts', { status: 'skipped', skip: { cause: 'failure-limit', reason: 'run stopped after 1 failure (--max-failures 1)' }, attempts: [] }),
+        ],
+      },
+    };
+    const specs = ['specs/features/auth-start/opens.e2e.ts', 'specs/features/sign-up/complete.e2e.ts'].map((path): SpecRef => ({ kind: 'committed', path, feature: null }));
+    const results = parseE2EReport(stopped, specs, mkdtempSync(join(tmpdir(), 'verify-report-')) as EvidencePath);
+    assert.deepEqual(
+      results.map((r) => ({ status: r.status, attempts: r.attempts, error: r.error, skipReason: r.skipReason })),
+      [
+        { status: 'failed', attempts: 1, error: 'the app did not show the "Sign in" button on the home', skipReason: null },
+        { status: 'failed', attempts: 0, error: 'not run: failure-limit run stopped after 1 failure (--max-failures 1)', skipReason: null },
+      ],
+    );
   });
 
   it('refuses a report of another schema', () => {

@@ -47,6 +47,8 @@ describe('parseArgv', () => {
     assert.equal((parseArgv(['run', '--all', '--retries', '1']).command as Extract<Command, { verb: 'run' }>).retries, 1);
     assert.equal((parseArgv(['run', '--all', '--github-report']).command as Extract<Command, { verb: 'run' }>).githubReport, true);
     for (const bad of ['-1', 'once']) assert.throws(() => parseArgv(['run', '--all', '--retries', bad]), { code: 'USAGE' }, bad);
+    assert.equal((parseArgv(['run', '--all', '--max-failures', '5']).command as Extract<Command, { verb: 'run' }>).maxFailures, 5);
+    for (const bad of ['0', '-1', 'none']) assert.throws(() => parseArgv(['run', '--all', '--max-failures', bad]), { code: 'USAGE' }, bad);
     assert.deepEqual(parseArgv(['screen', '--png']).command, { verb: 'screen', png: true });
     assert.deepEqual(parseArgv(['attach', 'r20261002-141210-7c1e', '--pr', '412', '--screenshot', 'a', '--screenshot=b']).command, {
       verb: 'attach',

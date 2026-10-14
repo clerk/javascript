@@ -100,6 +100,7 @@ export function planE2E(inputs: Inputs, specs: readonly SpecRef[], command: RunC
     '--retries',
     String(command.retries),
     ...(command.grep === undefined ? [] : ['--grep', command.grep]),
+    ...(command.maxFailures === undefined ? [] : ['--max-failures', String(command.maxFailures)]),
     '--pass-with-no-tests',
   ];
   return { args, env: { ...inputsEnv(inputs), AGENT_DEVICE_STATE_DIR: agentDeviceStateDir(join(packageDir, WORKSPACE_DIR)), E2E_TELEMETRY_DISABLED: '1' } };
