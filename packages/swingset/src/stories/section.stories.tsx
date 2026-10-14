@@ -1,9 +1,11 @@
+import { ActionMenu } from '@clerk/mosaic/components/action-menu';
 import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 import { Section } from '@clerk/mosaic/components/section';
 import { Skeleton } from '@clerk/mosaic/components/skeleton';
+import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useEffect, useState } from 'react';
@@ -581,6 +583,7 @@ export function Loading() {
       >
         Reload
       </Button>
+      <VisuallyHidden role='status'>{loading ? 'Loading active devices' : 'Active devices loaded'}</VisuallyHidden>
       <Section.Root>
         <Section.Group skeleton={loading}>
           <Section.Header>
@@ -610,6 +613,14 @@ export function Loading() {
                       <Skeleton>{item.description}</Skeleton>
                     </Section.Description>
                   </Section.Content>
+                  <Section.Actions>
+                    <Skeleton visible={false}>
+                      <ActionMenu
+                        label={`Manage ${item.label}`}
+                        actions={[{ label: 'View details', onClick: () => undefined }]}
+                      />
+                    </Skeleton>
+                  </Section.Actions>
                 </Section.Item>
               ))}
             </Section.Items>
