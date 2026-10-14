@@ -24,8 +24,8 @@ export type FakeMachineNetwork = {
   cleanup: () => Promise<void>;
 };
 
-async function createFakeMachineNetwork(clerkClient: ClerkClient): Promise<FakeMachineNetwork> {
-  const fakeCompanyName = faker.company.name();
+export async function createFakeMachineNetwork(clerkClient: ClerkClient): Promise<FakeMachineNetwork> {
+  const fakeCompanyName = `${faker.company.name()} ${Date.now()}`;
 
   const primaryServer = await clerkClient.machines.create({
     name: `${fakeCompanyName} Primary API Server`,
@@ -68,7 +68,7 @@ async function createFakeMachineNetwork(clerkClient: ClerkClient): Promise<FakeM
   };
 }
 
-async function createJwtM2MToken(clerkClient: ClerkClient, senderSecretKey: string): Promise<M2MToken> {
+export async function createJwtM2MToken(clerkClient: ClerkClient, senderSecretKey: string): Promise<M2MToken> {
   return clerkClient.m2m.createToken({
     machineSecretKey: senderSecretKey,
     secondsUntilExpiration: 60 * 30,
@@ -181,7 +181,7 @@ export type MachineAuthTestAdapter = {
 
 const createApiKeysEnv = (): EnvironmentConfig => appConfigs.envs.withAPIKeys.clone();
 
-const createMachineClient = () =>
+export const createMachineClient = () =>
   createClerkClient({
     secretKey: instanceKeys.get('with-api-keys').sk,
   });

@@ -4,6 +4,7 @@ import type { EnvironmentResource, PasskeyResource, UserResource } from '@clerk/
 
 import { FormSubmitError } from '../../../components/form';
 import { getMosaicEnvironment, useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
+import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
 import { save, SaveError } from '../../../utils/errors';
 import type {
@@ -85,6 +86,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
+  const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
   const messages = useMessages('userProfilePasskeys');
   const validateName: UserProfilePasskeyNameValidator = name =>
@@ -122,9 +124,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   };
 
   function formatPasskeyDate(date: Date): string {
-    // TODO: Read relativeTo from useNow({ updateInterval: 60_000 }) once
-    // https://github.com/clerk/javascript/pull/10098 merges.
-    const relative = formatRelative({ date, relativeTo: new Date() });
+    const relative = formatRelative({ date, relativeTo: now });
     if (!relative) {
       return '';
     }

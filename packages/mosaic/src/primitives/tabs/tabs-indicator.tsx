@@ -1,70 +1,24 @@
 'use client';
 
-import type React from 'react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
-import { autoUpdate, getRectRelativeTo, type Rect } from '../utils/dom';
-import { useTabsContext } from './tabs-context';
+import { type ComponentProps, useRender } from '../utils';
+import { type TabsDirection, useTabsContext } from './tabs-context';
 
 export type TabsIndicatorProps = ComponentProps<'span'>;
 
-export function TabsIndicator(props: TabsIndicatorProps) {
+export const TabsIndicator = React.forwardRef<HTMLSpanElement, TabsIndicatorProps>(function TabsIndicator(props, ref) {
   const { render, ...otherProps } = props;
-  const { value, getTabElement, orientation, listElement } = useTabsContext();
-
-  const [style, setStyle] = useState<React.CSSProperties>({});
-  const lastMeasureRef = useRef<{ value: string; rect: Rect } | null>(null);
-
-  // Measure synchronously before paint so the indicator never commits a frame
-  // at a stale position when the active tab changes.
-  useLayoutEffect(() => {
-    const el = getTabElement(value);
-    const list = listElement;
-    if (!el || !list) {
-      return;
-    }
-
-    // Keep the indicator in sync when the active tab or the list changes size
-    // (font load, container resize) without a tab-selection change.
-    return autoUpdate([el, list], () => {
-      const newRect = getRectRelativeTo(el, list);
-
-      const last = lastMeasureRef.current;
-      lastMeasureRef.current = { value, rect: newRect };
-      if (last && isSameRect(last.rect, newRect)) {
-        return;
-      }
-      const isTabChange = last != null && last.value !== value;
-
-      const sharedVars = {
-        '--cl-tab-left': `${newRect.x}px`,
-        '--cl-tab-width': `${newRect.width}px`,
-        '--cl-tab-top': `${newRect.y}px`,
-        '--cl-tab-height': `${newRect.height}px`,
-        ...(isTabChange ? {} : { transition: 'none' }),
-      };
-
-      if (orientation === 'horizontal') {
-        setStyle({ position: 'absolute', left: newRect.x, width: newRect.width, ...sharedVars });
-      } else {
-        setStyle({ position: 'absolute', top: newRect.y, height: newRect.height, ...sharedVars });
-      }
-    });
-  }, [value, getTabElement, orientation, listElement]);
-
-  const defaultProps = {
-    'aria-hidden': true as const,
-    style,
-  };
+  const { direction } = useTabsContext();
 
   return useRender({
     defaultTagName: 'span',
     render,
-    props: mergeProps<'span'>(defaultProps, otherProps),
+    ref,
+    state: { direction },
+    stateAttributesMapping: {
+      direction: (v: TabsDirection) => ({ 'data-direction': v }),
+    },
+    props: { 'aria-hidden': true, ...otherProps },
   });
-}
-
-function isSameRect(a: Rect, b: Rect) {
-  return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
-}
+});

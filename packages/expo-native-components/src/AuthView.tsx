@@ -24,7 +24,7 @@ type AuthNativeEvent = NativeSyntheticEvent<Readonly<{ type: string }>>;
  *
  * @example
  * ```tsx
- * import { AuthView } from '@clerk/expo-native-components';
+ * import { AuthView } from '@clerk/expo/native-components';
  * import { useAuth } from '@clerk/expo';
  *
  * export default function SignInScreen() {

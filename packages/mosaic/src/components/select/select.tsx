@@ -246,7 +246,7 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
         >
           {label}
         </span>
-        {described && (
+        {described ? (
           <span
             id={descriptionId}
             {...mergeStyleProps(
@@ -256,7 +256,7 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
           >
             {description}
           </span>
-        )}
+        ) : null}
       </span>
       <Icon
         name='checkmark'

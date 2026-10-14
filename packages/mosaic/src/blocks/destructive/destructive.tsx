@@ -1,78 +1,45 @@
-import type { FormEvent, ReactNode } from 'react';
-import { useEffect, useId, useState } from 'react';
+import type { FormEvent, RefObject } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import type { DialogFocusTarget, DialogHandle, DialogRootProps, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
-import { Flow } from '../../components/flow';
 import { Input } from '../../components/input';
-import { Reverification, type ReverificationController } from '../../features/reverification';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
-import { useConfirmationController } from '../confirmation/confirmation.controller';
+import type { ConfirmBlockProps, ConfirmStepProps } from '../confirm/confirm-shell';
+import { ConfirmShell } from '../confirm/confirm-shell';
 
-export interface DestructiveControlledProps {
-  finalFocus?: DialogFocusTarget;
-  /** Whether the dialog is open */
-  open: boolean;
-  /** Callback when open state changes */
-  onOpenChange: NonNullable<DialogRootProps['onOpenChange']>;
-  /** Element that opens the dialog */
-  trigger?: DialogTriggerProps['render'];
-  /** Dialog heading */
-  title: string;
-  /** What the action destroys */
-  description: ReactNode;
-  /** Label above the confirmation input */
-  fieldLabel: string;
-  /** Phrase the user must type to confirm. Also the input's placeholder */
-  confirmationValue: string;
-  /** Text of the delete button */
-  actionLabel: string;
-  /** Text of the cancel button (default: "Cancel") */
-  cancelLabel?: string;
-  /** Callback when delete is confirmed, by button or by Enter */
-  onDelete: () => Promise<unknown> | void;
-  /** Whether the delete action is in progress */
-  isDeleting?: boolean;
-  /** Error message to display if the delete action fails */
-  errorMessage?: string;
-  reverification?: ReverificationController;
-  step?: 'confirm' | 'verify';
+export interface DestructiveProps<Payload = void> extends ConfirmBlockProps<Payload> {
+  /** Label above the confirmation input, or a function of the payload */
+  fieldLabel: FromPayload<Payload, string>;
+  /** Phrase the user must type to confirm, or a function of the payload. Also the input's placeholder */
+  confirmationValue: FromPayload<Payload, string>;
 }
 
-type DestructiveCardProps = Omit<DestructiveControlledProps, 'onOpenChange' | 'trigger'> & {
-  onClose?: () => void;
-};
+interface DestructiveStepProps<Payload> extends ConfirmStepProps<Payload> {
+  fieldLabel: string;
+  confirmationValue: string;
+  typedValue: string;
+  onTypedValueChange: (value: string) => void;
+  inputRef: RefObject<HTMLInputElement>;
+}
 
-function DestructiveCard({
-  open,
-  finalFocus,
+function DestructiveStep<Payload>({
   title,
   description,
+  actionLabel,
+  cancelLabel,
+  isPending,
+  errorMessage,
+  confirm,
   fieldLabel,
   confirmationValue,
-  actionLabel,
-  cancelLabel = 'Cancel',
-  onDelete,
-  isDeleting = false,
-  errorMessage,
-  reverification,
-  step = 'confirm',
-  onClose,
-}: DestructiveCardProps) {
+  typedValue,
+  onTypedValueChange,
+  inputRef,
+}: DestructiveStepProps<Payload>) {
   const formId = useId();
-  const [typedValue, setTypedValue] = useState('');
-
-  // The caller may close the dialog without going through the trigger or Cancel, so the
-  // field is cleared on close rather than in a handler.
-  useEffect(() => {
-    if (!open) {
-      setTypedValue('');
-    }
-  }, [open]);
-
   const isConfirmed = typedValue === confirmationValue;
   // The action sits in the footer, outside the form, so `form={formId}` associates the two.
   // That is what makes Enter in the field submit. Both guards are re-checked here because
@@ -80,13 +47,12 @@ function DestructiveCard({
   // `aria-disabled`, and `isPending` only cancels the press.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isConfirmed && !isDeleting) {
-      // Errors are meant to be handled on the outside, so we swallow them here
-      onDelete()?.catch(() => {});
+    if (isConfirmed && !isPending) {
+      confirm();
     }
   };
 
-  const confirmation = (
+  return (
     <>
       <Card.Header>
         <Card.Title>{title}</Card.Title>
@@ -100,13 +66,14 @@ function DestructiveCard({
           <Field.Root invalid={Boolean(errorMessage)}>
             <Field.Label>{fieldLabel}</Field.Label>
             <Input
+              ref={inputRef}
               // Not a credential, so 1Password is told to leave it alone rather than
               // cover it with an autofill overlay.
               data-1p-ignore
               placeholder={confirmationValue}
               value={typedValue}
-              disabled={isDeleting}
-              onChange={event => setTypedValue(event.target.value)}
+              disabled={isPending}
+              onChange={event => onTypedValueChange(event.target.value)}
             />
             <Field.Message>
               <Field.Error>{errorMessage}</Field.Error>
@@ -129,7 +96,7 @@ function DestructiveCard({
           form={formId}
           fullWidth
           color='negative'
-          isPending={isDeleting}
+          isPending={isPending}
           disabled={!isConfirmed}
           focusableWhenDisabled
         >
@@ -138,159 +105,57 @@ function DestructiveCard({
       </Card.Footer>
     </>
   );
-
-  const content = reverification ? (
-    <Flow.Root
-      value={step}
-      direction={step === 'verify' ? 1 : -1}
-      state={step}
-    >
-      {() => (
-        <>
-          <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
-          <Flow.Step ids={['verify']}>
-            {reverification ? (
-              <Reverification
-                {...reverification}
-                // This onClose isn't strictly necessary, but make sure we close as soon as possible
-                // instead of after the reverification has been reset
-                onClose={onClose}
-              />
-            ) : null}
-          </Flow.Step>
-        </>
-      )}
-    </Flow.Root>
-  ) : (
-    confirmation
-  );
-
-  return (
-    <Dialog.Popup
-      variant='card'
-      finalFocus={finalFocus}
-    >
-      <Card.Root
-        elevation='overlay'
-        renderBranding={false}
-      >
-        {content}
-      </Card.Root>
-    </Dialog.Popup>
-  );
 }
-
-function ControlledDestructive({ open, onOpenChange, trigger, ...props }: DestructiveControlledProps) {
-  return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <DestructiveCard
-        open={open}
-        onClose={() => onOpenChange(false, { trigger: null, triggerId: null, event: undefined })}
-        {...props}
-      />
-    </Dialog.Root>
-  );
-}
-
-export interface DestructiveHandle<Payload> extends DialogHandle<Payload> {
-  open(payload: Payload): void;
-}
-
-function createHandle<Payload>(): DestructiveHandle<Payload> {
-  return Dialog.createHandle<Payload>();
-}
-
-export interface DestructiveHandleProps<Payload> {
-  handle: DestructiveHandle<Payload>;
-  finalFocus?: DialogFocusTarget;
-  title: FromPayload<Payload, string>;
-  description: FromPayload<Payload, ReactNode>;
-  fieldLabel: FromPayload<Payload, string>;
-  confirmationValue: FromPayload<Payload, string>;
-  actionLabel: FromPayload<Payload, string>;
-  cancelLabel?: string;
-  onDelete: (payload: Payload) => Promise<void> | void;
-  /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
-  errorFallback?: string;
-}
-
-function HandleDestructive<Payload>({
-  handle,
-  finalFocus,
-  title,
-  description,
-  fieldLabel,
-  confirmationValue,
-  actionLabel,
-  cancelLabel,
-  onDelete,
-  errorFallback,
-}: DestructiveHandleProps<Payload>) {
-  const controller = useConfirmationController({ errorFallback });
-
-  return (
-    <Dialog.Root
-      handle={handle}
-      open={controller.isOpen}
-      onOpenChange={controller.onOpenChange}
-    >
-      {({ payload }) =>
-        payload === undefined ? null : (
-          <DestructiveCard
-            open={controller.isOpen}
-            finalFocus={finalFocus}
-            title={resolve(title, payload)}
-            description={resolve(description, payload)}
-            fieldLabel={resolve(fieldLabel, payload)}
-            confirmationValue={resolve(confirmationValue, payload)}
-            actionLabel={resolve(actionLabel, payload)}
-            cancelLabel={cancelLabel}
-            onDelete={() =>
-              controller.onConfirm(async () => {
-                await onDelete(payload);
-              })
-            }
-            isDeleting={controller.isConfirming}
-            errorMessage={controller.errorMessage}
-          />
-        )
-      }
-    </Dialog.Root>
-  );
-}
-
-export type DestructiveProps<Payload = unknown> = DestructiveControlledProps | DestructiveHandleProps<Payload>;
 
 /**
  * Type-to-confirm dialog for an action that cannot be undone. The delete button stays inert
  * until the typed phrase matches `confirmationValue`.
  *
- * Controlled: the caller owns `open`, `isDeleting`, and `errorMessage`. With a `handle`,
- * the block owns all three, using the same controller as `Confirmation`. Mount it once and
- * call `handle.open(payload)` from menu items; `onDelete` resolves to close or rejects to
- * show an error. In both forms the block holds the typed phrase.
+ * An alert dialog: an outside press leaves it open, and the confirm step has no corner dismiss. The
+ * verify step a reverified action swaps in shows one, except while the action is being retried.
+ *
+ * Driven by a `useConfirmController`, the same way as `Confirmation`. The block holds the typed
+ * phrase and clears it when the dialog closes.
  *
  * @example
+ * const deleteAccount = useConfirmController({ onConfirm: deleteAccountWithReverification, reverification });
+ *
  * <Destructive
- *   open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
- *   onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
+ *   controller={deleteAccount}
  *   trigger={<Button color='negative'>Delete account</Button>}
  *   title='Delete account?'
  *   description='All of your data will be permanently deleted.'
  *   fieldLabel='Type “Delete account” below to continue'
  *   confirmationValue='Delete account'
  *   actionLabel='Delete account'
- *   onDelete={() => send({ type: 'CONFIRM' })}
- *   isDeleting={snapshot.value === 'deleting'}
- *   errorMessage={snapshot.context.errorMessage}
  * />
  */
-export function Destructive<Payload = unknown>(props: DestructiveProps<Payload>) {
-  return 'handle' in props ? <HandleDestructive<Payload> {...props} /> : <ControlledDestructive {...props} />;
-}
+export function Destructive<Payload = void>({ fieldLabel, confirmationValue, ...props }: DestructiveProps<Payload>) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [typedValue, setTypedValue] = useState('');
+  const { isOpen } = props.controller;
 
-Destructive.createHandle = createHandle;
+  useEffect(() => {
+    if (!isOpen) {
+      setTypedValue('');
+    }
+  }, [isOpen]);
+
+  return (
+    <ConfirmShell
+      {...props}
+      initialFocus={inputRef}
+    >
+      {step => (
+        <DestructiveStep
+          {...step}
+          fieldLabel={resolve(fieldLabel, step.payload)}
+          confirmationValue={resolve(confirmationValue, step.payload)}
+          typedValue={typedValue}
+          onTypedValueChange={setTypedValue}
+          inputRef={inputRef}
+        />
+      )}
+    </ConfirmShell>
+  );
+}
