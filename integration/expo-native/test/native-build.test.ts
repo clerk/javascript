@@ -427,6 +427,20 @@ describe('the native project a remote session generates', () => {
     assert.deepEqual(at.steps, NATIVE_BUILD);
     rmSync(worktree, { recursive: true, force: true });
   });
+
+  it('is generated again when uncommitted changes touch the root pnpm-lock.yaml, which resolves the config plugins expo prebuild runs', async () => {
+    const at = checkout();
+    const worktree = at.site.worktree;
+    at.write('pnpm-lock.yaml', lockfile({ '@expo/config-plugins': '54.0.4' }));
+    execFileSync('git', ['-C', worktree, 'add', '-A']);
+    execFileSync('git', ['-C', worktree, '-c', 'user.name=t', '-c', 'user.email=t@example.com', 'commit', '-q', '-m', 'base']);
+    await build(at, at.cache, await nativeProjectKey('ios', worktree));
+    at.write('pnpm-lock.yaml', lockfile({ '@expo/config-plugins': '54.0.5' }));
+    at.steps.length = 0;
+    await build(at, at.cache, await nativeProjectKey('ios', worktree));
+    assert.deepEqual(at.steps, ['expo prebuild', 'xcodebuild']);
+    rmSync(worktree, { recursive: true, force: true });
+  });
 });
 
 describe('the build key of a standalone app', () => {

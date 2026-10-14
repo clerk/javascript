@@ -39,7 +39,7 @@ The build key of a local dev client covers the native inputs only. The build key
 
 When the app sources differ from HEAD, `up` and `run` send the difference as one patch: `git diff --binary HEAD` of the app sources, with new files that git does not ignore. The session resets its checkout to the commit, applies the patch, builds, and installs the app on the same device. Edits to a tracked file are sent even when the file matches an ignore rule. When the patch does not apply, the build fails with `BUILD_FAILED` and says so; commit and push the changes, then run again. The patch is at most 16 MiB. The session refuses a patch that changes a file outside the app sources. It also refuses any patch when the session runs on `main`, so work on a branch to send uncommitted changes.
 
-A patch that changes only JS leaves the native fingerprint as it is, so the session puts a new bundle in the native build it already has and runs no `expo prebuild`, `xcodebuild`, or Gradle. A patch that changes a native input changes the fingerprint, and the session builds natively. [Freshness](freshness.md) lists what the fingerprint covers.
+A patch that changes only JS leaves the native fingerprint as it is, so the session puts a new bundle in the native build it already has and runs no `expo prebuild`, `xcodebuild`, or Gradle. A patch that changes a native input or the repository's `pnpm-lock.yaml` changes the fingerprint, and the session builds natively. [Freshness](freshness.md) lists what the fingerprint covers.
 
 A run on such a build is not tied to a commit. Its `run.json` names the patch under `remote.builtPatch`, and `attach` refuses it, as the run and as a before run. Commit and push the change, `run` again, and attach that run.
 
