@@ -118,13 +118,24 @@ jobs:
       WATCHED: >-
         integration/expo-native
         .github/workflows/ci.yml
+        .github/workflows/verify-e2e.yml
         .github/workflows/verify-remote.yml
-        .github/actionlint.yaml
+        integration/templates/expo-native/screens
+      MUST_EXIST: >-
+        .npmrc
+        package.json
+        pnpm-lock.yaml
+        pnpm-workspace.yaml
+        tsconfig.json
+        turbo.json
         integration/templates/expo-native
+        packages/clerk-js
         packages/expo
         packages/expo-biometrics
         packages/expo-google-signin
         packages/expo-native-components
+        packages/react
+        packages/shared
 
     steps:
       - name: Checkout Repo
@@ -140,7 +151,9 @@ jobs:
         env:
           EVENT: ${{ github.event_name }}
         run: |
-          if [ "$EVENT" != "pull_request" ] || ! git diff --quiet HEAD^1 HEAD -- $WATCHED; then
+          if [ "$EVENT" != "pull_request" ] ||
+            ! git diff --quiet HEAD^1 HEAD -- $WATCHED ||
+            ! git diff --quiet --no-renames --diff-filter=D HEAD^1 HEAD -- $MUST_EXIST; then
             echo "package=true" >> "$GITHUB_OUTPUT"
           fi
 
