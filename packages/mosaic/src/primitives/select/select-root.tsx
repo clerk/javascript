@@ -187,11 +187,14 @@ function SelectInner(props: SelectProps) {
           : [...selectedValues, value];
         setSelectedValues(next);
         onMultipleValueChange?.(next);
+        if (next.length === 0) {
+          setSelectedIndex(null);
+        }
       } else {
         setSelectedValues([value]);
         onSingleValueChange?.(value);
+        setSelectedIndex(index);
       }
-      setSelectedIndex(index);
       // In controlled mode the parent decides whether to accept the new value.
       // If they reject it, the selection rolls back but a cached label would not,
       // showing a stale label. Only cache labels in uncontrolled mode where

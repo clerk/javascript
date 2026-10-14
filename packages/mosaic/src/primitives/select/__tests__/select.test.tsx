@@ -1079,5 +1079,22 @@ describe('Select', () => {
       await waitFor(() => expect(document.activeElement).toBe(options[2]));
       expect(options[2]).toHaveAttribute('data-active', '');
     });
+
+    it('reopens on the first option after the last value is removed', async () => {
+      const user = userEvent.setup();
+      renderMultiple({ defaultValue: ['cherry'] });
+
+      const trigger = screen.getByRole('combobox');
+      await user.click(trigger);
+      await user.click(screen.getByRole('option', { name: 'Cherry' }));
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+
+      trigger.focus();
+      await user.keyboard('{ArrowDown}');
+
+      const options = screen.getAllByRole('option');
+      await waitFor(() => expect(document.activeElement).toBe(options[0]));
+    });
   });
 });
