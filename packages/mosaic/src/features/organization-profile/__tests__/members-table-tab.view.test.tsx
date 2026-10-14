@@ -1,12 +1,21 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { deferred } from '../../../__tests__/async';
+import { useConfirmController } from '../../../blocks/confirm';
 import { MosaicProvider } from '../../../mosaic-provider';
-import type { MembersTableTabViewProps } from '../members-table-tab.types';
+import type { MembersTableTabViewProps, OrganizationProfileMember } from '../members-table-tab.types';
 import { MembersTableTabView } from '../members-table-tab.view';
+
+function MembersWithRemoval(props: MembersTableTabViewProps) {
+  const remove = useConfirmController<OrganizationProfileMember>({ onConfirm: () => Promise.resolve() });
+  return (
+    <MembersTableTabView
+      {...props}
+      remove={remove}
+    />
+  );
+}
 
 function propsFor(overrides: Partial<MembersTableTabViewProps> = {}): MembersTableTabViewProps {
   return {
@@ -35,10 +44,12 @@ function propsFor(overrides: Partial<MembersTableTabViewProps> = {}): MembersTab
     ],
     totalCount: 2,
     page: 1,
+    pageSize: 10,
     searchValue: '',
     isLoading: false,
     onSearchChange: vi.fn(),
     onPageChange: vi.fn(),
+    registerTrigger: () => null,
     ...overrides,
   };
 }
@@ -58,24 +69,6 @@ function renderView(overrides: Partial<MembersTableTabViewProps> = {}) {
 describe('MembersTableTabView', () => {
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  it('shows the localized remove error, never the message of an unexpected error', async () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    const user = userEvent.setup();
-    render(
-      <MosaicProvider localization={{ overrides: { 'membersTableTab.removeError': 'Could not remove member.' } }}>
-        <MembersTableTabView
-          {...propsFor({ onRemove: vi.fn().mockRejectedValue(new Error('Cannot read properties of undefined')) })}
-        />
-      </MosaicProvider>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Manage Grace Hopper' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
-
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not remove member.');
   });
 
   it('chooses loading, retained rows, and filtered empty results from the supplied state', () => {
@@ -117,55 +110,17 @@ describe('MembersTableTabView', () => {
     const { props } = renderView({
       totalCount: 25,
       onBulkAction: vi.fn(),
-      onSortChange: vi.fn(),
-      onPageSizeChange: vi.fn(),
     });
     await user.click(screen.getByRole('checkbox', { name: 'Select all members on this page' }));
     expect(screen.getByRole('checkbox', { name: 'Select Ada Lovelace' })).not.toBeChecked();
     expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).toBeChecked();
-    await user.click(screen.getByRole('button', { name: 'Joined' }));
-    expect(props.onSortChange).toHaveBeenCalledWith({ column: 'joinedAt', direction: 'ascending' });
-    expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).not.toBeChecked();
     await user.type(screen.getByRole('searchbox', { name: 'Search members' }), 'G');
     expect(props.onSearchChange).toHaveBeenCalledWith('G');
     await user.click(screen.getByRole('button', { name: 'Next members page' }));
     expect(props.onPageChange).toHaveBeenCalledWith(2);
-    await user.click(screen.getByRole('combobox', { name: /^Results per page/ }));
-    await user.click(screen.getByRole('option', { name: '20', exact: true }));
-    expect(props.onPageSizeChange).toHaveBeenCalledWith(20);
-    expect(props.onPageChange).toHaveBeenLastCalledWith(1);
+    expect(screen.queryByRole('combobox', { name: /^Results per page/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Joined' })).toBeNull();
   });
-  it.each<Partial<MembersTableTabViewProps>>([
-    { page: 2 },
-    { pageSize: 20 },
-    { searchValue: 'Grace' },
-    { sort: { column: 'role', direction: 'ascending' } },
-    { sort: { column: 'name', direction: 'descending' } },
-  ])('clears selection when the caller changes result state: %j', async change => {
-    const user = userEvent.setup();
-    const { props, rerender } = renderView({ onBulkAction: vi.fn(), sort: { column: 'name', direction: 'ascending' } });
-    await user.click(screen.getByRole('checkbox', { name: 'Select Grace Hopper' }));
-    rerender(
-      <MosaicProvider>
-        <MembersTableTabView
-          {...props}
-          sort={{ column: 'name', direction: 'ascending' }}
-          isFetching
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).toBeChecked();
-    rerender(
-      <MosaicProvider>
-        <MembersTableTabView
-          {...props}
-          {...change}
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).not.toBeChecked();
-  });
-
   it('does not retain hidden selection for protected members within a Shift-click range', async () => {
     const user = userEvent.setup();
     const member = propsFor().members[1];
@@ -194,9 +149,22 @@ describe('MembersTableTabView', () => {
     expect(screen.getByRole('checkbox', { name: 'Select Deprovisioned' })).not.toBeChecked();
   });
 
+  it('marks deprovisioned members as inactive', () => {
+    const member = propsFor().members[1];
+    renderView({ members: [member, { ...member, id: 'gone', name: 'Gone', isDeprovisioned: true }], totalCount: 2 });
+    expect(screen.getByRole('row', { name: /Gone/ })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('row', { name: /Grace Hopper/ })).not.toHaveAttribute('aria-disabled');
+  });
+
   it('routes invite and role changes while withholding protected member actions', async () => {
     const user = userEvent.setup();
-    const { props } = renderView({ onRemove: vi.fn(), onChangeRole: vi.fn(), onInvite: vi.fn() });
+    const props = propsFor({ onChangeRole: vi.fn(), onInvite: vi.fn() });
+    render(
+      <MosaicProvider>
+        <MembersWithRemoval {...props} />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('button', { name: 'Manage Grace Hopper' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Manage Ada Lovelace' })).not.toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /^Change role for Ada Lovelace/ })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Invite' }));
@@ -211,52 +179,4 @@ describe('MembersTableTabView', () => {
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Manage|Invite/ })).not.toBeInTheDocument();
   });
-});
-
-it.each([true, false])('removes the confirmed member and restores focus with invite available: %s', async hasInvite => {
-  const user = userEvent.setup();
-  const pending = deferred<void>();
-  const onMutation = vi
-    .fn<(id: string) => Promise<void>>()
-    .mockImplementationOnce(() => pending.promise)
-    .mockResolvedValue(undefined);
-  function Example() {
-    const [items, setItems] = useState([
-      { ...propsFor().members[1], id: 'ada', name: 'Ada Lovelace' },
-      { ...propsFor().members[1], id: 'grace', name: 'Grace' },
-    ]);
-    return (
-      <MosaicProvider>
-        <MembersTableTabView
-          {...propsFor()}
-          members={items}
-          totalCount={items.length}
-          onInvite={hasInvite ? vi.fn() : undefined}
-          onRemove={async id => {
-            await onMutation(id);
-            setItems(current => current.filter(item => item.id !== id));
-          }}
-        />
-      </MosaicProvider>
-    );
-  }
-  render(<Example />);
-  await user.click(screen.getByRole('button', { name: 'Manage Ada Lovelace' }));
-  await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
-  expect(onMutation).not.toHaveBeenCalled();
-  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
-  expect(onMutation).toHaveBeenCalledExactlyOnceWith('ada');
-  expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-  await act(async () => {
-    pending.resolve();
-    await pending.promise;
-  });
-  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-  expect(screen.getByRole('button', { name: 'Manage Grace' })).toHaveFocus();
-  await user.click(screen.getByRole('button', { name: 'Manage Grace' }));
-  await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
-  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
-  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-  expect(onMutation).toHaveBeenLastCalledWith('grace');
-  expect(hasInvite ? screen.getByRole('button', { name: 'Invite' }) : screen.getByRole('searchbox')).toHaveFocus();
 });

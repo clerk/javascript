@@ -312,6 +312,12 @@ const noPhysicalCssProperties = {
   },
 };
 
+const noLeakedConditionalJsx = {
+  selector: ":matches(JSXElement, JSXFragment) > JSXExpressionContainer > LogicalExpression[operator='&&']",
+  message:
+    'Use a ternary (`condition ? <Element /> : null`) for conditional JSX; `&&` renders a falsy left-hand value such as `0`.',
+};
+
 export default tseslint.config([
   {
     name: 'repo/ignores',
@@ -620,6 +626,21 @@ export default tseslint.config([
       'sonarjs/prefer-single-boolean-return': 'error',
       '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/ban-ts-comment': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'error',
+      '@typescript-eslint/no-unsafe-assignment': 'error',
+      '@typescript-eslint/no-unsafe-call': 'error',
+      '@typescript-eslint/no-unsafe-member-access': 'error',
+      '@typescript-eslint/no-unsafe-return': 'error',
+      '@typescript-eslint/only-throw-error': 'error',
+      '@typescript-eslint/prefer-promise-reject-errors': 'error',
+      '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
+      'react-hooks/exhaustive-deps': 'error',
+      'react-hooks/rules-of-hooks': 'error',
       'max-lines': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],
       'no-restricted-properties': [
         'error',
@@ -641,6 +662,7 @@ export default tseslint.config([
           selector: "Property > Literal.key[value='&:hover']",
           message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
         },
+        noLeakedConditionalJsx,
         {
           selector: "Property > Literal.key[value='@media (hover: hover)']",
           message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
@@ -704,8 +726,9 @@ export default tseslint.config([
     // `<FloatingOverlay style={...}>`, a third-party component, not a Mosaic part.
     name: 'packages/mosaic - primitives',
     files: ['packages/mosaic/src/primitives/**/*'],
+    ignores: ['packages/mosaic/src/**/*.test.{ts,tsx}'],
     rules: {
-      'no-restricted-syntax': 'off',
+      'no-restricted-syntax': ['error', noLeakedConditionalJsx],
     },
   },
   {

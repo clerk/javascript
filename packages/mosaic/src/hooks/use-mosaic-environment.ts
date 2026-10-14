@@ -24,8 +24,6 @@ export function useMosaicEnvironment(): EnvironmentResource | undefined {
 }
 
 export function getMosaicEnvironment(clerk: LoadedClerk): EnvironmentResource | undefined {
-  // @ts-expect-error -- `__internal_environment` is a private Clerk surface for now.
-  // SAFETY: read-only access to the loaded environment resource, mirroring
-  // components/devPrompts/KeylessPrompt/use-revalidate-environment.ts.
-  return clerk.__internal_environment ?? undefined;
+  // @ts-expect-error -- clerk-js implements `__internal_environment`, but the shared `Clerk` type does not declare it.
+  return clerk.__internal_environment ?? undefined; // eslint-disable-line @typescript-eslint/no-unsafe-return -- The `@ts-expect-error` above leaves this access untyped; clerk-js returns `EnvironmentResource | null | undefined`.
 }

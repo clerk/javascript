@@ -90,6 +90,13 @@ export type UseBiometricCredentialsReturn = {
   list: () => Promise<BiometricCredential[]>;
   enroll: (params?: EnrollBiometricCredentialParams) => Promise<BiometricCredential>;
   revoke: (id: string) => Promise<BiometricCredential>;
+  /**
+   * Revokes this app installation's biometric credential for the signed-in user.
+   *
+   * Call it before signing out, since it needs an active or pending session. Resolves with `null` if there is nothing
+   * to revoke.
+   */
+  revokeCurrentDeviceCredential: () => Promise<BiometricCredential | null>;
   signIn: (params?: SignInWithBiometricsParams) => Promise<BiometricSignInResult>;
   reverify: (params?: ReverifyWithBiometricsParams) => Promise<BiometricReverificationResult>;
 };

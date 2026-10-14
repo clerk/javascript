@@ -5,6 +5,8 @@ import { serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfileView } from '../user-profile.view';
+import { useUserProfileActiveDevicesController } from '../user-profile-active-devices-section/user-profile-active-devices-section.controller';
+import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import { passkeysSectionNode } from '../user-profile-passkeys-section/user-profile-passkeys-section';
 import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section/user-profile-passkeys-section.model';
@@ -33,6 +35,11 @@ function serveAccounts() {
   });
 }
 
+function NoDevices() {
+  const controller = useUserProfileActiveDevicesController({ devices: [] });
+  return <UserProfileActiveDevicesSectionView {...controller} />;
+}
+
 function SecurityHost() {
   const passwordSlot = renderPasswordSection(useUserProfilePasswordModel(), null);
   const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
@@ -41,7 +48,7 @@ function SecurityHost() {
       passwordSlot={passwordSlot}
       passkeysSlot={passkeysSlot}
       mfaMethods={[]}
-      devices={[]}
+      activeDevicesSlot={<NoDevices />}
     />
   );
 }
@@ -53,7 +60,15 @@ function ProfileHost() {
     <UserProfileView
       activePage='security'
       onPageChange={() => {}}
-      pages={{ account: {}, security: { passwordSlot, passkeysSlot, mfaMethods: [], devices: [] } }}
+      pages={{
+        account: {},
+        security: {
+          passwordSlot,
+          passkeysSlot,
+          mfaMethods: [],
+          activeDevicesSlot: <NoDevices />,
+        },
+      }}
     />
   );
 }
@@ -65,6 +80,7 @@ describe('Composing connected authentication sections', () => {
       <UserProfileSecurityPanelView
         passkeysSlot={
           <UserProfilePasskeysSectionView
+            registerTrigger={() => null}
             passkeys={[]}
             onAdd={vi.fn()}
           />

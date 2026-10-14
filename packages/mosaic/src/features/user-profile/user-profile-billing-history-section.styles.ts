@@ -12,7 +12,8 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
   },
   body: {
-    marginInline: 0,
+    overflow: 'hidden',
+    paddingInline: 0,
   },
   cell: {
     paddingBlock: space['3'],

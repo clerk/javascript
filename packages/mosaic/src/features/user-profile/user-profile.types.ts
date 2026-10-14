@@ -1,8 +1,25 @@
 import type { ReactNode } from 'react';
 
+import { FormSubmitError } from '../../components/form';
 import type { UserProfileBillingPanelViewProps } from './user-profile-billing-panel.view';
 import type { UserProfileProfilePanelViewProps } from './user-profile-profile-panel.view';
 import type { UserProfileSecurityPanelViewProps } from './user-profile-security-panel.view';
+
+/** Plain data, so nothing downstream of the model imports a Clerk error. */
+export interface UserProfileFormError<TField extends string = string> {
+  /** Rendered in the dialog's negative banner. */
+  message?: string;
+  /** Rendered under the named control, which is also marked invalid. */
+  fields?: Partial<Record<TField, string>>;
+}
+
+/** What a save rejects with when the failure names a control; a plain `Error` shows only the banner. */
+export class UserProfileSaveError<TField extends string = string> extends FormSubmitError<Record<TField, unknown>> {
+  constructor(message: string, fields?: Partial<Record<TField, string>>) {
+    super({ message, fields });
+    this.name = 'UserProfileSaveError';
+  }
+}
 
 /** A page the UserProfile brings itself, named by the id its navigation knows it as. */
 export type UserProfilePageId = 'account' | 'security' | 'billing' | 'apiKeys';

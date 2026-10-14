@@ -1,11 +1,12 @@
-import { useMemo, useRef } from 'react';
+import type { Ref } from 'react';
 
+import type { ConfirmController } from '../../blocks/confirm';
 import { Confirmation } from '../../blocks/confirmation';
 import { Button } from '../../components/button';
+import type { DialogFocusTarget } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
 import { styles } from './user-profile-passkeys-section.styles';
@@ -18,37 +19,37 @@ export type { UserProfilePasskey } from './user-profile-passkeys-section/user-pr
 
 export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
+  sectionRef?: Ref<HTMLDivElement>;
+  addButtonRef?: Ref<HTMLButtonElement>;
   onAdd?: () => void;
   isAdding?: boolean;
   addError?: string;
   onRename?: (id: string, name: string) => void | Promise<void>;
   validateName?: UserProfilePasskeyNameValidator;
-  onRemove?: (id: string) => void | Promise<void>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+  remove?: ConfirmController<UserProfilePasskey>;
+  finalFocus?: DialogFocusTarget;
 }
 
 export function UserProfilePasskeysSectionView({
   passkeys,
+  sectionRef,
+  addButtonRef,
   onAdd,
   isAdding,
   addError,
   onRename,
   validateName,
-  onRemove,
+  registerTrigger,
+  remove,
+  finalFocus,
 }: UserProfilePasskeysSectionViewProps) {
   const m = useMessages('userProfilePasskeys');
-  const addButton = useRef<HTMLButtonElement>(null);
-  const section = useRef<HTMLDivElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: passkeys.map(passkey => passkey.id),
-    onRemove,
-    fallback: () => addButton.current ?? section.current,
-  });
-  const removePasskey = useMemo(() => Confirmation.createHandle<UserProfilePasskey>(), []);
 
   return (
     <>
       <Section.Group
-        ref={section}
+        ref={sectionRef}
         tabIndex={-1}
       >
         <Section.Header>
@@ -64,7 +65,7 @@ export function UserProfilePasskeysSectionView({
           {onAdd ? (
             <Section.Actions>
               <Button
-                ref={addButton}
+                ref={addButtonRef}
                 aria-label={m.addLabel}
                 color='neutral'
                 size='sm'
@@ -90,10 +91,10 @@ export function UserProfilePasskeysSectionView({
                 <UserProfilePasskeyRowView
                   key={passkey.id}
                   passkey={passkey}
-                  triggerRef={removalFocus.registerTrigger(passkey.id)}
+                  triggerRef={registerTrigger(passkey.id)}
                   onRename={onRename}
                   validateName={validateName}
-                  onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
+                  onRemove={remove ? () => remove.open(passkey) : undefined}
                 />
               ))
             ) : (
@@ -106,15 +107,14 @@ export function UserProfilePasskeysSectionView({
           </Section.Items>
         </Section.Body>
       </Section.Group>
-      {onRemove ? (
+      {remove ? (
         <Confirmation
-          handle={removePasskey}
+          controller={remove}
           title={m.removeTitle}
           description={passkey => fill(m.removeDescription, { name: passkey.name })}
           actionLabel={m.remove}
           cancelLabel={m.cancel}
-          finalFocus={removalFocus.finalFocus}
-          onConfirm={passkey => removalFocus.remove(passkey.id)}
+          finalFocus={finalFocus}
         />
       ) : null}
     </>

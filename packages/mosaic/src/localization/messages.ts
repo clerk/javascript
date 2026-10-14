@@ -77,73 +77,63 @@ type Token =
 
 const TOKEN_RE = /\{#(\w+)\/\}|\{#(\w+)\}|\{\/(\w+)\}|\{(\w+)\}/g;
 
-function tokenize(template: string): Token[] {
-  const tokens: Token[] = [];
+function* tokenize(template: string): Generator<Token> {
   let pos = 0;
   for (const match of template.matchAll(TOKEN_RE)) {
-    const index = match.index ?? 0;
-    if (index > pos) {
-      tokens.push({ type: 'text', value: template.slice(pos, index) });
+    if (match.index > pos) {
+      yield { type: 'text', value: template.slice(pos, match.index) };
     }
     const [, standalone, open, close, value] = match;
-    if (standalone) {
-      tokens.push({ type: 'standalone', name: standalone });
-    } else if (open) {
-      tokens.push({ type: 'open', name: open });
-    } else if (close) {
-      tokens.push({ type: 'close', name: close });
-    } else {
-      tokens.push({ type: 'value', name: value });
+    if (standalone !== undefined) {
+      yield { type: 'standalone', name: standalone };
+    } else if (open !== undefined) {
+      yield { type: 'open', name: open };
+    } else if (close !== undefined) {
+      yield { type: 'close', name: close };
+    } else if (value !== undefined) {
+      yield { type: 'value', name: value };
     }
-    pos = index + match[0].length;
+    pos = match.index + match[0].length;
   }
   if (pos < template.length) {
-    tokens.push({ type: 'text', value: template.slice(pos) });
+    yield { type: 'text', value: template.slice(pos) };
   }
-  return tokens;
 }
 
 function fold(
-  tokens: Token[],
-  start: number,
+  tokens: Iterator<Token>,
   stopTag: string | undefined,
   options: RichOptions,
-): { nodes: ReactNode[]; next: number; closed: boolean } {
+): { nodes: ReactNode[]; closed: boolean } {
   const nodes: ReactNode[] = [];
-  let i = start;
-  while (i < tokens.length) {
-    const token = tokens[i];
+  for (let step = tokens.next(); !step.done; step = tokens.next()) {
+    const token = step.value;
     if (token.type === 'text') {
       nodes.push(token.value);
-      i++;
     } else if (token.type === 'value') {
       nodes.push(own(options.values, token.name) ?? `{${token.name}}`);
-      i++;
     } else if (token.type === 'standalone') {
       const component = own(options.components, token.name);
-      nodes.push(createElement(Fragment, { key: i }, component ? component() : null));
-      i++;
+      nodes.push(createElement(Fragment, { key: nodes.length }, component ? component() : null));
     } else if (token.type === 'close') {
       if (token.name === stopTag) {
-        return { nodes, next: i + 1, closed: true };
+        return { nodes, closed: true };
       }
       nodes.push(`{/${token.name}}`);
-      i++;
     } else {
-      const inner = fold(tokens, i + 1, token.name, options);
+      const inner = fold(tokens, token.name, options);
       if (inner.closed) {
         const component = own(options.components, token.name);
-        nodes.push(createElement(Fragment, { key: i }, component ? component(inner.nodes) : inner.nodes));
+        nodes.push(createElement(Fragment, { key: nodes.length }, component ? component(inner.nodes) : inner.nodes));
       } else {
         nodes.push(`{#${token.name}}`, ...inner.nodes);
       }
-      i = inner.next;
     }
   }
-  return { nodes, next: i, closed: false };
+  return { nodes, closed: false };
 }
 
 export function rich<T extends string>(template: T, ...rest: TypedRichOptions<T>): ReactNode;
 export function rich(template: string, options: RichOptions = {}): ReactNode {
-  return createElement(Fragment, null, ...fold(tokenize(template), 0, undefined, options).nodes);
+  return createElement(Fragment, null, ...fold(tokenize(template), undefined, options).nodes);
 }

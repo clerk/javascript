@@ -1,4 +1,4 @@
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useState } from 'react';
@@ -34,8 +34,8 @@ function DangerSectionHarness({
   onLeave: () => Promise<void>;
   onDelete?: () => Promise<void>;
 }) {
-  const leave = useDestructiveController({ onDelete: onLeave });
-  const destroy = useDestructiveController({ onDelete: onDelete ?? (() => Promise.resolve()) });
+  const leave = useConfirmController({ onConfirm: onLeave });
+  const destroy = useConfirmController({ onConfirm: onDelete ?? (() => Promise.resolve()) });
   return (
     <OrganizationProfileDangerSectionView
       name='Clerk'
