@@ -24,7 +24,7 @@ export interface InvitationsTableTabViewProps {
   inviteButtonRef?: Ref<HTMLButtonElement>;
   tableContainerRef?: Ref<HTMLDivElement>;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   revoke?: ConfirmController<OrganizationProfileInvitation>;
   finalFocus?: DialogFocusTarget;
   onBulkAction?: (ids: string[]) => void;

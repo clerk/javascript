@@ -129,6 +129,7 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       web3WalletsSlot: (
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
         />
       ),
@@ -147,6 +148,7 @@ describe('UserProfileProfilePanelView', () => {
     const { container } = renderView({
       web3WalletsSlot: (
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[
             { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
           ]}
@@ -166,6 +168,7 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       web3WalletsSlot: (
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[
             {
               id: 'primary',

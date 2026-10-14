@@ -43,7 +43,7 @@ export interface MembersTableTabViewProps {
   searchInputRef?: Ref<HTMLInputElement>;
   inviteButtonRef?: Ref<HTMLButtonElement>;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<OrganizationProfileMember>;
   finalFocus?: DialogFocusTarget;
   onChangeRole?: (id: string, role: string) => void;

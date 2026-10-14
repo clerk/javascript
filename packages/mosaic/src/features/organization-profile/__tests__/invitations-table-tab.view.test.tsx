@@ -25,6 +25,7 @@ function propsFor(overrides: Partial<InvitationsTableTabViewProps> = {}): Invita
     pageSize: 10,
     isLoading: false,
     onPageChange: vi.fn(),
+    registerTrigger: () => null,
     ...overrides,
   };
 }

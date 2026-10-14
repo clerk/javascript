@@ -31,7 +31,7 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   pendingId?: string;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<UserProfileConnectedAccount>;
   finalFocus?: DialogFocusTarget;
 }

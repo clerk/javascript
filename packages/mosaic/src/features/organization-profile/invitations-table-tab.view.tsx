@@ -152,7 +152,7 @@ function InvitationsTableBody({
   onRetry?: () => void;
   hasBulkAction: boolean;
   onRevokeClick?: (invitation: OrganizationProfileInvitation) => void;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('invitationsTableTab');
   if (isLoading) {
@@ -238,7 +238,7 @@ function InvitationsTableBody({
             <Table.Cell align='end'>
               <ActionMenu
                 label={fill(m.manage, { name: row.original.email })}
-                triggerRef={registerTrigger?.(row.original.id)}
+                triggerRef={registerTrigger(row.original.id)}
                 actions={[
                   {
                     label: m.revoke,

@@ -30,7 +30,7 @@ export interface UserProfileWeb3WalletsSectionViewProps {
   pendingId?: string;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
-  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<UserProfileWeb3Wallet>;
   finalFocus?: DialogFocusTarget;
 }

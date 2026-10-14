@@ -22,7 +22,12 @@ import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.mo
 
 function ReadonlyPasskeys() {
   const model = useUserProfilePasskeysModel();
-  return model.status === 'ready' ? <UserProfilePasskeysSectionView passkeys={model.passkeys} /> : null;
+  return model.status === 'ready' ? (
+    <UserProfilePasskeysSectionView
+      registerTrigger={() => null}
+      passkeys={model.passkeys}
+    />
+  ) : null;
 }
 
 function SecurityPanel() {
