@@ -10,7 +10,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
@@ -24,7 +24,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 
     test('renders pricing table with plans', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/pricing-table');
 
       await u.po.pricingTable.waitForMounted();
@@ -32,7 +32,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('renders pricing details of a specific plan', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/billing/plan-details-btn');
 
       await u.po.page.waitForClerkJsLoaded();
@@ -52,7 +52,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('when signed out, clicking subscribe button navigates to sign in page', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/pricing-table');
 
       await u.po.pricingTable.waitForMounted();
@@ -62,7 +62,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('when signed out, clicking trial plan redirects to sign in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/pricing-table');
 
       await u.po.pricingTable.waitForMounted();
@@ -81,7 +81,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/pricing-table');
@@ -95,7 +95,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('when signed in, clicking checkout button open checkout drawer', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/checkout-btn');
@@ -108,7 +108,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('subscribes to a plan', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/pricing-table?newSubscriptionRedirectUrl=/pricing-table');
@@ -131,7 +131,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('opens subscription details drawer', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/subscription-details-btn');
@@ -148,7 +148,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('can upgrade to a new plan with saved card', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/pricing-table');
@@ -161,7 +161,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('can downgrade to previous plan', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/pricing-table');
@@ -176,7 +176,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
 
     test.describe('redirects', () => {
       test('default navigates to afterSignInUrl', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
         await u.po.page.goToRelative('/pricing-table');
@@ -200,7 +200,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       });
 
       test('navigates to supplied newSubscriptionRedirectUrl', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
         await u.po.page.goToRelative('/pricing-table?newSubscriptionRedirectUrl=/success');
@@ -219,7 +219,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
   });
 
   test('user is prompted to add email before checkout', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     const fakeUser = u.services.users.createFakeUser(test, { withEmail: false, withPhoneNumber: true });
     await u.services.users.createBapiUser(fakeUser);
@@ -248,7 +248,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
   });
 
   test('starts free trial subscription for new user', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Create a new user specifically for this trial test
     const trialUser = u.services.users.createFakeUser(test);
@@ -397,7 +397,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
   });
 
   test('subscribing to other paid plans while on free trial is immediate cancellation', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Create a new user specifically for this trial test
     const trialUser = u.services.users.createFakeUser(test);
@@ -471,7 +471,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
@@ -522,7 +522,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('unsubscribes from a plan', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
@@ -571,7 +571,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('checkout always revalidates on open', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
@@ -604,7 +604,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
@@ -638,7 +638,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('displays notice the plan cannot change', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
@@ -673,7 +673,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
@@ -825,7 +825,7 @@ testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
     });
 
     test('adds two payment methods and sets the last as default', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
