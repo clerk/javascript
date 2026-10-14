@@ -125,7 +125,7 @@ If the description has no evidence a few minutes after `down`, read the newest r
 
 Node ignores `HTTPS_PROXY` unless it is told to honor it, so the CLI decides. It goes through the proxy when the direct path to GitHub does not work, which means that it cannot connect or that GitHub rejects the machine's token on it. In that case the CLI reruns itself with the proxy in effect for itself, e2e, and agent-device. A machine that reaches GitHub directly stays direct. `doctor` prints the choice and the reason in `remote-env`.
 
-The `tunnel-egress` and `clerk-egress` checks in `doctor` show a host that the environment blocks as `blocked:` and what answered, or as `no response from <host>`. When `api.github.com` does not answer, the `github-rest` check shows `api.github.com did not answer`. In each case the fix is to add the host to the allowed domains of the environment that the CLI runs in.
+The `tunnel-egress` and `clerk-egress` checks in `doctor` show a host that the environment blocks as `blocked:` and what answered, or as `no response from <host>`. When `api.github.com` does not answer, the `github-rest` check shows `api.github.com did not answer`. For the two egress checks, the fix is to add the host to the allowed domains of the environment that the CLI runs in. For `github-rest`, the fix is to make `api.github.com` reachable from that environment; the check's fix line also says what GitHub access a cloud session needs.
 
 ## GitHub access
 
