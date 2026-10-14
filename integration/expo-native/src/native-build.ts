@@ -39,9 +39,13 @@ export interface FingerprintInputs {
 }
 
 export async function hashInputFiles(worktree: string, inputs: readonly string[], hash: Hash): Promise<void> {
-  const listed = await run('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...inputs], {
-    cwd: worktree,
-  });
+  const lockfile = await run('git', ['status', '--porcelain', '--', 'pnpm-lock.yaml'], { cwd: worktree });
+  const uncommitted = lockfile.stdout.trim() === '' ? [] : ['pnpm-lock.yaml'];
+  const listed = await run(
+    'git',
+    ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...inputs, ...uncommitted],
+    { cwd: worktree },
+  );
   if (listed.code !== 0)
     throw new VerifyFailure(
       'NOT_READY',

@@ -53,6 +53,7 @@ A remote lease runs a standalone Release build with the JS embedded, so there is
 - That platform's native inputs, listed under [What forces a native rebuild](#what-forces-a-native-rebuild).
 - What `@expo/fingerprint`, which `expo` installs, reports for the installed fixture on that platform. That is the app config as Expo resolves it, the config plugin files of the workspace packages, and every native module that autolinking links.
 - The resolved version of every Expo and React Native package in the test app's `pnpm-lock.yaml`: `expo`, `expo-*`, `@expo/*`, `react-native`, `react-native-*`, `@react-native*/*`, and `hermes-*`.
+- The repository's `pnpm-lock.yaml`, when it differs from HEAD. It resolves the `@expo/config-plugins` that the config plugins of the workspace packages load.
 - The Xcode version on iOS.
 - `src/fixture.ts` and `src/native-build.ts`.
 
