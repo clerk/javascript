@@ -286,6 +286,37 @@ describe('Mosaic Select', () => {
     expect(option).not.toHaveAttribute('aria-describedby');
   });
 
+  it('keeps the remaining description when another one in the option unmounts', () => {
+    function Options({ showSecond }: { showSecond: boolean }) {
+      return (
+        <Select.Root
+          items={[{ value: 'acme', label: 'Acme' }]}
+          defaultOpen
+        >
+          <Select.Trigger />
+          <Select.Popup>
+            <Select.Option
+              value='acme'
+              label='Acme'
+            >
+              <Select.Content>
+                <Select.Label>Acme</Select.Label>
+                <Select.Description>Owner</Select.Description>
+                {showSecond ? <Select.Description>Billing</Select.Description> : null}
+              </Select.Content>
+            </Select.Option>
+          </Select.Popup>
+        </Select.Root>
+      );
+    }
+
+    const { rerender } = render(<Options showSecond />);
+    expect(screen.getByRole('option', { name: 'Acme' })).toHaveAccessibleDescription('Owner Billing');
+
+    rerender(<Options showSecond={false} />);
+    expect(screen.getByRole('option', { name: 'Acme' })).toHaveAccessibleDescription('Owner');
+  });
+
   it('forwards the media ref and swaps its element via render', () => {
     const ref = React.createRef<HTMLSpanElement>();
     render(

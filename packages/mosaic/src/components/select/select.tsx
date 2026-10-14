@@ -229,8 +229,6 @@ export interface SelectOptionProps
 }
 
 interface OptionContextValue {
-  labelId: string;
-  descriptionId: string;
   setLabelIds: React.Dispatch<React.SetStateAction<string[]>>;
   setDescriptionIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
@@ -242,13 +240,9 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
   { label, description, xstyle, children, ...rest },
   ref,
 ) {
-  const id = React.useId();
   const [labelIds, setLabelIds] = React.useState<string[]>([]);
   const [descriptionIds, setDescriptionIds] = React.useState<string[]>([]);
-  const context = React.useMemo<OptionContextValue>(
-    () => ({ labelId: `${id}-label`, descriptionId: `${id}-description`, setLabelIds, setDescriptionIds }),
-    [id],
-  );
+  const context = React.useMemo<OptionContextValue>(() => ({ setLabelIds, setDescriptionIds }), []);
   const described = descriptionIds.length > 0;
 
   return (
@@ -331,7 +325,8 @@ export const SelectLabel = React.forwardRef<HTMLSpanElement, SelectLabelProps>(f
   ref,
 ) {
   const context = React.useContext(OptionContext);
-  const id = idProp ?? context?.labelId;
+  const generatedId = React.useId();
+  const id = idProp ?? generatedId;
   useRegisterFieldPartId(id, context?.setLabelIds);
 
   return useRender({
@@ -355,7 +350,8 @@ export type SelectDescriptionProps = MosaicComponentProps<'span'>;
 export const SelectDescription = React.forwardRef<HTMLSpanElement, SelectDescriptionProps>(
   function MosaicSelectDescription({ render, xstyle, id: idProp, ...rest }, ref) {
     const context = React.useContext(OptionContext);
-    const id = idProp ?? context?.descriptionId;
+    const generatedId = React.useId();
+    const id = idProp ?? generatedId;
     useRegisterFieldPartId(id, context?.setDescriptionIds);
 
     return useRender({
