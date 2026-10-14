@@ -888,7 +888,12 @@ function ManageSection() {
     node: <ActionRow {...item} />,
   }));
 
-  const rows = applyOrder<MenuRow>(data.menuItemOrder, [...builtIn, ...custom], r => r.id);
+  const builtInIds = new Set(builtIn.map(r => r.id));
+  const rows = applyOrder<MenuRow>(
+    data.menuItemOrder,
+    [...builtIn.map(r => custom.find(c => c.id === r.id) ?? r), ...custom.filter(r => !builtInIds.has(r.id))],
+    r => r.id,
+  );
 
   if (rows.length === 0) {
     return null;

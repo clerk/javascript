@@ -158,7 +158,10 @@ export type SwitcherMenuItem = SwitcherMenuAction | SwitcherMenuLink;
 
 /** The app's own rows, beside Settings, and the order that group runs in. */
 export interface SwitcherMenuProps {
-  /** Actions and links of your own, added to the group with Settings, after Clerk's own rows. */
+  /**
+   * Actions and links of your own, added to the group with Settings, after Clerk's own rows. An
+   * item whose `id` is a built-in row's replaces that row, in its place.
+   */
   customMenuItems?: SwitcherMenuItem[];
   /**
    * The order the Settings group runs in, by id: a built-in row's id, or a custom item's `id`.

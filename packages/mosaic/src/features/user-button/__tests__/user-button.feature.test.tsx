@@ -1041,6 +1041,38 @@ describe('UserButton', () => {
       ).toEqual(['Support', 'Invite members', 'Settings', 'Terms of service', 'Switch account', 'Sign out']);
     });
 
+    it('replaces the built-in row whose id one takes, in its place', async () => {
+      const appSettings = { id: 'settings', label: 'App settings', onClick: () => {} };
+      await renderUserButton({ customMenuItems: [terms, appSettings] });
+      await open();
+
+      expect(reading('Settings', 'App settings', 'Invite members', 'Terms of service')).toEqual([
+        'App settings',
+        'Invite members',
+        'Terms of service',
+      ]);
+    });
+
+    it('keeps a row whose id names a built-in the mode does not show', async () => {
+      const invite = { id: 'inviteMembers', label: 'Invite teammates', onClick: () => {} };
+      await renderUserButton({ customMenuItems: [invite] }, signedIn({ client: fapiClient([personalSession]) }));
+      await open();
+
+      expect(reading('Settings', 'Invite teammates')).toEqual(['Settings', 'Invite teammates']);
+    });
+
+    it('places a replacing row by the id it took', async () => {
+      const appSettings = { id: 'settings', label: 'App settings', onClick: () => {} };
+      await renderUserButton({ customMenuItems: [terms, appSettings], menuItemOrder: ['terms', 'inviteMembers'] });
+      await open();
+
+      expect(reading('App settings', 'Invite members', 'Terms of service')).toEqual([
+        'Terms of service',
+        'Invite members',
+        'App settings',
+      ]);
+    });
+
     it('signs the popup with Clerk where the instance is branded', async () => {
       await renderUserButton({}, signedIn({ environment: fapiEnvironment({ display_config: { branded: true } }) }));
       await open();

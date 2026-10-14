@@ -193,7 +193,8 @@ all accounts**. The foot keeps **Sign out**.
 `customMenuItems` adds the app's own rows to the group with **Settings** and **Invite members**, after
 Clerk's own. A row with `onClick` is an action and closes the popup on the way out; a row with `href`
 is a link and navigates on its own, so it stays followable while another action is in flight. The
-`icon` is optional — a row without one still holds the column, so labels stay in line.
+`icon` is optional — a row without one still holds the column, so labels stay in line. A custom item
+whose `id` is `settings` or `inviteMembers` replaces that row, in its place.
 
 `menuItemOrder` names that group's rows by id, and whatever it leaves out follows what it named. The
 ids it knows are `settings`, `inviteMembers`, and each custom item's `id`. The organizations above
