@@ -155,9 +155,6 @@ export const styles = stylex.create({
     maxWidth: '50%',
     minWidth: 0,
   },
-  actionsSkeleton: {
-    height: space['7'],
-  },
   note: {
     alignItems: 'center',
     color: colorVars['--cl-color-foreground-secondary'],

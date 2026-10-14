@@ -1,5 +1,6 @@
 import { createClerkClient as backendCreateClerkClient } from '@clerk/backend';
-import { createAppPageObject, createPageObjects, type EnhancedPage } from '@clerk/testing/playwright/unstable';
+import { parsePublishableKey } from '@clerk/shared/keys';
+import { createPageObjects, type EnhancedPage } from '@clerk/testing/playwright/unstable';
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 
 import type { Application } from '../models/application';
@@ -16,14 +17,15 @@ export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail, Playwri
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({
     apiUrl: app.env.privateVariables.get('CLERK_API_URL'),
-    secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
+    secretKey:
+      app.env.privateVariables.get('CLERK_SECRET_KEY') || app.env.privateVariables.get('CLERK_DYNAMIC_SECRET_KEY'),
     publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
   });
 };
 
 export type CreateAppPageObjectArgs = { page: Page; context: BrowserContext; browser: Browser };
 
-export const createTestUtils = <
+export const createTestUtils = async <
   Params extends { app: Application; useTestingToken?: boolean } & Partial<CreateAppPageObjectArgs>,
   Services = typeof services,
   PO = typeof pageObjects,
@@ -32,8 +34,8 @@ export const createTestUtils = <
   OnlyAppReturn = { services: Services },
 >(
   params: Params,
-): Params extends Partial<CreateAppPageObjectArgs> ? FullReturn : OnlyAppReturn => {
-  const { app, context, browser, useTestingToken = true } = params || {};
+): Promise<Params extends Partial<CreateAppPageObjectArgs> ? FullReturn : OnlyAppReturn> => {
+  const { app, page, context, browser, useTestingToken = true } = params || {};
 
   const clerkClient = withRetry(createClerkClient(app));
   const services = {
@@ -45,21 +47,37 @@ export const createTestUtils = <
     waitlist: createWaitlistService(clerkClient),
   };
 
-  if (!params.page) {
+  if (!page) {
     return { services } as any;
   }
 
-  const pageObjects = createPageObjects({ page: params.page, useTestingToken, baseURL: app.serverUrl });
+  const pageObjects = createPageObjects({ page, useTestingToken: false, baseURL: app.serverUrl });
+  if (useTestingToken) {
+    const { token } = await clerkClient.testingTokens.createTestingToken();
+    const { frontendApi } = parsePublishableKey(app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'), { fatal: true });
+    await page.context().route(
+      url => url.origin === `https://${frontendApi}` && url.pathname.startsWith('/v1/'),
+      async route => {
+        const url = new URL(route.request().url());
+        url.searchParams.set('__clerk_testing_token', token);
+        await route.continue({ url: url.toString() });
+      },
+    );
+  }
 
   const browserHelpers = {
     runInNewTab: async (
       cb: (u: { services: Services; po: PO; page: EnhancedPage }, context: BrowserContext) => Promise<unknown>,
     ) => {
-      const u = createTestUtils({
+      const tabContext = context ?? page.context();
+      const u = await createTestUtils({
         app,
-        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, { baseURL: app.serverUrl }),
+        page: await tabContext.newPage(),
+        context: tabContext,
+        browser,
+        useTestingToken,
       });
-      await cb(u as any, context);
+      await cb(u as any, tabContext);
       return u;
     },
     runInNewBrowser: async (
@@ -69,9 +87,12 @@ export const createTestUtils = <
         throw new Error('Browser is not defined. Did you forget to pass it to createPageObjects?');
       }
       const context = await browser.newContext();
-      const u = createTestUtils({
+      const u = await createTestUtils({
         app,
-        page: createAppPageObject({ page: await context.newPage(), useTestingToken }, { baseURL: app.serverUrl }),
+        page: await context.newPage(),
+        context,
+        browser,
+        useTestingToken,
       });
       await cb(u as any, context);
       return u;

@@ -4,11 +4,16 @@ import { act, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { vi } from 'vitest';
 
+import type { MosaicLocalization } from '../../localization';
 import { MosaicProvider } from '../../mosaic-provider';
-import { PUBLISHABLE_KEY } from './fake-fapi';
+import { publishableKey } from './fake-fapi';
 
-export async function renderWithClerk(ui: ReactElement, options?: Parameters<Clerk['load']>[0]) {
-  const clerk = new Clerk(PUBLISHABLE_KEY);
+export async function renderWithClerk(
+  ui: ReactElement,
+  options?: Parameters<Clerk['load']>[0],
+  localization?: MosaicLocalization,
+) {
+  const clerk = new Clerk(publishableKey());
   const navigate = vi.fn((_to: string) => Promise.resolve());
 
   const wrap = (element: ReactElement) => (
@@ -16,7 +21,7 @@ export async function renderWithClerk(ui: ReactElement, options?: Parameters<Cle
       clerk={clerk}
       clerkStatus={clerk.status}
     >
-      <MosaicProvider>{element}</MosaicProvider>
+      <MosaicProvider localization={localization}>{element}</MosaicProvider>
     </ClerkContextProvider>
   );
   let current = ui;

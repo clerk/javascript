@@ -39,8 +39,8 @@ export function Impersonation() {
 
   return (
     <UserProfileActiveDevicesSectionView
-      devices={devices.devices}
-      onSignOutDevice={devices.onSignOutDevice}
+      {...devices}
+      signOutAll={undefined}
     />
   );
 }

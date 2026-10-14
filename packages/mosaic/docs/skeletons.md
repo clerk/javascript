@@ -16,72 +16,80 @@ shows bones beside sections that have already loaded, and a table moving to anot
 page turns its rows into bones while its headers and controls stay. Whether a table's
 controls are bones on first load is still open.
 
-Actions (buttons, menus) are not drawn, but their height is held when it outgrows
-the content beside it.
+Row actions in a section (menus, buttons) are wrapped with `visible={false}`: they
+keep their space, so the row holds its height, but no bone is drawn for them.
+
+## When not to use one
+
+- A single action in flight (a save, a delete) shows a pending button, not a
+  skeleton: `SubmitButton`, with `useSpinDelay` for anything else that spins.
+- No data is not loading. When the fetch returns nothing, render `EmptyState`;
+  never leave a skeleton up as an empty state or as decoration.
+- A skeleton holds no working controls. Wrapped content is hidden, and a skeleton
+  container is `inert`, so anything interactive inside it is unreachable until the
+  content loads.
 
 ## Building one
 
-Each component defines its own bones, but every bone uses the shared shimmer and the
-same fill, `--cl-color-neutral-alpha-200`.
+Skeletons are composed, not built into components. Wrap the content that is loading in
+`Skeleton` (`src/components/skeleton/`); components carry no skeleton code of their
+own.
 
-- **Render the real view with mock data.** The view takes `skeleton` and passes it
-  to its container (`<Section.Group skeleton={skeleton}>`). Every part inside
-  inherits it and becomes a bone (`skeleton={false}` opts one out), and the
-  container turns `inert` and `aria-hidden`. Because the skeleton is the view's own
-  markup, it can't drift from it: change a row and the skeleton changes with it.
-  While `skeleton` is set, the view skips its dialogs and confirmations.
-- **The `.skeleton.tsx` is one line** next to the view, rendering it with a
-  `PLACEHOLDER_*` constant:
-  `<UserProfileActiveDevicesSectionView skeleton devices={PLACEHOLDER_DEVICES} />`
-  (see `user-profile-active-devices-section.skeleton.tsx`). A panel's skeleton
-  composes its sections' skeletons.
-- **Mock data decides row count, shape, and text length.** Text bones are drawn
-  from the mock strings, so write them at a typical length: a placeholder that
-  wraps to two lines where real text takes one shifts the layout. Aim at the most
-  common loaded shape: a typical count (2–3), every line present, and the branch
-  real data usually takes (a current device, not the empty state). When the count
-  is known before the fetch, use it instead: a table moving between pages with a
-  known total shows exactly `min(pageSize, total − offset)` rows. A first load or a
-  new search can't know, so it uses the typical count and accepts a shift. The page
-  size is a maximum, not a count.
-- **Announce it.** The skeleton is hidden from assistive technology, so the view
-  renders a `VisuallyHidden` `role='status'` message ("Loading active devices")
-  while `skeleton` is set.
-- **Parts also take `skeleton` standalone**, as does `Panel.Title`, for a bone
-  outside a skeleton container.
-- **What each part does:** text parts (Title, Label, Description, `Panel.Title`)
-  keep their mock text and wrap it in `SkeletonText`; Media renders empty as a
-  filled block; Actions render nothing and hold a small control's height.
-- **A component with its own shape** composes the pieces in
-  `styles/skeleton.styles.ts` itself:
-  - `SkeletonText` (`utils/skeleton-text.tsx`) around mock text: one span, one
-    line, as wide as its text, drawing a bar with its `::before`. The span is
-    `visibility: hidden` and only the bar is visible, so anything nested in the
-    mock text (a badge, a link, an icon) keeps its width but never draws. Leave
-    badges out of mock rows entirely; a skeleton doesn't draw them.
-  - `skeletonStyles.bone`: fill and radius, for media and blocks.
-  - `skeletonStyles.shimmer`: the moving highlight for a block, as an `::after`
-    overlay. `Avatar.Fallback`, which has its own fill and circle, takes `shimmer`
-    alone.
+- **What `Skeleton` draws.** Text children (strings) become a pill bar: one line,
+  cap height, on the text's baseline, as wide as the text. Element children become
+  a block the size of the element, which stays in the layout but hidden. So wrap
+  the text to get a bar, and wrap the text's parent element to cover several lines
+  with one block.
+- **Shapes are semantic:** `rounded` (the default, `--cl-radius-md`, for media,
+  icon frames and buttons), `pill` (`--cl-radius-full`, for avatars and round
+  controls) and `square` (`--cl-radius-none`, for image tiles). Text bars are
+  always pills. Pick the shape of the element being replaced; don't reach for other
+  radii.
+- **`visible={false}`** keeps the content's space without drawing a bone.
+- **`width` / `height`** size a skeleton that has no children. With children, the
+  size comes from them.
+- **Containers turn skeletons on.** `Section.Group skeleton` shows every
+  `Skeleton` inside it, and makes the card `inert` and `aria-hidden`. A `Skeleton`
+  outside a container shows by default; inside a container that isn't loading it
+  renders its children as they are. `show` overrides either, as in
+  `<Panel.Title><Skeleton show={loading}>…</Skeleton></Panel.Title>`.
+- **Render the real view with mock data.** The view takes `skeleton`, passes it to
+  its container, and wraps each piece of loading content in `Skeleton`. Because
+  the skeleton is the view's own markup, it can't drift from it. While `skeleton`
+  is set, the view skips its dialogs and confirmations and leaves out badges.
+- **The `.skeleton.tsx` renders the view with placeholder data,** through the
+  real controller when the view takes controller output:
+  `useUserProfileActiveDevicesController({ devices: PLACEHOLDER_DEVICES })`, then
+  `<UserProfileActiveDevicesSectionView {...controller} skeleton />` (see
+  `user-profile-active-devices-section.skeleton.tsx`).
+- **Mock data decides row count, shape, and text length.** Text bars are as wide
+  as the mock strings, so write them at a typical length, and keep each to one
+  line of real content: text bars don't wrap. Aim at the most common loaded shape:
+  a typical count (2–3), every line present, and the branch real data usually
+  takes (a current device, not the empty state). When the count is known before
+  the fetch, use it instead: a table moving between pages with a known total shows
+  exactly `min(pageSize, total − offset)` rows. A first load or a new search can't
+  know, so it uses the typical count and accepts a shift. The page size is a
+  maximum, not a count.
+- **Announce it, start and finish.** The view always renders one `VisuallyHidden`
+  `role='status'` message: "Loading active devices" while `skeleton` is set, then
+  "Active devices loaded". A live region only announces changes to an element that
+  already exists, so the completion is announced only if that element survives the
+  swap (see "When to show it").
+- **A component's own loading state** (not a skeleton), such as `Avatar.Fallback`
+  while an image loads, takes `skeletonStyles.shimmer` from
+  `src/styles/skeleton.styles.ts` for the same highlight.
 
 ## Sizing
 
-- **Height must match exactly.** Text bones are the text's own line boxes, so text
-  rows match by construction. Watch anything taller than its text:
-  `Section.Actions skeleton` exists because a 28px `sm` menu trigger outgrew a 20px
-  line.
-- **The bar is cap height on the baseline.** `SkeletonText` is one line of the
-  part's own type (`1lh` tall, so heights match), and its `::before` bar is `1cap`
-  tall (`0.7em` fallback), sitting on the baseline with a pill radius. It covers
-  the same band as the text's capitals in any font, with nothing measured, and
-  stacked lines keep a natural gap.
-- **Width comes from the mock text.** The span is `width: fit-content` around its
-  transparent mock text, and the bar fills it (a `-100%` end margin keeps the bar
-  from taking space in the line, so it shares the text's baseline). So each bar is
-  exactly as long as the text it stands in for. Mock text is held to one line
-  (`nowrap`, clipped at the part's width), so a long placeholder can't wrap and
-  shift the layout; keep placeholders to one line of real content. With no mock
-  text, the bar falls back to `12ch`.
+- **Height must match exactly.** A text bar sits in one line of its parent's type,
+  and a block is its element's own size, so wrapped content keeps its height by
+  construction. Measure anyway; a mock string that's longer than real content is
+  the usual cause of a shift.
+- **The text bar is cap height on the baseline.** Its `::before` bar is `1cap`
+  tall (`0.7em` fallback) with a `-100%` end margin, so it shares the hidden
+  text's baseline and covers the band of its capitals in any font, with nothing
+  measured. Stacked lines keep a natural gap.
 
 ## The shimmer
 
@@ -90,7 +98,7 @@ peaking in the middle, sweeps left to right across two bone widths, over 1.6s
 `ease-in-out` (the CSS keyword, not a token), repeating. Off under
 `prefers-reduced-motion: reduce`, leaving the plain fill.
 
-- **Blocks** (media, the avatar) move an `::after` overlay with `transform`
+- **Blocks** (wrapped elements, the avatar) move an `::after` overlay with `transform`
   (`translateX(-100%)` → `translateX(100%)`), clipped by `overflow: hidden`.
 - **Text bars** are themselves a pseudo-element, so they move their own
   background instead: a gradient `300%` wide (transparent, highlight, transparent
@@ -106,7 +114,10 @@ peaking in the middle, sweeps left to right across two bone widths, over 1.6s
 
 ## When to show it
 
-Not decided by the skeleton. The wiring around a panel owns it. The planned gate is
+Not decided by the skeleton. The wiring around a panel owns it. Keep the same view
+mounted and flip its `skeleton` prop, feeding it placeholder data while loading;
+don't swap a separate skeleton component for the real one. A swap remounts the
+status message, so screen readers never hear that loading finished. The planned gate is
 `useSpinDelay(loading, { delay: 150, minDuration: 500 })` with the skeleton mounted
 but `visibility: hidden` until the delay passes, so a fast load never flashes it and
 nothing shifts when it appears.

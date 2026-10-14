@@ -1,5 +1,30 @@
 # Change Log
 
+## 4.11.0
+
+### Minor Changes
+
+- Introduce `@clerk/expo-native-components`, a new package that the native components (`AuthView`, `UserButton`, `UserProfileView`) now require. Install it and rebuild your app. ([#9955](https://github.com/clerk/javascript/pull/9955)) by [@mikepitre](https://github.com/mikepitre)
+
+  ```sh
+  npx expo install @clerk/expo-native-components
+  ```
+
+  If it's missing, rendering a native component throws an error with these same steps. Install the package before you ship this version in an over-the-air update, because the error is thrown at runtime and not at build time.
+
+  Import the native components and their hooks from `@clerk/expo/native-components`. `@clerk/expo/native` is deprecated. It still works and logs a warning in development.
+
+  Apps that don't install the package no longer include the Clerk iOS and Android SDKs and no longer require iOS 17. On Android, those apps also stop migrating biometric credentials enrolled with earlier versions of `@clerk/expo`, so users who weren't migrated by an earlier release need to enroll again.
+
+## 4.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/clerk-js@6.39.0
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+
 ## 4.10.0
 
 ### Minor Changes

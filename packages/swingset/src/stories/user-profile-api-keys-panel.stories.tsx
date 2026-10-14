@@ -1,5 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
-import { UserProfileApiKeysPanelSkeleton } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.skeleton';
+import { placeholderAPIKeys } from '@clerk/mosaic/features/api-keys/api-keys-table.view';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useEffect, useState } from 'react';
@@ -39,6 +39,8 @@ export function Empty() {
   return <APIKeysPanelExample {...props} />;
 }
 
+const PLACEHOLDER_API_KEYS = placeholderAPIKeys(3);
+
 export function Loading() {
   const props = useAPIKeysTableFixture();
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,11 @@ export function Loading() {
       >
         Reload
       </Button>
-      {loading ? <UserProfileApiKeysPanelSkeleton /> : <APIKeysPanelExample {...props} />}
+      <APIKeysPanelExample
+        {...props}
+        {...(loading ? { apiKeys: PLACEHOLDER_API_KEYS, totalCount: PLACEHOLDER_API_KEYS.length } : {})}
+        skeleton={loading}
+      />
     </div>
   );
 }

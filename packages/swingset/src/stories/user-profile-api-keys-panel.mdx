@@ -23,7 +23,7 @@ The API keys panel lists the keys that belong to the signed-in user under the pa
 
 ### Loading
 
-`UserProfileApiKeysPanelSkeleton` renders the panel's first load: the panel title and `APIKeysTableSkeleton`, which is `APIKeysTableView` with `skeleton` and three placeholder keys. When to show it, and for how long, is up to the caller.
+`APIKeysTableView` takes `skeleton` for its first load. Render it with placeholder keys (`APIKeysTableSkeleton` uses three) and the toolbar, column headers and rows draw as [Skeleton](/components/skeleton)s; wrap the panel title in `Skeleton` too. Keep the same view mounted and flip `skeleton` when the keys arrive. When to show it, and for how long, is up to the caller.
 
 <Story name='Loading' storyModule={Stories} />
 

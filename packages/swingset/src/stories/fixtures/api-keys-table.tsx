@@ -1,14 +1,18 @@
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import { Panel } from '@clerk/mosaic/components/panel';
+import { Skeleton } from '@clerk/mosaic/components/skeleton';
 import { resolveAPIKeysTableMessages } from '@clerk/mosaic/features/api-keys/api-keys-table.messages';
 import type {
+  APIKey,
   APIKeysTableSort,
   APIKeysTableSubjectKind,
   APIKeysTableViewProps,
 } from '@clerk/mosaic/features/api-keys/api-keys-table.types';
 import { APIKeysTableView } from '@clerk/mosaic/features/api-keys/api-keys-table.view';
 import { useCreateAPIKeyController } from '@clerk/mosaic/features/api-keys/create-api-key.controller';
+import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
 import { useLocale, useMessages } from '@clerk/mosaic/localization';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosRows, chaosText } from '@/lib/chaos';
@@ -159,27 +163,47 @@ export function useAPIKeysTableFixture({
       setPage(Math.max(1, pageCount));
     }
   }, [page, pageCount]);
+  const apiKeys = sorted.slice((shown.page - 1) * shown.pageSize, shown.page * shown.pageSize).map(item => ({
+    id: item.id,
+    name: item.name,
+    createdAtLabel: dateLabel(item.createdAt),
+    expiresAtLabel: item.expiresAt === null ? null : dateLabel(item.expiresAt),
+    lastUsedAtLabel:
+      item.lastUsedAt === null
+        ? null
+        : relativeTime.format(Math.round((item.lastUsedAt - exampleTime) / 60_000), 'minute'),
+  }));
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const createButtonRef = useRef<HTMLButtonElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: apiKeys.map(key => key.id),
+    onRemove: async id => {
+      await revokeExampleAPIKey();
+      setItems(current => current.filter(item => item.id !== id));
+    },
+    fallback: () => createButtonRef.current ?? searchInputRef.current,
+  });
+  const revoke = useConfirmController<APIKey>({
+    onConfirm: key => removalFocus.remove(key.id),
+    errorFallback: messages.revokeError,
+  });
 
   return {
     messages,
-    apiKeys: sorted.slice((shown.page - 1) * shown.pageSize, shown.page * shown.pageSize).map(item => ({
-      id: item.id,
-      name: item.name,
-      createdAtLabel: dateLabel(item.createdAt),
-      expiresAtLabel: item.expiresAt === null ? null : dateLabel(item.expiresAt),
-      lastUsedAtLabel:
-        item.lastUsedAt === null
-          ? null
-          : relativeTime.format(Math.round((item.lastUsedAt - exampleTime) / 60_000), 'minute'),
-    })),
+    apiKeys,
     totalCount: shownFiltered.length,
     page,
     pageSize,
     searchValue,
     isLoading: false,
     isFetching,
+    searchInputRef,
+    createButtonRef,
     onCreate: create.onOpen,
     createDialog: create.dialog,
+    registerTrigger: removalFocus.registerTrigger,
+    revoke,
+    finalFocus: removalFocus.finalFocus,
     onSearchChange: setSearchValue,
     onPageChange: setPage,
     onPageSizeChange: setPageSize,
@@ -190,17 +214,15 @@ export function useAPIKeysTableFixture({
           setPage(1);
         }
       : undefined,
-    onRevoke: async id => {
-      await revokeExampleAPIKey();
-      setItems(current => current.filter(item => item.id !== id));
-    },
   };
 }
 
 export function APIKeysPanelExample(props: APIKeysTableViewProps) {
   return (
     <Panel.Root>
-      <Panel.Title>API Keys</Panel.Title>
+      <Panel.Title>
+        <Skeleton show={Boolean(props.skeleton)}>API Keys</Skeleton>
+      </Panel.Title>
       <APIKeysTableView {...props} />
     </Panel.Root>
   );

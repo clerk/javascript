@@ -67,7 +67,16 @@ describe('UserProfileSecurityPanel', () => {
     const environment = fapiEnvironment();
     environment.user_settings.attributes.password.enabled = false;
     serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
-    await renderWithClerk(<UserProfileSecurityPanel passkeysSlot={<UserProfilePasskeysSectionView passkeys={[]} />} />);
+    await renderWithClerk(
+      <UserProfileSecurityPanel
+        passkeysSlot={
+          <UserProfilePasskeysSectionView
+            registerTrigger={() => null}
+            passkeys={[]}
+          />
+        }
+      />,
+    );
 
     expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Passkeys');
     expect(screen.queryByText('Password')).toBeNull();

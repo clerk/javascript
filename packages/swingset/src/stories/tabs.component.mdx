@@ -23,7 +23,6 @@ import { Tabs } from '@clerk/mosaic/components/tabs';
   <Tabs.List>
     <Tabs.Tab value='tab1'>Account</Tabs.Tab>
     <Tabs.Tab value='tab2'>Security</Tabs.Tab>
-    <Tabs.Indicator />
   </Tabs.List>
   <Tabs.Panels>
     <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
@@ -34,22 +33,22 @@ import { Tabs } from '@clerk/mosaic/components/tabs';
 
 ## Parts
 
-| Part             | Element    | Description                                                                           |
-| ---------------- | ---------- | ------------------------------------------------------------------------------------- |
-| `Tabs.Root`      | `<div>`    | Column container providing active-value state and activation mode for horizontal tabs |
-| `Tabs.List`      | `<div>`    | `role="tablist"` container with roving-tabindex navigation                            |
-| `Tabs.Tab`       | `<button>` | A keyboard-navigable tab trigger inside `Tabs.List`                                   |
-| `Tabs.Trigger`   | `<button>` | Standalone tab trigger for use outside `Tabs.List`                                    |
-| `Tabs.Panels`    | `<div>`    | Grid container that stacks direct `Tabs.Panel` children                               |
-| `Tabs.Panel`     | `<div>`    | `role="tabpanel"`; hidden when inactive                                               |
-| `Tabs.Indicator` | `<span>`   | Decorative element that tracks the active tab's position and size                     |
+| Part           | Element    | Description                                                                            |
+| -------------- | ---------- | -------------------------------------------------------------------------------------- |
+| `Tabs.Root`    | `<div>`    | Column container providing active-value state and activation mode for horizontal tabs  |
+| `Tabs.List`    | `<div>`    | `role="tablist"` container with roving-tabindex navigation and the selection underline |
+| `Tabs.Tab`     | `<button>` | A keyboard-navigable tab trigger inside `Tabs.List`                                    |
+| `Tabs.Trigger` | `<button>` | Standalone tab trigger for use outside `Tabs.List`                                     |
+| `Tabs.Panels`  | `<div>`    | Grid container that stacks direct `Tabs.Panel` children                                |
+| `Tabs.Panel`   | `<div>`    | `role="tabpanel"`; hidden when inactive                                                |
 
 All parts accept `xstyle`. Parts other than `Tabs.Root` also accept a `render` prop for polymorphic
 rendering and standard HTML attributes. `Tabs.Root` renders a column container inside the primitive's
 context provider so the list and panels stack regardless of the surrounding layout.
 
-The selection indicator uses a short CSS transition and disables its motion when the user prefers
-reduced motion.
+The underline under the selected tab is `.cl-tabs-indicator`. Style that class to restyle the
+selection. It slides between tabs where the browser supports animating CSS anchor positioning, and
+sits still under the selected tab elsewhere or when the user prefers reduced motion.
 
 `Tabs.Panels` places its direct panels in one grid cell. Pair it with force-mounted panels and the
 tabs primitive's transition attributes when a theme needs to animate outgoing and incoming panels.

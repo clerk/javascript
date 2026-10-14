@@ -312,6 +312,12 @@ const noPhysicalCssProperties = {
   },
 };
 
+const noLeakedConditionalJsx = {
+  selector: ":matches(JSXElement, JSXFragment) > JSXExpressionContainer > LogicalExpression[operator='&&']",
+  message:
+    'Use a ternary (`condition ? <Element /> : null`) for conditional JSX; `&&` renders a falsy left-hand value such as `0`.',
+};
+
 export default tseslint.config([
   {
     name: 'repo/ignores',
@@ -656,6 +662,7 @@ export default tseslint.config([
           selector: "Property > Literal.key[value='&:hover']",
           message: "Use hover() from mosaic/utils instead of bare '&:hover'.",
         },
+        noLeakedConditionalJsx,
         {
           selector: "Property > Literal.key[value='@media (hover: hover)']",
           message: "Use hover() from mosaic/utils instead of raw '@media (hover: hover)'.",
@@ -719,8 +726,9 @@ export default tseslint.config([
     // `<FloatingOverlay style={...}>`, a third-party component, not a Mosaic part.
     name: 'packages/mosaic - primitives',
     files: ['packages/mosaic/src/primitives/**/*'],
+    ignores: ['packages/mosaic/src/**/*.test.{ts,tsx}'],
     rules: {
-      'no-restricted-syntax': 'off',
+      'no-restricted-syntax': ['error', noLeakedConditionalJsx],
     },
   },
   {

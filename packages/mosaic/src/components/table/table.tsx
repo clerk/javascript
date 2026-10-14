@@ -7,7 +7,6 @@ import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { SkeletonText } from '../../utils/skeleton-text';
 import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
 import { Checkbox } from '../checkbox';
@@ -15,18 +14,12 @@ import { Icon } from '../icon';
 import type { InputProps } from '../input';
 import { InputGroup } from '../input-group';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
+import { SkeletonContext } from '../skeleton';
 import { aligns, styles } from './table.styles';
 
 type TableSection = 'header' | 'body';
 
 const TableSectionContext = React.createContext<TableSection>('body');
-
-const TableSkeletonContext = React.createContext(false);
-
-function useInheritedSkeleton(skeleton: boolean | undefined) {
-  const inherited = React.useContext(TableSkeletonContext);
-  return skeleton ?? inherited;
-}
 
 export type TableAlign = keyof typeof aligns;
 
@@ -123,12 +116,12 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
           stylex.props(reset.base, scrollAreaViewport('auto', 'inline'), styles.viewport),
         )}
       >
-        <TableSkeletonContext.Provider value={skeleton}>
+        <SkeletonContext.Provider value={skeleton}>
           <table
             ref={ref}
             {...mergeStyleProps(themeProps('table'), stylex.props(reset.base, styles.table, xstyle), rest)}
           />
-        </TableSkeletonContext.Provider>
+        </SkeletonContext.Provider>
       </div>
     </div>
   );
@@ -155,7 +148,8 @@ const Body = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(function 
   { skeleton: skeletonProp, render, xstyle, ...rest },
   ref,
 ) {
-  const skeleton = useInheritedSkeleton(skeletonProp);
+  const inherited = React.useContext(SkeletonContext);
+  const skeleton = skeletonProp ?? inherited;
   const element = useRender({
     defaultTagName: 'tbody',
     render,
@@ -167,7 +161,7 @@ const Body = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(function 
   });
   return (
     <TableSectionContext.Provider value='body'>
-      <TableSkeletonContext.Provider value={skeleton}>{element}</TableSkeletonContext.Provider>
+      <SkeletonContext.Provider value={skeleton}>{element}</SkeletonContext.Provider>
     </TableSectionContext.Provider>
   );
 });
@@ -198,7 +192,6 @@ export interface TableHeaderCellProps extends Omit<MosaicComponentProps<'th'>, '
   align?: TableAlign;
   sort?: TableSort;
   onSort?: () => void;
-  skeleton?: boolean;
 }
 
 const sortIcons = {
@@ -208,11 +201,10 @@ const sortIcons = {
 } as const;
 
 const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(function MosaicTableHeaderCell(
-  { align = 'start', sort = 'none', onSort, skeleton: skeletonProp, children, render, xstyle, ...rest },
+  { align = 'start', sort = 'none', onSort, children, render, xstyle, ...rest },
   ref,
 ) {
-  const skeleton = useInheritedSkeleton(skeletonProp);
-  const sortable = onSort !== undefined && !skeleton;
+  const sortable = onSort !== undefined;
   return useRender({
     defaultTagName: 'th',
     render,
@@ -220,19 +212,12 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
     props: {
       scope: 'col',
       ...mergeStyleProps(
-        themeProps('table-header-cell', {
-          align,
-          sortable,
-          sort: sortable && sort !== 'none' ? sort : undefined,
-          skeleton,
-        }),
+        themeProps('table-header-cell', { align, sortable, sort: sortable && sort !== 'none' ? sort : undefined }),
         stylex.props(reset.base, styles.headerCell, aligns[align], sortable && styles.sortableHeaderCell, xstyle),
         { 'aria-sort': sortable && sort !== 'none' ? sort : undefined },
         rest,
       ),
-      children: skeleton ? (
-        <SkeletonText>{children}</SkeletonText>
-      ) : sortable ? (
+      children: sortable ? (
         <Button
           variant='ghost'
           color='neutral'
@@ -257,26 +242,21 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
 export interface TableCellProps extends Omit<MosaicComponentProps<'td'>, 'align'> {
   align?: TableAlign;
   noWrap?: boolean;
-  skeleton?: boolean;
 }
 
 const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function MosaicTableCell(
-  { align = 'start', noWrap = false, skeleton: skeletonProp, children, render, xstyle, ...rest },
+  { align = 'start', noWrap = false, render, xstyle, ...rest },
   ref,
 ) {
-  const skeleton = useInheritedSkeleton(skeletonProp);
   return useRender({
     defaultTagName: 'td',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('table-cell', { align, noWrap, skeleton }),
-        stylex.props(reset.base, styles.cell, aligns[align], noWrap && styles.noWrap, xstyle),
-        rest,
-      ),
-      children: skeleton ? <SkeletonText>{children}</SkeletonText> : children,
-    },
+    props: mergeStyleProps(
+      themeProps('table-cell', { align, noWrap }),
+      stylex.props(reset.base, styles.cell, aligns[align], noWrap && styles.noWrap, xstyle),
+      rest,
+    ),
   });
 });
 

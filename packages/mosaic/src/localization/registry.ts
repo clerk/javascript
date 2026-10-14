@@ -10,28 +10,29 @@ import { requestsTableTabMessages } from '../features/organization-profile/reque
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
-import { userProfileAccountSectionMessages } from '../features/user-profile/user-profile-account-section/user-profile-account-section.messages';
-import { userProfileAddEmailMessages } from '../features/user-profile/user-profile-account-section/user-profile-add-email.messages';
-import { userProfileAddPhoneMessages } from '../features/user-profile/user-profile-account-section/user-profile-add-phone.messages';
-import { userProfileVerifyEmailLinkMessages } from '../features/user-profile/user-profile-account-section/user-profile-verify-email-link.messages';
-import { userProfileVerifyEmailSsoMessages } from '../features/user-profile/user-profile-account-section/user-profile-verify-email-sso.messages';
 import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices-section/user-profile-active-devices.messages';
-import { userProfileAddAuthenticatorMessages } from '../features/user-profile/user-profile-add-authenticator.messages';
-import { userProfileAddSmsMessages } from '../features/user-profile/user-profile-add-sms.messages';
-import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';
-import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-backup-codes.messages';
 import { userProfileConnectedAccountsMessages } from '../features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.messages';
+import { userProfileContactMessages } from '../features/user-profile/user-profile-contact.messages';
 import { userProfileDangerSectionMessages } from '../features/user-profile/user-profile-danger-section/user-profile-danger-section.messages';
+import { userProfileAddEmailMessages } from '../features/user-profile/user-profile-email-section/user-profile-add-email.messages';
 import { userProfileEnterpriseAccountsMessages } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.messages';
-import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section.messages';
+import { userProfileAddAuthenticatorMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-add-authenticator.messages';
+import { userProfileAddSmsMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-add-sms.messages';
+import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-authenticator-setup.messages';
+import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-backup-codes.messages';
+import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-section.messages';
 import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section.messages';
 import { userProfilePasswordSectionMessages } from '../features/user-profile/user-profile-password-section/user-profile-password-section.messages';
+import { userProfileAddPhoneMessages } from '../features/user-profile/user-profile-phone-section/user-profile-add-phone.messages';
+import { userProfileProfileSectionMessages } from '../features/user-profile/user-profile-profile-section/user-profile-profile-section.messages';
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets.messages';
 import { errorMessages } from './errors.messages';
+import { roleMessages } from './roles.messages';
 
 export const mosaicMessages = {
   apiKeysTable: apiKeysTableMessages,
   errors: errorMessages,
+  roles: roleMessages,
   form: formMessages,
   membersTableTab: membersTableTabMessages,
   invitationsTableTab: invitationsTableTabMessages,
@@ -43,22 +44,21 @@ export const mosaicMessages = {
   reverification: reverificationMessages,
   userButton: userButtonMessages,
   userProfile: userProfileMessages,
-  userProfileAccountSection: userProfileAccountSectionMessages,
   userProfileActiveDevices: userProfileActiveDevicesMessages,
   userProfileAddEmail: userProfileAddEmailMessages,
   userProfileAddPhone: userProfileAddPhoneMessages,
-  userProfileVerifyEmailLink: userProfileVerifyEmailLinkMessages,
-  userProfileVerifyEmailSso: userProfileVerifyEmailSsoMessages,
   userProfileAddAuthenticator: userProfileAddAuthenticatorMessages,
   userProfileAddSms: userProfileAddSmsMessages,
   userProfileAuthenticatorSetup: userProfileAuthenticatorSetupMessages,
   userProfileBackupCodes: userProfileBackupCodesMessages,
   userProfileConnectedAccounts: userProfileConnectedAccountsMessages,
+  userProfileContact: userProfileContactMessages,
   userProfileDangerSection: userProfileDangerSectionMessages,
   userProfileEnterpriseAccountsSection: userProfileEnterpriseAccountsMessages,
   userProfileMfa: userProfileMfaMessages,
   userProfilePasskeys: userProfilePasskeysMessages,
   userProfilePasswordSection: userProfilePasswordSectionMessages,
+  userProfileProfileSection: userProfileProfileSectionMessages,
   userProfileWeb3Wallets: userProfileWeb3WalletsMessages,
 };
 

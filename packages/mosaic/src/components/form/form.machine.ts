@@ -120,7 +120,7 @@ function submitOrStay<TValues extends object>(
   if (isValidating(next)) {
     return { context: { ...patch, submitQueued: true } };
   }
-  return { target: 'submitting', context: { ...patch, submitQueued: false, error: undefined } };
+  return { target: 'submitting', context: { ...patch, submitQueued: false } };
 }
 
 function displayableFields<TValues extends object>(
@@ -247,7 +247,10 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
       },
       submitting: {
         invoke: fromPromise(async ctx => ctx.onSubmit(ctx.values), {
-          onDone: 'editing',
+          onDone: {
+            target: 'editing',
+            actions: assign(() => ({ error: undefined })),
+          },
           onError: {
             target: 'editing',
             actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),

@@ -940,8 +940,8 @@ function OrganizationSection() {
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
             placeholder stands in for all of them until the last one is in. */}
-        {showOrganizations &&
-          (data.organizationsLoading ? (
+        {showOrganizations ? (
+          data.organizationsLoading ? (
             <OrganizationListLoadingRow />
           ) : (
             <>
@@ -951,7 +951,8 @@ function OrganizationSection() {
               <PendingRows />
               {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
             </>
-          ))}
+          )
+        ) : null}
         {/* Trails the rows rather than sitting at the foot of the surface: what it offers is one
             more of the organizations above it, not an action on the account. */}
         {actions}

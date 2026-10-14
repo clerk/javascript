@@ -164,6 +164,57 @@ describe('Mosaic Dialog', () => {
   });
 });
 
+describe('shouldCloseOnInteractOutside', () => {
+  function Verify({ shouldCloseOnInteractOutside }: { shouldCloseOnInteractOutside?: boolean }) {
+    return (
+      <Dialog.Root
+        defaultOpen
+        shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
+      >
+        <Dialog.Popup>
+          <Surface title='Verify it is you' />
+        </Dialog.Popup>
+      </Dialog.Root>
+    );
+  }
+
+  it('closes on an outside press by default', async () => {
+    const user = userEvent.setup();
+    render(<Verify />);
+
+    await user.click(document.querySelector('.cl-dialog-backdrop') as HTMLElement);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('stays open on an outside press when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.click(document.querySelector('.cl-dialog-backdrop') as HTMLElement);
+
+    expect(screen.getByRole('dialog', { name: 'Verify it is you' })).toBeInTheDocument();
+  });
+
+  it('still closes on Escape when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('keeps the corner dismiss when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+});
+
 // A `profile` dialog (account profile) opening a `card` dialog (add an email address) is a real
 // shape, so the `FloatingTree` nesting the headless README claims is exercised here rather than
 // assumed. Dismissal must reach the topmost dialog only, and the body must stay locked until the
@@ -547,13 +598,13 @@ describe('compactPlacement', () => {
   // Written out rather than imported: an atom is named from its property, value AND condition, so
   // the probe only yields the popup's own atom if the query string matches `dialog.styles.ts`
   // exactly. A drift here shows up as a failing test rather than as a silently empty assertion.
-  const PHONE = '@container cl-dialog (width < 48rem)';
+  const SHEET = '@media (width < 40rem)';
   const probe = stylex.create({
-    anchored: { alignSelf: { [PHONE]: 'end', default: null } },
-    clipped: { overflow: { [PHONE]: 'clip', default: null } },
+    anchored: { alignSelf: { [SHEET]: 'end', default: null } },
+    clipped: { overflow: { [SHEET]: 'clip', default: null } },
   });
 
-  const renderPlacement = (compactPlacement: 'center' | 'sheet', variant: DialogVariant = 'card') =>
+  const renderPlacement = (compactPlacement: 'center' | 'sheet' | undefined, variant: DialogVariant = 'card') =>
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup
@@ -565,7 +616,13 @@ describe('compactPlacement', () => {
       </Dialog.Root>,
     );
 
-  it('centers by default, anchoring nothing to the bottom edge', () => {
+  it('makes a card a sheet by default', () => {
+    renderPlacement(undefined);
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+  });
+
+  it('centers when asked, anchoring nothing to the bottom edge', () => {
     renderPlacement('center');
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
@@ -586,6 +643,15 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
+    warn.mockRestore();
+  });
+
+  it('keeps a profile centered by default without warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPlacement(undefined, 'profile');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
     warn.mockRestore();
   });
 });

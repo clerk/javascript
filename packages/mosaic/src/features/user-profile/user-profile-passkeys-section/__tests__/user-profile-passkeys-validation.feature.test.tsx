@@ -1,8 +1,9 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { openDialog } from '../../../../__tests__/feature/dialog';
 import { fapiUrl, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
@@ -37,8 +38,8 @@ describe('Validating a passkey name', () => {
     vi.spyOn(passkey, 'update').mockRejectedValue(new Error('Private native failure'));
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.type(input, ' renamed');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Impossible de sauvegarder.'));
@@ -65,8 +66,8 @@ describe('Validating a passkey name', () => {
     );
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.type(input, ' modifié');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(screen.getByText('Ce nom est invalide.')).toBeVisible());
@@ -89,8 +90,8 @@ describe('Validating a passkey name', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     const save = screen.getByRole('button', { name: 'Save' });
     await user.clear(input);
     await user.type(input, '😀'.repeat(65));

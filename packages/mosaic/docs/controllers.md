@@ -12,7 +12,7 @@ where its effects come from.
 Worked examples:
 
 - `packages/mosaic/src/features/user-button/user-button.controller.tsx` — wraps a model
-- `packages/mosaic/src/features/user-profile/user-profile-account-section/user-profile-edit-username.controller.ts`
+- `packages/mosaic/src/features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts`
   — takes its one effect as a prop
 
 See `packages/mosaic/ARCHITECTURE.md` → "Controllers" for the layer contract.
@@ -23,14 +23,14 @@ A controller is not a machine wrapper. It is the layer that owns the
 interaction, and it holds that state in whichever tool the interaction's
 complexity calls for:
 
-| The interaction…                                                              | Hold it in                                                                |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Is a boolean or a controlled value, no async, nothing else depends on it      | `useState`                                                                |
-| Has an async lifecycle, or two values that must change together               | A machine, same file                                                      |
-| Has a coordinated async core plus some UI-only flags beside it                | Both — machine for the core                                               |
-| Is one async action from a button or a row, needing only pending and an error | `usePendingAction`                                                        |
-| Is a form                                                                     | `useForm`                                                                 |
-| Is a confirm step before an action                                            | `useConfirmationController` / `useDestructiveController` with their block |
+| The interaction…                                                              | Hold it in                                                  |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Is a boolean or a controlled value, no async, nothing else depends on it      | `useState`                                                  |
+| Has an async lifecycle, or two values that must change together               | A machine, same file                                        |
+| Has a coordinated async core plus some UI-only flags beside it                | Both — machine for the core                                 |
+| Is one async action from a button or a row, needing only pending and an error | `usePendingAction`                                          |
+| Is a form                                                                     | `useForm`                                                   |
+| Is a confirm step before an action                                            | `useConfirmController` with `Confirmation` or `Destructive` |
 
 Check `packages/mosaic/AGENTS.md` → "Reuse before you write" before holding any
 of this by hand. If nothing there fits, ask the user before adding a new pattern.
@@ -56,17 +56,43 @@ focus. To hold pending through an OAuth redirect, await a delay inside the
 action (`user-profile-connected-accounts-section.controller.ts`). It is not for:
 
 - a form → `useForm`
-- a confirm step → `Confirmation` / `Destructive` and their controllers
+- a confirm step → `useConfirmController` with `Confirmation` / `Destructive`
 - an action whose result drives other state → a machine
 - a check that reruns as the user types → `useDebouncedAsync` (`hooks/`), or a
   form field's `validateAsync`
 
-`useConfirmationController` earns a machine: the confirm is async, and a failure
-must land back on the confirming step with a reason. `useUserButtonController`
-earns one because `open` and `pendingKey` constrain each other and dismissing
-must not abandon an in-flight invoke. `useDestructiveController` is the middle
-ground: its states never overlap, so one `useState` holding a status union is
-enough.
+`useConfirmController` earns a machine: the confirm is async, a failure must land
+back on the confirming step with a reason, and a cancelled reverification must
+close without one. `useUserButtonController` earns one because `open` and
+`pendingKey` constrain each other and dismissing must not abandon an in-flight
+invoke.
+
+`useConfirmController({ onConfirm, reverification, errorFallback })` owns one
+confirm dialog: open, pending, error, and the verify step a reverified action
+swaps in. It is generic over a payload. Create it in the wrapper, pass it to the
+view, and the view hands it to the block as `controller` and opens it from a row
+with `open(payload)`; the copy props read the payload and `onConfirm` receives it.
+A dialog next to its button has no payload and takes the button as `trigger`.
+
+An action Clerk may interrupt for step-up verification goes through
+`useReverificationFlow` first. It reads Clerk hooks, so the wrapper calls it next
+to the model and hands the controller the wrapped action together with the
+`reverification` it returns; the controller passes both on, and the block shows
+the verify step inside the same dialog:
+
+```ts
+// wrapper
+const [revoke, reverification] = useReverificationFlow((id: string) => model.revoke(id));
+const controller = useInvitationsController({ ...model, revoke, reverification });
+
+// controller
+const removalFocus = useListRemovalFocus({ ids, onRemove: revoke, fallback });
+const remove = useConfirmController<Invitation>({
+  onConfirm: invitation => removalFocus.remove(invitation.id),
+  reverification,
+  errorFallback: m.revokeError,
+});
+```
 
 A single open boolean earns nothing. A two-state machine with one event is a
 boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in
@@ -201,6 +227,53 @@ When introducing lazy loading or Suspense, consider a boundary around dialog
 content that leaves the trigger and parent available. Choose that boundary from
 the feature's loading behavior; it does not require restructuring every dialog.
 
+## Removing a row takes focus with it
+
+A dialog returns focus to its trigger on close. When the action removes the row
+that trigger sits on — signing a device out, removing an email — the trigger
+unmounts and focus falls to `<body>`. Nothing catches it: the menu item that
+opened the dialog unmounted with the menu, and a dialog mounted at the section
+rather than inside the menu has no floating-tree ancestor to walk back to. A
+keyboard user loses their place mid-list and a screen reader announces nothing.
+
+Hand focus to a surviving element with `useListRemovalFocus` (`hooks/`). It sits
+in the controller or wrapper, e.g. between the confirm controller and the model call:
+`remove` records which row went, and `finalFocus` picks the row that took its
+place, the last row when it was the last, or `fallback()` once the list is empty.
+The view receives `registerTrigger` and `finalFocus` as props and passes
+`finalFocus` to the block, which resolves it when the dialog closes, after the
+row has gone:
+
+```ts
+const sectionRef = useRef<HTMLDivElement>(null);
+const removalFocus = useListRemovalFocus({
+  ids: methods.map(method => method.id),
+  onRemove,
+  fallback: () => sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
+});
+const remove = useConfirmController<Method>({ onConfirm: method => removalFocus.remove(method.id) });
+
+return { sectionRef, remove, registerTrigger: removalFocus.registerTrigger, finalFocus: removalFocus.finalFocus };
+```
+
+```tsx
+// each row's trigger
+triggerRef={registerTrigger(method.id)}
+
+// the dialog
+<Confirmation controller={remove} finalFocus={finalFocus} … />
+```
+
+A cancelled or failed removal keeps its own trigger, so `finalFocus` returns
+`null` and the dialog's default (the trigger) applies.
+
+Prefer the row that took the removed one's place, the last row when it was the
+last, and a control that outlives the list once it is empty.
+
+Test the removal, not just the cancel: `toHaveFocus()` on the row that should
+have caught it. A suite that only asserts focus after cancelling passes while
+every successful removal drops focus on the floor.
+
 ## Rules
 
 - **No Clerk imports.** If a controller needs a Clerk fact, the model supplies it
@@ -223,8 +296,8 @@ the feature's loading behavior; it does not require restructuring every dialog.
 One path, so every error a user sees goes through the `errors.*` catalog:
 
 - **Owners map, nothing else does.** A failure is owned by one of
-  `usePendingAction` (button and row actions), `useConfirmationController`,
-  `useDestructiveController`, or `useForm` (forms). The first three call
+  `usePendingAction` (button and row actions), `useConfirmController` (confirm
+  dialogs), or `useForm` (forms). The first two call
   `toLocalizableError(cause)` from `utils/errors.ts`. Use one of them instead of
   catching in a feature. A controller with its own machine maps in the machine's
   `onError` (`user-profile-rename-passkey.controller.ts`).

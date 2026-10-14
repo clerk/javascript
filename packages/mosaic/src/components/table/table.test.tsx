@@ -5,6 +5,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { EmptyState } from '../empty-state';
+import { Skeleton } from '../skeleton';
 import { Table } from './table';
 import { styles } from './table.styles';
 
@@ -323,19 +324,22 @@ describe('Mosaic Table', () => {
   });
 
   describe('skeleton', () => {
-    it('hides a skeleton table and turns its cells into placeholders', () => {
+    it('hides a skeleton table and shows the skeletons inside it', () => {
       const { container } = render(
         <Table.Root skeleton>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell skeleton={false}>Actions</Table.HeaderCell>
+              <Table.HeaderCell>
+                <Skeleton>Name</Skeleton>
+              </Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
             <Table.Row>
-              <Table.Cell>Web app</Table.Cell>
-              <Table.Cell skeleton={false}>Menu</Table.Cell>
+              <Table.Cell>
+                <Skeleton>Web app</Skeleton>
+              </Table.Cell>
+              <Table.Cell>Menu</Table.Cell>
             </Table.Row>
           </Table.Body>
         </Table.Root>,
@@ -346,33 +350,35 @@ describe('Mosaic Table', () => {
       expect(shell).toHaveAttribute('inert');
       expect(screen.getByText('Name')).toHaveAttribute('aria-hidden', 'true');
       expect(screen.getByText('Web app')).toHaveAttribute('aria-hidden', 'true');
-      expect(screen.getByText('Actions')).not.toHaveAttribute('aria-hidden');
       expect(screen.getByText('Menu')).not.toHaveAttribute('aria-hidden');
-      expect(container.querySelectorAll('th[data-skeleton], td[data-skeleton]')).toHaveLength(2);
     });
 
-    it('turns only the body into placeholders when the body is a skeleton', () => {
+    it('shows skeletons only in the body when the body is a skeleton', () => {
       const { container } = render(
         <Table.Root>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
+              <Table.HeaderCell>
+                <Skeleton>Name</Skeleton>
+              </Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body skeleton>
             <Table.Row>
-              <Table.Cell>Web app</Table.Cell>
+              <Table.Cell>
+                <Skeleton>Web app</Skeleton>
+              </Table.Cell>
             </Table.Row>
           </Table.Body>
         </Table.Root>,
       );
 
       expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
+      expect(screen.getByText('Name')).not.toHaveAttribute('aria-hidden');
       const body = container.querySelector('tbody');
       expect(body).toHaveAttribute('aria-hidden', 'true');
       expect(body).toHaveAttribute('inert');
       expect(screen.getByText('Web app')).toHaveAttribute('aria-hidden', 'true');
-      expect(screen.getByText('Name')).not.toHaveAttribute('aria-hidden');
     });
   });
 });

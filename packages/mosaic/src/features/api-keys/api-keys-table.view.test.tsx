@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { apiKeysTableMessages, resolveAPIKeysTableMessages } from './api-keys-table.messages';
 import { APIKeysTableSkeleton } from './api-keys-table.skeleton';
 import type { APIKey, APIKeysTableViewProps } from './api-keys-table.types';
-import { APIKeysTableView } from './api-keys-table.view';
+import { APIKeysTableView, placeholderAPIKeys } from './api-keys-table.view';
 
 const messages = resolveAPIKeysTableMessages(apiKeysTableMessages, 'user');
 
@@ -28,6 +28,7 @@ function props(overrides: Partial<APIKeysTableViewProps> = {}): APIKeysTableView
     isLoading: false,
     onPageChange: vi.fn(),
     onSearchChange: vi.fn(),
+    registerTrigger: () => null,
     refetchSkeleton: true,
     ...overrides,
   };
@@ -93,6 +94,27 @@ describe('APIKeysTableView skeleton', () => {
     );
 
     expect(within(screen.getByRole('table')).getByText('Key 1')).toBeInTheDocument();
-    expect(screen.queryByRole('status')).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent(messages.loaded);
+  });
+
+  it('announces the start and the end of loading from the same status message', () => {
+    const view = props({ refetchSkeleton: false });
+    const { rerender } = render(
+      <APIKeysTableView
+        {...view}
+        apiKeys={placeholderAPIKeys(3)}
+        totalCount={3}
+        skeleton
+      />,
+    );
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(messages.loading);
+    expect(screen.queryByRole('table')).toBeNull();
+
+    rerender(<APIKeysTableView {...view} />);
+
+    expect(screen.getByRole('status')).toBe(status);
+    expect(status).toHaveTextContent(messages.loaded);
+    expect(within(screen.getByRole('table')).getByText('Key 1')).toBeInTheDocument();
   });
 });

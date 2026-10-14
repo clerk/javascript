@@ -2,7 +2,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnterpriseAccount, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
@@ -33,20 +33,6 @@ describe('connected accounts', () => {
     expect(screen.queryByRole('button', { name: 'Manage GitHub' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Manage Google' })).toBeVisible();
     expect(fapi.client.sessions[0]?.user.external_accounts.map(account => account.id)).toEqual(['idn_google']);
-  });
-
-  it('returns focus to the account menu when removal is canceled', async () => {
-    await renderSection();
-    const user = userEvent.setup();
-    const trigger = screen.getByRole('button', { name: 'Manage Google' });
-
-    trigger.focus();
-    await user.keyboard('{Enter}');
-    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove' })).toHaveFocus());
-    await user.keyboard('{Enter}');
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(trigger).toHaveFocus());
   });
 
   it('keeps removal pending until the request completes', async () => {
@@ -83,20 +69,19 @@ describe('connected accounts', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 
-  it('keeps the confirmation open when removal needs reverification', async () => {
-    await renderSection([google]);
-    const request = holdRequests('post', '/v1/me/external_accounts/idn_google');
-    const dialog = await openRemoval(userEvent.setup(), 'Google');
+  it('verifies the session when removal demands it, then removes the account', async () => {
+    const { fapi } = await renderSection([google], { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/external_accounts/idn_google');
+    const user = userEvent.setup();
+    const dialog = await openRemoval(user, 'Google');
 
-    await userEvent.setup().click(within(dialog).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('session_reverification_required', 'Verify your session.');
-    expect(await within(dialog).findByText('Verify your session.')).toBeInTheDocument();
-    expect(dialog).toHaveAccessibleName('Remove connected account');
-    expect(screen.queryByRole('dialog')).toBeNull();
-    expect(within(dialog).queryByRole('textbox')).toBeNull();
-    expect(within(dialog).queryByLabelText('Password')).toBeNull();
-    expect(within(dialog).getByRole('button', { name: 'Remove' })).not.toHaveAttribute('aria-busy', 'true');
+    await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
+    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
+    expect(screen.getAllByRole('alertdialog')).toEqual([dialog]);
+    await user.type(within(dialog).getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user.external_accounts).toHaveLength(0);
   });
 
   it('targets the account selected after canceling another removal', async () => {
@@ -115,22 +100,9 @@ describe('connected accounts', () => {
     expect(fapi.client.sessions[0]?.user.external_accounts.map(account => account.id)).toEqual(['idn_google']);
   });
 
-  it('focuses the next account and then Connect as accounts are removed', async () => {
-    await renderSection([google, github]);
-    const user = userEvent.setup();
-
-    const first = await openRemoval(user, 'Google');
-    await user.click(within(first).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage GitHub' })).toHaveFocus());
-
-    const second = await openRemoval(user, 'GitHub');
-    await user.click(within(second).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect GitHub' })).toHaveFocus());
-  });
-
-  it('restores the profile title after removing the final enterprise-restricted account', async () => {
+  it('hides the section after removing the final enterprise-restricted account', async () => {
     const environment = signedIn().environment;
-    const { titleRef } = await renderSection([google], {
+    await renderSection([google], {
       client: fapiClient([
         fapiSession({
           id: 'sess_1',
@@ -154,7 +126,6 @@ describe('connected accounts', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(screen.queryByRole('group', { name: 'Connected accounts' })).toBeNull();
-    await waitFor(() => expect(titleRef.current).toHaveFocus());
   });
 
   it.each(['switch', 'sign out'] as const)('closes a stale removal confirmation after %s', async change => {

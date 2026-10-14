@@ -1,8 +1,11 @@
+import { ActionMenu } from '@clerk/mosaic/components/action-menu';
 import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 import { Section } from '@clerk/mosaic/components/section';
+import { Skeleton } from '@clerk/mosaic/components/skeleton';
+import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useEffect, useState } from 'react';
@@ -580,27 +583,44 @@ export function Loading() {
       >
         Reload
       </Button>
+      <VisuallyHidden role='status'>{loading ? 'Loading active devices' : 'Active devices loaded'}</VisuallyHidden>
       <Section.Root>
         <Section.Group skeleton={loading}>
           <Section.Header>
-            <Section.Title>Active devices</Section.Title>
+            <Section.Title>
+              <Skeleton>Active devices</Skeleton>
+            </Section.Title>
           </Section.Header>
           <Section.Body>
             <Section.Items>
               {loadingItems.map(item => (
                 <Section.Item key={item.label}>
-                  <Section.Media size='lg'>
-                    <IconFrame>
-                      <Icon
-                        name={item.icon}
-                        size='lg'
-                      />
-                    </IconFrame>
-                  </Section.Media>
+                  <Skeleton>
+                    <Section.Media size='lg'>
+                      <IconFrame>
+                        <Icon
+                          name={item.icon}
+                          size='lg'
+                        />
+                      </IconFrame>
+                    </Section.Media>
+                  </Skeleton>
                   <Section.Content>
-                    <Section.Label>{item.label}</Section.Label>
-                    <Section.Description>{item.description}</Section.Description>
+                    <Section.Label>
+                      <Skeleton>{item.label}</Skeleton>
+                    </Section.Label>
+                    <Section.Description>
+                      <Skeleton>{item.description}</Skeleton>
+                    </Section.Description>
                   </Section.Content>
+                  <Section.Actions>
+                    <Skeleton visible={false}>
+                      <ActionMenu
+                        label={`Manage ${item.label}`}
+                        actions={[{ label: 'View details', onClick: () => undefined }]}
+                      />
+                    </Skeleton>
+                  </Section.Actions>
                 </Section.Item>
               ))}
             </Section.Items>

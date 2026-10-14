@@ -23,7 +23,8 @@ describe('Mosaic Icon', () => {
   it.each([
     ['neutral', 'information-circle'],
     ['warning', 'exclamation-circle'],
-    ['negative', 'exclamation-circle'],
+    ['negative', 'x-circle'],
+    ['positive', 'checkmark-circle'],
   ] as const)('applies the canonical %s icon override in a banner', (color, name) => {
     const { getByTestId } = wrap(<Banner.Root color={color}>Notice</Banner.Root>, {
       [name]: <svg data-testid='canonical-icon' />,

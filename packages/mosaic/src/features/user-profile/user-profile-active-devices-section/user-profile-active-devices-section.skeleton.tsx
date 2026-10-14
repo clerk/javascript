@@ -1,4 +1,5 @@
 import type { UserProfileDevice } from './user-profile-active-devices.types';
+import { useUserProfileActiveDevicesController } from './user-profile-active-devices-section.controller';
 import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
 
 const PLACEHOLDER_DEVICES: UserProfileDevice[] = [
@@ -8,10 +9,11 @@ const PLACEHOLDER_DEVICES: UserProfileDevice[] = [
 ];
 
 export function UserProfileActiveDevicesSectionSkeleton() {
+  const controller = useUserProfileActiveDevicesController({ devices: PLACEHOLDER_DEVICES });
   return (
     <UserProfileActiveDevicesSectionView
+      {...controller}
       skeleton
-      devices={PLACEHOLDER_DEVICES}
     />
   );
 }

@@ -16,10 +16,14 @@ const pan = stylex.keyframes({
 });
 
 export const skeletonStyles = stylex.create({
-  bone: {
-    borderRadius: radiusVars['--cl-radius-md'],
-    backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
-    userSelect: 'none',
+  fill: {
+    '::before': {
+      inset: 0,
+      backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
+      content: "''",
+      position: 'absolute',
+      visibility: 'visible',
+    },
   },
   shimmer: {
     overflow: 'hidden',
@@ -37,19 +41,10 @@ export const skeletonStyles = stylex.create({
       content: "''",
       position: 'absolute',
       transform: 'translateX(-100%)',
+      visibility: 'visible',
     },
   },
-  text: {
-    overflow: 'hidden',
-    display: 'block',
-    userSelect: 'none',
-    visibility: 'hidden',
-    whiteSpace: 'nowrap',
-    maxWidth: '100%',
-    width: {
-      default: 'fit-content',
-      ':empty': '12ch',
-    },
+  textBar: {
     '::before': {
       backgroundPosition: '100% 0, 0 0',
       borderRadius: radiusVars['--cl-radius-full'],

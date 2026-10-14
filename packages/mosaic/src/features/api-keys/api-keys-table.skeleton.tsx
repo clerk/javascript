@@ -1,5 +1,7 @@
+import { useConfirmController } from '../../blocks/confirm';
 import { useMessages } from '../../localization';
 import { resolveAPIKeysTableMessages } from './api-keys-table.messages';
+import type { APIKey } from './api-keys-table.types';
 import { APIKeysTableView, placeholderAPIKeys } from './api-keys-table.view';
 
 const PLACEHOLDER_API_KEYS = placeholderAPIKeys(3);
@@ -8,6 +10,7 @@ const noop = () => undefined;
 
 export function APIKeysTableSkeleton() {
   const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), 'user');
+  const revoke = useConfirmController<APIKey>({ onConfirm: () => Promise.resolve() });
 
   return (
     <APIKeysTableView
@@ -21,7 +24,8 @@ export function APIKeysTableSkeleton() {
       onPageChange={noop}
       onSearchChange={noop}
       onCreate={noop}
-      onRevoke={() => Promise.resolve()}
+      registerTrigger={() => null}
+      revoke={revoke}
     />
   );
 }
