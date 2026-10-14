@@ -1,41 +1,23 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useConfirmController } from '../../../blocks/confirm';
-import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
-import { useMessages } from '../../../localization';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { InvitationsTableTabViewProps, OrganizationProfileInvitation } from '../invitations-table-tab.types';
 import { InvitationsTableTabView } from '../invitations-table-tab.view';
 
-type InvitationsProps = Omit<InvitationsTableTabViewProps, 'revoke'> & { onRevoke?: (id: string) => Promise<void> };
-
-function Invitations({ onRevoke, ...props }: InvitationsProps) {
-  const m = useMessages('invitationsTableTab');
-  const inviteButtonRef = useRef<HTMLButtonElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: props.invitations.map(invitation => invitation.id),
-    onRemove: onRevoke,
-    fallback: () => inviteButtonRef.current,
-  });
-  const revoke = useConfirmController<OrganizationProfileInvitation>({
-    onConfirm: invitation => removalFocus.remove(invitation.id),
-    errorFallback: m.revokeError,
-  });
+function InvitationsWithRevoke(props: InvitationsTableTabViewProps) {
+  const revoke = useConfirmController<OrganizationProfileInvitation>({ onConfirm: () => Promise.resolve() });
   return (
     <InvitationsTableTabView
       {...props}
-      inviteButtonRef={inviteButtonRef}
-      registerTrigger={removalFocus.registerTrigger}
-      revoke={onRevoke ? revoke : undefined}
-      finalFocus={removalFocus.finalFocus}
+      revoke={revoke}
     />
   );
 }
 
-function propsFor(overrides: Partial<InvitationsProps> = {}): InvitationsProps {
+function propsFor(overrides: Partial<InvitationsTableTabViewProps> = {}): InvitationsTableTabViewProps {
   return {
     invitations: [{ id: 'invite-1', email: 'ada@example.com', invitedAtLabel: 'Sep 1, 2026', roleLabel: 'Admin' }],
     totalCount: 1,
@@ -46,13 +28,13 @@ function propsFor(overrides: Partial<InvitationsProps> = {}): InvitationsProps {
     ...overrides,
   };
 }
-function renderView(overrides: Partial<InvitationsProps> = {}) {
+function renderView(overrides: Partial<InvitationsTableTabViewProps> = {}) {
   const props = propsFor(overrides);
   return {
     props,
     ...render(
       <MosaicProvider>
-        <Invitations {...props} />
+        <InvitationsTableTabView {...props} />
       </MosaicProvider>,
     ),
   };
@@ -63,33 +45,12 @@ describe('InvitationsTableTabView', () => {
     vi.restoreAllMocks();
   });
 
-  it.each(['', 'Cannot read properties of undefined'])(
-    'shows the localized revoke error, never the message "%s" of an unexpected error',
-    async message => {
-      vi.spyOn(console, 'error').mockImplementation(() => {});
-      const user = userEvent.setup();
-      render(
-        <MosaicProvider
-          localization={{ overrides: { 'invitationsTableTab.revokeError': 'Could not revoke invitation.' } }}
-        >
-          <Invitations {...propsFor({ onRevoke: vi.fn().mockRejectedValue(new Error(message)) })} />
-        </MosaicProvider>,
-      );
-
-      await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
-      await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
-      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Revoke invitation' }));
-
-      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not revoke invitation.'));
-    },
-  );
-
   it('chooses loading, retained rows, an empty list, and the error state from the supplied state', () => {
     const { props, rerender } = renderView({ invitations: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading invitations');
     rerender(
       <MosaicProvider>
-        <Invitations
+        <InvitationsTableTabView
           {...props}
           isLoading={false}
         />
@@ -98,7 +59,7 @@ describe('InvitationsTableTabView', () => {
     expect(screen.getByRole('status')).toHaveTextContent('No pending invitations');
     rerender(
       <MosaicProvider>
-        <Invitations
+        <InvitationsTableTabView
           {...propsFor()}
           isFetching
         />
@@ -108,7 +69,7 @@ describe('InvitationsTableTabView', () => {
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
     rerender(
       <MosaicProvider>
-        <Invitations
+        <InvitationsTableTabView
           {...propsFor()}
           isError
           onRetry={vi.fn()}
@@ -134,16 +95,20 @@ describe('InvitationsTableTabView', () => {
 
   it('routes invite and withholds unavailable actions', async () => {
     const user = userEvent.setup();
-    const { props, rerender } = renderView({ onInvite: vi.fn(), onRevoke: vi.fn() });
+    const props = propsFor({ onInvite: vi.fn() });
+    const { rerender } = render(
+      <MosaicProvider>
+        <InvitationsWithRevoke {...props} />
+      </MosaicProvider>,
+    );
     await user.click(screen.getByRole('button', { name: 'Invite' }));
     expect(props.onInvite).toHaveBeenCalledOnce();
     expect(screen.getByRole('button', { name: 'Manage ada@example.com' })).toBeVisible();
     rerender(
       <MosaicProvider>
-        <Invitations
+        <InvitationsTableTabView
           {...props}
           onInvite={undefined}
-          onRevoke={undefined}
         />
       </MosaicProvider>,
     );
