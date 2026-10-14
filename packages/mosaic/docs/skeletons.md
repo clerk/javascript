@@ -16,8 +16,19 @@ shows bones beside sections that have already loaded, and a table moving to anot
 page turns its rows into bones while its headers and controls stay. Whether a table's
 controls are bones on first load is still open.
 
-Actions (buttons, menus) are not drawn, but their height is held when it outgrows
-the content beside it.
+Actions (buttons, menus) are wrapped like any other content and draw a block the
+size of the control. Use `visible={false}` instead to keep their space without
+drawing them.
+
+## When not to use one
+
+- A single action in flight (a save, a delete) shows a pending button, not a
+  skeleton: `SubmitButton`, with `useSpinDelay` for anything else that spins.
+- No data is not loading. When the fetch returns nothing, render `EmptyState`;
+  never leave a skeleton up as an empty state or as decoration.
+- A skeleton holds no working controls. Wrapped content is hidden, and a skeleton
+  container is `inert`, so anything interactive inside it is unreachable until the
+  content loads.
 
 ## Building one
 
