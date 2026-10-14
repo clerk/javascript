@@ -17,7 +17,8 @@ export type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail, Playwri
 const createClerkClient = (app: Application) => {
   return backendCreateClerkClient({
     apiUrl: app.env.privateVariables.get('CLERK_API_URL'),
-    secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
+    secretKey:
+      app.env.privateVariables.get('CLERK_SECRET_KEY') || app.env.privateVariables.get('CLERK_DYNAMIC_SECRET_KEY'),
     publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
   });
 };
