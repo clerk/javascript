@@ -161,6 +161,39 @@ const [value, setValue] = useState('member');
   storyModule={SelectStories}
 />
 
+### Multiple
+
+`multiple` makes the value a `string[]`. Picking an option adds or removes it and keeps the list
+open, and every selected row shows the check. The trigger lists the selected labels separated by
+commas; pass a function as its children to render the value yourself.
+
+```tsx
+function renderValue(value: string[]) {
+  if (value.length === 0) {
+    return 'Select languages';
+  }
+
+  const firstLanguage = languages.find(language => language.value === value[0])?.label;
+  const additionalLanguages = value.length > 1 ? ` (+${value.length - 1} more)` : '';
+  return `${firstLanguage}${additionalLanguages}`;
+}
+
+<Select.Root
+  items={languages}
+  multiple
+  defaultValue={['javascript', 'typescript']}
+  alignItemWithTrigger={false}
+>
+  <Select.Trigger>{renderValue}</Select.Trigger>
+  <Select.Popup />
+</Select.Root>;
+```
+
+<Story
+  name='Multiple'
+  storyModule={SelectStories}
+/>
+
 ### Scrolling
 
 A list with more options than fit is cut at the viewport edge and scrolled so the selected row still
@@ -179,7 +212,7 @@ with the shared ScrollArea treatment. Nothing to opt into — `Select.Popup` com
 | ---------------- | ------------------------------------ | ----------------------------------------------------------------------------------- |
 | `Select.Root`    | —                                    | State provider; owns the value, the items, open/close, and keyboard nav.            |
 | `Select.Trigger` | `select-trigger`                     | Opens the listbox. Defaults to a neutral `md` `Button`; `variant` picks the chrome. |
-| ↳ value          | `select-value`                       | The selected label, or the placeholder.                                             |
+| ↳ value          | `select-value`                       | The selected labels, or the placeholder.                                            |
 | ↳ icon           | `select-trigger-icon`                | The trailing chevron.                                                               |
 | `Select.Popup`   | `select-positioner` / `select-popup` | Portals, positions, and renders the listbox surface.                                |
 | ↳ viewport       | `select-viewport`                    | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.      |
@@ -187,7 +220,7 @@ with the shared ScrollArea treatment. Nothing to opt into — `Select.Popup` com
 | ↳ content        | `select-option-content`              | Stacks the label over the description.                                              |
 | ↳ label          | `select-option-label`                | The option's text. Truncates to one line.                                           |
 | ↳ description    | `select-option-description`          | The optional second line.                                                           |
-| ↳ indicator      | `select-option-indicator`            | The check. Present on every row, visible on the selected one.                       |
+| ↳ indicator      | `select-option-indicator`            | The check. Present on every row, visible on each selected one.                      |
 
 ## Styling
 

@@ -1,4 +1,10 @@
-export { type SelectItem, type SelectProps, SelectRoot as Root } from './select-root';
+export {
+  type SelectItem,
+  type SelectMultipleProps,
+  type SelectProps,
+  type SelectSingleProps,
+  SelectRoot as Root,
+} from './select-root';
 export { type SelectTriggerProps, SelectTrigger as Trigger } from './select-trigger';
 export { type SelectValueProps, SelectValue as Value } from './select-value';
 export { type SelectPortalProps, SelectPortal as Portal } from './select-portal';

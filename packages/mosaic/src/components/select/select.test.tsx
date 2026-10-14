@@ -13,7 +13,7 @@ const roles = [
   { value: 'member', label: 'Member' },
 ];
 
-function renderSelect(props?: Partial<React.ComponentProps<typeof Select.Root>>) {
+function renderSelect(props?: Partial<Extract<React.ComponentProps<typeof Select.Root>, { multiple?: false }>>) {
   return render(
     <Select.Root
       items={roles}
@@ -134,6 +134,48 @@ describe('Mosaic Select', () => {
     expect(onValueChange).toHaveBeenCalledWith('admin');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Admin');
+  });
+
+  it('toggles options without closing and lists every selected label when multiple', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Select.Root
+        items={roles}
+        multiple
+        defaultValue={['admin']}
+        onValueChange={onValueChange}
+      >
+        <Select.Trigger placeholder='Choose roles' />
+        <Select.Popup />
+      </Select.Root>,
+    );
+
+    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: 'Member' }));
+
+    expect(onValueChange).toHaveBeenCalledWith(['admin', 'member']);
+    expect(screen.getByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveAttribute('data-selected', '');
+    expect(screen.getByRole('option', { name: 'Member' })).toHaveAttribute('data-selected', '');
+    expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Admin, Member');
+  });
+
+  it('renders the value through a function passed as trigger children', () => {
+    render(
+      <Select.Root
+        items={roles}
+        multiple
+        defaultValue={['admin', 'member']}
+      >
+        <Select.Trigger>{value => `${value.length} roles`}</Select.Trigger>
+        <Select.Popup />
+      </Select.Root>,
+    );
+
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.querySelector('.cl-select-value')).toHaveTextContent('2 roles');
+    expect(trigger.querySelector('.cl-select-trigger-icon')).toBeInTheDocument();
   });
 
   it('renders one option per item when the popup is given no children', () => {
