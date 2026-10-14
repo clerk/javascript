@@ -1,4 +1,4 @@
-import { UserButtonView } from '@clerk/mosaic/features/user-button/user-button.view';
+import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
 import type { MosaicCatalog } from '@clerk/mosaic/localization';
 import { fill, plural, rich, useLocale, useMessages } from '@clerk/mosaic/localization';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
@@ -86,7 +86,7 @@ const clerkCloud = {
 function OrganizationUserButton() {
   const [open, setOpen] = useState(false);
   return (
-    <UserButtonView
+    <SwitcherView
       open={open}
       onOpenChange={setOpen}
       activeSession={colin}

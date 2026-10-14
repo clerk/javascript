@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveUserButtonLayout } from '../user-button.layout';
-import type { UserButtonData, UserButtonMode } from '../user-button.types';
+import { resolveSwitcherLayout } from '../switcher.layout';
+import type { SwitcherData, SwitcherMode } from '../switcher.types';
 
 const alice = { sessionId: 'sess_1', name: 'Alice Smith', identifier: 'alice@example.com' };
 const bob = { sessionId: 'sess_2', name: 'Bob Jones', identifier: 'bob@example.com' };
 const foundry = { kind: 'membership', organizationId: 'org_1', name: 'Foundry' } as const;
 
-function resolve(mode: UserButtonMode, data: Partial<UserButtonData> = {}) {
-  return resolveUserButtonLayout(mode, {
+function resolve(mode: SwitcherMode, data: Partial<SwitcherData> = {}) {
+  return resolveSwitcherLayout(mode, {
     activeSession: alice,
     activeOrganization: foundry,
     hasOrganizations: true,
@@ -20,7 +20,7 @@ function resolve(mode: UserButtonMode, data: Partial<UserButtonData> = {}) {
   });
 }
 
-describe('resolveUserButtonLayout, where each action lands', () => {
+describe('resolveSwitcherLayout, where each action lands', () => {
   it('spreads them across all three slots in combined mode', () => {
     expect(resolve('combined').actions).toEqual({
       header: ['inviteMembers', 'manageLead'],
@@ -46,7 +46,7 @@ describe('resolveUserButtonLayout, where each action lands', () => {
   });
 });
 
-describe('resolveUserButtonLayout, what the data settles', () => {
+describe('resolveSwitcherLayout, what the data settles', () => {
   it('leads with the account where no organization is active', () => {
     const layout = resolve('combined', { activeOrganization: null });
 
@@ -58,7 +58,14 @@ describe('resolveUserButtonLayout, what the data settles', () => {
     const layout = resolve('organization', { activeOrganization: null, hidePersonal: true });
 
     expect(layout.lead).toBe('none');
-    expect(layout.actions.header).toEqual(['manageLead']);
+    expect(layout.actions.header).toEqual([]);
+  });
+
+  it('leads with the personal account, managing nothing, where no organization is active in organization mode', () => {
+    const layout = resolve('organization', { activeOrganization: null });
+
+    expect(layout.lead).toBe('personal');
+    expect(layout.actions.header).toEqual([]);
   });
 
   // With no second account the flyout would open onto one row, so the foot offers that row instead.
@@ -70,7 +77,7 @@ describe('resolveUserButtonLayout, what the data settles', () => {
   );
 });
 
-describe('resolveUserButtonLayout, a combined surface', () => {
+describe('resolveSwitcherLayout, a combined surface', () => {
   it('leads with the account inside its active organization, inviting to that organization', () => {
     const layout = resolve('combined');
 
@@ -86,7 +93,7 @@ describe('resolveUserButtonLayout, a combined surface', () => {
   });
 });
 
-describe('resolveUserButtonLayout, how the header carries its actions', () => {
+describe('resolveSwitcherLayout, how the header carries its actions', () => {
   it('stacks them wherever a labelled action joins the gear', () => {
     expect(resolve('combined').headerLayout).toBe('stacked');
     expect(resolve('organization').headerLayout).toBe('stacked');
@@ -94,11 +101,10 @@ describe('resolveUserButtonLayout, how the header carries its actions', () => {
 
   it('runs the gear inline where it is the only action', () => {
     expect(resolve('user').headerLayout).toBe('inline');
-    expect(resolve('organization', { activeOrganization: null, hidePersonal: true }).headerLayout).toBe('inline');
   });
 });
 
-describe('resolveUserButtonLayout, which sections render', () => {
+describe('resolveSwitcherLayout, which sections render', () => {
   it('counts an invitation or a suggestion as something to list', () => {
     const invitation = {
       kind: 'invitation',
