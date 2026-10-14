@@ -10,5 +10,5 @@ test('signing out in the native profile signs out the JS hooks', async ({ host, 
   await host.screenshot('before-sign-out');
   await host.tap(profile.signOut);
   await host.expectSignedOut(20_000);
-  await host.screenshot('signed-out');
+  await host.screenshot('signed-out-from-native');
 });

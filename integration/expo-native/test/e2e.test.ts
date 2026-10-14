@@ -1,6 +1,6 @@
 import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
@@ -183,6 +183,20 @@ describe('parseE2EReport', () => {
       assert.deepEqual(collectScreenshots(report, dir, e2eOutputDir(dir, index)), [{ label: 'auth', path: join(dir, 'screenshots', 'auth.png') }]);
       assert.equal(readFileSync(join(dir, 'screenshots', 'auth.png'), 'utf8'), bytes);
     }
+  });
+});
+
+describe('the screenshot labels of the committed specs', () => {
+  it('are each used once, because a run keeps one screenshot for a label', () => {
+    const features = join(import.meta.dirname, '..', 'specs', 'features');
+    const takenIn = new Map<string, string[]>();
+    for (const file of readdirSync(features, { recursive: true, encoding: 'utf8' }).filter((path) => path.endsWith('.e2e.ts'))) {
+      const source = readFileSync(join(features, file), 'utf8');
+      const labels = [...source.matchAll(/\.screenshot\('([^']+)'\)/g)].map((match) => match[1]!);
+      assert.equal(labels.length, source.split('.screenshot(').length - 1, `${file} takes a screenshot whose label is not a plain string`);
+      for (const label of labels) takenIn.set(label, [...(takenIn.get(label) ?? []), file]);
+    }
+    assert.deepEqual([...takenIn].filter(([, files]) => files.length > 1), []);
   });
 });
 

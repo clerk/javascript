@@ -8,7 +8,7 @@ test('a native password sign-in reaches the JS hooks and survives a relaunch', a
   await signInWithPassword(host, screen, platform, user);
   await host.expectSignedInAs(user, 45_000);
   const session = (await host.app.sessionId.textContent()) ?? '';
-  await host.screenshot('signed-in');
+  await host.screenshot('signed-in-from-native');
 
   await host.launch({ keepStorage: true, landsOn: host.app.signedIn });
   await host.expectSignedInAs(user);
