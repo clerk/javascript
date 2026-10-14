@@ -69,7 +69,7 @@ export default function Page() {
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
 
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     fakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
@@ -88,7 +88,7 @@ export default function Page() {
   });
 
   test('user profile with path routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -103,7 +103,7 @@ export default function Page() {
   });
 
   test('user profile with hash routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -118,7 +118,7 @@ export default function Page() {
   });
 
   test('user profile from user button opens actions correctly', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -145,7 +145,7 @@ export default function Page() {
   });
 
   test('can update user username', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -166,7 +166,7 @@ export default function Page() {
   });
 
   test('update users first and last name', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -190,7 +190,7 @@ export default function Page() {
   });
 
   test('add new email address', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -216,7 +216,7 @@ export default function Page() {
   });
 
   test('add new phone number', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -239,7 +239,7 @@ export default function Page() {
   });
 
   test('add mfa authetiation with phone number', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -266,7 +266,7 @@ export default function Page() {
   });
 
   test('can delete account', async ({ page, context }) => {
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     const delFakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
@@ -278,7 +278,7 @@ export default function Page() {
       phoneNumber: undefined,
     });
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: delFakeUser.email, password: delFakeUser.password });
@@ -313,7 +313,7 @@ export default function Page() {
   });
 
   test('closes the modal after delete', async ({ page, context }) => {
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     const delFakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
@@ -325,7 +325,7 @@ export default function Page() {
       phoneNumber: undefined,
     });
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: delFakeUser.email, password: delFakeUser.password });

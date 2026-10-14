@@ -60,7 +60,7 @@ test.describe('protect check @generic', () => {
   });
 
   test('passes the challenge on sign-up', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     fakeUser = u.services.users.createFakeUser(test);
     const protectCheckSubmit = waitForProtectCheckSubmit(page);
 
@@ -75,7 +75,7 @@ test.describe('protect check @generic', () => {
   });
 
   test('passes the challenge on sign-in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
     const protectCheckSubmit = waitForProtectCheckSubmit(page);
@@ -119,7 +119,7 @@ test.describe('protect check in custom flows @custom', () => {
   });
 
   test('shows the Protect modal on sign-up', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     fakeUser = u.services.users.createFakeUser(test);
     const protectCheckSubmit = waitForProtectCheckSubmit(page);
     const prepareVerification = page.waitForResponse(
@@ -143,7 +143,7 @@ test.describe('protect check in custom flows @custom', () => {
   });
 
   test('shows the Protect modal on sign-in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
     const protectCheckSubmit = waitForProtectCheckSubmit(page);
@@ -165,7 +165,7 @@ test.describe('protect check in custom flows @custom', () => {
   });
 
   test('goes to the SSO provider before the Protect challenge', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     const protectCheckRequests: string[] = [];
     page.on('request', request => {
       if (request.url().includes('/protect_check')) {
@@ -203,7 +203,7 @@ test.describe('protect check in custom flows @custom', () => {
   });
 
   test('returns to sign-up with the error when the challenge fails on the SSO callback', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     fakeUser = u.services.users.createFakeUser(test);
     await blockProtectChallengeScript(page);
 
