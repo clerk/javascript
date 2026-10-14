@@ -731,6 +731,84 @@ describe('revoke', () => {
   });
 });
 
+describe('revokeCurrentDeviceCredential', () => {
+  beforeEach(() => {
+    signInClerkUser();
+  });
+
+  test("revokes this device's credential and deletes the local record", async () => {
+    addLocalCredential();
+
+    const credential = await renderBiometricCredentials().revokeCurrentDeviceCredential();
+
+    expect(clerk.user.__experimental_revokeBiometricCredential).toHaveBeenCalledWith('td_1');
+    expect(biometrics.store.records).toEqual([]);
+    expect(credential).toMatchObject({ id: 'td_1', status: 'revoked', revokedAt: new Date(1_700_000_300_000) });
+  });
+
+  test('resolves null without calling the server when there is no local credential', async () => {
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toBeNull();
+    expect(clerk.user.__experimental_revokeBiometricCredential).not.toHaveBeenCalled();
+  });
+
+  test.each(['active', 'pending'])("never revokes another user's credential when the session is %s", async status => {
+    signInClerkUser(status);
+    addLocalCredential({ id: 'td_other', localKeyId: 'key_other', userId: 'user_other', createdAt: 2 });
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toBeNull();
+    expect(clerk.user.__experimental_revokeBiometricCredential).not.toHaveBeenCalled();
+    expect(biometrics.store.records.map(record => record.id)).toEqual(['td_other']);
+  });
+
+  test("revokes the session user's credential when a newer record belongs to another user", async () => {
+    signInClerkUser('pending');
+    addLocalCredential({ createdAt: 1 });
+    addLocalCredential({ id: 'td_other', localKeyId: 'key_other', userId: 'user_other', createdAt: 2 });
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toMatchObject({ id: 'td_1' });
+    expect(clerk.user.__experimental_revokeBiometricCredential).toHaveBeenCalledExactlyOnceWith('td_1');
+    expect(biometrics.store.records.map(record => record.id)).toEqual(['td_other']);
+  });
+
+  test('revokes when biometrics are no longer available on the device', async () => {
+    addLocalCredential();
+    biometrics.getAvailability.mockResolvedValue({
+      biometryType: 'none',
+      canEvaluateBiometrics: false,
+      canEvaluateDeviceOwner: true,
+      errorCode: 'biometry_not_enrolled',
+      secureKeyStorageAvailable: true,
+    });
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toMatchObject({ id: 'td_1' });
+  });
+
+  test('revokes the server credential when the local key is gone', async () => {
+    addLocalCredential({}, { withKey: false });
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toMatchObject({ id: 'td_1' });
+  });
+
+  test('resolves null and deletes the local record when the server credential is already gone', async () => {
+    addLocalCredential();
+    clerk.user.__experimental_revokeBiometricCredential.mockRejectedValue(apiError('resource_not_found'));
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).resolves.toBeNull();
+    expect(biometrics.store.records).toEqual([]);
+  });
+
+  test('requires an active or pending session', async () => {
+    clerk.instance.session = null;
+    addLocalCredential();
+
+    await expect(renderBiometricCredentials().revokeCurrentDeviceCredential()).rejects.toMatchObject({
+      code: 'E_TRUSTED_DEVICE_REVOCATION_FAILED',
+      message: 'Unable to revoke a biometric credential without an active or pending Clerk session.',
+    });
+    expect(clerk.user.__experimental_revokeBiometricCredential).not.toHaveBeenCalled();
+  });
+});
+
 describe('signIn', () => {
   test('signs the trusted device challenge and returns the completed sign-in', async () => {
     addLocalCredential();

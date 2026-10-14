@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
-import { useRef, useState } from 'react';
+import type { Ref } from 'react';
+import { useState } from 'react';
 
 import { Avatar } from '../../components/avatar';
 import { Button, SubmitButton } from '../../components/button';
@@ -9,126 +10,70 @@ import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { Section } from '../../components/section';
 import { Spinner } from '../../components/spinner';
-import { Table, type TableHeaderCellProps } from '../../components/table';
+import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../hooks/use-pending-action';
+import { useServerDataTable } from '../../hooks/use-server-data-table';
 import { fill, useMessages } from '../../localization';
-import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './requests-table-tab.styles';
-import type {
-  OrganizationProfileRequest,
-  RequestsTableSort,
-  RequestsTableTabViewProps,
-} from './requests-table-tab.types';
+import type { OrganizationProfileRequest, RequestsTableTabViewProps } from './requests-table-tab.types';
 import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (request: OrganizationProfileRequest) => request.id;
 
 export function RequestsTableTabView({
   requests,
+  inviteButtonRef,
+  tableContainerRef,
   onInvite,
+  registerAcceptTrigger,
+  registerDeclineTrigger,
   onAccept,
   onDecline,
   totalCount,
   page,
-  pageSize = 10,
-  searchValue,
-  onSearchChange,
+  pageSize,
   onPageChange,
-  onPageSizeChange,
   onBulkAction,
-  sort,
-  onSortChange,
   isLoading,
   isFetching = false,
+  isError = false,
+  onRetry,
 }: RequestsTableTabViewProps) {
   const m = useMessages('requestsTableTab');
-  const hasActions = Boolean(onAccept || onDecline);
-  const columnCount = 2 + Number(hasActions) + Number(Boolean(onBulkAction));
-  const query = searchValue.trim();
-  const searchInput = useRef<HTMLInputElement>(null);
-  const inviteButton = useRef<HTMLButtonElement>(null);
-  const acceptFocus = useListRemovalFocus({
-    ids: requests.map(getRowId),
-    onRemove: onAccept,
-    fallback: () => inviteButton.current ?? searchInput.current,
-  });
-  const declineFocus = useListRemovalFocus({
-    ids: requests.map(getRowId),
-    onRemove: onDecline,
-    fallback: () => inviteButton.current ?? searchInput.current,
-  });
-  const pagination = { pageIndex: page - 1, pageSize };
-  const table = useDataTable({
+  const { table, pagination } = useServerDataTable({
     data: requests,
     totalCount,
     getRowId,
-    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
-    onSortingChange: onSortChange
-      ? update => {
-          const next = typeof update === 'function' ? update(table.sorting) : update;
-          const active = next[0];
-          table.setRowSelection({});
-          onSortChange(
-            active && (active.id === 'email' || active.id === 'requestedAt')
-              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
-              : null,
-          );
-        }
-      : undefined,
-    pagination,
-    onPaginationChange: update => {
-      const next = typeof update === 'function' ? update(pagination) : update;
-      table.setRowSelection({});
-      if (next.pageSize !== pageSize) {
-        onPageSizeChange?.(next.pageSize);
-      }
-      onPageChange(next.pageIndex + 1);
-    },
-    globalFilter: searchValue,
-    onGlobalFilterChange: update => {
-      table.setRowSelection({});
-      onSearchChange(typeof update === 'function' ? update(searchValue) : update);
-    },
+    sortableColumns: [],
+    page,
+    pageSize,
+    onPageChange,
+    searchValue: '',
+    onSearchChange: () => {},
   });
-  const sortHeader = (column: RequestsTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
-    const active = table.sorting[0];
-    return {
-      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
-      onSort: onSortChange
-        ? () =>
-            table.setSorting(current => {
-              const active = current[0];
-              if (active?.id !== column) {
-                return [{ id: column, desc: false }];
-              }
-              return active.desc ? [] : [{ id: column, desc: true }];
-            })
-        : undefined,
-    };
-  };
+  const hasActions = Boolean(onAccept || onDecline);
+  const columnCount = 2 + Number(hasActions) + Number(Boolean(onBulkAction));
   return (
-    <div {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(tableTabStyles.root))}>
-      <Table.Toolbar>
-        <Table.Search
-          ref={searchInput}
-          label={m.search}
-          clearLabel={m.clearSearch}
-          value={table.globalFilter}
-          onValueChange={table.setGlobalFilter}
-        />
-        {onInvite ? (
+    <div
+      {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(tableTabStyles.root))}
+      ref={tableContainerRef}
+      tabIndex={-1}
+      role='group'
+      aria-label={m.title}
+    >
+      {onInvite ? (
+        <Table.Toolbar>
           <Button
-            ref={inviteButton}
+            ref={inviteButtonRef}
             onClick={onInvite}
           >
             <Icon name='plus' />
             {m.invite}
           </Button>
-        ) : null}
-      </Table.Toolbar>
+        </Table.Toolbar>
+      ) : null}
       <Table.Root
         aria-label={m.title}
         aria-busy={isLoading || isFetching}
@@ -143,8 +88,8 @@ export function RequestsTableTabView({
                 onChange={table.toggleAllRowsSelected}
               />
             ) : null}
-            <Table.HeaderCell {...sortHeader('email')}>{m.email}</Table.HeaderCell>
-            <Table.HeaderCell {...sortHeader('requestedAt')}>{m.requestedAt}</Table.HeaderCell>
+            <Table.HeaderCell>{m.email}</Table.HeaderCell>
+            <Table.HeaderCell>{m.requestedAt}</Table.HeaderCell>
             {hasActions ? (
               <Table.HeaderCell align='end'>
                 <VisuallyHidden>{m.actions}</VisuallyHidden>
@@ -152,109 +97,163 @@ export function RequestsTableTabView({
             ) : null}
           </Table.Row>
         </Table.Header>
-        <Table.Body>
-          {isLoading || (isFetching && table.rows.length === 0) ? (
-            <Table.Empty colSpan={columnCount}>
-              <span role='status'>
-                <Spinner />
-                <VisuallyHidden>{m.loading}</VisuallyHidden>
-              </span>
-            </Table.Empty>
-          ) : table.rows.length === 0 ? (
-            <Table.Empty colSpan={columnCount}>
-              <EmptyState.Root>
-                <EmptyState.Icon name='users' />
-                <EmptyState.Label>{query ? m.empty : m.noRequests}</EmptyState.Label>
-                <EmptyState.Description>
-                  {query ? fill(m.emptyDescription, { query }) : m.noRequestsDescription}
-                </EmptyState.Description>
-              </EmptyState.Root>
-            </Table.Empty>
-          ) : (
-            table.rows.map(row => {
-              const request = row.original;
-              return (
-                <Table.Row
-                  key={request.id}
-                  selected={Boolean(onBulkAction) && row.getIsSelected()}
-                >
-                  {onBulkAction ? (
-                    <Table.SelectCell
-                      aria-label={fill(m.select, { name: request.email })}
-                      checked={row.getIsSelected()}
-                      onToggleSelected={row.toggleSelected}
-                    />
-                  ) : null}
-                  <Table.Cell>
-                    <Item.Root>
-                      <Item.Media>
-                        <Avatar.Root
-                          size='fit'
-                          aria-hidden
-                        >
-                          {request.imageUrl ? (
-                            <Avatar.Image
-                              src={request.imageUrl}
-                              alt=''
-                            />
-                          ) : null}
-                          <Avatar.Fallback />
-                        </Avatar.Root>
-                      </Item.Media>
-                      <Item.Content>
-                        <Item.Label>{request.name ?? request.email}</Item.Label>
-                        {request.name ? <Item.Description>{request.email}</Item.Description> : null}
-                      </Item.Content>
-                    </Item.Root>
-                  </Table.Cell>
-                  <Table.Cell noWrap>{request.requestedAtLabel}</Table.Cell>
-                  {hasActions ? (
-                    <Table.Cell align='end'>
-                      <RequestActions
-                        request={request}
-                        onAccept={
-                          onAccept
-                            ? async () => {
-                                await acceptFocus.remove(request.id);
-                                acceptFocus.finalFocus()?.focus();
-                              }
-                            : undefined
-                        }
-                        onDecline={
-                          onDecline
-                            ? async () => {
-                                await declineFocus.remove(request.id);
-                                declineFocus.finalFocus()?.focus();
-                              }
-                            : undefined
-                        }
-                        registerAcceptTrigger={acceptFocus.registerTrigger}
-                        registerDeclineTrigger={declineFocus.registerTrigger}
-                      />
-                    </Table.Cell>
-                  ) : null}
-                </Table.Row>
-              );
-            })
-          )}
-        </Table.Body>
+        <RequestsTableBody
+          rows={table.rows}
+          columnCount={columnCount}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          isError={isError}
+          onRetry={onRetry}
+          hasActions={hasActions}
+          hasBulkAction={Boolean(onBulkAction)}
+          onAccept={onAccept}
+          onDecline={onDecline}
+          registerAcceptTrigger={registerAcceptTrigger}
+          registerDeclineTrigger={registerDeclineTrigger}
+        />
       </Table.Root>
-      {table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange) ? (
+      {pagination ? (
         <Pagination
-          page={table.pagination.pageIndex + 1}
-          pageSize={table.pagination.pageSize}
-          totalItems={totalCount}
+          {...pagination}
           label={m.pagination}
           pageSizeLabel={m.pageSize}
           previousPageLabel={m.previousPage}
           nextPageLabel={m.nextPage}
-          onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
-          onPageSizeChange={
-            onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
-          }
         />
       ) : null}
     </div>
+  );
+}
+
+function RequestsTableBody({
+  rows,
+  columnCount,
+  isLoading,
+  isFetching,
+  isError,
+  onRetry,
+  hasActions,
+  hasBulkAction,
+  onAccept,
+  onDecline,
+  registerAcceptTrigger,
+  registerDeclineTrigger,
+}: {
+  rows: Array<{
+    id: string;
+    original: OrganizationProfileRequest;
+    getIsSelected: () => boolean;
+    toggleSelected: () => void;
+  }>;
+  columnCount: number;
+  isLoading: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  onRetry?: () => void;
+  hasActions: boolean;
+  hasBulkAction: boolean;
+  onAccept?: RequestsTableTabViewProps['onAccept'];
+  onDecline?: RequestsTableTabViewProps['onDecline'];
+  registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
+}) {
+  const m = useMessages('requestsTableTab');
+  if (isLoading || (isFetching && rows.length === 0)) {
+    return (
+      <Table.Body>
+        <Table.Empty colSpan={columnCount}>
+          <span role='status'>
+            <Spinner />
+            <VisuallyHidden>{m.loading}</VisuallyHidden>
+          </span>
+        </Table.Empty>
+      </Table.Body>
+    );
+  }
+  if (isError) {
+    return (
+      <Table.Body>
+        <Table.Empty colSpan={columnCount}>
+          <EmptyState.Root role='alert'>
+            <EmptyState.Icon name='exclamation-circle' />
+            <EmptyState.Label>{m.loadError}</EmptyState.Label>
+            {onRetry ? (
+              <EmptyState.Actions>
+                <Button onClick={onRetry}>{m.retry}</Button>
+              </EmptyState.Actions>
+            ) : null}
+          </EmptyState.Root>
+        </Table.Empty>
+      </Table.Body>
+    );
+  }
+  if (rows.length === 0) {
+    return (
+      <Table.Body>
+        <Table.Empty colSpan={columnCount}>
+          <EmptyState.Root role='status'>
+            <EmptyState.Icon name='users' />
+            <EmptyState.Label>{m.noRequests}</EmptyState.Label>
+            <EmptyState.Description>{m.noRequestsDescription}</EmptyState.Description>
+          </EmptyState.Root>
+        </Table.Empty>
+      </Table.Body>
+    );
+  }
+  return (
+    <Table.Body>
+      {rows.map(row => {
+        const request = row.original;
+        return (
+          <Table.Row
+            key={request.id}
+            selected={hasBulkAction && row.getIsSelected()}
+          >
+            {hasBulkAction ? (
+              <Table.SelectCell
+                aria-label={fill(m.select, { name: request.email })}
+                checked={row.getIsSelected()}
+                onToggleSelected={row.toggleSelected}
+              />
+            ) : null}
+            <Table.Cell>
+              <Item.Root>
+                <Item.Media>
+                  <Avatar.Root
+                    size='fit'
+                    aria-hidden
+                  >
+                    {request.imageUrl ? (
+                      <Avatar.Image
+                        src={request.imageUrl}
+                        alt=''
+                      />
+                    ) : null}
+                    <Avatar.Fallback />
+                  </Avatar.Root>
+                </Item.Media>
+                <Item.Content>
+                  <Item.Label>{request.name ?? request.email}</Item.Label>
+                  {request.name ? <Item.Description>{request.email}</Item.Description> : null}
+                </Item.Content>
+              </Item.Root>
+            </Table.Cell>
+            <Table.Cell noWrap>{request.requestedAtLabel}</Table.Cell>
+            {hasActions ? (
+              <Table.Cell align='end'>
+                <RequestActions
+                  request={request}
+                  onAccept={onAccept ? () => onAccept(request.id) : undefined}
+                  onDecline={onDecline ? () => onDecline(request.id) : undefined}
+                  registerAcceptTrigger={registerAcceptTrigger}
+                  registerDeclineTrigger={registerDeclineTrigger}
+                />
+              </Table.Cell>
+            ) : null}
+          </Table.Row>
+        );
+      })}
+    </Table.Body>
   );
 }
 
@@ -268,12 +267,12 @@ function RequestActions({
   request: OrganizationProfileRequest;
   onAccept?: () => void | Promise<void>;
   onDecline?: () => void | Promise<void>;
-  registerAcceptTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
-  registerDeclineTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
+  registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('requestsTableTab');
-  const [acceptRef] = useState(() => registerAcceptTrigger(request.id));
-  const [declineRef] = useState(() => registerDeclineTrigger(request.id));
+  const [acceptRef] = useState(() => registerAcceptTrigger?.(request.id));
+  const [declineRef] = useState(() => registerDeclineTrigger?.(request.id));
   const actions = usePendingAction<'accept' | 'decline'>();
   const pendingAction = request.pendingAction ?? actions.pendingKey;
   const decide = (key: 'accept' | 'decline', action: () => void | Promise<void>, errorFallback: string) => {
@@ -296,7 +295,7 @@ function RequestActions({
             variant='outline'
             color='neutral'
             aria-label={fill(m.declineRequest, { name: request.name ?? request.email })}
-            onClick={() => decide('decline', () => onDecline?.(), m.declineError)}
+            onClick={() => decide('decline', onDecline, m.declineError)}
           >
             {m.decline}
           </SubmitButton>
@@ -310,7 +309,7 @@ function RequestActions({
             isPending={pendingAction === 'accept'}
             pendingLabel={m.accepting}
             aria-label={fill(m.acceptRequest, { name: request.name ?? request.email })}
-            onClick={() => decide('accept', () => onAccept?.(), m.acceptError)}
+            onClick={() => decide('accept', onAccept, m.acceptError)}
           >
             {m.accept}
           </SubmitButton>

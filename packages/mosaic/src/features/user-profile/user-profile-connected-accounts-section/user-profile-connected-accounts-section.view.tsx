@@ -1,17 +1,11 @@
-import { useMemo, useRef } from 'react';
-
 import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
-import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import {
   UserProfileConnectedAccountRowView,
   UserProfileConnectProviderRowView,
 } from './user-profile-connected-account-row.view';
-import type {
-  UserProfileConnectedAccount,
-  UserProfileConnectedAccountsSectionViewProps,
-} from './user-profile-connected-accounts-section.types';
+import type { UserProfileConnectedAccountsSectionViewProps } from './user-profile-connected-accounts-section.types';
 
 export type {
   UserProfileConnectedAccount,
@@ -21,25 +15,16 @@ export type {
 
 export function UserProfileConnectedAccountsSectionView({
   accounts,
-  fallbackFocus,
+  sectionRef,
   availableProviders = [],
   pendingId,
   onConnect,
   onReconnect,
-  onRemove,
+  registerTrigger,
+  remove,
+  finalFocus,
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
-  const section = useRef<HTMLDivElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: accounts.map(account => account.id),
-    onRemove,
-    fallback: () =>
-      section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
-      section.current ??
-      fallbackFocus?.() ??
-      null,
-  });
-  const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
   const isBusy = pendingId !== undefined;
 
@@ -48,21 +33,23 @@ export function UserProfileConnectedAccountsSectionView({
       {hasRows ? (
         <Section.Root>
           <Section.Group
-            ref={section}
+            ref={sectionRef}
             tabIndex={-1}
           >
             <Section.Header>
-              <Section.Title>{m.title}</Section.Title>
+              <Section.Content>
+                <Section.Title>{m.title}</Section.Title>
+              </Section.Content>
             </Section.Header>
             <Section.Body>
               {accounts.map(account => (
                 <UserProfileConnectedAccountRowView
                   key={account.id}
                   account={account}
-                  triggerRef={removalFocus.registerTrigger(account.id)}
+                  triggerRef={registerTrigger(account.id)}
                   isDisabled={isBusy}
                   onReconnect={onReconnect}
-                  onRemove={onRemove ? account => removeAccount.open(account) : undefined}
+                  onRemove={remove ? account => remove.open(account) : undefined}
                 />
               ))}
               {onConnect
@@ -80,15 +67,14 @@ export function UserProfileConnectedAccountsSectionView({
           </Section.Group>
         </Section.Root>
       ) : null}
-      {onRemove ? (
+      {remove ? (
         <Confirmation
-          handle={removeAccount}
+          controller={remove}
           title={m.removeDialog.title}
           description={account => fill(m.removeDialog.description, { provider: account.provider })}
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
-          finalFocus={removalFocus.finalFocus}
-          onConfirm={account => removalFocus.remove(account.id)}
+          finalFocus={finalFocus}
         />
       ) : null}
     </>

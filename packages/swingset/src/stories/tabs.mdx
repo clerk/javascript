@@ -4,7 +4,7 @@ import * as TabsStories from './tabs.stories';
 
 A set of layered sections where one panel is shown at a time, selected from a row of tabs.
 It is a **headless** primitive: it supplies behavior, active-tab
-state, roving-tabindex keyboard navigation, an optional position-tracking indicator, and
+state, roving-tabindex keyboard navigation, an optional indicator element, and
 ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the `data-*`
 attributes each part emits.
 
@@ -57,7 +57,7 @@ const [value, setValue] = useState('tab1');
 | `Tabs.Tab`       | `<button>`      | A keyboard-navigable tab trigger inside `Tabs.List`                |
 | `Tabs.Trigger`   | `<button>`      | Standalone tab trigger for use outside `Tabs.List` (not roving)    |
 | `Tabs.Panel`     | `<div>`         | `role="tabpanel"`; hidden via the `hidden` attribute when inactive |
-| `Tabs.Indicator` | `<span>`        | Decorative element that tracks the active tab's position and size  |
+| `Tabs.Indicator` | `<span>`        | Decorative element for the selection (`aria-hidden`)               |
 
 All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
 attributes for their default element. `Tabs.Root` renders no element of its own.
@@ -105,24 +105,27 @@ Each part emits `data-*` attributes you can target with any CSS solution:
 | `data-starting-style` | Panel        | Enter-animation first frame (force-mounted panels only)          |
 | `data-ending-style`   | Panel        | Exit-animation frame (force-mounted panels only)                 |
 
-`Tabs.Indicator` is absolutely positioned and exposes the active tab's geometry as CSS
-variables (give `Tabs.List` `position: relative`):
+`Tabs.Indicator` carries `data-direction`: `forward` when the selection last moved to a later tab,
+`backward` when it moved to an earlier one. Pair it with CSS anchor positioning to place it under
+the selected tab:
 
-| Variable          | Description                             |
-| ----------------- | --------------------------------------- |
-| `--cl-tab-left`   | Active tab left offset relative to list |
-| `--cl-tab-width`  | Active tab width                        |
-| `--cl-tab-top`    | Active tab top offset relative to list  |
-| `--cl-tab-height` | Active tab height                       |
+```css
+.tabs-list {
+  position: relative;
+  anchor-scope: --active-tab;
+}
+.tabs-tab[data-selected] {
+  anchor-name: --active-tab;
+}
+.tabs-indicator {
+  position: absolute;
+  position-anchor: --active-tab;
+  inset-inline: anchor(start) anchor(end);
+  bottom: 0;
+  height: 2px;
+  transition: inset-inline-start 200ms, inset-inline-end 200ms;
+}
+```
 
 A force-mounted `Tabs.Panel` also exposes `--cl-tab-transition-direction` (`1` when moving
 to a later tab, `-1` to an earlier one) for directional slide animations.
-
-```css
-.cl-tabs-indicator {
-  position: absolute;
-  left: var(--cl-tab-left);
-  width: var(--cl-tab-width);
-  transition: left 200ms ease, width 200ms ease;
-}
-```

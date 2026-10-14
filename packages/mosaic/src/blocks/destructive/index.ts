@@ -1,7 +1,2 @@
 export { Destructive } from './destructive';
-export type {
-  DestructiveControlledProps,
-  DestructiveHandle,
-  DestructiveHandleProps,
-  DestructiveProps,
-} from './destructive';
+export type { DestructiveProps } from './destructive';

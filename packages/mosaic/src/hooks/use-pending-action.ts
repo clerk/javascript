@@ -47,7 +47,7 @@ export function usePendingAction<TKey extends string = string>({
       await action();
       return true;
     } catch (cause) {
-      setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback ?? errorFallback });
+      setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
       return false;
     } finally {
       running.current = false;
@@ -59,7 +59,7 @@ export function usePendingAction<TKey extends string = string>({
     run,
     pendingKey,
     isPending: pendingKey !== undefined,
-    error: failure ? errorText(failure.error, failure.errorFallback) : undefined,
+    error: failure ? errorText(failure.error, failure.errorFallback ?? errorFallback) : undefined,
     errorKey: failure?.key,
     reset: () => setFailure(undefined),
   };

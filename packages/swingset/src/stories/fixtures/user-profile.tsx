@@ -1,48 +1,46 @@
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
-import { UserProfileDangerSectionView } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section.view';
-import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
-} from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-contact.types';
+import { UserProfileDangerSectionView } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section.view';
+import { UserProfileEmailSectionView } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.view';
+import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
+import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
+import { UserProfilePhoneSectionView } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.view';
+import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
 
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
-import { usePreviewImage } from './use-preview-image';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
-import { createUserProfileAddEmailFixture } from './user-profile-add-email';
-import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
-import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
-import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
+import { useUserProfileEmailsFixture } from './user-profile-emails';
 import { useUserProfileMfaExample } from './user-profile-mfa-example';
 import { usePasskeysFixture } from './user-profile-passkeys';
+import { useUserProfilePhonesFixture } from './user-profile-phones';
+import { useUserProfileProfileFixture } from './user-profile-profile';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export function UserProfileDangerPreview() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDangerSectionView {...controller} />;
-}
-
-export interface UserProfileFixtureOptions {
-  /** Replaces the default OTP flow, e.g. for a custom dialog example. */
-  onAddEmail?: () => void;
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
 }
 
 const exampleEmails: UserProfileEmail[] = [
   { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
-  { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
+  { id: 'email_2', value: 'preston.booth@gmail.com', isDefault: false, isVerified: true },
 ];
 
 const examplePhones: UserProfilePhone[] = [
@@ -64,12 +62,11 @@ const examplePaymentMethods: UserProfilePaymentMethod[] = [
  * Every page of the user profile, backed by local state so the actions on them do something. For
  * stories that need a realistic profile surface without being about it.
  */
-export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
+export function useUserProfileFixture() {
   const titleRef = useRef<HTMLDivElement>(null);
-  const connections = useConnectedAccountsFixture();
-  const wallets = useWeb3WalletsFixture();
-  const editName = useUserProfileEditNameFixture();
-  const editUsername = useUserProfileEditUsernameFixture();
+  const connections = useConnectedAccountsFixture({ fallbackFocus: () => titleRef.current });
+  const wallets = useWeb3WalletsFixture({ fallbackFocus: () => titleRef.current });
+  const profile = useUserProfileProfileFixture();
   const editPassword = useUserProfileEditPasswordFixture();
   const mfa = useUserProfileMfaExample();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
@@ -83,8 +80,11 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       isDefault: index === 0,
     })),
   );
-  const [emails, setEmails] = useState(seedEmails);
-  const [phones, setPhones] = useState(seedPhones);
+  const emails = useUserProfileEmailsFixture({
+    initialEmails: seedEmails,
+    username: profile.username,
+  });
+  const phones = useUserProfilePhonesFixture({ initialPhones: seedPhones });
   const passkeys = usePasskeysFixture();
   const activeDevices = useUserProfileActiveDevicesFixture();
 
@@ -105,67 +105,21 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const [paymentMethods, setPaymentMethods] = useState<UserProfilePaymentMethod[]>(seedPaymentMethods);
   const [historyPageSize, setHistoryPageSize] = useState(10);
   const apiKeys = useAPIKeysTableFixture();
-  const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
-  const addEmail = (value: string) =>
-    setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
-  const emailFlow = createUserProfileAddEmailFixture({
-    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
-  });
-
   const pages: UserProfileViewProps['pages'] = {
     account: {
-      ...editName,
-      ...editUsername,
       titleRef,
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          {...connections}
-          fallbackFocus={() => titleRef.current}
-        />
-      ),
-      web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
-          {...wallets}
-          fallbackFocus={() => titleRef.current}
-        />
-      ),
-      allowMultipleAccounts: true,
-      hasImage: Boolean(imageUrl),
-      imageUrl,
-      emails,
-      phones,
-      onAddEmail,
-      onSendEmailCode: onAddEmail ? undefined : emailFlow.onSendEmailCode,
-      onVerifyEmailCode: onAddEmail ? undefined : emailFlow.onVerifyEmailCode,
-      ...createUserProfileAddPhoneFixture({
-        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
-      }),
+      profileSlot: <UserProfileProfileSectionView {...profile} />,
+      emailSlot: <UserProfileEmailSectionView {...emails} />,
+      phoneSlot: <UserProfilePhoneSectionView {...phones} />,
+      connectedAccountsSlot: <UserProfileConnectedAccountsSectionView {...connections} />,
+      web3WalletsSlot: <UserProfileWeb3WalletsSectionView {...wallets} />,
       dangerSlot: <UserProfileDangerPreview />,
-      onManageEmail: () => undefined,
-      onManagePhone: () => undefined,
-      onProfilePictureChange: showFile,
-      onRemoveEmail: id => setEmails(current => current.filter(email => email.id !== id)),
-      onRemoveProfilePicture: clearImage,
-      onRemovePhone: id => setPhones(current => current.filter(phone => phone.id !== id)),
-      onSetPrimaryEmail: id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id }))),
-      onSetPrimaryPhone: id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id }))),
-      onVerifyEmail: id =>
-        setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
-      onVerifyPhone: id =>
-        setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      passwordSlot: { content: <UserProfilePasswordSectionView {...editPassword} /> },
-      passkeys: passkeys.passkeys,
-      addPasskeyError: passkeys.addError,
-      onRenamePasskey: passkeys.onRename,
+      passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
+      passkeysSlot: <UserProfilePasskeysSectionView {...passkeys} />,
       ...mfa.security,
-      devices: activeDevices.devices,
-      onAddPasskey: passkeys.onAdd,
-      dangerSlot: <UserProfileDangerPreview />,
-      onRemovePasskey: passkeys.onRemove,
-      onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
-      onSignOutDevice: activeDevices.onSignOutDevice,
+      activeDevicesSlot: <UserProfileActiveDevicesSectionView {...activeDevices} />,
     },
     billing: {
       subscription,
@@ -211,5 +165,5 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
-  return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };
+  return { activePage, setActivePage, pages, devices: activeDevices.devices };
 }

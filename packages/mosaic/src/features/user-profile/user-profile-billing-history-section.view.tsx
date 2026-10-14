@@ -43,7 +43,9 @@ export function UserProfileBillingHistorySectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>History</Section.Title>
+          <Section.Content>
+            <Section.Title>History</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body xstyle={styles.body}>
           {/* TODO: Replace this inline implementation with the Mosaic Table component. */}

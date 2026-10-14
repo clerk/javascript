@@ -1,12 +1,10 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars } from '../../tokens.stylex';
+import { colorVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   addError: {
-    gridColumnEnd: '-1',
-    gridColumnStart: '1',
-    marginTop: 0,
+    marginTop: `calc(-1 * ${space['0.5']})`,
   },
   icon: {
     color: colorVars['--cl-color-foreground-secondary'],

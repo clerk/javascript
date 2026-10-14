@@ -113,6 +113,7 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     return (
       <ConfigureDirectorySyncWizard
         title={<SecurityBackControl onClick={exitToOverview} />}
+        contentRef={contentRef}
         onExit={exitToOverview}
       />
     );

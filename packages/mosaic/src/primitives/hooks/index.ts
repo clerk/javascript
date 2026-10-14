@@ -1,5 +1,5 @@
 export { useAnimationsFinished } from './use-animations-finished';
-export { useDataTable } from './use-data-table';
+export { functionalUpdate, useDataTable } from './use-data-table';
 export type {
   ColumnFiltersState,
   DataTableRow,

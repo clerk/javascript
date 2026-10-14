@@ -10,6 +10,7 @@ import type {
   DialogRole,
 } from '../../primitives/dialog';
 import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
+import type { TriggerPayloadRequirement } from '../../primitives/dialog/dialog-trigger';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
@@ -25,9 +26,11 @@ import {
   trackCompactPlacements,
   trackVariants,
   variants,
+  viewportCompactPlacements,
   viewportVariants,
 } from './dialog.styles';
-import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
+import { acquireKeyboardInset } from './keyboard-inset';
+import { guardKeyboardTouch } from './keyboard-touch';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
@@ -38,7 +41,7 @@ import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
 export type DialogVariant = keyof typeof variants;
 
 /**
- * Where the surface sits in the compact band — the dialog viewport under `48rem`. `center`
+ * Where the surface sits in the compact band — a window under `40rem`. `center`
  * everywhere above it: there is no edge close enough for anchoring to mean anything at those
  * widths.
  */
@@ -72,9 +75,13 @@ export interface DialogContextValue {
    * the one way out an alert must not offer.
    */
   role: DialogRole;
+  /** Whether `Card.Header` renders its dismiss. From `showCloseButton` on the root. */
+  showCloseButton: boolean;
 }
 
 export const DialogContext = React.createContext<DialogContextValue | null>(null);
+
+const ShowCloseButtonContext = React.createContext(true);
 
 /**
  * In a dialog, as opposed to standalone. A surface that can be rendered either way — `Card`,
@@ -103,7 +110,7 @@ export type DialogTriggerProps<Payload = unknown> = MosaicComponentProps<'button
    * children-as-function receives it as `{ payload }`.
    */
   payload?: Payload;
-};
+} & TriggerPayloadRequirement<Payload>;
 export type DialogCloseProps = MosaicComponentProps<'button'>;
 export interface DialogCloseButtonProps extends MosaicComponentProps<'button'> {
   /**
@@ -116,13 +123,16 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
   /** Which surface the dialog holds, and so the geometry it takes. @default 'card' */
   variant?: DialogVariant;
   /**
-   * Bottom-anchors the surface in the compact band — the dialog viewport under `48rem` — and
-   * slides it up as a sheet, instead of centering it. For a dialog that asks one thing and returns
-   * — a confirmation, a single-field form — where the answer belongs within thumb's reach.
-   * `card` only. @default 'center'
+   * Where the surface sits in the compact band — a window under `40rem`. `sheet` bottom-anchors it
+   * flush to the sides and bottom edge and slides it up, so the answer sits within thumb's reach;
+   * `center` keeps it centered, for a dialog that only shows something. `card` only.
+   * @default 'sheet'
    */
   compactPlacement?: DialogCompactPlacement;
-  /** Where focus moves when the dialog opens. Default: the first tabbable element inside it. */
+  /**
+   * Where focus moves when the dialog opens. Default: the first tabbable element inside it. A ref to a
+   * text field is focused within the opening tap, so on iOS the keyboard opens with the dialog.
+   */
   initialFocus?: DialogFocusTarget;
   /** Where focus returns when the dialog closes. Default: the trigger. */
   finalFocus?: DialogFocusTarget;
@@ -131,32 +141,55 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
 type DialogRootBaseProps<Payload> = Omit<HeadlessDialogProps<Payload>, 'role' | 'closedBy'>;
 
 /**
- * `role` is the whole dismissal API: it decides how the dialog announces itself AND what closes it,
- * with no prop to contradict either.
+ * `role` decides how the dialog announces itself; `shouldCloseOnInteractOutside` decides whether
+ * an outside press closes it; `showCloseButton` decides whether the surface renders its dismiss.
+ * Escape always closes.
  *
  * - `alertdialog` announces as an interruption rather than as a surface the user navigated to, and
- *   cannot be dismissed by an outside press. A dialog asking a question it needs an answer to must
- *   not be answerable by clicking next to it. Escape still closes, which is the keyboard's
- *   equivalent of the cancel button that is always present;
- * - `dialog` dismisses on an outside press as well.
+ *   never closes on an outside press. A dialog asking a question it needs an answer to must not be
+ *   answerable by clicking next to it. Escape is the keyboard's equivalent of the cancel button
+ *   that is always present;
+ * - `dialog` closes on an outside press unless `shouldCloseOnInteractOutside` is `false`, for a
+ *   task an accidental press would throw away, such as entering a verification code.
  *
  * It says nothing about the variant: an alert is a `Card` like every other dialog.
  */
-export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> & {
-  /** The popup's ARIA role, and with it what dismisses the dialog. @default 'dialog' */
-  role?: DialogRole;
-};
+export type DialogRootProps<Payload = unknown> = DialogRootBaseProps<Payload> &
+  (
+    | {
+        /** The popup's ARIA role. @default 'dialog' */
+        role?: 'dialog';
+        /** Whether an outside press closes the dialog. @default true */
+        shouldCloseOnInteractOutside?: boolean;
+        /** Whether the surface renders its dismiss. @default true */
+        showCloseButton?: boolean;
+      }
+    | {
+        role: 'alertdialog';
+        shouldCloseOnInteractOutside?: false;
+        /** Whether the surface renders its dismiss, for a step past the question. @default false */
+        showCloseButton?: boolean;
+      }
+  );
 
 /** Owns the open state and the decisions — role, dismissal — every part reads. */
-function Root<Payload = unknown>({ role = 'dialog', children, ...rest }: DialogRootProps<Payload>) {
+function Root<Payload = unknown>({
+  role = 'dialog',
+  shouldCloseOnInteractOutside = role === 'dialog',
+  showCloseButton = role === 'dialog',
+  children,
+  ...rest
+}: DialogRootProps<Payload>) {
   return (
-    <Primitive.Root<Payload>
-      {...rest}
-      role={role}
-      closedBy={role === 'alertdialog' ? 'closerequest' : 'any'}
-    >
-      {children}
-    </Primitive.Root>
+    <ShowCloseButtonContext.Provider value={showCloseButton}>
+      <Primitive.Root<Payload>
+        {...rest}
+        role={role}
+        closedBy={shouldCloseOnInteractOutside ? 'any' : 'closerequest'}
+      >
+        {children}
+      </Primitive.Root>
+    </ShowCloseButtonContext.Provider>
   );
 }
 
@@ -186,8 +219,8 @@ const Close = React.forwardRef<HTMLButtonElement, DialogCloseProps>(function Dia
 });
 
 /**
- * Warns when the corner dismiss is rendered inside an alert dialog, where a corner X is a way out
- * without answering the question.
+ * Warns when the corner dismiss is rendered inside an alert dialog that has not opted in with
+ * `showCloseButton`, where a corner X is a way out without answering the question.
  */
 function useCloseButtonWarning(isAlert: boolean) {
   React.useEffect(() => {
@@ -214,9 +247,10 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
   ref,
 ) {
   const surface = React.useContext(DialogContext);
+  const showCloseButton = React.useContext(ShowCloseButtonContext);
   const { role } = useHeadlessDialogContext();
   const variant = surface?.variant ?? 'card';
-  useCloseButtonWarning(role === 'alertdialog');
+  useCloseButtonWarning(role === 'alertdialog' && !showCloseButton);
   return (
     <span {...stylex.props(styles.closeButton, closeInsets[variant])}>
       <Primitive.Close
@@ -272,14 +306,21 @@ function Viewport({
   compactPlacement: DialogCompactPlacement;
   children: React.ReactNode;
 }) {
+  const trackRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => acquireKeyboardInset(), []);
+  React.useEffect(() => (trackRef.current ? guardKeyboardTouch(trackRef.current) : undefined), []);
   return (
     <Primitive.Viewport
       overlay
       lockScroll
       {...mergeStyleProps(
         themeProps('dialog-viewport', { variant }),
-        stylex.props(reset.base, styles.viewport, viewportVariants[variant]),
+        stylex.props(
+          reset.base,
+          styles.viewport,
+          viewportVariants[variant],
+          viewportCompactPlacements[compactPlacement],
+        ),
       )}
     >
       <div
@@ -287,7 +328,7 @@ function Viewport({
           themeProps('dialog-track', { variant }),
           stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
-        onTouchEnd={focusWithoutScroll}
+        ref={trackRef}
       >
         {children}
       </div>
@@ -320,9 +361,14 @@ function useNestedVariantWarning(isNestedInDialog: boolean, variant: DialogVaria
  * A profile already fills the compact band — it is the page there, not a surface over one — so
  * there is no room for it to be anchored anywhere else.
  */
-function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCompactPlacement) {
+function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCompactPlacement | undefined) {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || variant !== 'profile' || placement === 'center') {
+    if (
+      process.env.NODE_ENV === 'production' ||
+      variant !== 'profile' ||
+      placement === undefined ||
+      placement === 'center'
+    ) {
       return;
     }
     console.warn(
@@ -337,7 +383,7 @@ function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCom
  * part a consumer composes, so they stay out of the public API.
  */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
-  { variant = 'card', compactPlacement: compactPlacementProp = 'center', initialFocus, finalFocus, xstyle, ...rest },
+  { variant = 'card', compactPlacement: compactPlacementProp, initialFocus, finalFocus, xstyle, ...rest },
   ref,
 ) {
   // The dialog this one renders inside, read before this popup publishes its own.
@@ -345,15 +391,16 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   // The headless flag, not the stack check below — the variant rule is about opening a dialog inside
   // ANY dialog, which is broader than the card-on-card case the stacking styles cover.
   const { role, isStacked: isNestedInDialog, labelId, descriptionId } = useHeadlessDialogContext();
+  const showCloseButton = React.useContext(ShowCloseButtonContext);
   const isAlert = role === 'alertdialog';
   // A profile has its own compact-band treatment and takes no placement; the warning says so.
-  const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : compactPlacementProp;
+  const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : (compactPlacementProp ?? 'sheet');
   useCompactPlacementWarning(variant, compactPlacementProp);
   useNestedVariantWarning(isNestedInDialog, variant);
 
   const surface = React.useMemo(
-    () => ({ labelId, descriptionId, variant, role }),
-    [labelId, descriptionId, variant, role],
+    () => ({ labelId, descriptionId, variant, role, showCloseButton }),
+    [labelId, descriptionId, variant, role, showCloseButton],
   );
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.
@@ -449,8 +496,8 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
  *
  * `Dialog.Popup` renders the portal, the scrim and the centering viewport itself, so those are
  * not parts. `role='alertdialog'` on the root makes it an alert dialog — one that interrupts to
- * ask for a decision and waits for one. `compactPlacement='sheet'` bottom-anchors it in the
- * compact band.
+ * ask for a decision and waits for one. In the compact band a card is a bottom sheet unless
+ * `compactPlacement='center'`.
  *
  * Each styled part spreads `themeProps` + `stylex.props` through `mergeStyleProps`, so it
  * carries the public `.cl-<slot>` class and StyleX atoms while the headless part keeps its focus
