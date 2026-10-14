@@ -248,6 +248,10 @@ describe('the workflows and the native build store', () => {
     assert.ok(fetch.includes('run: integration/expo-native/bin/fetch-native-build.sh'));
   });
 
+  it('fetches on both platforms whenever the session has a device', () => {
+    assert.deepEqual(fetch.match(/^ {8}if: .*$/gm), ["        if: needs.plan.outputs.device != ''"]);
+  });
+
   it('fetches before the session agent starts, into the cache the session build reads, under the app name the build looks for', () => {
     assert.ok(at('id: kept') > 0 && at('id: kept') < at('- name: Start the session agent and tunnel'));
     assert.ok(session.includes('\n      VERIFY_NATIVE_CACHE: integration/expo-native/.verify/native\n'));
