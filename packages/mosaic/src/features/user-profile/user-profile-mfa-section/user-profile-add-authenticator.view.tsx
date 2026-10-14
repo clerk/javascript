@@ -121,7 +121,7 @@ export function UserProfileAddAuthenticatorView({
           form={setup ? formId : undefined}
           fullWidth
           isPending={setup ? isPending : !setupErrorMessage}
-          disabled={setup ? code.length !== 6 : false}
+          disabled={Boolean(setup) && code.length !== 6}
           focusableWhenDisabled
           pendingLabel={setup ? m.pending : m.preparing}
           onClick={setup ? undefined : onRetry}

@@ -23,7 +23,7 @@ export function UserProfileEnterpriseAccountRowView({
   const m = useMessages('userProfileEnterpriseAccountsSection');
   const iconUrl = account.iconUrl?.trim();
   return (
-    <Section.Row xstyle={onConnect ? styles.connectRow : undefined}>
+    <Section.Row xstyle={onConnect && styles.connectRow}>
       <Section.Item>
         <Section.Media size='lg'>
           <IconFrame>

@@ -74,7 +74,7 @@ const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(function Mo
   return (
     <Primitive.Input
       ref={ref}
-      required={required ? value.length === 0 : required}
+      required={required && value.length === 0}
       aria-required={required || undefined}
       {...itemProps}
       {...mergeStyleProps(themeProps('tag-input-input'), stylex.props(reset.base, styles.input), rest)}

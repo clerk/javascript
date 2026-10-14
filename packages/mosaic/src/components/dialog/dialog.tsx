@@ -459,7 +459,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
         // A card stacked on a card paints no scrim of its own — one serves the whole stack.
         // Decided here rather than keyed on `data-stacked`, because whether this is a stack
         // depends on the variant of the dialog beneath, which the headless layer has no notion of.
-        stacked={isNestedInDialog ? host?.variant === 'card' : false}
+        stacked={isNestedInDialog && host?.variant === 'card'}
       />
       {popup}
     </Viewport>

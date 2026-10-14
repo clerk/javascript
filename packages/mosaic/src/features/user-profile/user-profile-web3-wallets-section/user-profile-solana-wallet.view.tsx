@@ -56,7 +56,7 @@ export function UserProfileSolanaWalletView({
                 color='neutral'
                 fullWidth
                 isPending={pendingWalletName === wallet.name}
-                disabled={pending ? pendingWalletName !== wallet.name : false}
+                disabled={pending && pendingWalletName !== wallet.name}
                 onClick={() => onConnect(wallet.name)}
               >
                 {wallet.icon ? (
