@@ -12,7 +12,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
@@ -23,7 +23,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
     });
 
     test('does not fetch ui.browser.js from an external URL', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const externalUiRequests: string[] = [];
 
       page.on('request', request => {
@@ -41,7 +41,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
     });
 
     test('Clerk client loads and renders sign-in/sign-up buttons on home page', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToAppHome();
       await u.page.waitForClerkJsLoaded();
       await u.po.expect.toBeSignedOut();
@@ -51,26 +51,26 @@ testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
     });
 
     test('SignIn component renders on /sign-in page', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
     });
 
     test('SignUp component renders on /sign-up page', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signUp.goTo();
       await u.po.signUp.waitForMounted();
     });
 
     test('can sign in with email and password', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
     });
 
     test('UserButton renders after sign in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
@@ -81,7 +81,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
     });
 
     test('can sign out through user button', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
@@ -95,7 +95,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
     });
 
     test('themes page renders SignIn components with all themes', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/themes');
       await u.page.waitForClerkJsLoaded();
 

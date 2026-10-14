@@ -12,7 +12,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
@@ -27,13 +27,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test.afterEach(async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.signOut();
       await u.page.context().clearCookies();
     });
 
     test('sign in using custom flow', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/custom-sign-in');
 
       await u.page.getByTestId('emailAddress-input').fill(fakeUser.email);
@@ -53,7 +53,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test('sign up using custom flow and also delete user', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const fakeSignUpUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,

@@ -1,15 +1,18 @@
 import { useRef, useState } from 'react';
 
+import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
-import type { UserProfileMfaMethod } from './user-profile-mfa-section.types';
+import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 
 export function useUserProfileMfaSectionLeafController({
   methods,
+  onAdd,
   onRemove,
   onSetDefault,
+  reverification,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -18,6 +21,10 @@ export function useUserProfileMfaSectionLeafController({
     onRemove,
     fallback: () =>
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? sectionRef.current,
+  });
+  const remove = useConfirmController<UserProfileMfaMethod>({
+    onConfirm: method => removalFocus.remove(method.id),
+    reverification,
   });
   const [pickerOpen, setPickerOpen] = useState(false);
   const defaultAction = usePendingAction<'default'>({ errorFallback: m.setDefaultError });
@@ -34,19 +41,23 @@ export function useUserProfileMfaSectionLeafController({
     sectionRef,
     pickerOpen,
     onPickerOpenChange: setPickerOpen,
-    closePicker: () => setPickerOpen(false),
+    addMethod: onAdd
+      ? (type: UserProfileMfaAddableMethod) => {
+          onAdd(type);
+          setPickerOpen(false);
+        }
+      : undefined,
     registerTrigger: removalFocus.registerTrigger,
-    openRemoval: (open: () => void) => {
+    openRemoval: (method: UserProfileMfaMethod) => {
       if (defaultAction.isPending) {
         return;
       }
       defaultAction.reset();
-      open();
+      remove.open(method);
     },
-    confirmRemoval: (method: UserProfileMfaMethod) => removalFocus.remove(method.id),
+    remove: onRemove ? remove : undefined,
     finalRemovalFocus: removalFocus.finalFocus,
-    isSettingDefault: defaultAction.isPending,
     defaultError: defaultAction.error,
-    setDefault,
+    setDefault: onSetDefault && !defaultAction.isPending ? setDefault : undefined,
   };
 }

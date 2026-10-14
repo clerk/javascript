@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices.types';
+import { useUserProfileActiveDevicesController } from '../user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 
 const current: UserProfileDevice = {
@@ -26,13 +27,20 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+function ActiveDevices({ devices, revokeAll }: { devices: UserProfileDevice[]; revokeAll: () => Promise<void> }) {
+  const controller = useUserProfileActiveDevicesController({ devices, revokeAll });
+  return <UserProfileActiveDevicesSectionView {...controller} />;
+}
+
 describe('signing out of all other devices', () => {
   function renderAll(onSignOutAllOtherDevices: () => void | Promise<void>, devices = [current, mobile]) {
     return render(
       <MosaicProvider>
-        <UserProfileActiveDevicesSectionView
+        <ActiveDevices
           devices={devices}
-          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
+          revokeAll={async () => {
+            await onSignOutAllOtherDevices();
+          }}
         />
       </MosaicProvider>,
     );
@@ -106,5 +114,37 @@ describe('signing out of all other devices', () => {
       await signOutAll.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+});
+
+describe('loading', () => {
+  function Section({ skeleton }: { skeleton: boolean }) {
+    const controller = useUserProfileActiveDevicesController({ devices: [current, mobile] });
+    return (
+      <UserProfileActiveDevicesSectionView
+        {...controller}
+        skeleton={skeleton}
+      />
+    );
+  }
+
+  it('announces the start and the end of loading from the same status message', () => {
+    const { rerender } = render(
+      <MosaicProvider>
+        <Section skeleton />
+      </MosaicProvider>,
+    );
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('Loading active devices');
+    expect(screen.queryByRole('button', { name: 'Manage Safari on iOS' })).not.toBeInTheDocument();
+
+    rerender(
+      <MosaicProvider>
+        <Section skeleton={false} />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('status')).toBe(status);
+    expect(status).toHaveTextContent('Active devices loaded');
+    expect(screen.getByRole('button', { name: 'Manage Safari on iOS' })).toBeInTheDocument();
   });
 });

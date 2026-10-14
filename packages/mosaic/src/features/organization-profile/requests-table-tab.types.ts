@@ -1,4 +1,4 @@
-import type { MouseEventHandler } from 'react';
+import type { MouseEventHandler, Ref } from 'react';
 
 export interface OrganizationProfileRequest {
   id: string;
@@ -19,7 +19,11 @@ export interface RequestsTableTabViewProps {
   isError?: boolean;
   onRetry?: () => void;
   onPageChange: (page: number) => void;
+  inviteButtonRef?: Ref<HTMLButtonElement>;
+  tableContainerRef?: Ref<HTMLDivElement>;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
+  registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
+  registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
   onAccept?: (id: string) => void | Promise<void>;
   onDecline?: (id: string) => void | Promise<void>;
   onBulkAction?: (ids: string[]) => void;

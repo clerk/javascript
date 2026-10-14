@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { useReverificationFlow } from '../../reverification';
 import { useUserProfileActiveDevicesController } from './user-profile-active-devices-section.controller';
 import type { UserProfileActiveDevicesModel } from './user-profile-active-devices-section.model';
 import { useUserProfileActiveDevicesModel } from './user-profile-active-devices-section.model';
@@ -22,6 +23,7 @@ export function UserProfileActiveDevicesSection({ fallback = null }: { fallback?
 }
 
 function ActiveDevices({ model }: { model: Extract<UserProfileActiveDevicesModel, { status: 'ready' }> }) {
-  const controller = useUserProfileActiveDevicesController(model);
+  const [revoke, reverification] = useReverificationFlow(model.revoke);
+  const controller = useUserProfileActiveDevicesController({ devices: model.devices, revoke, reverification });
   return <UserProfileActiveDevicesSectionView {...controller} />;
 }
