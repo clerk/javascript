@@ -1,33 +1,35 @@
-import { useConfirmationController } from '../../../blocks/confirmation/confirmation.controller';
+import type { ConfirmController } from '../../../blocks/confirm';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { DataList } from '../../../components/data-list';
-import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
+import type { DialogFocusTarget } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
+import { Flow } from '../../../components/flow';
+import { Reverification } from '../../../features/reverification';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 export interface UserProfileDeviceDetailsDialogProps {
-  handle: DialogHandle<UserProfileDevice>;
+  controller: ConfirmController<UserProfileDevice>;
   devices: UserProfileDevice[];
   finalFocus?: DialogFocusTarget;
-  onSignOut?: (device: UserProfileDevice) => void | Promise<void>;
+  onSignOut?: (device: UserProfileDevice) => void;
 }
 
 export function UserProfileDeviceDetailsDialog({
-  handle,
+  controller,
   devices,
   finalFocus,
   onSignOut,
 }: UserProfileDeviceDetailsDialogProps) {
-  const m = useMessages('userProfileActiveDevices');
-  const controller = useConfirmationController({ errorFallback: m.detailsDialog.signOutError });
-
+  const { reverification, step } = controller;
   return (
     <Dialog.Root
-      handle={handle}
+      handle={controller.handle}
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
+      shouldCloseOnInteractOutside={step !== 'verify'}
+      showCloseButton={step !== 'verify' || controller.canClose}
     >
       {({ payload }) => {
         if (payload === undefined) {
@@ -35,6 +37,14 @@ export function UserProfileDeviceDetailsDialog({
         }
 
         const device = devices.find(candidate => candidate.id === payload.id) ?? payload;
+        const details = (
+          <DeviceDetails
+            device={device}
+            onSignOut={onSignOut ? () => onSignOut(device) : undefined}
+            isSigningOut={controller.isPending}
+            errorMessage={controller.errorMessage}
+          />
+        );
 
         return (
           <Dialog.Popup
@@ -42,12 +52,32 @@ export function UserProfileDeviceDetailsDialog({
             compactPlacement='center'
             finalFocus={finalFocus}
           >
-            <DeviceDetailsCard
-              device={device}
-              onSignOut={onSignOut ? device => controller.onConfirm(async () => onSignOut(device)) : undefined}
-              isSigningOut={controller.isConfirming}
-              errorMessage={controller.errorMessage}
-            />
+            <Card.Root
+              elevation='overlay'
+              renderBranding={false}
+            >
+              {reverification ? (
+                <Flow.Root
+                  value={step}
+                  direction={step === 'verify' ? 1 : -1}
+                  state={step}
+                >
+                  {() => (
+                    <>
+                      <Flow.Step ids={['confirm']}>{details}</Flow.Step>
+                      <Flow.Step ids={['verify']}>
+                        <Reverification
+                          {...reverification}
+                          onClose={() => controller.onOpenChange(false)}
+                        />
+                      </Flow.Step>
+                    </>
+                  )}
+                </Flow.Root>
+              ) : (
+                details
+              )}
+            </Card.Root>
           </Dialog.Popup>
         );
       }}
@@ -55,14 +85,14 @@ export function UserProfileDeviceDetailsDialog({
   );
 }
 
-function DeviceDetailsCard({
+function DeviceDetails({
   device,
   onSignOut,
   isSigningOut,
   errorMessage,
 }: {
   device: UserProfileDevice;
-  onSignOut?: (device: UserProfileDevice) => void;
+  onSignOut?: () => void;
   isSigningOut: boolean;
   errorMessage: string | undefined;
 }) {
@@ -77,10 +107,7 @@ function DeviceDetailsCard({
   const details = fields.filter((field): field is { label: string; value: string } => Boolean(field.value));
 
   return (
-    <Card.Root
-      elevation='overlay'
-      renderBranding={false}
-    >
+    <>
       <Card.Header>
         <Card.Title>{device.name}</Card.Title>
         {device.lastActive ? (
@@ -111,7 +138,7 @@ function DeviceDetailsCard({
             type='button'
             fullWidth
             isPending={isSigningOut}
-            onClick={() => onSignOut(device)}
+            onClick={onSignOut}
           >
             {m.detailsDialog.signOut}
           </SubmitButton>
@@ -129,6 +156,6 @@ function DeviceDetailsCard({
           </Dialog.Close>
         )}
       </Card.Footer>
-    </Card.Root>
+    </>
   );
 }

@@ -4,16 +4,38 @@ import userEvent from '@testing-library/user-event';
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
+import { useConfirmController } from '../../../blocks/confirm';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+import { useUserProfileWeb3WalletsController } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
+import type { UserProfileWeb3Wallet } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 
+function Web3Wallets({
+  wallets,
+  fallbackFocus,
+  onRemove,
+}: {
+  wallets: UserProfileWeb3Wallet[];
+  fallbackFocus: () => HTMLElement | null;
+  onRemove: (id: string) => Promise<void>;
+}) {
+  const controller = useUserProfileWeb3WalletsController({
+    wallets,
+    availableProviders: [],
+    connect: () => Promise.resolve(),
+    setPrimary: () => Promise.resolve(),
+    remove: onRemove,
+    fallbackFocus,
+  });
+  return <UserProfileWeb3WalletsSectionView {...controller} />;
+}
+
 function DeleteAccount() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDangerSectionView {...controller} />;
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
 }
 
 function renderView(overrides: UserProfileProfilePanelViewProps = {}) {
@@ -58,7 +80,7 @@ describe('UserProfileProfilePanelView', () => {
     const { rerender } = renderView({
       titleRef,
       web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
+        <Web3Wallets
           wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
           fallbackFocus={() => titleRef.current}
           onRemove={onRemoveWeb3Wallet}
@@ -73,7 +95,7 @@ describe('UserProfileProfilePanelView', () => {
         <UserProfileProfilePanelView
           titleRef={titleRef}
           web3WalletsSlot={
-            <UserProfileWeb3WalletsSectionView
+            <Web3Wallets
               wallets={[]}
               fallbackFocus={() => titleRef.current}
               onRemove={onRemoveWeb3Wallet}
@@ -107,6 +129,7 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       web3WalletsSlot: (
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
         />
       ),
@@ -125,6 +148,7 @@ describe('UserProfileProfilePanelView', () => {
     const { container } = renderView({
       web3WalletsSlot: (
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[
             { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
           ]}
@@ -144,6 +168,7 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       web3WalletsSlot: (
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[
             {
               id: 'primary',
@@ -163,7 +188,6 @@ describe('UserProfileProfilePanelView', () => {
           availableProviders={[{ id: 'disconnected', provider: 'Coinbase Wallet' }]}
           onConnect={vi.fn()}
           onSetPrimary={vi.fn()}
-          onRemove={vi.fn()}
         />
       ),
     });

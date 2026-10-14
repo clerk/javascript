@@ -1,10 +1,11 @@
 import type { OrganizationInvitationJSON, RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 import { userEvent as browserEvent } from 'vitest/browser';
 
-import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnvironment,
@@ -153,6 +154,28 @@ describe('connected organization invitations', () => {
       ),
     );
     expect(fapi.organizationInvitations[0]?.status).toBe('accepted');
+  });
+
+  it('explains a revoke failure Clerk cannot describe with the revoke error', async () => {
+    const fapi = serve(['org:sys_memberships:manage']);
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+    worker.use(
+      http.post(fapiUrl('/v1/organizations/:organizationId/invitations/:invitationId/revoke'), () =>
+        HttpResponse.json({ errors: [] }, { status: 500 }),
+      ),
+    );
+
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+
+    await waitFor(() =>
+      expect(within(screen.getByRole('alertdialog')).getByRole('alert')).toHaveTextContent(
+        'Unable to revoke this invitation. Please try again.',
+      ),
+    );
+    expect(fapi.organizationInvitations[0]?.status).toBe('pending');
   });
 
   it('sends one revoke request when confirm is pressed repeatedly', async () => {

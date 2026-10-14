@@ -2,7 +2,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnterpriseAccount, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
@@ -69,20 +69,19 @@ describe('connected accounts', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 
-  it('keeps the confirmation open when removal needs reverification', async () => {
-    await renderSection([google]);
-    const request = holdRequests('post', '/v1/me/external_accounts/idn_google');
-    const dialog = await openRemoval(userEvent.setup(), 'Google');
+  it('verifies the session when removal demands it, then removes the account', async () => {
+    const { fapi } = await renderSection([google], { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/external_accounts/idn_google');
+    const user = userEvent.setup();
+    const dialog = await openRemoval(user, 'Google');
 
-    await userEvent.setup().click(within(dialog).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('session_reverification_required', 'Verify your session.');
-    expect(await within(dialog).findByText('Verify your session.')).toBeInTheDocument();
-    expect(dialog).toHaveAccessibleName('Remove connected account');
-    expect(screen.queryByRole('dialog')).toBeNull();
-    expect(within(dialog).queryByRole('textbox')).toBeNull();
-    expect(within(dialog).queryByLabelText('Password')).toBeNull();
-    expect(within(dialog).getByRole('button', { name: 'Remove' })).not.toHaveAttribute('aria-busy', 'true');
+    await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
+    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
+    expect(screen.getAllByRole('alertdialog')).toEqual([dialog]);
+    await user.type(within(dialog).getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user.external_accounts).toHaveLength(0);
   });
 
   it('targets the account selected after canceling another removal', async () => {
