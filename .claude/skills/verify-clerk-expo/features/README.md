@@ -2,6 +2,14 @@
 
 This directory is the maintained source for verifying the user-facing behavior of `@clerk/expo` through the `expo-native` test app in `integration/templates/expo-native`. On a local device the test app runs as a Debug dev client that loads its JS, and `packages/expo` with it, from a local Metro server. On a remote device it runs as a standalone Release build of a pushed commit, with the JS embedded. Read this index before driving the app, then use the matching feature file as the recipe. Every recipe runs through `integration/expo-native/bin/control-clerk-expo` and the specs under `specs/features/<feature>/`.
 
+## Baseline preconditions
+
+`SKILL.md` under Launch has the setup and the commands. These facts hold for every recipe here, on both platforms.
+
+- The standard settings have every auth method and signed-in feature that these recipes use. The `settings` check of `doctor` compares the live instance with the standard file once the worktree holds an application.
+- Every launch gets a new `verifyStorageScope`, so no spec inherits a session from another spec. A launch with `keepStorage: true` reuses the scope of the launch before it in the same test.
+- `down` deletes this worktree's application, and with it every user and organization a run created, including users created through the sign-up form.
+
 ## Test users and sign-in
 
 `.claude/skills/verify-clerk-expo/SKILL.md` has the rules for signing in. These are the test identities and the identifiers a spec needs.
