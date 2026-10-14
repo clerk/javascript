@@ -1,0 +1,22 @@
+import * as Stories from './organization-profile-api-keys-panel.stories';
+
+# OrganizationProfileApiKeysPanel
+
+The API keys panel lists the keys that belong to the active organization under the panel title. It renders `APIKeysTable` with the active organization as the subject.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Panel', href: '/components/panel', layer: 'Components' },
+    { name: 'APIKeysTable', href: '/api-keys/api-keys-table', layer: 'API Keys' },
+  ]}
+/>
+
+## Examples
+
+### Empty
+
+<Story name='Empty' storyModule={Stories} />

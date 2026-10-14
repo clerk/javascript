@@ -1,73 +1,46 @@
-import * as stylex from '@stylexjs/stylex';
-import type { FormEvent, RefObject } from 'react';
-import { useId, useRef, useState } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import type { RefObject } from 'react';
+import { useRef, useState } from 'react';
 
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
+import { Checkbox } from '../../../components/checkbox';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
+import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
-import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
-import type { UserProfileFormError } from '../user-profile-account-section/user-profile-account-section.types';
-import { styles } from './user-profile-password-section.styles';
-import type { UserProfileEditPasswordField } from './user-profile-password-section.types';
+import type {
+  UserProfileEditPasswordField,
+  UserProfileEditPasswordValues,
+} from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordDialogProps {
+  passwordFeedback?: FieldFeedback;
+  identifier?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-  signOutOfOtherSessions: boolean;
-  onCurrentPasswordChange: (value: string) => void;
-  onNewPasswordChange: (value: string) => void;
-  onConfirmPasswordChange: (value: string) => void;
-  onSignOutOfOtherSessionsChange: (value: boolean) => void;
-  canSave?: boolean;
-  isSaving?: boolean;
-  error?: UserProfileFormError<UserProfileEditPasswordField>;
-  onSubmit: () => void;
+  form: UseFormResult<UserProfileEditPasswordValues>;
 }
 
 export function UserProfileEditPasswordDialog({
+  passwordFeedback,
+  identifier = '',
   open,
   onOpenChange,
   trigger,
   hasPassword = false,
   requiresCurrentPassword = false,
-  currentPassword,
-  newPassword,
-  confirmPassword,
-  signOutOfOtherSessions,
-  onCurrentPasswordChange,
-  onNewPasswordChange,
-  onConfirmPasswordChange,
-  onSignOutOfOtherSessionsChange,
-  canSave = true,
-  isSaving = false,
-  error,
-  onSubmit,
+  form,
 }: UserProfileEditPasswordDialogProps) {
   const m = useMessages('userProfilePasswordSection');
-  const formId = useId();
-  const signOutId = useId();
-  const signOutDescriptionId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (canSave && !isSaving) {
-      onSubmit();
-    }
-  };
 
   return (
     <Dialog.Root
@@ -86,77 +59,63 @@ export function UserProfileEditPasswordDialog({
           <Card.Header>
             <Card.Title>{hasPassword ? m.dialogTitle.change : m.dialogTitle.set}</Card.Title>
           </Card.Header>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {form.error}
+          </Card.Banner>
           <Card.Content
             render={
               <form
-                id={formId}
-                onSubmit={handleSubmit}
+                id={form.id}
+                onSubmit={form.handleSubmit}
               />
             }
           >
-            {error?.message ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{error.message}</Banner.Label>
-              </Banner.Root>
-            ) : null}
+            <input
+              readOnly
+              hidden
+              name='identifier'
+              autoComplete='username'
+              value={identifier}
+            />
             {showCurrentPassword ? (
               <PasswordField
                 autoComplete='current-password'
-                disabled={isSaving}
-                error={error?.fields?.currentPassword}
+                form={form}
                 inputRef={initialFocusRef}
                 label={m.currentPasswordLabel}
-                value={currentPassword}
-                onChange={onCurrentPasswordChange}
+                name='currentPassword'
               />
             ) : null}
             <PasswordField
               autoComplete='new-password'
-              disabled={isSaving}
-              error={error?.fields?.newPassword}
+              form={form}
               inputRef={showCurrentPassword ? undefined : initialFocusRef}
               label={m.newPasswordLabel}
-              value={newPassword}
-              onChange={onNewPasswordChange}
+              name='newPassword'
+              advisoryFeedback={passwordFeedback}
             />
             <PasswordField
               autoComplete='new-password'
-              disabled={isSaving}
-              error={error?.fields?.confirmPassword}
+              form={form}
               label={m.confirmPasswordLabel}
-              value={confirmPassword}
-              onChange={onConfirmPasswordChange}
+              name='confirmPassword'
             />
-            <div {...stylex.props(styles.checkboxField)}>
-              <input
-                aria-describedby={signOutDescriptionId}
-                checked={signOutOfOtherSessions}
-                disabled={isSaving}
-                id={signOutId}
-                type='checkbox'
-                {...stylex.props(styles.checkbox)}
-                onChange={event => onSignOutOfOtherSessionsChange(event.target.checked)}
+            <Field.Root
+              orientation='horizontal'
+              disabled={form.isSubmitting}
+            >
+              <Checkbox
+                checked={form.values.signOutOfOtherSessions}
+                onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
               />
-              <div {...stylex.props(styles.checkboxCopy)}>
-                <Text
-                  render={<label htmlFor={signOutId} />}
-                  size='sm'
-                  xstyle={styles.checkboxLabel}
-                >
-                  {m.signOutOfOtherSessionsLabel}
-                </Text>
-                <Text
-                  id={signOutDescriptionId}
-                  size='xs'
-                  xstyle={styles.checkboxDescription}
-                >
-                  {m.signOutOfOtherSessionsDescription}
-                </Text>
-              </div>
-            </div>
+              <Field.Content>
+                <Field.Label>{m.signOutOfOtherSessionsLabel}</Field.Label>
+                <Field.Description>{m.signOutOfOtherSessionsDescription}</Field.Description>
+              </Field.Content>
+            </Field.Root>
           </Card.Content>
           <Card.Footer>
             <Dialog.Close
@@ -171,10 +130,10 @@ export function UserProfileEditPasswordDialog({
               }
             />
             <SubmitButton
-              form={formId}
+              form={form.id}
               fullWidth
-              isPending={isSaving}
-              disabled={!canSave}
+              isPending={form.isSubmitting}
+              disabled={!form.canSubmit}
               focusableWhenDisabled
             >
               {m.save}
@@ -189,37 +148,47 @@ export function UserProfileEditPasswordDialog({
 function PasswordField({
   label,
   autoComplete,
-  disabled,
-  error,
+  form,
   inputRef,
-  value,
-  onChange,
+  name,
+  advisoryFeedback,
 }: {
   label: string;
   autoComplete: 'current-password' | 'new-password';
-  disabled: boolean;
-  error?: string;
+  form: UseFormResult<UserProfileEditPasswordValues>;
   inputRef?: RefObject<HTMLInputElement>;
-  value: string;
-  onChange: (value: string) => void;
+  name: UserProfileEditPasswordField;
+  advisoryFeedback?: FieldFeedback;
 }) {
   const m = useMessages('userProfilePasswordSection');
   const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const { feedback } = form.fields[name];
+  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
+  const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
+  const { ref, ...control } = form.register(name);
+  const mergedRef = useMergeRefs([ref, inputRef]);
 
+  // TODO: Discuss enforcing the configured minimum length on the new password input or keeping the hint advisory and letting the server validate. https://github.com/clerk/javascript/pull/9930#discussion_r4151734254
   return (
     <Field.Root
-      disabled={disabled}
-      invalid={Boolean(error)}
+      disabled={form.isSubmitting}
+      focusableWhenDisabled
+      invalid={feedbackType === 'error'}
       required
     >
       <Field.Label>{label}</Field.Label>
       <InputGroup.Root>
         <InputGroup.Input
-          ref={inputRef}
+          ref={mergedRef}
           autoComplete={autoComplete}
           type={visible ? 'text' : 'password'}
-          value={value}
-          onChange={event => onChange(event.target.value)}
+          {...control}
+          onFocus={() => setFocused(true)}
+          onBlur={() => {
+            setFocused(false);
+            control.onBlur();
+          }}
         />
         <InputGroup.End>
           <Button
@@ -231,7 +200,7 @@ function PasswordField({
           </Button>
         </InputGroup.End>
       </InputGroup.Root>
-      {error ? <Field.Error>{error}</Field.Error> : null}
+      <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>
   );
 }

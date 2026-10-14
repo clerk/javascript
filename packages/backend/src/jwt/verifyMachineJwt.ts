@@ -14,11 +14,29 @@ import type { LoadClerkJWKFromRemoteOptions } from '../tokens/keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../tokens/keys';
 import { OAUTH_ACCESS_TOKEN_TYPES } from '../tokens/machine';
 import { TokenType } from '../tokens/tokenTypes';
+import { assertOAuthAudienceClaim } from './assertions';
 
 export type JwtMachineVerifyOptions = Pick<LoadClerkJWKFromRemoteOptions, 'secretKey' | 'apiUrl' | 'skipJwksCache'> & {
+  audience?: string | string[];
   jwtKey?: string;
   clockSkewInMs?: number;
 };
+
+export function getOAuthAudienceVerificationError(
+  aud: unknown,
+  audience?: string | string[],
+): MachineTokenVerificationError | undefined {
+  try {
+    assertOAuthAudienceClaim(aud, audience);
+  } catch (error) {
+    return new MachineTokenVerificationError({
+      code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+      message: (error as Error).message,
+    });
+  }
+
+  return undefined;
+}
 
 /**
  * Resolves the signing key and verifies a machine JWT's signature and claims.
@@ -125,10 +143,20 @@ export async function verifyOAuthJwt(
   decoded: Jwt,
   options: JwtMachineVerifyOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, options, OAUTH_ACCESS_TOKEN_TYPES);
+  const { audience, ...jwtOptions } = options;
+  const result = await resolveKeyAndVerifyJwt(token, decoded.header.kid, jwtOptions, OAUTH_ACCESS_TOKEN_TYPES);
 
   if ('error' in result) {
     return { data: undefined, tokenType: TokenType.OAuthToken, errors: [result.error] };
+  }
+
+  const audienceError = getOAuthAudienceVerificationError(result.payload.aud, audience);
+  if (audienceError) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [audienceError],
+    };
   }
 
   return {

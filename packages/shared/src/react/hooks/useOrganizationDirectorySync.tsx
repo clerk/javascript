@@ -5,6 +5,7 @@ import type { DeletedObjectResource } from '../../types/deletedObject';
 import type {
   CreateDirectorySyncParams,
   DirectorySyncResource,
+  SetDirectorySyncCredentialsParams,
   UpdateDirectorySyncParams,
 } from '../../types/directorySync';
 import { useClerkInstanceContext } from '../contexts';
@@ -29,6 +30,16 @@ export type UseOrganizationDirectorySyncReturn = {
   /** Resolves `undefined` until `data` has loaded, since the mutations act on the loaded directory. */
   updateDirectorySync: (params: UpdateDirectorySyncParams) => Promise<DirectorySyncResource | undefined>;
   rotateDirectorySyncToken: () => Promise<DirectorySyncResource | undefined>;
+  /**
+   * Stores the credential a pull-based directory reads the identity provider with, activating it.
+   * Rejects with the provider's own validation message when the credential is refused; surface that
+   * message, it is what tells the admin how to fix their setup.
+   */
+  setDirectorySyncCredentials: (
+    params: SetDirectorySyncCredentialsParams,
+  ) => Promise<DirectorySyncResource | undefined>;
+  /** Starts a sync for a pull-based directory rather than waiting for the next scheduled one. */
+  syncDirectory: () => Promise<void>;
   deleteDirectorySync: () => Promise<DeletedObjectResource | undefined>;
   revalidate: () => Promise<void>;
 };
@@ -117,6 +128,25 @@ function useOrganizationDirectorySync(params: UseOrganizationDirectorySyncParams
     return rotated;
   }, [directory, revalidate]);
 
+  const setDirectorySyncCredentials = useCallback(
+    async (credentialsParams: SetDirectorySyncCredentialsParams) => {
+      if (!directory) {
+        return undefined;
+      }
+      const updated = await directory.setCredentials(credentialsParams);
+      await revalidate();
+      return updated;
+    },
+    [directory, revalidate],
+  );
+
+  const syncDirectory = useCallback(async () => {
+    if (!directory) {
+      return;
+    }
+    await directory.sync();
+  }, [directory]);
+
   const deleteDirectorySync = useCallback(async () => {
     if (!directory) {
       return undefined;
@@ -134,6 +164,8 @@ function useOrganizationDirectorySync(params: UseOrganizationDirectorySyncParams
     createDirectorySync,
     updateDirectorySync,
     rotateDirectorySyncToken,
+    setDirectorySyncCredentials,
+    syncDirectory,
     deleteDirectorySync,
     revalidate,
   };

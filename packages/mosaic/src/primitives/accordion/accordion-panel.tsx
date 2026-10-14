@@ -1,11 +1,11 @@
 'use client';
 
-import React, { type RefObject, useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import { useAnimationsFinished } from '../hooks/use-animations-finished';
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
-import { resetLayoutStyles } from '../utils/reset-layout-styles';
+import { autoUpdate, getScrollDimensions } from '../utils/dom';
 import { useAccordionItemContext } from './accordion-context';
 
 export type AccordionPanelProps = ComponentProps<'div'>;
@@ -27,7 +27,7 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
 
     const { mounted, transitionStatus, transitionProps } = useTransition({
       open,
-      ref: panelRef as RefObject<HTMLElement>,
+      ref: panelRef,
     });
 
     const runOnAnimationsFinished = useAnimationsFinished(panelRef, open);
@@ -43,25 +43,7 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
         return;
       }
 
-      // Measure scrollHeight of the panel's content. Reset flex/grid alignment
-      // first so non-default alignment can't shrink the reported height.
-      let restoreLayoutStyles: (() => void) | undefined;
-      const measure = () => {
-        restoreLayoutStyles?.();
-        restoreLayoutStyles = resetLayoutStyles(panel);
-        setHeight(panel.scrollHeight);
-      };
-
-      measure();
-
-      const ro = new ResizeObserver(measure);
-      // Observe children mutations that affect height
-      ro.observe(panel, { box: 'border-box' });
-
-      return () => {
-        ro.disconnect();
-        restoreLayoutStyles?.();
-      };
+      return autoUpdate(panel, () => setHeight(getScrollDimensions(panel).height));
     }, [mounted]);
 
     // Once the open animation settles, drop the measured pixel height so the
@@ -83,9 +65,7 @@ export const AccordionPanel = React.forwardRef<HTMLDivElement, AccordionPanelPro
       if (!panel) {
         return;
       }
-      const restoreLayoutStyles = resetLayoutStyles(panel);
-      setHeight(panel.scrollHeight);
-      return restoreLayoutStyles;
+      setHeight(getScrollDimensions(panel).height);
     }, [open, transitionStatus]);
 
     const state = { open };

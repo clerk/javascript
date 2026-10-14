@@ -1,14 +1,18 @@
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
-} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { useState } from 'react';
 
-export const connectedAccount = {
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosText } from '@/lib/chaos';
+
+export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
   identifier: 'test@example.com',
   iconUrl: 'https://img.clerk.com/static/google.svg',
+  status: 'connected',
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
   { id: 'google', provider: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
@@ -17,7 +21,7 @@ const connectionProviders: UserProfileConnectionProvider[] = [
 
 export function useConnectedAccountsFixture({
   initialAccounts = [connectedAccount],
-  providers = connectionProviders,
+  providers: initialProviders = connectionProviders,
   removalState,
 }: {
   initialAccounts?: UserProfileConnectedAccount[];
@@ -25,7 +29,17 @@ export function useConnectedAccountsFixture({
   removalState?: 'pending' | 'error';
 } = {}) {
   const [hasRemovalFailed, setHasRemovalFailed] = useState(false);
-  const [accounts, setAccounts] = useState(initialAccounts);
+  const seed = useChaosFixture(initialAccounts, items =>
+    items.map((account, index) => ({
+      ...account,
+      provider: chaosText(account.provider),
+      identifier: chaosEmail(index),
+    })),
+  );
+  const [accounts, setAccounts] = useState(seed);
+  const providers = useChaosFixture(initialProviders, items =>
+    items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
+  );
   const availableProviders = providers.filter(provider => !accounts.some(account => account.id === provider.id));
 
   return {
@@ -36,7 +50,13 @@ export function useConnectedAccountsFixture({
       if (provider) {
         setAccounts(current => [
           ...current,
-          { id: provider.id, provider: provider.provider, iconUrl: provider.iconUrl, identifier: 'test@example.com' },
+          {
+            id: provider.id,
+            provider: provider.provider,
+            iconUrl: provider.iconUrl,
+            identifier: 'test@example.com',
+            status: 'connected',
+          },
         ]);
       }
     },

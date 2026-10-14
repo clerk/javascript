@@ -1,0 +1,186 @@
+import { act, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { deferred } from '../../../__tests__/async';
+import { MosaicProvider } from '../../../mosaic-provider';
+import type { RequestsTableTabViewProps } from '../requests-table-tab.types';
+import { RequestsTableTabView } from '../requests-table-tab.view';
+
+function propsFor(overrides: Partial<RequestsTableTabViewProps> = {}): RequestsTableTabViewProps {
+  return {
+    requests: [{ id: 'request-1', email: 'ada@example.com', name: 'Ada Lovelace', requestedAtLabel: 'Sep 1, 2026' }],
+    totalCount: 1,
+    page: 1,
+    pageSize: 10,
+    isLoading: false,
+    onPageChange: vi.fn(),
+    ...overrides,
+  };
+}
+function renderView(overrides: Partial<RequestsTableTabViewProps> = {}) {
+  const props = propsFor(overrides);
+  return {
+    props,
+    ...render(
+      <MosaicProvider>
+        <RequestsTableTabView {...props} />
+      </MosaicProvider>,
+    ),
+  };
+}
+
+describe('RequestsTableTabView', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it.each(['Accept', 'Decline'] as const)(
+    'holds the row while %s is pending and allows retry after failure',
+    async action => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const user = userEvent.setup();
+      const attempt = deferred<void>();
+      const onDecision = vi
+        .fn()
+        .mockImplementationOnce(() => attempt.promise)
+        .mockResolvedValue(undefined);
+      const onOtherDecision = vi.fn();
+      renderView({
+        onAccept: action === 'Accept' ? onDecision : onOtherDecision,
+        onDecline: action === 'Decline' ? onDecision : onOtherDecision,
+      });
+
+      await user.click(screen.getByRole('button', { name: `${action} Ada Lovelace` }));
+      await user.click(screen.getByRole('button', { name: 'Accept Ada Lovelace' }));
+      await user.click(screen.getByRole('button', { name: 'Decline Ada Lovelace' }));
+      expect(onDecision).toHaveBeenCalledExactlyOnceWith('request-1');
+      expect(onOtherDecision).not.toHaveBeenCalled();
+
+      await act(() => attempt.reject(new Error('Cannot read properties of undefined')));
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          action === 'Accept'
+            ? 'Unable to accept this request. Please try again.'
+            : 'Unable to decline this request. Please try again.',
+        ),
+      );
+      await user.click(screen.getByRole('button', { name: `${action} Ada Lovelace` }));
+      expect(onDecision).toHaveBeenCalledTimes(2);
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    },
+  );
+
+  it('chooses loading, retained rows, an empty list, and the error state from the supplied state', () => {
+    const { props, rerender } = renderView({ requests: [], totalCount: 0, isLoading: true });
+    expect(screen.getByRole('status')).toHaveTextContent('Loading requests');
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...props}
+          isLoading={false}
+          isFetching
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('Loading requests');
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...props}
+          isLoading={false}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('No pending requests');
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...propsFor()}
+          isFetching
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByText('ada@example.com')).toBeVisible();
+    expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...propsFor()}
+          isError
+          onRetry={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByText('ada@example.com')).toBeNull();
+    expect(within(screen.getByRole('table')).getByRole('alert')).toHaveTextContent('Unable to load requests');
+    expect(screen.getAllByRole('button', { name: 'Try again' })).toHaveLength(1);
+  });
+  it('forwards paging without search, sorting, or page-size controls', async () => {
+    const user = userEvent.setup();
+    const { props } = renderView({ totalCount: 21, onBulkAction: vi.fn() });
+    await user.click(screen.getByRole('checkbox', { name: 'Select ada@example.com' }));
+    expect(screen.getByRole('checkbox', { name: 'Select ada@example.com' })).toBeChecked();
+    await user.click(screen.getByRole('button', { name: 'Next requests page' }));
+    expect(props.onPageChange).toHaveBeenCalledWith(2);
+    expect(screen.queryByRole('searchbox')).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /^Results per page/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Requested' })).toBeNull();
+  });
+  it('holds both request actions while that row has a pending decision', async () => {
+    const user = userEvent.setup();
+    const { props } = renderView({
+      requests: [
+        { id: 'request-1', email: 'ada@example.com', requestedAtLabel: 'Sep 1, 2026', pendingAction: 'accept' },
+      ],
+      onAccept: vi.fn(),
+      onDecline: vi.fn(),
+    });
+    await user.click(screen.getByRole('button', { name: 'Accept ada@example.com' }));
+    await user.click(screen.getByRole('button', { name: 'Decline ada@example.com' }));
+    expect(props.onAccept).not.toHaveBeenCalled();
+    expect(props.onDecline).not.toHaveBeenCalled();
+  });
+  it('offers only the supplied request actions', () => {
+    const { props, rerender } = renderView({ onAccept: vi.fn(), onDecline: vi.fn() });
+    expect(screen.getByRole('button', { name: 'Accept Ada Lovelace' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Decline Ada Lovelace' })).toBeVisible();
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...props}
+          onAccept={undefined}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('button', { name: 'Accept Ada Lovelace' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Decline Ada Lovelace' })).toBeVisible();
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...props}
+          onAccept={undefined}
+          onDecline={undefined}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('button', { name: /Accept|Decline/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+
+  it('routes invite only when the caller supplies it', async () => {
+    const user = userEvent.setup();
+    const { props, rerender } = renderView({ onInvite: vi.fn() });
+    await user.click(screen.getByRole('button', { name: 'Invite' }));
+    expect(props.onInvite).toHaveBeenCalledOnce();
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...props}
+          onInvite={undefined}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('button', { name: 'Invite' })).not.toBeInTheDocument();
+  });
+});

@@ -1,7 +1,7 @@
 import type { IconProps } from '@clerk/mosaic/components/icon';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { iconRegistry } from '@clerk/mosaic/icons/registry';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -93,7 +93,6 @@ function IconGallery({ names }: { names: readonly IconProps['name'][] }) {
           <Icon
             name={name}
             size='lg'
-            aria-hidden
           />
           <code style={{ fontSize: 11, lineHeight: 1.5, overflowWrap: 'anywhere' }}>{name}</code>
         </div>

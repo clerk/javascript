@@ -79,6 +79,63 @@ toastManager.add({ title: 'Signed out' });
 
 Toasts added before the provider mounts show once it does.
 
+### Anchored
+
+A toast can sit next to the element that caused it, such as a "Copied" confirmation beside a copy button. Pass the anchor through `positionerProps` and wrap its root in `Toast.Positioner`. Anchored toasts share the provider with the others but stay out of the stack and don't count toward `limit`; use `Toast.isAnchored(toast)` to render them apart.
+
+```tsx
+function Toasts() {
+  const { toasts } = Toast.useToastManager();
+  return (
+    <Toast.Portal>
+      <Toast.Viewport>
+        {toasts
+          .filter(toast => !Toast.isAnchored(toast))
+          .map(toast => (
+            <Toast.Root
+              key={toast.id}
+              toast={toast}
+            >
+              <Toast.Title />
+            </Toast.Root>
+          ))}
+      </Toast.Viewport>
+      {toasts.filter(Toast.isAnchored).map(toast => (
+        <Toast.Positioner
+          key={toast.id}
+          toast={toast}
+        >
+          <Toast.Root toast={toast}>
+            <Toast.Arrow />
+            <Toast.Description />
+          </Toast.Root>
+        </Toast.Positioner>
+      ))}
+    </Toast.Portal>
+  );
+}
+
+function CopyButton() {
+  const toastManager = Toast.useToastManager();
+
+  return (
+    <button
+      type='button'
+      onClick={event =>
+        toastManager.add({
+          id: 'copy',
+          description: 'Copied',
+          timeout: 1500,
+          positionerProps: { anchor: event.currentTarget, sideOffset: 8 },
+        })
+      }
+    >
+      Copy
+    </button>
+  );
+}
+```
+
 ## Parts
 
 | Part                | Default Element | Description                                                                                   |
@@ -86,7 +143,9 @@ Toasts added before the provider mounts show once it does.
 | `Toast.Provider`    | —               | Owns the toast list, timers, and the queue. Renders no element.                               |
 | `Toast.Portal`      | —               | Renders its children into `document.body` (or `root`).                                        |
 | `Toast.Viewport`    | `<div>`         | Landmark region that holds the toasts. Hover or focus inside pauses every timer.              |
+| `Toast.Positioner`  | `<div>`         | Positions one toast against an anchor element. Optional; wraps `Toast.Root`.                  |
 | `Toast.Root`        | `<div>`         | One toast. Focusable, closes on Escape, drives the exit transition.                           |
+| `Toast.Arrow`       | `<svg>`         | Arrow pointing at the anchor. Must sit inside `Toast.Positioner`.                             |
 | `Toast.Content`     | `<div>`         | Layout wrapper. Carries `data-behind` so stacked toasts can hide their content.               |
 | `Toast.Title`       | `<h2>`          | Labels the root. Defaults to `toast.title`; renders nothing without content.                  |
 | `Toast.Description` | `<p>`           | Describes the root. Defaults to `toast.description`; renders nothing without content.         |
@@ -111,6 +170,19 @@ Element-rendering parts accept a `render` prop and the native attributes of thei
 | ------ | ------------------------------------------------------- | --------------- | ----------------- |
 | `root` | `HTMLElement \| null \| RefObject<HTMLElement \| null>` | `document.body` | Portal container. |
 
+### `Toast.Positioner`
+
+| Prop          | Type                                     | Default      | Description                                     |
+| ------------- | ---------------------------------------- | ------------ | ----------------------------------------------- |
+| `toast`       | `ToastObject`                            | — (required) | The toast from `useToastManager()`.             |
+| `anchor`      | `Element \| null`                        | —            | The element the toast is positioned against.    |
+| `side`        | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'`      | Side of the anchor. Flips when there's no room. |
+| `align`       | `'start' \| 'center' \| 'end'`           | `'center'`   | Alignment along that side.                      |
+| `sideOffset`  | `number`                                 | `0`          | Gap between the anchor and the toast, in px.    |
+| `alignOffset` | `number`                                 | `0`          | Shift along the alignment axis, in px.          |
+
+Fields in `toast.positionerProps` override these props.
+
 ### `Toast.Root`
 
 | Prop    | Type          | Description                         |
@@ -121,29 +193,31 @@ Element-rendering parts accept a `render` prop and the native attributes of thei
 
 Returns `{ toasts, add, close, update, promise }`.
 
-| Method    | Signature                                                                            | Description                                                               |
-| --------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| `add`     | `(options: ToastAddOptions) => string`                                               | Adds a toast at the front of the list and returns its id.                 |
-| `close`   | `(id?: string) => void`                                                              | Starts the exit transition of one toast, or of every toast without an id. |
-| `update`  | `(id: string, options: ToastUpdateOptions \| (toast) => ToastUpdateOptions) => void` | Merges new fields into a toast. A function receives the current toast.    |
-| `promise` | `(promise: Promise<T>, options: ToastPromiseOptions<T>) => Promise<T>`               | Loading → success / error toast, see above.                               |
+| Method    | Signature                                                                            | Description                                                                                                                                                                      |
+| --------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `add`     | `(options: ToastAddOptions) => string`                                               | Adds a toast at the front of the list and returns its id. If a toast with the same `id` is still open, updates it in place, restarts its timer, and bumps `repeatCount` instead. |
+| `close`   | `(id?: string) => void`                                                              | Starts the exit transition of one toast, or of every toast without an id.                                                                                                        |
+| `update`  | `(id: string, options: ToastUpdateOptions \| (toast) => ToastUpdateOptions) => void` | Merges new fields into a toast. A function receives the current toast.                                                                                                           |
+| `promise` | `(promise: Promise<T>, options: ToastPromiseOptions<T>) => Promise<T>`               | Loading → success / error toast, see above.                                                                                                                                      |
 
 ### `ToastObject`
 
-| Field         | Type                              | Description                                                           |
-| ------------- | --------------------------------- | --------------------------------------------------------------------- |
-| `id`          | `string`                          | Assigned by `add` unless supplied.                                    |
-| `title`       | `ReactNode`                       | Default content of `Toast.Title`; announced to screen readers.        |
-| `description` | `ReactNode`                       | Default content of `Toast.Description`; announced to screen readers.  |
-| `type`        | `string`                          | Free-form category, exposed as `data-type`.                           |
-| `timeout`     | `number`                          | Per-toast auto-dismiss override. `0` keeps it until closed.           |
-| `priority`    | `'low' \| 'high'`                 | `'high'` announces assertively. Default `'low'`.                      |
-| `actionProps` | `ComponentPropsWithRef<'button'>` | Props for `Toast.Action`. Its `onClick` runs before the toast closes. |
-| `onClose`     | `() => void`                      | Called when the toast starts closing.                                 |
-| `onRemove`    | `() => void`                      | Called once the toast is removed from the list.                       |
-| `data`        | `Record<string, unknown>`         | Anything the rendering code needs.                                    |
-| `limited`     | `boolean`                         | True while queued beyond the provider `limit`.                        |
-| `height`      | `number`                          | Measured root height, used for `--toast-offset-y`.                    |
+| Field             | Type                              | Description                                                                    |
+| ----------------- | --------------------------------- | ------------------------------------------------------------------------------ |
+| `id`              | `string`                          | Assigned by `add` unless supplied.                                             |
+| `title`           | `ReactNode`                       | Default content of `Toast.Title`; announced to screen readers.                 |
+| `description`     | `ReactNode`                       | Default content of `Toast.Description`; announced to screen readers.           |
+| `type`            | `string`                          | Free-form category, exposed as `data-type`.                                    |
+| `timeout`         | `number`                          | Per-toast auto-dismiss override. `0` keeps it until closed.                    |
+| `priority`        | `'low' \| 'high'`                 | `'high'` announces assertively. Default `'low'`.                               |
+| `actionProps`     | `ComponentPropsWithRef<'button'>` | Props for `Toast.Action`. Its `onClick` runs before the toast closes.          |
+| `positionerProps` | `ToastPositionerOptions`          | `anchor`, `side`, `align`, `sideOffset`, `alignOffset` for `Toast.Positioner`. |
+| `onClose`         | `() => void`                      | Called when the toast starts closing.                                          |
+| `onRemove`        | `() => void`                      | Called once the toast is removed from the list.                                |
+| `data`            | `Record<string, unknown>`         | Anything the rendering code needs.                                             |
+| `limited`         | `boolean`                         | True while beyond the provider `limit`. Its timer keeps running.               |
+| `height`          | `number`                          | Measured root height, used for `--toast-offset-y`.                             |
+| `repeatCount`     | `number`                          | How many times `add` was called again with this toast's id while it was open.  |
 
 ## Keyboard
 
@@ -155,15 +229,19 @@ Returns `{ toasts, add, close, update, promise }`.
 
 ## Data Attributes
 
-| Attribute             | Applies To     | Description                                                                                   |
-| --------------------- | -------------- | --------------------------------------------------------------------------------------------- |
-| `data-expanded`       | Viewport, Root | Present while the viewport is hovered or holds focus. Timers are paused.                      |
-| `data-type`           | Root           | The toast `type`.                                                                             |
-| `data-limited`        | Root           | Present while the toast is queued beyond `limit`. The root is also `inert`. Hide it with CSS. |
-| `data-behind`         | Content        | Present on every toast stacked behind the frontmost one.                                      |
-| `data-expanded`       | Content        | Same as on Root.                                                                              |
-| `data-starting-style` | Root           | Present on the first frame after mount.                                                       |
-| `data-ending-style`   | Root           | Present from `close` until the exit animations finish.                                        |
+| Attribute             | Applies To        | Description                                                                                   |
+| --------------------- | ----------------- | --------------------------------------------------------------------------------------------- |
+| `data-expanded`       | Viewport, Root    | Present while the viewport is hovered or holds focus. Timers are paused.                      |
+| `data-type`           | Root              | The toast `type`.                                                                             |
+| `data-limited`        | Root              | Present while the toast is queued beyond `limit`. The root is also `inert`. Hide it with CSS. |
+| `data-behind`         | Content           | Present on every toast stacked behind the frontmost one.                                      |
+| `data-expanded`       | Content           | Same as on Root.                                                                              |
+| `data-repeated`       | Root              | Present after `add` is called again with an open toast's id, until its animation ends.        |
+| `data-starting-style` | Root              | Present on the first frame after mount.                                                       |
+| `data-ending-style`   | Root              | Present from `close` until the exit animations finish.                                        |
+| `data-side`           | Positioner, Arrow | The side the toast ended up on after flipping.                                                |
+| `data-align`          | Positioner        | `start`, `center`, or `end`.                                                                  |
+| `data-anchor-hidden`  | Positioner        | Present while the anchor is scrolled out of view or not rendered. The positioner is hidden.   |
 
 ## CSS Variables
 
@@ -209,6 +287,8 @@ A collapsed stack that expands on hover sizes every toast to the frontmost one a
 }
 ```
 
+`Toast.Positioner` also sets `--cl-anchor-width`, `--cl-anchor-height`, `--cl-available-width`, `--cl-available-height`, and `--cl-transform-origin`, like the other floating primitives.
+
 ## ARIA
 
 - Viewport: `role="region"`, `aria-label="Notifications"` (override with your own label), `tabIndex="-1"`.
@@ -217,4 +297,4 @@ A collapsed stack that expands on hover sizes every toast to the frontmost one a
 
 ## Not yet implemented
 
-Swipe to dismiss (`swipeDirection`, `data-swiping`, `--toast-swipe-movement-*`) and anchored toasts (`Toast.Positioner`, `Toast.Arrow`) are not part of this primitive yet.
+Swipe to dismiss (`swipeDirection`, `data-swiping`, `--toast-swipe-movement-*`) is not part of this primitive yet.

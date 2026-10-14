@@ -55,6 +55,9 @@ export const PROVIDER_GROUPS: ReadonlyArray<ProviderGroup> = [
 export const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
   PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
 
+export const providerIconId = (provider: ProviderType): string | undefined =>
+  PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.iconId;
+
 /** Every OIDC variant is presented as the single OIDC card. */
 export const toProviderCard = (provider: EnterpriseConnectionProviderType): ProviderType =>
   isOidcProvider(provider) ? 'oidc_custom' : provider;

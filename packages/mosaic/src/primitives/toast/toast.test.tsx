@@ -427,25 +427,26 @@ describe('Toast', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    it('does not run the timer of a limited toast until it is promoted', () => {
+    it('keeps the timer of a limited toast running so toasts close oldest first', () => {
       const { add, advance } = renderWithTimers({ limit: 1, timeout: 1000 });
 
-      add();
-      add();
+      add({ title: 'First' });
+      advance(500);
+      add({ title: 'Second' });
       expect(screen.getAllByRole('dialog')).toHaveLength(2);
 
-      advance(1000);
+      advance(500);
       expect(screen.getAllByRole('dialog')).toHaveLength(1);
-      expect(screen.getByRole('dialog')).not.toHaveAttribute('data-limited');
+      expect(screen.getByRole('dialog', { name: 'Second' })).not.toHaveAttribute('data-limited');
 
-      advance(1000);
+      advance(500);
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('announces a limited toast only once it is promoted', () => {
       const { add, advance } = renderWithTimers({ limit: 1, timeout: 1000 });
 
-      add({ title: 'First' });
+      add({ title: 'First', timeout: 2000 });
       add({ title: 'Second' });
 
       advance(50);
@@ -481,6 +482,31 @@ describe('Toast', () => {
       await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
 
       await waitFor(() => expect(screen.getAllByRole('dialog')).toHaveLength(2));
+      for (const toast of screen.getAllByRole('dialog')) {
+        expect(toast).not.toHaveAttribute('data-limited');
+      }
+    });
+
+    it('does not count anchored toasts toward the limit', () => {
+      const manager = Toast.createToastManager();
+      render(
+        <Toast.Provider
+          toastManager={manager}
+          limit={1}
+        >
+          <Toast.Viewport>
+            <ToastList />
+          </Toast.Viewport>
+        </Toast.Provider>,
+      );
+
+      act(() => {
+        manager.add({ title: 'Saved' });
+      });
+      act(() => {
+        manager.add({ title: 'Copied', positionerProps: { anchor: document.body } });
+      });
+
       for (const toast of screen.getAllByRole('dialog')) {
         expect(toast).not.toHaveAttribute('data-limited');
       }
@@ -660,6 +686,99 @@ describe('Toast', () => {
       );
 
       expect(screen.getByRole('heading', { name: 'Early' })).toBeInTheDocument();
+    });
+  });
+
+  describe('repeated add', () => {
+    function renderManaged() {
+      const manager = Toast.createToastManager();
+      render(
+        <Toast.Provider
+          toastManager={manager}
+          timeout={1000}
+        >
+          <Toast.Viewport>
+            <ToastList />
+          </Toast.Viewport>
+        </Toast.Provider>,
+      );
+      return manager;
+    }
+
+    it('updates the open toast in place instead of adding another', () => {
+      const manager = Toast.createToastManager();
+      manager.add({ id: 'copy', title: 'Copied' });
+      manager.add({ title: 'Saved' });
+      manager.add({ id: 'copy', title: 'Copied again' });
+
+      const toasts = manager.getSnapshot();
+      expect(toasts.map(t => t.title)).toEqual(['Saved', 'Copied again']);
+      expect(toasts[1].repeatCount).toBe(1);
+    });
+
+    it('adds a closing toast again as a new toast', () => {
+      const manager = Toast.createToastManager();
+      manager.add({ id: 'copy', title: 'Copied' });
+      manager.close('copy');
+      manager.add({ id: 'copy', title: 'Copied' });
+
+      const [toast] = manager.getSnapshot();
+      expect(toast.transitionStatus).toBe('starting');
+      expect(toast.repeatCount).toBeUndefined();
+    });
+
+    it('calls onRemove for a closing toast replaced by a new one', () => {
+      const manager = Toast.createToastManager();
+      const onRemove = vi.fn();
+      manager.add({ id: 'copy', title: 'Copied', onRemove });
+      manager.close('copy');
+      manager.add({ id: 'copy', title: 'Copied' });
+
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    });
+
+    it('marks the root with data-repeated until its animation ends', async () => {
+      const manager = renderManaged();
+
+      act(() => {
+        manager.add({ id: 'copy', title: 'Copied' });
+      });
+      expect(screen.getByRole('dialog')).not.toHaveAttribute('data-repeated');
+
+      act(() => {
+        manager.add({ id: 'copy', title: 'Copied' });
+      });
+
+      await waitFor(() => expect(screen.getByRole('dialog')).toHaveAttribute('data-repeated', ''));
+      fireEvent.animationEnd(screen.getByRole('dialog'));
+      expect(screen.getByRole('dialog')).not.toHaveAttribute('data-repeated');
+    });
+
+    it('restarts the timer', () => {
+      vi.useFakeTimers();
+      const manager = renderManaged();
+
+      act(() => {
+        manager.add({ id: 'copy', title: 'Copied' });
+      });
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+      act(() => {
+        manager.add({ id: 'copy', title: 'Copied' });
+      });
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
+
+      const openToasts = () => manager.getSnapshot().filter(t => t.transitionStatus !== 'ending');
+      expect(openToasts()).toHaveLength(1);
+
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+
+      expect(openToasts()).toHaveLength(0);
     });
   });
 
@@ -903,6 +1022,180 @@ describe('Toast', () => {
       fireEvent.mouseEnter(screen.getByTestId('viewport'));
       expect(screen.getByTestId('content-New')).toHaveAttribute('data-expanded', '');
     });
+
+    it('keeps anchored toasts out of the stack', () => {
+      const manager = renderStack();
+
+      act(() => {
+        manager()?.add({ title: 'Old', type: 'Old' });
+      });
+      act(() => {
+        manager()?.add({ title: 'Copied', type: 'Anchored', positionerProps: { anchor: document.body } });
+      });
+
+      const root = (type: string) => screen.getByTestId(`content-${type}`).closest('[role="dialog"]');
+      expect(screen.getByTestId('content-Old')).not.toHaveAttribute('data-behind');
+      expect(screen.getByTestId('content-Anchored')).not.toHaveAttribute('data-behind');
+      expect(root('Old')).toHaveStyle({ '--toast-index': '0' });
+      expect(root('Anchored')).toHaveStyle({ '--toast-index': '0' });
+
+      act(() => {
+        manager()?.add({ title: 'New', type: 'New' });
+      });
+
+      expect(screen.getByTestId('content-Old')).toHaveAttribute('data-behind', '');
+      expect(root('Old')).toHaveStyle({ '--toast-index': '1' });
+      expect(root('New')).toHaveStyle({ '--toast-index': '0' });
+    });
+
+    it('measures each toast at its natural height', () => {
+      vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockImplementation(function (this: HTMLElement) {
+        return this.style.height === 'auto' ? 64 : 20;
+      });
+      const manager = renderStack();
+
+      act(() => {
+        manager()?.add({ title: 'New', type: 'New' });
+      });
+
+      expect(screen.getByRole('dialog').style.getPropertyValue('--toast-height')).toBe('64px');
+    });
+  });
+
+  describe('anchored', () => {
+    function AnchoredList(props: Partial<React.ComponentProps<typeof Toast.Positioner>>) {
+      const { toasts } = Toast.useToastManager();
+      return (
+        <>
+          {toasts.map(toast => (
+            <Toast.Positioner
+              key={toast.id}
+              toast={toast}
+              data-testid='positioner'
+              {...props}
+            >
+              <Toast.Root toast={toast}>
+                <Toast.Arrow data-testid='arrow' />
+                <Toast.Title />
+              </Toast.Root>
+            </Toast.Positioner>
+          ))}
+        </>
+      );
+    }
+
+    function AnchoredTrigger(props: { positionerProps?: ToastObject['positionerProps'] }) {
+      const manager = Toast.useToastManager();
+      return (
+        <button
+          type='button'
+          onClick={event =>
+            manager.add({ title: 'Copied', positionerProps: { anchor: event.currentTarget, ...props.positionerProps } })
+          }
+        >
+          Copy
+        </button>
+      );
+    }
+
+    const inView = new DOMRect(100, 100, 40, 20);
+
+    function layOutAnchor(rect: DOMRect) {
+      vi.spyOn(screen.getByRole('button', { name: 'Copy' }), 'getBoundingClientRect').mockReturnValue(rect);
+    }
+
+    function renderAnchored(
+      listProps: Partial<React.ComponentProps<typeof Toast.Positioner>> = {},
+      positionerProps?: ToastObject['positionerProps'],
+    ) {
+      const result = render(
+        <Toast.Provider>
+          <AnchoredTrigger positionerProps={positionerProps} />
+          <Toast.Portal>
+            <Toast.Viewport>
+              <AnchoredList {...listProps} />
+            </Toast.Viewport>
+          </Toast.Portal>
+        </Toast.Provider>,
+      );
+      vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
+      layOutAnchor(inView);
+      return result;
+    }
+
+    it('wraps the toast in a positioned element that defaults to top center', async () => {
+      const user = userEvent.setup();
+      renderAnchored();
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+      const positioner = screen.getByTestId('positioner');
+      expect(positioner).toContainElement(screen.getByRole('dialog', { name: 'Copied' }));
+      expect(positioner).toHaveAttribute('data-side', 'top');
+      expect(positioner).toHaveAttribute('data-align', 'center');
+      expect(positioner.style.position).toBe('absolute');
+    });
+
+    it('takes side and align from its props', async () => {
+      const user = userEvent.setup();
+      renderAnchored({ side: 'bottom', align: 'end' });
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+      expect(screen.getByTestId('positioner')).toHaveAttribute('data-side', 'bottom');
+      expect(screen.getByTestId('positioner')).toHaveAttribute('data-align', 'end');
+    });
+
+    it('lets the toast positionerProps override its props', async () => {
+      const user = userEvent.setup();
+      renderAnchored({ side: 'bottom', align: 'end' }, { side: 'right', align: 'start' });
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+      expect(screen.getByTestId('positioner')).toHaveAttribute('data-side', 'right');
+      expect(screen.getByTestId('positioner')).toHaveAttribute('data-align', 'start');
+    });
+
+    it('renders an arrow carrying the side', async () => {
+      const user = userEvent.setup();
+      renderAnchored({ side: 'bottom' });
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+      expect(screen.getByTestId('arrow')).toHaveAttribute('data-side', 'bottom');
+    });
+
+    it('hides the toast while its anchor is not rendered and shows it again once it is', async () => {
+      const user = userEvent.setup();
+      renderAnchored();
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+      const positioner = screen.getByTestId('positioner');
+      await waitFor(() => expect(positioner.style.transform).not.toBe(''));
+      expect(positioner).not.toHaveAttribute('data-anchor-hidden');
+      expect(screen.getByRole('dialog', { name: 'Copied' })).toBeVisible();
+
+      layOutAnchor(new DOMRect(0, 0, 0, 0));
+      fireEvent(window, new Event('resize'));
+      await waitFor(() => expect(positioner).toHaveAttribute('data-anchor-hidden'));
+      expect(positioner.style.visibility).toBe('hidden');
+
+      layOutAnchor(inView);
+      fireEvent(window, new Event('resize'));
+      await waitFor(() => expect(positioner).not.toHaveAttribute('data-anchor-hidden'));
+      expect(screen.getByRole('dialog', { name: 'Copied' })).toBeVisible();
+    });
+
+    it('unmounts the positioner once the toast is removed', async () => {
+      const user = userEvent.setup();
+      renderAnchored();
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+
+      await waitFor(() => expect(screen.queryByTestId('positioner')).not.toBeInTheDocument());
+    });
   });
 
   describe('accessibility (axe)', () => {
@@ -925,6 +1218,31 @@ describe('Toast', () => {
       }
       const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() => render(<Bad />)).toThrow('<Toast.Provider>');
+      spy.mockRestore();
+    });
+
+    it('throws when Arrow is used outside Positioner', () => {
+      function List() {
+        const { toasts } = Toast.useToastManager();
+        return toasts.map(toast => (
+          <Toast.Root
+            key={toast.id}
+            toast={toast}
+          >
+            <Toast.Arrow />
+          </Toast.Root>
+        ));
+      }
+      const manager = Toast.createToastManager();
+      manager.add({ title: 'Hi' });
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() =>
+        render(
+          <Toast.Provider toastManager={manager}>
+            <List />
+          </Toast.Provider>,
+        ),
+      ).toThrow('<Toast.Positioner>');
       spy.mockRestore();
     });
   });

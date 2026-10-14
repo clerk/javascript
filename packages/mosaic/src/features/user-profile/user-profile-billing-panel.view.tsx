@@ -1,14 +1,12 @@
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { Profile } from '../../components/profile';
-import { mergeStyleProps, themeProps } from '../../props';
+import { Panel } from '../../components/panel';
+import { themeProps } from '../../props';
 import type {
   UserProfileBillingHistoryItem,
   UserProfileBillingHistoryPagination,
 } from './user-profile-billing-history-section.view';
 import { UserProfileBillingHistorySectionView } from './user-profile-billing-history-section.view';
-import { styles } from './user-profile-billing-panel.styles';
 import type { UserProfilePaymentMethod } from './user-profile-payment-methods-section.view';
 import { UserProfilePaymentMethodsSectionView } from './user-profile-payment-methods-section.view';
 import type { UserProfileSubscription } from './user-profile-subscription-section.view';
@@ -49,9 +47,9 @@ export function UserProfileBillingPanelView({
   onViewInvoice,
 }: UserProfileBillingPanelViewProps): ReactElement {
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-billing-panel'), stylex.props(styles.root))}>
-      <Profile.PageTitle>Billing</Profile.PageTitle>
-      <div {...stylex.props(styles.sections)}>
+    <Panel.Root render={<div {...themeProps('user-profile-billing-panel')} />}>
+      <Panel.Title>Billing</Panel.Title>
+      <Panel.Sections>
         <UserProfileSubscriptionSectionView
           subscription={subscription}
           onChangePlan={onChangePlan}
@@ -69,7 +67,7 @@ export function UserProfileBillingPanelView({
           onPageSizeChange={onBillingHistoryPageSizeChange}
           onView={onViewInvoice}
         />
-      </div>
-    </div>
+      </Panel.Sections>
+    </Panel.Root>
   );
 }

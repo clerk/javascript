@@ -24,11 +24,11 @@ function renderMenu(props?: { onSignOut?: () => void }) {
     <Menu.Root>
       <Menu.Trigger />
       <Menu.Popup>
-        <Menu.Item label='Add workspace'>
+        <Menu.Item label='Add organization'>
           <Menu.Media>
             <svg data-testid='add-icon' />
           </Menu.Media>
-          <Menu.Label>Add workspace</Menu.Label>
+          <Menu.Label>Add organization</Menu.Label>
         </Menu.Item>
         <Menu.Separator />
         <Menu.Item
@@ -53,6 +53,35 @@ describe('Mosaic Menu', () => {
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
   });
 
+  it('keeps a disabled default trigger focusable and closed when focusableWhenDisabled is set', async () => {
+    render(
+      <Menu.Root>
+        <Menu.Trigger
+          aria-label='Actions'
+          disabled
+          focusableWhenDisabled
+        />
+        <Menu.Popup>
+          <Menu.Item label='Add organization'>
+            <Menu.Label>Add organization</Menu.Label>
+          </Menu.Item>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Actions' });
+
+    expect(trigger).toBeEnabled();
+    expect(trigger).toHaveAttribute('aria-disabled', 'true');
+
+    const act = userEvent.setup();
+    await act.tab();
+    expect(trigger).toHaveFocus();
+
+    await act.keyboard('{Enter}');
+    await act.click(trigger);
+    expect(screen.queryByRole('menu')).toBeNull();
+  });
+
   it('renders a consumer trigger passed via render', () => {
     render(
       <Menu.Root>
@@ -67,8 +96,8 @@ describe('Mosaic Menu', () => {
           Actions
         </Menu.Trigger>
         <Menu.Popup>
-          <Menu.Item label='Add workspace'>
-            <Menu.Label>Add workspace</Menu.Label>
+          <Menu.Item label='Add organization'>
+            <Menu.Label>Add organization</Menu.Label>
           </Menu.Item>
         </Menu.Popup>
       </Menu.Root>,
@@ -88,7 +117,7 @@ describe('Mosaic Menu', () => {
     // `role="menu"` sits on the positioner (floating-ui owns it); the popup is the surface inside.
     expect(screen.getByRole('menu')).toHaveClass('cl-menu-positioner');
     expect(screen.getByRole('menu').querySelector('.cl-menu-popup')).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Add workspace' })).toHaveAttribute('data-color', 'neutral');
+    expect(screen.getByRole('menuitem', { name: 'Add organization' })).toHaveAttribute('data-color', 'neutral');
     expect(screen.getByRole('separator')).toHaveClass('cl-menu-separator');
     expect(screen.getByTestId('add-icon')).toBeInTheDocument();
   });
@@ -233,11 +262,11 @@ describe('Mosaic Menu', () => {
       <Menu.Root defaultOpen>
         <Menu.Trigger />
         <Menu.Popup>
-          <Menu.Item label='Add workspace'>
+          <Menu.Item label='Add organization'>
             <Menu.Media>
               <svg data-testid='add-icon' />
             </Menu.Media>
-            <Menu.Label>Add workspace</Menu.Label>
+            <Menu.Label>Add organization</Menu.Label>
           </Menu.Item>
         </Menu.Popup>
       </Menu.Root>,

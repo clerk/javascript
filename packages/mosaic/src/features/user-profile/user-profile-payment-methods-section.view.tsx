@@ -1,9 +1,9 @@
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileProviderIcon } from './user-profile-provider-icon';
 
 export interface UserProfilePaymentMethod {
@@ -28,32 +28,32 @@ export function UserProfilePaymentMethodsSectionView({
   onRemove,
 }: UserProfilePaymentMethodsSectionViewProps) {
   return (
-    <Section.Root aria-label='Payment methods'>
+    <Section.Root>
       <Section.Group>
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Payment methods</Section.Label>
-            </Section.Content>
-            {onAdd ? (
-              <Section.Actions>
-                <Button
-                  aria-label='Add payment method'
-                  color='neutral'
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Payment methods</Section.Title>
+          </Section.Content>
+          {onAdd ? (
+            <Section.Actions>
+              <Button
+                aria-label='Add payment method'
+                color='neutral'
+                size='sm'
+                variant='outline'
+                onClick={onAdd}
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
                   size='sm'
-                  variant='outline'
-                  onClick={onAdd}
-                >
-                  <Icon
-                    name='plus'
-                    placement='inline-start'
-                    size='sm'
-                  />
-                  Add
-                </Button>
-              </Section.Actions>
-            ) : null}
-          </Section.Item>
+                />
+                Add
+              </Button>
+            </Section.Actions>
+          ) : null}
+        </Section.Header>
+        <Section.Body>
           <Section.Items>
             {paymentMethods.length > 0 ? (
               paymentMethods.map(paymentMethod => (
@@ -72,7 +72,7 @@ export function UserProfilePaymentMethodsSectionView({
               </Section.Item>
             )}
           </Section.Items>
-        </Section.Row>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
@@ -87,7 +87,7 @@ function PaymentMethodItem({
   onMakeDefault?: (id: string) => void;
   onRemove?: (id: string) => void;
 }) {
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
 
   if (!paymentMethod.isDefault && onMakeDefault) {
     actions.push({ label: 'Make default', onClick: () => onMakeDefault(paymentMethod.id) });
@@ -106,7 +106,7 @@ function PaymentMethodItem({
         {paymentMethod.expiryLabel ? <Section.Description>{paymentMethod.expiryLabel}</Section.Description> : null}
       </Section.Content>
       <Section.Actions>
-        <UserProfileActionMenu
+        <ActionMenu
           actions={actions}
           label={`Manage ${paymentMethod.label}`}
         />

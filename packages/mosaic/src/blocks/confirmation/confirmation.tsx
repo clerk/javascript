@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogFocusTarget, DialogHandle, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
+import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from './confirmation.controller';
 
 /** The weight the confirming button carries: an undoable action takes `primary`. */
@@ -34,10 +34,7 @@ function ConfirmationCard({
   errorMessage,
 }: ConfirmationCardProps) {
   return (
-    <Dialog.Popup
-      compactPlacement='sheet'
-      finalFocus={finalFocus}
-    >
+    <Dialog.Popup finalFocus={finalFocus}>
       <Card.Root
         elevation='overlay'
         renderBranding={false}
@@ -46,16 +43,12 @@ function ConfirmationCard({
           <Card.Title>{title}</Card.Title>
           <Card.Description>{description}</Card.Description>
         </Card.Header>
-        {errorMessage ? (
-          <Card.Content>
-            <Banner.Root
-              role='alert'
-              color='negative'
-            >
-              <Banner.Label>{errorMessage}</Banner.Label>
-            </Banner.Root>
-          </Card.Content>
-        ) : null}
+        <Card.Banner
+          role='alert'
+          color='negative'
+        >
+          {errorMessage}
+        </Card.Banner>
         <Card.Footer>
           <Dialog.Close
             render={
@@ -160,16 +153,6 @@ function createHandle<Payload>(): ConfirmationHandle<Payload> {
   return Dialog.createHandle<Payload>();
 }
 
-type FromPayload<Payload, Value> = Value | ((payload: Payload) => Value);
-
-function isFromPayload<Payload, Value>(value: FromPayload<Payload, Value>): value is (payload: Payload) => Value {
-  return typeof value === 'function';
-}
-
-function resolve<Payload, Value>(value: FromPayload<Payload, Value>, payload: Payload): Value {
-  return isFromPayload(value) ? value(payload) : value;
-}
-
 export interface ConfirmationHandleProps<Payload> {
   /** Opens the dialog with a payload from anywhere: `handle.open(payload)` */
   handle: ConfirmationHandle<Payload>;
@@ -188,8 +171,10 @@ export interface ConfirmationHandleProps<Payload> {
   actionLabel: FromPayload<Payload, string>;
   /** Text of the cancel button (default: "Cancel") */
   cancelLabel?: string;
-  /** Runs the action for the payload. Resolve to close the dialog; reject with an `Error` to keep it open showing why */
+  /** Runs the action for the payload. Resolve to close the dialog; reject to keep it open showing why */
   onConfirm: (payload: Payload) => Promise<void> | void;
+  /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
+  errorFallback?: string;
 }
 
 function HandleConfirmation<Payload>({
@@ -201,8 +186,9 @@ function HandleConfirmation<Payload>({
   actionLabel,
   cancelLabel = 'Cancel',
   onConfirm,
+  errorFallback,
 }: ConfirmationHandleProps<Payload>) {
-  const controller = useConfirmationController();
+  const controller = useConfirmationController({ errorFallback });
 
   return (
     <Dialog.Root

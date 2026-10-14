@@ -2,6 +2,23 @@ import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 export type ToastPriority = 'low' | 'high';
 
+export type ToastSide = 'top' | 'bottom' | 'left' | 'right';
+
+export type ToastAlign = 'start' | 'center' | 'end';
+
+export interface ToastPositionerOptions {
+  /** The element the toast is positioned against. */
+  anchor?: Element | null;
+  /** @default 'top' */
+  side?: ToastSide;
+  /** @default 'center' */
+  align?: ToastAlign;
+  /** Gap between the anchor and the toast, in px. @default 0 */
+  sideOffset?: number;
+  /** Shift along the alignment axis, in px. @default 0 */
+  alignOffset?: number;
+}
+
 export interface ToastObject {
   id: string;
   title?: ReactNode;
@@ -13,18 +30,24 @@ export interface ToastObject {
   /** `'high'` announces with `role="alert"` and `aria-live="assertive"`. @default 'low' */
   priority?: ToastPriority;
   transitionStatus?: 'starting' | 'ending';
-  /** True while the toast is queued beyond the provider `limit`. */
+  /** True while the toast is beyond the provider `limit`. Its timer keeps running. */
   limited?: boolean;
   /** Measured height of the root element, used to compute `--toast-offset-y` for the toasts stacked below it. */
   height?: number;
+  /** How many times `add` was called again with this toast's id while it was open. */
+  repeatCount?: number;
   onClose?: () => void;
   onRemove?: () => void;
   /** Props merged onto `Toast.Action`. Its `onClick` runs before the toast closes. */
   actionProps?: ComponentPropsWithRef<'button'>;
+  /** Positioning for `Toast.Positioner`. Overrides the props given to the positioner. A toast with an `anchor` stays out of the stack and the limit. */
+  positionerProps?: ToastPositionerOptions;
   data?: Record<string, unknown>;
 }
 
-export type ToastAddOptions = Omit<ToastObject, 'id' | 'transitionStatus' | 'limited' | 'height'> & { id?: string };
+export type ToastAddOptions = Omit<ToastObject, 'id' | 'transitionStatus' | 'limited' | 'height' | 'repeatCount'> & {
+  id?: string;
+};
 
 export type ToastUpdateOptions = Partial<ToastAddOptions>;
 
@@ -39,7 +62,7 @@ export interface ToastPromiseOptions<Value> {
 }
 
 export interface ToastManager {
-  /** Adds a toast and returns its id. */
+  /** Adds a toast and returns its id. Adding an id that is already open updates that toast and restarts its timer instead. */
   add: (options: ToastAddOptions) => string;
   /** Starts the exit transition of one toast, or of every toast when called without an id. */
   close: (id?: string) => void;
@@ -61,6 +84,10 @@ let toastCounter = 0;
 
 export function isActive(toast: ToastObject) {
   return toast.transitionStatus !== 'ending';
+}
+
+export function isAnchored(toast: ToastObject) {
+  return toast.positionerProps?.anchor != null;
 }
 
 function resolvePromiseResult<Value>(result: ToastPromiseResult<Value>, value: Value): ToastUpdateOptions {
@@ -87,7 +114,14 @@ export function createToastManager(): ExternalToastManager {
     add: options => {
       toastCounter += 1;
       const id = options.id ?? `toast-${toastCounter}`;
-      set([{ ...options, id, transitionStatus: 'starting' }, ...toasts.filter(t => t.id !== id)]);
+      const open = toasts.find(t => t.id === id && isActive(t));
+      if (open) {
+        set(toasts.map(t => (t === open ? { ...t, ...options, id, repeatCount: (t.repeatCount ?? 0) + 1 } : t)));
+        return id;
+      }
+      const replaced = toasts.find(t => t.id === id);
+      set([{ ...options, id, transitionStatus: 'starting' }, ...toasts.filter(t => t !== replaced)]);
+      replaced?.onRemove?.();
       return id;
     },
     close: id => {

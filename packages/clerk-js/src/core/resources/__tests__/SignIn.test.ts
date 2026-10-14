@@ -1,7 +1,10 @@
+import { stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
+import { camelToSnake } from '@clerk/shared/underscore';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
+import { ProtectCheckGate } from '../../protectCheckGate';
 import { signInErrorSignal, signInResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
@@ -31,10 +34,28 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
 }));
 
 describe('SignIn', () => {
+  beforeEach(() => {
+    vi.stubGlobal('Intl', undefined);
+  });
+
   it('can be serialized with JSON.stringify', () => {
     const signIn = new SignIn();
     const snapshot = JSON.stringify(signIn);
     expect(snapshot).toBeDefined();
+  });
+
+  it('keeps a null timezone across JSON, resource, and snapshot representations', () => {
+    const signIn = new SignIn({ timezone: null } as any);
+
+    expect(signIn.timezone).toBeNull();
+    expect(signIn.__internal_toSnapshot().timezone).toBeNull();
+  });
+
+  it('defaults a missing timezone from an older snapshot to null', () => {
+    const signIn = new SignIn({ id: 'signin_123' } as any);
+
+    expect(signIn.timezone).toBeNull();
+    expect(signIn.__internal_toSnapshot().timezone).toBeNull();
   });
 
   describe('prepareSecondFactor', () => {
@@ -311,6 +332,189 @@ describe('SignIn', () => {
     });
   });
 
+  describe('authenticateWithRedirect with a pending challenge', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+      SignIn.clerk = {} as any;
+    });
+
+    const gatedResponse = {
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        first_factor_verification: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token-abc',
+          sdk_url: 'https://sdk.example.com/challenge.js',
+        },
+      },
+    };
+
+    const setupClerk = () => {
+      const windowNavigate = vi.fn();
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_windowNavigate: windowNavigate,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+      return windowNavigate;
+    };
+
+    // The server builds the hand-off before it decides, so a challenged create can also carry a
+    // usable redirect.
+    const gatedWithHandOff = (url: string) => ({
+      client: null,
+      response: {
+        ...gatedResponse.response,
+        first_factor_verification: { status: 'unverified', external_verification_redirect_url: url },
+      },
+    });
+
+    it('follows the hand-off a challenged OAuth create built, leaving the challenge for the way back', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://accounts.google.example/auth'));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+    });
+
+    it('follows the create hand-off when the enterprise SSO prepare after it hits the same pending challenge', async () => {
+      const windowNavigate = setupClerk();
+      // Create builds the hand-off and is challenged; the prepare that follows lands on the same
+      // pending gate and builds nothing new.
+      const mockFetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://idp.example/from-create'));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/from-create'));
+    });
+
+    it('does not follow a hand-off left from an earlier attempt when the prepare is challenged', async () => {
+      const windowNavigate = setupClerk();
+      // The challenged prepare builds no verification, so the redirect on the sign-in is stale and
+      // may be for a different connection.
+      BaseResource._fetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://idp.example/earlier-attempt'));
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+          enterpriseConnectionId: 'ent_other',
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+    });
+
+    it('throws protect_check_required when a challenged create built no hand-off', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      // Only the create call — the prepare is not attempted while the challenge is pending.
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(windowNavigate).not.toHaveBeenCalled();
+      expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('throws protect_check_required when preparing the enterprise SSO hand-off returns a challenge', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+      expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('surfaces protect_check_required through an OAuth transport instead of opening it', async () => {
+      // The transport expects a URL back. Returning without one used to surface as
+      // `oauth_transport_missing_verification_url`, which hid the real reason.
+      setupClerk();
+      const transport = { getRedirectUrl: vi.fn().mockResolvedValue('app://callback'), open: vi.fn() };
+      (SignIn.clerk as any).__internal_oauthTransport = transport;
+      BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(transport.open).not.toHaveBeenCalled();
+    });
+
+    it('follows the hand-off once no challenge is pending', async () => {
+      const windowNavigate = setupClerk();
+      BaseResource._fetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://idp.example/auth',
+          },
+        },
+      });
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        continueSignIn: true,
+      });
+
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/auth'));
+    });
+  });
+
   describe('signIn.create', () => {
     afterEach(() => {
       vi.clearAllMocks();
@@ -384,6 +588,86 @@ describe('SignIn', () => {
           },
         }),
       );
+    });
+
+    it('includes the detected timezone when creating a sign-in', async () => {
+      vi.stubGlobal('Intl', {
+        DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+      });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({ timezone: 'America/New_York' }),
+        }),
+      );
+    });
+
+    it('omits timezone when browser detection is unavailable', async () => {
+      vi.stubGlobal('Intl', undefined);
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com' });
+
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
+    });
+
+    it('preserves an explicitly supplied timezone when creating a sign-in', async () => {
+      vi.stubGlobal('Intl', {
+        DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+      });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com', timezone: 'Europe/Paris' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({ body: expect.objectContaining({ timezone: 'Europe/Paris' }) }),
+      );
+    });
+
+    it('does not inject timezone when continuing an existing sign-in', async () => {
+      vi.stubGlobal('Intl', {
+        DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+      });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+
+      await signIn.prepareFirstFactor({ strategy: 'email_code', emailAddressId: 'email_123' });
+
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
     });
 
     it('includes captcha params when signUpIfMissing is true', async () => {
@@ -479,11 +763,100 @@ describe('SignIn', () => {
     });
   });
 
+  describe('trusted_device strategy', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    const toFormFields = (body: Record<string, unknown>) =>
+      Object.fromEntries(new URLSearchParams(stringifyQueryParams(body, { keyEncoder: camelToSnake })));
+
+    it('creates a sign-in with a trusted device id', async () => {
+      vi.stubGlobal('navigator', { language: '' });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            object: 'verification_trusted_device',
+            status: 'unverified',
+            strategy: 'trusted_device',
+            attempts: 0,
+            trusted_device_challenge: {
+              object: 'trusted_device_challenge',
+              challenge: 'challenge_value',
+              challenge_id: 'tdch_123',
+              trusted_device_id: 'td_123',
+              client_data: 'client_data_value',
+              expires_at: 1_700_000_300,
+              algorithm: 'ES256',
+            },
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      const signIn = new SignIn();
+      await signIn.create({ strategy: 'trusted_device', trustedDeviceId: 'td_123' });
+
+      const { path, method, body } = mockFetch.mock.calls[0][0];
+      expect({ path, method }).toEqual({ path: '/client/sign_ins', method: 'POST' });
+      expect(toFormFields(body)).toEqual({ strategy: 'trusted_device', trusted_device_id: 'td_123' });
+      expect(signIn.firstFactorVerification.trustedDeviceChallenge).toEqual({
+        challenge: 'challenge_value',
+        challengeId: 'tdch_123',
+        trustedDeviceId: 'td_123',
+        clientData: 'client_data_value',
+        expiresAt: new Date(1_700_000_300_000),
+        algorithm: 'ES256',
+      });
+    });
+
+    it('attempts the first factor with a signed challenge', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'complete' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.attemptFirstFactor({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_123',
+        clientData: 'client_data_value',
+        signature: 'signature_value',
+        algorithm: 'ES256',
+      });
+
+      const { path, method, body } = mockFetch.mock.calls[0][0];
+      expect({ path, method }).toEqual({ path: '/client/sign_ins/signin_123/attempt_first_factor', method: 'POST' });
+      expect(toFormFields(body)).toEqual({
+        strategy: 'trusted_device',
+        trusted_device_id: 'td_123',
+        client_data: 'client_data_value',
+        signature: 'signature_value',
+        algorithm: 'ES256',
+      });
+    });
+  });
+
   describe('SignInFuture', () => {
     it('can be serialized with JSON.stringify', () => {
       const signIn = new SignIn();
       const snapshot = JSON.stringify(signIn.__internal_future);
       expect(snapshot).toBeDefined();
+    });
+
+    it('exposes the sign-in timezone', () => {
+      const signIn = new SignIn({ timezone: 'America/New_York' } as any);
+
+      expect(signIn.__internal_future.timezone).toBe('America/New_York');
     });
 
     describe('selectFirstFactor', () => {
@@ -626,6 +999,21 @@ describe('SignIn', () => {
             identifier: 'user@example.com',
           },
         });
+      });
+
+      it('includes the detected timezone when creating a sign-in', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        await new SignIn().__internal_future.create({ identifier: 'user@example.com' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
       it('returns error property on success', async () => {
@@ -870,6 +1258,42 @@ describe('SignIn', () => {
             locale: 'de-DE',
           },
         });
+      });
+
+      it('reuses the timezone captured by an existing sign-in', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor', identifier: 'user@example.com' },
+        });
+        BaseResource._fetch = mockFetch;
+        const signIn = new SignIn({
+          id: 'signin_123',
+          identifier: 'user@example.com',
+          timezone: 'Europe/Paris',
+        } as any);
+
+        await signIn.__internal_future.password({ password: 'password123' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'Europe/Paris');
+      });
+
+      it('falls back to the browser timezone when an existing sign-in has none', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor', identifier: 'user@example.com' },
+        });
+        BaseResource._fetch = mockFetch;
+        const signIn = new SignIn({ id: 'signin_123', identifier: 'user@example.com' } as any);
+
+        await signIn.__internal_future.password({ password: 'password123' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
       it('uses previous identifier when no identifier parameter is provided', async () => {
@@ -3333,6 +3757,192 @@ describe('SignIn', () => {
         { strategy: 'email_code', safe_identifier: 'user@corp.com', email_address_id: 'idn_hmac' },
       ]);
       expect(new SignIn(snapshot).ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
+    });
+  });
+});
+
+describe('SignIn protect_check gate', () => {
+  let previousClerk: any;
+
+  beforeEach(() => {
+    previousClerk = SignIn.clerk;
+    SignIn.clerk = {} as any;
+    vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+    BaseResource._fetch = vi.fn().mockResolvedValue({
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    SignIn.clerk = previousClerk;
+  });
+
+  it('hands the resource to the gate after a Future call', async () => {
+    const signIn = new SignIn();
+
+    await signIn.__internal_future.create({ identifier: 'user@example.com' });
+
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(SignIn.clerk, signIn, undefined);
+  });
+
+  it('returns a classic call with the gate still pending', async () => {
+    const signIn = new SignIn();
+
+    await signIn.create({ identifier: 'user@example.com' });
+
+    expect(signIn.protectCheck?.token).toBe('challenge-token');
+    expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+  });
+
+  describe('Future sso', () => {
+    let windowNavigate: ReturnType<typeof vi.fn>;
+
+    const handOff = (url: string) => ({ status: 'unverified', external_verification_redirect_url: url });
+    const challenged = (firstFactorVerification: ReturnType<typeof handOff> | null = null) => ({
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        first_factor_verification: firstFactorVerification,
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
+    const cleared = (firstFactorVerification: ReturnType<typeof handOff>) => ({
+      client: null,
+      response: { id: 'signin_123', status: 'needs_first_factor', first_factor_verification: firstFactorVerification },
+    });
+
+    beforeEach(() => {
+      vi.stubGlobal('window', { location: { origin: 'https://example.com', href: 'https://example.com/sign-in' } });
+      windowNavigate = vi.fn();
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(url => url),
+        buildUrl: vi.fn(path => 'https://example.com' + path),
+        frontendApi: 'clerk.example.com',
+        __internal_windowNavigate: windowNavigate,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    it('goes to the provider when a challenged create carries a hand-off, leaving the challenge for the way back', async () => {
+      BaseResource._fetch = vi.fn().mockResolvedValue(challenged(handOff('https://accounts.google.example/auth')));
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+      expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+    });
+
+    it('runs the challenge before going to the provider when a challenged create has no hand-off', async () => {
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce(challenged())
+        .mockResolvedValueOnce(cleared(handOff('https://accounts.google.example/auth')));
+      const resolve = vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async (_clerk, resource) => {
+        await resource.submitProtectCheck({ proofToken: 'proof' });
+      });
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(resolve).toHaveBeenCalledTimes(1);
+      expect(resolve.mock.calls[0][1]).toBe(signIn);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+      expect(resolve.mock.invocationCallOrder[0]).toBeLessThan(windowNavigate.mock.invocationCallOrder[0]);
+    });
+
+    it('follows the create hand-off when the enterprise SSO prepare after it hits the same pending challenge', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(challenged(handOff('https://idp.example/from-create')));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'enterprise_sso',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/from-create'));
+      expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+    });
+
+    it('prepares enterprise SSO again after a challenged prepare instead of following an older redirect', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce(challenged())
+        .mockResolvedValueOnce(cleared(handOff('https://idp.example/fresh')));
+      BaseResource._fetch = mockFetch;
+      const resolve = vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async (_clerk, resource) => {
+        (resource as SignIn).protectCheck = null;
+      });
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_first_factor',
+        first_factor_verification: handOff('https://idp.example/stale'),
+      } as any);
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'enterprise_sso',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch.mock.calls.every(([init]) => init.path.endsWith('/prepare_first_factor'))).toBe(true);
+      expect(resolve.mock.invocationCallOrder[0]).toBeLessThan(mockFetch.mock.invocationCallOrder[1]);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/fresh'));
+      expect(windowNavigate).toHaveBeenCalledTimes(1);
+    });
+
+    it('runs a challenge that is waiting when the popup returns', async () => {
+      const popup = { location: { href: '' } } as Window;
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce(cleared(handOff('https://accounts.google.example/auth')))
+        .mockResolvedValueOnce(challenged());
+      vi.mocked(_futureAuthenticateWithPopup).mockResolvedValue(undefined);
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+        popup,
+      });
+
+      expect(error).toBeNull();
+      expect(_futureAuthenticateWithPopup).toHaveBeenCalledTimes(1);
+      expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(ProtectCheckGate.prototype.resolve).mock.calls[0][1]).toBe(signIn);
+      expect(vi.mocked(_futureAuthenticateWithPopup).mock.invocationCallOrder[0]).toBeLessThan(
+        vi.mocked(ProtectCheckGate.prototype.resolve).mock.invocationCallOrder[0],
+      );
     });
   });
 });

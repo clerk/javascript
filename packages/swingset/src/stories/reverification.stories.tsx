@@ -2,7 +2,11 @@ import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import type { ReverificationMethod, ReverificationStep } from '@clerk/mosaic/features/reverification';
 import { otpChannelFor } from '@clerk/mosaic/features/reverification/reverification.utils';
-import { ReverificationView } from '@clerk/mosaic/features/reverification/reverification.view';
+import {
+  ReverificationError,
+  ReverificationPending,
+  ReverificationView,
+} from '@clerk/mosaic/features/reverification/reverification.view';
 import { ReverificationBackupCode } from '@clerk/mosaic/features/reverification/steps/reverification-backup-code';
 import { ReverificationHelp } from '@clerk/mosaic/features/reverification/steps/reverification-help';
 import { ReverificationMethodPicker } from '@clerk/mosaic/features/reverification/steps/reverification-method-picker';
@@ -201,32 +205,34 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
 
   return (
     <>
-      <ReverificationView
-        step={step}
-        direction={direction}
-        value={value}
-        onValueChange={onValueChange}
-        errorMessage={errorMessage}
-        isPending={isPending}
-        onSubmit={onSubmit}
-        onShowMethods={() => navigate('method-picker', 1)}
-        onResend={onResend}
-        canResend={canResend}
-        onShowHelp={() => navigate('help', 1)}
-        onBack={() => {
-          if (step === 'help') {
-            navigate('method-picker', -1);
-            return;
-          }
-          if (step === 'method-picker') {
-            navigate(stepFor(methodId), -1);
-          }
-        }}
-        onEmailSupport={() => setSupportRequested(true)}
-        methods={allMethods.filter(method => method.id !== methodId)}
-        onSelectMethod={id => void selectMethod(id)}
-        otpChannel={activeMethod ? otpChannelFor(activeMethod.strategy) : undefined}
-      />
+      <Card.Root renderBranding={false}>
+        <ReverificationView
+          step={step}
+          direction={direction}
+          value={value}
+          onValueChange={onValueChange}
+          errorMessage={errorMessage}
+          isPending={isPending}
+          onSubmit={onSubmit}
+          onShowMethods={() => navigate('method-picker', 1)}
+          onResend={onResend}
+          canResend={canResend}
+          onShowHelp={() => navigate('help', 1)}
+          onBack={() => {
+            if (step === 'help') {
+              navigate('method-picker', -1);
+              return;
+            }
+            if (step === 'method-picker') {
+              navigate(stepFor(methodId), -1);
+            }
+          }}
+          onEmailSupport={() => setSupportRequested(true)}
+          methods={allMethods.filter(method => method.id !== methodId)}
+          onSelectMethod={id => void selectMethod(id)}
+          otpChannel={activeMethod ? otpChannelFor(activeMethod.strategy) : undefined}
+        />
+      </Card.Root>
       {supportRequested ? <p>Email support requested.</p> : null}
     </>
   );
@@ -236,28 +242,58 @@ export function Default(): JSX.Element {
   const [runId, setRunId] = useState(0);
   const [complete, setComplete] = useState(false);
 
-  if (complete) {
-    return (
-      <div>
-        <p>Reverification complete.</p>
-        <Button
-          type='button'
-          onClick={() => {
-            setComplete(false);
-            setRunId(current => current + 1);
-          }}
-        >
-          Restart
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <WorkingExample
-      key={runId}
-      onComplete={() => setComplete(true)}
-    />
+    <div className='min-h-136 grid w-full place-items-center'>
+      {complete ? (
+        <div>
+          <p>Reverification complete.</p>
+          <Button
+            type='button'
+            onClick={() => {
+              setComplete(false);
+              setRunId(current => current + 1);
+            }}
+          >
+            Restart
+          </Button>
+        </div>
+      ) : (
+        <WorkingExample
+          key={runId}
+          onComplete={() => setComplete(true)}
+        />
+      )}
+    </div>
+  );
+}
+
+export function Pending(): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationPending />
+    </Card.Root>
+  );
+}
+
+export function ErrorNoFactors(): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationError
+        reason='noFactors'
+        onClose={() => undefined}
+      />
+    </Card.Root>
+  );
+}
+
+export function ErrorGeneric(): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationError
+        reason='generic'
+        onClose={() => undefined}
+      />
+    </Card.Root>
   );
 }
 

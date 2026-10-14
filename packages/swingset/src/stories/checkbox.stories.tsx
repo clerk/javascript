@@ -9,7 +9,7 @@ export { default as __source } from './checkbox.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Checkbox',
   source: 'packages/mosaic/src/components/checkbox/checkbox.tsx',
   styles: {

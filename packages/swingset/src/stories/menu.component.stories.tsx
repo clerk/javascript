@@ -20,11 +20,11 @@ export function Default() {
     <Menu.Root>
       <Menu.Trigger />
       <Menu.Popup>
-        <Menu.Item label='Add workspace'>
+        <Menu.Item label='Add organization'>
           <Menu.Media>
             <Icon name='plus' />
           </Menu.Media>
-          <Menu.Label>Add workspace</Menu.Label>
+          <Menu.Label>Add organization</Menu.Label>
         </Menu.Item>
         <Menu.Item label='Sign out'>
           <Menu.Media>
@@ -83,7 +83,7 @@ export function Accounts() {
   );
 }
 
-const workspaces = [
+const organizations = [
   'Ashgrove',
   'Bramblewood',
   'Cedar Hollow',
@@ -154,22 +154,22 @@ const workspaces = [
 export function Overflowing() {
   return (
     <Menu.Root>
-      <Menu.Trigger>Switch workspace</Menu.Trigger>
+      <Menu.Trigger>Switch organization</Menu.Trigger>
       <Menu.Popup>
-        {workspaces.map(workspace => (
+        {organizations.map(organization => (
           <Menu.Item
-            key={workspace}
-            label={workspace}
+            key={organization}
+            label={organization}
           >
             <Menu.Media>
               <Avatar.Root
                 shape='square'
                 size='fit'
               >
-                <Avatar.Fallback>{workspace[0]}</Avatar.Fallback>
+                <Avatar.Fallback>{organization[0]}</Avatar.Fallback>
               </Avatar.Root>
             </Menu.Media>
-            <Menu.Label>{workspace}</Menu.Label>
+            <Menu.Label>{organization}</Menu.Label>
           </Menu.Item>
         ))}
       </Menu.Popup>

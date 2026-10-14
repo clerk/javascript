@@ -18,7 +18,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
     'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
-    'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
+    'user-profile-profile-section': dynamic(() => import('../stories/user-profile-profile-section.mdx')),
+    'user-profile-email-section': dynamic(() => import('../stories/user-profile-email-section.mdx')),
+    'user-profile-phone-section': dynamic(() => import('../stories/user-profile-phone-section.mdx')),
     'user-profile-password-section': dynamic(() => import('../stories/user-profile-password-section.mdx')),
     'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
     'user-profile-mfa-section': dynamic(() => import('../stories/user-profile-mfa-section.mdx')),
@@ -37,7 +39,20 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
       () => import('../stories/user-profile-connected-accounts-section.mdx'),
     ),
     'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
-    'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
+    'user-profile-danger-section': dynamic(() => import('../stories/user-profile-danger-section.mdx')),
+  },
+  'organization-profile': {
+    'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
+    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
+    'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
+    'organization-profile-profile-section': dynamic(
+      () => import('../stories/organization-profile-profile-section.mdx'),
+    ),
+    'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
+    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+  },
+  'api-keys': {
+    'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
   },
   reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
@@ -47,6 +62,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {
+    'action-bar': dynamic(() => import('../stories/action-bar.mdx')),
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
     banner: dynamic(() => import('../stories/banner.mdx')),
@@ -54,6 +70,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     card: dynamic(() => import('../stories/card.component.mdx')),
     checkbox: dynamic(() => import('../stories/checkbox.mdx')),
     combobox: dynamic(() => import('../stories/combobox.mdx')),
+    'copy-button': dynamic(() => import('../stories/copy-button.mdx')),
     'data-list': dynamic(() => import('../stories/data-list.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
@@ -63,16 +80,21 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     drawer: dynamic(() => import('../stories/drawer.component.mdx')),
     'empty-state': dynamic(() => import('../stories/empty-state.mdx')),
+    entity: dynamic(() => import('../stories/entity.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
     otp: dynamic(() => import('../stories/otp.component.mdx')),
+    panel: dynamic(() => import('../stories/panel.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     profile: dynamic(() => import('../stories/profile.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
+    'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
+    'tag-input': dynamic(() => import('../stories/tag-input.component.mdx')),
     toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
@@ -95,6 +117,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
+    'tag-input': dynamic(() => import('../stories/tag-input.mdx')),
     toast: dynamic(() => import('../stories/toast.primitive.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.mdx')),
   },
@@ -105,6 +128,8 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   hooks: {
     // Headless hooks — alphabetical.
     'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
+    'use-form': dynamic(() => import('../stories/use-form.mdx')),
+    'use-server-data-table': dynamic(() => import('../stories/use-server-data-table.mdx')),
   },
   localization: {
     localization: dynamic(() => import('../stories/localization.mdx')),
@@ -133,7 +158,7 @@ export function DocsViewer({ group, slug }: DocsViewerProps) {
       meta={meta}
     >
       <article
-        className={`prose mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
+        className={`prose prose-headings:scroll-mt-16 mx-auto w-full min-w-0 p-3 sm:p-8 ${meta?.layout === 'wide' ? 'max-w-7xl' : 'max-w-3xl'}`}
       >
         <DocContent />
       </article>

@@ -20,9 +20,10 @@ import type { SignUpCtx } from '@/types';
 import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
-import { buildSignInOAuthCallbackParams, buildSignUpOAuthCallbackParams } from './buildOAuthCallbackParams';
+import { buildCombinedFlowOAuthCallbackParams, buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
   LazySignUpContinue,
+  LazySignUpEnterpriseConnections,
   LazySignUpProtectCheck,
   LazySignUpSSOCallback,
   LazySignUpStart,
@@ -112,7 +113,7 @@ function SignInRoutes(): JSX.Element {
               <LazySignUpVerifyPhone />
             </Route>
             <Route path='sso-callback'>
-              <LazySignUpSSOCallback {...buildSignUpOAuthCallbackParams(signUpContext)} />
+              <LazySignUpSSOCallback {...buildCombinedFlowOAuthCallbackParams(signUpContext)} />
             </Route>
             <Route path='verify'>
               <SignUpEmailLinkFlowComplete
@@ -149,6 +150,9 @@ function SignInRoutes(): JSX.Element {
             </Route>
             <Route path='tasks'>
               <LazySessionTasks redirectUrlComplete={signInContext.afterSignUpUrl} />
+            </Route>
+            <Route path='enterprise-connections'>
+              <LazySignUpEnterpriseConnections />
             </Route>
             <Route index>
               <LazySignUpStart />

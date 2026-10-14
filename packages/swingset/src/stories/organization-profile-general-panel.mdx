@@ -1,0 +1,23 @@
+import * as Stories from './organization-profile-general-panel.stories';
+
+# OrganizationProfileGeneralPanel
+
+The organization's General page: its details, and the danger zone under them.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Organization details', href: '/organization-profile/organization-profile-profile-section', layer: 'Organization Profile' },
+    { name: 'Danger zone', href: '/organization-profile/organization-profile-danger-section', layer: 'Organization Profile' },
+  ]}
+/>
+
+## Without the danger zone
+
+The danger zone renders from `dangerSlot`. Without it, the panel shows only the organization details.
+
+<Story
+  name='ReadOnly'
+  storyModule={Stories}
+/>

@@ -1,4 +1,3 @@
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
@@ -32,16 +31,12 @@ export function ReverificationPasskey({
         <Card.Title>{messages.title}</Card.Title>
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
-      {errorMessage ? (
-        <Card.Content>
-          <Banner.Root
-            role='alert'
-            color='negative'
-          >
-            <Banner.Label>{errorMessage}</Banner.Label>
-          </Banner.Root>
-        </Card.Content>
-      ) : null}
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {errorMessage}
+      </Card.Banner>
       <Card.Footer>
         {onCancel ? (
           <Button

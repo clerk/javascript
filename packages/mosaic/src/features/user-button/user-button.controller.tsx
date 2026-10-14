@@ -1,6 +1,6 @@
-import { useSpinDelay } from '../../hooks/useSpinDelay';
+import { useSpinDelay } from '../../hooks/use-spin-delay';
 import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 import type { UserButtonModel } from './user-button.model';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonProps as UserButtonViewProps, UserButtonTriggerProps } from './user-button.view';
@@ -84,13 +84,19 @@ const userButtonMachine = createMachine({
           { target: 'idle', actions: assign(() => settled) },
         ],
         // Leave `open` as the user left it. The error surface is a later change.
-        onError: { target: 'idle', actions: assign(() => settled) },
+        onError: {
+          target: 'idle',
+          actions: [
+            assign(() => settled),
+            (_, event) => console.error('[Clerk] User button action failed', event.error),
+          ],
+        },
       }),
     },
   },
 });
 
-export type UserButtonControllerOptions = Pick<UserButtonModeProps, 'mode' | 'modePriority'> & UserButtonMenuProps;
+export type UserButtonControllerOptions = Pick<UserButtonModeProps, 'mode'> & UserButtonMenuProps;
 
 export type UserButtonController =
   | { status: 'loading' }
@@ -107,7 +113,7 @@ export function useUserButtonController(
   model: UserButtonModel,
   options: UserButtonControllerOptions = {},
 ): UserButtonController {
-  const { mode: requestedMode, modePriority, customMenuItems, menuItemOrder } = options;
+  const { mode: requestedMode, customMenuItems, menuItemOrder } = options;
   const [{ context }, send] = useMachine(userButtonMachine);
 
   // Every action here is a network round trip, so we can start the
@@ -197,7 +203,6 @@ export function useUserButtonController(
     status: 'ready',
     ...data,
     mode,
-    modePriority,
     customMenuItems: menuItems,
     menuItemOrder,
     open: context.open,

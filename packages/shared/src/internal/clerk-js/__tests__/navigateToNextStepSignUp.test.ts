@@ -13,6 +13,8 @@ const URLS = {
   signUpProtectCheckUrl: 'https://app.test/sign-up/protect-check',
 };
 
+const ENTERPRISE_CONNECTIONS_URL = 'https://app.test/sign-up/enterprise-connections';
+
 describe('navigateToNextStepSignUp', () => {
   beforeEach(() => {
     mockNavigate.mockReset();
@@ -54,6 +56,59 @@ describe('navigateToNextStepSignUp', () => {
 
     expect(mockNavigate).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith(URLS.signUpProtectCheckUrl);
+  });
+
+  it('navigates to the enterprise connections page when enterprise_sso is missing and the url is provided', async () => {
+    const signUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso'] as SignUpField[],
+      unverifiedFields: [],
+    } as unknown as SignUpResource;
+
+    await navigateToNextStepSignUp({
+      signUp,
+      ...URLS,
+      enterpriseConnectionsUrl: ENTERPRISE_CONNECTIONS_URL,
+      navigate: mockNavigate,
+    });
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith(ENTERPRISE_CONNECTIONS_URL);
+  });
+
+  it('navigates to the protect-check page before the enterprise connections page', async () => {
+    const signUp = {
+      status: 'missing_requirements',
+      missingFields: ['protect_check', 'enterprise_sso'] as SignUpField[],
+      unverifiedFields: [],
+    } as unknown as SignUpResource;
+
+    await navigateToNextStepSignUp({
+      signUp,
+      ...URLS,
+      enterpriseConnectionsUrl: ENTERPRISE_CONNECTIONS_URL,
+      navigate: mockNavigate,
+    });
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith(URLS.signUpProtectCheckUrl);
+  });
+
+  it('navigates to the continue page when enterprise_sso is missing and no enterprise connections url is provided', async () => {
+    const signUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso'] as SignUpField[],
+      unverifiedFields: [],
+    } as unknown as SignUpResource;
+
+    await navigateToNextStepSignUp({
+      signUp,
+      ...URLS,
+      navigate: mockNavigate,
+    });
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith(URLS.continueSignUpUrl);
   });
 
   it('navigates to verify-email-address when email is unverified and there are no missing fields', async () => {

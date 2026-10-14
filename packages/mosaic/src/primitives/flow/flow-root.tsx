@@ -2,8 +2,14 @@
 
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { useAnimationsFinished } from '../hooks/use-animations-finished';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { autoUpdate, getDimensions } from '../utils/dom';
 import { FlowContext, type FlowContextValue, type FlowDirection } from './flow-context';
+
+function isHeightTransition(animation: Animation): boolean {
+  return 'transitionProperty' in animation && animation.transitionProperty === 'height';
+}
 
 export interface FlowRootProps extends ComponentProps<'div'> {
   value: string;
@@ -14,10 +20,18 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
   const { render, value, direction = 1, ...otherProps } = props;
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [activeStep, setActiveStep] = useState<HTMLElement | null>(null);
-  const [activeStepHeight, setActiveStepHeight] = useState<number>();
+  const [measured, setMeasured] = useState(false);
   const [initial, setInitial] = useState(true);
+  const [transitioning, setTransitioning] = useState(false);
+  const lastActiveStepRef = useRef<HTMLElement | null>(null);
+  const stepHeightRef = useRef<number | null>(null);
+  const runOnHeightTransitionFinished = useAnimationsFinished(rootRef, false, isHeightTransition);
 
   const registerActiveStep = useCallback((element: HTMLElement) => {
+    if (lastActiveStepRef.current && lastActiveStepRef.current !== element) {
+      setTransitioning(true);
+    }
+    lastActiveStepRef.current = element;
     setActiveStep(element);
   }, []);
 
@@ -30,32 +44,43 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
       return;
     }
 
-    const measure = () => {
-      setActiveStepHeight(activeStep.offsetHeight);
-    };
-
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') {
-      return;
-    }
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(activeStep);
-    return () => observer.disconnect();
+    return autoUpdate(activeStep, () => {
+      const root = rootRef.current;
+      const { height } = getDimensions(activeStep);
+      if (root && stepHeightRef.current !== null && height !== stepHeightRef.current) {
+        root.dataset.heightChange = height < stepHeightRef.current ? 'shrink' : 'grow';
+      }
+      stepHeightRef.current = height;
+      root?.style.setProperty('--cl-flow-step-height', `${height}px`);
+      setMeasured(true);
+    });
   }, [activeStep]);
 
   useLayoutEffect(() => {
-    if (activeStepHeight === undefined || !initial) {
+    if (!transitioning) {
+      return;
+    }
+
+    return runOnHeightTransitionFinished(() => setTransitioning(false));
+  }, [transitioning, activeStep, runOnHeightTransitionFinished]);
+
+  useLayoutEffect(() => {
+    if (!measured || !initial) {
       return;
     }
 
     const frame = requestAnimationFrame(() => setInitial(false));
     return () => cancelAnimationFrame(frame);
-  }, [activeStepHeight, initial]);
+  }, [measured, initial]);
 
   const contextValue = useMemo<FlowContextValue>(
-    () => ({ value, direction, rootRef, registerActiveStep, unregisterActiveStep }),
+    () => ({
+      value,
+      direction,
+      rootRef,
+      registerActiveStep,
+      unregisterActiveStep,
+    }),
     [value, direction, registerActiveStep, unregisterActiveStep],
   );
 
@@ -66,9 +91,7 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     props: mergeProps<'div'>(
       {
         'data-initial': initial ? '' : undefined,
-        style: {
-          ['--cl-flow-step-height' as string]: activeStepHeight === undefined ? undefined : `${activeStepHeight}px`,
-        },
+        'data-transitioning': transitioning ? '' : undefined,
       },
       otherProps,
     ),

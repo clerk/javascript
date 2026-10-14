@@ -25,7 +25,6 @@ function FloatingCombobox(props?: { onValueChange?: (value: string | null) => vo
             <Icon
               name='chevron-down'
               size='sm'
-              aria-hidden='true'
             />
           </Combobox.Trigger>
         </InputGroup.End>
@@ -320,10 +319,7 @@ describe('Mosaic Combobox', () => {
       <Combobox.Root open>
         <InputGroup.Root size='lg'>
           <InputGroup.Start>
-            <Icon
-              name='magnifying-glass'
-              aria-hidden='true'
-            />
+            <Icon name='magnifying-glass' />
           </InputGroup.Start>
           <Combobox.Input
             aria-label='Search countries'

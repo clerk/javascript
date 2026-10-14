@@ -1,22 +1,32 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useFlowStepActive } from '../../primitives/flow';
+import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
+import { hasMessage, useHeldMessage } from '../../utils/feedback';
+import type { BannerRootProps } from '../banner';
+import { Banner } from '../banner';
 import { Branding } from '../branding';
 import { Button } from '../button';
+import type { DialogContextValue } from '../dialog';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Icon } from '../icon';
-import { cardContentMarker } from './card.markers.stylex';
+import { cardContentMarker, cardFooterMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
 
 type CardElevation = 'card' | 'flush' | 'overlay';
 
+export type CardSize = keyof typeof slots.sizes;
+
 const DEFAULT_ELEVATION: CardElevation = 'card';
 
-const CardElevationContext = React.createContext<CardElevation>(DEFAULT_ELEVATION);
+// The enclosing card and the dialog it was rendered in. Context crosses portals, so a card in a
+// dialog opened from inside another card is still the dialog's outermost one.
+const CardContext = React.createContext<{ elevation: CardElevation; dialog: DialogContextValue | null } | null>(null);
 
 function CardBranding() {
   return (
@@ -29,6 +39,8 @@ function CardBranding() {
 export interface CardProps extends MosaicComponentProps<'div'> {
   /** Surface treatment applied to the card. @default 'card' */
   elevation?: CardElevation;
+  /** The card's width. `lg` is for forms that need the room, like a tag input. @default 'md' */
+  size?: CardSize;
   /**
    * Signs the foot of the card with "Secured by Clerk". An instance that has paid the branding off
    * carries none of it, so a connected surface passes `displayConfig.branded` here.
@@ -39,17 +51,28 @@ export interface CardProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
-  { elevation = DEFAULT_ELEVATION, renderBranding = true, render, xstyle, children, ...rest },
+  { elevation = DEFAULT_ELEVATION, size = 'md', renderBranding = true, render, xstyle, children, ...rest },
   ref,
 ) {
+  const dialog = React.useContext(DialogContext);
+  const enclosing = React.useContext(CardContext);
+  const isSurface = (enclosing === null || enclosing.dialog !== dialog) && elevation !== 'flush';
+  const context = React.useMemo(() => ({ elevation, dialog }), [elevation, dialog]);
   const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('card-root', { elevation }),
-        stylex.props(reset.base, slots.root.base, slots.root[elevation], xstyle),
+        themeProps('card-root', { elevation, size }),
+        stylex.props(
+          reset.base,
+          slots.root.base,
+          slots.root[elevation],
+          slots.sizes[size],
+          isSurface && slots.surface.root,
+          xstyle,
+        ),
         rest,
       ),
       children: (
@@ -61,7 +84,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     },
   });
 
-  return <CardElevationContext.Provider value={elevation}>{element}</CardElevationContext.Provider>;
+  return <CardContext.Provider value={context}>{element}</CardContext.Provider>;
 });
 
 /**
@@ -102,10 +125,11 @@ const Header = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
         <>
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
               focus — the same reason `Dialog.CloseButton` is a part rather than a popup flag.
-              Not outside a dialog, where there is nothing to close, and not in an alert dialog. */}
+              Not outside a dialog, where there is nothing to close, and not where the dialog's
+              `showCloseButton` is off, which is the default for an alert dialog. */}
           {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
               without answering one. The cancel action in the footer is the way out. */}
-          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <HeaderCloseButton /> : null}
+          {isInDialog(dialog) && dialog.showCloseButton ? <HeaderCloseButton /> : null}
           <div {...mergeStyleProps(themeProps('card-header-content'), stylex.props(reset.base, slots.header.content))}>
             {children}
           </div>
@@ -124,6 +148,7 @@ const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(f
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  const stepActive = useFlowStepActive();
   return useRender({
     defaultTagName: 'h2',
     render,
@@ -132,7 +157,7 @@ const Title = React.forwardRef<HTMLHeadingElement, MosaicComponentProps<'h2'>>(f
       ...mergeStyleProps(themeProps('card-title'), stylex.props(reset.base, slots.header.title, xstyle), rest),
       // The popup points `aria-labelledby` at this id, so the surface outranks the caller: an id
       // that displaced it would leave the dialog with no accessible name.
-      ...(dialog && { id: dialog.labelId }),
+      ...(dialog && stepActive && { id: dialog.labelId }),
     },
   });
 });
@@ -143,6 +168,7 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
+  const stepActive = useFlowStepActive();
   return useRender({
     defaultTagName: 'p',
     render,
@@ -153,7 +179,49 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
         stylex.props(reset.base, slots.header.description, xstyle),
         rest,
       ),
-      ...(dialog && { id: dialog.descriptionId }),
+      ...(dialog && stepActive && { id: dialog.descriptionId }),
+    },
+  });
+});
+
+export interface CardBannerProps extends MosaicComponentProps<'div'> {
+  /** Semantic color of the banner. @default 'neutral' */
+  color?: BannerRootProps['color'];
+}
+
+const CardBanner = React.forwardRef<HTMLDivElement, CardBannerProps>(function CardBanner(
+  { color, render, xstyle, children, ...rest },
+  ref,
+) {
+  const open = hasMessage(children);
+  const element = React.useRef<HTMLElement | null>(null);
+  const { mounted, transitionProps } = useTransition({ open, ref: element });
+  const message = useHeldMessage(children, open);
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref: [ref, element],
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-banner'),
+        stylex.props(reset.base, slots.banner.collapse, xstyle),
+        { ...transitionProps },
+        rest,
+      ),
+      children: (
+        <div {...stylex.props(reset.base, slots.banner.clip)}>
+          {mounted ? (
+            <Banner.Root
+              color={color}
+              xstyle={slots.banner.surface}
+              aria-hidden={open ? undefined : true}
+              {...transitionProps}
+            >
+              <Banner.Label>{message}</Banner.Label>
+            </Banner.Root>
+          ) : null}
+        </div>
+      ),
     },
   });
 });
@@ -180,7 +248,7 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   { render, xstyle, ...rest },
   ref,
 ) {
-  const elevation = React.useContext(CardElevationContext);
+  const elevation = React.useContext(CardContext)?.elevation ?? DEFAULT_ELEVATION;
   return useRender({
     defaultTagName: 'div',
     render,
@@ -188,7 +256,7 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
     props: {
       ...mergeStyleProps(
         themeProps('card-footer', { elevation }),
-        stylex.props(reset.base, slots.footer.base, xstyle),
+        stylex.props(reset.base, slots.footer.base, cardFooterMarker, xstyle),
         rest,
       ),
     },
@@ -197,10 +265,14 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
 
 /**
  * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Title`, `Card.Description`,
- * `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic `render` prop and forwards its
- * ref.
+ * `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic `render` prop and
+ * forwards its ref.
+ *
+ * `Card.Banner` is a message slot between the header and the content. It is always rendered, and
+ * a `Banner` expands into it while its children hold a message, collapsing again once they are
+ * empty, so the slot takes `role='alert'` and stays a live region across both.
  *
  * Rendered as the content of a `Dialog.Popup`, the card reads that surface from `DialogContext`:
  * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
  */
-export const Card = { Root, Header, Title, Description, Content, Footer };
+export const Card = { Root, Header, Title, Description, Banner: CardBanner, Content, Footer };

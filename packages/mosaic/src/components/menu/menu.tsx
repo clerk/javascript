@@ -12,9 +12,9 @@ import { Menu as Primitive } from '../../primitives/menu';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
-import { truncationStyles } from '../../utils/typography.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
@@ -22,14 +22,22 @@ import * as slots from './menu.styles';
 
 export type { MenuProps };
 
-export type MenuTriggerProps = MosaicComponentProps<'button'>;
+export type MenuTriggerProps = MosaicComponentProps<'button'> & {
+  /**
+   * Keeps a disabled default trigger in the tab order, marked `aria-disabled`. Applies to the
+   * default `Button` only; a `render` trigger handles its own disabled state.
+   *
+   * @default false
+   */
+  focusableWhenDisabled?: boolean;
+};
 
 /**
  * Opens the menu. Renders a ghost `Button` holding an ellipsis glyph by default;
  * pass `children` for a labelled trigger, or `render` to supply your own element.
  */
 export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(function MosaicMenuTrigger(
-  { render, xstyle, children, ...rest },
+  { render, xstyle, children, focusableWhenDisabled, ...rest },
   ref,
 ) {
   const trigger: MenuTriggerProps['render'] =
@@ -39,6 +47,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
         variant='ghost'
         size='sm'
         shape={children ? 'default' : 'square'}
+        focusableWhenDisabled={focusableWhenDisabled}
         {...props}
       />
     ));

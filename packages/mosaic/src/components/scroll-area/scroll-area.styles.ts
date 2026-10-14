@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { focusOutline } from '../../styles/focus-outline.styles';
 import { durationVars, radiusVars, scrollbarVars, scrollFadeVars } from '../../tokens.stylex';
-import { focusOutline } from '../../utils/focus-outline.styles';
 import { scrollAreaVars, scrollbarThumbVars } from './scroll-area.vars.stylex';
 
 // Same-file locals so the `var()` references read as names rather than as a wall of
@@ -71,6 +71,8 @@ const styles = stylex.create({
    * lives in `axes` below.
    */
   viewport: {
+    '--cl-scroll-area-progress-end': 0,
+    '--cl-scroll-area-progress-start': 0,
     flexBasis: 'auto',
     flexGrow: 1,
     flexShrink: 1,

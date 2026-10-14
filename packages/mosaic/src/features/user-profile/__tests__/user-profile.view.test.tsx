@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../../../components/dialog';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
 
 const pages: UserProfileViewProps['pages'] = {
-  account: { name: 'Preston Booth', username: 'prestonxyz' },
-  security: { hasPassword: true },
+  account: {},
+  security: {},
   billing: {
     subscription: {
       planName: 'Basic Plan',
@@ -20,13 +20,7 @@ const pages: UserProfileViewProps['pages'] = {
     paymentMethods: [],
     historyItems: [],
   },
-  apiKeys: {
-    apiKeys: [],
-    searchValue: '',
-    selectedIds: [],
-    onSearchChange: vi.fn(),
-    onSelectionChange: vi.fn(),
-  },
+  apiKeys: <p>API keys content</p>,
 };
 
 function renderView(overrides: Partial<UserProfileViewProps> = {}) {
@@ -157,5 +151,14 @@ describe('UserProfileView', () => {
     const popup = screen.getByRole('dialog', { name: 'User profile' });
     expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
     expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+  });
+
+  it('warns when there are no pages to show', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    renderView({ pages: {} });
+
+    expect(warn).toHaveBeenCalledWith('[Clerk] UserProfile has no pages to show.');
+    warn.mockRestore();
   });
 });

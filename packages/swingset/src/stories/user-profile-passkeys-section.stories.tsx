@@ -18,12 +18,7 @@ export const meta: StoryMeta = {
 
 function PasskeysExample({ empty = false, failOnce = false }: { empty?: boolean; failOnce?: boolean }): ReactElement {
   const fixture = usePasskeysFixture({ empty, failOnce });
-  return (
-    <UserProfilePasskeysSectionView
-      {...fixture}
-      sectionTitle='Authentication'
-    />
-  );
+  return <UserProfilePasskeysSectionView {...fixture} />;
 }
 
 export function Default(): ReactElement {
@@ -39,7 +34,6 @@ export function CreationUnavailable(): ReactElement {
   return (
     <UserProfilePasskeysSectionView
       {...fixture}
-      sectionTitle='Authentication'
       onAdd={undefined}
     />
   );

@@ -1,15 +1,15 @@
 import type { Ref } from 'react';
 import { useMemo } from 'react';
 
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Dialog } from '../../components/dialog';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
-import { fill } from '../../localization/messages';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
+import { fill, useMessages } from '../../localization';
 import { styles } from './user-profile-passkeys-section.styles';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
+import type { UserProfilePasskeyNameValidator } from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 import { useUserProfileRenamePasskeyController } from './user-profile-rename-passkey.controller';
 import { UserProfileRenamePasskeyDialog } from './user-profile-rename-passkey.dialog';
 
@@ -17,21 +17,29 @@ export function UserProfilePasskeyRowView({
   passkey,
   triggerRef,
   onRename,
+  validateName,
   onRemove,
 }: {
   passkey: UserProfilePasskey;
   triggerRef?: Ref<HTMLButtonElement>;
   onRename?: (id: string, name: string) => void | Promise<void>;
+  validateName?: UserProfilePasskeyNameValidator;
   onRemove?: () => void;
 }) {
+  const m = useMessages('userProfilePasskeys');
   const renameDialog = useMemo(() => Dialog.createHandle(), []);
-  const controller = useUserProfileRenamePasskeyController({ id: passkey.id, name: passkey.name, onRename });
+  const controller = useUserProfileRenamePasskeyController({
+    id: passkey.id,
+    name: passkey.name,
+    onRename,
+    validateName,
+  });
   const description =
     passkey.createdAtLabel && passkey.lastUsedAtLabel
       ? fill(m.details, { createdAt: passkey.createdAtLabel, lastUsedAt: passkey.lastUsedAtLabel })
       : passkey.createdAtLabel || passkey.lastUsedAtLabel;
 
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
   if (onRename) {
     actions.push({ label: m.rename, onClick: () => renameDialog.open(undefined) });
   }
@@ -48,7 +56,6 @@ export function UserProfilePasskeyRowView({
             bordered={false}
           >
             <Icon
-              aria-hidden
               name='security-passkey'
               size='md'
               xstyle={styles.icon}
@@ -61,7 +68,7 @@ export function UserProfilePasskeyRowView({
         </Section.Content>
         {actions.length > 0 ? (
           <Section.Actions>
-            <UserProfileActionMenu
+            <ActionMenu
               triggerRef={triggerRef}
               actions={actions}
               label={fill(m.manage, { name: passkey.name })}

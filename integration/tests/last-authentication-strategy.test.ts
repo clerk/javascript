@@ -86,7 +86,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await expect(lastUsedBadge).toBeVisible();
       await expect(lastUsedBadge).toHaveCount(1);
 
-      const btn = page.getByRole('button', { name: 'Last used Sign in with Google' });
+      const btn = page.getByRole('button', { name: 'Last used Continue with Google' });
       await expect(btn).toBeVisible();
 
       // Ensure the last used social button has been pulled to the first row.
@@ -108,7 +108,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await expect(lastUsedBadge).toBeVisible();
       await expect(lastUsedBadge).toHaveCount(1);
 
-      const btn = page.getByRole('button', { name: 'Last used Sign in with Google' });
+      const btn = page.getByRole('button', { name: 'Last used Continue with Google' });
       await expect(btn).toBeVisible();
 
       // Ensure the last used social button has been pulled to the first row.
