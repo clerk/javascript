@@ -84,26 +84,6 @@ public class ClerkExpoModule: Module {
     AsyncFunction("getAuthFlowState") { (promise: Promise) in
       self.getAuthFlowState(promise: promise)
     }
-
-    AsyncFunction("reverifyWithBiometrics") {
-      (sessionId: String, level: String, reason: String?, promise: Promise) in
-      Task { @MainActor in
-        do {
-          let verification = try await ClerkNativeBridge.shared.reverifyWithBiometrics(
-            sessionId: sessionId,
-            level: level,
-            reason: reason
-          )
-          promise.resolve(verification)
-        } catch {
-          self.rejectBiometricCredentialError(
-            error,
-            fallbackCode: "E_BIOMETRIC_REVERIFICATION_FAILED",
-            promise: promise
-          )
-        }
-      }
-    }
   }
 
   // MARK: - getAuthFlowState
@@ -113,20 +93,6 @@ public class ClerkExpoModule: Module {
       let state = ClerkNativeBridge.shared.getAuthFlowState()
       promise.resolve(state)
     }
-  }
-
-  // MARK: - Biometric reverification
-
-  private func rejectBiometricCredentialError(
-    _ error: Error,
-    fallbackCode: String,
-    promise: Promise
-  ) {
-    let descriptor = ClerkNativeBridge.biometricCredentialErrorDescriptor(
-      error,
-      fallbackCode: fallbackCode
-    )
-    promise.reject(descriptor.code, descriptor.message)
   }
 
   static func emitClientInvalidated() {
