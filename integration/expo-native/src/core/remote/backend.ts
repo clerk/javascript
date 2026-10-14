@@ -31,6 +31,14 @@ async function pullRequestCommits(hub: GitHub, pr: number): Promise<readonly str
   return shas;
 }
 
+async function baseHolds(hub: GitHub, pr: number, base: unknown, commit: string): Promise<boolean> {
+  if (typeof base !== 'string' || !/^[0-9a-f]{40}$/.test(base)) return false;
+  const compared = await hub.api('GET', `/compare/${commit}...${base}?per_page=1`);
+  if (compared.status !== 200) throw new VerifyFailure('NOT_READY', `could not compare the commit the session started on with the base branch of PR #${pr}: ${apiMessage(compared)}`, 'retry {cli} attach');
+  const status = (compared.json as { readonly status?: unknown } | null)?.status;
+  return status === 'ahead' || status === 'identical';
+}
+
 export function remoteBackend(settings: RemoteSettings, deps: RemoteDeps = { env: process.env, runner: run }): DeviceBackend<RemoteLease> {
   const { platform } = settings;
   let opened: Promise<GitHub> | undefined;
@@ -245,10 +253,11 @@ export function remoteBackend(settings: RemoteSettings, deps: RemoteDeps = { env
       if (session.status !== 200) throw new VerifyFailure('NOT_READY', `could not read run ${lease.providerRef}: ${apiMessage(session)}`, `open ${runUrl(lease.providerRef)}`);
       if (pull.status !== 200) throw new VerifyFailure('NOT_READY', `could not read PR #${bundle.pr} of ${settings.repo}: ${apiMessage(pull)}`, 'pass the number of an open pull request of this branch as --pr');
       const started = session.json as { readonly head_branch: string; readonly head_sha: string };
-      const pr = pull.json as { readonly state: string; readonly body: string | null; readonly commits: number; readonly head: { readonly ref: string; readonly sha: string; readonly repo: { readonly full_name: string } | null } };
-      const mismatch = pullRequestMismatch(
+      const pr = pull.json as { readonly state: string; readonly body: string | null; readonly commits: number; readonly base?: { readonly sha?: unknown }; readonly head: { readonly ref: string; readonly sha: string; readonly repo: { readonly full_name: string } | null } };
+      const mismatch = await pullRequestMismatch(
         { state: pr.state, headRepo: pr.head.repo?.full_name ?? null, headRef: pr.head.ref, commits: await pullRequestCommits(hub, bundle.pr), commitCount: pr.commits },
         { repo: settings.repo, headBranch: started.head_branch, startedOn: started.head_sha, runCommit: bundle.summary.commit },
+        () => baseHolds(hub, bundle.pr, pr.base?.sha, started.head_sha),
       );
       if (mismatch !== null) throw wouldNot(mismatch.why, mismatch.fix);
       if (bundle.before !== null) {

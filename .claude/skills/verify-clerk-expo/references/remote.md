@@ -97,13 +97,15 @@ The workflow publishes only when all of these hold. Otherwise it prints the reas
 - The pull request that `--pr` names is open, and its branch is in this repository, not in a fork.
 - Its branch is the branch the session was started on.
 - The commit the run was made at is one of the pull request's commits.
-- The commit that branch had when `up` started the session is one of them too. GitHub lists the first 250 commits of a pull request, and the workflow reads no further. When a longer pull request has either commit past the first 250, the workflow says so and publishes nothing. Squash or rebase the branch to 250 commits or fewer, or attach from a machine whose `gh` can attach.
+- The commit that branch had when `up` started the session is one of them too, or a commit that the base branch of the pull request holds, such as the commit the branch came from. The workflow asks GitHub to compare that commit with the base of the pull request. GitHub lists the first 250 commits of a pull request, and the workflow reads no further. When a longer pull request has either commit past the first 250, the workflow says so and publishes nothing. Squash or rebase the branch to 250 commits or fewer, or attach from a machine whose `gh` can attach.
 - With `--before`, the commit of the before run is the commit of the run or a commit before it in its history. The workflow asks GitHub to compare the two commits.
 - The hand-off has at least one file.
 - The description has the two evidence comments of the platform once each, or neither.
 - A description without the comments does not end inside a code fence that is never closed.
 
 `attach` checks the same rules before it sends anything, and fails with the reason.
+
+So one session does the before run and the run of the change: push the branch, `up`, `run`, push the change, `run` again, open the pull request, `attach`, `down`. Open the pull request after the last run, so that it is not left open without its evidence, which reaches the description about a minute after `down`.
 
 A before run is the build without the change, so its commit is often the one the branch started from, which is no commit of the pull request. The workflow therefore does not look for that commit among the commits of the pull request. It asks GitHub whether that commit is the commit of the run or a commit before it in its history, and it publishes nothing when the answer is no. After a rebase that rewrote the commit of the before run, `run` the spec again on a commit that the branch still has, and pass that run as `--before`. The workflow cannot check that the files of the before run came from a build of that commit, which is why the line says that the session reports the before run.
 

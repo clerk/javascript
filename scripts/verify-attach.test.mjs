@@ -1195,11 +1195,12 @@ describe('the step that fetches the evidence', () => {
 });
 
 describe('the step that edits the description', () => {
+  const BASE = 'ba5e'.repeat(10);
   const PULL = {
     state: 'open',
     body: '## Summary\r\n\r\nFixes the button.\r\n',
     head: { ref: 'feature/change', sha: COMMIT, repo: { full_name: REPO } },
-    base: { repo: { full_name: REPO } },
+    base: { sha: BASE, repo: { full_name: REPO } },
   };
 
   async function fetched(manifest = GOOD, media = MEDIA) {
@@ -1213,7 +1214,7 @@ describe('the step that edits the description', () => {
   const asset = n =>
     `https://github.com/user-attachments/assets/00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 
-  function fakeGh(pull = PULL, onRead = () => undefined, commits = COMMITS) {
+  function fakeGh(pull = PULL, onRead = () => undefined, commits = COMMITS, compared = '{"status":"diverged"}') {
     const state = {
       pull: structuredClone(pull),
       reads: 0,
@@ -1228,6 +1229,10 @@ describe('the step that edits the description', () => {
       if (args[0] === 'api' && page !== null) {
         const from = (Number(page[1]) - 1) * 100;
         fs.writeFileSync(options.stdoutFile, JSON.stringify(commits.slice(from, from + 100)));
+        return { status: 0, stderr: '' };
+      }
+      if (args[0] === 'api' && /\/compare\//.test(args[1] ?? '')) {
+        fs.writeFileSync(options.stdoutFile, compared);
         return { status: 0, stderr: '' };
       }
       if (args[0] === 'api') {
@@ -1382,6 +1387,26 @@ describe('the step that edits the description', () => {
       fs.readFileSync(path.join(env.WORK, 'body.md'), 'utf8'),
       `${PULL.body}\r\n${PLACED.replaceAll('\n', '\r\n')}`,
     );
+  });
+
+  it('reads the comparison with the base branch from a file in a dry run that names one', async () => {
+    const dry = async status => {
+      const env = { ...(await fetched()), HEAD_SHA: 'd'.repeat(40) };
+      const file = name => path.join(path.dirname(env.WORK), name);
+      fs.writeFileSync(file('pull.json'), JSON.stringify(PULL));
+      fs.writeFileSync(file('commits.json'), JSON.stringify([{ sha: COMMIT }]));
+      fs.writeFileSync(file('compare.json'), JSON.stringify({ status }));
+      const lines = [];
+      const files = ['--pull', file('pull.json'), '--commits', file('commits.json'), '--compare', file('compare.json')];
+      assert.equal(await main(['publish', '--dry-run', ...files], env, line => lines.push(line)), 0);
+      return lines.map(line => line.replace(/-[0-9a-f]{16}-/g, '-<nonce>-').replaceAll(env.WORK, '<work>'));
+    };
+    assert.deepEqual(await dry('ahead'), [
+      'would run, in <work>/files:\ngh pr edit 669 --repo clerk/clerk-ios --body-file <work>/body.md --attach ./evidence-<nonce>-1.mp4 --attach ./evidence-<nonce>-2.png',
+    ]);
+    assert.deepEqual(await dry('diverged'), [
+      '::notice title=verify-attach::Pull request #669 is not the pull request of run 37731397352 (the commit the session started on is not one of its commits or a commit of its base branch), so nothing is published.',
+    ]);
   });
 
   const SHOT = [['profile.png', PNG]];
@@ -1768,10 +1793,16 @@ describe('the step that edits the description', () => {
     ]);
     const early = fakeGh(long, undefined, [{ sha: COMMIT }, ...listed.slice(1)]);
     assert.equal(publish(await fetched(), early).outcome, 'published', 'both commits are among the first 250');
+    const onBase = fakeGh(long, undefined, [{ sha: COMMIT }, ...listed.slice(1)], '{"status":"ahead"}');
+    assert.equal(
+      publish(await startedEarlier(), onBase).outcome,
+      'published',
+      'the run commit is among the first 250 and the base branch holds the commit the session started on',
+    );
     const short = fakeGh({ ...PULL, commits: 250 }, undefined, listed);
     assert.match(
       publish(await fetched(), short).said[0],
-      /is not the pull request of run 37731397352 \(the commit the session started on is not one of its commits\)/,
+      /is not the pull request of run 37731397352 \(the commit the session started on is not one of its commits or a commit of its base branch\)/,
     );
   });
 
@@ -1781,7 +1812,7 @@ describe('the step that edits the description', () => {
     assert.equal(outcome, 'refused');
     assert.equal(fake.state.writtenBody, null);
     assert.deepEqual(said, [
-      'notice: Pull request #669 is not the pull request of run 37731397352 (the commit the session started on is not one of its commits), so nothing is published.',
+      'notice: Pull request #669 is not the pull request of run 37731397352 (the commit the session started on is not one of its commits or a commit of its base branch), so nothing is published.',
     ]);
     const other = fakeGh(PULL, undefined, [{ sha: COMMIT }]);
     const refused = publish(await fetched(manifestFor(MEDIA, { commit: 'c'.repeat(40) })), other);
@@ -1791,14 +1822,71 @@ describe('the step that edits the description', () => {
     assert.equal(other.state.writtenBody, null);
   });
 
-  it('publishes nothing when the commit the session started on is not a commit of the pull request', async () => {
-    const fake = fakeGh(PULL, undefined, [{ sha: 'e'.repeat(40) }, { sha: COMMIT }]);
-    const { outcome, said } = publish(await startedEarlier(), fake);
+  const comparisons = fake => fake.state.calls.filter(call => /\/compare\//.test(call.args[1] ?? ''));
+  const NOT_STARTED_HERE =
+    'notice: Pull request #669 is not the pull request of run 37731397352 (the commit the session started on is not one of its commits or a commit of its base branch), so nothing is published.';
+
+  it('publishes a run of a session that started on a commit the base branch holds, the commit the branch came from', async () => {
+    for (const status of ['ahead', 'identical']) {
+      const fake = fakeGh(PULL, undefined, [{ sha: COMMIT }], JSON.stringify({ status }));
+      const { outcome } = publish(await startedEarlier(), fake);
+      assert.equal(outcome, 'published', status);
+      assert.deepEqual(
+        comparisons(fake).map(call => call.args),
+        [['api', `repos/clerk/clerk-ios/compare/${STARTED_ON}...${BASE}?per_page=1`]],
+        status,
+      );
+    }
+    const listed = fakeGh(PULL, undefined, [{ sha: STARTED_ON }, { sha: COMMIT }]);
+    assert.equal(publish(await startedEarlier(), listed).outcome, 'published');
+    assert.deepEqual(comparisons(listed), [], 'a commit of the pull request needs no question');
+  });
+
+  it('publishes nothing when the commit the session started on is not a commit of the pull request, and the base branch does not hold it', async () => {
+    const answers = ['{"status":"behind"}', '{"status":"diverged"}', '{"status":"AHEAD"}', '{}', 'null', '<html>'];
+    for (const compared of answers) {
+      const fake = fakeGh(PULL, undefined, [{ sha: 'e'.repeat(40) }, { sha: COMMIT }], compared);
+      const { outcome, said } = publish(await startedEarlier(), fake);
+      assert.equal(outcome, 'refused', compared);
+      assert.equal(fake.state.writtenBody, null, compared);
+      assert.deepEqual(said, [NOT_STARTED_HERE], compared);
+      assert.equal(comparisons(fake).length, 1, compared);
+    }
+    for (const base of [
+      { repo: PULL.base.repo },
+      { ...PULL.base, sha: `${BASE.slice(0, 39)}?` },
+      { ...PULL.base, sha: 'main' },
+    ]) {
+      const fake = fakeGh({ ...PULL, base }, undefined, [{ sha: COMMIT }], '{"status":"ahead"}');
+      assert.deepEqual(publish(await startedEarlier(), fake).said, [NOT_STARTED_HERE], JSON.stringify(base));
+      assert.deepEqual(comparisons(fake), [], 'no question is asked about a base that is not a commit id');
+    }
+  });
+
+  it('publishes nothing for a run made at a commit that only the base branch holds, such as a before run alone', async () => {
+    const fake = fakeGh(PULL, undefined, [{ sha: 'e'.repeat(40) }], '{"status":"identical"}');
+    const { outcome, said } = publish(await fetched(), fake);
     assert.equal(outcome, 'refused');
     assert.equal(fake.state.writtenBody, null);
     assert.deepEqual(said, [
-      'notice: Pull request #669 is not the pull request of run 37731397352 (the commit the session started on is not one of its commits), so nothing is published.',
+      'notice: Pull request #669 is not the pull request of run 37731397352 (the commit the verify run was made at is not one of its commits), so nothing is published.',
     ]);
+  });
+
+  it('fails when GitHub cannot compare the commit the session started on with the base branch, and writes nothing', async () => {
+    const fake = fakeGh(PULL, undefined, [{ sha: COMMIT }], '{"status":"ahead"}');
+    const failing = {
+      gh: (args, options) =>
+        /\/compare\//.test(args[1] ?? '')
+          ? { status: 1, stderr: 'gh: Not Found (HTTP 404)\n' }
+          : fake.gh(args, options),
+    };
+    const env = await startedEarlier();
+    assert.throws(
+      () => publish(env, failing),
+      /^Error: gh could not compare the commit the session started on with the base branch of pull request #669\ngh: gh: Not Found \(HTTP 404\)$/,
+    );
+    assert.equal(fake.state.writtenBody, null);
   });
 
   it('reads every page of the commits GitHub lists, and stops at the last one', async () => {

@@ -187,22 +187,29 @@ export interface PullRequestMismatch {
 }
 
 const ITS_OWN_PULL_REQUEST =
-  "it accepts only the open pull request of the session's branch, and only when the commit the session started on and the commit of the run are both commits of that pull request; git push, then {cli} run again and attach, or after a rewrite of the branch's history {cli} down and {cli} up first";
+  "it accepts only the open pull request of the session's branch, and only when the commit of the run is a commit of that pull request and the commit the session started on is one too or is a commit of its base branch; git push, then {cli} run again and attach, or after a rewrite of the branch's history {cli} down and {cli} up first";
 const FEWER_COMMITS = `it can check a commit only against the first ${MOST_COMMITS_GITHUB_LISTS} commits of a pull request; squash or rebase the branch to ${MOST_COMMITS_GITHUB_LISTS} commits or fewer, git push, then {cli} down, {cli} up, run again and attach, or run {cli} attach on a machine whose gh can attach`;
 
-export function pullRequestMismatch(pull: PullRequestView, session: { readonly repo: string; readonly headBranch: string; readonly startedOn: string; readonly runCommit: string }): PullRequestMismatch | null {
+export async function pullRequestMismatch(
+  pull: PullRequestView,
+  session: { readonly repo: string; readonly headBranch: string; readonly startedOn: string; readonly runCommit: string },
+  baseHoldsStart: () => Promise<boolean>,
+): Promise<PullRequestMismatch | null> {
   const refused = (why: string): PullRequestMismatch => ({ why, fix: ITS_OWN_PULL_REQUEST });
   if (pull.state !== 'open') return refused(`it is ${pull.state}`);
   if (pull.headRepo !== session.repo) return refused(`its branch is in ${pull.headRepo ?? 'a deleted fork'}, not in ${session.repo}`);
   if (pull.headRef !== session.headBranch) return refused(`its branch is ${pull.headRef} and the session runs on ${session.headBranch}`);
-  for (const [what, commit] of [['the session started on', session.startedOn], ['the run was made at', session.runCommit]] as const) {
-    if (pull.commits.includes(commit)) continue;
-    if (pull.commitCount > MOST_COMMITS_GITHUB_LISTS) {
-      return { why: `it has ${pull.commitCount} commits, GitHub lists only the first ${MOST_COMMITS_GITHUB_LISTS}, and ${what} ${commit.slice(0, 12)}, which is not among those`, fix: FEWER_COMMITS };
-    }
-    return refused(`${what} ${commit.slice(0, 12)}, which is not one of its commits`);
+  const notHeld =
+    !pull.commits.includes(session.startedOn) && !(await baseHoldsStart())
+      ? { commit: `the session started on ${session.startedOn.slice(0, 12)}`, among: 'one of its commits or a commit of its base branch' }
+      : !pull.commits.includes(session.runCommit)
+        ? { commit: `the run was made at ${session.runCommit.slice(0, 12)}`, among: 'one of its commits' }
+        : null;
+  if (notHeld === null) return null;
+  if (pull.commitCount > MOST_COMMITS_GITHUB_LISTS) {
+    return { why: `it has ${pull.commitCount} commits, GitHub lists only the first ${MOST_COMMITS_GITHUB_LISTS}, and ${notHeld.commit}, which is not among those`, fix: FEWER_COMMITS };
   }
-  return null;
+  return refused(`${notHeld.commit}, which is not ${notHeld.among}`);
 }
 
 const sha256File = (path: string): string => createHash('sha256').update(readFileSync(path)).digest('hex');

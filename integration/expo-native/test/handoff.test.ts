@@ -168,36 +168,50 @@ describe('the rule for which pull request a session may publish to', () => {
   const STARTED_ON = 'd'.repeat(40);
   const session = { repo: 'clerk/clerk-ios', headBranch: 'feature/change', startedOn: STARTED_ON, runCommit: COMMIT };
   const pull = { state: 'open', headRepo: 'clerk/clerk-ios', headRef: 'feature/change', commits: [STARTED_ON, COMMIT], commitCount: 2 };
-  const why = (...asked: Parameters<typeof pullRequestMismatch>): string | undefined => pullRequestMismatch(...asked)?.why;
+  const notOnBase = async (): Promise<boolean> => false;
+  const onBase = async (): Promise<boolean> => true;
+  const neverAsked = async (): Promise<boolean> => assert.fail('the base branch was asked about a commit of the pull request');
+  const why = async (...asked: Parameters<typeof pullRequestMismatch>): Promise<string | undefined> => (await pullRequestMismatch(...asked))?.why;
 
-  it('accepts the open pull request of the session branch that holds the commit the session started on and the commit of the run', () => {
-    assert.equal(pullRequestMismatch(pull, session), null);
-    assert.equal(pullRequestMismatch({ ...pull, commits: [COMMIT] }, { ...session, startedOn: COMMIT }), null, 'a run at the commit the session started on');
+  it('accepts the open pull request of the session branch that holds the commit the session started on and the commit of the run', async () => {
+    assert.equal(await pullRequestMismatch(pull, session, neverAsked), null);
+    assert.equal(await pullRequestMismatch({ ...pull, commits: [COMMIT] }, { ...session, startedOn: COMMIT }, neverAsked), null, 'a run at the commit the session started on');
   });
 
-  it('accepts a pull request that has newer commits than the run', () => {
-    assert.equal(pullRequestMismatch({ ...pull, commits: [STARTED_ON, COMMIT, 'b'.repeat(40)] }, session), null);
+  it('accepts a session that started on a commit the base branch holds, when the commit of the run is a commit of the pull request', async () => {
+    assert.equal(await pullRequestMismatch({ ...pull, commits: [COMMIT] }, session, onBase), null);
+    assert.equal(await why({ ...pull, commits: [COMMIT] }, session, notOnBase), 'the session started on dddddddddddd, which is not one of its commits or a commit of its base branch');
   });
 
-  it('refuses a closed one, a fork, another branch, and one that lacks either commit, and says which', () => {
-    assert.equal(why({ ...pull, state: 'closed' }, session), 'it is closed');
-    assert.equal(why({ ...pull, headRepo: 'someone/clerk-ios' }, session), 'its branch is in someone/clerk-ios, not in clerk/clerk-ios');
-    assert.equal(why({ ...pull, headRepo: null }, session), 'its branch is in a deleted fork, not in clerk/clerk-ios');
-    assert.equal(why({ ...pull, headRef: 'main' }, session), 'its branch is main and the session runs on feature/change');
-    assert.equal(why({ ...pull, commits: [COMMIT] }, session), 'the session started on dddddddddddd, which is not one of its commits');
-    assert.equal(why({ ...pull, commits: [STARTED_ON] }, session), 'the run was made at 0f50b597b1c2, which is not one of its commits');
+  it('refuses a run made at a commit that only the base branch holds, whether or not the session started there', async () => {
+    assert.equal(await why({ ...pull, commits: [STARTED_ON] }, session, onBase), 'the run was made at 0f50b597b1c2, which is not one of its commits');
+    assert.equal(await why({ ...pull, commits: ['e'.repeat(40)] }, { ...session, startedOn: COMMIT }, onBase), 'the run was made at 0f50b597b1c2, which is not one of its commits');
   });
 
-  it('says that GitHub lists only the first 250 commits when a longer pull request does not show a commit, and gives a fix that can change that', () => {
+  it('accepts a pull request that has newer commits than the run', async () => {
+    assert.equal(await pullRequestMismatch({ ...pull, commits: [STARTED_ON, COMMIT, 'b'.repeat(40)] }, session, neverAsked), null);
+  });
+
+  it('refuses a closed one, a fork, another branch, and one that lacks either commit, and says which', async () => {
+    assert.equal(await why({ ...pull, state: 'closed' }, session, neverAsked), 'it is closed');
+    assert.equal(await why({ ...pull, headRepo: 'someone/clerk-ios' }, session, neverAsked), 'its branch is in someone/clerk-ios, not in clerk/clerk-ios');
+    assert.equal(await why({ ...pull, headRepo: null }, session, neverAsked), 'its branch is in a deleted fork, not in clerk/clerk-ios');
+    assert.equal(await why({ ...pull, headRef: 'main' }, session, neverAsked), 'its branch is main and the session runs on feature/change');
+    assert.equal(await why({ ...pull, commits: [COMMIT] }, session, notOnBase), 'the session started on dddddddddddd, which is not one of its commits or a commit of its base branch');
+    assert.equal(await why({ ...pull, commits: [STARTED_ON] }, session, neverAsked), 'the run was made at 0f50b597b1c2, which is not one of its commits');
+  });
+
+  it('says that GitHub lists only the first 250 commits when a longer pull request does not show a commit, and gives a fix that can change that', async () => {
     const listed = Array.from({ length: 250 }, (_, i) => i.toString(16).padStart(40, '0'));
     const long = { ...pull, commits: listed, commitCount: 300 };
-    const refused = pullRequestMismatch(long, session);
+    const refused = await pullRequestMismatch(long, session, notOnBase);
     assert.equal(refused?.why, 'it has 300 commits, GitHub lists only the first 250, and the session started on dddddddddddd, which is not among those');
     assert.match(refused?.fix ?? '', /squash or rebase the branch to 250 commits or fewer, .* or run \{cli\} attach on a machine whose gh can attach$/);
-    assert.equal(why({ ...long, commits: [STARTED_ON, ...listed.slice(1)] }, session), 'it has 300 commits, GitHub lists only the first 250, and the run was made at 0f50b597b1c2, which is not among those');
-    assert.equal(pullRequestMismatch({ ...long, commits: [STARTED_ON, COMMIT, ...listed.slice(2)] }, session), null, 'both commits are among the first 250');
-    const short = pullRequestMismatch({ ...long, commitCount: 250 }, session);
-    assert.equal(short?.why, 'the session started on dddddddddddd, which is not one of its commits');
+    assert.equal(await why({ ...long, commits: [STARTED_ON, ...listed.slice(1)] }, session, neverAsked), 'it has 300 commits, GitHub lists only the first 250, and the run was made at 0f50b597b1c2, which is not among those');
+    assert.equal(await pullRequestMismatch({ ...long, commits: [STARTED_ON, COMMIT, ...listed.slice(2)] }, session, neverAsked), null, 'both commits are among the first 250');
+    assert.equal(await pullRequestMismatch({ ...long, commits: [COMMIT, ...listed.slice(1)] }, session, onBase), null, 'the commit of the run is among the first 250 and the base branch holds the other');
+    const short = await pullRequestMismatch({ ...long, commitCount: 250 }, session, notOnBase);
+    assert.equal(short?.why, 'the session started on dddddddddddd, which is not one of its commits or a commit of its base branch');
     assert.notEqual(short?.fix, refused?.fix);
   });
 });
@@ -529,7 +543,8 @@ describe('attach on a machine whose gh cannot attach', () => {
 describe('the remote backend before it sends evidence', () => {
   const settings: RemoteSettings = { platform: 'ios', repo: 'clerk/clerk-ios', workflow: 'verify-remote.yml', sessionsDir: '/nonexistent', runner: 'xcode-27', plumbingRunner: 'ubuntu-latest', device: 'iPhone Air', idleMinutes: 15, capMinutes: 60, requirement: 'a pushed branch' };
   const STARTED_ON = 'd'.repeat(40);
-  const OPEN = { state: 'open', body: '## Summary\r\n\r\nFixes the button.\r\n', head: { ref: 'feature/change', sha: COMMIT, repo: { full_name: 'clerk/clerk-ios' } } };
+  const BASE = 'ba5e'.repeat(10);
+  const OPEN = { state: 'open', body: '## Summary\r\n\r\nFixes the button.\r\n', base: { sha: BASE }, head: { ref: 'feature/change', sha: COMMIT, repo: { full_name: 'clerk/clerk-ios' } } };
 
   interface Case {
     readonly pull?: unknown;
@@ -538,6 +553,7 @@ describe('the remote backend before it sends evidence', () => {
     readonly files?: EvidenceBundle['files'];
     readonly before?: string;
     readonly compared?: { readonly status: number; readonly json: unknown };
+    readonly baseCompared?: { readonly status: number; readonly json: unknown };
   }
 
   async function handOff(options: Case = {}) {
@@ -561,6 +577,7 @@ describe('the remote backend before it sends evidence', () => {
         asked.push(path);
         const page = /^\/pulls\/669\/commits\?per_page=100&page=(\d+)$/.exec(path);
         if (page !== null) return { status: 200, json: commits.slice((Number(page[1]) - 1) * 100, Number(page[1]) * 100).map((sha) => ({ sha })), headers: new Headers() };
+        if (path.startsWith(`/compare/${STARTED_ON}...`)) return { ...(options.baseCompared ?? { status: 200, json: { status: 'diverged' } }), headers: new Headers() };
         if (path.startsWith('/compare/')) return { ...(options.compared ?? { status: 200, json: { status: 'ahead' } }), headers: new Headers() };
         return { status: 200, json: path.startsWith('/pulls/') ? (options.pull ?? OPEN) : { head_branch: 'feature/change', head_sha: STARTED_ON }, headers: new Headers() };
       },
@@ -645,14 +662,44 @@ describe('the remote backend before it sends evidence', () => {
     assert.deepEqual(closed.sent, []);
   });
 
+  it('sends a run of a session that started on a commit the base branch holds, as one that came up before the first push of the change did', async () => {
+    for (const status of ['ahead', 'identical']) {
+      const { error, sent, asked } = await handOff({ commits: [COMMIT], baseCompared: { status: 200, json: { status } } });
+      assert.equal(error, null, status);
+      assert.deepEqual(sent, ['/__sim/evidence/begin', '/__sim/evidence/chunk', '/__sim/evidence/commit'], status);
+      assert.deepEqual(asked.filter((path) => path.startsWith('/compare/')), [`/compare/${STARTED_ON}...${BASE}?per_page=1`], status);
+    }
+  });
+
+  it('sends nothing when the base branch does not hold the commit the session started on, or GitHub does not say that it does', async () => {
+    const message = `${wouldNot}the session started on dddddddddddd, which is not one of its commits or a commit of its base branch`;
+    for (const baseCompared of [{ status: 200, json: { status: 'behind' } }, { status: 200, json: { status: 'diverged' } }, { status: 200, json: { status: 'AHEAD' } }, { status: 200, json: null }]) {
+      const refused = await refusal({ commits: [COMMIT], baseCompared });
+      assert.deepEqual({ message: refused.error.message, sent: refused.sent }, { message, sent: [] }, JSON.stringify(baseCompared));
+    }
+    for (const base of [undefined, {}, { sha: 'main' }, { sha: `${BASE.slice(0, 39)}?` }]) {
+      const { error, asked } = await handOff({ commits: [COMMIT], pull: { ...OPEN, base }, baseCompared: { status: 200, json: { status: 'ahead' } } });
+      assert.equal(error?.message, message, JSON.stringify(base));
+      assert.deepEqual(asked.filter((path) => path.startsWith('/compare/')), [], 'no question is asked about a base that is not a commit id');
+    }
+    for (const status of [404, 502]) {
+      const unread = await refusal({ commits: [COMMIT], baseCompared: { status, json: { message: 'No answer' } } });
+      assert.deepEqual({ code: unread.error.code, fix: unread.error.fix, sent: unread.sent }, { code: 'NOT_READY', fix: 'retry {cli} attach', sent: [] }, String(status));
+      assert.match(unread.error.message, /^could not compare the commit the session started on with the base branch of PR #669: /, String(status));
+    }
+  });
+
   it('sends nothing when the commit the session started on, or the commit of the run, is not a commit of the pull request', async () => {
     const rewritten = await refusal({ commits: ['e'.repeat(40), COMMIT] });
-    assert.equal(rewritten.error.message, `${wouldNot}the session started on dddddddddddd, which is not one of its commits`);
+    assert.equal(rewritten.error.message, `${wouldNot}the session started on dddddddddddd, which is not one of its commits or a commit of its base branch`);
     assert.match(rewritten.error.fix, /git push, then \{cli\} run again and attach, or after a rewrite of the branch's history \{cli\} down and \{cli\} up first$/);
     assert.deepEqual(rewritten.sent, []);
     const unpushed = await refusal({ commits: [STARTED_ON, 'e'.repeat(40)] });
     assert.equal(unpushed.error.message, `${wouldNot}the run was made at 0f50b597b1c2, which is not one of its commits`);
     assert.deepEqual(unpushed.sent, []);
+    const beforeOnly = await refusal({ commits: ['e'.repeat(40)], baseCompared: { status: 200, json: { status: 'identical' } } });
+    assert.equal(beforeOnly.error.message, `${wouldNot}the run was made at 0f50b597b1c2, which is not one of its commits`, 'a run at a commit that only the base branch holds');
+    assert.deepEqual(beforeOnly.sent, []);
   });
 
   it('finds the commit the session started on in a later page of a long pull request', async () => {

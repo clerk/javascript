@@ -382,12 +382,15 @@ function pullRequestMismatch(pull, session) {
   return null;
 }
 
-function commitNotListed(commits, session) {
-  if (!commits.includes(session.startedOn)) {
-    return 'the commit the session started on';
+function commitNotHeld(commits, session, baseHoldsStart) {
+  if (!commits.includes(session.startedOn) && !baseHoldsStart()) {
+    return {
+      commit: 'the commit the session started on',
+      why: 'is not one of its commits or a commit of its base branch',
+    };
   }
   if (!commits.includes(session.runCommit)) {
-    return 'the commit the verify run was made at';
+    return { commit: 'the commit the verify run was made at', why: 'is not one of its commits' };
   }
   return null;
 }
@@ -704,7 +707,16 @@ const COMMITS_PER_PAGE = 100;
 const COMMIT_PAGES = 3;
 const MOST_COMMITS_GITHUB_LISTS = 250;
 
-function publishStep({ env, say, gh = realGh, dryRun = false, pullFile, commitsFile, nonce = unguessable }) {
+function publishStep({
+  env,
+  say,
+  gh = realGh,
+  dryRun = false,
+  pullFile,
+  commitsFile,
+  compareFile,
+  nonce = unguessable,
+}) {
   const { repo, runId, work, filesDir, manifestFile } = settings(env);
   const startedOn = shaped(env.HEAD_SHA, SHAPE.commit, 'HEAD_SHA');
   const actor = shaped(env.RUN_ACTOR, SHAPE.actor, 'RUN_ACTOR');
@@ -767,6 +779,31 @@ function publishStep({ env, say, gh = realGh, dryRun = false, pullFile, commitsF
     }
     return shas;
   };
+  const baseHoldsStart = () => {
+    const base = pull.base?.sha;
+    if (typeof base !== 'string' || !SHAPE.commit.test(base)) {
+      return false;
+    }
+    const compareJson = compareFile ?? path.join(work, 'compare.json');
+    if (compareFile === undefined) {
+      const read = gh(['api', `repos/${repo}/compare/${startedOn}...${base}?per_page=1`], {
+        cwd: work,
+        stdoutFile: compareJson,
+      });
+      if (read.status !== 0) {
+        throw new Failed(
+          `gh could not compare the commit the session started on with the base branch of pull request #${manifest.pr}\n${printable(read.stderr)}`,
+        );
+      }
+    }
+    let status;
+    try {
+      status = JSON.parse(fs.readFileSync(compareJson, 'utf8'))?.status;
+    } catch {
+      status = null;
+    }
+    return status === 'ahead' || status === 'identical';
+  };
   const notThisRun = why => {
     say(
       'notice',
@@ -781,16 +818,16 @@ function publishStep({ env, say, gh = realGh, dryRun = false, pullFile, commitsF
   if (mismatch !== null) {
     return notThisRun(mismatch);
   }
-  const notListed = commitNotListed(readCommits(), session);
-  if (notListed !== null && pull.commits > MOST_COMMITS_GITHUB_LISTS) {
+  const notHeld = commitNotHeld(readCommits(), session, baseHoldsStart);
+  if (notHeld !== null && pull.commits > MOST_COMMITS_GITHUB_LISTS) {
     say(
       'notice',
-      `Pull request #${manifest.pr} has ${pull.commits} commits and GitHub lists only the first ${MOST_COMMITS_GITHUB_LISTS}, which do not hold ${notListed}, so run ${runId} cannot be checked against it and nothing is published.`,
+      `Pull request #${manifest.pr} has ${pull.commits} commits and GitHub lists only the first ${MOST_COMMITS_GITHUB_LISTS}, which do not hold ${notHeld.commit}, so run ${runId} cannot be checked against it and nothing is published.`,
     );
     return 'refused';
   }
-  if (notListed !== null) {
-    return notThisRun(`${notListed} is not one of its commits`);
+  if (notHeld !== null) {
+    return notThisRun(`${notHeld.commit} ${notHeld.why}`);
   }
   let next = null;
   for (let attempt = 0; attempt < 2 && next === null; attempt += 1) {
@@ -905,10 +942,13 @@ async function main(argv, env, log = console.log) {
         dryRun: rest.includes('--dry-run'),
         pullFile: flag('--pull'),
         commitsFile: flag('--commits'),
+        compareFile: flag('--compare'),
       });
       return 0;
     }
-    log('usage: verify-attach.mjs fetch [--zip <file>] | publish [--dry-run] [--pull <file> --commits <file>]');
+    log(
+      'usage: verify-attach.mjs fetch [--zip <file>] | publish [--dry-run] [--pull <file> --commits <file> [--compare <file>]]',
+    );
     return 2;
   } catch (error) {
     if (error instanceof Refused) {
