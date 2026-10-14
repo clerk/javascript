@@ -88,6 +88,7 @@ export interface HostFixture {
   launch(options?: LaunchOptions): Promise<void>;
   expectSignedInAs(who: SeededUser | TestEmail, timeoutMs?: number): Promise<void>;
   expectSignedOut(timeoutMs?: number): Promise<void>;
+  expectVisible(target: Locator, timeoutMs?: number): Promise<void>;
   screenshot(label: string): Promise<void>;
   tap(target: Locator): Promise<void>;
   fill(target: Locator, text: string | SecretLike): Promise<void>;

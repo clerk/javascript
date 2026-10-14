@@ -32,6 +32,7 @@ const POLL_MS = 400;
 const TYPING_DELAY_MS = 40;
 const CONFIRM_READS = 5;
 const ONLY_E2E_WORKER_SLOT = 0;
+const NAMED_IN_EXPECT_VISIBLE = 'the element the spec names in expectVisible';
 
 const RUN = readRun(process.env);
 
@@ -119,6 +120,7 @@ export const test = base.extend<{ host: HostFixture }>({
       },
       expectSignedInAs: (who, timeoutMs = ASSERTION_TIMEOUT_MS) => waitFor(signedInAs(app, who), describeSignedIn(who), timeoutMs),
       expectSignedOut: (timeoutMs = ASSERTION_TIMEOUT_MS) => waitFor(signedOut(app), '"Signed out" and no user ID or session ID on the home', timeoutMs),
+      expectVisible: (target, timeoutMs = ASSERTION_TIMEOUT_MS) => waitFor(onScreen(target, NAMED_IN_EXPECT_VISIBLE), NAMED_IN_EXPECT_VISIBLE, timeoutMs),
       async screenshot(label) {
         await onceTheRunnerIsFree(() => e2eApp.screenshot(label), runnerBusy());
       },
