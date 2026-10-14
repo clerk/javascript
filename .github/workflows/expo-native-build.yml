@@ -12,6 +12,8 @@ on:
       - 'packages/expo-biometrics/**'
       - 'packages/expo-google-signin/**'
       - 'packages/expo-native-components/**'
+  schedule:
+    - cron: '0 7 * * *'
   workflow_dispatch:
 
 permissions:
@@ -28,31 +30,20 @@ env:
 
 jobs:
   native-build:
-    if: ${{ github.head_ref != 'changeset-release/main' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false) }}
+    if: ${{ github.head_ref != 'changeset-release/main' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.repository == 'clerk/javascript') || github.event.pull_request.draft == false) }}
     name: Native Build (${{ matrix.platform }}, sdk ${{ matrix.expo-sdk }})
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
+        # A pull request builds only the latest stable SDK, never a beta or canary one.
+        expo-sdk: ${{ fromJSON(github.event_name == 'pull_request' && '[57]' || '[54, 55, 57]') }}
+        platform: [android, ios]
         include:
-          - expo-sdk: 54
-            platform: android
+          - platform: android
             runner: blacksmith-8vcpu-ubuntu-2204
-          - expo-sdk: 54
-            platform: ios
-            runner: blacksmith-6vcpu-macos-26
-          - expo-sdk: 55
-            platform: android
-            runner: blacksmith-8vcpu-ubuntu-2204
-          - expo-sdk: 55
-            platform: ios
-            runner: blacksmith-6vcpu-macos-26
-          - expo-sdk: 57
-            platform: android
-            runner: blacksmith-8vcpu-ubuntu-2204
-          - expo-sdk: 57
-            platform: ios
+          - platform: ios
             runner: blacksmith-6vcpu-macos-26
 
     steps:
@@ -155,9 +146,6 @@ jobs:
         if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
         uses: gradle/actions/setup-gradle@4733eaac7c1b0da527e4206b7671e0061de1ce37 # v6.3.0
         with:
-          # This workflow never runs on main, so the default (write from main
-          # only) would never seed the cache.
-          cache-read-only: false
           add-job-summary: on-failure
 
       - name: Prebuild Android fixture
