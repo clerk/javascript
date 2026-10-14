@@ -131,14 +131,24 @@ describe('OrganizationSwitcher', () => {
     expect(host()).toBeEmptyDOMElement();
   });
 
-  it('heads the surface with the active organization and what can be done to it', async () => {
-    await renderSwitcher();
-    await open();
+  it('heads the surface with the active organization, and manages it from the rows beneath', async () => {
+    const { clerk } = await renderSwitcher({}, noOffers());
+    const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+    const user = await openWithList();
 
-    expect(within(requiredPopup()).getByText('Acme')).toBeInTheDocument();
-    expect(within(requiredPopup()).getByText('3 members')).toBeInTheDocument();
-    expect(within(requiredPopup()).getByRole('button', { name: 'Invite' })).toBeInTheDocument();
-    expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
+    const header = requiredPopup().querySelector('.cl-organization-switcher-header') ?? requiredPopup();
+    expect(within(header).getByText('Acme')).toBeInTheDocument();
+    expect(within(header).getByText('3 members')).toBeInTheDocument();
+    expect(within(header).queryAllByRole('button')).toEqual([]);
+    expect(reading('Add organization', 'Settings', 'Invite members')).toEqual([
+      'Add organization',
+      'Settings',
+      'Invite members',
+    ]);
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }));
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(openOrganizationProfile).toHaveBeenCalled();
   });
 
   it('falls back to the account, with nothing to manage, where no organization is active', async () => {
@@ -147,7 +157,7 @@ describe('OrganizationSwitcher', () => {
 
     expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
     expect(within(requiredPopup()).queryByRole('button', { name: 'Settings' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Invite members' })).toBeNull();
   });
 
   it('names no organization selected where personal is hidden and none is active', async () => {
@@ -158,19 +168,19 @@ describe('OrganizationSwitcher', () => {
 
     expect(within(requiredPopup()).getByText('No organization selected')).toBeInTheDocument();
     expect(within(requiredPopup()).queryByText('Alice Smith')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Manage account' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Settings' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Invite members' })).toBeNull();
   });
 
   it('carries no account rows, and trails the organizations with create-organization', async () => {
     await renderSwitcher({}, noOffers());
     await openWithList();
 
-    expect(reading('Personal account', 'Acme', 'Other', 'Create organization')).toEqual([
-      'Acme',
+    expect(reading('Personal account', 'Acme', 'Other', 'Add organization')).toEqual([
       'Personal account',
+      'Acme',
       'Other',
-      'Create organization',
+      'Add organization',
     ]);
     for (const name of ['Switch account', 'Add account', 'Sign out', 'Sign out of all accounts']) {
       expect(screen.queryByRole('button', { name })).toBeNull();
@@ -187,13 +197,13 @@ describe('OrganizationSwitcher', () => {
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
-  it('carries custom rows at the foot of the popup, in the order given', async () => {
+  it('carries custom rows beside Settings, in the order given', async () => {
     const terms = { id: 'terms', label: 'Terms of service', href: 'https://example.com/terms' };
     const support = { id: 'support', label: 'Support', onClick: vi.fn() };
-    await renderSwitcher({ customMenuItems: [terms, support], menuItemOrder: ['support', 'terms'] });
+    await renderSwitcher({ customMenuItems: [terms, support], menuItemOrder: ['support', 'terms', 'settings'] });
     await open();
 
-    expect(reading('Terms of service', 'Support')).toEqual(['Support', 'Terms of service']);
+    expect(reading('Settings', 'Terms of service', 'Support')).toEqual(['Support', 'Terms of service', 'Settings']);
   });
 
   it('themes its parts through organization-switcher slots', async () => {
@@ -229,7 +239,7 @@ describe('OrganizationSwitcher', () => {
 
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
       await userEvent.setup().click(trigger());
-      expect(within(requiredPopup()).getByRole('button', { name: 'Invite' })).toBeInTheDocument();
+      expect(within(requiredPopup()).getByRole('button', { name: 'Invite members' })).toBeInTheDocument();
 
       memberships.release();
       await waitFor(() => expect(screen.queryByText('Loading organizations…')).toBeNull());

@@ -23,7 +23,8 @@ export const styles = stylex.create({
   },
 
   triggerLabelled: {
-    padding: space['1'],
+    padding: space['1.5'],
+    borderRadius: `calc(${radiusVars['--cl-radius-md']} + ${space['1']})`,
     gap: space['1.5'],
     backgroundColor: {
       default: 'transparent',
@@ -46,23 +47,11 @@ export const styles = stylex.create({
     transitionProperty: 'opacity',
   },
 
-  triggerRinglessAvatar: {
-    outlineStyle: 'none',
-  },
-
   triggerRound: {
     borderRadius: radiusVars['--cl-radius-full'],
   },
 
-  triggerText: {
-    display: 'flex',
-    flexDirection: 'column',
-    textAlign: 'start',
-    minWidth: 0,
-  },
-
-  // Matches `SwitcherItemLabel`, so the trigger names an organization the same way its row does. Capped,
-  // because the trigger sits in a host app's chrome and a long organization name would push it apart.
+  // Capped, because the trigger sits in a host app's chrome and a long organization name would push it apart.
   triggerName: {
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
@@ -71,16 +60,9 @@ export const styles = stylex.create({
     maxWidth: '12rem',
   },
 
-  triggerOrganization: {
-    color: colorVars['--cl-color-foreground-secondary'],
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-    maxWidth: '12rem',
-  },
-
   triggerCaret: {
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    marginInlineEnd: space['1'],
+    marginInline: space['1'],
   },
 
   // The organization list scrolls; the header and footer stay put. The scroll area carries the

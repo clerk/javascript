@@ -68,7 +68,7 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  *
  * @example
  * `customPages` adds your own pages to either profile this button opens; `customMenuItems` adds your
- * own rows to the foot of the menu, each one either an `onClick` action or an `href` link.
+ * own rows beside Settings, each one either an `onClick` action or an `href` link.
  * ```tsx
  * <UserButton
  *   userProfileProps={{
@@ -83,7 +83,7 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  *     { id: 'docs', label: 'Documentation', icon: <BookIcon />, href: 'https://example.com/docs' },
  *     { id: 'support', label: 'Contact support', icon: <ChatIcon />, onClick: () => openSupportChat() },
  *   ]}
- *   menuItemOrder={['docs', 'support', 'addAccount', 'signOut']}
+ *   menuItemOrder={['docs', 'support', 'settings', 'inviteMembers']}
  * />
  * ```
  */

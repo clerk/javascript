@@ -122,17 +122,15 @@ export function SingleSession(_args: Record<string, unknown>) {
 export function CustomMenuItems(_args: Record<string, unknown>) {
   const prototype = usePrototype({ singleSession: true, hidePersonal: true });
 
-  // The app's own rows join the foot, and `menuItemOrder` puts them wherever it names them. Ids for
+  // The app's own rows join Settings, and `menuItemOrder` puts them wherever it names them. Ids for
   // rows the surface does not carry are ignored, so one order can cover every mode.
   return (
     <SwitcherView
       {...prototype}
       mode='combined'
-      // One account resolves the accounts row to "Add account", which is the form `menuItemOrder`
-      // names by either id.
       customMenuItems={[
         {
-          id: 'settings',
+          id: 'app-settings',
           label: 'App settings',
           icon: (
             <Icon
@@ -164,7 +162,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
           href: 'https://clerk.com/docs',
         },
       ]}
-      menuItemOrder={['docs', 'addAccount', 'signOut', 'settings']}
+      menuItemOrder={['docs', 'settings', 'inviteMembers', 'app-settings']}
     />
   );
 }

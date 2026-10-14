@@ -1,17 +1,19 @@
-import type { SwitcherData, SwitcherHeaderLayout, SwitcherMode } from './switcher.types';
+import type { SwitcherData, SwitcherMode } from './switcher.types';
 
 /*
- * Which mode puts what where. The surface is three slots deep, in this order, and each mode fills
- * them differently:
+ * Which mode puts what where. Under the header the surface is three slots deep, in this order, and
+ * each mode fills them differently:
  *
  *  combined                       organization                 user
  *  ┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
- *  │ Alice ᶠ                    │ │ Foundry                  │ │ Alice                   ⚙  │ header
- *  │ [⚙ Settings ▾] [Invite]    │ │ [⚙ Settings] [Invite]    │ │                            │
+ *  │ Foundry ᵃ                  │ │ Foundry                  │ │ Alice                      │ header
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
  *  │ Personal account           │ │ Personal account         │ │                            │ ┐
  *  │ ✓ Foundry                  │ │ ✓ Foundry                │ │                            │ ┘ organization rows
- *  │ + Create organization      │ │ + Create organization    │ │                            │ organizationsFooter
+ *  │ + Add organization         │ │ + Add organization       │ │                            │ organizationsFooter
+ *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
+ *  │ ⚙ Settings              ›  │ │ ⚙ Settings               │ │ ⚙ Settings                 │ ┐
+ *  │ ⊕ Invite members           │ │ ⊕ Invite members         │ │                            │ ┘ manage
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
  *  │ ⇄ Switch account        ›  │ │                          │ │ ⇄ Switch account        ›  │ ┐
  *  │ ⤴ Sign out                 │ │                          │ │ ⤴ Sign out                 │ ┘ footer
@@ -21,37 +23,37 @@ import type { SwitcherData, SwitcherHeaderLayout, SwitcherMode } from './switche
  * switch between. The other signed-in accounts are not: they are one row at the foot that opens a
  * flyout of them, so the surface stays about the organization it is on.
  *
- * The header is about whatever leads, not the mode: an organization is managed and invited to, an
- * account is managed, and signed out of at the foot. A combined surface always leads with the account. With an
- * organization active, the account is badged with it, invites to it, and its Settings opens onto
- * both the organization's settings and the account's.
+ * The header only names whatever leads; what can be done about it is the manage group, which the
+ * app's own rows join. An
+ * organization is managed and invited to, an account is managed, and signed out of at the foot. A
+ * combined surface leads with the account until an organization is active. Then it leads with the
+ * organization, badged with the account, invites to it, and its Settings opens onto both the
+ * organization's settings and the account's.
  */
 
-/** The three places an action can land. Every mode has a header and a footer; the list's varies. */
-export type SwitcherSlot = 'header' | 'organizationsFooter' | 'footer';
+/** The three places an action can land. Which of them a mode fills varies. */
+export type SwitcherSlot = 'organizationsFooter' | 'manage' | 'footer';
 
 export type SwitcherAction =
   | 'addAccount'
   | 'createOrganization'
   | 'inviteMembers'
-  /** The gear. Manages the header's organization and, where it badges the account, the account too. */
-  | 'manageLead'
+  /** Settings. Manages the lead's organization and, where it badges the account, the account too. */
+  | 'settings'
   | 'signOut'
   /** The flyout of signed-in accounts, adding one, and signing out of all of them. */
   | 'switchAccount';
 
 /**
- * What the trigger names and the header leads with. `member` is the account, badged with the
- * organization it is active in. `personal` and `none` are an organization-led surface with no
- * organization active, falling back to the personal account or to nothing. Neither has an
- * organization to manage, and an organization-led surface never manages the account.
+ * What the trigger names and the header leads with. `personal` and `none` are an organization-led
+ * surface with no organization active, falling back to the personal account or to nothing. Neither
+ * has an organization to manage, and an organization-led surface never manages the account.
  */
-export type SwitcherLead = 'organization' | 'member' | 'user' | 'personal' | 'none';
+export type SwitcherLead = 'organization' | 'user' | 'personal' | 'none';
 
-const headers = {
-  organization: ['inviteMembers', 'manageLead'],
-  member: ['inviteMembers', 'manageLead'],
-  user: ['manageLead'],
+const manage = {
+  organization: ['settings', 'inviteMembers'],
+  user: ['settings'],
   personal: [],
   none: [],
 } as const satisfies Record<SwitcherLead, readonly SwitcherAction[]>;
@@ -94,9 +96,10 @@ const modes = {
  */
 export interface SwitcherLayout {
   lead: SwitcherLead;
+  /** The organization lead is badged with the user, and its gear manages both. */
+  userBadge: boolean;
   /** The organization rows: the personal account, the organizations, and what is on offer. */
   showOrganizations: boolean;
-  headerLayout: SwitcherHeaderLayout;
   /** What each slot carries, in the order it renders. */
   actions: Record<SwitcherSlot, SwitcherAction[]>;
 }
@@ -106,7 +109,7 @@ function resolveLead(mode: SwitcherMode, data: SwitcherData): SwitcherLead {
     return 'user';
   }
   if (mode === 'combined') {
-    return data.activeOrganization ? 'member' : 'user';
+    return data.activeOrganization ? 'organization' : 'user';
   }
   if (data.activeOrganization) {
     return 'organization';
@@ -124,15 +127,14 @@ export function resolveSwitcherLayout(mode: SwitcherMode, data: SwitcherData): S
   const hasOrganizations = data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
 
   const lead = resolveLead(mode, data);
-  const header = [...headers[lead]];
 
   return {
     lead,
+    userBadge: mode === 'combined' && lead === 'organization',
     showOrganizations: declared.organizations !== false && hasOrganizations,
-    headerLayout: header.some(action => action !== 'manageLead') ? 'stacked' : 'inline',
     actions: {
-      header,
       organizationsFooter: [...organizationsFooter],
+      manage: [...manage[lead]],
       footer: [...(hasOtherSessions ? declared.footer.multiSession : declared.footer.singleSession)],
     },
   };

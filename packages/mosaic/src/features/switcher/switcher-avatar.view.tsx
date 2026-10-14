@@ -5,7 +5,7 @@ import type { AvatarProps } from '../../components/avatar';
 import { Avatar } from '../../components/avatar';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { badgeSizes, leadSizes, ringSizes, sizes, styles } from './switcher-avatar.styles';
+import { styles } from './switcher-avatar.styles';
 import { useSlot } from './switcher-surface';
 
 function initials(name: string): string {
@@ -42,55 +42,33 @@ export function RowAvatar({ name, imageUrl, shape, size, xstyle }: RowAvatarProp
   );
 }
 
-export interface SwitcherAvatarProps {
+export interface BadgedAvatarProps {
   name: string;
   imageUrl?: string;
-  shape: 'circle' | 'square';
-  size: 'xs' | 'sm' | 'md';
-  badge?: { name: string; imageUrl?: string };
-  focusRing?: boolean;
+  badge: { name: string; imageUrl?: string };
 }
 
-export function SwitcherAvatar({
-  name,
-  imageUrl,
-  shape,
-  size,
-  badge,
-  focusRing = false,
-}: SwitcherAvatarProps): ReactElement {
+export function BadgedAvatar({ name, imageUrl, badge }: BadgedAvatarProps): ReactElement {
   const slot = useSlot();
-  if (!badge) {
-    return (
-      <RowAvatar
-        name={name}
-        imageUrl={imageUrl}
-        shape={shape}
-        size={size}
-      />
-    );
-  }
-
   return (
     <span
       aria-hidden
-      {...mergeStyleProps(themeProps(slot('avatar'), { size }), stylex.props(reset.base, styles.root, sizes[size]))}
+      {...mergeStyleProps(themeProps(slot('avatar')), stylex.props(reset.base, styles.root))}
     >
       <RowAvatar
         name={name}
         imageUrl={imageUrl}
-        shape={shape}
+        shape='square'
         size='fit'
-        xstyle={[styles.lead, leadSizes[size]]}
+        xstyle={styles.lead}
       />
-      {focusRing ? <span {...stylex.props(reset.base, styles.ring, ringSizes[size])} /> : null}
       <span {...mergeStyleProps(themeProps(slot('avatar-badge')), stylex.props(reset.base, styles.badge))}>
         <RowAvatar
           name={badge.name}
           imageUrl={badge.imageUrl}
-          shape='square'
+          shape='circle'
           size='fit'
-          xstyle={badgeSizes[size]}
+          xstyle={styles.badgeAvatar}
         />
       </span>
     </span>
