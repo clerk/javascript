@@ -17,3 +17,8 @@ paths:
     ignore:
       - 'unexpected key "background" for step to run shell command'
       - 'step must run script with "run" section or run action with "uses" section'
+  # actionlint 1.7.x also predates `concurrency.queue`, which keeps every waiting run of a group.
+  # Remove once actionlint supports that key.
+  .github/workflows/verify-attach.yml:
+    ignore:
+      - 'unexpected key "queue" for "concurrency" section'
