@@ -51,8 +51,7 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-full'],
   },
 
-  // Matches `SwitcherItemLabel`, so the trigger names an organization the same way its row does. Capped,
-  // because the trigger sits in a host app's chrome and a long organization name would push it apart.
+  // Capped, because the trigger sits in a host app's chrome and a long organization name would push it apart.
   triggerName: {
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
