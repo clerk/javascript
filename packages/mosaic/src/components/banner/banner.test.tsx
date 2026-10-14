@@ -14,7 +14,7 @@ const overrides = stylex.create({
 const atoms = (style: stylex.StyleXStyles) =>
   (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
-const COLORS = ['neutral', 'warning', 'negative'] as const;
+const COLORS = ['neutral', 'warning', 'negative', 'positive'] as const;
 
 describe('Mosaic Banner', () => {
   it('renders its label and description', () => {

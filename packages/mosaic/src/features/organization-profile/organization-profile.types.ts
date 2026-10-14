@@ -20,19 +20,3 @@ export interface CustomOrganizationProfilePage {
   icon?: ReactNode;
   content: ReactNode;
 }
-
-export interface OrganizationProfileFormError {
-  message?: string;
-  /** Names the control the failure belongs to. Set, and `message` renders under it instead of in the banner. */
-  field?: string;
-}
-
-export class OrganizationProfileSaveError extends Error {
-  readonly field?: string;
-
-  constructor(message: string, field?: string) {
-    super(message);
-    this.name = 'OrganizationProfileSaveError';
-    this.field = field;
-  }
-}

@@ -30,7 +30,7 @@ export function Empty() {
     <APIKeysTableView
       {...props}
       onCreate={undefined}
-      onRevoke={undefined}
+      revoke={undefined}
     />
   );
 }

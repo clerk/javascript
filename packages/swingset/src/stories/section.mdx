@@ -31,12 +31,13 @@ import { Section } from '@clerk/mosaic/components/section';
 </Section.Root>
 ```
 
-`Section.Root` holds one topic and stacks its cards. It has no title of its own; pass `aria-label`
+`Section.Root` holds one topic and stacks its groups. It has no title of its own; pass `aria-label`
 to expose it as a named region.
 
-`Section.Group` is a card. `Section.Header` holds a `Section.Content` with its `Section.Title` and
-an optional `Section.Description`, followed by optional `Section.Actions`; the card takes its
-accessible name from the title. The actions move under the content when they don't fit beside it. `Section.Body` wraps everything under the header and draws the divider between the two.
+`Section.Group` pairs a header with a card. `Section.Header` holds a `Section.Content` with its
+`Section.Title` and an optional `Section.Description`, followed by optional `Section.Actions`; the
+group takes its accessible name from the title. The actions move under the content when they don't
+fit beside it. `Section.Body` is the card under the header.
 
 Inside the body, a `Section.Row` holds one setting as a `Section.Item`. `Section.Items` renders a
 list of values, one `Section.Item` per entry, and each item becomes a list item. Items lay out
@@ -47,24 +48,24 @@ When a row offers no action, `Section.Note` takes the place of its `Section.Acti
 sits directly in `Section.Item` and holds the trailing slot itself. Its `icon` prop renders into a
 fixed leading slot sized to the text, for a provider logo or a lock.
 
-`Section.Group` is a query container named `cl-section`, so rows can adapt to the card's width.
+`Section.Group` is a query container named `cl-section`, so rows can adapt to the group's width.
 `Section.Item` accepts `wrap`, which moves the actions under the content when the card is narrower
 than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at
 the same width.
 
 `Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
-On a page, put the sections in `Panel.Sections` so the card titles sit one level below the page
+On a page, put the sections in `Panel.Sections` so the group titles sit one level below the page
 title. See [Panel](/components/panel) and [Heading](/components/heading).
 
 ## Parts
 
 | Part                  | Element     | Class                     | Notes                                                           |
 | --------------------- | ----------- | ------------------------- | --------------------------------------------------------------- |
-| `Section.Root`        | `<section>` | `.cl-section`             | Stacks cards. Unnamed unless given `aria-label`.                |
-| `Section.Group`       | `<div>`     | `.cl-section-group`       | The card, with `role='group'` named by its title.               |
+| `Section.Root`        | `<section>` | `.cl-section`             | Stacks groups. Unnamed unless given `aria-label`.               |
+| `Section.Group`       | `<div>`     | `.cl-section-group`       | Header and card, with `role='group'` named by its title.        |
 | `Section.Header`      | `<div>`     | `.cl-section-header`      | Content and optional actions.                                   |
-| `Section.Title`       | heading     | `.cl-section-title`       | The card's heading.                                             |
-| `Section.Body`        | `<div>`     | `.cl-section-body`        | The card's content; draws the divider under the header.         |
+| `Section.Title`       | heading     | `.cl-section-title`       | The group's heading.                                            |
+| `Section.Body`        | `<div>`     | `.cl-section-body`        | The card under the header.                                      |
 | `Section.Row`         | `<div>`     | `.cl-section-row`         | One setting.                                                    |
 | `Section.Items`       | `<ul>`      | `.cl-section-items`       | A list of values.                                               |
 | `Section.Item`        | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`. |
@@ -132,11 +133,11 @@ inside `Section.Items` reflect `data-nested`.
   storyModule={SectionStories}
 />
 
-### Flat cards
+### Header inside the card
 
-External CSS can move the card from `.cl-section-group` to `.cl-section-body`; this example targets `.cl-section-group`, `.cl-section-header`, `.cl-section-body`, and the header's `.cl-button`.
+External CSS can move the card from `.cl-section-body` to `.cl-section-group`, so the header sits inside it above a divider; this example targets `.cl-section-group`, `.cl-section-header`, and `.cl-section-body`.
 
 <Story
-  name='Flat'
+  name='ContainedHeader'
   storyModule={SectionStories}
 />

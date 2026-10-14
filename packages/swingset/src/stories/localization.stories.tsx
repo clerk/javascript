@@ -128,7 +128,7 @@ function Rows({ rows }: { rows: Array<[string, ReactNode]> }) {
 // helper its placeholders call for.
 function Strings() {
   const m = useMessages('userButton');
-  const link = useMessages('userProfileVerifyEmailLink');
+  const link = useMessages('userProfileAddEmail');
   const locale = useLocale();
   return (
     <Rows
@@ -136,7 +136,7 @@ function Strings() {
         ['fill', fill(m.trigger.open, { name: 'Colin' })],
         ['plural · 1', plural(m.organizations.members, 1, locale)],
         ['plural · 5', plural(m.organizations.members, 5, locale)],
-        ['rich', rich(link.resendCountdown, { values: { seconds: <strong>30</strong> } })],
+        ['rich', rich(link.link.resendCountdown, { values: { seconds: <strong>30</strong> } })],
       ]}
     />
   );

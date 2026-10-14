@@ -4,7 +4,8 @@ import { useRef, useState } from 'react';
 import { useForm } from '../../components/form';
 import { useNow } from '../../hooks/use-now';
 import { useLocale } from '../../localization';
-import { formatDate, getExpirationDate } from './api-keys-table.format';
+import { formatDate } from '../../utils/format-date';
+import { getExpirationDate } from './api-keys-table.format';
 import type { APIKeysTableMessages } from './api-keys-table.types';
 import type { CreateAPIKeyDialogProps, CreateAPIKeyValues } from './create-api-key.dialog';
 
@@ -38,6 +39,7 @@ export function useCreateAPIKeyController({
 
   const form = useForm({
     initialValues,
+    errorFallback: messages.createError,
     canSubmit: values => values.name.trim().length > 2 && values.expiration !== null,
     onSubmit: async ({ name, expiration }) => {
       if (expiration === null) {

@@ -59,17 +59,14 @@ function SelectInner(props: SelectProps) {
     placement: placementProp = 'bottom-start',
     sideOffset = 4,
     children,
+    onValueChange,
   } = props;
 
   const nodeId = useFloatingNodeId();
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
-  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>(
-    props.value,
-    props.defaultValue,
-    props.onValueChange as ((value: string | undefined) => void) | undefined,
-  );
+  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>(props.value, props.defaultValue);
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
@@ -161,6 +158,7 @@ function SelectInner(props: SelectProps) {
   const handleSelect = useCallback(
     (value: string, index: number) => {
       setSelectedValue(value);
+      onValueChange?.(value);
       setSelectedIndex(index);
       // In controlled mode the parent decides whether to accept the new value.
       // If they reject it, selectedValue rolls back but selectedLabel would not,
@@ -171,7 +169,7 @@ function SelectInner(props: SelectProps) {
       }
       handleOpenChange(false);
     },
-    [isControlled, setSelectedValue, handleOpenChange],
+    [isControlled, setSelectedValue, handleOpenChange, onValueChange],
   );
 
   const handleTypeaheadMatch = useCallback(

@@ -1,5 +1,21 @@
 # Change Log
 
+## 4.40.0
+
+### Minor Changes
+
+- Add a role mapping step to the self-serve Directory Sync setup in `<OrganizationProfile />`. Organization admins can now assign an organization role to each directory group their identity provider pushes, set which group wins when a member belongs to several, and turn role syncing on or off. Members in no mapped group keep the organization's default role. The step is read-only for members without the `org:sys_memberships:manage` permission and while the organization's role set is being migrated. ([#10081](https://github.com/clerk/javascript/pull/10081)) by [@kalafut](https://github.com/kalafut)
+
+### Patch Changes
+
+- Add an `enterpriseConnectionsUrl` option to `handleRedirectCallback()` and `<AuthenticateWithRedirectCallback />`. When the Clerk API asks an OAuth sign-up to choose between several enterprise connections for the same email domain, the callback navigates to this URL, which defaults to the `enterprise-connections` route of your sign-up page. ([#9947](https://github.com/clerk/javascript/pull/9947)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.39.1
+
+### Patch Changes
+
+- The missing and invalid key errors now say that `npx clerk@latest init` does not need a Clerk account and writes temporary dev keys. Readers previously saw `init` listed beside `link`, `env pull` and the Dashboard link, and assumed signing up was required before any of the steps would work. ([#10099](https://github.com/clerk/javascript/pull/10099)) by [@eatmorespinach](https://github.com/eatmorespinach)
+
 ## 4.39.0
 
 ### Minor Changes

@@ -1,57 +1,35 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
-const importNativeEntry = () => import('../index');
+const nativeComponentsEntry = vi.hoisted(() => ({
+  AuthView: () => null,
+  UserButton: () => null,
+  UserProfileView: () => null,
+  useAuthViewState: () => null,
+  useUserProfileCustomPageNavigation: () => null,
+}));
+const deprecated = vi.hoisted(() => vi.fn());
+
+vi.mock('../../native-components', () => nativeComponentsEntry);
+vi.mock('@clerk/shared/deprecated', () => ({ deprecated }));
 
 describe('@clerk/expo/native', () => {
   afterEach(() => {
-    vi.doUnmock('../loadClerkExpoNative');
     vi.resetModules();
-    vi.restoreAllMocks();
+    deprecated.mockClear();
   });
 
-  describe('when @clerk/expo-native-components is not installed', () => {
-    beforeEach(() => {
-      vi.doMock('../loadClerkExpoNative', () => ({ loadClerkExpoNative: () => null }));
-    });
+  test('re-exports everything from @clerk/expo/native-components', async () => {
+    const nativeEntry = await import('../index');
 
-    test.each(['AuthView', 'UserButton', 'UserProfileView'] as const)(
-      'rendering %s throws an error with install instructions',
-      async name => {
-        const Component = (await importNativeEntry())[name] as (props: object) => unknown;
-
-        expect(() => Component({})).toThrow(
-          /`.+` is unavailable\. Native components have moved to the @clerk\/expo-native-components package\. Install it with `npx expo install @clerk\/expo-native-components`/,
-        );
-      },
-    );
-
-    test.each(['useAuthViewState', 'useUserProfileCustomPageNavigation'] as const)(
-      'calling %s throws an error with install instructions',
-      async name => {
-        const hook = (await importNativeEntry())[name] as () => unknown;
-
-        expect(() => hook()).toThrow(`\`${name}\` is unavailable.`);
-        expect(() => hook()).toThrow('add "@clerk/expo-native-components" to the plugins array in your app config');
-      },
-    );
+    expect({ ...nativeEntry }).toEqual(nativeComponentsEntry);
   });
 
-  test('re-exports @clerk/expo-native-components when it is installed', async () => {
-    const clerkExpoNative = {
-      AuthView: vi.fn(() => null),
-      UserButton: vi.fn(() => null),
-      UserProfileView: vi.fn(() => null),
-      useAuthViewState: vi.fn(),
-      useUserProfileCustomPageNavigation: vi.fn(),
-    };
-    vi.doMock('../loadClerkExpoNative', () => ({ loadClerkExpoNative: () => clerkExpoNative }));
+  test('warns that the entry point is deprecated when it is imported', async () => {
+    await import('../index');
 
-    const nativeEntry = await importNativeEntry();
-
-    expect(nativeEntry.AuthView).toBe(clerkExpoNative.AuthView);
-    expect(nativeEntry.UserButton).toBe(clerkExpoNative.UserButton);
-    expect(nativeEntry.UserProfileView).toBe(clerkExpoNative.UserProfileView);
-    expect(nativeEntry.useAuthViewState).toBe(clerkExpoNative.useAuthViewState);
-    expect(nativeEntry.useUserProfileCustomPageNavigation).toBe(clerkExpoNative.useUserProfileCustomPageNavigation);
+    expect(deprecated).toHaveBeenCalledExactlyOnceWith(
+      '@clerk/expo/native',
+      'Import from `@clerk/expo/native-components` instead.',
+    );
   });
 });
