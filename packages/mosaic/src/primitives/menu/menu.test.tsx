@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Popover } from '../popover';
 import { axe } from '../test-utils/axe';
@@ -786,6 +786,248 @@ describe('Menu', () => {
       await user.keyboard('{Escape}');
 
       expect(screen.getByText('Open popover')).toHaveAttribute('data-closed', '');
+    });
+  });
+
+  describe('open on hover', () => {
+    beforeEach(() => {
+      vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    beforeEach(() => {
+      vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    function renderHoverMenu(children?: React.ReactNode) {
+      return render(
+        <>
+          <button type='button'>Elsewhere</button>
+          <Menu.Root openOnHover>
+            <Menu.Trigger>Actions</Menu.Trigger>
+            <Menu.Positioner data-testid='menu-positioner'>
+              <Menu.Popup>
+                <Menu.Item label='Cut'>Cut</Menu.Item>
+                {children}
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Root>
+        </>,
+      );
+    }
+
+    function place(element: Element, x: number, y: number, width: number, height: number) {
+      vi.spyOn(element, 'getBoundingClientRect').mockReturnValue(new DOMRect(x, y, width, height));
+    }
+
+    function positionerOf(text: string) {
+      const positioner = screen.getByText(text).closest('[data-side]');
+      if (!positioner) {
+        throw new Error(`No positioner around ${text}`);
+      }
+      return positioner;
+    }
+
+    it('opens when the mouse rests on the trigger', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+
+      await user.hover(screen.getByText('Actions'));
+
+      expect(await screen.findByText('Cut')).toBeInTheDocument();
+    });
+
+    it('does not open on hover without openOnHover', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+
+      await user.hover(screen.getByText('Actions'));
+      await new Promise(r => setTimeout(r, 150));
+
+      expect(screen.queryByText('Cut')).toBeNull();
+    });
+
+    it('stays open as the mouse moves from the trigger into the menu', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+      place(screen.getByText('Actions'), 0, 0, 100, 20);
+
+      await user.pointer({ target: screen.getByText('Actions'), coords: { clientX: 50, clientY: 10 } });
+      await screen.findByText('Cut');
+      place(positionerOf('Cut'), 0, 24, 160, 100);
+      await user.pointer([
+        { target: document.documentElement, coords: { clientX: 50, clientY: 22 } },
+        { target: screen.getByText('Cut'), coords: { clientX: 60, clientY: 40 } },
+      ]);
+
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+    });
+
+    it('closes when the mouse leaves the menu', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+      place(screen.getByText('Actions'), 0, 0, 100, 20);
+
+      await user.pointer({ target: screen.getByText('Actions'), coords: { clientX: 50, clientY: 10 } });
+      await screen.findByText('Cut');
+      place(positionerOf('Cut'), 0, 24, 160, 100);
+      await user.pointer([
+        { target: document.documentElement, coords: { clientX: 50, clientY: 22 } },
+        { target: screen.getByText('Cut'), coords: { clientX: 60, clientY: 40 } },
+      ]);
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+
+      await user.pointer({ target: screen.getByText('Elsewhere'), coords: { clientX: 400, clientY: 400 } });
+
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
+    });
+
+    it('stays open when the trigger is pressed after a hover opened it', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+
+      await user.hover(screen.getByText('Actions'));
+      await screen.findByText('Cut');
+      await user.click(screen.getByText('Actions'));
+      await user.hover(screen.getByText('Elsewhere'));
+
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+    });
+
+    it('stays open when the mouse leaves a menu opened by a press', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+
+      await user.pointer({ keys: '[MouseLeft]', target: screen.getByText('Actions') });
+      await user.hover(screen.getByText('Elsewhere'));
+
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+    });
+
+    it('closes on a second press of the trigger', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+
+      await user.hover(screen.getByText('Actions'));
+      await screen.findByText('Cut');
+      await user.click(screen.getByText('Actions'));
+      await user.click(screen.getByText('Actions'));
+
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
+    });
+
+    it('leaves focus on the page when a hover opens it', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+      const before = document.activeElement;
+
+      await user.hover(screen.getByText('Actions'));
+      await screen.findByText('Cut');
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(before);
+    });
+
+    it('focuses the first item when opened with the keyboard', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+
+      screen.getByText('Actions').focus();
+      await user.keyboard('{Enter}');
+      await new Promise(r => requestAnimationFrame(r));
+
+      expect(document.activeElement).toBe(screen.getByText('Cut'));
+    });
+
+    it('opens on a tap', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu();
+
+      await user.pointer({ keys: '[TouchA]', target: screen.getByText('Actions') });
+
+      expect(await screen.findByText('Cut')).toBeInTheDocument();
+    });
+
+    it('stays open while the mouse moves into a submenu', async () => {
+      const user = userEvent.setup();
+      renderHoverMenu(
+        <Menu.Root>
+          <Menu.Trigger>Share</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item label='Copy link'>Copy link</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+      place(screen.getByText('Actions'), 0, 0, 100, 20);
+
+      await user.pointer({ target: screen.getByText('Actions'), coords: { clientX: 50, clientY: 10 } });
+      await screen.findByText('Share');
+      place(positionerOf('Cut'), 0, 24, 160, 100);
+      place(screen.getByText('Share'), 4, 60, 152, 28);
+      await user.pointer([
+        { target: document.documentElement, coords: { clientX: 50, clientY: 22 } },
+        { target: screen.getByText('Share'), coords: { clientX: 80, clientY: 74 } },
+      ]);
+      await screen.findByText('Copy link');
+      place(positionerOf('Copy link'), 160, 56, 160, 60);
+      await user.pointer([
+        { target: document.documentElement, coords: { clientX: 158, clientY: 74 } },
+        { target: screen.getByText('Copy link'), coords: { clientX: 200, clientY: 70 } },
+      ]);
+
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+      expect(screen.getByText('Share')).toHaveAttribute('data-open', '');
+    });
+
+    it('leaves the popover it sits in open when the mouse leaves', async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <button type='button'>Elsewhere</button>
+          <Popover.Root defaultOpen>
+            <Popover.Trigger>Open popover</Popover.Trigger>
+            <Popover.Positioner>
+              <Popover.Popup>
+                <Menu.Root openOnHover>
+                  <Menu.Trigger>Actions</Menu.Trigger>
+                  <Menu.Positioner>
+                    <Menu.Popup>
+                      <Menu.Item label='Cut'>Cut</Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Root>
+              </Popover.Popup>
+            </Popover.Positioner>
+          </Popover.Root>
+        </>,
+      );
+
+      await user.hover(screen.getByText('Actions'));
+      await user.hover(await screen.findByText('Cut'));
+      await user.hover(screen.getByText('Open popover'));
+
+      expect(screen.getByText('Actions')).toHaveAttribute('data-closed', '');
+      expect(screen.getByText('Open popover')).toHaveAttribute('data-open', '');
     });
   });
 
