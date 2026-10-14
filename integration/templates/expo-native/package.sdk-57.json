@@ -10,7 +10,8 @@
     "prebuild:ios": "expo prebuild --clean --platform ios"
   },
   "dependencies": {
-    "expo": "~57.0.1",
+    "expo": "~57.0.23",
+    "expo-build-properties": "~57.0.22",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-native": "0.86.0"
