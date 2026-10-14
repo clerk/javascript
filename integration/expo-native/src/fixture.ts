@@ -391,6 +391,7 @@ export async function buildStandalone(
   say: (line: string) => void,
   site: FixtureSite = THIS_CHECKOUT,
   now: () => number = Date.now,
+  nativeCache: string | null = nativeCacheDir(),
 ): Promise<string> {
   const must: typeof mustStep = async (what, command, args, cwd, env) => {
     const began = now();
@@ -403,7 +404,7 @@ export async function buildStandalone(
   say('build   pnpm install --frozen-lockfile');
   await must('pnpm install', 'pnpm', ['install', '--frozen-lockfile'], site.worktree);
   const built = await buildFixture(
-    { platform, product: 'standalone', nativeKey, buildPackages: true, progress: say },
+    { platform, product: 'standalone', nativeKey, buildPackages: true, nativeCache, progress: say },
     { ...site, must },
   );
   say(`build   ${built}`);

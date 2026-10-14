@@ -369,6 +369,18 @@ describe('the standalone build that a person or a remote session starts', () => 
     rmSync(at.site.worktree, { recursive: true, force: true });
   });
 
+  it('takes the native build kept for these native inputs and embeds only the new JS when a cache is named', async () => {
+    const at = checkout();
+    const say = () => undefined;
+    await buildStandalone('ios', 'key', say, at.site, Date.now, at.cache);
+    at.write('packages/expo/src/index.ts', 'js two');
+    at.steps.length = 0;
+    const app = await buildStandalone('ios', 'key', say, at.site, Date.now, at.cache);
+    assert.deepEqual(at.steps, ['pnpm install', 'turbo build', ...EMBED]);
+    assert.equal(bundleOf(app), 'embedded js two');
+    rmSync(at.site.worktree, { recursive: true, force: true });
+  });
+
   it('says how long a step ran before it failed', async () => {
     const at = checkout();
     const said: string[] = [];

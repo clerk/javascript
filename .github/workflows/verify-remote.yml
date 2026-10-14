@@ -64,10 +64,14 @@ jobs:
     if: needs.plan.outputs.mode == 'session'
     runs-on: ${{ needs.plan.outputs.runner }}
     timeout-minutes: ${{ fromJSON(needs.plan.outputs.timeout) }}
+    permissions:
+      contents: read
+      actions: read
     env:
       VERIFY_SESSION_REQUEST: ${{ needs.plan.outputs.request }}
       PLATFORM: ${{ fromJSON(needs.plan.outputs.request).platform }}
       DEVICE: ${{ needs.plan.outputs.device }}
+      VERIFY_NATIVE_CACHE: integration/expo-native/.verify/native
       # agent-device reaps its daemon, its XCTest runner, and its device lease after five idle minutes by default.
       AGENT_DEVICE_DAEMON_IDLE_TIMEOUT_MS: '0'
       AGENT_DEVICE_IOS_RUNNER_IDLE_STOP_MS: '0'
@@ -120,6 +124,29 @@ jobs:
             echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
             echo "id=$(node "$PACKAGE/src/platform/android/session-lane.ts" serial)" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Install monorepo dependencies
+        if: needs.plan.outputs.device != ''
+        timeout-minutes: 15
+        run: pnpm install --frozen-lockfile
+
+      - name: Name the native build that this commit needs
+        id: native
+        if: needs.plan.outputs.device != ''
+        timeout-minutes: 10
+        run: node "$PACKAGE/src/fixture.ts" native "$PLATFORM" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch a native build that an earlier run made
+        id: kept
+        if: needs.plan.outputs.device != ''
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+          NATIVE_ID: ${{ steps.native.outputs.id }}
+          NATIVE_DIR: ${{ steps.native.outputs.dir }}
+          NATIVE_APP: ${{ steps.native.outputs.app }}
+        run: integration/expo-native/bin/fetch-native-build.sh
 
       - name: Start the session agent and tunnel
         id: tunnel
@@ -239,3 +266,4 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
           compression-level: 0
+
