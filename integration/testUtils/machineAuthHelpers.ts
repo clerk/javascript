@@ -213,7 +213,7 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
       await app.withEnv(createApiKeysEnv());
       await app.dev();
 
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       fakeBapiUser = await u.services.users.createBapiUser(fakeUser);
       fakeAPIKey = await u.services.users.createFakeAPIKey(fakeBapiUser.id);
@@ -260,7 +260,7 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
     }
 
     test('should handle multiple token types', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const url = new URL(adapter.apiKey.path, app.serverUrl).toString();
       const origin = new URL(app.serverUrl).origin;
 
@@ -337,7 +337,7 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
     });
 
     test('authorizes M2M requests when sender machine has proper access', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       const res = await u.page.request.get(new URL(adapter.m2m.path, app.serverUrl).toString(), {
         headers: { Authorization: `Bearer ${network.scopedSenderToken.token}` },
@@ -389,7 +389,7 @@ export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void =>
       await app.withEnv(createApiKeysEnv());
       await app.dev();
 
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
       fakeOAuth = await createFakeOAuthApp(
@@ -405,7 +405,7 @@ export const registerOAuthAuthTests = (adapter: MachineAuthTestAdapter): void =>
     });
 
     test('verifies valid OAuth access token obtained through authorization flow', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       const accessToken = await obtainOAuthAccessToken({
         page: u.page,
         oAuthApp: fakeOAuth.oAuthApp,

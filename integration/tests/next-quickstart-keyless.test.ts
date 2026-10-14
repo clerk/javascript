@@ -68,7 +68,7 @@ test.describe('Keyless mode @quickstart', () => {
     await page.waitForTimeout(5_000);
 
     await mockClaimedInstanceEnvironmentCall(page);
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context, useTestingToken: false });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
 

@@ -35,7 +35,7 @@ test.describe('passkeys @generic', () => {
     await app.setup();
     await app.withEnv(appConfigs.envs.withPasskeys);
     await app.dev();
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test, { fictionalEmail: true, withPassword: true });
     await u.services.users.createBapiUser(fakeUser);
   });
@@ -48,7 +48,7 @@ test.describe('passkeys @generic', () => {
   test('registers a passkey through UserProfile', async ({ page, context }) => {
     await installVirtualAuthenticator(context);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email!, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
@@ -68,7 +68,7 @@ test.describe('passkeys @generic', () => {
     await context.credentials.create(savedCredential.rpId, savedCredential);
     await installVirtualAuthenticator(context);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
 
     // The start page requests the passkey with mediation: 'conditional' and the
@@ -79,7 +79,7 @@ test.describe('passkeys @generic', () => {
   test('signs in with passkey via identifier-first flow', async ({ page, context }) => {
     await installVirtualAuthenticator(context);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email!);
     await u.po.signIn.continue();
@@ -96,7 +96,7 @@ test.describe('passkeys @generic', () => {
   test('signs in with a seeded passkey', async ({ page, context }) => {
     await installVirtualAuthenticator(context);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
 
     const usePasskeyLink = u.page.getByRole('link', { name: /use passkey instead/i });

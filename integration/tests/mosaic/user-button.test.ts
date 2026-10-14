@@ -12,7 +12,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   let organization: Organization;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     organization = await u.services.clerk.organizations.createOrganization({
@@ -22,7 +22,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   });
 
   test.afterAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     const results = await Promise.allSettled([
       u.services.clerk.organizations.deleteOrganization(organization.id),
       fakeUser.deleteIfExists(),
@@ -38,7 +38,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   const popup = (page: Page) => page.getByRole('dialog', { name: 'Account' });
 
   async function signIn({ page, context }: { page: Page; context: BrowserContext }, path = '/') {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.page.goToRelative(path);

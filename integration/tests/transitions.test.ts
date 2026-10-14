@@ -30,7 +30,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitio
   let fakeOrganization2: FakeOrganization;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
 
     const env = app.env;
     const publishableKey = env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
@@ -69,7 +69,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitio
     would not be shown, and orgId would not update until the full transition, including data fetching, was complete.
   */
   test('should switch to the new organization immediately when not using transitions', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
@@ -112,7 +112,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitio
     page,
     context,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
@@ -162,7 +162,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitio
     page,
     context,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();

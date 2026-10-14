@@ -21,7 +21,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     let fakeUser2: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser1 = u.services.users.createFakeUser(test);
       fakeUser2 = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser1);
@@ -58,7 +58,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await page1.goto(app.serverUrl);
       await page1.waitForFunction(() => (window as any).Clerk?.loaded);
 
-      const u1 = createTestUtils({ app, page: page1 });
+      const u1 = await createTestUtils({ app, page: page1 });
       await u1.po.signIn.goTo();
       await u1.po.signIn.setIdentifier(fakeUser1.email);
       await u1.po.signIn.continue();
@@ -91,7 +91,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       // eslint-disable-next-line playwright/no-wait-for-timeout
       await page2.waitForTimeout(1000);
 
-      const u2 = createTestUtils({ app, page: page2 });
+      const u2 = await createTestUtils({ app, page: page2 });
       await u2.po.expect.toBeSignedIn();
 
       const page2User1SessionInfo = await page2.evaluate(() => {
@@ -251,7 +251,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await page1.goto(app.serverUrl);
       await page1.waitForFunction(() => (window as any).Clerk?.loaded);
 
-      const u1 = createTestUtils({ app, page: page1 });
+      const u1 = await createTestUtils({ app, page: page1 });
       await u1.po.signIn.goTo();
       await u1.po.signIn.setIdentifier(fakeUser1.email);
       await u1.po.signIn.continue();
@@ -269,7 +269,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       // eslint-disable-next-line playwright/no-wait-for-timeout
       await page2.waitForTimeout(1000);
 
-      const u2 = createTestUtils({ app, page: page2 });
+      const u2 = await createTestUtils({ app, page: page2 });
       await u2.po.expect.toBeSignedIn();
 
       // Sign in as user2 on tab2, creating a second session
