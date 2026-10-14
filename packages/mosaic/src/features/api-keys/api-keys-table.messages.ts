@@ -3,6 +3,7 @@ import type { APIKeysTableMessages, APIKeysTableSubjectKind } from './api-keys-t
 
 export const apiKeysTableMessages = {
   loading: 'Loading API keys',
+  loaded: 'API keys loaded',
   loadError: 'Could not load API keys',
   loadErrorDescription: 'Something went wrong. Please try again.',
   retry: 'Try again',

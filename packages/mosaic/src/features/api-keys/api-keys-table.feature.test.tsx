@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
-import { openDialog } from '../../../__tests__/feature/dialog';
-import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import { openDialog } from '../../__tests__/feature/dialog';
+import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../__tests__/feature/fake-fapi';
 import {
   fapiApiKey,
   fapiClient,
@@ -15,11 +15,11 @@ import {
   fapiOrganization,
   fapiSession,
   fapiUser,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
-import type { APIKeysTableProps } from '../api-keys-table';
-import { APIKeysTable } from '../api-keys-table';
+} from '../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../__tests__/feature/render';
+import { MosaicProvider } from '../../mosaic-provider';
+import type { APIKeysTableProps } from './api-keys-table';
+import { APIKeysTable } from './api-keys-table';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -138,7 +138,7 @@ describe('APIKeysTable', () => {
       await within(table()).findByText('Web app');
       expect(within(table()).getAllByRole('cell', { name: 'Jan 5, 2026' })).toHaveLength(2);
       expect(within(table()).getByText('Expires Dec 31, 2027')).toBeVisible();
-      expect(within(table()).getByText('Never expires')).toBeVisible();
+      expect(within(table()).getByText('Never expires', { exact: false })).toBeVisible();
       expect(within(table()).getByRole('cell', { name: '2 minutes ago' })).toBeVisible();
       expect(within(table()).getByRole('cell', { name: '-' })).toBeVisible();
       expect(within(table()).getByText('ak_...FKWO', { exact: false })).toBeVisible();
@@ -155,10 +155,12 @@ describe('APIKeysTable', () => {
       const list = holdRequests('get', '/api_keys');
       await renderWithClerk(<APIKeysTable subject={alice.id} />);
 
-      expect(await screen.findByRole('status')).toHaveTextContent('Loading API keys');
+      const status = await screen.findByRole('status');
+      expect(status).toHaveTextContent('Loading API keys');
       list.release();
       expect(await within(table()).findByText('Web app')).toBeVisible();
-      expect(screen.queryByRole('status')).toBeNull();
+      expect(screen.getByRole('status')).toBe(status);
+      expect(status).toHaveTextContent('API keys loaded');
     });
 
     it('explains when the user has no keys', async () => {

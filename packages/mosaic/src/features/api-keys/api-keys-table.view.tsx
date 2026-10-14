@@ -1,12 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Destructive } from '../../blocks/destructive';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
+import { Skeleton } from '../../components/skeleton';
 import { Spinner } from '../../components/spinner';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
@@ -16,10 +17,24 @@ import { fill } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
 import { styles } from './api-keys-table.styles';
-import type { APIKey, APIKeysTableMessages, APIKeysTableViewProps } from './api-keys-table.types';
+import type { APIKey, APIKeysTableMessages, APIKeysTableSort, APIKeysTableViewProps } from './api-keys-table.types';
 import { CreateAPIKeyDialog } from './create-api-key.dialog';
 
 const getRowId = (row: APIKey) => row.id;
+
+const PLACEHOLDER_ROW_COUNT = 3;
+
+const PLACEHOLDER_NAMES = ['Production server', 'CI pipeline', 'Analytics'];
+
+export function placeholderAPIKeys(count: number): APIKey[] {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `ak_placeholder${index}`,
+    name: PLACEHOLDER_NAMES[index % PLACEHOLDER_NAMES.length] ?? '',
+    createdAtLabel: 'Jan 5, 2026',
+    expiresAtLabel: null,
+    lastUsedAtLabel: '2 minutes ago',
+  }));
+}
 
 export function APIKeysTableView({
   messages: m,
@@ -45,47 +60,111 @@ export function APIKeysTableView({
   isFetching = false,
   isError = false,
   onRetry,
+  skeleton = false,
+  refetchSkeleton = false,
 }: APIKeysTableViewProps) {
+  const lastChange = useRef<'page' | 'search'>('page');
   const { table, sortHeader, pagination } = useServerDataTable({
     data: apiKeys,
     totalCount,
     getRowId,
     sortableColumns: ['name', 'createdAt', 'lastUsed'],
     sort,
-    onSortChange,
+    onSortChange: onSortChange
+      ? next => {
+          lastChange.current = 'page';
+          onSortChange(next);
+        }
+      : undefined,
     page,
     pageSize,
-    onPageChange,
+    onPageChange: next => {
+      lastChange.current = 'page';
+      onPageChange(next);
+    },
     onPageSizeChange,
     searchValue,
-    onSearchChange,
+    onSearchChange: value => {
+      lastChange.current = 'search';
+      onSearchChange(value);
+    },
   });
   const columnCount = 3 + Number(Boolean(revoke)) + Number(Boolean(onBulkAction));
+  const headerSort = (column: APIKeysTableSort['column']) => (skeleton ? {} : sortHeader(column));
+  const rowsSkeleton = refetchSkeleton && isFetching && !skeleton && !isLoading;
+  const remaining = totalCount - (page - 1) * pageSize;
+  const placeholderRows = placeholderAPIKeys(
+    lastChange.current === 'page' && remaining > 0 ? Math.min(pageSize, remaining) : PLACEHOLDER_ROW_COUNT,
+  );
+  const renderRow = (apiKey: APIKey, row?: (typeof table.rows)[number]) => (
+    <Table.Row
+      key={apiKey.id}
+      selected={Boolean(onBulkAction) && Boolean(row?.getIsSelected())}
+    >
+      {onBulkAction ? (
+        <Table.SelectCell
+          aria-label={fill(m.select, { name: apiKey.name })}
+          checked={Boolean(row?.getIsSelected())}
+          onToggleSelected={row?.toggleSelected}
+        />
+      ) : null}
+      <Table.Cell>
+        <APIKeyMetadata
+          messages={m}
+          apiKey={apiKey}
+        />
+      </Table.Cell>
+      <Table.Cell noWrap>
+        <Skeleton>{apiKey.createdAtLabel}</Skeleton>
+      </Table.Cell>
+      <Table.Cell noWrap>
+        <Skeleton>{apiKey.lastUsedAtLabel ?? m.neverUsed}</Skeleton>
+      </Table.Cell>
+      {revoke ? (
+        <Table.Cell align='end'>
+          <Skeleton visible={false}>
+            <APIKeyActions
+              messages={m}
+              apiKey={apiKey}
+              registerTrigger={registerTrigger}
+              onSelect={key => revoke.open(key)}
+            />
+          </Skeleton>
+        </Table.Cell>
+      ) : null}
+    </Table.Row>
+  );
   const query = searchValue.trim();
   const emptyState = query
     ? { label: m.empty, description: fill(m.emptyDescription, { query }) }
     : { label: m.noKeys, description: m.noKeysDescription };
   return (
     <>
-      <div {...mergeStyleProps(themeProps('api-keys-table'), stylex.props(styles.root))}>
+      <div {...mergeStyleProps(themeProps('api-keys-table', { skeleton }), stylex.props(styles.root))}>
+        <VisuallyHidden role='status'>{skeleton || rowsSkeleton || isLoading ? m.loading : m.loaded}</VisuallyHidden>
         <Table.Toolbar>
-          <Table.Search
-            ref={searchInputRef}
-            label={m.search}
-            clearLabel={m.clearSearch}
-            value={table.globalFilter}
-            onValueChange={table.setGlobalFilter}
-          />
+          <Skeleton show={skeleton}>
+            <Table.Search
+              ref={searchInputRef}
+              label={m.search}
+              clearLabel={m.clearSearch}
+              value={table.globalFilter}
+              onValueChange={table.setGlobalFilter}
+            />
+          </Skeleton>
           {onCreate ? (
-            <Button
-              ref={createButtonRef}
-              onClick={onCreate}
-            >
-              {m.create}
-            </Button>
+            <Skeleton show={skeleton}>
+              <Button
+                ref={createButtonRef}
+                onClick={onCreate}
+              >
+                {m.create}
+              </Button>
+            </Skeleton>
           ) : null}
         </Table.Toolbar>
         <Table.Root
+          skeleton={skeleton}
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
         >
@@ -99,9 +178,15 @@ export function APIKeysTableView({
                   onChange={table.toggleAllRowsSelected}
                 />
               ) : null}
-              <Table.HeaderCell {...sortHeader('name')}>{m.name}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('createdAt')}>{m.createdAt}</Table.HeaderCell>
-              <Table.HeaderCell {...sortHeader('lastUsed')}>{m.lastUsed}</Table.HeaderCell>
+              <Table.HeaderCell {...headerSort('name')}>
+                <Skeleton>{m.name}</Skeleton>
+              </Table.HeaderCell>
+              <Table.HeaderCell {...headerSort('createdAt')}>
+                <Skeleton>{m.createdAt}</Skeleton>
+              </Table.HeaderCell>
+              <Table.HeaderCell {...headerSort('lastUsed')}>
+                <Skeleton>{m.lastUsed}</Skeleton>
+              </Table.HeaderCell>
               {revoke ? (
                 <Table.HeaderCell align='end'>
                   <VisuallyHidden>{m.actions}</VisuallyHidden>
@@ -109,16 +194,15 @@ export function APIKeysTableView({
               ) : null}
             </Table.Row>
           </Table.Header>
-          <Table.Body>
+          <Table.Body skeleton={rowsSkeleton || undefined}>
             {/* TODO: Replace with a shared Table.Loading built on a Mosaic Skeleton component (skeleton rows sized to the columns). */}
-            {isLoading ? (
+            {rowsSkeleton ? (
+              placeholderRows.map(apiKey => renderRow(apiKey))
+            ) : isLoading && !skeleton ? (
               <Table.Empty colSpan={columnCount}>
-                <span role='status'>
-                  <Spinner />
-                  <VisuallyHidden>{m.loading}</VisuallyHidden>
-                </span>
+                <Spinner />
               </Table.Empty>
-            ) : isError ? (
+            ) : isError && !skeleton ? (
               <Table.Empty colSpan={columnCount}>
                 <EmptyState.Root>
                   <EmptyState.Icon name='exclamation-circle' />
@@ -137,7 +221,7 @@ export function APIKeysTableView({
                   ) : null}
                 </EmptyState.Root>
               </Table.Empty>
-            ) : table.rows.length === 0 ? (
+            ) : table.rows.length === 0 && !skeleton ? (
               <Table.Empty colSpan={columnCount}>
                 <EmptyState.Root>
                   <EmptyState.Icon name='key' />
@@ -146,46 +230,11 @@ export function APIKeysTableView({
                 </EmptyState.Root>
               </Table.Empty>
             ) : (
-              table.rows.map(row => (
-                <Table.Row
-                  key={row.id}
-                  selected={Boolean(onBulkAction) && row.getIsSelected()}
-                >
-                  {onBulkAction ? (
-                    <Table.SelectCell
-                      aria-label={fill(m.select, { name: row.original.name })}
-                      checked={row.getIsSelected()}
-                      onToggleSelected={row.toggleSelected}
-                    />
-                  ) : null}
-                  <Table.Cell>
-                    <APIKeyMetadata
-                      messages={m}
-                      apiKey={row.original}
-                    />
-                  </Table.Cell>
-                  <Table.Cell noWrap>
-                    <Text>{row.original.createdAtLabel}</Text>
-                  </Table.Cell>
-                  <Table.Cell noWrap>
-                    <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
-                  </Table.Cell>
-                  {revoke ? (
-                    <Table.Cell align='end'>
-                      <APIKeyActions
-                        messages={m}
-                        apiKey={row.original}
-                        registerTrigger={registerTrigger}
-                        onSelect={apiKey => revoke.open(apiKey)}
-                      />
-                    </Table.Cell>
-                  ) : null}
-                </Table.Row>
-              ))
+              table.rows.map(row => renderRow(row.original, row))
             )}
           </Table.Body>
         </Table.Root>
-        {pagination ? (
+        {pagination && !skeleton ? (
           <Pagination
             {...pagination}
             label={m.pagination}
@@ -195,8 +244,8 @@ export function APIKeysTableView({
           />
         ) : null}
       </div>
-      {createDialog ? <CreateAPIKeyDialog {...createDialog} /> : null}
-      {revoke ? (
+      {createDialog && !skeleton ? <CreateAPIKeyDialog {...createDialog} /> : null}
+      {revoke && !skeleton ? (
         <Destructive
           controller={revoke}
           title={apiKey => fill(m.revokeTitle, { name: apiKey.name })}
@@ -215,23 +264,27 @@ export function APIKeysTableView({
 function APIKeyMetadata({ messages: m, apiKey }: { messages: APIKeysTableMessages; apiKey: APIKey }) {
   return (
     <div {...stylex.props(styles.metadata)}>
-      <Text xstyle={styles.name}>{apiKey.name}</Text>
+      <Text xstyle={styles.name}>
+        <Skeleton>{apiKey.name}</Skeleton>
+      </Text>
       <Text
         size='xs'
         color='foreground-secondary'
       >
-        {truncateWithEndVisible(apiKey.id, 10, 4)} ·{' '}
-        <Text
-          render={<span />}
-          size='xs'
-          color={apiKey.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
-        >
-          {apiKey.expiresAtLabel === null
-            ? m.neverExpires
-            : fill(m.expires, {
-                expiresDate: apiKey.expiresAtLabel,
-              })}
-        </Text>
+        <Skeleton>
+          {truncateWithEndVisible(apiKey.id, 10, 4)} ·{' '}
+          {apiKey.expiresAtLabel === null ? (
+            m.neverExpires
+          ) : (
+            <Text
+              render={<span />}
+              size='xs'
+              color='warning'
+            >
+              {fill(m.expires, { expiresDate: apiKey.expiresAtLabel })}
+            </Text>
+          )}
+        </Skeleton>
       </Text>
     </div>
   );

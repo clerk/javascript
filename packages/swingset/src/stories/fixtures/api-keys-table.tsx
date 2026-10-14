@@ -1,5 +1,6 @@
 import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import { Panel } from '@clerk/mosaic/components/panel';
+import { Skeleton } from '@clerk/mosaic/components/skeleton';
 import { resolveAPIKeysTableMessages } from '@clerk/mosaic/features/api-keys/api-keys-table.messages';
 import type {
   APIKey,
@@ -82,10 +83,12 @@ export function useAPIKeysTableFixture({
   initialKeys = exampleAPIKeys,
   enableSorting = false,
   subjectKind = 'user',
+  fetchDelay = 0,
 }: {
   initialKeys?: FixtureAPIKey[];
   enableSorting?: boolean;
   subjectKind?: APIKeysTableSubjectKind;
+  fetchDelay?: number;
 } = {}): APIKeysTableViewProps {
   const locale = useLocale();
   const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), subjectKind);
@@ -137,15 +140,30 @@ export function useAPIKeysTableFixture({
     return () => clearTimeout(timer);
   }, [searchValue, query]);
 
+  const requested = { page, query, sort, pageSize };
+  const [settled, setSettled] = useState(requested);
+  const isFetching =
+    fetchDelay > 0 &&
+    (settled.page !== page || settled.query !== query || settled.sort !== sort || settled.pageSize !== pageSize);
+  useEffect(() => {
+    if (!isFetching) {
+      return;
+    }
+    const timer = setTimeout(() => setSettled({ page, query, sort, pageSize }), fetchDelay);
+    return () => clearTimeout(timer);
+  }, [isFetching, page, query, sort, pageSize, fetchDelay]);
+  const shown = fetchDelay > 0 ? settled : requested;
+
   const filtered = items.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
-  const sorted = sortAPIKeys(filtered, sort);
+  const shownFiltered = items.filter(item => item.name.toLowerCase().includes(shown.query.toLowerCase()));
+  const sorted = sortAPIKeys(shownFiltered, shown.sort);
   const pageCount = Math.ceil(filtered.length / pageSize);
   useEffect(() => {
     if (page > Math.max(1, pageCount)) {
       setPage(Math.max(1, pageCount));
     }
   }, [page, pageCount]);
-  const apiKeys = sorted.slice((page - 1) * pageSize, page * pageSize).map(item => ({
+  const apiKeys = sorted.slice((shown.page - 1) * shown.pageSize, shown.page * shown.pageSize).map(item => ({
     id: item.id,
     name: item.name,
     createdAtLabel: dateLabel(item.createdAt),
@@ -173,11 +191,12 @@ export function useAPIKeysTableFixture({
   return {
     messages,
     apiKeys,
-    totalCount: filtered.length,
+    totalCount: shownFiltered.length,
     page,
     pageSize,
     searchValue,
     isLoading: false,
+    isFetching,
     searchInputRef,
     createButtonRef,
     onCreate: create.onOpen,
@@ -201,7 +220,9 @@ export function useAPIKeysTableFixture({
 export function APIKeysPanelExample(props: APIKeysTableViewProps) {
   return (
     <Panel.Root>
-      <Panel.Title>API Keys</Panel.Title>
+      <Panel.Title>
+        <Skeleton show={Boolean(props.skeleton)}>API Keys</Skeleton>
+      </Panel.Title>
       <APIKeysTableView {...props} />
     </Panel.Root>
   );
