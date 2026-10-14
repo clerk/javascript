@@ -1409,6 +1409,19 @@ describe('the step that edits the description', () => {
     ]);
   });
 
+  it('prints the usage and compares nothing when --compare names no file', async () => {
+    const env = await fetched();
+    const file = name => path.join(path.dirname(env.WORK), name);
+    fs.writeFileSync(file('pull.json'), JSON.stringify(PULL));
+    fs.writeFileSync(file('commits.json'), JSON.stringify(COMMITS));
+    const lines = [];
+    const files = ['--pull', file('pull.json'), '--commits', file('commits.json'), '--compare'];
+    assert.equal(await main(['publish', '--dry-run', ...files], env, line => lines.push(line)), 2);
+    assert.deepEqual(lines, [
+      'usage: verify-attach.mjs fetch [--zip <file>] | publish [--dry-run] [--pull <file> --commits <file> [--compare <file>]]',
+    ]);
+  });
+
   const SHOT = [['profile.png', PNG]];
   const WAS_SHOT = [['before-profile.png', WAS_PNG]];
   const CLIP = [['video.mp4', MP4]];
@@ -1873,20 +1886,37 @@ describe('the step that edits the description', () => {
     ]);
   });
 
-  it('fails when GitHub cannot compare the commit the session started on with the base branch, and writes nothing', async () => {
+  const comparing = (fake, stderr) => ({
+    ...fake,
+    gh: (args, options) => (/\/compare\//.test(args[1] ?? '') ? { status: 1, stderr } : fake.gh(args, options)),
+  });
+
+  it('publishes nothing, and does not fail, when GitHub does not find the commit the session started on', async () => {
+    const notFound = 'gh: Not Found (HTTP 404)\n';
     const fake = fakeGh(PULL, undefined, [{ sha: COMMIT }], '{"status":"ahead"}');
-    const failing = {
-      gh: (args, options) =>
-        /\/compare\//.test(args[1] ?? '')
-          ? { status: 1, stderr: 'gh: Not Found (HTTP 404)\n' }
-          : fake.gh(args, options),
-    };
-    const env = await startedEarlier();
-    assert.throws(
-      () => publish(env, failing),
-      /^Error: gh could not compare the commit the session started on with the base branch of pull request #669\ngh: gh: Not Found \(HTTP 404\)$/,
-    );
+    const { outcome, said } = publish(await startedEarlier(), comparing(fake, notFound));
+    assert.equal(outcome, 'refused');
     assert.equal(fake.state.writtenBody, null);
+    assert.deepEqual(said, [
+      'notice: Pull request #669 is not the pull request of run 37731397352 (the commit the session started on is not a commit GitHub finds in this repository), so nothing is published.',
+    ]);
+    const long = fakeGh({ ...PULL, commits: 300 }, undefined, [{ sha: COMMIT }], '{"status":"ahead"}');
+    assert.deepEqual(publish(await startedEarlier(), comparing(long, notFound)).said, said, 'a long pull request');
+  });
+
+  it('fails when GitHub does not answer the comparison of the commit the session started on with the base branch, and writes nothing', async () => {
+    for (const stderr of ['gh: Bad Gateway (HTTP 502)\n', 'error connecting to api.github.com\n', '']) {
+      const fake = fakeGh(PULL, undefined, [{ sha: COMMIT }], '{"status":"ahead"}');
+      const env = await startedEarlier();
+      assert.throws(
+        () => publish(env, comparing(fake, stderr)),
+        error =>
+          error.message ===
+          `gh could not compare the commit the session started on with the base branch of pull request #669\n${stderr === '' ? '' : `gh: ${stderr.trimEnd()}`}`,
+        stderr,
+      );
+      assert.equal(fake.state.writtenBody, null, stderr);
+    }
   });
 
   it('reads every page of the commits GitHub lists, and stops at the last one', async () => {

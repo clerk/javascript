@@ -214,6 +214,14 @@ describe('the rule for which pull request a session may publish to', () => {
     assert.equal(short?.why, 'the session started on dddddddddddd, which is not one of its commits or a commit of its base branch');
     assert.notEqual(short?.fix, refused?.fix);
   });
+
+  it('refuses a session that started on a commit GitHub does not find, in a pull request of any length, and says where to start one', async () => {
+    const unknown = async (): Promise<'unknown'> => 'unknown';
+    const refused = { why: 'the session started on dddddddddddd, which GitHub does not find in clerk/clerk-ios', fix: '{cli} down, then {cli} up on a commit of the pull request or of its base branch, run again and attach' };
+    assert.deepEqual(await pullRequestMismatch({ ...pull, commits: [COMMIT] }, session, unknown), refused);
+    assert.deepEqual(await pullRequestMismatch({ ...pull, commits: [COMMIT], commitCount: 300 }, session, unknown), refused);
+    assert.equal(await pullRequestMismatch(pull, session, neverAsked), null);
+  });
 });
 
 describe('the receiver in the session job', () => {
@@ -682,11 +690,24 @@ describe('the remote backend before it sends evidence', () => {
       assert.equal(error?.message, message, JSON.stringify(base));
       assert.deepEqual(asked.filter((path) => path.startsWith('/compare/')), [], 'no question is asked about a base that is not a commit id');
     }
-    for (const status of [404, 502]) {
+    for (const status of [403, 502]) {
       const unread = await refusal({ commits: [COMMIT], baseCompared: { status, json: { message: 'No answer' } } });
       assert.deepEqual({ code: unread.error.code, fix: unread.error.fix, sent: unread.sent }, { code: 'NOT_READY', fix: 'retry {cli} attach', sent: [] }, String(status));
       assert.match(unread.error.message, /^could not compare the commit the session started on with the base branch of PR #669: /, String(status));
     }
+  });
+
+  it('sends nothing when GitHub does not find the commit the session started on, and says where to start a session', async () => {
+    const { error, sent } = await refusal({ commits: [COMMIT], baseCompared: { status: 404, json: { message: 'Not Found' } } });
+    assert.deepEqual(
+      { code: error.code, message: error.message, fix: error.fix, sent },
+      {
+        code: 'NOT_READY',
+        message: `${wouldNot}the session started on dddddddddddd, which GitHub does not find in clerk/clerk-ios`,
+        fix: '{cli} down, then {cli} up on a commit of the pull request or of its base branch, run again and attach',
+        sent: [],
+      },
+    );
   });
 
   it('sends nothing when the commit the session started on, or the commit of the run, is not a commit of the pull request', async () => {

@@ -383,7 +383,15 @@ function pullRequestMismatch(pull, session) {
 }
 
 function commitNotHeld(commits, session, baseHoldsStart) {
-  if (!commits.includes(session.startedOn) && !baseHoldsStart()) {
+  const startHeld = commits.includes(session.startedOn) || baseHoldsStart();
+  if (startHeld === 'unknown') {
+    return {
+      commit: 'the commit the session started on',
+      why: 'is not a commit GitHub finds in this repository',
+      unknown: true,
+    };
+  }
+  if (!startHeld) {
     return {
       commit: 'the commit the session started on',
       why: 'is not one of its commits or a commit of its base branch',
@@ -790,6 +798,9 @@ function publishStep({
         cwd: work,
         stdoutFile: compareJson,
       });
+      if (read.status !== 0 && / \(HTTP 404\)$/m.test(read.stderr)) {
+        return 'unknown';
+      }
       if (read.status !== 0) {
         throw new Failed(
           `gh could not compare the commit the session started on with the base branch of pull request #${manifest.pr}\n${printable(read.stderr)}`,
@@ -819,7 +830,7 @@ function publishStep({
     return notThisRun(mismatch);
   }
   const notHeld = commitNotHeld(readCommits(), session, baseHoldsStart);
-  if (notHeld !== null && pull.commits > MOST_COMMITS_GITHUB_LISTS) {
+  if (notHeld !== null && !notHeld.unknown && pull.commits > MOST_COMMITS_GITHUB_LISTS) {
     say(
       'notice',
       `Pull request #${manifest.pr} has ${pull.commits} commits and GitHub lists only the first ${MOST_COMMITS_GITHUB_LISTS}, which do not hold ${notHeld.commit}, so run ${runId} cannot be checked against it and nothing is published.`,
@@ -927,6 +938,7 @@ async function main(argv, env, log = console.log) {
   const say = (kind, text) => log(kind === 'plain' ? text : workflowCommand(kind, text));
   const [step, ...rest] = argv;
   const flag = name => (rest.includes(name) ? rest[rest.indexOf(name) + 1] : undefined);
+  const namesNoFile = name => rest.includes(name) && flag(name) === undefined;
   try {
     if (step === 'fetch') {
       const found = await fetchStep({ env, say, fetch, zipFile: flag('--zip') });
@@ -935,7 +947,7 @@ async function main(argv, env, log = console.log) {
       }
       return 0;
     }
-    if (step === 'publish') {
+    if (step === 'publish' && !namesNoFile('--compare')) {
       publishStep({
         env,
         say,

@@ -188,19 +188,22 @@ export interface PullRequestMismatch {
 
 const ITS_OWN_PULL_REQUEST =
   "it accepts only the open pull request of the session's branch, and only when the commit of the run is a commit of that pull request and the commit the session started on is one too or is a commit of its base branch; git push, then {cli} run again and attach, or after a rewrite of the branch's history {cli} down and {cli} up first";
+const A_COMMIT_GITHUB_FINDS = '{cli} down, then {cli} up on a commit of the pull request or of its base branch, run again and attach';
 const FEWER_COMMITS = `it can check a commit only against the first ${MOST_COMMITS_GITHUB_LISTS} commits of a pull request; squash or rebase the branch to ${MOST_COMMITS_GITHUB_LISTS} commits or fewer, git push, then {cli} down, {cli} up, run again and attach, or run {cli} attach on a machine whose gh can attach`;
 
 export async function pullRequestMismatch(
   pull: PullRequestView,
   session: { readonly repo: string; readonly headBranch: string; readonly startedOn: string; readonly runCommit: string },
-  baseHoldsStart: () => Promise<boolean>,
+  baseHoldsStart: () => Promise<boolean | 'unknown'>,
 ): Promise<PullRequestMismatch | null> {
   const refused = (why: string): PullRequestMismatch => ({ why, fix: ITS_OWN_PULL_REQUEST });
   if (pull.state !== 'open') return refused(`it is ${pull.state}`);
   if (pull.headRepo !== session.repo) return refused(`its branch is in ${pull.headRepo ?? 'a deleted fork'}, not in ${session.repo}`);
   if (pull.headRef !== session.headBranch) return refused(`its branch is ${pull.headRef} and the session runs on ${session.headBranch}`);
+  const startHeld = pull.commits.includes(session.startedOn) || (await baseHoldsStart());
+  if (startHeld === 'unknown') return { why: `the session started on ${session.startedOn.slice(0, 12)}, which GitHub does not find in ${session.repo}`, fix: A_COMMIT_GITHUB_FINDS };
   const notHeld =
-    !pull.commits.includes(session.startedOn) && !(await baseHoldsStart())
+    !startHeld
       ? { commit: `the session started on ${session.startedOn.slice(0, 12)}`, among: 'one of its commits or a commit of its base branch' }
       : !pull.commits.includes(session.runCommit)
         ? { commit: `the run was made at ${session.runCommit.slice(0, 12)}`, among: 'one of its commits' }

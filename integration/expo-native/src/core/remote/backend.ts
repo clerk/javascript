@@ -31,9 +31,10 @@ async function pullRequestCommits(hub: GitHub, pr: number): Promise<readonly str
   return shas;
 }
 
-async function baseHolds(hub: GitHub, pr: number, base: unknown, commit: string): Promise<boolean> {
+async function baseHolds(hub: GitHub, pr: number, base: unknown, commit: string): Promise<boolean | 'unknown'> {
   if (typeof base !== 'string' || !/^[0-9a-f]{40}$/.test(base)) return false;
   const compared = await hub.api('GET', `/compare/${commit}...${base}?per_page=1`);
+  if (compared.status === 404) return 'unknown';
   if (compared.status !== 200) throw new VerifyFailure('NOT_READY', `could not compare the commit the session started on with the base branch of PR #${pr}: ${apiMessage(compared)}`, 'retry {cli} attach');
   const status = (compared.json as { readonly status?: unknown } | null)?.status;
   return status === 'ahead' || status === 'identical';
