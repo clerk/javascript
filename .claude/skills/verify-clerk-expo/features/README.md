@@ -8,7 +8,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 
 - The standard settings have every auth method and signed-in feature that these recipes use. The `settings` check of `doctor` compares the live instance with the standard file once the worktree holds an application.
 - Every launch gets a new `verifyStorageScope`, so no spec inherits a session from another spec. A launch with `keepStorage: true` reuses the scope of the launch before it in the same test.
-- `down` deletes this worktree's application, and with it every user and organization a run created, including users created through the sign-up form.
+- `down` deletes this worktree's application, and with it every user and organization a run created, including users created through the sign-up form. `down --platform <p>` keeps the application while the other platform still holds a lease in this worktree. It deletes the application when the other platform holds no lease.
 
 ## Test users and sign-in
 

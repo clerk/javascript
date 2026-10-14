@@ -125,13 +125,13 @@ If the description has no evidence a few minutes after `down`, read the newest r
 
 Node ignores `HTTPS_PROXY` unless it is told to honor it, so the CLI decides. It goes through the proxy when the direct path to GitHub does not work, which means that it cannot connect or that GitHub rejects the machine's token on it. In that case the CLI reruns itself with the proxy in effect for itself, e2e, and agent-device. A machine that reaches GitHub directly stays direct. `doctor` prints the choice and the reason in `remote-env`.
 
-A host that the environment blocks shows in `doctor` as `blocked:` and what answered. The fix is to add the host to the allowed domains of the environment that the CLI runs in.
+The `tunnel-egress` and `clerk-egress` checks in `doctor` show a host that the environment blocks as `blocked:` and what answered, or as `no response from <host>`. When `api.github.com` does not answer, the `github-rest` check shows `api.github.com did not answer`. In each case the fix is to add the host to the allowed domains of the environment that the CLI runs in.
 
 ## GitHub access
 
 A session uses GitHub in two ways. REST starts, reads, and ends sessions. `git push` gets a commit that you make to GitHub, so that the session can build it.
 
-Claude Code cloud sessions are one example of a sandbox where the two differ. REST there uses the session user's own access. `git push` needs the Claude GitHub App installed on the repository, and a 403 on push means that it is not. The sandbox's `GH_TOKEN` is a placeholder that only the sandbox's proxy turns into a real credential, which is the case above where GitHub rejects the token on a direct connection.
+Claude Code cloud sessions are one example of a sandbox where the two differ. REST there can use a different credential from `git push`, so REST can work while a push is refused. A 403 on push means that this machine's GitHub credential may not push to the repository. In a cloud sandbox that credential belongs to the sandbox's GitHub integration, and an administrator of the organization gives the integration access to the repository. The sandbox's `GH_TOKEN` is a placeholder that only the sandbox's proxy turns into a real credential, which is the case above where GitHub rejects the token on a direct connection.
 
 ## The Backend API in a cloud environment
 
