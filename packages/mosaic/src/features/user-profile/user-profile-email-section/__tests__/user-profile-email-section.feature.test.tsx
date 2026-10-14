@@ -261,13 +261,13 @@ describe('Removing an address', () => {
     demandReverificationOnce('/v1/me/email_addresses/idn_second');
 
     await manageEmail(actor, 'bob@example.com', 'Remove email');
-    const dialog = await screen.findByRole('dialog', { name: 'Remove email address?' });
+    const dialog = await screen.findByRole('alertdialog', { name: 'Remove email address?' });
     await actor.click(within(dialog).getByRole('button', { name: 'Remove' }));
 
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
     await actor.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
 
     await waitFor(() => expect(emailsListed()).toEqual(['alice@example.com']));
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByRole('alertdialog')).toBeNull();
   });
 });

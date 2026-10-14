@@ -17,6 +17,9 @@ export interface ConfirmationProps<Payload = void> extends ConfirmBlockProps<Pay
  * Use `Destructive` for the destructive actions that are. `color` sets the weight the confirming
  * button carries: `negative` for what cannot be undone, `primary` for what can.
  *
+ * An alert dialog: an outside press leaves it open, and the confirm step has no corner dismiss. The
+ * verify step a reverified action swaps in shows one, except while the action is being retried.
+ *
  * Driven by a `useConfirmController`. A dialog that sits next to its button takes it as `trigger`;
  * a dialog shared by a list is opened from each row with `controller.open(payload)`, and the copy
  * is derived from that payload.

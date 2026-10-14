@@ -111,6 +111,9 @@ function DestructiveStep<Payload>({
  * Type-to-confirm dialog for an action that cannot be undone. The delete button stays inert
  * until the typed phrase matches `confirmationValue`.
  *
+ * An alert dialog: an outside press leaves it open, and the confirm step has no corner dismiss. The
+ * verify step a reverified action swaps in shows one, except while the action is being retried.
+ *
  * Driven by a `useConfirmController`, the same way as `Confirmation`. The block holds the typed
  * phrase and clears it when the dialog closes.
  *
