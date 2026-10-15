@@ -162,6 +162,8 @@ export type {
 } from '../components/popover';
 export { Panel } from '../components/panel';
 export type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from '../components/panel';
+export { Reveal } from '../components/reveal';
+export type { RevealProps } from '../components/reveal';
 export { Profile } from '../components/profile';
 export type {
   ProfileContentProps,
