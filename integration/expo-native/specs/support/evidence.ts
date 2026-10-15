@@ -7,6 +7,19 @@ export interface EvidenceMark {
   readonly passed: boolean;
 }
 
+export interface TapMark {
+  readonly tappedAt: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+interface Box {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
 export const EVIDENCE_PACE = {
   beatMs: 600,
   resultHoldMs: 2_000,
@@ -34,5 +47,17 @@ export function evidenceBlock(marker: Marker): <T>(label: string, body: () => Pr
       const mark: EvidenceMark = { label, startedAt, endedAt: marker.now(), passed };
       appendFileSync(file, `${JSON.stringify(mark)}\n`);
     }
+  };
+}
+
+export function tapMarker(marker: Pick<Marker, 'marksFile' | 'now'>): (target: { boundingBox(): Promise<Box | null> }, tap: () => Promise<void>) => Promise<void> {
+  return async (target, tap) => {
+    const file = marker.marksFile;
+    if (file === null) return tap();
+    const box = await target.boundingBox().catch(() => null);
+    await tap();
+    if (box === null) return;
+    const mark: TapMark = { tappedAt: marker.now(), x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    appendFileSync(file, `${JSON.stringify(mark)}\n`);
   };
 }

@@ -21,7 +21,7 @@ import { isRunning, type Runner } from './exec.ts';
 import { ledgerAgentDeviceDaemon, processesIn, readDaemonInfo, stopProcesses, type ProcessEntry } from './ledgers.ts';
 import { SHARED_ROOTS, manifestDrift } from './manifest.ts';
 import { CannotPostHere, chooseEvidence, missingAttach, postToPullRequest } from './publish.ts';
-import { cutVideo, readMarks, spansOfMarks, type VideoCut } from './video.ts';
+import { cutVideo, readMarks, readTaps, spansOfMarks, tapsOfMarks, type VideoCut } from './video.ts';
 import { redact } from '../../specs/support/secret.ts';
 import { count } from './state.ts';
 import { newEntryId, parseRunId, type Workspace } from './workspace.ts';
@@ -42,6 +42,7 @@ import {
   type EvidencePath,
   type EvidenceRecord,
   type EvidenceSpan,
+  type Viewport,
   type HandOffReceipt,
   type HostAdapter,
   type InstanceView,
@@ -521,6 +522,9 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
       const hasVideo = existsSync(join(dir, 'video.mp4'));
       const evidenceSpans = evidenceMarks === null || videoStartedAt === null || !hasVideo ? [] : spansOfMarks(readMarks(evidenceMarks), videoStartedAt);
       if (evidenceMarks !== null && hasVideo && evidenceSpans.length === 0) deps.progress("video   no test marked the part that shows the change with host.evidence('<label>', async () => { ... }), so attach --video refuses this run");
+      const taps = evidenceMarks === null || videoStartedAt === null || !hasVideo ? [] : tapsOfMarks(readTaps(evidenceMarks), videoStartedAt, platform);
+      const viewport = taps.length === 0 ? null : await viewportOf(deps, lease, platform);
+      if (taps.length > 0 && viewport === null) deps.progress('video   the size of the screen could not be read, so attach --video draws no taps for this run');
 
       driver.collect();
       const appLog = join(dir, 'app.log') as EvidencePath;
@@ -545,6 +549,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
         results,
         videos: hasVideo ? [join(dir, 'video.mp4') as EvidencePath] : [],
         evidenceSpans,
+        evidenceTaps: viewport === null ? null : { viewport, taps },
         screenshots: [...screenshots.values()],
         appLog,
         e2eReport: join(e2eOutputDir(dir, 0), 'report.json') as EvidencePath,
@@ -578,6 +583,21 @@ interface SnapshotNode {
   readonly value?: string;
   readonly identifier?: string;
   readonly depth?: number;
+}
+
+async function viewportOf(deps: Deps, lease: Lease, platform: Platform): Promise<Viewport | null> {
+  const { selector, call } = agentDeviceFor(deps, lease, platform);
+  const session = ['--session', `${agentDeviceSession(deps.workspace, platform)}-screen`];
+  try {
+    if ((await call(['open', deps.host.appId(platform), '--json', ...selector, ...session])).code !== 0) return null;
+    const snap = await call(['snapshot', '--json', ...selector, ...session]);
+    const viewport = snap.code === 0 ? (JSON.parse(snap.stdout) as { data?: { viewport?: Partial<Viewport> } }).data?.viewport : undefined;
+    return typeof viewport?.width === 'number' && typeof viewport.height === 'number' && viewport.width > 0 ? { width: viewport.width, height: viewport.height } : null;
+  } catch {
+    return null;
+  } finally {
+    await call(['close', ...selector, ...session]).catch(() => undefined);
+  }
 }
 
 function heldLease(deps: Deps, platform: Platform): { lease: Lease; backend: DeviceBackend } {
@@ -668,7 +688,7 @@ async function withCutVideos(deps: Deps, bundle: EvidenceBundle, after: Evidence
   const cut = async (file: EvidenceFile, record: EvidenceRecord): Promise<EvidenceFile> => {
     if (!file.name.endsWith('.mp4')) return file;
     const spans = (record.evidenceSpans ?? []).length > 0 ? record.evidenceSpans! : null;
-    const result = await cutVideo(file.path, spans, deps.runner);
+    const result = await cutVideo(file.path, spans, deps.runner, record.evidenceTaps ?? null);
     deps.progress(cutLine(record.run, result, spans));
     return { name: file.name, path: result.path };
   };
@@ -680,7 +700,8 @@ async function withCutVideos(deps: Deps, bundle: EvidenceBundle, after: Evidence
 function cutLine(run: RunId, result: VideoCut, spans: readonly EvidenceSpan[] | null): string {
   if (result.kind === 'uncut') return `video   run ${run}: ${result.why}, so its whole video goes up uncut; ${basename(result.path)} is what a reviewer sees`;
   const what = spans === null ? 'the whole run, with each still stretch shortened, because the run marks no evidence' : spans.map((span) => `"${span.label}"`).join(', ');
-  return `video   run ${run}: ${result.from.toFixed(1)} s cut to ${result.to.toFixed(1)} s, showing ${what}; ${result.path}`;
+  const taps = result.taps === 0 ? '' : `, with ${count(result.taps, 'tap')} marked where ${result.taps === 1 ? 'it' : 'they'} landed`;
+  return `video   run ${run}: ${result.from.toFixed(1)} s cut to ${result.to.toFixed(1)} s, showing ${what}${taps}; ${result.path}`;
 }
 
 function beforeRun(deps: Deps, run: RunId, after: EvidenceRecord): Showable {

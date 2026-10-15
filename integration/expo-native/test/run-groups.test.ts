@@ -95,6 +95,7 @@ fs.appendFileSync('order.log', 'e2e opens the app with no arguments\\n');
       if (marks !== undefined) {
         const at = Date.now();
         fs.appendFileSync(marks, JSON.stringify({ label: 'shows ' + path.basename(file), startedAt: at, endedAt: at + 1500, passed: true }) + '\\n');
+        if (plan.taps) fs.appendFileSync(marks, JSON.stringify({ tappedAt: at + 800, x: 210, y: 450 }) + '\\n');
         fs.appendFileSync('order.log', 'marks the evidence of ' + path.basename(file) + '\\n');
       }
     }
@@ -138,6 +139,7 @@ interface FakeE2EPlan {
   readonly edit?: string;
   readonly exitCode?: number;
   readonly password?: boolean;
+  readonly taps?: boolean;
   readonly launches?: boolean;
   readonly retriesTheOpen?: boolean;
   readonly driver?: {
@@ -332,6 +334,28 @@ describe('a run whose spec files declare different settings', () => {
       assert.equal(span?.label, 'shows auth-start.e2e.ts');
       assert.ok(span !== undefined && span.from >= 0 && span.from < 5 && Math.abs(span.to - span.from - 1.5) < 0.01, JSON.stringify(span));
       assert.equal(next, `{cli} attach ${record.run} --pr <n> --video, and add --before <run-id> when the change is to something that exists`);
+    });
+
+    it('keeps where each host.tap landed in seconds of the video, with the size of the screen the points are in', async () => {
+      const r = recorded({ launches: true, taps: true });
+      const snapshot = JSON.stringify({ success: true, data: { viewport: { width: 420, height: 912 }, nodes: [] } });
+      const answering: Runner = async (command, args, options) => (args[0] === 'snapshot' ? (await r.deps.runner(command, args, options), { code: 0, stdout: snapshot, stderr: '' }) : r.deps.runner(command, args, options));
+      const { record } = await runVerb({ ...r.deps, runner: answering }, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
+      const screenSession = `--platform ios --udid UDID-1 --session verify-ios-${r.w.workspace.worktreeId}-screen`;
+      assert.deepEqual(r.order().slice(-3), [`agent-device open com.clerk.E2EHost --json ${screenSession}`, `agent-device snapshot --json ${screenSession}`, `agent-device close ${screenSession}`]);
+      const [span] = record.evidenceSpans ?? [];
+      const [tap, ...others] = record.evidenceTaps?.taps ?? [];
+      assert.deepEqual(others, []);
+      assert.deepEqual(record.evidenceTaps?.viewport, { width: 420, height: 912 });
+      assert.ok(span !== undefined && tap !== undefined && Math.abs(tap.at - span.from - 0.5) < 0.002, JSON.stringify({ span, tap }));
+      assert.deepEqual({ x: tap.x, y: tap.y }, { x: 210, y: 450 });
+    });
+
+    it('keeps no taps, and says attach draws none, when the size of the screen cannot be read', async () => {
+      const r = recorded({ launches: true, taps: true });
+      const { record } = await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
+      assert.equal(record.evidenceTaps, null);
+      assert.deepEqual(r.videoLines().slice(-1), ['video   the size of the screen could not be read, so attach --video draws no taps for this run']);
     });
 
     it('keeps full speed and marks nothing in a run of --all, as the nightly suite runs, or with --no-video', async () => {
