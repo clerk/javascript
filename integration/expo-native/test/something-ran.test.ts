@@ -22,29 +22,36 @@ function results(rows: readonly { tags?: string[]; status: string; skip?: { caus
 describe('a run in which nothing executed', () => {
   it('fails when --grep matched no title', () => {
     const grepTypo = results([{ status: 'skipped', skip: { cause: 'filtered', reason: 'title does not match --grep' } }]);
-    assert.throws(() => nextStep(run, dir, grepTypo, 'auth-start'), { code: 'NO_SPECS', message: /no test ran for auth-start: filtered: title does not match --grep/ });
+    assert.throws(() => nextStep(run, dir, grepTypo, 'auth-start', false), { code: 'NO_SPECS', message: /no test ran for auth-start: filtered: title does not match --grep/ });
   });
 
   it('fails when the selection registered no tests', () => {
-    assert.throws(() => nextStep(run, dir, results([]), 'specs/explored/empty.e2e.ts'), { code: 'NO_SPECS', message: /registered no tests/ });
+    assert.throws(() => nextStep(run, dir, results([]), 'specs/explored/empty.e2e.ts', false), { code: 'NO_SPECS', message: /registered no tests/ });
   });
 
   it('fails a file whose tests are all test.skip', () => {
     const allSkipped = results([{ status: 'skipped', skip: { cause: 'explicit', reason: 'test.skip' } }]);
     assert.equal(allSkipped[0]!.status, 'failed', 'an explicitly skipped test is reported as not run, which fails the run');
-    assert.doesNotMatch(nextStep(run, dir, allSkipped, 'auth-start'), /attach/);
+    assert.doesNotMatch(nextStep(run, dir, allSkipped, 'auth-start', false), /attach/);
   });
 
   it('passes with no attach hint when every selected spec is for the other platform', () => {
-    const next = nextStep(run, dir, results([{ status: 'skipped', skip: { cause: 'platform-unavailable', reason: 'test declares platforms [android]' } }]), 'sign-in-email-code');
+    const next = nextStep(run, dir, results([{ status: 'skipped', skip: { cause: 'platform-unavailable', reason: 'test declares platforms [android]' } }]), 'sign-in-email-code', false);
     assert.match(next, /^nothing ran: every selected spec was left out/);
     assert.doesNotMatch(next, /attach/);
   });
 
-  it('suggests attach after a run with a passing spec', () => {
+  it('suggests screenshots after a passing run that marked nothing, and says how to get a video', () => {
     assert.equal(
-      nextStep(run, dir, results([{ status: 'passed' }]), 'auth-start'),
-      '{cli} attach r20261003-000000-abcd --pr <n> --screenshot <label> for a still change, or --video for behavior or a flow; add --before <run-id> when the change is to something that exists',
+      nextStep(run, dir, results([{ status: 'passed' }]), '--all', false),
+      '{cli} attach r20261003-000000-abcd --pr <n> --screenshot <label> for a still change, and add --before <run-id> when the change is to something that exists; for behavior or a flow, put the steps that show it in host.evidence, run that spec on its own, and attach that run with --video',
+    );
+  });
+
+  it('suggests the video alone after a passing run that marked the change', () => {
+    assert.equal(
+      nextStep(run, dir, results([{ status: 'passed' }]), 'auth-start', true),
+      '{cli} attach r20261003-000000-abcd --pr <n> --video, and add --before <run-id> when the change is to something that exists',
     );
   });
 });

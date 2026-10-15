@@ -324,22 +324,24 @@ describe('a run whose spec files declare different settings', () => {
 
     it('paces a run that names its specs and records a video, and keeps what host.evidence marked in seconds of that video', async () => {
       const r = recorded({ launches: true });
-      const { record } = await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
+      const { record, next } = await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
       assert.deepEqual(r.order(), ['e2e opens the app with no arguments', r.close, 'recorder starts', 'launches for auth-start.e2e.ts', 'marks the evidence of auth-start.e2e.ts']);
       assert.deepEqual(r.videoLines(), ['video   paced for a reviewer to follow; a run with --no-video, or with --all, keeps full speed']);
       const [span, ...others] = record.evidenceSpans ?? [];
       assert.deepEqual(others, []);
       assert.equal(span?.label, 'shows auth-start.e2e.ts');
       assert.ok(span !== undefined && span.from >= 0 && span.from < 5 && Math.abs(span.to - span.from - 1.5) < 0.01, JSON.stringify(span));
+      assert.equal(next, `{cli} attach ${record.run} --pr <n> --video, and add --before <run-id> when the change is to something that exists`);
     });
 
     it('keeps full speed and marks nothing in a run of --all, as the nightly suite runs, or with --no-video', async () => {
       for (const command of [{ ...RUN_ALL, video: true }, { ...RUN_ALL, selection: { selectors: ['auth-start'] } }]) {
         const r = recorded({ launches: true });
-        const { record } = await runVerb(r.deps, command);
+        const { record, next } = await runVerb(r.deps, command);
         assert.equal(r.order().some((line) => line.startsWith('marks')), false);
         assert.deepEqual(r.videoLines(), []);
         assert.deepEqual(record.evidenceSpans, []);
+        assert.match(next, /--screenshot <label> for a still change, .*; for behavior or a flow, put the steps that show it in host\.evidence, run that spec on its own, and attach that run with --video$/);
       }
     });
 

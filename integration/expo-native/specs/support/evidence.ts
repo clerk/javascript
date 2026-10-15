@@ -8,7 +8,6 @@ export interface EvidenceMark {
 }
 
 export const EVIDENCE_PACE = {
-  settleMs: 700,
   beatMs: 600,
   resultHoldMs: 2_000,
 } as const;
