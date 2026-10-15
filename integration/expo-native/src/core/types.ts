@@ -429,6 +429,7 @@ export interface ProcessRef {
 export interface Recording {
   readonly process: ProcessRef | null;
   readonly videoStartsAt?: number;
+  readonly videoStartGuess?: string;
   stop(): Promise<EvidencePath>;
 }
 

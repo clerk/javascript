@@ -123,26 +123,26 @@ function bearer(req: IncomingMessage): string | null {
 
 const isAgentRoute = (pathname: string): boolean => AGENT_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
-const RECORDER_START_MS = 10_000;
+const RECORDER_START_MINUTES = 1 / 6;
 
 // The CLI times the video from this answer, and a recorder can take a second or more to start on a runner.
-export function printed(child: ChildProcess, words: string, limitMs: number): Promise<{ readonly exited: boolean; readonly output: string }> {
+export function printed(child: ChildProcess, words: string, limitMs: number): Promise<{ readonly outcome: 'printed' | 'exited' | 'silent'; readonly output: string }> {
   return new Promise((done) => {
     let seen = '';
-    const settle = (exited: boolean) => {
+    const settle = (outcome: 'printed' | 'exited' | 'silent') => {
       clearTimeout(timer);
       child.stdout?.off('data', read);
       child.stderr?.off('data', read);
-      done({ exited, output: seen });
+      done({ outcome, output: seen });
     };
-    const timer = setTimeout(() => settle(false), limitMs);
+    const timer = setTimeout(() => settle('silent'), limitMs);
     const read = (chunk: Buffer) => {
       seen += chunk.toString();
-      if (seen.toLowerCase().includes(words)) settle(false);
+      if (seen.toLowerCase().includes(words)) settle('printed');
     };
     child.stdout?.on('data', read);
     child.stderr?.on('data', read);
-    child.on('close', () => settle(true));
+    child.on('close', () => settle('exited'));
   });
 }
 
@@ -498,13 +498,14 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
         rmSync(file, { force: true });
         const { start, startedWhen, stop, collect } = await recipe(device, { op: 'record', file });
         const child = spawn(start.command, [...start.args], { cwd: start.cwd, stdio: startedWhen === null ? 'ignore' : ['ignore', 'pipe', 'pipe'] });
+        const spawnedAt = Date.now();
         recorder = { child, exited: exitOf(child), file, stop, collect };
-        const started = startedWhen === null ? null : await printed(child, startedWhen, RECORDER_START_MS);
-        if (started?.exited === true) {
+        const started = startedWhen === null ? null : await printed(child, startedWhen, RECORDER_START_MINUTES * minuteMs);
+        if (started?.outcome === 'exited') {
           recorder = null;
           return json(res, 500, { error: `the recorder exited before it recorded: ${started.output.trim() || 'no output'}` });
         }
-        return json(res, 200, { ok: true });
+        return json(res, 200, started?.outcome === 'silent' ? { ok: true, recordingForMs: Date.now() - spawnedAt } : { ok: true });
       }
       case 'POST /record/stop':
         if (recorder === null) return json(res, 409, { error: 'not recording' });

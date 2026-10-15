@@ -263,9 +263,16 @@ export function remoteBackend(settings: RemoteSettings, deps: RemoteDeps = { env
     async startRecording(lease, into) {
       const started = await sessionCall(lease, '/__sim/record/start', { method: 'POST' });
       if (started.status !== 200) throw new VerifyFailure('NOT_READY', `the session did not start recording: ${started.status} ${await started.text()}`, 'rerun with --no-video');
+      const { recordingForMs } = (await started.json().catch(() => ({}))) as { readonly recordingForMs?: number };
       const file = join(into, 'video.mp4') as EvidencePath;
       const recording: Recording = {
         process: null,
+        ...(typeof recordingForMs === 'number'
+          ? {
+              videoStartsAt: Date.now() - recordingForMs,
+              videoStartGuess: 'the session never heard its recorder say it was recording, so this run times the video from when the recorder started, and its tap pulses can land up to a second or two late',
+            }
+          : {}),
         async stop() {
           const stopped = await sessionCall(lease, '/__sim/record/stop', { method: 'POST', timeoutMs: 90_000 });
           if (stopped.status !== 200) return file;

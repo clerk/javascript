@@ -22,7 +22,11 @@ export const CUT = {
 // An Android screen can change within a frame of the touch, so a pulse drawn at the touch shows on the next screen. Each pulse starts leadSeconds before the tapped control first changes in the video.
 export const PULSE = { seconds: 0.5, widthShare: 0.1, leadSeconds: 0.2 } as const;
 
-export const REACTION = { before: 0.1, after: 0.5, stillFor: 0.1, level: 8, share: 0.02, width: 0.4, height: 0.06 } as const;
+// simctl on a CI runner writes decode times seconds behind the presentation times, and ffmpeg then stamps frames by decode time.
+const readByPresentationTime = (video: EvidencePath): readonly string[] => ['-fflags', '+igndts', '-i', video];
+
+// On a CI runner the iOS simulator has shown a tap's effect up to 2.9 s after the runner returned, so the scan looks until 5 s after the return.
+export const REACTION = { before: 0.1, after: 5, stillFor: 0.1, level: 8, share: 0.02, width: 0.4, height: 0.06 } as const;
 
 export function spansOfMarks(marks: readonly EvidenceMark[], videoStartedAt: number): readonly EvidenceSpan[] {
   return marks
@@ -61,15 +65,19 @@ export const readTaps = (file: string): readonly TapMark[] => linesOf(file).flat
 
 export interface TapWindow {
   readonly sent: number;
-  readonly returned: number;
+  readonly until: number;
   readonly x: number;
   readonly y: number;
 }
 
 export function tapWindows(taps: readonly TapMark[], videoStartedAt: number): readonly TapWindow[] {
+  const seconds = (at: number): number => (at - videoStartedAt) / 1000;
   return taps
-    .map((tap) => ({ sent: round((tap.sentAt - videoStartedAt) / 1000), returned: round((tap.tappedAt - videoStartedAt) / 1000), x: tap.x, y: tap.y }))
-    .filter((tap) => tap.returned > 0);
+    .filter((tap) => tap.tappedAt > videoStartedAt)
+    .map((tap, i, kept) => {
+      const nextSentAt = kept[i + 1]?.sentAt ?? Infinity;
+      return { sent: round(seconds(tap.sentAt)), until: round(Math.min(seconds(tap.tappedAt) + REACTION.after, seconds(nextSentAt))), x: tap.x, y: tap.y };
+    });
 }
 
 export interface Change {
@@ -91,7 +99,9 @@ export function parseChanges(metadata: string): readonly Change[] {
 
 export function reactionAt(changes: readonly Change[], tap: TapWindow): number | null {
   const moved = changes.filter((change) => change.share >= REACTION.share).map((change) => change.at);
-  return moved.find((at, i) => at >= tap.sent - REACTION.before && at <= tap.returned + REACTION.after && (i === 0 || at - moved[i - 1]! >= REACTION.stillFor)) ?? null;
+  const first = moved.findIndex((at) => at >= tap.sent - REACTION.before);
+  const at = moved[first];
+  return at !== undefined && at <= tap.until && (first === 0 || at - moved[first - 1]! >= REACTION.stillFor) ? at : null;
 }
 
 export const pulseAt = (tap: TapWindow, reaction: number | null): number => round(Math.max(0, reaction === null ? tap.sent : reaction - PULSE.leadSeconds));
@@ -100,7 +110,7 @@ function reactionFilter(tap: TapWindow, viewport: Viewport): string {
   const fx = tap.x / viewport.width;
   const fy = tap.y / viewport.height;
   return [
-    `trim=end=${tap.returned + REACTION.after}`,
+    `trim=end=${tap.until}`,
     `crop=w=iw*${REACTION.width}:h=ih*${REACTION.height}:x=max(0\\,min(iw-ow\\,iw*${fx}-ow/2)):y=max(0\\,min(ih-oh\\,ih*${fy}-oh/2))`,
     'scale=96:32,format=gray,tblend=all_mode=difference',
     `lut=c0='if(gt(val\\,${REACTION.level})\\,255\\,0)'`,
@@ -112,7 +122,7 @@ export async function evidenceTapsOf(video: EvidencePath, taps: readonly TapWind
   const drawn: EvidenceTap[] = [];
   for (const tap of taps) {
     const from = Math.max(0, tap.sent - REACTION.before - 1);
-    const scan = await runner('ffmpeg', ['-hide_banner', '-nostats', '-v', 'error', '-noaccurate_seek', '-ss', String(from), '-copyts', '-i', video, '-an', '-vf', reactionFilter(tap, viewport), '-f', 'null', '-']);
+    const scan = await runner('ffmpeg', ['-hide_banner', '-nostats', '-v', 'error', '-noaccurate_seek', '-ss', String(from), '-copyts', ...readByPresentationTime(video), '-an', '-vf', reactionFilter(tap, viewport), '-f', 'null', '-']);
     drawn.push({ at: pulseAt(tap, scan.code === 0 ? reactionAt(parseChanges(scan.stdout), tap) : null), x: tap.x, y: tap.y });
   }
   return drawn;
@@ -229,7 +239,7 @@ export type VideoCut =
 
 export async function cutVideo(video: EvidencePath, spans: readonly EvidenceSpan[] | null, runner: Runner, taps: EvidenceRecord['evidenceTaps'] = null): Promise<VideoCut> {
   const uncut = (why: string): VideoCut => ({ kind: 'uncut', path: video, why });
-  const scan = await runner('ffmpeg', ['-hide_banner', '-nostats', '-i', video, '-an', '-vf', STILL_FILTER, '-f', 'null', '-']);
+  const scan = await runner('ffmpeg', ['-hide_banner', '-nostats', ...readByPresentationTime(video), '-an', '-vf', STILL_FILTER, '-f', 'null', '-']);
   if (scan.code === 127) return uncut('ffmpeg is not installed');
   if (scan.code !== 0) return uncut(`ffmpeg could not read the video: ${lastLine(scan.stderr)}`);
   const { duration, stills } = parseStills(scan.stderr);
@@ -241,7 +251,7 @@ export async function cutVideo(video: EvidencePath, spans: readonly EvidenceSpan
   const width = parseWidth(scan.stderr);
   const pulses = taps === null || width === null ? [] : pulsesIn(pieces, taps, width);
   const filter = pulses.length === 0 ? ['-vf', selectFilter(pieces)] : ['-filter_complex', drawnFilter(pieces, pulses, pulseSize(width!)), '-map', '[out]'];
-  const encode = await runner('ffmpeg', ['-hide_banner', '-v', 'error', '-y', '-i', video, '-an', ...filter, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out]);
+  const encode = await runner('ffmpeg', ['-hide_banner', '-v', 'error', '-y', ...readByPresentationTime(video), '-an', ...filter, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out]);
   if (encode.code !== 0 || !existsSync(out)) return uncut(`ffmpeg could not write the cut: ${lastLine(encode.stderr) || `exit ${encode.code}`}`);
   return { kind: 'cut', path: out, from: duration, to: lengthOf(pieces), pieces, taps: pulses.length };
 }
