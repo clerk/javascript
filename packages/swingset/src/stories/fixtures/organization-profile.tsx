@@ -1,4 +1,4 @@
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
 import { SaveError } from '@clerk/mosaic/utils/errors';
@@ -19,8 +19,8 @@ const exampleOrganization = { name: 'Clerk', slug: 'clerk-177654156132154', memb
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 export function OrganizationProfileDangerPreview({ name, memberCount }: { name: string; memberCount: number }) {
-  const leave = useDestructiveController({ onDelete: () => settleAfter(1200) });
-  const destroy = useDestructiveController({ onDelete: () => settleAfter(1200) });
+  const leave = useConfirmController({ onConfirm: () => settleAfter(1200) });
+  const destroy = useConfirmController({ onConfirm: () => settleAfter(1200) });
   return (
     <OrganizationProfileDangerSectionView
       name={name}

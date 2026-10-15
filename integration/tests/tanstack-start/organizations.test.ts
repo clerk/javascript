@@ -16,7 +16,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })(
     let fakeOrganization: FakeOrganization;
 
     test.beforeAll(async () => {
-      const m = createTestUtils({ app });
+      const m = await createTestUtils({ app });
       fakeAdmin = m.services.users.createFakeUser(test);
       const admin = await m.services.users.createBapiUser(fakeAdmin);
       fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
@@ -40,7 +40,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })(
     });
 
     test('admin auth object includes orgId, orgRole, orgSlug after selecting org', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/');
 
       await u.po.signIn.waitForMounted();
@@ -68,7 +68,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })(
     });
 
     test('non-member auth object has null orgId', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/');
 
       await u.po.signIn.waitForMounted();
@@ -89,7 +89,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })(
     });
 
     test('viewer org role is correctly reflected in auth response', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.goToRelative('/');
 
       await u.po.signIn.waitForMounted();

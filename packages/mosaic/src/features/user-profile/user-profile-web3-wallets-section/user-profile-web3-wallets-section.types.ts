@@ -1,4 +1,8 @@
 import type { Web3Strategy } from '@clerk/shared/types';
+import type { Ref } from 'react';
+
+import type { ConfirmController } from '../../../blocks/confirm';
+import type { DialogFocusTarget } from '../../../components/dialog';
 
 export interface UserProfileWeb3Provider {
   id: Web3Strategy;
@@ -20,13 +24,15 @@ export interface UserProfileWeb3Wallet {
 }
 
 export interface UserProfileWeb3WalletsSectionViewProps {
-  fallbackFocus?: () => HTMLElement | null;
   wallets: UserProfileWeb3Wallet[];
+  sectionRef?: Ref<HTMLDivElement>;
   availableProviders?: UserProfileWeb3Provider[];
   pendingId?: string;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
-  onRemove?: (id: string) => void | Promise<void>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+  remove?: ConfirmController<UserProfileWeb3Wallet>;
+  finalFocus?: DialogFocusTarget;
 }
 
 export type UserProfileWeb3WalletsModel =

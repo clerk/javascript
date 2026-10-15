@@ -10,6 +10,7 @@ import type {
   DialogRole,
 } from '../../primitives/dialog';
 import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
+import type { TriggerPayloadRequirement } from '../../primitives/dialog/dialog-trigger';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
@@ -113,7 +114,7 @@ export type DialogTriggerProps<Payload = unknown> = MosaicComponentProps<'button
    * children-as-function receives it as `{ payload }`.
    */
   payload?: Payload;
-};
+} & TriggerPayloadRequirement<Payload>;
 export type DialogCloseProps = MosaicComponentProps<'button'>;
 export interface DialogCloseButtonProps extends MosaicComponentProps<'button'> {
   /**

@@ -130,7 +130,7 @@ async function openWithList() {
 }
 
 describe('UserButton', () => {
-  describe.each(['combined', 'organization', 'user'] as const)('in %s mode', mode => {
+  describe.each(['combined', 'user'] as const)('in %s mode', mode => {
     it('renders nothing while Clerk is still loading', async () => {
       serveFapi(signedIn());
       const client = holdRequests('get', '/v1/client');
@@ -162,8 +162,8 @@ describe('UserButton', () => {
       for (const name of ['Acme', 'Other', 'Beta', 'Gamma', 'Personal account']) {
         expect(screen.queryByText(name)).toBeNull();
       }
-      expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
-      expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Add organization' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Invite members' })).toBeNull();
 
       expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
       const menu = await openAccounts(user);
@@ -183,7 +183,7 @@ describe('UserButton', () => {
     await open();
 
     expect(await screen.findByRole('button', { name: 'Other' })).toBeInTheDocument();
-    expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
+    expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
   });
 
   describe('switching organization', () => {
@@ -387,7 +387,7 @@ describe('UserButton', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Profile settings');
+      await openSettings(user, 'Manage profile');
 
       expect(openUserProfile).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
@@ -401,7 +401,7 @@ describe('UserButton', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Profile settings');
+      await openSettings(user, 'Manage profile');
 
       expect(openUserProfile.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
     });
@@ -424,7 +424,7 @@ describe('UserButton', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Profile settings');
+      await openSettings(user, 'Manage profile');
       await waitFor(() => expect(popup()).toBeNull());
 
       const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
@@ -450,7 +450,7 @@ describe('UserButton', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Profile settings');
+      await openSettings(user, 'Manage profile');
       await waitFor(() => expect(popup()).toBeNull());
 
       const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
@@ -462,7 +462,7 @@ describe('UserButton', () => {
       const openInviteMembers = vi.spyOn(clerk, 'openInviteMembers').mockImplementation(() => {});
       const user = await open();
 
-      await user.click(screen.getByRole('button', { name: 'Invite' }));
+      await user.click(screen.getByRole('button', { name: 'Invite members' }));
 
       expect(openInviteMembers).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
@@ -474,7 +474,7 @@ describe('UserButton', () => {
       const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
       const user = await open();
 
-      await user.click(await screen.findByRole('button', { name: 'Create organization' }));
+      await user.click(await screen.findByRole('button', { name: 'Add organization' }));
 
       expect(openCreateOrganization).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
@@ -486,7 +486,7 @@ describe('UserButton', () => {
       const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
       const user = await open();
 
-      await user.click(await screen.findByRole('button', { name: 'Create organization' }));
+      await user.click(await screen.findByRole('button', { name: 'Add organization' }));
 
       expect(navigate).toHaveBeenCalledWith('/new-org');
       expect(openCreateOrganization).not.toHaveBeenCalled();
@@ -498,7 +498,7 @@ describe('UserButton', () => {
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Profile settings');
+      await openSettings(user, 'Manage profile');
 
       expect(navigate).toHaveBeenCalledWith('/account');
       expect(openUserProfile).not.toHaveBeenCalled();
@@ -509,7 +509,7 @@ describe('UserButton', () => {
       const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Organization settings');
+      await openSettings(user, 'Manage organization');
 
       expect(navigate).toHaveBeenCalledWith('/org');
       expect(openOrganizationProfile).not.toHaveBeenCalled();
@@ -548,7 +548,7 @@ describe('UserButton', () => {
       await open();
 
       expect(await screen.findByRole('button', { name: 'Other' })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Add organization' })).toBeNull();
     });
   });
 
@@ -564,6 +564,8 @@ describe('UserButton', () => {
       expect(waiting()).toBe(true);
       expect(signOut()).toHaveAttribute('aria-disabled', 'true');
       expect(screen.getByRole('button', { name: 'Switch account' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Settings' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Invite members' })).toHaveAttribute('aria-disabled', 'true');
       expect(popup()).toBeInTheDocument();
 
       touch.release();
@@ -684,18 +686,18 @@ describe('UserButton', () => {
     expect(await screen.findByRole('button', { name: 'Org 15' })).toBeInTheDocument();
   });
 
-  it('leads with the active organization before the page holding it has loaded, and lists it once', async () => {
+  it('lists the active organization where its page puts it, and lists it once', async () => {
     const many = Array.from({ length: 15 }, (_, i) => fapiOrganization({ id: `org_p${i + 1}`, name: `Org ${i + 1}` }));
     await renderUserButton({}, signedIn({ memberships: [...many.map(o => fapiMembership(o)), fapiMembership(acme)] }));
     await open();
 
     const last = await screen.findByRole('button', { name: 'Org 9' });
-    expect(reading('Acme', 'Personal account', 'Org 1')).toEqual(['Acme', 'Personal account', 'Org 1']);
+    expect(reading('Acme', 'Personal account', 'Org 1')).toEqual(['Personal account', 'Org 1']);
 
     last.scrollIntoView();
     await screen.findByRole('button', { name: 'Org 15' });
 
-    expect(reading('Acme', 'Personal account', 'Org 15')).toEqual(['Acme', 'Personal account', 'Org 15']);
+    expect(reading('Acme', 'Personal account', 'Org 15')).toEqual(['Personal account', 'Org 15', 'Acme']);
   });
 
   describe('in user mode', () => {
@@ -725,16 +727,23 @@ describe('UserButton', () => {
 
       expect(screen.queryByText('Personal account')).toBeNull();
       expect(screen.queryByText('Gamma')).toBeNull();
-      expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Add organization' })).toBeNull();
     });
 
-    it('heads the surface with the account and its settings, and signs out at the foot', async () => {
-      await renderUserButton({ mode: 'user' });
-      await open();
+    it('manages the account from its settings row, and signs out at the foot', async () => {
+      const { clerk } = await renderUserButton({ mode: 'user' });
+      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+      const user = await open();
 
-      expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
-      expect(reading('Switch account', 'Sign out')).toEqual(['Switch account', 'Sign out']);
-      expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+      expect(
+        within(requiredPopup().querySelector('.cl-user-button-header') ?? requiredPopup()).queryAllByRole('button'),
+      ).toEqual([]);
+      expect(reading('Settings', 'Switch account', 'Sign out')).toEqual(['Settings', 'Switch account', 'Sign out']);
+      expect(screen.queryByRole('button', { name: 'Invite members' })).toBeNull();
+
+      await user.click(screen.getByRole('button', { name: 'Settings' }));
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(openUserProfile).toHaveBeenCalled();
     });
 
     it('lists every account in the flyout, then the way to add one, then signing out of them all', async () => {
@@ -751,69 +760,52 @@ describe('UserButton', () => {
     });
   });
 
-  describe('in organization mode', () => {
-    it('heads the surface with the active organization and what can be done to it', async () => {
-      await renderUserButton({ mode: 'organization' });
-      await open();
-
-      expect(within(requiredPopup()).getByText('Acme')).toBeInTheDocument();
-      expect(within(requiredPopup()).getByText('3 members')).toBeInTheDocument();
-      expect(within(requiredPopup()).getByRole('button', { name: 'Invite' })).toBeInTheDocument();
-      expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
-    });
-
-    it('falls back to the account where no organization is active', async () => {
-      await renderUserButton({ mode: 'organization' }, signedIn({ client: fapiClient([personalSession]) }));
-      await open();
-
-      expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
-      expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
-    });
-
-    it('names no organization selected where personal is hidden and none is active', async () => {
-      await renderUserButton(
-        { mode: 'organization', hidePersonal: true },
-        signedIn({ client: fapiClient([personalSession]) }),
-      );
-
-      expect(trigger()).toHaveAccessibleName(/No organization selected/);
-      await open();
-
-      expect(within(requiredPopup()).getByText('No organization selected')).toBeInTheDocument();
-      expect(within(requiredPopup()).queryByText('Alice Smith')).toBeNull();
-      expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
-    });
-
-    it('carries no account rows, and trails the organizations with create-organization', async () => {
-      await renderUserButton({ mode: 'organization' }, noOffers());
-      await openWithList();
-
-      expect(reading('Personal account', 'Acme', 'Other', 'Create organization')).toEqual([
-        'Acme',
-        'Personal account',
-        'Other',
-        'Create organization',
-      ]);
-      for (const name of ['Switch account', 'Add account', 'Sign out', 'Sign out of all accounts']) {
-        expect(screen.queryByRole('button', { name })).toBeNull();
-      }
-    });
-  });
-
   describe('in combined mode', () => {
-    it('heads the surface with the account, managing its active organization', async () => {
+    it('stands in for a mode it does not take', async () => {
+      const props: UserButtonProps = {};
+      Object.assign(props, { mode: 'organization' });
+      await renderUserButton(props);
+
+      expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(document.querySelector('.cl-user-button-trigger')).not.toBeNull();
+    });
+
+    it('heads the surface with the active organization, badged with the account, managing both', async () => {
       const { clerk } = await renderUserButton();
       const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       const user = await open();
 
-      expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
-      expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('Acme');
-      expect(within(requiredPopup()).getByRole('button', { name: 'Invite' })).toBeInTheDocument();
-      await openSettings(user, 'Organization settings');
+      const header = requiredPopup().querySelector('.cl-user-button-header');
+      expect(header?.querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
+      expect(header?.querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
+      expect(header?.querySelector('.cl-user-button-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
+      expect(header?.querySelector('.cl-user-button-avatar-badge > [data-shape]')).toHaveAttribute(
+        'data-shape',
+        'circle',
+      );
+      expect(within(header ?? requiredPopup()).queryAllByRole('button')).toEqual([]);
+      expect(reading('Add organization', 'Settings', 'Invite members', 'Switch account', 'Sign out')).toEqual([
+        'Add organization',
+        'Settings',
+        'Invite members',
+        'Switch account',
+        'Sign out',
+      ]);
+      await openSettings(user, 'Manage organization');
       expect(openOrganizationProfile).toHaveBeenCalled();
+    });
+
+    it('keeps the identifier beneath the organization even when it is all that names the account', async () => {
+      const nameless = fapiUser({ ...alice, first_name: null, last_name: null });
+      await renderUserButton({}, signedIn({ client: fapiClient([fapiSession({ ...aliceSession, user: nameless })]) }));
+
+      expect(trigger()).toHaveAccessibleName('Open account menu for alice');
+      await open();
+
+      expect(requiredPopup().querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
+      expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('alice');
     });
 
     it('trails the foot with sign-out, behind the flyout of accounts', async () => {
@@ -830,7 +822,7 @@ describe('UserButton', () => {
       await renderUserButton({}, noOffers());
       await openWithList();
 
-      expect(reading('Personal account', 'Acme', 'Other', 'Create organization').at(-1)).toBe('Create organization');
+      expect(reading('Personal account', 'Acme', 'Other', 'Add organization').at(-1)).toBe('Add organization');
     });
 
     it('marks the account it is already on in the flyout', async () => {
@@ -906,14 +898,14 @@ describe('UserButton', () => {
   });
 
   describe('the organization list', () => {
-    it('lists the active organization first, then the rest held, then the invitations, then the suggestions', async () => {
-      await renderUserButton();
+    it('lists the organizations held in the order they come, then the invitations, then the suggestions', async () => {
+      await renderUserButton({}, signedIn({ memberships: [fapiMembership(other), fapiMembership(acme)] }));
       await openWithList();
 
       expect(reading('Gamma', 'Beta', 'Personal account', 'Acme', 'Other')).toEqual([
-        'Acme',
         'Personal account',
         'Other',
+        'Acme',
         'Gamma',
         'Beta',
       ]);
@@ -971,8 +963,8 @@ describe('UserButton', () => {
       await openWithList();
 
       expect(reading('Gamma', 'Beta', 'Personal account', 'Acme', 'Other')).toEqual([
-        'Acme',
         'Personal account',
+        'Acme',
         'Other',
       ]);
     });
@@ -1004,7 +996,7 @@ describe('UserButton', () => {
 
       expect(await screen.findByText('Loading organizations…')).toBeInTheDocument();
       expect(reading('Personal account', 'Other')).toEqual([]);
-      expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
+      expect(requiredPopup().querySelector('.cl-user-button-header-title')).toHaveTextContent('Acme');
 
       invitations.release();
       await waitFor(() => expect(screen.queryByText('Loading organizations…')).toBeNull());
@@ -1012,20 +1004,21 @@ describe('UserButton', () => {
     });
   });
 
-  describe('the foot', () => {
+  describe('the custom rows', () => {
     const terms = { id: 'terms', label: 'Terms of service', onClick: () => {} };
     const support = { id: 'support', label: 'Support', href: '/support' };
+    const group = (name: string) =>
+      screen.getByRole(name === 'Support' ? 'link' : 'button', { name }).closest('.cl-user-button-group');
 
-    it('leads with the custom rows', async () => {
+    it('follow Settings and Invite members in their group, above the foot', async () => {
       await renderUserButton({ customMenuItems: [terms, support] });
       await open();
 
-      expect(reading('Terms of service', 'Support', 'Switch account', 'Add account', 'Sign out')).toEqual([
-        'Terms of service',
-        'Support',
-        'Switch account',
-        'Sign out',
-      ]);
+      expect(
+        reading('Settings', 'Invite members', 'Terms of service', 'Support', 'Switch account', 'Sign out'),
+      ).toEqual(['Settings', 'Invite members', 'Terms of service', 'Support', 'Switch account', 'Sign out']);
+      expect(group('Terms of service')).toBe(group('Settings'));
+      expect(group('Switch account')).not.toBe(group('Settings'));
       expect(screen.getByRole('link', { name: 'Support' })).toHaveAttribute('href', '/support');
     });
 
@@ -1036,40 +1029,48 @@ describe('UserButton', () => {
       expect(screen.getByTestId('glyph')).toBeInTheDocument();
     });
 
-    it('orders the rows by the ids it is given, dropping ids no row answers to', async () => {
+    it('orders the group by the ids it is given, leaving the foot as it is', async () => {
       await renderUserButton({
         customMenuItems: [terms, support],
-        menuItemOrder: ['signOut', 'manageAccount', 'support', 'nonsense'],
+        menuItemOrder: ['support', 'inviteMembers', 'signOut', 'nonsense'],
       });
       await open();
 
-      expect(reading('Terms of service', 'Support', 'Switch account', 'Add account', 'Sign out')).toEqual([
-        'Sign out',
-        'Support',
+      expect(
+        reading('Settings', 'Invite members', 'Terms of service', 'Support', 'Switch account', 'Sign out'),
+      ).toEqual(['Support', 'Invite members', 'Settings', 'Terms of service', 'Switch account', 'Sign out']);
+    });
+
+    it('replaces the built-in row whose id one takes, in its place', async () => {
+      const appSettings = { id: 'settings', label: 'App settings', onClick: () => {} };
+      await renderUserButton({ customMenuItems: [terms, appSettings] });
+      await open();
+
+      expect(reading('Settings', 'App settings', 'Invite members', 'Terms of service')).toEqual([
+        'App settings',
+        'Invite members',
         'Terms of service',
-        'Switch account',
       ]);
     });
 
-    it.each([
-      ['Switch account', signedIn()],
-      ['Add account', alone()],
-    ])('orders the accounts slot ahead of a custom row as "%s"', async (label, seed) => {
-      await renderUserButton({ customMenuItems: [terms], menuItemOrder: ['switchAccount', 'addAccount'] }, seed);
+    it('keeps a row whose id names a built-in the mode does not show', async () => {
+      const invite = { id: 'inviteMembers', label: 'Invite teammates', onClick: () => {} };
+      await renderUserButton({ customMenuItems: [invite] }, signedIn({ client: fapiClient([personalSession]) }));
       await open();
 
-      expect(
-        reading('Terms of service', 'Support', 'Switch account', 'Add account', 'Sign out of all accounts')[0],
-      ).toBe(label);
+      expect(reading('Settings', 'Invite teammates')).toEqual(['Settings', 'Invite teammates']);
     });
 
-    it('carries the custom rows on an organization surface too', async () => {
-      await renderUserButton({ mode: 'organization', customMenuItems: [terms] });
+    it('places a replacing row by the id it took', async () => {
+      const appSettings = { id: 'settings', label: 'App settings', onClick: () => {} };
+      await renderUserButton({ customMenuItems: [terms, appSettings], menuItemOrder: ['terms', 'inviteMembers'] });
       await open();
 
-      expect(
-        reading('Terms of service', 'Support', 'Switch account', 'Add account', 'Sign out of all accounts'),
-      ).toEqual(['Terms of service']);
+      expect(reading('App settings', 'Invite members', 'Terms of service')).toEqual([
+        'Terms of service',
+        'Invite members',
+        'App settings',
+      ]);
     });
 
     it('signs the popup with Clerk where the instance is branded', async () => {
@@ -1158,8 +1159,7 @@ describe('UserButton', () => {
 
   describe('the trigger', () => {
     it.each([
-      [{ mode: 'organization' as const }, 'Acme'],
-      [{ mode: 'combined' as const }, 'Alice Smith'],
+      [{ mode: 'combined' as const }, 'Acme'],
       [{ mode: 'user' as const }, 'Alice Smith'],
     ])('with %o names %s beside the avatar', async (props, name) => {
       await renderUserButton(props);
@@ -1168,11 +1168,22 @@ describe('UserButton', () => {
       expect(popup()).toBeNull();
     });
 
-    it('names the active organization beneath the account', async () => {
+    it('names the active organization alone, and opens as the account', async () => {
       await renderUserButton();
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+      expect(within(trigger()).queryByText('alice')).toBeNull();
+      expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
+      expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
+    });
+
+    it('leads the avatar alone with the organization, unbadged', async () => {
+      await renderUserButton({ renderTriggerLabel: false });
+
+      expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(trigger().querySelector('[data-shape]')).toHaveAttribute('data-shape', 'square');
+      expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
     });
 
     it('names no organization beneath the account in user mode', async () => {
@@ -1188,20 +1199,20 @@ describe('UserButton', () => {
     });
 
     it('renders the avatar alone when the label is off', async () => {
-      await renderUserButton({ mode: 'organization', renderTriggerLabel: false });
+      await renderUserButton({ mode: 'user', renderTriggerLabel: false });
 
-      expect(trigger()).toHaveAccessibleName('Open account menu for Acme');
-      expect(within(trigger()).queryByText('Acme')).toBeNull();
+      expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
     });
 
     it('names the active organization before its membership list has loaded', async () => {
       serveFapi(signedIn());
       const memberships = holdRequests('get', '/v1/me/organization_memberships');
-      await renderWithClerk(tree({ mode: 'organization' }));
+      await renderWithClerk(tree());
 
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
       await userEvent.setup().click(trigger());
-      expect(within(requiredPopup()).getByRole('button', { name: 'Invite' })).toBeInTheDocument();
+      expect(within(requiredPopup()).getByRole('button', { name: 'Invite members' })).toBeInTheDocument();
 
       memberships.release();
       await waitFor(() => expect(screen.queryByText('Loading organizations…')).toBeNull());
