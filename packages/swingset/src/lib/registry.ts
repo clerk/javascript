@@ -288,6 +288,13 @@ import {
   TextContent as SkeletonTextContent,
 } from '../stories/skeleton.stories';
 import {
+  Default as SwitchDefault,
+  meta as switchMeta,
+  Sizes as SwitchSizes,
+  States as SwitchStates,
+  WithField as SwitchWithField,
+} from '../stories/switch.stories';
+import {
   Default as TableDefault,
   Empty as TableEmpty,
   meta as tableMeta,
@@ -796,6 +803,14 @@ const segmentedControlModule: StoryModule = {
   Disabled: SegmentedControlDisabled,
 };
 
+const switchModule: StoryModule = {
+  meta: switchMeta,
+  Default: SwitchDefault,
+  States: SwitchStates,
+  Sizes: SwitchSizes,
+  WithField: SwitchWithField,
+};
+
 const tabsComponentModule: StoryModule = {
   meta: tabsComponentMeta,
   Default: TabsComponentDefault,
@@ -1059,6 +1074,7 @@ export const registry: StoryModule[] = [
   sectionModule,
   segmentedControlModule,
   selectComponentModule,
+  switchModule,
   tableModule,
   tabsComponentModule,
   tagInputComponentModule,

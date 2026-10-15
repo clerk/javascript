@@ -96,6 +96,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     section: dynamic(() => import('../stories/section.mdx')),
     'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
+    switch: dynamic(() => import('../stories/switch.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     'tag-input': dynamic(() => import('../stories/tag-input.component.mdx')),
