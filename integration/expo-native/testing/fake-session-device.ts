@@ -8,7 +8,9 @@ const fake: SessionDeviceFactory = ({ id: deviceId, platform }) => ({
   inputs: ['app.txt', 'extra.txt', 'Sources'],
   build: (work) => [{ command: node, args: ['-e', `require('fs').writeFileSync(${JSON.stringify(join(work, 'built'))}, require('fs').readFileSync('app.txt', 'utf8'))`] }],
   record:
-    process.env.FAKE_DEVICE_RECORDER === 'slow-start'
+    process.env.FAKE_DEVICE_RECORDER === 'dies'
+      ? { start: () => ({ command: node, args: ['-e', `console.error('Recording failed: the simulator is not booted'); process.exit(1)`] }), startedWhen: 'recording started' }
+      : process.env.FAKE_DEVICE_RECORDER === 'slow-start'
       ? {
           start: (file) => ({ command: node, args: ['-e', `setTimeout(() => console.log('Recording started'), 700); process.on('SIGINT', () => { require('fs').writeFileSync(${JSON.stringify(file)}, 'video'); process.exit(0); }); setInterval(() => {}, 1000)`] }),
           startedWhen: 'recording started',
