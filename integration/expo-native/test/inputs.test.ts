@@ -5,8 +5,9 @@ import { describe, it } from 'node:test';
 import { pathToFileURL } from 'node:url';
 import { PACKAGE_DIR } from '../specs/support/config.ts';
 import { agentDevice } from '../specs/support/device.ts';
-import { INPUT_VARIABLES, inputsEnv, readClerk, readEvidenceMarks, readRun, readTarget, type Inputs } from '../specs/support/inputs.ts';
+import { INPUT_VARIABLES, inputsEnv, newRunId, readClerk, readEvidenceMarks, readRun, readTarget, type Inputs } from '../specs/support/inputs.ts';
 import { Secret } from '../specs/support/secret.ts';
+import type { RunId } from '../specs/support/types.ts';
 import { BOTH_PLATFORMS_APP, IOS_APP, SAMPLE_INPUTS, SAMPLE_PUBLISHABLE_KEY, SAMPLE_RUN } from '../testing/sample-inputs.ts';
 
 const UDID = 'FDF0CD9E-CF9E-42B6-AE3A-116A665F7EF3';
@@ -107,6 +108,11 @@ describe('the id of a run', () => {
     assert.equal(readRun({ CLERK_E2E_RUN_ID: SAMPLE_RUN }), SAMPLE_RUN);
     assert.match(readRun({}), /^r\d{8}-\d{6}-[0-9a-f]{4}$/);
     assert.throws(() => readRun({ CLERK_E2E_RUN_ID: '../../etc' }), /is not a run id/);
+  });
+
+  it('never takes the tag of a run this worktree kept, since its users carry only the tag', () => {
+    const kept = Array.from({ length: 0x10000 }, (_, n) => `r20261015-120000-${n.toString(16).padStart(4, '0')}` as RunId).filter((run) => !run.endsWith('-beef'));
+    assert.match(newRunId(kept), /^r\d{8}-\d{6}-beef$/);
   });
 });
 
