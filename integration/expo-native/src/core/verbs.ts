@@ -274,12 +274,13 @@ export async function endRun(
   if (errors.length > 0) throw errors[0];
 }
 
-export function nextStep(run: RunId, dir: EvidencePath, results: readonly SpecResult[], selection: string): string {
+export function nextStep(run: RunId, dir: EvidencePath, results: readonly SpecResult[], selection: string, marked: boolean): string {
   const ran = assertSomethingRan(results, selection);
   const failed = results.filter((r) => r.status === 'failed' || r.status === 'interrupted');
   if (failed.length > 0) return failed[0]?.failurePage ?? join(dir, 'e2e.log');
   if (ran === 'all-left-out') return 'nothing ran: every selected spec was left out by platform, so the run proves nothing to post';
-  return `{cli} attach ${run} --pr <n> --screenshot <label> for a still change, or --video for behavior or a flow; add --before <run-id> when the change is to something that exists`;
+  if (marked) return `{cli} attach ${run} --pr <n> --video, and add --before <run-id> when the change is to something that exists`;
+  return `{cli} attach ${run} --pr <n> --screenshot <label> for a still change, and add --before <run-id> when the change is to something that exists; for behavior or a flow, put the steps that show it in host.evidence, run that spec on its own, and attach that run with --video`;
 }
 
 export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Extract<Command, { verb: 'run' }>, instances: { readonly willChange: boolean }, drive: (outcome: RuntimeOutcome) => Promise<T>): Promise<T> {
@@ -562,7 +563,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
         deps.progress(`evidence  ${dir}  sealed; the specs ran, and the run still fails because it did not end cleanly`);
         throw endFailure;
       }
-      const next = nextStep(run, dir, results, 'all' in command.selection ? '--all' : command.selection.selectors.join(' '));
+      const next = nextStep(run, dir, results, 'all' in command.selection ? '--all' : command.selection.selectors.join(' '), evidenceSpans.length > 0);
       return { verb: 'run', dir, record, next };
     } finally {
       ledgerAgentDeviceDaemon(workspace);
