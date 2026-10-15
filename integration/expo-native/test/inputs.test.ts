@@ -5,7 +5,7 @@ import { describe, it } from 'node:test';
 import { pathToFileURL } from 'node:url';
 import { PACKAGE_DIR } from '../specs/support/config.ts';
 import { agentDevice } from '../specs/support/device.ts';
-import { INPUT_VARIABLES, inputsEnv, readClerk, readRun, readTarget, type Inputs } from '../specs/support/inputs.ts';
+import { INPUT_VARIABLES, inputsEnv, readClerk, readEvidenceMarks, readRun, readTarget, type Inputs } from '../specs/support/inputs.ts';
 import { Secret } from '../specs/support/secret.ts';
 import { BOTH_PLATFORMS_APP, IOS_APP, SAMPLE_INPUTS, SAMPLE_PUBLISHABLE_KEY, SAMPLE_RUN } from '../testing/sample-inputs.ts';
 
@@ -115,6 +115,7 @@ describe('the settings the CLI hands to e2e', () => {
     target: { platform: 'android', device: { kind: 'local', id: 'emulator-5554' }, session: 'verify-android-abc', build: { path: '/builds/e2e-debug.apk', devServer: 'http://localhost:8085' } },
     clerk: { publishableKey: SAMPLE_PUBLISHABLE_KEY, access: { kind: 'secret-key', key: new Secret('clerk-secret-key', SECRET_KEY) } },
     run: SAMPLE_RUN,
+    evidenceMarks: null,
   };
 
   it('read back as the same device, app build, instance and run', () => {
@@ -122,16 +123,18 @@ describe('the settings the CLI hands to e2e', () => {
     assert.deepEqual(readTarget(IOS_APP, env), SAMPLE_INPUTS.target);
     assert.deepEqual(readClerk(env), SAMPLE_INPUTS.clerk);
     assert.equal(readRun(env), SAMPLE_INPUTS.run);
+    assert.equal(readEvidenceMarks(env), SAMPLE_INPUTS.evidenceMarks);
 
     const handEnv = inputsEnv(byHand);
     assert.deepEqual(readTarget(BOTH_PLATFORMS_APP, handEnv), byHand.target);
     const clerk = readClerk(handEnv);
     assert.equal(clerk.access.kind === 'secret-key' && clerk.access.key.use('bapi-authorization', (plain) => plain), SECRET_KEY);
+    assert.equal(readEvidenceMarks(handEnv), null);
   });
 
   it('carry no secret key when the CLI stands in for Clerk, and no app path the CLI did not name', () => {
     const env = inputsEnv(SAMPLE_INPUTS);
-    assert.deepEqual(Object.keys(env).sort(), ['CLERK_E2E_API_TOKEN_FILE', 'CLERK_E2E_API_URL', 'CLERK_E2E_DEVICE', 'CLERK_E2E_DEVICE_SESSION', 'CLERK_E2E_PLATFORM', 'CLERK_E2E_RUN_ID', 'CLERK_PUBLISHABLE_KEY']);
+    assert.deepEqual(Object.keys(env).sort(), ['CLERK_E2E_API_TOKEN_FILE', 'CLERK_E2E_API_URL', 'CLERK_E2E_DEVICE', 'CLERK_E2E_DEVICE_SESSION', 'CLERK_E2E_EVIDENCE_MARKS', 'CLERK_E2E_PLATFORM', 'CLERK_E2E_RUN_ID', 'CLERK_PUBLISHABLE_KEY']);
   });
 
   it('are all named in the list the CLI clears from the environment it inherits', () => {
