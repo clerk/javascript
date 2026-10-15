@@ -1,6 +1,6 @@
 import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
@@ -92,6 +92,12 @@ describe('marks of host.evidence', () => {
       { label: 'the new organization in the list', startedAt: 1_000, endedAt: 7_000, passed: true },
       { label: 'the list on the old build', startedAt: 7_000, endedAt: 27_000, passed: false },
     ]);
+  });
+
+  it('are read past a line the test process left half written, so the run is still sealed', () => {
+    const file = join(mkdtempSync(join(tmpdir(), 'verify-marks-')), 'evidence-marks.jsonl');
+    writeFileSync(file, '{"label":"the list","startedAt":1000,"endedAt":4000,"passed":true}\n{"label":"cut off","startedAt":5\n{"label":7}\n');
+    assert.deepEqual(readMarks(file), [{ label: 'the list', startedAt: 1_000, endedAt: 4_000, passed: true }]);
   });
 
   it('are not written, and nothing waits, in a run that records no evidence', async () => {

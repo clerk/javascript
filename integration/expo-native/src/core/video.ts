@@ -26,12 +26,22 @@ export function spansOfMarks(marks: readonly EvidenceMark[], videoStartedAt: num
     .map((span) => ({ ...span, from: Math.max(0, round(span.from)), to: round(span.to) }));
 }
 
+function parseMark(line: string): EvidenceMark | null {
+  try {
+    const mark = JSON.parse(line) as Partial<EvidenceMark>;
+    return typeof mark.label === 'string' && typeof mark.startedAt === 'number' && typeof mark.endedAt === 'number' && typeof mark.passed === 'boolean'
+      ? { label: mark.label, startedAt: mark.startedAt, endedAt: mark.endedAt, passed: mark.passed }
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 export function readMarks(file: string): readonly EvidenceMark[] {
   if (!existsSync(file)) return [];
   return readFileSync(file, 'utf8')
     .split('\n')
-    .filter((line) => line.trim() !== '')
-    .map((line) => JSON.parse(line) as EvidenceMark);
+    .flatMap((line) => parseMark(line) ?? []);
 }
 
 const round = (seconds: number): number => Math.round(seconds * 1000) / 1000;
