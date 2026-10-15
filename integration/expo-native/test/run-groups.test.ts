@@ -95,7 +95,7 @@ fs.appendFileSync('order.log', 'e2e opens the app with no arguments\\n');
       if (marks !== undefined) {
         const at = Date.now();
         fs.appendFileSync(marks, JSON.stringify({ label: 'shows ' + path.basename(file), startedAt: at, endedAt: at + 1500, passed: true }) + '\\n');
-        if (plan.taps) fs.appendFileSync(marks, JSON.stringify({ tappedAt: at + 800, x: 210, y: 450 }) + '\\n');
+        if (plan.taps) fs.appendFileSync(marks, JSON.stringify({ sentAt: at + 700, tappedAt: at + 800, x: 210, y: 450 }) + '\\n');
         fs.appendFileSync('order.log', 'marks the evidence of ' + path.basename(file) + '\\n');
       }
     }
@@ -336,7 +336,15 @@ describe('a run whose spec files declare different settings', () => {
       assert.equal(next, `{cli} attach ${record.run} --pr <n> --video, and add --before <run-id> when the change is to something that exists`);
     });
 
-    it('keeps where each host.tap landed in seconds of the video, with the size of the screen the points are in', async () => {
+    it('times the marks from the first frame when the recorder reports it, as the Android recorder does', async () => {
+      const r = recorded({ launches: true });
+      r.backend.startRecording = async (_lease, into) => ({ process: null, videoStartsAt: Date.now() - 2_000, stop: async () => (writeFileSync(join(into, 'video.mp4'), 'frames'), join(into, 'video.mp4') as EvidencePath) });
+      const { record } = await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
+      const [span] = record.evidenceSpans ?? [];
+      assert.ok(span !== undefined && span.from >= 2 && span.from < 2.5, JSON.stringify(span));
+    });
+
+    it('keeps each host.tap in seconds of the video, from when it was sent when the video shows no change at the control, with the size of the screen the points are in', async () => {
       const r = recorded({ launches: true, taps: true });
       const snapshot = JSON.stringify({ success: true, data: { viewport: { width: 420, height: 912 }, nodes: [] } });
       const answering: Runner = async (command, args, options) => (args[0] === 'snapshot' ? (await r.deps.runner(command, args, options), { code: 0, stdout: snapshot, stderr: '' }) : r.deps.runner(command, args, options));
@@ -347,7 +355,7 @@ describe('a run whose spec files declare different settings', () => {
       const [tap, ...others] = record.evidenceTaps?.taps ?? [];
       assert.deepEqual(others, []);
       assert.deepEqual(record.evidenceTaps?.viewport, { width: 420, height: 912 });
-      assert.ok(span !== undefined && tap !== undefined && Math.abs(tap.at - span.from - 0.5) < 0.002, JSON.stringify({ span, tap }));
+      assert.ok(span !== undefined && tap !== undefined && Math.abs(tap.at - span.from - 0.7) < 0.002, JSON.stringify({ span, tap }));
       assert.deepEqual({ x: tap.x, y: tap.y }, { x: 210, y: 450 });
     });
 

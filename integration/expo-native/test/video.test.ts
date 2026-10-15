@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { evidenceBlock, tapMarker } from '../specs/support/evidence.ts';
 import { run } from '../src/core/exec.ts';
-import { cutVideo, drawnFilter, keptPieces, lengthOf, parseStills, parseWidth, pulseSize, pulsesIn, readMarks, readTaps, selectFilter, spansOfMarks, tapsOfMarks } from '../src/core/video.ts';
+import { cutVideo, drawnFilter, evidenceTapsOf, keptPieces, lengthOf, parseChanges, parseStills, parseWidth, pulseAt, pulseSize, pulsesIn, reactionAt, readMarks, readTaps, selectFilter, spansOfMarks, tapWindows } from '../src/core/video.ts';
 import type { EvidencePath } from '../src/core/types.ts';
 
 const FFMPEG = await run('ffmpeg', ['-version']);
@@ -146,14 +146,13 @@ describe('marks of host.evidence', () => {
     assert.deepEqual(readMarks(file), [{ label: 'the list', startedAt: 1_000, endedAt: 4_000, passed: true }]);
   });
 
-  it('turn into taps at the moment each one landed: on iOS 0.3 s before the tap returned, on Android 80 ms before, and a tap before the video is dropped', () => {
+  it('of a tap become the window from sending it to its return in seconds of the video, and a tap that returned before the video is dropped', () => {
     const started = Date.parse('2026-10-14T23:00:00.000Z');
-    const taps = [{ tappedAt: started + 200, x: 1, y: 2 }, { tappedAt: started + 5_300, x: 210, y: 450.5 }];
-    assert.deepEqual(tapsOfMarks(taps, started, 'ios'), [{ at: 5, x: 210, y: 450.5 }]);
-    assert.deepEqual(tapsOfMarks(taps, started, 'android'), [{ at: 0.12, x: 1, y: 2 }, { at: 5.22, x: 210, y: 450.5 }]);
+    const taps = [{ sentAt: started - 100, tappedAt: started - 10, x: 1, y: 2 }, { sentAt: started + 5_120, tappedAt: started + 5_300, x: 210, y: 450.5 }];
+    assert.deepEqual(tapWindows(taps, started), [{ sent: 5.12, returned: 5.3, x: 210, y: 450.5 }]);
   });
 
-  it('of a tap are written after the tap returns, at the middle of the box the target had before it, beside the marks of the blocks', async () => {
+  it('of a tap are written after the tap returns, with when it was sent, at the middle of the box the target had before it, beside the marks of the blocks', async () => {
     const file = join(mkdtempSync(join(tmpdir(), 'verify-marks-')), 'evidence-marks.jsonl');
     let now = 1_000;
     const tapped: string[] = [];
@@ -164,7 +163,7 @@ describe('marks of host.evidence', () => {
       await assert.rejects(mark({ boundingBox: async () => ({ x: 0, y: 0, width: 10, height: 10 }) }, async () => Promise.reject(new Error('covered'))), /covered/);
     });
     assert.deepEqual(tapped, ['row', 'no box']);
-    assert.deepEqual(readTaps(file), [{ tappedAt: 1_450, x: 210, y: 422 }]);
+    assert.deepEqual(readTaps(file), [{ sentAt: 1_000, tappedAt: 1_450, x: 210, y: 422 }]);
     assert.deepEqual(readMarks(file), [{ label: 'the list', startedAt: 1_000, endedAt: 1_450, passed: true }]);
   });
 
@@ -181,6 +180,40 @@ describe('marks of host.evidence', () => {
     assert.equal(await block('anything', async () => 7), 7);
     assert.deepEqual(holds, []);
     await assert.rejects(block(' ', async () => 7), /host\.evidence needs a label/);
+  });
+});
+
+describe('the start of the pulse of a tap', () => {
+  const tap = { sent: 4.019, returned: 4.202, x: 640, y: 1386 };
+
+  it('is 0.2 s before the first change at the tapped control between sending the tap and just after its return, so the pulse shows on the control before it changes', () => {
+    const changes = [{ at: 3.1, share: 0.4 }, { at: 4.098, share: 0 }, { at: 4.112, share: 0.42 }, { at: 4.321, share: 0.4 }];
+    assert.equal(reactionAt(changes, tap), 4.112);
+    assert.equal(pulseAt(tap, reactionAt(changes, tap)), 3.912);
+  });
+
+  it('skips the end of an animation that was still running when the tap was sent, and a flicker too small to see', () => {
+    const changes = [{ at: 3.85, share: 0.3 }, { at: 3.93, share: 0.3 }, { at: 3.98, share: 0.3 }, { at: 4.03, share: 0.3 }, { at: 4.2, share: 0.01 }, { at: 4.3, share: 0.5 }];
+    assert.equal(reactionAt(changes, tap), 4.3);
+  });
+
+  it('is when the tap was sent when the control does not change near it', () => {
+    assert.equal(reactionAt([{ at: 4.8, share: 0.5 }], tap), null);
+    assert.equal(pulseAt(tap, null), 4.019);
+  });
+
+  it('reads each frame of the change ffmpeg prints', () => {
+    const printed = 'frame:0    pts:368855  pts_time:4.098389\nlavfi.signalstats.YAVG=0\nframe:1    pts:370088  pts_time:4.112089\nlavfi.signalstats.YAVG=107.1\n';
+    assert.deepEqual(parseChanges(printed), [{ at: 4.098389, share: 0 }, { at: 4.112089, share: 0.42 }]);
+  });
+
+  it('is found in a real video: 0.2 s before the tapped box changes, and when the tap was sent for a tap that changes nothing', { skip: FFMPEG.code === 0 ? false : 'ffmpeg is not installed on this machine' }, async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'verify-reaction-'));
+    const video = join(dir, 'video.mp4') as EvidencePath;
+    const made = await run('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'color=c=gray:size=300x600:rate=30:duration=3', '-vf', "drawbox=x=120:y=280:w=60:h=40:color=white:t=fill:enable='gte(t,1.5)'", '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video]);
+    assert.equal(made.code, 0, made.stderr);
+    const taps = await evidenceTapsOf(video, [{ sent: 1.4, returned: 1.6, x: 50, y: 100 }, { sent: 2.2, returned: 2.4, x: 50, y: 100 }], { width: 100, height: 200 }, run);
+    assert.deepEqual(taps, [{ at: 1.3, x: 50, y: 100 }, { at: 2.2, x: 50, y: 100 }]);
   });
 });
 

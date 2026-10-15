@@ -8,6 +8,7 @@ export interface EvidenceMark {
 }
 
 export interface TapMark {
+  readonly sentAt: number;
   readonly tappedAt: number;
   readonly x: number;
   readonly y: number;
@@ -55,9 +56,10 @@ export function tapMarker(marker: Pick<Marker, 'marksFile' | 'now'>): (target: {
     const file = marker.marksFile;
     if (file === null) return tap();
     const box = await target.boundingBox().catch(() => null);
+    const sentAt = marker.now();
     await tap();
     if (box === null) return;
-    const mark: TapMark = { tappedAt: marker.now(), x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    const mark: TapMark = { sentAt, tappedAt: marker.now(), x: box.x + box.width / 2, y: box.y + box.height / 2 };
     appendFileSync(file, `${JSON.stringify(mark)}\n`);
   };
 }
