@@ -562,6 +562,17 @@ describe('session agent', () => {
     await agent.exited;
   });
 
+  it('answers the start of a recording whose recorder never says it records with how long the recorder has run, so the CLI can time the video from its start', async () => {
+    const agent = await startAgent(base, { minuteMs: 600, env: { FAKE_DEVICE_RECORDER: 'mute' } });
+    const started = await agent.call('/__sim/record/start', { method: 'POST' });
+    const answer = (await started.json()) as { ok: boolean; recordingForMs?: number };
+    assert.equal(started.status, 200);
+    assert.ok(answer.ok && answer.recordingForMs !== undefined && answer.recordingForMs >= 100 && answer.recordingForMs < 1_000, JSON.stringify(answer));
+    await agent.call('/__sim/record/stop', { method: 'POST' });
+    await agent.call('/__sim/stop', { method: 'POST' });
+    await agent.exited;
+  });
+
   it('refuses the start of a recording when the recorder exits before it records, with what it printed', async () => {
     const agent = await startAgent(base, { env: { FAKE_DEVICE_RECORDER: 'dies' } });
     const started = await agent.call('/__sim/record/start', { method: 'POST' });
@@ -574,7 +585,7 @@ describe('session agent', () => {
   it('stops reading the recorder once it says it is recording, so a long recording does not pile its output up in the agent', async () => {
     const recorder = spawn(process.execPath, ['-e', "console.log('Recording started'); setTimeout(() => console.error('x'.repeat(100_000)), 100)"], { stdio: ['ignore', 'pipe', 'pipe'] });
     const closed = new Promise<number | null>((done) => recorder.on('close', done));
-    assert.deepEqual(await printed(recorder, 'recording started', 5_000), { exited: false, output: 'Recording started\n' });
+    assert.deepEqual(await printed(recorder, 'recording started', 5_000), { outcome: 'printed', output: 'Recording started\n' });
     assert.equal(await closed, 0);
     assert.deepEqual([recorder.stdout?.listenerCount('data'), recorder.stderr?.listenerCount('data')], [0, 0]);
   });

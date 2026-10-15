@@ -146,10 +146,10 @@ describe('marks of host.evidence', () => {
     assert.deepEqual(readMarks(file), [{ label: 'the list', startedAt: 1_000, endedAt: 4_000, passed: true }]);
   });
 
-  it('of a tap become the window from sending it to its return in seconds of the video, and a tap that returned before the video is dropped', () => {
+  it('of a tap become the window from sending it to 5 s after its return in seconds of the video, and a tap that returned before the video is dropped', () => {
     const started = Date.parse('2026-10-14T23:00:00.000Z');
     const taps = [{ sentAt: started - 100, tappedAt: started - 10, x: 1, y: 2 }, { sentAt: started + 5_120, tappedAt: started + 5_300, x: 210, y: 450.5 }];
-    assert.deepEqual(tapWindows(taps, started), [{ sent: 5.12, returned: 5.3, x: 210, y: 450.5 }]);
+    assert.deepEqual(tapWindows(taps, started), [{ sent: 5.12, until: 10.3, x: 210, y: 450.5 }]);
   });
 
   it('of a tap are written after the tap returns, with when it was sent, at the middle of the box the target had before it, beside the marks of the blocks', async () => {
@@ -184,21 +184,30 @@ describe('marks of host.evidence', () => {
 });
 
 describe('the start of the pulse of a tap', () => {
-  const tap = { sent: 4.019, returned: 4.202, x: 640, y: 1386 };
+  const tap = { sent: 4.019, until: 9.202, x: 640, y: 1386 };
 
-  it('is 0.2 s before the first change at the tapped control between sending the tap and just after its return, so the pulse shows on the control before it changes', () => {
+  it('is 0.2 s before the first change at the tapped control after the tap was sent, so the pulse shows on the control before it changes', () => {
     const changes = [{ at: 3.1, share: 0.4 }, { at: 4.098, share: 0 }, { at: 4.112, share: 0.42 }, { at: 4.321, share: 0.4 }];
     assert.equal(reactionAt(changes, tap), 4.112);
     assert.equal(pulseAt(tap, reactionAt(changes, tap)), 3.912);
   });
 
-  it('skips the end of an animation that was still running when the tap was sent, and a flicker too small to see', () => {
-    const changes = [{ at: 3.85, share: 0.3 }, { at: 3.93, share: 0.3 }, { at: 3.98, share: 0.3 }, { at: 4.03, share: 0.3 }, { at: 4.2, share: 0.01 }, { at: 4.3, share: 0.5 }];
-    assert.equal(reactionAt(changes, tap), 4.3);
+  it('skips a flicker too small to see', () => {
+    assert.equal(reactionAt([{ at: 3.5, share: 0.3 }, { at: 4.05, share: 0.01 }, { at: 4.3, share: 0.5 }], tap), 4.3);
+  });
+
+  it('is when the tap was sent when the strip is still moving as the control reacts, so a later change cannot put the pulse after the reaction', () => {
+    const moving = Array.from({ length: 14 }, (_, i) => ({ at: Math.round((3.85 + i / 30) * 1000) / 1000, share: 0.3 }));
+    assert.equal(reactionAt([...moving, { at: 4.5, share: 0.5 }], tap), null);
+  });
+
+  it('is looked for until 5 s after the tap returns, as late as a CI runner shows it, and never after the next tap was sent', () => {
+    const [first, second] = tapWindows([{ sentAt: 10_000, tappedAt: 11_500, x: 1, y: 2 }, { sentAt: 13_000, tappedAt: 14_000, x: 3, y: 4 }], 0);
+    assert.deepEqual([reactionAt([{ at: 12.9, share: 0.5 }], first!), reactionAt([{ at: 13.1, share: 0.5 }], first!), reactionAt([{ at: 18.9, share: 0.5 }], second!)], [12.9, null, 18.9]);
   });
 
   it('is when the tap was sent when the control does not change near it', () => {
-    assert.equal(reactionAt([{ at: 4.8, share: 0.5 }], tap), null);
+    assert.equal(reactionAt([{ at: 9.3, share: 0.5 }], tap), null);
     assert.equal(pulseAt(tap, null), 4.019);
   });
 
@@ -212,7 +221,7 @@ describe('the start of the pulse of a tap', () => {
     const video = join(dir, 'video.mp4') as EvidencePath;
     const made = await run('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'color=c=gray:size=300x600:rate=30:duration=3', '-vf', "drawbox=x=120:y=280:w=60:h=40:color=white:t=fill:enable='gte(t,1.5)'", '-c:v', 'libx264', '-pix_fmt', 'yuv420p', video]);
     assert.equal(made.code, 0, made.stderr);
-    const taps = await evidenceTapsOf(video, [{ sent: 1.4, returned: 1.6, x: 50, y: 100 }, { sent: 2.2, returned: 2.4, x: 50, y: 100 }], { width: 100, height: 200 }, run);
+    const taps = await evidenceTapsOf(video, [{ sent: 1.4, until: 2.2, x: 50, y: 100 }, { sent: 2.2, until: 7.4, x: 50, y: 100 }], { width: 100, height: 200 }, run);
     assert.deepEqual(taps, [{ at: 1.3, x: 50, y: 100 }, { at: 2.2, x: 50, y: 100 }]);
   });
 });
@@ -263,5 +272,27 @@ describe('cutVideo', () => {
     assert.equal(await differs(1.6, 24, 300), true, 'a pulse at the tap point once it landed');
     assert.equal(await differs(1.6, 24, 60), false, 'nothing drawn away from the tap');
     assert.equal(await differs(2.2, 24, 300), false, 'the pulse is gone half a second later');
+  });
+
+  it('times a video by when each frame shows, so the pulse still comes 0.2 s before the change it marks when the decode times lag far behind', { skip: FFMPEG.code === 0 ? false : 'ffmpeg is not installed on this machine' }, async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'verify-lagging-dts-'));
+    const made = join(dir, 'made.mp4');
+    const video = join(dir, 'video.mp4') as EvidencePath;
+    assert.equal((await run('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'color=c=black:size=300x600:rate=30:duration=4', '-vf', "drawbox=x=120:y=280:w=60:h=40:color=white:t=fill:enable='gte(t,2.5)'", '-c:v', 'libx264', '-bf', '2', '-pix_fmt', 'yuv420p', made])).code, 0);
+    const lagging = await run('ffmpeg', ['-v', 'error', '-i', made, '-c', 'copy', '-bsf:v', 'setts=pts=floor(PTS/1536)*1536:dts=DTS-15360', video]);
+    assert.equal(lagging.code, 0, lagging.stderr);
+    const taps = await evidenceTapsOf(video, [{ sent: 2.4, until: 7.6, x: 50, y: 100 }], { width: 100, height: 200 }, run);
+    assert.deepEqual(taps, [{ at: 2.3, x: 50, y: 100 }]);
+    const cut = await cutVideo(video, null, run, { viewport: { width: 100, height: 200 }, taps });
+    assert.ok(cut.kind === 'cut', JSON.stringify(cut));
+    assert.deepEqual(cut.pieces, [{ from: 0, to: 1 }, { from: 2.3, to: 3.93 }], 'the still before the box is cut where the pulse starts');
+    const firstBrightFrame = async (x: number, y: number): Promise<number> => {
+      const read = await run('ffmpeg', ['-v', 'error', '-i', cut.path, '-vf', `format=gray,crop=2:2:${x}:${y},signalstats,metadata=mode=print:key=lavfi.signalstats.YAVG:file=-`, '-f', 'null', '-']);
+      return [...read.stdout.matchAll(/YAVG=([\d.]+)/g)].findIndex((match) => Number(match[1]) > 60);
+    };
+    const pulse = await firstBrightFrame(150, 300);
+    const change = await firstBrightFrame(124, 284);
+    assert.ok(pulse > 0, `the pulse starts at frame ${pulse}`);
+    assert.equal(change - pulse, 6, `the pulse starts at frame ${pulse} and the box shows at frame ${change}`);
   });
 });

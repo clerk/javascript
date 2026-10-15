@@ -6,7 +6,7 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { tapMarker } from '../specs/support/evidence.ts';
-import { tapMarkedOnceUncovered, tapOnceUncovered } from '../specs/support/tapping.ts';
+import { atItsMiddle, backControl, tapMarkedOnceUncovered, tapOnceUncovered } from '../specs/support/tapping.ts';
 import { readTaps } from '../src/core/video.ts';
 
 const REFUSED = 'perform tap failed: Ref @e5 is covered by another visible element and cannot be tapped safely';
@@ -100,5 +100,20 @@ describe('the mark of a tap that a transition covered at first', () => {
     await tapMarkedOnceUncovered(moving, tapMarker({ marksFile: file, now: () => 7_000 }), control.settle(5_000));
     assert.equal(control.count(), 2);
     assert.deepEqual(readTaps(file), [{ sentAt: 7_000, tappedAt: 7_000, x: 50, y: 520 }]);
+  });
+});
+
+describe('a back that a user sees', () => {
+  it('taps the middle of the navigation back button on iOS and of the top bar back arrow on Android, and marks it like any tap', async () => {
+    const file = join(mkdtempSync(join(tmpdir(), 'verify-marks-')), 'evidence-marks.jsonl');
+    const found: string[] = [];
+    const tapped: unknown[] = [];
+    const control = (query: string) => (found.push(query), { boundingBox: async () => ({ x: 8, y: 60, width: 44, height: 24 }), tap: async (options: unknown) => void tapped.push(options) });
+    const screen = { getByTestId: (id: string) => control(`test id ${id}`), getByLabel: (label: string) => control(`label ${label}`) };
+    const settle = { timeoutMs: 5_000, now: () => 0, wait: async () => undefined };
+    for (const platform of ['ios', 'android'] as const) await tapMarkedOnceUncovered(atItsMiddle(backControl(screen, platform)), tapMarker({ marksFile: file, now: () => 7_000 }), settle);
+    assert.deepEqual(found, ['test id BackButton', 'label Back']);
+    assert.deepEqual(tapped, [{ timeout: 5_000, position: { x: 22, y: 12 } }, { timeout: 5_000, position: { x: 22, y: 12 } }]);
+    assert.deepEqual(readTaps(file), [{ sentAt: 7_000, tappedAt: 7_000, x: 30, y: 72 }, { sentAt: 7_000, tappedAt: 7_000, x: 30, y: 72 }]);
   });
 });

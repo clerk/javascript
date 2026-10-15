@@ -462,19 +462,25 @@ export async function startScreenrecord(options: ScreenrecordOptions): Promise<R
   child.stdout.on('data', (chunk: Buffer) => (output += chunk.toString()));
   child.stderr.on('data', (chunk: Buffer) => (output += chunk.toString()));
   const done = new Promise<number>((resolve) => child.on('close', (code) => resolve(code ?? 1)));
-  const deadline = Date.now() + 10_000;
+  const deadline = now() + 10_000;
   let pid = '';
   while ((pid = await shell('pidof screenrecord')) === '') {
     const exited = await Promise.race([done, sleep(500).then(() => null)]);
-    if (exited !== null || Date.now() >= deadline) {
+    if (exited !== null || now() >= deadline) {
       child.kill();
       throw new VerifyFailure('NOT_READY', `screenrecord did not start on ${serial}: ${output.trim() || `exit ${exited}`}`, 'rerun with --no-video, or `{cli} down` and `{cli} up`');
     }
   }
-  const videoStartsAt = await firstFrameAt(shell, pid, startedAt, now, deadline);
+  const appearedAt = now();
+  const firstFrame = await firstFrameAt(shell, pid, startedAt, now, deadline);
   return {
     process: { pid: child.pid ?? 0, startedAt },
-    ...(videoStartsAt === null ? {} : { videoStartsAt }),
+    ...(firstFrame === null
+      ? {
+          videoStartsAt: appearedAt,
+          videoStartGuess: "screenrecord's MP4 writer never logged its first frame, so this run times the video from when screenrecord started, and its tap pulses can land up to a second or two late",
+        }
+      : { videoStartsAt: firstFrame }),
     async stop() {
       await shell('pkill -INT screenrecord');
       const stopDeadline = Date.now() + 30_000;
