@@ -12,7 +12,7 @@ it('keeps the Members placeholder until a table is configured', () => {
         activePage='members'
         onPageChange={vi.fn()}
         pages={{
-          general: { name: 'Acme', slug: 'acme', memberCount: 1 },
+          general: {},
           members: {},
         }}
       />
@@ -47,7 +47,7 @@ it('replaces the corner dismiss with a back button in a fullscreen dialog', () =
           <OrganizationProfileView
             activePage='general'
             onPageChange={vi.fn()}
-            pages={{ general: { name: 'Acme', slug: 'acme', memberCount: 1 } }}
+            pages={{ general: {} }}
           />
         </Dialog.Popup>
       </Dialog.Root>
