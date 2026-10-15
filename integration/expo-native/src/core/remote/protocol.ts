@@ -120,6 +120,7 @@ export interface SessionDevice {
   build(work: string): readonly CommandLine[];
   readonly record: {
     start(file: string): CommandLine;
+    readonly startedWhen?: string;
     stop?(file: string): readonly CommandLine[];
     collect?(file: string): readonly CommandLine[];
   };
@@ -140,7 +141,7 @@ export type RecipeRequest =
 export interface RecipeAnswers {
   readonly inputs: readonly string[];
   readonly build: readonly CommandLine[];
-  readonly record: { readonly start: CommandLine; readonly stop: readonly CommandLine[] | null; readonly collect: readonly CommandLine[] };
+  readonly record: { readonly start: CommandLine; readonly startedWhen: string | null; readonly stop: readonly CommandLine[] | null; readonly collect: readonly CommandLine[] };
   readonly logs: CommandLine;
 }
 

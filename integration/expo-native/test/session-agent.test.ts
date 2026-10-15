@@ -552,6 +552,16 @@ describe('session agent', () => {
     await agent.exited;
   });
 
+  it('answers the start of a recording once the recorder says it is recording, because the CLI times the video from that answer', async () => {
+    const agent = await startAgent(base, { env: { FAKE_DEVICE_RECORDER: 'slow-start' } });
+    const asked = Date.now();
+    assert.equal((await agent.call('/__sim/record/start', { method: 'POST' })).status, 200);
+    assert.ok(Date.now() - asked >= 700, `answered after ${Date.now() - asked} ms`);
+    await agent.call('/__sim/record/stop', { method: 'POST' });
+    await agent.call('/__sim/stop', { method: 'POST' });
+    await agent.exited;
+  });
+
   it('records, serves the file, and reads device logs', async () => {
     const agent = await startAgent(base);
     assert.equal((await agent.call('/__sim/record/start', { method: 'POST' })).status, 200);
