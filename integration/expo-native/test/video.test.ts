@@ -196,6 +196,17 @@ describe('the start of the pulse of a tap', () => {
     assert.equal(reactionAt([{ at: 3.97, share: 0.5 }, { at: 4.15, share: 0.5 }], tap), 4.15);
   });
 
+  it('sees a change from just before the tap was sent, so a change right after it is not taken as the reaction', async () => {
+    const changes = [{ at: 4.0, share: 0.5 }, { at: 4.05, share: 0.5 }];
+    const scan = async (_command: string, args: readonly string[]) => {
+      const from = Number(args[args.indexOf('-ss') + 1]);
+      const stdout = changes.filter((change) => change.at >= from).map((change) => `frame:0 pts:0 pts_time:${change.at}\nlavfi.signalstats.YAVG=${change.share * 255}`).join('\n');
+      return { code: 0, stdout, stderr: '' };
+    };
+    const [drawn] = await evidenceTapsOf('video.mp4' as EvidencePath, [tap], { width: 1280, height: 2772 }, scan as Parameters<typeof evidenceTapsOf>[3]);
+    assert.equal(drawn!.at, 4.019);
+  });
+
   it('skips a flicker too small to see', () => {
     assert.equal(reactionAt([{ at: 3.5, share: 0.3 }, { at: 4.05, share: 0.01 }, { at: 4.3, share: 0.5 }], tap), 4.3);
   });
