@@ -5,6 +5,8 @@ import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useOrganization, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 
+import { LivePageHeader } from '../../live-page-header';
+
 export default function OrganizationGeneralLivePage() {
   const { isLoaded, isSignedIn } = useUser();
   const { organization } = useOrganization();
@@ -12,6 +14,7 @@ export default function OrganizationGeneralLivePage() {
   return (
     <MosaicProvider>
       <div className='mx-auto flex w-full max-w-3xl flex-col gap-6 p-3 sm:p-8'>
+        <LivePageHeader title='General'>Edit the name, slug, and logo of the active organization.</LivePageHeader>
         {!isLoaded ? <p className='text-muted-foreground text-sm'>Loading…</p> : null}
         {isLoaded && !isSignedIn ? (
           <p className='text-muted-foreground text-sm'>

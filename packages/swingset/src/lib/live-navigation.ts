@@ -1,7 +1,12 @@
 import { getSidebarGroups } from '@/lib/registry';
 import { getSidebarCategories, type SidebarEntry } from '@/lib/sidebar-navigation';
+import type { StoryStatus, WipSubstatus } from '@/lib/types';
 
-type LiveSidebarEntry = SidebarEntry & { href: string };
+export type LiveSidebarEntry = SidebarEntry & {
+  href: string;
+  status?: StoryStatus;
+  substatus?: WipSubstatus;
+};
 
 type LiveSidebarGroup = {
   group: string;
@@ -28,6 +33,11 @@ const liveRoutes = new Map([
   ['/reverification/reverification', '/live/reverification'],
 ]);
 
+const inventoriedGroups = new Set(['User Profile', 'Organization Profile']);
+const inventoriedCategories = new Set(['Panels', 'Sections']);
+
+const LIVE_TODO_PREFIX = '/live/todo';
+
 export function getLiveSidebarGroups(): LiveSidebarGroup[] {
   const liveGroups: LiveSidebarGroup[] = [];
 
@@ -38,9 +48,17 @@ export function getLiveSidebarGroups(): LiveSidebarGroup[] {
       const liveComponents: LiveSidebarEntry[] = [];
 
       for (const component of categoryComponents) {
-        const href = liveRoutes.get(`/${groupSlug}/${component.componentSlug}`);
+        const key = `/${groupSlug}/${component.componentSlug}`;
+        const href = liveRoutes.get(key);
         if (href) {
-          liveComponents.push({ ...component, href });
+          liveComponents.push({
+            ...component,
+            href,
+            status: component.mod.meta.status,
+            substatus: component.mod.meta.substatus,
+          });
+        } else if (inventoriedGroups.has(group) && inventoriedCategories.has(category)) {
+          liveComponents.push({ ...component, href: `${LIVE_TODO_PREFIX}${key}`, status: 'todo' });
         }
       }
 
@@ -55,4 +73,12 @@ export function getLiveSidebarGroups(): LiveSidebarGroup[] {
   }
 
   return liveGroups;
+}
+
+const liveEntries = getLiveSidebarGroups().flatMap(({ categories }) =>
+  categories.flatMap(({ components }) => components),
+);
+
+export function findLiveEntry(pathname: string): LiveSidebarEntry | undefined {
+  return liveEntries.find(({ href }) => pathname === href || pathname.startsWith(`${href}/`));
 }
