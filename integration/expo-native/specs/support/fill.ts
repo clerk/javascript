@@ -39,8 +39,19 @@ export interface FillPace {
   wait(): Promise<unknown>;
 }
 
+// The iOS simulator's accessibility frames lag about a second behind typed text, so a tap resolved sooner lands where a control sat before the keyboard moved it.
+const IOS_FRAMES_SETTLE_AFTER_TYPING_MS = 1_500;
+
 export async function fillField(field: NamedField, text: string, device: FillDevice, pace: FillPace, busy: BusyWait): Promise<void> {
   const { focused } = device;
+  let typedAt: number | null = null;
+  const type = async (command: readonly [string, ...string[]]): Promise<void> => {
+    try {
+      await device.type(command);
+    } finally {
+      typedAt = pace.now();
+    }
+  };
   const tap = (): Promise<void> => tapOnceUncovered(() => field.tap({ timeout: pace.tapTimeoutMs }), { timeoutMs: pace.tapTimeoutMs, now: pace.now, wait: pace.wait }, busy);
   await tap();
   const read = <T>(reading: () => Promise<T>, unreadable: T): Promise<T> => onceTheRunnerIsFree(reading, busy).catch(() => unreadable);
@@ -51,7 +62,7 @@ export async function fillField(field: NamedField, text: string, device: FillDev
   let namedInput: FieldNode | null = null;
   await typeConfirmed(
     {
-      type: (value) => device.type(['type', value]),
+      type: (value) => type(['type', value]),
       async valueIfReadable() {
         const now = await frame();
         if (input === null || now === null || now.x !== input.x || now.y !== input.y || now.width !== input.width || now.height !== input.height) return null;
@@ -74,7 +85,7 @@ export async function fillField(field: NamedField, text: string, device: FillDev
       tapAgain: tap,
       async replace(value) {
         const box = input ?? (await namedInput?.boundingBox().catch(() => null)) ?? null;
-        if (box !== null) await device.type(['fill', String(Math.round(box.x + box.width / 2)), String(Math.round(box.y + box.height / 2)), value]);
+        if (box !== null) await type(['fill', String(Math.round(box.x + box.width / 2)), String(Math.round(box.y + box.height / 2)), value]);
       },
       ...(device.platform === 'android' ? { nothingFocused: async () => (await focused.count()) !== 1 } : {}),
     },
@@ -82,4 +93,6 @@ export async function fillField(field: NamedField, text: string, device: FillDev
     { reads: pace.reads, wait: pace.wait },
     busy,
   );
+  if (device.platform !== 'ios' || typedAt === null) return;
+  while (pace.now() - typedAt < IOS_FRAMES_SETTLE_AFTER_TYPING_MS) await pace.wait();
 }

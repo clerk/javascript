@@ -24,7 +24,18 @@ const resendIn = (seconds: number): string => `Didn't receive a code? Resend (${
 const EMAIL_CODE_SCREEN = ['Check your email', 'someone+clerk_test@example.com', resendIn(30)];
 const PHONE_CODE_SCREEN = ['Check your phone', '+1 201-555-0160', resendIn(30)];
 
-function form(runner: BusyRunner = {}, platform: Platform = 'ios', tapsUntilFocused = 1, screen: Screen = { texts: () => EMAIL_CODE_SCREEN }) {
+interface Clock {
+  now(): number;
+  wait(): Promise<unknown>;
+  typed?(): void;
+}
+
+function ticking(): Clock {
+  let at = 0;
+  return { now: () => at, wait: async () => void (at += 400) };
+}
+
+function form(runner: BusyRunner = {}, platform: Platform = 'ios', tapsUntilFocused = 1, screen: Screen = { texts: () => EMAIL_CODE_SCREEN }, clock: Clock = ticking()) {
   const refusalsLeft = { tap: runner.tap ?? 0, read: runner.read ?? 0, type: runner.type ?? 0, replace: runner.replace ?? 0 };
   const calls: string[] = [];
   let held = '';
@@ -57,11 +68,12 @@ function form(runner: BusyRunner = {}, platform: Platform = 'ios', tapsUntilFocu
       step(command === 'fill' ? 'replace' : 'type', `${command} ${operands.join(' ')}`);
       held = command === 'fill' ? operands.at(-1)! : held + operands.join('');
       held = screen.afterTyping?.(held) ?? held;
+      clock.typed?.();
     },
   };
   let waited = 0;
   const fill = (text: string, most: number): Promise<void> =>
-    fillField(field, text, device, { tapTimeoutMs: 1_000, reads: 2, now: () => 0, wait: async () => undefined }, busyWaits(most, async () => void (waited += 1)));
+    fillField(field, text, device, { tapTimeoutMs: 1_000, reads: 2, now: clock.now, wait: clock.wait }, busyWaits(most, async () => void (waited += 1)));
   return { fill, calls, held: () => held, waited: () => waited };
 }
 
@@ -98,6 +110,18 @@ describe('one host.fill', () => {
     await assert.rejects(stuck.fill('424242', 6), (error: Error) => error.message === BUSY);
     assert.deepEqual([stuck.waited(), stuck.held()], [6, '']);
     assert.deepEqual(stuck.calls, Array.from({ length: 7 }, () => 'tap'));
+  });
+
+  it('returns on iOS only once 1.5 s have passed since the last typing, so a tap after it resolves where the keyboard moved the controls', async () => {
+    const ended = async (platform: Platform): Promise<{ readonly typedAt: number; readonly returnedAt: number }> => {
+      let at = 0;
+      let typedAt = -1;
+      const clock: Clock = { now: () => at, wait: async () => void (at += 400), typed: () => void (typedAt = at += 3_000) };
+      await form({}, platform, 1, undefined, clock).fill('424242', 6);
+      return { typedAt, returnedAt: at };
+    };
+    assert.deepEqual(await ended('ios'), { typedAt: 3_000, returnedAt: 4_600 });
+    assert.deepEqual(await ended('android'), { typedAt: 3_000, returnedAt: 3_000 });
   });
 
   it('taps the field again on Android when the first tap left nothing focused, so no text is typed at nothing', async () => {
