@@ -3,6 +3,7 @@ import type { Ref } from 'react';
 import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import type { CountryIso } from '../../../components/phone-input';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddPhoneController } from './user-profile-add-phone.controller';
 
@@ -33,6 +34,7 @@ export type UserProfilePhoneSectionModel =
       getPhoneVerifier: (id: string) => UserProfilePhoneVerifier;
       onSetPrimaryPhone: (id: string) => Promise<void>;
       onRemovePhone?: (id: string) => Promise<void>;
+      reverification: ReverificationController;
     };
 
 export type ReadyPhoneSectionModel = Extract<UserProfilePhoneSectionModel, { status: 'ready' }>;
