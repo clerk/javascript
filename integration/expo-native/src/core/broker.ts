@@ -234,7 +234,7 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
         if (name !== role.name) return `role ${key} is named ${role.name}`;
         if (!Array.isArray(permissions) || permissions.some((id) => typeof id !== 'string')) return 'permissions is not a list of permission ids';
         const keys = await systemPermissionKeys();
-        const given = (permissions as string[]).map((id) => keys.get(id) ?? id).sort();
+        const given = (permissions as string[]).map((id) => keys.get(id) ?? `${id} (not a permission id)`).sort();
         const wanted = [...role.permissions].sort();
         return given.join() === wanted.join() ? null : `role ${key} has exactly the permissions ${wanted.join(', ')}, and the request gives ${given.join(', ')}`;
       },
