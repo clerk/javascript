@@ -156,11 +156,13 @@ export function chooseEvidence(pr: number, evidence: Publishable, before: Showab
     ...shots.map(
       ({ label, test }) =>
         before.screenshots.find((s) => s.label === label)?.path ??
-        before.results.find((r) => basename(r.spec.path) === basename(test?.spec ?? '') && r.title === test?.title)?.failureScreenshot ??
-        missing(
-          `run ${before.run} has no screenshot labelled ${label}, and no failure screenshot of the test that takes it to show in its place`,
-          `call host.screenshot('${label}') in the spec and run it on the build without the change, or attach without --before`,
-        ),
+        before.results.find((r) => test !== undefined && basename(r.spec.path) === basename(test.spec) && r.title === test.title)?.failureScreenshot ??
+        (test === undefined
+          ? missing(`run ${before.run} has no screenshot labelled ${label}, and run ${evidence.run} does not record which test took ${label}`, '{cli} run the spec again and attach that run, or attach without --before')
+          : missing(
+              `run ${before.run} has no screenshot labelled ${label}, and no failure screenshot of the test "${test.title}" in ${basename(test.spec)} to show in its place`,
+              `call host.screenshot('${label}') in the spec and run it on the build without the change, or attach without --before`,
+            )),
     ),
     ...video.map(() => before.videos[0] ?? missing(noVideo(before.run), '{cli} run it again without --no-video, or attach without --video or without --before')),
   ];
