@@ -162,6 +162,7 @@ export function openWorkspace(options: WorkspaceOptions): Workspace {
       .map((line) => JSON.parse(line) as LedgerEntry);
   };
 
+  const runs = (): RunId[] => (existsSync(join(root, 'runs')) ? readdirSync(join(root, 'runs')).filter(isRunId).sort() : []);
   const acquireDir = (platform: Platform) => join(dir('locks'), `acquire-${platform}`);
   const unreachable = () => new VerifyFailure('DEVICE_BUSY', 'unreachable', '');
 
@@ -175,11 +176,12 @@ export function openWorkspace(options: WorkspaceOptions): Workspace {
     claimsDir,
     agentDeviceDir: agentDeviceStateDir(root),
     newRun() {
-      const run = newRunId();
+      // The worktree's one application outlives its runs, and a run finds its users there by the tag alone.
+      const run = newRunId(runs());
       return { run, dir: dir('runs', run) as EvidencePath, scratch: dir('scratch', run) as ScratchPath };
     },
     runDir: (run) => join(root, 'runs', run) as EvidencePath,
-    runs: () => (existsSync(join(root, 'runs')) ? readdirSync(join(root, 'runs')).filter(isRunId).sort() : []),
+    runs,
     buildsDir: () => join(root, 'builds') as ScratchPath,
     leaseFile: (platform) => join(root, 'leases', `${platform}.json`),
     readLease(platform) {
