@@ -211,6 +211,10 @@ Choose before and after, or after only, by whether the thing existed. A change t
 
 To make the before run, `run` the spec of your change on the build without the change, before you make the change, on the platform of the run it goes with. That run can fail, and a failed run is a good before: a spec that expects the new wording fails on the old build. `attach` pairs each screenshot with the screenshot of the same label in the before run. When the before run failed before it took that screenshot, `attach` uses that run's failure screenshot. With `--video` it pairs the two videos. The before run must be in `.verify/runs/` of this checkout, and `attach` fails with a usage error when it is a run of the other platform.
 
+Show each screen the change touches, and each state of a screen that it touches, in a before and after of its own. That includes a state the change should leave as it was, because its pair shows that it did. Write one spec file with one test per state, each ending in its own `host.screenshot(label)`. On each platform you show, run it once without the change and once with it, and pass every label to one `attach`, one `--screenshot <label>` each. The table of that platform then has a row for each state.
+
+Some states are out of reach for a test user on the standard settings with the default roles. Try a settings file for the spec, or test data that the spec seeds, first. When neither reaches it, force the state with a small local patch to the build. Never commit or push the patch. Put the same patch on the before build and the after build, and run both on a local device, because `attach` refuses a run on a session build with uncommitted changes. In the pull request, say exactly what the patch changed and why no test user could reach the state without it.
+
 `attach` puts the files in the description of the pull request with `gh pr edit --attach`. It writes one block for the platform of the run, between the comments `<!-- verify-evidence:ios -->` and `<!-- /verify-evidence:ios -->`, or the same two with `android`. The block is a line and one or two tables. The line leads with the result and names the run, the device, the commit, and how many tests passed. With `--before` it also names the before run, its commit, and how many of its tests passed. With `--before`, a table has a `Before` and an `After` column and one row for each screenshot. Without it, the screenshots are two across, each under its label in code font. Each screenshot is 280 pixels wide. The video is in a table of its own under the screenshots.
 
 The first `attach` of a platform adds its block after the description. A later `attach` of that platform replaces its block, so the description holds the latest run of each platform and the media does not pile up. `attach` changes nothing outside the block. Keep both comments of a block or remove both: `attach` refuses a description that has one without the other, or either one twice. A comment counts only when it is a whole line outside a code fence, so a description can quote one in a sentence or show a whole block as an example.
@@ -230,6 +234,16 @@ When this machine cannot attach and there is no session to hand the files to, or
 Work in this order, with one `up` for both runs: make the branch and `git push` it, `up`, `run` the spec without your change when it changes something that exists, make the change, commit, `git push`, `run` the spec again, open the pull request, `attach` with the before run as `--before <run-id>`, `down`. Open the pull request after the last run, so that it is not left open without its evidence. Commit before the second `run`, so that the line `attach` writes names a commit the pull request holds. In the pull request, name the run id and the specs you ran, and say what you did not run.
 
 On a local device `attach` writes the description itself, and no run needs a push. A remote session builds only the commit it was started on and later commits of the branch, so its before run comes before the push of the change. Its evidence reaches the description about a minute after `down`.
+
+When the change is already committed or pushed, make the before run on its base commit in this worktree, so the run lands in this checkout's `.verify/runs/`. A spec in `specs/explored/` stays through the switch, because that directory is gitignored. A committed spec of the change is not on the base, so copy it to `specs/explored/` first and change its import to `'../fixtures.ts'`.
+
+```console
+$ git switch -c <branch>-before "$(git merge-base origin/main HEAD)"
+$ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform ios
+$ git switch <branch> && git branch -D <branch>-before
+```
+
+This does not work on a remote session. The session builds only the commit it was started on and later commits of that branch, and `attach` refuses a run on a session build with uncommitted changes. When the change is already pushed and the device is remote, attach without `--before` and say in the pull request why there is no before.
 
 Attach the run of your own change. Run your new or changed spec on its own and attach that run, so the screenshots or the video show only what the change is about. You do not owe a regression run: PR CI (`.github/workflows/verify-e2e.yml`) runs every committed spec on the pull request and reports them there. If you ran other committed specs anyway, cite that run's id in the PR and leave its video in `.verify/runs/`.
 
