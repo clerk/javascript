@@ -562,6 +562,15 @@ describe('session agent', () => {
     await agent.exited;
   });
 
+  it('refuses the start of a recording when the recorder exits before it records, with what it printed', async () => {
+    const agent = await startAgent(base, { env: { FAKE_DEVICE_RECORDER: 'dies' } });
+    const started = await agent.call('/__sim/record/start', { method: 'POST' });
+    assert.deepEqual([started.status, await started.json()], [500, { error: 'the recorder exited before it recorded: Recording failed: the simulator is not booted' }]);
+    assert.equal((await agent.call('/__sim/record/stop', { method: 'POST' })).status, 409);
+    await agent.call('/__sim/stop', { method: 'POST' });
+    await agent.exited;
+  });
+
   it('records, serves the file, and reads device logs', async () => {
     const agent = await startAgent(base);
     assert.equal((await agent.call('/__sim/record/start', { method: 'POST' })).status, 200);

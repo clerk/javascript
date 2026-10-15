@@ -126,22 +126,22 @@ const isAgentRoute = (pathname: string): boolean => AGENT_ROUTES.some((route) =>
 const RECORDER_START_MS = 10_000;
 
 // The CLI times the video from this answer, and a recorder can take a second or more to start on a runner.
-function printed(child: ChildProcess, words: string, limitMs: number): Promise<void> {
+function printed(child: ChildProcess, words: string, limitMs: number): Promise<{ readonly exited: boolean; readonly output: string }> {
   return new Promise((done) => {
     let seen = '';
-    const timer = setTimeout(done, limitMs);
+    const timer = setTimeout(() => done({ exited: false, output: seen }), limitMs);
     const read = (chunk: Buffer) => {
-      seen += chunk.toString().toLowerCase();
-      if (seen.includes(words)) {
+      seen += chunk.toString();
+      if (seen.toLowerCase().includes(words)) {
         clearTimeout(timer);
-        done();
+        done({ exited: false, output: seen });
       }
     };
     child.stdout?.on('data', read);
     child.stderr?.on('data', read);
     child.on('close', () => {
       clearTimeout(timer);
-      done();
+      done({ exited: true, output: seen });
     });
   });
 }
@@ -499,7 +499,11 @@ async function serve(env: NodeJS.ProcessEnv): Promise<void> {
         const { start, startedWhen, stop, collect } = await recipe(device, { op: 'record', file });
         const child = spawn(start.command, [...start.args], { cwd: start.cwd, stdio: startedWhen === null ? 'ignore' : ['ignore', 'pipe', 'pipe'] });
         recorder = { child, exited: exitOf(child), file, stop, collect };
-        if (startedWhen !== null) await printed(child, startedWhen, RECORDER_START_MS);
+        const started = startedWhen === null ? null : await printed(child, startedWhen, RECORDER_START_MS);
+        if (started?.exited === true) {
+          recorder = null;
+          return json(res, 500, { error: `the recorder exited before it recorded: ${started.output.trim() || 'no output'}` });
+        }
         return json(res, 200, { ok: true });
       }
       case 'POST /record/stop':
