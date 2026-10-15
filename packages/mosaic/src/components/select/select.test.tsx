@@ -221,6 +221,131 @@ describe('Mosaic Select', () => {
     expect(option.querySelector('.cl-select-option-description')).toHaveTextContent('Can manage members and settings');
   });
 
+  it('composes media beside a content column of label and description', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media>
+              <svg data-testid='acme-logo' />
+            </Select.Media>
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+              <Select.Description>Owner</Select.Description>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const option = screen.getByRole('option', { name: 'Acme' });
+    expect(option).toHaveAttribute('data-described', '');
+    expect(option).toHaveAccessibleDescription('Owner');
+
+    const media = screen.getByTestId('acme-logo').parentElement;
+    expect(media?.tagName).toBe('SPAN');
+    expect(media).toHaveClass('cl-select-option-media');
+    expect(media?.parentElement).toBe(option);
+
+    const content = option.querySelector('.cl-select-option-content');
+    expect(content?.previousElementSibling).toBe(media);
+    expect(content?.querySelector('.cl-select-option-label')).toHaveTextContent('Acme');
+    expect(content?.querySelector('.cl-select-option-description')).toHaveTextContent('Owner');
+  });
+
+  it('leaves a composed option without a description undescribed', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media />
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const option = screen.getByRole('option', { name: 'Acme' });
+    expect(option).not.toHaveAttribute('data-described');
+    expect(option).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('keeps the remaining description when another one in the option unmounts', () => {
+    function Options({ showSecond }: { showSecond: boolean }) {
+      return (
+        <Select.Root
+          items={[{ value: 'acme', label: 'Acme' }]}
+          defaultOpen
+        >
+          <Select.Trigger />
+          <Select.Popup>
+            <Select.Option
+              value='acme'
+              label='Acme'
+            >
+              <Select.Content>
+                <Select.Label>Acme</Select.Label>
+                <Select.Description>Owner</Select.Description>
+                {showSecond ? <Select.Description>Billing</Select.Description> : null}
+              </Select.Content>
+            </Select.Option>
+          </Select.Popup>
+        </Select.Root>
+      );
+    }
+
+    const { rerender } = render(<Options showSecond />);
+    expect(screen.getByRole('option', { name: 'Acme' })).toHaveAccessibleDescription('Owner Billing');
+
+    rerender(<Options showSecond={false} />);
+    expect(screen.getByRole('option', { name: 'Acme' })).toHaveAccessibleDescription('Owner');
+  });
+
+  it('forwards the media ref and swaps its element via render', () => {
+    const ref = React.createRef<HTMLSpanElement>();
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media
+              ref={ref}
+              render={<span data-testid='custom-media' />}
+            />
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    expect(ref.current).toBe(screen.getByTestId('custom-media'));
+    expect(ref.current).toHaveClass('cl-select-option-media');
+  });
+
   it('marks a disabled option as aria-disabled and does not select it', async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();
