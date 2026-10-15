@@ -141,6 +141,7 @@ export function newRunId(kept: readonly RunId[] = []): RunId {
   const date = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
   const time = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
   const taken = new Set(kept.map((run) => runIdParts(run).tag));
+  if (taken.size === 0x10000) throw new Error('every run tag is taken; run down to delete the application');
   let tag: string;
   do tag = randomBytes(2).toString('hex');
   while (taken.has(tag));
