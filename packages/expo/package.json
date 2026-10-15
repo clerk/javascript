@@ -137,5 +137,5 @@
   "publishConfig": {
     "access": "public"
   },
-  "deprecated": "@clerk/clerk-expo is deprecated. Migrate to @clerk/expo by following the Core 3 upgrade guide https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3"
+  "deprecated": "@clerk/clerk-expo is deprecated. Migrate to @clerk/expo by following the Core 3 upgrade guide: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3"
 }
