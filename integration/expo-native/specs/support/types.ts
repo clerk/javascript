@@ -1,4 +1,5 @@
 import type { Locator } from 'e2e';
+import type { HarnessRole } from './clerk.ts';
 
 declare const brand: unique symbol;
 export type Brand<T, B extends string> = T & { readonly [brand]: B };
@@ -65,6 +66,22 @@ export interface SeededUser {
   readonly password: SecretLike | null;
 }
 
+export interface EmailOptions {
+  readonly domain?: string;
+}
+
+export interface OrganizationSeed {
+  readonly creator: SeededUser;
+  readonly members?: readonly { readonly user: SeededUser; readonly role: HarnessRole }[];
+  readonly suggestDomain?: true;
+}
+
+export interface SeededOrganization<Seed extends OrganizationSeed = OrganizationSeed> {
+  readonly id: string;
+  readonly name: string;
+  readonly domain: Seed extends { readonly suggestDomain: true } ? string : null;
+}
+
 export interface SeedOptions {
   readonly phone?: boolean;
   readonly password?: boolean;
@@ -82,9 +99,10 @@ export interface LaunchOptions {
 export interface HostFixture {
   readonly runId: RunId;
   readonly app: AppLocators;
-  newEmail(): Promise<TestEmail>;
+  newEmail(options?: EmailOptions): Promise<TestEmail>;
   newPhone(): Promise<TestPhone>;
   seedUser(options?: SeedOptions): Promise<SeededUser>;
+  seedOrganization<Seed extends OrganizationSeed>(seed: Seed): Promise<SeededOrganization<Seed>>;
   launch(options?: LaunchOptions): Promise<void>;
   expectSignedInAs(who: SeededUser | TestEmail, timeoutMs?: number): Promise<void>;
   expectSignedOut(timeoutMs?: number): Promise<void>;

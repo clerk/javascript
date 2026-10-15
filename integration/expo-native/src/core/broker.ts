@@ -2,7 +2,24 @@ import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { join } from 'node:path';
-import { ABOUT_TO_LAUNCH, BACKEND_API_URL, BACKEND_CALLS, TICKET_SECONDS, parseTestEmail, parseTestPhone, runEmailPrefix, typedPassword, type BackendCall } from '../../specs/support/clerk.ts';
+import {
+  ABOUT_TO_LAUNCH,
+  BACKEND_API_URL,
+  BACKEND_CALLS,
+  HARNESS_ROLES,
+  PATH_PARAM,
+  SYSTEM_PERMISSIONS,
+  TICKET_SECONDS,
+  backendPath,
+  isHarnessRole,
+  isTestDomainOf,
+  organizationNamePrefix,
+  parseTestEmail,
+  parseTestPhone,
+  runEmailPrefix,
+  typedPassword,
+  type BackendCall,
+} from '../../specs/support/clerk.ts';
 import { protect } from '../../specs/support/secret.ts';
 import { ownKeyRefused, userLimitReached } from './clerk.ts';
 import type { InstanceKeys } from './keys.ts';
@@ -26,12 +43,13 @@ export interface Broker {
 }
 
 interface Asked {
+  readonly params: Readonly<Record<string, string>>;
   readonly query: URLSearchParams;
   readonly body: Readonly<Record<string, unknown>>;
 }
 
 interface Guard {
-  refuses(asked: Asked): string | null;
+  refuses(asked: Asked): string | null | Promise<string | null>;
   forwards(asked: Asked): Asked;
   answered?(asked: Asked, reply: unknown): unknown;
 }
@@ -54,6 +72,17 @@ const onlyKeys = (given: Readonly<Record<string, unknown>> | URLSearchParams, al
   return extra.length === 0 ? null : `it carries ${extra.join(', ')}, and the tests send only ${allowed.join(', ')}`;
 };
 
+const listOf = (reply: unknown): readonly Record<string, unknown>[] => {
+  const data = (reply as { data?: unknown } | null)?.data;
+  return Array.isArray(data) ? data : [];
+};
+
+const listed = (reply: unknown, fields: (item: Record<string, unknown>) => Record<string, unknown>): unknown => ({ data: listOf(reply).map(fields), total_count: (reply as { total_count?: unknown } | null)?.total_count });
+
+const idAndKey = (item: Record<string, unknown>): Record<string, unknown> => ({ id: item.id, key: item.key });
+
+const CUSTOM_ROLES = Object.entries(HARNESS_ROLES).flatMap(([key, role]) => (role === null ? [] : [key]));
+
 const notOurs = (check: () => unknown): string | null => {
   try {
     check();
@@ -63,13 +92,35 @@ const notOurs = (check: () => unknown): string | null => {
   }
 };
 
+function paramsOf(template: string, path: string): Readonly<Record<string, string>> | null {
+  const names: string[] = [];
+  const pattern = template.replace(PATH_PARAM, (_, name: string) => {
+    names.push(name);
+    return '([A-Za-z0-9_]+)';
+  });
+  const match = new RegExp(`^${STAND_IN_PATH}${pattern}$`).exec(path);
+  return match === null ? null : Object.fromEntries(names.map((name, index) => [name, match[index + 1]!]));
+}
+
 export async function startBroker(run: RunId, workspace: Workspace, scratch: ScratchPath, deps: BrokerDeps): Promise<Broker> {
   const token = randomBytes(32).toString('hex');
   protect(token);
   const tokenFile = join(scratch, 'broker-token');
   writeFileSync(tokenFile, token, { mode: 0o600 });
   const created = new Set<string>();
+  const organizations = new Set<string>();
   const prefix = runEmailPrefix(run);
+  const namePrefix = organizationNamePrefix(run);
+
+  const ourUser = (userId: unknown, what: string): string | null => (typeof userId === 'string' && created.has(userId) ? null : `user ${String(userId)} was not created by this run; ${what} only users from host.seedUser`);
+  const ourOrganization = ({ params }: Asked): string | null => (organizations.has(params.organization_id ?? '') ? null : `organization ${params.organization_id} was not created by this run; seed it with host.seedOrganization`);
+  const asSent = ({ body }: Asked): Asked => ({ params: {}, query: NO_QUERY, body });
+
+  async function systemPermissionKeys(): Promise<ReadonlyMap<string, string>> {
+    const reply = await forward('GET', `${STAND_IN_PATH}${backendPath('listPermissions')}`, { params: {}, query: new URLSearchParams(SYSTEM_PERMISSIONS), body: {} });
+    if (reply.status < 200 || reply.status >= 300) throw new Error(`Clerk answered ${reply.status} to the list of permissions`);
+    return new Map(listOf(JSON.parse(reply.body)).map((permission) => [String(permission.id), String(permission.key)]));
+  }
 
   const guards: Record<BackendCall, Guard> = {
     createUser: {
@@ -87,7 +138,7 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
           null
         );
       },
-      forwards: ({ body }) => ({ query: NO_QUERY, body: body.phone_number === undefined ? body : { ...body, phone_number: (body.phone_number as string[]).map(parseTestPhone) } }),
+      forwards: ({ body }) => ({ params: {}, query: NO_QUERY, body: body.phone_number === undefined ? body : { ...body, phone_number: (body.phone_number as string[]).map(parseTestPhone) } }),
       answered({ body }, reply) {
         if (typeof body.password === 'string') typedPassword(body.password);
         const userId = (reply as { id?: unknown } | null)?.id;
@@ -101,11 +152,13 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
     signInToken: {
       refuses({ body }) {
         const { user_id: userId, expires_in_seconds: seconds } = body;
-        if (typeof userId !== 'string' || !created.has(userId)) return `user ${String(userId)} was not created by this run; sign in only users from host.seedUser`;
-        if (typeof seconds !== 'number' || !(seconds > 0 && seconds <= TICKET_SECONDS)) return `a sign-in ticket lives ${TICKET_SECONDS} seconds at most`;
-        return onlyKeys(body, ['user_id', 'expires_in_seconds']);
+        return (
+          ourUser(userId, 'sign in') ??
+          (typeof seconds === 'number' && seconds > 0 && seconds <= TICKET_SECONDS ? null : `a sign-in ticket lives ${TICKET_SECONDS} seconds at most`) ??
+          onlyKeys(body, ['user_id', 'expires_in_seconds'])
+        );
       },
-      forwards: ({ body }) => ({ query: NO_QUERY, body }),
+      forwards: asSent,
       answered(_asked, reply) {
         const ticket = (reply as { token?: unknown } | null)?.token;
         if (typeof ticket === 'string') protect(ticket);
@@ -118,14 +171,84 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
         if (phones.length !== 1) return 'users are looked up by one test phone';
         return onlyKeys(query, ['phone_number']) ?? notOurs(() => parseTestPhone(phones[0]!));
       },
-      forwards: ({ query }) => ({ query: new URLSearchParams({ phone_number: parseTestPhone(query.get('phone_number')!) }), body: {} }),
+      forwards: ({ query }) => ({ params: {}, query: new URLSearchParams({ phone_number: parseTestPhone(query.get('phone_number')!) }), body: {} }),
       answered: (_asked, reply) => (Array.isArray(reply) ? reply.flatMap((user: { id?: unknown } | null) => (typeof user?.id === 'string' ? [{ id: user.id }] : [])) : reply),
+    },
+    createOrganization: {
+      refuses({ body }) {
+        const { name, created_by: creator } = body;
+        return (
+          onlyKeys(body, ['name', 'created_by']) ??
+          ourUser(creator, 'an organization is created by') ??
+          (typeof name === 'string' && name.startsWith(namePrefix) ? null : `${String(name)} is not an organization name of run ${run}, whose organization names start "${namePrefix}"`)
+        );
+      },
+      forwards: asSent,
+      answered(_asked, reply) {
+        const id = (reply as { id?: unknown } | null)?.id;
+        if (typeof id === 'string') organizations.add(id);
+        return reply;
+      },
+    },
+    createMembership: {
+      refuses(asked) {
+        const { user_id: userId, role } = asked.body;
+        return (
+          ourOrganization(asked) ??
+          onlyKeys(asked.body, ['user_id', 'role']) ??
+          ourUser(userId, 'an organization takes as members') ??
+          (isHarnessRole(role) ? null : `${String(role)} is not a role the tests give; they give ${Object.keys(HARNESS_ROLES).join(', ')}`)
+        );
+      },
+      forwards: asSent,
+    },
+    createDomain: {
+      refuses(asked) {
+        const { name, enrollment_mode: mode, verified } = asked.body;
+        return (
+          ourOrganization(asked) ??
+          onlyKeys(asked.body, ['name', 'enrollment_mode', 'verified']) ??
+          (typeof name === 'string' && isTestDomainOf(run, name) ? null : `${String(name)} is not a domain of run ${run}, whose domains are ${prefix} and four characters, then .clerk.test`) ??
+          (mode === 'automatic_suggestion' && verified === true ? null : 'a domain is added verified, with automatic suggestions')
+        );
+      },
+      forwards: asSent,
+    },
+    listPermissions: {
+      refuses: ({ query }) => onlyKeys(query, ['query', 'limit']) ?? (query.get('query') === SYSTEM_PERMISSIONS.query ? null : `permissions are listed with query ${SYSTEM_PERMISSIONS.query} only`),
+      forwards: () => ({ params: {}, query: new URLSearchParams(SYSTEM_PERMISSIONS), body: {} }),
+      answered: (_asked, reply) => listed(reply, idAndKey),
+    },
+    listRoles: {
+      refuses: ({ query }) => onlyKeys(query, ['query']) ?? (CUSTOM_ROLES.includes(query.get('query') ?? '') ? null : `roles are looked up by one custom role of the tests: ${CUSTOM_ROLES.join(', ')}`),
+      forwards: ({ query }) => ({ params: {}, query: new URLSearchParams({ query: query.get('query')! }), body: {} }),
+      answered: (_asked, reply) => listed(reply, (role) => ({ ...idAndKey(role), permissions: listOf({ data: role.permissions }).map((permission) => ({ key: permission.key })) })),
+    },
+    createRole: {
+      async refuses({ body }) {
+        const { name, key, permissions } = body;
+        const role = isHarnessRole(key) ? HARNESS_ROLES[key] : null;
+        if (role === null) return `${String(key)} is not a custom role of the tests; they create ${CUSTOM_ROLES.join(', ')}`;
+        const extra = onlyKeys(body, ['name', 'key', 'permissions']);
+        if (extra !== null) return extra;
+        if (name !== role.name) return `role ${key} is named ${role.name}`;
+        if (!Array.isArray(permissions) || permissions.some((id) => typeof id !== 'string')) return 'permissions is not a list of permission ids';
+        const keys = await systemPermissionKeys();
+        const given = (permissions as string[]).map((id) => keys.get(id) ?? id).sort();
+        const wanted = [...role.permissions].sort();
+        return given.join() === wanted.join() ? null : `role ${key} has exactly the permissions ${wanted.join(', ')}, and the request gives ${given.join(', ')}`;
+      },
+      forwards: asSent,
     },
   };
 
-  const guardFor = (method: string | undefined, path: string): Guard | undefined => {
-    const call = (Object.keys(BACKEND_CALLS) as BackendCall[]).find((name) => BACKEND_CALLS[name].method === method && `${STAND_IN_PATH}${BACKEND_CALLS[name].path}` === path);
-    return call === undefined ? undefined : guards[call];
+  const guardFor = (method: string | undefined, path: string): { readonly guard: Guard; readonly params: Readonly<Record<string, string>> } | undefined => {
+    for (const call of Object.keys(BACKEND_CALLS) as BackendCall[]) {
+      if (BACKEND_CALLS[call].method !== method) continue;
+      const params = paramsOf(BACKEND_CALLS[call].path, path);
+      if (params !== null) return { guard: guards[call], params };
+    }
+    return undefined;
   };
 
   async function forward(method: string, path: string, { query, body }: Asked): Promise<Answer> {
@@ -152,8 +275,8 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
   async function answer(request: IncomingMessage): Promise<Answer> {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1');
     if (request.method === ABOUT_TO_LAUNCH.method && url.pathname === `${STAND_IN_PATH}${ABOUT_TO_LAUNCH.path}`) return readyToLaunch();
-    const guard = guardFor(request.method, url.pathname);
-    if (guard === undefined) return clerkError(404, 'verify_stand_in_unknown_call', `the verify CLI's stand-in for the Backend API has no ${request.method} ${url.pathname}; the tests make ${Object.values(BACKEND_CALLS).map((call) => `${call.method} ${call.path}`).join(', ')}`);
+    const found = guardFor(request.method, url.pathname);
+    if (found === undefined) return clerkError(404, 'verify_stand_in_unknown_call', `the verify CLI's stand-in for the Backend API has no ${request.method} ${url.pathname}; the tests make ${Object.values(BACKEND_CALLS).map((call) => `${call.method} ${call.path}`).join(', ')}`);
     let text = '';
     for await (const chunk of request) {
       text += chunk;
@@ -167,8 +290,9 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
     } catch {
       return refused('its body is not JSON');
     }
-    const asked: Asked = { query: url.searchParams, body };
-    const why = guard.refuses(asked);
+    const { guard, params } = found;
+    const asked: Asked = { params, query: url.searchParams, body };
+    const why = await guard.refuses(asked);
     if (why !== null) return refused(why);
     const reply = await forward(request.method ?? 'GET', url.pathname, guard.forwards(asked));
     if (reply.status === 401) return failure(401, 'verify_stand_in_key_refused', ownKeyRefused());
