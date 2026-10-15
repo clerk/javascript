@@ -1,4 +1,4 @@
-import { createHash, randomBytes, randomInt } from 'node:crypto';
+import { createHash, randomInt } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import net from 'node:net';
 import { runIdParts, type ClerkAccess, type ClerkInstance } from './inputs.ts';
@@ -88,19 +88,19 @@ export function typedPassword(value: string): Secret<'password'> {
 
 type Pick = (count: number) => number;
 
-function passwordFrom(pick: Pick, hex: string): string {
+function passwordFrom(pick: Pick): string {
   const first = PASSWORD_WORDS[pick(PASSWORD_WORDS.length)]!;
   const others = PASSWORD_WORDS.filter((word) => word !== first);
-  return `${first}-${others[pick(others.length)]}-${hex}`;
+  return `${first}-${others[pick(others.length)]}-${String(pick(10_000)).padStart(4, '0')}`;
 }
 
-export const newTestPassword = (): Secret<'password'> => typedPassword(passwordFrom(randomInt, randomBytes(2).toString('hex')));
+export const newTestPassword = (): Secret<'password'> => typedPassword(passwordFrom(randomInt));
 
 export function runPassword(run: RunId): Secret<'password'> {
   const digest = createHash('sha256').update(run).digest();
   let read = 0;
   const pick: Pick = (count) => digest.readUInt32BE(4 * read++) % count;
-  return typedPassword(passwordFrom(pick, digest.subarray(8, 10).toString('hex')));
+  return typedPassword(passwordFrom(pick));
 }
 
 export interface TestUsers {

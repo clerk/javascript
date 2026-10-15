@@ -138,7 +138,7 @@ describe('the users a test asks for', () => {
     const two = await users.seed({ password: true });
     const [first, second] = [String(sent[1]!.body!.password), String(sent[2]!.body!.password)];
     assert.notEqual(first, second, 'each user has its own password');
-    for (const typed of [first, second]) assert.match(typed, /^[A-Z][a-z]{2,4}-[A-Z][a-z]{2,4}-[0-9a-f]{4}$/, 'two words and four hex characters, with the hyphen the standard settings require');
+    for (const typed of [first, second]) assert.match(typed, /^[A-Z][a-z]{2,4}-[A-Z][a-z]{2,4}-[0-9]{4}$/, 'two words and four digits, with the hyphen the standard settings require');
     assert.deepEqual([sent[1]!.body!.bypass_client_trust, 'skip_password_requirement' in sent[1]!.body!], [true, false], 'a password sign-in on a new device asks for no second step');
     assert.equal(one.password!.use('device-input', (value) => value), first, 'the test can type the password Clerk was sent');
     for (const shown of [String(one.password), JSON.stringify(one), inspect(one), JSON.stringify(two)]) assert.equal(shown.includes(first) || shown.includes(second), false);
@@ -148,7 +148,7 @@ describe('the users a test asks for', () => {
 
   it('sign up with the password of the run, which is a secret once the test process asks for the users of the run', () => {
     const run = 'r20261015-000000-beef' as RunId;
-    const password = 'Oak-Pine-bb12';
+    const password = 'Oak-Pine-0527';
     assert.equal(redact(`typed ${password}`), `typed ${password}`, 'nothing knows it before the test process asks for the users of the run');
     testUsers(readClerk({ CLERK_PUBLISHABLE_KEY: SAMPLE_PUBLISHABLE_KEY, CLERK_SECRET_KEY: SECRET_KEY }), run, clerk(created).fetchImpl, freshNames(run));
     assert.equal(redact(`typed ${password}`), 'typed <redacted>');
@@ -157,9 +157,9 @@ describe('the users a test asks for', () => {
 
   it('have passwords short enough to type in one command and long enough to be a secret', () => {
     const passwords = [runPassword(SAMPLE_RUN), runPassword(OTHER_RUN), ...Array.from({ length: 50 }, () => newTestPassword())].map((password) => password.use('device-input', (plain) => plain));
-    assert.deepEqual(passwords.slice(0, 2), ['Cliff-Pond-3a5f', 'Oak-Opal-3d46'], 'the password of a run is the same in every process of the run');
+    assert.deepEqual(passwords.slice(0, 2), ['Cliff-Pond-6425', 'Oak-Opal-2162'], 'the password of a run is the same in every process of the run');
     for (const password of passwords) {
-      assert.match(password, /^[A-Z][a-z]{2,4}-[A-Z][a-z]{2,4}-[0-9a-f]{4}$/);
+      assert.match(password, /^[A-Z][a-z]{2,4}-[A-Z][a-z]{2,4}-[0-9]{4}$/, 'two words and four digits, so it always has a digit');
       assert.ok(password.length >= SHORTEST_SECRET && password.length <= 16, password);
       assert.deepEqual(commandsFor(password), [password], `${password} is typed in one command`);
       assert.equal(redact(`input text ${password}`), 'input text <redacted>');
@@ -180,7 +180,7 @@ describe('the users a test asks for', () => {
     const sources = readdirSync(committed, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.e2e.ts')).map((file) => readFileSync(join(committed, file), 'utf8'));
     const uses = sources.flatMap((source) => [...source.matchAll(/[^\s(,]*\(?host\.runId\)?/g)].map((match) => match[0]));
     assert.deepEqual([...new Set(uses)], ['runPassword(host.runId)']);
-    assert.equal(runPassword(SAMPLE_RUN).use('device-input', (plain) => plain), 'Cliff-Pond-3a5f');
+    assert.equal(runPassword(SAMPLE_RUN).use('device-input', (plain) => plain), 'Cliff-Pond-6425');
   });
 
   it('get a test phone no user holds: a taken one moves on to the next, and one test is never handed the same phone twice', async () => {
