@@ -143,14 +143,20 @@ async function withSlotLock<T>(dir: string, timeoutMs: number, onTimeout: () => 
 const deviceBusy = (platform: Platform, fix: string) =>
   new VerifyFailure('DEVICE_BUSY', `another {cli} process in this worktree is driving the ${platform} device`, fix);
 
+const CLAIM = '.tag-';
+
 function claimTag(runsDir: string, tag: string): boolean {
   try {
-    writeFileSync(join(runsDir, `.tag-${tag}`), '', { flag: 'wx' });
+    writeFileSync(join(runsDir, `${CLAIM}${tag}`), '', { flag: 'wx' });
     return true;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false;
     throw error;
   }
+}
+
+export function keptTags(runsDir: string): string[] {
+  return readdirSync(runsDir).flatMap((name) => (isRunId(name) ? [runIdParts(name).tag] : name.startsWith(CLAIM) ? [name.slice(CLAIM.length)] : []));
 }
 
 export function openWorkspace(options: WorkspaceOptions): Workspace {
@@ -187,13 +193,10 @@ export function openWorkspace(options: WorkspaceOptions): Workspace {
     agentDeviceDir: agentDeviceStateDir(root),
     newRun() {
       // The worktree's one application outlives its runs, and a run finds its users there by the tag alone.
-      dir('runs');
-      const refused: RunId[] = [];
+      const runsDir = dir('runs');
       let run: RunId;
-      do {
-        run = newRunId([...runs(), ...refused]);
-        refused.push(run);
-      } while (!claimTag(join(root, 'runs'), runIdParts(run).tag));
+      do run = newRunId(keptTags(runsDir));
+      while (!claimTag(runsDir, runIdParts(run).tag));
       return { run, dir: dir('runs', run) as EvidencePath, scratch: dir('scratch', run) as ScratchPath };
     },
     runDir: (run) => join(root, 'runs', run) as EvidencePath,
