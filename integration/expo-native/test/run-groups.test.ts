@@ -351,11 +351,19 @@ describe('a run whose spec files declare different settings', () => {
       assert.deepEqual({ x: tap.x, y: tap.y }, { x: 210, y: 450 });
     });
 
-    it('keeps no taps, and says attach draws none, when the size of the screen cannot be read', async () => {
-      const r = recorded({ launches: true, taps: true });
-      const { record } = await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
-      assert.equal(record.evidenceTaps, null);
-      assert.deepEqual(r.videoLines().slice(-1), ['video   the size of the screen could not be read, so attach --video draws no taps for this run']);
+    it('keeps no taps, and says attach draws none, when the size of the screen cannot be read or the read runs out of its 30 seconds', async () => {
+      for (const answer of [{ code: 0, stdout: '', stderr: '' }, { code: 124, stdout: '', stderr: '' }]) {
+        const r = recorded({ launches: true, taps: true });
+        const limits: [string, number | undefined][] = [];
+        const timing: Runner = async (command, args, options) => {
+          if (args.some((arg) => arg.endsWith('-screen'))) limits.push([args[0]!, options?.timeoutMs]);
+          return args[0] === 'snapshot' ? answer : r.deps.runner(command, args, options);
+        };
+        const { record } = await runVerb({ ...r.deps, runner: timing }, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
+        assert.equal(record.evidenceTaps, null);
+        assert.deepEqual(limits, [['open', 30_000], ['snapshot', 30_000], ['close', 30_000]]);
+        assert.deepEqual(r.videoLines().slice(-1), ['video   the size of the screen could not be read, so attach --video draws no taps for this run']);
+      }
     });
 
     it('keeps full speed and marks nothing in a run of --all, as the nightly suite runs, or with --no-video', async () => {
