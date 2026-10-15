@@ -193,7 +193,7 @@ export class Session extends BaseResource implements SessionResource {
 
       return result;
     } catch (error) {
-      // An HTTP response means we reached FAPI, so navigator.onLine was wrong; surface the real error.
+      // If FAPI fetch fails and the browser is offline after retries, throw ClerkOfflineError
       if (!isClerkAPIResponseError(error) && !isValidBrowserOnline()) {
         throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
       }
