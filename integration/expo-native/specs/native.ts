@@ -34,6 +34,8 @@ export function nativeAuth(screen: Screen, platform: string) {
     passwordLabel: screen.getByText('Enter your password'),
     passwordField: screen.getByRole('textbox').last(),
     passwordContinue: ios ? screen.getByTestId('clerk.auth.signIn.continue') : screen.getByText('Continue'),
+    codeScreen: ios ? screen.getByTestId('clerk.auth.signIn.code') : screen.getByText('Check your email'),
+    codeField: ios ? screen.getByTestId('clerk.auth.signIn.code') : screen.getByRole('textbox').last(),
   };
 }
 

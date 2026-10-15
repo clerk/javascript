@@ -22,7 +22,7 @@ Preconditions:
 
 - The spec seeds a `+clerk_test` user and signs in with a ticket (`host.launch({ signedInAs })`).
 
-- **User button and profile.** Run `integration/expo-native/bin/control-clerk-expo run user-button-and-profile --platform ios`, and again with `--platform android`. The first test launches signed in. The launch lands on the home only when it shows the seeded user's email and user ID and a session ID. The test taps the UserButton, expects `Manage account`, taps it, and expects the user's email. Screenshots `user-button-profile` and `profile`.
+- **User button and profile.** Run `integration/expo-native/bin/control-clerk-expo run user-button-and-profile/profile --platform ios`, and again with `--platform android`. The first test launches signed in. The launch lands on the home only when it shows the seeded user's email and user ID and a session ID. The test taps the UserButton, expects `Manage account`, taps it, and expects the user's email. Screenshots `user-button-profile` and `profile`.
 - **Home sign-out.** The second test launches signed in, taps `Sign out`, and expects the home to show `Signed out`, no user ID, no session ID, and the `Sign in` button. Screenshot `signed-out`.
 - **Embedded profile and `onHostBack`.** Run `integration/expo-native/bin/control-clerk-expo run user-button-and-profile/embedded-profile --platform ios`, and again with `--platform android`. The first test launches signed in, taps `Embedded profile` on the home, and expects `Manage account`. It taps `Manage account`, expects the user's email, taps Back, and expects the root of the profile. It taps Back again and expects the home to show the same user, with no profile left. Screenshots `embedded-profile` and `closed-home`.
 - **Custom page.** The second test taps the `E2E Custom Page` row and expects the text `Rehosted RN body`. It leaves the page with Back on iOS and the device's back button on Android, expects the root of the profile, taps Back, and expects the home.
@@ -31,7 +31,7 @@ Preconditions:
 ## Gotchas
 
 - The UserButton is `clerk.userButton.profile` on iOS and the accessibility label `Open user profile` on Android (`nativeUserButton` in `specs/native.ts`).
-- Profile rows have no stable identifier on Android, and the iOS rows are inside a sheet, so the specs find them by text (`Manage account`, `Sign out`).
+- Profile rows have no stable identifier on Android, and on iOS the profile that the UserButton opens is inside a sheet, so the specs find the rows by text (`Manage account`, `Sign out`).
 - A seeded user has no name, so the profile header shows only the avatar. The email appears under `Manage account`.
 - Open the profile from the UserButton, as a user does. The `embeddedProfile` screen is for what only an inline UserProfileView has: `onHostBack` and custom pages.
 - Tap the profile's Back button with `tapProfileBack` from `specs/native.ts`, which taps the middle of its frame. On Android the label `Back` is on a group that holds the button, and `locator.tap()` on it fails with "no parent-owned touch point".
