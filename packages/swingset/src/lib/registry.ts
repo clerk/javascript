@@ -226,6 +226,13 @@ import {
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
 import {
+  Default as RadioDefault,
+  Descriptions as RadioDescriptions,
+  meta as radioMeta,
+  Sizes as RadioSizes,
+  States as RadioStates,
+} from '../stories/radio.stories';
+import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
   BackupCodeError as ReverificationBackupCodeError,
@@ -619,6 +626,13 @@ const profileComponentModule: StoryModule = {
   Default: ProfileDefault,
   Customized: ProfileCustomized,
   Transitions: ProfileTransitions,
+};
+const radioModule: StoryModule = {
+  meta: radioMeta,
+  Default: RadioDefault,
+  Descriptions: RadioDescriptions,
+  States: RadioStates,
+  Sizes: RadioSizes,
 };
 
 const dataListModule: StoryModule = {
@@ -1056,6 +1070,7 @@ export const registry: StoryModule[] = [
   panelModule,
   popoverComponentModule,
   profileComponentModule,
+  radioModule,
   sectionModule,
   segmentedControlModule,
   selectComponentModule,

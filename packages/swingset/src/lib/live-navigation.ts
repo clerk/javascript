@@ -14,24 +14,28 @@ type LiveSidebarGroup = {
   categories: Array<{ category: string; components: LiveSidebarEntry[] }>;
 };
 
-const liveRoutes = new Map([
-  ['/user-profile/user-profile-api-keys-panel', '/live/api-keys'],
-  ['/user-profile/user-profile-profile-section', '/live/profile'],
-  ['/user-profile/user-profile-email-section', '/live/email'],
-  ['/user-profile/user-profile-phone-section', '/live/phone'],
-  ['/user-profile/user-profile-password-section', '/live/password'],
-  ['/user-profile/user-profile-active-devices-section', '/live/active-devices'],
-  ['/user-profile/user-profile-mfa-section', '/live/mfa'],
-  ['/user-profile/user-profile-connected-accounts-section', '/live/connected-accounts'],
-  ['/user-profile/user-profile-enterprise-accounts-section', '/live/enterprise-accounts'],
-  ['/user-profile/user-profile-danger-section', '/live/user-danger'],
-  ['/organization-profile/organization-profile-general-panel', '/live/organization-general'],
-  ['/organization-profile/organization-profile-members-panel', '/live/organization-members'],
-  ['/organization-profile/organization-profile-api-keys-panel', '/live/api-keys'],
-  ['/organization-profile/organization-profile-danger-section', '/live/organization-danger'],
-  ['/user-profile/user-profile-passkeys-section', '/live/passkeys'],
-  ['/user-profile/user-profile-web3wallets-section', '/live/web3-wallets'],
-  ['/reverification/reverification', '/live/reverification'],
+const livePages = new Set([
+  '/user-profile/user-profile-profile-panel',
+  '/user-profile/user-profile-security-panel',
+  '/user-profile/user-profile-api-keys-panel',
+  '/user-profile/user-profile-profile-section',
+  '/user-profile/user-profile-email-section',
+  '/user-profile/user-profile-phone-section',
+  '/user-profile/user-profile-password-section',
+  '/user-profile/user-profile-active-devices-section',
+  '/user-profile/user-profile-mfa-section',
+  '/user-profile/user-profile-connected-accounts-section',
+  '/user-profile/user-profile-enterprise-accounts-section',
+  '/user-profile/user-profile-danger-section',
+  '/organization-profile/organization-profile-general-panel',
+  '/organization-profile/organization-profile-members-panel',
+  '/organization-profile/organization-profile-api-keys-panel',
+  '/organization-profile/organization-profile-profile-section',
+  '/organization-profile/organization-profile-danger-section',
+  '/user-profile/user-profile-passkeys-section',
+  '/user-profile/user-profile-web3wallets-section',
+  '/api-keys/api-keys-table',
+  '/reverification/reverification',
 ]);
 
 const inventoriedGroups = new Set(['User Profile', 'Organization Profile']);
@@ -49,17 +53,16 @@ export function getLiveSidebarGroups(): LiveSidebarGroup[] {
       const liveComponents: LiveSidebarEntry[] = [];
 
       for (const component of categoryComponents) {
-        const key = `/${groupSlug}/${component.componentSlug}`;
-        const href = liveRoutes.get(key);
-        if (href) {
+        const path = `/${groupSlug}/${component.componentSlug}`;
+        if (livePages.has(path)) {
           liveComponents.push({
             ...component,
-            href,
+            href: `/live${path}`,
             status: component.mod.meta.status,
             substatus: component.mod.meta.substatus,
           });
         } else if (inventoriedGroups.has(group) && inventoriedCategories.has(category)) {
-          liveComponents.push({ ...component, href: `${LIVE_TODO_PREFIX}${key}`, status: 'todo' });
+          liveComponents.push({ ...component, href: `${LIVE_TODO_PREFIX}${path}`, status: 'todo' });
         }
       }
 
