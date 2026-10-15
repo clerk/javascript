@@ -1,11 +1,12 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import { isValidBrowserOnline } from '@clerk/shared/browser';
 import {
   ClerkOfflineError,
   ClerkRuntimeError,
   ClerkWebAuthnError,
   is4xxError,
   is429Error,
+  isClerkAPIResponseError,
   MissingExpiredTokenError,
 } from '@clerk/shared/error';
 import {
@@ -192,8 +193,8 @@ export class Session extends BaseResource implements SessionResource {
 
       return result;
     } catch (error) {
-      // If the browser is offline after retries, throw ClerkOfflineError
-      if (!isValidBrowserOnline()) {
+      // An HTTP response means we reached FAPI, so navigator.onLine was wrong; surface the real error.
+      if (!isClerkAPIResponseError(error) && !isValidBrowserOnline()) {
         throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
       }
       throw error;
@@ -473,8 +474,6 @@ export class Session extends BaseResource implements SessionResource {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       result = cachedToken.getRawString() || null;
-    } else if (!isBrowserOnline()) {
-      throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
     } else {
       result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
     }
