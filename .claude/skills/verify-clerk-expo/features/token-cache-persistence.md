@@ -26,7 +26,7 @@ Preconditions:
 ## Gotchas
 
 - `keepStorage: true` reuses the previous launch's `verifyStorageScope`. Without it, the test app clears Clerk's stored client on launch, so the relaunch would start signed out.
-- On iOS the test app clears every generic-password keychain item the test app owns when the scope changes, not only Clerk's.
+- When the scope changes, the test app clears more than Clerk's own storage. On iOS it clears every generic-password keychain item the test app owns. On Android it deletes the `clerk_preferences` and `SecureStore` SharedPreferences files, so every `expo-secure-store` item goes.
 - The home alone does not prove the JS token cache. Native storage could restore the session and sync it to JS, and the home would look the same. The `Token cache` screen shows what the JS cache itself held.
 - The test app reads the cache once, when the app starts and before Clerk has loaded, and the `Token cache` screen shows that answer whenever the home opens it. Do not read the cache again after Clerk loads. A signed-out client stores a client token of its own by then, so the text would say `yes` on a new scope.
 - A launch with no `signedInAs` that keeps storage needs `landsOn`, because only the spec knows that it expects a signed-in home.
