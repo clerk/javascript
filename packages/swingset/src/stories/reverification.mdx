@@ -26,7 +26,7 @@ import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/re
 const [runAction, reverification] = useReverificationFlow(action);
 
 <Card.Root renderBranding={false}>
-  <Reverification {...reverification} />
+  <Reverification controller={reverification} />
 </Card.Root>;
 ```
 
@@ -67,7 +67,7 @@ The parent decides what cancelling means for its own flow. Pass `onClose` to `<R
 
 ```tsx
 <Reverification
-  {...reverification}
+  controller={reverification}
   onClose={() => closeDialog()}
 />
 ```

@@ -22,11 +22,12 @@ export function useReverificationFlow<F extends ReverificationFetcher = Reverifi
   return [wrappedFetcher, controller];
 }
 
-export type ReverificationProps = ReverificationController & {
+export interface ReverificationProps {
+  controller: ReverificationController;
   onClose?: () => void;
-};
+}
 
-export function Reverification({ onClose, ...controller }: ReverificationProps) {
+export function Reverification({ controller, onClose }: ReverificationProps) {
   if (controller.status === 'idle') {
     return null;
   }

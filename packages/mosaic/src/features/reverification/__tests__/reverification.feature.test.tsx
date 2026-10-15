@@ -142,7 +142,7 @@ function Host({ action }: { action: () => Promise<unknown> }) {
       <output aria-label='Outcome'>{outcome}</output>
       {running ? (
         <Card.Root renderBranding={false}>
-          <Reverification {...reverification} />
+          <Reverification controller={reverification} />
           {reverification.onCancel ? (
             <button
               type='button'
@@ -183,7 +183,7 @@ function HoldingHost({ action }: { action: () => Promise<unknown> }) {
       <output aria-label='Outcome'>{outcome}</output>
       <output aria-label='Visible'>{String(reverification.visible)}</output>
       <Card.Root renderBranding={false}>
-        <Reverification {...reverification} />
+        <Reverification controller={reverification} />
         {reverification.onCancel ? (
           <button
             type='button'
