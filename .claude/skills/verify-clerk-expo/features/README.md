@@ -16,7 +16,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 
 - **Emails.** Any address that contains `+clerk_test@` is a test address. Clerk sends no mail and accepts the code below. `host.newEmail()` and `host.seedUser()` mint an address such as `maya.7c1e+clerk_test@example.com`, a first name and the run tag, new for each test of the run.
 - **One-time code.** `424242` verifies every email code for a test address. Specs use the constant `CLERK_TEST_CODE`.
-- **Passwords.** The standard settings require a password at sign-up. Fill it with `runPassword(host.runId)` from `specs/support/clerk.ts`, such as `Otter-Lamp-3f9c`. For a password sign-in, seed the user with `host.seedUser({ password: true })` and fill the field with `host.fill(field, user.password!)`.
+- **Passwords.** The standard settings require a password at sign-up. Fill it with `runPassword(host.runId)` from `specs/support/clerk.ts`, such as `Otter-Lamp-3917`. For a password sign-in, seed the user with `host.seedUser({ password: true })` and fill the field with `host.fill(field, user.password!)`.
 
 | Step                                        | Native AuthView (iOS identifier)                                | Custom flow (test app testID)                                          |
 | ------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------- |
