@@ -175,12 +175,12 @@ describe('parseE2EReport', () => {
     assert.throws(() => parseE2EReport({ schemaVersion: 'report-2', run: { results: [] } }, [], '/x' as EvidencePath), { code: 'E2E_CRASHED' });
   });
 
-  it('copies app.screenshot artifacts under their labels, a later group replacing an earlier one with the same label', () => {
+  it('copies app.screenshot artifacts under their labels with the test that took each, a later group replacing an earlier one with the same label', () => {
     const dir = mkdtempSync(join(tmpdir(), 'verify-shots-')) as EvidencePath;
     for (const [index, bytes] of [[0, 'first'], [1, 'second']] as const) {
       mkdirSync(join(e2eOutputDir(dir, index), 'artifacts', 'ios/x/attempt-0/screenshots'), { recursive: true });
       writeFileSync(join(e2eOutputDir(dir, index), 'artifacts', 'ios/x/attempt-0/screenshots/001-auth.png'), bytes);
-      assert.deepEqual(collectScreenshots(report, dir, e2eOutputDir(dir, index)), [{ label: 'auth', path: join(dir, 'screenshots', 'auth.png') }]);
+      assert.deepEqual(collectScreenshots(report, dir, e2eOutputDir(dir, index)), [{ label: 'auth', path: join(dir, 'screenshots', 'auth.png'), test: { spec: 'specs/features/auth-start/opens.e2e.ts', title: 'opens' } }]);
       assert.equal(readFileSync(join(dir, 'screenshots', 'auth.png'), 'utf8'), bytes);
     }
   });
