@@ -55,5 +55,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "deprecated": "This package is no longer supported. Please import types from @clerk/shared/types instead. See the upgrade guide for more info: https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3"
 }
