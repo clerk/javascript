@@ -16,7 +16,7 @@ import type { IconName } from '../../icons/registry';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
-import { themeProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
@@ -1060,7 +1060,14 @@ export function SwitcherTrigger({
       />
       {renderTriggerLabel ? (
         <>
-          <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
+          <span
+            {...mergeStyleProps(
+              themeProps(slot('trigger-label')),
+              stylex.props(styles.triggerName, truncationStyles.singleLine),
+            )}
+          >
+            {name}
+          </span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
           <Icon
             name='chevron-down'
