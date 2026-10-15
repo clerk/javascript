@@ -226,6 +226,7 @@ import {
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
+import { Default as RevealDefault, meta as revealMeta } from '../stories/reveal.component.stories';
 import {
   Default as RadioDefault,
   Descriptions as RadioDescriptions,
@@ -642,6 +643,8 @@ const radioModule: StoryModule = {
   States: RadioStates,
   Sizes: RadioSizes,
 };
+
+const revealModule: StoryModule = { meta: revealMeta, Default: RevealDefault };
 
 const dataListModule: StoryModule = {
   meta: dataListMeta,
@@ -1088,6 +1091,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   radioModule,
+  revealModule,
   sectionModule,
   segmentedControlModule,
   selectComponentModule,
