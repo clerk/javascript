@@ -1,5 +1,6 @@
 'use client';
 
+import { OrganizationProfileProvider } from '@clerk/mosaic/features/organization-profile/organization-profile.provider';
 import { OrganizationProfileDangerSection } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useOrganization, useUser } from '@clerk/nextjs';
@@ -34,7 +35,11 @@ export default function OrganizationDangerLivePage() {
         {isLoaded && isSignedIn && !organization ? (
           <p className='text-muted-foreground text-sm'>Pick an active organization to see its danger zone.</p>
         ) : null}
-        {isLoaded && isSignedIn ? <OrganizationProfileDangerSection afterLeaveOrganizationUrl='/live' /> : null}
+        {isLoaded && isSignedIn ? (
+          <OrganizationProfileProvider afterLeaveOrganizationUrl='/live'>
+            <OrganizationProfileDangerSection />
+          </OrganizationProfileProvider>
+        ) : null}
       </div>
     </MosaicProvider>
   );

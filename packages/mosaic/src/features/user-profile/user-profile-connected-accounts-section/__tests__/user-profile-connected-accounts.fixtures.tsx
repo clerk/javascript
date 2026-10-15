@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react';
 import type userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
 
 import { type FakeFapiSeed, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
@@ -12,7 +11,7 @@ import {
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
-import { UserProfileProfilePanelView } from '../../user-profile-profile-panel.view';
+import { UserProfileProfilePanel } from '../../user-profile-profile-panel';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 
 export const google = fapiExternalAccount({ id: 'idn_google', provider: 'google', username: 'jdoe' });
@@ -65,11 +64,10 @@ export function deferred<T>() {
 
 export async function renderSection(accounts = [google], overrides: FakeFapiSeed = {}) {
   const fapi = serveFapi(signedIn(accounts, overrides));
-  const titleRef = createRef<HTMLDivElement>();
   const view = await renderWithClerk(
-    <UserProfileProfilePanelView titleRef={titleRef}>
-      <UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />
-    </UserProfileProfilePanelView>,
+    <UserProfileProfilePanel>
+      <UserProfileConnectedAccountsSection />
+    </UserProfileProfilePanel>,
   );
   return { ...view, fapi };
 }

@@ -24,12 +24,10 @@ export function useConnectedAccountsFixture({
   initialAccounts = [connectedAccount],
   providers: initialProviders = connectionProviders,
   removalState,
-  fallbackFocus,
 }: {
   initialAccounts?: UserProfileConnectedAccount[];
   providers?: UserProfileConnectionProvider[];
   removalState?: 'pending' | 'error';
-  fallbackFocus?: () => HTMLElement | null;
 } = {}) {
   const [hasRemovalFailed, setHasRemovalFailed] = useState(false);
   const seed = useChaosFixture(initialAccounts, items =>
@@ -48,7 +46,6 @@ export function useConnectedAccountsFixture({
   return useUserProfileConnectedAccountsController({
     accounts,
     availableProviders,
-    fallbackFocus,
     // eslint-disable-next-line @typescript-eslint/require-await
     onConnect: async (id: string) => {
       const provider = providers.find(item => item.id === id);

@@ -1,4 +1,4 @@
-import { type ReactNode, useRef } from 'react';
+import type { ReactNode } from 'react';
 
 import { UserProfileConnectedAccountsSection } from './user-profile-connected-accounts-section/user-profile-connected-accounts-section';
 import { UserProfileDangerSection } from './user-profile-danger-section/user-profile-danger-section';
@@ -14,19 +14,16 @@ export interface UserProfileProfilePanelProps {
 }
 
 export function UserProfileProfilePanel({ children }: UserProfileProfilePanelProps) {
-  const titleRef = useRef<HTMLDivElement>(null);
-  const focusTitle = () => titleRef.current;
-
   return (
-    <UserProfileProfilePanelView titleRef={titleRef}>
+    <UserProfileProfilePanelView>
       {children ?? (
         <>
           <UserProfileProfileSection />
           <UserProfileEmailSection />
           <UserProfilePhoneSection />
-          <UserProfileConnectedAccountsSection fallbackFocus={focusTitle} />
+          <UserProfileConnectedAccountsSection />
           <UserProfileEnterpriseAccountsSection />
-          <UserProfileWeb3WalletsSection fallbackFocus={focusTitle} />
+          <UserProfileWeb3WalletsSection />
           <UserProfileDangerSection />
         </>
       )}
