@@ -8,6 +8,7 @@ import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
 import { BaseResource, Organization, Session } from '../internal';
+import { SessionWithActivities } from '../SessionWithActivities';
 
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
@@ -29,6 +30,32 @@ describe('Session', () => {
   afterEach(() => {
     SessionTokenCache.clear();
     vi.useRealTimers();
+  });
+
+  it.each([
+    { expire_at: 0, abandon_at: 0 },
+    { expire_at: 2000000000000, abandon_at: 2000000000000 },
+    { expire_at: 0, abandon_at: 2000000000000 },
+    { expire_at: 2000000000000, abandon_at: 0 },
+  ])('preserves session deadlines $expire_at and $abandon_at through snapshots', deadlines => {
+    const session = new Session({
+      id: 'session_lifetime',
+      status: 'active',
+      ...deadlines,
+      public_user_data: { user_id: 'user_1' },
+    } as SessionJSON);
+    expect(session.expireAt.getTime()).toBe(deadlines.expire_at);
+    expect(session.abandonAt.getTime()).toBe(deadlines.abandon_at);
+
+    const snapshot = session.__internal_toSnapshot();
+    expect(snapshot).toMatchObject(deadlines);
+    const restored = new Session(snapshot);
+    expect(restored.expireAt.getTime()).toBe(deadlines.expire_at);
+    expect(restored.abandonAt.getTime()).toBe(deadlines.abandon_at);
+
+    const withActivities = new SessionWithActivities({ id: session.id, ...deadlines } as any, '/me/sessions');
+    expect(withActivities.expireAt.getTime()).toBe(deadlines.expire_at);
+    expect(withActivities.abandonAt.getTime()).toBe(deadlines.abandon_at);
   });
 
   describe('getToken()', () => {
