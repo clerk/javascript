@@ -2,7 +2,7 @@ name: Nightly upstream tests
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 7 * * *"
+    - cron: '0 7 * * *'
 
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ["nextjs"]
+        test-name: ['nextjs']
 
     steps:
       - name: Checkout Repo
@@ -24,7 +24,7 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Setup
@@ -35,7 +35,14 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true
+
+      - name: Setup Playwright
+        id: playwright
+        background: true
+        uses: ./.github/actions/setup-playwright
+        with:
+          cache-enabled: true
+          cache-provider: github
 
       - name: Build packages
         run: pnpm turbo build $TURBO_ARGS --only
@@ -44,6 +51,8 @@ jobs:
         run: pkglab pub --force
 
       - name: Install @clerk/clerk-js in os temp
+        id: install-clerk-js
+        background: true
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
@@ -51,6 +60,8 @@ jobs:
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
+        id: install-clerk-ui
+        background: true
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
@@ -63,6 +74,9 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           RUN_ATTEMPT: ${{ github.run_attempt }}
           TEST_NAME: ${{ matrix.test-name }}
+
+      - name: Wait for integration test dependencies
+        wait: [playwright, install-clerk-js, install-clerk-ui]
 
       - name: Run Integration Tests
         id: integration_tests
@@ -84,10 +98,10 @@ jobs:
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           # Don't set E2E_CLERK_JS_VERSION - let it use '*' (via linkPackage)
           # which resolves via pkglab add in the integration test setup
-          E2E_NEXTJS_VERSION: "canary"
-          E2E_NPM_FORCE: "true"
-          E2E_REACT_DOM_VERSION: "19.2.3"
-          E2E_REACT_VERSION: "19.2.3"
+          E2E_NEXTJS_VERSION: 'canary'
+          E2E_NPM_FORCE: 'true'
+          E2E_REACT_DOM_VERSION: '19.2.3'
+          E2E_REACT_VERSION: '19.2.3'
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
 
       # Print error logs for immediate visibility in CI
@@ -117,6 +131,7 @@ jobs:
 
       # Upload test artifacts if tests failed
       - name: Upload Test Artifacts
+        background: true
         if: steps.integration_tests.outputs.exit_code != '0'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -128,9 +143,10 @@ jobs:
           retention-days: 7
 
       - name: Delete integration-test resources
+        background: true
         if: ${{ always() && steps.integration_tests.outcome != 'skipped' }}
         timeout-minutes: 4
-        run: pnpm test:integration:cleanup
+        run: pnpm test:integration:cleanup --output "$RUNNER_TEMP/cleanup-test-results"
         env:
           CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -140,8 +156,8 @@ jobs:
         uses: ravsamhq/notify-slack-action@4ed28566c2bdcdaee6dca2b46b9666d01b4ed8a4 # v1
         with:
           status: ${{ steps.integration_tests.outputs.exit_code == '0' && 'success' || 'failure' }}
-          notify_when: "failure"
-          notification_title: "Integration Test Failure - ${{ matrix.test-name }}"
+          notify_when: 'failure'
+          notification_title: 'Integration Test Failure - ${{ matrix.test-name }}'
           message_format: |
             *Job:* ${{ github.workflow }} (${{ matrix.test-name }})
             *Status:* ${{ steps.integration_tests.outputs.exit_code == '0' && 'Success' || 'Failed' }}

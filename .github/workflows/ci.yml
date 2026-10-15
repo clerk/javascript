@@ -65,6 +65,8 @@ jobs:
           show-progress: false
 
       - name: Fetch main branch for changeset comparison
+        id: fetch-main
+        background: true
         run: git fetch origin main:refs/remotes/origin/main --depth=100
 
       - name: Setup
@@ -77,22 +79,33 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Verify lockfile is deduped
+        background: true
         run: pnpm dedupe --check
 
       - name: Check Formatting
+        background: true
         run: pnpm format:check
 
       - name: Check Dashboard links
+        background: true
         run: pnpm lint:dashboard-links
 
       - name: Verify localizations are generated
+        background: true
         run: |
-          pnpm --filter @clerk/localizations generate
-          if ! git diff --quiet -- packages/localizations/src; then
+          CHECK_DIR=$(mktemp -d)
+          trap 'rm -rf "$CHECK_DIR"' EXIT
+          cp -R packages/localizations/src "$CHECK_DIR/src"
+          cp packages/localizations/package.json packages/localizations/tsconfig.generate.json prettier.config.mjs "$CHECK_DIR/"
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$CHECK_DIR/node_modules"
+          pnpm --dir "$CHECK_DIR" run generate
+          if ! diff -ru packages/localizations/src "$CHECK_DIR/src"; then
             echo "::error::Localization files are out of date. Run 'pnpm --filter @clerk/localizations generate' and commit the result."
-            git --no-pager diff -- packages/localizations/src
             exit 1
           fi
+
+      - name: Wait for changeset base
+        wait: fetch-main
 
       - name: Require Changeset
         if: ${{ github.event_name != 'merge_group' && github.event.pull_request.draft == false }}
@@ -227,14 +240,8 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Lint packages using publint
-        run: pnpm turbo lint:publint $TURBO_ARGS
-
-      - name: Lint types using attw
-        run: pnpm turbo lint:attw $TURBO_ARGS
-
-      - name: Run lint
-        run: pnpm turbo lint $TURBO_ARGS
+      - name: Run ESLint, publint, and attw
+        run: pnpm turbo lint lint:publint lint:attw $TURBO_ARGS
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -292,24 +299,15 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
-      - name: Run tests in packages
+      - name: Run package and TypeDoc tests
         run: |
-          TURBO_ARGS=$(sed -E 's/--concurrency=[0-9]+/--concurrency=1/' <<< "$TURBO_ARGS")
-          if [ "${{ matrix.test-filter }}" = "**" ]; then
-            echo "Running full test suite on Node ${{ matrix.node-version }}"
+          TURBO_ARGS=$(sed -E 's/--concurrency=[0-9]+/--concurrency=2/' <<< "$TURBO_ARGS")
+          if [ "${{ matrix.node-version }}" = "24.15.0" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
+            pnpm turbo test //#test:typedoc:ci $TURBO_ARGS
+          elif [ "${{ matrix.test-filter }}" = "**" ]; then
             pnpm turbo test $TURBO_ARGS
           else
-            echo "Running tests: ${{ matrix.filter-label }}"
             pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
-          fi
-        env:
-          NODE_VERSION: ${{ matrix.node-version }}
-
-      - name: Run Typedoc tests
-        run: |
-          # Only run Typedoc tests for one matrix version and main test run
-          if [ "${{ matrix.node-version }}" == "24.15.0" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
-            pnpm turbo run //#test:typedoc
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -348,13 +346,23 @@ jobs:
         uses: ./.github/actions/init-blacksmith
         with:
           cache-enabled: true
-          playwright-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Setup Playwright
+        id: playwright
+        background: true
+        uses: ./.github/actions/setup-playwright
+        with:
+          cache-enabled: true
+          cache-provider: blacksmith
+
       - name: Build Mosaic and its dependencies
         run: pnpm turbo build $TURBO_ARGS --filter=@clerk/mosaic...
+
+      - name: Wait for Playwright
+        wait: playwright
 
       - name: Run feature tests
         run: pnpm --filter @clerk/mosaic test:feature
@@ -447,7 +455,14 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          playwright-enabled: true
+
+      - name: Setup Playwright
+        id: playwright
+        background: true
+        uses: ./.github/actions/setup-playwright
+        with:
+          cache-enabled: true
+          cache-provider: blacksmith
 
       - name: Verify jq is installed
         shell: bash
@@ -507,6 +522,8 @@ jobs:
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/clerk-js in os temp
+        id: install-clerk-js
+        background: true
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
@@ -514,6 +531,8 @@ jobs:
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
+        id: install-clerk-ui
+        background: true
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
@@ -562,6 +581,9 @@ jobs:
           TEST_PROJECT: ${{ matrix.test-project }}
           NEXT_VERSION: ${{ matrix.next-version }}
 
+      - name: Wait for integration test dependencies
+        wait: [playwright, install-clerk-js, install-clerk-ui]
+
       - name: Run Integration Tests
         id: integration-tests
         timeout-minutes: 25
@@ -595,6 +617,7 @@ jobs:
           TEST_NAME: ${{ matrix.test-name }}
 
       - name: Upload test-results
+        background: true
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -605,7 +628,7 @@ jobs:
       - name: Delete integration-test users
         if: ${{ always() && steps.integration-tests.outcome != 'skipped' }}
         timeout-minutes: 10
-        run: pnpm test:integration:cleanup
+        run: pnpm test:integration:cleanup --output "$RUNNER_TEMP/cleanup-test-results"
         env:
           CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
           CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}

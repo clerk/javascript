@@ -28,19 +28,30 @@ jobs:
       contents: read # checkout the trusted base labeler config
       pull-requests: write # apply labels
     steps:
+      - name: Check out trusted labeler config
+        id: labeler-config
+        background: true
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          sparse-checkout: .github/labeler.yml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Download PR number
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: pr-number
+          path: ${{ runner.temp }}/labeler-pr
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Resolve and verify PR number
         id: pr
+        env:
+          PR_NUMBER_FILE: ${{ runner.temp }}/labeler-pr/number
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const fs = require('fs');
-            const raw = fs.readFileSync('number', 'utf8').trim();
+            const raw = fs.readFileSync(process.env.PR_NUMBER_FILE, 'utf8').trim();
             if (!/^[0-9]+$/.test(raw)) {
               return core.setFailed(`Invalid PR number from artifact: '${raw}'`);
             }
@@ -63,12 +74,9 @@ jobs:
               return core.setFailed(`PR #${raw} head repo ${prHeadRepo} does not match triggering run head repo ${runHeadRepo}`);
             }
             core.setOutput('number', raw);
-      - name: Check out trusted labeler config
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          sparse-checkout: .github/labeler.yml
-          sparse-checkout-cone-mode: false
-          persist-credentials: false
+      - name: Wait for labeler configuration
+        wait: labeler-config
+
       - uses: actions/labeler@b8dd2d9be0f68b860e7dae5dae7d772984eacd6d # v6
         with:
           pr-number: ${{ steps.pr.outputs.number }}
