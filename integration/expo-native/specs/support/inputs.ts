@@ -33,6 +33,7 @@ export interface Inputs {
   readonly target: Target;
   readonly clerk: ClerkInstance;
   readonly run: RunId;
+  readonly evidenceMarks: string | null;
 }
 
 export interface TestApp {
@@ -54,6 +55,7 @@ const NAMES = {
   apiUrl: 'CLERK_E2E_API_URL',
   apiTokenFile: 'CLERK_E2E_API_TOKEN_FILE',
   run: 'CLERK_E2E_RUN_ID',
+  evidenceMarks: 'CLERK_E2E_EVIDENCE_MARKS',
 } as const;
 
 export const INPUT_VARIABLES: readonly string[] = Object.values(NAMES);
@@ -148,6 +150,8 @@ export function readRun(env: Env): RunId {
   return named;
 }
 
+export const readEvidenceMarks = (env: Env): string | null => given(env, NAMES.evidenceMarks);
+
 export function inputsEnv(inputs: Inputs): Readonly<Record<string, string>> {
   const { target, clerk } = inputs;
   return {
@@ -162,5 +166,6 @@ export function inputsEnv(inputs: Inputs): Readonly<Record<string, string>> {
       ? { [NAMES.secretKey]: clerk.access.key.use('test-process-environment', (plain) => plain) }
       : { [NAMES.apiUrl]: clerk.access.url, [NAMES.apiTokenFile]: clerk.access.tokenFile }),
     [NAMES.run]: inputs.run,
+    ...(inputs.evidenceMarks === null ? {} : { [NAMES.evidenceMarks]: inputs.evidenceMarks }),
   };
 }

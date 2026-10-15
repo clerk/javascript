@@ -91,6 +91,12 @@ fs.appendFileSync('order.log', 'e2e opens the app with no arguments\\n');
       const ready = await fetch(process.env.CLERK_E2E_API_URL + '/about_to_launch', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
       launchRefused = ready.ok ? null : (await ready.json()).errors[0].long_message;
       fs.appendFileSync('order.log', (launchRefused === null ? 'launches for ' : 'does not launch for ') + path.basename(file) + '\\n');
+      const marks = process.env.CLERK_E2E_EVIDENCE_MARKS;
+      if (marks !== undefined) {
+        const at = Date.now();
+        fs.appendFileSync(marks, JSON.stringify({ label: 'shows ' + path.basename(file), startedAt: at, endedAt: at + 1500, passed: true }) + '\\n');
+        fs.appendFileSync('order.log', 'marks the evidence of ' + path.basename(file) + '\\n');
+      }
     }
     if (plan.retriesTheOpen) {
       const again = await fetch(process.env.CLERK_E2E_API_URL + '/about_to_launch', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
@@ -314,6 +320,27 @@ describe('a run whose spec files declare different settings', () => {
       await runVerb({ ...r.deps, runner: refusing }, { ...RUN_ALL, video: true });
       assert.deepEqual(r.order(), ['e2e opens the app with no arguments', 'recorder starts', 'launches for auth-start.e2e.ts']);
       assert.deepEqual(r.videoLines(), ['video   the app could not be closed before the recording, so the video may open on the screen it was showing: DEVICE_IN_USE']);
+    });
+
+    it('paces a run that names its specs and records a video, and keeps what host.evidence marked in seconds of that video', async () => {
+      const r = recorded({ launches: true });
+      const { record } = await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
+      assert.deepEqual(r.order(), ['e2e opens the app with no arguments', r.close, 'recorder starts', 'launches for auth-start.e2e.ts', 'marks the evidence of auth-start.e2e.ts']);
+      assert.deepEqual(r.videoLines(), ['video   paced for a reviewer to follow; a run with --no-video, or with --all, keeps full speed']);
+      const [span, ...others] = record.evidenceSpans ?? [];
+      assert.deepEqual(others, []);
+      assert.equal(span?.label, 'shows auth-start.e2e.ts');
+      assert.ok(span !== undefined && span.from >= 0 && span.from < 5 && Math.abs(span.to - span.from - 1.5) < 0.01, JSON.stringify(span));
+    });
+
+    it('keeps full speed and marks nothing in a run of --all, as the nightly suite runs, or with --no-video', async () => {
+      for (const command of [{ ...RUN_ALL, video: true }, { ...RUN_ALL, selection: { selectors: ['auth-start'] } }]) {
+        const r = recorded({ launches: true });
+        const { record } = await runVerb(r.deps, command);
+        assert.equal(r.order().some((line) => line.startsWith('marks')), false);
+        assert.deepEqual(r.videoLines(), []);
+        assert.deepEqual(record.evidenceSpans, []);
+      }
     });
 
     it('runs agent-device in its state folder, so a file it writes to its working folder stays out of the checkout', async () => {

@@ -64,7 +64,7 @@ describe('parseArgv', () => {
       media: { screenshots: [], video: true },
       before: 'r20261002-140000-0a1b',
     });
-    assert.deepEqual((parseArgv(['attach', 'r20261002-141210-7c1e', '--pr=7', '--video', '--screenshot', 'a']).command as Extract<Command, { verb: 'attach' }>).media, { screenshots: ['a'], video: true });
+    assert.deepEqual((parseArgv(['attach', 'r20261002-141210-7c1e', '--pr=7', '--video', '--screenshot', 'a', '--both']).command as Extract<Command, { verb: 'attach' }>).media, { screenshots: ['a'], video: true });
     assert.deepEqual(parseArgv(['down', '--stale', '--dry-run']).command, { verb: 'down', stale: true, dryRun: true });
   });
 
@@ -73,9 +73,16 @@ describe('parseArgv', () => {
     assert.equal(neither.message, '{cli} attach posts what you choose and nothing by default: screenshots show a still change such as wording, and the video shows behavior, movement or a flow');
     assert.equal(
       neither.fix,
-      '{cli} attach <run-id> --pr <n> --screenshot <label> [--screenshot <label>]..., or {cli} attach <run-id> --pr <n> --video; add --before <run-id> to either when the change is to something that already exists, and pass both flags only when one kind does not show the change',
+      '{cli} attach <run-id> --pr <n> --screenshot <label> [--screenshot <label>]..., or {cli} attach <run-id> --pr <n> --video; add --before <run-id> to either when the change is to something that already exists',
     );
     assert.equal(usageError(['attach', 'r20261002-141210-7c1e', '--pr', '412', '--before', 'r20261002-140000-0a1b']).message, neither.message);
+  });
+
+  it('posts one kind of evidence for a change, and both only when --both says the reviewer needs both', () => {
+    assert.equal(
+      usageError(['attach', 'r20261002-141210-7c1e', '--pr', '412', '--video', '--screenshot', 'a']).message,
+      'a change is shown by one video or by screenshots, not both: pass --video alone for a flow or behavior, or --screenshot alone for a still change; add --both only when the reviewer needs both to see the change',
+    );
   });
 
   it('reads --json on every verb', () => {

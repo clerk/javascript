@@ -111,7 +111,7 @@ export class VerifyFailure extends Error {
 
 export type DoctorCheckId =
   | 'node' | 'xcode' | 'jdk' | 'e2e-pins' | 'template' | 'proxy-trust'
-  | 'settings' | 'build' | 'gh-attach' | 'core-drift' | 'stale-claims' | 'lane-ports'
+  | 'settings' | 'build' | 'gh-attach' | 'video-cut' | 'core-drift' | 'stale-claims' | 'lane-ports'
   | 'instances' | 'clerk-api' | 'agent'
   | 'backend' | 'remote-env' | 'git-fetch' | 'git-push' | 'github-rest' | 'remote-commit' | 'tunnel-egress' | 'clerk-egress' | 'remote-sessions'
   | `live-${string}`;
@@ -337,6 +337,13 @@ export interface Screenshot {
   readonly test?: { readonly spec: string; readonly title: string };
 }
 
+export interface EvidenceSpan {
+  readonly label: string;
+  readonly from: number;
+  readonly to: number;
+  readonly passed: boolean;
+}
+
 export interface EvidenceRecord {
   readonly run: RunId;
   readonly startedAt: string;
@@ -351,6 +358,7 @@ export interface EvidenceRecord {
   readonly build: BuildKey;
   readonly results: readonly SpecResult[];
   readonly videos: readonly EvidencePath[];
+  readonly evidenceSpans?: readonly EvidenceSpan[];
   readonly screenshots: readonly Screenshot[];
   readonly appLog: EvidencePath | null;
   readonly e2eReport: EvidencePath;

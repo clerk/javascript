@@ -6,7 +6,8 @@ import { fileURLToPath } from 'node:url';
 import type { E2EConfig } from 'e2e';
 import { mobile, type DeviceProvider } from '@e2e-dev/mobile';
 import { readAgent } from './agent.ts';
-import type { Device, Target, TestApp } from './inputs.ts';
+import { EVIDENCE_PACE } from './evidence.ts';
+import { readEvidenceMarks, type Device, type Target, type TestApp } from './inputs.ts';
 import { Secret } from './secret.ts';
 
 export const ASSERTION_TIMEOUT_MS = 10_000;
@@ -48,7 +49,13 @@ export function composeE2EConfig(app: TestApp, target: Target, env: Env): E2ECon
     targets: [
       {
         name: target.platform,
-        engine: mobile({ platform: target.platform, device: engineDevice(target.device), session: target.session, videoTouches: false }),
+        engine: mobile({
+          platform: target.platform,
+          device: engineDevice(target.device),
+          session: target.session,
+          videoTouches: false,
+          ...(readEvidenceMarks(env) === null ? {} : { settle: EVIDENCE_PACE.settleMs }),
+        }),
         app: { bundleId: app.id(target.platform), appPath: target.build.path ?? undefined },
       },
     ],

@@ -48,6 +48,7 @@ describe('planE2E', () => {
       CLERK_E2E_API_URL: 'http://127.0.0.1:4010/v1',
       CLERK_E2E_API_TOKEN_FILE: '/package/.verify/scratch/r/broker-token',
       CLERK_E2E_RUN_ID: 'r20261002-141210-7c1e',
+      CLERK_E2E_EVIDENCE_MARKS: '/package/.verify/runs/r/evidence-marks.jsonl',
       AGENT_DEVICE_STATE_DIR: '/package/.verify/agent-device',
       E2E_TELEMETRY_DISABLED: '1',
     });

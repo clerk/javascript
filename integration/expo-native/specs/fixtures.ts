@@ -8,8 +8,9 @@ import { busyWaits, onceTheRunnerIsFree, type BusyWait } from './support/busy-ru
 import { aboutToLaunch, testUsers } from './support/clerk.ts';
 import { ASSERTION_TIMEOUT_MS, PACKAGE_DIR } from './support/config.ts';
 import { agentDevice, deviceCommand } from './support/device.ts';
+import { EVIDENCE_PACE, evidenceBlock } from './support/evidence.ts';
 import { fillField } from './support/fill.ts';
-import { readClerk, readRun, readTarget, type Target } from './support/inputs.ts';
+import { readClerk, readEvidenceMarks, readRun, readTarget, type Target } from './support/inputs.ts';
 import { appLauncher } from './support/launch.ts';
 import { redact } from './support/secret.ts';
 import { tapOnceUncovered } from './support/tapping.ts';
@@ -34,6 +35,7 @@ const CONFIRM_READS = 5;
 const ONLY_E2E_WORKER_SLOT = 0;
 
 const RUN = readRun(process.env);
+const EVIDENCE_MARKS = readEvidenceMarks(process.env);
 
 const AGENT_DEVICE = join(PACKAGE_DIR, 'node_modules', '.bin', 'agent-device');
 
@@ -104,6 +106,12 @@ export const test = base.extend<{ host: HostFixture }>({
       return on(app.signIn, 'the "Sign in" button on the home');
     }
 
+    const beat = async (control: Locator): Promise<void> => {
+      if (EVIDENCE_MARKS === null) return;
+      await control.waitFor({ timeout: ASSERTION_TIMEOUT_MS }).catch(() => undefined);
+      await sleep(EVIDENCE_PACE.beatMs);
+    };
+
     const tap = (control: Locator, busy: BusyWait): Promise<void> =>
       tapOnceUncovered(() => control.tap({ timeout: ASSERTION_TIMEOUT_MS }), { timeoutMs: ASSERTION_TIMEOUT_MS, now: Date.now, wait: () => sleep(POLL_MS) }, busy);
 
@@ -124,15 +132,21 @@ export const test = base.extend<{ host: HostFixture }>({
       async screenshot(label) {
         await onceTheRunnerIsFree(() => e2eApp.screenshot(label), runnerBusy());
       },
-      tap: (control) => tap(control, runnerBusy()),
-      fill: async (field, text) =>
-        fillField(
+      async tap(control) {
+        await beat(control);
+        await tap(control, runnerBusy());
+      },
+      async fill(field, text) {
+        await beat(field);
+        await fillField(
           field,
           typeof text === 'string' ? text : text.use('device-input', (value) => value),
           { platform, focused: device.locator('role=textbox focused'), texts: device.locator('role=text'), type: (command) => typeOnDevice(target, command) },
           { tapTimeoutMs: ASSERTION_TIMEOUT_MS, reads: CONFIRM_READS, now: Date.now, wait: () => sleep(POLL_MS) },
           runnerBusy(),
-        ),
+        );
+      },
+      evidence: evidenceBlock({ marksFile: EVIDENCE_MARKS, now: Date.now, hold: sleep }),
     };
     await use(host);
   },
