@@ -387,7 +387,7 @@ describe('a run whose spec files declare different settings', () => {
     const log = readFileSync(join(dir, 'e2e.log'), 'utf8').split('\n');
     assert.deepEqual(log.filter((line) => line.startsWith('settings ')), [`settings ${ORG_LABEL}: 1 spec file`, `settings ${MFA_LABEL}: 2 spec files`]);
     assert.ok(log.indexOf(`fake e2e runs ${SIGN_UP}`) < log.indexOf(`settings ${ORG_LABEL}: 1 spec file`) && log.indexOf(`settings ${ORG_LABEL}: 1 spec file`) < log.indexOf(`fake e2e runs ${CHOOSE_ORG}`), 'one log for the whole run, in the order the groups ran');
-    assert.deepEqual(record.screenshots, [{ label: 'home', path: join(dir, 'screenshots', 'home.png') }], 'one screenshot per label across the groups');
+    assert.deepEqual(record.screenshots, [{ label: 'home', path: join(dir, 'screenshots', 'home.png'), test: { spec: SETUP_MFA, title: 'a test of setup-mfa.e2e.ts' } }], 'one screenshot per label across the groups, with the test that took it');
     assert.equal(readFileSync(join(dir, 'screenshots', 'home.png'), 'utf8'), 'e2e-3', 'the last group to take a label keeps it');
 
     assert.match(result.next, /^\{cli\} attach /);

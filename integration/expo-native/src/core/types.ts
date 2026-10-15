@@ -331,6 +331,12 @@ export interface SpecResult {
   readonly failureScreenshot: EvidencePath | null;
 }
 
+export interface Screenshot {
+  readonly label: string;
+  readonly path: EvidencePath;
+  readonly test?: { readonly spec: string; readonly title: string };
+}
+
 export interface EvidenceRecord {
   readonly run: RunId;
   readonly startedAt: string;
@@ -345,7 +351,7 @@ export interface EvidenceRecord {
   readonly build: BuildKey;
   readonly results: readonly SpecResult[];
   readonly videos: readonly EvidencePath[];
-  readonly screenshots: readonly { readonly label: string; readonly path: EvidencePath }[];
+  readonly screenshots: readonly Screenshot[];
   readonly appLog: EvidencePath | null;
   readonly e2eReport: EvidencePath;
   readonly identities: readonly { readonly email: TestEmail; readonly userId: string | null }[];
