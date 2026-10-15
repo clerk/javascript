@@ -1,7 +1,7 @@
 import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { runEmailPrefix } from '../specs/support/clerk.ts';
+import { testEmail } from '../specs/support/clerk.ts';
 import { Secret } from '../specs/support/secret.ts';
 import { createClerkBackends } from '../src/core/clerk.ts';
 import { VerifyFailure, type PublishableKey, type RunId } from '../src/core/types.ts';
@@ -19,7 +19,6 @@ function fakeBapi(answer: { status: number; body: unknown }) {
 
 describe('what the CLI asks a development instance about its users', () => {
   const run = 'r20261003-000000-abcd' as RunId;
-  const prefix = runEmailPrefix(run);
 
   it('counts them with the instance\'s own key', async () => {
     const { calls, backend } = fakeBapi({ status: 200, body: { object: 'total_count', total_count: 61 } });
@@ -33,22 +32,24 @@ describe('what the CLI asks a development instance about its users', () => {
     assert.ok(calls[0]!.signal instanceof AbortSignal);
   });
 
-  it('lists the users of one run by the start of their addresses, in one request, whether a test seeded them or signed them up in the app', async () => {
+  it('lists the users of one run by the tag in their addresses, in one request, whether a test seeded them or signed them up in the app', async () => {
     const { calls, backend } = fakeBapi({
       status: 200,
       body: [
-        { id: 'user_1', email_addresses: [{ email_address: `${prefix}0a1b2c3d+clerk_test@example.com` }] },
-        { id: 'user_2', email_addresses: [{ email_address: 'someone@example.com' }, { email_address: `${prefix}ffffffff+clerk_test@example.com` }] },
-        { id: 'user_3', email_addresses: [{ email_address: `not_${prefix}00000000+clerk_test@example.com` }] },
+        { id: 'user_1', email_addresses: [{ email_address: 'maya.abcd+clerk_test@example.com' }] },
+        { id: 'user_2', email_addresses: [{ email_address: 'someone@example.com' }, { email_address: 'ben2.abcd+clerk_test@harbor-abcd.clerk.test' }] },
+        { id: 'user_3', email_addresses: [{ email_address: 'abcd.ffff+clerk_test@example.com' }] },
+        { id: 'user_5', email_addresses: [{ email_address: '000000abcdk3x9+clerk_test@example.com' }] },
+        { id: 'user_6', email_addresses: [{ email_address: 'maya.abcd@example.com' }] },
         { id: 'user_4', email_addresses: [] },
-        { email_addresses: [{ email_address: `${prefix}11111111+clerk_test@example.com` }] },
+        { email_addresses: [{ email_address: 'cleo.abcd+clerk_test@example.com' }] },
       ],
     });
     assert.deepEqual(await backend.usersOfRun(run), [
-      { userId: 'user_1', email: `${prefix}0a1b2c3d+clerk_test@example.com` },
-      { userId: 'user_2', email: `${prefix}ffffffff+clerk_test@example.com` },
+      { userId: 'user_1', email: testEmail(run, 'maya') },
+      { userId: 'user_2', email: testEmail(run, 'ben2', 'harbor-abcd.clerk.test') },
     ]);
-    assert.deepEqual(calls.map((call) => call.url), [`GET https://api.clerk.com/v1/users?limit=500&email_address_query=${prefix}`]);
+    assert.deepEqual(calls.map((call) => call.url), ['GET https://api.clerk.com/v1/users?limit=500&email_address_query=abcd']);
   });
 
   it('says what to change when Clerk refuses the instance\'s own key, and names the request when it fails another way', async () => {

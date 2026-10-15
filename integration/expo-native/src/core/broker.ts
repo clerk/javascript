@@ -12,14 +12,15 @@ import {
   TICKET_SECONDS,
   backendPath,
   isHarnessRole,
+  isOrganizationNameOf,
   isTestDomainOf,
-  organizationNamePrefix,
+  isTestEmailOf,
   parseTestEmail,
   parseTestPhone,
-  runEmailPrefix,
   typedPassword,
   type BackendCall,
 } from '../../specs/support/clerk.ts';
+import { runIdParts } from '../../specs/support/inputs.ts';
 import { protect } from '../../specs/support/secret.ts';
 import { ownKeyRefused, userLimitReached } from './clerk.ts';
 import type { InstanceKeys } from './keys.ts';
@@ -109,8 +110,7 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
   writeFileSync(tokenFile, token, { mode: 0o600 });
   const created = new Set<string>();
   const organizations = new Set<string>();
-  const prefix = runEmailPrefix(run);
-  const namePrefix = organizationNamePrefix(run);
+  const { tag } = runIdParts(run);
 
   const ourUser = (userId: unknown, what: string): string | null => (typeof userId === 'string' && created.has(userId) ? null : `user ${String(userId)} was not created by this run; ${what} only users from host.seedUser`);
   const ourOrganization = ({ params }: Asked): string | null => (organizations.has(params.organization_id ?? '') ? null : `organization ${params.organization_id} was not created by this run; seed it with host.seedOrganization`);
@@ -133,7 +133,7 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
         return (
           onlyKeys(body, ['email_address', 'phone_number', 'password', 'skip_password_requirement', 'bypass_client_trust']) ??
           notOurs(() => parseTestEmail(email)) ??
-          (email.startsWith(prefix) ? null : `${email} is not an address of run ${run}, whose addresses start ${prefix}`) ??
+          (isTestEmailOf(run, email) ? null : `${email} is not an address of run ${run}, whose addresses are a name, then .${tag}+clerk_test@`) ??
           phones.map((phone: string) => notOurs(() => parseTestPhone(phone))).find((problem) => problem !== null) ??
           null
         );
@@ -180,7 +180,7 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
         return (
           onlyKeys(body, ['name', 'created_by']) ??
           ourUser(creator, 'an organization is created by') ??
-          (typeof name === 'string' && name.startsWith(namePrefix) ? null : `${String(name)} is not an organization name of run ${run}, whose organization names start "${namePrefix}"`)
+          (typeof name === 'string' && isOrganizationNameOf(run, name) ? null : `${String(name)} is not an organization name of run ${run}, whose organization names are a capitalized word, a space, and ${tag}`)
         );
       },
       forwards: asSent,
@@ -208,7 +208,7 @@ export async function startBroker(run: RunId, workspace: Workspace, scratch: Scr
         return (
           ourOrganization(asked) ??
           onlyKeys(asked.body, ['name', 'enrollment_mode', 'verified']) ??
-          (typeof name === 'string' && isTestDomainOf(run, name) ? null : `${String(name)} is not a domain of run ${run}, whose domains are ${prefix} and four characters, then .clerk.test`) ??
+          (typeof name === 'string' && isTestDomainOf(run, name) ? null : `${String(name)} is not a domain of run ${run}, whose domains are a lowercase word, then -${tag}.clerk.test`) ??
           (mode === 'automatic_suggestion' && verified === true ? null : 'a domain is added verified, with automatic suggestions')
         );
       },

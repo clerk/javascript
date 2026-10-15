@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { sealEvidence } from '../src/core/evidence.ts';
 import type { EvidencePath } from '../src/core/types.ts';
+import { newTestPassword } from '../specs/support/clerk.ts';
 import { holdsJwt, protect, redact } from '../specs/support/secret.ts';
 
 const part = (claims: object): string => Buffer.from(JSON.stringify(claims)).toString('base64url');
@@ -77,7 +78,7 @@ describe('the seal check', () => {
   });
 
   it('taints a file that spells a secret one quoted character at a time, as XCTest shows typed text', () => {
-    const password = `${randomBytes(12).toString('hex')}Aa1!`;
+    const password = newTestPassword().use('device-input', (plain) => plain);
     const typedLines = (quote: string): string => [...password].map((character, at) => `    t = ${at}.00s Type ${quote}${character}${quote} into "password" SecureTextField`).join('\n');
     assert.deepEqual(
       sealed({ 'single.log': typedLines("'"), 'double.log': typedLines('"'), 'escaped.log': typedLines('\\"'), 'other.log': typedLines("'").replaceAll(password[3]!, password[3] === 'z' ? 'y' : 'z'), 'none.log': "Type 'a' into a field" }, [password]),
