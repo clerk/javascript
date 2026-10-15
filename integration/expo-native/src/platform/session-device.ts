@@ -26,7 +26,7 @@ function simulator(udid: string): SessionDevice {
   return {
     inputs: buildInputs('ios', 'standalone'),
     build: () => [buildStandalone('ios'), waitForBoot(udid), installApp(udid, artifact('ios', 'standalone'))],
-    record: { start: file => recordVideo(udid, file) },
+    record: { start: file => recordVideo(udid, file), startedWhen: 'recording started' },
     logs: (since, predicate) => showLogs(udid, since, predicate),
   };
 }

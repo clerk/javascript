@@ -12,6 +12,7 @@ import { createInstances } from '../src/core/instances/instances.ts';
 import { SettingsRefused, settingsFileOf } from '../src/core/instances/settings.ts';
 import { summarize } from '../src/core/publish.ts';
 import { attach, runVerb, type Deps } from '../src/core/verbs.ts';
+import { readMarks } from '../src/core/video.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
 import { VerifyFailure, type BuildKey, type BuiltApp, type Command, type DeviceBackend, type EvidencePath, type HostAdapter, type InstanceSettings, type LocalLease, type RemoteLease, type ScratchPath } from '../src/core/types.ts';
 import { PLATFORM_KEY, fakeClerk, type FakeClerkOptions } from '../testing/fake-clerk.ts';
@@ -338,10 +339,11 @@ describe('a run whose spec files declare different settings', () => {
 
     it('times the marks from the first frame when the recorder reports it, as the Android recorder does', async () => {
       const r = recorded({ launches: true });
-      r.backend.startRecording = async (_lease, into) => ({ process: null, videoStartsAt: Date.now() - 2_000, stop: async () => (writeFileSync(join(into, 'video.mp4'), 'frames'), join(into, 'video.mp4') as EvidencePath) });
-      const { record } = await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
-      const [span] = record.evidenceSpans ?? [];
-      assert.ok(span !== undefined && span.from >= 2 && span.from < 2.5, JSON.stringify(span));
+      const videoStartsAt = Date.parse('2026-10-15T09:00:00.000Z');
+      r.backend.startRecording = async (_lease, into) => ({ process: null, videoStartsAt, stop: async () => (writeFileSync(join(into, 'video.mp4'), 'frames'), join(into, 'video.mp4') as EvidencePath) });
+      const { record, dir } = await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
+      const [mark] = readMarks(join(dir, 'evidence-marks.jsonl'));
+      assert.deepEqual(record.evidenceSpans?.[0]?.from, Math.round(mark!.startedAt - videoStartsAt) / 1000);
     });
 
     it('keeps each host.tap in seconds of the video, from when it was sent when the video shows no change at the control, with the size of the screen the points are in', async () => {
