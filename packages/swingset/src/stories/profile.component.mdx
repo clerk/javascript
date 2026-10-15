@@ -5,7 +5,8 @@ import * as ProfileStories from './profile.component.stories';
 A surface you navigate: a column of destinations beside the page each one opens. The user profile
 and the organization profile are both one of these — `UserProfileView` composes it from the pages an
 instance has content for. Rendered as the content of a `profile` dialog it names the dialog, carries
-its dismiss, and fills the popup; standalone it paints the same frame and takes its own height.
+its dismiss, and fills the popup; in a `fullscreen` dialog it fills the viewport and moves its
+dismiss into the navigation; standalone it paints the same frame and takes its own height.
 
 ## Playground
 
@@ -71,6 +72,7 @@ reaches the page title instead.
 | `Profile.Root`         | `div` (the container)   | `cl-profile`               |
 | —                      | `span` (query sentinel) | `cl-profile-sentinel`      |
 | `Profile.Nav`          | `nav` (labelled)        | `cl-profile-nav`           |
+| —                      | back `button`           | `cl-profile-back-button`   |
 | —                      | tablist                 | `cl-profile-nav-list`      |
 | `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`      |
 | `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`       |
@@ -80,6 +82,10 @@ reaches the page title instead.
 
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog. While compact, `ContentPanel` is a `div[role=group]` named by the page title.
+
+The back `button` renders only inside a `fullscreen` dialog, where it replaces `Dialog.CloseButton`.
+It is first in the navigation, sized like a `NavItem`, and its label is the `profile.backToApp`
+message. Below `48rem` the corner dismiss returns and it does not render.
 
 ## Heading levels
 

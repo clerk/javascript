@@ -1,6 +1,5 @@
 import { UserProfileAddMfaDialog } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-add-mfa.dialog';
 import { UserProfileMfaSetupView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
-import type { UserProfileSecurityPanelViewProps } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 
 import { useUserProfileMfaFixture } from './user-profile-mfa';
 
@@ -24,23 +23,5 @@ export function useUserProfileMfaExample() {
     </UserProfileAddMfaDialog>
   );
   const section = { ...fixture.section, addControl };
-  const security: Pick<
-    UserProfileSecurityPanelViewProps,
-    | 'mfaMethods'
-    | 'addableMfaMethods'
-    | 'mfaAddControl'
-    | 'onAddMfaMethod'
-    | 'onSetDefaultMfaMethod'
-    | 'onRemoveMfaMethod'
-    | 'onRegenerateBackupCodes'
-  > = {
-    mfaMethods: section.methods,
-    addableMfaMethods: section.addableMethods,
-    mfaAddControl: addControl,
-    onAddMfaMethod: section.onAdd,
-    onSetDefaultMfaMethod: section.onSetDefault,
-    onRemoveMfaMethod: section.onRemove,
-    onRegenerateBackupCodes: section.onRegenerateBackupCodes,
-  };
-  return { section, security };
+  return { section };
 }

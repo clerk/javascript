@@ -31,12 +31,12 @@ export function SelectValue(props: SelectValueProps) {
   const { selectedValues, cachedLabels, items, valueToLabelRef } = useSelectContext();
 
   let displayText: ReactNode;
-  if (typeof children === 'function') {
-    displayText = children(selectedValues);
-  } else if (children != null) {
+  if (children != null && typeof children !== 'function') {
     displayText = children;
-  } else if (selectedValues.length === 0) {
+  } else if (selectedValues.length === 0 && placeholder != null) {
     displayText = placeholder;
+  } else if (typeof children === 'function') {
+    displayText = children(selectedValues);
   } else {
     displayText = selectedValues.map(value => resolveLabel(value, items, cachedLabels, valueToLabelRef)).join(', ');
   }

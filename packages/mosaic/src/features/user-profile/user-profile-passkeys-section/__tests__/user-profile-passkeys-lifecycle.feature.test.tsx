@@ -14,24 +14,9 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import {
-  UserProfileSecurityPanelView,
-  type UserProfileSecurityPanelViewProps,
-} from '../../user-profile-security-panel.view';
-import { passkeysSectionNode, UserProfilePasskeysSection } from '../user-profile-passkeys-section';
-import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.model';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 
 afterEach(() => vi.restoreAllMocks());
-
-function SecurityHost(props: Pick<UserProfileSecurityPanelViewProps, 'mfaMethods' | 'devices'> = {}) {
-  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
-  return (
-    <UserProfileSecurityPanelView
-      {...props}
-      passkeysSlot={passkeysSlot}
-    />
-  );
-}
 
 function serveAccounts(enabled = true) {
   vi.spyOn(navigator, 'webdriver', 'get').mockReturnValue(false);
@@ -180,28 +165,6 @@ describe('Composing passkeys in Security', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     expect(screen.queryByRole('group', { name: 'Passkeys' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
-  });
-
-  it('does not leave an empty Authentication region when a connected passkeys slot is hidden', async () => {
-    serveAccounts(false);
-    await renderWithClerk(<SecurityHost />);
-    expect(screen.queryByText('Passkeys')).toBeNull();
-    expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-  });
-
-  it('orders connected passkeys before MFA and active devices', async () => {
-    serveAccounts();
-    await renderWithClerk(
-      <SecurityHost
-        mfaMethods={[]}
-        devices={[]}
-      />,
-    );
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Passkeys');
-    expect(
-      screen.getByText('Passkeys').compareDocumentPosition(screen.getByText('2-step verification')) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
   });
 });
 

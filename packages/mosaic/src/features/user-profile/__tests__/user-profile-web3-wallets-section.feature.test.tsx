@@ -179,7 +179,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
     expect(creation.requests).toHaveLength(1);
     expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual([pendingId]);
-    expect(screen.getByText('Primary')).toBeInTheDocument();
+    expect(await screen.findByText('Primary')).toBeInTheDocument();
   });
 
   it('hides immutable wallet mutations but still permits setting a verified wallet as primary', async () => {
@@ -492,7 +492,7 @@ describe('Web3 wallets', () => {
     const selectedRow = screen.getByTitle('0xabcdef1234567890').closest<HTMLElement>('.cl-section-row');
     expect(selectedRow).not.toBeNull();
     if (selectedRow) {
-      expect(within(selectedRow).getByText('Primary')).toBeInTheDocument();
+      expect(await within(selectedRow).findByText('Primary')).toBeInTheDocument();
     }
   });
 
@@ -515,7 +515,7 @@ describe('Web3 wallets', () => {
     await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(retryFapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_1'));
-    expect(screen.getByText('Primary')).toBeInTheDocument();
+    expect(await screen.findByText('Primary')).toBeInTheDocument();
   });
 
   it('confirms removal and clears the primary after deleting the last wallet', async () => {
