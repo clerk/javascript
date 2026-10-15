@@ -338,11 +338,12 @@ describe('attach', () => {
     const packageDir = mkdtempSync(join(tmpdir(), 'verify-attach-'));
     const workspace = openWorkspace({ packageDir, worktree: packageDir, home: join(packageDir, 'home') });
     const deps = { host, workspace, runner: gh.runner, env: {}, progress: () => undefined, instances: heldInstances() };
-    const sealed = (shape: { readonly called: string; readonly shots?: readonly string[]; readonly video?: boolean; readonly failed?: boolean; readonly failureShot?: boolean; readonly change?: Partial<EvidenceRecord>; readonly log?: string }) => {
+    const sealed = (shape: { readonly called: string; readonly shots?: readonly string[]; readonly states?: readonly string[]; readonly spec?: string; readonly video?: boolean; readonly failed?: boolean; readonly failureShot?: boolean; readonly change?: Partial<EvidenceRecord>; readonly log?: string }) => {
       const { run, dir } = workspace.newRun();
       mkdirSync(join(dir, 'screenshots'), { recursive: true });
       const file = (name: string, holds: string): EvidencePath => (writeFileSync(join(dir, name), holds), join(dir, name) as EvidencePath);
-      const base = partialRecord(dir, run);
+      const recorded = partialRecord(dir, run);
+      const base = shape.spec === undefined ? recorded : { ...recorded, results: [{ ...recorded.results[0]!, spec: { ...recorded.results[0]!.spec, path: shape.spec } }] };
       const failureScreenshot = shape.failureShot === true ? file('001-failure.png', `${shape.called} failure`) : null;
       file('app.log', shape.log ?? hostLogLine(OWN_USER));
       sealEvidence(
@@ -350,9 +351,16 @@ describe('attach', () => {
         {
           ...base,
           gitHead: shape.failed === true ? BEFORE_COMMIT : AFTER_COMMIT,
-          results: [{ ...base.results[0]!, status: shape.failed === true ? 'failed' : 'passed', failureScreenshot }],
+          results:
+            shape.states === undefined
+              ? [{ ...base.results[0]!, status: shape.failed === true ? 'failed' : 'passed', failureScreenshot }]
+              : shape.states.map((title) => ({ ...base.results[0]!, title, status: shape.failed === true ? 'failed' : 'passed', failureScreenshot: shape.failed === true ? file(`${title}-failure.png`, `${shape.called} ${title} failure`) : null })),
           videos: shape.video === false ? [] : [file('video.mp4', `${shape.called} video`)],
-          screenshots: (shape.shots ?? ['profile']).map((label) => ({ label, path: file(join('screenshots', `${label}.png`), `${shape.called} ${label}`) })),
+          screenshots: (shape.shots ?? shape.states ?? ['profile']).map((label) => ({
+            label,
+            path: file(join('screenshots', `${label}.png`), `${shape.called} ${label}`),
+            test: { spec: base.results[0]!.spec.path, title: shape.states === undefined ? base.results[0]!.title : label },
+          })),
           ...shape.change,
         },
         [],
@@ -508,6 +516,15 @@ describe('attach', () => {
     ]);
   });
 
+  it('pairs each screenshot the before run lacks with the failure screenshot of the test that takes it, when each state has a test of its own', async () => {
+    const gh = fakeGh();
+    const { deps, sealed } = checkout(gh);
+    const before = sealed({ called: 'before', failed: true, states: ['start', 'profile'], shots: [], spec: 'specs/explored/states.e2e.ts' });
+    const after = sealed({ called: 'after', states: ['start', 'profile'], spec: 'specs/features/profile/states.e2e.ts' });
+    await attach(deps, { verb: 'attach', run: after.run, pr: 9, media: { screenshots: ['start', 'profile'], video: false }, before: before.run });
+    assert.deepEqual(gh.edits[0]!.attached, ['after start', 'after profile', 'before start failure', 'before profile failure']);
+  });
+
   it('posts nothing when the before run has nothing to pair with what was asked for, and says what to do', async () => {
     const gh = fakeGh();
     const { deps, sealed } = checkout(gh);
@@ -515,8 +532,14 @@ describe('attach', () => {
     const passedWithoutIt = sealed({ called: 'before', shots: ['start'] });
     await assert.rejects(attach(deps, { verb: 'attach', run: after.run, pr: 9, media: still, before: passedWithoutIt.run }), {
       code: 'USAGE',
-      message: `run ${passedWithoutIt.run} has no screenshot labelled profile, and no failure screenshot to show in its place`,
+      message: `run ${passedWithoutIt.run} has no screenshot labelled profile, and no failure screenshot of the test that takes it to show in its place`,
       fix: "call host.screenshot('profile') in the spec and run it on the build without the change, or attach without --before",
+    });
+    const perState = sealed({ called: 'after', states: ['start', 'profile'] });
+    const onlyAnotherFailed = sealed({ called: 'before', failed: true, states: ['start'], shots: [] });
+    await assert.rejects(attach(deps, { verb: 'attach', run: perState.run, pr: 9, media: still, before: onlyAnotherFailed.run }), {
+      code: 'USAGE',
+      message: `run ${onlyAnotherFailed.run} has no screenshot labelled profile, and no failure screenshot of the test that takes it to show in its place`,
     });
     const noVideo = sealed({ called: 'before', failed: true, video: false });
     await assert.rejects(attach(deps, { verb: 'attach', run: after.run, pr: 9, media: flow, before: noVideo.run }), {

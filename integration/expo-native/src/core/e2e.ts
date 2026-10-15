@@ -13,6 +13,7 @@ import {
   type EvidencePath,
   type FeatureName,
   type RunCommand,
+  type Screenshot,
   type SpecRef,
   type SpecResult,
   type SpecSelection,
@@ -197,6 +198,8 @@ function platformSkip(reason: string | undefined): string {
   return declared === undefined ? `skipped: ${reason ?? 'other platform'}` : `skipped: ${declared.split(/,\s*/).join(' and ')} only`;
 }
 
+const titleOf = (result: WireResult): string => (result.titlePath ?? []).join(' > ');
+
 export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], outputDir: EvidencePath): readonly SpecResult[] {
   const failuresDir = join(outputDir, 'failures');
   const pages = existsSync(failuresDir) ? readdirSync(failuresDir) : [];
@@ -225,7 +228,7 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], o
       const message = notRun ? `not run: ${r.skip?.cause ?? 'skipped'} ${r.skip?.reason ?? ''}`.trim() : shown?.error?.message;
       return {
         spec,
-        title: (r.titlePath ?? []).join(' > '),
+        title: titleOf(r),
         platform: r.platform === 'android' ? 'android' : 'ios',
         status,
         seconds: Math.round(attempts.reduce((sum, a) => sum + (a.durationMs ?? 0), 0) / 100) / 10,
@@ -241,8 +244,8 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], o
     });
 }
 
-export function collectScreenshots(reportJson: unknown, runDir: EvidencePath, outputDir: EvidencePath): readonly { readonly label: string; readonly path: EvidencePath }[] {
-  const out = new Map<string, EvidencePath>();
+export function collectScreenshots(reportJson: unknown, runDir: EvidencePath, outputDir: EvidencePath): readonly Screenshot[] {
+  const out = new Map<string, Screenshot>();
   const dir = join(runDir, 'screenshots');
   for (const result of wireResults(reportJson)) {
     for (const attempt of result.attempts ?? []) {
@@ -257,11 +260,11 @@ export function collectScreenshots(reportJson: unknown, runDir: EvidencePath, ou
         mkdirSync(dir, { recursive: true });
         const target = join(dir, `${label}.png`) as EvidencePath;
         copyFileSync(source, target);
-        out.set(label, target);
+        out.set(label, { label, path: target, test: { spec: result.file ?? '', title: titleOf(result) } });
       }
     }
   }
-  return [...out].map(([label, path]) => ({ label, path }));
+  return [...out.values()];
 }
 
 export function assertSomethingRan(results: readonly SpecResult[], selection: string): 'ran' | 'all-left-out' {
