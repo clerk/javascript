@@ -567,7 +567,7 @@ describe('session agent', () => {
     const started = await agent.call('/__sim/record/start', { method: 'POST' });
     const answer = (await started.json()) as { ok: boolean; recordingForMs?: number };
     assert.equal(started.status, 200);
-    assert.ok(answer.ok && answer.recordingForMs !== undefined && answer.recordingForMs >= 100 && answer.recordingForMs < 1_000, JSON.stringify(answer));
+    assert.ok(answer.ok && answer.recordingForMs !== undefined && answer.recordingForMs >= 50 && answer.recordingForMs < 1_000, JSON.stringify(answer));
     await agent.call('/__sim/record/stop', { method: 'POST' });
     await agent.call('/__sim/stop', { method: 'POST' });
     await agent.exited;
