@@ -1,5 +1,6 @@
 'use client';
 
+import { OrganizationProfileProvider } from '@clerk/mosaic/features/organization-profile/organization-profile.provider';
 import { OrganizationProfileGeneralPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useOrganization, useUser } from '@clerk/nextjs';
@@ -27,7 +28,11 @@ export default function OrganizationGeneralLivePage() {
         {isLoaded && isSignedIn && !organization ? (
           <p className='text-muted-foreground text-sm'>Pick an active organization to see its general panel.</p>
         ) : null}
-        {isLoaded && isSignedIn ? <OrganizationProfileGeneralPanel /> : null}
+        {isLoaded && isSignedIn ? (
+          <OrganizationProfileProvider afterLeaveOrganizationUrl='/live'>
+            <OrganizationProfileGeneralPanel />
+          </OrganizationProfileProvider>
+        ) : null}
       </div>
     </MosaicProvider>
   );
