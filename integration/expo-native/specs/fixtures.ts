@@ -118,9 +118,10 @@ export const test = base.extend<{ host: HostFixture }>({
     const host: HostFixture = {
       runId: RUN,
       app,
-      newEmail: async () => users.newEmail(),
+      newEmail: async (options) => users.newEmail(options),
       newPhone: users.newPhone,
       seedUser: users.seed,
+      seedOrganization: users.seedOrganization,
       async launch(options = {}) {
         const lands = landing(options);
         const launchId = await launchApp(options);

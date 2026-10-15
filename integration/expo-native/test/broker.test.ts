@@ -5,7 +5,7 @@ import net from 'node:net';
 import { networkInterfaces, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
-import { TEST_PHONES, aboutToLaunch, newTestEmail, runEmailPrefix, testUsers } from '../specs/support/clerk.ts';
+import { TEST_PHONES, aboutToLaunch, newTestDomain, newTestEmail, runEmailPrefix, testUsers } from '../specs/support/clerk.ts';
 import { Secret, usedSecretValues } from '../specs/support/secret.ts';
 import { startBroker, type Broker } from '../src/core/broker.ts';
 import { REPLACE_AT_USERS } from '../src/core/clerk.ts';
@@ -59,6 +59,28 @@ async function standIn(clerk: Clerk = emptyClerk, beforeLaunch: () => Promise<vo
   const access = { kind: 'stand-in', url: broker.url, tokenFile: broker.tokenFile } as const;
   const users = testUsers({ publishableKey: keys.pk, access }, run);
   return { broker, workspace, run, forwarded, ask, users, access };
+}
+
+function organizationClerk({ roleExists = false } = {}): Clerk {
+  let users = 0;
+  let organizations = 0;
+  const permissions = [
+    { object: 'permission', id: 'perm_domains_read', key: 'org:sys_domains:read', name: 'Read domains', type: 'system' },
+    { object: 'permission', id: 'perm_memberships_read', key: 'org:sys_memberships:read', name: 'Read members', type: 'system' },
+    { object: 'permission', id: 'perm_domains_manage', key: 'org:sys_domains:manage', name: 'Manage domains', type: 'system' },
+  ];
+  const role = { object: 'role', id: 'role_1', key: 'org:e2e_domains_reader', name: 'Domains reader', description: '', permissions: permissions.slice(0, 2) };
+  return (request) => {
+    const path = new URL(request.url).pathname.replace('/v1', '');
+    if (request.method === 'GET' && path === '/organization_permissions') return { status: 200, body: { data: permissions, total_count: permissions.length } };
+    if (request.method === 'GET' && path === '/organization_roles') return { status: 200, body: roleExists ? { data: [role], total_count: 1 } : { data: [], total_count: 0 } };
+    if (request.method === 'POST' && path === '/organization_roles') return (roleExists = true), { status: 200, body: role };
+    if (request.method === 'POST' && path === '/users') return { status: 200, body: { object: 'user', id: `user_${(users += 1)}` } };
+    if (request.method === 'POST' && path === '/organizations') return { status: 200, body: { object: 'organization', id: `org_${(organizations += 1)}`, name: request.body?.name, private_metadata: {} } };
+    if (request.method === 'POST' && path.endsWith('/memberships')) return { status: 200, body: { object: 'organization_membership', id: 'orgmem_1', role: request.body?.role } };
+    if (request.method === 'POST' && path.endsWith('/domains')) return { status: 200, body: { object: 'organization_domain', id: 'orgdmn_1', name: request.body?.name } };
+    return emptyClerk(request);
+  };
 }
 
 const stopping = async <T>(broker: Broker, body: () => Promise<T>): Promise<T> => {
@@ -173,7 +195,7 @@ describe("the CLI's stand-in for the Backend API", () => {
     });
   });
 
-  it('refuses a fourth kind of call: nothing but create a user, mint a ticket, and look a phone up reaches Clerk', async () => {
+  it('refuses any other kind of call: nothing but the calls that seed users and organizations and mint a ticket reaches Clerk', async () => {
     const s = await standIn();
     await stopping(s.broker, async () => {
       const others: readonly (readonly [string, string])[] = [
@@ -182,7 +204,14 @@ describe("the CLI's stand-in for the Backend API", () => {
         ['DELETE', '/users/user_created_1'],
         ['PATCH', '/users/user_created_1'],
         ['POST', '/users/user_created_1/ban'],
-        ['POST', '/organizations'],
+        ['GET', '/organizations'],
+        ['DELETE', '/organizations/org_1'],
+        ['PATCH', '/organizations/org_1'],
+        ['POST', '/organizations/org_1/invitations'],
+        ['POST', '/organizations/org_1/domains/orgdmn_1/verify'],
+        ['POST', '/organizations/org%2F1/memberships'],
+        ['PATCH', '/organization_roles/role_1'],
+        ['DELETE', '/organization_roles/role_1'],
         ['GET', '/sign_in_tokens'],
         ['POST', '/sign_in_tokens/sit_1/revoke'],
         ['GET', '/instance'],
@@ -196,6 +225,112 @@ describe("the CLI's stand-in for the Backend API", () => {
       const outsideTheApi = await fetch(`${s.broker.url.replace(/\/v1$/, '')}/users`, { method: 'POST', headers: { Authorization: `Bearer ${readFileSync(s.broker.tokenFile, 'utf8')}` }, body: '{}' });
       assert.equal(outsideTheApi.status, 404);
       assert.deepEqual(s.forwarded, []);
+    });
+  });
+
+  it('seeds an organization through it with the instance key: the custom role once, the organization, its members, and a verified domain', async () => {
+    const s = await standIn(organizationClerk());
+    await stopping(s.broker, async () => {
+      const admin = await s.users.seed();
+      const reader = await s.users.seed();
+      const org = await s.users.seedOrganization({ creator: admin, members: [{ user: reader, role: 'org:e2e_domains_reader' }], suggestDomain: true });
+      assert.deepEqual(
+        s.forwarded.slice(2).map((request) => [request.method, request.url, request.authorization]),
+        [
+          ['GET', 'https://api.clerk.com/v1/organization_roles?query=org%3Ae2e_domains_reader', `Bearer ${SECRET_KEY}`],
+          ['GET', 'https://api.clerk.com/v1/organization_permissions?query=org%3Asys_&limit=100', `Bearer ${SECRET_KEY}`],
+          ['GET', 'https://api.clerk.com/v1/organization_permissions?query=org%3Asys_&limit=100', `Bearer ${SECRET_KEY}`],
+          ['POST', 'https://api.clerk.com/v1/organization_roles', `Bearer ${SECRET_KEY}`],
+          ['POST', 'https://api.clerk.com/v1/organizations', `Bearer ${SECRET_KEY}`],
+          ['POST', 'https://api.clerk.com/v1/organizations/org_1/memberships', `Bearer ${SECRET_KEY}`],
+          ['POST', 'https://api.clerk.com/v1/organizations/org_1/domains', `Bearer ${SECRET_KEY}`],
+        ],
+      );
+      const prefix = runEmailPrefix(s.run);
+      assert.deepEqual(s.forwarded[5]!.body, { name: 'Domains reader', key: 'org:e2e_domains_reader', permissions: ['perm_domains_read', 'perm_memberships_read'] });
+      assert.deepEqual(s.forwarded[6]!.body, { name: org.name, created_by: 'user_1' });
+      assert.deepEqual(s.forwarded[7]!.body, { user_id: 'user_2', role: 'org:e2e_domains_reader' });
+      assert.deepEqual(s.forwarded[8]!.body, { name: org.domain, enrollment_mode: 'automatic_suggestion', verified: true });
+      assert.equal(org.id, 'org_1');
+      assert.match(org.name, new RegExp(`^${prefix} [0-9a-f]{6}$`));
+      assert.match(org.domain, new RegExp(`^${prefix}[0-9a-z]{4}\\.clerk\\.test$`));
+
+      const again = await s.users.seedOrganization({ creator: reader, members: [{ user: admin, role: 'org:e2e_domains_reader' }] });
+      assert.deepEqual([again.id, again.domain], ['org_2', null]);
+      assert.deepEqual(
+        s.forwarded.slice(9).map((request) => [request.method, request.url.replace('https://api.clerk.com/v1', '')]),
+        [
+          ['GET', '/organization_roles?query=org%3Ae2e_domains_reader'],
+          ['POST', '/organizations'],
+          ['POST', '/organizations/org_2/memberships'],
+        ],
+        'a role that the instance already holds is not created again',
+      );
+    });
+  });
+
+  it('tells the tests only the id and key of each permission and role it lists', async () => {
+    const s = await standIn(organizationClerk({ roleExists: true }));
+    await stopping(s.broker, async () => {
+      const permissions = await s.ask('GET', '/organization_permissions?query=org:sys_&limit=100');
+      assert.deepEqual(permissions.json, {
+        data: [
+          { id: 'perm_domains_read', key: 'org:sys_domains:read' },
+          { id: 'perm_memberships_read', key: 'org:sys_memberships:read' },
+          { id: 'perm_domains_manage', key: 'org:sys_domains:manage' },
+        ],
+        total_count: 3,
+      });
+      const roles = await s.ask('GET', '/organization_roles?query=org:e2e_domains_reader');
+      assert.deepEqual(roles.json, { data: [{ id: 'role_1', key: 'org:e2e_domains_reader', permissions: [{ key: 'org:sys_domains:read' }, { key: 'org:sys_memberships:read' }] }], total_count: 1 });
+    });
+  });
+
+  it('refuses each organization call outside its guard, and sends Clerk none of it', async () => {
+    const s = await standIn(organizationClerk());
+    await stopping(s.broker, async () => {
+      const user = await s.users.seed();
+      const org = await s.users.seedOrganization({ creator: user });
+      const sent = s.forwarded.length;
+      const prefix = runEmailPrefix(s.run);
+      const otherRun = 'r20200101-000000-aaaa' as RunId;
+      const refusedRequests: readonly (readonly [string, string, string, Record<string, unknown> | undefined, RegExp])[] = [
+        ['an organization of a user from elsewhere', 'POST', '/organizations', { name: `${prefix} abcdef`, created_by: 'user_of_someone_else' }, /user user_of_someone_else was not created by this run/],
+        ['an organization with a name of no run', 'POST', '/organizations', { name: 'Acme', created_by: user.id }, /Acme is not an organization name of run/],
+        ['an organization with a name of another run', 'POST', '/organizations', { name: `${runEmailPrefix(otherRun)} abcdef`, created_by: user.id }, /is not an organization name of run/],
+        ['an organization with metadata', 'POST', '/organizations', { name: `${prefix} abcdef`, created_by: user.id, private_metadata: { plan: 'x' } }, /it carries private_metadata/],
+        ['a member of an organization from elsewhere', 'POST', '/organizations/org_someone_else/memberships', { user_id: user.id, role: 'org:member' }, /organization org_someone_else was not created by this run/],
+        ['a member from elsewhere', 'POST', `/organizations/${org.id}/memberships`, { user_id: 'user_of_someone_else', role: 'org:member' }, /user user_of_someone_else was not created by this run/],
+        ['a role the tests do not give', 'POST', `/organizations/${org.id}/memberships`, { user_id: user.id, role: 'org:owner' }, /org:owner is not a role the tests give/],
+        ['a member with metadata', 'POST', `/organizations/${org.id}/memberships`, { user_id: user.id, role: 'org:member', public_metadata: {} }, /it carries public_metadata/],
+        ['a domain of an organization from elsewhere', 'POST', '/organizations/org_someone_else/domains', { name: newTestDomain(s.run), enrollment_mode: 'automatic_suggestion', verified: true }, /organization org_someone_else was not created by this run/],
+        ['a real domain', 'POST', `/organizations/${org.id}/domains`, { name: 'clerk.com', enrollment_mode: 'automatic_suggestion', verified: true }, /clerk\.com is not a domain of run/],
+        ['a domain of another run', 'POST', `/organizations/${org.id}/domains`, { name: newTestDomain(otherRun), enrollment_mode: 'automatic_suggestion', verified: true }, /is not a domain of run/],
+        ['a domain under a real one', 'POST', `/organizations/${org.id}/domains`, { name: `${prefix}abcd.clerk.test.clerk.com`, enrollment_mode: 'automatic_suggestion', verified: true }, /is not a domain of run/],
+        ['a domain with invitations', 'POST', `/organizations/${org.id}/domains`, { name: newTestDomain(s.run), enrollment_mode: 'automatic_invitation', verified: true }, /verified, with automatic suggestions/],
+        ['an unverified domain', 'POST', `/organizations/${org.id}/domains`, { name: newTestDomain(s.run), enrollment_mode: 'automatic_suggestion', verified: false }, /verified, with automatic suggestions/],
+        ['every permission', 'GET', '/organization_permissions', undefined, /listed with query org:sys_ only/],
+        ['a search for other permissions', 'GET', '/organization_permissions?query=org:billing', undefined, /listed with query org:sys_ only/],
+        ['a permission list ordered', 'GET', '/organization_permissions?query=org:sys_&order_by=key', undefined, /it carries order_by/],
+        ['every role', 'GET', '/organization_roles', undefined, /looked up by one custom role of the tests/],
+        ['a system role', 'GET', '/organization_roles?query=org:admin', undefined, /looked up by one custom role of the tests/],
+        ['a page of roles', 'GET', '/organization_roles?query=org:e2e_domains_reader&limit=500', undefined, /it carries limit/],
+        ['a system role made again', 'POST', '/organization_roles', { name: 'Admin', key: 'org:admin', permissions: [] }, /org:admin is not a custom role of the tests/],
+        ['a role of no table', 'POST', '/organization_roles', { name: 'Owner', key: 'org:owner', permissions: [] }, /org:owner is not a custom role of the tests/],
+        ['a role with another name', 'POST', '/organization_roles', { name: 'Reader', key: 'org:e2e_domains_reader', permissions: ['perm_domains_read', 'perm_memberships_read'] }, /is named Domains reader/],
+        ['a role with metadata', 'POST', '/organization_roles', { name: 'Domains reader', key: 'org:e2e_domains_reader', permissions: [], description: 'x' }, /it carries description/],
+      ];
+      for (const [what, method, path, body, why] of refusedRequests) {
+        const answer = await s.ask(method, path, body);
+        assert.equal(answer.status, 403, what);
+        assert.match(whyRefused(answer), why, what);
+      }
+      assert.equal(s.forwarded.length, sent, 'no refused request reached Clerk');
+
+      const moreThanTheTable = await s.ask('POST', '/organization_roles', { name: 'Domains reader', key: 'org:e2e_domains_reader', permissions: ['perm_domains_read', 'perm_memberships_read', 'perm_domains_manage'] });
+      assert.equal(moreThanTheTable.status, 403);
+      assert.match(whyRefused(moreThanTheTable), /has exactly the permissions org:sys_domains:read, org:sys_memberships:read, and the request gives org:sys_domains:manage, org:sys_domains:read, org:sys_memberships:read/);
+      assert.deepEqual(s.forwarded.slice(sent).map((request) => [request.method, request.url]), [['GET', 'https://api.clerk.com/v1/organization_permissions?query=org%3Asys_&limit=100']], 'only the lookup of the permission ids reached Clerk');
     });
   });
 
