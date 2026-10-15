@@ -53,6 +53,17 @@ describe('taps in the part of a video that attach posts', () => {
     ]);
   });
 
+  it('keep a tap at the very end of a still, and reach past a tap at the end of a block by the length of its pulse', () => {
+    assert.deepEqual(keptPieces(60, [{ from: 20, to: 30 }], [{ from: 21, to: 27 }], [26.99]), [
+      { from: 19, to: 22 },
+      { from: 26.99, to: 30.5 },
+    ]);
+    assert.deepEqual(keptPieces(60, [{ from: 20, to: 30 }], [{ from: 25, to: 40 }], [30.47]), [
+      { from: 19, to: 27 },
+      { from: 30.47, to: 30.97 },
+    ]);
+  });
+
   it('are drawn when they land in a kept piece or pulse into one, at video pixels scaled from the points of the screen', () => {
     const drawn = { viewport: { width: 420, height: 912 }, taps: [{ at: 3, x: 210, y: 450 }, { at: 9.8, x: 100, y: 100 }, { at: 14, x: 10, y: 10 }] };
     assert.deepEqual(pulsesIn([{ from: 2, to: 5 }, { from: 10, to: 12 }], drawn, 1260), [

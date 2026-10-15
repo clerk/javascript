@@ -13,7 +13,7 @@ import { fillField } from './support/fill.ts';
 import { readClerk, readEvidenceMarks, readRun, readTarget, type Target } from './support/inputs.ts';
 import { appLauncher } from './support/launch.ts';
 import { redact } from './support/secret.ts';
-import { tapOnceUncovered } from './support/tapping.ts';
+import { tapMarkedOnceUncovered } from './support/tapping.ts';
 import {
   APP_ELEMENT_IDS,
   CLERK_TEST_CODE,
@@ -112,11 +112,11 @@ export const test = base.extend<{ host: HostFixture }>({
       await sleep(EVIDENCE_PACE.beatMs);
     };
 
-    const tap = (control: Locator, busy: BusyWait): Promise<void> =>
-      tapOnceUncovered(() => control.tap({ timeout: ASSERTION_TIMEOUT_MS }), { timeoutMs: ASSERTION_TIMEOUT_MS, now: Date.now, wait: () => sleep(POLL_MS) }, busy);
-
     const marker = { marksFile: EVIDENCE_MARKS, now: Date.now, hold: sleep };
     const markTap = tapMarker(marker);
+
+    const tap = (control: Locator, busy: BusyWait): Promise<void> =>
+      tapMarkedOnceUncovered(control, markTap, { timeoutMs: ASSERTION_TIMEOUT_MS, now: Date.now, wait: () => sleep(POLL_MS) }, busy);
 
     const host: HostFixture = {
       runId: RUN,
@@ -138,7 +138,7 @@ export const test = base.extend<{ host: HostFixture }>({
       },
       async tap(control) {
         await beat(control);
-        await markTap(control, () => tap(control, runnerBusy()));
+        await tap(control, runnerBusy());
       },
       async fill(field, text) {
         await beat(field);

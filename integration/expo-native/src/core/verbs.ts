@@ -585,8 +585,11 @@ interface SnapshotNode {
   readonly depth?: number;
 }
 
+const VIEWPORT_COMMAND_MS = 30_000;
+
 async function viewportOf(deps: Deps, lease: Lease, platform: Platform): Promise<Viewport | null> {
-  const { selector, call } = agentDeviceFor(deps, lease, platform);
+  const { selector, call: unbounded } = agentDeviceFor(deps, lease, platform);
+  const call = (args: readonly string[]) => unbounded(args, { timeoutMs: VIEWPORT_COMMAND_MS });
   const session = ['--session', `${agentDeviceSession(deps.workspace, platform)}-screen`];
   try {
     if ((await call(['open', deps.host.appId(platform), '--json', ...selector, ...session])).code !== 0) return null;

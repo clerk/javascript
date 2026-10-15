@@ -2,7 +2,12 @@ import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { busyWaits } from '../specs/support/busy-runner.ts';
-import { tapOnceUncovered } from '../specs/support/tapping.ts';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { tapMarker } from '../specs/support/evidence.ts';
+import { tapMarkedOnceUncovered, tapOnceUncovered } from '../specs/support/tapping.ts';
+import { readTaps } from '../src/core/video.ts';
 
 const REFUSED = 'perform tap failed: Ref @e5 is covered by another visible element and cannot be tapped safely';
 
@@ -82,5 +87,18 @@ describe('a tap that the iOS runner refuses because it is still finishing an ear
     const { waits, busy } = waiting(6);
     await tapOnceUncovered(control.tap, control.settle(20_000), busy);
     assert.deepEqual([control.count(), waits.length], [4, 1]);
+  });
+});
+
+describe('the mark of a tap that a transition covered at first', () => {
+  it('has the box the control had at the attempt that landed, not before the wait', async () => {
+    const file = join(mkdtempSync(join(tmpdir(), 'verify-marks-')), 'evidence-marks.jsonl');
+    const control = taps([REFUSED, null]);
+    const boxes = [{ x: 0, y: 900, width: 100, height: 40 }, { x: 0, y: 500, width: 100, height: 40 }];
+    let reads = 0;
+    const moving = { boundingBox: async () => boxes[Math.min(reads++, boxes.length - 1)]!, tap: control.tap };
+    await tapMarkedOnceUncovered(moving, tapMarker({ marksFile: file, now: () => 7_000 }), control.settle(5_000));
+    assert.equal(control.count(), 2);
+    assert.deepEqual(readTaps(file), [{ tappedAt: 7_000, x: 50, y: 520 }]);
   });
 });
