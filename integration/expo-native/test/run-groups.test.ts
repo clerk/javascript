@@ -362,7 +362,7 @@ describe('a run whose spec files declare different settings', () => {
     });
 
     it('keeps no taps, and says attach draws none, when the size of the screen cannot be read or the read runs out of its 30 seconds', async () => {
-      for (const answer of [{ code: 0, stdout: '', stderr: '' }, { code: 124, stdout: '', stderr: '' }]) {
+      for (const answer of [{ code: 0, stdout: '', stderr: '' }, { code: 124, stdout: '', stderr: '' }, { code: 0, stdout: JSON.stringify({ success: true, data: { viewport: { width: 420, height: 0 }, nodes: [] } }), stderr: '' }]) {
         const r = recorded({ launches: true, taps: true });
         const limits: [string, number | undefined][] = [];
         const timing: Runner = async (command, args, options) => {
