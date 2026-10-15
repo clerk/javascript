@@ -39,7 +39,6 @@ export type StoryStatus = 'stable' | 'wip' | 'todo';
 export type WipSubstatus =
   /** View renders against mock/static data; not yet connected to its model/controller. */
   | 'needs wire-up'
-  /** Wired to FAPI, but one or more sensitive actions still run without session reverification. */
   | 'needs reverification'
   /** Awaiting final visual design or a design review. */
   | 'needs design'
