@@ -10,7 +10,6 @@ import type {
 } from '@clerk/shared/types';
 import { deepSnakeToCamel } from '@clerk/shared/underscore';
 
-import { filterSecondFactorsForLoadedUI } from '../../utils/uiCapabilities';
 import { BaseResource, Session, Verification } from './internal';
 
 export class SessionVerification extends BaseResource implements SessionVerificationResource {
@@ -18,17 +17,9 @@ export class SessionVerification extends BaseResource implements SessionVerifica
   level!: SessionVerificationLevel;
   session!: SessionResource;
   supportedFirstFactors: SessionVerificationFirstFactor[] | null = [];
-  private _supportedSecondFactors: SessionVerificationSecondFactor[] | null = [];
+  supportedSecondFactors: SessionVerificationSecondFactor[] | null = [];
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
-
-  get supportedSecondFactors(): SessionVerificationSecondFactor[] | null {
-    return filterSecondFactorsForLoadedUI(SessionVerification.clerk, this._supportedSecondFactors);
-  }
-
-  set supportedSecondFactors(value: SessionVerificationSecondFactor[] | null) {
-    this._supportedSecondFactors = value;
-  }
 
   constructor(data: SessionVerificationJSON | null = null) {
     super();

@@ -6,8 +6,6 @@ type Appearance = any;
 
 export type UIVersion = string;
 
-export type ClerkUICapability = 'second_factor:passkey';
-
 export type ComponentControls = {
   mountComponent: (params: { appearanceKey: string; name: string; node: HTMLDivElement; props?: any }) => void;
   unmountComponent: (params: { node: HTMLDivElement }) => void;
@@ -41,7 +39,6 @@ export interface ClerkUIConstructor {
     moduleManager: ModuleManager,
   ): ClerkUIInstance;
   version: string;
-  __internal_capabilities?: readonly ClerkUICapability[];
 }
 
 export type ClerkUI = ClerkUIInstance;
