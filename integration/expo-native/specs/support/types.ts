@@ -109,6 +109,7 @@ export interface HostFixture {
   expectVisible(target: Locator, what: string, timeoutMs?: number): Promise<void>;
   screenshot(label: string): Promise<void>;
   tap(target: Locator): Promise<void>;
+  back(): Promise<void>;
   fill(target: Locator, text: string | SecretLike): Promise<void>;
   evidence<T>(label: string, body: () => Promise<T>): Promise<T>;
 }
