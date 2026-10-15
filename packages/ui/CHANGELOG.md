@@ -1,5 +1,11 @@
 # @clerk/ui
 
+## 1.40.2
+
+### Patch Changes
+
+- Fix `<SignUp />` asking a returning user to fill in missing fields after a verification challenge. When someone signs up with a social account that already belongs to a user, they are now signed in to that account once the challenge clears, as they are when no challenge is shown. ([#10158](https://github.com/clerk/javascript/pull/10158)) by [@mwickett](https://github.com/mwickett)
+
 ## 1.40.1
 
 ### Patch Changes
