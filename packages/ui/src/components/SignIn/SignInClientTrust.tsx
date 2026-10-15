@@ -3,6 +3,7 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn } from '../../contexts';
+import { useIsWebAuthnSupported } from '../../hooks';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
@@ -21,8 +22,11 @@ function SignInClientTrustInternal(): JSX.Element {
     showAllStrategies,
     toggleAllStrategies,
   } = useSecondFactorSelection(signIn.supportedSecondFactors);
+  const webAuthnSupported = useIsWebAuthnSupported();
   const onShowAlternativeMethodsClicked =
-    (signIn.supportedSecondFactors?.filter(isOfferableSecondFactor).length ?? 0) > 1 ? toggleAllStrategies : undefined;
+    (signIn.supportedSecondFactors?.filter(f => isOfferableSecondFactor(f, webAuthnSupported)).length ?? 0) > 1
+      ? toggleAllStrategies
+      : undefined;
 
   if (!currentFactor) {
     return <LoadingCard />;

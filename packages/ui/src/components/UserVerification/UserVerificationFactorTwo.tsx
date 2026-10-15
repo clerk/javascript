@@ -1,9 +1,9 @@
 import type { SessionVerificationResource, SessionVerificationSecondFactor } from '@clerk/shared/types';
-import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import { useEffect, useMemo } from 'react';
 
 import { withCardStateProvider } from '@/elements/contexts';
 import { LoadingCard } from '@/elements/LoadingCard';
+import { useIsWebAuthnSupported } from '@/hooks';
 import { useRouter } from '@/router';
 
 import { useSecondFactorSelection } from '../SignIn/useSecondFactorSelection';
@@ -27,16 +27,17 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   const { navigate } = useRouter();
   const { data } = useUserVerificationSession();
   const sessionVerification = data as SessionVerificationResource;
+  const webAuthnSupported = useIsWebAuthnSupported();
 
   const availableFactors = useMemo(() => {
     return (
       sessionVerification.supportedSecondFactors
         ?.filter(factor => SUPPORTED_STRATEGIES.includes(factor.strategy))
         // Only include passkey if the device supports it.
-        ?.filter(factor => factor.strategy !== 'passkey' || isWebAuthnSupported())
+        ?.filter(factor => factor.strategy !== 'passkey' || webAuthnSupported)
         ?.sort(sortByPrimaryFactor) || null
     );
-  }, [sessionVerification.supportedSecondFactors]);
+  }, [sessionVerification.supportedSecondFactors, webAuthnSupported]);
 
   const {
     currentFactor,

@@ -6,6 +6,7 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useIsWebAuthnSupported } from '../../hooks';
 import { useRouter } from '../../router';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
@@ -30,8 +31,11 @@ function SignInFactorTwoInternal(): JSX.Element {
     showAllStrategies,
     toggleAllStrategies,
   } = useSecondFactorSelection(signIn.supportedSecondFactors);
+  const webAuthnSupported = useIsWebAuthnSupported();
   const onShowAlternativeMethodsClicked =
-    (signIn.supportedSecondFactors?.filter(isOfferableSecondFactor).length ?? 0) > 1 ? toggleAllStrategies : undefined;
+    (signIn.supportedSecondFactors?.filter(f => isOfferableSecondFactor(f, webAuthnSupported)).length ?? 0) > 1
+      ? toggleAllStrategies
+      : undefined;
 
   React.useEffect(() => {
     if (clerk.__internal_setActiveInProgress) {

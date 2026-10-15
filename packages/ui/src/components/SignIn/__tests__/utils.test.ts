@@ -1,4 +1,4 @@
-import type { SignInResource } from '@clerk/shared/types';
+import type { SignInFactor, SignInResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import type { FormControlState } from '@/ui/utils/useFormControl';
@@ -6,8 +6,10 @@ import type { FormControlState } from '@/ui/utils/useFormControl';
 import {
   determineSalutation,
   determineStartingSignInFactor,
+  determineStartingSignInSecondFactor,
   getPreferredAlternativePhoneChannel,
   getPreferredAlternativePhoneChannelForCombinedFlow,
+  isOfferableSecondFactor,
 } from '../utils';
 
 describe('determineStrategy(signIn, displayConfig)', () => {
@@ -20,9 +22,11 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
-        strategy: 'password',
-      });
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password', false)).toEqual(
+        {
+          strategy: 'password',
+        },
+      );
     });
 
     it('selects based on user input in the previous step if password is not available', () => {
@@ -39,10 +43,12 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
-        strategy: 'phone_code',
-        safeIdentifier: 'jdoe@example.com',
-      });
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password', false)).toEqual(
+        {
+          strategy: 'phone_code',
+          safeIdentifier: 'jdoe@example.com',
+        },
+      );
     });
 
     it('selects by prioritizing email_code if all the above fail', () => {
@@ -59,10 +65,12 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
-        strategy: 'email_code',
-        safeIdentifier: 'ccoe@example.com',
-      });
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password', false)).toEqual(
+        {
+          strategy: 'email_code',
+          safeIdentifier: 'ccoe@example.com',
+        },
+      );
     });
 
     it('selects phone_code if all the above fail', () => {
@@ -75,10 +83,12 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toEqual({
-        strategy: 'phone_code',
-        safeIdentifier: 'jdoe@example.com',
-      });
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password', false)).toEqual(
+        {
+          strategy: 'phone_code',
+          safeIdentifier: 'jdoe@example.com',
+        },
+      );
     });
 
     it('returns null if every other scenario', () => {
@@ -86,7 +96,9 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         identifier: undefined,
         supportedFirstFactors: [],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password')).toBeNull();
+      expect(
+        determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'password', false),
+      ).toBeNull();
     });
   });
 
@@ -108,7 +120,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp', false)).toEqual({
         strategy: 'phone_code',
         safeIdentifier: 'jdoe@example.com',
       });
@@ -131,7 +143,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp', false)).toEqual({
         strategy: 'email_code',
         safeIdentifier: 'ccoe@example.com',
       });
@@ -150,7 +162,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp', false)).toEqual({
         strategy: 'phone_code',
         safeIdentifier: 'jdoe@example.com',
       });
@@ -164,7 +176,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
           },
         ],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toEqual({
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp', false)).toEqual({
         strategy: 'password',
       });
     });
@@ -174,7 +186,7 @@ describe('determineStrategy(signIn, displayConfig)', () => {
         identifier: undefined,
         supportedFirstFactors: [],
       } as unknown as SignInResource;
-      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp')).toBeNull();
+      expect(determineStartingSignInFactor(signIn.supportedFirstFactors, signIn.identifier, 'otp', false)).toBeNull();
     });
   });
 
@@ -309,5 +321,25 @@ describe('getPreferredAlternativePhoneChannelForCombinedFlow', () => {
       '+447911123456',
     );
     expect(result).toBeNull();
+  });
+});
+
+describe('determineStartingSignInSecondFactor', () => {
+  const secondFactors = [{ strategy: 'totp' }, { strategy: 'passkey' }] as SignInFactor[];
+
+  it('prefers passkey when WebAuthn is supported', () => {
+    expect(determineStartingSignInSecondFactor(secondFactors, true)).toEqual({ strategy: 'passkey' });
+  });
+
+  it('falls back to the next factor when WebAuthn is not supported', () => {
+    expect(determineStartingSignInSecondFactor(secondFactors, false)).toEqual({ strategy: 'totp' });
+  });
+});
+
+describe('isOfferableSecondFactor', () => {
+  it('offers passkey only when WebAuthn is supported', () => {
+    expect(isOfferableSecondFactor({ strategy: 'passkey' }, true)).toBe(true);
+    expect(isOfferableSecondFactor({ strategy: 'passkey' }, false)).toBe(false);
+    expect(isOfferableSecondFactor({ strategy: 'totp' }, false)).toBe(true);
   });
 });

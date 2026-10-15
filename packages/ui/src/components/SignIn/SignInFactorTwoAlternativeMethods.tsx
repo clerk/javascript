@@ -8,6 +8,7 @@ import { ArrowBlockButton } from '@/elements/ArrowBlockButton';
 import { Card } from '@/elements/Card';
 import { useCardState } from '@/elements/contexts';
 import { Header } from '@/elements/Header';
+import { useIsWebAuthnSupported } from '@/hooks';
 import { backupCodePrefFactorComparator } from '@/utils/factorSorting';
 import { formatSafeIdentifier } from '@/utils/formatSafeIdentifier';
 
@@ -40,6 +41,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
   const { onHavingTroubleClick, onFactorSelected, onBackLinkClick } = props;
   const card = useCardState();
   const { supportedSecondFactors } = useCoreSignIn();
+  const webAuthnSupported = useIsWebAuthnSupported();
 
   return (
     <Flow.Part part='alternativeMethods'>
@@ -58,7 +60,7 @@ const AlternativeMethodsList = (props: AlternativeMethodsProps & { onHavingTroub
             <Col gap={2}>
               {supportedSecondFactors &&
                 supportedSecondFactors
-                  .filter(isOfferableSecondFactor)
+                  .filter(factor => isOfferableSecondFactor(factor, webAuthnSupported))
                   .sort(backupCodePrefFactorComparator)
                   .map((factor, i) => (
                     <ArrowBlockButton
