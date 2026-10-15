@@ -99,6 +99,6 @@ describe('the mark of a tap that a transition covered at first', () => {
     const moving = { boundingBox: async () => boxes[Math.min(reads++, boxes.length - 1)]!, tap: control.tap };
     await tapMarkedOnceUncovered(moving, tapMarker({ marksFile: file, now: () => 7_000 }), control.settle(5_000));
     assert.equal(control.count(), 2);
-    assert.deepEqual(readTaps(file), [{ tappedAt: 7_000, x: 50, y: 520 }]);
+    assert.deepEqual(readTaps(file), [{ sentAt: 7_000, tappedAt: 7_000, x: 50, y: 520 }]);
   });
 });

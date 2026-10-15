@@ -1,9 +1,8 @@
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import type { EvidenceMark, TapMark } from '../../specs/support/evidence.ts';
-import type { Platform } from '../../specs/support/types.ts';
 import type { Runner } from './exec.ts';
-import type { EvidencePath, EvidenceRecord, EvidenceSpan, EvidenceTap } from './types.ts';
+import type { EvidencePath, EvidenceRecord, EvidenceSpan, EvidenceTap, Viewport } from './types.ts';
 
 export interface Span {
   readonly from: number;
@@ -20,10 +19,10 @@ export const CUT = {
   fps: 30,
 } as const;
 
-// agent-device returns a tap after the touch has landed: the iOS XCTest runner holds the command 0.3 s after it dispatches the touch, and on Android `adb shell input tap` and the trip back take about 80 ms.
-export const TAP_LANDS_BEFORE_RETURN_MS: Readonly<Record<Platform, number>> = { ios: 300, android: 80 };
+// An Android screen can change within a frame of the touch, so a pulse drawn at the touch shows on the next screen. Each pulse starts leadSeconds before the tapped control first changes in the video.
+export const PULSE = { seconds: 0.5, widthShare: 0.1, leadSeconds: 0.2 } as const;
 
-export const PULSE = { seconds: 0.5, widthShare: 0.1 } as const;
+export const REACTION = { before: 0.1, after: 0.5, stillFor: 0.1, level: 8, share: 0.02, width: 0.4, height: 0.06 } as const;
 
 export function spansOfMarks(marks: readonly EvidenceMark[], videoStartedAt: number): readonly EvidenceSpan[] {
   return marks
@@ -46,7 +45,9 @@ function parseMark(line: string): EvidenceMark | null {
 function parseTap(line: string): TapMark | null {
   try {
     const tap = JSON.parse(line) as Partial<TapMark>;
-    return typeof tap.tappedAt === 'number' && typeof tap.x === 'number' && typeof tap.y === 'number' ? { tappedAt: tap.tappedAt, x: tap.x, y: tap.y } : null;
+    return typeof tap.sentAt === 'number' && typeof tap.tappedAt === 'number' && typeof tap.x === 'number' && typeof tap.y === 'number'
+      ? { sentAt: tap.sentAt, tappedAt: tap.tappedAt, x: tap.x, y: tap.y }
+      : null;
   } catch {
     return null;
   }
@@ -58,10 +59,63 @@ export const readMarks = (file: string): readonly EvidenceMark[] => linesOf(file
 
 export const readTaps = (file: string): readonly TapMark[] => linesOf(file).flatMap((line) => parseTap(line) ?? []);
 
-export function tapsOfMarks(taps: readonly TapMark[], videoStartedAt: number, platform: Platform): readonly EvidenceTap[] {
+export interface TapWindow {
+  readonly sent: number;
+  readonly returned: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+export function tapWindows(taps: readonly TapMark[], videoStartedAt: number): readonly TapWindow[] {
   return taps
-    .map((tap) => ({ at: round((tap.tappedAt - TAP_LANDS_BEFORE_RETURN_MS[platform] - videoStartedAt) / 1000), x: tap.x, y: tap.y }))
-    .filter((tap) => tap.at > 0);
+    .map((tap) => ({ sent: round((tap.sentAt - videoStartedAt) / 1000), returned: round((tap.tappedAt - videoStartedAt) / 1000), x: tap.x, y: tap.y }))
+    .filter((tap) => tap.returned > 0);
+}
+
+export interface Change {
+  readonly at: number;
+  readonly share: number;
+}
+
+export function parseChanges(metadata: string): readonly Change[] {
+  const changes: Change[] = [];
+  let at: number | null = null;
+  for (const line of metadata.split('\n')) {
+    const time = /pts_time:([\d.]+)/.exec(line);
+    const average = /lavfi\.signalstats\.YAVG=([\d.]+)/.exec(line);
+    if (time !== null) at = Number(time[1]);
+    if (average !== null && at !== null) changes.push({ at, share: Number(average[1]) / 255 });
+  }
+  return changes;
+}
+
+export function reactionAt(changes: readonly Change[], tap: TapWindow): number | null {
+  const moved = changes.filter((change) => change.share >= REACTION.share).map((change) => change.at);
+  return moved.find((at, i) => at >= tap.sent - REACTION.before && at <= tap.returned + REACTION.after && (i === 0 || at - moved[i - 1]! >= REACTION.stillFor)) ?? null;
+}
+
+export const pulseAt = (tap: TapWindow, reaction: number | null): number => round(Math.max(0, reaction === null ? tap.sent : reaction - PULSE.leadSeconds));
+
+function reactionFilter(tap: TapWindow, viewport: Viewport): string {
+  const fx = tap.x / viewport.width;
+  const fy = tap.y / viewport.height;
+  return [
+    `trim=end=${tap.returned + REACTION.after}`,
+    `crop=w=iw*${REACTION.width}:h=ih*${REACTION.height}:x=max(0\\,min(iw-ow\\,iw*${fx}-ow/2)):y=max(0\\,min(ih-oh\\,ih*${fy}-oh/2))`,
+    'scale=96:32,format=gray,tblend=all_mode=difference',
+    `lut=c0='if(gt(val\\,${REACTION.level})\\,255\\,0)'`,
+    'signalstats,metadata=mode=print:key=lavfi.signalstats.YAVG:file=-',
+  ].join(',');
+}
+
+export async function evidenceTapsOf(video: EvidencePath, taps: readonly TapWindow[], viewport: Viewport, runner: Runner): Promise<readonly EvidenceTap[]> {
+  const drawn: EvidenceTap[] = [];
+  for (const tap of taps) {
+    const from = Math.max(0, tap.sent - REACTION.before - 1);
+    const scan = await runner('ffmpeg', ['-hide_banner', '-nostats', '-v', 'error', '-noaccurate_seek', '-ss', String(from), '-copyts', '-i', video, '-an', '-vf', reactionFilter(tap, viewport), '-f', 'null', '-']);
+    drawn.push({ at: pulseAt(tap, scan.code === 0 ? reactionAt(parseChanges(scan.stdout), tap) : null), x: tap.x, y: tap.y });
+  }
+  return drawn;
 }
 
 const round = (seconds: number): number => Math.round(seconds * 1000) / 1000;
