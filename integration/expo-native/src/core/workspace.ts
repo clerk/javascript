@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
-import { isRunId, newRunId } from '../../specs/support/inputs.ts';
+import { isRunId, newRunId, runIdParts } from '../../specs/support/inputs.ts';
 import { currentProcess, isRunning, sleep, type ProcessRef } from './exec.ts';
 import { compareAndSwapSlot, readSlot } from './slot.ts';
 import {
@@ -143,6 +143,22 @@ async function withSlotLock<T>(dir: string, timeoutMs: number, onTimeout: () => 
 const deviceBusy = (platform: Platform, fix: string) =>
   new VerifyFailure('DEVICE_BUSY', `another {cli} process in this worktree is driving the ${platform} device`, fix);
 
+const CLAIM = '.tag-';
+
+function claimTag(runsDir: string, tag: string): boolean {
+  try {
+    writeFileSync(join(runsDir, `${CLAIM}${tag}`), '', { flag: 'wx' });
+    return true;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false;
+    throw error;
+  }
+}
+
+export function keptTags(runsDir: string): string[] {
+  return readdirSync(runsDir).flatMap((name) => (isRunId(name) ? [runIdParts(name).tag] : name.startsWith(CLAIM) ? [name.slice(CLAIM.length)] : []));
+}
+
 export function openWorkspace(options: WorkspaceOptions): Workspace {
   const root = join(options.packageDir, WORKSPACE_DIR);
   const home = options.home ?? join(homedir(), '.verify');
@@ -177,7 +193,10 @@ export function openWorkspace(options: WorkspaceOptions): Workspace {
     agentDeviceDir: agentDeviceStateDir(root),
     newRun() {
       // The worktree's one application outlives its runs, and a run finds its users there by the tag alone.
-      const run = newRunId(runs());
+      const runsDir = dir('runs');
+      let run: RunId;
+      do run = newRunId(keptTags(runsDir));
+      while (!claimTag(runsDir, runIdParts(run).tag));
       return { run, dir: dir('runs', run) as EvidencePath, scratch: dir('scratch', run) as ScratchPath };
     },
     runDir: (run) => join(root, 'runs', run) as EvidencePath,
