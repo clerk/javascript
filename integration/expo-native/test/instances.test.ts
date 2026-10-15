@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { startBroker } from '../src/core/broker.ts';
 import { createClerkBackends } from '../src/core/clerk.ts';
-import { newTestEmail } from '../specs/support/clerk.ts';
+import { testEmail } from '../specs/support/clerk.ts';
 import { newRunId } from '../specs/support/inputs.ts';
 import type { ExecResult, Runner } from '../src/core/exec.ts';
 import { compareEnvironment, flattenEnvironment } from '../src/core/instances/settings.ts';
@@ -1249,7 +1249,7 @@ describe('finishing a ledger', () => {
     const w = world();
     await w.instances.ensure(NOTHING_NEW, quiet);
     const run = newRunId();
-    w.workspace.append({ id: newEntryId(), kind: 'user', run, userId: 'user_1', email: newTestEmail(run) });
+    w.workspace.append({ id: newEntryId(), kind: 'user', run, userId: 'user_1', email: testEmail(run, 'maya') });
 
     const before = w.clerk.requests.length;
     await w.open().finish(w.workspace, { keepApplications: false }, quiet);
@@ -1314,7 +1314,7 @@ describe('finishing a ledger', () => {
     const w = world();
     await w.instances.ensure(NOTHING_NEW, quiet);
     const run = newRunId();
-    w.workspace.append({ id: newEntryId(), kind: 'user', run, userId: 'user_1', email: newTestEmail(run) });
+    w.workspace.append({ id: newEntryId(), kind: 'user', run, userId: 'user_1', email: testEmail(run, 'maya') });
     await w.open().finish(w.workspace, { keepApplications: true }, quiet);
     assert.equal(w.clerk.live().length, 1);
     assert.deepEqual(w.workspace.unclosedEntries().map((entry) => entry.kind), ['application']);
@@ -1577,7 +1577,7 @@ describe('the broker of a run', () => {
     const { run, scratch } = w.workspace.newRun();
     const broker = await startBroker(run, w.workspace, scratch as ScratchPath, { keys: () => w.instances.keys(), fetch: w.clerk.fetch, beforeLaunch: async () => undefined });
     const create = async () => {
-      const response = await fetch(`${broker.url}/users`, { method: 'POST', headers: { Authorization: `Bearer ${readFileSync(broker.tokenFile, 'utf8')}` }, body: JSON.stringify({ email_address: [newTestEmail(run)], skip_password_requirement: true }) });
+      const response = await fetch(`${broker.url}/users`, { method: 'POST', headers: { Authorization: `Bearer ${readFileSync(broker.tokenFile, 'utf8')}` }, body: JSON.stringify({ email_address: [testEmail(run, 'maya')], skip_password_requirement: true }) });
       return { status: response.status, json: (await response.json()) as Record<string, unknown> };
     };
     try {

@@ -122,6 +122,7 @@ export const test = base.extend<{ host: HostFixture }>({
       runId: RUN,
       app,
       newEmail: async (options) => users.newEmail(options),
+      newOrganizationName: users.newOrganizationName,
       newPhone: users.newPhone,
       seedUser: users.seed,
       seedOrganization: users.seedOrganization,

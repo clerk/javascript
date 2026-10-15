@@ -1,4 +1,5 @@
-import { runEmailPrefix } from '../../specs/support/clerk.ts';
+import { isTestEmailOf } from '../../specs/support/clerk.ts';
+import { runIdParts } from '../../specs/support/inputs.ts';
 import type { InstanceKeys } from './keys.ts';
 import { VerifyFailure, type PublishableKey, type RunId, type TestEmail } from './types.ts';
 
@@ -65,11 +66,10 @@ export function createClerkBackends(fetchImpl: typeof fetch = fetch): (keys: () 
 
   return (keys) => ({
     async usersOfRun(run) {
-      const prefix = runEmailPrefix(run);
-      const listed = await request(keys(), 'GET', `/users?limit=${USERS_PAGE_LIMIT}&email_address_query=${encodeURIComponent(prefix)}`);
+      const listed = await request(keys(), 'GET', `/users?limit=${USERS_PAGE_LIMIT}&email_address_query=${encodeURIComponent(runIdParts(run).tag)}`);
       if (!Array.isArray(listed)) return [];
       return listed.flatMap((user: { id?: unknown; email_addresses?: { email_address?: unknown }[] } | null) => {
-        const email = (user?.email_addresses ?? []).map((address) => address.email_address).find((address): address is string => typeof address === 'string' && address.startsWith(prefix));
+        const email = (user?.email_addresses ?? []).map((address) => address.email_address).find((address): address is string => typeof address === 'string' && isTestEmailOf(run, address));
         return typeof user?.id === 'string' && email !== undefined ? [{ userId: user.id, email: email as TestEmail }] : [];
       });
     },

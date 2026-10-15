@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { heldInstances } from '../testing/fake-instances.ts';
 import { describe, it } from 'node:test';
-import { newTestEmail } from '../specs/support/clerk.ts';
+import { testEmail } from '../specs/support/clerk.ts';
 import { assertPublishable, loggedUserIds, sealEvidence } from '../src/core/evidence.ts';
 import type { Runner } from '../src/core/exec.ts';
 import { evidenceBlock, evidenceMarkers, summarize, withEvidenceBlock } from '../src/core/publish.ts';
@@ -41,7 +41,7 @@ function partialRecord(dir: EvidencePath, run: RunId): Omit<EvidenceRecord, 'sea
     screenshots: [{ label: 'profile', path: join(dir, 'screenshots', 'profile.png') as EvidencePath }],
     appLog: join(dir, 'app.log') as EvidencePath,
     e2eReport: join(dir, 'e2e', 'report.json') as EvidencePath,
-    identities: [{ email: newTestEmail(run), userId: OWN_USER }],
+    identities: [{ email: testEmail(run, 'maya'), userId: OWN_USER }],
     settings: [{ label: 'standard', askedBy: null, specs: ['specs/explored/a.e2e.ts'], application: null, changed: false, held: true, e2eReport: join(dir, 'e2e', 'report.json') as EvidencePath }],
   };
 }

@@ -14,10 +14,11 @@ import { summarize } from '../src/core/publish.ts';
 import { attach, runVerb, type Deps } from '../src/core/verbs.ts';
 import { readMarks } from '../src/core/video.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
-import { VerifyFailure, type BuildKey, type BuiltApp, type Command, type DeviceBackend, type EvidencePath, type HostAdapter, type InstanceSettings, type LocalLease, type RemoteLease, type ScratchPath } from '../src/core/types.ts';
+import { VerifyFailure, type BuildKey, type BuiltApp, type RunId, type Command, type DeviceBackend, type EvidencePath, type HostAdapter, type InstanceSettings, type LocalLease, type RemoteLease, type ScratchPath } from '../src/core/types.ts';
 import { PLATFORM_KEY, fakeClerk, type FakeClerkOptions } from '../testing/fake-clerk.ts';
 import { LEFT_OUT, linesLeftOut, watchDriver } from '../src/core/driver.ts';
 import { readAgent } from '../specs/support/agent.ts';
+import { isTestEmailOf, runPassword } from '../specs/support/clerk.ts';
 
 const MFA: InstanceSettings = { config: { auth_multi_factor: { required_for_sign_up: true } }, environment: { 'user_settings.sign_up.mfa.required': true } };
 const FORCED_ORG: InstanceSettings = { config: { organization_settings: { force_organization_selection: true } }, environment: { 'organization_settings.force_organization_selection': true } };
@@ -30,6 +31,8 @@ const SETUP_MFA = 'specs/features/session-tasks/setup-mfa.e2e.ts';
 const SIGN_UP = 'specs/features/sign-up/complete.e2e.ts';
 const COMMITTED: Readonly<Record<string, InstanceSettings | null>> = { [AUTH_START]: null, [CHOOSE_ORG]: FORCED_ORG, [COMPLETE_MFA]: MFA, [SETUP_MFA]: MFA, [SIGN_UP]: null };
 
+const SUPPORT = { clerk: join(import.meta.dirname, '..', 'specs', 'support', 'clerk.ts'), names: join(import.meta.dirname, '..', 'specs', 'support', 'names.ts') };
+
 const FAKE_E2E = `#!${process.execPath}
 const fs = require('node:fs');
 const path = require('node:path');
@@ -41,8 +44,12 @@ fs.appendFileSync('invocations.jsonl', JSON.stringify({ specs, output, args }) +
 fs.appendFileSync('order.log', 'e2e opens the app with no arguments\\n');
 (async () => {
   const token = fs.readFileSync(process.env.CLERK_E2E_API_TOKEN_FILE, 'utf8');
-  const [, runTime, runTag] = process.env.CLERK_E2E_RUN_ID.split('-');
-  const emailOf = () => runTime + runTag + require('node:crypto').randomBytes(2).toString('hex') + '+clerk_test@example.com';
+  const run = process.env.CLERK_E2E_RUN_ID;
+  const { newTestPassword, runPassword, testEmail } = await import(${JSON.stringify(SUPPORT.clerk)});
+  const { runNames } = await import(${JSON.stringify(SUPPORT.names)});
+  const names = runNames(run, path.join(require('node:os').tmpdir(), 'verify-fake-names', run));
+  const emailOf = () => testEmail(run, names.claim('person'));
+  const plain = (secret) => secret.use('device-input', (value) => value);
   const stateDir = process.env.AGENT_DEVICE_STATE_DIR;
   const driver = plan.driver;
   if (driver) {
@@ -61,12 +68,12 @@ fs.appendFileSync('order.log', 'e2e opens the app with no arguments\\n');
     if (driver.rewrites) for (const file of driver.rewrites) fs.writeFileSync(path.join(stateDir, file), '');
     if (driver.writes) {
       const ask = (route, body) => fetch(process.env.CLERK_E2E_API_URL + route, { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: JSON.stringify(body) }).then((answer) => answer.json());
-      const seededPassword = require('node:crypto').randomBytes(12).toString('hex') + 'Aa1!';
+      const seededPassword = plain(newTestPassword());
       const user = await ask('/users', { email_address: [emailOf()], password: seededPassword, bypass_client_trust: true });
       const ticket = (await ask('/sign_in_tokens', { user_id: user.id, expires_in_seconds: 60 })).token;
       const part = (claims) => Buffer.from(JSON.stringify(claims)).toString('base64url');
       const sessionToken = [part({ alg: 'RS256', typ: 'JWT' }), part({ sid: 'sess_fake', sub: user.id }), require('node:crypto').randomBytes(32).toString('base64url')].join('.');
-      const secrets = { ...driver.known, standInToken: token, seededPassword, ticket, sessionToken, runPassword: 'Verify-' + process.env.CLERK_E2E_RUN_ID + '-Pw1!' };
+      const secrets = { ...driver.known, standInToken: token, seededPassword, ticket, sessionToken, runPassword: plain(runPassword(run)) };
       fs.writeFileSync('secrets-the-driver-saw.json', JSON.stringify(secrets));
       const named = (line) => Object.entries(secrets).reduce((text, [name, value]) => text.split('{' + name + '}').join(value), line);
       const expanded = (line) => {
@@ -104,7 +111,7 @@ fs.appendFileSync('order.log', 'e2e opens the app with no arguments\\n');
       const again = await fetch(process.env.CLERK_E2E_API_URL + '/about_to_launch', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
       fs.appendFileSync('order.log', 'retries the open for ' + path.basename(file) + ', answered ' + again.status + ' ' + (await again.text()) + '\\n');
     }
-    const password = require('node:crypto').randomBytes(12).toString('hex') + 'Aa1!';
+    const password = plain(newTestPassword());
     const seeded = await fetch(process.env.CLERK_E2E_API_URL + '/users', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: JSON.stringify({ email_address: [emailOf()], ...(plan.password === true ? { password, bypass_client_trust: true } : { skip_password_requirement: true }) }) });
     const body = await seeded.json();
     if (plan.password) {
@@ -453,7 +460,8 @@ describe('a run whose spec files declare different settings', () => {
     assert.equal(record.identities.length, 5);
     assert.ok(record.identities.every((identity) => identity.userId?.startsWith(`user_${application.id}_`)));
     assert.equal(w.workspace.unclosedEntries().filter((entry) => entry.kind === 'user' && entry.run === record.run).length, 5, 'each spec made one user, and the run ledgered it');
-    assert.deepEqual(record.identities.map((identity) => identity.email.startsWith(record.run.split('-').slice(1).join(''))), [true, true, true, true, true]);
+    assert.deepEqual(record.identities.map((identity) => isTestEmailOf(record.run, identity.email)), [true, true, true, true, true]);
+    assert.equal(new Set(record.identities.map((identity) => identity.email)).size, 5, 'the e2e process of each group takes names the others did not');
 
     const log = readFileSync(join(dir, 'e2e.log'), 'utf8').split('\n');
     assert.deepEqual(log.filter((line) => line.startsWith('settings ')), [`settings ${ORG_LABEL}: 1 spec file`, `settings ${MFA_LABEL}: 2 spec files`]);
@@ -785,7 +793,7 @@ describe('the driver logs in the evidence of a run', () => {
     const { record, dir } = await runVerb({ ...w.deps(), env: { GITHUB_TOKEN }, agent: () => readAgent({ AI_GATEWAY_API_KEY: GATEWAY_KEY }) }, RUN_ALL);
     const secrets = JSON.parse(readFileSync(join(w.dir, 'secrets-the-driver-saw.json'), 'utf8')) as Record<Kind, string>;
     assert.equal(secrets.secretKey, w.clerk.live()[0]!.sk, 'the key planted is the key of the application the run used');
-    assert.equal(secrets.runPassword, `Verify-${record.run}-Pw1!`);
+    assert.equal(secrets.runPassword, runPassword(record.run).use('device-input', (plain) => plain));
     return { w, record, dir, secrets };
   };
 
@@ -799,8 +807,8 @@ describe('the driver logs in the evidence of a run', () => {
         assert.equal(quotedAlone(copy).includes(secrets[kind].slice(0, 8)), false, `the ${name} spells the ${kind}`);
       }
     }
-    const typedLines = [secrets.runPassword.length, secrets.seededPassword.length, 3, 2];
-    assert.deepEqual(copies.daemon.trim().split('\n'), [`Daemon error: ${LEFT_OUT}`, linesLeftOut(9 + 3 + 2)]);
+    const typedLines = [secrets.runPassword.length, secrets.seededPassword.length, 1, 1];
+    assert.deepEqual(copies.daemon.trim().split('\n'), [`Daemon error: ${LEFT_OUT}`, linesLeftOut(9 + 1 + 1)]);
     assert.deepEqual(copies.runner.trimEnd().split('\n'), [
       `    t =     1.00s Find the "${LEFT_OUT}" SecureTextField`,
       ...['2.00', '3.00', '4.00', '5.00'].flatMap((seconds, at) => Array.from({ length: typedLines[at]! }, () => `    t = ${seconds.padStart(8)}s Type ${LEFT_OUT}`)),
@@ -844,7 +852,7 @@ describe('the driver logs in the evidence of a run', () => {
         ...watch,
         collect: () => {
           watch.collect();
-          writeFileSync(join(runDir, 'driver', 'runner-that-kept-a-secret.log'), `Verify-${runDir.split('/').at(-1)}-Pw1!\n`);
+          writeFileSync(join(runDir, 'driver', 'runner-that-kept-a-secret.log'), `${runPassword(runDir.split('/').at(-1) as RunId).use('device-input', (plain) => plain)}\n`);
         },
       };
     };
