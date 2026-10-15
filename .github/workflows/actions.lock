@@ -92,6 +92,9 @@ workflows:
         - 'slackapi/slack-github-action@v1.27.1'
     '.github/workflows/validate-renovate-config.yml':
         - 'actions/checkout@v4.4.0'
+    '.github/workflows/verify-attach.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'actions/setup-node@v7.1.0'
     '.github/workflows/verify-e2e.yml':
         - 'actions/cache@v4.3.0'
         - 'actions/checkout@v4.4.0'
@@ -122,6 +125,11 @@ dependencies:
         commit: 'sha1-11d5960a326750d5838078e36cf38b85af677262'
         owner_id: 44036562
         repo_id: 197814629
+    'actions/checkout@v7.0.1':
+        ref: 'v7.0.1'
+        commit: 'sha1-3d3c42e5aac5ba805825da76410c181273ba90b1'
+        owner_id: 44036562
+        repo_id: 197814629
     'actions/download-artifact@v4.3.0':
         ref: 'v4.3.0'
         commit: 'sha1-d3f86a106a0bac45b974a628896c90dbdf5c8093'
@@ -150,6 +158,11 @@ dependencies:
     'actions/setup-node@v4.4.0':
         ref: 'v4.4.0'
         commit: 'sha1-49933ea5288caeca8642d1e84afbd3f7d6820020'
+        owner_id: 44036562
+        repo_id: 189476904
+    'actions/setup-node@v7.1.0':
+        ref: 'v7.1.0'
+        commit: 'sha1-949feb2413d6458794dcd2491c4babbbce0c15c1'
         owner_id: 44036562
         repo_id: 189476904
     'actions/stale@v9.1.0':
