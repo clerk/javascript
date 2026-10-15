@@ -17,8 +17,8 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const { general } = useOrganizationProfileFixture();
-  return <OrganizationProfileGeneralPanelView {...general} />;
+  const { pages } = useOrganizationProfileFixture();
+  return pages.general;
 }
 
 export function ReadOnly() {
