@@ -331,6 +331,11 @@ describe("the CLI's stand-in for the Backend API", () => {
       assert.equal(moreThanTheTable.status, 403);
       assert.match(whyRefused(moreThanTheTable), /has exactly the permissions org:sys_domains:read, org:sys_memberships:read, and the request gives org:sys_domains:manage, org:sys_domains:read, org:sys_memberships:read/);
       assert.deepEqual(s.forwarded.slice(sent).map((request) => [request.method, request.url]), [['GET', 'https://api.clerk.com/v1/organization_permissions?query=org%3Asys_&limit=100']], 'only the lookup of the permission ids reached Clerk');
+
+      const keysForIds = await s.ask('POST', '/organization_roles', { name: 'Domains reader', key: 'org:e2e_domains_reader', permissions: ['org:sys_domains:read', 'perm_memberships_read'] });
+      assert.equal(keysForIds.status, 403);
+      assert.match(whyRefused(keysForIds), /the request gives org:sys_domains:read \(not a permission id\), org:sys_memberships:read$/);
+      assert.deepEqual(s.forwarded.slice(sent + 1).map((request) => request.method), ['GET'], 'a permission key in place of its id is not forwarded');
     });
   });
 
