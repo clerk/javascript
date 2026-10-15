@@ -7,3 +7,9 @@ self-hosted-runner:
   labels:
     - blacksmith-8vcpu-ubuntu-2204
     - blacksmith-6vcpu-macos-26
+
+paths:
+  .github/workflows/**/*.yml:
+    ignore:
+      # `$/` self-repo action syntax; unsupported by actionlint 1.7.12 (rhysd/actionlint#711)
+      - 'specifying action "\$/[^"]*" in invalid format because ref is missing'
