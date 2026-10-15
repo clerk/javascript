@@ -1,3 +1,4 @@
+import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Field } from '@clerk/mosaic/components/field';
 import { Select } from '@clerk/mosaic/components/select';
 import { Text } from '@clerk/mosaic/components/text';
@@ -57,6 +58,50 @@ export function Descriptions() {
       >
         <Select.Trigger />
         <Select.Popup />
+      </Select.Root>
+    </Field.Root>
+  );
+}
+
+const organizations = [
+  { value: 'acme', label: 'Acme Inc.', description: 'Owner', initials: 'AI' },
+  { value: 'globex', label: 'Globex', description: 'Member', initials: 'GX' },
+  { value: 'initech', label: 'Initech', initials: 'IN' },
+];
+
+/** Rows lead with an avatar; the trigger shows the label only. */
+export function Media() {
+  return (
+    <Field.Root xstyle={styles.stack}>
+      <Field.Label>Organization</Field.Label>
+      <Select.Root
+        items={organizations}
+        defaultValue='acme'
+        alignItemWithTrigger={false}
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          {organizations.map(organization => (
+            <Select.Option
+              key={organization.value}
+              value={organization.value}
+              label={organization.label}
+            >
+              <Select.Media>
+                <Avatar.Root
+                  shape='square'
+                  size='fit'
+                >
+                  <Avatar.Fallback>{organization.initials}</Avatar.Fallback>
+                </Avatar.Root>
+              </Select.Media>
+              <Select.Content>
+                <Select.Label>{organization.label}</Select.Label>
+                {organization.description ? <Select.Description>{organization.description}</Select.Description> : null}
+              </Select.Content>
+            </Select.Option>
+          ))}
+        </Select.Popup>
       </Select.Root>
     </Field.Root>
   );
