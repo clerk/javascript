@@ -1,7 +1,7 @@
 import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { syncBuiltinESMExports } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -169,8 +169,11 @@ describe('the id of a run', () => {
     });
 
     it('claims the tag it hands out', () => {
-      drawing(['beef', 'beef', '1234'], (workspace) => {
-        assert.match(workspace.newRun().run, /^r\d{8}-\d{6}-beef$/);
+      drawing(['beef', 'beef', '1234'], (workspace, runs) => {
+        const first = workspace.newRun();
+        assert.match(first.run, /^r\d{8}-\d{6}-beef$/);
+        assert.ok(existsSync(join(runs, '.tag-beef')));
+        rmSync(first.dir, { recursive: true });
         assert.match(workspace.newRun().run, /^r\d{8}-\d{6}-1234$/);
       });
     });
