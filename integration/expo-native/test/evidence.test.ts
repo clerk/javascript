@@ -338,7 +338,7 @@ describe('attach', () => {
     const packageDir = mkdtempSync(join(tmpdir(), 'verify-attach-'));
     const workspace = openWorkspace({ packageDir, worktree: packageDir, home: join(packageDir, 'home') });
     const deps = { host, workspace, runner: gh.runner, env: {}, progress: () => undefined, instances: heldInstances() };
-    const sealed = (shape: { readonly called: string; readonly shots?: readonly string[]; readonly states?: readonly string[]; readonly spec?: string; readonly video?: boolean; readonly failed?: boolean; readonly failureShot?: boolean; readonly recordsTests?: boolean; readonly change?: Partial<EvidenceRecord>; readonly log?: string }) => {
+    const sealed = (shape: { readonly called: string; readonly shots?: readonly string[]; readonly states?: readonly string[]; readonly spec?: string; readonly specs?: readonly string[]; readonly video?: boolean; readonly failed?: boolean; readonly failureShot?: boolean; readonly recordsTests?: boolean; readonly change?: Partial<EvidenceRecord>; readonly log?: string }) => {
       const { run, dir } = workspace.newRun();
       mkdirSync(join(dir, 'screenshots'), { recursive: true });
       const file = (name: string, holds: string): EvidencePath => (writeFileSync(join(dir, name), holds), join(dir, name) as EvidencePath);
@@ -352,7 +352,9 @@ describe('attach', () => {
           ...base,
           gitHead: shape.failed === true ? BEFORE_COMMIT : AFTER_COMMIT,
           results:
-            shape.states === undefined
+            shape.specs !== undefined
+              ? shape.specs.map((path, at) => ({ ...base.results[0]!, spec: { ...base.results[0]!.spec, path }, status: 'failed', failureScreenshot: file(`${at}-failure.png`, `${shape.called} ${path} failure`) }))
+              : shape.states === undefined
               ? [{ ...base.results[0]!, status: shape.failed === true ? 'failed' : 'passed', failureScreenshot }]
               : shape.states.map((title) => ({ ...base.results[0]!, title, status: shape.failed === true ? 'failed' : 'passed', failureScreenshot: shape.failed === true ? file(`${title}-failure.png`, `${shape.called} ${title} failure`) : null })),
           videos: shape.video === false ? [] : [file('video.mp4', `${shape.called} video`)],
@@ -523,6 +525,32 @@ describe('attach', () => {
     const after = sealed({ called: 'after', states: ['start', 'profile'], spec: 'specs/features/profile/states.e2e.ts' });
     await attach(deps, { verb: 'attach', run: after.run, pr: 9, media: { screenshots: ['start', 'profile'], video: false }, before: before.run });
     assert.deepEqual(gh.edits[0]!.attached, ['after start', 'after profile', 'before start failure', 'before profile failure']);
+  });
+
+  it('pairs a screenshot with the failure screenshot of the same spec when another spec of the same name has the same test, and with a copy of it when the copy is the only one', async () => {
+    const pairedWith = async (specs: readonly string[]): Promise<readonly string[]> => {
+      const gh = fakeGh();
+      const { deps, sealed } = checkout(gh);
+      const after = sealed({ called: 'after', spec: 'specs/features/sign-up/complete.e2e.ts' });
+      const before = sealed({ called: 'before', shots: [], specs });
+      await attach(deps, { verb: 'attach', run: after.run, pr: 9, media: still, before: before.run });
+      return gh.edits[0]!.attached;
+    };
+    assert.deepEqual(await pairedWith(['specs/features/sign-in/complete.e2e.ts', 'specs/features/sign-up/complete.e2e.ts']), ['after profile', 'before specs/features/sign-up/complete.e2e.ts failure']);
+    assert.deepEqual(await pairedWith(['specs/features/sign-in/other.e2e.ts', 'specs/explored/complete.e2e.ts']), ['after profile', 'before specs/explored/complete.e2e.ts failure']);
+  });
+
+  it('posts nothing when the before run has the test in more than one spec of the same name and none at the same path, and names each of them', async () => {
+    const gh = fakeGh();
+    const { deps, sealed } = checkout(gh);
+    const after = sealed({ called: 'after', spec: 'specs/features/sign-up/complete.e2e.ts' });
+    const before = sealed({ called: 'before', shots: [], specs: ['specs/features/sign-in/complete.e2e.ts', 'specs/explored/complete.e2e.ts'] });
+    await assert.rejects(attach(deps, { verb: 'attach', run: after.run, pr: 9, media: still, before: before.run }), {
+      code: 'USAGE',
+      message: `run ${before.run} has no screenshot labelled profile, and the test "a" of specs/features/sign-up/complete.e2e.ts could be any of 2 tests in it: specs/features/sign-in/complete.e2e.ts, specs/explored/complete.e2e.ts`,
+      fix: 'run only one spec named complete.e2e.ts on the build without the change and attach that run as --before, or attach without --before',
+    });
+    assert.deepEqual(gh.edits, []);
   });
 
   it('posts nothing when the before run has nothing to pair with what was asked for, and says what to do', async () => {
