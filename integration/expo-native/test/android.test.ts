@@ -60,9 +60,9 @@ describe('android lanes', () => {
     assert.deepEqual(emulatorArgs(5560, 'linux'), ['-avd', 'Clerk_Verify_Pixel', '-read-only', '-no-window', '-no-audio', '-no-boot-anim', '-gpu', 'swiftshader_indirect', '-port', '5560']);
   });
 
-  it('turns off the window, transition, and animator animations on a lane, and reads the same settings back', () => {
+  it('turns on the window, transition, and animator animations on a lane at the device default of 1, rather than leaving what the AVD holds, and reads the same settings back', () => {
     for (const scale of ['window_animation_scale', 'transition_animation_scale', 'animator_duration_scale']) {
-      assert.ok(laneSettingsCommand().split(' && ').includes(`settings put global ${scale} 0`), scale);
+      assert.ok(laneSettingsCommand().split(' && ').includes(`settings put global ${scale} 1`), scale);
       assert.ok(laneSettingsReadCommand().split(' && ').includes(`settings get global ${scale}`), scale);
     }
     assert.equal(laneSettingsCommand().split(' && ').length, laneSettingsReadCommand().split(' && ').length);
@@ -76,8 +76,8 @@ describe('android lanes', () => {
   it('counts a lane as set up only when every setting reads back as written', () => {
     const written = laneSettingsCommand().split(' && ').map((command) => command.split(' ').at(-1) as string);
     assert.equal(laneSettingsHold(written.join('\n')), true);
-    assert.equal(laneSettingsHold(`${written.map((value) => `${value}.0`).join('\n')}\n`), true, 'the settings provider may print 0 as 0.0');
-    assert.equal(laneSettingsHold(['1.0', ...written.slice(1)].join('\n')), false, 'one animation scale still on');
+    assert.equal(laneSettingsHold(`${written.map((value) => `${value}.0`).join('\n')}\n`), true, 'the settings provider may print 1 as 1.0');
+    assert.equal(laneSettingsHold(['0', ...written.slice(1)].join('\n')), false, 'one animation scale still off');
     assert.equal(laneSettingsHold([...written.slice(0, -1), '0'].join('\n')), false, 'error dialogs still shown');
     assert.equal(laneSettingsHold(written.slice(1).join('\n')), false, 'a setting that did not answer');
     assert.equal(laneSettingsHold(written.map(() => 'null').join('\n')), false, 'a device that never had them set');
