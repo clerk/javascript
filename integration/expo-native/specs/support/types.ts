@@ -100,6 +100,7 @@ export interface HostFixture {
   readonly runId: RunId;
   readonly app: AppLocators;
   newEmail(options?: EmailOptions): Promise<TestEmail>;
+  newOrganizationName(): string;
   newPhone(): Promise<TestPhone>;
   seedUser(options?: SeedOptions): Promise<SeededUser>;
   seedOrganization<Seed extends OrganizationSeed>(seed: Seed): Promise<SeededOrganization<Seed>>;

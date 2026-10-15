@@ -192,6 +192,10 @@ describe('the start of the pulse of a tap', () => {
     assert.equal(pulseAt(tap, reactionAt(changes, tap)), 3.912);
   });
 
+  it('is never a change from before the tap was sent, which the tap did not cause', () => {
+    assert.equal(reactionAt([{ at: 3.97, share: 0.5 }, { at: 4.15, share: 0.5 }], tap), 4.15);
+  });
+
   it('skips a flicker too small to see', () => {
     assert.equal(reactionAt([{ at: 3.5, share: 0.3 }, { at: 4.05, share: 0.01 }, { at: 4.3, share: 0.5 }], tap), 4.3);
   });

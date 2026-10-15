@@ -5,7 +5,9 @@ import net from 'node:net';
 import { networkInterfaces, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
-import { TEST_PHONES, aboutToLaunch, newTestDomain, newTestEmail, runEmailPrefix, testUsers } from '../specs/support/clerk.ts';
+import { TEST_PHONES, aboutToLaunch, isOrganizationNameOf, isTestDomainOf, isTestEmailOf, organizationName, testDomain, testEmail, testUsers } from '../specs/support/clerk.ts';
+import { runIdParts } from '../specs/support/inputs.ts';
+import { runNames } from '../specs/support/names.ts';
 import { Secret, usedSecretValues } from '../specs/support/secret.ts';
 import { startBroker, type Broker } from '../src/core/broker.ts';
 import { REPLACE_AT_USERS } from '../src/core/clerk.ts';
@@ -57,7 +59,7 @@ async function standIn(clerk: Clerk = emptyClerk, beforeLaunch: () => Promise<vo
     return { status: response.status, json: (text === '' ? null : JSON.parse(text)) as { errors?: { code: string; long_message: string }[] } & Record<string, unknown> };
   };
   const access = { kind: 'stand-in', url: broker.url, tokenFile: broker.tokenFile } as const;
-  const users = testUsers({ publishableKey: keys.pk, access }, run);
+  const users = testUsers({ publishableKey: keys.pk, access }, run, fetch, runNames(run, join(dir, 'names')));
   return { broker, workspace, run, forwarded, ask, users, access };
 }
 
@@ -110,7 +112,7 @@ describe("the CLI's stand-in for the Backend API", () => {
       );
       assert.equal(readFileSync(s.broker.tokenFile, 'utf8').includes(SECRET_KEY), false, 'the token the test process reads is not the key');
       assert.deepEqual(s.forwarded[1]!.body, { user_id: 'user_created_1', expires_in_seconds: 120 });
-      assert.equal(user.email.startsWith(runEmailPrefix(s.run)), true);
+      assert.equal(isTestEmailOf(s.run, user.email), true);
       assert.deepEqual(
         s.workspace.entries().flatMap((entry) => (entry.kind === 'user' ? [[entry.run, entry.userId, entry.email]] : [])),
         [[s.run, 'user_created_1', user.email]],
@@ -124,7 +126,7 @@ describe("the CLI's stand-in for the Backend API", () => {
     const s = await standIn();
     await stopping(s.broker, async () => {
       const password = 'a-password-only-the-test-process-made-Aa1!';
-      const created = await s.ask('POST', '/users', { email_address: [newTestEmail(s.run)], password, bypass_client_trust: true });
+      const created = await s.ask('POST', '/users', { email_address: [testEmail(s.run, 'maya')], password, bypass_client_trust: true });
       assert.equal(usedSecretValues().includes(password), true);
       const ticket = await s.ask('POST', '/sign_in_tokens', { user_id: created.json.id, expires_in_seconds: 120 });
       assert.equal(typeof ticket.json.token, 'string');
@@ -136,7 +138,7 @@ describe("the CLI's stand-in for the Backend API", () => {
     const s = await standIn();
     await stopping(s.broker, async () => {
       const password = 'a-password-typed-in-pieces-of-sixteen-Aa1!';
-      await s.ask('POST', '/users', { email_address: [newTestEmail(s.run)], password, bypass_client_trust: true });
+      await s.ask('POST', '/users', { email_address: [testEmail(s.run, 'maya')], password, bypass_client_trust: true });
       for (const piece of ['a-password-typed', '-in-pieces-of-si', 'xteen-Aa1!']) assert.equal(usedSecretValues().includes(piece), true, piece);
       assert.equal(usedSecretValues().includes(readFileSync(s.broker.tokenFile, 'utf8')), true);
     });
@@ -145,7 +147,7 @@ describe("the CLI's stand-in for the Backend API", () => {
   it('refuses a request without the run token before anything is forwarded', async () => {
     const s = await standIn();
     await stopping(s.broker, async () => {
-      const body = { email_address: [newTestEmail(s.run)], skip_password_requirement: true };
+      const body = { email_address: [testEmail(s.run, 'maya')], skip_password_requirement: true };
       assert.equal((await s.ask('POST', '/users', body, 'not-the-token')).status, 401);
       assert.equal((await s.ask('POST', '/users', body, SECRET_KEY)).status, 401);
       assert.equal((await fetch(`${s.broker.url}/users`, { method: 'POST', body: JSON.stringify(body) })).status, 401);
@@ -246,14 +248,14 @@ describe("the CLI's stand-in for the Backend API", () => {
           ['POST', 'https://api.clerk.com/v1/organizations/org_1/domains', `Bearer ${SECRET_KEY}`],
         ],
       );
-      const prefix = runEmailPrefix(s.run);
       assert.deepEqual(s.forwarded[5]!.body, { name: 'Domains reader', key: 'org:e2e_domains_reader', permissions: ['perm_domains_read', 'perm_memberships_read'] });
       assert.deepEqual(s.forwarded[6]!.body, { name: org.name, created_by: 'user_1' });
       assert.deepEqual(s.forwarded[7]!.body, { user_id: 'user_2', role: 'org:e2e_domains_reader' });
       assert.deepEqual(s.forwarded[8]!.body, { name: org.domain, enrollment_mode: 'automatic_suggestion', verified: true });
       assert.equal(org.id, 'org_1');
-      assert.match(org.name, new RegExp(`^${prefix} [0-9a-f]{6}$`));
-      assert.match(org.domain, new RegExp(`^${prefix}[0-9a-z]{4}\\.clerk\\.test$`));
+      const word = org.name.split(' ')[0]!;
+      assert.deepEqual([isOrganizationNameOf(s.run, org.name), org.name, org.domain], [true, organizationName(s.run, word), testDomain(s.run, word)]);
+      assert.equal(isTestDomainOf(s.run, org.domain), true);
 
       const again = await s.users.seedOrganization({ creator: reader, members: [{ user: admin, role: 'org:e2e_domains_reader' }] });
       assert.deepEqual([again.id, again.domain], ['org_2', null]);
@@ -292,23 +294,24 @@ describe("the CLI's stand-in for the Backend API", () => {
       const user = await s.users.seed();
       const org = await s.users.seedOrganization({ creator: user });
       const sent = s.forwarded.length;
-      const prefix = runEmailPrefix(s.run);
+      const { tag } = runIdParts(s.run);
       const otherRun = 'r20200101-000000-aaaa' as RunId;
       const refusedRequests: readonly (readonly [string, string, string, Record<string, unknown> | undefined, RegExp])[] = [
-        ['an organization of a user from elsewhere', 'POST', '/organizations', { name: `${prefix} abcdef`, created_by: 'user_of_someone_else' }, /user user_of_someone_else was not created by this run/],
-        ['an organization with a name of no run', 'POST', '/organizations', { name: 'Acme', created_by: user.id }, /Acme is not an organization name of run/],
-        ['an organization with a name of another run', 'POST', '/organizations', { name: `${runEmailPrefix(otherRun)} abcdef`, created_by: user.id }, /is not an organization name of run/],
-        ['an organization with metadata', 'POST', '/organizations', { name: `${prefix} abcdef`, created_by: user.id, private_metadata: { plan: 'x' } }, /it carries private_metadata/],
+        ['an organization of a user from elsewhere', 'POST', '/organizations', { name: organizationName(s.run, 'Acme'), created_by: 'user_of_someone_else' }, /user user_of_someone_else was not created by this run/],
+        ['an organization with a name of no run', 'POST', '/organizations', { name: 'Acme', created_by: user.id }, new RegExp(`: Acme is not an organization name of run ${s.run}, whose organization names are a capitalized word, a space, and ${tag}$`)],
+        ['an organization with a name of the run and a hyphen', 'POST', '/organizations', { name: `Acme-${tag}`, created_by: user.id }, /is not an organization name of run/],
+        ['an organization with a name of another run', 'POST', '/organizations', { name: organizationName(otherRun, 'Acme'), created_by: user.id }, /is not an organization name of run/],
+        ['an organization with metadata', 'POST', '/organizations', { name: organizationName(s.run, 'Acme'), created_by: user.id, private_metadata: { plan: 'x' } }, /it carries private_metadata/],
         ['a member of an organization from elsewhere', 'POST', '/organizations/org_someone_else/memberships', { user_id: user.id, role: 'org:member' }, /organization org_someone_else was not created by this run/],
         ['a member from elsewhere', 'POST', `/organizations/${org.id}/memberships`, { user_id: 'user_of_someone_else', role: 'org:member' }, /user user_of_someone_else was not created by this run/],
         ['a role the tests do not give', 'POST', `/organizations/${org.id}/memberships`, { user_id: user.id, role: 'org:owner' }, /org:owner is not a role the tests give/],
         ['a member with metadata', 'POST', `/organizations/${org.id}/memberships`, { user_id: user.id, role: 'org:member', public_metadata: {} }, /it carries public_metadata/],
-        ['a domain of an organization from elsewhere', 'POST', '/organizations/org_someone_else/domains', { name: newTestDomain(s.run), enrollment_mode: 'automatic_suggestion', verified: true }, /organization org_someone_else was not created by this run/],
+        ['a domain of an organization from elsewhere', 'POST', '/organizations/org_someone_else/domains', { name: testDomain(s.run, 'acme'), enrollment_mode: 'automatic_suggestion', verified: true }, /organization org_someone_else was not created by this run/],
         ['a real domain', 'POST', `/organizations/${org.id}/domains`, { name: 'clerk.com', enrollment_mode: 'automatic_suggestion', verified: true }, /clerk\.com is not a domain of run/],
-        ['a domain of another run', 'POST', `/organizations/${org.id}/domains`, { name: newTestDomain(otherRun), enrollment_mode: 'automatic_suggestion', verified: true }, /is not a domain of run/],
-        ['a domain under a real one', 'POST', `/organizations/${org.id}/domains`, { name: `${prefix}abcd.clerk.test.clerk.com`, enrollment_mode: 'automatic_suggestion', verified: true }, /is not a domain of run/],
-        ['a domain with invitations', 'POST', `/organizations/${org.id}/domains`, { name: newTestDomain(s.run), enrollment_mode: 'automatic_invitation', verified: true }, /verified, with automatic suggestions/],
-        ['an unverified domain', 'POST', `/organizations/${org.id}/domains`, { name: newTestDomain(s.run), enrollment_mode: 'automatic_suggestion', verified: false }, /verified, with automatic suggestions/],
+        ['a domain of another run', 'POST', `/organizations/${org.id}/domains`, { name: testDomain(otherRun, 'acme'), enrollment_mode: 'automatic_suggestion', verified: true }, new RegExp(`: acme-aaaa\\.clerk\\.test is not a domain of run ${s.run}, whose domains are a lowercase word, then -${tag}\\.clerk\\.test$`)],
+        ['a domain under a real one', 'POST', `/organizations/${org.id}/domains`, { name: `${testDomain(s.run, 'acme')}.clerk.com`, enrollment_mode: 'automatic_suggestion', verified: true }, /is not a domain of run/],
+        ['a domain with invitations', 'POST', `/organizations/${org.id}/domains`, { name: testDomain(s.run, 'acme'), enrollment_mode: 'automatic_invitation', verified: true }, /verified, with automatic suggestions/],
+        ['an unverified domain', 'POST', `/organizations/${org.id}/domains`, { name: testDomain(s.run, 'acme'), enrollment_mode: 'automatic_suggestion', verified: false }, /verified, with automatic suggestions/],
         ['every permission', 'GET', '/organization_permissions', undefined, /listed with query org:sys_ only/],
         ['a search for other permissions', 'GET', '/organization_permissions?query=org:billing', undefined, /listed with query org:sys_ only/],
         ['a permission list ordered', 'GET', '/organization_permissions?query=org:sys_&order_by=key', undefined, /it carries order_by/],
@@ -342,11 +345,12 @@ describe("the CLI's stand-in for the Backend API", () => {
   it('creates a user only with one test address of this run, test phones, and the fields the tests send', async () => {
     const s = await standIn();
     await stopping(s.broker, async () => {
-      const mine = newTestEmail(s.run);
+      const mine = testEmail(s.run, 'maya');
       const refusedBodies: readonly (readonly [string, Record<string, unknown>, RegExp])[] = [
         ['a real address', { email_address: ['someone@example.com'] }, /is not a \+clerk_test email/],
-        ['an address of another run', { email_address: [newTestEmail('r20200101-000000-aaaa' as RunId)] }, /is not an address of run/],
-        ['two addresses', { email_address: [mine, newTestEmail(s.run)] }, /exactly one email address/],
+        ['an address of another run', { email_address: [testEmail('r20200101-000000-aaaa' as RunId, 'maya')] }, new RegExp(`: maya\\.aaaa\\+clerk_test@example\\.com is not an address of run ${s.run}, whose addresses are a name, then \\.${runIdParts(s.run).tag}\\+clerk_test@$`)],
+        ['an address that only holds the tag of the run', { email_address: [`${runIdParts(s.run).tag}.aaaa+clerk_test@example.com`] }, /is not an address of run/],
+        ['two addresses', { email_address: [mine, testEmail(s.run, 'ben')] }, /exactly one email address/],
         ['no address', { phone_number: [TEST_PHONES[0]] }, /exactly one email address/],
         ['a real phone', { email_address: [mine], phone_number: ['+14155552671'] }, /is not a 555-0100\.\.0199 test phone/],
         ['a phone that is not a list', { email_address: [mine], phone_number: TEST_PHONES[0] }, /not a list of phone numbers/],
@@ -429,7 +433,7 @@ describe("the CLI's stand-in for the Backend API", () => {
   it('sends Clerk the request it checked, not the text it was sent: one value for each field, each phone in one spelling, and no query on a request that has a body', async () => {
     const s = await standIn();
     await stopping(s.broker, async () => {
-      const mine = newTestEmail(s.run);
+      const mine = testEmail(s.run, 'maya');
       const twice = `{"email_address":["someone@example.com"],"email_address":[${JSON.stringify(mine)}],"phone_number":["+1 (201) 555-0100; DROP"],"skip_password_requirement":true}`;
       assert.equal((await s.ask('POST', '/users?limit=500&email_address=someone@example.com', twice)).status, 200);
       assert.deepEqual([s.forwarded[0]!.url, s.forwarded[0]!.text], ['https://api.clerk.com/v1/users', JSON.stringify({ email_address: [mine], phone_number: ['+12015550100'], skip_password_requirement: true })]);
@@ -469,7 +473,7 @@ describe("the CLI's stand-in for the Backend API", () => {
   it('refuses a body larger than any request the tests make, and sends none of it to Clerk', async () => {
     const s = await standIn();
     await stopping(s.broker, async () => {
-      const user = (password: string) => ({ email_address: [newTestEmail(s.run)], password, bypass_client_trust: true });
+      const user = (password: string) => ({ email_address: [testEmail(s.run, 'maya')], password, bypass_client_trust: true });
       const large = await s.ask('POST', '/users', user('p'.repeat(64 * 1024)));
       assert.equal(large.status, 403);
       assert.match(whyRefused(large), /its body is larger than any request the tests make/);
@@ -486,7 +490,7 @@ describe("the CLI's stand-in for the Backend API", () => {
       return emptyClerk(request);
     });
     await stopping(s.broker, async () => {
-      const taken = await s.ask('POST', '/users', { email_address: [newTestEmail(s.run)], phone_number: [TEST_PHONES[0]] });
+      const taken = await s.ask('POST', '/users', { email_address: [testEmail(s.run, 'maya')], phone_number: [TEST_PHONES[0]] });
       assert.deepEqual([taken.status, taken.json.errors?.[0]?.code], [422, 'form_identifier_exists']);
       assert.equal((await s.users.seed({ phone: true })).phone, TEST_PHONES[99]);
     });
@@ -513,7 +517,7 @@ describe("the CLI's stand-in for the Backend API", () => {
     };
     const s = await standIn(unreachable);
     await stopping(s.broker, async () => {
-      const answer = await s.ask('POST', '/users', { email_address: [newTestEmail(s.run)] });
+      const answer = await s.ask('POST', '/users', { email_address: [testEmail(s.run, 'maya')] });
       assert.equal(answer.status, 502);
       assert.match(whyRefused(answer), /could not forward this request: fetch failed/);
     });
