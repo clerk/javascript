@@ -1,5 +1,13 @@
 # @clerk/expo-native-components
 
+## 0.1.1
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.11` to `1.2.1`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.2.1. ([#10250](https://github.com/clerk/javascript/pull/10250)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Native components now respect the `proxyUrl` passed to `<ClerkProvider>` and route Frontend API requests through the configured proxy. Applying the proxy requires a new app binary; a JS-only OTA update safely keeps the previous behavior. ([#9373](https://github.com/clerk/javascript/pull/9373)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.1.0
 
 ### Minor Changes
