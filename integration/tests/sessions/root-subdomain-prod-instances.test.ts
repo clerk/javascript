@@ -75,7 +75,7 @@ test.describe('root and subdomain production apps @sessions', () => {
         },
       });
 
-      const u = createTestUtils({ app: apps[0].app });
+      const u = await createTestUtils({ app: apps[0].app });
       fakeUser = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(fakeUser);
     });
@@ -89,8 +89,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are aligned for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
@@ -145,8 +145,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('signing out from the sub domains signs out the user from the root domain as well', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
@@ -209,7 +209,7 @@ test.describe('root and subdomain production apps @sessions', () => {
         },
       });
 
-      const u = apps.map(a => createTestUtils({ app: a.app }));
+      const u = await Promise.all(apps.map(a => createTestUtils({ app: a.app })));
       fakeUsers = await Promise.all(u.map(u => u.services.users.createFakeUser(test)));
       await Promise.all([
         await u[0].services.users.createBapiUser(fakeUsers[0]),
@@ -226,8 +226,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are independent for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);
@@ -284,8 +284,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('signing out from the root domains does not affect the sub domain', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       // signin in tab0
@@ -341,7 +341,7 @@ test.describe('root and subdomain production apps @sessions', () => {
         },
       });
 
-      const u = apps.map(a => createTestUtils({ app: a.app }));
+      const u = await Promise.all(apps.map(a => createTestUtils({ app: a.app })));
       fakeUsers = await Promise.all(u.map(u => u.services.users.createFakeUser(test)));
       await Promise.all([
         await u[0].services.users.createBapiUser(fakeUsers[0]),
@@ -358,8 +358,8 @@ test.describe('root and subdomain production apps @sessions', () => {
     test('the cookies are independent for the root and sub domains', async ({ context }) => {
       const pages = await Promise.all([context.newPage(), context.newPage()]);
       const u = [
-        createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
-        createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[0].app, page: pages[0], context, useTestingToken: false }),
+        await createTestUtils({ app: apps[1].app, page: pages[1], context, useTestingToken: false }),
       ];
 
       await u[0].page.goto(`https://${hosts[0]}`);

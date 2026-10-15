@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { rtl } from '../../utils/rtl.styles';
+import { rtl } from '../../styles/rtl.styles';
 import { Pagination } from './pagination';
 import { styles } from './pagination.styles';
 
@@ -140,6 +140,7 @@ describe('Mosaic Pagination', () => {
         totalItems={100}
         pageSize={10}
         disabled
+        onPageSizeChange={vi.fn()}
       />,
     );
     expect(screen.getByRole('navigation')).toHaveAttribute('data-disabled', '');
@@ -166,6 +167,20 @@ describe('Mosaic Pagination', () => {
     expect(onPageSizeChange).toHaveBeenCalledWith(20);
   });
 
+  it('omits the page size control without a page size callback', () => {
+    const { container } = render(
+      <Pagination
+        page={1}
+        totalItems={100}
+        pageSize={10}
+      />,
+    );
+    expect(screen.getByText('1–10 of 100')).toBeInTheDocument();
+    expect(screen.queryByText('Results per page')).toBeNull();
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(container.querySelector('.cl-pagination-divider')).toBeNull();
+  });
+
   it('uses custom visible and accessible labels', () => {
     render(
       <Pagination
@@ -175,6 +190,7 @@ describe('Mosaic Pagination', () => {
         rangeLabel='{start} à {end} sur {total}'
         pageSizeLabel='Rows per page'
         pageSizeLabelCompact='Rows'
+        onPageSizeChange={vi.fn()}
         firstPageLabel='Start'
         previousPageLabel='Back'
         nextPageLabel='Forward'
@@ -226,6 +242,7 @@ describe('Mosaic Pagination', () => {
         totalItems={100}
         pageSize={15}
         pageSizeOptions={[20, 20, 0, 12.7, Number.NaN]}
+        onPageSizeChange={vi.fn()}
       />,
     );
     await userEvent.click(screen.getByRole('combobox'));

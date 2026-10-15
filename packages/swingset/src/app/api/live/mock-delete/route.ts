@@ -6,7 +6,7 @@ const COOKIE = 'swingset-mock-delete';
 export async function POST() {
   const store = await cookies();
 
-  // First call: ask for step-up. After the card completes, the same fetcher is retried.
+  // First call asks for step-up. The same fetcher is retried after verification.
   if (store.get(COOKIE)?.value !== '1') {
     store.set(COOKIE, '1', { path: '/', maxAge: 120, sameSite: 'lax' });
     return reverificationErrorResponse('strict');

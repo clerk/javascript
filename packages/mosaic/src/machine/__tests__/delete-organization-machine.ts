@@ -1,5 +1,5 @@
 import { assign } from '../assign';
-import { createMachine } from '../createMachine';
+import { createMachine } from '../create-machine';
 import type { DoneInvokeEvent, ErrorInvokeEvent, StateMachine } from '../types';
 
 /**

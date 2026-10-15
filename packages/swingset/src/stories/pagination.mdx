@@ -23,7 +23,7 @@ and controlled.
     { name: 'pageSize', type: 'number', default: '—', description: 'Items per page. The page count is derived from this and `totalItems`.' },
     { name: 'onChange', type: '(page: number) => void', default: '—', description: 'Called with the page the user navigated to.' },
     { name: 'pageSizeOptions', type: 'number[]', default: '[10, 15, 20, 100]', description: 'Sizes offered by the results-per-page select. The current `pageSize` is always included.' },
-    { name: 'onPageSizeChange', type: '(pageSize: number) => void', default: '—', description: 'Called with the page size the user chose.' },
+    { name: 'onPageSizeChange', type: '(pageSize: number) => void', default: '—', description: 'Called with the page size the user chose. Without it, the results-per-page select is not shown.' },
     { name: 'step', type: 'number', default: '1', description: 'How many pages the previous and next controls move.' },
     { name: 'siblingCount', type: 'number', default: '1', description: 'Retained for compatibility and reflected as `data-sibling-count`.' },
     { name: 'label', type: 'string', default: "'Pagination'", description: 'Accessible name of the `nav`.' },

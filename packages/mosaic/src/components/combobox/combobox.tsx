@@ -8,7 +8,7 @@ import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';

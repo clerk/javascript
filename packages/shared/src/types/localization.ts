@@ -1255,7 +1255,11 @@ export type __internal_LocalizationResource = {
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         descriptionLine1: LocalizationValue;
+        /**
+         * @deprecated Use `primaryButton__configure` instead.
+         */
         primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__configure: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
         primaryButton__addConnection: LocalizationValue;
         domainLabel: LocalizationValue;
@@ -1298,6 +1302,10 @@ export type __internal_LocalizationResource = {
         identityProvider: {
           title: LocalizationValue;
           certificateExpires: LocalizationValue;
+          certificates: LocalizationValue;
+          certificatesCount: LocalizationValue<'count'>;
+          certificatesSummary: LocalizationValue<'count' | 'date'>;
+          certificatesSummaryExpired: LocalizationValue<'count' | 'date'>;
           editButton: LocalizationValue;
           form: {
             title: LocalizationValue;
@@ -1332,13 +1340,12 @@ export type __internal_LocalizationResource = {
       };
       directorySyncSection: {
         title: LocalizationValue;
-        badge__unconfigured: LocalizationValue;
         badge__ssoRequired: LocalizationValue;
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         description: LocalizationValue;
         error__load: LocalizationValue;
-        primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__configure: LocalizationValue;
         menuAction__edit: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
@@ -1589,6 +1596,7 @@ export type __internal_LocalizationResource = {
       configure: LocalizationValue;
       attributes: LocalizationValue;
       test: LocalizationValue;
+      roles: LocalizationValue;
     };
     providers: {
       okta: LocalizationValue;
@@ -1682,6 +1690,41 @@ export type __internal_LocalizationResource = {
       badge__deprovisioned: LocalizationValue;
       error__loadUsers: LocalizationValue;
       actionLabel__complete: LocalizationValue;
+    };
+    roleMappingStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formFieldLabel__syncRoles: LocalizationValue;
+      columns: {
+        priority: LocalizationValue;
+        directoryGroup: LocalizationValue;
+        role: LocalizationValue;
+      };
+      roleOption__unassigned: LocalizationValue;
+      everyoneElse: LocalizationValue;
+      actionLabel__reorder: LocalizationValue<'group'>;
+      actionHint__reorder: LocalizationValue;
+      empty__noGroups: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue<'provider'>;
+      };
+      error__loadMappings: LocalizationValue;
+      alert__missingManageMembersPermission: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      enableDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
+      disableDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
     };
   };
   configureSSO: {
@@ -2256,6 +2299,17 @@ export type __internal_LocalizationResource = {
         };
       };
     };
+    signingCertificates: {
+      addCertificate: LocalizationValue;
+      expired: LocalizationValue<'date'>;
+      expires: LocalizationValue<'date'>;
+      expiryAfterSave: LocalizationValue;
+      fileUnreadable: LocalizationValue;
+      notACertificate: LocalizationValue;
+      primary: LocalizationValue;
+      primaryTooltip: LocalizationValue;
+      removeCertificate: LocalizationValue;
+    };
     activate: {
       title: LocalizationValue;
       subtitle: LocalizationValue<'domain'>;
@@ -2462,6 +2516,7 @@ type UnstableErrors = WithParamName<{
   passkey_retrieval_cancelled: LocalizationValue;
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
+  too_many_unverified_identifications: LocalizationValue;
   web3_missing_identifier: LocalizationValue;
   web3_solana_signature_generation_failed: LocalizationValue;
   web3_signature_request_rejected: LocalizationValue;

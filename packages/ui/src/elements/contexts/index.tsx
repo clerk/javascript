@@ -99,6 +99,7 @@ export type FlowMetadata = {
     | 'organizationList'
     | 'oneTap'
     | 'blankCaptcha'
+    | 'protectCheck'
     | 'waitlist'
     | 'checkout'
     | 'planDetails'

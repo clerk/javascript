@@ -10,7 +10,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test, {
       withPhoneNumber: true,
       withUsername: true,
@@ -24,7 +24,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('sign in with email and password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -34,14 +34,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('sign in with email and instant password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
   });
 
   test('(modal) sign in with email and instant password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/buttons');
     await u.page.getByText('Sign in button (force)').click();
     await u.po.signIn.waitForModal();
@@ -51,7 +51,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('sign in with email code', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
     await u.po.signIn.continue();
@@ -62,7 +62,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('sign in with phone number and password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.usePhoneNumberIdentifier().click();
     await u.po.signIn.getIdentifierInput().fill(fakeUser.phoneNumber);
@@ -72,7 +72,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('sign in only with phone number', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     const fakeUserWithoutPassword = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPassword: false,
@@ -90,7 +90,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('sign in with username and password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.getIdentifierInput().fill(fakeUser.username);
     await u.po.signIn.setPassword(fakeUser.password);
@@ -99,7 +99,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('can reset password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     const fakeUserWithPasword = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPassword: true,
@@ -121,7 +121,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('cannot sign in with wrong password', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
@@ -135,7 +135,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
   });
 
   test('cannot sign in with wrong password but can sign in with email', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.getIdentifierInput().fill(fakeUser.email);
@@ -158,7 +158,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     context,
     browser,
   }) => {
-    const u = createTestUtils({ app, page, context, browser });
+    const u = await createTestUtils({ app, page, context, browser });
 
     // Open sign-in page in both tabs before signing in
     await u.po.signIn.goTo();

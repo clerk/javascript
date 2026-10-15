@@ -118,12 +118,16 @@ function StubPage({ id, title }: { id: string; title: string }) {
       <Panel.Sections>
         {stubSections[id]?.map(section => (
           <Section.Root key={section.title}>
-            <Section.Title>{section.title}</Section.Title>
             <Section.Group>
-              <Section.Row>
-                <Section.Items>
-                  {section.rows.map(row => (
-                    <Section.Item key={row.label}>
+              <Section.Header>
+                <Section.Content>
+                  <Section.Title>{section.title}</Section.Title>
+                </Section.Content>
+              </Section.Header>
+              <Section.Body>
+                {section.rows.map(row => (
+                  <Section.Row key={row.label}>
+                    <Section.Item>
                       <Section.Content>
                         <Section.Label>{row.label}</Section.Label>
                         <Section.Description>{row.description}</Section.Description>
@@ -138,9 +142,9 @@ function StubPage({ id, title }: { id: string; title: string }) {
                         </Button>
                       </Section.Actions>
                     </Section.Item>
-                  ))}
-                </Section.Items>
-              </Section.Row>
+                  </Section.Row>
+                ))}
+              </Section.Body>
             </Section.Group>
           </Section.Root>
         ))}
@@ -179,7 +183,7 @@ function Surface({
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle={pages.find(item => item.id === page)?.label}>
         {pages.map(item => (
           <Profile.ContentPanel
             key={item.id}
@@ -314,7 +318,8 @@ export function Transitions() {
             display: grid;
           }
           .cl-profile-content-panel {
-            grid-area: 1 / 1;
+            grid-row: 2;
+            grid-column: 1;
             /* Seven tenths of the scale's steps: quick enough to feel like a swap, slow enough to see. */
             --enter: calc(var(--cl-duration-slow) * 0.7);
             --exit: calc(var(--cl-duration-base) * 0.7);

@@ -2,7 +2,7 @@ import { act, cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { Dialog } from '../dialog';
 import { type ToastManager, type ToastPromiseOptions, useToastManager } from './use-toast-manager';
 

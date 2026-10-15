@@ -1,4 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
+import { Checkbox } from '@clerk/mosaic/components/checkbox';
 import { Field } from '@clerk/mosaic/components/field';
 import { Input } from '@clerk/mosaic/components/input';
 import { Select } from '@clerk/mosaic/components/select';
@@ -155,5 +156,30 @@ export function WithSelect() {
       </Select.Root>
       <Field.Description>Applies to new members of the organization.</Field.Description>
     </Field.Root>
+  );
+}
+
+export function Horizontal() {
+  return (
+    <div {...stylex.props(styles.stack)}>
+      <Field.Root orientation='horizontal'>
+        <Checkbox
+          name='signOutOfOtherSessions'
+          defaultChecked
+        />
+        <Field.Content>
+          <Field.Label>Sign out of all devices</Field.Label>
+          <Field.Description>
+            It is recommended to sign out of all other devices which may have used your old password.
+          </Field.Description>
+        </Field.Content>
+      </Field.Root>
+      <Field.Root orientation='horizontal'>
+        <Checkbox name='marketingEmails' />
+        <Field.Content>
+          <Field.Label>Send me product updates, feature announcements, and occasional offers by email</Field.Label>
+        </Field.Content>
+      </Field.Root>
+    </div>
   );
 }

@@ -1,21 +1,30 @@
+import { useUserProfileWeb3WalletsController } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
-} from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
-import { useState } from 'react';
+} from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
+import type { Web3Strategy } from '@clerk/shared/types';
+import { useRef, useState } from 'react';
+
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosText } from '@/lib/chaos';
 
 interface DemoWallet extends UserProfileWeb3Wallet {
   providerId?: string;
 }
 
 const providers: UserProfileWeb3Provider[] = [
-  { id: 'metamask', provider: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
-  { id: 'coinbase-wallet', provider: 'Coinbase Wallet', iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg' },
+  { id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+  {
+    id: 'web3_coinbase_wallet_signature',
+    provider: 'Coinbase Wallet',
+    iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
+  },
 ];
 
 export const primaryWallet: DemoWallet = {
   id: 'wallet_1',
-  providerId: 'metamask',
+  providerId: 'web3_metamask_signature',
   provider: 'MetaMask',
   iconUrl: 'https://img.clerk.com/static/metamask.svg',
   address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
@@ -25,7 +34,7 @@ export const primaryWallet: DemoWallet = {
 
 export const secondaryWallet: DemoWallet = {
   id: 'wallet_2',
-  providerId: 'coinbase-wallet',
+  providerId: 'web3_coinbase_wallet_signature',
   provider: 'Coinbase Wallet',
   iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
   address: '0x1234567890abcdef1234567890abcdef12345678',
@@ -43,17 +52,24 @@ export function useWeb3WalletsFixture({
   primaryError?: boolean;
   removalState?: 'pending' | 'error';
 } = {}) {
-  const [wallets, setWallets] = useState(initialWallets);
-  const [connectionProviders, setConnectionProviders] = useState(availableProviders);
+  const seedWallets = useChaosFixture(initialWallets, items =>
+    items.map(wallet => ({ ...wallet, provider: chaosText(wallet.provider) })),
+  );
+  const seedProviders = useChaosFixture(availableProviders, items =>
+    items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
+  );
+  const [wallets, setWallets] = useState(seedWallets);
+  const [connectionProviders, setConnectionProviders] = useState(seedProviders);
   const [removalFailed, setRemovalFailed] = useState(false);
-  const [primaryFailed, setPrimaryFailed] = useState(false);
+  const primaryFailed = useRef(false);
 
-  return {
+  return useUserProfileWeb3WalletsController({
     wallets,
     availableProviders: connectionProviders.filter(
       provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
     ),
-    onConnect: (id: string) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    connect: async (id: Web3Strategy) => {
       const provider = connectionProviders.find(item => item.id === id);
       if (!provider) {
         return;
@@ -79,23 +95,15 @@ export function useWeb3WalletsFixture({
         ];
       });
     },
-    onSetPrimary: (id: string) => {
-      if (primaryError && !primaryFailed) {
-        setPrimaryFailed(true);
-        setWallets(current =>
-          current.map(wallet =>
-            wallet.id === id
-              ? { ...wallet, primaryError: 'Unable to set this wallet as primary. Please try again.' }
-              : wallet,
-          ),
-        );
-        return;
+    // eslint-disable-next-line @typescript-eslint/require-await
+    setPrimary: async (id: string) => {
+      if (primaryError && !primaryFailed.current) {
+        primaryFailed.current = true;
+        throw new Error('Unable to set this wallet as primary. Please try again.');
       }
-      setWallets(current =>
-        current.map(wallet => ({ ...wallet, isPrimary: wallet.id === id, primaryError: undefined })),
-      );
+      setWallets(current => current.map(wallet => ({ ...wallet, isPrimary: wallet.id === id })));
     },
-    onRemove: async (id: string) => {
+    remove: async (id: string) => {
       if (removalState === 'pending') {
         await new Promise(resolve => setTimeout(resolve, 1500));
       }
@@ -105,5 +113,5 @@ export function useWeb3WalletsFixture({
       }
       setWallets(current => current.filter(wallet => wallet.id !== id));
     },
-  };
+  });
 }

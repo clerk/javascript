@@ -1,3 +1,4 @@
+import { logger } from '@clerk/shared/logger';
 import React from 'react';
 
 import { Icon } from '../../components/icon';
@@ -14,7 +15,6 @@ import type {
   OrganizationProfilePageId,
   OrganizationProfilePages,
 } from './organization-profile.types';
-import { OrganizationProfileApiKeysPanelView } from './organization-profile-api-keys-panel.view';
 import { OrganizationProfileGeneralPanelView } from './organization-profile-general-panel.view';
 import { OrganizationProfileMembersPanelView } from './organization-profile-members-panel.view';
 import { OrganizationProfilePlaceholderPanelView } from './organization-profile-placeholder-panel.view';
@@ -34,12 +34,12 @@ function BuiltInPage({
 }: {
   id: OrganizationProfilePageId;
   pages: OrganizationProfilePages;
-}): React.ReactElement | null {
+}): React.ReactNode {
   if (id === 'general') {
     return <OrganizationProfileGeneralPanelView {...pages.general} />;
   }
   if (id === 'apiKeys') {
-    return pages.apiKeys ? <OrganizationProfileApiKeysPanelView {...pages.apiKeys} /> : null;
+    return pages.apiKeys;
   }
   if (id === 'members') {
     return pages.members?.members || pages.members?.invitations || pages.members?.requests ? (
@@ -59,7 +59,12 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
       customPages,
       pageOrder,
     );
-    const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : entries[0].id;
+    const firstPage = entries[0];
+    if (!firstPage) {
+      logger.warnOnce('[Clerk] OrganizationProfile has no pages to show.');
+    }
+    const resolvedEntry = entries.find(entry => entry.id === activePage) ?? firstPage;
+    const resolvedPage = resolvedEntry?.id ?? 'general';
 
     return (
       <Profile.Root
@@ -89,7 +94,9 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
             </Profile.NavItem>
           ))}
         </Profile.Nav>
-        <Profile.Content>
+        <Profile.Content
+          pageTitle={resolvedEntry?.custom ? resolvedEntry.custom.label : resolvedEntry && m.pages[resolvedEntry.id]}
+        >
           {entries.map(entry => (
             <Profile.ContentPanel
               key={entry.id}

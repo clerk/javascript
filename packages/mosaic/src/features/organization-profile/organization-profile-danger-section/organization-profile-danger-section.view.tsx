@@ -1,93 +1,95 @@
+import type { ConfirmController } from '../../../blocks/confirm';
 import { Destructive } from '../../../blocks/destructive';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
-import { useOrganizationProfileDangerActionController } from './organization-profile-danger-action.controller';
 
 export interface OrganizationProfileDangerSectionViewProps {
   name: string;
   memberCount: number;
-  onLeave?: () => Promise<void>;
-  onDelete?: () => Promise<void>;
+  leave?: ConfirmController;
+  destroy?: ConfirmController;
 }
 
 export function OrganizationProfileDangerSectionView({
   name,
   memberCount,
-  onLeave,
-  onDelete,
+  leave,
+  destroy,
 }: OrganizationProfileDangerSectionViewProps) {
   const m = useMessages('organizationProfileDangerSection');
   const locale = useLocale();
 
-  if (!onLeave && !onDelete) {
+  if (!leave && !destroy) {
     return null;
   }
 
   return (
     <Section.Root>
-      <Section.Title>{m.sectionTitle}</Section.Title>
       <Section.Group>
-        {onLeave ? (
-          <DangerRow
-            confirmationValue={name}
-            label={m.leave.label}
-            description={m.leave.description}
-            actionLabel={m.leave.actionLabel}
-            dialogTitle={m.leave.dialogTitle}
-            dialogDescription={m.leave.dialogDescription}
-            onRun={onLeave}
-          />
-        ) : null}
-        {onDelete ? (
-          <DangerRow
-            confirmationValue={name}
-            label={m.delete.label}
-            description={m.delete.description}
-            actionLabel={m.delete.actionLabel}
-            dialogTitle={m.delete.dialogTitle}
-            dialogDescription={plural(m.delete.dialogDescription, memberCount, locale, { name })}
-            onRun={onDelete}
-          />
-        ) : null}
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>{m.sectionTitle}</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          {leave ? (
+            <DangerRow
+              controller={leave}
+              confirmationValue={name}
+              label={m.leave.label}
+              description={m.leave.description}
+              actionLabel={m.leave.actionLabel}
+              dialogTitle={m.leave.dialogTitle}
+              dialogDescription={m.leave.dialogDescription}
+            />
+          ) : null}
+          {destroy ? (
+            <DangerRow
+              controller={destroy}
+              confirmationValue={name}
+              label={m.delete.label}
+              description={m.delete.description}
+              actionLabel={m.delete.actionLabel}
+              dialogTitle={m.delete.dialogTitle}
+              dialogDescription={plural(m.delete.dialogDescription, memberCount, locale, { name })}
+            />
+          ) : null}
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
 }
 
 function DangerRow({
+  controller,
   confirmationValue,
   label,
   description,
   actionLabel,
   dialogTitle,
   dialogDescription,
-  onRun,
 }: {
+  controller: ConfirmController;
   confirmationValue: string;
   label: string;
   description: string;
   actionLabel: string;
   dialogTitle: string;
   dialogDescription: string;
-  onRun: () => Promise<void>;
 }) {
   const m = useMessages('organizationProfileDangerSection');
-  const { isOpen, onOpenChange, onConfirm, isRunning, errorMessage } = useOrganizationProfileDangerActionController({
-    onRun,
-  });
 
   return (
     <Section.Row>
-      <Section.Item>
+      <Section.Item wrap>
         <Section.Content>
           <Section.Label>{label}</Section.Label>
           <Section.Description>{description}</Section.Description>
         </Section.Content>
         <Section.Actions>
           <Destructive
-            open={isOpen}
-            onOpenChange={onOpenChange}
+            controller={controller}
             trigger={
               <Button
                 color='negative'
@@ -103,9 +105,6 @@ function DangerRow({
             confirmationValue={confirmationValue}
             actionLabel={actionLabel}
             cancelLabel={m.cancelLabel}
-            onDelete={onConfirm}
-            isDeleting={isRunning}
-            errorMessage={errorMessage}
           />
         </Section.Actions>
       </Section.Item>

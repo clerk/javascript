@@ -1,12 +1,16 @@
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type {
-  MembersTableSort,
   MembersTableTabViewProps,
   OrganizationProfileMember,
 } from '@clerk/mosaic/features/organization-profile/members-table-tab.types';
+import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
 import { useLocale } from '@clerk/mosaic/localization';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
-const roles = [
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosName, chaosRows, chaosText } from '@/lib/chaos';
+
+const exampleRoles = [
   { value: 'admin', label: 'Admin' },
   { value: 'member', label: 'Member' },
 ];
@@ -34,22 +38,23 @@ const exampleMembers = [
 
 export function useMembersTableFixture({ proposed = false, empty = false } = {}): MembersTableTabViewProps {
   const locale = useLocale();
-  const [items, setItems] = useState(empty ? [] : exampleMembers);
+  const roles = useChaosFixture(exampleRoles, items => items.map(role => ({ ...role, label: chaosText(role.label) })));
+  const seed = useChaosFixture(exampleMembers, items =>
+    chaosRows(items).map((member, index) => ({
+      ...member,
+      name: chaosName(index),
+      email: chaosEmail(index),
+      isCurrentUser: index === 0,
+    })),
+  );
+  const [items, setItems] = useState(empty ? [] : seed);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const pageSize = 10;
   const [searchValue, setSearchValue] = useState('');
-  const [sort, setSort] = useState<MembersTableSort | null>(null);
   const query = searchValue.trim().toLowerCase();
   const filtered = items.filter(item => `${item.name} ${item.email}`.toLowerCase().includes(query));
-  const sorted = sort
-    ? [...filtered].sort((a, b) => {
-        const comparison =
-          sort.column === 'joinedAt' ? a.joinedAt - b.joinedAt : a[sort.column].localeCompare(b[sort.column]);
-        return sort.direction === 'ascending' ? comparison : -comparison;
-      })
-    : filtered;
-  const currentPage = Math.min(page, Math.max(1, Math.ceil(sorted.length / pageSize)));
-  const members: OrganizationProfileMember[] = sorted
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / pageSize)));
+  const members: OrganizationProfileMember[] = filtered
     .slice((currentPage - 1) * pageSize, currentPage * pageSize)
     .map(item => ({
       ...item,
@@ -61,10 +66,20 @@ export function useMembersTableFixture({ proposed = false, empty = false } = {})
       }).format(item.joinedAt),
       roleLabel: roles.find(role => role.value === item.role)?.label ?? item.role,
     }));
+  const inviteButtonRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: members.filter(member => !member.isCurrentUser).map(member => member.id),
+    onRemove: id => setItems(current => current.filter(item => item.id !== id)),
+    fallback: () => inviteButtonRef.current ?? searchInputRef.current,
+  });
+  const remove = useConfirmController<OrganizationProfileMember>({
+    onConfirm: member => removalFocus.remove(member.id),
+  });
   return {
     members,
     roles,
-    totalCount: sorted.length,
+    totalCount: filtered.length,
     page: currentPage,
     pageSize,
     searchValue,
@@ -74,16 +89,12 @@ export function useMembersTableFixture({ proposed = false, empty = false } = {})
       setPage(1);
     },
     onPageChange: setPage,
-    onPageSizeChange: setPageSize,
     onChangeRole: (id, role) => setItems(current => current.map(item => (item.id === id ? { ...item, role } : item))),
-    onRemove: id => setItems(current => current.filter(item => item.id !== id)),
+    inviteButtonRef,
+    searchInputRef,
+    registerTrigger: removalFocus.registerTrigger,
+    remove,
+    finalFocus: removalFocus.finalFocus,
     onBulkAction: proposed ? () => undefined : undefined,
-    sort,
-    onSortChange: proposed
-      ? next => {
-          setSort(next);
-          setPage(1);
-        }
-      : undefined,
   };
 }

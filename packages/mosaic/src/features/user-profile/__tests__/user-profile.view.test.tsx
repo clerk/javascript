@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../../../components/dialog';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
 
 const pages: UserProfileViewProps['pages'] = {
-  account: { name: 'Preston Booth', username: 'prestonxyz' },
-  security: { hasPassword: true },
+  account: {},
+  security: {},
   billing: {
     subscription: {
       planName: 'Basic Plan',
@@ -20,15 +20,7 @@ const pages: UserProfileViewProps['pages'] = {
     paymentMethods: [],
     historyItems: [],
   },
-  apiKeys: {
-    apiKeys: [],
-    searchValue: '',
-    totalCount: 0,
-    page: 1,
-    isLoading: false,
-    onSearchChange: vi.fn(),
-    onPageChange: vi.fn(),
-  },
+  apiKeys: <p>API keys content</p>,
 };
 
 function renderView(overrides: Partial<UserProfileViewProps> = {}) {
@@ -159,5 +151,43 @@ describe('UserProfileView', () => {
     const popup = screen.getByRole('dialog', { name: 'User profile' });
     expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
     expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+  });
+
+  it('replaces the close button with a back button in a fullscreen dialog', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <MosaicProvider>
+        <Dialog.Root
+          defaultOpen
+          onOpenChange={onOpenChange}
+        >
+          <Dialog.Popup variant='fullscreen'>
+            <UserProfileView
+              activePage='account'
+              pages={pages}
+              onPageChange={vi.fn()}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+
+    const popup = screen.getByRole('dialog', { name: 'User profile' });
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    const back = screen.getByRole('button', { name: 'Back to app' });
+    expect(popup).toContainElement(back);
+
+    await userEvent.setup().click(back);
+
+    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+  });
+
+  it('warns when there are no pages to show', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    renderView({ pages: {} });
+
+    expect(warn).toHaveBeenCalledWith('[Clerk] UserProfile has no pages to show.');
+    warn.mockRestore();
   });
 });

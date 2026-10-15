@@ -10,6 +10,17 @@ import { EnterpriseConnectionPage } from '../EnterpriseConnectionPage';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
+// jsdom's File has no text(); the certificate upload reads the file with it.
+if (typeof File.prototype.text !== 'function') {
+  File.prototype.text = function (this: File) {
+    return new Promise<string>(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsText(this);
+    });
+  };
+}
+
 const withPageFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
   f.withEnterpriseSso({ selfServeSSO: true });
   f.withEmailAddress();
@@ -87,16 +98,12 @@ const renderPage = (
   fixtures: any,
   connection: any,
   onBack = vi.fn(),
-  onOpenWizard = vi.fn(),
 ) => {
   const page = (next: any) => (
     <EnterpriseConnectionPage
       connection={next}
       enterpriseConnectionMutations={mutationsFor(fixtures)}
-      organizationName='Org1'
-      contentRef={{ current: null }}
       onBack={onBack}
-      onOpenWizard={onOpenWizard}
     />
   );
 
@@ -104,7 +111,6 @@ const renderPage = (
 
   return {
     onBack,
-    onOpenWizard,
     ...result,
     rerenderWith: (next: any) => result.rerender(page(next)),
   };
@@ -132,8 +138,8 @@ describe('EnterpriseConnectionPage', () => {
       expect(screen.getByText('Service provider')).toBeInTheDocument();
       expect(screen.getByText('Identity provider')).toBeInTheDocument();
       expect(screen.getByText('Settings')).toBeInTheDocument();
-      expect(screen.getByText('Danger zone')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Remove connection' })).toBeInTheDocument();
+      expect(screen.queryByText('Danger zone')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Remove connection' })).not.toBeInTheDocument();
 
       expect(screen.getByDisplayValue('https://accounts.clerk.com/v1/acs')).toBeInTheDocument();
       expect(screen.getByDisplayValue('https://accounts.clerk.com/saml/ent_1')).toBeInTheDocument();
@@ -211,6 +217,138 @@ describe('EnterpriseConnectionPage', () => {
       expect(await screen.findByText('Certificate expires')).toBeInTheDocument();
     });
 
+    it('lists every trusted certificate in the Edit form, marking the primary', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { userEvent, container } = renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({
+          idpCertificates: [
+            { certificate: 'CERTONE', issuedAt: null, expiresAt: Date.parse('2036-05-01T00:00:00Z') },
+            { certificate: 'CERTTWO', issuedAt: null, expiresAt: Date.parse('2020-05-01T00:00:00Z') },
+          ],
+        }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      expect(within(form).getByText('CERTONE')).toBeInTheDocument();
+      expect(within(form).getByText('CERTTWO')).toBeInTheDocument();
+      expect(within(form).getByText('Primary').closest('[tabindex="0"]')).not.toBeNull();
+      expect(within(form).getByText(/^Expired /)).toBeInTheDocument();
+      expect(within(form).getAllByRole('button', { name: 'Remove certificate' })).toHaveLength(2);
+      expect(within(form).getByRole('button', { name: 'Add certificate' })).toBeInTheDocument();
+    });
+
+    it('adds the certificates of an uploaded bundle and saves the whole list', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue(samlConnection());
+
+      const { userEvent, container } = renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({
+          idpCertificates: [{ certificate: 'CERTONE', issuedAt: null, expiresAt: Date.parse('2036-05-01T00:00:00Z') }],
+        }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      const bundle = new File(
+        [
+          '-----BEGIN CERTIFICATE-----\nCERTONE\n-----END CERTIFICATE-----\n' +
+            '-----BEGIN CERTIFICATE-----\nCERT\nTWO\n-----END CERTIFICATE-----\n',
+        ],
+        'bundle.pem',
+      );
+      await userEvent.upload(form.querySelector('input[type="file"]') as HTMLInputElement, bundle);
+
+      expect(await within(form).findByText('CERTTWO')).toBeInTheDocument();
+      expect(within(form).getByText('Expiry shows after you save.')).toBeInTheDocument();
+
+      await userEvent.click(within(form).getByRole('button', { name: 'Save' }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
+          saml: {
+            idpSsoUrl: 'https://idp.example.com/sso',
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificates: ['CERTONE', 'CERTTWO'],
+          },
+        });
+      });
+    });
+
+    it('removes a certificate but never the last one', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { userEvent, container } = renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({
+          idpCertificates: [
+            { certificate: 'CERTONE', issuedAt: null, expiresAt: null },
+            { certificate: 'CERTTWO', issuedAt: null, expiresAt: null },
+          ],
+        }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      await userEvent.click(within(form).getAllByRole('button', { name: 'Remove certificate' })[1]);
+
+      expect(within(form).queryByText('CERTTWO')).not.toBeInTheDocument();
+      expect(within(form).getByRole('button', { name: 'Remove certificate' })).toBeDisabled();
+    });
+
+    it('rejects a file that is not a certificate', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { userEvent, container } = renderPage(wrapper, fixtures, samlConnection());
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      const key = new File(['-----BEGIN PRIVATE KEY-----\nAAAA\n-----END PRIVATE KEY-----\n'], 'key.pem');
+      await userEvent.upload(form.querySelector('input[type="file"]') as HTMLInputElement, key);
+
+      expect(await within(form).findAllByText('One of the uploaded files is not a certificate.')).not.toHaveLength(0);
+      expect(within(form).getAllByRole('button', { name: 'Remove certificate' })).toHaveLength(1);
+    });
+
+    it('summarizes several certificates in the closed view', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({
+          idpCertificates: [
+            { certificate: 'CERTONE', issuedAt: null, expiresAt: Date.parse('2036-05-01T00:00:00Z') },
+            { certificate: 'CERTTWO', issuedAt: null, expiresAt: Date.parse('2030-05-01T00:00:00Z') },
+            { certificate: 'CERTTHREE', issuedAt: null, expiresAt: null },
+          ],
+        }),
+      );
+
+      expect(await screen.findByText('Certificates')).toBeInTheDocument();
+      expect(screen.getByText('3 certificates, earliest expires May 1, 2030')).toBeInTheDocument();
+      expect(screen.queryByText('Certificate expires')).not.toBeInTheDocument();
+    });
+
     it('renders the OIDC variant of the service provider section and only the shared settings', async () => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);
       withNoTestRuns(fixtures);
@@ -231,97 +369,22 @@ describe('EnterpriseConnectionPage', () => {
     });
   });
 
-  describe('header actions', () => {
-    it('offers no header action for an active connection', async () => {
+  describe('header', () => {
+    it.each([
+      ['active', { active: true }],
+      ['inactive', { active: false }],
+      ['mid-setup', { samlConnection: null, oauthConfig: null }],
+    ])('offers no lifecycle actions for a %s connection', async (_, overrides) => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);
       withNoTestRuns(fixtures);
 
-      renderPage(wrapper, fixtures, samlConnection({ active: true }));
+      renderPage(wrapper, fixtures, samlConnection(overrides));
 
       expect(await screen.findByRole('heading', { name: 'clerk.com' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Activate' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Deactivate' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Continue setup' })).not.toBeInTheDocument();
-    });
-
-    it('activates an inactive connection', async () => {
-      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
-      withNoTestRuns(fixtures);
-      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
-        data: [{ id: 'run_1', status: 'success' }],
-        total_count: 1,
-      } as any);
-      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue({ active: true } as any);
-
-      const { userEvent } = renderPage(wrapper, fixtures, samlConnection({ active: false }));
-
-      await userEvent.click(await screen.findByRole('button', { name: 'Activate' }));
-
-      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', { active: true });
-    });
-
-    it('offers Continue setup for a connection that is still mid-setup', async () => {
-      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
-      withNoTestRuns(fixtures);
-
-      const { userEvent, onOpenWizard } = renderPage(
-        wrapper,
-        fixtures,
-        samlConnection({ samlConnection: null, oauthConfig: null }),
-      );
-
-      await userEvent.click(await screen.findByRole('button', { name: 'Continue setup' }));
-
-      expect(onOpenWizard).toHaveBeenCalled();
-      expect(screen.queryByRole('button', { name: 'Open setup wizard' })).not.toBeInTheDocument();
-    });
-  });
-
-  describe('danger zone', () => {
-    it('deactivates an active connection', async () => {
-      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
-      withNoTestRuns(fixtures);
-      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue({ active: false } as any);
-
-      const { userEvent } = renderPage(wrapper, fixtures, samlConnection({ active: true }));
-
-      await userEvent.click(await screen.findByRole('button', { name: 'Deactivate connection' }));
-
-      expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', { active: false });
-    });
-
-    it('offers no Deactivate connection button for an inactive connection', async () => {
-      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
-      withNoTestRuns(fixtures);
-
-      renderPage(wrapper, fixtures, samlConnection({ active: false }));
-
-      expect(await screen.findByRole('button', { name: 'Remove connection' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Deactivate connection' })).not.toBeInTheDocument();
-    });
-
-    it('removes the connection from the danger zone and returns to the overview', async () => {
-      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
-      withNoTestRuns(fixtures);
-      fixtures.clerk.organization?.deleteEnterpriseConnection.mockResolvedValue({} as any);
-
-      const { userEvent, onBack } = renderPage(wrapper, fixtures, samlConnection({ active: true }));
-
-      expect(await screen.findAllByRole('button', { name: 'Remove connection' })).toHaveLength(1);
-      await userEvent.click(screen.getByRole('button', { name: 'Remove connection' }));
-
-      const dialog = within(await screen.findByRole('dialog'));
-      expect(dialog.getByRole('heading', { name: 'Remove SSO connection' })).toBeInTheDocument();
-      expect(dialog.getByText(/Are you sure you want to remove the connection "clerk.com"\?/i)).toBeInTheDocument();
-
-      await userEvent.type(dialog.getByLabelText(/below to continue/i), 'Org1');
-      await waitFor(() => expect(dialog.getByRole('button', { name: 'Remove connection' })).toBeEnabled());
-      await userEvent.click(dialog.getByRole('button', { name: 'Remove connection' }));
-
-      await waitFor(() => {
-        expect(fixtures.clerk.organization?.deleteEnterpriseConnection).toHaveBeenCalledWith('ent_1');
-      });
-      expect(onBack).toHaveBeenCalled();
+      expect(screen.queryByRole('button', { name: 'Remove connection' })).not.toBeInTheDocument();
     });
   });
 

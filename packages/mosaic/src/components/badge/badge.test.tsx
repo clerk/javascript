@@ -16,45 +16,78 @@ describe('Mosaic Badge', () => {
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
+  it('gives a text child its own box to truncate against', () => {
+    render(<Badge data-testid='badge'>Active</Badge>);
+    const label = screen.getByTestId('badge').firstElementChild;
+    expect(label?.tagName).toBe('SPAN');
+    expect(label).toHaveTextContent('Active');
+  });
+
   it('applies the default color when none is passed', () => {
-    render(<Badge>Active</Badge>);
-    const badge = screen.getByText('Active');
+    render(<Badge data-testid='badge'>Active</Badge>);
+    const badge = screen.getByTestId('badge');
     expect(badge).toHaveClass('cl-badge');
     expect(badge).toHaveAttribute('data-color', 'primary');
   });
 
   it.each(['primary', 'neutral', 'warning', 'negative', 'positive'] as const)('reflects the %s color', color => {
-    render(<Badge color={color}>Active</Badge>);
-    expect(screen.getByText('Active')).toHaveAttribute('data-color', color);
+    render(
+      <Badge
+        color={color}
+        data-testid='badge'
+      >
+        Active
+      </Badge>,
+    );
+    expect(screen.getByTestId('badge')).toHaveAttribute('data-color', color);
   });
 
   it('takes its color from BadgeContext when none is passed', () => {
     render(
       <BadgeContext.Provider value={{ color: 'neutral' }}>
-        <Badge>Active</Badge>
+        <Badge data-testid='badge'>Active</Badge>
       </BadgeContext.Provider>,
     );
-    expect(screen.getByText('Active')).toHaveAttribute('data-color', 'neutral');
+    expect(screen.getByTestId('badge')).toHaveAttribute('data-color', 'neutral');
   });
 
   it('lets an explicit color override the BadgeContext default', () => {
     render(
       <BadgeContext.Provider value={{ color: 'neutral' }}>
-        <Badge color='positive'>Active</Badge>
+        <Badge
+          color='positive'
+          data-testid='badge'
+        >
+          Active
+        </Badge>
       </BadgeContext.Provider>,
     );
-    expect(screen.getByText('Active')).toHaveAttribute('data-color', 'positive');
+    expect(screen.getByTestId('badge')).toHaveAttribute('data-color', 'positive');
   });
 
   it('merges xstyle atoms after the slot atoms', () => {
-    render(<Badge xstyle={atoms.spaced}>Active</Badge>);
-    const badge = screen.getByText('Active');
+    render(
+      <Badge
+        xstyle={atoms.spaced}
+        data-testid='badge'
+      >
+        Active
+      </Badge>,
+    );
+    const badge = screen.getByTestId('badge');
     expect(badge).toHaveClass('cl-badge', stylex.props(atoms.spaced).className ?? '');
   });
 
   it('merges a className carried by the render element instead of clobbering the slot class', () => {
-    render(<Badge render={<span className='from-source' />}>Active</Badge>);
-    expect(screen.getByText('Active')).toHaveClass('cl-badge', 'from-source');
+    render(
+      <Badge
+        render={<span className='from-source' />}
+        data-testid='badge'
+      >
+        Active
+      </Badge>,
+    );
+    expect(screen.getByTestId('badge')).toHaveClass('cl-badge', 'from-source');
   });
 
   it('forwards arbitrary span props and the ref', () => {
@@ -63,12 +96,13 @@ describe('Mosaic Badge', () => {
       <Badge
         ref={ref}
         id='status'
+        data-testid='badge'
         aria-label='Status'
       >
         Active
       </Badge>,
     );
-    const badge = screen.getByText('Active');
+    const badge = screen.getByTestId('badge');
     expect(ref.current).toBe(badge);
     expect(badge).toHaveAttribute('id', 'status');
     expect(badge).toHaveAttribute('aria-label', 'Status');

@@ -304,9 +304,48 @@ export const enUS: LocalizationResource = {
       google: 'Google Workspace',
       okta: 'Okta Workforce',
     },
+    roleMappingStep: {
+      actionHint__reorder: 'Drag to reorder, or use the arrow keys',
+      actionLabel__reorder: 'Reorder {{group}} mapping',
+      alert__missingManageMembersPermission: {
+        subtitle: 'Ask someone who can manage members to change role sync or the group role mappings.',
+        title: 'Role mapping is read-only',
+      },
+      columns: {
+        directoryGroup: 'Directory group',
+        priority: 'Priority',
+        role: 'Role',
+      },
+      disableDialog: {
+        cancelButton: 'Cancel',
+        confirmButton: 'Disable role sync',
+        subtitle:
+          "Members keep their current roles, but new members won't get a role from their directory group. Your mappings are saved, and turning role sync back on reapplies them to every member, overwriting any manual role changes.",
+        title: 'Disabling role sync',
+      },
+      empty__noGroups: {
+        subtitle: 'Push groups from {{provider}} and they will appear here, ready to map.',
+        title: 'No groups provisioned yet',
+      },
+      enableDialog: {
+        cancelButton: 'Cancel',
+        confirmButton: 'Enable role sync',
+        subtitle:
+          "Members' organization roles will be overwritten by the role mapped to their directory group, including roles that were assigned manually.",
+        title: 'Enabling role sync',
+      },
+      error__loadMappings: 'Could not load role mappings',
+      everyoneElse: 'Everyone else',
+      formFieldLabel__syncRoles: 'Sync roles',
+      roleOption__unassigned: 'Unassigned',
+      subtitle:
+        'Members get a role from the directory group they belong to. Members belonging to multiple groups are assigned the highest priority role.',
+      title: 'Role mapping',
+    },
     stepper: {
       attributes: 'Attributes',
       configure: 'Configure',
+      roles: 'Roles',
       test: 'Test',
     },
     testStep: {
@@ -500,7 +539,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -583,7 +622,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -700,7 +739,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -822,7 +861,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -925,6 +964,17 @@ export const enUS: LocalizationResource = {
       subtitle: "You'll configure the connection details in the next step",
       title: 'Select your identity provider',
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
+    signingCertificates: {
+      addCertificate: 'Add certificate',
+      expired: 'Expired {{date}}',
+      expires: 'Expires {{date}}',
+      expiryAfterSave: 'Expiry shows after you save.',
+      fileUnreadable: 'The file could not be read. Try again.',
+      notACertificate: 'One of the uploaded files is not a certificate.',
+      primary: 'Primary',
+      primaryTooltip: 'Checked first when verifying a sign-in. Every certificate in this list is trusted.',
+      removeCertificate: 'Remove certificate',
     },
     testConfigurationStep: {
       error__noSuccessfulTestRun:
@@ -1375,6 +1425,10 @@ export const enUS: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: 'Certificate expires',
+          certificates: 'Certificates',
+          certificatesCount: '{{count}} certificates',
+          certificatesSummary: '{{count}} certificates, earliest expires {{date}}',
+          certificatesSummaryExpired: '{{count}} certificates, one expired {{date}}',
           clientSecret: {
             placeholder: 'Leave empty to keep the current secret',
           },
@@ -1425,16 +1479,14 @@ export const enUS: LocalizationResource = {
       directorySyncSection: {
         badge__active: 'Active',
         badge__inactive: 'Inactive',
-        badge__ssoRequired: 'SSO Required',
-        badge__unconfigured: 'Unconfigured',
-        description:
-          "Automatically add, update, and remove organization members from your identity provider's directory. Requires an SSO connection.",
+        badge__ssoRequired: 'SSO required',
+        description: 'Keep organization members synced with your identity provider. Requires an SSO connection.',
         error__load: 'Could not load Directory Sync',
         menuAction__activate: 'Activate',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
-        primaryButton__startConfiguration: 'Start configuration',
+        primaryButton__configure: 'Configure',
         removeDialog: {
           confirmButton: 'Remove Directory Sync',
           subtitle:
@@ -1510,6 +1562,7 @@ export const enUS: LocalizationResource = {
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
         primaryButton__addConnection: 'Add connection',
+        primaryButton__configure: 'Configure',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',
@@ -2166,6 +2219,8 @@ export const enUS: LocalizationResource = {
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
     ticket_invalid_code:
       'This link is no longer valid or has already been used. Please start again or request a new link.',
+    too_many_unverified_identifications:
+      'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:

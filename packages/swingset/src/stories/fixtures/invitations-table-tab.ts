@@ -1,9 +1,14 @@
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type {
-  InvitationsTableSort,
   InvitationsTableTabViewProps,
+  OrganizationProfileInvitation,
 } from '@clerk/mosaic/features/organization-profile/invitations-table-tab.types';
+import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
 import { useLocale } from '@clerk/mosaic/localization';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
 
 const exampleInvitations = [
   'ada',
@@ -27,50 +32,48 @@ const exampleInvitations = [
 
 export function useInvitationsTableFixture({ proposed = false, empty = false } = {}): InvitationsTableTabViewProps {
   const locale = useLocale();
-  const [items, setItems] = useState(empty ? [] : exampleInvitations);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [searchValue, setSearchValue] = useState('');
-  const [sort, setSort] = useState<InvitationsTableSort | null>(null);
-  const query = searchValue.trim().toLowerCase();
-  const filtered = items.filter(item => item.email.toLowerCase().includes(query));
-  const sorted = sort
-    ? [...filtered].sort((a, b) => {
-        const comparison =
-          sort.column === 'invitedAt' ? a.invitedAt - b.invitedAt : a[sort.column].localeCompare(b[sort.column]);
-        return sort.direction === 'ascending' ? comparison : -comparison;
-      })
-    : filtered;
-  const currentPage = Math.min(page, Math.max(1, Math.ceil(sorted.length / pageSize)));
-  return {
-    invitations: sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(item => ({
-      ...item,
-      invitedAtLabel: new Intl.DateTimeFormat(locale, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        timeZone: 'UTC',
-      }).format(item.invitedAt),
+  const invitations = useChaosFixture(exampleInvitations, items =>
+    chaosRows(items).map((invitation, index) => ({
+      ...invitation,
+      email: chaosEmail(index),
+      roleLabel: chaosText(invitation.roleLabel),
     })),
-    totalCount: sorted.length,
+  );
+  const [items, setItems] = useState(empty ? [] : invitations);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(items.length / pageSize)));
+  const pageItems = items.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(item => ({
+    ...item,
+    invitedAtLabel: new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(item.invitedAt),
+  }));
+  const inviteButtonRef = useRef<HTMLButtonElement>(null);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: pageItems.map(item => item.id),
+    onRemove: id => setItems(current => current.filter(item => item.id !== id)),
+    fallback: () => inviteButtonRef.current ?? tableContainerRef.current,
+  });
+  const revoke = useConfirmController<OrganizationProfileInvitation>({
+    onConfirm: invitation => removalFocus.remove(invitation.id),
+  });
+  return {
+    invitations: pageItems,
+    totalCount: items.length,
     page: currentPage,
     pageSize,
-    searchValue,
     isLoading: false,
-    onSearchChange: value => {
-      setSearchValue(value);
-      setPage(1);
-    },
     onPageChange: setPage,
-    onPageSizeChange: setPageSize,
-    onRevoke: id => setItems(current => current.filter(item => item.id !== id)),
+    inviteButtonRef,
+    tableContainerRef,
+    registerTrigger: removalFocus.registerTrigger,
+    revoke,
+    finalFocus: removalFocus.finalFocus,
     onBulkAction: proposed ? () => undefined : undefined,
-    sort,
-    onSortChange: proposed
-      ? next => {
-          setSort(next);
-          setPage(1);
-        }
-      : undefined,
   };
 }

@@ -87,6 +87,37 @@ describe('Mosaic PhoneInput', () => {
     expect(document.querySelector('.cl-phone-input')).toHaveAttribute('data-size', 'md');
   });
 
+  it('starts on the given default country and dials the number with its code', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <PhoneInput
+        defaultCountry='de'
+        aria-label='Phone number'
+        onValueChange={onValueChange}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Country, Germany' })).toBeInTheDocument();
+    expect(screen.getByText('+49')).toHaveClass('cl-phone-input-prefix');
+
+    await user.type(screen.getByRole('textbox', { name: 'Phone number' }), '15123456789');
+
+    expect(onValueChange).toHaveBeenLastCalledWith('+4915123456789');
+  });
+
+  it('prefers the number it is given over the default country', () => {
+    render(
+      <PhoneInput
+        defaultCountry='de'
+        defaultValue='+18015550100'
+        aria-label='Phone number'
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Country, United States' })).toBeInTheDocument();
+  });
+
   it('emits an E.164 value while displaying the national number', async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();

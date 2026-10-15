@@ -1,13 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { SpinDelayOptions } from '../../hooks/useSpinDelay';
-import { useSpinDelay } from '../../hooks/useSpinDelay';
+import type { SpinDelayOptions } from '../../hooks/use-spin-delay';
+import { useSpinDelay } from '../../hooks/use-spin-delay';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
+import { withTruncatableLabel } from '../../utils/truncatable-label';
 import { Spinner } from '../spinner';
 import type { ButtonProps } from './button';
-import { Button, withTruncatableLabel } from './button';
+import { Button } from './button';
 import { styles } from './submit-button.styles';
 
 export interface SubmitButtonProps extends ButtonProps {

@@ -241,7 +241,7 @@ Returns `{ toasts, add, close, update, promise }`.
 | `data-ending-style`   | Root              | Present from `close` until the exit animations finish.                                        |
 | `data-side`           | Positioner, Arrow | The side the toast ended up on after flipping.                                                |
 | `data-align`          | Positioner        | `start`, `center`, or `end`.                                                                  |
-| `data-anchor-hidden`  | Positioner        | Present while the anchor is scrolled out of view.                                             |
+| `data-anchor-hidden`  | Positioner        | Present while the anchor is scrolled out of view or not rendered. The positioner is hidden.   |
 
 ## CSS Variables
 

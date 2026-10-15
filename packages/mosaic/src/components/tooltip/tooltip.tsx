@@ -5,8 +5,8 @@ import type { TooltipProps as HeadlessTooltipProps } from '../../primitives/tool
 import { Tooltip as Primitive } from '../../primitives/tooltip';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { tooltipSurface } from '../../utils/tooltip-surface.styles';
+import { reset } from '../../styles/reset.styles';
+import { tooltipSurface } from '../../styles/tooltip-surface.styles';
 import { styles } from './tooltip.styles';
 
 export type TooltipRootProps = HeadlessTooltipProps;

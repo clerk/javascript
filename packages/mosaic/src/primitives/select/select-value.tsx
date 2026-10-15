@@ -7,36 +7,39 @@ import type { SelectItem } from './select-context';
 import { useSelectContext } from './select-context';
 
 function resolveLabel(
-  value: string | undefined,
+  value: string,
   items: SelectItem[] | undefined,
+  cachedLabels: ReadonlyMap<string, string> | null,
   valueToLabelRef: React.MutableRefObject<Map<string, string>>,
-): string | null {
-  if (value === undefined) {
-    return null;
-  }
-  if (items) {
-    const item = items.find(i => i.value === value);
-    if (item) {
-      return item.label;
-    }
-  }
-  const label = valueToLabelRef.current.get(value);
-  if (label) {
-    return label;
-  }
-  return value;
+): string {
+  return (
+    cachedLabels?.get(value) ??
+    items?.find(i => i.value === value)?.label ??
+    valueToLabelRef.current.get(value) ??
+    value
+  );
 }
 
-export interface SelectValueProps extends ComponentProps<'span'> {
+export interface SelectValueProps extends Omit<ComponentProps<'span'>, 'children'> {
   placeholder?: ReactNode;
+  /** Replaces the selected labels. A function receives the selected values in the order they were picked. */
+  children?: ReactNode | ((value: string[]) => ReactNode);
 }
 
 export function SelectValue(props: SelectValueProps) {
-  const { render, placeholder, ...otherProps } = props;
-  const { selectedValue, selectedLabel, items, valueToLabelRef } = useSelectContext();
+  const { render, placeholder, children, ...otherProps } = props;
+  const { selectedValues, cachedLabels, items, valueToLabelRef } = useSelectContext();
 
-  const displayText =
-    selectedValue !== undefined ? (selectedLabel ?? resolveLabel(selectedValue, items, valueToLabelRef)) : placeholder;
+  let displayText: ReactNode;
+  if (children != null && typeof children !== 'function') {
+    displayText = children;
+  } else if (selectedValues.length === 0 && placeholder != null) {
+    displayText = placeholder;
+  } else if (typeof children === 'function') {
+    displayText = children(selectedValues);
+  } else {
+    displayText = selectedValues.map(value => resolveLabel(value, items, cachedLabels, valueToLabelRef)).join(', ');
+  }
 
   const defaultProps = {
     children: displayText,

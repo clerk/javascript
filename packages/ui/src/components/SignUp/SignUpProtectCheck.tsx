@@ -1,28 +1,18 @@
-import type { SignUpProps, SignUpResource } from '@clerk/shared/types';
+import { useClerk } from '@clerk/shared/react';
+import type { HandleOAuthCallbackParams, SignUpProps, SignUpResource } from '@clerk/shared/types';
 import { type ComponentType, useEffect, useRef, useState } from 'react';
 
-import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { Header } from '@/ui/elements/Header';
 import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
 import { ActionBlockedCard, withRedirectToAfterSignUp } from '../../common';
-import { useCoreSignUp } from '../../contexts';
-import {
-  Box,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Flow,
-  localizationKeys,
-  Spinner,
-  useLocalizations,
-} from '../../customizables';
-import { useSpinDelay } from '../../hooks';
+import { useCoreSignUp, useSignUpContext } from '../../contexts';
 import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
+import { useRouter } from '../../router';
+import { ProtectCheckCard } from '../ProtectCheck/ProtectCheckCard';
 import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
+import { isSignUpPendingOAuthTransfer } from './util';
 
 /**
  * Continuation paths default to the standalone `/sign-up/protect-check` mount. When the card is
@@ -36,6 +26,7 @@ type SignUpProtectCheckProps = Partial<SignUpProps> & {
   verifyPhonePath?: string;
   continuePath?: string;
   protectCheckPath?: string;
+  oauthCallbackParams?: HandleOAuthCallbackParams;
 };
 
 function SignUpProtectCheckInternal({
@@ -43,10 +34,13 @@ function SignUpProtectCheckInternal({
   verifyPhonePath = '../verify-phone-number',
   continuePath = '../continue',
   protectCheckPath = '.',
+  oauthCallbackParams,
 }: SignUpProtectCheckProps = {}): JSX.Element | null {
   const card = useCardState();
-  const { t } = useLocalizations();
   const signUp = useCoreSignUp();
+  const { navigate } = useRouter();
+  const { __internal_resumeAfterProtectCheck } = useClerk();
+  const { navigateOnSetActive } = useSignUpContext();
   const { navigateToFlowStart } = useNavigateToFlowStart();
   const completeSignUpFlow = useCompleteSignUpFlow();
   // Latches that a protect check existed at some point, so the resolution race
@@ -55,6 +49,7 @@ function SignUpProtectCheckInternal({
   // write, which React disallows in the render body.
   const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signUp.protectCheck);
   const didStartNoCheckFallbackRef = useRef(false);
+  const didResumeOAuthCallbackRef = useRef(false);
 
   if (signUp.protectCheck && !everSawProtectCheck) {
     setEverSawProtectCheck(true);
@@ -67,7 +62,7 @@ function SignUpProtectCheckInternal({
     }
   }, [everSawProtectCheck, navigateToFlowStart, signUp.protectCheck]);
 
-  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignUpResource>({
+  const runner = useProtectCheckRunner<SignUpResource>({
     getProtectCheck: () => signUp.protectCheck,
     getResource: () => signUp,
     reload: () => signUp.reload(),
@@ -80,6 +75,18 @@ function SignUpProtectCheckInternal({
       if (isCancelled()) {
         return;
       }
+      if (
+        oauthCallbackParams &&
+        typeof __internal_resumeAfterProtectCheck === 'function' &&
+        (didResumeOAuthCallbackRef.current || isSignUpPendingOAuthTransfer(updatedSignUp))
+      ) {
+        didResumeOAuthCallbackRef.current = true;
+        await __internal_resumeAfterProtectCheck(
+          { ...oauthCallbackParams, __internal_navigateOnSetActive: navigateOnSetActive },
+          navigate,
+        );
+        return;
+      }
       await completeSignUpFlow({
         signUp: updatedSignUp,
         verifyEmailPath,
@@ -89,13 +96,6 @@ function SignUpProtectCheckInternal({
       });
     },
   });
-
-  // Debounce the spinner's entrance so a near-instant check (or a script that signals its
-  // widget immediately) never flashes it — the card header alone carries the first ~300ms.
-  // The error and widget-visibility gates stay OUTSIDE the delay hook (in the JSX below): its
-  // minimum visible duration must never outrank the handshake's "spinner is gone when the
-  // promise resolves" guarantee, nor keep a spinner next to the retry button.
-  const showSpinner = useSpinDelay(isRunning, { delay: 300 });
 
   // Stale/direct visit that never had a check: render nothing while the
   // flow-start redirect scheduled above kicks in, instead of flashing the card
@@ -110,47 +110,10 @@ function SignUpProtectCheckInternal({
   }
 
   return (
-    <Flow.Part part='protectCheck'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signUp.protectCheck.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signUp.protectCheck.subtitle')} />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Col
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            <Box
-              ref={containerRef}
-              id='clerk-protect-check'
-              aria-busy={isRunning}
-              // Out of flow while empty so the collapsed container adds no reserved height or flex-gap
-              // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
-              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
-            />
-            {showSpinner && !hasError && !isWidgetVisible ? (
-              <Flex center>
-                <Spinner
-                  size='lg'
-                  colorScheme='primary'
-                  elementDescriptor={descriptors.spinner}
-                  aria-label={t(localizationKeys('signUp.protectCheck.loading'))}
-                />
-              </Flex>
-            ) : null}
-            {hasError ? (
-              <Button
-                onClick={retry}
-                localizationKey={localizationKeys('signUp.protectCheck.retryButton')}
-              />
-            ) : null}
-          </Col>
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
-    </Flow.Part>
+    <ProtectCheckCard
+      flow='signUp'
+      runner={runner}
+    />
   );
 }
 

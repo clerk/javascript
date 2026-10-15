@@ -4,16 +4,18 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { HeadingLevelProvider } from '../heading';
 import { Icon } from '../icon';
-import { Panel } from '../panel';
+import { Panel, usePanelTitle } from '../panel';
 import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
 import { Profile } from './profile';
+
+const pageTitles: Record<string, string> = { account: 'Account', security: 'Security' };
 
 function Surface(rootProps: Partial<ProfileRootProps>) {
   return (
@@ -31,13 +33,19 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
         </Profile.NavItem>
         <Profile.NavItem value='security'>Security</Profile.NavItem>
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle={pageTitles[rootProps.value ?? 'account']}>
         <Profile.ContentPanel value='account'>
           <Panel.Root>
             <Panel.Title>Account</Panel.Title>
             <Panel.Sections>
               <Section.Root>
-                <Section.Title>Email addresses</Section.Title>
+                <Section.Group>
+                  <Section.Header>
+                    <Section.Content>
+                      <Section.Title>Email addresses</Section.Title>
+                    </Section.Content>
+                  </Section.Header>
+                </Section.Group>
               </Section.Root>
             </Panel.Sections>
           </Panel.Root>
@@ -76,7 +84,7 @@ describe('Profile', () => {
             Account
           </Profile.NavItem>
         </Profile.Nav>
-        <Profile.Content>
+        <Profile.Content pageTitle='Account'>
           <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
         </Profile.Content>
       </Profile.Root>,
@@ -92,33 +100,38 @@ describe('Profile', () => {
         <Profile.Nav>
           <Profile.NavItem
             value='account'
-            badge={<Badge>3</Badge>}
+            badge={<Badge data-testid='account-badge'>3</Badge>}
           >
             Account
           </Profile.NavItem>
           <Profile.NavItem
             value='security'
-            badge={<Badge color='warning'>1</Badge>}
+            badge={
+              <Badge
+                color='warning'
+                data-testid='security-badge'
+              >
+                1
+              </Badge>
+            }
           >
             Security
           </Profile.NavItem>
         </Profile.Nav>
-        <Profile.Content>
+        <Profile.Content pageTitle='Account'>
           <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
           <Profile.ContentPanel value='security'>Security content</Profile.ContentPanel>
         </Profile.Content>
       </Profile.Root>,
     );
 
-    expect(screen.getByText('3')).toHaveAttribute('data-color', 'neutral');
-    expect(screen.getByText('1')).toHaveAttribute('data-color', 'warning');
+    expect(screen.getByTestId('account-badge')).toHaveAttribute('data-color', 'neutral');
+    expect(screen.getByTestId('security-badge')).toHaveAttribute('data-color', 'warning');
   });
 
   it('is a labelled navigation of tabs beside the selected page', () => {
     renderSurface();
 
-    // The title is a heading for the page outline and the name of the navigation, but not a
-    // visible headline: those belong to the pages.
     const title = screen.getByRole('heading', { level: 2, name: 'User profile' });
     expect(title).toHaveClass('cl-profile-title', 'cl-visually-hidden');
     expect(screen.getByRole('navigation', { name: 'User profile' })).toHaveAttribute('aria-labelledby', title.id);
@@ -169,7 +182,6 @@ describe('Profile', () => {
     expect(container.firstChild).toHaveClass('cl-profile', 'from-render');
   });
 
-  // The profile is often the content of the host's own `main`, or of a dialog.
   it('claims no main landmark', () => {
     renderSurface();
 
@@ -194,9 +206,6 @@ describe('Profile', () => {
     expect(screen.queryByText(/Secured by/)).not.toBeInTheDocument();
   });
 
-  // The compact layout is a container query against the profile itself, so the profile has to BE
-  // a container — drop that and it never collapses, at any width. The rules it drives live one
-  // level in, on the frame: an element is never its own query container.
   it('is the named container its compact layout queries', () => {
     const probe = stylex.create({ container: { containerName: 'cl-profile', containerType: 'inline-size' } });
     const { container } = renderSurface();
@@ -206,8 +215,6 @@ describe('Profile', () => {
     );
   });
 
-  // Unmeasured — before hydration, or the observer's first callback — the column renders in place
-  // at any width; the compact query must hide it, or a phone shows the tablist over the page.
   it('hides the in-place navigation under the compact query', () => {
     const probe = stylex.create({
       hidden: { display: { default: 'flex', '@container (width < 48rem)': 'none' } },
@@ -253,13 +260,34 @@ describe('Profile', () => {
   describe('page title', () => {
     it('is a plain heading while the navigation is beside the content', () => {
       renderSurface();
-      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toHaveClass('cl-profile-page-title');
       expect(screen.queryByRole('button', { name: 'Account' })).not.toBeInTheDocument();
+    });
+
+    it('is the only page title, follows the selection, and names the tabpanel', () => {
+      const { rerender } = renderSurface();
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(1);
+      expect(screen.queryByText('Account', { selector: '.cl-panel-title *' })).not.toBeInTheDocument();
+      expect(screen.getByRole('tabpanel', { name: 'Account' })).toBeInTheDocument();
+
+      rerender(
+        <MosaicProvider>
+          <Surface value='security' />
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeInTheDocument();
+      expect(screen.getByRole('tabpanel', { name: 'Security' })).toHaveTextContent('Security page');
+    });
+
+    it('sits in the scrolling content, above the pages', () => {
+      renderSurface();
+      const title = screen.getByRole('heading', { level: 3, name: 'Account' });
+      expect(document.querySelector('.cl-profile-content-body')).toContainElement(title);
+      expect(title.compareDocumentPosition(screen.getByRole('tabpanel'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
   });
 
-  // Compact is measured, not styled: which box the tablist renders in is a DOM decision. The
-  // measurement is the root's sentinel — `1px` wide, `2px` once the compact query matches.
+  // The sentinel reports 1px column, 2px select, 3px sheet.
   describe('compact', () => {
     let observe: ((width: number) => void) | null = null;
     const original = globalThis.ResizeObserver;
@@ -272,6 +300,10 @@ describe('Profile', () => {
           this.callback = callback;
         }
         observe(target: Element) {
+          // The select's positioning observes its trigger too; only the sentinel reports the layout.
+          if (!target.classList.contains('cl-profile-sentinel')) {
+            return;
+          }
           observe = width => {
             Object.defineProperty(target, 'offsetWidth', { configurable: true, value: width });
             Object.defineProperty(target, 'offsetHeight', { configurable: true, value: 600 });
@@ -292,9 +324,8 @@ describe('Profile', () => {
       const user = userEvent.setup();
       const onValueChange = vi.fn();
       renderSurface({ onValueChange });
-      act(() => observe?.(2));
+      act(() => observe?.(3));
 
-      // Nothing in the column; the headline is the way in, and still a heading.
       expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
       const headline = screen.getByRole('button', { name: 'Account' });
       expect(headline).toHaveAttribute('aria-expanded', 'false');
@@ -312,29 +343,38 @@ describe('Profile', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
-    it('hands focus to the headline of the page that is showing once the sheet closes', async () => {
+    it('picks the page from a listbox under the page title off a phone', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      renderSurface({ onValueChange });
+      act(() => observe?.(2));
+
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toContainElement(headline);
+      await user.click(headline);
+      const listbox = screen.getByRole('listbox');
+      expect(headline).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('option', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('option', { name: 'Account' })).toHaveClass('cl-profile-nav-item');
+      expect(listbox).toContainElement(screen.getByRole('option', { name: 'Security' }));
+      expect(document.querySelector('.cl-drawer-popup')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('option', { name: 'Security' }));
+      expect(onValueChange).toHaveBeenCalledWith('security');
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    });
+
+    it('opens the listbox from the keyboard, picks with the arrows, and keeps focus on the title', async () => {
       const user = userEvent.setup();
       function Controlled() {
         const [value, setValue] = React.useState('account');
         return (
-          <Profile.Root
+          <Surface
             value={value}
             onValueChange={setValue}
-          >
-            <Profile.Title>User profile</Profile.Title>
-            <Profile.Nav>
-              <Profile.NavItem value='account'>Account</Profile.NavItem>
-              <Profile.NavItem value='security'>Security</Profile.NavItem>
-            </Profile.Nav>
-            <Profile.Content>
-              <Profile.ContentPanel value='account'>
-                <Panel.Title>Account</Panel.Title>
-              </Profile.ContentPanel>
-              <Profile.ContentPanel value='security'>
-                <Panel.Title>Security</Panel.Title>
-              </Profile.ContentPanel>
-            </Profile.Content>
-          </Profile.Root>
+          />
         );
       }
       render(
@@ -343,49 +383,213 @@ describe('Profile', () => {
         </MosaicProvider>,
       );
       act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
 
-      await user.click(screen.getByRole('button', { name: 'Account' }));
+      headline.focus();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(screen.getByRole('option', { name: 'Account' })).toHaveFocus());
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('option', { name: 'Security' })).toHaveFocus();
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+      expect(headline).toHaveAccessibleName('Security');
+      expect(screen.getByRole('group', { name: 'Security' })).toHaveTextContent('Security page');
+    });
+
+    it('returns focus to the page title when the listbox is escaped', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+
+      await user.click(headline);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+    });
+
+    it('closes the listbox when the page title is pressed again', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+      await user.click(headline);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+      await user.click(headline);
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('closes the sheet on Escape and returns focus to the page title', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(3));
+      const headline = screen.getByRole('button', { name: 'Account' });
+      headline.focus();
+      await user.keyboard('{Enter}');
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+    });
+
+    it('hands focus back to the page title once the sheet closes on a choice', async () => {
+      const user = userEvent.setup();
+      function Controlled() {
+        const [value, setValue] = React.useState('account');
+        return (
+          <Surface
+            value={value}
+            onValueChange={setValue}
+          />
+        );
+      }
+      render(
+        <MosaicProvider>
+          <Controlled />
+        </MosaicProvider>,
+      );
+      act(() => observe?.(3));
+
+      const headline = screen.getByRole('button', { name: 'Account' });
+      await user.click(headline);
       await user.click(screen.getByRole('tab', { name: 'Security' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Security' })).toHaveFocus());
+      await waitFor(() => expect(headline).toHaveFocus());
+      expect(headline).toHaveAccessibleName('Security');
     });
 
-    // The tab a panel is normally named by exists only while the sheet is open, so compact the
-    // panel is named by its own title.
-    it('names the visible panel by its title while the tablist is away', () => {
+    it.each([
+      ['sheet', 3],
+      ['select', 2],
+    ])('falls back to the corner dismiss in a fullscreen dialog in the %s layout', (_, width) => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup variant='fullscreen'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('button', { name: 'Back to app' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+
+      act(() => observe?.(width));
+
+      expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+    });
+
+    it.each([
+      ['sheet', 3],
+      ['select', 2],
+    ])('shows the page as a group named by the page title in the %s layout', (_, width) => {
       renderSurface();
-      act(() => observe?.(2));
-      const panel = screen.getByRole('tabpanel');
-      const title = screen.getByRole('heading', { level: 3, name: 'Account' });
-      expect(panel).toHaveAttribute('aria-labelledby', title.id);
-      expect(panel).toHaveAccessibleName('Account');
+      act(() => observe?.(width));
+      expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
+      const page = screen.getByRole('group', { name: 'Account' });
+      expect(page).toHaveTextContent('Email addresses');
+      expect(page).not.toHaveAttribute('tabindex');
     });
 
     it('closes the sheet when the layout widens, and does not bring it back on narrowing', async () => {
       const user = userEvent.setup();
       renderSurface();
-      act(() => observe?.(2));
+      act(() => observe?.(3));
       await user.click(screen.getByRole('button', { name: 'Account' }));
       expect(screen.getByRole('dialog')).toBeInTheDocument();
 
       act(() => observe?.(1));
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-      act(() => observe?.(2));
+      act(() => observe?.(3));
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closes the navigation when it moves between the sheet and the select', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      await user.click(screen.getByRole('combobox', { name: 'Account' }));
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+      act(() => observe?.(3));
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('keeps a page title ref on the page title across layouts', () => {
+      const titleRef = React.createRef<HTMLDivElement>();
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Nav>
+              <Profile.NavItem value='account'>Account</Profile.NavItem>
+            </Profile.Nav>
+            <Profile.Content pageTitle='Account'>
+              <Profile.ContentPanel value='account'>
+                <Panel.Title ref={titleRef}>Account</Panel.Title>
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+      const title = () => screen.getByRole('heading', { level: 3, name: 'Account' });
+      expect(titleRef.current).toBe(title());
+
+      act(() => observe?.(2));
+      expect(titleRef.current).toBe(title());
+      act(() => observe?.(3));
+      expect(titleRef.current).toBe(title());
+    });
+
+    it('makes the page title the panel title inside a profile page', () => {
+      let panelTitle: () => HTMLDivElement | null = () => null;
+      function ReadPanelTitle() {
+        panelTitle = usePanelTitle();
+        return null;
+      }
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Nav>
+              <Profile.NavItem value='account'>Account</Profile.NavItem>
+            </Profile.Nav>
+            <Profile.Content pageTitle='Account'>
+              <Profile.ContentPanel value='account'>
+                <Panel.Root>
+                  <Panel.Title>Account</Panel.Title>
+                  <Panel.Sections>
+                    <ReadPanelTitle />
+                  </Panel.Sections>
+                </Panel.Root>
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+
+      expect(panelTitle()).toBe(screen.getByRole('heading', { level: 3, name: 'Account' }));
     });
 
     it('returns the tablist to the column when the width comes back', () => {
       renderSurface();
-      act(() => observe?.(2));
+      act(() => observe?.(3));
       expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
       act(() => observe?.(1));
       expect(screen.getByRole('navigation', { name: 'User profile' })).toContainElement(screen.getByRole('tablist'));
     });
   });
 
-  // `flush` is the page-content presentation without a dialog around it: the same look an inline
-  // dialog implies, chosen the way `Card` chooses its elevation.
   it('takes the flush presentation from its elevation prop', () => {
     const probe = stylex.create({ frameless: { borderWidth: '0px', backgroundColor: 'transparent' } });
     const flush = renderSurface({ elevation: 'flush' });
@@ -414,8 +618,6 @@ describe('Profile', () => {
       );
     }
 
-    // Named from inside, the way `Card.Title` names a card dialog — nothing is passed in. And the
-    // dismiss comes from the profile too, the way `Card.Header` carries a card's.
     it('names the dialog and carries its dismiss', () => {
       renderInDialog();
 
@@ -446,15 +648,82 @@ describe('Profile', () => {
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
-    // The dismiss belongs to the dialog, so a profile that is the page's own content has none.
+    describe('fullscreen', () => {
+      function renderFullscreen(
+        onOpenChange = vi.fn(),
+        localization?: React.ComponentProps<typeof MosaicProvider>['localization'],
+      ) {
+        return render(
+          <MosaicProvider localization={localization}>
+            <Dialog.Root
+              defaultOpen
+              onOpenChange={onOpenChange}
+            >
+              <Dialog.Popup variant='fullscreen'>
+                <Surface />
+              </Dialog.Popup>
+            </Dialog.Root>
+          </MosaicProvider>,
+        );
+      }
+
+      it('puts a back button first in the navigation in place of the corner dismiss', () => {
+        renderFullscreen();
+
+        const back = screen.getByRole('button', { name: 'Back to app' });
+        expect(screen.getByRole('navigation', { name: 'User profile' })).toContainElement(back);
+        expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+        expect(back.compareDocumentPosition(screen.getByRole('tablist'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+
+      it('dismisses the dialog from the back button', async () => {
+        const onOpenChange = vi.fn();
+        renderFullscreen(onOpenChange);
+
+        await userEvent.setup().click(screen.getByRole('button', { name: 'Back to app' }));
+
+        expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+      });
+
+      it('reads the back button label from the catalog', () => {
+        renderFullscreen(vi.fn(), { overrides: { 'profile.backToApp': 'Retour à l’application' } });
+
+        expect(screen.getByRole('button', { name: 'Retour à l’application' })).toBeInTheDocument();
+      });
+    });
+
+    it('has no back button in a profile dialog, or standalone', () => {
+      const standalone = renderSurface();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+      standalone.unmount();
+
+      renderInDialog();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+    });
+
+    it('follows showCloseButton on the dialog', () => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root
+            defaultOpen
+            showCloseButton={false}
+          >
+            <Dialog.Popup variant='profile'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+
+      expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
+    });
+
     it('carries no dismiss standalone', () => {
       renderSurface();
 
       expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
     });
 
-    // Switching pages must never resize the surface: standalone it holds a fixed height and
-    // scrolls inside; over the page the popup's height is the one that counts.
     it('holds a fixed height standalone, and hands it to the popup over the page', () => {
       const probe = stylex.create({ fixed: { blockSize: '45rem' }, handed: { blockSize: 'auto' } });
       const fixed = atomsOf(probe.fixed);
@@ -470,8 +739,6 @@ describe('Profile', () => {
       expect(frame()).toEqual(expect.arrayContaining(handed));
     });
 
-    // Flush, the profile is the page's content: no frame, no scroll region of its own, and the
-    // branding closes the pages' column out rather than the navigation's.
     it('is flush and unframed at that elevation, and scrolls with the page', () => {
       const probe = stylex.create({
         frameless: { borderWidth: '0px', overflow: 'visible', backgroundColor: 'transparent', blockSize: 'auto' },
