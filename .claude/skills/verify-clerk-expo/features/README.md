@@ -42,7 +42,7 @@ The iOS identifiers come from `Sources/ClerkKitUI/Components/Auth/ClerkAccessibi
 ## Proof and skip reporting
 
 - A proof is a passing `run` whose run directory holds `video.mp4`, `screenshots/`, `app.log`, and `e2e/report.json`. The video and the screenshots are the proof on both platforms.
-- Name the run id, the platform, and the specs in the PR. Attach the run with `attach <run-id> --pr <n>` and `--screenshot <label>` for a still change or `--video` for behavior or a flow. Add `--before <run-id>` when the change is to something that exists. `SKILL.md` has the choice under Evidence.
+- Name the run id, the platform, and the specs in the PR. Attach the run with `attach <run-id> --pr <n>` and `--screenshot <label>` for a still change or `--video` for behavior or a flow, with the part that shows the change inside `host.evidence`. Add `--before <run-id>` when the change is to something that exists. `SKILL.md` has the choice under Evidence.
 - A spec limited to one platform reports as skipped on the other. Say which platform, and local or remote device, each proof ran on.
 
 ## Feature entry contract
