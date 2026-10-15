@@ -402,7 +402,7 @@ describe('APIKeysTable', () => {
 
       await waitFor(() => expect(name).toHaveFocus());
       await user.type(name, 'Deploy');
-      expect(add).toBeDisabled();
+      expect(add).toHaveAttribute('aria-disabled', 'true');
 
       await user.click(within(dialog).getByRole('combobox', { name: /^Expiration/ }));
       expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual([
@@ -417,7 +417,7 @@ describe('APIKeysTable', () => {
       ]);
       await user.click(screen.getByRole('option', { name: 'Never' }));
       await waitFor(() => expect(within(dialog).getByText('This key will never expire')).toBeVisible());
-      expect(add).toBeEnabled();
+      expect(add).not.toHaveAttribute('aria-disabled');
     });
 
     it('requires a name longer than two characters', async () => {
@@ -426,10 +426,10 @@ describe('APIKeysTable', () => {
       const add = within(dialog).getByRole('button', { name: 'Add API Key' });
 
       await fillCreate(user, dialog, 'ab', 'Never');
-      expect(add).toBeDisabled();
+      expect(add).toHaveAttribute('aria-disabled', 'true');
 
       await user.type(within(dialog).getByRole('textbox', { name: 'Secret key name' }), 'c');
-      expect(add).toBeEnabled();
+      expect(add).not.toHaveAttribute('aria-disabled');
     });
 
     it('holds the form while the key is created', async () => {
