@@ -1,24 +1,19 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { useConfirmController } from '../../../blocks/confirm';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { useUserProfileActiveDevicesController } from '../user-profile-active-devices-section/user-profile-active-devices-section.controller';
 import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
-import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
+import type { UserProfileMfaSectionViewProps } from '../user-profile-mfa-section/user-profile-mfa-section.view';
+import { UserProfileMfaSectionView } from '../user-profile-mfa-section/user-profile-mfa-section.view';
 import type { UserProfilePasskey } from '../user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import { useUserProfilePasskeysSectionController } from '../user-profile-passkeys-section/user-profile-passkeys-section.controller';
-import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
-
-function DeleteAccount() {
-  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
-  return <UserProfileDangerSectionView controller={controller} />;
-}
 
 function ActiveDevices({
   devices,
@@ -46,6 +41,7 @@ function Passkeys({ passkeys, onRemove }: { passkeys: UserProfilePasskey[]; onRe
   });
   return <UserProfilePasskeysSectionView {...controller} />;
 }
+
 const devices: UserProfileDevice[] = [
   {
     id: 'current',
@@ -77,89 +73,72 @@ const passkeys = [
   },
 ];
 
-const props: UserProfileSecurityPanelViewProps = {
-  passkeysSlot: (
-    <UserProfilePasskeysSectionView
-      registerTrigger={() => null}
-      passkeys={passkeys}
-    />
-  ),
-  mfaMethods: [
-    { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
-    { id: 'totp_1', type: 'authenticator' },
-    { id: 'backup_1', type: 'backup-codes' },
-  ],
-  activeDevicesSlot: <ActiveDevices devices={devices} />,
-};
+const mfaMethods: UserProfileMfaSectionViewProps['methods'] = [
+  { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
+  { id: 'totp_1', type: 'authenticator' },
+  { id: 'backup_1', type: 'backup-codes' },
+];
 
-function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) {
+function renderView(children: ReactNode) {
   return render(
     <MosaicProvider>
-      <UserProfileSecurityPanelView
-        {...props}
-        {...overrides}
-      />
+      <UserProfileSecurityPanelView>{children}</UserProfileSecurityPanelView>
     </MosaicProvider>,
   );
 }
 
 describe('UserProfileSecurityPanelView', () => {
-  it('renders supplied password content without a separate visibility flag', () => {
-    renderView({
-      passwordSlot: <div>Password</div>,
-      passkeysSlot: undefined,
-      mfaMethods: undefined,
-    });
-
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
-    expect(screen.getByText('Password')).toBeVisible();
-  });
-
-  it('composes authentication and active devices without rendering a supplied danger zone', () => {
-    const staleSecurityProps = { ...props, dangerSlot: <DeleteAccount /> };
-    renderView(staleSecurityProps);
+  it('renders its sections in the order given', () => {
+    renderView(
+      <>
+        <UserProfilePasskeysSectionView
+          registerTrigger={() => null}
+          passkeys={passkeys}
+        />
+        <UserProfileMfaSectionView methods={mfaMethods} />
+        <ActiveDevices devices={devices} />
+      </>,
+    );
 
     expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
-    const authentication = screen.getByRole('region', { name: 'Authentication' });
-    expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 3, name: 'Active devices' })).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { level: 3, name: 'Danger zone' })).not.toBeInTheDocument();
-    expect(within(authentication).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeInTheDocument();
-    expect(within(authentication).getByRole('heading', { level: 3, name: '2-step verification' })).toBeInTheDocument();
-    expect(within(authentication).getByRole('group', { name: 'Passkeys' })).toBeInTheDocument();
-    expect(within(authentication).getByRole('group', { name: '2-step verification' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 3 }).map(heading => heading.textContent)).toEqual([
+      'Passkeys',
+      '2-step verification',
+      'Active devices',
+    ]);
     const activeDevices = screen.getByRole('group', { name: 'Active devices' });
     expect(within(activeDevices).getAllByRole('listitem')).toHaveLength(3);
     expect(screen.queryByRole('button', { name: 'Sign out of all devices' })).not.toBeInTheDocument();
     expect(screen.getByText('This device')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Delete account' })).not.toBeInTheDocument();
   });
 
-  it('omits active devices when no slot is supplied', () => {
-    renderView({ activeDevicesSlot: undefined });
+  it('keeps the title when it has no sections', () => {
+    renderView(null);
 
-    expect(screen.queryByRole('heading', { name: 'Active devices' })).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Security' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
+    expect(screen.queryAllByRole('heading', { level: 3 })).toHaveLength(0);
   });
 
   it('adds an available MFA method through the picker', async () => {
-    const onAddMfaMethod = vi.fn();
+    const onAdd = vi.fn();
     const user = userEvent.setup();
 
-    renderView({
-      mfaMethods: [
-        { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
-        { id: 'backup_1', type: 'backup-codes' },
-      ],
-      onAddMfaMethod,
-      addableMfaMethods: ['authenticator'],
-    });
+    renderView(
+      <UserProfileMfaSectionView
+        methods={[
+          { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
+          { id: 'backup_1', type: 'backup-codes' },
+        ]}
+        onAdd={onAdd}
+        addableMethods={['authenticator']}
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     expect(screen.queryByRole('button', { name: /SMS verification Get a code/ })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Authenticator app Get codes/ }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(onAddMfaMethod).toHaveBeenCalledWith('authenticator');
+    expect(onAdd).toHaveBeenCalledWith('authenticator');
   });
 
   it('forwards security actions', async () => {
@@ -167,15 +146,13 @@ describe('UserProfileSecurityPanelView', () => {
     const onSignOutAllOtherDevices = vi.fn();
     const user = userEvent.setup();
 
-    renderView({
-      activeDevicesSlot: (
-        <ActiveDevices
-          devices={devices}
-          onSignOutDevice={onSignOutDevice}
-          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
-        />
-      ),
-    });
+    renderView(
+      <ActiveDevices
+        devices={devices}
+        onSignOutDevice={onSignOutDevice}
+        onSignOutAllOtherDevices={onSignOutAllOtherDevices}
+      />,
+    );
 
     const signOutAll = screen.getByRole('button', { name: 'Sign out of all devices' });
     expect(signOutAll).toHaveAttribute('data-variant', 'outline');
@@ -197,19 +174,21 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('keeps supported empty MFA methods and devices actionable', () => {
-    renderView({
-      passkeysSlot: (
+    renderView(
+      <>
         <UserProfilePasskeysSectionView
           registerTrigger={() => null}
           passkeys={[]}
           onAdd={vi.fn()}
         />
-      ),
-      mfaMethods: [],
-      activeDevicesSlot: <ActiveDevices devices={[]} />,
-      onAddMfaMethod: vi.fn(),
-      addableMfaMethods: ['sms', 'authenticator'],
-    });
+        <UserProfileMfaSectionView
+          methods={[]}
+          onAdd={vi.fn()}
+          addableMethods={['sms', 'authenticator']}
+        />
+        <ActiveDevices devices={[]} />
+      </>,
+    );
 
     expect(screen.getByText('No verification methods added')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add verification method' })).toBeInTheDocument();
@@ -218,47 +197,29 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('withholds sign out from the current device', async () => {
     const user = userEvent.setup();
-    renderView({
-      activeDevicesSlot: (
-        <ActiveDevices
-          devices={devices}
-          onSignOutDevice={vi.fn()}
-        />
-      ),
-    });
+    renderView(
+      <ActiveDevices
+        devices={devices}
+        onSignOutDevice={vi.fn()}
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Manage Safari on macOS' }));
     expect(screen.getByRole('menuitem', { name: 'View details' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Sign out' })).not.toBeInTheDocument();
   });
 
-  it('keeps the authentication section on MFA when existing passkeys are hidden', () => {
-    renderView({
-      passkeysSlot: null,
-    });
+  it('keeps the passkeys card when passkeys are empty and Add is unavailable', () => {
+    renderView(
+      <UserProfilePasskeysSectionView
+        registerTrigger={() => null}
+        passkeys={[]}
+      />,
+    );
 
-    expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
-    expect(screen.queryByText('Passkey')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
+    expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
-    expect(screen.getByRole('heading', { level: 3, name: '2-step verification' })).toBeVisible();
-  });
-
-  it('keeps the passkeys card in the authentication section when passkeys are empty and Add is unavailable', () => {
-    renderView({
-      passkeysSlot: (
-        <UserProfilePasskeysSectionView
-          registerTrigger={() => null}
-          passkeys={[]}
-        />
-      ),
-    });
-
-    const section = screen.getByRole('region', { name: 'Authentication' });
-    expect(within(section).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
-    expect(within(section).getByText('No passkeys added')).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
-    expect(screen.getByRole('group', { name: '2-step verification' })).toBeVisible();
   });
 
   it('keeps the empty section and final passkey confirmation mounted without Add', async () => {
@@ -267,15 +228,12 @@ describe('UserProfileSecurityPanelView', () => {
     const onRemovePasskey = vi.fn(async () => {
       await removal.promise;
     });
-    const { rerender } = renderView({
-      mfaMethods: undefined,
-      passkeysSlot: (
-        <Passkeys
-          passkeys={passkeys}
-          onRemove={onRemovePasskey}
-        />
-      ),
-    });
+    const { rerender } = renderView(
+      <Passkeys
+        passkeys={passkeys}
+        onRemove={onRemovePasskey}
+      />,
+    );
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
@@ -283,17 +241,14 @@ describe('UserProfileSecurityPanelView', () => {
 
     rerender(
       <MosaicProvider>
-        <UserProfileSecurityPanelView
-          passkeysSlot={
-            <Passkeys
-              passkeys={[]}
-              onRemove={onRemovePasskey}
-            />
-          }
-        />
+        <UserProfileSecurityPanelView>
+          <Passkeys
+            passkeys={[]}
+            onRemove={onRemovePasskey}
+          />
+        </UserProfileSecurityPanelView>
       </MosaicProvider>,
     );
-    expect(screen.getByRole('region', { name: 'Authentication' })).toBeInTheDocument();
     expect(screen.getByRole('alertdialog', { name: 'Remove passkey' })).toBeVisible();
 
     await act(async () => {
@@ -301,7 +256,6 @@ describe('UserProfileSecurityPanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Passkeys' })).toBeVisible();
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
@@ -309,23 +263,27 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('shows supplied backup codes independently and only allows regeneration', async () => {
     const onRegenerateBackupCodes = vi.fn();
-    const onRemoveMfaMethod = vi.fn();
+    const onRemove = vi.fn();
     const backupCodes = { id: 'backup_1', type: 'backup-codes' as const };
-    const backupOnlyView = renderView({
-      mfaMethods: [backupCodes],
-      onRegenerateBackupCodes,
-      onRemoveMfaMethod,
-    });
+    const backupOnlyView = renderView(
+      <UserProfileMfaSectionView
+        methods={[backupCodes]}
+        onRegenerateBackupCodes={onRegenerateBackupCodes}
+        onRemove={onRemove}
+      />,
+    );
 
     expect(screen.getByText('Backup codes')).toBeVisible();
     backupOnlyView.unmount();
 
     const user = userEvent.setup();
-    renderView({
-      mfaMethods: [{ id: 'sms_1', type: 'sms' }, backupCodes],
-      onRegenerateBackupCodes,
-      onRemoveMfaMethod,
-    });
+    renderView(
+      <UserProfileMfaSectionView
+        methods={[{ id: 'sms_1', type: 'sms' }, backupCodes]}
+        onRegenerateBackupCodes={onRegenerateBackupCodes}
+        onRemove={onRemove}
+      />,
+    );
 
     expect(screen.getByText('Backup codes')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
@@ -335,14 +293,14 @@ describe('UserProfileSecurityPanelView', () => {
     expect(dialog).toHaveAccessibleDescription(
       'This phone number will no longer receive sign-in verification codes. It will remain on your account.',
     );
-    expect(onRemoveMfaMethod).not.toHaveBeenCalled();
+    expect(onRemove).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
     expect(screen.queryByRole('menuitem', { name: 'Remove method' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
 
-    expect(onRemoveMfaMethod).toHaveBeenCalledWith('sms_1');
+    expect(onRemove).toHaveBeenCalledWith('sms_1');
     expect(onRegenerateBackupCodes).toHaveBeenCalledOnce();
   });
 });

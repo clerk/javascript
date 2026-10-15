@@ -35,14 +35,13 @@ export function Default(_args: Record<string, unknown>) {
   const phones = useUserProfilePhonesFixture();
 
   return (
-    <UserProfileProfilePanelView
-      titleRef={titleRef}
-      profileSlot={<UserProfileProfileSectionView {...profile} />}
-      emailSlot={<UserProfileEmailSectionView {...emails} />}
-      phoneSlot={<UserProfilePhoneSectionView {...phones} />}
-      connectedAccountsSlot={<UserProfileConnectedAccountsSectionView {...connections} />}
-      web3WalletsSlot={<UserProfileWeb3WalletsSectionView {...wallets} />}
-      dangerSlot={<UserProfileDangerPreview />}
-    />
+    <UserProfileProfilePanelView titleRef={titleRef}>
+      <UserProfileProfileSectionView {...profile} />
+      <UserProfileEmailSectionView {...emails} />
+      <UserProfilePhoneSectionView {...phones} />
+      <UserProfileConnectedAccountsSectionView {...connections} />
+      <UserProfileWeb3WalletsSectionView {...wallets} />
+      <UserProfileDangerPreview />
+    </UserProfileProfilePanelView>
   );
 }

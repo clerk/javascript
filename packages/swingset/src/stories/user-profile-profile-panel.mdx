@@ -15,23 +15,23 @@ import * as UserProfileProfilePanelStories from './user-profile-profile-panel.st
 
 ## Usage
 
-Each section arrives as a slot, so the panel only arranges them under the Account title.
+`UserProfileProfilePanel` renders the Account title and every account section. Each section shows itself only when the signed-in user and the instance settings call for it.
 
 ```tsx
-import { useRef } from 'react';
-import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { UserProfileProfileSection } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section';
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
+
+<UserProfileProfilePanel />;
+```
+
+Pass sections as children to choose which ones render and in what order.
+
+```tsx
 import { UserProfileEmailSection } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section';
-import { UserProfilePhoneSection } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section';
-import { UserProfileConnectedAccountsSection } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section';
+import { UserProfileProfilePanel } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel';
+import { UserProfileProfileSection } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section';
 
-const titleRef = useRef<HTMLDivElement>(null);
-
-<UserProfileProfilePanelView
-  titleRef={titleRef}
-  profileSlot={<UserProfileProfileSection />}
-  emailSlot={<UserProfileEmailSection />}
-  phoneSlot={<UserProfilePhoneSection />}
-  connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
-/>
+<UserProfileProfilePanel>
+  <UserProfileProfileSection />
+  <UserProfileEmailSection />
+</UserProfileProfilePanel>;
 ```

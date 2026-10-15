@@ -48,65 +48,67 @@ export function UserProfilePasskeysSectionView({
 
   return (
     <>
-      <Section.Group
-        ref={sectionRef}
-        tabIndex={-1}
-      >
-        <Section.Header>
-          <Section.Content>
-            <Section.Title>{m.label}</Section.Title>
-            <Field.Message
-              role={addError ? 'alert' : 'status'}
-              xstyle={styles.addError}
-            >
-              <Field.Error>{addError}</Field.Error>
-            </Field.Message>
-          </Section.Content>
-          {onAdd ? (
-            <Section.Actions>
-              <Button
-                ref={addButtonRef}
-                aria-label={m.addLabel}
-                color='neutral'
-                size='sm'
-                variant='outline'
-                disabled={isAdding}
-                aria-busy={isAdding}
-                onClick={onAdd}
+      <Section.Root>
+        <Section.Group
+          ref={sectionRef}
+          tabIndex={-1}
+        >
+          <Section.Header>
+            <Section.Content>
+              <Section.Title>{m.label}</Section.Title>
+              <Field.Message
+                role={addError ? 'alert' : 'status'}
+                xstyle={styles.addError}
               >
-                <Icon
-                  name='plus'
-                  placement='inline-start'
+                <Field.Error>{addError}</Field.Error>
+              </Field.Message>
+            </Section.Content>
+            {onAdd ? (
+              <Section.Actions>
+                <Button
+                  ref={addButtonRef}
+                  aria-label={m.addLabel}
+                  color='neutral'
                   size='sm'
-                />
-                {m.add}
-              </Button>
-            </Section.Actions>
-          ) : null}
-        </Section.Header>
-        <Section.Body>
-          <Section.Items>
-            {passkeys.length > 0 ? (
-              passkeys.map(passkey => (
-                <UserProfilePasskeyRowView
-                  key={passkey.id}
-                  passkey={passkey}
-                  triggerRef={registerTrigger(passkey.id)}
-                  onRename={onRename}
-                  validateName={validateName}
-                  onRemove={remove ? () => remove.open(passkey) : undefined}
-                />
-              ))
-            ) : (
-              <Section.Item>
-                <Section.Content>
-                  <Section.Description>{m.empty}</Section.Description>
-                </Section.Content>
-              </Section.Item>
-            )}
-          </Section.Items>
-        </Section.Body>
-      </Section.Group>
+                  variant='outline'
+                  disabled={isAdding}
+                  aria-busy={isAdding}
+                  onClick={onAdd}
+                >
+                  <Icon
+                    name='plus'
+                    placement='inline-start'
+                    size='sm'
+                  />
+                  {m.add}
+                </Button>
+              </Section.Actions>
+            ) : null}
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              {passkeys.length > 0 ? (
+                passkeys.map(passkey => (
+                  <UserProfilePasskeyRowView
+                    key={passkey.id}
+                    passkey={passkey}
+                    triggerRef={registerTrigger(passkey.id)}
+                    onRename={onRename}
+                    validateName={validateName}
+                    onRemove={remove ? () => remove.open(passkey) : undefined}
+                  />
+                ))
+              ) : (
+                <Section.Item>
+                  <Section.Content>
+                    <Section.Description>{m.empty}</Section.Description>
+                  </Section.Content>
+                </Section.Item>
+              )}
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>
       {remove ? (
         <Confirmation
           controller={remove}
