@@ -344,6 +344,17 @@ export interface EvidenceSpan {
   readonly passed: boolean;
 }
 
+export interface EvidenceTap {
+  readonly at: number;
+  readonly x: number;
+  readonly y: number;
+}
+
+export interface Viewport {
+  readonly width: number;
+  readonly height: number;
+}
+
 export interface EvidenceRecord {
   readonly run: RunId;
   readonly startedAt: string;
@@ -359,6 +370,7 @@ export interface EvidenceRecord {
   readonly results: readonly SpecResult[];
   readonly videos: readonly EvidencePath[];
   readonly evidenceSpans?: readonly EvidenceSpan[];
+  readonly evidenceTaps?: { readonly viewport: Viewport; readonly taps: readonly EvidenceTap[] } | null;
   readonly screenshots: readonly Screenshot[];
   readonly appLog: EvidencePath | null;
   readonly e2eReport: EvidencePath;
