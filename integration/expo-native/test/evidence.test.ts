@@ -37,6 +37,7 @@ function partialRecord(dir: EvidencePath, run: RunId): Omit<EvidenceRecord, 'sea
       { spec: { kind: 'explored', path: 'specs/explored/a.e2e.ts', feature: null }, title: 'a', platform: 'ios', status: 'passed', seconds: 1, attempts: 1, error: null, skipReason: null, skippedBy: null, tags: [], failurePage: null, failureScreen: null, failureScreenshot: null },
     ],
     videos: [join(dir, 'video.mp4') as EvidencePath],
+    evidenceSpans: [{ label: 'the change', from: 1, to: 3, passed: true }],
     screenshots: [{ label: 'profile', path: join(dir, 'screenshots', 'profile.png') as EvidencePath }],
     appLog: join(dir, 'app.log') as EvidencePath,
     e2eReport: join(dir, 'e2e', 'report.json') as EvidencePath,
@@ -309,12 +310,13 @@ describe('attach', () => {
     readonly attached: readonly string[];
   }
 
-  function fakeGh(options: { readonly attachFlag?: boolean; readonly body?: string; readonly onView?: (views: number, pr: { body: string; state: string }) => void; readonly upload?: (reference: string, address: string) => string } = {}) {
+  function fakeGh(options: { readonly ffmpeg?: Runner; readonly attachFlag?: boolean; readonly body?: string; readonly onView?: (views: number, pr: { body: string; state: string }) => void; readonly upload?: (reference: string, address: string) => string } = {}) {
     const pr = { body: options.body ?? DESCRIPTION, state: 'OPEN' };
     const edits: Edit[] = [];
     let views = 0;
     let uploads = 0;
     const runner: Runner = async (command, args, runOptions) => {
+      if (command === 'ffmpeg') return options.ffmpeg?.(command, args, runOptions) ?? { code: 127, stdout: '', stderr: 'spawn ffmpeg ENOENT' };
       assert.equal(command, 'gh');
       if (args.includes('--help')) return { code: 0, stdout: options.attachFlag === false ? '  -b, --body text   Set the new body.\n' : '      --attach file   Attach a file\n', stderr: '' };
       if (args[1] === 'view') {
@@ -463,6 +465,38 @@ describe('attach', () => {
     await attach(deps, { verb: 'attach', run, pr: 9, media: flow, before: null });
     assert.equal(gh.pr.body, block(`**Verified on an iOS simulator.** Run \`${run}\` on \`verify-ios-1\` at \`606639a63448\`, 1 of 1 passed.`, '', '| `video` |', '| :---: |', `| ${asset(1)} |`));
     assert.deepEqual(gh.edits[0]!.attached, ['after video']);
+  });
+
+  it('posts the part of each video that its run marked, cut by ffmpeg, and says how long each was and is', async () => {
+    const ffmpeg: Runner = async (_command, args) => {
+      if (args.some((arg) => arg.includes('freezedetect'))) return { code: 0, stdout: '', stderr: '  Duration: 00:00:40.00, start: 0.000000\nlavfi.freezedetect.freeze_start: 20\nlavfi.freezedetect.freeze_end: 35\n' };
+      writeFileSync(args.at(-1)!, `${readFileSync(args[args.indexOf('-i') + 1]!, 'utf8')} cut`);
+      return { code: 0, stdout: '', stderr: '' };
+    };
+    const gh = fakeGh({ ffmpeg });
+    const { deps, sealed } = checkout(gh);
+    const before = sealed({ called: 'before', failed: true });
+    const after = sealed({ called: 'after' });
+    const lines: string[] = [];
+    await attach({ ...deps, progress: (line) => lines.push(line) }, { verb: 'attach', run: after.run, pr: 9, media: flow, before: before.run });
+    assert.deepEqual(gh.edits[0]!.attached, ['after video cut', 'before video cut']);
+    assert.deepEqual(lines, [
+      `video   run ${after.run}: 40.0 s cut to 3.5 s, showing "the change"; ${join(after.dir, 'video-cut.mp4')}`,
+      `video   run ${before.run}: 40.0 s cut to 3.5 s, showing "the change"; ${join(before.dir, 'video-cut.mp4')}`,
+    ]);
+    assert.equal(readFileSync(join(after.dir, 'video.mp4'), 'utf8'), 'after video', 'the recording stays as it was');
+  });
+
+  it('refuses the video of a run that marks no part of it, and calls no gh', async () => {
+    const gh = fakeGh();
+    const { deps, sealed } = checkout(gh);
+    const { run } = sealed({ called: 'after', change: { evidenceSpans: [] } });
+    await assert.rejects(attach(deps, { verb: 'attach', run, pr: 9, media: flow, before: null }), {
+      code: 'USAGE',
+      message: `run ${run} marks no part of its video as the change, so its video would show the whole run`,
+      fix: "wrap the steps that show the change in host.evidence('<what it shows>', async () => { ... }), run the spec again, and attach that run",
+    });
+    assert.deepEqual(gh.edits, []);
   });
 
   it('shows both kinds when asked for both: the screenshots first, then the video, each laid out as it is alone', async () => {

@@ -332,6 +332,8 @@ describe('the receiver in the session job', () => {
   });
 });
 
+const NO_FFMPEG = { code: 127, stdout: '', stderr: 'spawn ffmpeg ENOENT' };
+
 const LEASE: RemoteLease = { backend: 'remote', provider: 'github-actions', platform: 'ios', session: 'ios0000aa', providerRef: '37731397352', baseUrl: 'https://session.trycloudflare.com', tokenFile: '', deviceId: 'UDID', deviceName: 'iPhone Air', runner: 'xcode-27', expiresAt: '2026-10-08T06:00:00Z', builtSha: COMMIT, builtPatch: null, acquiredAt: '2026-10-08T05:00:00.000Z', installedBuild: null };
 
 function remoteRun(options: { readonly backend?: EvidenceRecord['backend']; readonly lease?: Lease | null; readonly startedAt?: string; readonly handOff?: DeviceBackend['handOffEvidence'] | null; readonly gh?: (args: readonly string[]) => { readonly code: number; readonly stdout: string; readonly stderr: string } } = {}) {
@@ -358,6 +360,7 @@ function remoteRun(options: { readonly backend?: EvidenceRecord['backend']; read
       build: 'ios-000000000000' as BuildKey,
       results: [{ spec: { kind: 'explored', path: 'specs/explored/a.e2e.ts', feature: null }, title: 'a', platform: 'ios', status: 'passed', seconds: 1, attempts: 1, error: null, skipReason: null, skippedBy: null, tags: [], failurePage: null, failureScreen: null, failureScreenshot: null }],
       videos: [join(dir, 'video.mp4') as EvidencePath],
+      evidenceSpans: [{ label: 'the change', from: 1, to: 3, passed: true }],
       screenshots: [{ label: 'profile', path: join(dir, 'screenshots', 'profile.png') as EvidencePath }],
       appLog: null,
       e2eReport: join(dir, 'e2e', 'report.json') as EvidencePath,
@@ -373,7 +376,7 @@ function remoteRun(options: { readonly backend?: EvidenceRecord['backend']; read
   const host = { repo: 'clerk-ios', githubRepo: 'clerk/clerk-ios', backends: [remote] } as unknown as HostAdapter;
   const ghCalls: string[] = [];
   const gh = options.gh ?? (() => ({ code: 0, stdout: '  -b, --body text   Set the new body.\n', stderr: '' }));
-  const runner: Runner = async (_command, args) => (ghCalls.push(args.slice(0, 2).join(' ') === 'pr edit' && !args.includes('--help') ? 'pr edit --attach' : args.slice(0, 3).join(' ')), gh(args));
+  const runner: Runner = async (command, args) => (command === 'ffmpeg' ? NO_FFMPEG : (ghCalls.push(args.slice(0, 2).join(' ') === 'pr edit' && !args.includes('--help') ? 'pr edit --attach' : args.slice(0, 3).join(' ')), gh(args)));
   const deps: Deps = { host, workspace, runner, env: {}, progress: () => undefined, instances: heldInstances() };
   return { deps, run, dir, bundles, ghCalls };
 }

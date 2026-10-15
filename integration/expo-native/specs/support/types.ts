@@ -92,4 +92,5 @@ export interface HostFixture {
   screenshot(label: string): Promise<void>;
   tap(target: Locator): Promise<void>;
   fill(target: Locator, text: string | SecretLike): Promise<void>;
+  evidence<T>(label: string, body: () => Promise<T>): Promise<T>;
 }
