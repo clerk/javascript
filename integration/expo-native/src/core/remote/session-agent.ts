@@ -126,23 +126,23 @@ const isAgentRoute = (pathname: string): boolean => AGENT_ROUTES.some((route) =>
 const RECORDER_START_MS = 10_000;
 
 // The CLI times the video from this answer, and a recorder can take a second or more to start on a runner.
-function printed(child: ChildProcess, words: string, limitMs: number): Promise<{ readonly exited: boolean; readonly output: string }> {
+export function printed(child: ChildProcess, words: string, limitMs: number): Promise<{ readonly exited: boolean; readonly output: string }> {
   return new Promise((done) => {
     let seen = '';
-    const timer = setTimeout(() => done({ exited: false, output: seen }), limitMs);
+    const settle = (exited: boolean) => {
+      clearTimeout(timer);
+      child.stdout?.off('data', read);
+      child.stderr?.off('data', read);
+      done({ exited, output: seen });
+    };
+    const timer = setTimeout(() => settle(false), limitMs);
     const read = (chunk: Buffer) => {
       seen += chunk.toString();
-      if (seen.toLowerCase().includes(words)) {
-        clearTimeout(timer);
-        done({ exited: false, output: seen });
-      }
+      if (seen.toLowerCase().includes(words)) settle(false);
     };
     child.stdout?.on('data', read);
     child.stderr?.on('data', read);
-    child.on('close', () => {
-      clearTimeout(timer);
-      done({ exited: true, output: seen });
-    });
+    child.on('close', () => settle(true));
   });
 }
 

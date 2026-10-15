@@ -596,7 +596,7 @@ async function viewportOf(deps: Deps, lease: Lease, platform: Platform): Promise
     if ((await call(['open', deps.host.appId(platform), '--json', ...selector, ...session])).code !== 0) return null;
     const snap = await call(['snapshot', '--json', ...selector, ...session]);
     const viewport = snap.code === 0 ? (JSON.parse(snap.stdout) as { data?: { viewport?: Partial<Viewport> } }).data?.viewport : undefined;
-    return typeof viewport?.width === 'number' && typeof viewport.height === 'number' && viewport.width > 0 ? { width: viewport.width, height: viewport.height } : null;
+    return typeof viewport?.width === 'number' && typeof viewport.height === 'number' && viewport.width > 0 && viewport.height > 0 ? { width: viewport.width, height: viewport.height } : null;
   } catch {
     return null;
   } finally {
