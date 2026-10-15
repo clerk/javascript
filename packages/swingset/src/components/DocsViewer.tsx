@@ -93,6 +93,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     panel: dynamic(() => import('../stories/panel.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     profile: dynamic(() => import('../stories/profile.component.mdx')),
+    radio: dynamic(() => import('../stories/radio.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
     'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
