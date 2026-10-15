@@ -14,9 +14,9 @@ export function emulatorArgs(port: number, os: NodeJS.Platform): readonly string
 }
 
 export const LANE_SETTINGS = [
-  ['window_animation_scale', '0'],
-  ['transition_animation_scale', '0'],
-  ['animator_duration_scale', '0'],
+  ['window_animation_scale', '1'],
+  ['transition_animation_scale', '1'],
+  ['animator_duration_scale', '1'],
   ['hide_error_dialogs', '1'],
 ] as const;
 
