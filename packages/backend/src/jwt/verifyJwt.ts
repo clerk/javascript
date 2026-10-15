@@ -132,9 +132,6 @@ export type VerifyJwtOptions = {
    * @default 5000
    */
   clockSkewInMs?: number;
-  /**
-   * The issuer to verify against the `iss` claim in the token. Accepts a string for an exact match, or a list of strings of which one must match exactly. If omitted, the `iss` claim is not validated.
-   */
   issuer?: string | string[];
   /**
    * @internal

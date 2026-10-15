@@ -125,8 +125,6 @@ export const assertAuthorizedPartiesClaim = (azp?: string, authorizedParties?: s
 };
 
 export const assertIssuerClaim = (iss: unknown, issuer?: string | string[]) => {
-  // No issuer configured, skip validation. Preserves the default behavior, matching how
-  // the audience and authorized parties claims are only checked when an option is provided.
   const issuerList = [issuer].flat().filter(i => !!i);
   if (issuerList.length === 0) {
     return;
