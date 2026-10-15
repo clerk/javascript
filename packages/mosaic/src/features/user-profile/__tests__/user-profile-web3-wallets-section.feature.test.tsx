@@ -179,7 +179,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
     expect(creation.requests).toHaveLength(1);
     expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual([pendingId]);
-    expect(screen.getByText('Primary')).toBeInTheDocument();
+    expect(await screen.findByText('Primary')).toBeInTheDocument();
   });
 
   it('hides immutable wallet mutations but still permits setting a verified wallet as primary', async () => {
