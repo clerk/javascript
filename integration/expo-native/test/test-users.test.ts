@@ -6,7 +6,6 @@ import { join } from 'node:path';
 import net from 'node:net';
 import { describe, it } from 'node:test';
 import { inspect } from 'node:util';
-import { createHash } from 'node:crypto';
 import {
   CONNECT_ATTEMPT_MS,
   TEST_PHONES,
@@ -17,13 +16,12 @@ import {
   organizationName,
   parseTestEmail,
   parseTestPhone,
-  passwordFrom,
   runPassword,
   testDomain,
   testEmail,
   testUsers,
 } from '../specs/support/clerk.ts';
-import { newRunId, readClerk } from '../specs/support/inputs.ts';
+import { readClerk } from '../specs/support/inputs.ts';
 import { runNames } from '../specs/support/names.ts';
 import { SHORTEST_SECRET, redact, usedSecretValues } from '../specs/support/secret.ts';
 import { commandsFor } from '../specs/support/typing.ts';
@@ -149,8 +147,8 @@ describe('the users a test asks for', () => {
   });
 
   it('sign up with the password of the run, which is a secret once the test process asks for the users of the run', () => {
-    const run = newRunId();
-    const password = passwordFrom(createHash('sha256').update(run).digest());
+    const run = 'r20261015-000000-beef' as RunId;
+    const password = 'Oak-Pine-bb12';
     assert.equal(redact(`typed ${password}`), `typed ${password}`, 'nothing knows it before the test process asks for the users of the run');
     testUsers(readClerk({ CLERK_PUBLISHABLE_KEY: SAMPLE_PUBLISHABLE_KEY, CLERK_SECRET_KEY: SECRET_KEY }), run, clerk(created).fetchImpl, freshNames(run));
     assert.equal(redact(`typed ${password}`), 'typed <redacted>');
@@ -159,7 +157,7 @@ describe('the users a test asks for', () => {
 
   it('have passwords short enough to type in one command and long enough to be a secret', () => {
     const passwords = [runPassword(SAMPLE_RUN), runPassword(OTHER_RUN), ...Array.from({ length: 50 }, () => newTestPassword())].map((password) => password.use('device-input', (plain) => plain));
-    assert.deepEqual(passwords.slice(0, 2), ['Dune-Pine-c1d1', 'Loom-Gem-877c'], 'the password of a run is the same in every process of the run');
+    assert.deepEqual(passwords.slice(0, 2), ['Cliff-Pond-3a5f', 'Oak-Opal-3d46'], 'the password of a run is the same in every process of the run');
     for (const password of passwords) {
       assert.match(password, /^[A-Z][a-z]{2,4}-[A-Z][a-z]{2,4}-[0-9a-f]{4}$/);
       assert.ok(password.length >= SHORTEST_SECRET && password.length <= 16, password);
@@ -182,7 +180,7 @@ describe('the users a test asks for', () => {
     const sources = readdirSync(committed, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.e2e.ts')).map((file) => readFileSync(join(committed, file), 'utf8'));
     const uses = sources.flatMap((source) => [...source.matchAll(/[^\s(,]*\(?host\.runId\)?/g)].map((match) => match[0]));
     assert.deepEqual([...new Set(uses)], ['runPassword(host.runId)']);
-    assert.equal(runPassword(SAMPLE_RUN).use('device-input', (plain) => plain), 'Dune-Pine-c1d1');
+    assert.equal(runPassword(SAMPLE_RUN).use('device-input', (plain) => plain), 'Cliff-Pond-3a5f');
   });
 
   it('get a test phone no user holds: a taken one moves on to the next, and one test is never handed the same phone twice', async () => {

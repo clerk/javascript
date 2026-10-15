@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, randomInt } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import net from 'node:net';
 import { runIdParts, type ClerkAccess, type ClerkInstance } from './inputs.ts';
@@ -86,17 +86,22 @@ export function typedPassword(value: string): Secret<'password'> {
   return password;
 }
 
-export function passwordFrom(bytes: Uint8Array): string {
-  if (bytes.length < 4) throw new Error('a password is made from at least four bytes');
-  const words = PASSWORD_WORDS.length;
-  const first = bytes[0]! % words;
-  const second = (first + 1 + (bytes[1]! % (words - 1))) % words;
-  return `${PASSWORD_WORDS[first]}-${PASSWORD_WORDS[second]}-${Buffer.from(bytes.subarray(2, 4)).toString('hex')}`;
+type Pick = (count: number) => number;
+
+function passwordFrom(pick: Pick, hex: string): string {
+  const first = PASSWORD_WORDS[pick(PASSWORD_WORDS.length)]!;
+  const others = PASSWORD_WORDS.filter((word) => word !== first);
+  return `${first}-${others[pick(others.length)]}-${hex}`;
 }
 
-export const newTestPassword = (): Secret<'password'> => typedPassword(passwordFrom(randomBytes(4)));
+export const newTestPassword = (): Secret<'password'> => typedPassword(passwordFrom(randomInt, randomBytes(2).toString('hex')));
 
-export const runPassword = (run: RunId): Secret<'password'> => typedPassword(passwordFrom(createHash('sha256').update(run).digest()));
+export function runPassword(run: RunId): Secret<'password'> {
+  const digest = createHash('sha256').update(run).digest();
+  let read = 0;
+  const pick: Pick = (count) => digest.readUInt32BE(4 * read++) % count;
+  return typedPassword(passwordFrom(pick, digest.subarray(8, 10).toString('hex')));
+}
 
 export interface TestUsers {
   newEmail(options?: EmailOptions): TestEmail;
