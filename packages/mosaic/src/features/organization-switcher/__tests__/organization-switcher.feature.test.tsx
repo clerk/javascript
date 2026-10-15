@@ -210,7 +210,7 @@ describe('OrganizationSwitcher', () => {
     await renderSwitcher({}, noOffers());
     await openWithList();
 
-    for (const slot of ['trigger', 'popover', 'header', 'item', 'group', 'separator']) {
+    for (const slot of ['trigger', 'trigger-label', 'popover', 'header', 'item', 'group', 'separator']) {
       expect(document.querySelector(`.cl-organization-switcher-${slot}`)).not.toBeNull();
     }
     expect(document.querySelector('[class*="cl-user-button"]')).toBeNull();

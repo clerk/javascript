@@ -11,6 +11,7 @@ export const Cog6Teeth = glyph(
     <path
       d='M9.83333 8C9.83333 9.01253 9.01253 9.83333 8 9.83333C6.98747 9.83333 6.16667 9.01253 6.16667 8C6.16667 6.98747 6.98747 6.16667 8 6.16667C9.01253 6.16667 9.83333 6.98747 9.83333 8Z'
       stroke='currentColor'
+      strokeWidth='1.5'
       strokeLinejoin='round'
     />
   </>,
