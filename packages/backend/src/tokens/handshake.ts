@@ -32,8 +32,9 @@ async function verifyHandshakeJwt(token: string, { key }: VerifyJwtOptions): Pro
   // Handshake tokens are minted with the session-token category, so any other class signed by
   // the same instance key is not one. Without this a JWT-template token passes, and a template
   // can carry an author-controlled top-level `handshake[]` claim that resolveHandshake emits
-  // verbatim as Set-Cookie (AISEC-85).
-  if (isNonSessionJwtCategory(header.cat)) {
+  // verbatim as Set-Cookie (AISEC-85). An absent category is still tolerated here, unlike the
+  // session paths, because the edge session-minter signs handshake tokens without one.
+  if (header.cat !== undefined && isNonSessionJwtCategory(header.cat)) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenInvalid,

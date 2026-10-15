@@ -31,7 +31,7 @@ describe('authenticateRequest with cookie token', () => {
     });
 
     vi.mocked(decodeJwt).mockReturnValue({
-      data: { payload } as any,
+      data: { header: { cat: 'cl_B7d4PD111AAA' }, payload } as any,
       errors: undefined,
     });
 
@@ -79,7 +79,7 @@ describe('authenticateRequest with cookie token', () => {
     });
 
     vi.mocked(decodeJwt).mockReturnValue({
-      data: { payload } as any,
+      data: { header: { cat: 'cl_B7d4PD111AAA' }, payload } as any,
       errors: undefined,
     });
 
@@ -121,7 +121,7 @@ describe('authenticateRequest with header token', () => {
     });
 
     vi.mocked(decodeJwt).mockReturnValue({
-      data: { payload } as any,
+      data: { header: { cat: 'cl_B7d4PD111AAA' }, payload } as any,
       errors: undefined,
     });
 
