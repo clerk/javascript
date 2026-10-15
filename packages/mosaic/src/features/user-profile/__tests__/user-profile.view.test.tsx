@@ -153,6 +153,35 @@ describe('UserProfileView', () => {
     expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
   });
 
+  it('replaces the close button with a back button in a fullscreen dialog', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <MosaicProvider>
+        <Dialog.Root
+          defaultOpen
+          onOpenChange={onOpenChange}
+        >
+          <Dialog.Popup variant='fullscreen'>
+            <UserProfileView
+              activePage='account'
+              pages={pages}
+              onPageChange={vi.fn()}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+
+    const popup = screen.getByRole('dialog', { name: 'User profile' });
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    const back = screen.getByRole('button', { name: 'Back to app' });
+    expect(popup).toContainElement(back);
+
+    await userEvent.setup().click(back);
+
+    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+  });
+
   it('warns when there are no pages to show', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
