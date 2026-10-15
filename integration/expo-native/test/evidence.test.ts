@@ -338,7 +338,7 @@ describe('attach', () => {
     const packageDir = mkdtempSync(join(tmpdir(), 'verify-attach-'));
     const workspace = openWorkspace({ packageDir, worktree: packageDir, home: join(packageDir, 'home') });
     const deps = { host, workspace, runner: gh.runner, env: {}, progress: () => undefined, instances: heldInstances() };
-    const sealed = (shape: { readonly called: string; readonly shots?: readonly string[]; readonly states?: readonly string[]; readonly spec?: string; readonly video?: boolean; readonly failed?: boolean; readonly failureShot?: boolean; readonly change?: Partial<EvidenceRecord>; readonly log?: string }) => {
+    const sealed = (shape: { readonly called: string; readonly shots?: readonly string[]; readonly states?: readonly string[]; readonly spec?: string; readonly video?: boolean; readonly failed?: boolean; readonly failureShot?: boolean; readonly recordsTests?: boolean; readonly change?: Partial<EvidenceRecord>; readonly log?: string }) => {
       const { run, dir } = workspace.newRun();
       mkdirSync(join(dir, 'screenshots'), { recursive: true });
       const file = (name: string, holds: string): EvidencePath => (writeFileSync(join(dir, name), holds), join(dir, name) as EvidencePath);
@@ -359,7 +359,7 @@ describe('attach', () => {
           screenshots: (shape.shots ?? shape.states ?? ['profile']).map((label) => ({
             label,
             path: file(join('screenshots', `${label}.png`), `${shape.called} ${label}`),
-            test: { spec: base.results[0]!.spec.path, title: shape.states === undefined ? base.results[0]!.title : label },
+            ...(shape.recordsTests === false ? {} : { test: { spec: base.results[0]!.spec.path, title: shape.states === undefined ? base.results[0]!.title : label } }),
           })),
           ...shape.change,
         },
@@ -532,14 +532,21 @@ describe('attach', () => {
     const passedWithoutIt = sealed({ called: 'before', shots: ['start'] });
     await assert.rejects(attach(deps, { verb: 'attach', run: after.run, pr: 9, media: still, before: passedWithoutIt.run }), {
       code: 'USAGE',
-      message: `run ${passedWithoutIt.run} has no screenshot labelled profile, and no failure screenshot of the test that takes it to show in its place`,
+      message: `run ${passedWithoutIt.run} has no screenshot labelled profile, and no failure screenshot of the test "a" in a.e2e.ts to show in its place`,
       fix: "call host.screenshot('profile') in the spec and run it on the build without the change, or attach without --before",
     });
     const perState = sealed({ called: 'after', states: ['start', 'profile'] });
     const onlyAnotherFailed = sealed({ called: 'before', failed: true, states: ['start'], shots: [] });
     await assert.rejects(attach(deps, { verb: 'attach', run: perState.run, pr: 9, media: still, before: onlyAnotherFailed.run }), {
       code: 'USAGE',
-      message: `run ${onlyAnotherFailed.run} has no screenshot labelled profile, and no failure screenshot of the test that takes it to show in its place`,
+      message: `run ${onlyAnotherFailed.run} has no screenshot labelled profile, and no failure screenshot of the test "profile" in a.e2e.ts to show in its place`,
+    });
+    const recordedNoTests = sealed({ called: 'after', recordsTests: false });
+    const failedEarly = sealed({ called: 'before', failed: true, failureShot: true, shots: [] });
+    await assert.rejects(attach(deps, { verb: 'attach', run: recordedNoTests.run, pr: 9, media: still, before: failedEarly.run }), {
+      code: 'USAGE',
+      message: `run ${failedEarly.run} has no screenshot labelled profile, and run ${recordedNoTests.run} does not record which test took profile`,
+      fix: '{cli} run the spec again and attach that run, or attach without --before',
     });
     const noVideo = sealed({ called: 'before', failed: true, video: false });
     await assert.rejects(attach(deps, { verb: 'attach', run: after.run, pr: 9, media: flow, before: noVideo.run }), {

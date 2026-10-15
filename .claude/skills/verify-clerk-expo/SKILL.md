@@ -248,11 +248,11 @@ On a remote device, the before run needs a session of its own, started on the ba
 ```console
 $ git switch -c <branch>-before "$(git merge-base origin/main HEAD)"
 $ git push origin <branch>-before
-$ integration/expo-native/bin/control-clerk-expo up --platform ios
+$ integration/expo-native/bin/control-clerk-expo up --platform ios --backend remote
 $ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform ios
 $ integration/expo-native/bin/control-clerk-expo down
 $ git switch <branch>
-$ integration/expo-native/bin/control-clerk-expo up --platform ios
+$ integration/expo-native/bin/control-clerk-expo up --platform ios --backend remote
 $ integration/expo-native/bin/control-clerk-expo run specs/explored/<name>.e2e.ts --platform ios
 $ integration/expo-native/bin/control-clerk-expo attach <run-id> --pr <n> --screenshot <label> --before <before-run-id>
 $ integration/expo-native/bin/control-clerk-expo down
