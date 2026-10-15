@@ -174,12 +174,6 @@ function HoldingHost({ action }: { action: () => Promise<unknown> }) {
       >
         Run action
       </button>
-      <button
-        type='button'
-        onClick={reverification.reset}
-      >
-        Reset
-      </button>
       <output aria-label='Outcome'>{outcome}</output>
       <output aria-label='Visible'>{String(reverification.visible)}</output>
       <Card.Root renderBranding={false}>
@@ -1093,8 +1087,8 @@ describe('Reverification', () => {
       return renderWithClerk(<HoldingHost action={action} />);
     };
 
-    it('keeps the last card on screen, inert, after a dismissal until it is reset', async () => {
-      await renderHolding(guardedAction());
+    it('keeps the last card on screen, inert, after a dismissal, until the next challenge replaces it', async () => {
+      await renderHolding(vi.fn().mockResolvedValue(reverificationError()));
       const user = await startVerification();
       await user.type(await screen.findByLabelText('Password'), 'half-typed');
 
@@ -1106,24 +1100,36 @@ describe('Reverification', () => {
       expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
       expect(passwordField()).toHaveAttribute('readonly');
 
-      await user.click(screen.getByRole('button', { name: 'Reset' }));
-      expect(screen.queryByText(STEP.password)).toBeNull();
+      await user.click(screen.getByRole('button', { name: 'Run action' }));
+      await waitFor(() => expect(passwordField()).toBeEnabled());
+      expect(passwordField()).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
     });
 
-    it('keeps the last card on screen after the action completes until the next run', async () => {
-      await renderHolding(guardedAction());
+    it('keeps the last card on screen after the action completes, until the next challenge replaces it', async () => {
+      await renderHolding(
+        vi
+          .fn()
+          .mockResolvedValueOnce(reverificationError())
+          .mockResolvedValueOnce({ done: true })
+          .mockResolvedValueOnce(reverificationError())
+          .mockResolvedValue({ done: true }),
+      );
       const user = await startVerification();
       await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
       await untilResolved();
 
       expect(screen.getByText(STEP.password)).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
 
       await user.click(screen.getByRole('button', { name: 'Run action' }));
-      await waitFor(() => expect(screen.queryByText(STEP.password)).toBeNull());
+      await waitFor(() => expect(passwordField()).toBeEnabled());
+      expect(passwordField()).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
     });
 
-    it('is visible once there is a card of its own to show, until it is reset', async () => {
+    it('is visible once there is a card of its own to show, until the run ends', async () => {
       await renderHolding(guardedAction());
       const start = holdRequests('post', VERIFY);
       const visible = () => screen.getByLabelText('Visible').textContent;
@@ -1140,10 +1146,8 @@ describe('Reverification', () => {
 
       await dismiss(user);
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-      expect(visible()).toBe('true');
-
-      await user.click(screen.getByRole('button', { name: 'Reset' }));
       expect(visible()).toBe('false');
+      expect(screen.getByText(STEP.password)).toBeVisible();
     });
 
     it('does not keep anything on screen when no reverification was needed', async () => {
