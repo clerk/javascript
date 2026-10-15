@@ -10,7 +10,7 @@ import { remoteBackend, workingPatch } from '../src/core/remote/backend.ts';
 import type { GitHub } from '../src/core/remote/github.ts';
 import { driverId, newSessionRequest, type RemoteSettings } from '../src/core/remote/settings.ts';
 import { BUILD_LOG_START, BUILD_TIMEOUT_MINUTES, PATCH_LIMIT_BYTES, sha256Hex, type SessionHealth } from '../src/core/remote/protocol.ts';
-import { VerifyFailure, type BuildKey, type BuiltApp, type RemoteLease } from '../src/core/types.ts';
+import { VerifyFailure, type BuildKey, type BuiltApp, type EvidencePath, type RemoteLease } from '../src/core/types.ts';
 
 function repo(): { dir: string; git: (...args: string[]) => string } {
   const dir = mkdtempSync(join(tmpdir(), 'verify-remote-'));
@@ -159,6 +159,28 @@ describe('the patch of a working tree', () => {
     const { dir } = repo();
     writeFileSync(join(dir, 'README.md'), 'edited docs');
     assert.equal(workingPatch(dir, ['App.swift']), null);
+  });
+});
+
+describe('the remote backend starts a recording', () => {
+  it('times the video from when the recorder started when the session never heard it say it records, and says so', async () => {
+    const realFetch = globalThis.fetch;
+    const { dir } = repo();
+    const session = join(dir, '.verify', 'remote', 'ios0000cc');
+    mkdirSync(session, { recursive: true });
+    writeFileSync(join(session, 'token'), 'f'.repeat(64));
+    const lease: RemoteLease = { backend: 'remote', provider: 'github-actions', platform: 'ios', session: 'ios0000cc', providerRef: '7', baseUrl: 'https://quick-fox.trycloudflare.com', tokenFile: join(session, 'token'), deviceId: 'UDID-1', deviceName: 'iPhone Air', runner: 'free-mac', expiresAt: '2026-10-13T18:00:00.000Z', builtSha: null, builtPatch: null, acquiredAt: '2026-10-13T17:00:00.000Z', installedBuild: null };
+    globalThis.fetch = (async () => Response.json({ ok: true, recordingForMs: 10_000 })) as typeof fetch;
+    try {
+      const { hub } = github(() => ({ status: 200, json: {} }));
+      const asked = Date.now();
+      const recording = await remoteBackend(settings(dir), { env: {}, runner: run, github: async () => hub }).startRecording(lease, join(dir, 'run') as EvidencePath);
+      const answered = Date.now();
+      assert.ok(recording.videoStartsAt !== undefined && recording.videoStartsAt >= asked - 10_000 && recording.videoStartsAt <= answered - 10_000, `the video starts ${recording.videoStartsAt === undefined ? 'unknown' : answered - recording.videoStartsAt} ms before the answer`);
+      assert.equal(recording.videoStartGuess, 'the session never heard its recorder say it was recording, so this run times the video from when the recorder started, and its tap pulses can land up to a second or two late');
+    } finally {
+      globalThis.fetch = realFetch;
+    }
   });
 });
 

@@ -487,6 +487,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
         if (closed.code !== 0) deps.progress(`video   the app could not be closed before the recording, so the video may open on the screen it was showing: ${redact(closed.stderr.trim() || closed.stdout.trim())}`);
         const recording = await backend.startRecording(lease, dir);
         const startedAt = recording.videoStartsAt ?? Date.now();
+        if (recording.videoStartGuess !== undefined) deps.progress(`video   ${recording.videoStartGuess}`);
         if (recording.process === null) return { recording, recorderEntry: null, startedAt };
         const recorderEntry = newEntryId();
         workspace.append({ id: recorderEntry, kind: 'process', what: 'recorder', pid: recording.process.pid, startedAt: new Date(recording.process.startedAt).toISOString(), platform });

@@ -13,7 +13,7 @@ import { fillField } from './support/fill.ts';
 import { readClerk, readEvidenceMarks, readRun, readTarget, type Target } from './support/inputs.ts';
 import { appLauncher } from './support/launch.ts';
 import { redact } from './support/secret.ts';
-import { tapMarkedOnceUncovered } from './support/tapping.ts';
+import { atItsMiddle, backControl, tapMarkedOnceUncovered } from './support/tapping.ts';
 import {
   APP_ELEMENT_IDS,
   CLERK_TEST_CODE,
@@ -140,6 +140,11 @@ export const test = base.extend<{ host: HostFixture }>({
       async tap(control) {
         await beat(control);
         await tap(control, runnerBusy());
+      },
+      async back() {
+        const control = backControl(screen, platform);
+        await beat(control);
+        await tapMarkedOnceUncovered(atItsMiddle(control), markTap, { timeoutMs: ASSERTION_TIMEOUT_MS, now: Date.now, wait: () => sleep(POLL_MS) }, runnerBusy());
       },
       async fill(field, text) {
         await beat(field);

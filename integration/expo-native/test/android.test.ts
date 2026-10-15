@@ -178,6 +178,27 @@ describe('android screenrecord', () => {
     assert.equal(recording.videoStartsAt?.toFixed(3), '1792075718600.316');
   });
 
+  it('starts the video when screenrecord appeared when the MP4 writer never logs its first frame, and says that the start is a guess', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'verify-adb-'));
+    const adb = fakeTool(dir, 'adb', [
+      `state=${dir}/recording`,
+      'case "$*" in',
+      '  *"shell screenrecord"*) touch "$state"; while [ -f "$state" ]; do sleep 0.1; done ;;',
+      `  *"shell pidof screenrecord"*) [ -f ${dir}/stopped ] || echo 4242 ;;`,
+      '  *"shell date +%s%N"*) echo 1792075718500000000 ;;',
+      `  *"shell pkill -INT screenrecord"*) rm -f "$state"; touch ${dir}/stopped ;;`,
+      'esac',
+    ]);
+    const into = join(dir, 'r20261003-040814-846e') as EvidencePath;
+    mkdirSync(into);
+    const spawned = Date.now();
+    let clock = spawned;
+    const recording = await startScreenrecord({ adbBin: adb, serial: 'emulator-5560', into, now: () => (clock += 1_000) });
+    await recording.stop().catch(() => undefined);
+    assert.ok(recording.videoStartsAt !== undefined && recording.videoStartsAt > spawned && recording.videoStartsAt < spawned + 10_000, `the video starts ${recording.videoStartsAt === undefined ? 'unknown' : recording.videoStartsAt - spawned} ms after the spawn`);
+    assert.equal(recording.videoStartGuess, "screenrecord's MP4 writer never logged its first frame, so this run times the video from when screenrecord started, and its tap pulses can land up to a second or two late");
+  });
+
   it('fails stop with adb\'s error when the pull fails', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'verify-adb-'));
     const adb = fakeTool(dir, 'adb', [

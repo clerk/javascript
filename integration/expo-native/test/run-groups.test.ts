@@ -353,6 +353,13 @@ describe('a run whose spec files declare different settings', () => {
       assert.deepEqual(record.evidenceSpans?.[0]?.from, Math.round(mark!.startedAt - videoStartsAt) / 1000);
     });
 
+    it('says when the recorder could only guess when its video starts', async () => {
+      const r = recorded({ launches: true });
+      r.backend.startRecording = async (_lease, into) => ({ process: null, videoStartsAt: Date.now(), videoStartGuess: 'the recorder never logged its first frame', stop: async () => (writeFileSync(join(into, 'video.mp4'), 'frames'), join(into, 'video.mp4') as EvidencePath) });
+      await runVerb(r.deps, { ...RUN_ALL, selection: { selectors: ['auth-start'] }, video: true });
+      assert.deepEqual(r.videoLines(), ['video   paced for a reviewer to follow; a run with --no-video, or with --all, keeps full speed', 'video   the recorder never logged its first frame']);
+    });
+
     it('keeps each host.tap in seconds of the video, from when it was sent when the video shows no change at the control, with the size of the screen the points are in', async () => {
       const r = recorded({ launches: true, taps: true });
       const snapshot = JSON.stringify({ success: true, data: { viewport: { width: 420, height: 912 }, nodes: [] } });
