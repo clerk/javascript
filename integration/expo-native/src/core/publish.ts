@@ -152,11 +152,23 @@ export function chooseEvidence(pr: number, evidence: Publishable, before: Showab
   const summary = summarize(evidence);
   if (before === null) return { pr, summary, files, before: null };
 
+  const failureShotOf = (label: string, test: { readonly spec: string; readonly title: string }): EvidencePath | null | undefined => {
+    const same = before.results.find((r) => r.spec.path === test.spec && r.title === test.title);
+    if (same !== undefined) return same.failureScreenshot;
+    const copies = before.results.filter((r) => basename(r.spec.path) === basename(test.spec) && r.title === test.title);
+    if (copies.length > 1) {
+      missing(
+        `run ${before.run} has no screenshot labelled ${label}, and the test "${test.title}" of ${test.spec} could be any of ${copies.length} tests in it: ${copies.map((r) => r.spec.path).join(', ')}`,
+        `run only one spec named ${basename(test.spec)} on the build without the change and attach that run as --before, or attach without --before`,
+      );
+    }
+    return copies[0]?.failureScreenshot;
+  };
   const was = [
     ...shots.map(
       ({ label, test }) =>
         before.screenshots.find((s) => s.label === label)?.path ??
-        before.results.find((r) => test !== undefined && basename(r.spec.path) === basename(test.spec) && r.title === test.title)?.failureScreenshot ??
+        (test === undefined ? undefined : failureShotOf(label, test)) ??
         (test === undefined
           ? missing(`run ${before.run} has no screenshot labelled ${label}, and run ${evidence.run} does not record which test took ${label}`, '{cli} run the spec again and attach that run, or attach without --before')
           : missing(
