@@ -157,6 +157,15 @@ describe('the evidence block of a pull request description', () => {
     assert.deepEqual(summarize(assertPublishable(record, [OWN_USER])), { run, platform: 'ios', device: 'verify-ios-1', commit: 'abc', passed: 1, flaky: 1, total: 2 });
   });
 
+  it('counts only the tests the run selected', () => {
+    const { dir, run } = runDir();
+    const base = partialRecord(dir, run);
+    const leftOut = { ...base.results[0]!, status: 'skipped' as const, seconds: 0, attempts: 0 };
+    const results = [base.results[0]!, { ...leftOut, title: 'b', skipReason: 'filtered: grep' }, { ...leftOut, title: 'c', skipReason: 'skipped: android only', skippedBy: 'platform' as const }];
+    const record = sealEvidence(dir, { ...base, results }, []);
+    assert.equal(evidenceBlock(summarize(assertPublishable(record, [OWN_USER])), null, []).split('\n')[2], `**Verified on an iOS simulator.** Run \`${run}\` on \`verify-ios-1\` at \`abc\`, 1 of 1 passed.`);
+  });
+
   it('goes after a description that has no block, and leaves that description as it was', () => {
     for (const body of ['## Summary\r\n\r\nFixes the button.  \r\n', 'no newline at the end', 'ends with one\n']) {
       const edit = withEvidenceBlock(body, 'ios', block);

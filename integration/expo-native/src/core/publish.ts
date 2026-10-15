@@ -14,7 +14,7 @@ export function summarize(evidence: Showable): EvidenceSummary {
     commit: evidence.gitHead,
     passed: evidence.results.filter((r) => r.status === 'passed').length,
     flaky: evidence.results.filter((r) => r.status === 'flaky').length,
-    total: evidence.results.length,
+    total: evidence.results.filter((r) => r.status !== 'skipped').length,
   };
 }
 
