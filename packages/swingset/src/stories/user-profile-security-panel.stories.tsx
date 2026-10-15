@@ -1,5 +1,3 @@
-import { UserProfileSecurityPanelView } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
-
 import type { StoryMeta } from '@/lib/types';
 
 import { useUserProfileFixture } from './fixtures/user-profile';
@@ -17,5 +15,5 @@ export const meta: StoryMeta = {
 
 export function Default() {
   const { pages } = useUserProfileFixture();
-  return <UserProfileSecurityPanelView {...pages.security} />;
+  return pages.security;
 }
