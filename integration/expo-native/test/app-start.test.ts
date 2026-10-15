@@ -1,7 +1,7 @@
 import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { newTestEmail } from '../specs/support/clerk.ts';
+import { testEmail } from '../specs/support/clerk.ts';
 import { appLauncher, appStart, performAppStart, type LaunchedApp } from '../specs/support/launch.ts';
 import { Secret } from '../specs/support/secret.ts';
 import type { AppEntry, SeededUser } from '../src/core/types.ts';
@@ -116,7 +116,7 @@ describe('appStart', () => {
 
 describe('a launch the host fixture starts', () => {
   const E2E_HOST: LaunchedApp = { platform: 'ios', id: 'com.clerk.E2EHost', entry: { kind: 'binary' }, buildPath: null, publishableKey: SAMPLE_PUBLISHABLE_KEY, run: SAMPLE_RUN };
-  const user: SeededUser = { id: 'user_1', email: newTestEmail(SAMPLE_RUN), phone: null, password: null };
+  const user: SeededUser = { id: 'user_1', email: testEmail(SAMPLE_RUN, 'maya'), phone: null, password: null };
 
   function device(app: LaunchedApp = E2E_HOST, installedBuilds = new Set<string>()) {
     const calls: string[] = [];

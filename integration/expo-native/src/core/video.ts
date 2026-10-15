@@ -26,7 +26,7 @@ export const PULSE = { seconds: 0.5, widthShare: 0.1, leadSeconds: 0.2 } as cons
 const readByPresentationTime = (video: EvidencePath): readonly string[] => ['-fflags', '+igndts', '-i', video];
 
 // On a CI runner the iOS simulator has shown a tap's effect up to 2.9 s after the runner returned, so the scan looks until 5 s after the return.
-export const REACTION = { before: 0.1, after: 5, stillFor: 0.1, level: 8, share: 0.02, width: 0.4, height: 0.06 } as const;
+export const REACTION = { after: 5, stillFor: 0.1, level: 8, share: 0.02, width: 0.4, height: 0.06 } as const;
 
 export function spansOfMarks(marks: readonly EvidenceMark[], videoStartedAt: number): readonly EvidenceSpan[] {
   return marks
@@ -99,7 +99,7 @@ export function parseChanges(metadata: string): readonly Change[] {
 
 export function reactionAt(changes: readonly Change[], tap: TapWindow): number | null {
   const moved = changes.filter((change) => change.share >= REACTION.share).map((change) => change.at);
-  const first = moved.findIndex((at) => at >= tap.sent - REACTION.before);
+  const first = moved.findIndex((at) => at >= tap.sent);
   const at = moved[first];
   return at !== undefined && at <= tap.until && (first === 0 || at - moved[first - 1]! >= REACTION.stillFor) ? at : null;
 }
@@ -121,7 +121,7 @@ function reactionFilter(tap: TapWindow, viewport: Viewport): string {
 export async function evidenceTapsOf(video: EvidencePath, taps: readonly TapWindow[], viewport: Viewport, runner: Runner): Promise<readonly EvidenceTap[]> {
   const drawn: EvidenceTap[] = [];
   for (const tap of taps) {
-    const from = Math.max(0, tap.sent - REACTION.before - 1);
+    const from = Math.max(0, tap.sent - 1);
     const scan = await runner('ffmpeg', ['-hide_banner', '-nostats', '-v', 'error', '-noaccurate_seek', '-ss', String(from), '-copyts', ...readByPresentationTime(video), '-an', '-vf', reactionFilter(tap, viewport), '-f', 'null', '-']);
     drawn.push({ at: pulseAt(tap, scan.code === 0 ? reactionAt(parseChanges(scan.stdout), tap) : null), x: tap.x, y: tap.y });
   }

@@ -1,12 +1,12 @@
 import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { newTestEmail } from '../specs/support/clerk.ts';
+import { testEmail } from '../specs/support/clerk.ts';
 import { SAVE_PASSWORD_PROMPT, errorScreenElseSavePasswordPrompt, onScreen, signedInAs, signedOut, until, untilVisible, type Home, type ScreenElement, type Sight, type WaitPace, type WaitScreen } from '../specs/support/waiting.ts';
 import type { SeededUser } from '../src/core/types.ts';
 import { SAMPLE_RUN } from '../testing/sample-inputs.ts';
 
-const EMAIL = newTestEmail(SAMPLE_RUN);
+const EMAIL = testEmail(SAMPLE_RUN, 'maya');
 const HEADING = `Signed in as ${EMAIL}`;
 const SEEDED: SeededUser = { id: 'user_seeded', email: EMAIL, phone: null, password: null };
 const WAITING_FOR = 'the signed-in home';
