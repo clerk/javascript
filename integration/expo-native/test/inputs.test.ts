@@ -163,7 +163,7 @@ describe('the id of a run', () => {
       drawing([], (_workspace, runs) => {
         mkdirSync(join(runs, 'r20261015-120000-beef'), { recursive: true });
         writeFileSync(join(runs, '.tag-1234'), '');
-        writeFileSync(join(runs, 'notes.txt'), '');
+        for (const stray of ['notes.txt', '.tag-notes', '.tag-123', '.tag-12345', '.tag-BEEF']) writeFileSync(join(runs, stray), '');
         assert.deepEqual(keptTags(runs).sort(), ['1234', 'beef']);
       });
     });

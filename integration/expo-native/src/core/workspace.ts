@@ -144,6 +144,7 @@ const deviceBusy = (platform: Platform, fix: string) =>
   new VerifyFailure('DEVICE_BUSY', `another {cli} process in this worktree is driving the ${platform} device`, fix);
 
 const CLAIM = '.tag-';
+const CLAIMED = /^\.tag-[0-9a-f]{4}$/;
 
 function claimTag(runsDir: string, tag: string): boolean {
   try {
@@ -156,7 +157,7 @@ function claimTag(runsDir: string, tag: string): boolean {
 }
 
 export function keptTags(runsDir: string): string[] {
-  return readdirSync(runsDir).flatMap((name) => (isRunId(name) ? [runIdParts(name).tag] : name.startsWith(CLAIM) ? [name.slice(CLAIM.length)] : []));
+  return readdirSync(runsDir).flatMap((name) => (isRunId(name) ? [runIdParts(name).tag] : CLAIMED.test(name) ? [name.slice(CLAIM.length)] : []));
 }
 
 export function openWorkspace(options: WorkspaceOptions): Workspace {
