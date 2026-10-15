@@ -87,7 +87,9 @@ function splitAt(stills: readonly Span[], taps: readonly number[]): readonly Spa
 export function keptPieces(duration: number, marked: readonly Span[] | null, stillStretches: readonly Span[], taps: readonly number[] = []): readonly Span[] {
   const stills = splitAt(stillStretches, taps);
   const windows = merged(
-    marked === null ? [{ from: 0, to: duration }] : marked.map((span) => ({ from: Math.max(0, span.from - CUT.contextBefore), to: Math.min(duration, span.to + CUT.contextAfter) })),
+    merged(
+      marked === null ? [{ from: 0, to: duration }] : marked.map((span) => ({ from: Math.max(0, span.from - CUT.contextBefore), to: Math.min(duration, span.to + CUT.contextAfter) })),
+    ).map((window) => ({ from: window.from, to: Math.min(duration, Math.max(window.to, ...taps.filter((at) => at >= window.from && at < window.to).map((at) => at + PULSE.seconds))) })),
   ).filter((window) => window.to > window.from);
   const ends = marked === null ? [duration] : marked.map((span) => Math.min(duration, span.to));
   const pieces: Span[] = [];

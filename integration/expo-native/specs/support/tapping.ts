@@ -19,3 +19,11 @@ export async function tapOnceUncovered(tap: () => Promise<void>, settle: TapSett
     }
   }
 }
+
+export type MarkTap = (target: { boundingBox(): Promise<{ readonly x: number; readonly y: number; readonly width: number; readonly height: number } | null> }, tap: () => Promise<void>) => Promise<void>;
+
+export type Control = Parameters<MarkTap>[0] & { tap(options: { readonly timeout: number }): Promise<void> };
+
+export function tapMarkedOnceUncovered(control: Control, markTap: MarkTap, settle: TapSettle, busy: BusyWait = NO_BUSY_WAIT): Promise<void> {
+  return tapOnceUncovered(() => markTap(control, () => control.tap({ timeout: settle.timeoutMs })), settle, busy);
+}
