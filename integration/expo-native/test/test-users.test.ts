@@ -77,6 +77,11 @@ describe('the users a test asks for', () => {
     assert.equal((await users.seed()).email.startsWith(runEmailPrefix(SAMPLE_RUN)), true);
   });
 
+  it('have an address at the domain a test names, such as the domain of an organization it seeded', () => {
+    const { users } = byHand(created);
+    assert.match(users.newEmail({ domain: '1412107c1eab12.clerk.test' }), /^1412107c1e[0-9a-z]{4}\+clerk_test@1412107c1eab12\.clerk\.test$/);
+  });
+
   it('have an address that starts with the time of day and the four characters of the run id, and none for an id of another shape', () => {
     assert.equal(runEmailPrefix(SAMPLE_RUN), '1412107c1e');
     for (const id of ['r20261002-141210', 'R20261002-141210-7C1E', 'r20261002_141210_7c1e', '20261002-141210-7c1e', '']) {
@@ -154,6 +159,81 @@ describe('the users a test asks for', () => {
     const { sent, users } = byHand(() => ({ status: 422, body: { errors: [{ code: 'form_param_unknown', long_message: 'phone_number is not a valid parameter for this request.' }] } }));
     await assert.rejects(users.seed({ phone: true }), /^Error: Clerk POST \/users answered 422: phone_number is not a valid parameter for this request\.$/);
     assert.equal(sent.length, 1);
+  });
+
+  const SEEDER = { id: 'user_1', email: newTestEmail(SAMPLE_RUN), phone: null, password: null } as const;
+  const MEMBER = { id: 'user_2', email: newTestEmail(SAMPLE_RUN), phone: null, password: null } as const;
+  const READER_PERMISSIONS = [{ id: 'perm_dr', key: 'org:sys_domains:read' }, { id: 'perm_mr', key: 'org:sys_memberships:read' }];
+  const organizations = (roles: (n: number) => { readonly status: number; readonly body: unknown }, createRole: { readonly status: number; readonly body: unknown } = { status: 200, body: { id: 'role_1' } }) =>
+    byHand((sent, n) => {
+      const path = new URL(sent.url).pathname;
+      if (path === '/v1/organization_roles' && sent.method === 'GET') return roles(n);
+      if (path === '/v1/organization_roles') return createRole;
+      if (path === '/v1/organization_permissions') return { status: 200, body: { data: [...READER_PERMISSIONS, { id: 'perm_dm', key: 'org:sys_domains:manage' }] } };
+      if (path === '/v1/organizations') return { status: 200, body: { id: 'org_9' } };
+      return { status: 200, body: {} };
+    });
+
+  it('seed an organization with members of a role and a domain, making the role first when the instance lacks it', async () => {
+    const { sent, users } = organizations(() => ({ status: 200, body: { data: [] } }));
+    const org = await users.seedOrganization({ creator: SEEDER, members: [{ user: MEMBER, role: 'org:e2e_domains_reader' }], suggestDomain: true });
+    assert.deepEqual(
+      sent.map((request) => [request.method, request.url, request.body]),
+      [
+        ['GET', 'https://api.clerk.com/v1/organization_roles?query=org%3Ae2e_domains_reader', null],
+        ['GET', 'https://api.clerk.com/v1/organization_permissions?query=org%3Asys_&limit=100', null],
+        ['POST', 'https://api.clerk.com/v1/organization_roles', { name: 'Domains reader', key: 'org:e2e_domains_reader', permissions: ['perm_dr', 'perm_mr'] }],
+        ['POST', 'https://api.clerk.com/v1/organizations', { name: org.name, created_by: 'user_1' }],
+        ['POST', 'https://api.clerk.com/v1/organizations/org_9/memberships', { user_id: 'user_2', role: 'org:e2e_domains_reader' }],
+        ['POST', 'https://api.clerk.com/v1/organizations/org_9/domains', { name: org.domain, enrollment_mode: 'automatic_suggestion', verified: true }],
+      ],
+    );
+    assert.match(org.name, /^1412107c1e [0-9a-f]{6}$/);
+    assert.match(org.domain, /^1412107c1e[0-9a-z]{4}\.clerk\.test$/);
+    assert.equal(org.id, 'org_9');
+  });
+
+  it('seed an organization with a default role and no domain, looking up no role', async () => {
+    const { sent, users } = organizations(() => ({ status: 500, body: null }));
+    const org = await users.seedOrganization({ creator: SEEDER, members: [{ user: MEMBER, role: 'org:member' }] });
+    assert.deepEqual(sent.map((request) => [request.method, new URL(request.url).pathname]), [
+      ['POST', '/v1/organizations'],
+      ['POST', '/v1/organizations/org_9/memberships'],
+    ]);
+    assert.equal(org.domain, null);
+  });
+
+  it('use the role the instance holds when it has the permissions of the table, and refuse one that does not', async () => {
+    const holds = organizations(() => ({ status: 200, body: { data: [{ id: 'role_1', key: 'org:e2e_domains_reader', permissions: READER_PERMISSIONS }] } }));
+    await holds.users.seedOrganization({ creator: SEEDER, members: [{ user: MEMBER, role: 'org:e2e_domains_reader' }] });
+    assert.deepEqual(holds.sent.map((request) => [request.method, new URL(request.url).pathname]), [
+      ['GET', '/v1/organization_roles'],
+      ['POST', '/v1/organizations'],
+      ['POST', '/v1/organizations/org_9/memberships'],
+    ]);
+    const stale = organizations(() => ({ status: 200, body: { data: [{ id: 'role_1', key: 'org:e2e_domains_reader', permissions: [{ key: 'org:sys_domains:read' }] }] } }));
+    await assert.rejects(
+      stale.users.seedOrganization({ creator: SEEDER, members: [{ user: MEMBER, role: 'org:e2e_domains_reader' }] }),
+      /^Error: role org:e2e_domains_reader on this instance has the permissions org:sys_domains:read, and the tests give it org:sys_domains:read, org:sys_memberships:read; run down so the next run creates a new application$/,
+    );
+    assert.equal(stale.sent.length, 1, 'no organization is created with the wrong role');
+  });
+
+  it('use the role another test made at the same moment, when Clerk says its key is taken', async () => {
+    const { sent, users } = organizations(
+      (n) => ({ status: 200, body: { data: n === 1 ? [] : [{ id: 'role_1', key: 'org:e2e_domains_reader', permissions: READER_PERMISSIONS }] } }),
+      { status: 422, body: { errors: [{ code: 'form_identifier_exists', message: 'That key is taken. Please try another.' }] } },
+    );
+    const org = await users.seedOrganization({ creator: SEEDER, members: [{ user: MEMBER, role: 'org:e2e_domains_reader' }] });
+    assert.equal(org.id, 'org_9');
+    assert.deepEqual(sent.map((request) => [request.method, new URL(request.url).pathname]), [
+      ['GET', '/v1/organization_roles'],
+      ['GET', '/v1/organization_permissions'],
+      ['POST', '/v1/organization_roles'],
+      ['GET', '/v1/organization_roles'],
+      ['POST', '/v1/organizations'],
+      ['POST', '/v1/organizations/org_9/memberships'],
+    ]);
   });
 
   it("say what Clerk said when it refuses, in Clerk's words", async () => {
