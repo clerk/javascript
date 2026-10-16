@@ -21,7 +21,7 @@ export { default as __source } from './reverification.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Reverification',
-  status: 'wip',
+  status: 'stable',
   title: 'Reverification',
   source: 'packages/mosaic/src/features/reverification/reverification.view.tsx',
 };

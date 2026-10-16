@@ -7,9 +7,6 @@ import { Profile } from '../../components/profile';
 import { useMessages } from '../../localization';
 import { getAvailableUserProfilePages, resolveUserProfilePages, USER_PROFILE_PAGE_ICONS } from './user-profile.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
-import { UserProfileBillingPanelView } from './user-profile-billing-panel.view';
-import { UserProfileProfilePanelView } from './user-profile-profile-panel.view';
-import { UserProfileSecurityPanelView } from './user-profile-security-panel.view';
 
 export interface UserProfileViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
   /** Names the surface, and the dialog it opens in. Defaults to the `userProfile.label` message. */
@@ -25,19 +22,6 @@ export interface UserProfileViewProps extends Omit<ProfileRootProps, 'children' 
    */
   pageOrder?: readonly (UserProfilePageId | (string & {}))[];
   onPageChange: (page: UserProfilePageId | (string & {})) => void;
-}
-
-function BuiltInPage({ id, pages }: { id: UserProfilePageId; pages: UserProfilePages }): React.ReactNode {
-  switch (id) {
-    case 'account':
-      return <UserProfileProfilePanelView {...pages.account} />;
-    case 'security':
-      return pages.security ? <UserProfileSecurityPanelView {...pages.security} /> : null;
-    case 'billing':
-      return pages.billing ? <UserProfileBillingPanelView {...pages.billing} /> : null;
-    case 'apiKeys':
-      return pages.apiKeys;
-  }
 }
 
 /**
@@ -95,14 +79,7 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
             key={entry.id}
             value={entry.id}
           >
-            {entry.custom ? (
-              entry.custom.content
-            ) : (
-              <BuiltInPage
-                id={entry.id}
-                pages={pages}
-              />
-            )}
+            {entry.custom ? entry.custom.content : pages[entry.id]}
           </Profile.ContentPanel>
         ))}
       </Profile.Content>

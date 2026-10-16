@@ -126,10 +126,10 @@ By default, the selected option visually aligns with the trigger. Disable this f
 
 ### `Select.Value`
 
-| Prop          | Type                                            | Default | Description                                                           |
-| ------------- | ----------------------------------------------- | ------- | --------------------------------------------------------------------- |
-| `placeholder` | `ReactNode`                                     | —       | Shown when no value is selected                                       |
-| `children`    | `ReactNode \| ((value: string[]) => ReactNode)` | —       | Replaces the selected labels; a function receives the selected values |
+| Prop          | Type                                            | Default | Description                                                                                                                        |
+| ------------- | ----------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `placeholder` | `ReactNode`                                     | —       | Shown when no value is selected                                                                                                    |
+| `children`    | `ReactNode \| ((value: string[]) => ReactNode)` | —       | Replaces the selected labels; a function receives the selected values, and the placeholder shows instead while nothing is selected |
 
 ### `Select.Option`
 

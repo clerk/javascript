@@ -1,4 +1,4 @@
-import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel.view';
+import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-members-panel.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -12,11 +12,12 @@ export { default as __source } from './organization-profile-members-panel.storie
 export const meta: StoryMeta = {
   group: 'Organization Profile',
   status: 'wip',
-  substatus: 'needs wire-up',
+  substatus: 'needs reverification',
   title: 'OrganizationProfileMembersPanel',
   label: 'Members panel',
   navigation: { category: 'Panels' },
-  source: 'packages/mosaic/src/features/organization-profile/organization-profile-members-panel.view.tsx',
+  source:
+    'packages/mosaic/src/features/organization-profile/organization-profile-members-panel/organization-profile-members-panel.view.tsx',
 };
 
 export function Legacy() {

@@ -1,12 +1,13 @@
 import { formMessages } from '../components/form/form.messages';
+import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
-import { invitationsTableTabMessages } from '../features/organization-profile/invitations-table-tab.messages';
-import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
-import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-invite-members.messages';
+import { invitationsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.messages';
+import { membersTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/members-table-tab.messages';
+import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.messages';
+import { requestsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.messages';
 import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
-import { requestsTableTabMessages } from '../features/organization-profile/requests-table-tab.messages';
 import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
@@ -22,7 +23,7 @@ import { userProfileAddSmsMessages } from '../features/user-profile/user-profile
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-authenticator-setup.messages';
 import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-backup-codes.messages';
 import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-section.messages';
-import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section.messages';
+import { userProfilePasskeysMessages } from '../features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.messages';
 import { userProfilePasswordSectionMessages } from '../features/user-profile/user-profile-password-section/user-profile-password-section.messages';
 import { userProfileAddPhoneMessages } from '../features/user-profile/user-profile-phone-section/user-profile-add-phone.messages';
 import { userProfileProfileSectionMessages } from '../features/user-profile/user-profile-profile-section/user-profile-profile-section.messages';
@@ -43,6 +44,7 @@ export const mosaicMessages = {
   organizationProfileDangerSection: organizationProfileDangerSectionMessages,
   organizationProfileProfileSection: organizationProfileProfileSectionMessages,
   organizationProfileInviteMembers: organizationProfileInviteMembersMessages,
+  profile: profileMessages,
   reverification: reverificationMessages,
   userButton: userButtonMessages,
   userProfile: userProfileMessages,

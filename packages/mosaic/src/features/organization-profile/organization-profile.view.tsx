@@ -15,9 +15,6 @@ import type {
   OrganizationProfilePageId,
   OrganizationProfilePages,
 } from './organization-profile.types';
-import { OrganizationProfileGeneralPanelView } from './organization-profile-general-panel.view';
-import { OrganizationProfileMembersPanelView } from './organization-profile-members-panel.view';
-import { OrganizationProfilePlaceholderPanelView } from './organization-profile-placeholder-panel.view';
 
 export interface OrganizationProfileViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
   label?: string;
@@ -26,29 +23,6 @@ export interface OrganizationProfileViewProps extends Omit<ProfileRootProps, 'ch
   customPages?: readonly CustomOrganizationProfilePage[];
   pageOrder?: readonly (OrganizationProfilePageId | (string & {}))[];
   onPageChange: (page: OrganizationProfilePageId | (string & {})) => void;
-}
-
-function BuiltInPage({
-  id,
-  pages,
-}: {
-  id: OrganizationProfilePageId;
-  pages: OrganizationProfilePages;
-}): React.ReactNode {
-  if (id === 'general') {
-    return <OrganizationProfileGeneralPanelView {...pages.general} />;
-  }
-  if (id === 'apiKeys') {
-    return pages.apiKeys;
-  }
-  if (id === 'members') {
-    return pages.members?.members || pages.members?.invitations || pages.members?.requests ? (
-      <OrganizationProfileMembersPanelView {...pages.members} />
-    ) : (
-      <OrganizationProfilePlaceholderPanelView page={id} />
-    );
-  }
-  return <OrganizationProfilePlaceholderPanelView page={id} />;
 }
 
 export const OrganizationProfileView = React.forwardRef<HTMLDivElement, OrganizationProfileViewProps>(
@@ -102,14 +76,7 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
               key={entry.id}
               value={entry.id}
             >
-              {entry.custom ? (
-                entry.custom.content
-              ) : (
-                <BuiltInPage
-                  id={entry.id}
-                  pages={pages}
-                />
-              )}
+              {entry.custom ? entry.custom.content : pages[entry.id]}
             </Profile.ContentPanel>
           ))}
         </Profile.Content>

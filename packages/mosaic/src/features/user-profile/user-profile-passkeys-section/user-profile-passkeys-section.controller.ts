@@ -5,9 +5,9 @@ import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
-import type { UserProfilePasskeysSectionViewProps } from '../user-profile-passkeys-section.view';
 import type { UserProfilePasskeysModel } from './user-profile-passkeys-section.model';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.types';
+import type { UserProfilePasskeysSectionViewProps } from './user-profile-passkeys-section.view';
 
 type PasskeysControllerInput = Pick<
   Extract<UserProfilePasskeysModel, { status: 'ready' }>,
