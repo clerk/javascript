@@ -21,7 +21,7 @@ import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
-import { JWT_CATEGORY_JWT_TEMPLATE } from '../jwtCategories';
+import { JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_M2M_TOKEN, JWT_CATEGORY_SESSION_TOKEN } from '../jwtCategories';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
 import { type MachineTokenType, TokenType } from '../tokenTypes';
@@ -1234,7 +1234,7 @@ describe('tokens.authenticateRequest(options)', () => {
     const { sub: _, ...payloadWithoutSub } = mockJwtPayload;
     const { data: malformedJwt } = await signJwt(payloadWithoutSub, signingJwks, {
       algorithm: 'RS256',
-      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_SESSION_TOKEN },
     });
 
     const requestState = await authenticateRequest(
@@ -1285,7 +1285,7 @@ describe('tokens.authenticateRequest(options)', () => {
     // A same-instance M2M JWT carries the instance issuer, so it survives the suffixed-cookie check.
     const { data: m2mJwt } = await signJwt({ ...mockM2MJwtPayload, iss: mockJwtPayload.iss }, signingJwks, {
       algorithm: 'RS256',
-      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+      header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_M2M_TOKEN },
     });
 
     const requestState = await authenticateRequest(
@@ -1337,6 +1337,43 @@ describe('tokens.authenticateRequest(options)', () => {
       });
 
       const requestState = await authenticateRequest(buildRequest(templateJwt!), mockOptions(options));
+
+      expect(requestState).toBeSignedOut({
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+      expect(requestState.toAuth()).toBeSignedOutToAuth();
+    });
+  });
+
+  describe.each([
+    ['headerToken', templateInHeader, {}],
+    [
+      'cookieToken',
+      (jwt: string) =>
+        mockRequestWithCookies(
+          {},
+          { __clerk_db_jwt: 'deadbeef', __client_uat: `${mockJwtPayload.iat - 10}`, __session: jwt },
+        ),
+      {},
+    ],
+    ['headerToken, acceptsToken: any', templateInHeader, { acceptsToken: 'any' as const }],
+    [
+      'headerToken, acceptsToken: [session_token, m2m_token]',
+      templateInHeader,
+      { acceptsToken: ['session_token', 'm2m_token'] as const },
+    ],
+  ])('%s: OIDC id_token presented as a session token (AISEC-21)', (_label, buildRequest, options) => {
+    test('returns signed out', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+      const { azp: _azp, ...payloadWithoutAzp } = mockJwtPayload;
+      const { data: idToken } = await signJwt(
+        { ...payloadWithoutAzp, aud: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc' },
+        signingJwks,
+        { algorithm: 'RS256', header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' } },
+      );
+
+      const requestState = await authenticateRequest(buildRequest(idToken!), mockOptions(options));
 
       expect(requestState).toBeSignedOut({
         reason: AuthErrorReason.TokenTypeMismatch,
