@@ -1,6 +1,7 @@
 import { formMessages } from '../components/form/form.messages';
 import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
+import { oauthConsentMessages } from '../features/oauth-consent/oauth-consent.messages';
 import { invitationsTableTabMessages } from '../features/organization-profile/invitations-table-tab.messages';
 import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
@@ -37,6 +38,7 @@ export const mosaicMessages = {
   roles: roleMessages,
   form: formMessages,
   membersTableTab: membersTableTabMessages,
+  oauthConsent: oauthConsentMessages,
   invitationsTableTab: invitationsTableTabMessages,
   requestsTableTab: requestsTableTabMessages,
   organizationProfile: organizationProfileMessages,

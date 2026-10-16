@@ -57,6 +57,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'api-keys': {
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
   },
+  'o-auth-consent': {
+    'o-auth-consent': dynamic(() => import('../stories/oauth-consent.mdx')),
+  },
   reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
