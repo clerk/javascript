@@ -743,6 +743,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       leaveOrganization(state, membership.organization.id, user.id);
       return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
     }),
+    http.get(fapiUrl('/v1/organizations/:organizationId'), ({ params }) => {
+      const membership = state.memberships.find(m => m.organization.id === params.organizationId);
+      return membership ? envelope(membership.organization, null) : missing();
+    }),
     http.post(fapiUrl('/v1/organizations/:organizationId'), async ({ params, request }) => {
       const method = new URL(request.url).searchParams.get('_method');
       if (method === 'PATCH') {
@@ -895,7 +899,7 @@ export function demandReverificationOnce(path: string): void {
   );
 }
 
-export function holdRequests(method: 'get' | 'post', path: string): HeldRequests {
+export function holdRequests(method: 'get' | 'post', path: string, query: Record<string, string> = {}): HeldRequests {
   const requests: Request[] = [];
   let resolveGate: (response: Response | undefined) => void = () => {};
   const gate = new Promise<Response | undefined>(resolve => {
@@ -910,6 +914,10 @@ export function holdRequests(method: 'get' | 'post', path: string): HeldRequests
 
   worker.use(
     http[method](fapiUrl(path), ({ request }) => {
+      const { searchParams } = new URL(request.url);
+      if (Object.entries(query).some(([key, value]) => searchParams.get(key) !== value)) {
+        return undefined;
+      }
       requests.push(request.clone());
       return gate;
     }),

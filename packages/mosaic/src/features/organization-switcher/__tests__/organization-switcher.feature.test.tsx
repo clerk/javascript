@@ -197,6 +197,46 @@ describe('OrganizationSwitcher', () => {
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
+  describe('an accepted invitation', () => {
+    const fullFirstPage = Array.from({ length: 10 }, (_, i) =>
+      fapiMembership(fapiOrganization({ id: `org_page_${i}`, name: `Page ${i}` })),
+    );
+    const enabledRow = async (name: string) => {
+      const row = await screen.findByRole('button', { name });
+      await waitFor(() => expect(row).not.toHaveAttribute('aria-disabled', 'true'));
+      return row;
+    };
+
+    it('stays reachable, and follows afterSelectOrganizationUrl, before the memberships list its organization', async () => {
+      serveFapi(
+        noOffers({
+          client: fapiClient([personalSession]),
+          memberships: fullFirstPage,
+          invitations: [fapiInvitation('inv_1', gamma)],
+        }),
+      );
+      const nextPage = holdRequests('get', '/v1/me/organization_memberships', { offset: '10' });
+      const { navigate } = await renderWithClerk(tree({ afterSelectOrganizationUrl: '/orgs/:id' }));
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Accept' }));
+      await user.click(await enabledRow('Gamma'));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/orgs/org_3'));
+      nextPage.release();
+    });
+
+    it('lists once, as a membership, when the memberships list its organization', async () => {
+      await renderSwitcher({}, noOffers({ invitations: [fapiInvitation('inv_1', gamma)] }));
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Accept' }));
+      await enabledRow('Gamma');
+
+      expect(reading('Gamma')).toEqual(['Gamma']);
+    });
+  });
+
   it('carries custom rows beside Settings, in the order given', async () => {
     const terms = { id: 'terms', label: 'Terms of service', href: 'https://example.com/terms' };
     const support = { id: 'support', label: 'Support', onClick: vi.fn() };

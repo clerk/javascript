@@ -335,11 +335,11 @@ describe('UserButton', () => {
       expect(popup()).toBeInTheDocument();
     });
 
-    it('stays busy until the invitations have reloaded', async () => {
+    it('stays busy until the memberships have reloaded', async () => {
       await renderUserButton();
       const user = await open();
       await screen.findByRole('button', { name: 'Accept' });
-      const reload = holdRequests('get', '/v1/me/organization_invitations');
+      const reload = holdRequests('get', '/v1/me/organization_memberships');
 
       await user.click(screen.getByRole('button', { name: 'Accept' }));
       await waitFor(() => expect(reload.requests).toHaveLength(1));
