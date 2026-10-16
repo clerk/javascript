@@ -1028,10 +1028,6 @@ export interface SwitcherTriggerProps {
   renderTriggerBadge?: boolean;
 }
 
-/**
- * How much the labelled trigger carries. `full` is the larger trigger, its organization badged with
- * the account; `condensed` is the lead's avatar alone, at the size of the label beside it.
- */
 export type SwitcherTriggerVariant = 'full' | 'condensed';
 
 /** The trigger: the lead's avatar, and what it is called. */
