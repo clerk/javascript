@@ -264,9 +264,9 @@ async function verifyAPIKey(
  * For JWTs, decodes once and routes based on claims to avoid redundant decoding.
  *
  * @param token - The token to verify (e.g., starts with "mt_", "oat_", "ak_", or a JWT)
- * @param options - Options including secretKey for BAPI authorization
+ * @param options - Options including secretKey for BAPI authorization. The `issuer` option is accepted for compatibility but ignored for machine tokens.
  */
-export async function verifyMachineAuthToken(token: string, options: Simplify<Omit<VerifyTokenOptions, 'issuer'>>) {
+export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
   if (isJwtFormat(token)) {
     let decodedResult: Jwt;
     try {
