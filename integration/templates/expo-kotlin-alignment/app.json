@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Clerk Kotlin Alignment",
+    "slug": "clerk-kotlin-alignment",
+    "version": "1.0.0",
+    "android": {
+      "package": "com.clerk.expo.kotlin_alignment"
+    },
+    "plugins": [
+      "@clerk/expo",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "buildArchs": ["arm64-v8a"],
+            "kotlinVersion": "2.4.20"
+          }
+        }
+      ]
+    ]
+  }
+}
