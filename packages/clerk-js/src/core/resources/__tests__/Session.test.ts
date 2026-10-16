@@ -383,7 +383,7 @@ describe('Session', () => {
         expect(ClerkOfflineError.is(error)).toBe(true);
       });
 
-      it('retries 3 times before throwing when offline without making network requests', async () => {
+      it('still attempts the network request on each retry when offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -407,7 +407,80 @@ describe('Session', () => {
         await errorPromise;
 
         expect(getTokenSpy).toHaveBeenCalledTimes(4);
-        expect(global.fetch).toHaveBeenCalledTimes(0);
+        expect(global.fetch).toHaveBeenCalledTimes(4);
+      });
+
+      it('returns the token when navigator.onLine is false but the network works', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockFetch(true, 200, { object: 'token', jwt: mockJwt });
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        expect(await session.getToken({ skipCache: true })).toEqual(mockJwt);
+      });
+
+      it('throws the API error instead of ClerkOfflineError when FAPI responds', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockFetch(false, 503, { errors: [{ code: 'service_unavailable', message: 'Service unavailable' }] });
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        const error = await errorPromise;
+        expect(ClerkOfflineError.is(error)).toBe(false);
+        expect(error).toBeInstanceOf(ClerkAPIResponseError);
+      });
+
+      it('throws the API error instead of ClerkOfflineError when FAPI responds with a non-JSON body', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        // @ts-ignore
+        global.fetch = vi.fn(() =>
+          Promise.resolve({
+            status: 502,
+            statusText: 'Bad Gateway',
+            ok: false,
+            json: () => Promise.reject(new SyntaxError('Unexpected token < in JSON')),
+          }),
+        );
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        const error = await errorPromise;
+        expect(ClerkOfflineError.is(error)).toBe(false);
+        expect(error).toBeInstanceOf(ClerkAPIResponseError);
+        expect(error.status).toBe(502);
       });
 
       it('does not emit token:update with an empty token when offline', async () => {

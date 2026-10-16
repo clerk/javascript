@@ -11,6 +11,7 @@ import {
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 import {
   deferred,
@@ -112,7 +113,11 @@ describe('connected accounts', () => {
 
   it('preserves modal state when reconnecting', async () => {
     serveFapi(signedIn([disconnectedGoogle]));
-    await renderWithClerk(<UserProfileConnectedAccountsSection mode='modal' />);
+    await renderWithClerk(
+      <UserProfileProvider mode='modal'>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
+    );
     const request = holdRequests('post', '/v1/me/external_accounts');
     const user = userEvent.setup();
 
@@ -128,7 +133,9 @@ describe('connected accounts', () => {
   it('reauthorizes a connected account when it lacks requested scopes', async () => {
     serveFapi(signedIn([google]));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['email', 'calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['email', 'calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
     );
     const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
     const request = holdRequests('post', '/v1/me/external_accounts/idn_google/reauthorize');
@@ -146,7 +153,9 @@ describe('connected accounts', () => {
   it('shows a failed reauthorization and allows another attempt', async () => {
     serveFapi(signedIn([google]));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
     );
     const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
     const request = holdRequests('post', '/v1/me/external_accounts/idn_google/reauthorize');
@@ -167,7 +176,9 @@ describe('connected accounts', () => {
     const callback = deferred<{ callbackUrl: string }>();
     const open = vi.fn(() => callback.promise);
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['email', 'calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['email', 'calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
       {
         __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
       },
@@ -218,7 +229,9 @@ describe('connected accounts', () => {
     const getRedirectUrl = vi.fn(() => redirect.promise);
     const open = vi.fn(() => Promise.resolve({ callbackUrl: 'https://app.example/callback' }));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
       {
         __internal_oauthTransport: { getRedirectUrl, open },
       },
@@ -247,7 +260,9 @@ describe('connected accounts', () => {
   it('allows another connection when reauthorizing an account fails to navigate', async () => {
     serveFapi(signedIn([google]));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
     );
     const navigate = vi.spyOn(clerk, 'navigate').mockRejectedValueOnce(new Error('Navigation failed'));
     const user = userEvent.setup();

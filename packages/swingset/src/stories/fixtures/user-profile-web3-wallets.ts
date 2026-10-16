@@ -46,13 +46,11 @@ export function useWeb3WalletsFixture({
   availableProviders = providers,
   primaryError = false,
   removalState,
-  fallbackFocus,
 }: {
   initialWallets?: DemoWallet[];
   availableProviders?: UserProfileWeb3Provider[];
   primaryError?: boolean;
   removalState?: 'pending' | 'error';
-  fallbackFocus?: () => HTMLElement | null;
 } = {}) {
   const seedWallets = useChaosFixture(initialWallets, items =>
     items.map(wallet => ({ ...wallet, provider: chaosText(wallet.provider) })),
@@ -70,7 +68,6 @@ export function useWeb3WalletsFixture({
     availableProviders: connectionProviders.filter(
       provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
     ),
-    fallbackFocus,
     // eslint-disable-next-line @typescript-eslint/require-await
     connect: async (id: Web3Strategy) => {
       const provider = connectionProviders.find(item => item.id === id);

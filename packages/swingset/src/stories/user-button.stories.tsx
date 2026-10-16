@@ -27,6 +27,19 @@ export function Combined(_args: Record<string, unknown>) {
     <SwitcherView
       {...prototype}
       mode='combined'
+      triggerVariant='full'
+    />
+  );
+}
+
+export function CombinedCondensedTrigger(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true });
+
+  return (
+    <SwitcherView
+      {...prototype}
+      mode='combined'
+      triggerVariant='condensed'
     />
   );
 }
@@ -99,6 +112,7 @@ export function WithoutTriggerBadge(_args: Record<string, unknown>) {
   return (
     <SwitcherView
       {...prototype}
+      triggerVariant='full'
       renderTriggerBadge={false}
     />
   );

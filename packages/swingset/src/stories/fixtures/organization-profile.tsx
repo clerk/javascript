@@ -1,6 +1,11 @@
 import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
+import { OrganizationProfileGeneralPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel.view';
+import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-members-panel.view';
+import { OrganizationProfilePlaceholderPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-placeholder-panel.view';
+import type { OrganizationProfileProfileSectionViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
+import { OrganizationProfileProfileSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
 import { SaveError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
@@ -61,7 +66,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     apply();
   };
 
-  const general: OrganizationProfileViewProps['pages']['general'] = {
+  const profile: OrganizationProfileProfileSectionViewProps = {
     name,
     slug,
     imageUrl,
@@ -70,21 +75,31 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     onRemoveLogo: clearImage,
     onSubmitName: async next => save('name', () => setName(next)),
     onSubmitSlug: async next => save('slug', () => setSlug(next)),
-    dangerSlot: (
-      <OrganizationProfileDangerPreview
-        name={name}
-        memberCount={organization.memberCount}
-      />
-    ),
   };
 
   const pages: OrganizationProfileViewProps['pages'] = {
-    general,
-    members: { members, invitations, requests, onInvite, inviteDialog },
-    security: {},
-    billing: {},
+    general: (
+      <OrganizationProfileGeneralPanelView>
+        <OrganizationProfileProfileSectionView {...profile} />
+        <OrganizationProfileDangerPreview
+          name={name}
+          memberCount={organization.memberCount}
+        />
+      </OrganizationProfileGeneralPanelView>
+    ),
+    members: (
+      <OrganizationProfileMembersPanelView
+        members={members}
+        invitations={invitations}
+        requests={requests}
+        onInvite={onInvite}
+        inviteDialog={inviteDialog}
+      />
+    ),
+    security: <OrganizationProfilePlaceholderPanelView page='security' />,
+    billing: <OrganizationProfilePlaceholderPanelView page='billing' />,
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
-  return { activePage, setActivePage, pages, general, name };
+  return { activePage, setActivePage, pages, profile, name };
 }
