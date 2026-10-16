@@ -13,7 +13,7 @@ import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
-import { replaceInPages, shrinkTotal } from '../../utils/replace-in-pages';
+import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,

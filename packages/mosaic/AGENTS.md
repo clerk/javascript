@@ -49,7 +49,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Whether enterprise SSO permits adding another identification             | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                |
 | An inline message row that animates open and closed                      | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `styles/feedback.styles.ts` |
 | A table whose sorting, paging and search are done by the server          | `useServerDataTable` (`src/hooks/`)                                                                           |
-| An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/replace-in-pages.ts`), passed to the list's `setData`                            |
+| An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                              |
 | Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                |
 | An interaction with an async lifecycle or two values that move together  | A machine in the controller file, via `setup()` (`src/machine/`)                                              |
 | Styles several components share                                          | `src/styles/*.styles.ts`                                                                                      |

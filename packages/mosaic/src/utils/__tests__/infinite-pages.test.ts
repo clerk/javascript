@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { replaceInPages, shrinkTotal } from '../replace-in-pages';
+import { replaceInPages, shrinkTotal } from '../infinite-pages';
 
 describe('replaceInPages', () => {
   const page = (...ids: string[]) => ({ data: ids.map(id => ({ id, status: 'pending' })), total_count: 3 });
