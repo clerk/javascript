@@ -380,3 +380,54 @@ export function Overflow() {
     </div>
   );
 }
+
+export function StickyColumn() {
+  const columns = ['Environment', 'Last used', 'Created', 'Expires', 'Created by', 'Scopes'];
+
+  return (
+    <div style={{ maxWidth: 480 }}>
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            {columns.map(column => (
+              <Table.HeaderCell key={column}>{column}</Table.HeaderCell>
+            ))}
+            <Table.HeaderCell sticky='end'>
+              <VisuallyHidden>Actions</VisuallyHidden>
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {apiKeys.map(key => (
+            <Table.Row
+              key={key.id}
+              selected={key.id === 'k2'}
+            >
+              <Table.Cell noWrap>{key.name}</Table.Cell>
+              <Table.Cell>{key.environment}</Table.Cell>
+              <Table.Cell noWrap>{key.lastUsed}</Table.Cell>
+              <Table.Cell noWrap>{key.created}</Table.Cell>
+              <Table.Cell>Never</Table.Cell>
+              <Table.Cell>cameron@clerk.com</Table.Cell>
+              <Table.Cell noWrap>read, write</Table.Cell>
+              <Table.Cell
+                sticky='end'
+                align='end'
+              >
+                <Menu.Root placement='bottom-end'>
+                  <Menu.Trigger aria-label={`Manage ${key.name}`} />
+                  <Menu.Popup>
+                    <Menu.Item label='Revoke'>
+                      <Menu.Label>Revoke</Menu.Label>
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Root>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </div>
+  );
+}

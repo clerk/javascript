@@ -13,7 +13,7 @@ import { Icon } from '../icon';
 import type { InputProps } from '../input';
 import { InputGroup } from '../input-group';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { aligns, styles } from './table.styles';
+import { aligns, stickySides, styles } from './table.styles';
 
 type TableSection = 'header' | 'body';
 
@@ -22,6 +22,8 @@ const TableSectionContext = React.createContext<TableSection>('body');
 export type TableAlign = keyof typeof aligns;
 
 export type TableSort = 'ascending' | 'descending' | 'none';
+
+export type TableSticky = keyof typeof stickySides;
 
 export type TableProps = MosaicElementProps<'table'>;
 
@@ -168,6 +170,7 @@ const Row = React.forwardRef<HTMLTableRowElement, TableRowProps>(function Mosaic
 
 export interface TableHeaderCellProps extends Omit<MosaicComponentProps<'th'>, 'align'> {
   align?: TableAlign;
+  sticky?: TableSticky;
   sort?: TableSort;
   onSort?: () => void;
 }
@@ -179,7 +182,7 @@ const sortIcons = {
 } as const;
 
 const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(function MosaicTableHeaderCell(
-  { align = 'start', sort = 'none', onSort, children, render, xstyle, ...rest },
+  { align = 'start', sticky, sort = 'none', onSort, children, render, xstyle, ...rest },
   ref,
 ) {
   const sortable = onSort !== undefined;
@@ -190,8 +193,20 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
     props: {
       scope: 'col',
       ...mergeStyleProps(
-        themeProps('table-header-cell', { align, sortable, sort: sortable && sort !== 'none' ? sort : undefined }),
-        stylex.props(reset.base, styles.headerCell, aligns[align], sortable && styles.sortableHeaderCell, xstyle),
+        themeProps('table-header-cell', {
+          align,
+          sticky,
+          sortable,
+          sort: sortable && sort !== 'none' ? sort : undefined,
+        }),
+        stylex.props(
+          reset.base,
+          styles.headerCell,
+          aligns[align],
+          sortable && styles.sortableHeaderCell,
+          sticky && [styles.sticky, stickySides[sticky]],
+          xstyle,
+        ),
         { 'aria-sort': sortable && sort !== 'none' ? sort : undefined },
         rest,
       ),
@@ -219,11 +234,12 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
 
 export interface TableCellProps extends Omit<MosaicComponentProps<'td'>, 'align'> {
   align?: TableAlign;
+  sticky?: TableSticky;
   noWrap?: boolean;
 }
 
 const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function MosaicTableCell(
-  { align = 'start', noWrap = false, render, xstyle, ...rest },
+  { align = 'start', sticky, noWrap = false, render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -231,8 +247,15 @@ const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function Mos
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('table-cell', { align, noWrap }),
-      stylex.props(reset.base, styles.cell, aligns[align], noWrap && styles.noWrap, xstyle),
+      themeProps('table-cell', { align, sticky, noWrap }),
+      stylex.props(
+        reset.base,
+        styles.cell,
+        aligns[align],
+        noWrap && styles.noWrap,
+        sticky && [styles.sticky, stickySides[sticky]],
+        xstyle,
+      ),
       rest,
     ),
   });
