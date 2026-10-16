@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -136,12 +137,28 @@ export function readSpecFunctions(file: string) {
   return functions;
 }
 
+export function shippedNativeFunctions(root: string, release: string, native: string) {
+  const tag = execFileSync('git', ['tag', '--list', `${release}@*`, '--sort=-v:refname'], {
+    cwd: root,
+    encoding: 'utf8',
+  })
+    .split('\n')
+    .find(line => /@\d+\.\d+\.\d+$/.test(line));
+  if (!tag) {
+    throw new Error(
+      `No ${release}@<version> release tag in this checkout. The native contract test reads the shipped native module from it. Fetch it with: git fetch --depth=1 --no-tags origin 'refs/tags/${release}@*:refs/tags/${release}@*'`,
+    );
+  }
+  const source = execFileSync('git', ['show', `${tag}:${native}`], { cwd: root, encoding: 'utf8' });
+  return parseNativeFunctions(source, native);
+}
+
 type ContractInput = {
   root: string;
   module: string;
   spec: string;
   native: string;
-  shipped: Record<string, number>;
+  shipped: Map<string, number>;
 };
 
 export function nativeModuleContractErrors({ root, module, spec, native, shipped }: ContractInput) {
@@ -158,14 +175,15 @@ export function nativeModuleContractErrors({ root, module, spec, native, shipped
         `${module}.${name} takes ${arity} argument(s) in ${spec} but ${nativeFunctions.get(name)} in ${native}. Change both sides together.`,
       );
     }
-    if (name in shipped && shipped[name] !== arity) {
+    const shippedArity = shipped.get(name);
+    if (shippedArity !== undefined && shippedArity !== arity) {
       errors.push(
-        `${module}.${name} shipped with ${shipped[name]} argument(s) but ${spec} now passes ${arity}. Apps that get this JS over the air still run the old binary, so keep ${name}(${shipped[name]} args) as is and add a new optional function (as configureWithOptions did for configure).`,
+        `${module}.${name} shipped with ${shippedArity} argument(s) but ${spec} now passes ${arity}. Apps that get this JS over the air still run the old binary, so keep ${name}(${shippedArity} args) as is and add a new optional function (as configureWithOptions did for configure).`,
       );
     }
-    if (!(name in shipped) && !optional) {
+    if (shippedArity === undefined && !optional) {
       errors.push(
-        `${module}.${name} is not in any released binary yet, so OTA JS can reach a binary without it. Declare it optional (${name}?(...)) in ${spec} and feature-detect before calling it. After the release that ships it, run 'node packages/expo/scripts/generate-shipped-native-api.mjs' to refresh shipped-native-api.json from the latest release tags.`,
+        `${module}.${name} is not in any released binary yet, so OTA JS can reach a binary without it. Declare it optional (${name}?(...)) in ${spec} and feature-detect before calling it.`,
       );
     }
   }
