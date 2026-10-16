@@ -68,31 +68,14 @@ export interface AuthProtect {
 
   /**
    * @example
+   * auth.protect();
    * auth.protect({ token: 'session_token' });
-   */
-  <T extends TokenType>(
-    options?: AuthProtectOptions & { token: T },
-  ): Promise<InferAuthObjectFromToken<T, SignedInAuthObject, AuthenticatedMachineObject>>;
-
-  /**
-   * @example
    * auth.protect({ token: ['session_token', 'm2m_token'] });
-   */
-  <T extends TokenType[]>(
-    options?: AuthProtectOptions & { token: T },
-  ): Promise<InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>>;
-
-  /**
-   * @example
    * auth.protect({ token: 'any' });
    */
-  (options?: AuthProtectOptions & { token: 'any' }): Promise<SignedInAuthObject | AuthenticatedMachineObject>;
-
-  /**
-   * @example
-   * auth.protect();
-   */
-  (options?: AuthProtectOptions): Promise<SignedInAuthObject>;
+  <T extends AuthProtectOptions['token'] = SessionTokenType>(
+    options?: AuthProtectOptions & { token?: T },
+  ): Promise<InferProtectedAuthObject<T>>;
 }
 
 export function createProtect(opts: {

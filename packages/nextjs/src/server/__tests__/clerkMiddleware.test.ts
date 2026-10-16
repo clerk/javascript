@@ -118,20 +118,48 @@ describe('ClerkMiddleware type tests', () => {
     });
   });
 
-  it('infers the protect return type from the token option when a predicate is passed', () => {
+  it('infers the protect return type from the token option', () => {
     clerkMiddlewareMock(auth => {
       const predicate = () => true;
+      type SessionToken = typeof TokenType.SessionToken;
+      type ApiKey = typeof TokenType.ApiKey;
+      type M2MToken = typeof TokenType.M2MToken;
 
-      expectTypeOf(auth.protect(predicate)).toEqualTypeOf(auth.protect());
-      expectTypeOf(auth.protect(predicate, { unauthorizedUrl: '/denied' })).toEqualTypeOf(auth.protect());
-      expectTypeOf(auth.protect(predicate, { token: TokenType.SessionToken })).toEqualTypeOf(auth.protect());
-      expectTypeOf(auth.protect(predicate, { token: TokenType.ApiKey })).toEqualTypeOf(
-        auth.protect({ token: TokenType.ApiKey }),
-      );
-      expectTypeOf(auth.protect(predicate, { token: [TokenType.SessionToken, TokenType.M2MToken] })).toEqualTypeOf(
-        auth.protect({ token: [TokenType.SessionToken, TokenType.M2MToken] }),
-      );
-      expectTypeOf(auth.protect(predicate, { token: 'any' })).toEqualTypeOf(auth.protect({ token: 'any' }));
+      expectTypeOf(auth.protect()).resolves.toHaveProperty('tokenType').toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect({ permission: 'org:admin:example1' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect({ unauthorizedUrl: '/denied' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect({ token: TokenType.SessionToken }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect({ token: TokenType.ApiKey }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<ApiKey>();
+      expectTypeOf(auth.protect({ token: [TokenType.SessionToken, TokenType.M2MToken] }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken | M2MToken>();
+      expectTypeOf(auth.protect({ token: 'any' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<TokenType>();
+      expectTypeOf(auth.protect(predicate)).resolves.toHaveProperty('tokenType').toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect(predicate, { unauthorizedUrl: '/denied' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect(predicate, { token: TokenType.SessionToken }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect(predicate, { token: TokenType.ApiKey }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<ApiKey>();
+      expectTypeOf(auth.protect(predicate, { token: [TokenType.SessionToken, TokenType.M2MToken] }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken | M2MToken>();
+      expectTypeOf(auth.protect(predicate, { token: 'any' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<TokenType>();
     });
   });
 
