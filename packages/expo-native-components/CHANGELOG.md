@@ -1,5 +1,17 @@
 # @clerk/expo-native-components
 
+## 0.2.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix Android builds on Expo SDK 58. Compiling `@clerk/expo-native-components` no longer fails with `Unresolved reference 'LocalSavedStateRegistryOwner'`. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Apply the Clerk theme to custom user-profile page backgrounds and navigation bars on iOS. ([#10272](https://github.com/clerk/javascript/pull/10272)) by [@juliusmarminge](https://github.com/juliusmarminge)
+
 ## 0.1.1
 
 ### Patch Changes

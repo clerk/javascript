@@ -1,5 +1,11 @@
 # @clerk/mosaic
 
+## 0.1.10
+
+### Patch Changes
+
+- `<UserButton />` in `combined` mode now defaults to a larger trigger that badges the active organization with the user's avatar. Pass `triggerVariant='condensed'` to keep the previous, smaller trigger. ([#10279](https://github.com/clerk/javascript/pull/10279)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.1.9
 
 ### Patch Changes

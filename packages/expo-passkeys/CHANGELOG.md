@@ -1,5 +1,11 @@
 # @clerk/expo-passkeys
 
+## 2.1.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 2.0.29
 
 ### Patch Changes
