@@ -57,13 +57,13 @@ drops the fallback instead of holding the space open. Keep the two apart.
   from inside the callback that made it. Deciding _when_ is model logic:
 
   ```tsx
-  onAcceptInvitation: async invitationId => {
+  onAcceptSuggestion: async suggestionId => {
     try {
-      await invitationData.find(i => i.id === invitationId)?.accept();
+      await suggestionData.find(s => s.id === suggestionId)?.accept();
     } finally {
       // Always revalidate — a failed accept might be stale state. allSettled never throws,
       // so a failed revalidate doesn't look like a failed accept.
-      await Promise.allSettled([userInvitations.revalidate?.(), userMemberships.revalidate?.()]);
+      await Promise.allSettled([userSuggestions.revalidate?.()]);
     }
   },
   ```
