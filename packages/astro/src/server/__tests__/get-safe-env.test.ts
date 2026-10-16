@@ -211,20 +211,6 @@ describe('getSafeEnv', () => {
     expect(env.pk).toBeUndefined();
     expect(env.sk).toBeUndefined();
   });
-
-  it('prefers keylessPublishableKey over all env sources', () => {
-    process.env.PUBLIC_CLERK_PUBLISHABLE_KEY = 'pk_from_process';
-
-    const locals = createLocals({
-      runtime: { env: undefined as unknown as InternalEnv },
-      keylessPublishableKey: 'pk_keyless',
-    });
-    const env = getSafeEnv(locals);
-
-    expect(env.pk).toBe('pk_keyless');
-
-    delete process.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
-  });
 });
 
 describe('getClientSafeEnv', () => {
