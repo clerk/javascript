@@ -6,10 +6,7 @@ import { NATIVE_MODULES, nativeModuleContractErrors, shippedNativeFunctions } fr
 
 const root = resolve(__dirname, '../../../../..');
 
-test.each(NATIVE_MODULES)(
-  '$spec matches $native and the latest $release release',
-  ({ module, release, spec, native }) => {
-    const shipped = shippedNativeFunctions(root, release, native);
-    expect(nativeModuleContractErrors({ root, module, spec, native, shipped })).toEqual([]);
-  },
-);
+test.each(NATIVE_MODULES)('$spec matches $native and every $release release', ({ module, release, spec, native }) => {
+  const releases = shippedNativeFunctions(root, release, native);
+  expect(nativeModuleContractErrors({ root, module, spec, native, releases })).toEqual([]);
+});

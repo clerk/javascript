@@ -137,20 +137,27 @@ export function readSpecFunctions(file: string) {
   return functions;
 }
 
-export function shippedNativeFunctions(root: string, release: string, native: string) {
-  const tag = execFileSync('git', ['tag', '--list', `${release}@*`, '--sort=-v:refname'], {
+type Release = { tag: string; functions: Map<string, number> };
+
+export function shippedNativeFunctions(root: string, release: string, native: string): Release[] {
+  const tags = execFileSync('git', ['tag', '--list', `${release}@*`, '--sort=v:refname'], {
     cwd: root,
     encoding: 'utf8',
   })
     .split('\n')
-    .find(line => /@\d+\.\d+\.\d+$/.test(line));
-  if (!tag) {
+    .filter(line => /@\d+\.\d+\.\d+$/.test(line));
+  if (tags.length === 0) {
     throw new Error(
-      `No ${release}@<version> release tag in this checkout. The native contract test reads the shipped native module from it. Fetch it with: git fetch --depth=1 --no-tags origin 'refs/tags/${release}@*:refs/tags/${release}@*'`,
+      `No ${release}@<version> release tag in this checkout. The native contract test reads the shipped native module from every release. Fetch them with: git fetch --depth=1 --no-tags origin 'refs/tags/${release}@*:refs/tags/${release}@*'`,
     );
   }
-  const source = execFileSync('git', ['show', `${tag}:${native}`], { cwd: root, encoding: 'utf8' });
-  return parseNativeFunctions(source, native);
+  return tags.map(tag => ({
+    tag,
+    functions: parseNativeFunctions(
+      execFileSync('git', ['show', `${tag}:${native}`], { cwd: root, encoding: 'utf8' }),
+      native,
+    ),
+  }));
 }
 
 type ContractInput = {
@@ -158,10 +165,10 @@ type ContractInput = {
   module: string;
   spec: string;
   native: string;
-  shipped: Map<string, number>;
+  releases: Release[];
 };
 
-export function nativeModuleContractErrors({ root, module, spec, native, shipped }: ContractInput) {
+export function nativeModuleContractErrors({ root, module, spec, native, releases }: ContractInput) {
   const specFunctions = readSpecFunctions(join(root, spec));
   const nativeFunctions = parseNativeFunctions(readFileSync(join(root, native), 'utf8'), native);
   const errors: string[] = [];
@@ -175,16 +182,19 @@ export function nativeModuleContractErrors({ root, module, spec, native, shipped
         `${module}.${name} takes ${arity} argument(s) in ${spec} but ${nativeFunctions.get(name)} in ${native}. Change both sides together.`,
       );
     }
-    const shippedArity = shipped.get(name);
-    if (shippedArity !== undefined && shippedArity !== arity) {
+    const missingFrom = releases.filter(release => !release.functions.has(name)).map(release => release.tag);
+    if (missingFrom.length > 0 && !optional) {
       errors.push(
-        `${module}.${name} shipped with ${shippedArity} argument(s) but ${spec} now passes ${arity}. Apps that get this JS over the air still run the old binary, so keep ${name}(${shippedArity} args) as is and add a new optional function (as configureWithOptions did for configure).`,
+        `${module}.${name} is missing from ${missingFrom.join(', ')}. Apps built on those releases do not have it, and OTA JS can still reach them. Declare it optional (${name}?(...)) in ${spec} and feature-detect before calling it.`,
       );
     }
-    if (shippedArity === undefined && !optional) {
-      errors.push(
-        `${module}.${name} is not in any released binary yet, so OTA JS can reach a binary without it. Declare it optional (${name}?(...)) in ${spec} and feature-detect before calling it.`,
-      );
+    for (const { tag, functions } of releases) {
+      const shippedArity = functions.get(name);
+      if (shippedArity !== undefined && shippedArity !== arity) {
+        errors.push(
+          `${module}.${name} takes ${shippedArity} argument(s) in ${tag} but ${spec} now passes ${arity}. Apps built on that release still run that binary, so keep ${name}(${shippedArity} args) as is and add a new optional function that you feature-detect (as configureWithOptions did for configure).`,
+        );
+      }
     }
   }
   for (const name of nativeFunctions.keys()) {
