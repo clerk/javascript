@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react';
 
 import { withCardStateProvider } from '@/elements/contexts';
 import { LoadingCard } from '@/elements/LoadingCard';
+import { useIsWebAuthnSupported } from '@/hooks';
 import { useRouter } from '@/router';
 
 import { useSecondFactorSelection } from '../SignIn/useSecondFactorSelection';
@@ -12,26 +13,31 @@ import { useUserVerificationSession, withUserVerificationSessionGuard } from './
 import { sortByPrimaryFactor } from './utils';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
 import { UVFactorTwoBackupCodeCard } from './UVFactorTwoBackupCodeCard';
+import { UVFactorTwoPasskeyCard } from './UVFactorTwoPasskeyCard';
 import { UVFactorTwoPhoneCodeCard } from './UVFactorTwoPhoneCodeCard';
 
 const SUPPORTED_STRATEGIES: SessionVerificationSecondFactor['strategy'][] = [
   'phone_code',
   'totp',
   'backup_code',
+  'passkey',
 ] as const;
 
 export function UserVerificationFactorTwoComponent(): JSX.Element {
   const { navigate } = useRouter();
   const { data } = useUserVerificationSession();
   const sessionVerification = data as SessionVerificationResource;
+  const webAuthnSupported = useIsWebAuthnSupported();
 
   const availableFactors = useMemo(() => {
     return (
       sessionVerification.supportedSecondFactors
         ?.filter(factor => SUPPORTED_STRATEGIES.includes(factor.strategy))
+        // Only include passkey if the device supports it.
+        ?.filter(factor => factor.strategy !== 'passkey' || webAuthnSupported)
         ?.sort(sortByPrimaryFactor) || null
     );
-  }, [sessionVerification.supportedSecondFactors]);
+  }, [sessionVerification.supportedSecondFactors, webAuthnSupported]);
 
   const {
     currentFactor,
@@ -98,6 +104,13 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
       return (
         <UVFactorTwoBackupCodeCard
           onShowAlternativeMethodsClicked={hasAlternativeStrategies ? toggleAllStrategies : undefined}
+        />
+      );
+    case 'passkey':
+      return (
+        <UVFactorTwoPasskeyCard
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          showAlternativeMethods={hasAlternativeStrategies}
         />
       );
     default:
