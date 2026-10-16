@@ -14,10 +14,8 @@ import {
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
-import {
-  OrganizationProfileDangerSection,
-  type OrganizationProfileDangerSectionProps,
-} from '../organization-profile-danger-section';
+import { OrganizationProfileProvider } from '../../organization-profile.provider';
+import { OrganizationProfileDangerSection } from '../organization-profile-danger-section';
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 20 });
 const deletePermission = ['org:sys_profile:delete'];
@@ -38,9 +36,9 @@ function signedIn({
   } satisfies FakeFapiSeed;
 }
 
-async function renderSection(seed: FakeFapiSeed = signedIn(), props: OrganizationProfileDangerSectionProps = {}) {
+async function renderSection(seed: FakeFapiSeed = signedIn()) {
   const fapi = serveFapi(seed);
-  const view = await renderWithClerk(<OrganizationProfileDangerSection {...props} />);
+  const view = await renderWithClerk(<OrganizationProfileDangerSection />);
   return { ...view, fapi };
 }
 
@@ -89,7 +87,9 @@ describe('OrganizationProfileDangerSection', () => {
     it('leaves once the name is typed, then sends the user to the after-leave url', async () => {
       const { fapi, navigate } = await renderSection();
       const user = userEvent.setup();
-      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }));
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }), {
+        role: 'alertdialog',
+      });
 
       await confirm(user, dialog, 'Leave organization', 'Acme Inc');
       expect(memberOf(fapi, 'org_1')).toBe(true);
@@ -104,7 +104,9 @@ describe('OrganizationProfileDangerSection', () => {
     it('keeps the dialog open with the Clerk error when leaving fails', async () => {
       const { navigate } = await renderSection();
       const user = userEvent.setup();
-      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }));
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Leave organization' }), {
+        role: 'alertdialog',
+      });
       const leave = holdRequests('post', '/v1/me/organization_memberships/:organizationId');
 
       await confirm(user, dialog, 'Leave organization');
@@ -120,7 +122,7 @@ describe('OrganizationProfileDangerSection', () => {
           ),
         ),
       );
-      expect(screen.getByRole('dialog')).toBeVisible();
+      expect(screen.getByRole('alertdialog')).toBeVisible();
       expect(navigate).not.toHaveBeenCalled();
     });
   });
@@ -129,7 +131,9 @@ describe('OrganizationProfileDangerSection', () => {
     it('warns how many members are removed', async () => {
       await renderSection();
       const user = userEvent.setup();
-      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }));
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }), {
+        role: 'alertdialog',
+      });
 
       expect(dialog).toHaveTextContent(
         'Are you sure you want to delete Acme? This removes 20 members and permanently deletes all organization data.',
@@ -139,15 +143,24 @@ describe('OrganizationProfileDangerSection', () => {
     it('names a single member in the warning', async () => {
       await renderSection(signedIn({ organizations: [fapiOrganization({ id: 'org_1', name: 'Acme' })] }));
       const user = userEvent.setup();
-      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }));
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }), {
+        role: 'alertdialog',
+      });
 
       expect(dialog).toHaveTextContent('This removes 1 member and permanently deletes all organization data.');
     });
 
-    it('deletes the organization and sends the user to the url the host passed', async () => {
-      const { fapi, navigate } = await renderSection(signedIn(), { afterLeaveOrganizationUrl: '/organizations' });
+    it('deletes the organization and sends the user to the url from the provider', async () => {
+      const fapi = serveFapi(signedIn());
+      const { navigate } = await renderWithClerk(
+        <OrganizationProfileProvider afterLeaveOrganizationUrl='/organizations'>
+          <OrganizationProfileDangerSection />
+        </OrganizationProfileProvider>,
+      );
       const user = userEvent.setup();
-      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }));
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }), {
+        role: 'alertdialog',
+      });
 
       await confirm(user, dialog, 'Delete organization');
 
@@ -158,7 +171,9 @@ describe('OrganizationProfileDangerSection', () => {
     it('holds the dialog open while the delete is in flight', async () => {
       await renderSection();
       const user = userEvent.setup();
-      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }));
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }), {
+        role: 'alertdialog',
+      });
       const destroy = holdRequests('post', '/v1/organizations/:organizationId');
 
       await confirm(user, dialog, 'Delete organization');
@@ -170,23 +185,27 @@ describe('OrganizationProfileDangerSection', () => {
         ),
       );
       await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-      expect(screen.getByRole('dialog')).toBeVisible();
+      expect(screen.getByRole('alertdialog')).toBeVisible();
 
       destroy.release();
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     });
 
     it('drops a pending confirmation when the active organization changes', async () => {
       const twin = fapiOrganization({ id: 'org_2', name: 'Acme', members_count: 20 });
       const { clerk, fapi } = await renderSection(signedIn({ organizations: [acme, twin] }));
       const user = userEvent.setup();
-      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }));
+      const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }), {
+        role: 'alertdialog',
+      });
       await user.type(within(dialog).getByRole('textbox'), 'Acme');
 
       await act(() => clerk.setActive({ organization: 'org_2' }));
 
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      const reopened = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }));
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+      const reopened = await openDialog(user, await screen.findByRole('button', { name: 'Delete organization' }), {
+        role: 'alertdialog',
+      });
       expect(within(reopened).getByRole('textbox')).toHaveValue('');
       expect(within(reopened).getByRole('button', { name: 'Delete organization' })).not.toHaveAttribute(
         'aria-busy',

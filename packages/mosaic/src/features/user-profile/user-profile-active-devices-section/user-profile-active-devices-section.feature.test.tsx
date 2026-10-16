@@ -61,6 +61,7 @@ function serveDevices(
     client: fapiClient([fapiSession({ id: 'sess_current', user: alice, actor: options.currentActor })]),
     activeDevices: devices,
     deviceTrackingEnabled: options.deviceTrackingEnabled ?? true,
+    verification: { secrets: { password: 'hunter2' } },
   });
   worker.use(
     http.post(fapiUrl('/v1/me/sessions/:id/revoke'), ({ params }) => {
@@ -117,7 +118,11 @@ describe('Active devices', () => {
       },
       { ...device('sess_expired', 'active', { device_type: 'Expired laptop' }), expire_at: 1 },
     ]);
-    await renderWithClerk(<UserProfileSecurityPanelView activeDevicesSlot={<UserProfileActiveDevicesSection />} />);
+    await renderWithClerk(
+      <UserProfileSecurityPanelView>
+        <UserProfileActiveDevicesSection />
+      </UserProfileSecurityPanelView>,
+    );
 
     expect(await screen.findByRole('button', { name: 'Manage Safari on MacBook Pro' })).toBeInTheDocument();
     expect(screen.getByText('This device')).toBeVisible();
@@ -138,7 +143,6 @@ describe('Active devices', () => {
     expect(within(screen.getByRole('dialog')).getByText('Paris, France')).toBeInTheDocument();
     expect(within(screen.getByRole('dialog')).queryByText('Original sign in')).toBeNull();
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
-    expect(screen.queryByRole('alertdialog')).toBeNull();
 
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull());
     expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
@@ -494,13 +498,11 @@ describe('Active devices', () => {
   });
 
   it.each(['confirmation', 'details'] as const)(
-    'surfaces verification-required errors in the %s without opening reverification',
+    'verifies the session when signing out from the %s demands it, then signs the device out',
     async surface => {
       const devices = serveDevices(
         [device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })],
-        {
-          reverifyOnceId: 'sess_other',
-        },
+        { reverifyOnceId: 'sess_other' },
       );
       const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
       const openReverification = vi.spyOn(view.clerk, '__internal_openReverification').mockImplementation(() => {});
@@ -511,11 +513,17 @@ describe('Active devices', () => {
       const dialog = screen.getByRole(surface === 'details' ? 'dialog' : 'alertdialog');
       await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
 
-      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Verification required'));
+      expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
       expect(openReverification).not.toHaveBeenCalled();
       expect(devices.find(item => item.id === 'sess_other')?.status).toBe('active');
-      expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toBeInTheDocument();
-      expect(within(dialog).getByRole('button', { name: 'Sign out' })).not.toHaveAttribute('aria-busy', 'true');
+      await user.click(document.body);
+      expect(dialog).toBeVisible();
+      expect(within(dialog).getByRole('button', { name: 'Close' })).toBeVisible();
+      await user.type(within(dialog).getByLabelText('Password'), 'hunter2{Enter}');
+
+      await waitFor(() => expect(screen.queryByRole(surface === 'details' ? 'dialog' : 'alertdialog')).toBeNull());
+      expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
+      expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
     },
   );
 
@@ -742,7 +750,6 @@ describe('Change language while viewing device details', () => {
 
 describe('Deferred active-device actions', () => {
   it.todo('signs out every other eligible device after confirmation while preserving the current session');
-  it.todo('reverifies device revocation before retrying verification-required API errors');
 });
 
 describe('Sign out an unavailable device', () => {

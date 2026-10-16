@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { useReverificationFlow } from '../../reverification';
 import { UserProfileSolanaWalletDialog } from './user-profile-solana-wallet.dialog';
 import { useUserProfileWeb3WalletsController } from './user-profile-web3-wallets-section.controller';
 import { useUserProfileWeb3WalletsModel } from './user-profile-web3-wallets-section.model';
@@ -8,10 +9,9 @@ import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-s
 
 export interface UserProfileWeb3WalletsSectionProps {
   fallback?: ReactNode;
-  fallbackFocus?: () => HTMLElement | null;
 }
 
-export function UserProfileWeb3WalletsSection({ fallback, fallbackFocus }: UserProfileWeb3WalletsSectionProps) {
+export function UserProfileWeb3WalletsSection({ fallback }: UserProfileWeb3WalletsSectionProps) {
   const model = useUserProfileWeb3WalletsModel();
   if (model.status === 'loading') {
     return fallback ?? null;
@@ -23,24 +23,22 @@ export function UserProfileWeb3WalletsSection({ fallback, fallbackFocus }: UserP
     <Web3Wallets
       key={model.userId}
       model={model}
-      fallbackFocus={fallbackFocus}
     />
   );
 }
 
-function Web3Wallets({
-  model,
-  fallbackFocus,
-}: {
-  model: ReadyWeb3WalletsModel;
-  fallbackFocus?: () => HTMLElement | null;
-}) {
-  const controller = useUserProfileWeb3WalletsController(model);
+function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
+  const [removeWallet, reverification] = useReverificationFlow((id: string) => model.remove?.(id));
+  const controller = useUserProfileWeb3WalletsController({
+    ...model,
+    remove: model.remove ? removeWallet : undefined,
+    reverification,
+  });
   return (
     <>
       <UserProfileWeb3WalletsSectionView
-        fallbackFocus={fallbackFocus}
         wallets={controller.wallets}
+        sectionRef={controller.sectionRef}
         availableProviders={controller.availableProviders}
         pendingId={controller.pendingId}
         onConnect={id => {
@@ -49,7 +47,9 @@ function Web3Wallets({
         onSetPrimary={id => {
           void controller.onSetPrimary(id);
         }}
-        onRemove={controller.onRemove}
+        registerTrigger={controller.registerTrigger}
+        remove={controller.remove}
+        finalFocus={controller.finalFocus}
       />
       <UserProfileSolanaWalletDialog
         open={controller.solanaPickerOpen}

@@ -3,7 +3,7 @@
 import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isHoverOpen, isKeyboardOpen, mergeProps, useRender } from '../utils';
 import { parsePlacement } from '../utils/side-offset';
 import { useMenuContext } from './menu-context';
 
@@ -82,7 +82,9 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
       <FloatingFocusManager
         context={floatingContext}
         modal={false}
-        initialFocus={isNested ? -1 : isKeyboardOpen(floatingContext) ? 0 : refs.floating}
+        initialFocus={
+          isNested || isHoverOpen(floatingContext) ? -1 : isKeyboardOpen(floatingContext) ? 0 : refs.floating
+        }
         returnFocus={isNested ? false : returnFocusRef}
       >
         <FloatingList

@@ -1,0 +1,78 @@
+import * as SkeletonStories from './skeleton.stories';
+
+# Skeleton
+
+## Playground
+
+<Preview
+  name='Primary'
+  storyModule={SkeletonStories}
+/>
+
+## Props
+
+<PropTable
+  meta={SkeletonStories.meta}
+  extra={[
+    { name: 'show', type: 'boolean', default: 'inherits the nearest skeleton container, else true' },
+    { name: 'width', type: 'number | string', default: '—' },
+    { name: 'height', type: 'number | string', default: '—' },
+  ]}
+/>
+
+## Usage
+
+<Usage
+  component='Skeleton'
+  module='@clerk/mosaic/components/skeleton'
+>
+  Chrome on macOS
+</Usage>
+
+---
+
+## Examples
+
+### Text
+
+Text is held to one line, so a long placeholder can't wrap.
+
+<Story
+  name='TextContent'
+  storyModule={SkeletonStories}
+/>
+
+### Elements
+
+`shape` sets the block's corners. Wrap a text's parent element to cover several lines with one
+block.
+
+<Story
+  name='Elements'
+  storyModule={SkeletonStories}
+/>
+
+### Shapes and sizes
+
+With no children, `width` and `height` set the size.
+
+<Story
+  name='Shapes'
+  storyModule={SkeletonStories}
+/>
+
+### Holding space
+
+`visible={false}` keeps the content's space without drawing a placeholder.
+
+<Story
+  name='HoldSpace'
+  storyModule={SkeletonStories}
+/>
+
+### Not shown
+
+<Story
+  name='NotShown'
+  storyModule={SkeletonStories}
+/>

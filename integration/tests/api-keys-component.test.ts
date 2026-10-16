@@ -43,7 +43,7 @@ test.describe('api keys component @machine', () => {
     await app.withEnv(appConfigs.envs.withAPIKeys);
     await app.dev();
 
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeAdmin = u.services.users.createFakeUser(test);
     const admin = await u.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await u.services.users.createFakeOrganization(admin.id);
@@ -56,7 +56,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('can create api keys', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
@@ -96,7 +96,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('pagination works correctly with multiple pages', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Create user and 11 API keys to trigger pagination (default perPage is 10)
     const fakeUser = u.services.users.createFakeUser(test);
@@ -135,7 +135,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('pagination does not show when items fit in one page', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
@@ -160,7 +160,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('can revoke api keys', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
@@ -206,7 +206,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('can copy api key secret after creation', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
@@ -244,7 +244,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('UserProfile API keys page visibility', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -269,7 +269,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('OrganizationProfile API keys page visibility', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -292,7 +292,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('UserProfile API keys uses user ID as subject even when organization is active', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     const admin = await u.services.users.getUser({ email: fakeAdmin.email });
     expect(admin).toBeDefined();
@@ -329,7 +329,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('standalone API keys component in user context based on user_api_keys_enabled', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -359,7 +359,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('standalone API keys component in org context based on orgs_api_keys_enabled', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -392,7 +392,7 @@ test.describe('api keys component @machine', () => {
     page,
     context,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -504,7 +504,7 @@ test.describe('api keys component @machine', () => {
     };
 
     test('api key list invalidation: new key appears immediately after creation', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
@@ -550,7 +550,7 @@ test.describe('api keys component @machine', () => {
     });
 
     test('api key list invalidation: pagination info updates after creation', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Create a dedicated user for this test to ensure clean state
       const dedicatedUser = u.services.users.createFakeUser(test);
@@ -621,7 +621,7 @@ test.describe('api keys component @machine', () => {
     });
 
     test('api key list invalidation: works with active search filter', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
@@ -682,7 +682,7 @@ test.describe('api keys component @machine', () => {
     });
 
     test('api key list invalidation: works when on second page of results', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Create a dedicated user for this test to ensure clean state
       const dedicatedUser = u.services.users.createFakeUser(test);
@@ -741,7 +741,7 @@ test.describe('api keys component @machine', () => {
     });
 
     test('api key list invalidation: multiple rapid creations update correctly', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
@@ -797,7 +797,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('shows error when creating API key with duplicate name', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
@@ -832,7 +832,7 @@ test.describe('api keys component @machine', () => {
   });
 
   test('shows error when API key usage is exceeded for free plan', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });

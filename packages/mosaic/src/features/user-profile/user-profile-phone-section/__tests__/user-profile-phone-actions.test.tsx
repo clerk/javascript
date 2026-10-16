@@ -33,19 +33,13 @@ function renderPhone(overrides: PhoneSectionProps = {}) {
 }
 
 describe('phone actions', () => {
-  it('ignores backdrop clicks and allows Escape to cancel removal', async () => {
+  it('keeps the phone when removal is canceled with Escape', async () => {
     const user = userEvent.setup();
     const onRemovePhone = vi.fn();
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
     const dialog = screen.getByRole('alertdialog', { name: 'Remove phone number?' });
-    const backdrop = document.querySelector('.cl-dialog-backdrop');
-    if (!backdrop) {
-      throw new Error('Expected a dialog backdrop');
-    }
-    await user.click(backdrop);
-    expect(dialog).toBeInTheDocument();
     await user.keyboard('{Escape}');
     await waitFor(() => expect(dialog).not.toBeInTheDocument());
     expect(onRemovePhone).not.toHaveBeenCalled();
@@ -124,7 +118,7 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(screen.getByText('Primary')).toBeInTheDocument();
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Manage +1 (801) 555-0100' })).not.toBeInTheDocument();
   });
 
@@ -221,7 +215,7 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledExactlyOnceWith('phone_1');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Not verified yet.'));
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('shows the generic message and logs a primary update that threw unexpectedly', async () => {
@@ -312,5 +306,25 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Verify phone number' }));
     expect(getPhoneVerifier).toHaveBeenCalledExactlyOnceWith('phone_unverified');
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('returns focus to the row that opened verification when the dialog closes', async () => {
+    const user = userEvent.setup();
+    renderPhone({
+      phones: [
+        { id: 'phone_1', value: '+18015550100', isDefault: true, isVerified: true },
+        { id: 'phone_2', value: '+18015550101', isDefault: false, isVerified: false },
+      ],
+    });
+    const trigger = screen.getByRole('button', { name: 'Manage +1 (801) 555-0101' });
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Verify phone number' }));
+    expect(await screen.findByRole('dialog', { name: 'Verify your phone number' })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 });

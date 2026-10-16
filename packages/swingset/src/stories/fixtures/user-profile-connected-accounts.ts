@@ -1,3 +1,4 @@
+import { useUserProfileConnectedAccountsController } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.controller';
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
@@ -42,10 +43,11 @@ export function useConnectedAccountsFixture({
   );
   const availableProviders = providers.filter(provider => !accounts.some(account => account.id === provider.id));
 
-  return {
+  return useUserProfileConnectedAccountsController({
     accounts,
     availableProviders,
-    onConnect: (id: string) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    onConnect: async (id: string) => {
       const provider = providers.find(item => item.id === id);
       if (provider) {
         setAccounts(current => [
@@ -60,7 +62,8 @@ export function useConnectedAccountsFixture({
         ]);
       }
     },
-    onReconnect: (id: string) =>
+    // eslint-disable-next-line @typescript-eslint/require-await
+    onReconnect: async (id: string) =>
       setAccounts(current =>
         current.map(account =>
           account.id === id
@@ -78,5 +81,5 @@ export function useConnectedAccountsFixture({
       }
       setAccounts(current => current.filter(item => item.id !== id));
     },
-  };
+  });
 }

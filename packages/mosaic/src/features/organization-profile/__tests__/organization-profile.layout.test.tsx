@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { getAvailableOrganizationProfilePages } from '../organization-profile.layout';
 import type { OrganizationProfilePages } from '../organization-profile.types';
 
-const general: OrganizationProfilePages['general'] = { name: 'Acme', slug: 'acme', memberCount: 1 };
+const general: OrganizationProfilePages['general'] = {};
 
 describe('getAvailableOrganizationProfilePages', () => {
   it('lists api keys given content', () => {

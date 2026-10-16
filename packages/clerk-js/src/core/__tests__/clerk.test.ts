@@ -2176,6 +2176,129 @@ describe('Clerk singleton', () => {
 
         await waitFor(() => expect(mockSignUpCreate).not.toHaveBeenCalled());
       });
+
+      describe('a sign-up whose external account already belongs to a user', () => {
+        const existingAccountSignUp = (extra: Record<string, unknown> = {}) =>
+          new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['email_address', 'password'],
+            verifications: {
+              external_account: {
+                status: 'transferable',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: null,
+                error: {
+                  code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
+                  long_message: 'This external account already exists.',
+                  message: 'already exists',
+                },
+              },
+            },
+            external_account: null,
+            ...extra,
+          } as any as SignUpJSON);
+
+        it('is sent to its challenge by the callback before the transfer runs', async () => {
+          loadEnvironment();
+          mockClientFetch.mockReturnValue(
+            Promise.resolve({
+              signedInSessions: [],
+              signIn: new SignIn(null),
+              signUp: existingAccountSignUp({
+                missing_fields: ['email_address', 'password', 'protect_check'],
+                protect_check: { status: 'pending', token: 'token', sdk_url: 'https://example.com/sdk.js' },
+              }),
+            }),
+          );
+
+          const mockSignInCreate = vi.fn();
+
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load(mockedLoadOptions);
+          if (!sut.client) {
+            fail('we should always have a client');
+          }
+          sut.client.signIn.create = mockSignInCreate;
+          sut.setActive = vi.fn();
+
+          await sut.handleRedirectCallback();
+
+          await waitFor(() => expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/protect-check'));
+          expect(mockSignInCreate).not.toHaveBeenCalled();
+        });
+
+        it('completes the transfer as a SIGN-IN and activates the created session', async () => {
+          loadEnvironment();
+          mockClientFetch.mockReturnValue(
+            Promise.resolve({
+              signedInSessions: [],
+              signIn: new SignIn(null),
+              signUp: existingAccountSignUp(),
+            }),
+          );
+
+          const mockSetActive = vi.fn();
+          const mockSignInCreate = vi
+            .fn()
+            .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load(mockedLoadOptions);
+          if (!sut.client) {
+            fail('we should always have a client');
+          }
+          sut.client.signIn.create = mockSignInCreate;
+          sut.setActive = mockSetActive;
+
+          await sut.__internal_resumeAfterProtectCheck();
+
+          await waitFor(() => {
+            expect(mockSignInCreate).toHaveBeenCalledTimes(1);
+            expect(mockSignInCreate).toHaveBeenCalledWith({ transfer: true });
+            expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: '123' }));
+          });
+          expect(mockNavigate.mock.calls.some(([to]) => typeof to === 'string' && to.includes('protect-check'))).toBe(
+            false,
+          );
+        });
+
+        it('activates the transferred sign-in when resumed again after the transfer has committed', async () => {
+          loadEnvironment();
+          mockClientFetch.mockReturnValue(
+            Promise.resolve({
+              signedInSessions: [],
+              signIn: new SignIn({
+                status: 'complete',
+                first_factor_verification: null,
+                second_factor_verification: null,
+                identifier: '',
+                user_data: null,
+                created_session_id: '123',
+                created_user_id: 'user_1',
+              } as any as SignInJSON),
+              signUp: new SignUp(null),
+            }),
+          );
+
+          const mockSetActive = vi.fn();
+          const mockSignInCreate = vi.fn();
+
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load(mockedLoadOptions);
+          if (!sut.client) {
+            fail('we should always have a client');
+          }
+          sut.client.signIn.create = mockSignInCreate;
+          sut.setActive = mockSetActive;
+
+          await sut.__internal_resumeAfterProtectCheck();
+
+          await waitFor(() => {
+            expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: '123' }));
+          });
+          expect(mockSignInCreate).not.toHaveBeenCalled();
+        });
+      });
     });
 
     it('does not initiate the transfer flow when transferable: false is passed', async () => {
