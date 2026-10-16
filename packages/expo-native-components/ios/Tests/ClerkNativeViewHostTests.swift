@@ -38,6 +38,40 @@ final class ClerkNativeViewHostTests: XCTestCase {
   }
 
   @MainActor
+  func testHostBackFallsBackWhenThereIsNoNavigationController() {
+    let hostView = TestClerkNativeViewHost(appContext: nil)
+    let container = UIViewController()
+    container.view.addSubview(hostView)
+
+    XCTAssertFalse(hostView.popEnclosingNavigationRoute())
+  }
+
+  @MainActor
+  func testHostBackDoesNotPopTheRootScreen() {
+    let root = UIViewController()
+    let navigation = UINavigationController(rootViewController: root)
+    let hostView = TestClerkNativeViewHost(appContext: nil)
+    root.view.addSubview(hostView)
+
+    XCTAssertFalse(hostView.popEnclosingNavigationRoute())
+    XCTAssertTrue(navigation.topViewController === root)
+  }
+
+  @MainActor
+  func testHostBackPopsTheEnclosingScreen() {
+    let root = UIViewController()
+    let screen = UIViewController()
+    let navigation = UINavigationController(rootViewController: root)
+    navigation.setViewControllers([root, screen], animated: false)
+    let hostView = TestClerkNativeViewHost(appContext: nil)
+    screen.view.addSubview(hostView)
+
+    XCTAssertTrue(hostView.popEnclosingNavigationRoute())
+    XCTAssertTrue(navigation.topViewController === root)
+    XCTAssertFalse(hostView.popEnclosingNavigationRoute())
+  }
+
+  @MainActor
   private func mountInWindow(_ hostView: UIView) -> UIWindow {
     let window = UIWindow(frame: UIScreen.main.bounds)
     let viewController = UIViewController()

@@ -5,6 +5,7 @@ public class ClerkNativeViewHost: ExpoView {
   private lazy var hostingCoordinator = ClerkNativeHostingCoordinator(containerView: self)
   private var hasInitialized: Bool = false
   private var configuredObserver: NSObjectProtocol?
+  private var isPoppingHostRoute = false
 
   public required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -23,6 +24,7 @@ public class ClerkNativeViewHost: ExpoView {
     super.didMoveToWindow()
 
     guard window != nil else {
+      isPoppingHostRoute = false
       if hasInitialized {
         hostedViewDidDetachFromWindow()
       }
@@ -57,6 +59,34 @@ public class ClerkNativeViewHost: ExpoView {
   func hostedViewDidAttachToWindow() {}
 
   func hostedViewDidDetachFromWindow() {}
+
+  func popEnclosingNavigationRoute() -> Bool {
+    guard !isPoppingHostRoute else { return true }
+
+    var responder: UIResponder? = self
+
+    while let nextResponder = responder?.next {
+      if let viewController = nextResponder as? UIViewController,
+         let navigationController = viewController.navigationController,
+         navigationController.viewControllers.count > 1 {
+        isPoppingHostRoute = true
+        if navigationController.popViewController(animated: true) != nil {
+          if let coordinator = navigationController.transitionCoordinator {
+            coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+              self?.isPoppingHostRoute = false
+            }
+          } else {
+            isPoppingHostRoute = false
+          }
+          return true
+        }
+        isPoppingHostRoute = false
+      }
+      responder = nextResponder
+    }
+
+    return false
+  }
 
   private func addConfiguredObserver() {
     guard configuredObserver == nil else { return }
