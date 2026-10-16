@@ -366,7 +366,7 @@ function settleWithin(ready: PromiseLike<unknown>, deadline: number): Promise<un
  * `timeout`: until the server half deploys it is the correct answer for every load, and calling
  * that a timeout would make a normal rollout look like an outage.
  */
-async function readInlineToken(cid: string, rid: string, deadline: number): Promise<MintedToken | ProtectStatus> {
+async function readInlineToken(cid: string, rid: string, deadline?: number): Promise<MintedToken | ProtectStatus> {
   const inline = (globalThis as unknown as Record<string, unknown>)[INLINE_TOKEN_GLOBAL];
   if (!inline || typeof inline !== 'object') {
     return 'no_token';
@@ -379,7 +379,9 @@ async function readInlineToken(cid: string, rid: string, deadline: number): Prom
     return 'no_token';
   }
 
-  const resolved = await settleWithin(ready, deadline);
+  // No deadline means a late read, which waits for `ready` however long it takes.
+  const resolved =
+    deadline === undefined ? await Promise.resolve(ready).catch(() => null) : await settleWithin(ready, deadline);
   if (resolved === DEADLINE) {
     return 'timeout';
   }
@@ -717,13 +719,19 @@ export class ProtectSession {
     if (this.#tokenUrl) {
       return;
     }
-    const late = await readInlineToken(this.#cid as string, this.#rid as string, Date.now() + this.#timeoutMs);
-    // Never replace a token another tab or a newer attempt already stored.
-    if (typeof late === 'string' || this.#freshStoredToken()) {
+    const late = await readInlineToken(this.#cid as string, this.#rid as string);
+    if (typeof late === 'string') {
       return;
     }
-    writeStoredToken(this.#tokenStorageKey, late, this.#floor);
-    this.#consecutiveFailures = 0;
+    await this.#lock.acquireLockAndRun(() => {
+      const stored = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor);
+      // Keep whichever token is better: a newer invalidation floor first, then the later expiry.
+      if (!stored || (stored.floor <= this.#floor && stored.exp < late.exp)) {
+        writeStoredToken(this.#tokenStorageKey, late, this.#floor);
+        this.#consecutiveFailures = 0;
+      }
+      return Promise.resolve();
+    });
   }
 
   /**
