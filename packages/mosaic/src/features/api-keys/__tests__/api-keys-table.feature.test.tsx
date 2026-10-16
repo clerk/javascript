@@ -411,6 +411,30 @@ describe('APIKeysTable', () => {
       await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     });
 
+    it('keeps the secret open on Escape while a copy is pending', async () => {
+      const { user } = await renderTable();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+      await within(dialog).findByRole('textbox', { name: 'API key' });
+      let rejectCopy: (error: Error) => void = () => undefined;
+      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(
+        () =>
+          new Promise<void>((_, reject) => {
+            rejectCopy = reject;
+          }),
+      );
+      onTestFinished(() => writeText.mockRestore());
+
+      await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
+
+      rejectCopy(new Error('blocked'));
+      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
+      expect(screen.getByRole('alertdialog', { name: 'Copy your API Key' })).toBeVisible();
+    });
+
     it('closes the secret on Escape after a failed copy', async () => {
       const { user } = await renderTable();
       const dialog = await openCreate(user);
@@ -540,18 +564,33 @@ describe('APIKeysTable', () => {
       );
     });
 
-    it('explains a created key that came back without its secret', async () => {
-      const { user } = await renderTable();
+    it('explains a created key that came back without its secret and lists it', async () => {
+      const consoleError = vi.spyOn(console, 'error');
+      onTestFinished(() => consoleError.mockRestore());
+      const { fapi, user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
-      worker.use(http.post(fapiUrl('/api_keys'), () => HttpResponse.json(userKey('ak_new', 'Deploy')), { once: true }));
+      worker.use(
+        http.post(
+          fapiUrl('/api_keys'),
+          () => {
+            const created = userKey('ak_new', 'Deploy');
+            fapi.apiKeys = [created, ...fapi.apiKeys];
+            return HttpResponse.json(created);
+          },
+          { once: true },
+        ),
+      );
 
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
 
       await waitFor(() =>
-        expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not create the API key. Try again.'),
+        expect(within(dialog).getByRole('alert')).toHaveTextContent(
+          'The API key was created, but its secret could not be shown. Revoke it and create a new one.',
+        ),
       );
-      expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toHaveValue('Deploy');
+      expect(await within(table()).findByText('Deploy')).toBeVisible();
+      expect(consoleError).not.toHaveBeenCalledWith('[Clerk] Could not localize error', expect.anything());
     });
 
     it('creates a key with an optional description when descriptions are enabled', async () => {

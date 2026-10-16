@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
 import { useAPIKeys, useClerk, useSession } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
@@ -55,12 +56,14 @@ export function useAPIKeysTableModel(subject: string, pageSize: number, query: s
           subject,
           secondsUntilExpiration: expiresAt ? Math.floor((expiresAt.getTime() - Date.now()) / 1000) : undefined,
         });
+        void apiKeys.revalidate();
         if (!created.secret) {
-          throw new Error('The created API key has no secret');
+          throw new ClerkRuntimeError('The API key was created without a secret.', {
+            code: 'api_key_secret_unavailable',
+          });
         }
         secret = created.secret;
       });
-      void apiKeys.revalidate();
       return secret;
     },
     revoke: async (id: string) => {

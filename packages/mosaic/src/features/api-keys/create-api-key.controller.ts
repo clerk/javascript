@@ -86,16 +86,17 @@ export function useCreateAPIKeyController({
       secret,
       copyError,
       onCopy: async close => {
-        setHasTriedCopy(true);
         try {
           await navigator.clipboard.writeText(secret ?? '');
         } catch (error) {
+          setHasTriedCopy(true);
           setCopyError(messages.copyError);
           if (!close) {
             throw error;
           }
           return;
         }
+        setHasTriedCopy(true);
         setCopyError(null);
         if (close) {
           setOpen(false);
