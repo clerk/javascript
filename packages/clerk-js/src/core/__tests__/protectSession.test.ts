@@ -686,7 +686,7 @@ describe('ProtectSession deadlines', () => {
 
     const startedAt = Date.now();
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
-    // Misread, this would fall back to the 5s default and be two orders of magnitude out.
+    // Misread, this would fall back to the 10s default and be two orders of magnitude out.
     expect(Date.now() - startedAt).toBeLessThan(1_000);
   });
 
@@ -733,11 +733,11 @@ describe('ProtectSession deadlines', () => {
     // `tokenTimeoutMs` is server config with no upper bound of its own, so the ceiling is ours.
     expect(clampTimeout(120_000)).toBe(10_000);
     expect(clampTimeout(1_500)).toBe(1_500);
-    expect(clampTimeout(undefined)).toBe(5_000);
-    expect(clampTimeout(0)).toBe(5_000);
-    expect(clampTimeout(-1)).toBe(5_000);
-    expect(clampTimeout('soon')).toBe(5_000);
-    expect(clampTimeout(Number.POSITIVE_INFINITY)).toBe(5_000);
+    expect(clampTimeout(undefined)).toBe(10_000);
+    expect(clampTimeout(0)).toBe(10_000);
+    expect(clampTimeout(-1)).toBe(10_000);
+    expect(clampTimeout('soon')).toBe(10_000);
+    expect(clampTimeout(Number.POSITIVE_INFINITY)).toBe(10_000);
   });
 });
 

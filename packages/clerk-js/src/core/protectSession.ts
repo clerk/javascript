@@ -31,7 +31,7 @@ const INLINE_TOKEN_GLOBAL = '__clerk_specter';
 /** A token this close to expiry is treated as absent, so a fresh run starts before it lapses. */
 const TOKEN_REFRESH_MARGIN_MS = 60 * 1_000;
 /** Acquisition deadline when the instance does not configure one. */
-const DEFAULT_TOKEN_TIMEOUT_MS = 5 * 1_000;
+const DEFAULT_TOKEN_TIMEOUT_MS = 10 * 1_000;
 /** Ceiling on the instance-configured deadline, so no server value can stall a sign-in. */
 const MAX_TOKEN_TIMEOUT_MS = 10 * 1_000;
 /** A stored token claiming more remaining life than this was not minted by us. */
