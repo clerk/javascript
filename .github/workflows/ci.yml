@@ -372,6 +372,10 @@ jobs:
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
+      - name: Run verify-attach script tests
+        if: matrix.node-version == '24.15.0'
+        run: pnpm vitest run --root scripts verify-attach
+
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4.6.2
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
