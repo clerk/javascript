@@ -9,7 +9,7 @@ export { default as __source } from './organization-profile-general-panel.storie
 
 export const meta: StoryMeta = {
   group: 'Organization Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'OrganizationProfileGeneralPanel',
   label: 'General panel',
   navigation: { category: 'Panels' },

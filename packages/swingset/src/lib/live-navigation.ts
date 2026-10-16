@@ -1,7 +1,12 @@
 import { getSidebarGroups } from '@/lib/registry';
 import { getSidebarCategories, type SidebarEntry } from '@/lib/sidebar-navigation';
+import type { StoryStatus, WipSubstatus } from '@/lib/types';
 
-type LiveSidebarEntry = SidebarEntry & { href: string };
+export type LiveSidebarEntry = SidebarEntry & {
+  href: string;
+  status?: StoryStatus;
+  substatus?: WipSubstatus;
+};
 
 type LiveSidebarGroup = {
   group: string;
@@ -33,6 +38,11 @@ const livePages = new Set([
   '/reverification/reverification',
 ]);
 
+const inventoriedGroups = new Set(['User Profile', 'Organization Profile']);
+const inventoriedCategories = new Set(['Panels', 'Sections']);
+
+const LIVE_TODO_PREFIX = '/live/todo';
+
 export function getLiveSidebarGroups(): LiveSidebarGroup[] {
   const liveGroups: LiveSidebarGroup[] = [];
 
@@ -45,7 +55,14 @@ export function getLiveSidebarGroups(): LiveSidebarGroup[] {
       for (const component of categoryComponents) {
         const path = `/${groupSlug}/${component.componentSlug}`;
         if (livePages.has(path)) {
-          liveComponents.push({ ...component, href: `/live${path}` });
+          liveComponents.push({
+            ...component,
+            href: `/live${path}`,
+            status: component.mod.meta.status,
+            substatus: component.mod.meta.substatus,
+          });
+        } else if (inventoriedGroups.has(group) && inventoriedCategories.has(category)) {
+          liveComponents.push({ ...component, href: `${LIVE_TODO_PREFIX}${path}`, status: 'todo' });
         }
       }
 
@@ -60,4 +77,12 @@ export function getLiveSidebarGroups(): LiveSidebarGroup[] {
   }
 
   return liveGroups;
+}
+
+const liveEntries = getLiveSidebarGroups().flatMap(({ categories }) =>
+  categories.flatMap(({ components }) => components),
+);
+
+export function findLiveEntry(pathname: string): LiveSidebarEntry | undefined {
+  return liveEntries.find(({ href }) => pathname === href || pathname.startsWith(`${href}/`));
 }
