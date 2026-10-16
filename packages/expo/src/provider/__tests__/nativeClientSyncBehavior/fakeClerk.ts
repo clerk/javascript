@@ -1,11 +1,14 @@
 import type { TokenCache } from '../../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../../constants';
+import type { ClientTokenCache } from '../../nativeClientSync';
 import type { FakeClerkServer, FakeServerClientJSON, FapiResponse } from './fakeServer';
 
 export type FakeSessionResource = {
   id: string;
   status: 'active';
-  user: { id: string; profileVersion: number };
+  activityVersion: number;
+  updatedAt: Date;
+  user: { id: string; profileVersion: number; updatedAt: Date };
 };
 
 export type JsEmission = {
@@ -17,7 +20,13 @@ type ListenerCallback = (resources: { client: FakeClientResource; session: FakeS
 type StatusListener = (status: string) => void;
 
 function toSessionResource(session: FakeServerClientJSON['sessions'][number]): FakeSessionResource {
-  return { id: session.id, status: 'active', user: { id: session.userId, profileVersion: session.profileVersion } };
+  return {
+    id: session.id,
+    status: 'active',
+    activityVersion: session.activityVersion,
+    updatedAt: new Date(session.profileVersion + session.activityVersion),
+    user: { id: session.userId, profileVersion: session.profileVersion, updatedAt: new Date(session.profileVersion) },
+  };
 }
 
 /**
@@ -55,6 +64,7 @@ export class FakeClientResource {
         id: session.id,
         userId: session.user.id,
         profileVersion: session.user.profileVersion,
+        activityVersion: session.activityVersion,
       })),
     };
   }
@@ -63,7 +73,8 @@ export class FakeClientResource {
 /**
  * Stand-in for the clerk-js instance returned by `getClerkInstance`, with the same surface the existing
  * ClerkProvider tests mock. It talks to the fake Frontend API through the token cache it was built with,
- * mirroring the `__internal_onBeforeRequest` / `__internal_onAfterResponse` hooks in `createClerkInstance`.
+ * mirroring the `__internal_onBeforeRequest` / `__internal_onAfterResponse` hooks in `createClerkInstance`,
+ * including the compare-and-set write against the token the request used.
  */
 export class FakeClerk {
   loaded = false;
@@ -73,7 +84,7 @@ export class FakeClerk {
   __internal_setActiveInProgress = false;
   /** Every state emitted to Clerk listeners (what `useAuth` consumers observe). */
   readonly emissions: JsEmission[] = [];
-  tokenCache: TokenCache | undefined;
+  tokenCache: (TokenCache & Partial<ClientTokenCache>) | undefined;
   #listeners: ListenerCallback[] = [];
   #statusListeners = new Set<StatusListener>();
   #onLoadedListeners: Array<() => void> = [];
@@ -85,7 +96,9 @@ export class FakeClerk {
     const token = (await this.tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
     const response = await request(token);
     if (response.token) {
-      await this.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, response.token);
+      await (this.tokenCache?.saveClientToken
+        ? this.tokenCache.saveClientToken(response.token, token)
+        : this.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, response.token));
     }
     return response;
   }
@@ -227,6 +240,7 @@ export class FakeClerk {
       await this.handleUnauthenticated();
       return false;
     }
+    this.#applyPiggybackedClient(response);
     return true;
   }
 

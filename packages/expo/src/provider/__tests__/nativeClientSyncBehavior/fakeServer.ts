@@ -2,6 +2,8 @@ export type FakeServerSessionJSON = {
   id: string;
   userId: string;
   profileVersion: number;
+  /** Bumped by session activity such as minting a session token. */
+  activityVersion: number;
 };
 
 export type FakeServerClientJSON = {
@@ -95,7 +97,7 @@ export class FakeClerkServer {
     const { client, token } = this.#createClient();
     const sessionIds: Record<string, string> = {};
     for (const userId of users) {
-      const session = { id: this.#nextId('sess'), userId, profileVersion: 0 };
+      const session = { id: this.#nextId('sess'), userId, profileVersion: 0, activityVersion: 0 };
       client.sessions.push(session);
       sessionIds[userId] = session.id;
     }
@@ -151,7 +153,7 @@ export class FakeClerkServer {
       client = created.client;
       responseToken = created.token;
     }
-    const session = { id: this.#nextId('sess'), userId, profileVersion: 0 };
+    const session = { id: this.#nextId('sess'), userId, profileVersion: 0, activityVersion: 0 };
     client.sessions.push(session);
     client.lastActiveSessionId = session.id;
     return { ...this.#respond(responseToken, client), sessionId: session.id };
@@ -193,8 +195,11 @@ export class FakeClerkServer {
   async createSessionToken(caller: FapiCaller, token: string | null, sessionId: string): Promise<FapiResponse> {
     await this.#request(caller, 'POST /client/sessions/:id/tokens', token);
     const client = this.#clientFor(token);
-    const status = client?.sessions.some(session => session.id === sessionId) ? 200 : 401;
-    return this.#respond(token, client, status);
+    const session = client?.sessions.find(candidate => candidate.id === sessionId);
+    if (session) {
+      session.activityVersion += 1;
+    }
+    return this.#respond(token, client, session ? 200 : 401);
   }
 
   async updateUser(caller: FapiCaller, token: string | null, sessionId: string): Promise<FapiResponse> {

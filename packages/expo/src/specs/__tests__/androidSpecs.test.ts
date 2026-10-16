@@ -39,7 +39,7 @@ describe('android native module specs', () => {
   });
 
   test('resolve the module registered under the expected name (development build)', async () => {
-    const clerkExpoModule = { configure: vi.fn() };
+    const clerkExpoModule = { configureNative: vi.fn() };
     const googleSignInModule = { signIn: vi.fn() };
     mocks.available = { ClerkExpo: clerkExpoModule, ClerkGoogleSignIn: googleSignInModule };
 
