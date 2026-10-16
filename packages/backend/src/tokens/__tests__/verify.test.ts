@@ -904,6 +904,29 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors?.[0].message).toContain('Invalid JWT audience claim array (aud)');
     });
 
+    it('ignores a session-token issuer option when verifying an M2M JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = await createSignedM2MJwt();
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.errors).toBeUndefined();
+      expect(result.data).toBeDefined();
+    });
+
     it('rejects M2M JWT with alg: none', async () => {
       server.use(
         http.get(
