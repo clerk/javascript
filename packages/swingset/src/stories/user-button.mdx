@@ -75,8 +75,16 @@ Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use 
 
 ## Trigger
 
-The avatar and name of whatever leads the popup. With an organization active, it leads with the
-organization alone; the account's badge is kept for the popup's header.
+The avatar and name of whatever leads the popup. With an organization active in `combined`, the
+trigger leads with the organization, badged with the account.
+
+`triggerVariant='condensed'` makes the trigger smaller and drops the account's badge. `user` mode is
+always condensed.
+
+<Story
+  name='CombinedCondensedTrigger'
+  storyModule={UserButtonStories}
+/>
 
 `renderTriggerLabel={false}` leaves the avatar alone. A user's avatar on its own rounds the trigger
 fully to match it; see [User only](#user-only).
@@ -109,10 +117,10 @@ available, **Settings** opens it directly.
 `mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
 Everything else is data.
 
-| Mode                 | Popup                                | Leads with                                             |
-| -------------------- | ------------------------------------ | ------------------------------------------------------ |
-| `combined` (default) | Organizations and accounts together. | The active org, badged with the account in the header. |
-| `user`               | Accounts only; never shows an org.   | The account.                                           |
+| Mode                 | Popup                                | Leads with                               |
+| -------------------- | ------------------------------------ | ---------------------------------------- |
+| `combined` (default) | Organizations and accounts together. | The active org, badged with the account. |
+| `user`               | Accounts only; never shows an org.   | The account.                             |
 
 What a mode leads with is named in the trigger and heads the popup — the two always agree.
 

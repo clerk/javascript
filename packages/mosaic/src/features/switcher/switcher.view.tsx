@@ -16,7 +16,7 @@ import type { IconName } from '../../icons/registry';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
-import { themeProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
@@ -342,6 +342,7 @@ function Header() {
             name={lead.name}
             imageUrl={lead.imageUrl}
             badge={user}
+            size='md'
           />
         ) : (
           <RowAvatar
@@ -1027,11 +1028,14 @@ export interface SwitcherTriggerProps {
   renderTriggerBadge?: boolean;
 }
 
+export type SwitcherTriggerVariant = 'full' | 'condensed';
+
 /** The trigger: the lead's avatar, and what it is called. */
 export function SwitcherTrigger({
   renderTriggerLabel = true,
   renderTriggerBadge = true,
-}: SwitcherTriggerProps = {}): ReactElement {
+  triggerVariant = 'condensed',
+}: SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant } = {}): ReactElement {
   const m = useSwitcherMessages();
   const slot = useSlot();
   const data = useSwitcherContext();
@@ -1042,7 +1046,7 @@ export function SwitcherTrigger({
 
   return (
     <Popover.Trigger
-      {...themeProps(slot('trigger'))}
+      {...themeProps(slot('trigger'), { variant: triggerVariant })}
       aria-label={fill(m.trigger.open, { name: user?.name ?? name })}
       xstyle={[
         focusOutline.visible,
@@ -1051,16 +1055,20 @@ export function SwitcherTrigger({
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
-      <RowAvatar
-        name={lead.name}
-        imageUrl={lead.imageUrl}
-        shape={shape}
-        size={renderTriggerLabel ? 'fit' : 'sm'}
-        xstyle={renderTriggerLabel ? styles.rowAvatar : undefined}
+      <TriggerAvatar
+        lead={lead}
+        variant={renderTriggerLabel ? triggerVariant : 'avatarOnly'}
       />
       {renderTriggerLabel ? (
         <>
-          <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
+          <span
+            {...mergeStyleProps(
+              themeProps(slot('trigger-label')),
+              stylex.props(styles.triggerName, truncationStyles.singleLine),
+            )}
+          >
+            {name}
+          </span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
           <Icon
             name='chevron-down'
@@ -1070,6 +1078,35 @@ export function SwitcherTrigger({
         </>
       ) : null}
     </Popover.Trigger>
+  );
+}
+
+function TriggerAvatar({
+  lead,
+  variant,
+}: {
+  lead: LeadSelection;
+  variant: SwitcherTriggerVariant | 'avatarOnly';
+}): ReactElement {
+  const user = leadUser(lead);
+  if (variant === 'full' && user) {
+    return (
+      <BadgedAvatar
+        name={lead.name}
+        imageUrl={lead.imageUrl}
+        badge={user}
+        size='sm'
+      />
+    );
+  }
+  return (
+    <RowAvatar
+      name={lead.name}
+      imageUrl={lead.imageUrl}
+      shape={lead.shape}
+      size={variant === 'condensed' ? 'fit' : 'sm'}
+      xstyle={variant === 'condensed' ? styles.rowAvatar : undefined}
+    />
   );
 }
 
@@ -1095,18 +1132,25 @@ export function SwitcherPopup(): ReactElement {
   );
 }
 
-export type SwitcherViewProps = Omit<SwitcherRootProps, 'children'> & SwitcherTriggerProps;
+export type SwitcherViewProps = Omit<SwitcherRootProps, 'children'> &
+  SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant };
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
  * connected, Clerk-backed `Switcher` lives in `switcher.tsx` and wraps this view.
  */
-export function SwitcherView({ renderTriggerLabel, renderTriggerBadge, ...root }: SwitcherViewProps): ReactElement {
+export function SwitcherView({
+  renderTriggerLabel,
+  renderTriggerBadge,
+  triggerVariant,
+  ...root
+}: SwitcherViewProps): ReactElement {
   return (
     <SwitcherRoot {...root}>
       <SwitcherTrigger
         renderTriggerLabel={renderTriggerLabel}
         renderTriggerBadge={renderTriggerBadge}
+        triggerVariant={triggerVariant}
       />
       <SwitcherPopup />
     </SwitcherRoot>

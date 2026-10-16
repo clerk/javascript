@@ -96,7 +96,7 @@ function checkout(): Checkout {
   };
   execFileSync('git', ['init', '-q', worktree]);
   mkdirSync(join(worktree, 'node_modules'));
-  write('integration/templates/expo-native/package.sdk-57.json', '{"main":"index.js"}');
+  write('integration/templates/expo-native/package.sdk-58.json', '{"main":"index.js"}');
   write('integration/templates/expo-native/.gitignore', '/ios/\n/node_modules/\n/package.json\n/pnpm-lock.yaml\n');
   write('integration/templates/expo-native/index.js', 'screen one');
   write('packages/expo-native-components/ios/ClerkExpo.swift', 'native one');
