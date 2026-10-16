@@ -916,11 +916,13 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
       const m2mJwt = await createSignedM2MJwt();
 
-      const result = await verifyMachineAuthToken(m2mJwt, {
+      const options = {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
         issuer: 'https://clerk.inspired.puma-74.lcl.dev',
-      });
+      };
+
+      const result = await verifyMachineAuthToken(m2mJwt, options);
 
       expect(result.tokenType).toBe('m2m_token');
       expect(result.errors).toBeUndefined();

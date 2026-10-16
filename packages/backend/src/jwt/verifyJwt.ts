@@ -132,6 +132,9 @@ export type VerifyJwtOptions = {
    * @default 5000
    */
   clockSkewInMs?: number;
+  /**
+   * A string or list of allowed issuers. If passed, the token's `iss` claim must match one exactly. If omitted, the issuer is not checked.
+   */
   issuer?: string | string[];
   /**
    * @internal
