@@ -229,7 +229,7 @@ jobs:
             const fs = require("fs");
             const path = require("path");
             const runs = path.join(process.env.PACKAGE, ".verify", "runs");
-            const ids = fs.existsSync(runs) ? fs.readdirSync(runs) : [];
+            const ids = fs.existsSync(runs) ? fs.readdirSync(runs).filter((id) => !id.startsWith(".")) : [];
             let upload = ids.length > 0;
             for (const id of ids) {
               let record = null;
