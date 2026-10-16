@@ -1,5 +1,11 @@
 # @clerk/mosaic
 
+## 0.1.11
+
+### Patch Changes
+
+- Menu items now use the secondary foreground color at rest and the primary foreground color on hover, matching the `UserButton` menu rows. ([#10281](https://github.com/clerk/javascript/pull/10281)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.1.10
 
 ### Patch Changes
