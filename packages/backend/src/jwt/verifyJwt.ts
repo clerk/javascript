@@ -12,6 +12,7 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
+  assertIssuerClaim,
   assertSubClaim,
 } from './assertions';
 import { importKey } from './cryptoKeys';
@@ -131,6 +132,7 @@ export type VerifyJwtOptions = {
    * @default 5000
    */
   clockSkewInMs?: number;
+  issuer?: string | string[];
   /**
    * @internal
    */
@@ -146,7 +148,7 @@ export async function verifyJwt(
   token: string,
   options: VerifyJwtOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
-  const { audience, authorizedParties, clockSkewInMs, key, headerType } = options;
+  const { audience, authorizedParties, clockSkewInMs, issuer, key, headerType } = options;
   const clockSkew =
     typeof clockSkewInMs === 'number' && Number.isFinite(clockSkewInMs) ? clockSkewInMs : DEFAULT_CLOCK_SKEW_IN_MS;
 
@@ -194,11 +196,12 @@ export async function verifyJwt(
 
   // Payload verifications (only after signature is confirmed valid)
   try {
-    const { azp, sub, aud, iat, exp, nbf } = payload;
+    const { azp, sub, aud, iss, iat, exp, nbf } = payload;
 
     assertSubClaim(sub);
     assertAudienceClaim(aud, audience);
     assertAuthorizedPartiesClaim(azp, authorizedParties);
+    assertIssuerClaim(iss, issuer);
     assertExpirationClaim(exp, clockSkew);
     assertActivationClaim(nbf, clockSkew);
     assertIssuedAtClaim(iat, clockSkew);
