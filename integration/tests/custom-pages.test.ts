@@ -14,11 +14,13 @@ const CUSTOM_BUTTON_DYNAMIC_ITEMS_PAGE = '/custom-user-button-dynamic-items';
 
 async function waitForMountedComponent(
   component: 'UserButton' | 'UserProfile',
-  u: ReturnType<
-    typeof createTestUtils<
-      {
-        app: Application;
-      } & CreateAppPageObjectArgs
+  u: Awaited<
+    ReturnType<
+      typeof createTestUtils<
+        {
+          app: Application;
+        } & CreateAppPageObjectArgs
+      >
     >
   >,
 ) {
@@ -43,7 +45,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
     let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
-      const m = createTestUtils({ app });
+      const m = await createTestUtils({ app });
       fakeUser = m.services.users.createFakeUser(test, {
         withUsername: true,
         fictionalEmail: true,
@@ -67,7 +69,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
           page,
           context,
         }) => {
-          const u = createTestUtils({ app, page, context });
+          const u = await createTestUtils({ app, page, context });
           await u.po.signIn.goTo();
           await u.po.signIn.waitForMounted();
           await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -90,7 +92,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         });
 
         test('user profile custom page 1', async ({ page, context }) => {
-          const u = createTestUtils({ app, page, context });
+          const u = await createTestUtils({ app, page, context });
           await u.po.signIn.goTo();
           await u.po.signIn.waitForMounted();
           await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -117,7 +119,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         });
 
         test('renders only custom pages and does not display unrelated child components', async ({ page, context }) => {
-          const u = createTestUtils({ app, page, context });
+          const u = await createTestUtils({ app, page, context });
           await u.po.signIn.goTo();
           await u.po.signIn.waitForMounted();
           await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -135,7 +137,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         });
 
         test('user profile custom external absolute link', async ({ page, context }) => {
-          const u = createTestUtils({ app, page, context });
+          const u = await createTestUtils({ app, page, context });
           await u.po.signIn.goTo();
           await u.po.signIn.waitForMounted();
           await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -153,7 +155,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         });
 
         test('user profile custom internal relative link', async ({ page, context }) => {
-          const u = createTestUtils({ app, page, context });
+          const u = await createTestUtils({ app, page, context });
           await u.po.signIn.goTo();
           await u.po.signIn.waitForMounted();
           await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -184,7 +186,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
         'validates the unreleased @clerk/react fix (#8604); covered by ref-built CI',
       );
 
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.waitForMounted();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -216,7 +218,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
 
     test.describe('User Button with experimental asStandalone and asProvider', () => {
       test('items at the specified order', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -243,7 +245,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
       });
 
       test('children should be leaking when used with asProvider', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -263,7 +265,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
 
     test.describe('User Button custom items', () => {
       test('items at the specified order', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -294,7 +296,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
       });
 
       test('visit external absolute link', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -317,7 +319,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
       });
 
       test('visit internal relative link', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -340,7 +342,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
       });
 
       test('onClick custom item action', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -369,7 +371,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
 
     test.describe('User Button with dynamic labels', () => {
       test('click Chat is OFF and ensure that state has been changed', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -423,7 +425,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
 
     test.describe('User Button with dynamic labels and custom page', () => {
       test('click Chat is OFF and ensure that state has been changed', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -490,7 +492,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })(
 
     test.describe('User Button with dynamic items', () => {
       test('should show dynamically rendered menu items with icons', async ({ page, context }) => {
-        const u = createTestUtils({ app, page, context });
+        const u = await createTestUtils({ app, page, context });
         await u.po.signIn.goTo();
         await u.po.signIn.waitForMounted();
         await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });

@@ -1,3 +1,4 @@
+import { SamlConnectionIdpCertificate } from './EnterpriseConnection';
 import type { AttributeMappingJSON, SamlConnectionJSON } from './JSON';
 
 /**
@@ -52,6 +53,8 @@ export class SamlConnection {
     readonly updatedAt: number,
     /** Defines the attribute name mapping between the Identity Provider (IdP) and Clerk's [`User`](https://clerk.com/docs/reference/objects/user) properties. */
     readonly attributeMapping: AttributeMapping,
+    /** Every Identity Provider (IdP) signing certificate the connection trusts. The first entry is the primary, also returned as `idpCertificate`. */
+    readonly idpCertificates: SamlConnectionIdpCertificate[],
   ) {}
   static fromJSON(data: SamlConnectionJSON): SamlConnection {
     return new SamlConnection(
@@ -78,6 +81,7 @@ export class SamlConnection {
       data.created_at,
       data.updated_at,
       data.attribute_mapping && AttributeMapping.fromJSON(data.attribute_mapping),
+      (data.idp_certificates ?? []).map(certificate => SamlConnectionIdpCertificate.fromJSON(certificate)),
     );
   }
 }

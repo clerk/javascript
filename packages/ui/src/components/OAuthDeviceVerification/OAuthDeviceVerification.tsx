@@ -313,22 +313,24 @@ function OAuthDeviceVerificationInternal() {
               onChange={setSelectedOrg}
             />
           )}
-          <ListGroup>
-            <ListGroupHeader>
-              <ListGroupHeaderTitle
-                localizationKey={localizationKeys('oauthDeviceVerification.confirmation.scopeListTitle', {
-                  applicationName: data.oauthApplicationName,
-                })}
-              />
-            </ListGroupHeader>
-            <ListGroupContent>
-              {displayedScopes.map(scope => (
-                <ListGroupItem key={scope.scope}>
-                  <ListGroupItemLabel>{scope.description || scope.scope}</ListGroupItemLabel>
-                </ListGroupItem>
-              ))}
-            </ListGroupContent>
-          </ListGroup>
+          {displayedScopes.length > 0 && (
+            <ListGroup>
+              <ListGroupHeader>
+                <ListGroupHeaderTitle
+                  localizationKey={localizationKeys('oauthDeviceVerification.confirmation.scopeListTitle', {
+                    applicationName: data.oauthApplicationName,
+                  })}
+                />
+              </ListGroupHeader>
+              <ListGroupContent>
+                {displayedScopes.map(scope => (
+                  <ListGroupItem key={scope.scope}>
+                    <ListGroupItemLabel>{scope.description || scope.scope}</ListGroupItemLabel>
+                  </ListGroupItem>
+                ))}
+              </ListGroupContent>
+            </ListGroup>
+          )}
           <Alert colorScheme='warning'>
             <Text
               colorScheme='warning'

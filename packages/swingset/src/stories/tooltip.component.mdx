@@ -1,0 +1,139 @@
+import * as TooltipStories from './tooltip.component.stories';
+
+# Tooltip
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={TooltipStories}
+/>
+
+## Usage
+
+Compose the parts: `Tooltip.Root` owns the open state, delays and placement, `Tooltip.Trigger` is
+the anchor, and `Tooltip.Popup` is the floating label. The popup paints its own surface, so put
+plain text (and, optionally, an `Icon`) inside it.
+
+```tsx
+import { Button } from '@clerk/mosaic/components/button';
+import { Tooltip } from '@clerk/mosaic/components/tooltip';
+
+<Tooltip.Root>
+  <Tooltip.Trigger render={props => <Button {...props}>Hover me</Button>} />
+  <Tooltip.Popup>Helpful label</Tooltip.Popup>
+</Tooltip.Root>;
+```
+
+`Tooltip.Trigger` renders a `<button>` by default. Its `render` prop swaps in your own element and
+receives the interaction props (ARIA attributes, hover and focus handlers, and the `data-open` /
+`data-closed` state attributes) from the headless layer to spread onto it. The trigger must be
+focusable, or keyboard users never see the label.
+
+`Tooltip.Popup` portals itself out to the document body and positions against the trigger, so it
+needs no wrapper of its own. It is `role="tooltip"` and wired to the trigger's `aria-describedby`,
+so its text supplements the trigger's accessible name rather than replacing it: an icon-only
+trigger still needs its own `aria-label`.
+
+### Delay
+
+A tooltip opens after `delay` (200ms by default) and closes after `closeDelay` (0ms). Both live on
+`Tooltip.Root`.
+
+```tsx
+<Tooltip.Root
+  delay={500}
+  closeDelay={100}
+>
+  <Tooltip.Trigger>Hover me</Tooltip.Trigger>
+  <Tooltip.Popup>Opens after half a second.</Tooltip.Popup>
+</Tooltip.Root>
+```
+
+### Group
+
+Wrap neighbouring tooltips in `Tooltip.Group` to share one delay: once any tooltip in the group is
+open, moving to a sibling trigger shows its label instantly. The group's `delay` replaces each
+member's own `delay` and `closeDelay`.
+
+<Story
+  name='Group'
+  storyModule={TooltipStories}
+/>
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Tooltip.Root
+  open={open}
+  onOpenChange={setOpen}
+>
+  <Tooltip.Trigger>Hover me</Tooltip.Trigger>
+  <Tooltip.Popup>Helpful label</Tooltip.Popup>
+</Tooltip.Root>;
+```
+
+### Placement
+
+`placement` on `Tooltip.Root` sets the preferred side: `top` (the default), `right`, `bottom`, or
+`left`. Append `-start` or `-end` to align with that edge of the trigger instead of centering on
+it. `sideOffset` sets the gap from the trigger.
+
+<Story
+  name='Placement'
+  storyModule={TooltipStories}
+/>
+
+Placement is a preference, not a guarantee — the tooltip flips to the opposite side when it would
+overflow, and shifts along the cross axis to stay in view. `data-side` on the positioner always
+reports the side actually used.
+
+## Parts
+
+| Part              | Slot              | Description                                                          |
+| ----------------- | ----------------- | -------------------------------------------------------------------- |
+| `Tooltip.Root`    | —                 | State provider; owns open/close, `delay`, `placement`, `sideOffset`. |
+| `Tooltip.Group`   | —                 | Shares one open/close delay across the tooltips inside it.           |
+| `Tooltip.Trigger` | `tooltip-trigger` | Anchor element; renders a `<button>` and accepts a `render` prop.    |
+| `Tooltip.Popup`   | `tooltip-popup`   | The floating label; owns the surface, type and the enter/exit run.   |
+
+`Tooltip.Popup` renders the portal and the floating positioner internally. The positioner carries
+the `tooltip-positioner` slot.
+
+## Styling
+
+The Mosaic tooltip is themed with **StyleX**. Each styled part carries a stable `.cl-<slot>` class
+(the slots in the table above) alongside the StyleX atoms. Consumers never target the hashed atomic
+classes — override by targeting the `.cl-*` slot from a CSS layer that wins over
+`@clerk/mosaic/styles.css`:
+
+```css
+@import '@clerk/mosaic/styles.css' layer(components);
+
+@layer overrides {
+  .cl-tooltip-popup {
+    max-width: 24rem;
+  }
+}
+```
+
+The popup fills with `--cl-color-foreground` and sets its text in `--cl-color-background`, so it
+reads as an inverted surface in both color schemes. It is padded `--cl-spacing` on the block axis
+and one and a half times that inline, and caps its width at `20rem`.
+
+State attributes from the headless layer are available for CSS targeting:
+
+| Attribute             | Applies To     | Description                                         |
+| --------------------- | -------------- | --------------------------------------------------- |
+| `data-open`           | Trigger, Popup | Present when the tooltip is open                    |
+| `data-closed`         | Trigger, Popup | Present when closed (during exit)                   |
+| `data-starting-style` | Popup          | Present on the entering frame                       |
+| `data-ending-style`   | Popup          | Present during the exit animation                   |
+| `data-side`           | Positioner     | Resolved side (`top` / `bottom` / `left` / `right`) |
+
+The popup's enter/exit transition (opacity + scale) is driven off `data-starting-style` /
+`data-ending-style` and eases per property: `linear` for the fade, `--cl-ease-default` for the
+scale on the way in and `--cl-ease-exit` on the way out. Under `prefers-reduced-motion: reduce`
+only `transform` drops out of the transition — the fade still runs.

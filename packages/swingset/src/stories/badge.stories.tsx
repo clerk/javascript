@@ -1,5 +1,5 @@
-import type { BadgeProps } from '@clerk/ui/mosaic/components/badge';
-import { Badge } from '@clerk/ui/mosaic/components/badge';
+import type { BadgeProps } from '@clerk/mosaic/components/badge';
+import { Badge } from '@clerk/mosaic/components/badge';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Badge',
-  source: 'packages/ui/src/mosaic/components/badge/badge.tsx',
+  source: 'packages/mosaic/src/components/badge/badge.tsx',
   styles: {
     _variants: {
       color: { primary: {}, neutral: {}, warning: {}, negative: {}, positive: {} },

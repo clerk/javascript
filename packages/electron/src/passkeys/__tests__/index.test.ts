@@ -1,4 +1,8 @@
 import { webAuthnCreateCredential, webAuthnGetCredential } from '@clerk/shared/internal/clerk-js/passkeys';
+import type {
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
+} from '@clerk/shared/types';
 import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -22,7 +26,7 @@ vi.mock('@clerk/shared/webauthn', () => ({
 
 const HELLO_B64URL = 'aGVsbG8';
 
-const creationOptions = () =>
+const creationOptions = (): PublicKeyCredentialCreationOptionsWithoutExtensions =>
   ({
     rp: { id: 'example.com', name: 'Example' },
     user: { id: new Uint8Array([1]).buffer, name: 'jdoe', displayName: 'J Doe' },
@@ -37,28 +41,26 @@ const creationOptions = () =>
     },
     attestation: 'none',
     excludeCredentials: [],
-  }) as never;
+  }) as PublicKeyCredentialCreationOptionsWithoutExtensions;
 
-const requestOptions = () =>
+const requestOptions = (): PublicKeyCredentialRequestOptionsWithoutExtensions =>
   ({
     challenge: new Uint8Array([1, 2, 3]).buffer,
     rpId: 'example.com',
     timeout: 60_000,
     userVerification: 'required',
     allowCredentials: [],
-  }) as never;
+  }) as PublicKeyCredentialRequestOptionsWithoutExtensions;
 
-const creationOptionsForRpId = (rpId: string) =>
-  ({
-    ...creationOptions(),
-    rp: { id: rpId, name: 'Example' },
-  }) as never;
+const creationOptionsForRpId = (rpId: string): PublicKeyCredentialCreationOptionsWithoutExtensions => ({
+  ...creationOptions(),
+  rp: { id: rpId, name: 'Example' },
+});
 
-const requestOptionsForRpId = (rpId: string) =>
-  ({
-    ...requestOptions(),
-    rpId,
-  }) as never;
+const requestOptionsForRpId = (rpId: string): PublicKeyCredentialRequestOptionsWithoutExtensions => ({
+  ...requestOptions(),
+  rpId,
+});
 
 const registrationJSON = {
   id: HELLO_B64URL,

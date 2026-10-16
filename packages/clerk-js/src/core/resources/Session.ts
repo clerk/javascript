@@ -270,6 +270,9 @@ export class Session extends BaseResource implements SessionResource {
       case 'passkey':
         config = {};
         break;
+      case 'trusted_device':
+        config = { trustedDeviceId: factor.trustedDeviceId };
+        break;
       case 'enterprise_sso':
         config = {
           emailAddressId: factor.emailAddressId,

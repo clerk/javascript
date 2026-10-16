@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const msMY: LocalizationResource = {
   locale: 'ms-MY',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Tambah kunci baharu',
     action__search: 'Cari kunci',
@@ -245,14 +250,23 @@ export const msMY: LocalizationResource = {
     },
     configureStep: {
       actionLabel__generateToken: undefined,
+      actionLabel__replaceKey: undefined,
       actionLabel__retry: undefined,
+      actionLabel__uploadKey: undefined,
+      badge__credentialsConfigured: undefined,
+      badge__credentialsMissing: undefined,
       domainsLabel: undefined,
+      error__invalidKeyFile: undefined,
       error__ssoRequired: {
         subtitle: undefined,
         title: undefined,
       },
+      formFieldHint__subjectEmail: undefined,
+      formFieldInputPlaceholder__subjectEmail: undefined,
       formFieldInputPlaceholder__token: undefined,
       formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__serviceAccountKey: undefined,
+      formFieldLabel__subjectEmail: undefined,
       formFieldLabel__token: undefined,
       instructions: {
         actionLabel__toggle: undefined,
@@ -268,6 +282,13 @@ export const msMY: LocalizationResource = {
           step3: undefined,
           step4: undefined,
         },
+        google: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+        },
         okta: {
           step1: undefined,
           step2: undefined,
@@ -278,10 +299,6 @@ export const msMY: LocalizationResource = {
       notice__tokenShownOnce: undefined,
       subtitle: undefined,
       title: undefined,
-      warning__googleUnsupported: {
-        subtitle: undefined,
-        title: undefined,
-      },
       warning__ssoInactive: undefined,
     },
     navbar: {
@@ -293,21 +310,71 @@ export const msMY: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
       actionLabel__complete: undefined,
+      actionLabel__syncNow: undefined,
       badge__active: undefined,
       badge__deprovisioned: undefined,
       description: undefined,
+      description__pull: undefined,
+      empty__noUsersProvisioned: undefined,
+      empty__waitingForFirstSync: undefined,
       empty__waitingForFirstUser: undefined,
+      error__lastSyncFailed: undefined,
       error__loadUsers: undefined,
+      error__syncFailed: undefined,
       note: undefined,
       noteLabel: undefined,
       subtitle: undefined,
+      syncRow: {
+        neverSynced: undefined,
+        title: undefined,
+      },
+      syncStatus__cancelled: undefined,
+      syncStatus__failed: undefined,
+      syncStatus__running: undefined,
+      syncStatus__succeeded: undefined,
       title: undefined,
     },
   },
@@ -815,9 +882,11 @@ export const msMY: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: undefined,
         badge__expired: undefined,
         badge__unverified: 'Belum disahkan',
         badge__verified: 'Disahkan',
+        checkboxLabel: undefined,
         expiredAtLabel: undefined,
         expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
@@ -872,6 +941,17 @@ export const msMY: LocalizationResource = {
       subtitle: 'Pilih pembekal yang anda akan sediakan SSO untuknya.',
       title: 'Pilih pembekal',
       warning: 'Setelah pembekal dipilih anda tidak boleh menukar lagi sehingga konfigurasi selesai',
+    },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
     },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
@@ -962,6 +1042,8 @@ export const msMY: LocalizationResource = {
   formButtonPrimary: 'Teruskan',
   formButtonPrimary__verify: 'Sahkan',
   formFieldAction__forgotPassword: 'Lupa kata laluan?',
+  formFieldAction__hidePassword: 'Sembunyikan kata laluan',
+  formFieldAction__showPassword: 'Tunjukkan kata laluan',
   formFieldError__matchingPasswords: 'Kata laluan sepadan.',
   formFieldError__notMatchingPasswords: 'Kata laluan tidak sepadan.',
   formFieldError__verificationLinkExpired: 'Pautan pengesahan telah tamat tempoh. Sila minta pautan baharu.',
@@ -1298,18 +1380,83 @@ export const msMY: LocalizationResource = {
       title: 'Keluarkan domain',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
       directorySyncSection: {
         badge__active: undefined,
         badge__inactive: undefined,
         badge__ssoRequired: undefined,
-        badge__unconfigured: undefined,
         description: undefined,
         error__load: undefined,
         menuAction__activate: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
-        primaryButton__startConfiguration: undefined,
+        primaryButton__configure: undefined,
         removeDialog: {
           confirmButton: undefined,
           subtitle: undefined,
@@ -1320,6 +1467,52 @@ export const msMY: LocalizationResource = {
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
+        title: undefined,
+      },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
         title: undefined,
       },
       ssoSection: {
@@ -1335,6 +1528,7 @@ export const msMY: LocalizationResource = {
         menuAction__edit: undefined,
         menuAction__remove: undefined,
         primaryButton__addConnection: undefined,
+        primaryButton__configure: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
@@ -1640,7 +1834,7 @@ export const msMY: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Kami perlu mengesahkan identiti anda sebelum menetapkan semula kata laluan anda.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -1988,12 +2182,15 @@ export const msMY: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
     web3_signature_request_rejected: 'Anda telah menolak permintaan tandatangan. Sila cuba lagi untuk meneruskan.',
     web3_solana_signature_generation_failed:

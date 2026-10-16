@@ -2,7 +2,7 @@ import * as Stories from './user-profile-connected-accounts-section.stories';
 
 # UserProfileConnectedAccountsSection
 
-Linked accounts and available providers are supplied separately. These examples simulate state through props; they do not start OAuth or mutate a user. Reload to reset interactive examples.
+Linked accounts and available providers are supplied separately. Removal uses one shared confirmation per section, which awaits the removal callback and displays failures. These examples simulate actions; they do not start OAuth or mutate a user. Reload to reset interactive examples.
 
 <Story name='Default' storyModule={Stories} />
 
@@ -30,7 +30,7 @@ Recoverable verification errors and additional scope requirements show a Disconn
 
 ## Removal Pending
 
-Choose Remove from the row menu, then confirm to show the pending state.
+Choose Remove from the row menu, then confirm. The dialog shows pending for a short delay, then the account becomes available to connect again.
 
 <Story name='RemovalPending' storyModule={Stories} />
 

@@ -1,6 +1,8 @@
 import { iconImageUrl } from '@clerk/shared/constants';
+import type { OAuthProvider } from '@clerk/shared/types';
 import React from 'react';
 
+import { ProviderIcon } from '@/common';
 import type { LocalizationKey } from '@/customizables';
 import {
   Box,
@@ -10,14 +12,13 @@ import {
   Grid,
   localizationKeys,
   RadioInput,
-  Span,
   Text,
   useLocalizations,
 } from '@/customizables';
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
-import { handleError } from '@/utils/errorHandler';
+import { getFieldError, getGlobalError, handleError } from '@/utils/errorHandler';
 
 import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
@@ -25,8 +26,6 @@ import { PROVIDER_GROUPS, providerLabel, toProviderCard } from '../domain/provid
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 import type { ProviderType } from '../types';
-
-const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 
 export const SelectProviderStep = (): JSX.Element => {
   const {
@@ -76,8 +75,19 @@ export const SelectProviderStep = (): JSX.Element => {
       await createConnection(selected);
       void goNext();
     } catch (err) {
-      handleError(err as Error, [], card.setError);
+      handleCreateError(err as Error);
       setIsSubmitting(false);
+    }
+  };
+
+  // FAPI reports a domain another connection already authenticates as a field
+  // error on `domains`. This step has no domains field, so it surfaces as the
+  // step's alert instead of vanishing.
+  const handleCreateError = (err: Error) => {
+    handleError(err, [], card.setError);
+    const fieldError = getFieldError(err);
+    if (fieldError && !getGlobalError(err)) {
+      card.setError(fieldError);
     }
   };
 
@@ -97,7 +107,7 @@ export const SelectProviderStep = (): JSX.Element => {
       }
       void goNext();
     } catch (err) {
-      handleError(err as Error, [], card.setError);
+      handleCreateError(err as Error);
       setIsChangeDialogOpen(false);
       setChangeFromProvider(null);
       setIsSubmitting(false);
@@ -263,31 +273,14 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         sx={common.visuallyHidden()}
       />
 
-      <Span
+      <ProviderIcon
+        id={iconId as OAuthProvider}
+        iconUrl={iconImageUrl(iconId)}
+        name={labelText}
+        size='$8'
+        aria-hidden
         elementDescriptor={descriptors.configureSSOProviderCardIcon}
         elementId={descriptors.configureSSOProviderCardIcon.setId(value)}
-        aria-hidden
-        sx={theme => {
-          const isMonochromatic = MONOCHROMATIC_PROVIDER_ICONS.has(iconId);
-          const baseSize = { width: theme.sizes.$8, height: theme.sizes.$8 };
-          if (isMonochromatic) {
-            return {
-              ...baseSize,
-              backgroundColor: theme.colors.$colorForeground,
-              maskImage: `url(${iconImageUrl(iconId)})`,
-              maskSize: 'contain',
-              maskPosition: 'center',
-              maskRepeat: 'no-repeat',
-            };
-          }
-          return {
-            ...baseSize,
-            backgroundImage: `url(${iconImageUrl(iconId)})`,
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          };
-        }}
       />
 
       <Text

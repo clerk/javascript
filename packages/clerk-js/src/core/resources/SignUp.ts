@@ -60,6 +60,7 @@ import { _authenticateWithTransport } from '../../utils/authenticateWithTranspor
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { getBrowserTimezone } from '../../utils/timezone';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
@@ -68,7 +69,8 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { BaseResource, SignUpVerifications } from './internal';
+import { ProtectCheckGate } from '../protectCheckGate';
+import { type BaseMutateParams, BaseResource, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {
@@ -101,6 +103,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
   locale: string | null = null;
+  timezone: string | null = null;
 
   /**
    * The current status of the sign-up process.
@@ -140,7 +143,16 @@ export class SignUp extends BaseResource implements SignUpResource {
    * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
    * of `SignUp`.
    */
-  __internal_basePost = this._basePost.bind(this);
+  __internal_basePost = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
+    await this._basePost(params);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignUp.clerk, this, params?.action);
+    }
+    return this;
+  };
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -148,7 +160,16 @@ export class SignUp extends BaseResource implements SignUpResource {
    * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
    * of `SignUp`.
    */
-  __internal_basePatch = this._basePatch.bind(this);
+  __internal_basePatch = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
+    await this._basePatch(params);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignUp.clerk, this, params?.action);
+    }
+    return this;
+  };
 
   constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
@@ -165,6 +186,13 @@ export class SignUp extends BaseResource implements SignUpResource {
       const browserLocale = getBrowserLocale();
       if (browserLocale) {
         finalParams.locale = browserLocale;
+      }
+    }
+
+    if (finalParams.timezone === undefined) {
+      const browserTimezone = getBrowserTimezone();
+      if (browserTimezone) {
+        finalParams.timezone = browserTimezone;
       }
     }
 
@@ -550,6 +578,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
       this.locale = data.locale;
+      this.timezone = data.timezone ?? null;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -592,6 +621,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       web3_wallet: this.web3wallet,
       legal_accepted_at: this.legalAcceptedAt,
       locale: this.locale,
+      timezone: this.timezone,
       external_account: this.externalAccount,
       external_account_strategy: this.externalAccount?.strategy,
     };
@@ -825,6 +855,10 @@ class SignUpFuture implements SignUpFutureResource {
     return this.#resource.locale;
   }
 
+  get timezone() {
+    return this.#resource.timezone;
+  }
+
   get unverifiedFields() {
     return this.#resource.unverifiedFields;
   }
@@ -914,6 +948,7 @@ class SignUpFuture implements SignUpFutureResource {
 
   private async _create(params: SignUpFutureCreateParams): Promise<void> {
     const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
+    const timezone = params.timezone ?? getBrowserTimezone();
 
     const body: Record<string, unknown> = {
       transfer: params.transfer,
@@ -923,6 +958,7 @@ class SignUpFuture implements SignUpFutureResource {
       ...params,
       unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       locale: params.locale ?? getBrowserLocale(),
+      ...(timezone !== null ? { timezone } : {}),
     };
 
     await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
@@ -961,9 +997,13 @@ class SignUpFuture implements SignUpFutureResource {
       if (this.#resource.id) {
         await this.#resource.__internal_basePatch({ body });
       } else {
-        // Inject browser locale only when creating the sign-up, so an existing
-        // sign-up's locale is not overwritten on update.
+        // Inject browser locale and timezone only when creating the sign-up, so an existing
+        // sign-up's values are not overwritten on update.
         body.locale = params.locale ?? getBrowserLocale();
+        const timezone = getBrowserTimezone();
+        if (timezone !== null) {
+          body.timezone = timezone;
+        }
         await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
       }
     });
@@ -1102,12 +1142,19 @@ class SignUpFuture implements SignUpFutureResource {
           locale,
         };
         if (this.#resource.id) {
-          return this.#resource.__internal_basePatch({ body });
+          return this.#resource.__internal_basePatch({ body }, { resolveProtectCheck: false });
         }
-        // Inject browser locale only when creating the sign-up, so an existing
-        // sign-up's locale is not overwritten on update.
+        // Inject browser locale and timezone only when creating the sign-up, so an existing
+        // sign-up's values are not overwritten on update.
         body.locale = locale ?? getBrowserLocale();
-        return this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+        const browserTimezone = getBrowserTimezone();
+        if (browserTimezone !== null) {
+          body.timezone = browserTimezone;
+        }
+        return this.#resource.__internal_basePost(
+          { path: this.#resource.pathRoot, body },
+          { resolveProtectCheck: false },
+        );
       };
 
       await authenticateFn().catch(async e => {
@@ -1119,13 +1166,24 @@ class SignUpFuture implements SignUpFutureResource {
         throw e;
       });
 
-      const { status, externalVerificationRedirectURL } = this.#resource.verifications.externalAccount;
+      const pendingHandOff = () => {
+        const { status, externalVerificationRedirectURL } = this.#resource.verifications.externalAccount;
+        return status === 'unverified' ? externalVerificationRedirectURL : null;
+      };
+      const resolveChallenge = () => ProtectCheckGate.getInstance().resolve(SignUp.clerk, this.#resource);
 
-      if (status === 'unverified' && externalVerificationRedirectURL) {
+      if (this.#resource.protectCheck && !pendingHandOff()) {
+        await resolveChallenge();
+      }
+
+      const externalVerificationRedirectURL = pendingHandOff();
+
+      if (externalVerificationRedirectURL) {
         if (popup) {
           await _futureAuthenticateWithPopup(SignUp.clerk, { popup, externalVerificationRedirectURL });
           // Pick up the modified SignUp resource
           await this.#resource.reload();
+          await resolveChallenge();
         } else {
           SignUp.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
@@ -1251,6 +1309,8 @@ class SignUpFuture implements SignUpFutureResource {
 class SignUpEnterpriseConnection extends BaseResource implements SignUpEnterpriseConnectionResource {
   id!: string;
   name!: string;
+  provider!: string;
+  logoPublicUrl: string | null = null;
 
   constructor(data: SignUpEnterpriseConnectionJSON) {
     super();
@@ -1261,6 +1321,8 @@ class SignUpEnterpriseConnection extends BaseResource implements SignUpEnterpris
     if (data) {
       this.id = data.id;
       this.name = data.name;
+      this.provider = data.provider;
+      this.logoPublicUrl = data.logo_public_url ?? null;
     }
 
     return this;

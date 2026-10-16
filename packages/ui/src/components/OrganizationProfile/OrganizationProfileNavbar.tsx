@@ -8,6 +8,7 @@ import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID } from '../../constants';
 import { useOrganizationProfileContext } from '../../contexts';
 import { localizationKeys } from '../../localization';
 import type { PropsOfComponent } from '../../styledSystem';
+import { useSecurityRouteAccess } from './useSecurityRouteAccess';
 
 export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
@@ -29,7 +30,7 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
 
-  const allowSecurityRoute = useProtect(has => has({ permission: 'org:sys_entconns:manage' }));
+  const { allowed: allowSecurityRoute } = useSecurityRouteAccess();
 
   const routes = pages.routes
     .filter(

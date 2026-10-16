@@ -111,7 +111,7 @@ test.describe('composed UserProfile exports @generic', () => {
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
 
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     fakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
@@ -136,7 +136,7 @@ test.describe('composed UserProfile exports @generic', () => {
   // the user + environment are loaded and emits no `.cl-userProfile-root`, so we wait on a rendered
   // affordance (the profile section's "Update profile" action) rather than the standard root.
   const signInAndVisitComposedUserProfile = async (page: Page, context: BrowserContext, user: FakeUser) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: user.email, password: user.password });
@@ -220,7 +220,7 @@ test.describe('composed UserProfile exports @generic', () => {
   });
 
   test('can delete the account', async ({ page, context }) => {
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     const delFakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
@@ -357,7 +357,7 @@ test.describe('composed OrganizationProfile exports @generic', () => {
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
 
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     fakeUser = m.services.users.createFakeUser(test, { fictionalEmail: true });
     const user = await m.services.users.createBapiUser(fakeUser);
     fakeOrganization = await m.services.users.createFakeOrganization(user.id);
@@ -376,7 +376,7 @@ test.describe('composed OrganizationProfile exports @generic', () => {
   // Sign in as `user` and open the composed organization profile page, waiting for the active org's
   // "Update profile" affordance (the composed provider renders null until an org is active).
   const signInAndVisitComposedOrganizationProfile = async (page: Page, context: BrowserContext, user: FakeUser) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: user.email, password: user.password });
@@ -414,7 +414,7 @@ test.describe('composed OrganizationProfile exports @generic', () => {
   });
 
   test('can delete the organization', async ({ page, context }) => {
-    const m = createTestUtils({ app });
+    const m = await createTestUtils({ app });
     const delFakeUser = m.services.users.createFakeUser(test, { fictionalEmail: true });
     const delUser = await m.services.users.createBapiUser(delFakeUser);
     const delOrg = await m.services.users.createFakeOrganization(delUser.id);
@@ -451,7 +451,7 @@ test.describe('composed OrganizationProfile exports @generic', () => {
   });
 
   test('renders the composed organization security page', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -463,6 +463,6 @@ test.describe('composed OrganizationProfile exports @generic', () => {
     // the composed counterpart to the security tab (there are no composable sub-sections here).
     await expect(u.page.getByRole('heading', { name: /^security$/i })).toBeVisible();
     await expect(u.page.getByText(/^SSO$/)).toBeVisible();
-    await expect(u.page.getByRole('button', { name: /start configuration/i })).toBeVisible();
+    await expect(u.page.locator('.cl-profileSection__sso').getByRole('button', { name: /^configure$/i })).toBeVisible();
   });
 });

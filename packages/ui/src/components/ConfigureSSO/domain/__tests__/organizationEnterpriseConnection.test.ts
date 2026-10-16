@@ -9,8 +9,10 @@ import type {
 import { describe, expect, it } from 'vitest';
 
 import {
-  areAllOrganizationDomainsVerified,
+  areConnectionDomainsReady,
   connectionBackingEmail,
+  defaultConnectionDomains,
+  domainsClaimedByOtherConnections,
   isEnterpriseConnectionConfigured,
   organizationEnterpriseConnection,
   sortEnterpriseConnections,
@@ -364,34 +366,78 @@ describe('isEnterpriseConnectionConfigured', () => {
   });
 });
 
-describe('areAllOrganizationDomainsVerified', () => {
-  const makeDomain = (status: 'verified' | 'unverified' | null): OrganizationDomainResource =>
-    ({
-      id: `dmn_${status}`,
-      name: 'acme.com',
-      ownershipVerification: status ? { status } : null,
-    }) as OrganizationDomainResource;
+const makeDomain = (name: string, status: 'verified' | 'unverified' | null): OrganizationDomainResource =>
+  ({
+    id: `dmn_${name}`,
+    name,
+    ownershipVerification: status ? { status } : null,
+  }) as OrganizationDomainResource;
 
-  it('undefined domains → false', () => {
-    expect(areAllOrganizationDomainsVerified(undefined)).toBe(false);
+describe('domainsClaimedByOtherConnections', () => {
+  const connection = (id: string, name: string, domains: string[]) =>
+    ({ id, name, domains }) as unknown as EnterpriseConnectionResource;
+
+  it('maps each domain of every other connection to that connection name', () => {
+    const claimed = domainsClaimedByOtherConnections(
+      [connection('ent_1', 'Okta', ['acme.com']), connection('ent_2', 'Google', ['example.com', 'other.com'])],
+      'ent_1',
+    );
+
+    expect(claimed.get('acme.com')).toBeUndefined();
+    expect(claimed.get('example.com')).toBe('Google');
+    expect(claimed.get('other.com')).toBe('Google');
   });
-  it('null domains → false', () => {
-    expect(areAllOrganizationDomainsVerified(null)).toBe(false);
+
+  it('treats every connection as another one while the scope is new', () => {
+    const claimed = domainsClaimedByOtherConnections([connection('ent_1', 'Okta', ['acme.com'])], undefined);
+
+    expect(claimed.get('acme.com')).toBe('Okta');
   });
-  it('empty list → false', () => {
-    expect(areAllOrganizationDomainsVerified([])).toBe(false);
+});
+
+describe('defaultConnectionDomains', () => {
+  it('keeps verified domains no other connection claims', () => {
+    const domains = [
+      makeDomain('acme.com', 'verified'),
+      makeDomain('pending.com', 'unverified'),
+      makeDomain('taken.com', 'verified'),
+    ];
+
+    expect(defaultConnectionDomains(domains, new Map([['taken.com', 'Okta']]))).toEqual(['acme.com']);
   });
-  it('a single verified domain → true', () => {
-    expect(areAllOrganizationDomainsVerified([makeDomain('verified')])).toBe(true);
+
+  it('undefined domains → empty', () => {
+    expect(defaultConnectionDomains(undefined, new Map())).toEqual([]);
   });
-  it('every domain verified → true', () => {
-    expect(areAllOrganizationDomainsVerified([makeDomain('verified'), makeDomain('verified')])).toBe(true);
+});
+
+describe('areConnectionDomainsReady', () => {
+  it('no connection domains → false', () => {
+    expect(areConnectionDomainsReady([], [makeDomain('acme.com', 'verified')])).toBe(false);
   });
-  it('any unverified domain → false', () => {
-    expect(areAllOrganizationDomainsVerified([makeDomain('verified'), makeDomain('unverified')])).toBe(false);
+  it('every connection domain verified → true', () => {
+    expect(areConnectionDomainsReady(['acme.com'], [makeDomain('acme.com', 'verified')])).toBe(true);
   });
-  it('domain without ownership verification → false', () => {
-    expect(areAllOrganizationDomainsVerified([makeDomain(null)])).toBe(false);
+  it('a connection domain another connection claims → false', () => {
+    expect(
+      areConnectionDomainsReady(['acme.com'], [makeDomain('acme.com', 'verified')], new Map([['acme.com', 'Other']])),
+    ).toBe(false);
+  });
+  it('a connection domain still unverified → false', () => {
+    expect(
+      areConnectionDomainsReady(
+        ['acme.com', 'pending.com'],
+        [makeDomain('acme.com', 'verified'), makeDomain('pending.com', 'unverified')],
+      ),
+    ).toBe(false);
+  });
+  it('an unverified organization domain outside the connection does not block', () => {
+    expect(
+      areConnectionDomainsReady(['acme.com'], [makeDomain('acme.com', 'verified'), makeDomain('pending.com', null)]),
+    ).toBe(true);
+  });
+  it('a connection domain missing from the organization list counts as ready', () => {
+    expect(areConnectionDomainsReady(['legacy.com'], [])).toBe(true);
   });
 });
 

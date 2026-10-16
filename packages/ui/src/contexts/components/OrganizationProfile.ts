@@ -1,4 +1,4 @@
-import { __internal_useOrganizationBase, useClerk } from '@clerk/shared/react';
+import { __internal_useOrganizationBase, useClerk, useSession } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
 import type { NavbarRoute } from '@/ui/elements/Navbar';
@@ -28,6 +28,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isSecurityPageRoot: boolean;
   shouldShowBilling: boolean;
   shouldShowSelfServeSSO: boolean;
+  shouldShowSecurityPage: boolean;
 };
 
 export const OrganizationProfileContext = createContext<OrganizationProfileCtx | null>(null);
@@ -38,6 +39,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const environment = useEnvironment();
   const clerk = useClerk();
   const organization = __internal_useOrganizationBase();
+  const { session } = useSession();
 
   if (!context || context.componentName !== 'OrganizationProfile') {
     throw new Error('Clerk: useOrganizationProfileContext called outside OrganizationProfile.');
@@ -62,6 +64,9 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const shouldShowSelfServeSSO =
     environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
 
+  const canManageSSOBypass = Boolean(session?.checkAuthorization({ permission: 'org:sys_entconns_sso_bypass:manage' }));
+  const shouldShowSecurityPage = shouldShowSelfServeSSO || canManageSSOBypass;
+
   const pages = useMemo(
     () =>
       createOrganizationProfileCustomPages(
@@ -69,9 +74,9 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
         clerk,
         shouldShowBilling,
         environment,
-        shouldShowSelfServeSSO,
+        shouldShowSecurityPage,
       ),
-    [customPages, shouldShowBilling, shouldShowSelfServeSSO],
+    [customPages, shouldShowBilling, shouldShowSecurityPage],
   );
 
   const navigateAfterLeaveOrganization = () =>
@@ -98,5 +103,6 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isSecurityPageRoot,
     shouldShowBilling,
     shouldShowSelfServeSSO,
+    shouldShowSecurityPage,
   };
 };

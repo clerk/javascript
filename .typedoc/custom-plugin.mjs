@@ -49,6 +49,8 @@ const FILES_WITHOUT_HEADINGS = [
  * Ideally this is a temporary solution until every one of these files are published in production and can be linked to.
  */
 const LINK_REPLACEMENTS = [
+  ['get-token-options', '/docs/reference/objects/session#gettokenoptions'],
+  ['sign-out-options', '/docs/reference/objects/clerk#signoutoptions'],
   ['set-active-params', '/docs/reference/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/types/clerk-paginated-response'],
   ['paginated-resources', '#paginatedresources'],
@@ -70,6 +72,7 @@ const LINK_REPLACEMENTS = [
   ['organization-membership-resource', '/docs/reference/types/organization-membership'],
   ['organization-suggestion-resource', '/docs/reference/types/organization-suggestion'],
   ['organization-resource', '/docs/reference/objects/organization'],
+  ['sso-bypass-allowlist-resource', '/docs/reference/types/sso-bypass-allowlist-resource'],
   ['organization-domain-resource', '/docs/reference/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/types/organization-membership-request'],
@@ -107,6 +110,7 @@ const LINK_REPLACEMENTS = [
     'enterprise-connection-saml-connection-login-hint',
     '/docs/reference/backend/types/backend-enterprise-connection-saml-connection-login-hint',
   ],
+  ['saml-connection-idp-certificate', '/docs/reference/backend/types/backend-saml-connection-idp-certificate'],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['protect-check-resource', '/docs/reference/types/protect-check-resource'],

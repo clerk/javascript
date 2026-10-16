@@ -150,11 +150,14 @@ export class StateProxy implements State {
         get id() {
           return gateProperty(target, 'id', undefined);
         },
+        get timezone() {
+          return gateProperty(target, 'timezone', null);
+        },
         get supportedFirstFactors() {
           return gateProperty(target, 'supportedFirstFactors', []);
         },
-        get ssoFallbackFirstFactors() {
-          return gateProperty(target, 'ssoFallbackFirstFactors', []);
+        get ssoBypassFirstFactors() {
+          return gateProperty(target, 'ssoBypassFirstFactors', []);
         },
         get supportedSecondFactors() {
           return gateProperty(target, 'supportedSecondFactors', []);
@@ -268,6 +271,9 @@ export class StateProxy implements State {
       signUp: {
         get id() {
           return gateProperty(target, 'id', undefined);
+        },
+        get timezone() {
+          return gateProperty(target, 'timezone', null);
         },
         get requiredFields() {
           return gateProperty(target, 'requiredFields', []);

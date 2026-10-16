@@ -14,6 +14,7 @@ describe('AuthConfig', () => {
     expect(authConfig.claimedAt).toBeNull();
     expect(authConfig.reverification).toBe(false);
     expect(authConfig.singleSessionMode).toBe(false);
+    expect(authConfig.nativeSettings).toBeNull();
   });
 
   it('initializes with provided values', () => {
@@ -47,6 +48,43 @@ describe('AuthConfig', () => {
       reverification: true,
       single_session_mode: true,
       session_minter: false,
+      native_settings: null,
+    });
+  });
+
+  describe('native_settings', () => {
+    const nativeSettingsJSON = {
+      object: 'native_settings' as const,
+      api_enabled: true,
+      trusted_device_sign_in_enabled: true,
+      trusted_device_enrollment_prompt_after_sign_in_enabled: false,
+      trusted_device_enrollment_prompt_after_sign_up_enabled: true,
+    };
+
+    it('parses native settings', () => {
+      const authConfig = new AuthConfig({ native_settings: nativeSettingsJSON });
+
+      expect(authConfig.nativeSettings).toEqual({
+        apiEnabled: true,
+        trustedDeviceSignInEnabled: true,
+        trustedDeviceEnrollmentPromptAfterSignInEnabled: false,
+        trustedDeviceEnrollmentPromptAfterSignUpEnabled: true,
+      });
+    });
+
+    it('round-trips native settings through the snapshot', () => {
+      const snapshot = new AuthConfig({ native_settings: nativeSettingsJSON }).__internal_toSnapshot();
+
+      expect(snapshot.native_settings).toEqual(nativeSettingsJSON);
+      expect(new AuthConfig(snapshot).nativeSettings).toEqual(
+        new AuthConfig({ native_settings: nativeSettingsJSON }).nativeSettings,
+      );
+    });
+
+    it('treats null native settings as null', () => {
+      const authConfig = new AuthConfig({ native_settings: null });
+
+      expect(authConfig.nativeSettings).toBeNull();
     });
   });
 });

@@ -41,6 +41,11 @@ export type FieldId =
   | 'redirectUri'
   | 'acsUrl'
   | 'spEntityId'
+  | 'syncUserAttributes'
+  | 'allowAdditionalIdentifiers'
+  | 'allowSubdomains'
+  | 'allowIdpInitiated'
+  | 'forceAuthn'
   | 'web3WalletName'
   | 'domain';
 export type ProfileSectionId =
@@ -72,6 +77,13 @@ export type ProfileSectionId =
   | 'resetSso'
   | 'testSsoUrl'
   | 'testResults'
+  | 'ssoConnectionName'
+  | 'ssoConnectionDomains'
+  | 'ssoConnectionServiceProvider'
+  | 'ssoConnectionIdentityProvider'
+  | 'ssoConnectionSettings'
+  | 'ssoConnectionDangerZone'
+  | 'ssoBypass'
   | 'accountCredits';
 export type ProfilePageId =
   | 'account'
@@ -97,7 +109,7 @@ export type CardActionId =
   | 'usePasskey'
   | 'waitlist'
   | 'signOut'
-  | 'ssoFallback';
+  | 'ssoBypass';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
 export type SelectId = 'countryCode' | 'role' | 'paymentMethod' | 'apiKeyExpiration';

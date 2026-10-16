@@ -1,6 +1,8 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Input } from '@clerk/ui/mosaic/components/input';
+import { Button } from '@clerk/mosaic/components/button';
+import { Checkbox } from '@clerk/mosaic/components/checkbox';
+import { Field } from '@clerk/mosaic/components/field';
+import { Input } from '@clerk/mosaic/components/input';
+import { Select } from '@clerk/mosaic/components/select';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -14,7 +16,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Field',
-  source: 'packages/ui/src/mosaic/components/field/field.tsx',
+  source: 'packages/mosaic/src/components/field/field.tsx',
 };
 
 const styles = stylex.create({
@@ -132,6 +134,52 @@ export function WithFeedback() {
       >
         Clear
       </Button>
+    </div>
+  );
+}
+
+const roles = [
+  { value: 'member', label: 'Member' },
+  { value: 'admin', label: 'Admin' },
+];
+
+export function WithSelect() {
+  return (
+    <Field.Root xstyle={styles.stack}>
+      <Field.Label>Role</Field.Label>
+      <Select.Root
+        items={roles}
+        defaultValue='member'
+      >
+        <Select.Trigger />
+        <Select.Popup />
+      </Select.Root>
+      <Field.Description>Applies to new members of the organization.</Field.Description>
+    </Field.Root>
+  );
+}
+
+export function Horizontal() {
+  return (
+    <div {...stylex.props(styles.stack)}>
+      <Field.Root orientation='horizontal'>
+        <Checkbox
+          name='signOutOfOtherSessions'
+          defaultChecked
+        />
+        <Field.Content>
+          <Field.Label>Sign out of all devices</Field.Label>
+          <Field.Description>
+            It is recommended to sign out of all other devices which may have used your old password.
+          </Field.Description>
+        </Field.Content>
+      </Field.Root>
+      <Field.Root orientation='horizontal'>
+        <Checkbox name='marketingEmails' />
+        <Field.Content>
+          <Field.Label>Send me product updates, feature announcements, and occasional offers by email</Field.Label>
+        </Field.Content>
+      </Field.Root>
     </div>
   );
 }

@@ -10,11 +10,13 @@ export interface HandleSSOCallbackProps {
   navigateToApp: (...params: Parameters<SetActiveNavigate>) => void;
   /**
    * Called when a sign-in requires additional verification, or a sign-up is transfered to a sign-in that requires
-   * additional verification.
+   * additional verification. Also called when a Clerk Protect challenge fails during a sign-in, with the error
+   * available on `errors` from `useSignIn()`.
    */
   navigateToSignIn: () => void;
   /**
-   * Called when a sign-in is transfered to a sign-up that requires additional verification.
+   * Called when a sign-in is transfered to a sign-up that requires additional verification. Also called when a Clerk
+   * Protect challenge fails during a sign-up, with the error available on `errors` from `useSignUp()`.
    */
   navigateToSignUp: () => void;
 }
@@ -77,6 +79,15 @@ export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
       }
       // Prevent re-running this effect if the page is re-rendered during session activation (such as on Next.js).
       hasRun.current = true;
+
+      const intent = new URLSearchParams(window.location.search).get('intent');
+      const flow = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
+      try {
+        await clerk.__internal_resolvePendingProtectCheck?.(flow);
+      } catch {
+        const failedSignUp = flow ? flow === 'signUp' : !signIn.protectCheck && !!signUp.protectCheck;
+        return failedSignUp ? navigateToSignUp() : navigateToSignIn();
+      }
 
       // If this was a sign-in, and it's complete, there's nothing else to do.
       // Note: We perform a cast here to prevent TypeScript from narrowing the type of signIn.status. TypeScript

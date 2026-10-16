@@ -1,4 +1,11 @@
+import { isClerkRuntimeError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignInResource } from '@clerk/shared/types';
+
+import {
+  shouldHandOffToEnterpriseConnection,
+  shouldHandOffUnidentifiedToEnterpriseConnection,
+} from './enterpriseSSOFactors';
 
 /**
  * Detects whether a sign-in response is gated by Clerk Protect.
@@ -38,6 +45,19 @@ export function navigateOnSignInProtectGate(
 }
 
 /**
+ * Whether `err` is the error `authenticateWithRedirect` throws when a challenge stopped it before it
+ * could redirect. The sign-in has already been updated and is sitting on the gate, so the caller
+ * routes to the challenge rather than showing the error.
+ */
+export function isProtectCheckRequiredError(err: unknown): boolean {
+  // The type guard throws on a non-object, and a catch block can receive anything.
+  if (typeof err !== 'object' || err === null) {
+    return false;
+  }
+  return isClerkRuntimeError(err) && err.code === ERROR_CODES.PROTECT_CHECK_REQUIRED;
+}
+
+/**
  * Whether this sign-in is waiting to become a sign-up.
  */
 export function isSignInPendingOAuthTransfer(signIn: SignInResource): boolean {
@@ -48,10 +68,12 @@ export function resumeSignInAfterProtectCheck(
   signIn: SignInResource,
   {
     navigate,
+    resumeEnterpriseSSO,
     resumeOAuthContinuation,
     startedAsOAuthTransfer,
   }: {
     navigate: (to: string) => Promise<unknown>;
+    resumeEnterpriseSSO: () => Promise<unknown>;
     resumeOAuthContinuation: () => Promise<unknown>;
     startedAsOAuthTransfer: boolean;
   },
@@ -63,6 +85,11 @@ export function resumeSignInAfterProtectCheck(
 
   switch (signIn.status) {
     case 'needs_first_factor':
+      // An SSO-only sign-in has no first factor to render — the hand-off to the identity
+      // provider is the next step, and it was interrupted before it could be issued.
+      if (shouldHandOffToEnterpriseConnection(signIn)) {
+        return resumeEnterpriseSSO();
+      }
       return navigate('../factor-one');
     case 'needs_second_factor':
       return navigate('../factor-two');
@@ -70,6 +97,17 @@ export function resumeSignInAfterProtectCheck(
       return navigate('../client-trust');
     case 'needs_new_password':
       return navigate('../reset-password');
+    case 'needs_identifier':
+      // A pending OAuth transfer carries this status too, and continuing it comes first.
+      if (startedAsOAuthTransfer || isSignInPendingOAuthTransfer(signIn)) {
+        return resumeOAuthContinuation();
+      }
+      // The start page hands an unidentified sign-in straight to an enterprise connection when
+      // there is one; the challenge interrupted that hand-off.
+      if (shouldHandOffUnidentifiedToEnterpriseConnection(signIn)) {
+        return resumeEnterpriseSSO();
+      }
+      return navigate('..');
     default:
       return startedAsOAuthTransfer || isSignInPendingOAuthTransfer(signIn)
         ? resumeOAuthContinuation()

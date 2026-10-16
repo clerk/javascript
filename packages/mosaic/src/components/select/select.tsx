@@ -1,0 +1,382 @@
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
+import type {
+  SelectMultipleProps as PrimitiveSelectMultipleProps,
+  SelectOptionProps as PrimitiveSelectOptionProps,
+  SelectPopupProps as PrimitiveSelectPopupProps,
+  SelectPortalProps,
+  SelectSingleProps as PrimitiveSelectSingleProps,
+} from '../../primitives/select';
+import { Select as Primitive } from '../../primitives/select';
+import { useRender } from '../../primitives/utils';
+import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
+import { Button } from '../button';
+import { mergeIds, useOptionalFieldControlProps, useRegisterFieldPartId } from '../field/field.context';
+import { Icon } from '../icon';
+import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
+import { selectOptionScope } from './select.markers.stylex';
+import * as slots from './select.styles';
+
+export interface SelectItem {
+  value: string;
+  /** Shown in the row and in the trigger once selected; also drives typeahead. */
+  label: string;
+  /**
+   * Secondary line under the label. Rows with one are taller than the trigger, so a list with any
+   * description hangs below the trigger unless `alignItemWithTrigger` says otherwise.
+   */
+  description?: string;
+  disabled?: boolean;
+}
+
+interface SelectItemsProps {
+  /**
+   * Every choice. Required, unlike the primitive's: the options only mount while the listbox is
+   * open, so this is what lets the closed trigger show the selected label. `Select.Popup`
+   * renders them as `Select.Option`s when it is given no children.
+   */
+  items: SelectItem[];
+}
+
+export type SelectProps =
+  | (Omit<PrimitiveSelectSingleProps, 'items'> & SelectItemsProps)
+  | (Omit<PrimitiveSelectMultipleProps, 'items'> & SelectItemsProps);
+
+const ItemsContext = React.createContext<SelectItem[]>([]);
+
+/** Holds the selection and the items; renders no element of its own. */
+export function SelectRoot({ items, alignItemWithTrigger, children, ...rest }: SelectProps): React.ReactElement {
+  const described = items.some(item => item.description !== undefined);
+
+  return (
+    <ItemsContext.Provider value={items}>
+      <Primitive.Root
+        items={items}
+        alignItemWithTrigger={alignItemWithTrigger ?? !(described || rest.multiple)}
+        {...rest}
+      >
+        {children}
+      </Primitive.Root>
+    </ItemsContext.Provider>
+  );
+}
+
+export type SelectTriggerVariant = 'outline' | 'ghost';
+
+export type SelectTriggerProps = Omit<MosaicComponentProps<'button'>, 'children'> & {
+  /**
+   * `outline` is the bordered form control; `ghost` drops the border for triggers that sit in
+   * dense surfaces such as table rows.
+   *
+   * @default 'outline'
+   */
+  variant?: SelectTriggerVariant;
+  /** Shown in place of the selected label while nothing is selected. */
+  placeholder?: React.ReactNode;
+  /**
+   * Content that replaces the selected label. A function renders inside the value slot and
+   * receives the selected values; anything else replaces the value slot entirely.
+   */
+  children?: React.ReactNode | ((value: string[]) => React.ReactNode);
+};
+
+/**
+ * Opens the listbox and shows the selected option's label. Renders a neutral `md` `Button` by
+ * default; pass `render` to supply your own element. Inside a `Field` it takes the field's id,
+ * disabled, required, invalid, label, and message relationships.
+ */
+export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(function MosaicSelectTrigger(
+  {
+    variant = 'outline',
+    placeholder,
+    render,
+    xstyle,
+    children,
+    id: idProp,
+    disabled: disabledProp,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    'aria-invalid': ariaInvalid,
+    'aria-required': ariaRequired,
+    ...rest
+  },
+  ref,
+) {
+  const generatedId = React.useId();
+  const valueId = `${generatedId}-value`;
+  const fieldProps = useOptionalFieldControlProps({
+    id: idProp,
+    disabled: disabledProp,
+    ariaInvalid,
+    ariaLabelledBy,
+    ariaDescribedBy,
+    labelElementType: 'span',
+  });
+  const id = fieldProps?.id ?? idProp ?? generatedId;
+  const renderValue = typeof children === 'function' ? children : undefined;
+  const content = typeof children === 'function' ? undefined : children;
+  // A combobox takes no name from its content, so the value is named explicitly, after any label.
+  // An `aria-label` is kept by naming the trigger itself.
+  const labelledBy = fieldProps?.['aria-labelledby'] ?? ariaLabelledBy ?? (ariaLabel ? id : undefined);
+  const trigger: SelectTriggerProps['render'] =
+    render ??
+    (props => (
+      <Button
+        variant={variant}
+        color='neutral'
+        size='md'
+        {...props}
+      />
+    ));
+
+  return (
+    <Primitive.Trigger
+      ref={ref}
+      render={trigger}
+      id={id}
+      disabled={fieldProps?.disabled ?? disabledProp}
+      aria-label={ariaLabel}
+      aria-labelledby={mergeIds(labelledBy, content === undefined ? valueId : undefined)}
+      aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
+      aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
+      aria-required={ariaRequired ?? (fieldProps?.required ? true : undefined)}
+      {...mergeStyleProps(themeProps('select-trigger', { variant }), stylex.props(xstyle), rest)}
+    >
+      {content ?? (
+        <Primitive.Value
+          id={valueId}
+          placeholder={placeholder}
+          {...mergeStyleProps(
+            themeProps('select-value'),
+            stylex.props(reset.base, truncationStyles.singleLine, slots.value.base),
+          )}
+        >
+          {renderValue}
+        </Primitive.Value>
+      )}
+      <Icon
+        name='chevron-down'
+        size='sm'
+        placement='inline-end'
+        {...themeProps('select-trigger-icon')}
+      />
+    </Primitive.Trigger>
+  );
+});
+
+export interface SelectPopupProps extends Omit<PrimitiveSelectPopupProps, 'className' | 'style'>, MosaicStyleProps {
+  /** Container the listbox portals into. Defaults to `document.body`. */
+  portalRoot?: SelectPortalProps['root'];
+}
+
+/**
+ * The floating surface: portals, positions, and renders the options. Given no children it renders
+ * one `Select.Option` per root `item`; pass children to compose the rows yourself. The portal and
+ * the positioner are not parts a consumer composes, so they stay out of the public API.
+ */
+export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(function MosaicSelectPopup(
+  { portalRoot, xstyle, children, ...rest },
+  ref,
+) {
+  const items = React.useContext(ItemsContext);
+
+  return (
+    <Primitive.Portal root={portalRoot}>
+      <Primitive.Positioner
+        {...mergeStyleProps(themeProps('select-positioner'), stylex.props(reset.base, slots.positioner.base))}
+      >
+        <Primitive.Popup
+          ref={ref}
+          {...mergeStyleProps(
+            themeProps('select-popup'),
+            stylex.props(reset.base, scrollAreaRoot, slots.popup.base, xstyle),
+            rest,
+          )}
+        >
+          <div
+            {...mergeStyleProps(
+              themeProps('select-viewport'),
+              stylex.props(reset.base, ...scrollAreaViewport(), slots.viewport.base),
+            )}
+          >
+            {children ??
+              items.map(item => (
+                <SelectOption
+                  key={item.value}
+                  {...item}
+                />
+              ))}
+          </div>
+        </Primitive.Popup>
+      </Primitive.Positioner>
+    </Primitive.Portal>
+  );
+});
+
+export interface SelectOptionProps
+  extends Omit<PrimitiveSelectOptionProps, 'label' | 'children' | 'className' | 'style'>, MosaicStyleProps, SelectItem {
+  /**
+   * The row's content, composed from `Select.Media` and `Select.Content`. Without children the row
+   * shows `label` and `description`.
+   */
+  children?: React.ReactNode;
+}
+
+interface OptionContextValue {
+  setLabelIds: React.Dispatch<React.SetStateAction<string[]>>;
+  setDescriptionIds: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+const OptionContext = React.createContext<OptionContextValue | null>(null);
+
+/** A single choice: its content, and a check when it is the selection. */
+export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function MosaicSelectOption(
+  { label, description, xstyle, children, ...rest },
+  ref,
+) {
+  const [labelIds, setLabelIds] = React.useState<string[]>([]);
+  const [descriptionIds, setDescriptionIds] = React.useState<string[]>([]);
+  const context = React.useMemo<OptionContextValue>(() => ({ setLabelIds, setDescriptionIds }), []);
+  const described = descriptionIds.length > 0;
+
+  return (
+    <Primitive.Option
+      ref={ref}
+      label={label}
+      aria-labelledby={mergeIds(...labelIds)}
+      aria-describedby={mergeIds(...descriptionIds)}
+      {...mergeStyleProps(
+        themeProps('select-option', { described }),
+        stylex.props(
+          reset.base,
+          focusOutline.visible,
+          selectOptionScope,
+          slots.option.base,
+          described && slots.option.described,
+          xstyle,
+        ),
+        rest,
+      )}
+    >
+      <OptionContext.Provider value={context}>
+        {children ?? (
+          <SelectContent>
+            <SelectLabel>{label}</SelectLabel>
+            {description !== undefined ? <SelectDescription>{description}</SelectDescription> : null}
+          </SelectContent>
+        )}
+      </OptionContext.Provider>
+      <Icon
+        name='checkmark'
+        size='sm'
+        xstyle={slots.indicator.base}
+        {...themeProps('select-option-indicator')}
+      />
+    </Primitive.Option>
+  );
+});
+
+/** `span`, not `div`: the option this sits in may be a button, so its children are phrasing content. */
+export type SelectMediaProps = MosaicComponentProps<'span'>;
+
+/** Square leading column at the top of the row that holds its media (icon, image, or avatar). */
+export const SelectMedia = React.forwardRef<HTMLSpanElement, SelectMediaProps>(function MosaicSelectMedia(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('select-option-media'), stylex.props(reset.base, slots.media.base, xstyle), rest),
+  });
+});
+
+export type SelectContentProps = MosaicComponentProps<'span'>;
+
+/** Stacks the option's label and description, taking the space beside the media. */
+export const SelectContent = React.forwardRef<HTMLSpanElement, SelectContentProps>(function MosaicSelectContent(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: mergeStyleProps(
+      themeProps('select-option-content'),
+      stylex.props(reset.base, slots.content.base, xstyle),
+      rest,
+    ),
+  });
+});
+
+export type SelectLabelProps = MosaicComponentProps<'span'>;
+
+/** The option's name, on one line. */
+export const SelectLabel = React.forwardRef<HTMLSpanElement, SelectLabelProps>(function MosaicSelectLabel(
+  { render, xstyle, id: idProp, ...rest },
+  ref,
+) {
+  const context = React.useContext(OptionContext);
+  const generatedId = React.useId();
+  const id = idProp ?? generatedId;
+  useRegisterFieldPartId(id, context?.setLabelIds);
+
+  return useRender({
+    defaultTagName: 'span',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(
+        themeProps('select-option-label'),
+        stylex.props(reset.base, truncationStyles.singleLine, xstyle),
+        rest,
+      ),
+      id,
+    },
+  });
+});
+
+export type SelectDescriptionProps = MosaicComponentProps<'span'>;
+
+/** Secondary line under the label. Describes the option without joining its name. */
+export const SelectDescription = React.forwardRef<HTMLSpanElement, SelectDescriptionProps>(
+  function MosaicSelectDescription({ render, xstyle, id: idProp, ...rest }, ref) {
+    const context = React.useContext(OptionContext);
+    const generatedId = React.useId();
+    const id = idProp ?? generatedId;
+    useRegisterFieldPartId(id, context?.setDescriptionIds);
+
+    return useRender({
+      defaultTagName: 'span',
+      render,
+      ref,
+      props: {
+        ...mergeStyleProps(
+          themeProps('select-option-description'),
+          stylex.props(reset.base, slots.description.base, xstyle),
+          rest,
+        ),
+        id,
+      },
+    });
+  },
+);
+
+export const Select = {
+  Root: SelectRoot,
+  Trigger: SelectTrigger,
+  Popup: SelectPopup,
+  Option: SelectOption,
+  Media: SelectMedia,
+  Content: SelectContent,
+  Label: SelectLabel,
+  Description: SelectDescription,
+};

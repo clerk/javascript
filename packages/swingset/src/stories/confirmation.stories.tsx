@@ -1,5 +1,7 @@
-import { Confirmation } from '@clerk/ui/mosaic/blocks/confirmation';
-import { Button } from '@clerk/ui/mosaic/components/button';
+import type { ConfirmControllerOptions } from '@clerk/mosaic/blocks/confirm';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
+import { Confirmation } from '@clerk/mosaic/blocks/confirmation';
+import { Button } from '@clerk/mosaic/components/button';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -10,13 +12,13 @@ export { default as __source } from './confirmation.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Blocks',
-  status: 'wip',
+  status: 'stable',
   title: 'Confirmation',
-  source: 'packages/ui/src/mosaic/blocks/confirmation/confirmation.tsx',
+  source: 'packages/mosaic/src/blocks/confirmation/confirmation.tsx',
 };
 
 // A real removal is a network round trip. Without one the action never renders its pending
-// state, so both stories wait before they settle.
+// state, so the stories wait before they settle.
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 const trigger = (
@@ -28,72 +30,38 @@ const trigger = (
   </Button>
 );
 
-/**
- * The block holds nothing of its own. `open` closes it, `isConfirming` marks it busy,
- * `errorMessage` explains a failure.
- */
-export function Default() {
-  const [open, setOpen] = React.useState(false);
-  const [isConfirming, setIsConfirming] = React.useState(false);
-
-  const handleConfirm = async () => {
-    setIsConfirming(true);
-    await settleAfter(2000);
-    setIsConfirming(false);
-    setOpen(false);
-  };
-
+function Example(options: ConfirmControllerOptions) {
+  const remove = useConfirmController(options);
   return (
     <Confirmation
-      open={open}
-      onOpenChange={setOpen}
+      controller={remove}
       trigger={trigger}
       title='Remove connected account'
       description='Google will be removed from this account. You will no longer be able to use this connected account and any dependent features will no longer work.'
       actionLabel='Remove'
-      onConfirm={() => void handleConfirm()}
-      isConfirming={isConfirming}
     />
   );
 }
 
 /**
- * A failed attempt leaves the dialog up. Pass the sentence the user should read as
- * `errorMessage`, and clear it when the next attempt starts.
+ * The controller owns the dialog. Resolve `onConfirm` and it closes.
+ */
+export function Default() {
+  return <Example onConfirm={() => settleAfter(2000)} />;
+}
+
+/**
+ * Reject `onConfirm` and the dialog stays up. A Clerk error is localized by its code; anything
+ * else renders as `errorFallback`.
  */
 export function WithError() {
-  const [open, setOpen] = React.useState(false);
-  const [isConfirming, setIsConfirming] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState<string | undefined>(undefined);
-
-  const handleConfirm = async () => {
-    setErrorMessage(undefined);
-    setIsConfirming(true);
-    await settleAfter(2000);
-    setIsConfirming(false);
-    setErrorMessage('Google is your only way to sign in. Add a password or another account first.');
-  };
-
-  // The error belongs to the caller, so the caller drops it. Without this a reopened dialog
-  // still shows why the last attempt failed.
-  const handleOpenChange = (next: boolean) => {
-    setOpen(next);
-    if (!next) {
-      setErrorMessage(undefined);
-    }
-  };
-
   return (
-    <Confirmation
-      open={open}
-      onOpenChange={handleOpenChange}
-      trigger={trigger}
-      title='Remove connected account'
-      description='Google will be removed from this account. You will no longer be able to use this connected account and any dependent features will no longer work.'
-      actionLabel='Remove'
-      onConfirm={() => void handleConfirm()}
-      isConfirming={isConfirming}
-      errorMessage={errorMessage}
+    <Example
+      onConfirm={async () => {
+        await settleAfter(2000);
+        throw new Error('internal');
+      }}
+      errorFallback='Google is your only way to sign in. Add a password or another account first.'
     />
   );
 }
@@ -103,8 +71,6 @@ interface ConnectedAccount {
   provider: string;
 }
 
-const removeAccount = Confirmation.createHandle<ConnectedAccount>();
-
 const describeRemoval = (account: ConnectedAccount) => (
   <>
     <strong>{account.provider}</strong> will be removed from this account. You will no longer be able to use this
@@ -113,23 +79,26 @@ const describeRemoval = (account: ConnectedAccount) => (
 );
 
 /**
- * One block for many rows. `handle.open(account)` opens it with the account it is about, and the
- * promise `onConfirm` returns closes it or explains the failure. The block owns the rest.
+ * One block for many rows. `remove.open(account)` opens it with the account it is about, the copy
+ * reads that payload, and `onConfirm` receives it back.
  */
-export function WithHandle() {
+export function WithPayload() {
   const [accounts, setAccounts] = React.useState<ConnectedAccount[]>([
     { id: 'eac_1', provider: 'Google' },
     { id: 'eac_2', provider: 'GitHub' },
     { id: 'eac_3', provider: 'Microsoft' },
   ]);
 
-  const handleConfirm = async (account: ConnectedAccount) => {
-    await settleAfter(2000);
-    if (account.provider === 'Google') {
-      throw new Error('Google is your only way to sign in. Add a password or another account first.');
-    }
-    setAccounts(current => current.filter(item => item.id !== account.id));
-  };
+  const remove = useConfirmController<ConnectedAccount>({
+    onConfirm: async account => {
+      await settleAfter(2000);
+      if (account.provider === 'Google') {
+        throw new Error('internal');
+      }
+      setAccounts(current => current.filter(item => item.id !== account.id));
+    },
+    errorFallback: 'Google is your only way to sign in. Add a password or another account first.',
+  });
 
   return (
     <>
@@ -143,7 +112,7 @@ export function WithHandle() {
             <Button
               color='negative'
               variant='outline'
-              onClick={() => removeAccount.open(account)}
+              onClick={() => remove.open(account)}
             >
               Remove
             </Button>
@@ -151,11 +120,10 @@ export function WithHandle() {
         ))}
       </ul>
       <Confirmation
-        handle={removeAccount}
+        controller={remove}
         title='Remove connected account'
         description={describeRemoval}
         actionLabel='Remove'
-        onConfirm={handleConfirm}
       />
     </>
   );

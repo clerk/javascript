@@ -99,6 +99,22 @@ describe('Electron ClerkProvider', () => {
     });
   });
 
+  it('reports the Electron SDK in sdkMetadata even when a caller passes its own', () => {
+    renderToStaticMarkup(
+      <ClerkProvider
+        publishableKey='pk_test_provider'
+        sdkMetadata={{ name: '@clerk/react', version: '1.0.0' }}
+      >
+        <span>App</span>
+      </ClerkProvider>,
+    );
+
+    expect(capturedProviderProps?.sdkMetadata).toEqual({
+      name: '@clerk/electron',
+      version: '0.0.0-test',
+    });
+  });
+
   describe('router handlers', () => {
     const renderWithRouter = (props: Record<string, unknown> = {}) => {
       renderToStaticMarkup(
@@ -306,7 +322,7 @@ describe('Electron ClerkProvider', () => {
     tokenCache.getToken.mockResolvedValue('client-jwt');
     renderToStaticMarkup(<ClerkProvider publishableKey='pk_test_before_request'>App</ClerkProvider>);
 
-    const request = {
+    const request: { credentials?: RequestCredentials; headers: Headers; url: URL } = {
       headers: new Headers(),
       url: new URL('https://api.clerk.test/v1/client'),
     };

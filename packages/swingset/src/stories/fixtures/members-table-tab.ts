@@ -1,0 +1,100 @@
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
+import type {
+  MembersTableTabViewProps,
+  OrganizationProfileMember,
+} from '@clerk/mosaic/features/organization-profile/members-table-tab.types';
+import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
+import { useLocale } from '@clerk/mosaic/localization';
+import { useRef, useState } from 'react';
+
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosName, chaosRows, chaosText } from '@/lib/chaos';
+
+const exampleRoles = [
+  { value: 'admin', label: 'Admin' },
+  { value: 'member', label: 'Member' },
+];
+const exampleMembers = [
+  'Ada Lovelace',
+  'Grace Hopper',
+  'Alan Turing',
+  'Katherine Johnson',
+  'Margaret Hamilton',
+  'Edsger Dijkstra',
+  'Barbara Liskov',
+  'Donald Knuth',
+  'Radia Perlman',
+  'John McCarthy',
+  'Frances Allen',
+  'Ken Thompson',
+].map((name, index) => ({
+  id: `member-${index}`,
+  name,
+  email: `${name.toLowerCase().replaceAll(' ', '.')}@example.com`,
+  joinedAt: Date.UTC(2026, 8, index + 1),
+  role: index % 3 === 0 ? 'admin' : 'member',
+  isCurrentUser: index === 0,
+}));
+
+export function useMembersTableFixture({ proposed = false, empty = false } = {}): MembersTableTabViewProps {
+  const locale = useLocale();
+  const roles = useChaosFixture(exampleRoles, items => items.map(role => ({ ...role, label: chaosText(role.label) })));
+  const seed = useChaosFixture(exampleMembers, items =>
+    chaosRows(items).map((member, index) => ({
+      ...member,
+      name: chaosName(index),
+      email: chaosEmail(index),
+      isCurrentUser: index === 0,
+    })),
+  );
+  const [items, setItems] = useState(empty ? [] : seed);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [searchValue, setSearchValue] = useState('');
+  const query = searchValue.trim().toLowerCase();
+  const filtered = items.filter(item => `${item.name} ${item.email}`.toLowerCase().includes(query));
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / pageSize)));
+  const members: OrganizationProfileMember[] = filtered
+    .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    .map(item => ({
+      ...item,
+      joinedAtLabel: new Intl.DateTimeFormat(locale, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        timeZone: 'UTC',
+      }).format(item.joinedAt),
+      roleLabel: roles.find(role => role.value === item.role)?.label ?? item.role,
+    }));
+  const inviteButtonRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: members.filter(member => !member.isCurrentUser).map(member => member.id),
+    onRemove: id => setItems(current => current.filter(item => item.id !== id)),
+    fallback: () => inviteButtonRef.current ?? searchInputRef.current,
+  });
+  const remove = useConfirmController<OrganizationProfileMember>({
+    onConfirm: member => removalFocus.remove(member.id),
+  });
+  return {
+    members,
+    roles,
+    totalCount: filtered.length,
+    page: currentPage,
+    pageSize,
+    searchValue,
+    isLoading: false,
+    onSearchChange: value => {
+      setSearchValue(value);
+      setPage(1);
+    },
+    onPageChange: setPage,
+    onChangeRole: (id, role) => setItems(current => current.map(item => (item.id === id ? { ...item, role } : item))),
+    inviteButtonRef,
+    searchInputRef,
+    registerTrigger: removalFocus.registerTrigger,
+    remove,
+    finalFocus: removalFocus.finalFocus,
+    onBulkAction: proposed ? () => undefined : undefined,
+  };
+}

@@ -30,7 +30,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
 
 concurrency:
   # Key on the clerk_go commit being validated rather than the (effectively always "main")
@@ -47,7 +46,7 @@ jobs:
     runs-on: 'blacksmith-8vcpu-ubuntu-2204'
     steps:
       - name: Check org membership
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           script: |
             const org = context.repo.owner;
@@ -101,7 +100,7 @@ jobs:
           fi
 
       - name: Checkout Repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           ref: ${{ steps.inputs.outputs.ref }}
@@ -188,7 +187,7 @@ jobs:
           fi
 
       - name: Checkout Repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           ref: ${{ steps.inputs.outputs.ref }}
@@ -197,10 +196,15 @@ jobs:
           filter: 'blob:none'
           show-progress: false
 
+      - name: Read Node version from checked-out ref
+        id: nvmrc
+        run: echo "node-version=$(tr -d 'v[:space:]' < .nvmrc)" >> "$GITHUB_OUTPUT"
+
       - name: Setup
         id: config
-        uses: ./.github/actions/init-blacksmith
+        uses: $/.github/actions/init-blacksmith
         with:
+          node-version: ${{ steps.nvmrc.outputs.node-version }}
           cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
@@ -261,7 +265,7 @@ jobs:
           pnpm add @clerk/ui@latest
 
       - name: Write all ENV certificates to files in integration/certs
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           INTEGRATION_CERTS: '${{ secrets.INTEGRATION_CERTS }}'
           INTEGRATION_ROOT_CA: '${{ secrets.INTEGRATION_ROOT_CA }}'
@@ -306,7 +310,7 @@ jobs:
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
           path: test-results
@@ -320,7 +324,7 @@ jobs:
       # so a future path regression surfaces in the logs instead of failing silently.
       - name: Upload Playwright JSON report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: playwright-report-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.inputs.outputs.artifact-suffix }}
           path: integration/playwright-report/results.json
@@ -366,7 +370,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ (needs.integration-tests.result == 'failure' || needs.validate-instances.result == 'failure') && steps.inputs.outputs.notify-slack == 'true' }}
-        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
+        uses: slackapi/slack-github-action@v1.27.1
         with:
           payload: |
             {

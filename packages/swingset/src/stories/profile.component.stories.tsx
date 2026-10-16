@@ -1,9 +1,11 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import type { ProfileRootProps } from '@clerk/ui/mosaic/components/profile';
-import { Profile } from '@clerk/ui/mosaic/components/profile';
-import { Section } from '@clerk/ui/mosaic/components/section';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import { Badge } from '@clerk/mosaic/components/badge';
+import { Button } from '@clerk/mosaic/components/button';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Panel } from '@clerk/mosaic/components/panel';
+import type { ProfileRootProps } from '@clerk/mosaic/components/profile';
+import { Profile } from '@clerk/mosaic/components/profile';
+import { Section } from '@clerk/mosaic/components/section';
+import { Text } from '@clerk/mosaic/components/text';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -14,10 +16,10 @@ export { default as __source } from './profile.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Profile',
   layout: 'wide',
-  source: 'packages/ui/src/mosaic/components/profile/profile.tsx',
+  source: 'packages/mosaic/src/components/profile/profile.tsx',
   styles: {
     _variants: {
       elevation: { card: {}, flush: {} },
@@ -42,10 +44,10 @@ const pages = [
 
 function Placeholder({ title }: { title: string }) {
   return (
-    <div style={{ display: 'grid', gap: '0.5rem' }}>
-      <Profile.PageTitle>{title}</Profile.PageTitle>
+    <Panel.Root>
+      <Panel.Title>{title}</Panel.Title>
       <Text>Content for the {title.toLowerCase()} page.</Text>
-    </div>
+    </Panel.Root>
   );
 }
 
@@ -111,37 +113,43 @@ const stubSections: Record<string, { title: string; rows: { label: string; descr
 
 function StubPage({ id, title }: { id: string; title: string }) {
   return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      <Profile.PageTitle>{title}</Profile.PageTitle>
-      {stubSections[id]?.map(section => (
-        <Section.Root key={section.title}>
-          <Section.Title>{section.title}</Section.Title>
-          <Section.Group>
-            <Section.Row>
-              <Section.Items>
+    <Panel.Root>
+      <Panel.Title>{title}</Panel.Title>
+      <Panel.Sections>
+        {stubSections[id]?.map(section => (
+          <Section.Root key={section.title}>
+            <Section.Group>
+              <Section.Header>
+                <Section.Content>
+                  <Section.Title>{section.title}</Section.Title>
+                </Section.Content>
+              </Section.Header>
+              <Section.Body>
                 {section.rows.map(row => (
-                  <Section.Item key={row.label}>
-                    <Section.Content>
-                      <Section.Label>{row.label}</Section.Label>
-                      <Section.Description>{row.description}</Section.Description>
-                    </Section.Content>
-                    <Section.Actions>
-                      <Button
-                        color='neutral'
-                        size='sm'
-                        variant='outline'
-                      >
-                        Edit
-                      </Button>
-                    </Section.Actions>
-                  </Section.Item>
+                  <Section.Row key={row.label}>
+                    <Section.Item>
+                      <Section.Content>
+                        <Section.Label>{row.label}</Section.Label>
+                        <Section.Description>{row.description}</Section.Description>
+                      </Section.Content>
+                      <Section.Actions>
+                        <Button
+                          color='neutral'
+                          size='sm'
+                          variant='outline'
+                        >
+                          Edit
+                        </Button>
+                      </Section.Actions>
+                    </Section.Item>
+                  </Section.Row>
                 ))}
-              </Section.Items>
-            </Section.Row>
-          </Section.Group>
-        </Section.Root>
-      ))}
-    </div>
+              </Section.Body>
+            </Section.Group>
+          </Section.Root>
+        ))}
+      </Panel.Sections>
+    </Panel.Root>
   );
 }
 
@@ -169,12 +177,13 @@ function Surface({
                 size='sm'
               />
             }
+            badge={item.id === 'security' ? <Badge>2</Badge> : undefined}
           >
             {item.label}
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle={pages.find(item => item.id === page)?.label}>
         {pages.map(item => (
           <Profile.ContentPanel
             key={item.id}
@@ -309,7 +318,8 @@ export function Transitions() {
             display: grid;
           }
           .cl-profile-content-panel {
-            grid-area: 1 / 1;
+            grid-row: 2;
+            grid-column: 1;
             /* Seven tenths of the scale's steps: quick enough to feel like a swap, slow enough to see. */
             --enter: calc(var(--cl-duration-slow) * 0.7);
             --exit: calc(var(--cl-duration-base) * 0.7);

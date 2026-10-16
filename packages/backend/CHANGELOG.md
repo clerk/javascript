@@ -1,5 +1,110 @@
 # Change Log
 
+## 3.24.0
+
+### Minor Changes
+
+- Add `deprovisioned` to the Backend `User` object and `UserJSON`, so you can tell when Directory Sync has deactivated a user, including in `user.updated` webhook payloads, without casting. It's separate from `banned`: Directory Sync sets and clears `deprovisioned`, while you set `banned` through the Dashboard or Backend API. ([#10245](https://github.com/clerk/javascript/pull/10245)) by [@manovotny](https://github.com/manovotny)
+
+## 3.23.2
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+
+## 3.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/shared@4.39.1
+
+## 3.23.0
+
+### Minor Changes
+
+- Add `clerkClient.invitations.deleteInvitation(invitationId)`, which permanently deletes an instance invitation and the stored copies of its invitation email. Unlike `revokeInvitation`, this removes the invitation record itself, so it can be used to honor a data erasure request from someone who was invited but never signed up. ([#10034](https://github.com/clerk/javascript/pull/10034)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Verified OAuth access tokens now expose `act`, the RFC 8693 actor chain, when the token was issued by an OAuth 2.0 Token Exchange. It is available on the `IdPOAuthAccessToken` returned for both opaque and JWT access tokens. ([#9929](https://github.com/clerk/javascript/pull/9929)) by [@wyattjoh](https://github.com/wyattjoh)
+
+### Patch Changes
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260)]:
+  - @clerk/shared@4.39.0
+
+## 3.22.0
+
+### Minor Changes
+
+- SAML connections can trust several Identity Provider signing certificates at once. `SamlConnection` and `EnterpriseConnection.samlConnection` now include `idpCertificates`, every trusted certificate with its validity window, and `createSamlConnection()`, `updateSamlConnection()`, `createEnterpriseConnection()` and `updateEnterpriseConnection()` accept an `idpCertificates` array that replaces the connection's whole set. The single `idpCertificate` parameter is deprecated in favor of the array; it keeps working and still replaces the whole set. ([#9995](https://github.com/clerk/javascript/pull/9995)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/shared@4.38.0
+
+## 3.21.1
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc on `clerkClient.instances.update()` and the `Instance` resource to note that Electron apps using `@clerk/electron` also need the renderer's dev server origin, for example `http://localhost:5173`, during development. ([#9982](https://github.com/clerk/javascript/pull/9982)) by [@manovotny](https://github.com/manovotny)
+
+- Update the `lockUser()` JSDoc to link the Dashboard's current Protect rules page. ([#9976](https://github.com/clerk/javascript/pull/9976)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/shared@4.37.1
+
+## 3.21.0
+
+### Minor Changes
+
+- `verifyWebhook()` now returns the event's top-level `timestamp` (milliseconds since epoch when the event occurred) and `instance_id`, so webhook handlers can order events and identify the instance that sent them. ([#9906](https://github.com/clerk/javascript/pull/9906)) by [@manovotny](https://github.com/manovotny)
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc for Electron apps to describe the custom renderer scheme used by `@clerk/electron`. ([#9784](https://github.com/clerk/javascript/pull/9784)) by [@manovotny](https://github.com/manovotny)
+
+- Capture authentication timezones so Clerk emails can display timestamps in a stored user timezone. ([#9540](https://github.com/clerk/javascript/pull/9540)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`6a14691`](https://github.com/clerk/javascript/commit/6a14691f8d98dcafd3956e1ea97cb35d56a34864), [`0ee4ee2`](https://github.com/clerk/javascript/commit/0ee4ee2b49286a8cae5f251ec997f30c8a863205), [`7a3fcf5`](https://github.com/clerk/javascript/commit/7a3fcf5b2d536b4e444920a3e87c4f70da3487ba), [`69c1b9c`](https://github.com/clerk/javascript/commit/69c1b9c886ab0860a9af12872235b6e492b2b2d0), [`d9cf0f2`](https://github.com/clerk/javascript/commit/d9cf0f29ea2ef8388bbd5736007ca71f9411bf42)]:
+  - @clerk/shared@4.37.0
+
+## 3.20.1
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+
+## 3.20.0
+
+### Minor Changes
+
+- Add an optional `nameQuery` filter to `oauthApplications.list()` to search OAuth applications by name or exact client ID. ([#9904](https://github.com/clerk/javascript/pull/9904)) by [@austincalvelage](https://github.com/austincalvelage)
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+
+## 3.19.0
+
+### Minor Changes
+
+- - Fixes an issue where OAuth token validation did not correctly validate audience (`aud`) claims. Previous usages that specified `audience` were falsely passing. This upgrade will cause those to start rejecting if the `audience` indeed does not match the OAuth token's `aud` claim, including cases where the `aud` claim is omitted. ([#9724](https://github.com/clerk/javascript/pull/9724)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - Adds an optional `audience` parameter to `idPOAuthAccessToken.verify()`
+
+- Expose the optional `aud` audience on verified OAuth access tokens. ([#9585](https://github.com/clerk/javascript/pull/9585)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Clarify domain API documentation and deletion parameter names. The active domain cannot be deleted. ([#9741](https://github.com/clerk/javascript/pull/9741)) by [@rafaelrcamargo](https://github.com/rafaelrcamargo)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+
 ## 3.18.1
 
 ### Patch Changes

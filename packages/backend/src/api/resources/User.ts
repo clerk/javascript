@@ -83,6 +83,10 @@ export class User {
 
     /** The locale of the user in BCP-47 format. */
     readonly locale: string | null,
+    /** The timezone of the user. */
+    readonly timezone: string | null = null,
+    /** Whether the user has been [deprovisioned through Directory Sync](https://clerk.com/docs/guides/configure/auth-strategies/enterprise-connections/directory-sync) and is restricted from signing in. Unlike `banned`, it's set and cleared by Directory Sync, not through the Backend API. */
+    readonly deprovisioned: boolean = false,
   ) {}
 
   static fromJSON(data: UserJSON): User {
@@ -120,6 +124,8 @@ export class User {
       data.delete_self_enabled,
       data.legal_accepted_at,
       data.locale,
+      data.timezone,
+      data.deprovisioned,
     );
     res._raw = data;
     return res;
