@@ -86,6 +86,28 @@ describe('tokens.verify(token, options)', () => {
     expect(result.errors).toBeUndefined();
   });
 
+  it('rejects the token when the provided issuer option does not match the iss claim', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    const { data, errors } = await verifyToken(mockJwt, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      issuer: 'https://clerk.another-app.com',
+      skipJwksCache: true,
+    });
+
+    expect(data).toBeUndefined();
+    expect(errors?.[0].reason).toBe('token-invalid-issuer');
+  });
+
   it('verifies the token by fetching the JWKs from Backend API when secretKey is provided', async () => {
     server.use(
       http.get(
@@ -864,6 +886,45 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.tokenType).toBe('m2m_token');
       expect(result.data).toBeDefined();
       expect(result.errors).toBeUndefined();
+    });
+
+    it('rejects an M2M JWT whose aud does not include the configured audience', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+      const token = await createSignedM2MJwt();
+
+      const result = await verifyMachineAuthToken(token, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience: 'mch_3xxxxx',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors?.[0].code).toBe('token-verification-failed');
+      expect(result.errors?.[0].message).toContain('Invalid JWT audience claim array (aud)');
+    });
+
+    it('ignores a session-token issuer option when verifying an M2M JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = await createSignedM2MJwt();
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.errors).toBeUndefined();
+      expect(result.data).toBeDefined();
     });
 
     it('rejects M2M JWT with alg: none', async () => {

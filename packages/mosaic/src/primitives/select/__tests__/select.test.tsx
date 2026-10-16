@@ -92,6 +92,26 @@ describe('Select', () => {
       expect(value?.textContent).toBe('Pick a fruit...');
     });
 
+    it('shows placeholder over a function child when no value is selected', () => {
+      render(
+        <Select.Root
+          items={fruits}
+          multiple
+        >
+          <Select.Trigger>
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick fruits...'
+            >
+              {(values: string[]) => `${values.length} fruits`}
+            </Select.Value>
+          </Select.Trigger>
+        </Select.Root>,
+      );
+      const value = document.querySelector('[data-testid="select-value"]');
+      expect(value?.textContent).toBe('Pick fruits...');
+    });
+
     it('resolves label from items before options mount', () => {
       renderSelect({ defaultValue: 'banana' });
       const value = document.querySelector('[data-testid="select-value"]');

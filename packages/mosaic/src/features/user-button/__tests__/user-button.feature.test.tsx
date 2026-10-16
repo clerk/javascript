@@ -1168,14 +1168,42 @@ describe('UserButton', () => {
       expect(popup()).toBeNull();
     });
 
-    it('names the active organization alone, and opens as the account', async () => {
+    it('names the active organization alone, badged with the account, and opens as the account', async () => {
       await renderUserButton();
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(trigger()).toHaveAttribute('data-variant', 'full');
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
       expect(within(trigger()).queryByText('alice')).toBeNull();
       expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
+      expect(trigger().querySelector('.cl-user-button-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
+      expect(trigger().querySelector('.cl-user-button-avatar-badge > [data-shape]')).toHaveAttribute(
+        'data-shape',
+        'circle',
+      );
+    });
+
+    it('drops the account badge from a condensed trigger', async () => {
+      await renderUserButton({ triggerVariant: 'condensed' });
+
+      expect(trigger()).toHaveAttribute('data-variant', 'condensed');
+      expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
       expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
+    });
+
+    it('leads a full trigger with the account alone when no organization is active', async () => {
+      await renderUserButton({}, signedIn({ client: fapiClient([personalSession]) }));
+
+      expect(trigger()).toHaveAttribute('data-variant', 'full');
+      expect(within(trigger()).getByText('Alice Smith')).toBeInTheDocument();
+      expect(trigger().querySelector('[data-shape]')).toHaveAttribute('data-shape', 'circle');
+      expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
+    });
+
+    it('keeps the condensed trigger in user mode', async () => {
+      await renderUserButton({ mode: 'user', triggerVariant: 'full' });
+
+      expect(trigger()).toHaveAttribute('data-variant', 'condensed');
     });
 
     it('leads the avatar alone with the organization, unbadged', async () => {

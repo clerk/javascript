@@ -8,7 +8,7 @@ export { default as __source } from './user-profile-danger-section.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'UserProfileDangerSection',
   label: 'Danger zone',
   navigation: { category: 'Sections' },

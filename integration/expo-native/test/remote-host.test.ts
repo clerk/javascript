@@ -143,7 +143,7 @@ describe('the fixture build', () => {
     const fixture = join(worktree, 'fixture');
     mkdirSync(join(worktree, 'node_modules'));
     mkdirSync(fixture);
-    writeFileSync(join(fixture, 'package.sdk-57.json'), '{}');
+    writeFileSync(join(fixture, 'package.sdk-58.json'), '{}');
     const calls: Call[] = [];
     const marker = join(fixture, 'ios', '.verify-native-project');
     const must: FixtureSite['must'] = async (what, _command, args) => {
