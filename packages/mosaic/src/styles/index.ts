@@ -234,6 +234,6 @@ export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-m
 export { APIKeysTableView } from '../features/api-keys/api-keys-table.view';
 export { UserProfileEnterpriseAccountsSectionView } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';
 
-export { MembersTableTabView } from '../features/organization-profile/members-table-tab.view';
-export { InvitationsTableTabView } from '../features/organization-profile/invitations-table-tab.view';
-export { RequestsTableTabView } from '../features/organization-profile/requests-table-tab.view';
+export { MembersTableTabView } from '../features/organization-profile/organization-profile-members-panel/members-table-tab.view';
+export { InvitationsTableTabView } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.view';
+export { RequestsTableTabView } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.view';

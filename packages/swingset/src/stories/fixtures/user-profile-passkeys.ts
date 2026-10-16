@@ -1,7 +1,7 @@
 import type {
   UserProfilePasskey,
   UserProfilePasskeysSectionViewProps,
-} from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.view';
 import { useUserProfilePasskeysSectionController } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.controller';
 import { useRef, useState } from 'react';
 

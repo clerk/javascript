@@ -22,10 +22,10 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import { UserProfilePasskeysSectionView } from '../../user-profile-passkeys-section.view';
 import { UserProfileSecurityPanelView } from '../../user-profile-security-panel.view';
 import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.model';
+import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 
 function ReadonlyPasskeys() {
   const model = useUserProfilePasskeysModel();

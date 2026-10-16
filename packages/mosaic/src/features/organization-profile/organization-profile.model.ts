@@ -3,7 +3,7 @@ import { useOrganization } from '@clerk/shared/react';
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useAPIKeysAccess } from '../api-keys/api-keys-table.model';
 import type { OrganizationProfilePageId } from './organization-profile.types';
-import { useMembersPanelAccessModel } from './organization-profile-members-panel.model';
+import { useMembersPanelAccessModel } from './organization-profile-members-panel/organization-profile-members-panel.model';
 
 export type OrganizationProfileModel =
   | { status: 'loading' }

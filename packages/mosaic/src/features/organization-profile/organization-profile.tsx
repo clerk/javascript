@@ -10,7 +10,7 @@ import type { OrganizationProfileViewProps } from './organization-profile.view';
 import { OrganizationProfileView } from './organization-profile.view';
 import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
-import { OrganizationProfileMembersPanel } from './organization-profile-members-panel';
+import { OrganizationProfileMembersPanel } from './organization-profile-members-panel/organization-profile-members-panel';
 
 /** Everything `<OrganizationProfile />` takes: your own pages and their order, the page it opens on, and where leaving the organization lands. */
 export interface OrganizationProfileProps
