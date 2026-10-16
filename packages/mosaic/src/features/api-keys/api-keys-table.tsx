@@ -31,7 +31,7 @@ export function APIKeysTable(props: APIKeysTableProps) {
 
 function SubjectAPIKeysTable({
   subject,
-  perPage = PAGE_SIZE,
+  perPage,
   showDescription = false,
   messages: overrides,
   fallback,
@@ -41,9 +41,10 @@ function SubjectAPIKeysTable({
     isOrganizationId(subject) ? 'organization' : 'user',
     overrides,
   );
+  const pageSize = perPage !== undefined && Number.isInteger(perPage) && perPage > 0 ? perPage : PAGE_SIZE;
   const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController({
     subject,
-    pageSize: perPage,
+    pageSize,
     showDescription,
     messages,
   });
@@ -55,7 +56,7 @@ function SubjectAPIKeysTable({
   return (
     <APIKeysTableView
       messages={messages}
-      pageSize={perPage}
+      pageSize={pageSize}
       {...controller}
       {...manage}
     />

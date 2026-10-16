@@ -338,6 +338,14 @@ describe('APIKeysTable', () => {
       expect(await within(table()).findByText('Key 6')).toBeVisible();
       expect(within(table()).queryByText('Key 5')).toBeNull();
     });
+
+    it.each([0, -1, 2.5])('uses the default page size when the configured one is %s', async perPage => {
+      await renderTable(signedIn(manyKeys), { perPage });
+
+      expect(await within(table()).findByText('Key 10')).toBeVisible();
+      expect(within(table()).queryByText('Key 11')).toBeNull();
+      expect(screen.getByText('1/2')).toBeVisible();
+    });
   });
 
   describe('creating a key', () => {
