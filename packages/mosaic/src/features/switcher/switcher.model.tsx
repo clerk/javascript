@@ -13,7 +13,7 @@ import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
-import { replaceInPages } from '../../utils/replace-in-pages';
+import { replaceInPages, shrinkTotal } from '../../utils/replace-in-pages';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,
@@ -367,7 +367,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
       try {
         const accepted = await invitation?.accept();
         if (accepted) {
-          await userInvitations.setData?.(pages => replaceInPages(pages ?? [], accepted));
+          await userInvitations.setData?.(pages => shrinkTotal(replaceInPages(pages ?? [], accepted)));
         }
       } catch (error) {
         // A failed accept might be because of old state

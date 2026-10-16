@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { replaceInPages } from '../replace-in-pages';
+import { replaceInPages, shrinkTotal } from '../replace-in-pages';
 
 describe('replaceInPages', () => {
   const page = (...ids: string[]) => ({ data: ids.map(id => ({ id, status: 'pending' })), total_count: 3 });
@@ -29,5 +29,13 @@ describe('replaceInPages', () => {
 
   it('leaves the pages as they are when no item shares its id', () => {
     expect(replaceInPages([page('a')], { id: 'z', status: 'accepted' })).toEqual([page('a')]);
+  });
+});
+
+describe('shrinkTotal', () => {
+  const page = (total_count: number) => ({ data: [{ id: 'a' }], total_count });
+
+  it('counts one fewer on every loaded page', () => {
+    expect(shrinkTotal([page(12), undefined, page(12)])).toEqual([page(11), undefined, page(11)]);
   });
 });
