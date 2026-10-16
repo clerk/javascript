@@ -688,7 +688,7 @@ export class ProtectSession {
   async #mint(): Promise<ProtectStatus> {
     const deadline = Date.now() + this.#timeoutMs;
 
-    const outcome = await this.#runTokenLoader(deadline);
+    const outcome = await this.#runTokenLoader(deadline, () => void this.#keepLateToken());
     if (outcome === 'error') {
       return 'script_error';
     }
@@ -701,6 +701,9 @@ export class ProtectSession {
     }
 
     const inline = await readInlineToken(this.#cid as string, this.#rid as string, deadline);
+    if (inline === 'timeout') {
+      void this.#keepLateToken();
+    }
     if (typeof inline === 'string') {
       return inline;
     }
@@ -709,11 +712,25 @@ export class ProtectSession {
     return 'ok';
   }
 
+  /** A token that lands after the deadline was still minted for this page, so keep it for the next sign-in. */
+  async #keepLateToken(): Promise<void> {
+    if (this.#tokenUrl) {
+      return;
+    }
+    const late = await readInlineToken(this.#cid as string, this.#rid as string, Date.now() + this.#timeoutMs);
+    // Never replace a token another tab or a newer attempt already stored.
+    if (typeof late === 'string' || this.#freshStoredToken()) {
+      return;
+    }
+    writeStoredToken(this.#tokenStorageKey, late, this.#floor);
+    this.#consecutiveFailures = 0;
+  }
+
   /**
    * Injects the token loader and settles on whichever of `load`, `error` or the deadline comes
    * first, or immediately when the element has nothing to fetch.
    */
-  #runTokenLoader(deadline: number): Promise<LoaderOutcome> {
+  #runTokenLoader(deadline: number, onLateLoad?: () => void): Promise<LoaderOutcome> {
     const loader = this.#tokenLoader;
     if (!loader) {
       return Promise.resolve('error');
@@ -739,12 +756,29 @@ export class ProtectSession {
     }
 
     return new Promise<LoaderOutcome>(resolve => {
-      const timer = setTimeout(() => resolve('timeout'), Math.max(0, deadline - Date.now()));
+      let timedOut = false;
+      const timer = setTimeout(
+        () => {
+          timedOut = true;
+          resolve('timeout');
+        },
+        Math.max(0, deadline - Date.now()),
+      );
       const settle = (outcome: LoaderOutcome) => () => {
         clearTimeout(timer);
         resolve(outcome);
       };
-      element.addEventListener('load', settle('loaded'), { once: true });
+      element.addEventListener(
+        'load',
+        () => {
+          if (timedOut) {
+            onLateLoad?.();
+            return;
+          }
+          settle('loaded')();
+        },
+        { once: true },
+      );
       element.addEventListener('error', settle('error'), { once: true });
     });
   }
