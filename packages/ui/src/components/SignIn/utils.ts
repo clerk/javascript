@@ -131,7 +131,7 @@ export function determineStartingSignInSecondFactor(
     return phoneCodeFactor;
   }
 
-  return secondFactors.find(f => f.strategy !== 'passkey') || null;
+  return secondFactors.find(f => f.strategy !== 'passkey') ?? secondFactors[0];
 }
 
 const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 'reset_password_email_code'];

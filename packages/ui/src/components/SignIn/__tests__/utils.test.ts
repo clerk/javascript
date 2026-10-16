@@ -334,6 +334,12 @@ describe('determineStartingSignInSecondFactor', () => {
   it('falls back to the next factor when WebAuthn is not supported', () => {
     expect(determineStartingSignInSecondFactor(secondFactors, false)).toEqual({ strategy: 'totp' });
   });
+
+  it('falls back to the passkey when it is the only factor, even without WebAuthn support', () => {
+    expect(determineStartingSignInSecondFactor([{ strategy: 'passkey' }] as SignInFactor[], false)).toEqual({
+      strategy: 'passkey',
+    });
+  });
 });
 
 describe('isOfferableSecondFactor', () => {

@@ -1724,6 +1724,7 @@ class SignInFuture implements SignInFutureResource {
       await this.#resource.__internal_basePost({
         body: { strategy: 'passkey' },
         action: 'prepare_second_factor',
+        coalesce: true,
       });
 
       const { nonce } = this.#resource.secondFactorVerification;
