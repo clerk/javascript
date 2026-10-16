@@ -8,8 +8,10 @@ export type CreateSignInTokensParams = {
   userId: string;
   /** The ID of the organization to activate when the user signs in. Organizations must be enabled for the instance, and the user must be a member of the organization. */
   orgId?: string;
-  /** The number of seconds until the sign-in token expires. By default, the duration is `2592000` (30 days). */
-  expiresInSeconds: number;
+  /** The number of seconds until the sign-in token expires. By default, the duration is `2592000` (30 days), or `600` (10 minutes) when `secondFactorVerification` is set. */
+  expiresInSeconds?: number;
+  /** Lets a user with a second factor enabled complete the sign-in without being prompted for it. With `fresh`, the second factor is treated as verified at sign-in. With `stale`, it is treated as unverified, so any reverification that requires a second factor prompts the user to complete one. Has no effect for users without a second factor enabled. */
+  secondFactorVerification?: 'fresh' | 'stale';
 };
 
 const basePath = '/sign_in_tokens';
@@ -17,7 +19,7 @@ const basePath = '/sign_in_tokens';
 /** @generateWithEmptyComment */
 export class SignInTokenAPI extends AbstractAPI {
   /**
-   * Creates a new sign-in token for the given user. By default, sign-in tokens expire in 30 days. You can optionally specify a custom expiration time in seconds using the `expiresInSeconds` parameter.
+   * Creates a new sign-in token for the given user. By default, sign-in tokens expire in 30 days, or in 10 minutes when `secondFactorVerification` is set. You can optionally specify a custom expiration time in seconds using the `expiresInSeconds` parameter.
    * @returns The created [`SignInToken`](https://clerk.com/docs/reference/backend/types/backend-sign-in-token) object.
    */
   public async createSignInToken(params: CreateSignInTokensParams) {
