@@ -1,7 +1,8 @@
 # @clerk/expo
 
-These rules apply to everything in this package, including the Swift and Kotlin
-code under `ios/`, `apple/` and `android/`. They add to the root `AGENTS.md`.
+These rules apply to everything in this package, and to the Swift and Kotlin
+code under `packages/expo-native-components`, `packages/expo-google-signin` and
+`packages/expo-biometrics`. They add to the root `AGENTS.md`.
 
 ## Comments
 
