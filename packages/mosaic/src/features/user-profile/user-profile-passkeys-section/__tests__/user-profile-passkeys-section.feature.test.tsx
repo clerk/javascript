@@ -226,6 +226,27 @@ describe('Seeing passkeys', () => {
     expect(screen.queryByRole('group', { name: 'Passkeys' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
   });
+
+  it("shows the new user's passkeys after switching sessions", async () => {
+    servePasskeys([], {
+      client: fapiClient([
+        fapiSession({
+          id: 'sess_a',
+          user: fapiUser({ id: 'user_a', passkeys: [fapiPasskey({ id: 'pk_a', name: 'Alice laptop' })] }),
+        }),
+        fapiSession({
+          id: 'sess_b',
+          user: fapiUser({ id: 'user_b', passkeys: [fapiPasskey({ id: 'pk_b', name: 'Bob phone' })] }),
+        }),
+      ]),
+    });
+    const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
+    expect(screen.getByText('Alice laptop')).toBeVisible();
+    await act(() => clerk.setActive({ session: 'sess_b' }));
+    expect(await screen.findByText('Bob phone')).toBeVisible();
+    expect(screen.getAllByRole('group', { name: 'Passkeys' })).toHaveLength(1);
+    expect(screen.queryByText('Alice laptop')).toBeNull();
+  });
 });
 
 describe('Adding a passkey', () => {

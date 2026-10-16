@@ -13,6 +13,8 @@ import { isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shar
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
+import { LivePageHeader } from '../../../live-page-header';
+
 const SUCCESS_DELAY_MS = 3000;
 
 async function mockDelete(delaySuccess: boolean) {
@@ -320,7 +322,7 @@ export default function ReverificationLivePage() {
     <MosaicProvider>
       <div className='mx-auto flex w-full max-w-3xl flex-col gap-10 p-3 sm:p-8'>
         <div className='flex flex-col gap-4'>
-          <h1 className='text-xl font-semibold'>Reverification</h1>
+          <LivePageHeader title='Reverification' />
           <div className='flex flex-wrap items-start justify-between gap-4'>
             <p className='text-muted-foreground max-w-xl text-sm'>
               Delete account hits a mock route that returns a reverification hint, then a fake success. The account is

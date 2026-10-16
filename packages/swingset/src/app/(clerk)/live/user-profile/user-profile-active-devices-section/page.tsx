@@ -5,16 +5,15 @@ import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 
+import { LivePageHeader } from '../../../live-page-header';
+
 export default function ActiveDevicesLivePage() {
   const { isLoaded, isSignedIn } = useUser();
 
   return (
     <MosaicProvider>
       <div className='mx-auto flex w-full max-w-3xl flex-col gap-6 p-3 sm:p-8'>
-        <div className='flex flex-col gap-1'>
-          <h1 className='text-xl font-semibold'>Active devices</h1>
-          <p className='text-muted-foreground text-sm'>Review the devices signed in to your account.</p>
-        </div>
+        <LivePageHeader title='Active devices'>Review the devices signed in to your account.</LivePageHeader>
         {!isLoaded ? <p className='text-muted-foreground text-sm'>Loading…</p> : null}
         {isLoaded && !isSignedIn ? (
           <p className='text-muted-foreground text-sm'>
