@@ -29,13 +29,13 @@ export function useAPIKeysAccess(subject: string | undefined) {
   return { isLoaded, isAvailable, canRead, canManage };
 }
 
-export function useAPIKeysTableModel(subject: string, query: string) {
+export function useAPIKeysTableModel(subject: string, pageSize: number, query: string) {
   const clerk = useClerk();
   const { isLoaded, isAvailable, canRead, canManage } = useAPIKeysAccess(subject);
   const apiKeys = useAPIKeys({
     subject,
     query,
-    pageSize: PAGE_SIZE,
+    pageSize,
     keepPreviousData: true,
     enabled: isAvailable && canRead,
   });
@@ -46,15 +46,19 @@ export function useAPIKeysTableModel(subject: string, query: string) {
     ...apiKeys,
     data: apiKeys.data.map(toAPIKeyRecord),
     canManage,
-    create: async ({ name, expiresAt }: CreateAPIKeyInput) => {
+    create: async ({ name, description, expiresAt }: CreateAPIKeyInput) => {
       let secret = '';
       await save(async () => {
         const created = await clerk.apiKeys.create({
           name,
+          description,
           subject,
           secondsUntilExpiration: expiresAt ? Math.floor((expiresAt.getTime() - Date.now()) / 1000) : undefined,
         });
-        secret = created.secret ?? '';
+        if (!created.secret) {
+          throw new Error('The created API key has no secret');
+        }
+        secret = created.secret;
       });
       void apiKeys.revalidate();
       return secret;
