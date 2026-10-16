@@ -95,6 +95,7 @@ export function UserProfile({
       mode='mounted'
     >
       <UserProfileView
+        elevation='flush'
         activePage={activePage}
         onPageChange={setActivePage}
         customPages={customPages}
