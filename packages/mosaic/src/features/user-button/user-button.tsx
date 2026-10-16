@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import type { SwitcherProps } from '../switcher/switcher';
 import { Switcher } from '../switcher/switcher';
 import type { SwitcherMode } from '../switcher/switcher.types';
+import type { SwitcherTriggerVariant } from '../switcher/switcher.view';
 
 /**
  * Which switchers the surface carries. `combined` is both; `user` is an account switcher that never
@@ -20,6 +21,14 @@ export interface UserButtonModeProps {
    * @default 'combined'
    */
   mode?: UserButtonMode;
+  /**
+   * How much the labelled trigger carries in `combined` mode: `full` badges the active organization
+   * with the account at a larger size, `condensed` shows the lead's avatar alone. `user` mode is
+   * always `condensed`.
+   *
+   * @default 'full'
+   */
+  triggerVariant?: SwitcherTriggerVariant;
 }
 
 /** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profiles it opens. */
@@ -44,6 +53,12 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  * `mode` narrows the menu to the account switcher.
  * ```tsx
  * <UserButton mode='user' />
+ * ```
+ *
+ * @example
+ * `triggerVariant` trades the badged trigger for the lead's avatar alone.
+ * ```tsx
+ * <UserButton triggerVariant='condensed' />
  * ```
  *
  * @example
@@ -87,11 +102,13 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  * />
  * ```
  */
-export function UserButton(props: UserButtonProps = {}): ReactElement {
+export function UserButton({ mode, triggerVariant = 'full', ...props }: UserButtonProps = {}): ReactElement {
+  const combined = mode !== 'user';
   return (
     <Switcher
       {...props}
-      mode={props.mode === 'user' ? 'user' : 'combined'}
+      mode={combined ? 'combined' : 'user'}
+      triggerVariant={combined ? triggerVariant : 'condensed'}
     />
   );
 }
