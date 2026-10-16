@@ -63,26 +63,31 @@ public class ClerkNativeViewHost: ExpoView {
   func popEnclosingNavigationRoute() -> Bool {
     guard !isPoppingHostRoute else { return true }
 
-    var responder: UIResponder? = self
+    // Follow controller containment, not the responder chain: past a presented controller the
+    // responder chain continues to its presenter, so a host inside a modal would pop the screen
+    // behind the modal instead of letting `onHostBack` dismiss it.
+    var route = enclosingViewController(of: self)
 
-    while let nextResponder = responder?.next {
-      if let viewController = nextResponder as? UIViewController,
-         let navigationController = viewController.navigationController,
+    while let candidate = route {
+      if let navigationController = candidate.parent as? UINavigationController,
          navigationController.viewControllers.count > 1 {
+        guard navigationController.topViewController === candidate else { return false }
+
         isPoppingHostRoute = true
-        if navigationController.popViewController(animated: true) != nil {
-          if let coordinator = navigationController.transitionCoordinator {
-            coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-              self?.isPoppingHostRoute = false
-            }
-          } else {
-            isPoppingHostRoute = false
-          }
-          return true
+        guard navigationController.popViewController(animated: true) != nil else {
+          isPoppingHostRoute = false
+          return false
         }
-        isPoppingHostRoute = false
+        if let coordinator = navigationController.transitionCoordinator {
+          coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+            self?.isPoppingHostRoute = false
+          }
+        } else {
+          isPoppingHostRoute = false
+        }
+        return true
       }
-      responder = nextResponder
+      route = candidate.parent
     }
 
     return false
@@ -192,7 +197,7 @@ private final class ClerkNativeHostingCoordinator {
     controller.view.frame = containerView.bounds
     controller.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
-    if let parentVC = findViewController(from: containerView) {
+    if let parentVC = enclosingViewController(of: containerView) {
       parentVC.addChild(controller)
       containerView.addSubview(controller.view)
       controller.didMove(toParent: parentVC)
@@ -220,15 +225,15 @@ private final class ClerkNativeHostingCoordinator {
     guard let containerView else { return }
     hostingController?.view.frame = containerView.bounds
   }
+}
 
-  private func findViewController(from view: UIView) -> UIViewController? {
-    var responder: UIResponder? = view
-    while let nextResponder = responder?.next {
-      if let vc = nextResponder as? UIViewController {
-        return vc
-      }
-      responder = nextResponder
+private func enclosingViewController(of view: UIView) -> UIViewController? {
+  var responder: UIResponder? = view
+  while let nextResponder = responder?.next {
+    if let viewController = nextResponder as? UIViewController {
+      return viewController
     }
-    return nil
+    responder = nextResponder
   }
+  return nil
 }

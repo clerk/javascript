@@ -4,8 +4,11 @@
  */
 export interface EmbeddedNavigationProps {
   /**
-   * Shows a back button on the component's root screen and calls this when it
-   * is tapped. Pop your own route in response.
+   * Shows a back button on the component's root screen. On iOS, tapping it pops
+   * the native navigation screen that contains the component, and this callback
+   * runs only when there is no such screen to pop, such as when the component is
+   * the stack's root screen or is presented in a modal. On Android, tapping it
+   * always calls this. Pop your own route or dismiss your modal in response.
    *
    * The component keeps its own navigation chrome, so screen titles, back
    * buttons, swipe-back, and transitions inside the component stay native.
