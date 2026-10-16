@@ -481,6 +481,18 @@ describe('UserButton', () => {
       await waitFor(() => expect(popup()).toBeNull());
     });
 
+    it('hands the CreateOrganization modal the portal root the app provides', async () => {
+      const container = document.createElement('div');
+      serveFapi(signedIn());
+      const { clerk } = await renderWithClerk(<PortalProvider getContainer={() => container}>{tree()}</PortalProvider>);
+      const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
+      const user = await open();
+
+      await user.click(await screen.findByRole('button', { name: 'Add organization' }));
+
+      expect(openCreateOrganization.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
+    });
+
     it('navigates to create an organization when a URL routes it', async () => {
       const { clerk, navigate } = await renderUserButton({ createOrganizationUrl: '/new-org' });
       const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
