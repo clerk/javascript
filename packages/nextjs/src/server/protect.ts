@@ -14,6 +14,7 @@ import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
+  OrganizationCustomRoleKey,
 } from '@clerk/shared/types';
 
 import { constants as nextConstants } from '../constants';
@@ -43,8 +44,8 @@ export interface AuthProtect {
    * auth.protect({ permission: 'org:admin:example1' });
    * auth.protect({ role: 'admin' });
    */
-  <P extends OrganizationCustomPermissionKey>(
-    params?: CheckAuthorizationParamsFromSessionClaims<P>,
+  <P extends OrganizationCustomPermissionKey, R extends OrganizationCustomRoleKey = OrganizationCustomRoleKey>(
+    params?: CheckAuthorizationParamsFromSessionClaims<P, R>,
     options?: AuthProtectOptions,
   ): Promise<SignedInAuthObject>;
 
