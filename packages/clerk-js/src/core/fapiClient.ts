@@ -325,13 +325,22 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     // 204 No Content responses do not have a body so we should not try to parse it
     const parsed = response.status !== 204 ? response.json() : Promise.resolve(null);
     // Gateway errors may not be JSON (e.g. a proxy's HTML 502); keep the status instead of throwing a parse error.
-    const json: FapiResponseJSON<T> | null = await (response.status >= 500 ? parsed.catch(() => null) : parsed);
+    // Such responses did not come from FAPI, so the after response callbacks are skipped for them.
+    let isUnparsableGatewayError = false;
+    const json: FapiResponseJSON<T> | null = await (response.status >= 500
+      ? parsed.catch(() => {
+          isUnparsableGatewayError = true;
+          return null;
+        })
+      : parsed);
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
     if (!response.ok) {
       debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');
     }
-    // TODO @userland-errors:
-    await runAfterResponseCallbacks(requestInit, fapiResponse);
+    if (!isUnparsableGatewayError) {
+      // TODO @userland-errors:
+      await runAfterResponseCallbacks(requestInit, fapiResponse);
+    }
     return fapiResponse;
   }
 

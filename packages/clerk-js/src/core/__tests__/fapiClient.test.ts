@@ -244,6 +244,42 @@ describe('request', () => {
     expect(resp.payload).toEqual(null);
   });
 
+  it('returns a null payload and skips the after response callbacks on a non-JSON 5xx response', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    const afterResponse = vi.fn();
+    client.onAfterResponse(afterResponse);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 502,
+        ok: false,
+        json: () => Promise.reject(new SyntaxError('Unexpected token < in JSON')),
+      }),
+    );
+
+    const resp = await client.request({ path: '/foo' });
+
+    expect(resp.status).toBe(502);
+    expect(resp.payload).toEqual(null);
+    expect(afterResponse).not.toHaveBeenCalled();
+  });
+
+  it('runs the after response callbacks on a JSON 5xx response', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    const afterResponse = vi.fn();
+    client.onAfterResponse(afterResponse);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 503,
+        ok: false,
+        json: () => Promise.resolve({ errors: [{ code: 'service_unavailable' }] }),
+      }),
+    );
+
+    await client.request({ path: '/foo' });
+
+    expect(afterResponse).toHaveBeenCalledTimes(1);
+  });
+
   describe('for production instances', () => {
     it.todo('does not append the __clerk_db_jwt cookie value to the query string');
     it.todo('does not set the __clerk_db_jwt cookie from the response Clerk-Cookie header');
