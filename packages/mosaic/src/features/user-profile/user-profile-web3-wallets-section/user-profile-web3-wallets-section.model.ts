@@ -2,11 +2,12 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { createWeb3 } from '@clerk/shared/internal/clerk-js/web3';
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { VerificationResource, Web3WalletResource } from '@clerk/shared/types';
+import type { UserResource, VerificationResource, Web3WalletResource } from '@clerk/shared/types';
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import { useReverificationFlow } from '../../reverification';
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
@@ -94,10 +95,21 @@ export function projectWeb3Wallets({
   };
 }
 
+function walletUnavailable() {
+  return new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
+}
+
 export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
+  const [removeWallet, reverification] = useReverificationFlow((current: UserResource, walletId: string) => {
+    const wallet = current.web3Wallets.find(candidate => candidate.id === walletId);
+    if (!wallet) {
+      throw walletUnavailable();
+    }
+    return wallet.destroy();
+  });
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -199,11 +211,8 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
           if (environment.userSettings.attributes.web3_wallet?.immutable) {
             throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
           }
-          const wallet = requireCurrentUser().web3Wallets.find(wallet => wallet.id === walletId);
-          if (!wallet) {
-            throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
-          }
-          await wallet.destroy();
+          await removeWallet(requireCurrentUser(), walletId);
         },
+    reverification,
   };
 }

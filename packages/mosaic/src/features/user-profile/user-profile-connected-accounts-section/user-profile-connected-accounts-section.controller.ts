@@ -21,7 +21,7 @@ export interface UserProfileConnectedAccountsControllerOptions {
   onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onRemove?: (id: string) => void | Promise<void>;
-  reverification?: ReverificationController;
+  reverification: ReverificationController;
 }
 
 export interface UserProfileConnectedAccountsController {

@@ -17,7 +17,7 @@ The example pauses briefly in each pending state. Enter `error` in password or b
 
 ## Usage
 
-The feature wrapper reads Clerk state and drives the reverification flow. It renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the error state. Isolated panel stories below are for visual development only.
+The feature's model drives the reverification flow around its Clerk call and hands the controller to the feature's controller and view. The component renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the error state. Isolated panel stories below are for visual development only.
 
 ```tsx
 import { Card } from '@clerk/mosaic/components/card';
@@ -43,6 +43,8 @@ A parent should decide its layout from its own state and `visible`, not from `st
 ```tsx
 const step = isRunning && reverification.visible ? 'verify' : 'confirm';
 ```
+
+The card covers the wrapped action and nothing more. Work that should happen while the card is up, such as reloading after the mutation, goes inside the action the flow wraps. A parent that has work of its own after the action keeps the step it moved to and leaves `<Reverification>` mounted until it is done, rather than deriving the step from `visible`, which turns false as soon as the action resolves.
 
 ### When the run ends
 
