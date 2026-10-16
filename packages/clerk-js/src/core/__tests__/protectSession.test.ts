@@ -741,6 +741,114 @@ describe('ProtectSession deadlines', () => {
   });
 });
 
+describe('ProtectSession default deadline', () => {
+  const defaultLoader = () => loader({ token_timeout_ms: undefined });
+
+  const track = (params: Promise<unknown> | undefined) => {
+    const state = { settled: false };
+    void params?.then(() => {
+      state.settled = true;
+    });
+    return state;
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (navigator as unknown as Record<string, unknown>).locks;
+  });
+
+  it('accepts a token that arrives after 7s', async () => {
+    const { session: created, elements } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+
+    await vi.advanceTimersByTimeAsync(7_000);
+    serveInline(elements[0], { cid: created?.placeholders().cid });
+
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+  });
+
+  it('gives up at 10s when the loader never loads', async () => {
+    const { session: created } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(9_999);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it('holds a sign-in made mid-acquisition only for what is left of it', async () => {
+    const { session: created } = session([defaultLoader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(6_000);
+
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(3_999);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it('never holds one sign-in past the deadline when the lock is granted late', async () => {
+    Object.defineProperty(navigator, 'locks', {
+      value: {
+        request: vi.fn((_key: string, _options: unknown, callback: () => Promise<unknown>) =>
+          new Promise(resolve => setTimeout(resolve, 4_900)).then(() => callback()),
+        ),
+      },
+      configurable: true,
+    });
+
+    const { session: created } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(9_999);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it('keeps waiting for a leader tab after SafeLock gives up, until its own deadline', async () => {
+    Object.defineProperty(navigator, 'locks', {
+      value: {
+        // Never granted; rejects on SafeLock's abort the way the Web Locks API does.
+        request: vi.fn(
+          (_key: string, options: { signal: AbortSignal }) =>
+            new Promise((_resolve, reject) => {
+              options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+            }),
+        ),
+      },
+      configurable: true,
+    });
+
+    const { session: created, elements } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+
+    await vi.advanceTimersByTimeAsync(7_000);
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
+    await vi.advanceTimersByTimeAsync(100);
+
+    await expect(params).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.leader.mac',
+      __clerk_protect_status: 'ok',
+    });
+    expect(elements).toHaveLength(0);
+  });
+});
+
 describe('ProtectSession cross-tab single flight', () => {
   /**
    * A serialising Web Locks stand-in. jsdom has no `navigator.locks`, and the `browser-tabs-lock`
