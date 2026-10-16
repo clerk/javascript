@@ -70,7 +70,7 @@ test.describe('React Router v7 compatibility @react-router', () => {
     page,
     context,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/protected');
 

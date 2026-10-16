@@ -11,9 +11,9 @@ import type {
 import { TagInput as Primitive } from '../../primitives/tag-input';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { inputStyles } from '../../utils/input.styles';
-import { reset } from '../../utils/reset.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { inputStyles } from '../../styles/input.styles';
+import { reset } from '../../styles/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { styles } from './tag-input.styles';

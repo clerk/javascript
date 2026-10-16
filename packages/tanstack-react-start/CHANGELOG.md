@@ -1,5 +1,69 @@
 # @clerk/tanstack-react-start
 
+## 1.7.2
+
+### Patch Changes
+
+- Updated dependencies [[`9159465`](https://github.com/clerk/javascript/commit/9159465ac02cafec69a3e4e2235cddd1ed3639b7)]:
+  - @clerk/backend@3.24.0
+
+## 1.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+  - @clerk/backend@3.23.2
+
+## 1.7.0
+
+### Minor Changes
+
+- Raise the minimum supported peer dependencies to `@tanstack/react-start@^1.168.10` and `@tanstack/react-router@^1.170.7`. Start 1.168.10 is the first version where importing `createCsrfMiddleware()` works reliably during Vite SSR. ([#10102](https://github.com/clerk/javascript/pull/10102)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+  TanStack Start skips its default CSRF protection for server functions when your app has a `src/start.ts`, which `clerkMiddleware()` requires. Register `createCsrfMiddleware()` before `clerkMiddleware()` to restore it:
+
+  ```ts
+  import { clerkMiddleware } from '@clerk/tanstack-react-start/server';
+  import { createCsrfMiddleware, createStart } from '@tanstack/react-start';
+
+  const csrfMiddleware = createCsrfMiddleware({
+    filter: ctx => ctx.handlerType === 'serverFn',
+  });
+
+  export const startInstance = createStart(() => {
+    return {
+      requestMiddleware: [csrfMiddleware, clerkMiddleware()],
+    };
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`fc7d050`](https://github.com/clerk/javascript/commit/fc7d0506c59ca01f7d86bea1a9999a1fe4dd81ff), [`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/react@6.17.7
+  - @clerk/shared@4.39.1
+  - @clerk/backend@3.23.1
+
+## 1.6.5
+
+### Patch Changes
+
+- Updated dependencies [[`2302140`](https://github.com/clerk/javascript/commit/23021401d3ab66bf920ba07be1d7500c4d98a5a9), [`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260), [`dee649c`](https://github.com/clerk/javascript/commit/dee649c2d6cad6ba543a2433e65707a0d93686df)]:
+  - @clerk/backend@3.23.0
+  - @clerk/shared@4.39.0
+  - @clerk/react@6.17.6
+
+## 1.6.4
+
+### Patch Changes
+
+- Updated dependencies [[`4eac21f`](https://github.com/clerk/javascript/commit/4eac21f68b6608d5e59dfb9d7660582d7bf0a148), [`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/backend@3.22.0
+  - @clerk/shared@4.38.0
+  - @clerk/react@6.17.5
+
 ## 1.6.3
 
 ### Patch Changes

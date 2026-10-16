@@ -25,6 +25,12 @@ if (typeof window !== 'undefined') {
     clearTimeout(frames.get(handle));
     frames.delete(handle);
   };
+
+  Object.defineProperties(document.documentElement, {
+    clientWidth: { configurable: true, value: 1024 },
+    clientHeight: { configurable: true, value: 768 },
+  });
+  Element.prototype.getBoundingClientRect = () => new DOMRect(0, 0, 24, 24);
 }
 
 afterEach(() => {

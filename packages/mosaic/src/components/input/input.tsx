@@ -4,8 +4,8 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { inputStyles } from '../../utils/input.styles';
-import { reset } from '../../utils/reset.styles';
+import { inputStyles } from '../../styles/input.styles';
+import { reset } from '../../styles/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
 import { sizes, styles } from './input.styles';
@@ -47,6 +47,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
   });
   const size = inputGroup?.size ?? sizeProp ?? 'md';
   const disabled = inputGroup?.disabled || fieldProps?.disabled || disabledProp || false;
+  const keepsFocus = disabled && (fieldProps?.focusableWhenDisabled ?? false);
   const required = fieldProps?.required ?? requiredProp;
   const ariaInvalidValue = inputGroup?.invalid ? true : (fieldProps?.['aria-invalid'] ?? ariaInvalid);
 
@@ -55,7 +56,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Mos
     render,
     ref: [forwardedRef, inputGroup?.inputRef],
     props: {
-      disabled,
+      disabled: disabled && !keepsFocus,
+      ...(keepsFocus ? { readOnly: true, 'aria-disabled': true } : null),
       required,
       id: fieldProps?.id ?? id,
       'aria-invalid': ariaInvalidValue,

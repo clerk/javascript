@@ -1311,6 +1311,10 @@ export type __internal_LocalizationResource = {
         identityProvider: {
           title: LocalizationValue;
           certificateExpires: LocalizationValue;
+          certificates: LocalizationValue;
+          certificatesCount: LocalizationValue<'count'>;
+          certificatesSummary: LocalizationValue<'count' | 'date'>;
+          certificatesSummaryExpired: LocalizationValue<'count' | 'date'>;
           editButton: LocalizationValue;
           form: {
             title: LocalizationValue;
@@ -1601,6 +1605,7 @@ export type __internal_LocalizationResource = {
       configure: LocalizationValue;
       attributes: LocalizationValue;
       test: LocalizationValue;
+      roles: LocalizationValue;
     };
     providers: {
       okta: LocalizationValue;
@@ -1694,6 +1699,41 @@ export type __internal_LocalizationResource = {
       badge__deprovisioned: LocalizationValue;
       error__loadUsers: LocalizationValue;
       actionLabel__complete: LocalizationValue;
+    };
+    roleMappingStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formFieldLabel__syncRoles: LocalizationValue;
+      columns: {
+        priority: LocalizationValue;
+        directoryGroup: LocalizationValue;
+        role: LocalizationValue;
+      };
+      roleOption__unassigned: LocalizationValue;
+      everyoneElse: LocalizationValue;
+      actionLabel__reorder: LocalizationValue<'group'>;
+      actionHint__reorder: LocalizationValue;
+      empty__noGroups: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue<'provider'>;
+      };
+      error__loadMappings: LocalizationValue;
+      alert__missingManageMembersPermission: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      enableDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
+      disableDialog: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+        cancelButton: LocalizationValue;
+        confirmButton: LocalizationValue;
+      };
     };
   };
   configureSSO: {
@@ -2267,6 +2307,17 @@ export type __internal_LocalizationResource = {
           };
         };
       };
+    };
+    signingCertificates: {
+      addCertificate: LocalizationValue;
+      expired: LocalizationValue<'date'>;
+      expires: LocalizationValue<'date'>;
+      expiryAfterSave: LocalizationValue;
+      fileUnreadable: LocalizationValue;
+      notACertificate: LocalizationValue;
+      primary: LocalizationValue;
+      primaryTooltip: LocalizationValue;
+      removeCertificate: LocalizationValue;
     };
     activate: {
       title: LocalizationValue;

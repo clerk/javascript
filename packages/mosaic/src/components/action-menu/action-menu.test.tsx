@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { ActionMenu } from './action-menu';
 
 function renderMenu(actions: Parameters<typeof ActionMenu>[0]['actions']) {
@@ -35,5 +35,36 @@ describe('Mosaic ActionMenu', () => {
     await user.click(await screen.findByRole('menuitem', { name: 'Rename' }));
 
     expect(onClick).toHaveBeenCalledOnce();
+  });
+  it('disables both the trigger and existing menu items while busy', async () => {
+    const onClick = vi.fn();
+    const actions = [{ label: 'Remove', onClick }];
+    const view = render(
+      <MosaicProvider>
+        <ActionMenu
+          label='Manage wallet'
+          actions={actions}
+        />
+      </MosaicProvider>,
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage wallet' }));
+    expect(await screen.findByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+
+    view.rerender(
+      <MosaicProvider>
+        <ActionMenu
+          label='Manage wallet'
+          actions={actions}
+          disabled
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Manage wallet' })).toBeDisabled();
+    const remove = screen.getByRole('menuitem', { name: 'Remove' });
+    expect(remove).toHaveAttribute('aria-disabled', 'true');
+    await user.click(remove);
+    expect(onClick).not.toHaveBeenCalled();
   });
 });

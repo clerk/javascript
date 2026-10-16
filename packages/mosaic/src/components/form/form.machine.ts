@@ -1,6 +1,8 @@
+import type { LocalizableError } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { TransitionResult } from '../../machine/types';
-import { keysOf, mapKeys } from '../../utils/object';
+import { keysOf, mapKeys } from '../../primitives/utils/object';
+import { SaveError } from '../../utils/errors';
 import type { FieldFeedback, FormError, FormFieldErrors } from './form-submit-error';
 import { FormSubmitError } from './form-submit-error';
 
@@ -21,6 +23,13 @@ export interface FieldConfig<TValue, TValues extends object> {
 
 export type FieldsConfig<TValues extends object> = { [K in keyof TValues]?: FieldConfig<TValues[K], TValues> };
 
+export function fieldConfig<TValues extends object, K extends keyof TValues>(
+  fields: FieldsConfig<TValues> | undefined,
+  name: K,
+): FieldConfig<TValues[K], TValues> | undefined {
+  return fields?.[name];
+}
+
 export interface AsyncFieldState {
   value: unknown;
   feedback: FieldFeedback | undefined;
@@ -33,6 +42,7 @@ export interface FormDeps<TValues extends object> {
   onSubmit: (values: TValues) => Promise<unknown>;
   canSubmit: (values: TValues) => boolean;
   fallbackMessage: string;
+  errorText: (error: LocalizableError) => string;
 }
 
 export interface FormContext<TValues extends object> extends FormDeps<TValues> {
@@ -59,7 +69,7 @@ function syncFeedback<TValues extends object>(
   context: FormContext<TValues>,
   name: keyof TValues,
 ): FieldFeedback | undefined {
-  return context.fields?.[name]?.validate?.(context.values[name], context.values);
+  return fieldConfig(context.fields, name)?.validate?.(context.values[name], context.values);
 }
 
 function settledAsyncFeedback<TValues extends object>(
@@ -110,7 +120,7 @@ function submitOrStay<TValues extends object>(
   if (isValidating(next)) {
     return { context: { ...patch, submitQueued: true } };
   }
-  return { target: 'submitting', context: { ...patch, submitQueued: false, error: undefined } };
+  return { target: 'submitting', context: { ...patch, submitQueued: false } };
 }
 
 function displayableFields<TValues extends object>(
@@ -130,13 +140,32 @@ function displayableFields<TValues extends object>(
   return result;
 }
 
+function savedFieldErrors<TValues extends object>(
+  context: FormContext<TValues>,
+  fields: Partial<Record<string, LocalizableError>> | undefined,
+): FormFieldErrors<TValues> {
+  const result: FormFieldErrors<TValues> = {};
+  for (const name of keysOf(context.values)) {
+    const error = typeof name === 'string' ? fields?.[name] : undefined;
+    if (error !== undefined) {
+      result[name] = context.errorText(error);
+    }
+  }
+  return result;
+}
+
 function toFormError<TValues extends object>(cause: unknown, context: FormContext<TValues>): FormError<TValues> {
+  if (!(cause instanceof FormSubmitError) && !(cause instanceof SaveError)) {
+    console.error('[Clerk] Could not localize error', cause);
+    return { message: context.fallbackMessage };
+  }
   const error: FormError<TValues> =
     cause instanceof FormSubmitError
       ? { message: cause.banner, fields: displayableFields(context, cause.fields) }
-      : cause instanceof Error
-        ? { message: cause.message }
-        : {};
+      : {
+          message: cause.formError.global ? context.errorText(cause.formError.global) : undefined,
+          fields: savedFieldErrors(context, cause.formError.fields),
+        };
   const visible = (error.message ?? '') !== '' || keysOf(error.fields ?? {}).length > 0;
   return visible ? error : { ...error, message: context.fallbackMessage };
 }
@@ -158,7 +187,7 @@ function asyncStateFor<TValues extends object>(
   name: keyof TValues,
   value: TValues[keyof TValues],
 ): AsyncFieldState | undefined {
-  if (context.fields?.[name]?.validateAsync === undefined || value === initialOf(context)[name]) {
+  if (fieldConfig(context.fields, name)?.validateAsync === undefined || value === initialOf(context)[name]) {
     return undefined;
   }
   return { value, feedback: context.async[name]?.feedback, pending: true };
@@ -218,7 +247,10 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
       },
       submitting: {
         invoke: fromPromise(async ctx => ctx.onSubmit(ctx.values), {
-          onDone: 'editing',
+          onDone: {
+            target: 'editing',
+            actions: assign(() => ({ error: undefined })),
+          },
           onError: {
             target: 'editing',
             actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),

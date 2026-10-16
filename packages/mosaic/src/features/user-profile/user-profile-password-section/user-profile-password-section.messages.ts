@@ -3,6 +3,7 @@ export const userProfilePasswordSectionMessages = {
   masked: '••••••••••••••••••',
   noPasswordSet: 'No password set',
   managedBy: 'Managed by {name}',
+  enterpriseConnection: 'your enterprise connection',
   change: 'Change password',
   set: 'Set password',
 
@@ -20,8 +21,41 @@ export const userProfilePasswordSectionMessages = {
     'It is recommended to sign out of all other devices which may have used your old password.',
   cancel: 'Cancel',
   save: 'Save changes',
+  rules: {
+    weak: 'Your password is not strong enough.',
+    stronger: 'Your password works, but could be stronger. Try adding more characters.',
+    strong: 'Your password meets all the necessary requirements.',
+  },
+
+  complexity: {
+    sentence: 'Your password must contain {requirements}.',
+    minimumLength: '{length} or more characters',
+    maximumLength: 'less than {length} characters',
+    lowercase: 'a lowercase letter',
+    uppercase: 'an uppercase letter',
+    number: 'a number',
+    special: 'a special character',
+  },
+  suggestions: {
+    allUppercase: 'Capitalize some, but not all letters.',
+    anotherWord: 'Add more words that are less common.',
+    associatedYears: 'Avoid years that are associated with you.',
+    capitalization: 'Capitalize more than the first letter.',
+    dates: 'Avoid dates and years that are associated with you.',
+    l33t: "Avoid predictable letter substitutions like '@' for 'a'.",
+    longerKeyboardPattern: 'Use longer keyboard patterns and change typing direction multiple times.',
+    noNeed: 'You can create strong passwords without using symbols, numbers, or uppercase letters.',
+    pwned: 'If you use this password elsewhere, you should change it.',
+    recentYears: 'Avoid recent years.',
+    repeated: 'Avoid repeated words and characters.',
+    reverseWords: 'Avoid reversed spellings of common words.',
+    sequences: 'Avoid common character sequences.',
+    useWords: 'Use multiple words, but avoid common phrases.',
+  },
 
   errors: {
+    unavailable: 'Password update is no longer available.',
+    currentPasswordRequired: 'Current password is required.',
     mismatch: "Passwords don't match.",
   },
 } as const;

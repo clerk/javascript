@@ -4,7 +4,7 @@ import React from 'react';
 import { Icon } from '../components/icon';
 import type { IconName } from '../icons/registry';
 import { autoUpdate, getDimensions } from '../primitives/utils/dom';
-import { feedbackStyles } from './feedback.styles';
+import { feedbackStyles } from '../styles/feedback.styles';
 
 export function hasMessage(children: React.ReactNode) {
   return React.Children.toArray(children).some(child => child !== '');

@@ -68,7 +68,7 @@ export type ReverifyWithBiometricsParams = {
   reason?: string;
 };
 
-/** The verification outcome and synchronized session, without creating or activating a session. */
+/** The verification outcome and its session, without creating or activating a session. */
 export type BiometricReverificationResult = {
   id: string | null;
   status: SessionVerificationStatus | (string & {});
@@ -79,7 +79,7 @@ export type BiometricReverificationResult = {
 export type BiometricSignInResult = {
   status: SignInStatus | (string & {});
   createdSessionId: string | null;
-  /** The synchronized JS sign-in resource used to continue any remaining authentication steps. */
+  /** The sign-in resource used to continue any remaining authentication steps. */
   signIn: SignInResource;
   /** Activates a session after the sign-in reaches `complete`. */
   setActive: SetActive;
@@ -90,6 +90,13 @@ export type UseBiometricCredentialsReturn = {
   list: () => Promise<BiometricCredential[]>;
   enroll: (params?: EnrollBiometricCredentialParams) => Promise<BiometricCredential>;
   revoke: (id: string) => Promise<BiometricCredential>;
+  /**
+   * Revokes this app installation's biometric credential for the signed-in user.
+   *
+   * Call it before signing out, since it needs an active or pending session. Resolves with `null` if there is nothing
+   * to revoke.
+   */
+  revokeCurrentDeviceCredential: () => Promise<BiometricCredential | null>;
   signIn: (params?: SignInWithBiometricsParams) => Promise<BiometricSignInResult>;
   reverify: (params?: ReverifyWithBiometricsParams) => Promise<BiometricReverificationResult>;
 };

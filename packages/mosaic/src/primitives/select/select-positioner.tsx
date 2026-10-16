@@ -4,6 +4,7 @@ import { FloatingFocusManager, FloatingList, FloatingOverlay } from '@floating-u
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useSelectContext } from './select-context';
 
 export type SelectPositionerProps = ComponentProps<'div'>;
@@ -23,9 +24,10 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       returnFocusRef,
       setActiveIndex,
       alignItemWithTrigger,
+      multiple,
     } = useSelectContext();
 
-    const side = alignItemWithTrigger ? 'none' : placement.split('-')[0];
+    const side = alignItemWithTrigger ? 'none' : parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps({
       onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
@@ -52,6 +54,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
 
     const ownProps = {
       'data-side': side,
+      'aria-multiselectable': multiple || undefined,
       style: floatingStyles,
     } satisfies DefaultProps<'div'>;
 
@@ -69,10 +72,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       defaultTagName: 'div',
       render,
       enabled: mounted,
-      // floating-ui types `setFloating` as a method signature, but at runtime it's
-      // a stable callback that doesn't use `this`, so the unbound-method check is a
-      // false positive here.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
       ref: [refs.setFloating, ref],
       props: merged,
     });
@@ -84,7 +84,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     return (
       <>
         {/* An overlay on the trigger only works while the page holds still beneath it. */}
-        {alignItemWithTrigger && <FloatingOverlay lockScroll />}
+        {alignItemWithTrigger ? <FloatingOverlay lockScroll /> : null}
         <FloatingFocusManager
           context={floatingContext}
           modal={false}

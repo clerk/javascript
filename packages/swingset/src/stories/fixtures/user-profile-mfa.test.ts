@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { deferred } from '../../../../mosaic/src/machines/__tests__/test-utils';
+import { deferred } from '../../../../mosaic/src/__tests__/async';
 import { useUserProfileMfaFixture } from './user-profile-mfa';
 
 const enrollmentCodes = ['enrollment-code-1', 'enrollment-code-2'];

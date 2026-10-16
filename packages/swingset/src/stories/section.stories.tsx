@@ -1,10 +1,14 @@
+import { ActionMenu } from '@clerk/mosaic/components/action-menu';
 import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 import { Section } from '@clerk/mosaic/components/section';
+import { Skeleton } from '@clerk/mosaic/components/skeleton';
+import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
+import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -13,6 +17,14 @@ export { default as __source } from './section.stories?raw';
 const styles = stylex.create({
   rootMax: {
     maxWidth: 560,
+  },
+  loadingStack: {
+    alignItems: 'flex-start',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: space['4'],
+    maxWidth: 560,
+    width: '100%',
   },
   descriptionFlex: {
     alignItems: 'center',
@@ -49,7 +61,9 @@ export function Default() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Profile</Section.Title>
+          <Section.Content>
+            <Section.Title>Profile</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -143,7 +157,9 @@ export function Cards() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Profile</Section.Title>
+          <Section.Content>
+            <Section.Title>Profile</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -188,7 +204,9 @@ export function Cards() {
       ].map(({ label, values }) => (
         <Section.Group key={label}>
           <Section.Header>
-            <Section.Title>{label}</Section.Title>
+            <Section.Content>
+              <Section.Title>{label}</Section.Title>
+            </Section.Content>
             <Section.Actions>
               <Button
                 aria-label={`Add ${label.toLowerCase()}`}
@@ -241,8 +259,10 @@ export function HeaderDescription() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Active devices</Section.Title>
-          <Section.Description>Devices signed in to this account.</Section.Description>
+          <Section.Content>
+            <Section.Title>Active devices</Section.Title>
+            <Section.Description>Devices signed in to this account.</Section.Description>
+          </Section.Content>
           <Section.Actions>
             <Button
               color='neutral'
@@ -286,7 +306,9 @@ export function ConnectedAccounts() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Connected accounts</Section.Title>
+          <Section.Content>
+            <Section.Title>Connected accounts</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -342,7 +364,9 @@ export function IconFrameMedia() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Team</Section.Title>
+          <Section.Content>
+            <Section.Title>Team</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -372,7 +396,9 @@ export function Destructive() {
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Danger zone</Section.Title>
+          <Section.Content>
+            <Section.Title>Danger zone</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -400,39 +426,40 @@ export function Destructive() {
   );
 }
 
-export function Flat() {
+export function ContainedHeader() {
   return (
     <>
       <style>{`
         @scope {
           .cl-section-group {
+            border: 1px solid var(--cl-color-border) !important;
+            border-radius: var(--cl-radius-xl) !important;
+            background: var(--cl-color-background) !important;
+          }
+          .cl-section-header {
+            margin: 0 1rem !important;
+            padding-block: 0.75rem !important;
+            min-height: 3.25rem !important;
+            width: auto !important;
+          }
+          .cl-section-body {
+            margin-inline: 1rem !important;
+            padding-inline: 0 !important;
             border: none !important;
             border-radius: 0 !important;
             background: none !important;
           }
-          .cl-section-header {
-            margin: 0 0 0.75rem !important;
-            padding: 0 !important;
-            min-height: 0 !important;
-          }
-          .cl-section-header .cl-button {
-            padding: 0 !important;
-            border: none !important;
-            background: none !important;
-          }
-          .cl-section-body {
-            margin: 0 !important;
-            padding-inline: 1rem !important;
-            border: 1px solid var(--cl-color-border) !important;
-            border-radius: var(--cl-radius-xl) !important;
-            background: var(--cl-color-background) !important;
+          .cl-section-header + .cl-section-body {
+            border-top: 1px solid var(--cl-color-border) !important;
           }
         }
       `}</style>
       <Section.Root xstyle={styles.rootMax}>
         <Section.Group>
           <Section.Header>
-            <Section.Title>Profile</Section.Title>
+            <Section.Content>
+              <Section.Title>Profile</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body>
             <Section.Row>
@@ -477,7 +504,9 @@ export function Flat() {
         ].map(({ label, values }) => (
           <Section.Group key={label}>
             <Section.Header>
-              <Section.Title>{label}</Section.Title>
+              <Section.Content>
+                <Section.Title>{label}</Section.Title>
+              </Section.Content>
               <Section.Actions>
                 <Button
                   aria-label={`Add ${label.toLowerCase()}`}
@@ -523,5 +552,81 @@ export function Flat() {
         ))}
       </Section.Root>
     </>
+  );
+}
+
+const loadingItems = [
+  { icon: 'device-laptop', label: 'Chrome on macOS', description: 'San Francisco, US · Active now' },
+  { icon: 'device-phone', label: 'Safari on iOS', description: 'San Francisco, US · 2 hours ago' },
+  { icon: 'device-laptop', label: 'Firefox on Windows', description: 'Denver, US · 3 days ago' },
+] as const;
+
+export function Loading() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!loading) {
+      return;
+    }
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  return (
+    <div {...stylex.props(styles.loadingStack)}>
+      <Button
+        color='neutral'
+        size='sm'
+        variant='outline'
+        disabled={loading}
+        onClick={() => setLoading(true)}
+      >
+        Reload
+      </Button>
+      <VisuallyHidden role='status'>{loading ? 'Loading active devices' : 'Active devices loaded'}</VisuallyHidden>
+      <Section.Root>
+        <Section.Group skeleton={loading}>
+          <Section.Header>
+            <Section.Title>
+              <Skeleton>Active devices</Skeleton>
+            </Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              {loadingItems.map(item => (
+                <Section.Item key={item.label}>
+                  <Skeleton>
+                    <Section.Media size='lg'>
+                      <IconFrame>
+                        <Icon
+                          name={item.icon}
+                          size='lg'
+                        />
+                      </IconFrame>
+                    </Section.Media>
+                  </Skeleton>
+                  <Section.Content>
+                    <Section.Label>
+                      <Skeleton>{item.label}</Skeleton>
+                    </Section.Label>
+                    <Section.Description>
+                      <Skeleton>{item.description}</Skeleton>
+                    </Section.Description>
+                  </Section.Content>
+                  <Section.Actions>
+                    <Skeleton visible={false}>
+                      <ActionMenu
+                        label={`Manage ${item.label}`}
+                        actions={[{ label: 'View details', onClick: () => undefined }]}
+                      />
+                    </Skeleton>
+                  </Section.Actions>
+                </Section.Item>
+              ))}
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>
+    </div>
   );
 }

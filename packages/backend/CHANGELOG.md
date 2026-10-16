@@ -1,5 +1,49 @@
 # Change Log
 
+## 3.24.0
+
+### Minor Changes
+
+- Add `deprovisioned` to the Backend `User` object and `UserJSON`, so you can tell when Directory Sync has deactivated a user, including in `user.updated` webhook payloads, without casting. It's separate from `banned`: Directory Sync sets and clears `deprovisioned`, while you set `banned` through the Dashboard or Backend API. ([#10245](https://github.com/clerk/javascript/pull/10245)) by [@manovotny](https://github.com/manovotny)
+
+## 3.23.2
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+
+## 3.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/shared@4.39.1
+
+## 3.23.0
+
+### Minor Changes
+
+- Add `clerkClient.invitations.deleteInvitation(invitationId)`, which permanently deletes an instance invitation and the stored copies of its invitation email. Unlike `revokeInvitation`, this removes the invitation record itself, so it can be used to honor a data erasure request from someone who was invited but never signed up. ([#10034](https://github.com/clerk/javascript/pull/10034)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Verified OAuth access tokens now expose `act`, the RFC 8693 actor chain, when the token was issued by an OAuth 2.0 Token Exchange. It is available on the `IdPOAuthAccessToken` returned for both opaque and JWT access tokens. ([#9929](https://github.com/clerk/javascript/pull/9929)) by [@wyattjoh](https://github.com/wyattjoh)
+
+### Patch Changes
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260)]:
+  - @clerk/shared@4.39.0
+
+## 3.22.0
+
+### Minor Changes
+
+- SAML connections can trust several Identity Provider signing certificates at once. `SamlConnection` and `EnterpriseConnection.samlConnection` now include `idpCertificates`, every trusted certificate with its validity window, and `createSamlConnection()`, `updateSamlConnection()`, `createEnterpriseConnection()` and `updateEnterpriseConnection()` accept an `idpCertificates` array that replaces the connection's whole set. The single `idpCertificate` parameter is deprecated in favor of the array; it keeps working and still replaces the whole set. ([#9995](https://github.com/clerk/javascript/pull/9995)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/shared@4.38.0
+
 ## 3.21.1
 
 ### Patch Changes

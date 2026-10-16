@@ -52,6 +52,7 @@ export default defineConfig({
         optimizeDeps: {
           include: [
             '@clerk/clerk-js',
+            '@wallet-standard/core',
             '@testing-library/jest-dom/matchers',
             '@testing-library/react',
             '@testing-library/user-event',

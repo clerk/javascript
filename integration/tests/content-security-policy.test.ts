@@ -8,7 +8,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.withEmailCodes'] })(
     test.describe.configure({ mode: 'serial' });
 
     test('Clerk loads when nonce is specified', async ({ page }) => {
-      const u = createTestUtils({ app, page });
+      const u = await createTestUtils({ app, page });
       await u.page.goToRelative('/csp');
       await u.page.getByText('clerk loaded').waitFor({ state: 'visible' });
     });

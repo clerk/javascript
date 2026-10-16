@@ -4,6 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { HeadingLevelProvider } from '../heading';
+import { Skeleton } from '../skeleton';
 import { Section } from './section';
 
 const overrides = stylex.create({
@@ -23,8 +24,12 @@ describe('Section', () => {
       <Section.Root data-testid='root'>
         <Section.Group data-testid='group'>
           <Section.Header data-testid='header'>
-            <Section.Title>Account</Section.Title>
-            <Section.Description data-testid='header-description'>Who you are to the application.</Section.Description>
+            <Section.Content>
+              <Section.Title>Account</Section.Title>
+              <Section.Description data-testid='header-description'>
+                Who you are to the application.
+              </Section.Description>
+            </Section.Content>
             <Section.Actions data-testid='header-actions'>Add</Section.Actions>
           </Section.Header>
           <Section.Body data-testid='body'>
@@ -77,13 +82,17 @@ describe('Section', () => {
       <Section.Root>
         <Section.Group>
           <Section.Header>
-            <Section.Title>Email</Section.Title>
+            <Section.Content>
+              <Section.Title>Email</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body />
         </Section.Group>
         <Section.Group>
           <Section.Header>
-            <Section.Title>Phone</Section.Title>
+            <Section.Content>
+              <Section.Title>Phone</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body />
         </Section.Group>
@@ -103,7 +112,9 @@ describe('Section', () => {
         <Section.Root>
           <Section.Group>
             <Section.Header>
-              <Section.Title>Account</Section.Title>
+              <Section.Content>
+                <Section.Title>Account</Section.Title>
+              </Section.Content>
             </Section.Header>
           </Section.Group>
         </Section.Root>
@@ -117,7 +128,9 @@ describe('Section', () => {
     render(
       <Section.Group>
         <Section.Header>
-          <Section.Title render={<h5 />}>Account</Section.Title>
+          <Section.Content>
+            <Section.Title render={<h5 />}>Account</Section.Title>
+          </Section.Content>
         </Section.Header>
       </Section.Group>,
     );
@@ -134,7 +147,9 @@ describe('Section', () => {
         </Section.Group>
         <Section.Group aria-label='Contact'>
           <Section.Header>
-            <Section.Title>Email</Section.Title>
+            <Section.Content>
+              <Section.Title>Email</Section.Title>
+            </Section.Content>
           </Section.Header>
         </Section.Group>
       </Section.Root>,
@@ -150,7 +165,9 @@ describe('Section', () => {
     render(
       <Section.Group>
         <Section.Header data-testid='header'>
-          <Section.Title>Email</Section.Title>
+          <Section.Content>
+            <Section.Title>Email</Section.Title>
+          </Section.Content>
           <Section.Actions>Add</Section.Actions>
         </Section.Header>
         <Section.Body>
@@ -224,7 +241,9 @@ describe('Section', () => {
           xstyle={overrides.group}
         >
           <Section.Header>
-            <Section.Title>Account</Section.Title>
+            <Section.Content>
+              <Section.Title>Account</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body
             ref={bodyRef}
@@ -252,7 +271,7 @@ describe('Section', () => {
     expect(bodyRef.current).toHaveClass('cl-section-body', ...atoms(overrides.body));
     expect(itemRef.current).toHaveClass('cl-section-item', ...atoms(overrides.item));
     expect(contentRef.current).toHaveClass('cl-section-content');
-    expect(screen.getByText('Name')).toHaveClass('cl-section-label', ...atoms(overrides.label));
+    expect(screen.getByText('Name').closest('.cl-section-label')).toHaveClass(...atoms(overrides.label));
     expect(actionsRef.current).toHaveClass('cl-section-actions');
   });
 
@@ -263,7 +282,7 @@ describe('Section', () => {
       </Section.Body>,
     );
 
-    expect(screen.getByText('Name').parentElement).toHaveClass('cl-section-body', 'cl-section-row');
+    expect(screen.getByText('Name').closest('.cl-section-body')).toHaveClass('cl-section-row');
   });
 
   it('renders a row-level error as a sibling of the item, with the alert glyph', () => {
@@ -340,6 +359,46 @@ describe('Section', () => {
     await waitFor(() => expect(screen.queryByTestId('error')).not.toBeInTheDocument());
   });
 
+  it('states why a row has no action, with the leading glyph in its own slot', () => {
+    render(
+      <Section.Root>
+        <Section.Group>
+          <Section.Row>
+            <Section.Item data-testid='item'>
+              <Section.Content>
+                <Section.Label>Name</Section.Label>
+              </Section.Content>
+              <Section.Note
+                data-testid='note'
+                icon={
+                  <img
+                    alt=''
+                    src='/okta.svg'
+                  />
+                }
+              >
+                Managed by Okta
+              </Section.Note>
+            </Section.Item>
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const note = screen.getByTestId('note');
+    expect(note).toHaveClass('cl-section-note');
+    expect(note).toHaveTextContent('Managed by Okta');
+    expect(note.querySelector('.cl-section-note-icon')).toContainElement(screen.getByRole('presentation'));
+    // Holds the trailing slot itself, so it needs no Section.Actions around it.
+    expect(note.parentElement).toBe(screen.getByTestId('item'));
+  });
+
+  it('leaves out the glyph slot when the note carries no icon', () => {
+    render(<Section.Note data-testid='note'>Managed by Acme SSO</Section.Note>);
+
+    expect(screen.getByTestId('note').querySelector('.cl-section-note-icon')).toBeNull();
+  });
+
   it('marks a wrapping item for its theme hook', () => {
     render(
       <Section.Root>
@@ -360,5 +419,52 @@ describe('Section', () => {
     );
 
     expect(screen.getByTestId('item')).toHaveAttribute('data-wrap', '');
+  });
+
+  it('makes a skeleton card inert and shows the skeletons inside it', () => {
+    render(
+      <Section.Root>
+        <Section.Group
+          skeleton
+          data-testid='group'
+        >
+          <Section.Header>
+            <Section.Title>
+              <Skeleton>Account</Skeleton>
+            </Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>
+                    <Skeleton>Name</Skeleton>
+                  </Section.Label>
+                </Section.Content>
+              </Section.Item>
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const group = screen.getByTestId('group');
+    expect(group).toHaveAttribute('aria-hidden', 'true');
+    expect(group).toHaveAttribute('inert');
+    expect(group).not.toHaveAttribute('role');
+    expect(group.querySelectorAll('.cl-skeleton')).toHaveLength(2);
+  });
+
+  it('renders skeleton content as-is in a card that is not loading', () => {
+    render(
+      <Section.Group>
+        <Section.Label>
+          <Skeleton>Name</Skeleton>
+        </Section.Label>
+      </Section.Group>,
+    );
+
+    expect(screen.getByText('Name')).not.toHaveClass('cl-skeleton');
+    expect(document.querySelector('.cl-skeleton')).toBeNull();
   });
 });

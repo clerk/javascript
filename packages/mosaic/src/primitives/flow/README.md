@@ -76,11 +76,13 @@ Focus moves only for a step that transitions in; the initially active step is le
 | `data-starting-style` | Present for the incoming step's initial animation frame  |
 | `data-ending-style`   | Present while the outgoing step's animation is finishing |
 
-The initially active step does not receive `data-starting-style`. An exiting step is inert, hidden from the accessibility tree, and retains the content from its last active render until it unmounts.
+The initially active step does not receive `data-starting-style`. An exiting step is inert, hidden from the accessibility tree, and retains the content from its last active render until it unmounts. `useFlowStepActive()` returns `false` inside an exiting step, including inside any flow nested in it, and `true` everywhere else, so content can give up an id it shares with the incoming step, as `Card.Title` does with the dialog's label.
 
 `Flow.Root` carries `data-initial` through the first measured frame. Styled adapters can use it to disable viewport transitions so the initial step never animates.
 
-`Flow.Root` carries `data-transitioning` while any step is exiting. Styled adapters should only transition the viewport height under it, so a resize inside the active step (for example a field message animating open) is tracked as-is instead of being animated a second time.
+`Flow.Root` carries `data-transitioning` from a step change until its own `height` transition finishes, independent of how long the steps take to enter or exit. If the height does not transition, it clears at once, and other animations on the root are ignored. Styled adapters should only transition the viewport height under it, so a resize inside the active step (for example a field message animating open) is tracked as-is instead of being animated a second time.
+
+`Flow.Root` carries `data-height-change` set to `grow` or `shrink` after the measured step height changes, so the height transition can use a different curve in each direction.
 
 ## CSS variable
 

@@ -47,6 +47,12 @@ export const styles = stylex.create({
       position: 'absolute',
     },
   },
+  fieldHitTarget: {
+    '::before': {
+      inset: `calc(-1 * (${space['2']} + 1px))`,
+      display: 'block',
+    },
+  },
   indicator: {
     inset: 0,
     alignItems: 'center',
@@ -73,6 +79,11 @@ export const styles = stylex.create({
 export const sizes = stylex.create({
   sm: { height: space['3.5'], width: space['3.5'] },
   md: { height: space['4'], width: space['4'] },
+});
+
+export const firstLine = stylex.create({
+  sm: { marginTop: `max(0px, calc((1lh - ${space['3.5']}) / 2))` },
+  md: { marginTop: `max(0px, calc((1lh - ${space['4']}) / 2))` },
 });
 
 export const indicatorSizes = stylex.create({

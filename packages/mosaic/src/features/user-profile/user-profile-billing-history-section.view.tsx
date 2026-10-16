@@ -5,7 +5,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import { rtl } from '../../utils/rtl.styles';
+import { rtl } from '../../styles/rtl.styles';
 import { styles } from './user-profile-billing-history-section.styles';
 
 export interface UserProfileBillingHistoryItem {
@@ -43,7 +43,9 @@ export function UserProfileBillingHistorySectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>History</Section.Title>
+          <Section.Content>
+            <Section.Title>History</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body xstyle={styles.body}>
           {/* TODO: Replace this inline implementation with the Mosaic Table component. */}

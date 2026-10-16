@@ -33,7 +33,7 @@ export function Default(props: Record<string, unknown>) {
   return (
     <CopyButton
       {...knobsAsProps(props)}
-      value='clerkWorkspace-177654156132154'
+      value='clerkOrganization-177654156132154'
     />
   );
 }
@@ -41,10 +41,10 @@ export function Default(props: Record<string, unknown>) {
 export function Inline(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 4, alignItems: 'center', fontSize: 14 }}>
-      <span>clerkWorkspace-177654156132154</span>
+      <span>clerkOrganization-177654156132154</span>
       <CopyButton
         {...knobsAsProps(props)}
-        value='clerkWorkspace-177654156132154'
+        value='clerkOrganization-177654156132154'
         label='Copy slug'
       />
     </div>

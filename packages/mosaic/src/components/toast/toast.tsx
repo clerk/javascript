@@ -5,8 +5,8 @@ import type { IconName } from '../../icons/registry';
 import type { ToastObject } from '../../primitives/toast';
 import { Toast as Primitive } from '../../primitives/toast';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { tooltipSurface } from '../../utils/tooltip-surface.styles';
+import { reset } from '../../styles/reset.styles';
+import { tooltipSurface } from '../../styles/tooltip-surface.styles';
 import { Icon } from '../icon';
 import { Spinner } from '../spinner';
 import { iconColors, styles } from './toast.styles';
@@ -59,7 +59,7 @@ function StackedToast(props: { toast: ToastObject; zIndex: number }) {
       {...mergeStyleProps(themeProps('toast-root'), stylex.props(reset.base, styles.root, styles.stackOrder(zIndex)))}
     >
       <Primitive.Content {...mergeStyleProps(themeProps('toast-item'), stylex.props(reset.base, styles.item))}>
-        {type && (
+        {type ? (
           <span
             aria-hidden='true'
             {...mergeStyleProps(themeProps('toast-icon', { type }), stylex.props(styles.icon, iconColors[type]))}
@@ -69,7 +69,7 @@ function StackedToast(props: { toast: ToastObject; zIndex: number }) {
               indicator={DEFAULT_INDICATOR}
             />
           </span>
-        )}
+        ) : null}
         <div {...mergeStyleProps(themeProps('toast-content'), stylex.props(reset.base, styles.content))}>
           <Primitive.Title {...mergeStyleProps(themeProps('toast-label'), stylex.props(reset.base, styles.label))} />
           <Primitive.Description
@@ -100,7 +100,7 @@ function AnchoredToast(props: { toast: ToastObject }) {
       >
         <Primitive.Title {...mergeStyleProps(themeProps('toast-label'), stylex.props(reset.base))} />
         <Primitive.Description {...mergeStyleProps(themeProps('toast-description'), stylex.props(reset.base))} />
-        {type && (
+        {type ? (
           <span
             aria-hidden='true'
             {...mergeStyleProps(themeProps('toast-icon', { type }), stylex.props(styles.anchoredIcon))}
@@ -110,7 +110,7 @@ function AnchoredToast(props: { toast: ToastObject }) {
               indicator={ANCHORED_INDICATOR}
             />
           </span>
-        )}
+        ) : null}
       </Primitive.Root>
     </Primitive.Positioner>
   );

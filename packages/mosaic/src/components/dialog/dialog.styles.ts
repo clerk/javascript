@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, durationVars, easingVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
 
 // How far the contents of a surface beneath a stacked dialog are veiled toward its own background.
 // Declared up here rather than beside `STACK_SCALE` further down because `variants` reads it, and
@@ -36,6 +36,9 @@ const PHONE = '@container cl-dialog (width < 48rem)';
 const ABOVE_PHONE = '@container cl-dialog (width >= 48rem)';
 const DESK = '@container cl-dialog (48rem <= width < 90rem)';
 const WIDE = '@container cl-dialog (width >= 90rem)';
+// Narrower than `PHONE` so a portrait small tablet keeps the centered card. A media query, so the
+// overlay's scrollbar cannot split the viewport and the popup across it. `card.styles.ts` repeats it.
+const SHEET = '@media (width < 40rem)';
 
 export const styles = stylex.create({
   // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
@@ -223,7 +226,7 @@ export const styles = stylex.create({
       // one gesture, and the phone band runs the transform at `slow`. Pinning the veil at `base`
       // there finishes the dim 100ms before the surface stops moving, in both directions.
       transitionDuration: {
-        [PHONE]: durationVars['--cl-duration-slow'],
+        [SHEET]: durationVars['--cl-duration-slow'],
         default: durationVars['--cl-duration-base'],
       },
       transitionProperty: 'opacity',
@@ -266,6 +269,8 @@ export const styles = stylex.create({
   },
 });
 
+const profileCloseInset = { insetBlockStart: space['3'], insetInlineEnd: space['3'] };
+
 /**
  * Positions the ICON the surface's inset from the corner, not the button box: the `sm` circle
  * carries `(space[7] - space[4]) / 2` = `space[1.5]` of its own padding around the glyph, so each
@@ -274,8 +279,26 @@ export const styles = stylex.create({
  */
 export const closeInsets = stylex.create({
   card: { insetBlockStart: space['2.5'], insetInlineEnd: space['2.5'] },
-  profile: { insetBlockStart: space['3'], insetInlineEnd: space['3'] },
+  profile: profileCloseInset,
+  fullscreen: profileCloseInset,
 });
+
+const profileViewport = {
+  // A definite container height is NOT enough on its own: an `auto` grid row still sizes to its
+  // content and happily exceeds the container, which is how a profile of rows measured 2208px
+  // inside a 1251px overlay. `minmax(0, 1fr)` pins the single row to the content box, so the row
+  // is what an item stretches to and what its overflow is measured against.
+  //
+  // Deliberately NOT applied to the scrolling variants: it would clamp the row there too, which is
+  // exactly what has to stop happening for the popup to grow past the fold.
+  gridTemplateRows: 'minmax(0, 1fr)',
+  // A DEFINITE height, taken from the overlay (`position: fixed; inset: 0`), which makes the
+  // single grid row definite too. That is what lets `variants.profile` fill the content box with
+  // `align-self: stretch` alone — no `dvh` arithmetic, so nothing can disagree with the box a
+  // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
+  // overlay measures 1251px while `100dvh` reports 844.
+  height: '100%',
+};
 
 /**
  * Named for what the surface IS rather than for a t-shirt step, because these are different
@@ -311,21 +334,16 @@ export const closeInsets = stylex.create({
  */
 export const viewportVariants = stylex.create({
   card: { minHeight: '100%' },
-  profile: {
-    // A definite container height is NOT enough on its own: an `auto` grid row still sizes to its
-    // content and happily exceeds the container, which is how a profile of rows measured 2208px
-    // inside a 1251px overlay. `minmax(0, 1fr)` pins the single row to the content box, so the row
-    // is what an item stretches to and what its overflow is measured against.
-    //
-    // Deliberately NOT applied to the scrolling variants: it would clamp the row there too, which is
-    // exactly what has to stop happening for the popup to grow past the fold.
-    gridTemplateRows: 'minmax(0, 1fr)',
-    // A DEFINITE height, taken from the overlay (`position: fixed; inset: 0`), which makes the
-    // single grid row definite too. That is what lets `variants.profile` fill the content box with
-    // `align-self: stretch` alone — no `dvh` arithmetic, so nothing can disagree with the box a
-    // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
-    // overlay measures 1251px while `100dvh` reports 844.
-    height: '100%',
+  profile: profileViewport,
+  fullscreen: profileViewport,
+});
+
+/** Pins the box for a sheet, so `compactPlacements.sheet` can cap the popup at the overlay's own height. */
+export const viewportCompactPlacements = stylex.create({
+  center: {},
+  sheet: {
+    gridTemplateRows: { [SHEET]: 'minmax(0, 1fr)', default: null },
+    height: { [SHEET]: '100%', default: null },
   },
 });
 
@@ -347,7 +365,34 @@ export const trackVariants = stylex.create({
     // Same definite row as the viewport's, one level down, so the popup's `stretch` lands on it.
     gridTemplateRows: 'minmax(0, 1fr)',
   },
+  fullscreen: {
+    '--_cl-dialog-inset': '0px',
+    paddingInline: 0,
+    gridTemplateRows: 'minmax(0, 1fr)',
+  },
 });
+
+const profileSurface = {
+  borderColor: null,
+  borderRadius: null,
+  borderStyle: null,
+  borderWidth: null,
+  // The profile does NOT scroll itself, and that is the whole design. A fixed-height surface
+  // needs somewhere for overflow to go, but putting the scroll on the POPUP takes everything
+  // anchored to it along for the ride — the close button most obviously. So the popup clips,
+  // and the scroll region is the surface's own: `Profile` scrolls its content column.
+  // Deliberately a flex column with no `align-items` override, so the surface inside grows to
+  // the popup's height.
+  //
+  // `clip` rather than `hidden` for the same reason as the viewport: `hidden` would make the
+  // profile a scroll container, and focusing anything inside it that sits outside its box would
+  // scroll the profile itself.
+  overflow: 'clip',
+  // Fills the viewport's content box rather than computing a height from `dvh`. The grid row
+  // is definite (see `styles.viewport`), so `stretch` lands the profile's edges on exactly the
+  // lines a bottom-anchored sheet reaches with `align-self: end`, and clamps to them.
+  alignSelf: 'stretch',
+};
 
 export const variants = stylex.create({
   // The surface is a `Card` — so it comes from `Card`'s own `elevations.overlay`, and the popup
@@ -385,27 +430,8 @@ export const variants = stylex.create({
    *
    * Consequence worth knowing: `variant="profile"` with no surface inside renders an unpainted box.
    */
-  profile: {
-    borderColor: null,
-    borderRadius: null,
-    borderStyle: null,
-    borderWidth: null,
-    // The profile does NOT scroll itself, and that is the whole design. A fixed-height surface
-    // needs somewhere for overflow to go, but putting the scroll on the POPUP takes everything
-    // anchored to it along for the ride — the close button most obviously. So the popup clips,
-    // and the scroll region is the surface's own: `Profile` scrolls its content column.
-    // Deliberately a flex column with no `align-items` override, so the surface inside grows to
-    // the popup's height.
-    //
-    // `clip` rather than `hidden` for the same reason as the viewport: `hidden` would make the
-    // profile a scroll container, and focusing anything inside it that sits outside its box would
-    // scroll the profile itself.
-    overflow: 'clip',
-    // Fills the viewport's content box rather than computing a height from `dvh`. The grid row
-    // is definite (see `styles.viewport`), so `stretch` lands the profile's edges on exactly the
-    // lines a bottom-anchored sheet reaches with `align-self: end`, and clamps to them.
-    alignSelf: 'stretch',
-  },
+  profile: profileSurface,
+  fullscreen: profileSurface,
 });
 
 /**
@@ -415,18 +441,47 @@ export const variants = stylex.create({
  *
  * Only that band differs. Above it a sheet is a centered dialog like any other — there is no screen
  * edge close enough for anchoring to mean anything — so `center` is genuinely empty and `sheet`
- * resolves back to the same geometry. Named `compact` rather than for a device because the band is
- * a width, and because `Profile` already calls the identical `48rem` query that.
+ * resolves back to the same geometry. The band is `SHEET`, a window under `40rem`: narrower than the
+ * `48rem` `PHONE` band the track and `Profile` step on, so between the two a sheet still renders as a
+ * centered card, with the phone band's tighter side inset.
  *
  * Applied for `card` alone (see `Dialog.Popup`): a profile has its own compact treatment and never
  * takes a placement.
  */
 export const compactPlacements = stylex.create({
   center: {},
+  // A `default` restates the base value where `null` would drop it: within one `stylex.props` call
+  // a later `null` removes the earlier atom outright.
   sheet: {
+    '--_cl-surface-min-width': { [SHEET]: '100%', default: null },
+    '--_cl-surface-shadow': { [SHEET]: 'none', default: null },
+    borderRadius: {
+      [SHEET]: `${radiusVars['--cl-radius-2xl']} ${radiusVars['--cl-radius-2xl']} 0 0`,
+      default: radiusVars['--cl-radius-xl'],
+    },
+    overscrollBehavior: { [SHEET]: 'contain', default: null },
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
     // shared: bottom-aligning there would drag a centered dialog down with it.
-    alignSelf: { [PHONE]: 'end', default: null },
+    alignSelf: { [SHEET]: 'end', default: null },
+    // The sheet's surface, so it runs on through the keyboard padding below; the card only fills it.
+    backgroundColor: { [SHEET]: colorVars['--cl-color-background'], default: null },
+    // No drop shadow on the screen edge, only the hairline ring, as on `Drawer`. The card inside
+    // reads the two variables and drops its own shadow and fixed width.
+    boxShadow: { [SHEET]: shadowVars['--cl-shadow-sm'], default: null },
+    // Scrolls itself rather than the overlay, so the keyboard's padding never makes the page scroll.
+    // A block box, not the flex column: WebKit leaves a flex container's end padding out of its
+    // scroll range, which would strand the bottom of a tall sheet under the keyboard.
+    display: { [SHEET]: 'block', default: 'flex' },
+    // Tops the card rows' `space['4']` block padding up to their `space['5']` inline padding. The
+    // keyboard inset carries the sheet down to the keyboard, address bar included.
+    paddingBlockEnd: {
+      [SHEET]: `calc(${space['1']} + max(env(safe-area-inset-bottom, 0px), var(--_cl-keyboard-inset, 0px)))`,
+      default: null,
+    },
+    paddingBlockStart: { [SHEET]: space['1'], default: null },
+    maxHeight: { [SHEET]: '100%', default: null },
+    overflowY: { [SHEET]: 'auto', default: null },
+    width: { [SHEET]: '100%', default: 'fit-content' },
   },
 });
 
@@ -446,15 +501,32 @@ export const trackCompactPlacements = stylex.create({
     // and dragged the sheet part-way up the screen, then unwound as the translate resolved:
     // measured as `scrollTop` 0 -> 136 -> 50 -> 8 -> 0. It read as the sheet flying too far up and
     // snapping back, the unwind stacking extra bounces on the real overshoot. `clip` never becomes
-    // scrollable, so focus has nothing to scroll.
-    //
-    // The cost is real and accepted: a sheet taller than a phone screen is clipped rather than
-    // scrolled, because the same rule that contains the slide also contains the overflow. A tall
-    // surface on a phone wants the default `center`, which does not translate and so is not
-    // clipped here.
-    overflow: { [PHONE]: 'clip', default: null },
+    // scrollable, so focus has nothing to scroll. A sheet taller than the box scrolls inside its
+    // popup instead, so the clip never hides any of it.
+    overflow: { [SHEET]: 'clip', default: null },
+    // Flush to the sides and the bottom edge; the popup pads itself for the keyboard.
+    paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [SHEET]: 0, default: space['4'] },
+    gridTemplateRows: { [SHEET]: 'minmax(0, 1fr)', default: null },
+    paddingBlockEnd: {
+      [SHEET]: 0,
+      default: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
+    },
   },
 });
+
+const profileBackdropMotion = {
+  opacity: {
+    default: 1,
+    ':where([data-ending-style])': 0,
+    ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
+  },
+  transitionDuration: {
+    default: durationVars['--cl-duration-fast'],
+    ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+  },
+  transitionProperty: 'opacity',
+  transitionTimingFunction: 'linear',
+};
 
 /**
  * Enter/exit motion, keyed by size, because the two surfaces want opposite things.
@@ -500,19 +572,8 @@ export const backdropMotion = stylex.create({
   },
 
   /** Identical to `card` — the popup it accompanies fades on the same clock, it just does not scale. */
-  profile: {
-    opacity: {
-      default: 1,
-      ':where([data-ending-style])': 0,
-      ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
-    },
-    transitionDuration: {
-      default: durationVars['--cl-duration-fast'],
-      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
-    },
-    transitionProperty: 'opacity',
-    transitionTimingFunction: 'linear',
-  },
+  profile: profileBackdropMotion,
+  fullscreen: profileBackdropMotion,
 });
 
 // The plain CSS `ease-out` — `cubic-bezier(0, 0, 0.58, 1)` — used ONLY for the sheet's slide out.
@@ -553,6 +614,22 @@ const ENTER_SCALE = 0.94;
 const STACK_SCALE = 0.96;
 const STACK_LIFT = '-0.5rem';
 
+const profilePopupMotion = {
+  opacity: {
+    default: 1,
+    ':where([data-starting-style], [data-ending-style])': 0,
+  },
+  transitionDuration: {
+    default: durationVars['--cl-duration-fast'],
+    ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+  },
+  transitionProperty: 'opacity',
+  transitionTimingFunction: {
+    default: easingVars['--cl-ease-enter'],
+    ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+  },
+};
+
 export const popupMotion = stylex.create({
   /**
    * `compactPlacement='sheet'`: a card that scales from its center above the compact band, and slides up
@@ -574,7 +651,7 @@ export const popupMotion = stylex.create({
       ':where([data-starting-style], [data-ending-style])': 0,
     },
     transform: {
-      [PHONE]: {
+      [SHEET]: {
         default: 'scale(1)',
         ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
         ':where([data-starting-style], [data-ending-style])': 'scale(1)',
@@ -635,7 +712,7 @@ export const popupMotion = stylex.create({
     // plain `data-stacked` one, which would otherwise hand a stacked sheet the three-value entrance
     // list on its way out and slow its exit slide.
     transitionDuration: {
-      [PHONE]: {
+      [SHEET]: {
         default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
         ':where([data-ending-style])': durationVars['--cl-duration-base'],
         ':where([data-stacked])': `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
@@ -662,11 +739,11 @@ export const popupMotion = stylex.create({
       ':where([data-ending-style])': `${easingVars['--cl-ease-exit']}, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
     },
     translate: {
-      [PHONE]: {
+      [SHEET]: {
         default: null,
         '@media (prefers-reduced-motion: no-preference)': {
           default: null,
-          ':where([data-starting-style], [data-ending-style])': '0 calc(100% + var(--_cl-dialog-inset))',
+          ':where([data-starting-style], [data-ending-style])': '0 100%',
         },
       },
       default: null,
@@ -726,19 +803,6 @@ export const popupMotion = stylex.create({
    * No reduced-motion branch, matching `card` — under `reduce` the two shed their transform and
    * are left with exactly this, so there is nothing here to drop.
    */
-  profile: {
-    opacity: {
-      default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0,
-    },
-    transitionDuration: {
-      default: durationVars['--cl-duration-fast'],
-      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
-    },
-    transitionProperty: 'opacity',
-    transitionTimingFunction: {
-      default: easingVars['--cl-ease-enter'],
-      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
-    },
-  },
+  profile: profilePopupMotion,
+  fullscreen: profilePopupMotion,
 });

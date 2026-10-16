@@ -5,6 +5,7 @@ import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type {
   AuthConfigJSON,
+  BiometricCredentialJSON,
   ClientJSON,
   ClientTrustState,
   EmailAddressJSON,
@@ -145,6 +146,8 @@ export type OrganizationMembershipJSONSnapshot = OrganizationMembershipJSON;
 export type OrganizationSettingsJSONSnapshot = OrganizationSettingsJSON;
 
 export type OrganizationCreationDefaultsJSONSnapshot = OrganizationCreationDefaultsJSON;
+
+export type BiometricCredentialJSONSnapshot = BiometricCredentialJSON;
 
 export type PasskeyJSONSnapshot = Override<PasskeyJSON, { verification: VerificationJSONSnapshot | null }>;
 

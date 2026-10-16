@@ -1,31 +1,24 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
+import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
 import type { PopoverProps as HeadlessPopoverProps } from '../../primitives/popover';
 import { Popover as Primitive } from '../../primitives/popover';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { sizes, styles } from './popover.styles';
 
 export type PopoverSize = 'sm' | 'md' | 'lg' | 'anchor';
 
 export type PopoverRootProps = HeadlessPopoverProps;
 
-/**
- * The headless parts type their props (and the `render` callback's argument) against
- * the raw tag props, which carry the non-standard HTML `color` attribute typed
- * `string`. Re-typing them through `MosaicComponentProps` drops it, so a `render`
- * callback can spread straight into a Mosaic component whose own `color` is a narrow
- * variant union.
- */
+// Drops the raw `color: string` attr so a `render` callback can spread into a Mosaic component.
 export type PopoverTriggerProps = MosaicComponentProps<'button'>;
 export type PopoverCloseProps = MosaicComponentProps<'button'>;
 export type PopoverTitleProps = MosaicComponentProps<'h2'>;
 export type PopoverDescriptionProps = MosaicComponentProps<'p'>;
 
-/** The anchor. Renders a `<button>`; `render` swaps in another element. */
 const Trigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(function PopoverTrigger(
   { xstyle, ...rest },
   ref,
@@ -38,7 +31,6 @@ const Trigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(functio
   );
 });
 
-/** Dismisses the popover. Renders a `<button>`; `render` swaps in another element. */
 const Close = React.forwardRef<HTMLButtonElement, PopoverCloseProps>(function PopoverClose({ xstyle, ...rest }, ref) {
   return (
     <Primitive.Close
@@ -48,7 +40,6 @@ const Close = React.forwardRef<HTMLButtonElement, PopoverCloseProps>(function Po
   );
 });
 
-/** Names the dialog. Renders an `<h2>` wired to the popup's `aria-labelledby`. */
 const Title = React.forwardRef<HTMLHeadingElement, PopoverTitleProps>(function PopoverTitle({ xstyle, ...rest }, ref) {
   return (
     <Primitive.Title
@@ -58,7 +49,6 @@ const Title = React.forwardRef<HTMLHeadingElement, PopoverTitleProps>(function P
   );
 });
 
-/** Describes the dialog. Renders a `<p>` wired to the popup's `aria-describedby`. */
 const Description = React.forwardRef<HTMLParagraphElement, PopoverDescriptionProps>(function PopoverDescription(
   { xstyle, ...rest },
   ref,
@@ -70,26 +60,6 @@ const Description = React.forwardRef<HTMLParagraphElement, PopoverDescriptionPro
     />
   );
 });
-
-/**
- * Mosaic Popover: a floating box anchored to a trigger, built on the
- * `primitives/popover` primitive. Composed via dot syntax:
- * `Popover.Root`, `Popover.Trigger`, `Popover.Popup`, plus `Popover.Title`,
- * `Popover.Description` and `Popover.Close` for the popup's contents.
- *
- * The popover owns only what it means to float — trigger wiring, ARIA, focus
- * management, positioning, stacking, viewport clamps, and the enter/exit
- * transition. It paints no surface of its own: background, border, radius,
- * shadow and padding come from whatever is rendered inside it (typically a
- * `Card`), so the two never both draw a border.
- *
- * `Popover.Popup` renders the portal and the floating positioner itself —
- * neither is a part a consumer composes, so they stay out of the public API.
- * Each styled part spreads `themeProps` + `stylex.props` through
- * `mergeStyleProps`, so it carries the public `.cl-<slot>` class and StyleX
- * atoms while the headless part keeps its floating behavior, refs, and ARIA
- * wiring.
- */
 
 function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof Primitive.Positioner>) {
   const [node, setNode] = React.useState<HTMLDivElement | null>(null);
@@ -109,34 +79,20 @@ function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof
 export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
   /** Positions against this element instead of the trigger. */
   anchor?: HTMLElement | null;
-  /** Width of the floating box. */
   size?: PopoverSize;
-  /**
-   * Names the dialog for assistive technology. Required unless the contents render a
-   * `Popover.Title`, which wires `aria-labelledby` instead.
-   */
+  /** Required unless the contents render a `Popover.Title`. */
   'aria-label'?: string;
-  /** Names the dialog from an existing element. Alternative to `aria-label`. */
   'aria-labelledby'?: string;
 }
 
-/**
- * The floating box. Portals itself out of the tree and positions against
- * `Popover.Trigger`; supply the surface inside it, usually a `Card`.
- */
+// Paints no surface of its own; supply one inside it, usually a `Card`.
 const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function PopoverPopup(
   { anchor, xstyle, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
   ref,
 ) {
   return (
     <Primitive.Portal>
-      {/*
-        The positioner is the `role="dialog"` element, so the accessible name belongs on
-        it rather than on the popup. Spread conditionally: the headless positioner merges
-        these over its own `aria-labelledby` (set once a `Popover.Title` mounts), so
-        passing an explicit `undefined` would delete the Title's label rather than leave
-        it alone.
-      */}
+      {/* Spread conditionally: an explicit `undefined` would drop the `Popover.Title`'s label. */}
       <Positioner
         anchor={anchor}
         {...(ariaLabel == null ? {} : { 'aria-label': ariaLabel })}
@@ -155,11 +111,7 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
   );
 });
 
-/**
- * Mosaic `Popover` — a floating box anchored to a trigger. Composed via dot
- * syntax: `Popover.Root`, `Popover.Trigger`, `Popover.Popup`, `Popover.Title`,
- * `Popover.Description`, `Popover.Close`.
- */
+/** A floating box anchored to a trigger. */
 export const Popover = {
   Root: Primitive.Root,
   Trigger,

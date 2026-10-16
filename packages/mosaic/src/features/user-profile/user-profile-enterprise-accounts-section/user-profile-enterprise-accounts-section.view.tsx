@@ -9,14 +9,14 @@ import type {
 export interface UserProfileEnterpriseAccountsSectionViewProps {
   accounts: UserProfileEnterpriseAccount[];
   connections?: UserProfileEnterpriseConnection[];
-  pendingConnectionId?: string;
+  pendingId?: string;
   onConnect?: (id: string) => void;
 }
 
 export function UserProfileEnterpriseAccountsSectionView({
   accounts,
   connections = [],
-  pendingConnectionId,
+  pendingId,
   onConnect,
 }: UserProfileEnterpriseAccountsSectionViewProps) {
   const m = useMessages('userProfileEnterpriseAccountsSection');
@@ -27,7 +27,9 @@ export function UserProfileEnterpriseAccountsSectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>{m.title}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.title}</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           {accounts.map(account => (
@@ -42,8 +44,8 @@ export function UserProfileEnterpriseAccountsSectionView({
                   key={connection.id}
                   account={connection}
                   onConnect={onConnect}
-                  isPending={pendingConnectionId === connection.id}
-                  disabled={pendingConnectionId !== undefined}
+                  isPending={pendingId === connection.id}
+                  disabled={pendingId !== undefined}
                 />
               ))
             : null}

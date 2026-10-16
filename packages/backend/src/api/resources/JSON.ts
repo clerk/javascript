@@ -694,6 +694,7 @@ export interface UserJSON extends ClerkResourceJSON {
   last_sign_in_at: number | null;
   banned: boolean;
   locked: boolean;
+  deprovisioned: boolean;
   lockout_expires_in_seconds: number | null;
   verification_attempts_remaining: number | null;
   created_at: number;
@@ -778,6 +779,12 @@ export interface EnterpriseConnectionCustomAttributeJSON {
   multi_valued: boolean;
 }
 
+export interface SamlConnectionIdpCertificateJSON {
+  certificate: string;
+  issued_at: number | null;
+  expires_at: number | null;
+}
+
 export interface EnterpriseConnectionSamlConnectionJSON {
   id: string;
   name: string;
@@ -786,6 +793,7 @@ export interface EnterpriseConnectionSamlConnectionJSON {
   idp_certificate?: string;
   idp_certificate_issued_at?: number;
   idp_certificate_expires_at?: number;
+  idp_certificates?: SamlConnectionIdpCertificateJSON[];
   idp_metadata_url?: string;
   /** @deprecated The Backend API does not return this field. */
   idp_metadata?: string;
@@ -848,6 +856,7 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   idp_certificate: string;
   idp_certificate_issued_at: number;
   idp_certificate_expires_at: number;
+  idp_certificates: SamlConnectionIdpCertificateJSON[];
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -968,6 +977,13 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
   aud?: string[];
+  act?: IdPOAuthAccessTokenActorJSON;
+}
+
+export interface IdPOAuthAccessTokenActorJSON {
+  iss?: string;
+  sub: string;
+  act?: IdPOAuthAccessTokenActorJSON;
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {

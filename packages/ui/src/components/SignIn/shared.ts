@@ -102,5 +102,9 @@ function useHandleAuthenticateWithPasskey(
   }, []);
 }
 
-export { getSSOBypassFactor, hasMultipleEnterpriseConnections } from './enterpriseSSOFactors';
+export {
+  getEnterpriseConnectionFactors,
+  getSSOBypassFactor,
+  hasMultipleEnterpriseConnections,
+} from './enterpriseSSOFactors';
 export { useHandleAuthenticateWithPasskey };
