@@ -13,6 +13,10 @@ describe('date utilities', () => {
   });
 
   describe('unixEpochToDate', () => {
+    it('preserves an unset session deadline', () => {
+      expect(unixEpochToDate(0).getTime()).toBe(0);
+    });
+
     it('converts a unix epoch to Date', function () {
       const epoch = 1622575087;
       const date = unixEpochToDate(epoch);
