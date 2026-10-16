@@ -28,6 +28,7 @@ const livePages = new Set([
   '/user-profile/user-profile-connected-accounts-section',
   '/user-profile/user-profile-enterprise-accounts-section',
   '/user-profile/user-profile-danger-section',
+  '/organization-profile/organization-profile',
   '/organization-profile/organization-profile-general-panel',
   '/organization-profile/organization-profile-members-panel',
   '/organization-profile/organization-profile-api-keys-panel',
