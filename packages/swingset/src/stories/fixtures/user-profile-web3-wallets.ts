@@ -1,8 +1,10 @@
+import { useUserProfileWeb3WalletsController } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
 } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
-import { useState } from 'react';
+import type { Web3Strategy } from '@clerk/shared/types';
+import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosText } from '@/lib/chaos';
@@ -59,14 +61,15 @@ export function useWeb3WalletsFixture({
   const [wallets, setWallets] = useState(seedWallets);
   const [connectionProviders, setConnectionProviders] = useState(seedProviders);
   const [removalFailed, setRemovalFailed] = useState(false);
-  const [primaryFailed, setPrimaryFailed] = useState(false);
+  const primaryFailed = useRef(false);
 
-  return {
+  return useUserProfileWeb3WalletsController({
     wallets,
     availableProviders: connectionProviders.filter(
       provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
     ),
-    onConnect: (id: string) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    connect: async (id: Web3Strategy) => {
       const provider = connectionProviders.find(item => item.id === id);
       if (!provider) {
         return;
@@ -92,23 +95,15 @@ export function useWeb3WalletsFixture({
         ];
       });
     },
-    onSetPrimary: (id: string) => {
-      if (primaryError && !primaryFailed) {
-        setPrimaryFailed(true);
-        setWallets(current =>
-          current.map(wallet =>
-            wallet.id === id
-              ? { ...wallet, primaryError: 'Unable to set this wallet as primary. Please try again.' }
-              : wallet,
-          ),
-        );
-        return;
+    // eslint-disable-next-line @typescript-eslint/require-await
+    setPrimary: async (id: string) => {
+      if (primaryError && !primaryFailed.current) {
+        primaryFailed.current = true;
+        throw new Error('Unable to set this wallet as primary. Please try again.');
       }
-      setWallets(current =>
-        current.map(wallet => ({ ...wallet, isPrimary: wallet.id === id, primaryError: undefined })),
-      );
+      setWallets(current => current.map(wallet => ({ ...wallet, isPrimary: wallet.id === id })));
     },
-    onRemove: async (id: string) => {
+    remove: async (id: string) => {
       if (removalState === 'pending') {
         await new Promise(resolve => setTimeout(resolve, 1500));
       }
@@ -118,5 +113,5 @@ export function useWeb3WalletsFixture({
       }
       setWallets(current => current.filter(wallet => wallet.id !== id));
     },
-  };
+  });
 }

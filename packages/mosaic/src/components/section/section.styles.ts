@@ -125,7 +125,6 @@ export const styles = stylex.create({
     flexDirection: 'column',
     flexGrow: 1,
     justifyContent: 'center',
-    rowGap: space['0.5'],
     minWidth: 0,
   },
   label: {

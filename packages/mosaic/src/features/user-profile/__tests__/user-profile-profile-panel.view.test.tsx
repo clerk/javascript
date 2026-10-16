@@ -1,19 +1,37 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
+import { useConfirmController } from '../../../blocks/confirm';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+import { useUserProfileWeb3WalletsController } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
+import type { UserProfileWeb3Wallet } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.types';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 
+function Web3Wallets({
+  wallets,
+  onRemove,
+}: {
+  wallets: UserProfileWeb3Wallet[];
+  onRemove: (id: string) => Promise<void>;
+}) {
+  const controller = useUserProfileWeb3WalletsController({
+    wallets,
+    availableProviders: [],
+    connect: () => Promise.resolve(),
+    setPrimary: () => Promise.resolve(),
+    remove: onRemove,
+  });
+  return <UserProfileWeb3WalletsSectionView {...controller} />;
+}
+
 function DeleteAccount() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDangerSectionView {...controller} />;
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
 }
 
 function renderView(overrides: UserProfileProfilePanelViewProps = {}) {
@@ -32,35 +50,16 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('tab')).toBeNull();
   });
 
-  it('places the sections in the order of the composed profile page', () => {
-    renderView({
-      dangerSlot: <div data-testid='danger' />,
-      web3WalletsSlot: <div data-testid='web3' />,
-      enterpriseAccountsSlot: <div data-testid='enterprise' />,
-      connectedAccountsSlot: <div data-testid='connected' />,
-      phoneSlot: <div data-testid='phone' />,
-      emailSlot: <div data-testid='email' />,
-      profileSlot: <div data-testid='profile' />,
-    });
-
-    const order = ['profile', 'email', 'phone', 'connected', 'enterprise', 'web3', 'danger'];
-    const rendered = Array.from(document.querySelectorAll('[data-testid]'), node => node.getAttribute('data-testid'));
-    expect(rendered).toEqual(order);
-  });
-
-  it('keeps the final wallet confirmation mounted until removal settles', async () => {
+  it('keeps the final wallet confirmation mounted until removal settles, then focuses the title', async () => {
     const user = userEvent.setup();
-    const titleRef = createRef<HTMLDivElement>();
     const removal = createDeferredPromise();
     const onRemoveWeb3Wallet = vi.fn(async () => {
       await removal.promise;
     });
     const { rerender } = renderView({
-      titleRef,
-      web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
+      children: (
+        <Web3Wallets
           wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
-          fallbackFocus={() => titleRef.current}
           onRemove={onRemoveWeb3Wallet}
         />
       ),
@@ -70,16 +69,12 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     rerender(
       <MosaicProvider>
-        <UserProfileProfilePanelView
-          titleRef={titleRef}
-          web3WalletsSlot={
-            <UserProfileWeb3WalletsSectionView
-              wallets={[]}
-              fallbackFocus={() => titleRef.current}
-              onRemove={onRemoveWeb3Wallet}
-            />
-          }
-        />
+        <UserProfileProfilePanelView>
+          <Web3Wallets
+            wallets={[]}
+            onRemove={onRemoveWeb3Wallet}
+          />
+        </UserProfileProfilePanelView>
       </MosaicProvider>,
     );
     expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
@@ -89,11 +84,14 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Account', level: 2 }).closest('.cl-panel-title')).toHaveFocus(),
+    );
   });
 
   it('renders the danger zone when provided', () => {
     renderView({
-      dangerSlot: <DeleteAccount />,
+      children: <DeleteAccount />,
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
@@ -103,28 +101,11 @@ describe('UserProfileProfilePanelView', () => {
     );
   });
 
-  it('places enterprise accounts before Web3 wallets and the danger zone', () => {
-    renderView({
-      web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
-          wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
-        />
-      ),
-      enterpriseAccountsSlot: <div data-testid='enterprise'>Enterprise accounts</div>,
-      dangerSlot: <DeleteAccount />,
-    });
-
-    const wallets = screen.getByRole('group', { name: 'Web3 wallets' });
-    const enterprise = screen.getByTestId('enterprise');
-    const danger = screen.getByRole('heading', { name: 'Danger zone' });
-    expect(enterprise.compareDocumentPosition(wallets) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(enterprise.compareDocumentPosition(danger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
   it('renders Web3 images inside icon frames', () => {
     const { container } = renderView({
-      web3WalletsSlot: (
+      children: (
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[
             { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
           ]}
@@ -142,8 +123,9 @@ describe('UserProfileProfilePanelView', () => {
 
   it('composes linked wallets and available providers', () => {
     renderView({
-      web3WalletsSlot: (
+      children: (
         <UserProfileWeb3WalletsSectionView
+          registerTrigger={() => null}
           wallets={[
             {
               id: 'primary',
@@ -163,7 +145,6 @@ describe('UserProfileProfilePanelView', () => {
           availableProviders={[{ id: 'disconnected', provider: 'Coinbase Wallet' }]}
           onConnect={vi.fn()}
           onSetPrimary={vi.fn()}
-          onRemove={vi.fn()}
         />
       ),
     });

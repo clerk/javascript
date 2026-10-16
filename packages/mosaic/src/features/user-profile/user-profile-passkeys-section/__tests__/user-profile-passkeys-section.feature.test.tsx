@@ -4,7 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  type FakeFapiSeed,
+  fapiUrl,
+  holdRequests,
+  serveFapi,
+  worker,
+} from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -17,25 +24,34 @@ import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePasskeysSectionView } from '../../user-profile-passkeys-section.view';
 import { UserProfileSecurityPanelView } from '../../user-profile-security-panel.view';
-import { passkeysSectionNode, UserProfilePasskeysSection } from '../user-profile-passkeys-section';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.model';
 
 function ReadonlyPasskeys() {
   const model = useUserProfilePasskeysModel();
-  return model.status === 'ready' ? <UserProfilePasskeysSectionView passkeys={model.passkeys} /> : null;
+  return model.status === 'ready' ? (
+    <UserProfilePasskeysSectionView
+      registerTrigger={() => null}
+      passkeys={model.passkeys}
+    />
+  ) : null;
 }
 
 function SecurityPanel() {
-  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
-  return <UserProfileSecurityPanelView passkeysSlot={passkeysSlot} />;
+  return (
+    <UserProfileSecurityPanelView>
+      <UserProfilePasskeysSection />
+    </UserProfileSecurityPanelView>
+  );
 }
 
-function servePasskeys(passkeys: PasskeyJSON[] = [fapiPasskey({ id: 'pk_1' })]) {
+function servePasskeys(passkeys: PasskeyJSON[] = [fapiPasskey({ id: 'pk_1' })], overrides: FakeFapiSeed = {}) {
   const environment = fapiEnvironment();
   environment.user_settings.attributes.passkey.enabled = true;
   return serveFapi({
     environment,
     client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', passkeys }) })]),
+    ...overrides,
   });
 }
 
@@ -435,32 +451,20 @@ describe('Removing a passkey', () => {
     expect(fapi.client.sessions[0]?.user.passkeys).toEqual([]);
   });
 
-  it('keeps confirmation open on localized verification-required errors and retries manually', async () => {
-    const fapi = servePasskeys();
-    await renderWithClerk(
-      <MosaicProvider
-        localization={{
-          messages: { errors: { session_reverification_required: 'Veuillez confirmer votre identité.' } },
-        }}
-      >
-        <UserProfilePasskeysSection />
-      </MosaicProvider>,
-    );
-    const removal = holdRequests('post', '/v1/me/passkeys/pk_1');
+  it('verifies the session when removal demands it, then removes the passkey', async () => {
+    const fapi = servePasskeys([fapiPasskey({ id: 'pk_1' })], { verification: { secrets: { password: 'hunter2' } } });
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    demandReverificationOnce('/v1/me/passkeys/pk_1');
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(removal.requests).toHaveLength(1));
-    removal.fail('session_reverification_required');
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Veuillez confirmer votre identité.'));
-    expect(screen.getByRole('alertdialog')).not.toHaveAttribute('data-closed');
-    expect(screen.queryByLabelText('Password')).toBeNull();
-    expect(removal.requests).toHaveLength(1);
-    const retried = serveFapi(fapi);
-    await user.click(screen.getByRole('button', { name: 'Remove' }));
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
-    expect(retried.client.sessions[0]?.user.passkeys).toHaveLength(0);
+    expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(0);
   });
 });
 
@@ -473,7 +477,6 @@ describe('Satellite passkeys', () => {
     expect(screen.getByRole('group', { name: 'Passkeys' })).toBeVisible();
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
-    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
   });
 
   it('removes the final passkey without Add', async () => {
@@ -502,7 +505,5 @@ describe('Passkey reverification', () => {
 });
 
 describe('Passkey follow-ups', () => {
-  it.todo('shows a localized duplicate-passkey message instead of the raw SDK error for passkey_already_exists');
   it.todo('rerenders passkey eligibility when a replaced or fetched environment changes policy');
-  it.todo('focuses a surviving passkey row during React cleanup after removal');
 });

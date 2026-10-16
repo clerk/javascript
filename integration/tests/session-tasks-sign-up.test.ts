@@ -2,7 +2,7 @@ import { createClerkClient } from '@clerk/backend';
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
-import { instanceKeys } from '../presets/envs';
+import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { withRetry } from '../testUtils/retryableClerkClient';
@@ -16,8 +16,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     let regularFakeUser: FakeUser;
     let fakeUserForOAuth: FakeUser;
 
-    test.beforeEach(() => {
-      const u = createTestUtils({ app });
+    test.beforeEach(async () => {
+      const u = await createTestUtils({ app });
       regularFakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
@@ -31,14 +31,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       await u.services.organizations.deleteAll();
       await regularFakeUser.deleteIfExists();
 
       // Delete user from OAuth provider instance
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
       const users = createUserService(withRetry(client));
       await users.deleteIfExists({ email: fakeUserForOAuth.email });
@@ -47,14 +47,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     });
 
     test.afterEach(async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.signOut();
       await u.page.context().clearCookies();
     });
 
     test('navigate to task on after sign-up', async ({ page, context }) => {
       // Performs sign-up
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signUp.goTo();
       await u.po.signUp.signUpWithEmailAndPassword({
         email: regularFakeUser.email,
@@ -78,7 +78,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     });
 
     test('with sso, navigate to task on after sign-up', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       await u.po.signUp.goTo();
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();

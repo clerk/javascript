@@ -24,7 +24,7 @@ import type { TokenCache } from '../../cache/types';
 import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { assertValidProxyUrl } from '../../utils/errors';
-import { isNative } from '../../utils/runtime';
+import { isNative, waitUntilAppIsActive } from '../../utils/runtime';
 import type { BuildClerkOptions } from './types';
 
 /**
@@ -61,6 +61,15 @@ let __internal_clerkOptions: ClerkRuntimeOptions | undefined;
 let __internal_cancelResourceRetries: (() => void) | undefined;
 // Token IO can change without recreating the native singleton.
 let __internal_tokenCache: TokenCache = MemoryTokenCache;
+
+async function readClientJwt(): Promise<string | null | undefined> {
+  try {
+    return await __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+  } catch {
+    await waitUntilAppIsActive();
+  }
+  return __internal_tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+}
 
 /**
  * Resolves the next native singleton config while preserving existing values for omitted options.
@@ -123,7 +132,6 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         void __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
-      const getToken = (key: string) => __internal_tokenCache.getToken(key);
       const saveToken = (key: string, token: string) => __internal_tokenCache.saveToken(key, token);
 
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
@@ -290,7 +298,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend to parse the api token from the Authorization header.
         requestInit.url?.searchParams.append('_is_native', '1');
 
-        const jwt = await getToken(CLERK_CLIENT_JWT_KEY);
+        const jwt = await readClientJwt();
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
         // Instructs the backend that the request is from a mobile device.

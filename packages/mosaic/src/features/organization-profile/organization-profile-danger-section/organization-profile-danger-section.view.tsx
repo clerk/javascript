@@ -1,5 +1,5 @@
+import type { ConfirmController } from '../../../blocks/confirm';
 import { Destructive } from '../../../blocks/destructive';
-import type { DestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
@@ -7,8 +7,8 @@ import { fill, plural, useLocale, useMessages } from '../../../localization';
 export interface OrganizationProfileDangerSectionViewProps {
   name: string;
   memberCount: number;
-  leave?: DestructiveController;
-  destroy?: DestructiveController;
+  leave?: ConfirmController;
+  destroy?: ConfirmController;
 }
 
 export function OrganizationProfileDangerSectionView({
@@ -70,7 +70,7 @@ function DangerRow({
   dialogTitle,
   dialogDescription,
 }: {
-  controller: DestructiveController;
+  controller: ConfirmController;
   confirmationValue: string;
   label: string;
   description: string;
@@ -89,7 +89,7 @@ function DangerRow({
         </Section.Content>
         <Section.Actions>
           <Destructive
-            {...controller}
+            controller={controller}
             trigger={
               <Button
                 color='negative'

@@ -1,0 +1,1094 @@
+@file:OptIn(FrameworkIntegrationApi::class)
+
+package expo.modules.clerk
+
+import android.content.Context
+import android.util.Log
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.clerk.api.Clerk
+import com.clerk.api.ClerkConfigurationOptions
+import com.clerk.api.FrameworkIntegrationApi
+import com.clerk.api.network.model.client.Client
+import com.clerk.api.network.model.error.ClerkErrorResponse
+import com.clerk.api.network.model.error.firstMessage
+import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.signin.SignIn
+import com.clerk.api.biometriccredential.BiometricCredential
+import com.clerk.api.biometriccredential.BiometricCredentialAvailability
+import com.clerk.api.biometriccredential.BiometricCredentialKeyManagerException
+import com.clerk.api.biometriccredential.BiometricCredentialPolicy
+import com.clerk.api.session.SessionVerification
+import com.clerk.api.session.startVerification
+import com.clerk.api.session.verifyWithBiometrics
+import com.clerk.api.ui.ClerkColors
+import com.clerk.api.ui.ClerkDesign
+import com.clerk.api.ui.ClerkTheme
+import expo.modules.kotlin.Promise
+import expo.modules.kotlin.modules.Module
+import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.kotlin.records.Field
+import expo.modules.kotlin.records.Record
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
+import org.json.JSONObject
+
+private const val TAG = "ClerkExpoModule"
+private const val NATIVE_AUTH_FLOW_CHANGED_EVENT = "clerkNativeAuthFlowChanged"
+private const val NATIVE_CLIENT_CHANGED_EVENT = "clerkNativeClientChanged"
+private const val HOST_SDK_HEADER = "x-clerk-host-sdk"
+private const val HOST_SDK_VERSION_HEADER = "x-clerk-host-sdk-version"
+private const val HOST_SDK = "expo"
+
+private fun debugLog(tag: String, message: String) {
+    if (BuildConfig.DEBUG) {
+        Log.d(tag, message)
+    }
+}
+
+internal class ConfigureOptions : Record {
+    @Field val bearerToken: String? = null
+
+    @Field val proxyUrl: String? = null
+}
+
+internal fun biometricCredentialAvailabilityPayload(
+    availability: BiometricCredentialAvailability
+): Map<String, Any?> {
+    return mapOf(
+        "isAvailable" to availability.isAvailable,
+        "unavailableReason" to availability.unavailableReason?.name?.lowercase()
+    )
+}
+
+internal fun biometricCredentialEnvironmentAvailabilityPayload(
+    isInitialized: Boolean
+): Map<String, Any?>? {
+    if (isInitialized) {
+        return null
+    }
+
+    return mapOf(
+        "isAvailable" to false,
+        "unavailableReason" to "environment_unavailable"
+    )
+}
+
+internal fun biometricCredentialPayload(biometricCredential: BiometricCredential): Map<String, Any?> {
+    return mapOf(
+        "id" to biometricCredential.id,
+        "object" to "trusted_device",
+        "platform" to biometricCredential.platform.name.lowercase(),
+        "appIdentifier" to biometricCredential.appIdentifier,
+        "name" to biometricCredential.name,
+        "algorithm" to biometricCredential.algorithm,
+        "status" to biometricCredential.status.name.lowercase(),
+        "createdAt" to biometricCredential.createdAt,
+        "updatedAt" to biometricCredential.updatedAt,
+        "lastUsedAt" to biometricCredential.lastUsedAt,
+        "revokedAt" to biometricCredential.revokedAt
+    )
+}
+
+internal fun biometricSignInPayload(signIn: SignIn): Map<String, Any?> {
+    return mapOf(
+        "id" to signIn.id,
+        "status" to signIn.status.name.lowercase(),
+        "createdSessionId" to signIn.createdSessionId
+    )
+}
+
+internal fun biometricCredentialPolicy(policy: String): BiometricCredentialPolicy? {
+    return when (policy) {
+        "biometry_current_set" -> BiometricCredentialPolicy.BIOMETRY_CURRENT_SET
+        "biometry_any" -> BiometricCredentialPolicy.BIOMETRY_ANY
+        "biometry_or_device_passcode" -> BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE
+        else -> null
+    }
+}
+
+internal fun biometricReverificationLevel(level: String): SessionVerification.Level? = when (level) {
+    "first_factor" -> SessionVerification.Level.FIRST_FACTOR
+    "second_factor" -> SessionVerification.Level.SECOND_FACTOR
+    "multi_factor" -> SessionVerification.Level.MULTI_FACTOR
+    else -> null
+}
+
+internal fun biometricReverificationPayload(
+    verification: SessionVerification,
+    sessionId: String
+): Map<String, Any?> = mapOf(
+    "id" to verification.id,
+    "status" to verification.status.name.lowercase(),
+    "level" to verification.level.value,
+    "sessionId" to (verification.session?.id ?: sessionId)
+)
+
+internal suspend fun verifyBiometricReverification(
+    started: SessionVerification,
+    verify: suspend (SessionVerification.Level) -> ClerkResult<SessionVerification, ClerkErrorResponse>
+): ClerkResult<SessionVerification, ClerkErrorResponse> = when (started.status) {
+    SessionVerification.Status.NEEDS_FIRST_FACTOR -> {
+        val result = verify(SessionVerification.Level.FIRST_FACTOR)
+        if (result is ClerkResult.Success && result.value.status == SessionVerification.Status.NEEDS_SECOND_FACTOR) {
+            currentCoroutineContext().ensureActive()
+            verify(SessionVerification.Level.SECOND_FACTOR)
+        } else {
+            result
+        }
+    }
+    SessionVerification.Status.NEEDS_SECOND_FACTOR -> verify(SessionVerification.Level.SECOND_FACTOR)
+    SessionVerification.Status.COMPLETE -> ClerkResult.success(started)
+    SessionVerification.Status.UNKNOWN -> ClerkResult.unknownFailure(
+        IllegalStateException("The server returned an unsupported reverification status.")
+    )
+}
+
+internal data class BiometricCredentialBridgeError(
+    val code: String,
+    val message: String
+)
+
+internal fun biometricCredentialEnvironmentError(isInitialized: Boolean): BiometricCredentialBridgeError? {
+    if (isInitialized) {
+        return null
+    }
+
+    return BiometricCredentialBridgeError(
+        code = "environment_unavailable",
+        message = "Biometric credential operations are unavailable until Clerk finishes configuring."
+    )
+}
+
+internal fun biometricCredentialKeyManagerErrorCode(
+    code: BiometricCredentialKeyManagerException.Code
+): String = code.name.lowercase()
+
+internal fun biometricCredentialBridgeError(
+    throwable: Throwable,
+    fallbackCode: String,
+    fallbackMessage: String
+): BiometricCredentialBridgeError {
+    val keyManagerError = throwable as? BiometricCredentialKeyManagerException
+    return BiometricCredentialBridgeError(
+        code = keyManagerError?.code?.let(::biometricCredentialKeyManagerErrorCode) ?: fallbackCode,
+        message = throwable.message ?: fallbackMessage
+    )
+}
+
+internal fun biometricCredentialBridgeError(
+    failure: ClerkResult.Failure<ClerkErrorResponse>,
+    fallbackCode: String,
+    fallbackMessage: String
+): BiometricCredentialBridgeError {
+    val apiError = failure.error?.errors?.firstOrNull()
+    val throwable = failure.throwable
+    val keyManagerError = throwable as? BiometricCredentialKeyManagerException
+
+    return BiometricCredentialBridgeError(
+        code = apiError?.code
+            ?: keyManagerError?.code?.let(::biometricCredentialKeyManagerErrorCode)
+            ?: fallbackCode,
+        message = apiError?.longMessage
+            ?: apiError?.message
+            ?: throwable?.message
+            ?: fallbackMessage
+    )
+}
+
+class ClerkExpoModule : Module() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private var authFlowStateObserverJob: Job? = null
+    private var clientStateObserverJob: Job? = null
+    private var lastObservedClientState: ClientStateSnapshot? = null
+    private var jsOriginatedClientSyncDepth = 0
+    private var configuredPublishableKey: String? = null
+    private var configuredProxyUrl: String? = null
+
+    private data class AuthFlowStateSnapshot(
+        val isLoaded: Boolean,
+        val isAuthFlowComplete: Boolean
+    )
+
+    private data class ClientStateSnapshot(
+        val client: Client?,
+        val deviceToken: String?
+    )
+
+    private data class ClientStateChanges(
+        val client: Boolean,
+        val deviceToken: Boolean
+    )
+
+    companion object {
+        private var sharedInstance: ClerkExpoModule? = null
+
+        fun emitClientChanged(sourceId: String? = null) {
+            val instance = sharedInstance ?: return
+            instance.sendEvent(
+                NATIVE_CLIENT_CHANGED_EVENT,
+                instance.clientChangedPayload(
+                    sourceId = sourceId,
+                    changes = ClientStateChanges(client = true, deviceToken = true)
+                )
+            )
+        }
+    }
+
+    override fun definition() = ModuleDefinition {
+        Name("ClerkExpo")
+
+        Events(NATIVE_AUTH_FLOW_CHANGED_EVENT, NATIVE_CLIENT_CHANGED_EVENT)
+
+        OnCreate {
+            sharedInstance = this@ClerkExpoModule
+            startAuthFlowStateObserver()
+        }
+
+        OnDestroy {
+            if (sharedInstance === this@ClerkExpoModule) {
+                sharedInstance = null
+            }
+            authFlowStateObserverJob?.cancel()
+            authFlowStateObserverJob = null
+            clientStateObserverJob?.cancel()
+            clientStateObserverJob = null
+        }
+
+        AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
+            configure(pubKey, bearerToken, null, promise)
+        }
+
+        AsyncFunction("configureWithOptions") { pubKey: String, options: ConfigureOptions, promise: Promise ->
+            configure(pubKey, options.bearerToken, options.proxyUrl, promise)
+        }
+
+        AsyncFunction("getClientToken") { promise: Promise ->
+            getClientToken(promise)
+        }
+
+        AsyncFunction("getAuthFlowState") { promise: Promise ->
+            promise.resolve(authFlowStatePayload())
+        }
+
+        AsyncFunction("syncClientStateFromJs") {
+                deviceToken: String?,
+                sourceId: String?,
+                didChangeClient: Boolean,
+                didChangeDeviceToken: Boolean,
+                promise: Promise ->
+            syncClientStateFromJs(
+                deviceToken,
+                sourceId,
+                didChangeClient,
+                didChangeDeviceToken,
+                promise
+            )
+        }
+
+        AsyncFunction("getTrustedDeviceAvailability") {
+                id: String?,
+                identifierHint: String?,
+                promise: Promise ->
+            getBiometricCredentialAvailability(id, identifierHint, promise)
+        }
+
+        AsyncFunction("listTrustedDevices") { promise: Promise ->
+            listBiometricCredentials(promise)
+        }
+
+        AsyncFunction("enrollTrustedDevice") {
+                deviceName: String?,
+                identifierHint: String?,
+                reason: String?,
+                policy: String,
+                promise: Promise ->
+            enrollBiometricCredential(deviceName, identifierHint, reason, policy, promise)
+        }
+
+        AsyncFunction("revokeTrustedDevice") { id: String, promise: Promise ->
+            revokeBiometricCredential(id, promise)
+        }
+
+        AsyncFunction("signInWithTrustedDevice") {
+                id: String?,
+                identifierHint: String?,
+                reason: String?,
+                promise: Promise ->
+            signInWithBiometrics(id, identifierHint, reason, promise)
+        }
+
+        AsyncFunction("reverifyWithBiometrics") {
+                sessionId: String,
+                level: String,
+                reason: String?,
+                promise: Promise ->
+            reverifyWithBiometrics(sessionId, level, reason, promise)
+        }
+    }
+
+    private val reactContext: Context?
+        get() = appContext.reactContext
+
+    private fun clerkConfigurationOptions(proxyUrl: String?): ClerkConfigurationOptions {
+        val hostSdkVersion = BuildConfig.CLERK_EXPO_VERSION.trim()
+        val customHeaders = buildMap {
+            put(HOST_SDK_HEADER, HOST_SDK)
+            if (hostSdkVersion.isNotEmpty()) {
+                put(HOST_SDK_VERSION_HEADER, hostSdkVersion)
+            }
+        }
+
+        // JS owns client state. The native foreground refresh races SSO completion and mints duplicate clients (#9217).
+        return ClerkConfigurationOptions(proxyUrl = proxyUrl)
+            .withForegroundRefreshDisabled()
+            .withCustomHeaders(customHeaders)
+    }
+
+    private fun startAuthFlowStateObserver() {
+        if (authFlowStateObserverJob != null) {
+            return
+        }
+
+        authFlowStateObserverJob = coroutineScope.launch {
+            combine(Clerk.isInitialized, Clerk.isAuthFlowCompleteFlow) { isLoaded, isAuthFlowComplete ->
+                AuthFlowStateSnapshot(
+                    isLoaded = isLoaded,
+                    isAuthFlowComplete = isLoaded && isAuthFlowComplete
+                )
+            }
+                .distinctUntilChanged()
+                .collect { state ->
+                    sendEvent(NATIVE_AUTH_FLOW_CHANGED_EVENT, authFlowStatePayload(state))
+                }
+        }
+    }
+
+    private fun authFlowStatePayload(
+        state: AuthFlowStateSnapshot = AuthFlowStateSnapshot(
+            isLoaded = Clerk.isInitialized.value,
+            isAuthFlowComplete = Clerk.isInitialized.value && Clerk.isAuthFlowComplete
+        )
+    ): Map<String, Boolean> {
+        return mapOf(
+            "isLoaded" to state.isLoaded,
+            "isAuthFlowComplete" to state.isAuthFlowComplete
+        )
+    }
+
+    private fun startClientStateObserver() {
+        if (clientStateObserverJob != null) {
+            return
+        }
+
+        lastObservedClientState = clientStateSnapshot()
+
+        clientStateObserverJob = coroutineScope.launch {
+            Clerk.clientFlow.collect { client ->
+                val previousClientState = lastObservedClientState
+                val newClientState = clientStateSnapshot(client)
+
+                if (newClientState == previousClientState) {
+                    return@collect
+                }
+
+                lastObservedClientState = newClientState
+                if (jsOriginatedClientSyncDepth > 0) {
+                    return@collect
+                }
+
+                sendEvent(
+                    NATIVE_CLIENT_CHANGED_EVENT,
+                    clientChangedPayload(
+                        deviceToken = newClientState.deviceToken,
+                        changes = ClientStateChanges(
+                            client = newClientState.client != previousClientState?.client,
+                            deviceToken = newClientState.deviceToken != previousClientState?.deviceToken
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private fun clientStateSnapshot(client: Client? = Clerk.clientFlow.value): ClientStateSnapshot {
+        return ClientStateSnapshot(
+            client = client,
+            deviceToken = try {
+                Clerk.getDeviceToken()
+            } catch (e: Exception) {
+                debugLog(TAG, "clientStateSnapshot - getDeviceToken failed: ${e.message}")
+                null
+            }
+        )
+    }
+
+    private fun clientChangedPayload(
+        sourceId: String? = null,
+        changes: ClientStateChanges,
+        deviceToken: String? = clientStateSnapshot().deviceToken
+    ): Map<String, Any?> {
+        val result = mutableMapOf<String, Any?>(
+            "changed" to mapOf(
+                "client" to changes.client,
+                "deviceToken" to changes.deviceToken
+            ),
+            "deviceToken" to deviceToken
+        )
+        if (!sourceId.isNullOrEmpty()) {
+            result["sourceId"] = sourceId
+        }
+        return result
+    }
+
+    private fun emitSyncedClientChanged(
+        sourceId: String?,
+        changes: ClientStateChanges,
+        snapshot: ClientStateSnapshot = clientStateSnapshot()
+    ) {
+        lastObservedClientState = snapshot
+        sendEvent(
+            NATIVE_CLIENT_CHANGED_EVENT,
+            clientChangedPayload(
+                sourceId = sourceId,
+                changes = changes,
+                deviceToken = snapshot.deviceToken
+            )
+        )
+    }
+
+    // MARK: - configure
+
+    private fun configure(pubKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) {
+        val context = reactContext ?: run {
+            promise.reject("E_INIT_FAILED", "React context is not available", null)
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                val normalizedBearerToken = bearerToken?.trim()?.takeIf { it.isNotEmpty() }
+                val normalizedProxyUrl = proxyUrl?.trim()?.takeIf { it.isNotEmpty() }
+
+                if (!Clerk.isInitialized.value) {
+                    // First-time initialization — write the bearer token to SharedPreferences
+                    // before initializing so the SDK boots with the correct client.
+                    if (normalizedBearerToken != null) {
+                        context.getSharedPreferences("clerk_preferences", Context.MODE_PRIVATE)
+                            .edit()
+                            .putString("DEVICE_TOKEN", normalizedBearerToken)
+                            .apply()
+                    }
+
+                    Clerk.initialize(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
+                    startClientStateObserver()
+                    // clerk-android registers ActivityLifecycleCallbacks during
+                    // initialize(), but in React Native MainActivity has already passed
+                    // onResume() by the time <ClerkProvider> mounts and we reach this
+                    // line, so the callbacks miss the initial activity. Without seeding,
+                    // the first Credential Manager call (Google sign-in / passkeys)
+                    // fails with MissingActivity until the user backgrounds and
+                    // foregrounds the app. currentActivity can be null here on
+                    // cold start before React's host-resume sync — AuthView and
+                    // UserProfile also call attachActivity() on mount as a backstop.
+                    appContext.currentActivity?.let { Clerk.attachActivity(it) }
+                    // Must be set AFTER Clerk.initialize() because initialize()
+                    // resets customTheme to its `theme` parameter (default null).
+                    loadThemeFromAssets(context)
+
+                    // Wait for initialization to complete with timeout
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                        // If a bearer token was provided, wait for native client state to hydrate
+                        // before resolving the configure call.
+                        if (normalizedBearerToken != null) {
+                            withTimeout(5_000L) {
+                                Clerk.clientFlow.first { it != null }
+                            }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk initialization timed out: ${initError.message}"
+                        } else {
+                            "Clerk initialization timed out after 10 seconds"
+                        }
+                        promise.reject("E_TIMEOUT", message, null)
+                        return@launch
+                    }
+
+                    // Check for initialization errors
+                    val error = Clerk.initializationError.value
+                    if (error != null) {
+                        promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${error.message}", null)
+                    } else {
+                        configuredPublishableKey = pubKey
+                        configuredProxyUrl = normalizedProxyUrl
+                        lastObservedClientState = clientStateSnapshot()
+                        promise.resolve(null)
+                    }
+                    return@launch
+                }
+
+                val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
+                val activeProxyUrl = configuredProxyUrl ?: Clerk.proxyUrl
+                if (activePublishableKey != null && (activePublishableKey != pubKey || activeProxyUrl != normalizedProxyUrl)) {
+                    Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions(normalizedProxyUrl))
+                    startClientStateObserver()
+                    appContext.currentActivity?.let { Clerk.attachActivity(it) }
+                    loadThemeFromAssets(context)
+
+                    try {
+                        withTimeout(10_000L) {
+                            Clerk.isInitialized.first { it }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        val initError = Clerk.initializationError.value
+                        val message = if (initError != null) {
+                            "Clerk reconfiguration timed out: ${initError.message}"
+                        } else {
+                            "Clerk reconfiguration timed out after 10 seconds"
+                        }
+                        promise.reject("E_TIMEOUT", message, null)
+                        return@launch
+                    }
+
+                    val error = Clerk.initializationError.value
+                    if (error != null) {
+                        promise.reject("E_RECONFIGURE_FAILED", "Failed to reconfigure Clerk SDK: ${error.message}", null)
+                        return@launch
+                    }
+
+                    if (normalizedBearerToken != null) {
+                        val clientState = clientStateSnapshot()
+                        if (clientState.deviceToken != normalizedBearerToken || clientState.client == null) {
+                            val result = Clerk.updateDeviceToken(normalizedBearerToken)
+                            if (result is ClerkResult.Failure) {
+                                debugLog(TAG, "configure - updateDeviceToken after reconfigure failed: ${result.error}")
+                            }
+                        }
+
+                        try {
+                            withTimeout(5_000L) {
+                                Clerk.clientFlow.first { it != null }
+                            }
+                        } catch (_: TimeoutCancellationException) {
+                            debugLog(TAG, "configure - client did not appear after reconfigure token update")
+                        }
+                    }
+
+                    configuredPublishableKey = pubKey
+                    configuredProxyUrl = normalizedProxyUrl
+                    lastObservedClientState = clientStateSnapshot()
+                    promise.resolve(null)
+                    return@launch
+                }
+
+                // Already initialized — use the public SDK API to update
+                // the device token and trigger a client/environment refresh.
+                startClientStateObserver()
+                if (normalizedBearerToken != null) {
+                    val clientState = clientStateSnapshot()
+                    val result = if (
+                        clientState.deviceToken != normalizedBearerToken ||
+                        clientState.client == null
+                    ) {
+                        Clerk.updateDeviceToken(normalizedBearerToken)
+                    } else {
+                        // A remounted JS runtime can have the same token while native
+                        // client state is stale, so preserve one refresh in that case.
+                        Clerk.refreshClient()
+                    }
+                    if (result is ClerkResult.Failure) {
+                        debugLog(TAG, "configure - client refresh failed: ${result.error}")
+                    }
+
+                    // Wait for client state to hydrate with the new token (up to 5s).
+                    try {
+                        withTimeout(5_000L) {
+                            Clerk.clientFlow.first { it != null }
+                        }
+                    } catch (_: TimeoutCancellationException) {
+                        debugLog(TAG, "configure - client did not appear after token update")
+                    }
+                }
+
+                lastObservedClientState = clientStateSnapshot()
+                promise.resolve(null)
+            } catch (e: Exception) {
+                promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
+            }
+        }
+    }
+
+    // MARK: - getClientToken
+
+    private fun getClientToken(promise: Promise) {
+        try {
+            // Use the SDK's public API which handles encrypted storage transparently.
+            // Direct SharedPreferences reads break on clerk-android >= 1.0.11 where
+            // DEVICE_TOKEN is encrypted via StorageCipher.
+            val deviceToken = Clerk.getDeviceToken()
+            promise.resolve(deviceToken)
+        } catch (e: Exception) {
+            debugLog(TAG, "getClientToken failed: ${e.message}")
+            promise.resolve(null)
+        }
+    }
+
+    // MARK: - biometric credentials
+
+    private fun getBiometricCredentialAvailability(
+        id: String?,
+        identifierHint: String?,
+        promise: Promise
+    ) {
+        val environmentAvailability = biometricCredentialEnvironmentAvailabilityPayload(Clerk.isInitialized.value)
+        if (environmentAvailability != null) {
+            promise.resolve(environmentAvailability)
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                val availability = Clerk.biometricCredentials.availability(id, identifierHint)
+                promise.resolve(biometricCredentialAvailabilityPayload(availability))
+            } catch (e: Exception) {
+                rejectBiometricCredentialException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_AVAILABILITY_FAILED",
+                    fallbackMessage = "Unable to determine biometric-credential availability",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun listBiometricCredentials(promise: Promise) {
+        if (!requireBiometricCredentialEnvironment(promise)) {
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                when (val result = Clerk.biometricCredentials.list()) {
+                    is ClerkResult.Success -> promise.resolve(result.value.map(::biometricCredentialPayload))
+                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
+                        promise,
+                        "E_TRUSTED_DEVICE_LIST_FAILED",
+                        "Unable to list biometric credentials",
+                        result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectBiometricCredentialException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_LIST_FAILED",
+                    fallbackMessage = "Unable to list biometric credentials",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun enrollBiometricCredential(
+        deviceName: String?,
+        identifierHint: String?,
+        reason: String?,
+        policy: String,
+        promise: Promise
+    ) {
+        if (!requireBiometricCredentialEnvironment(promise)) {
+            return
+        }
+
+        val biometricCredentialPolicy = biometricCredentialPolicy(policy)
+        if (biometricCredentialPolicy == null) {
+            promise.reject(
+                "invalid_trusted_device_policy",
+                "Invalid biometric-credential policy: $policy",
+                null
+            )
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                if (!attachCurrentActivityForBiometricCredential(promise)) {
+                    return@launch
+                }
+                when (
+                    val result = Clerk.biometricCredentials.enroll(
+                        name = deviceName,
+                        identifierHint = identifierHint,
+                        policy = biometricCredentialPolicy,
+                        promptSubtitle = reason
+                    )
+                ) {
+                    is ClerkResult.Success -> promise.resolve(biometricCredentialPayload(result.value))
+                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
+                        promise,
+                        "E_TRUSTED_DEVICE_ENROLLMENT_FAILED",
+                        "Unable to enroll biometric credential",
+                        result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectBiometricCredentialException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_ENROLLMENT_FAILED",
+                    fallbackMessage = "Unable to enroll biometric credential",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun revokeBiometricCredential(id: String, promise: Promise) {
+        if (!requireBiometricCredentialEnvironment(promise)) {
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                when (val result = Clerk.biometricCredentials.revoke(id)) {
+                    is ClerkResult.Success -> promise.resolve(biometricCredentialPayload(result.value))
+                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
+                        promise,
+                        "E_TRUSTED_DEVICE_REVOCATION_FAILED",
+                        "Unable to revoke biometric credential",
+                        result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectBiometricCredentialException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_REVOCATION_FAILED",
+                    fallbackMessage = "Unable to revoke biometric credential",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun signInWithBiometrics(
+        id: String?,
+        identifierHint: String?,
+        reason: String?,
+        promise: Promise
+    ) {
+        if (!requireBiometricCredentialEnvironment(promise)) {
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                if (!attachCurrentActivityForBiometricCredential(promise)) {
+                    return@launch
+                }
+                when (
+                    val result = Clerk.biometricCredentials.signIn(
+                        id = id,
+                        identifierHint = identifierHint,
+                        promptSubtitle = reason
+                    )
+                ) {
+                    is ClerkResult.Success -> promise.resolve(biometricSignInPayload(result.value))
+                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
+                        promise,
+                        "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
+                        "Unable to sign in with biometric credential",
+                        result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectBiometricCredentialException(
+                    promise = promise,
+                    fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
+                    fallbackMessage = "Unable to sign in with biometric credential",
+                    exception = e
+                )
+            }
+        }
+    }
+
+    private fun reverifyWithBiometrics(
+        sessionId: String,
+        level: String,
+        reason: String?,
+        promise: Promise
+    ) {
+        if (!requireBiometricCredentialEnvironment(promise)) return
+        val requestedLevel = biometricReverificationLevel(level)
+        if (requestedLevel == null) {
+            promise.reject("invalid_reverification_level", "Invalid biometric reverification level: $level", null)
+            return
+        }
+        coroutineScope.launch {
+            try {
+                val session = Clerk.clientFlow.value?.sessions?.firstOrNull { it.id == sessionId }
+                if (session == null) {
+                    promise.reject(
+                        "biometric_reverification_session_unavailable",
+                        "The session to reverify is unavailable in the native Clerk client.",
+                        null
+                    )
+                    return@launch
+                }
+                if (!attachCurrentActivityForBiometricCredential(promise)) return@launch
+                val started = when (val result = session.startVerification(requestedLevel)) {
+                    is ClerkResult.Success -> result.value
+                    is ClerkResult.Failure -> {
+                        rejectBiometricCredentialFailure(promise, "E_BIOMETRIC_REVERIFICATION_FAILED",
+                            "Unable to start biometric reverification", result)
+                        return@launch
+                    }
+                }
+                val result = verifyBiometricReverification(started) { factor ->
+                    session.verifyWithBiometrics(promptSubtitle = reason, level = factor)
+                }
+                when (result) {
+                    is ClerkResult.Success -> promise.resolve(biometricReverificationPayload(result.value, sessionId))
+                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
+                        promise, "E_BIOMETRIC_REVERIFICATION_FAILED", "Unable to reverify with biometrics", result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectBiometricCredentialException(promise, "E_BIOMETRIC_REVERIFICATION_FAILED",
+                    "Unable to reverify with biometrics", e)
+            }
+        }
+    }
+
+    private fun requireBiometricCredentialEnvironment(promise: Promise): Boolean {
+        val error = biometricCredentialEnvironmentError(Clerk.isInitialized.value) ?: return true
+        promise.reject(error.code, error.message, null)
+        return false
+    }
+
+    private fun attachCurrentActivityForBiometricCredential(promise: Promise): Boolean {
+        val activity = appContext.currentActivity
+        if (activity == null) {
+            promise.reject(
+                "environment_unavailable",
+                "Biometric authentication requires an active Android activity",
+                null
+            )
+            return false
+        }
+
+        Clerk.attachActivity(activity)
+        return true
+    }
+
+    private fun rejectBiometricCredentialFailure(
+        promise: Promise,
+        code: String,
+        fallbackMessage: String,
+        failure: ClerkResult.Failure<ClerkErrorResponse>
+    ) {
+        val error = biometricCredentialBridgeError(failure, code, fallbackMessage)
+        promise.reject(
+            error.code,
+            error.message,
+            failure.throwable
+        )
+    }
+
+    private fun rejectBiometricCredentialException(
+        promise: Promise,
+        fallbackCode: String,
+        fallbackMessage: String,
+        exception: Exception
+    ) {
+        val error = biometricCredentialBridgeError(exception, fallbackCode, fallbackMessage)
+        promise.reject(error.code, error.message, exception)
+    }
+
+    // MARK: - syncClientStateFromJs
+
+    private fun syncClientStateFromJs(
+        deviceToken: String?,
+        sourceId: String?,
+        didChangeClient: Boolean,
+        didChangeDeviceToken: Boolean,
+        promise: Promise
+    ) {
+        if (!Clerk.isInitialized.value) {
+            promise.resolve(null)
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                jsOriginatedClientSyncDepth += 1
+                val previousClientState = clientStateSnapshot()
+                var refreshedClientWhileUpdatingToken = false
+
+                if (didChangeDeviceToken && !deviceToken.isNullOrBlank()) {
+                    val currentDeviceToken = try {
+                        Clerk.getDeviceToken()
+                    } catch (_: Exception) {
+                        null
+                    }
+
+                    if (currentDeviceToken != deviceToken) {
+                        when (val result = Clerk.updateDeviceToken(deviceToken)) {
+                            is ClerkResult.Failure -> {
+                                promise.reject(
+                                    "E_SYNC_FROM_JS_FAILED",
+                                    result.error?.firstMessage() ?: result.throwable?.message ?: "Device token sync failed",
+                                    null
+                                )
+                                return@launch
+                            }
+                            is ClerkResult.Success -> {
+                                refreshedClientWhileUpdatingToken = true
+                                try {
+                                    withTimeout(5_000L) {
+                                        Clerk.clientFlow.first { it != null }
+                                    }
+                                } catch (_: TimeoutCancellationException) {
+                                    debugLog(TAG, "syncClientStateFromJs - client did not appear after token update")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!refreshedClientWhileUpdatingToken && (didChangeClient || didChangeDeviceToken)) {
+                    when (val result = Clerk.refreshClient()) {
+                        is ClerkResult.Failure -> {
+                            promise.reject(
+                                "E_SYNC_FROM_JS_FAILED",
+                                result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
+                                null
+                            )
+                        }
+                        is ClerkResult.Success -> {
+                            val newClientState = clientStateSnapshot()
+                            emitSyncedClientChanged(
+                                sourceId,
+                                ClientStateChanges(
+                                    client = newClientState.client != previousClientState.client,
+                                    deviceToken = newClientState.deviceToken != previousClientState.deviceToken
+                                ),
+                                newClientState
+                            )
+                            promise.resolve(null)
+                        }
+                    }
+                    return@launch
+                }
+
+                val newClientState = clientStateSnapshot()
+                emitSyncedClientChanged(
+                    sourceId,
+                    ClientStateChanges(
+                        client = newClientState.client != previousClientState.client,
+                        deviceToken = newClientState.deviceToken != previousClientState.deviceToken
+                    ),
+                    newClientState
+                )
+                promise.resolve(null)
+            } catch (e: Exception) {
+                promise.reject("E_SYNC_FROM_JS_FAILED", e.message ?: "Client state sync failed", e)
+            } finally {
+                jsOriginatedClientSyncDepth = maxOf(0, jsOriginatedClientSyncDepth - 1)
+            }
+        }
+    }
+
+    // MARK: - Theme Loading
+
+    private fun loadThemeFromAssets(context: Context) {
+        try {
+            val jsonString = context.assets
+                .open("clerk_theme.json")
+                .bufferedReader()
+                .use { it.readText() }
+            val json = JSONObject(jsonString)
+            Clerk.customTheme = parseClerkTheme(json)
+        } catch (e: java.io.FileNotFoundException) {
+            // No theme file provided — use defaults
+        } catch (e: Exception) {
+            debugLog(TAG, "Failed to load clerk_theme.json: ${e.message}")
+        }
+    }
+
+    private fun parseClerkTheme(json: JSONObject): ClerkTheme {
+        val colors = json.optJSONObject("colors")?.let { parseColors(it) }
+        val darkColors = json.optJSONObject("darkColors")?.let { parseColors(it) }
+        val design = json.optJSONObject("design")?.let { parseDesign(it) }
+        return ClerkTheme(
+            colors = colors,
+            darkColors = darkColors,
+            design = design
+        )
+    }
+
+    private fun parseColors(json: JSONObject): ClerkColors {
+        return ClerkColors(
+            primary = json.optStringColor("primary"),
+            background = json.optStringColor("background"),
+            input = json.optStringColor("input"),
+            danger = json.optStringColor("danger"),
+            success = json.optStringColor("success"),
+            warning = json.optStringColor("warning"),
+            foreground = json.optStringColor("foreground"),
+            mutedForeground = json.optStringColor("mutedForeground"),
+            primaryForeground = json.optStringColor("primaryForeground"),
+            inputForeground = json.optStringColor("inputForeground"),
+            neutral = json.optStringColor("neutral"),
+            border = json.optStringColor("border"),
+            ring = json.optStringColor("ring"),
+            muted = json.optStringColor("muted"),
+            shadow = json.optStringColor("shadow"),
+            secondaryButtonBackground = json.optStringColor("secondaryButtonBackground"),
+            secondaryButtonForeground = json.optStringColor("secondaryButtonForeground")
+        )
+    }
+
+    private fun parseDesign(json: JSONObject): ClerkDesign {
+        return if (json.has("borderRadius")) {
+            ClerkDesign(borderRadius = json.getDouble("borderRadius").toFloat().dp)
+        } else {
+            ClerkDesign()
+        }
+    }
+
+    private fun parseHexColor(hex: String): Color? {
+        val cleaned = hex.removePrefix("#")
+        return try {
+            when (cleaned.length) {
+                6 -> Color(android.graphics.Color.parseColor("#FF$cleaned"))
+                // Theme JSON uses RRGGBBAA; Android parseColor expects AARRGGBB
+                8 -> {
+                    val rrggbb = cleaned.substring(0, 6)
+                    val aa = cleaned.substring(6, 8)
+                    Color(android.graphics.Color.parseColor("#$aa$rrggbb"))
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun JSONObject.optStringColor(key: String): Color? {
+        if (!has(key) || isNull(key)) return null
+        val value = optString(key)
+        return parseHexColor(value)
+    }
+}

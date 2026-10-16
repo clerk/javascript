@@ -1,9 +1,10 @@
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { type ReactNode, type Ref, useMemo } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import { UserProfileSecurityList } from '../user-profile-security-list';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
@@ -22,6 +23,7 @@ export interface UserProfileMfaSectionViewProps {
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
+  reverification?: ReverificationController;
 }
 
 export function UserProfileMfaSectionView({
@@ -33,10 +35,10 @@ export function UserProfileMfaSectionView({
   onRegenerateBackupCodes,
   onRemove,
   onSetDefault,
+  reverification,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const controller = useUserProfileMfaSectionLeafController({ methods, onRemove, onSetDefault });
-  const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
+  const controller = useUserProfileMfaSectionLeafController({ methods, onAdd, onRemove, onSetDefault, reverification });
 
   return (
     <>
@@ -44,7 +46,7 @@ export function UserProfileMfaSectionView({
         sectionRef={controller.sectionRef}
         addControl={
           addControl ??
-          (onAdd && addableMethods?.length ? (
+          (controller.addMethod && addableMethods?.length ? (
             <UserProfileAddMfaDialog
               triggerRef={addButtonRef}
               open={controller.pickerOpen}
@@ -52,10 +54,7 @@ export function UserProfileMfaSectionView({
             >
               <UserProfileAddMfaView
                 methods={addableMethods}
-                onSelect={type => {
-                  onAdd(type);
-                  controller.closePicker();
-                }}
+                onSelect={controller.addMethod}
               />
             </UserProfileAddMfaDialog>
           ) : null)
@@ -70,21 +69,20 @@ export function UserProfileMfaSectionView({
             key={method.id}
             method={method}
             triggerRef={controller.registerTrigger(method.id)}
-            onRemove={onRemove ? () => controller.openRemoval(() => removeMethod.open(method)) : undefined}
-            onSetDefault={onSetDefault && !controller.isSettingDefault ? controller.setDefault : undefined}
+            onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
+            onSetDefault={controller.setDefault}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
         ))}
       </UserProfileSecurityList>
       <Section.Error>{controller.defaultError}</Section.Error>
-      {onRemove ? (
+      {controller.remove ? (
         <Confirmation
-          handle={removeMethod}
+          controller={controller.remove}
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
           description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
           finalFocus={controller.finalRemovalFocus}
-          onConfirm={controller.confirmRemoval}
         />
       ) : null}
     </>

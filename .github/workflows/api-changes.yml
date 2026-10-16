@@ -19,6 +19,7 @@ on:
       - 'packages/clerk-js/**'
       - 'packages/expo/**'
       - 'packages/expo-google-signin/**'
+      - 'packages/expo-native-components/**'
       - 'packages/expo-passkeys/**'
       - 'packages/express/**'
       - 'packages/fastify/**'
@@ -56,6 +57,7 @@ env:
     --filter=@clerk/clerk-js
     --filter=@clerk/expo
     --filter=@clerk/expo-google-signin
+    --filter=@clerk/expo-native-components
     --filter=@clerk/expo-passkeys
     --filter=@clerk/express
     --filter=@clerk/fastify
@@ -90,14 +92,14 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           filter: 'blob:none'
           show-progress: false
 
       - name: Setup
-        uses: ./.github/actions/init-blacksmith
+        uses: $/.github/actions/init-blacksmith
         with:
           cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
@@ -113,7 +115,7 @@ jobs:
             --output "$GITHUB_WORKSPACE/.api-snapshots-baseline"
 
       - name: Upload baseline artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: break-check-baseline
           path: .api-snapshots-baseline
@@ -142,7 +144,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           # Check out the PR head commit, not the refs/pull/N/merge ref that
           # checkout resolves by default (it absorbs base-branch drift, so once
@@ -159,7 +161,7 @@ jobs:
           show-progress: false
 
       - name: Setup
-        uses: ./.github/actions/init-blacksmith
+        uses: $/.github/actions/init-blacksmith
         with:
           cache-enabled: true
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
@@ -174,7 +176,7 @@ jobs:
         run: echo "BREAK_CHECK_FILTERS=$BREAK_CHECK_FILTERS" >> "$GITHUB_ENV"
 
       - name: Break Check
-        uses: clerk/break-check@92be9cc726c848b9567c7b869e9b11dc761ddd6e # v0.6.0
+        uses: clerk/break-check@v0.6.0
         with:
           break-check-version: '0.6.0'
           # The PR head is already checked out, so build it in place rather than

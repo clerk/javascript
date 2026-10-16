@@ -1,4 +1,4 @@
-import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
@@ -12,12 +12,13 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-contact.types';
 import { UserProfileDangerSectionView } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section.view';
 import { UserProfileEmailSectionView } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.view';
+import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
 import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import { UserProfilePhoneSectionView } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.view';
 import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
 import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
@@ -34,8 +35,8 @@ import { useUserProfileProfileFixture } from './user-profile-profile';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export function UserProfileDangerPreview() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDangerSectionView {...controller} />;
+  const controller = useConfirmController({ onConfirm: () => Promise.resolve() });
+  return <UserProfileDangerSectionView controller={controller} />;
 }
 
 const exampleEmails: UserProfileEmail[] = [
@@ -63,7 +64,6 @@ const examplePaymentMethods: UserProfilePaymentMethod[] = [
  * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture() {
-  const titleRef = useRef<HTMLDivElement>(null);
   const connections = useConnectedAccountsFixture();
   const wallets = useWeb3WalletsFixture();
   const profile = useUserProfileProfileFixture();
@@ -107,29 +107,26 @@ export function useUserProfileFixture() {
   const apiKeys = useAPIKeysTableFixture();
   const pages: UserProfileViewProps['pages'] = {
     account: {
-      titleRef,
-      profileSlot: <UserProfileProfileSectionView {...profile} />,
-      emailSlot: <UserProfileEmailSectionView {...emails} />,
-      phoneSlot: <UserProfilePhoneSectionView {...phones} />,
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          {...connections}
-          fallbackFocus={() => titleRef.current}
-        />
+      children: (
+        <>
+          <UserProfileProfileSectionView {...profile} />
+          <UserProfileEmailSectionView {...emails} />
+          <UserProfilePhoneSectionView {...phones} />
+          <UserProfileConnectedAccountsSectionView {...connections} />
+          <UserProfileWeb3WalletsSectionView {...wallets} />
+          <UserProfileDangerPreview />
+        </>
       ),
-      web3WalletsSlot: (
-        <UserProfileWeb3WalletsSectionView
-          {...wallets}
-          fallbackFocus={() => titleRef.current}
-        />
-      ),
-      dangerSlot: <UserProfileDangerPreview />,
     },
     security: {
-      passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
-      passkeysSlot: <UserProfilePasskeysSectionView {...passkeys} />,
-      ...mfa.security,
-      activeDevicesSlot: <UserProfileActiveDevicesSectionView {...activeDevices} />,
+      children: (
+        <>
+          <UserProfilePasswordSectionView {...editPassword} />
+          <UserProfilePasskeysSectionView {...passkeys} />
+          <UserProfileMfaSectionView {...mfa.section} />
+          <UserProfileActiveDevicesSectionView {...activeDevices} />
+        </>
+      ),
     },
     billing: {
       subscription,

@@ -4,7 +4,6 @@ import { UserProfilePhoneSectionView } from '@clerk/mosaic/features/user-profile
 import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
 import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
-import { useRef } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -20,6 +19,7 @@ export { default as __source } from './user-profile-profile-panel.stories?raw';
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
+  substatus: 'needs reverification',
   title: 'UserProfileProfilePanel',
   label: 'Profile panel',
   navigation: { category: 'Panels' },
@@ -27,7 +27,6 @@ export const meta: StoryMeta = {
 };
 
 export function Default(_args: Record<string, unknown>) {
-  const titleRef = useRef<HTMLDivElement>(null);
   const connections = useConnectedAccountsFixture();
   const wallets = useWeb3WalletsFixture();
   const profile = useUserProfileProfileFixture();
@@ -35,24 +34,13 @@ export function Default(_args: Record<string, unknown>) {
   const phones = useUserProfilePhonesFixture();
 
   return (
-    <UserProfileProfilePanelView
-      titleRef={titleRef}
-      profileSlot={<UserProfileProfileSectionView {...profile} />}
-      emailSlot={<UserProfileEmailSectionView {...emails} />}
-      phoneSlot={<UserProfilePhoneSectionView {...phones} />}
-      connectedAccountsSlot={
-        <UserProfileConnectedAccountsSectionView
-          {...connections}
-          fallbackFocus={() => titleRef.current}
-        />
-      }
-      web3WalletsSlot={
-        <UserProfileWeb3WalletsSectionView
-          {...wallets}
-          fallbackFocus={() => titleRef.current}
-        />
-      }
-      dangerSlot={<UserProfileDangerPreview />}
-    />
+    <UserProfileProfilePanelView>
+      <UserProfileProfileSectionView {...profile} />
+      <UserProfileEmailSectionView {...emails} />
+      <UserProfilePhoneSectionView {...phones} />
+      <UserProfileConnectedAccountsSectionView {...connections} />
+      <UserProfileWeb3WalletsSectionView {...wallets} />
+      <UserProfileDangerPreview />
+    </UserProfileProfilePanelView>
   );
 }

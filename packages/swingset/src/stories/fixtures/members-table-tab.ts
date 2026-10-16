@@ -1,9 +1,11 @@
+import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type {
   MembersTableTabViewProps,
   OrganizationProfileMember,
 } from '@clerk/mosaic/features/organization-profile/members-table-tab.types';
+import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
 import { useLocale } from '@clerk/mosaic/localization';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosName, chaosRows, chaosText } from '@/lib/chaos';
@@ -64,6 +66,16 @@ export function useMembersTableFixture({ proposed = false, empty = false } = {})
       }).format(item.joinedAt),
       roleLabel: roles.find(role => role.value === item.role)?.label ?? item.role,
     }));
+  const inviteButtonRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: members.filter(member => !member.isCurrentUser).map(member => member.id),
+    onRemove: id => setItems(current => current.filter(item => item.id !== id)),
+    fallback: () => inviteButtonRef.current ?? searchInputRef.current,
+  });
+  const remove = useConfirmController<OrganizationProfileMember>({
+    onConfirm: member => removalFocus.remove(member.id),
+  });
   return {
     members,
     roles,
@@ -78,7 +90,11 @@ export function useMembersTableFixture({ proposed = false, empty = false } = {})
     },
     onPageChange: setPage,
     onChangeRole: (id, role) => setItems(current => current.map(item => (item.id === id ? { ...item, role } : item))),
-    onRemove: id => setItems(current => current.filter(item => item.id !== id)),
+    inviteButtonRef,
+    searchInputRef,
+    registerTrigger: removalFocus.registerTrigger,
+    remove,
+    finalFocus: removalFocus.finalFocus,
     onBulkAction: proposed ? () => undefined : undefined,
   };
 }

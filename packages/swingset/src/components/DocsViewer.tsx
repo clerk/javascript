@@ -12,6 +12,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
+  'organization-switcher': {
+    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
+  },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
@@ -65,6 +68,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'action-bar': dynamic(() => import('../stories/action-bar.mdx')),
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
+    skeleton: dynamic(() => import('../stories/skeleton.mdx')),
     banner: dynamic(() => import('../stories/banner.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
@@ -89,6 +93,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     panel: dynamic(() => import('../stories/panel.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     profile: dynamic(() => import('../stories/profile.component.mdx')),
+    radio: dynamic(() => import('../stories/radio.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),
     'segmented-control': dynamic(() => import('../stories/segmented-control.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),

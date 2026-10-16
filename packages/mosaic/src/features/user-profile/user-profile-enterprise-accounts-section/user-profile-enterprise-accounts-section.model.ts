@@ -5,6 +5,7 @@ import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@c
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import { useUserProfileOptions } from '../user-profile.provider';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
@@ -71,9 +72,8 @@ export type UserProfileEnterpriseAccountsModel =
       connect: (connectionId: string) => Promise<EnterpriseAccountActionResult>;
     };
 
-export function useUserProfileEnterpriseAccountsModel({
-  mode,
-}: { mode?: 'modal' | 'mounted' } = {}): UserProfileEnterpriseAccountsModel {
+export function useUserProfileEnterpriseAccountsModel(): UserProfileEnterpriseAccountsModel {
+  const { mode } = useUserProfileOptions();
   const clerk = useClerk();
   const router = useMosaicRouter();
   const { isLoaded, user } = useUser();

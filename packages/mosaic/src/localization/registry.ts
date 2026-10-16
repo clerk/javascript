@@ -1,4 +1,5 @@
 import { formMessages } from '../components/form/form.messages';
+import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
 import { invitationsTableTabMessages } from '../features/organization-profile/invitations-table-tab.messages';
 import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
@@ -7,6 +8,7 @@ import { organizationProfileDangerSectionMessages } from '../features/organizati
 import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-invite-members.messages';
 import { organizationProfileProfileSectionMessages } from '../features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.messages';
 import { requestsTableTabMessages } from '../features/organization-profile/requests-table-tab.messages';
+import { organizationSwitcherMessages } from '../features/organization-switcher/organization-switcher.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
@@ -38,9 +40,11 @@ export const mosaicMessages = {
   invitationsTableTab: invitationsTableTabMessages,
   requestsTableTab: requestsTableTabMessages,
   organizationProfile: organizationProfileMessages,
+  organizationSwitcher: organizationSwitcherMessages,
   organizationProfileDangerSection: organizationProfileDangerSectionMessages,
   organizationProfileProfileSection: organizationProfileProfileSectionMessages,
   organizationProfileInviteMembers: organizationProfileInviteMembersMessages,
+  profile: profileMessages,
   reverification: reverificationMessages,
   userButton: userButtonMessages,
   userProfile: userProfileMessages,

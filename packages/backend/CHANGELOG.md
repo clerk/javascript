@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.24.0
+
+### Minor Changes
+
+- Add `deprovisioned` to the Backend `User` object and `UserJSON`, so you can tell when Directory Sync has deactivated a user, including in `user.updated` webhook payloads, without casting. It's separate from `banned`: Directory Sync sets and clears `deprovisioned`, while you set `banned` through the Dashboard or Backend API. ([#10245](https://github.com/clerk/javascript/pull/10245)) by [@manovotny](https://github.com/manovotny)
+
 ## 3.23.2
 
 ### Patch Changes

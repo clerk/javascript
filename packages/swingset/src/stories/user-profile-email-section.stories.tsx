@@ -10,6 +10,7 @@ export { default as __source } from './user-profile-email-section.stories?raw';
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
+  substatus: 'needs reverification',
   title: 'UserProfileEmailSection',
   label: 'Email',
   navigation: { category: 'Sections' },
