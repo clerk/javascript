@@ -1,5 +1,5 @@
 import { useToastManager } from '@clerk/mosaic/components/toast';
-import type { OrganizationProfileInviteMembersDialogProps } from '@clerk/mosaic/features/organization-profile/organization-profile-invite-members.dialog';
+import type { OrganizationProfileInviteMembersDialogProps } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.dialog';
 import { useMessages } from '@clerk/mosaic/localization';
 import type { MouseEvent } from 'react';
 import { useRef, useState } from 'react';

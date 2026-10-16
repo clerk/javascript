@@ -1,4 +1,4 @@
-import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel.view';
+import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-members-panel.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -16,7 +16,8 @@ export const meta: StoryMeta = {
   title: 'OrganizationProfileMembersPanel',
   label: 'Members panel',
   navigation: { category: 'Panels' },
-  source: 'packages/mosaic/src/features/organization-profile/organization-profile-members-panel.view.tsx',
+  source:
+    'packages/mosaic/src/features/organization-profile/organization-profile-members-panel/organization-profile-members-panel.view.tsx',
 };
 
 export function Legacy() {

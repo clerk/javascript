@@ -1,4 +1,4 @@
-import type { RequestsTableTabViewProps } from '@clerk/mosaic/features/organization-profile/requests-table-tab.types';
+import type { RequestsTableTabViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/requests-table-tab.types';
 import { useLocale } from '@clerk/mosaic/localization';
 import { useState } from 'react';
 
