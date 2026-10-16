@@ -818,7 +818,8 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       return HttpResponse.json(page(keys, url));
     }),
     http.post(fapiUrl('/api_keys'), async ({ request }) => {
-      const body: { name: string; subject: string; seconds_until_expiration?: number } = await request.json();
+      const body: { name: string; subject: string; description?: string; seconds_until_expiration?: number } =
+        await request.json();
       if (state.apiKeys.some(key => !key.revoked && key.subject === body.subject && key.name === body.name)) {
         return error('token_creation_conflict', 409);
       }
@@ -827,6 +828,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         id: `ak_${state.apiKeys.length + 1}`,
         name: body.name,
         subject: body.subject,
+        description: body.description ?? null,
         expiration: body.seconds_until_expiration ? now + body.seconds_until_expiration * 1000 : null,
         created_at: now,
         updated_at: now,
