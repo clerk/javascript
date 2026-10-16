@@ -3,6 +3,12 @@ import { createContext, type ReactNode, useContext } from 'react';
 import type { AdditionalOAuthScopes } from './user-profile-connected-accounts-section/user-profile-connected-accounts-section.model';
 
 export interface UserProfileOptions {
+  /**
+   * Extra OAuth scopes to request per provider. A connected account missing any of them offers
+   * Reconnect to grant them.
+   *
+   * @example { google: ['https://www.googleapis.com/auth/calendar.readonly'] }
+   */
   additionalOAuthScopes?: AdditionalOAuthScopes;
   mode?: 'modal' | 'mounted';
 }
