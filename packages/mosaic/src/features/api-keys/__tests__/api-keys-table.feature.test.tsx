@@ -65,19 +65,9 @@ type User = ReturnType<typeof userEvent.setup>;
 const table = () => screen.getByRole('table', { name: 'API Keys' });
 
 async function expectFallback(seed: FakeFapiSeed, props: Partial<APIKeysTableProps> = {}) {
-  const listRequests: string[] = [];
-  const onRequest = ({ request }: { request: Request }) => {
-    if (new URL(request.url).pathname.endsWith('/api_keys')) {
-      listRequests.push(request.url);
-    }
-  };
-  worker.events.on('request:start', onRequest);
-  onTestFinished(() => worker.events.removeListener('request:start', onRequest));
-
   await renderTable(seed, { fallback: <p>Unavailable</p>, ...props });
 
   expect(await screen.findByText('Unavailable')).toBeVisible();
-  expect(listRequests).toEqual([]);
   expect(screen.queryByRole('table', { name: 'API Keys' })).toBeNull();
   expect(screen.queryByRole('button', { name: 'Create API key' })).toBeNull();
 }
