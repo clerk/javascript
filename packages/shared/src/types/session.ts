@@ -221,7 +221,7 @@ export interface SessionResource extends ClerkResource {
    */
   status: SessionStatus;
   /**
-   * The date and time when the session will expire. Unix epoch zero means no maximum lifetime.
+   * The date and time when the session will expire. For an [indefinite native session](https://clerk.com/docs/guides/secure/session-options#native-sessions), this represents Unix epoch zero, meaning no expiration deadline is configured.
    */
   expireAt: Date;
   /**
@@ -229,7 +229,7 @@ export interface SessionResource extends ClerkResource {
    */
   readonly hasMaximumLifetime?: boolean;
   /**
-   * The abandonment deadline. Unix epoch zero means no abandonment deadline.
+   * The abandonment deadline. For an [indefinite native session](https://clerk.com/docs/guides/secure/session-options#native-sessions), this represents Unix epoch zero, meaning no abandonment deadline is configured.
    */
   abandonAt: Date;
   /**
