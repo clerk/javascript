@@ -82,13 +82,6 @@ export const viewport = stylex.create({
 
 export const item = stylex.create({
   base: {
-    '--_cl-icon-color': {
-      default: colorVars['--cl-color-foreground-secondary'],
-      ':is([data-active])': colorVars['--cl-color-foreground'],
-      '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-foreground'],
-      },
-    },
     borderRadius: '0.375rem',
     borderStyle: 'none',
     gap: space['0.5'],
@@ -133,7 +126,6 @@ export const item = stylex.create({
   },
 
   negative: {
-    '--_cl-icon-color': colorVars['--cl-color-negative'],
     backgroundColor: {
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-negative-alpha-200'],
