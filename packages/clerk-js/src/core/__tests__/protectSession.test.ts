@@ -741,6 +741,158 @@ describe('ProtectSession deadlines', () => {
   });
 });
 
+describe('ProtectSession late token', () => {
+  const STORE_KEY = '__clerk_protect_st';
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (navigator as unknown as Record<string, unknown>).locks;
+  });
+
+  const timedOut = async () => {
+    const h = session([loader({ token_timeout_ms: 5_000 })]);
+    h.session?.start();
+    const first = h.session?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(5_000);
+    await expect(first).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+    return h;
+  };
+
+  it('keeps a token whose loader finishes after the deadline for the next sign-in', async () => {
+    const { session: created, elements } = await timedOut();
+
+    await vi.advanceTimersByTimeAsync(2_000);
+    serveInline(elements[0], { cid: created?.placeholders().cid });
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.payload.mac',
+      __clerk_protect_status: 'ok',
+    });
+    // Still inside the cooldown, so the token can only have come from the late load.
+    expect(elements).toHaveLength(1);
+  });
+
+  it('keeps a token whose ready settles after the deadline', async () => {
+    const { session: created, elements } = session([loader({ token_timeout_ms: 5_000 })]);
+    created?.start();
+    const first = created?.getRequestParams();
+
+    let release: (value: unknown) => void = () => undefined;
+    await vi.advanceTimersByTimeAsync(1_000);
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      ready: new Promise(resolve => {
+        release = resolve;
+      }),
+    });
+    await vi.advanceTimersByTimeAsync(4_000);
+    await expect(first).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+
+    // Well past a second deadline window, so only an unbounded late read can still catch it.
+    await vi.advanceTimersByTimeAsync(7_000);
+    release({ token: 'v1.late.mac', exp: nowSeconds() + 43_200 });
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.late.mac',
+      __clerk_protect_status: 'ok',
+    });
+  });
+
+  it('does not replace a stored token that lasts longer', async () => {
+    const { session: created, elements } = await timedOut();
+
+    localStorage.setItem(
+      STORE_KEY,
+      storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26), exp: nowSeconds() + 43_260 }),
+    );
+    serveInline(elements[0], { cid: created?.placeholders().cid });
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.leader.mac' });
+  });
+
+  it('replaces a stored token that is still usable but expires sooner', async () => {
+    const { session: created, elements } = await timedOut();
+
+    localStorage.setItem(STORE_KEY, storedEntry({ token: 'v1.old.mac', rid: 'c'.repeat(26), exp: nowSeconds() + 45 }));
+    serveInline(elements[0], { cid: created?.placeholders().cid });
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+  });
+
+  it('does not replace a stored token stamped with a newer invalidation floor', async () => {
+    const floor = nowSeconds() - 60;
+    const created = session([loader({ token_timeout_ms: 5_000 })], floor);
+    created.session?.start();
+    const first = created.session?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(5_000);
+    await expect(first).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+
+    localStorage.setItem(
+      STORE_KEY,
+      storedEntry({ token: 'v1.newer.mac', rid: 'c'.repeat(26), exp: nowSeconds() + 3_600, floor: floor + 30 }),
+    );
+    serveInline(created.elements[0], { cid: created.session?.placeholders().cid });
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(created.session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.newer.mac' });
+  });
+
+  it('waits for the cross-tab lock before storing a late token', async () => {
+    let tail: Promise<unknown> = Promise.resolve();
+    Object.defineProperty(navigator, 'locks', {
+      value: {
+        request: vi.fn((_key: string, _options: unknown, callback: () => Promise<unknown>) => {
+          const result = tail.then(() => callback());
+          tail = result.catch(() => undefined);
+          return result;
+        }),
+      },
+      configurable: true,
+    });
+
+    const a = await timedOut();
+
+    // Another tab takes the lock and starts minting.
+    const b = session([loader({ token_timeout_ms: 5_000 })]);
+    b.session?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(b.elements).toHaveLength(1);
+
+    serveInline(a.elements[0], { cid: a.session?.placeholders().cid });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(localStorage.getItem(STORE_KEY)).toBeNull();
+
+    serveInline(b.elements[0], {
+      cid: b.session?.placeholders().cid,
+      ready: Promise.resolve({ token: 'v1.b.mac', exp: nowSeconds() + 43_260 }),
+    });
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(JSON.parse(localStorage.getItem(STORE_KEY) as string)).toMatchObject({ token: 'v1.b.mac' });
+  });
+
+  it.each([
+    ['minted for another page', { cid: 'someone-else' }],
+    ['carrying no token', { ready: Promise.resolve({ status: 'no_token' }) }],
+  ])('ignores a late result %s', async (_name, overrides) => {
+    const { session: created, elements } = await timedOut();
+
+    serveInline(elements[0], { cid: created?.placeholders().cid, ...overrides });
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+    expect(localStorage.getItem(STORE_KEY)).toBeNull();
+  });
+});
+
 describe('ProtectSession cross-tab single flight', () => {
   /**
    * A serialising Web Locks stand-in. jsdom has no `navigator.locks`, and the `browser-tabs-lock`
