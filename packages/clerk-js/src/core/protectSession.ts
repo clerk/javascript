@@ -31,9 +31,11 @@ const INLINE_TOKEN_GLOBAL = '__clerk_specter';
 /** A token this close to expiry is treated as absent, so a fresh run starts before it lapses. */
 const TOKEN_REFRESH_MARGIN_MS = 60 * 1_000;
 /** Acquisition deadline when the instance does not configure one. */
-const DEFAULT_TOKEN_TIMEOUT_MS = 5 * 1_000;
+const DEFAULT_TOKEN_TIMEOUT_MS = 10 * 1_000;
 /** Ceiling on the instance-configured deadline, so no server value can stall a sign-in. */
 const MAX_TOKEN_TIMEOUT_MS = 10 * 1_000;
+/** How often a tab that could not take the lock re-reads the store while another tab mints. */
+const STORE_POLL_INTERVAL_MS = 100;
 /** A stored token claiming more remaining life than this was not minted by us. */
 const MAX_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1_000;
 /** Longest token we will hand back, so a planted store entry cannot bloat a sign-in body. */
@@ -666,6 +668,7 @@ export class ProtectSession {
       return 'ok';
     }
 
+    const deadline = Date.now() + this.#timeoutMs;
     const result = await this.#lock.acquireLockAndRun(async () => {
       // Double-checked inside the lock. Without this re-read every tab runs the loader in turn,
       // which is the exact failure this design exists to prevent.
@@ -680,8 +683,19 @@ export class ProtectSession {
     }
 
     // The lock was never held — `SafeLock` gives up waiting after ~5s so a wedged leader delays
-    // nobody. Whatever a leader did manage to write is still ours to use.
-    return this.#freshStoredToken() ? 'ok' : 'timeout';
+    // nobody. Whatever a leader manages to write before our own deadline is still ours to use.
+    return (await this.#awaitStoredToken(deadline)) ? 'ok' : 'timeout';
+  }
+
+  async #awaitStoredToken(deadline: number): Promise<boolean> {
+    while (!this.#freshStoredToken()) {
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) {
+        return false;
+      }
+      await new Promise(resolve => setTimeout(resolve, Math.min(STORE_POLL_INTERVAL_MS, remaining)));
+    }
+    return true;
   }
 
   /** Runs the loader and takes the token it was served with. Never rejects. */
