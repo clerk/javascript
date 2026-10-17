@@ -2,7 +2,7 @@ import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SignedInSessionResource } from '@clerk/shared/types';
 import type { PointerEventHandler } from 'react';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useSignOutContext, withCoreUserGuard } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
@@ -115,6 +115,7 @@ const ImpersonationFabInternal = () => {
   const { t } = useLocalizations();
   const { parsedInternalTheme } = useAppearance();
   const containerRef = useRef<HTMLDivElement>(null);
+  const dragCleanupRef = useRef<(() => void) | null>(null);
   const actor = session?.actor;
   const agent = session?.agent;
   const isImpersonating = !!actor && !agent;
@@ -144,36 +145,62 @@ const ImpersonationFabInternal = () => {
     }
   };
 
-  const onPointerDown: PointerEventHandler = () => {
-    window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener(
-      'pointerup',
-      () => {
-        window.removeEventListener('pointermove', onPointerMove);
-        handleResize();
-      },
-      { once: true },
-    );
-  };
+  const onPointerDown: PointerEventHandler = e => {
+    if (e.button !== 0 || (e.target as HTMLElement).closest('a')) {
+      return;
+    }
 
-  const onPointerMove = React.useCallback((e: PointerEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
     const current = containerRef.current;
     if (!current) {
       return;
     }
-    const rightOffestBasedOnViewportAndContent = `${
-      window.innerWidth - current.offsetLeft - current.offsetWidth - e.movementX
-    }px`;
-    document.documentElement.style.setProperty(rightProperty, rightOffestBasedOnViewportAndContent);
-    document.documentElement.style.setProperty(topProperty, `${current.offsetTop - -e.movementY}px`);
-  }, []);
+
+    e.preventDefault();
+    dragCleanupRef.current?.();
+
+    const bounds = current.getBoundingClientRect();
+    const startRight = window.innerWidth - bounds.right;
+    const { clientX, clientY, pointerId } = e;
+
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      if (moveEvent.pointerId !== pointerId) {
+        return;
+      }
+      moveEvent.stopPropagation();
+      moveEvent.preventDefault();
+      document.documentElement.style.setProperty(rightProperty, `${startRight - (moveEvent.clientX - clientX)}px`);
+      document.documentElement.style.setProperty(topProperty, `${bounds.top + moveEvent.clientY - clientY}px`);
+    };
+
+    const onPointerEnd = (endEvent: PointerEvent) => {
+      if (endEvent.pointerId === pointerId) {
+        endDrag();
+      }
+    };
+
+    const endDrag = () => {
+      dragCleanupRef.current?.();
+      handleResize();
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerEnd);
+    window.addEventListener('pointercancel', onPointerEnd);
+    window.addEventListener('blur', endDrag);
+    dragCleanupRef.current = () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerEnd);
+      window.removeEventListener('pointercancel', onPointerEnd);
+      window.removeEventListener('blur', endDrag);
+      dragCleanupRef.current = null;
+    };
+  };
 
   const repositionFabOnResize = () => {
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
+      dragCleanupRef.current?.();
     };
   };
 
@@ -197,6 +224,7 @@ const ImpersonationFabInternal = () => {
         align='center'
         sx={t => ({
           touchAction: 'none', //for drag to work on mobile consistently
+          userSelect: 'none',
           position: 'fixed',
           overflow: 'hidden',
           top: `var(${topProperty}, ${defaultTop}px)`,
