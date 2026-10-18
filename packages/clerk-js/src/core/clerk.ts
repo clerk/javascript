@@ -3016,10 +3016,7 @@ export class Clerk implements ClerkInterface {
       if (this.session) {
         return;
       }
-      if (opts.broadcast) {
-        eventBus.emit(events.UserSignOut, null);
-      }
-      return this.setActive({ session: null });
+      return this.#completeSignOut(opts);
     } catch (err) {
       // `/client` can fail with either a 401, a 403, 500 or network errors.
       // 401 is already handled internally in our fetcher.
@@ -3031,6 +3028,23 @@ export class Clerk implements ClerkInterface {
         throw err;
       }
     }
+  };
+
+  /**
+   * Completes a sign-out that FAPI already performed, such as when a failed password
+   * confirmation ended the session and the piggybacked client no longer contains it.
+   *
+   * @internal
+   */
+  public __internal_handleSessionEnded = (): Promise<void> => {
+    return this.#completeSignOut({ broadcast: true });
+  };
+
+  #completeSignOut = (opts: { broadcast: boolean }): Promise<void> => {
+    if (opts.broadcast) {
+      eventBus.emit(events.UserSignOut, null);
+    }
+    return this.setActive({ session: null });
   };
 
   public __internal_handleUnauthenticatedDevBrowser = async (): Promise<void> => {
