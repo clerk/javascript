@@ -1,4 +1,4 @@
-import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
+import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.view';
 import type { ReactElement } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -14,7 +14,8 @@ export const meta: StoryMeta = {
   title: 'UserProfilePasskeysSection',
   label: 'Passkeys',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-passkeys-section.view.tsx',
+  source:
+    'packages/mosaic/src/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.view.tsx',
 };
 
 function PasskeysExample({ empty = false, failOnce = false }: { empty?: boolean; failOnce?: boolean }): ReactElement {

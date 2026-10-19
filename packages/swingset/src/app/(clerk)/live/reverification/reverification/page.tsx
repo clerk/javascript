@@ -88,7 +88,7 @@ function CardHarness() {
       </div>
       {requestPending ? (
         <Card.Root renderBranding={false}>
-          <Reverification {...reverification} />
+          <Reverification controller={reverification} />
         </Card.Root>
       ) : null}
       {message ? <p className={status === 'error' ? 'text-sm text-red-600' : 'text-sm'}>{message}</p> : null}
@@ -251,7 +251,7 @@ function DialogHarness() {
                     </Card.Footer>
                   </Flow.Step>
                   <Flow.Step ids={['verify']}>
-                    <Reverification {...reverification} />
+                    <Reverification controller={reverification} />
                   </Flow.Step>
                   <Flow.Step ids={['finalizing']}>
                     <Card.Header>

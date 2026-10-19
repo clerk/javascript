@@ -535,6 +535,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
     onRegenerateBackupCodes: model.generateBackupCodes ? generateBackupCodes : undefined,
     onRemove: model.remove,
     onSetDefault: model.setDefault,
+    reverification: model.reverification,
   };
 
   const showAddTrigger = model.addableMethods.length > 0;

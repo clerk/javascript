@@ -97,6 +97,31 @@ describe('OrganizationProfile', () => {
     },
   );
 
+  it.each([
+    { hide: true, tabs: ['General'] },
+    { hide: false, tabs: ['General', 'API Keys'] },
+  ])('lists API keys only when they are not hidden: $hide', async ({ hide, tabs }) => {
+    serve({ orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'] });
+    await renderWithClerk(<OrganizationProfile apiKeysProps={{ hide }} />);
+    expect(tabNames()).toEqual(tabs);
+  });
+
+  it('passes the API keys options to the API keys page', async () => {
+    serve({ orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read', 'org:sys_api_keys:manage'] });
+    await renderWithClerk(
+      <OrganizationProfile
+        defaultPage='apiKeys'
+        apiKeysProps={{ showDescription: true }}
+      />,
+    );
+    const user = userEvent.setup();
+
+    const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Create API key' }), {
+      name: 'Add new API key',
+    });
+    expect(within(dialog).getByRole('textbox', { name: 'Description' })).toBeVisible();
+  });
+
   it('switches pages from the navigation', async () => {
     serve({ orgAPIKeysEnabled: true, permissions: ['org:sys_memberships:read', 'org:sys_api_keys:read'] });
     await renderWithClerk(<OrganizationProfile />);

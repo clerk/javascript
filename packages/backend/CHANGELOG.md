@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.25.0
+
+### Minor Changes
+
+- Added an optional `issuer` option to `verifyJwt()`, `verifyToken()`, and `authenticateRequest()` to validate the JWT `iss` claim against a string or list of allowed strings. For `verifyToken()` and `authenticateRequest()`, this applies only to session tokens. Omitting `issuer` preserves existing behavior. ([#8772](https://github.com/clerk/javascript/pull/8772)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 3.24.0
 
 ### Minor Changes

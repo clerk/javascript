@@ -11,12 +11,15 @@ import type {
   OAuthProviders,
   OAuthScope,
   OAuthStrategy,
+  UserResource,
   VerificationResource,
 } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
 import { useUserProfileOptions } from '../user-profile.provider';
 import type {
   ConnectedAccountActionResult,
@@ -212,7 +215,14 @@ export type UserProfileConnectedAccountsModel =
       connect: (strategy: string) => Promise<ConnectedAccountActionResult>;
       reconnect: (accountId: string) => Promise<ConnectedAccountActionResult>;
       remove: (accountId: string) => Promise<void>;
+      reverification: ReverificationController;
     };
+
+function unavailable() {
+  return new ClerkRuntimeError('This connected account is no longer available.', {
+    code: 'connected_account_unavailable',
+  });
+}
 
 export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
   const { additionalOAuthScopes, mode } = useUserProfileOptions();
@@ -220,6 +230,13 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
+  const [removeAccount, reverification] = useReverificationFlow((current: UserResource, accountId: string) => {
+    const account = current.externalAccounts.find(candidate => candidate.id === accountId);
+    if (!account) {
+      throw unavailable();
+    }
+    return account.destroy();
+  });
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -246,9 +263,6 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
 
   const userId = user.id;
   const transport = clerk.__internal_oauthTransport;
-
-  const unavailable = () =>
-    new ClerkRuntimeError('This connected account is no longer available.', { code: 'connected_account_unavailable' });
 
   const requireCurrentUser = () => {
     const current = clerk.user;
@@ -326,11 +340,8 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       return completeVerification(response);
     },
     remove: async accountId => {
-      const account = requireCurrentUser().externalAccounts.find(candidate => candidate.id === accountId);
-      if (!account) {
-        throw unavailable();
-      }
-      await account.destroy();
+      await removeAccount(requireCurrentUser(), accountId);
     },
+    reverification,
   };
 }

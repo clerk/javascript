@@ -9,6 +9,8 @@ import { useRef, useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosText } from '@/lib/chaos';
 
+import { idleReverification } from './reverification';
+
 interface DemoWallet extends UserProfileWeb3Wallet {
   providerId?: string;
 }
@@ -65,6 +67,7 @@ export function useWeb3WalletsFixture({
 
   return useUserProfileWeb3WalletsController({
     wallets,
+    reverification: idleReverification,
     availableProviders: connectionProviders.filter(
       provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
     ),

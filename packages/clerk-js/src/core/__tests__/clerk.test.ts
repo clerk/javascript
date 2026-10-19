@@ -1,4 +1,9 @@
-import { ClerkOfflineError, ClerkRuntimeError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import {
+  ClerkAPIResponseError,
+  ClerkOfflineError,
+  ClerkRuntimeError,
+  EmailLinkErrorCodeStatus,
+} from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ActiveSessionResource,
@@ -1067,6 +1072,39 @@ describe('Clerk singleton', () => {
 
         expect(sut.client).toBe(realClient);
         expect(sut.session).toBe(realSession);
+      });
+    });
+
+    mockNativeRuntime(() => {
+      describe('with cached resources in a non-standard browser', () => {
+        it.each([
+          ['a network error', new ClerkRuntimeError('Network request failed.', { code: 'network_error' })],
+          ['a 5xx API response', new ClerkAPIResponseError('Bad Gateway', { data: [], status: 502 })],
+        ])('falls back to the cached resources on %s', async (_, error) => {
+          const clientInstance = { fetch: mockClientFetch, signedInSessions: [] };
+          vi.mocked(Client.getOrCreateInstance)
+            .mockReturnValueOnce(clientInstance as any)
+            .mockReturnValueOnce(clientInstance as any);
+          mockClientFetch.mockRejectedValue(error);
+
+          const sut = new Clerk(productionPublishableKey);
+          sut.__internal_getCachedResources = vi.fn(() => Promise.resolve({ client: null, environment: null }));
+          await sut.load({ standardBrowser: false });
+
+          expect(sut.__internal_getCachedResources).toHaveBeenCalled();
+          expect(sut.status).toBe('degraded');
+        });
+
+        it('does not fall back to the cached resources on a 4xx API response', async () => {
+          const error = new ClerkAPIResponseError('Bad Request', { data: [], status: 400 });
+          mockClientFetch.mockRejectedValue(error);
+
+          const sut = new Clerk(productionPublishableKey);
+          sut.__internal_getCachedResources = vi.fn(() => Promise.resolve({ client: null, environment: null }));
+          await expect(sut.load({ standardBrowser: false })).rejects.toBe(error);
+
+          expect(sut.__internal_getCachedResources).not.toHaveBeenCalled();
+        });
       });
     });
   });

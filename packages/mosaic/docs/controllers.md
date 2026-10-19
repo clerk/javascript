@@ -75,22 +75,23 @@ with `open(payload)`; the copy props read the payload and `onConfirm` receives i
 A dialog next to its button has no payload and takes the button as `trigger`.
 
 An action Clerk may interrupt for step-up verification goes through
-`useReverificationFlow` first. It reads Clerk hooks, so the wrapper calls it next
-to the model and hands the controller the wrapped action together with the
-`reverification` it returns; the controller passes both on, and the block shows
-the verify step inside the same dialog:
+`useReverificationFlow` in the model, which wraps the raw Clerk call and returns
+the `reverification` controller beside the mapped callback (see
+[Models](models.md)). The controller passes it on, and the block shows the
+verify step inside the same dialog:
 
 ```ts
-// wrapper
-const [revoke, reverification] = useReverificationFlow((id: string) => model.revoke(id));
-const controller = useInvitationsController({ ...model, revoke, reverification });
+// model
+const [removeEmail, reverification] = useReverificationFlow((user: UserResource, id: string) =>
+  byId(user.emailAddresses, id, 'email address').destroy(),
+);
+return { ..., onRemoveEmail: id => saveAsUser(current => removeEmail(current, id)), reverification };
 
 // controller
-const removalFocus = useListRemovalFocus({ ids, onRemove: revoke, fallback });
-const remove = useConfirmController<Invitation>({
-  onConfirm: invitation => removalFocus.remove(invitation.id),
+const removalFocus = useListRemovalFocus({ ids, onRemove: onRemoveEmail, fallback });
+const remove = useConfirmController<UserProfileEmail>({
+  onConfirm: email => removalFocus.remove(email.id),
   reverification,
-  errorFallback: m.revokeError,
 });
 ```
 

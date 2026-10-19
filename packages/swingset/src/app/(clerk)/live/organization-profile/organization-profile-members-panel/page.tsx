@@ -1,6 +1,6 @@
 'use client';
 
-import { OrganizationProfileMembersPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel';
+import { OrganizationProfileMembersPanel } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-members-panel';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useOrganization, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
