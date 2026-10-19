@@ -10,9 +10,7 @@ export const styles = stylex.create({
     width: 'fit-content',
   },
   text: {
-    overflow: 'hidden',
-    display: 'block',
-    whiteSpace: 'nowrap',
+    display: 'inline',
   },
   block: {
     overflow: 'hidden',

@@ -35,10 +35,19 @@ import * as SkeletonStories from './skeleton.stories';
 
 ### Text
 
-Text is held to one line, so a long placeholder can't wrap.
+Text becomes a bar as wide as the text, at cap height.
 
 <Story
   name='TextContent'
+  storyModule={SkeletonStories}
+/>
+
+### Wrapping text
+
+Text wraps like the real text and draws one bar per line. The left column is the loaded text.
+
+<Story
+  name='MultilineText'
   storyModule={SkeletonStories}
 />
 

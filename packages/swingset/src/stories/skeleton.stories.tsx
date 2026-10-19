@@ -3,6 +3,7 @@ import { Button } from '@clerk/mosaic/components/button';
 import type { SkeletonProps } from '@clerk/mosaic/components/skeleton';
 import { Skeleton } from '@clerk/mosaic/components/skeleton';
 import { Text } from '@clerk/mosaic/components/text';
+import { Fragment } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -52,6 +53,27 @@ export function TextContent() {
       >
         <Skeleton>San Francisco, US</Skeleton>
       </Text>
+    </div>
+  );
+}
+
+export function MultilineText() {
+  const paragraph =
+    'Signed in from a new device. If this was not you, sign out of every session and change your password right away.';
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 320px))', gap: 24 }}>
+      {(['xs', 'sm', 'base', 'lg'] as const).map(size => (
+        <Fragment key={size}>
+          <Text size={size}>{paragraph}</Text>
+          <Text size={size}>
+            <Skeleton>{paragraph}</Skeleton>
+          </Text>
+        </Fragment>
+      ))}
+      <p style={{ margin: 0, fontFamily: 'Georgia, serif', fontSize: 20 }}>{paragraph}</p>
+      <p style={{ margin: 0, fontFamily: 'Georgia, serif', fontSize: 20 }}>
+        <Skeleton>{paragraph}</Skeleton>
+      </p>
     </div>
   );
 }
