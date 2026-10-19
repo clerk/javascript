@@ -15,113 +15,123 @@ final class ClerkBiometricsException: Exception {
   override var reason: String { errorMessage }
 }
 
-struct BiometricAvailabilityResult: Record {
-  @Field var biometryType: String = "none"
-  @Field var canEvaluateBiometrics: Bool = false
-  @Field var canEvaluateDeviceOwner: Bool = false
-  @Field var errorCode: String?
-  @Field var secureKeyStorageAvailable: Bool = false
+@Record
+struct BiometricAvailabilityResult {
+  var biometryType: String = "none"
+  var canEvaluateBiometrics: Bool = false
+  var canEvaluateDeviceOwner: Bool = false
+  var errorCode: String?
+  var secureKeyStorageAvailable: Bool = false
 }
 
-struct BiometricCredentialKeyResult: Record {
-  @Field var localKeyId: String = ""
-  @Field var publicKeyJwk: String = ""
+@Record
+struct BiometricCredentialKeyResult {
+  var localKeyId: String = ""
+  var publicKeyJwk: String = ""
 }
 
-struct BiometricCredentialRecordInput: Record {
-  @Field var id: String = ""
-  @Field var localKeyId: String = ""
-  @Field var userId: String = ""
-  @Field var appIdentifier: String = ""
-  @Field var identifierHint: String?
-  @Field var policy: String = ""
-  @Field var createdAt: Double = -1
-  @Field var updatedAt: Double = -1
+@Record
+struct BiometricCredentialRecordInput {
+  var id: String = ""
+  var localKeyId: String = ""
+  var userId: String = ""
+  var appIdentifier: String = ""
+  var identifierHint: String?
+  var policy: String = ""
+  var createdAt: Double = -1
+  var updatedAt: Double = -1
 }
 
-struct SaveRecordOptions: Record {
-  @Field var removeOtherRecordsForApp: Bool = false
+@Record
+struct SaveRecordOptions {
+  var removeOtherRecordsForApp: Bool = false
 }
 
-struct InstallationMarkerResult: Record {
-  @Field var wiped: Bool = false
+@Record
+struct InstallationMarkerResult {
+  var wiped: Bool = false
 }
 
+@ExpoModule("ClerkExpoBiometrics")
 public final class ClerkExpoBiometricsModule: Module {
   private let keyManager = BiometricKeyManager()
   private lazy var store = BiometricCredentialStore.live(keyManager: keyManager)
 
-  public func definition() -> ModuleDefinition {
-    Name("ClerkExpoBiometrics")
+  @JS
+  func getAppIdentifier() -> String {
+    Bundle.main.bundleIdentifier ?? ""
+  }
 
-    Function("getAppIdentifier") { () -> String in
-      Bundle.main.bundleIdentifier ?? ""
-    }
+  @JS
+  func hashIdentifierHint(hint: String) -> String? {
+    BiometricCredentialCoding.identifierHintSHA256(hint)
+  }
 
-    Function("hashIdentifierHint") { (hint: String) -> String? in
-      BiometricCredentialCoding.identifierHintSHA256(hint)
-    }
+  @JS(.concurrent)
+  func getAvailability() async -> BiometricAvailabilityResult {
+    let availability = keyManager.availability()
+    return BiometricAvailabilityResult(
+      biometryType: availability.biometryType,
+      canEvaluateBiometrics: availability.canEvaluateBiometrics,
+      canEvaluateDeviceOwner: availability.canEvaluateDeviceOwner,
+      errorCode: availability.errorCode?.rawValue,
+      secureKeyStorageAvailable: availability.secureKeyStorageAvailable
+    )
+  }
 
-    AsyncFunction("getAvailability") { () -> BiometricAvailabilityResult in
-      let availability = self.keyManager.availability()
-      let result = BiometricAvailabilityResult()
-      result.biometryType = availability.biometryType
-      result.canEvaluateBiometrics = availability.canEvaluateBiometrics
-      result.canEvaluateDeviceOwner = availability.canEvaluateDeviceOwner
-      result.errorCode = availability.errorCode?.rawValue
-      result.secureKeyStorageAvailable = availability.secureKeyStorageAvailable
-      return result
-    }
-
-    AsyncFunction("createKey") { (policy: String) throws -> BiometricCredentialKeyResult in
-      try Self.bridge {
-        guard let policy = BiometricCredentialPolicy(rawValue: policy) else {
-          throw BiometricsError(.invalidArgument, "Unknown biometric credential policy '\(policy)'.")
-        }
-        let key = try self.keyManager.createKey(policy: policy)
-        let result = BiometricCredentialKeyResult()
-        result.localKeyId = key.localKeyId
-        result.publicKeyJwk = key.publicKeyJWK
-        return result
+  @JS(.concurrent)
+  func createKey(policy: String) async throws -> BiometricCredentialKeyResult {
+    try Self.bridge {
+      guard let policy = BiometricCredentialPolicy(rawValue: policy) else {
+        throw BiometricsError(.invalidArgument, "Unknown biometric credential policy '\(policy)'.")
       }
+      let key = try keyManager.createKey(policy: policy)
+      return BiometricCredentialKeyResult(localKeyId: key.localKeyId, publicKeyJwk: key.publicKeyJWK)
     }
+  }
 
-    AsyncFunction("sign") { (localKeyId: String, clientData: String, reason: String?) throws -> String in
-      try Self.bridge {
-        try self.keyManager.sign(localKeyId: localKeyId, clientData: clientData, reason: reason)
-      }
+  @JS(.concurrent)
+  func sign(localKeyId: String, clientData: String, reason: String?) async throws -> String {
+    try Self.bridge {
+      try keyManager.sign(localKeyId: localKeyId, clientData: clientData, reason: reason)
     }
+  }
 
-    AsyncFunction("hasKey") { (localKeyId: String) throws -> Bool in
-      try Self.bridge { try self.keyManager.hasKey(localKeyId: localKeyId) }
+  @JS(.concurrent)
+  func hasKey(localKeyId: String) async throws -> Bool {
+    try Self.bridge { try keyManager.hasKey(localKeyId: localKeyId) }
+  }
+
+  @JS(.concurrent)
+  func deleteKey(localKeyId: String) async throws {
+    try Self.bridge { try keyManager.deleteKey(localKeyId: localKeyId) }
+  }
+
+  // Store operations run on the main actor so they cannot interleave with ClerkKit's @MainActor store access.
+  @JS
+  @MainActor
+  func listRecords() async throws -> String {
+    try Self.bridge { try store.listRecordsJSON() }
+  }
+
+  @JS
+  @MainActor
+  func saveRecord(input: BiometricCredentialRecordInput, options: SaveRecordOptions) async throws {
+    try Self.bridge {
+      try store.save(Self.record(from: input), removeOtherRecordsForApp: options.removeOtherRecordsForApp)
     }
+  }
 
-    AsyncFunction("deleteKey") { (localKeyId: String) throws in
-      try Self.bridge { try self.keyManager.deleteKey(localKeyId: localKeyId) }
-    }
+  @JS
+  @MainActor
+  func deleteRecord(localKeyId: String) async throws {
+    try Self.bridge { try store.deleteRecords(localKeyId: localKeyId) }
+  }
 
-    // Store operations run on the main queue so they cannot interleave with ClerkKit's @MainActor store access.
-    AsyncFunction("listRecords") { () throws -> String in
-      try Self.bridge { try self.store.listRecordsJSON() }
-    }.runOnQueue(.main)
-
-    AsyncFunction("saveRecord") { (input: BiometricCredentialRecordInput, options: SaveRecordOptions) throws in
-      try Self.bridge {
-        try self.store.save(Self.record(from: input), removeOtherRecordsForApp: options.removeOtherRecordsForApp)
-      }
-    }.runOnQueue(.main)
-
-    AsyncFunction("deleteRecord") { (localKeyId: String) throws in
-      try Self.bridge { try self.store.deleteRecords(localKeyId: localKeyId) }
-    }.runOnQueue(.main)
-
-    AsyncFunction("ensureInstallationMarker") { () throws -> InstallationMarkerResult in
-      try Self.bridge {
-        let result = InstallationMarkerResult()
-        result.wiped = try self.store.ensureInstallationMarker()
-        return result
-      }
-    }.runOnQueue(.main)
+  @JS
+  @MainActor
+  func ensureInstallationMarker() async throws -> InstallationMarkerResult {
+    try Self.bridge { InstallationMarkerResult(wiped: try store.ensureInstallationMarker()) }
   }
 
   static func record(from input: BiometricCredentialRecordInput) throws -> BiometricCredentialRecord {
