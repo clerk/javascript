@@ -3,7 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
-import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  type FakeFapiSeed,
+  fapiUrl,
+  holdRequests,
+  serveFapi,
+  worker,
+} from '../../../../__tests__/feature/fake-fapi';
 import type { FapiAttributeOverrides } from '../../../../__tests__/feature/fapi';
 import {
   fapiClient,
@@ -268,5 +275,76 @@ describe('the user profile profile section', () => {
 });
 
 describe('username reverification', () => {
-  it.todo('confirms it is the user before the username changes');
+  async function renderUsernameNeedingReverification(prepare?: () => void) {
+    const fapi = serveFapi({
+      ...withUsername('alicesmith'),
+      verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+    });
+    prepare?.();
+    demandReverificationOnce('/v1/me');
+    await renderWithClerk(<UserProfileProfileSection />);
+    const actor = userEvent.setup();
+    await actor.click(within(profile()).getByRole('button', { name: 'Edit username' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit username' });
+    await actor.clear(within(dialog).getByLabelText('Username'));
+    await actor.type(within(dialog).getByLabelText('Username'), 'alicia');
+    await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+    return { fapi, actor };
+  }
+
+  const savedUsername = (fapi: ReturnType<typeof serveFapi>) => fapi.client.sessions[0]?.user?.username;
+
+  it('asks to verify before saving the username, then saves it', async () => {
+    const { fapi, actor } = await renderUsernameNeedingReverification();
+
+    const field = await screen.findByPlaceholderText('Enter your password');
+    expect(savedUsername(fapi)).toBe('alicesmith');
+    await actor.type(field, 'hunter2{Enter}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull(), { timeout: 3000 });
+    expect(savedUsername(fapi)).toBe('alicia');
+    expect(profile()).toHaveTextContent('alicia');
+  });
+
+  it('closes without saving when verification is dismissed, and reopens on the saved username', async () => {
+    const { fapi, actor } = await renderUsernameNeedingReverification();
+
+    await screen.findByPlaceholderText('Enter your password');
+    await actor.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(savedUsername(fapi)).toBe('alicesmith');
+    await actor.click(within(profile()).getByRole('button', { name: 'Edit username' }));
+    expect(screen.getByLabelText('Username')).toHaveValue('alicesmith');
+  });
+
+  it('returns to the form with the field error when the save fails after verifying', async () => {
+    const updates: Array<ReturnType<typeof holdRequests>> = [];
+    const { fapi, actor } = await renderUsernameNeedingReverification(() => {
+      updates.push(holdRequests('post', '/v1/me'));
+    });
+    const update = updates[0];
+
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    update.fail('form_identifier_exists', 'That username is taken. Please try another.', 'username');
+
+    const field = await screen.findByLabelText('Username', undefined, { timeout: 3000 });
+    expect(field).toHaveValue('alicia');
+    await waitFor(() => expect(field).toHaveAccessibleDescription(/That username is taken/));
+    expect(savedUsername(fapi)).toBe('alicesmith');
+  });
+
+  it('closes the dialog from the verification error card', async () => {
+    const { fapi, actor } = await renderUsernameNeedingReverification(() =>
+      holdRequests('post', '/v1/client/sessions/sess_1/verify').fail('some_new_error', 'Nope'),
+    );
+
+    expect(await screen.findByText('Something went wrong')).toBeVisible();
+    const buttons = screen.getAllByRole('button', { name: 'Close' });
+    await actor.click(buttons[buttons.length - 1]);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(savedUsername(fapi)).toBe('alicesmith');
+  });
 });

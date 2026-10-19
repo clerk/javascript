@@ -6,9 +6,12 @@ import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
+import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
+import { Reverification } from '../../reverification';
 
 export type UserProfileEditUsernameField = 'username';
 
@@ -22,6 +25,8 @@ export interface UserProfileEditUsernameDialogProps {
   trigger?: DialogTriggerProps['render'];
   title?: string;
   form: UseFormResult<UserProfileEditUsernameValue>;
+  reverification?: ReverificationController;
+  step: 'edit' | 'verify';
 }
 
 export function UserProfileEditUsernameDialog({
@@ -30,18 +35,81 @@ export function UserProfileEditUsernameDialog({
   trigger,
   title,
   form,
+  reverification,
+  step,
 }: UserProfileEditUsernameDialogProps) {
   const m = useMessages('userProfileProfileSection').username;
   const usernameRef = useRef<HTMLInputElement>(null);
   const { feedback } = form.fields.username;
   const error = feedback?.type === 'error' ? feedback.message : undefined;
   const { ref, ...control } = form.register('username');
-  const mergedRef = useMergeRefs([ref, usernameRef]);
+  const mergedRef = useMergeRefs([ref, usernameRef, useFlowAutoFocus<HTMLInputElement>()]);
+
+  const edit = (
+    <>
+      <Card.Header>
+        <Card.Title>{title ?? m.dialogTitle}</Card.Title>
+      </Card.Header>
+
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {form.error}
+      </Card.Banner>
+      <Card.Content
+        render={
+          <form
+            id={form.id}
+            onSubmit={form.handleSubmit}
+          />
+        }
+      >
+        <Field.Root
+          disabled={form.isSubmitting}
+          focusableWhenDisabled
+          invalid={error !== undefined}
+        >
+          <Field.Label>{m.fieldLabel}</Field.Label>
+          <Input
+            ref={mergedRef}
+            autoComplete='username'
+            {...control}
+          />
+          <Field.Feedback feedback={feedback} />
+        </Field.Root>
+      </Card.Content>
+      <Card.Footer>
+        <Dialog.Close
+          render={
+            <Button
+              variant='outline'
+              color='neutral'
+              fullWidth
+            >
+              {m.cancel}
+            </Button>
+          }
+        />
+        <SubmitButton
+          form={form.id}
+          fullWidth
+          isPending={form.isSubmitting}
+          disabled={!form.canSubmit}
+          focusableWhenDisabled
+        >
+          {m.save}
+        </SubmitButton>
+      </Card.Footer>
+    </>
+  );
 
   return (
     <Dialog.Root
       open={open}
       onOpenChange={onOpenChange}
+      shouldCloseOnInteractOutside={step !== 'verify'}
+      showCloseButton={step !== 'verify' || Boolean(reverification?.onCancel)}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
@@ -52,60 +120,27 @@ export function UserProfileEditUsernameDialog({
           elevation='overlay'
           renderBranding={false}
         >
-          <Card.Header>
-            <Card.Title>{title ?? m.dialogTitle}</Card.Title>
-          </Card.Header>
-
-          <Card.Banner
-            role='alert'
-            color='negative'
-          >
-            {form.error}
-          </Card.Banner>
-          <Card.Content
-            render={
-              <form
-                id={form.id}
-                onSubmit={form.handleSubmit}
-              />
-            }
-          >
-            <Field.Root
-              disabled={form.isSubmitting}
-              focusableWhenDisabled
-              invalid={error !== undefined}
+          {reverification ? (
+            <Flow.Root
+              value={step}
+              direction={step === 'verify' ? 1 : -1}
+              state={step}
             >
-              <Field.Label>{m.fieldLabel}</Field.Label>
-              <Input
-                ref={mergedRef}
-                autoComplete='username'
-                {...control}
-              />
-              <Field.Feedback feedback={feedback} />
-            </Field.Root>
-          </Card.Content>
-          <Card.Footer>
-            <Dialog.Close
-              render={
-                <Button
-                  variant='outline'
-                  color='neutral'
-                  fullWidth
-                >
-                  {m.cancel}
-                </Button>
-              }
-            />
-            <SubmitButton
-              form={form.id}
-              fullWidth
-              isPending={form.isSubmitting}
-              disabled={!form.canSubmit}
-              focusableWhenDisabled
-            >
-              {m.save}
-            </SubmitButton>
-          </Card.Footer>
+              {() => (
+                <>
+                  <Flow.Step ids={['edit']}>{edit}</Flow.Step>
+                  <Flow.Step ids={['verify']}>
+                    <Reverification
+                      controller={reverification}
+                      onClose={() => onOpenChange(false)}
+                    />
+                  </Flow.Step>
+                </>
+              )}
+            </Flow.Root>
+          ) : (
+            edit
+          )}
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>

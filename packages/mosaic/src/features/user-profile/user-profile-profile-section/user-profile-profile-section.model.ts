@@ -1,6 +1,7 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
-import type { AttributeData, EnterpriseAccountResource } from '@clerk/shared/types';
+import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
+import { useReverificationFlow } from '../../reverification';
 import { isAttributeAvailable } from '../user-profile.utils';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import { useUserProfileUserModel } from '../user-profile-user.model';
@@ -25,6 +26,9 @@ function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameA
 
 export function useUserProfileProfileSectionModel(): UserProfileProfileSectionModel {
   const model = useUserProfileUserModel();
+  const [updateUsername, usernameReverification] = useReverificationFlow((current: UserResource, username: string) =>
+    current.update({ username }),
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -60,10 +64,11 @@ export function useUserProfileProfileSectionModel(): UserProfileProfileSectionMo
     onSubmitUsername:
       showUsername && !usernameImmutable
         ? username =>
-            saveAsUser(current => current.update({ username }), USERNAME_FIELDS, {
+            saveAsUser(current => updateUsername(current, username), USERNAME_FIELDS, {
               min_length: usernameSettings.min_length,
               max_length: usernameSettings.max_length,
             })
         : undefined,
+    usernameReverification,
   };
 }
