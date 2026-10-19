@@ -15,6 +15,7 @@
         "tsup.config.ts",
         "$TURBO_ROOT$/packages/expo-biometrics/android/**",
         "$TURBO_ROOT$/packages/expo-biometrics/ios/**",
+        "$TURBO_ROOT$/packages/expo-biometrics/src/ClerkExpoBiometricsModule.ts",
         "$TURBO_ROOT$/packages/expo-google-signin/android/**",
         "$TURBO_ROOT$/packages/expo-google-signin/ios/**",
         "$TURBO_ROOT$/packages/expo-native-components/android/**",
