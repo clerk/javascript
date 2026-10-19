@@ -84,9 +84,16 @@ export function RequestsTableTabView({
         </Table.Toolbar>
       ) : null}
       <Table.Root
+        layout='fixed'
         aria-label={m.title}
         aria-busy={isLoading || isFetching}
       >
+        <Table.ColumnGroup>
+          {onBulkAction ? <Table.Column /> : null}
+          <Table.Column />
+          <Table.Column width='9rem' />
+          {hasActions ? <Table.Column width='10rem' /> : null}
+        </Table.ColumnGroup>
         <Table.Header>
           <Table.Row>
             {onBulkAction ? (

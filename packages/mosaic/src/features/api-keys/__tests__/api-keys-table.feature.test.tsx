@@ -64,6 +64,10 @@ async function renderTable(seed: FakeFapiSeed = signedIn(), props: Partial<APIKe
 type User = ReturnType<typeof userEvent.setup>;
 
 const table = () => screen.getByRole('table', { name: 'API Keys' });
+const columnWidths = () =>
+  within(table())
+    .getAllByRole('columnheader')
+    .map(cell => cell.getBoundingClientRect().width);
 
 async function expectFallback(seed: FakeFapiSeed, props: Partial<APIKeysTableProps> = {}) {
   await renderTable(seed, { fallback: <p>Unavailable</p>, ...props });
@@ -165,9 +169,11 @@ describe('APIKeysTable', () => {
       await renderWithClerk(<APIKeysTable subject={alice.id} />);
 
       expect(await screen.findByRole('status')).toHaveTextContent('Loading API keys');
+      const loadingWidths = columnWidths();
       list.release();
       expect(await within(table()).findByText('Web app')).toBeVisible();
       expect(screen.queryByRole('status')).toBeNull();
+      expect(columnWidths()).toEqual(loadingWidths);
     });
 
     it('explains when the user has no keys', async () => {

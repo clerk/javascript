@@ -80,9 +80,17 @@ export function InvitationsTableTabView({
           </Table.Toolbar>
         ) : null}
         <Table.Root
+          layout='fixed'
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
         >
+          <Table.ColumnGroup>
+            {onBulkAction ? <Table.Column /> : null}
+            <Table.Column />
+            <Table.Column width='9rem' />
+            <Table.Column width='8rem' />
+            {revoke ? <Table.Column width='4rem' /> : null}
+          </Table.ColumnGroup>
           <Table.Header>
             <Table.Row>
               {onBulkAction ? (

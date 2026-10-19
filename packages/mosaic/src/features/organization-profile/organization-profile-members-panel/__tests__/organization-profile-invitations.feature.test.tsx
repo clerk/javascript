@@ -95,14 +95,20 @@ describe('connected organization invitations', () => {
     const list = holdRequests('get', '/v1/organizations/:organizationId/invitations');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const table = () => screen.getByRole('table', { name: 'Invitations' });
+    const columnWidths = () =>
+      within(table())
+        .getAllByRole('columnheader')
+        .map(cell => cell.getBoundingClientRect().width);
 
     expect(await screen.findByRole('status')).toHaveTextContent('Loading invitations');
     expect(within(table()).getAllByRole('row')).toHaveLength(1);
     expect(within(table()).queryByRole('button')).toBeNull();
+    const loadingWidths = columnWidths();
     list.release();
     expect(await within(table()).findByText('ada@example.com')).toBeVisible();
     expect(screen.getByRole('status')).toHaveTextContent('Invitations loaded');
     expect(within(table()).getAllByRole('row')).toHaveLength(2);
+    expect(columnWidths()).toEqual(loadingWidths);
   });
 
   it('shows a failed initial load and retries the invitation list', async () => {

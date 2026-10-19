@@ -125,14 +125,20 @@ describe('connected organization requests', () => {
     await userEvent.setup().click(await screen.findByRole('tab', { name: 'Requests' }));
     const table = () => screen.getByRole('table', { name: 'Requests' });
     const panel = () => screen.getByRole('tabpanel', { name: 'Requests' });
+    const columnWidths = () =>
+      within(table())
+        .getAllByRole('columnheader')
+        .map(cell => cell.getBoundingClientRect().width);
 
     expect(within(panel()).getByRole('status')).toHaveTextContent('Loading requests');
     expect(within(table()).getAllByRole('row')).toHaveLength(1);
     expect(within(table()).queryByRole('button')).toBeNull();
+    const loadingWidths = columnWidths();
     list.release();
     expect(await within(table()).findByText('Ada Lovelace')).toBeVisible();
     expect(within(panel()).getByRole('status')).toHaveTextContent('Requests loaded');
     expect(within(table()).getAllByRole('row')).toHaveLength(2);
+    expect(columnWidths()).toEqual(loadingWidths);
   });
 
   it('shows an initial load error and retries', async () => {
