@@ -27,7 +27,7 @@
 
 ### Prerequisites
 
-- Expo 53 or later
+- Expo 54 or later
 - React 18 or later
 - React Native 0.73 or later
 - Node.js `>=20.9.0` or later
