@@ -40,7 +40,11 @@ export const run: Runner = (command, args, options = {}) =>
     const timer = options.timeoutMs === undefined ? undefined : setTimeout(() => {
       timedOut = true;
       child.kill('SIGTERM');
-      killTimer = setTimeout(() => child.kill('SIGKILL'), KILL_GRACE_MS);
+      killTimer = setTimeout(() => {
+        child.kill('SIGKILL');
+        child.stdout?.destroy();
+        child.stderr?.destroy();
+      }, KILL_GRACE_MS);
     }, options.timeoutMs);
     child.on('error', (error) => {
       clearTimeout(timer);
