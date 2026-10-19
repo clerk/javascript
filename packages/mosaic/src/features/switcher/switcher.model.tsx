@@ -13,6 +13,7 @@ import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,
@@ -282,12 +283,17 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     return [toSession(s.id, sessionUser)];
   });
 
-  const afterSelectUrl = (organizationId: string | null): string | undefined => {
+  const afterSelectUrl = async (organizationId: string | null): Promise<string | undefined> => {
     if (!organizationId) {
       return resolveAfterUrl(options?.afterSelectPersonalUrl, user);
     }
-    const selected = membershipData.find(m => m.organization.id === organizationId)?.organization;
-    return selected ? resolveAfterUrl(options?.afterSelectOrganizationUrl, selected) : undefined;
+    if (!options?.afterSelectOrganizationUrl) {
+      return undefined;
+    }
+    const selected =
+      membershipData.find(m => m.organization.id === organizationId)?.organization ??
+      (await clerk.getOrganization(organizationId));
+    return resolveAfterUrl(options.afterSelectOrganizationUrl, selected);
   };
 
   return {
@@ -309,8 +315,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
       ref,
       hasMore: Boolean(userMemberships.hasNextPage || userInvitations.hasNextPage || userSuggestions.hasNextPage),
     },
-    onSelectOrganization: organizationId =>
-      clerk.setActive({ organization: organizationId, redirectUrl: afterSelectUrl(organizationId) }),
+    onSelectOrganization: async organizationId =>
+      clerk.setActive({ organization: organizationId, redirectUrl: await afterSelectUrl(organizationId) }),
     // The session switched to can carry a task of its own, and a plain `redirectUrl` routes past it.
     // App-level `taskUrls` outrank this callback, so it only answers for an app that set none.
     onSwitchSession: sessionId =>
@@ -359,11 +365,17 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     onAcceptInvitation: async invitationId => {
       const invitation = invitationData.find(i => i.id === invitationId);
       try {
-        await invitation?.accept();
+        const accepted = await invitation?.accept();
+        if (accepted) {
+          await userInvitations.setData?.(pages => shrinkTotal(replaceInPages(pages ?? [], accepted)));
+        }
+      } catch (error) {
+        // A failed accept might be because of old state
+        await Promise.allSettled([userInvitations.revalidate?.()]);
+        throw error;
       } finally {
-        // We always revalidate, a failed accept might be because of old state
         // Using allSettled since it never throws and we don't want failed revalidates to look like failed accepts
-        await Promise.allSettled([userInvitations.revalidate?.(), userMemberships.revalidate?.()]);
+        await Promise.allSettled([userMemberships.revalidate?.()]);
       }
     },
   };

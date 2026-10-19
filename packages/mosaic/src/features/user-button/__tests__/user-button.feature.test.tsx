@@ -335,11 +335,11 @@ describe('UserButton', () => {
       expect(popup()).toBeInTheDocument();
     });
 
-    it('stays busy until the invitations have reloaded', async () => {
+    it('stays busy until the memberships have reloaded', async () => {
       await renderUserButton();
       const user = await open();
       await screen.findByRole('button', { name: 'Accept' });
-      const reload = holdRequests('get', '/v1/me/organization_invitations');
+      const reload = holdRequests('get', '/v1/me/organization_memberships');
 
       await user.click(screen.getByRole('button', { name: 'Accept' }));
       await waitFor(() => expect(reload.requests).toHaveLength(1));
@@ -479,6 +479,18 @@ describe('UserButton', () => {
       expect(openCreateOrganization).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
       await waitFor(() => expect(popup()).toBeNull());
+    });
+
+    it('hands the CreateOrganization modal the portal root the app provides', async () => {
+      const container = document.createElement('div');
+      serveFapi(signedIn());
+      const { clerk } = await renderWithClerk(<PortalProvider getContainer={() => container}>{tree()}</PortalProvider>);
+      const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
+      const user = await open();
+
+      await user.click(await screen.findByRole('button', { name: 'Add organization' }));
+
+      expect(openCreateOrganization.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
     });
 
     it('navigates to create an organization when a URL routes it', async () => {
