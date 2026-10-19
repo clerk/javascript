@@ -175,6 +175,39 @@ describe('CLI Integration', () => {
     });
   });
 
+  describe('--agents-md flag', () => {
+    let fixture;
+
+    beforeEach(() => {
+      fixture = createTempFixture('nextjs-v7');
+    });
+
+    afterEach(() => {
+      fixture?.cleanup();
+    });
+
+    it('writes AGENTS.md and CLAUDE.md without running SDK upgrade detection', async () => {
+      const fs = await import('node:fs');
+      const result = await runCli(['--dir', fixture.path, '--agents-md'], { timeout: 15000 });
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('Wrote Clerk AGENTS.md sections');
+      expect(fs.readFileSync(path.join(fixture.path, 'AGENTS.md'), 'utf8')).toContain(
+        '<!-- BEGIN:clerk-agent-rules:nextjs -->',
+      );
+      expect(fs.readFileSync(path.join(fixture.path, 'CLAUDE.md'), 'utf8')).toBe('@AGENTS.md\n');
+    });
+
+    it('does not write files in dry-run mode', async () => {
+      const fs = await import('node:fs');
+      const result = await runCli(['--dir', fixture.path, '--agents-md', '--dry-run'], { timeout: 15000 });
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('[dry run] Would write');
+      expect(fs.existsSync(path.join(fixture.path, 'AGENTS.md'))).toBe(false);
+    });
+  });
+
   describe('Version Display', () => {
     it('shows current version in output', async () => {
       const dir = getFixturePath('nextjs-v6');
