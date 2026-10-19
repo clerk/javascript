@@ -21,6 +21,7 @@ export interface PortalProps {
 }
 
 const PortalContainerContext = React.createContext<PortalContainer | undefined>(undefined);
+const InsidePortalContext = React.createContext(false);
 
 export function PortalProvider(props: PortalProviderProps): React.ReactElement {
   return <PortalContainerContext.Provider value={props.container}>{props.children}</PortalContainerContext.Provider>;
@@ -30,7 +31,7 @@ export function Portal(props: PortalProps): React.ReactElement {
   const provided = usePortalRoot();
   return (
     <FloatingPortal root={props.root === undefined ? provided : props.root}>
-      <PortalContainerContext.Provider value={undefined}>{props.children}</PortalContainerContext.Provider>
+      <InsidePortalContext.Provider value={true}>{props.children}</InsidePortalContext.Provider>
     </FloatingPortal>
   );
 }
@@ -44,7 +45,8 @@ export function useGetPortalContainer(): (() => HTMLElement | null) | undefined 
 }
 
 function usePortalRoot(): HTMLElement | null | undefined {
-  const container = React.useContext(PortalContainerContext);
+  const provided = React.useContext(PortalContainerContext);
+  const container = React.useContext(InsidePortalContext) ? undefined : provided;
   const [root, setRoot] = React.useState<HTMLElement | null>(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- A ref's `current` changes without a re-render, so every render checks it again; setting the same element is a no-op.

@@ -12,7 +12,7 @@ import { Popover } from '../popover';
 import { Select } from '../select';
 import { Toast } from '../toast';
 import { Tooltip } from '../tooltip';
-import { PortalProvider } from './index';
+import { PortalProvider, useGetPortalContainer } from './index';
 
 type Root = HTMLElement | null | RefObject<HTMLElement | null>;
 
@@ -251,6 +251,44 @@ describe.each([
     expect(dialogPortalNode).not.toBeNull();
     expect(nested.closest('[data-floating-ui-portal]')?.parentElement).toBe(dialogPortalNode);
     expect(container).toContainElement(dialog);
+    container.remove();
+  });
+});
+
+describe('useGetPortalContainer', () => {
+  function ContainerProbe(props: { onResolve: (container: HTMLElement | null | undefined) => void }): null {
+    const getContainer = useGetPortalContainer();
+    React.useEffect(() => {
+      props.onResolve(getContainer?.());
+    });
+    return null;
+  }
+
+  it('returns undefined without a provider', () => {
+    let resolved: HTMLElement | null | undefined = null;
+    render(<ContainerProbe onResolve={value => (resolved = value)} />);
+
+    expect(resolved).toBeUndefined();
+  });
+
+  it('returns the provider container inside a Mosaic portal', async () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    let resolved: HTMLElement | null | undefined;
+    render(
+      <PortalProvider container={container}>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <div data-testid='dialog'>
+              <ContainerProbe onResolve={value => (resolved = value)} />
+            </div>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </PortalProvider>,
+    );
+
+    await screen.findByTestId('dialog');
+    expect(resolved).toBe(container);
     container.remove();
   });
 });
