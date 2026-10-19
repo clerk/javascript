@@ -489,10 +489,7 @@ describe('User profile MFA management', () => {
       await waitFor(() => expect(held.requests).toHaveLength(1));
       try {
         const pendingAction = screen.getByRole('button', { name: `Manage SMS verification ${pendingPhone}` });
-        await user.click(pendingAction);
-        if (pendingAction.getAttribute('aria-expanded') !== 'true') {
-          await user.click(pendingAction);
-        }
+        await openMenu(user, pendingAction);
         await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
         expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
         await user.click(await screen.findByRole('menuitem', { name: 'Remove method' }));
