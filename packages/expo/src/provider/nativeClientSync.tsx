@@ -302,7 +302,7 @@ async function refreshJsClientFromNativeState({
 }: {
   clerkInstance: SyncableClerkInstance;
   nativeDeviceToken: string | null;
-  previousDeviceToken?: string | null;
+  previousDeviceToken?: CachedDeviceToken;
   rejectForeignSessionlessClient?: boolean;
   reloadInitialResources: boolean;
   shouldSyncDeviceToken?: boolean;
@@ -313,14 +313,19 @@ async function refreshJsClientFromNativeState({
   const previousClientSnapshot = snapshotClientState(clerkInstance.client);
 
   const restorePreviousDeviceToken = async () => {
-    if (!rejectForeignSessionlessClient || !shouldSyncDeviceToken || previousDeviceToken === undefined) {
+    if (
+      !rejectForeignSessionlessClient ||
+      !shouldSyncDeviceToken ||
+      !previousDeviceToken ||
+      previousDeviceToken.status === 'unavailable'
+    ) {
       return;
     }
 
     // On the 401 path a rollback is part of recovery, not an external rotation, so it must not
     // reopen the cooldown. The native-event path still notifies so native resyncs the restored token.
     await syncNativeDeviceTokenToCache({
-      deviceToken: previousDeviceToken,
+      deviceToken: knownDeviceToken(previousDeviceToken),
       suppressTokenCacheNotificationsRef: suppressDeviceTokenRollbackNotification
         ? suppressTokenCacheNotificationsRef
         : undefined,
@@ -498,10 +503,15 @@ function mergePendingNativeRefreshOptions(
 
 const tokenCacheReadTimedOut = Symbol('tokenCacheReadTimedOut');
 
-// `undefined` = read timed out, `null` = confirmed missing token.
-async function getCachedDeviceToken(tokenCache: TokenCache | undefined): Promise<string | null | undefined> {
+type CachedDeviceToken = { status: 'present'; token: string } | { status: 'absent' } | { status: 'unavailable' };
+
+function knownDeviceToken(read: Exclude<CachedDeviceToken, { status: 'unavailable' }>): string | null {
+  return read.status === 'present' ? read.token : null;
+}
+
+async function getCachedDeviceToken(tokenCache: TokenCache | undefined): Promise<CachedDeviceToken> {
   if (!tokenCache) {
-    return null;
+    return { status: 'absent' };
   }
 
   try {
@@ -512,7 +522,7 @@ async function getCachedDeviceToken(tokenCache: TokenCache | undefined): Promise
   return readCachedDeviceToken(tokenCache);
 }
 
-async function readCachedDeviceToken(tokenCache: TokenCache): Promise<string | null | undefined> {
+async function readCachedDeviceToken(tokenCache: TokenCache): Promise<CachedDeviceToken> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   try {
     const result = await Promise.race([
@@ -522,9 +532,9 @@ async function readCachedDeviceToken(tokenCache: TokenCache): Promise<string | n
       }),
     ]);
     if (result === tokenCacheReadTimedOut) {
-      return undefined;
+      return { status: 'unavailable' };
     }
-    return result ?? null;
+    return result ? { status: 'present', token: result } : { status: 'absent' };
   } finally {
     if (timeoutId) {
       clearTimeout(timeoutId);
@@ -568,13 +578,12 @@ async function syncNativeClientToJs({
   const hasSignedInJsClient = Boolean(getDefaultSignedInSession(clerkInstance.client));
 
   if (didChangeDeviceToken && hasSignedInJsClient) {
-    // Timed-out cache read leaves no rollback snapshot, so keep JS authoritative.
-    if (previousDeviceToken === undefined) {
+    if (!previousDeviceToken || previousDeviceToken.status === 'unavailable') {
       return;
     }
 
-    if (previousDeviceToken && !canRefreshJsClientFromServer(clerkInstance)) {
-      nativeRefreshFromJsControllerRef?.current?.syncDeviceTokenToNative(previousDeviceToken);
+    if (previousDeviceToken.status === 'present' && !canRefreshJsClientFromServer(clerkInstance)) {
+      nativeRefreshFromJsControllerRef?.current?.syncDeviceTokenToNative(previousDeviceToken.token);
       return;
     }
   }
@@ -916,8 +925,10 @@ export function NativeClientSync({
               });
               // The suppressed rollback write skips the listener that resyncs native, so the
               // restored token must be pushed to native from here.
-              if (result === 'restored' && previousDeviceToken !== undefined) {
-                nativeRefreshFromJsControllerRef.current?.syncDeviceTokenToNative(previousDeviceToken);
+              if (result === 'restored' && previousDeviceToken.status !== 'unavailable') {
+                nativeRefreshFromJsControllerRef.current?.syncDeviceTokenToNative(
+                  knownDeviceToken(previousDeviceToken),
+                );
               }
               if (result) {
                 return;
@@ -1118,7 +1129,10 @@ export function useNativeClientBootstrap({
 
             let initialJsDeviceToken: string | null = null;
             try {
-              initialJsDeviceToken = (await getCachedDeviceToken(tokenCache)) ?? null;
+              const initialRead = await getCachedDeviceToken(tokenCache);
+              if (initialRead.status !== 'unavailable') {
+                initialJsDeviceToken = knownDeviceToken(initialRead);
+              }
             } catch (e) {
               if (__DEV__) {
                 console.warn('[ClerkProvider] Token cache read failed:', e);
@@ -1149,7 +1163,8 @@ export function useNativeClientBootstrap({
             }
 
             if (clerkInstance) {
-              const currentJsDeviceToken = (await getCachedDeviceToken(tokenCache)) ?? null;
+              const currentRead = await getCachedDeviceToken(tokenCache);
+              const currentJsDeviceToken = currentRead.status === 'unavailable' ? null : knownDeviceToken(currentRead);
               const nativeDeviceToken = await readNativeDeviceToken({ waitForToken: false });
 
               if (!isCurrentConfiguration()) {
