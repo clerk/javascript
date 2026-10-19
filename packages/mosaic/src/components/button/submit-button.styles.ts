@@ -6,11 +6,9 @@ export const styles = stylex.create({
   root: {
     position: 'relative',
   },
-  // A pending button is disabled underneath, but it is busy rather than unavailable, so it
-  // keeps full opacity and the default cursor instead of the disabled dim and `not-allowed`.
   rootPending: {
-    cursor: 'default',
     opacity: 1,
+    pointerEvents: 'none',
   },
 
   // One box around every child, so the whole content fades as a unit rather than per-run. It
