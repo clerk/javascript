@@ -53,7 +53,7 @@ import { Table } from '@clerk/mosaic/components/table';
 - `Table.Search` composes [InputGroup](/components/input-group), [Icon](/components/icon), and [Button](/components/button). Supply the controlled `value`, `onValueChange`, and localized `label` and `clearLabel`. Clearing returns focus to the input. Its `ref`, `xstyle`, and input props apply to the search input; `placeholder` defaults to `label`. The caller owns filtering and any debounce.
 - `Table.Root` renders the `<table>`. `xstyle`, `ref`, and any table props land on it; the scrolling shell around it is internal. `layout` defaults to `'auto'`, where columns size to their content; `'fixed'` sizes them from the column group instead.
 - `Table.ColumnGroup` renders a `<colgroup>`. Put it first inside `Table.Root`, with one column part per column.
-- `Table.Column` renders a `<col>`. Pass `width` (any CSS length) to set the column's width. A column without `width` takes the space the others leave, unless its cells set their own width, as `Table.SelectAllCell` and `Table.SelectCell` do.
+- `Table.Column` renders a `<col>`. Pass `width` (any CSS length) to set the column's width. A column without `width` takes the space the others leave, unless the cell in its first row sets its own width, as `Table.SelectAllCell` does.
 - `Table.Header` and `Table.Body` render `<thead>` and `<tbody>`. Rows inside the body get a top border.
 - `Table.Row` renders a `<tr>`. Pass `selected` to mark it `aria-selected` and tint it.
 - `Table.HeaderCell` renders a `<th scope="col">`. Pass `onSort` to make it sortable: the label becomes a button with a direction icon, and `sort` (`'ascending'`, `'descending'`, or `'none'`) reflects the current direction as `aria-sort`. `align` moves the content to `'center'` or `'end'`.
