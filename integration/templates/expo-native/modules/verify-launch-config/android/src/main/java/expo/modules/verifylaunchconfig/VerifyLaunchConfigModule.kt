@@ -13,11 +13,8 @@ class VerifyLaunchConfigModule : Module() {
     Name("VerifyLaunchConfig")
 
     Function("readLaunchInputs") {
-      val extras = appContext.currentActivity?.intent?.extras ?: return@Function emptyMap<String, String>()
-      extras.keySet()
-        .filter { it.startsWith("verify") }
-        .mapNotNull { key -> extras.getString(key)?.let { key to it } }
-        .toMap()
+      // The JS bundle can run before React Native sets currentActivity in onHostResume, so the extras are captured at activity creation.
+      checkNotNull(LaunchInputs.captured) { "readLaunchInputs ran before the main activity was created, so the launch extras are unknown" }
     }
 
     Function("applyStorageScope") { scope: String ->
