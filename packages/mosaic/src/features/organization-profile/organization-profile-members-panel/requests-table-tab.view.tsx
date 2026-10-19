@@ -213,7 +213,7 @@ function RequestsTableBody({
               ) : null}
               <Table.Cell>
                 <Item.Root>
-                  <Skeleton>
+                  <Skeleton shape='pill'>
                     <Item.Media>
                       <Avatar.Root
                         size='fit'

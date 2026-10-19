@@ -318,7 +318,7 @@ function MemberRow({
       ) : null}
       <Table.Cell>
         <Entity.Root>
-          <Skeleton>
+          <Skeleton shape='pill'>
             <Entity.Media>
               <Avatar.Root
                 size='fit'
