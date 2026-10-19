@@ -6,6 +6,7 @@ import { useForm } from '../../../components/form';
 import type { FieldFeedback } from '../../../components/form/form-submit-error';
 import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import type {
   UserProfileEditPasswordValue,
   UserProfileEditPasswordValues,
@@ -23,6 +24,7 @@ export interface UserProfileEditPasswordControllerOptions {
   policy: UserProfilePasswordPolicy;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<unknown>;
   validatePassword?: (password: string) => Promise<FieldFeedback | undefined>;
+  reverification?: ReverificationController;
 }
 
 export interface UserProfileEditPasswordController {
@@ -30,12 +32,14 @@ export interface UserProfileEditPasswordController {
   onOpenChange: (open: boolean) => void;
   form: UseFormResult<UserProfileEditPasswordValues>;
   passwordFeedback: FieldFeedback | undefined;
+  step: 'edit' | 'verify';
 }
 
 export function useUserProfileEditPasswordController({
   policy,
   onSubmit,
   validatePassword,
+  reverification,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
   const requiresCurrentPassword = policy.requiresCurrentPassword;
   const validationError = useMessages('errors').generic;
@@ -78,13 +82,18 @@ export function useUserProfileEditPasswordController({
     ? { type: 'error', message: validationError }
     : strength.data;
 
+  const step = form.isSubmitting && reverification?.visible ? 'verify' : 'edit';
+
   const onOpenChange = (open: boolean) => {
     if (form.isSubmitting) {
-      return;
+      if (open || !reverification?.onCancel) {
+        return;
+      }
+      reverification.onCancel();
     }
     form.reset();
     setIsOpen(open);
   };
 
-  return { isOpen, onOpenChange, form, passwordFeedback };
+  return { isOpen, onOpenChange, form, passwordFeedback, step };
 }
