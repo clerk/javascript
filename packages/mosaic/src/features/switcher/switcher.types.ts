@@ -8,6 +8,7 @@ import type { SwitcherSlot } from './switcher.layout';
 
 export interface SwitcherSession {
   sessionId: string;
+  userId: string;
   name: string;
   /** Whatever the account is addressed by: username, email, phone, or wallet. */
   identifier: string;
@@ -170,3 +171,9 @@ export interface SwitcherMenuProps {
    */
   menuItemOrder?: (SwitcherMenuItemId | (string & {}))[];
 }
+
+export type SwitcherTriggerBadgeOptions = { kind: 'user' | 'organization'; id: string };
+
+export type SwitcherTriggerBadge =
+  | boolean
+  | ((options: SwitcherTriggerBadgeOptions) => Promise<{ id: string; label: string } | null>);

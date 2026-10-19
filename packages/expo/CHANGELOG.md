@@ -1,5 +1,29 @@
 # Change Log
 
+## 4.13.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`c0ba3bc`](https://github.com/clerk/javascript/commit/c0ba3bc728d76bd40f80c2c4c506cbfeb5d0807a), [`560ff50`](https://github.com/clerk/javascript/commit/560ff507af494b43210fd2d9a7bd109c4eb6902c)]:
+  - @clerk/clerk-js@6.39.1
+
+## 4.12.0
+
+### Minor Changes
+
+- Fix iOS users being signed out when the keychain can't be read for a moment, for example when the app launches in the background before the device has been unlocked since a restart. ([#10199](https://github.com/clerk/javascript/pull/10199)) by [@jescalan](https://github.com/jescalan)
+  - On iOS, `getToken()` from the `tokenCache` in `@clerk/expo/token-cache` now rejects with the keychain error instead of deleting the stored client token, unless the read starts and fails while the app is active.
+  - When reading the client token fails, Clerk waits until the app is active and reads it again before sending the request. Requests made in the background wait until the app is opened.
+  - If your custom `tokenCache` deletes the token and returns `null` when a read fails, it can still sign users out in this case. Rethrow the error instead, unless `AppState.currentState` is `active` both when the read starts and when it fails.
+
+### Patch Changes
+
+- Native components now respect the `proxyUrl` passed to `<ClerkProvider>` and route Frontend API requests through the configured proxy. Applying the proxy requires a new app binary; a JS-only OTA update safely keeps the previous behavior. ([#9373](https://github.com/clerk/javascript/pull/9373)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 4.11.0
 
 ### Minor Changes

@@ -10,7 +10,7 @@ import { useSwitcherModel } from './switcher.model';
 import type { OrganizationProfilePageId } from './switcher.pages';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './switcher.pages';
 import type { SwitcherMenuProps, SwitcherMode } from './switcher.types';
-import type { SwitcherTriggerProps } from './switcher.view';
+import type { SwitcherTriggerProps, SwitcherTriggerVariant } from './switcher.view';
 import { SwitcherView } from './switcher.view';
 
 /** What a profile opened from the switcher takes beyond the profile component's own props. */
@@ -61,10 +61,13 @@ export type SwitcherProps = SwitcherModelOptions &
     fallback?: ReactNode;
   };
 
-export function Switcher(props: SwitcherProps & { mode: SwitcherMode }): ReactElement | null {
+export function Switcher(
+  props: SwitcherProps & { mode: SwitcherMode; triggerVariant?: SwitcherTriggerVariant },
+): ReactElement | null {
   const {
     renderTriggerLabel,
     renderTriggerBadge,
+    triggerVariant,
     mode,
     userProfileProps,
     organizationProfileProps,
@@ -128,6 +131,7 @@ export function Switcher(props: SwitcherProps & { mode: SwitcherMode }): ReactEl
         {...viewController}
         renderTriggerLabel={renderTriggerLabel}
         renderTriggerBadge={renderTriggerBadge}
+        triggerVariant={triggerVariant}
       />
       {portals}
     </>

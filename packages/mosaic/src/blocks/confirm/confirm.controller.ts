@@ -139,7 +139,6 @@ export function useConfirmController<Payload = void>({
       if (snapshot.value !== 'confirming') {
         return;
       }
-      reverification?.reset();
       send({
         type: 'CONFIRM',
         run: async () => {

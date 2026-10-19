@@ -1,5 +1,25 @@
 # @clerk/expo-native-components
 
+## 0.2.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix Android builds on Expo SDK 58. Compiling `@clerk/expo-native-components` no longer fails with `Unresolved reference 'LocalSavedStateRegistryOwner'`. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Apply the Clerk theme to custom user-profile page backgrounds and navigation bars on iOS. ([#10272](https://github.com/clerk/javascript/pull/10272)) by [@juliusmarminge](https://github.com/juliusmarminge)
+
+## 0.1.1
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.11` to `1.2.1`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.2.1. ([#10250](https://github.com/clerk/javascript/pull/10250)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Native components now respect the `proxyUrl` passed to `<ClerkProvider>` and route Frontend API requests through the configured proxy. Applying the proxy requires a new app binary; a JS-only OTA update safely keeps the previous behavior. ([#9373](https://github.com/clerk/javascript/pull/9373)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.1.0
 
 ### Minor Changes

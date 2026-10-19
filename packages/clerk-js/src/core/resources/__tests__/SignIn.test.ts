@@ -33,6 +33,9 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
   }),
 }));
 
+const toFormFields = (body: Record<string, unknown>) =>
+  Object.fromEntries(new URLSearchParams(stringifyQueryParams(body, { keyEncoder: camelToSnake })));
+
 describe('SignIn', () => {
   beforeEach(() => {
     vi.stubGlobal('Intl', undefined);
@@ -329,6 +332,49 @@ describe('SignIn', () => {
 
       expect(open).toHaveBeenCalledWith(new URL('https://provider.example/auth'));
       expect(handleResourceCallback).toHaveBeenCalledWith(signIn, { signInUrl: '/sign-in' });
+    });
+  });
+
+  describe('authenticateWithRedirect with oidcPrompt', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+      SignIn.clerk = {} as any;
+    });
+
+    it('sends oidc_prompt in the request that creates an OAuth sign-in', async () => {
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_windowNavigate: vi.fn(),
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://accounts.google.example/auth',
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+
+      await new SignIn().authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        oidcPrompt: 'select_account',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockFetch.mock.calls[0][0]).toMatchObject({ method: 'POST', path: '/client/sign_ins' });
+      expect(toFormFields(mockFetch.mock.calls[0][0].body)).toMatchObject({
+        strategy: 'oauth_google',
+        oidc_prompt: 'select_account',
+      });
     });
   });
 
@@ -768,9 +814,6 @@ describe('SignIn', () => {
       vi.clearAllMocks();
       vi.unstubAllGlobals();
     });
-
-    const toFormFields = (body: Record<string, unknown>) =>
-      Object.fromEntries(new URLSearchParams(stringifyQueryParams(body, { keyEncoder: camelToSnake })));
 
     it('creates a sign-in with a trusted device id', async () => {
       vi.stubGlobal('navigator', { language: '' });
@@ -2806,6 +2849,41 @@ describe('SignIn', () => {
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
+      });
+
+      it('sends oidc_prompt in the request that creates an OAuth sign-in', async () => {
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
+        SignIn.clerk = {
+          buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          __internal_windowNavigate: vi.fn(),
+          __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+        } as any;
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: {
+            id: 'signin_123',
+            first_factor_verification: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://accounts.google.example/auth',
+            },
+          },
+        });
+        BaseResource._fetch = mockFetch;
+
+        const { error } = await new SignIn().__internal_future.sso({
+          strategy: 'oauth_google',
+          redirectUrl: '/dashboard',
+          redirectCallbackUrl: '/sso-callback',
+          oidcPrompt: 'select_account',
+        });
+
+        expect(error).toBeNull();
+        expect(mockFetch).toHaveBeenCalledTimes(1);
+        expect(mockFetch.mock.calls[0][0]).toMatchObject({ method: 'POST', path: '/client/sign_ins' });
+        expect(toFormFields(mockFetch.mock.calls[0][0].body)).toMatchObject({
+          strategy: 'oauth_google',
+          oidc_prompt: 'select_account',
+        });
       });
 
       it('creates signIn with enterprise_sso strategy and prepares first factor', async () => {

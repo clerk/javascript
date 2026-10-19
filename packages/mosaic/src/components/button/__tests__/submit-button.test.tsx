@@ -87,6 +87,61 @@ describe('Mosaic SubmitButton', () => {
     expect(button).not.toHaveAttribute('aria-busy');
   });
 
+  it.each([
+    { disabled: false, focusableWhenDisabled: false, nativelyDisabled: false, ariaDisabled: 'true' },
+    { disabled: true, focusableWhenDisabled: false, nativelyDisabled: true, ariaDisabled: null },
+    { disabled: true, focusableWhenDisabled: true, nativelyDisabled: false, ariaDisabled: 'true' },
+  ])(
+    'marks a pending button disabled with disabled=$disabled focusableWhenDisabled=$focusableWhenDisabled',
+    ({ disabled, focusableWhenDisabled, nativelyDisabled, ariaDisabled }) => {
+      render(
+        <SubmitButton
+          disabled={disabled}
+          focusableWhenDisabled={focusableWhenDisabled}
+          isPending
+        >
+          Save
+        </SubmitButton>,
+      );
+      const button = screen.getByRole('button', { name: 'Save' });
+      expect(button).toHaveAttribute('data-disabled');
+      expect(button).toHaveAttribute('aria-busy', 'true');
+      expect(button.hasAttribute('disabled')).toBe(nativelyDisabled);
+      expect(button.getAttribute('aria-disabled')).toBe(ariaDisabled);
+    },
+  );
+
+  it('keeps focus while pending and restores enabled behavior afterward', () => {
+    const { rerender } = render(<SubmitButton>Save</SubmitButton>);
+    const button = screen.getByRole('button', { name: 'Save' });
+    button.focus();
+
+    rerender(<SubmitButton isPending>Save</SubmitButton>);
+    expect(button).toHaveFocus();
+
+    rerender(<SubmitButton isPending={false}>Save</SubmitButton>);
+    expect(button).toHaveFocus();
+    expect(button).toBeEnabled();
+    expect(button).not.toHaveAttribute('data-disabled');
+    expect(button).not.toHaveAttribute('data-pending');
+    expect(button).not.toHaveAttribute('aria-disabled');
+    expect(button).not.toHaveAttribute('aria-busy');
+  });
+
+  it('keeps the disabled dim when a disabled button goes pending', () => {
+    const { rerender } = render(<SubmitButton disabled>Save</SubmitButton>);
+    const disabledAtoms = atoms(screen.getByRole('button'));
+    rerender(
+      <SubmitButton
+        disabled
+        isPending
+      >
+        Save
+      </SubmitButton>,
+    );
+    expect(atoms(screen.getByRole('button'))).toEqual(disabledAtoms);
+  });
+
   it('renders the spinner and reflects the pending state', () => {
     render(<SubmitButton isPending>Save</SubmitButton>);
     const button = screen.getByRole('button');

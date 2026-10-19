@@ -4,6 +4,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -335,11 +336,11 @@ describe('UserButton', () => {
       expect(popup()).toBeInTheDocument();
     });
 
-    it('stays busy until the invitations have reloaded', async () => {
+    it('stays busy until the memberships have reloaded', async () => {
       await renderUserButton();
       const user = await open();
       await screen.findByRole('button', { name: 'Accept' });
-      const reload = holdRequests('get', '/v1/me/organization_invitations');
+      const reload = holdRequests('get', '/v1/me/organization_memberships');
 
       await user.click(screen.getByRole('button', { name: 'Accept' }));
       await waitFor(() => expect(reload.requests).toHaveLength(1));
@@ -479,6 +480,18 @@ describe('UserButton', () => {
       expect(openCreateOrganization).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
       await waitFor(() => expect(popup()).toBeNull());
+    });
+
+    it('hands the CreateOrganization modal the portal root the app provides', async () => {
+      const container = document.createElement('div');
+      serveFapi(signedIn());
+      const { clerk } = await renderWithClerk(<PortalProvider getContainer={() => container}>{tree()}</PortalProvider>);
+      const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
+      const user = await open();
+
+      await user.click(await screen.findByRole('button', { name: 'Add organization' }));
+
+      expect(openCreateOrganization.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
     });
 
     it('navigates to create an organization when a URL routes it', async () => {
@@ -1168,14 +1181,42 @@ describe('UserButton', () => {
       expect(popup()).toBeNull();
     });
 
-    it('names the active organization alone, and opens as the account', async () => {
+    it('names the active organization alone, badged with the account, and opens as the account', async () => {
       await renderUserButton();
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(trigger()).toHaveAttribute('data-variant', 'full');
       expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
       expect(within(trigger()).queryByText('alice')).toBeNull();
       expect(within(trigger()).queryByText('Alice Smith')).toBeNull();
+      expect(trigger().querySelector('.cl-user-button-avatar > [data-shape]')).toHaveAttribute('data-shape', 'square');
+      expect(trigger().querySelector('.cl-user-button-avatar-badge > [data-shape]')).toHaveAttribute(
+        'data-shape',
+        'circle',
+      );
+    });
+
+    it('drops the account badge from a condensed trigger', async () => {
+      await renderUserButton({ triggerVariant: 'condensed' });
+
+      expect(trigger()).toHaveAttribute('data-variant', 'condensed');
+      expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
       expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
+    });
+
+    it('leads a full trigger with the account alone when no organization is active', async () => {
+      await renderUserButton({}, signedIn({ client: fapiClient([personalSession]) }));
+
+      expect(trigger()).toHaveAttribute('data-variant', 'full');
+      expect(within(trigger()).getByText('Alice Smith')).toBeInTheDocument();
+      expect(trigger().querySelector('[data-shape]')).toHaveAttribute('data-shape', 'circle');
+      expect(trigger().querySelector('.cl-user-button-avatar-badge')).toBeNull();
+    });
+
+    it('keeps the condensed trigger in user mode', async () => {
+      await renderUserButton({ mode: 'user', triggerVariant: 'full' });
+
+      expect(trigger()).toHaveAttribute('data-variant', 'condensed');
     });
 
     it('leads the avatar alone with the organization, unbadged', async () => {
@@ -1217,5 +1258,98 @@ describe('UserButton', () => {
       memberships.release();
       await waitFor(() => expect(screen.queryByText('Loading organizations…')).toBeNull());
     });
+  });
+});
+
+describe('UserButton custom trigger badges', () => {
+  it.each([
+    { mode: 'combined' as const, seed: signedIn(), badge: 'organization:org_1', name: 'Acme' },
+    { mode: 'user' as const, seed: signedIn(), badge: 'user:user_1', name: 'Alice Smith' },
+    {
+      mode: 'combined' as const,
+      seed: signedIn({ client: fapiClient([personalSession]) }),
+      badge: 'user:user_1',
+      name: 'Alice Smith',
+    },
+  ])('shows a badge for the displayed identity as $badge', async ({ mode, seed, badge, name }) => {
+    await renderUserButton(
+      { mode, renderTriggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
+      seed,
+    );
+
+    await waitFor(() => expect(within(trigger()).getByText(badge)).toBeInTheDocument());
+    expect(within(trigger()).getByText(badge).closest('.cl-badge')).toHaveAttribute('data-badge-id', 'pro');
+    expect(within(trigger()).getByText(name)).toBeInTheDocument();
+    expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+    await open();
+    expect(within(requiredPopup()).queryByText(badge)).toBeNull();
+  });
+
+  it('hides the badge while pending and for null without changing the name', async () => {
+    const badge = deferred<{ id: string; label: string } | null>();
+    const { rerender } = await renderUserButton({ renderTriggerBadge: () => badge.promise });
+
+    expect(trigger()).toHaveTextContent('Acme');
+    expect(trigger()).not.toHaveTextContent('Pro plan');
+    await act(() => badge.resolve({ id: 'pro', label: 'Pro plan' }));
+    await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
+    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+
+    const renderTriggerBadge = vi.fn(() => Promise.resolve(null));
+    rerender(tree({ renderTriggerBadge }));
+    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalled());
+    expect(trigger()).not.toHaveTextContent('Pro plan');
+    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+  });
+
+  it('discards the previous workspace badge after switching organizations', async () => {
+    const first = deferred<{ id: string; label: string } | null>();
+    const renderTriggerBadge = vi.fn(async ({ id }: { id: string }) =>
+      id === 'org_1' ? first.promise : { id: 'other', label: 'Other plan' },
+    );
+    const { clerk } = await renderUserButton({ renderTriggerBadge });
+    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalledWith({ kind: 'organization', id: 'org_1' }));
+
+    await act(() => clerk.setActive({ organization: 'org_9' }));
+    await waitFor(() => expect(within(trigger()).getByText('Other plan')).toBeInTheDocument());
+    await act(() => first.resolve({ id: 'previous', label: 'Previous plan' }));
+    expect(within(trigger()).getByText('Other')).toBeInTheDocument();
+    expect(within(trigger()).getByText('Other plan').closest('.cl-badge')).toHaveAttribute('data-badge-id', 'other');
+    expect(trigger()).not.toHaveTextContent('Previous plan');
+  });
+
+  it('refreshes the badge when the callback changes and hides it on failure or false', async () => {
+    const { rerender } = await renderUserButton({
+      renderTriggerBadge: () => Promise.resolve({ id: 'pro', label: 'Pro plan' }),
+    });
+    await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
+
+    rerender(tree({ renderTriggerBadge: () => Promise.resolve({ id: 'business', label: 'Business plan' }) }));
+    await waitFor(() => expect(within(trigger()).getByText('Business plan')).toBeInTheDocument());
+    expect(within(trigger()).getByText('Business plan').closest('.cl-badge')).toHaveAttribute(
+      'data-badge-id',
+      'business',
+    );
+    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+
+    const fail = vi.fn().mockRejectedValue(new Error('Plan unavailable'));
+    rerender(tree({ renderTriggerBadge: fail }));
+    await waitFor(() => expect(fail).toHaveBeenCalled());
+    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+    expect(trigger()).not.toHaveTextContent('Business plan');
+
+    rerender(tree({ renderTriggerBadge: false }));
+    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+    expect(trigger()).not.toHaveTextContent('Business plan');
+  });
+
+  it('does not request a badge when the trigger label is hidden', async () => {
+    const renderTriggerBadge = vi.fn(() => Promise.resolve({ id: 'pro', label: 'Pro plan' }));
+    await renderUserButton({ renderTriggerLabel: false, renderTriggerBadge });
+
+    expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+    expect(trigger()).not.toHaveTextContent('Acme');
+    expect(trigger()).not.toHaveTextContent('Pro plan');
+    expect(renderTriggerBadge).not.toHaveBeenCalled();
   });
 });

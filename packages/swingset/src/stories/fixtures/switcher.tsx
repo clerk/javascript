@@ -20,7 +20,13 @@ const defaultOrgLogo =
 const cameronPhoto = 'https://randomuser.me/api/portraits/men/32.jpg';
 
 function cameron(sessionId: string): SwitcherSession {
-  return { sessionId, name: 'Cameron Walker', identifier: 'cameron@clerk.com', imageUrl: cameronPhoto };
+  return {
+    sessionId,
+    userId: 'user_cameron',
+    name: 'Cameron Walker',
+    identifier: 'cameron@clerk.com',
+    imageUrl: cameronPhoto,
+  };
 }
 
 const nestLabs: SwitcherMembership = {

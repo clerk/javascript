@@ -24,48 +24,50 @@ export function UserProfileSecurityList({
   children: ReactNode;
 }) {
   return (
-    <Section.Group
-      ref={sectionRef}
-      tabIndex={-1}
-    >
-      <Section.Header>
-        <Section.Content>
-          <Section.Title>{label}</Section.Title>
-        </Section.Content>
-        {addControl ? (
-          <Section.Actions>{addControl}</Section.Actions>
-        ) : onAdd ? (
-          <Section.Actions>
-            <Button
-              aria-label={addLabel}
-              color='neutral'
-              size='sm'
-              variant='outline'
-              onClick={onAdd}
-            >
-              <Icon
-                name='plus'
-                placement='inline-start'
+    <Section.Root>
+      <Section.Group
+        ref={sectionRef}
+        tabIndex={-1}
+      >
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>{label}</Section.Title>
+          </Section.Content>
+          {addControl ? (
+            <Section.Actions>{addControl}</Section.Actions>
+          ) : onAdd ? (
+            <Section.Actions>
+              <Button
+                aria-label={addLabel}
+                color='neutral'
                 size='sm'
-              />
-              Add
-            </Button>
-          </Section.Actions>
-        ) : null}
-      </Section.Header>
-      <Section.Body>
-        <Section.Items>
-          {hasItems ? (
-            children
-          ) : (
-            <Section.Item>
-              <Section.Content>
-                <Section.Description>{emptyLabel}</Section.Description>
-              </Section.Content>
-            </Section.Item>
-          )}
-        </Section.Items>
-      </Section.Body>
-    </Section.Group>
+                variant='outline'
+                onClick={onAdd}
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
+                  size='sm'
+                />
+                Add
+              </Button>
+            </Section.Actions>
+          ) : null}
+        </Section.Header>
+        <Section.Body>
+          <Section.Items>
+            {hasItems ? (
+              children
+            ) : (
+              <Section.Item>
+                <Section.Content>
+                  <Section.Description>{emptyLabel}</Section.Description>
+                </Section.Content>
+              </Section.Item>
+            )}
+          </Section.Items>
+        </Section.Body>
+      </Section.Group>
+    </Section.Root>
   );
 }

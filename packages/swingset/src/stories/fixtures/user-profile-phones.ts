@@ -3,6 +3,7 @@ import { useUserProfilePhoneSectionController } from '@clerk/mosaic/features/use
 import type { UserProfilePhoneSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-phone-section/user-profile-phone-section.types';
 import { useState } from 'react';
 
+import { idleReverification } from './reverification';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
 
 export const examplePhones: UserProfilePhone[] = [
@@ -32,6 +33,7 @@ export function useUserProfilePhonesFixture({
 
   return useUserProfilePhoneSectionController({
     phones,
+    reverification: idleReverification,
     ...flow,
     onSetPrimaryPhone: id => {
       setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })));
