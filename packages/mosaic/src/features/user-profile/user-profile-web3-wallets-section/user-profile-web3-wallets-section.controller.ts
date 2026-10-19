@@ -19,10 +19,17 @@ export function useUserProfileWeb3WalletsController({
   connect,
   setPrimary,
   remove,
-  reverification,
+  removeReverification,
+  setPrimaryReverification,
 }: Pick<
   ReadyWeb3WalletsModel,
-  'wallets' | 'availableProviders' | 'connect' | 'setPrimary' | 'remove' | 'reverification'
+  | 'wallets'
+  | 'availableProviders'
+  | 'connect'
+  | 'setPrimary'
+  | 'remove'
+  | 'removeReverification'
+  | 'setPrimaryReverification'
 >) {
   const messages = useMessages('userProfileWeb3Wallets');
   const action = usePendingAction({ errorFallback: messages.errors.generic });
@@ -40,7 +47,7 @@ export function useUserProfileWeb3WalletsController({
   // TODO: Share the action lock during removal while preserving errors for the confirmation dialog.
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({
     onConfirm: wallet => removalFocus.remove(wallet.id),
-    reverification,
+    reverification: removeReverification,
   });
 
   const onConnect = (id: string) => {
@@ -83,6 +90,8 @@ export function useUserProfileWeb3WalletsController({
     registerTrigger: removalFocus.registerTrigger,
     remove: remove ? removeWallet : undefined,
     finalFocus: removalFocus.finalFocus,
+    setPrimaryReverification,
+    setPrimaryFinalFocus: () => (action.lastKey ? removalFocus.trigger(action.lastKey) : null),
     solanaPickerOpen: picker.open,
     solanaPickerError: picker.open && picker.provider.id === action.errorKey ? action.error : undefined,
     pendingWalletName: picker.open && picker.provider.id === action.pendingKey ? picker.walletName : undefined,
