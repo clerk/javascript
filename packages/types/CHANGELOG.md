@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.101.28
+
+### Patch Changes
+
+- Publish `@clerk/clerk-react`, `@clerk/types`, and `@clerk/clerk-expo` as deprecated on npm. Use `@clerk/react`, `@clerk/shared/types`, and `@clerk/expo` instead, following the [Core 3 upgrade guide](https://clerk.com/docs/guides/development/upgrading/upgrade-guides/core-3). ([#9863](https://github.com/clerk/javascript/pull/9863)) by [@manovotny](https://github.com/manovotny)
+
 ## 4.101.27
 
 ### Patch Changes
