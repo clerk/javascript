@@ -32,7 +32,7 @@
 ### Prerequisites
 
 - React 18 or later
-- Expo 54 or later
+- Expo 54 to 58
 - React Native 0.73 or later
 - Node.js `>=20.9.0` or later
 - An existing Expo application

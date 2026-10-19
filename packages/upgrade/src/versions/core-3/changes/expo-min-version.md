@@ -1,18 +1,18 @@
 ---
-title: 'Minimum Expo version increased to 54'
+title: 'Minimum Expo version increased to 53'
 packages: ['expo']
-matcher: "expo\":\\s*\"(?:^|~|>|=|\\s)*(?:50|51|52|53)\\..*?"
+matcher: "expo\":\\s*\"(?:\\^|~|>|=|\\s)*(?:50|51|52)\\..*?"
 matcherFlags: 'm'
 category: 'version'
 ---
 
-Support for Expo 50, 51, 52, and 53 has been dropped. Update your project to Expo 54 or later:
+Support for Expo 50, 51, and 52 has been dropped. Update your project to Expo 53 or later:
 
 ```diff
 {
   "dependencies": {
--   "expo": "~53.0.0",
-+   "expo": "~54.0.0",
+-   "expo": "~52.0.0",
++   "expo": "~53.0.0",
   }
 }
 ```
