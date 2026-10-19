@@ -66,7 +66,6 @@ const SHARED_NATIVE_INPUTS = [
   'packages/expo-biometrics/expo-module.config.json',
   'packages/expo-biometrics/package.json',
   'integration/templates/expo-native/app.json',
-  'integration/templates/expo-native/app.config.js',
   'integration/templates/expo-native/package.sdk-58.json',
   'integration/templates/expo-native/pnpm-workspace.yaml',
   'integration/templates/expo-native/modules',
