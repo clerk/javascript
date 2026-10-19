@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button } from '../components/button';
 import { Dialog } from '../components/dialog';
-import { withoutUndefined } from '../utils/object';
+import { withoutUndefined } from '../primitives/utils/object';
 import type { ModalContentProps, ModalHandle, ModalSurface } from './modal.types';
 import type { ModalController } from './modal-controller';
 import { createModalController } from './modal-controller';
@@ -43,7 +43,7 @@ export function createModalHook<Config extends object, Payload>(
         loaded = module.default;
         return module;
       },
-      error => {
+      (error: unknown) => {
         loading = undefined;
         throw error;
       },
@@ -86,6 +86,7 @@ export function createModalHook<Config extends object, Payload>(
             <Attempt
               config={config}
               payload={state.payload}
+              close={controller.close}
             />
           </LoadBoundary>
         </Dialog.Popup>

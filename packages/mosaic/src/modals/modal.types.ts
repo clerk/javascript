@@ -5,6 +5,7 @@ import type { DialogVariant } from '../components/dialog/dialog';
 export interface ModalContentProps<Config, Payload> {
   config: Config;
   payload: Payload | undefined;
+  close: () => void;
 }
 
 export interface ModalSurface<Config, Payload> {

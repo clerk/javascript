@@ -2,11 +2,9 @@ import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type {
-  OrganizationProfileModalProps,
   OrganizationResource,
   OrganizationSwitcherProps,
   UserButtonProps as ClerkUserButtonProps,
-  UserProfileModalProps,
   UserResource,
 } from '@clerk/shared/types';
 import { populateParamFromObject } from '@clerk/shared/url';
@@ -15,6 +13,10 @@ import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
+import { useOrganizationProfileModal } from '../organization-profile/organization-profile.modal';
+import type { OrganizationProfileModalConfig } from '../organization-profile/organization-profile.modal.types';
+import { useUserProfileModal } from '../user-profile/user-profile.modal';
+import type { UserProfileModalConfig } from '../user-profile/user-profile.modal.types';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,
@@ -109,8 +111,8 @@ export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
 
 /** Props forwarded to the profile modals this button opens. */
 export interface SwitcherModalProps {
-  userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
-  organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
+  userProfile?: UserProfileModalConfig;
+  organizationProfile?: Omit<OrganizationProfileModalConfig, 'afterLeaveOrganizationUrl'>;
 }
 
 function resolveAfterUrl<T extends object>(
@@ -173,8 +175,7 @@ function toSession(sessionId: string, user: UserResource): SwitcherSession {
 }
 
 /**
- * @param modals - Props forwarded to the profile modals. Custom pages arrive already bridged, since only
- *   the wrapper can render the portals behind them.
+ * @param modals - Props forwarded to the profile modals.
  */
 export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
@@ -185,6 +186,11 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
   const clerk = useClerk();
   const router = useMosaicRouter();
+  const userProfile = useUserProfileModal(modals?.userProfile);
+  const organizationProfile = useOrganizationProfileModal({
+    ...modals?.organizationProfile,
+    afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
+  });
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
@@ -199,7 +205,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => clerk.openUserProfile({ getContainer, ...modals?.userProfile }),
+    openModal: () => userProfile.open(),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -207,12 +213,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageOrganization = openOrNavigate({
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
-    openModal: () =>
-      clerk.openOrganizationProfile({
-        getContainer,
-        ...modals?.organizationProfile,
-        afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
-      }),
+    openModal: () => organizationProfile.open(),
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });

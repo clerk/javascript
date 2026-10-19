@@ -1,13 +1,13 @@
 import type { ModalContentProps } from '../../modals/modal.types';
-import type { CustomProfilePage, UserProfilePageId } from './user-profile.types';
+import type { UserProfileProps } from './user-profile';
 
-export interface UserProfileModalConfig {
-  customPages?: readonly CustomProfilePage[];
-  pageOrder?: readonly (UserProfilePageId | (string & {}))[];
-}
+export type UserProfileModalConfig = Pick<
+  UserProfileProps,
+  'customPages' | 'pageOrder' | 'additionalOAuthScopes' | 'apiKeysProps'
+>;
 
 export interface UserProfileModalPayload {
-  page?: UserProfilePageId | (string & {});
+  page?: UserProfileProps['defaultPage'];
 }
 
 export type UserProfileModalContentProps = ModalContentProps<UserProfileModalConfig, UserProfileModalPayload>;

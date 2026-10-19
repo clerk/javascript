@@ -3,7 +3,7 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { UserProfileModalConfig } from '../features/user-profile/user-profile.modal.types';
-import { MosaicProvider } from '../MosaicProvider';
+import { MosaicProvider } from '../mosaic-provider';
 import { createModalHook } from './create-modal-hook';
 import type { ModalContentProps, ModalHandle } from './modal.types';
 import { ModalHost } from './modal-host';

@@ -2,12 +2,19 @@ import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
 import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
-import { useUserProfileModal } from '@clerk/mosaic/features/user-profile/user-profile.modal';
+import type {
+  UserProfileModalConfig,
+  UserProfileModalContentProps,
+  UserProfileModalPayload,
+} from '@clerk/mosaic/features/user-profile/user-profile.modal.types';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { createModalHook } from '@clerk/mosaic/modals/create-modal-hook';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
 import { nestLabsWithClerkApp, usePrototype } from './fixtures/switcher';
+import { useUserProfileFixture } from './fixtures/user-profile';
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -203,9 +210,29 @@ const integrationsPage = {
   content: <p>An app-provided page, passed to the profile modal as a custom page.</p>,
 };
 
+function FixtureUserProfile({ config, payload }: UserProfileModalContentProps) {
+  const { pages } = useUserProfileFixture();
+  const [activePage, setActivePage] = useState(payload?.page ?? 'account');
+
+  return (
+    <UserProfileView
+      activePage={activePage}
+      pages={pages}
+      customPages={config.customPages}
+      pageOrder={config.pageOrder}
+      onPageChange={setActivePage}
+    />
+  );
+}
+
+const useFixtureUserProfileModal = createModalHook<UserProfileModalConfig, UserProfileModalPayload>(
+  { id: 'fixtureUserProfile', variant: 'profile', load: () => Promise.resolve({ default: FixtureUserProfile }) },
+  defaults => defaults.userProfile ?? {},
+);
+
 export function ProfileModal(_args: Record<string, unknown>) {
   const prototype = usePrototype({ singleSession: true });
-  const userProfile = useUserProfileModal({ customPages: [integrationsPage] });
+  const userProfile = useFixtureUserProfileModal({ customPages: [integrationsPage] });
 
   return (
     <div className='flex flex-wrap items-center gap-2'>
