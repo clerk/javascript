@@ -150,7 +150,7 @@
   "peerDependencies": {
     "@clerk/expo-biometrics": ">=0.1.0",
     "@clerk/expo-google-signin": ">=0.1.0",
-    "@clerk/expo-native-components": ">=0.2.0",
+    "@clerk/expo-native-components": ">=0.3.0",
     "@clerk/expo-passkeys": ">=0.0.6",
     "expo": "catalog:peer-expo",
     "expo-apple-authentication": ">=7.0.0",
