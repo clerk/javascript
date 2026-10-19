@@ -436,7 +436,7 @@ export function ColumnWidths() {
   const table = useDataTable({ data: apiKeys, getRowId: row => row.id });
 
   return (
-    <Table.Root layout='fixed'>
+    <Table.Root>
       <Table.ColumnGroup>
         <Table.Column />
         <Table.Column />

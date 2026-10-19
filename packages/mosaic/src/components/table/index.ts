@@ -8,7 +8,6 @@ export type {
   TableEmptyProps,
   TableHeaderCellProps,
   TableHeaderProps,
-  TableLayout,
   TableProps,
   TableRowProps,
   TableSearchProps,
