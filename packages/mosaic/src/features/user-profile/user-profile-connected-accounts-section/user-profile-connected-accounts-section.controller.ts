@@ -21,7 +21,8 @@ export interface UserProfileConnectedAccountsControllerOptions {
   onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onRemove?: (id: string) => void | Promise<void>;
-  reverification: ReverificationController;
+  removeReverification: ReverificationController;
+  reconnectReverification: ReverificationController;
 }
 
 export interface UserProfileConnectedAccountsController {
@@ -34,6 +35,8 @@ export interface UserProfileConnectedAccountsController {
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   remove: ConfirmController<UserProfileConnectedAccount> | undefined;
   finalFocus: DialogFocusTarget;
+  reconnectReverification: ReverificationController;
+  reconnectFinalFocus: DialogFocusTarget;
 }
 
 const OAUTH_REDIRECT_HOLD_MS = 2000;
@@ -44,7 +47,8 @@ export function useUserProfileConnectedAccountsController({
   onConnect,
   onReconnect,
   onRemove,
-  reverification,
+  removeReverification,
+  reconnectReverification,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const messages = useMessages('userProfileConnectedAccounts');
   const actions = usePendingAction({ errorFallback: messages.errors.generic });
@@ -60,7 +64,7 @@ export function useUserProfileConnectedAccountsController({
   });
   const remove = useConfirmController<UserProfileConnectedAccount>({
     onConfirm: account => removalFocus.remove(account.id),
-    reverification,
+    reverification: removeReverification,
   });
 
   const run = (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) =>
@@ -84,5 +88,7 @@ export function useUserProfileConnectedAccountsController({
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemove ? remove : undefined,
     finalFocus: removalFocus.finalFocus,
+    reconnectReverification,
+    reconnectFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
   };
 }

@@ -1,4 +1,5 @@
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 import {
@@ -23,6 +24,8 @@ export function UserProfileConnectedAccountsSectionView({
   registerTrigger,
   remove,
   finalFocus,
+  reconnectReverification,
+  reconnectFinalFocus,
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
@@ -75,6 +78,12 @@ export function UserProfileConnectedAccountsSectionView({
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
           finalFocus={finalFocus}
+        />
+      ) : null}
+      {reconnectReverification ? (
+        <ReverificationDialog
+          controller={reconnectReverification}
+          finalFocus={reconnectFinalFocus}
         />
       ) : null}
     </>
