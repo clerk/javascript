@@ -5,6 +5,7 @@ import type {
   InferAuthObjectFromToken,
   InferAuthObjectFromTokenArray,
   RedirectFun,
+  SessionTokenType,
   SignedInAuthObject,
 } from '@clerk/backend/internal';
 import { constants, isTokenTypeAccepted, TokenType } from '@clerk/backend/internal';
@@ -34,6 +35,14 @@ type AuthProtectOptions = {
   unauthenticatedUrl?: string;
 };
 
+type InferProtectedAuthObject<T extends AuthProtectOptions['token']> = T extends TokenType[]
+  ? InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>
+  : T extends TokenType
+    ? InferAuthObjectFromToken<T, SignedInAuthObject, AuthenticatedMachineObject>
+    : T extends 'any'
+      ? SignedInAuthObject | AuthenticatedMachineObject
+      : SignedInAuthObject;
+
 /**
  * Throws a Nextjs notFound error if user is not authenticated or authorized.
  */
@@ -52,38 +61,21 @@ export interface AuthProtect {
    * @example
    * auth.protect(has => has({ permission: 'org:admin:example1' }));
    */
-  (
+  <T extends AuthProtectOptions['token'] = SessionTokenType>(
     params?: (has: CheckAuthorizationFromSessionClaims) => boolean,
-    options?: AuthProtectOptions,
-  ): Promise<SignedInAuthObject>;
-
-  /**
-   * @example
-   * auth.protect({ token: 'session_token' });
-   */
-  <T extends TokenType>(
-    options?: AuthProtectOptions & { token: T },
-  ): Promise<InferAuthObjectFromToken<T, SignedInAuthObject, AuthenticatedMachineObject>>;
-
-  /**
-   * @example
-   * auth.protect({ token: ['session_token', 'm2m_token'] });
-   */
-  <T extends TokenType[]>(
-    options?: AuthProtectOptions & { token: T },
-  ): Promise<InferAuthObjectFromTokenArray<T, SignedInAuthObject, AuthenticatedMachineObject>>;
-
-  /**
-   * @example
-   * auth.protect({ token: 'any' });
-   */
-  (options?: AuthProtectOptions & { token: 'any' }): Promise<SignedInAuthObject | AuthenticatedMachineObject>;
+    options?: AuthProtectOptions & { token?: T },
+  ): Promise<InferProtectedAuthObject<T>>;
 
   /**
    * @example
    * auth.protect();
+   * auth.protect({ token: 'session_token' });
+   * auth.protect({ token: ['session_token', 'm2m_token'] });
+   * auth.protect({ token: 'any' });
    */
-  (options?: AuthProtectOptions): Promise<SignedInAuthObject>;
+  <T extends AuthProtectOptions['token'] = SessionTokenType>(
+    options?: AuthProtectOptions & { token?: T },
+  ): Promise<InferProtectedAuthObject<T>>;
 }
 
 export function createProtect(opts: {
