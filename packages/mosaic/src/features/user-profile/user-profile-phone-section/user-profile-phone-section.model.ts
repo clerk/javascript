@@ -22,8 +22,11 @@ function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
 export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel {
   const clerk = useClerk();
   const model = useUserProfileUserModel();
-  const [removePhone, reverification] = useReverificationFlow((user: UserResource, id: string) =>
+  const [removePhone, removeReverification] = useReverificationFlow((user: UserResource, id: string) =>
     byId(user.phoneNumbers, id, 'phone number').destroy(),
+  );
+  const [setPrimaryPhone, setPrimaryReverification] = useReverificationFlow((user: UserResource, id: string) =>
+    user.update({ primaryPhoneNumberId: id }),
   );
   if (model.status !== 'ready') {
     return model;
@@ -54,8 +57,9 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
         }
       : undefined,
     getPhoneVerifier: id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')),
-    onSetPrimaryPhone: id => saveAsUser(current => current.update({ primaryPhoneNumberId: id })),
+    onSetPrimaryPhone: id => saveAsUser(current => setPrimaryPhone(current, id)),
     onRemovePhone: access.canRemove ? id => saveAsUser(current => removePhone(current, id)) : undefined,
-    reverification,
+    removeReverification,
+    setPrimaryReverification,
   };
 }
