@@ -286,3 +286,44 @@ describe('OrganizationSwitcher', () => {
     });
   });
 });
+
+describe('OrganizationSwitcher custom trigger badges', () => {
+  it.each([
+    { seed: signedIn(), badge: 'organization:org_1', name: 'Acme' },
+    { seed: signedIn({ client: fapiClient([personalSession]) }), badge: 'user:user_1', name: 'Alice Smith' },
+  ])('shows a badge for the displayed identity as $badge', async ({ seed, badge, name }) => {
+    await renderSwitcher(
+      { renderTriggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
+      seed,
+    );
+
+    await waitFor(() => expect(within(trigger()).getByText(badge)).toBeInTheDocument());
+    expect(within(trigger()).getByText(badge).closest('.cl-badge')).toHaveAttribute('data-badge-id', 'pro');
+    expect(within(trigger()).getByText(name)).toBeInTheDocument();
+  });
+
+  it('does not request a badge when no organization or personal account is displayed', async () => {
+    const renderTriggerBadge = vi.fn(() => Promise.resolve({ id: 'custom', label: 'Custom plan' }));
+    await renderSwitcher(
+      { hidePersonal: true, renderTriggerBadge },
+      signedIn({ client: fapiClient([personalSession]) }),
+    );
+
+    expect(trigger()).toHaveTextContent('No organization selected');
+    expect(renderTriggerBadge).not.toHaveBeenCalled();
+  });
+
+  it('hides the badge for null and keeps the organization name', async () => {
+    const { rerender } = await renderSwitcher({
+      renderTriggerBadge: () => Promise.resolve({ id: 'pro', label: 'Pro plan' }),
+    });
+    await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
+
+    const renderTriggerBadge = vi.fn(() => Promise.resolve(null));
+    rerender(tree({ renderTriggerBadge }));
+    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalled());
+    expect(trigger()).not.toHaveTextContent('Pro plan');
+    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+    expect(trigger()).toHaveAccessibleName('Open organization menu for Acme');
+  });
+});

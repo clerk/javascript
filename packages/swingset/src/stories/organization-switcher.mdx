@@ -35,6 +35,8 @@ The avatar and name of the active organization. Where none is active, the accoun
 
 `renderTriggerLabel={false}` leaves the avatar alone.
 
+`renderTriggerBadge` also supports supplying an async function to determine the badge shown alongside the trigger. The function receives an object with `kind` and `id`, and returns an object with `id` and `label`, or `null` to hide the badge. See the [UserButton trigger example](./user-button#trigger).
+
 <Story
   name='IconTrigger'
   storyModule={OrganizationSwitcherStories}
