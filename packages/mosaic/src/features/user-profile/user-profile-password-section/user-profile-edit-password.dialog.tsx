@@ -8,13 +8,13 @@ import { Checkbox } from '../../../components/checkbox';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import { useFlowAutoFocus } from '../../../components/flow';
+import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
-import { ReverificationFlow } from '../../reverification';
+import { Reverification } from '../../reverification';
 import type {
   UserProfileEditPasswordField,
   UserProfileEditPasswordValues,
@@ -153,14 +153,27 @@ export function UserProfileEditPasswordDialog({
           elevation='overlay'
           renderBranding={false}
         >
-          <ReverificationFlow
-            contentId='edit'
-            isVerifying={step === 'verify'}
-            reverification={reverification}
-            onClose={() => onOpenChange(false)}
-          >
-            {edit}
-          </ReverificationFlow>
+          {reverification ? (
+            <Flow.Root
+              value={step}
+              direction={step === 'verify' ? 1 : -1}
+              state={step}
+            >
+              {() => (
+                <>
+                  <Flow.Step ids={['edit']}>{edit}</Flow.Step>
+                  <Flow.Step ids={['verify']}>
+                    <Reverification
+                      controller={reverification}
+                      onClose={() => onOpenChange(false)}
+                    />
+                  </Flow.Step>
+                </>
+              )}
+            </Flow.Root>
+          ) : (
+            edit
+          )}
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
