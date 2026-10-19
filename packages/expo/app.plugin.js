@@ -8,8 +8,66 @@
  */
 const { AndroidConfig, withAndroidManifest, withEntitlementsPlist, withInfoPlist } = require('@expo/config-plugins');
 
+const fs = require('fs');
+const path = require('path');
+
 const CLERK_EXPO_NATIVE = '@clerk/expo-native-components';
 const CLERK_EXPO_NATIVE_OPTIONS = ['keychainService', 'theme'];
+let didWriteAgentRules = false;
+
+const isTruthyEnvValue = value => typeof value === 'string' && !!value && !['0', 'false', 'off', 'no'].includes(value);
+
+const isAgentEnvironment = () =>
+  [
+    'CLAUDECODE',
+    'CURSOR_AGENT',
+    'CURSOR_CLI',
+    'CURSOR_EXTENSION_HOST_ROLE',
+    'CURSOR_TRACE_ID',
+    'GITHUB_COPILOT_AGENT',
+    'GITHUB_COPILOT_CHAT',
+    'AGENT',
+    'AGENTS',
+  ].some(name => isTruthyEnvValue(process.env[name]));
+
+const isAutomatedEnvironment = () =>
+  [
+    'CI',
+    'CONTINUOUS_INTEGRATION',
+    'GITHUB_ACTIONS',
+    'GITLAB_CI',
+    'CIRCLECI',
+    'TRAVIS',
+    'BUILDKITE',
+    'BITBUCKET_BUILD_NUMBER',
+    'APPVEYOR',
+    'CODEBUILD_BUILD_ID',
+    'TF_BUILD',
+    'TEAMCITY_VERSION',
+    'JENKINS_URL',
+    'HUDSON_URL',
+    'BAMBOO_BUILDKEY',
+    'CF_PAGES',
+  ].some(name => isTruthyEnvValue(process.env[name]));
+
+const maybeWriteAgentRules = config => {
+  if (didWriteAgentRules || isAutomatedEnvironment() || !isAgentEnvironment()) {
+    return;
+  }
+
+  const projectRoot = config?._internal?.projectRoot || process.cwd();
+  if (!fs.existsSync(path.join(projectRoot, 'package.json'))) {
+    return;
+  }
+
+  didWriteAgentRules = true;
+
+  try {
+    require('@clerk/shared/agentRules').writeClerkAgentRules({ cwd: projectRoot, fs, path, sdks: ['expo'] });
+  } catch {
+    // Writing agent hints must never break Expo config evaluation.
+  }
+};
 
 const addHostedAuthIntentFilter = (mainActivity, packageName) => {
   const callbackHost = `${packageName}.hosted-callback`;
@@ -138,6 +196,8 @@ const withClerkExpoNativeComponents = (config, props = {}, resolvePlugin = resol
 };
 
 const withClerkExpo = (config, props = {}) => {
+  maybeWriteAgentRules(config);
+
   const { appleSignIn = true } = props;
   if (appleSignIn !== false) {
     config = withClerkAppleSignIn(config);
