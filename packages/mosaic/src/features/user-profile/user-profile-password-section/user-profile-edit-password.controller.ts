@@ -60,7 +60,6 @@ export function useUserProfileEditPasswordController({
       values.confirmPassword === values.newPassword &&
       (!requiresCurrentPassword || values.currentPassword !== ''),
     onSubmit: async values => {
-      reverification?.reset();
       await onSubmit({
         currentPassword: requiresCurrentPassword ? values.currentPassword : undefined,
         newPassword: values.newPassword,

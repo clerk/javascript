@@ -47,12 +47,12 @@ export function useUserProfileEditPasswordFixture({
     action: (
       <UserProfileEditPasswordDialog
         form={controller.form}
-        step={controller.step}
         passwordFeedback={controller.passwordFeedback}
         hasPassword={hasPassword}
         open={controller.isOpen}
         onOpenChange={controller.onOpenChange}
         requiresCurrentPassword={policy.requiresCurrentPassword}
+        step={controller.step}
         trigger={
           <Button
             color='neutral'

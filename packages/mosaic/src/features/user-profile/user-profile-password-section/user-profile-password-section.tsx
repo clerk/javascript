@@ -2,8 +2,6 @@ import type { ReactNode } from 'react';
 
 import { Button } from '../../../components/button';
 import { useMessages } from '../../../localization';
-import { save } from '../../../utils/errors';
-import { useReverificationFlow } from '../../reverification';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
 import type { UserProfilePasswordModel } from './user-profile-password-section.model';
@@ -41,12 +39,11 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
 function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
   const m = useMessages('userProfilePasswordSection');
   const hasPassword = model.mode === 'change';
-  const [updatePassword, reverification] = useReverificationFlow(model.updatePassword);
   const controller = useUserProfileEditPasswordController({
     policy: model,
     validatePassword: model.validatePassword,
-    onSubmit: value => save(() => updatePassword(value)),
-    reverification,
+    onSubmit: model.updatePassword,
+    reverification: model.reverification,
   });
 
   return (
@@ -61,7 +58,7 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
           onOpenChange={controller.onOpenChange}
           hasPassword={hasPassword}
           requiresCurrentPassword={model.requiresCurrentPassword}
-          reverification={reverification}
+          reverification={model.reverification}
           step={controller.step}
           trigger={
             <Button
