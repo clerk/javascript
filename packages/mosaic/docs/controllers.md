@@ -101,7 +101,8 @@ For a direct action without a confirmation step, pass the controller from
 `useReverificationFlow` to `ReverificationDialog` (`blocks/reverification/`) in the view. Keep the direct
 action under `usePendingAction` so its lock and ordinary errors stay with the
 section. The dialog opens from the reverification status, and offers dismissal
-only while the controller has a cancel callback.
+only while the controller has a cancel callback. Return focus with the hook's
+`lastKey`, which outlives the run, unlike `pendingKey`.
 
 A single open boolean earns nothing. A two-state machine with one event is a
 boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in

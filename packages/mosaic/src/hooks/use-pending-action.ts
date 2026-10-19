@@ -13,6 +13,7 @@ export interface PendingActionOptions {
 export interface PendingAction<TKey extends string> {
   run: (key: TKey, action: () => Promise<unknown> | void, options?: PendingActionOptions) => Promise<boolean>;
   pendingKey: TKey | undefined;
+  lastKey: TKey | undefined;
   isPending: boolean;
   error: string | undefined;
   errorKey: TKey | undefined;
@@ -26,7 +27,7 @@ interface PendingActionFailure<TKey extends string> {
 }
 
 /**
- * Runs inline actions, such as row buttons, under one lock and tracks which key is pending and which key last failed.
+ * Runs inline actions, such as row buttons, under one lock and tracks which key is pending, which key ran last, and which key last failed.
  * `run` resolves `true` on success and `false` on failure, ignores calls while any run is in flight, and clears the last error when it starts.
  */
 export function usePendingAction<TKey extends string = string>({
@@ -34,6 +35,7 @@ export function usePendingAction<TKey extends string = string>({
 }: PendingActionOptions = {}): PendingAction<TKey> {
   const errorText = useErrorText();
   const [pendingKey, setPendingKey] = useState<TKey>();
+  const [lastKey, setLastKey] = useState<TKey>();
   const [failure, setFailure] = useState<PendingActionFailure<TKey>>();
   const running = useRef(false);
 
@@ -43,6 +45,7 @@ export function usePendingAction<TKey extends string = string>({
     }
     running.current = true;
     setPendingKey(key);
+    setLastKey(key);
     setFailure(undefined);
     try {
       await action();
@@ -61,6 +64,7 @@ export function usePendingAction<TKey extends string = string>({
   return {
     run,
     pendingKey,
+    lastKey,
     isPending: pendingKey !== undefined,
     error: failure ? errorText(failure.error, failure.errorFallback ?? errorFallback) : undefined,
     errorKey: failure?.key,

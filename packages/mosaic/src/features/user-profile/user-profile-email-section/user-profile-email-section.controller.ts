@@ -14,13 +14,12 @@ export function useUserProfileEmailSectionController({
   getEmailVerifier,
   onSetPrimaryEmail,
   onRemoveEmail,
-  reverification,
+  removeReverification,
   setPrimaryReverification,
 }: Omit<ReadyEmailSectionModel, 'status' | 'userId'>): UserProfileEmailSectionViewProps {
   const verification = useUserProfileAddEmailController({ username, onCreate: onCreateEmail });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
-  const setPrimaryId = useRef<string>();
   const removalFocus = useListRemovalFocus({
     ids: emails.map(email => email.id),
     onRemove: onRemoveEmail,
@@ -28,7 +27,7 @@ export function useUserProfileEmailSectionController({
   });
   const remove = useConfirmController<UserProfileEmail>({
     onConfirm: email => removalFocus.remove(email.id),
-    reverification,
+    reverification: removeReverification,
   });
 
   return {
@@ -42,18 +41,13 @@ export function useUserProfileEmailSectionController({
     finalFocus: removalFocus.finalFocus,
     verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
     setPrimaryReverification,
-    setPrimaryFinalFocus: () =>
-      (setPrimaryId.current ? removalFocus.trigger(setPrimaryId.current) : null) ?? rowRef.current,
+    setPrimaryFinalFocus: () => (setPrimary.lastKey ? removalFocus.trigger(setPrimary.lastKey) : null),
     onVerify: id => {
       const email = emails.find(email => email.id === id);
       if (email) {
         verification.onVerifyEmail(email, getEmailVerifier(id));
       }
     },
-    onSetPrimary: id =>
-      void setPrimary.run(id, () => {
-        setPrimaryId.current = id;
-        return onSetPrimaryEmail(id);
-      }),
+    onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryEmail(id)),
   };
 }

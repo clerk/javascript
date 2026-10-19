@@ -132,6 +132,17 @@ describe('usePendingAction', () => {
     expect(result.current.error).toBeDefined();
   });
 
+  it('remembers the last key after the run ends', async () => {
+    const { result } = renderHook(() => usePendingAction());
+
+    await act(async () => {
+      await result.current.run('a', () => Promise.resolve());
+    });
+
+    expect(result.current.pendingKey).toBeUndefined();
+    expect(result.current.lastKey).toBe('a');
+  });
+
   it('releases a cancelled reverification without showing an error', async () => {
     const { result } = renderHook(() => usePendingAction());
     const cancelled = new ClerkRuntimeError('User cancelled attempted verification', {

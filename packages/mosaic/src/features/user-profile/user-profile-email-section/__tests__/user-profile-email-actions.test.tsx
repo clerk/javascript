@@ -24,7 +24,7 @@ function EmailSection({
   emails = [{ id: 'email_1', value: 'test@example.com', isDefault: false, isVerified: true }],
   getEmailVerifier = () => codeVerifier,
   onSetPrimaryEmail = () => Promise.resolve(),
-  reverification = idleReverification,
+  removeReverification = idleReverification,
   setPrimaryReverification = idleReverification,
   ...rest
 }: EmailSectionProps) {
@@ -32,7 +32,7 @@ function EmailSection({
     emails,
     getEmailVerifier,
     onSetPrimaryEmail,
-    reverification,
+    removeReverification,
     setPrimaryReverification,
     ...rest,
   });
