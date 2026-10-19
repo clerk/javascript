@@ -1,0 +1,32 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "*.d.ts",
+        "bundlewatch.config.json",
+        "src/**",
+        "tests/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsdown.config.mts",
+        "tsdown.config.ts",
+        "tsup.config.ts",
+        "$TURBO_ROOT$/packages/expo-biometrics/android/**",
+        "$TURBO_ROOT$/packages/expo-biometrics/ios/**",
+        "$TURBO_ROOT$/packages/expo-google-signin/android/**",
+        "$TURBO_ROOT$/packages/expo-google-signin/ios/**",
+        "$TURBO_ROOT$/packages/expo-native-components/android/**",
+        "$TURBO_ROOT$/packages/expo-native-components/ios/**",
+        "!$TURBO_ROOT$/packages/expo-*/android/build/**",
+        "!**/__snapshots__/**",
+        "!CHANGELOG.md",
+        "!coverage/**",
+        "!dist/**",
+        "!examples/**",
+        "!node_modules/**"
+      ]
+    }
+  }
+}
