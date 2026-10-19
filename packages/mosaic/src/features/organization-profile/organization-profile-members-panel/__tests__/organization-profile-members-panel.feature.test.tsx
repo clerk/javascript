@@ -12,6 +12,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../../localization';
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
@@ -126,8 +127,8 @@ describe('OrganizationProfileMembersPanel', () => {
     await waitFor(() => expect(members.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeDisabled();
     members.release();
-    await user.click(await screen.findByRole('button', { name: 'Manage Bob Smith' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Bob Smith' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
     const dialog = await screen.findByRole('alertdialog', { name: 'Remove Bob Smith?' });
     await user.click(within(dialog).getByRole('button', { name: 'Remove from organization' }));
     await waitFor(() => expect(fapi.memberships.some(item => item.id === bob.id)).toBe(false));
@@ -138,8 +139,8 @@ describe('OrganizationProfileMembersPanel', () => {
     const fapi = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Bob Smith' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Bob Smith' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
     const dialog = await screen.findByRole('alertdialog', { name: 'Remove Bob Smith?' });
     worker.use(
       http.post(fapiUrl('/v1/organizations/:organizationId/memberships/:userId'), () =>
@@ -322,8 +323,8 @@ describe('OrganizationProfileMembersPanel', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Next members page' }));
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Manage Bob Smith' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob Smith' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
     await user.click(
       within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }),
     );

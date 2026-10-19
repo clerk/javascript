@@ -13,6 +13,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileProfileSection } from '../user-profile-profile-section';
 
@@ -91,8 +92,8 @@ describe('the user profile profile section', () => {
     expect(screen.queryByRole('button', { name: 'Manage profile picture' })).not.toBeInTheDocument();
     await actor.upload(fileInput(container), new File(['x'], 'me.png', { type: 'image/png' }));
 
-    await actor.click(await screen.findByRole('button', { name: 'Manage profile picture' }));
-    expect(await screen.findByRole('menuitem', { name: 'Remove avatar' })).toBeInTheDocument();
+    await openMenu(actor, await screen.findByRole('button', { name: 'Manage profile picture' }));
+    expect(screen.getByRole('menuitem', { name: 'Remove avatar' })).toBeInTheDocument();
   });
 
   it('says why an upload was refused', async () => {
@@ -139,7 +140,7 @@ describe('the user profile profile section', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
 
     failsWith('/v1/me/profile_image', { code: 'action_blocked', message: 'Blocked' }, 403);
-    await actor.click(screen.getByRole('button', { name: 'Manage profile picture' }));
+    await openMenu(actor, screen.getByRole('button', { name: 'Manage profile picture' }));
     await actor.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));

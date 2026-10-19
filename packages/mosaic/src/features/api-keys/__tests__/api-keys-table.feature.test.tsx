@@ -16,6 +16,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { APIKeysTableProps } from '../api-keys-table';
@@ -93,8 +94,8 @@ async function createKey(user: User, name: string) {
 }
 
 async function startRevoke(user: User, name: string) {
-  await user.click(await screen.findByRole('button', { name: `Manage ${name}` }));
-  return openDialog(user, await screen.findByRole('menuitem', { name: 'Revoke key' }), {
+  await openMenu(user, await screen.findByRole('button', { name: `Manage ${name}` }));
+  return openDialog(user, screen.getByRole('menuitem', { name: 'Revoke key' }), {
     role: 'alertdialog',
     name: `Revoke ${name}?`,
   });
@@ -213,8 +214,8 @@ describe('APIKeysTable', () => {
 
       expect(await within(table()).findByText('Expiration: Dec 31, 2027')).toBeVisible();
       expect(screen.getByRole('searchbox', { name: 'Find a key' })).toBeVisible();
-      await user.click(screen.getByRole('button', { name: 'Manage Web app' }));
-      await user.click(await screen.findByRole('menuitem', { name: 'Revoke key' }));
+      await openMenu(user, screen.getByRole('button', { name: 'Manage Web app' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
       const dialog = await screen.findByRole('alertdialog', { name: 'Retirer Web app ?' });
       await waitFor(() => expect(dialog).toBeVisible());
     });

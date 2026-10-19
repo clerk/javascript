@@ -19,6 +19,7 @@ import {
   fapiVerification,
   fapiWeb3Wallet,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { Dialog } from '../../../../components/dialog';
 import { MosaicProvider } from '../../../../mosaic-provider';
@@ -78,7 +79,7 @@ describe('Web3 wallets', () => {
       });
       const user = userEvent.setup();
       expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
-      await user.click(screen.getByRole('button', { name: `Manage ${address}` }));
+      await openMenu(user, screen.getByRole('button', { name: `Manage ${address}` }));
       await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
       const warning = 'You will no longer be able to sign in using this web3 wallet.';
       if (status === 'verified') {
@@ -101,7 +102,7 @@ describe('Web3 wallets', () => {
     });
     expect(screen.getByText('Unverified')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await openMenu(userEvent.setup(), screen.getByRole('button', { name: 'Manage MetaMask' }));
     expect(screen.getByRole('menuitem', { name: 'Remove wallet' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).toBeNull();
   });
@@ -210,7 +211,7 @@ describe('Web3 wallets', () => {
     await renderWithClerk(<UserProfileWeb3WalletsSection />);
 
     expect(screen.queryByRole('button', { name: 'Connect Coinbase Wallet' })).toBeNull();
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await openMenu(userEvent.setup(), screen.getByRole('button', { name: 'Manage MetaMask' }));
     expect(screen.getByRole('menuitem', { name: 'Set as primary' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Remove wallet' })).toBeNull();
   });
@@ -460,7 +461,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('wallet_creation_failed'));
 
     const primary = holdRequests('post', '/v1/me');
-    await user.click(screen.getByRole('button', { name: 'Manage Solana' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Solana' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(primary.requests).toHaveLength(1));
     try {
@@ -482,10 +483,10 @@ describe('Web3 wallets', () => {
     const user = userEvent.setup();
 
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })).toHaveLength(2));
-    await user.click(screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
+    await openMenu(user, screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
     expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).toBeNull();
     await user.keyboard('{Escape}');
-    await user.click(screen.getAllByRole('button', { name: 'Manage MetaMask' })[1]);
+    await openMenu(user, screen.getAllByRole('button', { name: 'Manage MetaMask' })[1]);
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_2'));
@@ -503,7 +504,7 @@ describe('Web3 wallets', () => {
     const hold = holdRequests('post', '/v1/me');
     const user = userEvent.setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(hold.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toBeDisabled();
@@ -512,7 +513,7 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('primary_update_failed'));
     expect(screen.queryByText('Cannot verify your account')).not.toBeInTheDocument();
     const retryFapi = serveFapi(fapi);
-    await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(retryFapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_1'));
     expect(await screen.findByText('Primary')).toBeInTheDocument();
@@ -525,7 +526,7 @@ describe('Web3 wallets', () => {
     });
     const user = userEvent.setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
     expect(screen.getByRole('alertdialog')).toHaveTextContent('0x1234...cdef');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
@@ -541,7 +542,7 @@ describe('Web3 wallets', () => {
     const hold = holdRequests('post', '/v1/me/web3_wallets/:id');
     const user = userEvent.setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
     const confirm = within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' });
     await user.click(confirm);
@@ -567,7 +568,7 @@ describe('Web3 wallets', () => {
     demandReverificationOnce('/v1/me/web3_wallets/wallet_1');
     const user = userEvent.setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
 
@@ -590,11 +591,11 @@ describe('Web3 wallets', () => {
     const first = screen.getAllByRole('button', { name: 'Manage MetaMask' })[1];
     first.focus();
     await user.keyboard('{Enter}');
-    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Remove wallet' }));
     await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(2);
-    await user.click(screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
+    await openMenu(user, screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
     expect(screen.getByRole('alertdialog')).toHaveTextContent('0xabcd...7890');
     await user.click(screen.getByRole('button', { name: 'Remove' }));

@@ -20,6 +20,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfileSecurityPanelView } from '../../user-profile-security-panel.view';
@@ -118,7 +119,7 @@ describe('Seeing passkeys', () => {
     expect(screen.getByRole('group', { name: 'Clés d’accès' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Ajouter une clé' })).toBeVisible();
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Gérer Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Gérer Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Renommer' }));
     const rename = screen.getByRole('dialog', { name: 'Renommer la clé' });
     expect(rename).toHaveTextContent('Choisissez un nouveau nom.');
@@ -126,7 +127,7 @@ describe('Seeing passkeys', () => {
     expect(within(rename).getByRole('button', { name: 'Enregistrer' })).toBeVisible();
     await user.click(within(rename).getByRole('button', { name: 'Annuler' }));
 
-    await user.click(screen.getByRole('button', { name: 'Gérer Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Gérer Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Supprimer la clé' }));
     const removal = screen.getByRole('alertdialog', { name: 'Supprimer la clé' });
     expect(removal).toHaveAccessibleDescription('Laptop sera supprimée de ce compte.');
@@ -340,7 +341,7 @@ describe('Renaming a passkey', () => {
     const fapi = servePasskeys();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     const dialog = screen.getByRole('dialog');
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
@@ -384,7 +385,7 @@ describe('Renaming a passkey', () => {
       </MosaicProvider>,
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await user.type(screen.getByRole('textbox', { name: 'Passkey name' }), ' modifié');
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -398,7 +399,7 @@ describe('Renaming a passkey', () => {
     const fapi = servePasskeys();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     const input = screen.getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
@@ -424,13 +425,13 @@ describe('Removing a passkey', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
     const trigger = screen.getByRole('button', { name: 'Manage $& laptop' });
-    await user.click(trigger);
+    await openMenu(user, trigger);
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription('$& laptop will be removed from this account.');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
-    await user.click(trigger);
+    await openMenu(user, trigger);
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
@@ -447,7 +448,7 @@ describe('Removing a passkey', () => {
     ]);
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: `Manage ${removed}` }));
+    await openMenu(user, screen.getByRole('button', { name: `Manage ${removed}` }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
@@ -459,7 +460,7 @@ describe('Removing a passkey', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     const removal = holdRequests('post', '/v1/me/passkeys/pk_1');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(removal.requests).toHaveLength(1));
@@ -477,7 +478,7 @@ describe('Removing a passkey', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     demandReverificationOnce('/v1/me/passkeys/pk_1');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
 
@@ -507,7 +508,7 @@ describe('Satellite passkeys', () => {
     view.rerender(<SecurityPanel />);
     const removal = holdRequests('post', '/v1/me/passkeys/pk_1');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(removal.requests).toHaveLength(1));

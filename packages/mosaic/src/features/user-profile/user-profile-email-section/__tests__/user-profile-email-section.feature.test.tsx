@@ -20,6 +20,7 @@ import {
   fapiUser,
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileEmailSection } from '../user-profile-email-section';
 
@@ -55,8 +56,8 @@ const emailsListed = () =>
     .map(node => node.textContent);
 
 async function manageEmail(actor: Actor, label: string, action: string) {
-  await actor.click(within(emailRow()).getByRole('button', { name: `Manage ${label}` }));
-  await actor.click(await screen.findByRole('menuitem', { name: action }));
+  await openMenu(actor, within(emailRow()).getByRole('button', { name: `Manage ${label}` }));
+  await actor.click(screen.getByRole('menuitem', { name: action }));
 }
 
 async function enterCode(actor: Actor, code: string) {

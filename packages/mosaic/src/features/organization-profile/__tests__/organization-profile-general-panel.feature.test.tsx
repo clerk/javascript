@@ -13,6 +13,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { OrganizationProfileProvider } from '../organization-profile.provider';
@@ -344,8 +345,8 @@ describe('OrganizationProfileGeneralPanel', () => {
       await waitFor(() => expect(remove.requests).toHaveLength(1));
       expect(manage).toBeEnabled();
       expect(input).toBeDisabled();
-      await user.click(manage);
-      await user.click(await screen.findByRole('menuitem', { name: 'Remove logo' }));
+      await openMenu(user, manage);
+      await user.click(screen.getByRole('menuitem', { name: 'Remove logo' }));
       expect(remove.requests).toHaveLength(1);
       remove.release();
       await waitFor(() => expect(fapi.memberships[0]?.organization.has_image).toBe(false));
