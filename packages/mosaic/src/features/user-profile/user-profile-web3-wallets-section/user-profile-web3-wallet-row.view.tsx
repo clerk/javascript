@@ -111,7 +111,6 @@ export function UserProfileWeb3WalletRowView({
             <ActionMenu
               triggerRef={triggerRef}
               actions={actions}
-              disabled={isDisabled}
               label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
             />
           </Section.Actions>
