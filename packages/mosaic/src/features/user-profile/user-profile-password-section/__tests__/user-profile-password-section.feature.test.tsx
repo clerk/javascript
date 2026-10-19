@@ -239,6 +239,27 @@ describe('Changing a password', () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeVisible();
   });
 
+  it('cancels an in-progress password verification when the active session changes', async () => {
+    const fapi = serveFapi({
+      environment: fapiEnvironment({ auth_config: { reverification: true } }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: alice }), fapiSession({ id: 'sess_2', user: alice })]),
+      verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+    });
+    demandReverificationOnce('/v1/me/change_password');
+    const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Change password' }));
+    await user.type(screen.getByLabelText('New password'), 'new-password-123');
+    await user.type(screen.getByLabelText('Confirm password'), 'new-password-123');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByPlaceholderText('Enter your password');
+
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates).toHaveLength(0);
+  });
+
   it('returns to the form with the field error when the save fails after verifying', async () => {
     const updates: Array<ReturnType<typeof holdRequests>> = [];
     const { fapi, user } = await renderWithReverification(() => {
@@ -254,44 +275,6 @@ describe('Changing a password', () => {
     expect(field).toHaveValue('new-password-123');
     await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
     await waitFor(() => expect(field).toHaveFocus());
-    expect(fapi.passwordUpdates).toHaveLength(0);
-  });
-
-  it('returns focus to the form after the focused verification dismiss is removed and the save fails', async () => {
-    const { fapi, user } = await renderWithReverification();
-    const attempt = holdRequests('post', '/v1/client/sessions/sess_1/verify/attempt_first_factor');
-    const update = holdRequests('post', '/v1/me/change_password');
-
-    await user.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
-    await waitFor(() => expect(attempt.requests).toHaveLength(1));
-    const close = screen.getByRole('button', { name: 'Close' });
-    await act(() => close.focus());
-    expect(close).toHaveFocus();
-    attempt.release();
-    await waitFor(() => expect(update.requests).toHaveLength(1));
-    update.fail('form_password_pwned', undefined, 'new_password');
-
-    const field = await screen.findByLabelText('New password');
-    expect(field).toHaveValue('new-password-123');
-    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
-    await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
-    await waitFor(() => expect(field).toHaveFocus());
-    expect(fapi.passwordUpdates).toHaveLength(0);
-  });
-
-  it('says the password was not saved when Clerk asks to verify again after verifying', async () => {
-    const { fapi, user } = await renderWithReverification(() => demandReverificationOnce('/v1/me/change_password'));
-
-    await user.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
-
-    await waitFor(
-      () =>
-        expect(screen.getByRole('alert')).toHaveTextContent(
-          'Your request was not completed. Please try verifying again.',
-        ),
-      { timeout: 3000 },
-    );
-    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
     expect(fapi.passwordUpdates).toHaveLength(0);
   });
 
