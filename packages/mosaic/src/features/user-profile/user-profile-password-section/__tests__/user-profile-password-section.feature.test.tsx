@@ -257,15 +257,18 @@ describe('Changing a password', () => {
     expect(fapi.passwordUpdates).toHaveLength(0);
   });
 
-  it('returns focus to the form when the verification header is removed after a save error', async () => {
+  it('returns focus to the form after the focused verification dismiss is removed and the save fails', async () => {
     const { fapi, user } = await renderWithReverification();
+    const attempt = holdRequests('post', '/v1/client/sessions/sess_1/verify/attempt_first_factor');
     const update = holdRequests('post', '/v1/me/change_password');
 
     await user.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
-    await waitFor(() => expect(update.requests).toHaveLength(1));
+    await waitFor(() => expect(attempt.requests).toHaveLength(1));
     const close = screen.getByRole('button', { name: 'Close' });
     await act(() => close.focus());
     expect(close).toHaveFocus();
+    attempt.release();
+    await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('form_password_pwned', undefined, 'new_password');
 
     const field = await screen.findByLabelText('New password');

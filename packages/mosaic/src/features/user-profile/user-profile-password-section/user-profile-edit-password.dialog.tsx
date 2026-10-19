@@ -141,6 +141,8 @@ export function UserProfileEditPasswordDialog({
     <Dialog.Root
       open={open}
       onOpenChange={onOpenChange}
+      shouldCloseOnInteractOutside={step !== 'verify'}
+      showCloseButton={step !== 'verify' || Boolean(reverification?.onCancel)}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
