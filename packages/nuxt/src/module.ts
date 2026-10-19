@@ -1,4 +1,9 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
+import { writeClerkAgentRules } from '@clerk/shared/agentRules';
 import type { InternalClerkScriptProps, Without } from '@clerk/shared/types';
+import { isAgentEnvironment, isAutomatedEnvironment } from '@clerk/shared/utils';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
@@ -35,6 +40,8 @@ export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace
     skipServerMiddleware?: boolean;
   };
 
+let didWriteAgentRules = false;
+
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: PACKAGE_NAME,
@@ -45,6 +52,15 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   setup(options, nuxt) {
+    if (nuxt.options.dev && !didWriteAgentRules && !isAutomatedEnvironment() && isAgentEnvironment()) {
+      didWriteAgentRules = true;
+      try {
+        writeClerkAgentRules({ cwd: nuxt.options.rootDir, fs, path, sdks: ['nuxt'] });
+      } catch {
+        // Writing agent hints must never break a dev server.
+      }
+    }
+
     // These values must be set (even as undefined) to allow runtime config to work properly.
     // In Nuxt, having these keys defined (even as undefined) allows them to be overridden
     // by environment variables following the pattern NUXT_PUBLIC_CLERK_* (e.g. NUXT_PUBLIC_CLERK_PUBLISHABLE_KEY).

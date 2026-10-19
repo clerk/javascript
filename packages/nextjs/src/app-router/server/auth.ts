@@ -83,6 +83,8 @@ export const auth: AuthFn = (async (options?: AuthOptions) => {
   require('server-only');
 
   try {
+    await import('../../server/agent-rules-node.js').then(m => m.writeAgentRulesOnce()).catch(() => undefined);
+
     const request = await buildRequestLike();
 
     const stepsBasedOnSrcDirectory = async () => {

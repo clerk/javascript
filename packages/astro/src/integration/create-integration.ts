@@ -1,4 +1,10 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { writeClerkAgentRules } from '@clerk/shared/agentRules';
 import type { ClerkOptions } from '@clerk/shared/types';
+import { isAgentEnvironment, isAutomatedEnvironment } from '@clerk/shared/utils';
 import type { AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
 
@@ -10,6 +16,8 @@ import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof InternalEnv) => {
   return valueToBeStored ? { [`import.meta.env.${envName}`]: JSON.stringify(valueToBeStored) } : {};
 };
+
+let didWriteAgentRules = false;
 
 type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
   enableEnvSchema?: boolean;
@@ -31,6 +39,15 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
       name: '@clerk/astro/integration',
       hooks: {
         'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
+          if (command === 'dev' && !didWriteAgentRules && !isAutomatedEnvironment() && isAgentEnvironment()) {
+            didWriteAgentRules = true;
+            try {
+              writeClerkAgentRules({ cwd: fileURLToPath(config.root), fs, path, sdks: ['astro'] });
+            } catch {
+              // Writing agent hints must never break a dev server.
+            }
+          }
+
           if (['server', 'hybrid'].includes(config.output) && !config.adapter) {
             logger.error('Missing adapter, please update your Astro config to use one.');
           }
