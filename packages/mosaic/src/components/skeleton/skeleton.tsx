@@ -7,7 +7,7 @@ import { reset } from '../../styles/reset.styles';
 import { skeletonStyles } from '../../styles/skeleton.styles';
 import { shapes, size, styles } from './skeleton.styles';
 
-export type SkeletonShape = 'rounded' | 'pill' | 'square';
+export type SkeletonShape = 'rounded' | 'circle' | 'square';
 
 export interface SkeletonProps extends Omit<MosaicComponentProps<'span'>, 'render'> {
   show?: boolean;

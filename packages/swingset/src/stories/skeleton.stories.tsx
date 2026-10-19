@@ -15,7 +15,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/skeleton/skeleton.tsx',
   styles: {
     _variants: {
-      shape: { rounded: {}, pill: {}, square: {} },
+      shape: { rounded: {}, circle: {}, square: {} },
       visible: { true: {}, false: {} },
     },
     _defaultVariants: {
@@ -59,7 +59,7 @@ export function TextContent() {
 export function Elements() {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <Skeleton shape='pill'>
+      <Skeleton shape='circle'>
         <Avatar.Root size='md'>
           <Avatar.Fallback>PB</Avatar.Fallback>
         </Avatar.Root>
@@ -85,7 +85,7 @@ export function Shapes() {
         height={48}
       />
       <Skeleton
-        shape='pill'
+        shape='circle'
         width={48}
         height={48}
       />

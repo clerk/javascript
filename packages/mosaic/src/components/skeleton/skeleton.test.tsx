@@ -19,7 +19,7 @@ describe('Skeleton', () => {
     render(
       <Skeleton
         data-testid='bone'
-        shape='pill'
+        shape='circle'
       >
         <button type='button'>Edit</button>
       </Skeleton>,
@@ -27,7 +27,7 @@ describe('Skeleton', () => {
 
     const bone = screen.getByTestId('bone');
     expect(bone).not.toHaveAttribute('data-text');
-    expect(bone).toHaveAttribute('data-shape', 'pill');
+    expect(bone).toHaveAttribute('data-shape', 'circle');
     expect(bone.querySelector('button')).not.toBeNull();
   });
 

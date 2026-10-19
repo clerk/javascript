@@ -23,7 +23,7 @@ export const styles = stylex.create({
 
 export const shapes = stylex.create({
   rounded: { borderRadius: radiusVars['--cl-radius-md'] },
-  pill: { borderRadius: radiusVars['--cl-radius-full'] },
+  circle: { borderRadius: radiusVars['--cl-radius-full'] },
   square: { borderRadius: radiusVars['--cl-radius-none'] },
 });
 
