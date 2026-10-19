@@ -55,9 +55,19 @@ describe('run', () => {
   it('returns on timeout even when a background child of the command keeps its output open', async () => {
     const began = Date.now();
     const result = await run('sh', ['-c', 'sleep 30 & echo $!; wait'], { timeoutMs: 300 });
-    assert.equal(result.code, 124);
-    assert.ok(Date.now() - began < 10_000, `returned after ${Date.now() - began}ms`);
-    process.kill(Number(result.stdout.trim()));
+    try {
+      assert.equal(result.code, 124);
+      assert.ok(Date.now() - began < 10_000, `returned after ${Date.now() - began}ms`);
+    } finally {
+      const child = Number(result.stdout.trim());
+      if (Number.isInteger(child) && child > 0) {
+        try {
+          process.kill(child);
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== 'ESRCH') throw error;
+        }
+      }
+    }
   });
 });
 
