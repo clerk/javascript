@@ -81,11 +81,12 @@ export const styles = stylex.create({
     verticalAlign: 'middle',
   },
   selectCell: {
+    boxSizing: 'content-box',
     lineHeight: 0,
     paddingInlineEnd: 0,
     paddingInlineStart: space['4'],
     verticalAlign: 'middle',
-    width: 0,
+    width: space['4'],
   },
   sticky: {
     backgroundColor: surface,
@@ -103,6 +104,15 @@ export const styles = stylex.create({
   emptyCell: {
     textAlign: 'center',
   },
+});
+
+export const layouts = stylex.create({
+  auto: { tableLayout: 'auto' },
+  fixed: { tableLayout: 'fixed' },
+});
+
+export const columnWidth = stylex.create({
+  fixed: (width: string) => ({ width }),
 });
 
 export const aligns = stylex.create({
