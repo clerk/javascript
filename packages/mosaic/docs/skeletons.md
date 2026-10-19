@@ -41,7 +41,7 @@ own.
   the text to get a bar, and wrap the text's parent element to cover several lines
   with one block.
 - **Shapes are semantic:** `rounded` (the default, `--cl-radius-md`, for media,
-  icon frames and buttons), `pill` (`--cl-radius-full`, for avatars and round
+  icon frames and buttons), `circle` (`--cl-radius-full`, for avatars and round
   controls) and `square` (`--cl-radius-none`, for image tiles). Text bars are
   always pills. Pick the shape of the element being replaced; don't reach for other
   radii.
