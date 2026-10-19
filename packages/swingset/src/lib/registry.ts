@@ -219,6 +219,7 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import { meta as portalMeta } from '../stories/portal.stories';
 import {
   Customized as ProfileCustomized,
   Default as ProfileDefault,
@@ -768,6 +769,7 @@ const flowModule: StoryModule = { meta: flowMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
+const portalModule: StoryModule = { meta: portalMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tagInputModule: StoryModule = { meta: tagInputMeta };
@@ -1110,6 +1112,7 @@ export const registry: StoryModule[] = [
   menuModule,
   otpModule,
   popoverModule,
+  portalModule,
   selectModule,
   tabsModule,
   tagInputModule,

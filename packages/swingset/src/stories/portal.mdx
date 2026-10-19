@@ -1,0 +1,61 @@
+import * as PortalStories from './portal.stories';
+
+# Portal
+
+`PortalProvider` sets where Mosaic overlays render. Dialogs, drawers, popovers, menus, selects,
+comboboxes, tooltips, toasts and the action bar portal into its `container` instead of
+`document.body`, and so do the Clerk modals that Mosaic components open. Use it when Mosaic
+renders inside another library's modal dialog, which makes everything outside itself inert.
+
+Without a provider, overlays render into `document.body`.
+
+## Example
+
+A Mosaic select inside a shadcn dialog, with an element in the dialog as the container.
+
+<Story
+  name='Default'
+  storyModule={PortalStories}
+/>
+
+## Usage
+
+Pass a ref to the element overlays should render into:
+
+```tsx
+import { PortalProvider } from '@clerk/mosaic';
+
+const container = useRef<HTMLDivElement>(null);
+
+<DialogContent>
+  <div ref={container}>
+    <PortalProvider container={container}>
+      <UserButton />
+    </PortalProvider>
+  </div>
+</DialogContent>;
+```
+
+Or pass the element itself:
+
+```tsx
+<PortalProvider container={document.getElementById('overlays')}>
+  <App />
+</PortalProvider>
+```
+
+- Overlays wait until the container exists. A ref attached after the first render, or a
+  `container` that starts as `null`, renders once the element is there.
+- The innermost provider wins.
+- An overlay opened inside another overlay renders into its parent's portal, so a menu inside a
+  Mosaic dialog stays in that dialog.
+- An explicit `root` on a part's `Portal`, or `portalRoot` on a component, wins over the provider.
+- `PortalProvider` works with or without `MosaicProvider`, and usually sits below it. Toasts follow
+  the provider only when it sits above `MosaicProvider`, since `MosaicProvider` renders them.
+
+## Props
+
+| Prop        | Type                                                    | Default | Description                        |
+| ----------- | ------------------------------------------------------- | ------- | ---------------------------------- |
+| `container` | `RefObject<HTMLElement \| null> \| HTMLElement \| null` | —       | The element overlays render into.  |
+| `children`  | `ReactNode`                                             | —       | Where overlays use this container. |
