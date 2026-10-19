@@ -431,3 +431,62 @@ export function StickyColumn() {
     </div>
   );
 }
+
+export function ColumnWidths() {
+  const table = useDataTable({ data: apiKeys, getRowId: row => row.id });
+
+  return (
+    <Table.Root layout='fixed'>
+      <Table.ColumnGroup>
+        <Table.Column />
+        <Table.Column />
+        <Table.Column width='9rem' />
+        <Table.Column width='9rem' />
+        <Table.Column width='4rem' />
+      </Table.ColumnGroup>
+      <Table.Header>
+        <Table.Row>
+          <Table.SelectAllCell
+            aria-label='Select all keys'
+            checked={table.getIsAllRowsSelected()}
+            indeterminate={table.getIsSomeRowsSelected()}
+            onChange={() => table.toggleAllRowsSelected()}
+          />
+          <Table.HeaderCell>Name</Table.HeaderCell>
+          <Table.HeaderCell>Last used</Table.HeaderCell>
+          <Table.HeaderCell>Created</Table.HeaderCell>
+          <Table.HeaderCell align='end'>
+            <VisuallyHidden>Actions</VisuallyHidden>
+          </Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {table.rows.map(row => (
+          <Table.Row
+            key={row.id}
+            selected={row.getIsSelected()}
+          >
+            <Table.SelectCell
+              aria-label={`Select ${row.original.name}`}
+              checked={row.getIsSelected()}
+              onToggleSelected={row.toggleSelected}
+            />
+            <Table.Cell>{row.original.name}</Table.Cell>
+            <Table.Cell noWrap>{row.original.lastUsed}</Table.Cell>
+            <Table.Cell noWrap>{row.original.created}</Table.Cell>
+            <Table.Cell align='end'>
+              <Menu.Root placement='bottom-end'>
+                <Menu.Trigger aria-label={`Manage ${row.original.name}`} />
+                <Menu.Popup>
+                  <Menu.Item label='Revoke'>
+                    <Menu.Label>Revoke</Menu.Label>
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Root>
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table.Root>
+  );
+}

@@ -13,7 +13,7 @@ import { Icon } from '../icon';
 import type { InputProps } from '../input';
 import { InputGroup } from '../input-group';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { aligns, stickySides, styles } from './table.styles';
+import { aligns, columnWidth, layouts, stickySides, styles } from './table.styles';
 
 type TableSection = 'header' | 'body';
 
@@ -25,7 +25,11 @@ export type TableSort = 'ascending' | 'descending' | 'none';
 
 export type TableSticky = keyof typeof stickySides;
 
-export type TableProps = MosaicElementProps<'table'>;
+export type TableLayout = keyof typeof layouts;
+
+export interface TableProps extends MosaicElementProps<'table'> {
+  layout?: TableLayout;
+}
 
 export type TableToolbarProps = MosaicComponentProps<'div'>;
 
@@ -96,7 +100,10 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
   );
 });
 
-const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable({ xstyle, ...rest }, ref) {
+const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable(
+  { layout = 'auto', xstyle, ...rest },
+  ref,
+) {
   return (
     <div {...mergeStyleProps(themeProps('table-shell'), stylex.props(reset.base, scrollAreaRoot, styles.shell))}>
       <div
@@ -109,11 +116,49 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
       >
         <table
           ref={ref}
-          {...mergeStyleProps(themeProps('table'), stylex.props(reset.base, styles.table, xstyle), rest)}
+          {...mergeStyleProps(
+            themeProps('table', { layout }),
+            stylex.props(reset.base, styles.table, layouts[layout], xstyle),
+            rest,
+          )}
         />
       </div>
     </div>
   );
+});
+
+export type TableColumnGroupProps = MosaicComponentProps<'colgroup'>;
+
+const ColumnGroup = React.forwardRef<HTMLTableColElement, TableColumnGroupProps>(function MosaicTableColumnGroup(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'colgroup',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('table-column-group'), stylex.props(reset.base, xstyle), rest),
+  });
+});
+
+export interface TableColumnProps extends MosaicComponentProps<'col'> {
+  width?: string;
+}
+
+const Column = React.forwardRef<HTMLTableColElement, TableColumnProps>(function MosaicTableColumn(
+  { width, render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'col',
+    render,
+    ref,
+    props: mergeStyleProps(
+      themeProps('table-column'),
+      stylex.props(reset.base, width !== undefined && columnWidth.fixed(width), xstyle),
+      rest,
+    ),
+  });
 });
 
 export type TableHeaderProps = MosaicComponentProps<'thead'>;
@@ -323,4 +368,18 @@ const Empty = React.forwardRef<HTMLTableCellElement, TableEmptyProps>(function M
   );
 });
 
-export const Table = { Root, Toolbar, Search, Header, Body, Row, HeaderCell, Cell, SelectAllCell, SelectCell, Empty };
+export const Table = {
+  Root,
+  Toolbar,
+  Search,
+  ColumnGroup,
+  Column,
+  Header,
+  Body,
+  Row,
+  HeaderCell,
+  Cell,
+  SelectAllCell,
+  SelectCell,
+  Empty,
+};
