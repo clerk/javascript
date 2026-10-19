@@ -85,6 +85,7 @@
   },
   "main": "./dist/index.cjs",
   "files": [
+    "AGENTS.md",
     "dist"
   ],
   "scripts": {
