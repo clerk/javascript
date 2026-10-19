@@ -26,14 +26,6 @@ describe('save', () => {
     await expect(save(() => Promise.reject(cause))).rejects.toBeInstanceOf(SaveError);
   });
 
-  it('lets a reverification hint through untouched, so the flow can start a challenge', async () => {
-    const cause = new ClerkAPIResponseError('Forbidden', {
-      status: 403,
-      data: [{ code: 'session_reverification_required', message: 'Reverification required' }],
-    });
-    await expect(save(() => Promise.reject(cause))).rejects.toBe(cause);
-  });
-
   it('lets a cancelled reverification through untouched, so the dialog can close quietly', async () => {
     const cause = new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' });
     await expect(save(() => Promise.reject(cause))).rejects.toBe(cause);

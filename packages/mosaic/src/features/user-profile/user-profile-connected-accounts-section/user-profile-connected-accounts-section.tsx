@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { useReverificationFlow } from '../../reverification';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
 import type { UserProfileConnectedAccountsModel } from './user-profile-connected-accounts-section.model';
 import { useUserProfileConnectedAccountsModel } from './user-profile-connected-accounts-section.model';
@@ -27,14 +26,13 @@ export function UserProfileConnectedAccountsSection({ fallback }: UserProfileCon
 }
 
 function ConnectedAccounts({ model }: { model: Extract<UserProfileConnectedAccountsModel, { status: 'ready' }> }) {
-  const [remove, reverification] = useReverificationFlow((id: string) => model.remove(id));
   const controller = useUserProfileConnectedAccountsController({
     accounts: model.accounts,
     availableProviders: model.availableProviders,
     onConnect: model.connect,
     onReconnect: model.reconnect,
-    onRemove: remove,
-    reverification,
+    onRemove: model.remove,
+    reverification: model.reverification,
   });
 
   return <UserProfileConnectedAccountsSectionView {...controller} />;

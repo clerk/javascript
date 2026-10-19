@@ -1,9 +1,10 @@
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
-import type { EmailAddressResource } from '@clerk/shared/types';
+import type { EmailAddressResource, UserResource } from '@clerk/shared/types';
 
 import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { save } from '../../../utils/errors';
+import { useReverificationFlow } from '../../reverification';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../user-profile-contact.types';
 import { byId, canAddIdentifications, toContactAccess, toContacts } from '../user-profile-contact.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
@@ -84,6 +85,9 @@ function toEmailVerifier(
 export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
   const model = useUserProfileUserModel();
   const router = useMosaicRouter();
+  const [removeEmail, reverification] = useReverificationFlow((user: UserResource, id: string) =>
+    byId(user.emailAddresses, id, 'email address').destroy(),
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -118,8 +122,7 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
       : undefined,
     getEmailVerifier: id => verifierFor(byId(user.emailAddresses, id, 'email address')),
     onSetPrimaryEmail: id => saveAsUser(current => current.update({ primaryEmailAddressId: id })),
-    onRemoveEmail: access.canRemove
-      ? id => saveAsUser(current => byId(current.emailAddresses, id, 'email address').destroy())
-      : undefined,
+    onRemoveEmail: access.canRemove ? id => saveAsUser(current => removeEmail(current, id)) : undefined,
+    reverification,
   };
 }

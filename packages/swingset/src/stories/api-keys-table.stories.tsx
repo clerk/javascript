@@ -24,6 +24,11 @@ export function Organization() {
   return <APIKeysTableView {...props} />;
 }
 
+export function Description() {
+  const props = useAPIKeysTableFixture({ showDescription: true });
+  return <APIKeysTableView {...props} />;
+}
+
 export function Empty() {
   const props = useAPIKeysTableFixture({ initialKeys: [] });
   return (

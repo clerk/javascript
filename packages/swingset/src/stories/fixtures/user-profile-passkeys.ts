@@ -8,6 +8,8 @@ import { useRef, useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosName, chaosRows, chaosText } from '@/lib/chaos';
 
+import { idleReverification } from './reverification';
+
 const examplePasskeys: UserProfilePasskey[] = [
   { id: 'laptop', name: 'MacBook', createdAtLabel: 'Created today', lastUsedAtLabel: 'Last used 1 hour ago' },
   { id: 'phone', name: 'iPhone', createdAtLabel: 'Created yesterday' },
@@ -39,6 +41,7 @@ export function usePasskeysFixture({
 
   return useUserProfilePasskeysSectionController({
     passkeys,
+    reverification: idleReverification,
     onAdd: async () => {
       await attempt('add');
       const id = nextId.current++;

@@ -1,4 +1,3 @@
-import { useReverificationFlow } from '../../reverification';
 import { useUserProfileEmailSectionController } from './user-profile-email-section.controller';
 import { useUserProfileEmailSectionModel } from './user-profile-email-section.model';
 import type { ReadyEmailSectionModel } from './user-profile-email-section.types';
@@ -20,11 +19,6 @@ export function UserProfileEmailSection() {
 }
 
 function Emails({ model }: { model: ReadyEmailSectionModel }) {
-  const [removeEmail, reverification] = useReverificationFlow((id: string) => model.onRemoveEmail?.(id));
-  const controller = useUserProfileEmailSectionController({
-    ...model,
-    onRemoveEmail: model.onRemoveEmail ? removeEmail : undefined,
-    reverification,
-  });
+  const controller = useUserProfileEmailSectionController(model);
   return <UserProfileEmailSectionView {...controller} />;
 }

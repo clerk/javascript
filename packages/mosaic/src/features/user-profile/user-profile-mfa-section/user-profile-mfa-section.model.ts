@@ -4,6 +4,7 @@ import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
+import { useReverificationFlow } from '../../reverification';
 import type {
   MfaEnrollmentResult,
   MfaPhone,
@@ -160,11 +161,34 @@ function createSmsActions(
   };
 }
 
+async function removeMfaMethod(
+  current: UserResource,
+  environment: EnvironmentResource,
+  methodId: string,
+): Promise<void> {
+  if (methodId === 'authenticator') {
+    if (!current.totpEnabled) {
+      throw new ClerkRuntimeError('This method cannot be removed.', { code: 'mfa_method_cannot_remove' });
+    }
+    requireRemovable(current, environment);
+    await current.disableTOTP();
+  } else {
+    const phone = current.phoneNumbers.find(item => item.id === methodId);
+    if (!phone?.reservedForSecondFactor || phone.verification.status !== 'verified') {
+      throw new ClerkRuntimeError('This method cannot be removed.', { code: 'mfa_method_cannot_remove' });
+    }
+    requireRemovable(current, environment);
+    await phone.setReservedForSecondFactor({ reserved: false });
+  }
+  await current.reload().catch(() => undefined);
+}
+
 export function useUserProfileMfaModel(): UserProfileMfaModel {
   const clerk = useClerk();
   const { isLoaded: userLoaded, user } = useUser();
   const { isLoaded: sessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
+  const [removeMethod, reverification] = useReverificationFlow(removeMfaMethod);
 
   if (!userLoaded || !sessionLoaded || !environment) {
     return { status: 'loading' };
@@ -233,23 +257,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
             return result.codes;
           }
         : undefined,
-    remove: async methodId => {
-      const current = requireIdentity(clerk, userId, sessionId);
-      if (methodId === 'authenticator') {
-        if (!current.totpEnabled) {
-          throw new ClerkRuntimeError('This method cannot be removed.', { code: 'mfa_method_cannot_remove' });
-        }
-        requireRemovable(current, environment);
-        await current.disableTOTP();
-      } else {
-        const phone = current.phoneNumbers.find(item => item.id === methodId);
-        if (!phone?.reservedForSecondFactor || phone.verification.status !== 'verified') {
-          throw new ClerkRuntimeError('This method cannot be removed.', { code: 'mfa_method_cannot_remove' });
-        }
-        requireRemovable(current, environment);
-        await phone.setReservedForSecondFactor({ reserved: false });
-      }
-      await refresh().catch(() => undefined);
-    },
+    remove: methodId => removeMethod(requireIdentity(clerk, userId, sessionId), environment, methodId),
+    reverification,
   };
 }
