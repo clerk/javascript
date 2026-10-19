@@ -38,6 +38,11 @@ export type UserCountParams = {
 
 /** @generateWithEmptyComment */
 export type UserListParams = ClerkPaginationRequest<{
+  /**
+   * The ID of the last user on the previous page. Only valid when `orderBy` is `created_at`, `+created_at`,
+   * or `-created_at` and `offset` is omitted or `0`.
+   */
+  startingAfter?: string;
   /** Filters users with the specified email addresses. Accepts up to 100 email addresses. */
   emailAddress?: string[];
   /** Filters users with the specified phone numbers. Accepts up to 100 phone numbers. */
@@ -435,7 +440,7 @@ export class UserAPI extends AbstractAPI {
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property that contains an array of [`User`](https://clerk.com/docs/reference/backend/types/backend-user) objects, and a `totalCount` property that indicates the total number of users in your instance.
    */
   public async getUserList(params: UserListParams = {}) {
-    const { limit, offset, orderBy, ...userCountParams } = params;
+    const { limit, offset, orderBy, startingAfter, ...userCountParams } = params;
     // TODO(dimkl): Temporary change to populate totalCount using a 2nd BAPI call to /users/count endpoint
     // until we update the /users endpoint to be paginated in a next BAPI version.
     // In some edge cases the data.length != totalCount due to a creation of a user between the 2 api responses
