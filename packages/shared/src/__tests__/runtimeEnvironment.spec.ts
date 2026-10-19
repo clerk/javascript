@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { automatedEnvironmentVariables, isAutomatedEnvironment } from '../utils/runtimeEnvironment';
+import {
+  agentEnvironmentVariables,
+  automatedEnvironmentVariables,
+  isAgentEnvironment,
+  isAutomatedEnvironment,
+} from '../utils/runtimeEnvironment';
 
 describe('isAutomatedEnvironment', () => {
   beforeEach(() => {
@@ -58,5 +63,35 @@ describe('isAutomatedEnvironment', () => {
     vi.stubGlobal('CI', true);
 
     expect(isAutomatedEnvironment()).toBe(false);
+  });
+});
+
+describe('isAgentEnvironment', () => {
+  beforeEach(() => {
+    agentEnvironmentVariables.forEach(name => {
+      vi.stubEnv(name, undefined);
+      vi.stubGlobal(name, undefined);
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it('returns true when an agent environment variable is enabled', () => {
+    vi.stubEnv('CLAUDECODE', 'true');
+
+    expect(isAgentEnvironment()).toBe(true);
+  });
+
+  it('returns false when agent environment variables are explicitly falsey', () => {
+    const falseyValues = ['false', '0', 'off', 'no'];
+
+    agentEnvironmentVariables.forEach((name, index) => {
+      vi.stubEnv(name, falseyValues[index % falseyValues.length]);
+    });
+
+    expect(isAgentEnvironment()).toBe(false);
   });
 });

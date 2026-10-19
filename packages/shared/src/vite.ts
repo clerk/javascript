@@ -1,0 +1,30 @@
+import { type ClerkAgentRulesSdk, writeClerkAgentRules } from './agentRules';
+import { isAgentEnvironment, isAutomatedEnvironment } from './utils';
+
+type ViteResolvedConfig = {
+  command: 'build' | 'serve';
+  root: string;
+};
+
+export function clerkAgentRulesVitePlugin(sdk: Extract<ClerkAgentRulesSdk, 'react' | 'vue'>) {
+  let didWrite = false;
+
+  return {
+    name: `clerk-agent-rules-${sdk}`,
+    apply: 'serve' as const,
+    async configResolved(config: ViteResolvedConfig) {
+      if (didWrite || config.command !== 'serve' || isAutomatedEnvironment() || !isAgentEnvironment()) {
+        return;
+      }
+
+      didWrite = true;
+
+      try {
+        const [fs, path] = await Promise.all([import('node:fs'), import('node:path')]);
+        writeClerkAgentRules({ cwd: config.root, fs, path, sdks: [sdk] });
+      } catch {
+        // Writing agent hints must never break a dev server.
+      }
+    },
+  };
+}
