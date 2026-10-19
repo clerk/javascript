@@ -1,3 +1,4 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useRef, useState } from 'react';
 
 import type { ErrorDescription } from '../localization';
@@ -47,7 +48,9 @@ export function usePendingAction<TKey extends string = string>({
       await action();
       return true;
     } catch (cause) {
-      setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
+      if (!isReverificationCancelledError(cause)) {
+        setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
+      }
       return false;
     } finally {
       running.current = false;
