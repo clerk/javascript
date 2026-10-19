@@ -215,7 +215,8 @@ export type UserProfileConnectedAccountsModel =
       connect: (strategy: string) => Promise<ConnectedAccountActionResult>;
       reconnect: (accountId: string) => Promise<ConnectedAccountActionResult>;
       remove: (accountId: string) => Promise<void>;
-      reverification: ReverificationController;
+      removeReverification: ReverificationController;
+      reconnectReverification: ReverificationController;
     };
 
 function unavailable() {
@@ -230,13 +231,17 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
-  const [removeAccount, reverification] = useReverificationFlow((current: UserResource, accountId: string) => {
+  const [removeAccount, removeReverification] = useReverificationFlow((current: UserResource, accountId: string) => {
     const account = current.externalAccounts.find(candidate => candidate.id === accountId);
     if (!account) {
       throw unavailable();
     }
     return account.destroy();
   });
+  const [recreateAccount, reconnectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -332,7 +337,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
               additionalScopes: recovery.additionalScopes,
               redirectUrl: withModalState(redirectUrl),
             })
-          : await current.createExternalAccount({
+          : await recreateAccount(current, {
               strategy: recovery.strategy,
               redirectUrl: withModalState(redirectUrl),
               additionalScopes: recovery.additionalScopes,
@@ -342,6 +347,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
     remove: async accountId => {
       await removeAccount(requireCurrentUser(), accountId);
     },
-    reverification,
+    removeReverification,
+    reconnectReverification,
   };
 }
