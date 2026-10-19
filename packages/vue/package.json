@@ -42,7 +42,11 @@
       "types": "./dist/errors.d.ts",
       "default": "./dist/errors.js"
     },
-    "./types": "./dist/types/index.d.ts"
+    "./types": "./dist/types/index.d.ts",
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "default": "./dist/vite.js"
+    }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
