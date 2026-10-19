@@ -1,8 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneNumberResource } from '@clerk/shared/types';
+import type { PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
 import { toCountryIso } from '../../../components/phone-input';
 import { save } from '../../../utils/errors';
+import { useReverificationFlow } from '../../reverification';
 import type { UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import { byId, canAddIdentifications, toContactAccess, toContacts } from '../user-profile-contact.utils';
 import { useUserProfileUserModel } from '../user-profile-user.model';
@@ -21,6 +22,9 @@ function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
 export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel {
   const clerk = useClerk();
   const model = useUserProfileUserModel();
+  const [removePhone, reverification] = useReverificationFlow((user: UserResource, id: string) =>
+    byId(user.phoneNumbers, id, 'phone number').destroy(),
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -51,8 +55,7 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
       : undefined,
     getPhoneVerifier: id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')),
     onSetPrimaryPhone: id => saveAsUser(current => current.update({ primaryPhoneNumberId: id })),
-    onRemovePhone: access.canRemove
-      ? id => saveAsUser(current => byId(current.phoneNumbers, id, 'phone number').destroy())
-      : undefined,
+    onRemovePhone: access.canRemove ? id => saveAsUser(current => removePhone(current, id)) : undefined,
+    reverification,
   };
 }

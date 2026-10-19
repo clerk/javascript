@@ -3,6 +3,7 @@ import type { Ref } from 'react';
 
 import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
+import type { ReverificationController } from '../../reverification';
 
 export interface UserProfileWeb3Provider {
   id: Web3Strategy;
@@ -46,6 +47,7 @@ export type UserProfileWeb3WalletsModel =
       connect: (strategy: Web3Strategy, walletName?: string) => Promise<void>;
       setPrimary: (walletId: string) => Promise<void>;
       remove?: (walletId: string) => Promise<void>;
+      reverification: ReverificationController;
     };
 
 export type ReadyWeb3WalletsModel = Extract<UserProfileWeb3WalletsModel, { status: 'ready' }>;

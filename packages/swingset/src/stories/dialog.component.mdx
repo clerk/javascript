@@ -69,10 +69,11 @@ committing.
 
 ### Variant
 
-| Value     | Width                                      | For                                                                  |
-| --------- | ------------------------------------------ | -------------------------------------------------------------------- |
-| `card`    | Width from its `Card`, height from content | Everything a `Card` holds — a flow, a confirmation, a form (default) |
-| `profile` | Width from its surface, fills the height   | Account profile and settings — a surface you navigate                |
+| Value        | Width                                       | For                                                                  |
+| ------------ | ------------------------------------------- | -------------------------------------------------------------------- |
+| `card`       | Width from its `Card`, height from content  | Everything a `Card` holds — a flow, a confirmation, a form (default) |
+| `profile`    | Width from its surface, fills the height    | Account profile and settings — a surface you navigate                |
+| `fullscreen` | Fills the viewport at every width, no inset | The same profile surface taking the whole screen                     |
 
 ### Every dialog brings its own surface
 
@@ -107,6 +108,10 @@ import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profil
 </Dialog.Root>;
 ```
 
+`fullscreen` holds the same `Profile` and fills the viewport at every width, with no inset around
+it. The profile replaces its corner dismiss with a "Back to app" row above the navigation; below
+`48rem`, where the navigation collapses into the page title, the corner dismiss returns.
+
 ### Compact placement
 
 In the compact band, a window under `40rem`, a card is a bottom sheet: flush to the sides and the
@@ -122,7 +127,7 @@ bottom edge, sliding up from it. `compactPlacement='center'` keeps it centered t
 | `sheet`  | Bottom-anchored, slides up (default) | Centered |
 | `center` | Centered                             | Centered |
 
-A `profile` takes no placement and warns in dev if given one.
+A `profile` and a `fullscreen` take no placement and warn in dev if given one.
 
 ### Alert dialogs
 
@@ -251,14 +256,15 @@ State attributes:
 
 A dialog opened inside another is one of two relationships, decided by the variant beneath it:
 
-|                     | Nested                     | Stack                              |
-| ------------------- | -------------------------- | ---------------------------------- |
-| Opens over          | a `profile`                | a `card`                           |
-| Its own scrim       | Yes, lighter than the base | None — one scrim serves the stack  |
-| The surface beneath | Unchanged                  | Dims and recedes                   |
-| Attributes          | `data-nested`              | `data-stacked` / `data-stack-base` |
+|                     | Nested                      | Stack                              |
+| ------------------- | --------------------------- | ---------------------------------- |
+| Opens over          | a `profile` or `fullscreen` | a `card`                           |
+| Its own scrim       | Yes, lighter than the base  | None — one scrim serves the stack  |
+| The surface beneath | Unchanged                   | Dims and recedes                   |
+| Attributes          | `data-nested`               | `data-stacked` / `data-stack-base` |
 
-A `profile` never opens inside another dialog — it warns in dev. A `card` is what opens over one.
+A `profile` and a `fullscreen` never open inside another dialog — they warn in dev. A `card` is
+what opens over one.
 
 ---
 

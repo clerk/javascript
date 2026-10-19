@@ -11,6 +11,7 @@ import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStartSolanaWalletsCard';
 
+import { buildSignUpOAuthCallbackParams } from '../SignIn/buildOAuthCallbackParams';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
 import { SignUpProtectCheck } from './SignUpProtectCheck';
@@ -40,7 +41,7 @@ function SignUpRoutes(): JSX.Element {
             unmounts this card mid-navigation and blanks the route. The card
             owns its own post-resolution routing. */}
         <Route path='protect-check'>
-          <SignUpProtectCheck />
+          <SignUpProtectCheck oauthCallbackParams={buildSignUpOAuthCallbackParams(signUpContext)} />
         </Route>
         <Route
           path='verify-email-address'

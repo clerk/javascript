@@ -8,9 +8,14 @@ import { Table } from '@clerk/mosaic/components/table';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import type { OnChangeFn, SortingState } from '@clerk/mosaic/primitives/hooks';
 import { useDataTable } from '@clerk/mosaic/primitives/hooks';
+import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+const styles = stylex.create({
+  columnWidthsTable: { minWidth: '36rem' },
+});
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -378,5 +383,118 @@ export function Overflow() {
         </Table.Body>
       </Table.Root>
     </div>
+  );
+}
+
+export function StickyColumn() {
+  const columns = ['Environment', 'Last used', 'Created', 'Expires', 'Created by', 'Scopes'];
+
+  return (
+    <div style={{ maxWidth: 480 }}>
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            {columns.map(column => (
+              <Table.HeaderCell key={column}>{column}</Table.HeaderCell>
+            ))}
+            <Table.HeaderCell sticky='end'>
+              <VisuallyHidden>Actions</VisuallyHidden>
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {apiKeys.map(key => (
+            <Table.Row
+              key={key.id}
+              selected={key.id === 'k2'}
+            >
+              <Table.Cell noWrap>{key.name}</Table.Cell>
+              <Table.Cell>{key.environment}</Table.Cell>
+              <Table.Cell noWrap>{key.lastUsed}</Table.Cell>
+              <Table.Cell noWrap>{key.created}</Table.Cell>
+              <Table.Cell>Never</Table.Cell>
+              <Table.Cell>cameron@clerk.com</Table.Cell>
+              <Table.Cell noWrap>read, write</Table.Cell>
+              <Table.Cell
+                sticky='end'
+                align='end'
+              >
+                <Menu.Root placement='bottom-end'>
+                  <Menu.Trigger aria-label={`Manage ${key.name}`} />
+                  <Menu.Popup>
+                    <Menu.Item label='Revoke'>
+                      <Menu.Label>Revoke</Menu.Label>
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Root>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </div>
+  );
+}
+
+export function ColumnWidths() {
+  const table = useDataTable({ data: apiKeys, getRowId: row => row.id });
+
+  return (
+    <Table.Root
+      layout='fixed'
+      xstyle={styles.columnWidthsTable}
+    >
+      <Table.ColumnGroup>
+        <Table.Column />
+        <Table.Column />
+        <Table.Column width='9rem' />
+        <Table.Column width='9rem' />
+        <Table.Column width='4rem' />
+      </Table.ColumnGroup>
+      <Table.Header>
+        <Table.Row>
+          <Table.SelectAllCell
+            aria-label='Select all keys'
+            checked={table.getIsAllRowsSelected()}
+            indeterminate={table.getIsSomeRowsSelected()}
+            onChange={() => table.toggleAllRowsSelected()}
+          />
+          <Table.HeaderCell>Name</Table.HeaderCell>
+          <Table.HeaderCell>Last used</Table.HeaderCell>
+          <Table.HeaderCell>Created</Table.HeaderCell>
+          <Table.HeaderCell align='end'>
+            <VisuallyHidden>Actions</VisuallyHidden>
+          </Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {table.rows.map(row => (
+          <Table.Row
+            key={row.id}
+            selected={row.getIsSelected()}
+          >
+            <Table.SelectCell
+              aria-label={`Select ${row.original.name}`}
+              checked={row.getIsSelected()}
+              onToggleSelected={row.toggleSelected}
+            />
+            <Table.Cell>{row.original.name}</Table.Cell>
+            <Table.Cell noWrap>{row.original.lastUsed}</Table.Cell>
+            <Table.Cell noWrap>{row.original.created}</Table.Cell>
+            <Table.Cell align='end'>
+              <Menu.Root placement='bottom-end'>
+                <Menu.Trigger aria-label={`Manage ${row.original.name}`} />
+                <Menu.Popup>
+                  <Menu.Item label='Revoke'>
+                    <Menu.Label>Revoke</Menu.Label>
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Root>
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table.Root>
   );
 }

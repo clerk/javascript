@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
+import { usePanelTitle } from '../../../components/panel';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
-import type { ReverificationController } from '../../reverification';
 import type {
   ReadyWeb3WalletsModel,
   UserProfileWeb3Provider,
@@ -19,24 +19,23 @@ export function useUserProfileWeb3WalletsController({
   connect,
   setPrimary,
   remove,
-  fallbackFocus,
   reverification,
-}: Pick<ReadyWeb3WalletsModel, 'wallets' | 'availableProviders' | 'connect' | 'setPrimary' | 'remove'> & {
-  fallbackFocus?: () => HTMLElement | null;
-  reverification?: ReverificationController;
-}) {
+}: Pick<
+  ReadyWeb3WalletsModel,
+  'wallets' | 'availableProviders' | 'connect' | 'setPrimary' | 'remove' | 'reverification'
+>) {
   const messages = useMessages('userProfileWeb3Wallets');
   const action = usePendingAction({ errorFallback: messages.errors.generic });
   const [picker, setPicker] = useState<SolanaPicker>({ open: false });
   const sectionRef = useRef<HTMLDivElement>(null);
+  const panelTitle = usePanelTitle();
   const removalFocus = useListRemovalFocus({
     ids: wallets.map(wallet => wallet.id),
     onRemove: remove,
     fallback: () =>
       sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
       sectionRef.current ??
-      fallbackFocus?.() ??
-      null,
+      panelTitle(),
   });
   // TODO: Share the action lock during removal while preserving errors for the confirmation dialog.
   const removeWallet = useConfirmController<UserProfileWeb3Wallet>({

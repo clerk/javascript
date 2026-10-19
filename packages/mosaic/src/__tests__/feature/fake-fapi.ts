@@ -743,6 +743,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       leaveOrganization(state, membership.organization.id, user.id);
       return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
     }),
+    http.get(fapiUrl('/v1/organizations/:organizationId'), ({ params }) => {
+      const membership = state.memberships.find(m => m.organization.id === params.organizationId);
+      return membership ? envelope(membership.organization, null) : missing();
+    }),
     http.post(fapiUrl('/v1/organizations/:organizationId'), async ({ params, request }) => {
       const method = new URL(request.url).searchParams.get('_method');
       if (method === 'PATCH') {
@@ -818,7 +822,8 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       return HttpResponse.json(page(keys, url));
     }),
     http.post(fapiUrl('/api_keys'), async ({ request }) => {
-      const body: { name: string; subject: string; seconds_until_expiration?: number } = await request.json();
+      const body: { name: string; subject: string; description?: string; seconds_until_expiration?: number } =
+        await request.json();
       if (state.apiKeys.some(key => !key.revoked && key.subject === body.subject && key.name === body.name)) {
         return error('token_creation_conflict', 409);
       }
@@ -827,6 +832,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         id: `ak_${state.apiKeys.length + 1}`,
         name: body.name,
         subject: body.subject,
+        description: body.description ?? null,
         expiration: body.seconds_until_expiration ? now + body.seconds_until_expiration * 1000 : null,
         created_at: now,
         updated_at: now,
@@ -895,7 +901,7 @@ export function demandReverificationOnce(path: string): void {
   );
 }
 
-export function holdRequests(method: 'get' | 'post', path: string): HeldRequests {
+export function holdRequests(method: 'get' | 'post', path: string, query: Record<string, string> = {}): HeldRequests {
   const requests: Request[] = [];
   let resolveGate: (response: Response | undefined) => void = () => {};
   const gate = new Promise<Response | undefined>(resolve => {
@@ -910,6 +916,10 @@ export function holdRequests(method: 'get' | 'post', path: string): HeldRequests
 
   worker.use(
     http[method](fapiUrl(path), ({ request }) => {
+      const { searchParams } = new URL(request.url);
+      if (Object.entries(query).some(([key, value]) => searchParams.get(key) !== value)) {
+        return undefined;
+      }
       requests.push(request.clone());
       return gate;
     }),

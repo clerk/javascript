@@ -1,22 +1,26 @@
 import type { ReactNode } from 'react';
 
-import { renderPasswordSection } from './user-profile-password-section/user-profile-password-section';
-import { useUserProfilePasswordModel } from './user-profile-password-section/user-profile-password-section.model';
-import type { UserProfileSecurityPanelViewProps } from './user-profile-security-panel.view';
+import { UserProfileActiveDevicesSection } from './user-profile-active-devices-section/user-profile-active-devices-section';
+import { UserProfileMfaSection } from './user-profile-mfa-section/user-profile-mfa-section';
+import { UserProfilePasskeysSection } from './user-profile-passkeys-section/user-profile-passkeys-section';
+import { UserProfilePasswordSection } from './user-profile-password-section/user-profile-password-section';
 import { UserProfileSecurityPanelView } from './user-profile-security-panel.view';
 
-export interface UserProfileSecurityPanelProps extends Omit<UserProfileSecurityPanelViewProps, 'passwordSlot'> {
-  passwordFallback?: ReactNode;
+export interface UserProfileSecurityPanelProps {
+  children?: ReactNode;
 }
 
-export function UserProfileSecurityPanel({ passwordFallback = null, ...props }: UserProfileSecurityPanelProps) {
-  const password = useUserProfilePasswordModel();
-  const passwordSlot = renderPasswordSection(password, passwordFallback);
-
+export function UserProfileSecurityPanel({ children }: UserProfileSecurityPanelProps) {
   return (
-    <UserProfileSecurityPanelView
-      {...props}
-      passwordSlot={passwordSlot}
-    />
+    <UserProfileSecurityPanelView>
+      {children ?? (
+        <>
+          <UserProfilePasswordSection />
+          <UserProfilePasskeysSection />
+          <UserProfileMfaSection />
+          <UserProfileActiveDevicesSection />
+        </>
+      )}
+    </UserProfileSecurityPanelView>
   );
 }

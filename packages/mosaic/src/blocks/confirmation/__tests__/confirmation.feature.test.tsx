@@ -297,12 +297,10 @@ describe('Confirmation shared by rows', () => {
 function ReverifiedHost({
   action,
   cleanupMs,
-  settleMs,
   beforeRunMs,
 }: {
   action: () => Promise<unknown>;
   cleanupMs?: number;
-  settleMs?: number;
   beforeRunMs?: number;
 }) {
   const [run, reverification] = useReverificationFlow(action);
@@ -312,11 +310,7 @@ function ReverifiedHost({
         await new Promise(resolve => setTimeout(resolve, beforeRunMs));
       }
       try {
-        const result = await run();
-        if (settleMs !== undefined) {
-          await new Promise(resolve => setTimeout(resolve, settleMs));
-        }
-        return result;
+        return await run();
       } catch (error) {
         if (cleanupMs !== undefined) {
           await new Promise(resolve => setTimeout(resolve, cleanupMs));
@@ -435,9 +429,13 @@ describe('Confirmation with reverification', () => {
   }
 
   for (const settleMs of [undefined, 400]) {
-    it(`does not go back to the confirm step after a successful verification (host settles after ${settleMs ?? 0}ms)`, async () => {
+    it(`does not go back to the confirm step after a successful verification (action settles after ${settleMs ?? 0}ms)`, async () => {
       serveFapi(passwordVerification);
-      const { user } = await renderReverified({ action: interruptedOnce(), settleMs });
+      const action = vi
+        .fn()
+        .mockResolvedValueOnce(reverificationError())
+        .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ done: true }), settleMs ?? 0)));
+      const { user } = await renderReverified({ action });
       await confirmIntoVerification(user);
 
       const field = await screen.findByLabelText('Password');

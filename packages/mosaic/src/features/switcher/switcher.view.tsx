@@ -16,7 +16,7 @@ import type { IconName } from '../../icons/registry';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import { Button as HeadlessButton } from '../../primitives/button';
 import type { PopoverProps } from '../../primitives/popover';
-import { themeProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
@@ -34,6 +34,7 @@ import type {
   SwitcherMenuProps,
   SwitcherMode,
   SwitcherSession,
+  SwitcherTriggerBadge,
 } from './switcher.types';
 import { BadgedAvatar, RowAvatar } from './switcher-avatar.view';
 import { SwitcherHeader } from './switcher-header.view';
@@ -49,6 +50,7 @@ import {
 } from './switcher-item.view';
 import type { SwitcherMessages } from './switcher-surface';
 import { surfaceForMode, SwitcherSurfaceProvider, useSlot, useSwitcherMessages } from './switcher-surface';
+import { useSwitcherTriggerController } from './switcher-trigger.controller';
 
 // The data contract, the mode flags, and the menu item shapes live in `switcher.types`; they are
 // what the model and the view agree on, so neither file owns them.
@@ -342,6 +344,7 @@ function Header() {
             name={lead.name}
             imageUrl={lead.imageUrl}
             badge={user}
+            size='md'
           />
         ) : (
           <RowAvatar
@@ -1021,28 +1024,46 @@ export interface SwitcherTriggerProps {
   /**
    * Carries the active organization's plan beside the label. Part of the label, so it needs
    * `renderTriggerLabel`: a plan badge with nothing to qualify says nothing.
+   * A function receives the displayed user or organization ID and returns a badge with string `id` and `label` properties.
+   * The badge uses `id` for `data-badge-id` and `label` for its text.
+   * The badge is hidden for a null result, while pending, or if the function fails.
    *
    * @default true
    */
-  renderTriggerBadge?: boolean;
+  renderTriggerBadge?: SwitcherTriggerBadge;
 }
+
+export type SwitcherTriggerVariant = 'full' | 'condensed';
 
 /** The trigger: the lead's avatar, and what it is called. */
 export function SwitcherTrigger({
   renderTriggerLabel = true,
   renderTriggerBadge = true,
-}: SwitcherTriggerProps = {}): ReactElement {
+  triggerVariant = 'condensed',
+}: SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant } = {}): ReactElement {
   const m = useSwitcherMessages();
   const slot = useSlot();
   const data = useSwitcherContext();
   const lead = leadSelection(data, m);
   const { name, shape } = lead;
-  const planLabel = renderTriggerBadge ? leadOrganization(lead)?.planLabel : undefined;
+  const { badge } = useSwitcherTriggerController({
+    kind: lead.kind,
+    id: lead.kind === 'organization' ? lead.organization.organizationId : data.activeSession.userId,
+    sessionId: data.activeSession.sessionId,
+    renderTriggerBadge,
+    renderTriggerLabel,
+  });
+  const planLabel =
+    typeof renderTriggerBadge === 'function'
+      ? badge?.label
+      : renderTriggerBadge
+        ? leadOrganization(lead)?.planLabel
+        : undefined;
   const user = leadUser(lead);
 
   return (
     <Popover.Trigger
-      {...themeProps(slot('trigger'))}
+      {...themeProps(slot('trigger'), { variant: triggerVariant })}
       aria-label={fill(m.trigger.open, { name: user?.name ?? name })}
       xstyle={[
         focusOutline.visible,
@@ -1051,17 +1072,28 @@ export function SwitcherTrigger({
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
-      <RowAvatar
-        name={lead.name}
-        imageUrl={lead.imageUrl}
-        shape={shape}
-        size={renderTriggerLabel ? 'fit' : 'sm'}
-        xstyle={renderTriggerLabel ? styles.rowAvatar : undefined}
+      <TriggerAvatar
+        lead={lead}
+        variant={renderTriggerLabel ? triggerVariant : 'avatarOnly'}
       />
       {renderTriggerLabel ? (
         <>
-          <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
-          {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
+          <span
+            {...mergeStyleProps(
+              themeProps(slot('trigger-label')),
+              stylex.props(styles.triggerName, truncationStyles.singleLine),
+            )}
+          >
+            {name}
+          </span>
+          {typeof planLabel === 'string' ? (
+            <Badge
+              color='neutral'
+              data-badge-id={badge?.id}
+            >
+              {planLabel}
+            </Badge>
+          ) : null}
           <Icon
             name='chevron-down'
             size='sm'
@@ -1070,6 +1102,35 @@ export function SwitcherTrigger({
         </>
       ) : null}
     </Popover.Trigger>
+  );
+}
+
+function TriggerAvatar({
+  lead,
+  variant,
+}: {
+  lead: LeadSelection;
+  variant: SwitcherTriggerVariant | 'avatarOnly';
+}): ReactElement {
+  const user = leadUser(lead);
+  if (variant === 'full' && user) {
+    return (
+      <BadgedAvatar
+        name={lead.name}
+        imageUrl={lead.imageUrl}
+        badge={user}
+        size='sm'
+      />
+    );
+  }
+  return (
+    <RowAvatar
+      name={lead.name}
+      imageUrl={lead.imageUrl}
+      shape={lead.shape}
+      size={variant === 'condensed' ? 'fit' : 'sm'}
+      xstyle={variant === 'condensed' ? styles.rowAvatar : undefined}
+    />
   );
 }
 
@@ -1095,18 +1156,25 @@ export function SwitcherPopup(): ReactElement {
   );
 }
 
-export type SwitcherViewProps = Omit<SwitcherRootProps, 'children'> & SwitcherTriggerProps;
+export type SwitcherViewProps = Omit<SwitcherRootProps, 'children'> &
+  SwitcherTriggerProps & { triggerVariant?: SwitcherTriggerVariant };
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
  * connected, Clerk-backed `Switcher` lives in `switcher.tsx` and wraps this view.
  */
-export function SwitcherView({ renderTriggerLabel, renderTriggerBadge, ...root }: SwitcherViewProps): ReactElement {
+export function SwitcherView({
+  renderTriggerLabel,
+  renderTriggerBadge,
+  triggerVariant,
+  ...root
+}: SwitcherViewProps): ReactElement {
   return (
     <SwitcherRoot {...root}>
       <SwitcherTrigger
         renderTriggerLabel={renderTriggerLabel}
         renderTriggerBadge={renderTriggerBadge}
+        triggerVariant={triggerVariant}
       />
       <SwitcherPopup />
     </SwitcherRoot>

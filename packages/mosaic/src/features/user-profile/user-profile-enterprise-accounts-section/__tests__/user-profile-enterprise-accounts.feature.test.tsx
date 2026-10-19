@@ -15,6 +15,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section';
 import { useUserProfileEnterpriseAccountsModel } from '../user-profile-enterprise-accounts-section.model';
 import { custom, enterpriseAccountSeed as signedIn, enterpriseMember, okta } from './enterprise-accounts.fixtures';
@@ -179,7 +180,11 @@ describe('enterprise accounts', () => {
 
   it('preserves modal return state in the redirect URL', async () => {
     serveFapi(signedIn());
-    await renderWithClerk(<UserProfileEnterpriseAccountsSection mode='modal' />);
+    await renderWithClerk(
+      <UserProfileProvider mode='modal'>
+        <UserProfileEnterpriseAccountsSection />
+      </UserProfileProvider>,
+    );
     const request = holdRequests('post', '/v1/me/external_accounts');
 
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));

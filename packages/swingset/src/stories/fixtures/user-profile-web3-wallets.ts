@@ -9,6 +9,8 @@ import { useRef, useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosText } from '@/lib/chaos';
 
+import { idleReverification } from './reverification';
+
 interface DemoWallet extends UserProfileWeb3Wallet {
   providerId?: string;
 }
@@ -46,13 +48,11 @@ export function useWeb3WalletsFixture({
   availableProviders = providers,
   primaryError = false,
   removalState,
-  fallbackFocus,
 }: {
   initialWallets?: DemoWallet[];
   availableProviders?: UserProfileWeb3Provider[];
   primaryError?: boolean;
   removalState?: 'pending' | 'error';
-  fallbackFocus?: () => HTMLElement | null;
 } = {}) {
   const seedWallets = useChaosFixture(initialWallets, items =>
     items.map(wallet => ({ ...wallet, provider: chaosText(wallet.provider) })),
@@ -67,10 +67,10 @@ export function useWeb3WalletsFixture({
 
   return useUserProfileWeb3WalletsController({
     wallets,
+    reverification: idleReverification,
     availableProviders: connectionProviders.filter(
       provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
     ),
-    fallbackFocus,
     // eslint-disable-next-line @typescript-eslint/require-await
     connect: async (id: Web3Strategy) => {
       const provider = connectionProviders.find(item => item.id === id);

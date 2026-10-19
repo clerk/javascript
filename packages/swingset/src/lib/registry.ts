@@ -226,6 +226,13 @@ import {
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
 import {
+  Default as RadioDefault,
+  Descriptions as RadioDescriptions,
+  meta as radioMeta,
+  Sizes as RadioSizes,
+  States as RadioStates,
+} from '../stories/radio.stories';
+import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
   BackupCodeError as ReverificationBackupCodeError,
@@ -287,6 +294,13 @@ import {
   Shapes as SkeletonShapes,
   TextContent as SkeletonTextContent,
 } from '../stories/skeleton.stories';
+import {
+  Default as SwitchDefault,
+  meta as switchMeta,
+  Sizes as SwitchSizes,
+  States as SwitchStates,
+  WithField as SwitchWithField,
+} from '../stories/switch.stories';
 import {
   Default as TableDefault,
   Empty as TableEmpty,
@@ -620,6 +634,13 @@ const profileComponentModule: StoryModule = {
   Customized: ProfileCustomized,
   Transitions: ProfileTransitions,
 };
+const radioModule: StoryModule = {
+  meta: radioMeta,
+  Default: RadioDefault,
+  Descriptions: RadioDescriptions,
+  States: RadioStates,
+  Sizes: RadioSizes,
+};
 
 const dataListModule: StoryModule = {
   meta: dataListMeta,
@@ -794,6 +815,14 @@ const segmentedControlModule: StoryModule = {
   meta: segmentedControlMeta,
   Default: SegmentedControlDefault,
   Disabled: SegmentedControlDisabled,
+};
+
+const switchModule: StoryModule = {
+  meta: switchMeta,
+  Default: SwitchDefault,
+  States: SwitchStates,
+  Sizes: SwitchSizes,
+  WithField: SwitchWithField,
 };
 
 const tabsComponentModule: StoryModule = {
@@ -1056,9 +1085,11 @@ export const registry: StoryModule[] = [
   panelModule,
   popoverComponentModule,
   profileComponentModule,
+  radioModule,
   sectionModule,
   segmentedControlModule,
   selectComponentModule,
+  switchModule,
   tableModule,
   tabsComponentModule,
   tagInputComponentModule,

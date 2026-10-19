@@ -2,7 +2,7 @@ import { requireOptionalNativeModule } from 'expo';
 
 import type { NativeAuthFlowModule, NativeClientSyncModule } from './NativeClerkModule.types';
 
-interface Spec extends NativeAuthFlowModule, NativeClientSyncModule {
+interface Spec extends NativeAuthFlowModule, Partial<NativeClientSyncModule> {
   // Exposed by Expo Modules EventEmitter for the internal `clerkNativeClientInvalidated` event.
   // This is not part of the public @clerk/expo API.
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };

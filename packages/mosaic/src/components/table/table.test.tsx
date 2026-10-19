@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { EmptyState } from '../empty-state';
 import { Table } from './table';
-import { styles } from './table.styles';
+import { stickySides, styles } from './table.styles';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -91,6 +91,40 @@ describe('Mosaic Table', () => {
     expect(date).toHaveClass(stylex.props(styles.noWrap).className ?? '');
     expect(description).not.toHaveAttribute('data-no-wrap');
     expect(description).not.toHaveClass(stylex.props(styles.noWrap).className ?? '');
+  });
+
+  it.each(['start', 'end'] as const)('pins header and body cells to the %s edge', side => {
+    render(
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell sticky={side}>Actions</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>Alpha</Table.Cell>
+            <Table.Cell sticky={side}>Edit</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table.Root>,
+    );
+    const stickyClass = stylex.props(styles.sticky, stickySides[side]).className ?? '';
+    for (const cell of [
+      screen.getByRole('columnheader', { name: 'Actions' }),
+      screen.getByRole('cell', { name: 'Edit' }),
+    ]) {
+      expect(cell).toHaveAttribute('data-sticky', side);
+      expect(cell).toHaveClass(...stickyClass.split(' '));
+    }
+    for (const cell of [
+      screen.getByRole('columnheader', { name: 'Name' }),
+      screen.getByRole('cell', { name: 'Alpha' }),
+    ]) {
+      expect(cell).not.toHaveAttribute('data-sticky');
+      expect(cell).not.toHaveClass(stylex.props(styles.sticky).className ?? '');
+    }
   });
 
   it('lets the keyboard reach the scrolling viewport', () => {

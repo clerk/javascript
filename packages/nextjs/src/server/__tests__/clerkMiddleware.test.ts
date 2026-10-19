@@ -6,7 +6,7 @@ import { MalformedURLError } from '@clerk/shared/pathMatcher';
 import assert from 'assert';
 import type { NextFetchEvent } from 'next/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, type Mock, vi } from 'vitest';
 
 import { clerkClient } from '../clerkClient';
 import type { ClerkMiddlewareAuth } from '../clerkMiddleware';
@@ -115,6 +115,51 @@ describe('ClerkMiddleware type tests', () => {
     clerkMiddlewareMock(async auth => {
       const { getToken } = await auth({ acceptsToken: TokenType.ApiKey });
       await getToken();
+    });
+  });
+
+  it('infers the protect return type from the token option', () => {
+    clerkMiddlewareMock(auth => {
+      const predicate = () => true;
+      type SessionToken = typeof TokenType.SessionToken;
+      type ApiKey = typeof TokenType.ApiKey;
+      type M2MToken = typeof TokenType.M2MToken;
+
+      expectTypeOf(auth.protect()).resolves.toHaveProperty('tokenType').toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect({ permission: 'org:admin:example1' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect({ unauthorizedUrl: '/denied' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect({ token: TokenType.SessionToken }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect({ token: TokenType.ApiKey }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<ApiKey>();
+      expectTypeOf(auth.protect({ token: [TokenType.SessionToken, TokenType.M2MToken] }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken | M2MToken>();
+      expectTypeOf(auth.protect({ token: 'any' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<TokenType>();
+      expectTypeOf(auth.protect(predicate)).resolves.toHaveProperty('tokenType').toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect(predicate, { unauthorizedUrl: '/denied' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect(predicate, { token: TokenType.SessionToken }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken>();
+      expectTypeOf(auth.protect(predicate, { token: TokenType.ApiKey }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<ApiKey>();
+      expectTypeOf(auth.protect(predicate, { token: [TokenType.SessionToken, TokenType.M2MToken] }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<SessionToken | M2MToken>();
+      expectTypeOf(auth.protect(predicate, { token: 'any' }))
+        .resolves.toHaveProperty('tokenType')
+        .toEqualTypeOf<TokenType>();
     });
   });
 

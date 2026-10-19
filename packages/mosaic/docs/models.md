@@ -57,13 +57,13 @@ drops the fallback instead of holding the space open. Keep the two apart.
   from inside the callback that made it. Deciding _when_ is model logic:
 
   ```tsx
-  onAcceptInvitation: async invitationId => {
+  onAcceptSuggestion: async suggestionId => {
     try {
-      await invitationData.find(i => i.id === invitationId)?.accept();
+      await suggestionData.find(s => s.id === suggestionId)?.accept();
     } finally {
       // Always revalidate — a failed accept might be stale state. allSettled never throws,
       // so a failed revalidate doesn't look like a failed accept.
-      await Promise.allSettled([userInvitations.revalidate?.(), userMemberships.revalidate?.()]);
+      await Promise.allSettled([userSuggestions.revalidate?.()]);
     }
   },
   ```
@@ -106,14 +106,24 @@ drops the fallback instead of holding the space open. Keep the two apart.
   from `utils/errors.ts`. It rethrows a Clerk error as a `SaveError` routed to
   the form fields it names, which the form renders
   (`user-profile-profile-section.model.ts`).
+- An action Clerk may interrupt for step-up verification wraps its Clerk call in
+  `useReverificationFlow` (`features/reverification/`) before any error mapping,
+  because the flow has to see the raw Clerk error. The hook is called at the top
+  of the model hook, above its early returns; the fetcher is the raw Clerk call
+  and takes the resource it acts on as an argument; the exposed callback runs the
+  wrapped action inside `save`; and the model returns the `reverification`
+  controller beside its callbacks (`user-profile-email-section.model.ts`). A
+  cancelled challenge rejects the callback with a `reverification_cancelled`
+  error, which `save` lets through for the controller to recognise.
 - No local UI state. What is open and what is in flight belong to the controller.
-- No React state machinery beyond the Clerk hooks themselves; the model is a
-  derivation of what Clerk currently says. The exception is what to fetch: a
-  search query, page, or sort the Clerk hook takes as input lives in the model
-  beside the page the hook already holds, and the model exposes a callback to
-  change it (`search(query)` sets the query and returns to page 1). The
-  controller keeps the interaction around it, such as the input's value and
-  the debounce, and calls that callback.
+- No React state machinery beyond the Clerk hooks themselves. Certain Mosaic hooks
+  can also count when they deal with "outside" state, like `useReverificationFlow`
+  described above; the model is a derivation of what Clerk currently says.
+  The other exception is what to fetch: a search query, page, or sort the
+  Clerk hook takes as input lives in the model beside the page the hook already
+  holds, and the model exposes a callback to change it (`search(query)` sets the
+  query and returns to page 1). The controller keeps the interaction around it,
+  such as the input's value and the debounce, and calls that callback.
 
 ## Time-dependent display data
 

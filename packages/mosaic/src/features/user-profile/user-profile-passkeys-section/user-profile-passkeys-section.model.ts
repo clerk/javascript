@@ -7,6 +7,8 @@ import { getMosaicEnvironment, useMosaicEnvironment } from '../../../hooks/use-m
 import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
 import { save, SaveError } from '../../../utils/errors';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
 import type {
   UserProfilePasskey,
   UserProfilePasskeyNameValidator,
@@ -62,6 +64,7 @@ export type UserProfilePasskeysModel =
       onRename: (id: string, name: string) => Promise<void>;
       validateName: UserProfilePasskeyNameValidator;
       onRemove: (id: string) => Promise<void>;
+      reverification: ReverificationController;
     };
 
 function getPasskeysProjection(
@@ -89,6 +92,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
   const messages = useMessages('userProfilePasskeys');
+  const [deletePasskey, reverification] = useReverificationFlow((passkey: PasskeyResource) => passkey.delete());
   const validateName: UserProfilePasskeyNameValidator = name =>
     new TextEncoder().encode(name).length > 256 ? { type: 'error', message: messages.nameTooLongError } : undefined;
 
@@ -177,7 +181,8 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       if (!passkey) {
         throw new SaveError({ global: { code: 'passkey_unavailable', message: messages.unavailableError } });
       }
-      await save(() => passkey.delete());
+      await save(() => deletePasskey(passkey));
     },
+    reverification,
   };
 }

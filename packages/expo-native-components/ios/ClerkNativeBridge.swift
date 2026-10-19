@@ -1166,6 +1166,8 @@ private struct ClerkReactEmbeddedUserProfileCustomPage: View {
 }
 
 private struct ClerkReactUserProfileCustomPageContent: View {
+  @Environment(\.clerkTheme) private var theme
+
   let path: String
   let rows: [ClerkUserProfileCustomRowConfig]
   let state: ClerkUserProfileCustomPageState
@@ -1179,8 +1181,11 @@ private struct ClerkReactUserProfileCustomPageContent: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(theme.colors.muted)
     .navigationTitle(userProfileCustomPageLabel(for: path, rows: rows))
     .navigationBarTitleDisplayMode(.inline)
+    .preGlassSolidNavBar()
+    .background(theme.colors.background)
   }
 }
 

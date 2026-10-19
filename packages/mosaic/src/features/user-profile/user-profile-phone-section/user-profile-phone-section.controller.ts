@@ -4,7 +4,6 @@ import { useRef } from 'react';
 import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
-import type { ReverificationController } from '../../reverification';
 import type { UserProfilePhone } from '../user-profile-contact.types';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
 import type { ReadyPhoneSectionModel, UserProfilePhoneSectionViewProps } from './user-profile-phone-section.types';
@@ -17,9 +16,7 @@ export function useUserProfilePhoneSectionController({
   onSetPrimaryPhone,
   onRemovePhone,
   reverification,
-}: Omit<ReadyPhoneSectionModel, 'status' | 'userId'> & {
-  reverification?: ReverificationController;
-}): UserProfilePhoneSectionViewProps {
+}: Omit<ReadyPhoneSectionModel, 'status' | 'userId'>): UserProfilePhoneSectionViewProps {
   const verification = useUserProfileAddPhoneController({ onCreate: onCreatePhone });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);

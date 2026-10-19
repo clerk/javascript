@@ -1,5 +1,17 @@
 # Change Log
 
+## 3.25.0
+
+### Minor Changes
+
+- Added an optional `issuer` option to `verifyJwt()`, `verifyToken()`, and `authenticateRequest()` to validate the JWT `iss` claim against a string or list of allowed strings. For `verifyToken()` and `authenticateRequest()`, this applies only to session tokens. Omitting `issuer` preserves existing behavior. ([#8772](https://github.com/clerk/javascript/pull/8772)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.24.0
+
+### Minor Changes
+
+- Add `deprovisioned` to the Backend `User` object and `UserJSON`, so you can tell when Directory Sync has deactivated a user, including in `user.updated` webhook payloads, without casting. It's separate from `banned`: Directory Sync sets and clears `deprovisioned`, while you set `banned` through the Dashboard or Backend API. ([#10245](https://github.com/clerk/javascript/pull/10245)) by [@manovotny](https://github.com/manovotny)
+
 ## 3.23.2
 
 ### Patch Changes
