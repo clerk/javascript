@@ -590,6 +590,11 @@ describe('session agent', () => {
     assert.deepEqual([recorder.stdout?.listenerCount('data'), recorder.stderr?.listenerCount('data')], [0, 0]);
   });
 
+  it('matches what the recorder prints whatever the case of the words a device module waits for', async () => {
+    const recorder = spawn(process.execPath, ['-e', "console.log('Recording started')"], { stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal((await printed(recorder, 'Recording Started', 5_000)).outcome, 'printed');
+  });
+
   it('records, serves the file, and reads device logs', async () => {
     const agent = await startAgent(base);
     assert.equal((await agent.call('/__sim/record/start', { method: 'POST' })).status, 200);

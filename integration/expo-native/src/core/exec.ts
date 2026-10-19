@@ -20,6 +20,8 @@ export interface CommandLine {
   readonly cwd?: string;
 }
 
+const KILL_GRACE_MS = 2_000;
+
 export type Runner = (command: string, args: readonly string[], options?: ExecOptions) => Promise<ExecResult>;
 
 export const run: Runner = (command, args, options = {}) =>
@@ -34,16 +36,20 @@ export const run: Runner = (command, args, options = {}) =>
     child.stdout?.on('data', (chunk: Buffer) => (stdout += chunk.toString()));
     child.stderr?.on('data', (chunk: Buffer) => (stderr += chunk.toString()));
     let timedOut = false;
+    let killTimer: NodeJS.Timeout | undefined;
     const timer = options.timeoutMs === undefined ? undefined : setTimeout(() => {
       timedOut = true;
       child.kill('SIGTERM');
+      killTimer = setTimeout(() => child.kill('SIGKILL'), KILL_GRACE_MS);
     }, options.timeoutMs);
     child.on('error', (error) => {
       clearTimeout(timer);
+      clearTimeout(killTimer);
       resolve({ code: 127, stdout, stderr: stderr + error.message });
     });
     child.on('close', (code) => {
       clearTimeout(timer);
+      clearTimeout(killTimer);
       resolve({ code: timedOut ? 124 : (code ?? 1), stdout, stderr });
     });
     if (options.input !== undefined) child.stdin?.end(options.input);
@@ -73,7 +79,7 @@ export function isRunning(ref: ProcessRef): boolean {
   try {
     const started = Date.parse(execFileSync('ps', ['-o', 'lstart=', '-p', String(ref.pid)], { encoding: 'utf8' }).trim());
     return Number.isNaN(started) || Math.abs(started - ref.startedAt) < PS_WHOLE_SECONDS_SLACK_MS;
-  } catch {
-    return false;
+  } catch (error) {
+    return (error as { readonly status?: number | null }).status !== 1;
   }
 }

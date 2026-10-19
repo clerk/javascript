@@ -267,6 +267,16 @@ describe('android lane ownership', () => {
     assert.match(calls(), /-s emulator-5560 emu kill/);
   });
 
+  it('frees the claim when the process group of the emulator it booted is gone by the time it stops it', async () => {
+    const { backend, lease, dir } = setup('Clerk_Verify_Pixel', (own) => own);
+    writeFileSync(join(dir, 'killed'), '');
+    const emulator = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 1500)', '--', '-avd', 'Clerk_Verify_Pixel', '-port', '5560'], { stdio: 'ignore' });
+    mkdirSync(join(dir, '.verify', 'emulators'), { recursive: true });
+    writeFileSync(join(dir, '.verify', 'emulators', 'android-1.pid'), JSON.stringify({ pid: emulator.pid, startedAt: Date.now(), nonce: lease.claimNonce }));
+    await backend.release(lease);
+    assert.equal(readClaim(join(dir, 'claims'), 'android', 1).claim, null);
+  });
+
   it('doctor flags a foreign emulator on a lane port with a kill command for its owner', async () => {
     const { backend } = setup('Pixel_9_Pro', () => '');
     const lanePorts = (await backend.doctorChecks(doctorOptions)).device.find((c) => c.id === 'lane-ports');

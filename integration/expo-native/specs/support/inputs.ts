@@ -97,11 +97,16 @@ function readDevice(platform: Platform, env: Env): Device {
 
 export function readTarget(app: TestApp, env: Env): Target {
   const platform = readPlatform(app, env);
+  const device = readDevice(platform, env);
+  const devServer = given(env, NAMES.devServer);
+  if (platform === 'android' && device.kind === 'borrowed' && devServer !== null) {
+    throw new Error(`${NAMES.devServer} and ${NAMES.daemonUrl} are both set; a dev-client app on Android starts through adb on this machine, and a borrowed emulator is on the session runner, so unset ${NAMES.devServer} and install a standalone build`);
+  }
   return {
     platform,
-    device: readDevice(platform, env),
+    device,
     session: given(env, NAMES.session) ?? `clerk-e2e-${platform}`,
-    build: { path: given(env, NAMES.appPath), devServer: given(env, NAMES.devServer) },
+    build: { path: given(env, NAMES.appPath), devServer },
   };
 }
 

@@ -1,11 +1,15 @@
 import '../testing/git-env.ts';
 import assert from 'node:assert/strict';
+import { mkdtempSync, readdirSync } from 'node:fs';
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { selectBackend } from '../src/core/devices.ts';
 import type { ExecResult } from '../src/core/exec.ts';
 import { openGitHub, publishedStep, startRun, waitReporter, type GitHub, type JobView } from '../src/core/remote/github.ts';
+import { remoteDoctorChecks } from '../src/core/remote/preflight.ts';
 import { RUN_TITLE, RequestError, STEP, matchesToken, parseRequest, sha256Hex, type SessionRequest } from '../src/core/remote/protocol.ts';
 import { tunnelUrl } from '../src/core/remote/session.ts';
 import { TUNNEL } from '../src/core/remote/tunnel.ts';
@@ -241,5 +245,39 @@ describe('backend selection', () => {
     const linux = host([backend('local', false, 'the iOS simulator needs macOS and this machine runs linux'), backend('remote', true, 'y')]);
     assert.throws(() => selectBackend(linux, 'ios', 'local', null), (error: VerifyFailure) => error.code === 'UNSUPPORTED' && error.message.includes('needs macOS'));
     assert.match(selectBackend(both, 'ios', undefined, { backend: 'remote' } as never).why, /already holds a remote lease/);
+  });
+});
+
+describe('doctor --live', () => {
+  it('keeps its checks and forgets the session when GitHub fails the read that ends the run', async () => {
+    const sha = 'e'.repeat(40);
+    const sessionsDir = mkdtempSync(join(tmpdir(), 'verify-doctor-live-'));
+    const settings = { platform: 'ios', repo: 'clerk/clerk-ios', workflow: 'verify-remote.yml', sessionsDir, runner: 'macos-26', plumbingRunner: 'ubuntu-latest', device: 'iPhone 17 Pro', idleMinutes: 15, capMinutes: 60, requirement: 'GitHub Actions' } as const;
+    const answers: Readonly<Record<string, string>> = { 'rev-parse --abbrev-ref HEAD': 'feature', 'rev-parse HEAD': sha, 'remote get-url origin': 'git@github.com:clerk/clerk-ios.git' };
+    const runner = async (command: string, args: readonly string[]): Promise<ExecResult> => ({ code: 0, stdout: command === 'git' ? (answers[args.join(' ')] ?? '') : '1.0.0', stderr: '' });
+    let runReads = 0;
+    const github: GitHub = {
+      repo: settings.repo,
+      workflow: settings.workflow,
+      tokenSource: 'GH_TOKEN',
+      api: async (method, path) => {
+        const answer = (status: number, json: unknown) => ({ status, json, headers: new Headers() });
+        if (method === 'POST') return answer(200, { workflow_run_id: 41 });
+        if (path === '/actions/runs/41') return (runReads += 1) <= 2 ? answer(200, { status: 'completed', conclusion: 'failure', html_url: 'https://github.com/clerk/clerk-ios/actions/runs/41' }) : answer(502, { message: 'Bad Gateway' });
+        if (path.startsWith('/actions/runs/41/jobs')) return answer(200, { jobs: [] });
+        if (path.includes('/runs?')) return answer(200, { workflow_runs: [] });
+        return answer(200, {});
+      },
+    };
+    const env = { HTTPS_PROXY: 'http://127.0.0.1:9', NODE_USE_ENV_PROXY: '1' };
+    const { device } = await remoteDoctorChecks(settings, { env, runner }, async () => github, { live: true, worktree: '/nowhere', progress: () => undefined });
+    assert.deepEqual(
+      device.filter((check) => check.id === 'live-session' || check.id === 'live-stop').map(({ id, ok, detail }) => ({ id, ok, detail })),
+      [
+        { id: 'live-session', ok: false, detail: 'run 41 ended (failure) before it published' },
+        { id: 'live-stop', ok: false, detail: 'could not read run 41: 502 Bad Gateway' },
+      ],
+    );
+    assert.deepEqual(readdirSync(sessionsDir).filter((name) => name !== 'owner'), [], 'the session token directory is removed');
   });
 });
