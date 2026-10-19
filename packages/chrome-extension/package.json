@@ -71,6 +71,7 @@
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "files": [
+    "AGENTS.md",
     "background",
     "client",
     "dist",
