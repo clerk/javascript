@@ -326,9 +326,9 @@ describe('email reverification', () => {
     );
   });
 
-  it('opens a cancellable loading dialog while the verification start request is pending', async () => {
+  it('waits for a verification factor before opening the dialog', async () => {
     const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
-    const { actor, fapi } = await renderSection({
+    const { actor } = await renderSection({
       ...signedInWithEmails([PRIMARY, second]),
       verification: { secrets: { password: 'hunter2' } },
     });
@@ -337,14 +337,10 @@ describe('email reverification', () => {
 
     await manageEmail(actor, 'bob@example.com', 'Set as primary');
     await waitFor(() => expect(start.requests).toHaveLength(1));
-    const dialog = screen.getByRole('dialog');
-    expect(dialog).toHaveTextContent('Verification required');
-    await actor.click(within(dialog).getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     start.release();
-    expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_primary');
-    expect(within(emailRow()).queryByRole('alert')).toBeNull();
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
   });
 });
 
