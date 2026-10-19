@@ -34,6 +34,7 @@ import type {
   SwitcherMenuProps,
   SwitcherMode,
   SwitcherSession,
+  SwitcherTriggerBadge,
 } from './switcher.types';
 import { BadgedAvatar, RowAvatar } from './switcher-avatar.view';
 import { SwitcherHeader } from './switcher-header.view';
@@ -49,6 +50,7 @@ import {
 } from './switcher-item.view';
 import type { SwitcherMessages } from './switcher-surface';
 import { surfaceForMode, SwitcherSurfaceProvider, useSlot, useSwitcherMessages } from './switcher-surface';
+import { useSwitcherTriggerController } from './switcher-trigger.controller';
 
 // The data contract, the mode flags, and the menu item shapes live in `switcher.types`; they are
 // what the model and the view agree on, so neither file owns them.
@@ -1022,10 +1024,13 @@ export interface SwitcherTriggerProps {
   /**
    * Carries the active organization's plan beside the label. Part of the label, so it needs
    * `renderTriggerLabel`: a plan badge with nothing to qualify says nothing.
+   * A function receives the displayed user or organization ID and returns a badge with string `id` and `label` properties.
+   * The badge uses `id` for `data-badge-id` and `label` for its text.
+   * The badge is hidden for a null result, while pending, or if the function fails.
    *
    * @default true
    */
-  renderTriggerBadge?: boolean;
+  renderTriggerBadge?: SwitcherTriggerBadge;
 }
 
 export type SwitcherTriggerVariant = 'full' | 'condensed';
@@ -1041,7 +1046,19 @@ export function SwitcherTrigger({
   const data = useSwitcherContext();
   const lead = leadSelection(data, m);
   const { name, shape } = lead;
-  const planLabel = renderTriggerBadge ? leadOrganization(lead)?.planLabel : undefined;
+  const { badge } = useSwitcherTriggerController({
+    kind: lead.kind,
+    id: lead.kind === 'organization' ? lead.organization.organizationId : data.activeSession.userId,
+    sessionId: data.activeSession.sessionId,
+    renderTriggerBadge,
+    renderTriggerLabel,
+  });
+  const planLabel =
+    typeof renderTriggerBadge === 'function'
+      ? badge?.label
+      : renderTriggerBadge
+        ? leadOrganization(lead)?.planLabel
+        : undefined;
   const user = leadUser(lead);
 
   return (
@@ -1069,7 +1086,14 @@ export function SwitcherTrigger({
           >
             {name}
           </span>
-          {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
+          {typeof planLabel === 'string' ? (
+            <Badge
+              color='neutral'
+              data-badge-id={badge?.id}
+            >
+              {planLabel}
+            </Badge>
+          ) : null}
           <Icon
             name='chevron-down'
             size='sm'

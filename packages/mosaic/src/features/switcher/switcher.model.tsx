@@ -164,6 +164,7 @@ function toMembership(organization: OrganizationResource): SwitcherMembership {
 function toSession(sessionId: string, user: UserResource): SwitcherSession {
   return {
     sessionId,
+    userId: user.id,
     name: displayName(user),
     identifier: getIdentifier(user),
     imageUrl: user.imageUrl,

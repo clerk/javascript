@@ -118,6 +118,19 @@ export function WithoutTriggerBadge(_args: Record<string, unknown>) {
   );
 }
 
+export function CustomTriggerBadge(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true });
+
+  return (
+    <SwitcherView
+      {...prototype}
+      mode='combined'
+      triggerVariant='full'
+      renderTriggerBadge={() => Promise.resolve({ id: 'enterprise', label: 'Enterprise plan' })}
+    />
+  );
+}
+
 export function SingleSession(_args: Record<string, unknown>) {
   const prototype = usePrototype({ singleSession: true, hidePersonal: true });
 
