@@ -1,13 +1,7 @@
 import { createModalHook } from '../../modals/create-modal-hook';
-import type {
-  OrganizationProfileModalConfig,
-  OrganizationProfileModalPayload,
-} from './organization-profile.modal.types';
+import type { OrganizationProfileModalOptions } from './organization-profile.modal.types';
 
-export const useOrganizationProfileModal = createModalHook<
-  OrganizationProfileModalConfig,
-  OrganizationProfileModalPayload
->(
+export const useOrganizationProfileModal = createModalHook<OrganizationProfileModalOptions>(
   { id: 'organizationProfile', variant: 'profile', load: () => import('./organization-profile.modal-content') },
   defaults => defaults.organizationProfile ?? {},
 );

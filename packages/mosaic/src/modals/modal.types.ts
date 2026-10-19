@@ -2,20 +2,19 @@ import type { ComponentType } from 'react';
 
 import type { DialogVariant } from '../components/dialog/dialog';
 
-export interface ModalContentProps<Config, Payload> {
-  config: Config;
-  payload: Payload | undefined;
+export interface ModalContentProps<Options> {
+  options: Options;
   close: () => void;
 }
 
-export interface ModalSurface<Config, Payload> {
+export interface ModalSurface<Options> {
   id: string;
   variant: DialogVariant;
-  load: () => Promise<{ default: ComponentType<ModalContentProps<Config, Payload>> }>;
+  load: () => Promise<{ default: ComponentType<ModalContentProps<Options>> }>;
 }
 
-export interface ModalHandle<Payload> {
-  open: (payload?: Payload) => void;
+export interface ModalHandle<Options> {
+  open: (options?: Options) => void;
   close: () => void;
   preload: () => void;
   isOpen: boolean;

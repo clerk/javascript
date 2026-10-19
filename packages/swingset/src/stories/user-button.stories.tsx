@@ -3,9 +3,8 @@ import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
 import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
 import type {
-  UserProfileModalConfig,
   UserProfileModalContentProps,
-  UserProfileModalPayload,
+  UserProfileModalOptions,
 } from '@clerk/mosaic/features/user-profile/user-profile.modal.types';
 import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { createModalHook } from '@clerk/mosaic/modals/create-modal-hook';
@@ -210,29 +209,29 @@ const integrationsPage = {
   content: <p>An app-provided page, passed to the profile modal as a custom page.</p>,
 };
 
-function FixtureUserProfile({ config, payload }: UserProfileModalContentProps) {
+function FixtureUserProfile({ options }: UserProfileModalContentProps) {
   const { pages } = useUserProfileFixture();
-  const [activePage, setActivePage] = useState(payload?.page ?? 'account');
+  const [activePage, setActivePage] = useState(options.page ?? 'account');
 
   return (
     <UserProfileView
       activePage={activePage}
       pages={pages}
-      customPages={config.customPages}
-      pageOrder={config.pageOrder}
+      customPages={options.customPages}
+      pageOrder={options.pageOrder}
       onPageChange={setActivePage}
     />
   );
 }
 
-const useFixtureUserProfileModal = createModalHook<UserProfileModalConfig, UserProfileModalPayload>(
+const useFixtureUserProfileModal = createModalHook<UserProfileModalOptions>(
   { id: 'fixtureUserProfile', variant: 'profile', load: () => Promise.resolve({ default: FixtureUserProfile }) },
   defaults => defaults.userProfile ?? {},
 );
 
 export function ProfileModal(_args: Record<string, unknown>) {
   const prototype = usePrototype({ singleSession: true });
-  const userProfile = useFixtureUserProfileModal({ customPages: [integrationsPage] });
+  const userProfile = useFixtureUserProfileModal();
 
   return (
     <div className='flex flex-wrap items-center gap-2'>
@@ -241,19 +240,19 @@ export function ProfileModal(_args: Record<string, unknown>) {
         mode='user'
         onManageAccount={() => {
           prototype.onManageAccount?.();
-          userProfile.open();
+          userProfile.open({ customPages: [integrationsPage] });
         }}
       />
       <Button
         variant='outline'
-        onClick={() => userProfile.open({ page: 'security' })}
+        onClick={() => userProfile.open({ page: 'security', customPages: [integrationsPage] })}
         onPointerEnter={userProfile.preload}
       >
         Open security
       </Button>
       <Button
         variant='outline'
-        onClick={() => userProfile.open({ page: 'integrations' })}
+        onClick={() => userProfile.open({ page: 'integrations', customPages: [integrationsPage] })}
         onPointerEnter={userProfile.preload}
       >
         Open integrations

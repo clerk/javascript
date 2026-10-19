@@ -421,6 +421,31 @@ describe('UserButton', () => {
           .map(tab => tab.textContent),
       ).toEqual(['Account', 'Terms', 'Security']);
     });
+
+    it('opens the pages of whichever button opened it', async () => {
+      serveFapi(signedIn());
+      await renderWithClerk(
+        <>
+          <UserButton userProfileProps={{ customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms</p> }] }} />
+          <UserButton userProfileProps={{ customPages: [{ label: 'Usage', path: 'usage', content: <p>Usage</p> }] }} />
+        </>,
+      );
+      const user = userEvent.setup();
+      const [first, second] = screen.getAllByRole('button', { name: /Open account menu/ });
+
+      await user.click(first);
+      await openSettings(user, 'Manage profile');
+      await within(await userProfile()).findByRole('tab', { name: 'Terms' });
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog', { name: 'User profile' })).toBeNull());
+
+      await user.click(second);
+      await openSettings(user, 'Manage profile');
+
+      const dialog = await userProfile();
+      await within(dialog).findByRole('tab', { name: 'Usage' });
+      expect(within(dialog).queryByRole('tab', { name: 'Terms' })).toBeNull();
+    });
   });
 
   describe('handing off', () => {

@@ -1,11 +1,11 @@
 import React from 'react';
 
-import type { OrganizationProfileModalConfig } from '../features/organization-profile/organization-profile.modal.types';
-import type { UserProfileModalConfig } from '../features/user-profile/user-profile.modal.types';
+import type { OrganizationProfileModalOptions } from '../features/organization-profile/organization-profile.modal.types';
+import type { UserProfileModalOptions } from '../features/user-profile/user-profile.modal.types';
 
 export interface MosaicModalDefaults {
-  userProfile?: UserProfileModalConfig;
-  organizationProfile?: OrganizationProfileModalConfig;
+  userProfile?: UserProfileModalOptions;
+  organizationProfile?: OrganizationProfileModalOptions;
 }
 
 export interface ModalRegistry {

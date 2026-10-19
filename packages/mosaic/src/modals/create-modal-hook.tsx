@@ -29,11 +29,11 @@ class LoadBoundary extends React.Component<{ onRetry: () => void; children: Reac
   }
 }
 
-export function createModalHook<Config extends object, Payload>(
-  surface: ModalSurface<Config, Payload>,
-  selectDefaults: (defaults: MosaicModalDefaults) => Config,
-): (config?: Config) => ModalHandle<Payload> {
-  type Content = React.ComponentType<ModalContentProps<Config, Payload>>;
+export function createModalHook<Options extends object>(
+  surface: ModalSurface<Options>,
+  selectDefaults: (defaults: MosaicModalDefaults) => Options,
+): () => ModalHandle<Options> {
+  type Content = React.ComponentType<ModalContentProps<Options>>;
 
   let loaded: Content | undefined;
   let loading: Promise<{ default: Content }> | undefined;
@@ -54,7 +54,7 @@ export function createModalHook<Config extends object, Payload>(
     void load().catch(() => undefined);
   };
 
-  function Attempt(props: ModalContentProps<Config, Payload>) {
+  function Attempt(props: ModalContentProps<Options>) {
     const [Content] = React.useState<Content>(() => loaded ?? React.lazy(load));
     return (
       <React.Suspense fallback='Loading…'>
@@ -63,10 +63,10 @@ export function createModalHook<Config extends object, Payload>(
     );
   }
 
-  function Slot({ controller }: { controller: ModalController<Config, Payload> }) {
+  function Slot({ controller }: { controller: ModalController<Options> }) {
     const state = React.useSyncExternalStore(controller.subscribe, controller.getState, controller.getState);
-    const base = selectDefaults(React.useContext(ModalDefaultsContext));
-    const config = state.config ? { ...base, ...withoutUndefined(state.config) } : base;
+    const defaults = selectDefaults(React.useContext(ModalDefaultsContext));
+    const options = state.options ? { ...defaults, ...withoutUndefined(state.options) } : defaults;
     const [attempt, setAttempt] = React.useState(0);
 
     return (
@@ -84,8 +84,7 @@ export function createModalHook<Config extends object, Payload>(
             onRetry={() => setAttempt(attempt + 1)}
           >
             <Attempt
-              config={config}
-              payload={state.payload}
+              options={options}
               close={controller.close}
             />
           </LoadBoundary>
@@ -94,11 +93,11 @@ export function createModalHook<Config extends object, Payload>(
     );
   }
 
-  const controllers = new WeakMap<ModalRegistry, ModalController<Config, Payload>>();
+  const controllers = new WeakMap<ModalRegistry, ModalController<Options>>();
   const controllerFor = (registry: ModalRegistry) => {
     let controller = controllers.get(registry);
     if (!controller) {
-      controller = createModalController<Config, Payload>();
+      controller = createModalController<Options>();
       controllers.set(registry, controller);
     }
     return controller;
@@ -106,34 +105,27 @@ export function createModalHook<Config extends object, Payload>(
 
   const closedSnapshot = () => false;
 
-  return function useModal(config) {
+  return function useModal() {
     const registry = React.useContext(ModalRegistryContext);
     if (!registry) {
       throw new Error(`[clerk] The "${surface.id}" modal hook must be used within <MosaicProvider>.`);
     }
     const controller = controllerFor(registry);
-    const ownerId = React.useId();
-    const configRef = React.useRef(config);
 
     React.useEffect(() => {
       registry.add(surface.id, <Slot controller={controller} />);
     }, [registry, controller]);
 
-    React.useEffect(() => {
-      configRef.current = config;
-      controller.updateConfig(ownerId, config);
-    });
-
     const isOpen = React.useSyncExternalStore(controller.subscribe, () => controller.getState().open, closedSnapshot);
 
     return React.useMemo(
       () => ({
-        open: (payload?: Payload) => controller.open(ownerId, configRef.current, payload),
+        open: (options?: Options) => controller.open(options),
         close: controller.close,
         preload,
         isOpen,
       }),
-      [controller, ownerId, isOpen],
+      [controller, isOpen],
     );
   };
 }

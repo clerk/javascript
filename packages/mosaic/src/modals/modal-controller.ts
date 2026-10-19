@@ -1,43 +1,28 @@
-export interface ModalState<Config, Payload> {
+export interface ModalState<Options> {
   open: boolean;
-  ownerId: string | null;
-  config: Config | undefined;
-  payload: Payload | undefined;
+  options: Options | undefined;
   openCount: number;
 }
 
-export interface ModalController<Config, Payload> {
-  open: (ownerId: string, config: Config | undefined, payload: Payload | undefined) => void;
-  updateConfig: (ownerId: string, config: Config | undefined) => void;
+export interface ModalController<Options> {
+  open: (options: Options | undefined) => void;
   close: () => void;
   subscribe: (listener: () => void) => () => void;
-  getState: () => ModalState<Config, Payload>;
+  getState: () => ModalState<Options>;
 }
 
-export function createModalController<Config, Payload>(): ModalController<Config, Payload> {
-  let state: ModalState<Config, Payload> = {
-    open: false,
-    ownerId: null,
-    config: undefined,
-    payload: undefined,
-    openCount: 0,
-  };
+export function createModalController<Options>(): ModalController<Options> {
+  let state: ModalState<Options> = { open: false, options: undefined, openCount: 0 };
   const listeners = new Set<() => void>();
 
-  const setState = (next: ModalState<Config, Payload>) => {
+  const setState = (next: ModalState<Options>) => {
     state = next;
     listeners.forEach(listener => listener());
   };
 
   return {
-    open(ownerId, config, payload) {
-      setState({ open: true, ownerId, config, payload, openCount: state.openCount + 1 });
-    },
-    updateConfig(ownerId, config) {
-      if (state.ownerId !== ownerId || state.config === config) {
-        return;
-      }
-      setState({ ...state, config });
+    open(options) {
+      setState({ open: true, options, openCount: state.openCount + 1 });
     },
     close() {
       if (!state.open) {

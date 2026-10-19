@@ -2,7 +2,7 @@ import { act, cleanup, render, renderHook, screen } from '@testing-library/react
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { UserProfileModalConfig } from '../features/user-profile/user-profile.modal.types';
+import type { UserProfileModalOptions } from '../features/user-profile/user-profile.modal.types';
 import { MosaicProvider } from '../mosaic-provider';
 import { createModalHook } from './create-modal-hook';
 import type { ModalContentProps, ModalHandle } from './modal.types';
@@ -10,21 +10,16 @@ import { ModalHost } from './modal-host';
 
 afterEach(() => cleanup());
 
-type StubConfig = UserProfileModalConfig & {
+type StubOptions = UserProfileModalOptions & {
   label?: string;
   tone?: string;
 };
 
-interface StubPayload {
-  page?: string;
-}
-
-function StubContent({ config, payload }: ModalContentProps<StubConfig, StubPayload>) {
+function StubContent({ options }: ModalContentProps<StubOptions>) {
   return (
     <div aria-label='Stub'>
       <h2>Stub modal</h2>
-      <output data-testid='config'>{JSON.stringify(config)}</output>
-      <output data-testid='payload'>{JSON.stringify(payload ?? null)}</output>
+      <output data-testid='options'>{JSON.stringify(options)}</output>
     </div>
   );
 }
@@ -40,19 +35,16 @@ const flush = () =>
     await new Promise(resolve => setTimeout(resolve, 0));
   });
 
-const readConfig = () => JSON.parse(screen.getByTestId('config').textContent ?? 'null');
-const readPayload = () => JSON.parse(screen.getByTestId('payload').textContent ?? 'null');
+const readOptions = () => JSON.parse(screen.getByTestId('options').textContent ?? 'null');
 
 function Caller({
   useModal,
-  config,
   onHandle,
 }: {
-  useModal: (config?: StubConfig) => ModalHandle<StubPayload>;
-  config?: StubConfig;
-  onHandle: (handle: ModalHandle<StubPayload>) => void;
+  useModal: () => ModalHandle<StubOptions>;
+  onHandle: (handle: ModalHandle<StubOptions>) => void;
 }) {
-  const handle = useModal(config);
+  const handle = useModal();
   onHandle(handle);
   return null;
 }
@@ -60,7 +52,7 @@ function Caller({
 describe('createModalHook', () => {
   it('opens and closes the surface and reports isOpen', async () => {
     const { useStubModal } = createStubModal();
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <MosaicProvider>
         <Caller
@@ -79,7 +71,7 @@ describe('createModalHook', () => {
 
     expect(handle?.isOpen).toBe(true);
     expect(screen.getByText('Stub modal')).toBeInTheDocument();
-    expect(readPayload()).toEqual({ page: 'security' });
+    expect(readOptions()).toEqual({ page: 'security' });
 
     act(() => handle?.close());
     await flush();
@@ -90,7 +82,7 @@ describe('createModalHook', () => {
 
   it('closes through the dialog dismissal and updates isOpen', async () => {
     const { useStubModal } = createStubModal();
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <MosaicProvider>
         <Caller
@@ -113,7 +105,7 @@ describe('createModalHook', () => {
 
   it('loads the content once across preloads and opens', async () => {
     const { load, useStubModal } = createStubModal();
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <MosaicProvider>
         <Caller
@@ -143,7 +135,7 @@ describe('createModalHook', () => {
 
   it('renders preloaded content without a suspense fallback', async () => {
     const { useStubModal } = createStubModal();
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <MosaicProvider>
         <Caller
@@ -161,64 +153,55 @@ describe('createModalHook', () => {
     expect(screen.getByText('Stub modal')).toBeInTheDocument();
   });
 
-  it('passes the latest caller config to the open modal', async () => {
+  it('opens a fresh copy of the options each time', async () => {
     const { useStubModal } = createStubModal();
-    let handle: ModalHandle<StubPayload> | undefined;
-    const { rerender } = render(
+    let handle: ModalHandle<StubOptions> | undefined;
+    render(
       <MosaicProvider>
         <Caller
           useModal={useStubModal}
-          config={{ label: 'first' }}
           onHandle={h => (handle = h)}
         />
       </MosaicProvider>,
     );
+    await flush();
+
+    act(() => handle?.open({ label: 'first' }));
+    await flush();
+    expect(readOptions()).toEqual({ label: 'first' });
+
+    act(() => handle?.close());
     await flush();
     act(() => handle?.open());
     await flush();
 
-    expect(readConfig()).toEqual({ label: 'first' });
-
-    rerender(
-      <MosaicProvider>
-        <Caller
-          useModal={useStubModal}
-          config={{ label: 'second' }}
-          onHandle={h => (handle = h)}
-        />
-      </MosaicProvider>,
-    );
-    await flush();
-
-    expect(readConfig()).toEqual({ label: 'second' });
+    expect(readOptions()).toEqual({});
   });
 
-  it('keeps the last config when the caller unmounts while open', async () => {
+  it('stays open with its options when the caller unmounts', async () => {
     const { useStubModal } = createStubModal();
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     const { rerender } = render(
       <MosaicProvider>
         <Caller
           useModal={useStubModal}
-          config={{ label: 'kept' }}
           onHandle={h => (handle = h)}
         />
       </MosaicProvider>,
     );
     await flush();
-    act(() => handle?.open({ page: 'account' }));
+    act(() => handle?.open({ label: 'kept', page: 'account' }));
     await flush();
 
     rerender(<MosaicProvider>{null}</MosaicProvider>);
     await flush();
 
-    expect(readConfig()).toEqual({ label: 'kept' });
-    expect(readPayload()).toEqual({ page: 'account' });
+    expect(readOptions()).toEqual({ label: 'kept', page: 'account' });
   });
 
-  it('shallow-merges provider defaults under the caller config', async () => {
-    let handle: ModalHandle<StubPayload> | undefined;
-    const useWithDefaults = createModalHook<StubConfig, StubPayload>(
+  it('shallow-merges provider defaults under the options it was opened with', async () => {
+    let handle: ModalHandle<StubOptions> | undefined;
+    const useWithDefaults = createModalHook<StubOptions>(
       { id: 'stub-defaults', variant: 'card', load: () => Promise.resolve({ default: StubContent }) },
       () => ({ label: 'default', tone: 'neutral' }),
     );
@@ -226,23 +209,22 @@ describe('createModalHook', () => {
       <MosaicProvider>
         <Caller
           useModal={useWithDefaults}
-          config={{ label: 'caller' }}
           onHandle={h => (handle = h)}
         />
       </MosaicProvider>,
     );
     await flush();
-    act(() => handle?.open());
+    act(() => handle?.open({ label: 'caller' }));
     await flush();
 
-    expect(readConfig()).toEqual({ label: 'caller', tone: 'neutral' });
+    expect(readOptions()).toEqual({ label: 'caller', tone: 'neutral' });
   });
 
   it.todo('reads defaults from a public MosaicProvider prop once the modal API is public');
 
   it('reads defaults from the modal host', async () => {
     const { useStubModal } = createStubModal();
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <ModalHost defaults={{ userProfile: { pageOrder: ['security'] } }}>
         <Caller
@@ -255,50 +237,47 @@ describe('createModalHook', () => {
     act(() => handle?.open());
     await flush();
 
-    expect(readConfig()).toEqual({ pageOrder: ['security'] });
+    expect(readOptions()).toEqual({ pageOrder: ['security'] });
   });
 
-  it('uses the config and payload of the last caller to open', async () => {
+  it('shows the options of the last caller to open', async () => {
     const { useStubModal } = createStubModal();
-    let first: ModalHandle<StubPayload> | undefined;
-    let second: ModalHandle<StubPayload> | undefined;
+    let first: ModalHandle<StubOptions> | undefined;
+    let second: ModalHandle<StubOptions> | undefined;
     render(
       <MosaicProvider>
         <Caller
           useModal={useStubModal}
-          config={{ label: 'first' }}
           onHandle={h => (first = h)}
         />
         <Caller
           useModal={useStubModal}
-          config={{ label: 'second' }}
           onHandle={h => (second = h)}
         />
       </MosaicProvider>,
     );
     await flush();
 
-    act(() => first?.open({ page: 'one' }));
+    act(() => first?.open({ label: 'first', page: 'one' }));
     await flush();
-    act(() => second?.open({ page: 'two' }));
+    act(() => second?.open({ label: 'second', page: 'two' }));
     await flush();
 
-    expect(readConfig()).toEqual({ label: 'second' });
-    expect(readPayload()).toEqual({ page: 'two' });
+    expect(readOptions()).toEqual({ label: 'second', page: 'two' });
     expect(first?.isOpen).toBe(true);
     expect(screen.getAllByText('Stub modal')).toHaveLength(1);
   });
 
   it('re-seeds the content when opened again while open', async () => {
-    function SeededContent({ payload }: ModalContentProps<StubConfig, StubPayload>) {
-      const [page] = React.useState(payload?.page);
+    function SeededContent({ options }: ModalContentProps<StubOptions>) {
+      const [page] = React.useState(options.page);
       return <output data-testid='seeded'>{page}</output>;
     }
     const useSeededModal = createModalHook(
       { id: 'seeded', variant: 'card', load: () => Promise.resolve({ default: SeededContent }) },
       defaults => defaults.userProfile ?? {},
     );
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <MosaicProvider>
         <Caller
@@ -318,24 +297,23 @@ describe('createModalHook', () => {
     expect(screen.getByTestId('seeded')).toHaveTextContent('security');
   });
 
-  it('keeps a host default when the caller leaves that key undefined', async () => {
+  it('keeps a host default when the options leave that key undefined', async () => {
     const { useStubModal } = createStubModal();
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <ModalHost defaults={{ userProfile: { pageOrder: ['security'] } }}>
         <Caller
           useModal={useStubModal}
-          config={{ pageOrder: undefined, label: 'caller' }}
           onHandle={h => (handle = h)}
         />
       </ModalHost>,
     );
     await flush();
 
-    act(() => handle?.open());
+    act(() => handle?.open({ pageOrder: undefined, label: 'caller' }));
     await flush();
 
-    expect(readConfig()).toEqual({ pageOrder: ['security'], label: 'caller' });
+    expect(readOptions()).toEqual({ pageOrder: ['security'], label: 'caller' });
   });
 
   it('shows a retry inside the dialog when the content fails to load', async () => {
@@ -348,7 +326,7 @@ describe('createModalHook', () => {
       { id: 'flaky', variant: 'card', load },
       defaults => defaults.userProfile ?? {},
     );
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <MosaicProvider>
         <p>App content</p>
@@ -382,7 +360,7 @@ describe('createModalHook', () => {
       { id: 'flaky-preload', variant: 'card', load },
       defaults => defaults.userProfile ?? {},
     );
-    let handle: ModalHandle<StubPayload> | undefined;
+    let handle: ModalHandle<StubOptions> | undefined;
     render(
       <MosaicProvider>
         <Caller

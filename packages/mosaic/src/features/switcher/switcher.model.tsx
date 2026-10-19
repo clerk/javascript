@@ -14,9 +14,9 @@ import { useMosaicRouter } from '../../hooks/use-mosaic-router';
 import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import { useOrganizationProfileModal } from '../organization-profile/organization-profile.modal';
-import type { OrganizationProfileModalConfig } from '../organization-profile/organization-profile.modal.types';
+import type { OrganizationProfileModalOptions } from '../organization-profile/organization-profile.modal.types';
 import { useUserProfileModal } from '../user-profile/user-profile.modal';
-import type { UserProfileModalConfig } from '../user-profile/user-profile.modal.types';
+import type { UserProfileModalOptions } from '../user-profile/user-profile.modal.types';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,
@@ -111,8 +111,8 @@ export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
 
 /** Props forwarded to the profile modals this button opens. */
 export interface SwitcherModalProps {
-  userProfile?: UserProfileModalConfig;
-  organizationProfile?: Omit<OrganizationProfileModalConfig, 'afterLeaveOrganizationUrl'>;
+  userProfile?: Omit<UserProfileModalOptions, 'page'>;
+  organizationProfile?: Omit<OrganizationProfileModalOptions, 'page' | 'afterLeaveOrganizationUrl'>;
 }
 
 function resolveAfterUrl<T extends object>(
@@ -186,11 +186,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
   const clerk = useClerk();
   const router = useMosaicRouter();
-  const userProfile = useUserProfileModal(modals?.userProfile);
-  const organizationProfile = useOrganizationProfileModal({
-    ...modals?.organizationProfile,
-    afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
-  });
+  const userProfile = useUserProfileModal();
+  const organizationProfile = useOrganizationProfileModal();
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
@@ -205,7 +202,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => userProfile.open(),
+    openModal: () => userProfile.open(modals?.userProfile),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -213,7 +210,11 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageOrganization = openOrNavigate({
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
-    openModal: () => organizationProfile.open(),
+    openModal: () =>
+      organizationProfile.open({
+        ...modals?.organizationProfile,
+        afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
+      }),
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });

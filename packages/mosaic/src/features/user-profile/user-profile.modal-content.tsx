@@ -5,8 +5,7 @@ import { UserProfile } from './user-profile';
 import type { UserProfileModalContentProps } from './user-profile.modal.types';
 
 export default function UserProfileModalContent({
-  config,
-  payload,
+  options: { page, ...options },
   close,
 }: UserProfileModalContentProps): React.ReactElement {
   const { isLoaded, user } = useUser();
@@ -20,8 +19,8 @@ export default function UserProfileModalContent({
 
   return (
     <UserProfile
-      {...config}
-      defaultPage={payload?.page}
+      {...options}
+      defaultPage={page}
     />
   );
 }

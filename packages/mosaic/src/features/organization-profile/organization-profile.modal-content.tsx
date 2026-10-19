@@ -5,8 +5,7 @@ import { OrganizationProfile } from './organization-profile';
 import type { OrganizationProfileModalContentProps } from './organization-profile.modal.types';
 
 export default function OrganizationProfileModalContent({
-  config,
-  payload,
+  options: { page, ...options },
   close,
 }: OrganizationProfileModalContentProps): React.ReactElement {
   const { isLoaded, organization } = useOrganization();
@@ -20,8 +19,8 @@ export default function OrganizationProfileModalContent({
 
   return (
     <OrganizationProfile
-      {...config}
-      defaultPage={payload?.page}
+      {...options}
+      defaultPage={page}
     />
   );
 }

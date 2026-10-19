@@ -3,7 +3,7 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import type { OrganizationProfilePageId } from '../organization-profile/organization-profile.types';
-import type { UserProfileModalConfig } from '../user-profile/user-profile.modal.types';
+import type { UserProfileModalOptions } from '../user-profile/user-profile.modal.types';
 import type { CustomProfilePage, UserProfilePageId } from '../user-profile/user-profile.types';
 import { useSwitcherController } from './switcher.controller';
 import type { SwitcherModelOptions } from './switcher.model';
@@ -32,7 +32,7 @@ export interface SwitcherProfilePages<PageId extends string> {
 export interface SwitcherUserProfileProps
   extends
     SwitcherProfilePages<UserProfilePageId>,
-    Pick<UserProfileModalConfig, 'additionalOAuthScopes' | 'apiKeysProps'> {}
+    Pick<UserProfileModalOptions, 'additionalOAuthScopes' | 'apiKeysProps'> {}
 
 /** Options for the underlying `<OrganizationProfile />` component. */
 export type SwitcherOrganizationProfileProps = SwitcherProfilePages<OrganizationProfilePageId>;
