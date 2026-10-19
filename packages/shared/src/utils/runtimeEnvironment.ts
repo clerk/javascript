@@ -19,6 +19,18 @@ export const automatedEnvironmentVariables = [
   'CF_PAGES',
 ] as const;
 
+export const agentEnvironmentVariables = [
+  'CLAUDECODE',
+  'CURSOR_AGENT',
+  'CURSOR_CLI',
+  'CURSOR_EXTENSION_HOST_ROLE',
+  'CURSOR_TRACE_ID',
+  'GITHUB_COPILOT_AGENT',
+  'GITHUB_COPILOT_CHAT',
+  'AGENT',
+  'AGENTS',
+] as const;
+
 const isTruthyEnvValue = (value: unknown): boolean => {
   if (typeof value !== 'string' || !value) {
     return false;
@@ -60,4 +72,8 @@ export const isProductionEnvironment = (): boolean => {
 
 export const isAutomatedEnvironment = (): boolean => {
   return automatedEnvironmentVariables.some(name => isTruthyEnvValue(getEnvVariable(name)));
+};
+
+export const isAgentEnvironment = (): boolean => {
+  return agentEnvironmentVariables.some(name => isTruthyEnvValue(getEnvVariable(name)));
 };

@@ -1,0 +1,145 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import {
+  CLERK_SDK_MCP_END,
+  CLERK_SDK_MCP_START,
+  type FileSystemAdapter,
+  renderClerkAgentRulesBlock,
+  renderClerkSdkMcpBlock,
+  writeClerkAgentRules,
+} from '../agentRules';
+
+const createMemoryFs = (files: Record<string, string> = {}) => {
+  const store = new Map(Object.entries(files));
+  const dirs = new Set<string>();
+
+  const fs: FileSystemAdapter = {
+    existsSync: path => store.has(path) || dirs.has(path),
+    readFileSync: path => store.get(path) ?? '',
+    writeFileSync: (path, data) => {
+      store.set(path, data);
+    },
+    mkdirSync: path => {
+      dirs.add(path);
+    },
+  };
+
+  return {
+    fs,
+    read(path: string) {
+      return store.get(path);
+    },
+  };
+};
+
+const pathAdapter = {
+  dirname(path: string) {
+    const normalized = path.replace(/\/+$/, '');
+    const index = normalized.lastIndexOf('/');
+    return index <= 0 ? '/' : normalized.slice(0, index);
+  },
+  join(...paths: string[]) {
+    return paths.join('/').replace(/\/+/g, '/');
+  },
+  parse() {
+    return { root: '/' };
+  },
+  resolve(...paths: string[]) {
+    return paths.join('/').replace(/\/+/g, '/');
+  },
+};
+
+describe('writeClerkAgentRules', () => {
+  beforeEach(() => {
+    process.env.NODE_ENV = 'test';
+  });
+
+  it('creates AGENTS.md and CLAUDE.md when neither exists', () => {
+    const memory = createMemoryFs();
+
+    const result = writeClerkAgentRules({
+      cwd: '/repo/app',
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['nextjs'],
+    });
+
+    expect(result.agentsMd).toBe('created');
+    expect(result.claudeMd).toBe('created');
+    expect(memory.read('/repo/app/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:nextjs -->');
+    expect(memory.read('/repo/app/CLAUDE.md')).toBe('@AGENTS.md\n');
+  });
+
+  it('targets the workspace root when one exists', () => {
+    const memory = createMemoryFs({
+      '/repo/pnpm-workspace.yaml': 'packages:\n  - apps/*\n',
+    });
+
+    writeClerkAgentRules({
+      cwd: '/repo/apps/web',
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['react'],
+    });
+
+    expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:react -->');
+    expect(memory.read('/repo/apps/web/AGENTS.md')).toBeUndefined();
+  });
+
+  it('replaces only Clerk blocks and preserves surrounding content', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': 'Project rules\n\n<!-- BEGIN:clerk-agent-rules -->\nold\n<!-- END:clerk-agent-rules -->\n',
+    });
+
+    writeClerkAgentRules({
+      cwd: '/repo',
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['vue'],
+    });
+
+    const content = memory.read('/repo/AGENTS.md');
+    expect(content).toContain('Project rules');
+    expect(content).toContain('<!-- BEGIN:clerk-agent-rules:vue -->');
+    expect(content).not.toContain('\nold\n');
+  });
+
+  it('does not write files in dry-run mode', () => {
+    const memory = createMemoryFs();
+
+    const result = writeClerkAgentRules({
+      cwd: '/repo',
+      dryRun: true,
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['astro'],
+    });
+
+    expect(result.agentsMd).toBe('created');
+    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
+  });
+});
+
+describe('Clerk MCP rules', () => {
+  it('adds the MCP intro and the ask-before-changes rule to the root block', () => {
+    const block = renderClerkAgentRulesBlock();
+
+    expect(block).toContain('### Clerk MCP server');
+    expect(block).toContain('https://mcp.clerk.com/mcp');
+    expect(block).toContain('https://clerk.com/docs/guides/ai/mcp/clerk-mcp-server');
+    expect(block).toContain('Ask the user before calling any Clerk MCP tool');
+  });
+
+  it('renders a marked per-SDK MCP block that names the installed package', () => {
+    const block = renderClerkSdkMcpBlock('nextjs');
+
+    expect(block.startsWith(CLERK_SDK_MCP_START)).toBe(true);
+    expect(block.endsWith(CLERK_SDK_MCP_END)).toBe(true);
+    expect(block).toContain('installed `@clerk/nextjs` types');
+    expect(block).toContain('https://clerk.com/docs/llms.txt');
+  });
+
+  it('uses the requested line endings', () => {
+    expect(renderClerkSdkMcpBlock('react', '\r\n')).not.toMatch(/[^\r]\n/);
+  });
+});
