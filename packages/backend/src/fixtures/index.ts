@@ -1,3 +1,4 @@
+import { JWT_CATEGORY_SESSION_TOKEN } from '../tokens/jwtCategories';
 import { base64url } from '../util/rfc4648';
 
 // signed with signingJwks
@@ -21,7 +22,7 @@ export const mockJwtHeader = {
   alg: 'RS256',
   kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD',
   typ: 'JWT',
-  cat: 'cl_B7d4PD111AAA',
+  cat: JWT_CATEGORY_SESSION_TOKEN,
 };
 
 export const mockJwtPayload = {
