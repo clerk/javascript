@@ -19,7 +19,12 @@ import {
 } from '../../fixtures/machine';
 import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
-import { JWT_CATEGORY_IGNORE, JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_M2M_TOKEN } from '../jwtCategories';
+import {
+  JWT_CATEGORY_IGNORE,
+  JWT_CATEGORY_JWT_TEMPLATE,
+  JWT_CATEGORY_M2M_TOKEN,
+  JWT_CATEGORY_SESSION_TOKEN,
+} from '../jwtCategories';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
 async function createSignedOAuthJwt(
@@ -982,8 +987,8 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     });
 
     describe.each([
-      ['session-token', 'cl_B7d4PD111AAA'],
-      ['jwt-template', 'cl_B7d4PD222AAA'],
+      ['session-token', JWT_CATEGORY_SESSION_TOKEN],
+      ['jwt-template', JWT_CATEGORY_JWT_TEMPLATE],
       ['unknown', 'cl_some_future_unknown_cat'],
     ])('rejects M2M JWT masquerading with a non-M2M cat', (label, cat) => {
       it(`rejects cat=${label} without attempting signature verification`, async () => {
