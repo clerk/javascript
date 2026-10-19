@@ -90,6 +90,21 @@ describe('connected organization invitations', () => {
     members.release();
   });
 
+  it('shows loading until the first page of invitations arrives', async () => {
+    serve(['org:sys_memberships:manage']);
+    const list = holdRequests('get', '/v1/organizations/:organizationId/invitations');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const table = () => screen.getByRole('table', { name: 'Invitations' });
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Loading invitations');
+    expect(within(table()).getAllByRole('row')).toHaveLength(1);
+    expect(within(table()).queryByRole('button')).toBeNull();
+    list.release();
+    expect(await within(table()).findByText('ada@example.com')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Invitations loaded');
+    expect(within(table()).getAllByRole('row')).toHaveLength(2);
+  });
+
   it('shows a failed initial load and retries the invitation list', async () => {
     serve(['org:sys_memberships:manage']);
     const initial = holdRequests('get', '/v1/organizations/:organizationId/invitations');

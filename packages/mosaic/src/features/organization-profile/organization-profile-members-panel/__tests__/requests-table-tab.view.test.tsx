@@ -92,7 +92,7 @@ describe('RequestsTableTabView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No pending requests');
+    expect(within(screen.getByRole('table')).getByRole('status')).toHaveTextContent('No pending requests');
     rerender(
       <MosaicProvider>
         <RequestsTableTabView

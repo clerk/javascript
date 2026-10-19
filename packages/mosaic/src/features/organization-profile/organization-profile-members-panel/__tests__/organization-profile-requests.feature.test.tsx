@@ -118,6 +118,23 @@ describe('connected organization requests', () => {
     members.release();
   });
 
+  it('shows loading until the first page of requests arrives', async () => {
+    serve(['org:sys_memberships:manage']);
+    const list = holdRequests('get', '/v1/organizations/:organizationId/membership_requests');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    await userEvent.setup().click(await screen.findByRole('tab', { name: 'Requests' }));
+    const table = () => screen.getByRole('table', { name: 'Requests' });
+    const panel = () => screen.getByRole('tabpanel', { name: 'Requests' });
+
+    expect(within(panel()).getByRole('status')).toHaveTextContent('Loading requests');
+    expect(within(table()).getAllByRole('row')).toHaveLength(1);
+    expect(within(table()).queryByRole('button')).toBeNull();
+    list.release();
+    expect(await within(table()).findByText('Ada Lovelace')).toBeVisible();
+    expect(within(panel()).getByRole('status')).toHaveTextContent('Requests loaded');
+    expect(within(table()).getAllByRole('row')).toHaveLength(2);
+  });
+
   it('shows an initial load error and retries', async () => {
     serve(['org:sys_memberships:manage']);
     const initial = holdRequests('get', '/v1/organizations/:organizationId/membership_requests');

@@ -57,7 +57,7 @@ describe('InvitationsTableTabView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No pending invitations');
+    expect(within(screen.getByRole('table')).getByRole('status')).toHaveTextContent('No pending invitations');
     rerender(
       <MosaicProvider>
         <InvitationsTableTabView

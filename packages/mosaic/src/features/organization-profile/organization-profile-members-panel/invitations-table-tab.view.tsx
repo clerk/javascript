@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
@@ -9,7 +10,7 @@ import { EmptyState } from '../../../components/empty-state';
 import { Icon } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Pagination } from '../../../components/pagination';
-import { Spinner } from '../../../components/spinner';
+import { Skeleton, SkeletonContext } from '../../../components/skeleton';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { useServerDataTable } from '../../../hooks/use-server-data-table';
@@ -44,7 +45,7 @@ export function InvitationsTableTabView({
 }: InvitationsTableTabViewProps) {
   const m = useMessages('invitationsTableTab');
   const { table, pagination } = useServerDataTable({
-    data: invitations,
+    data: isLoading ? PLACEHOLDER_INVITATIONS : invitations,
     totalCount,
     getRowId,
     sortableColumns: [],
@@ -64,6 +65,7 @@ export function InvitationsTableTabView({
         role='group'
         aria-label={m.title}
       >
+        <VisuallyHidden role='status'>{isLoading ? m.loading : m.loaded}</VisuallyHidden>
         {onInvite ? (
           <Table.Toolbar>
             <Button
@@ -161,19 +163,7 @@ function InvitationsTableBody({
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('invitationsTableTab');
-  if (isLoading) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
-          <span role='status'>
-            <Spinner />
-            <VisuallyHidden>{m.loading}</VisuallyHidden>
-          </span>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  if (isError) {
+  if (!isLoading && isError) {
     return (
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
@@ -204,59 +194,92 @@ function InvitationsTableBody({
     );
   }
   return (
-    <Table.Body>
-      {rows.map(row => (
-        <Table.Row
-          key={row.id}
-          selected={hasBulkAction && row.getIsSelected()}
-        >
-          {hasBulkAction ? (
-            <Table.SelectCell
-              aria-label={fill(m.select, { name: row.original.email })}
-              checked={row.getIsSelected()}
-              onToggleSelected={row.toggleSelected}
-            />
-          ) : null}
-          <Table.Cell>
-            <Item.Root>
-              <Item.Media>
-                <Avatar.Root
-                  size='fit'
-                  aria-hidden
-                >
-                  {row.original.imageUrl ? (
-                    <Avatar.Image
-                      src={row.original.imageUrl}
-                      alt=''
-                    />
-                  ) : null}
-                  <Avatar.Fallback />
-                </Avatar.Root>
-              </Item.Media>
-              <Item.Content>
-                <Item.Label>{row.original.email}</Item.Label>
-              </Item.Content>
-            </Item.Root>
-          </Table.Cell>
-          <Table.Cell noWrap>{row.original.invitedAtLabel}</Table.Cell>
-          <Table.Cell>{row.original.roleLabel}</Table.Cell>
-          {onRevokeClick ? (
-            <Table.Cell align='end'>
-              <ActionMenu
-                label={fill(m.manage, { name: row.original.email })}
-                triggerRef={registerTrigger(row.original.id)}
-                actions={[
-                  {
-                    label: m.revoke,
-                    color: 'negative',
-                    onClick: () => onRevokeClick(row.original),
-                  },
-                ]}
+    <SkeletonContext.Provider value={isLoading}>
+      <Table.Body {...(isLoading ? { 'aria-hidden': true, ...inertProps(true) } : {})}>
+        {rows.map(row => (
+          <Table.Row
+            key={row.id}
+            selected={hasBulkAction && row.getIsSelected()}
+          >
+            {hasBulkAction ? (
+              <Table.SelectCell
+                aria-label={fill(m.select, { name: row.original.email })}
+                checked={row.getIsSelected()}
+                onToggleSelected={row.toggleSelected}
               />
+            ) : null}
+            <Table.Cell>
+              <Item.Root>
+                <Skeleton>
+                  <Item.Media>
+                    <Avatar.Root
+                      size='fit'
+                      aria-hidden
+                    >
+                      {row.original.imageUrl ? (
+                        <Avatar.Image
+                          src={row.original.imageUrl}
+                          alt=''
+                        />
+                      ) : null}
+                      <Avatar.Fallback />
+                    </Avatar.Root>
+                  </Item.Media>
+                </Skeleton>
+                <Item.Content>
+                  <Item.Label>
+                    <Skeleton>{row.original.email}</Skeleton>
+                  </Item.Label>
+                </Item.Content>
+              </Item.Root>
             </Table.Cell>
-          ) : null}
-        </Table.Row>
-      ))}
-    </Table.Body>
+            <Table.Cell noWrap>
+              <Skeleton>{row.original.invitedAtLabel}</Skeleton>
+            </Table.Cell>
+            <Table.Cell>
+              <Skeleton>{row.original.roleLabel}</Skeleton>
+            </Table.Cell>
+            {onRevokeClick ? (
+              <Table.Cell align='end'>
+                <Skeleton visible={false}>
+                  <ActionMenu
+                    label={fill(m.manage, { name: row.original.email })}
+                    triggerRef={registerTrigger(row.original.id)}
+                    actions={[
+                      {
+                        label: m.revoke,
+                        color: 'negative',
+                        onClick: () => onRevokeClick(row.original),
+                      },
+                    ]}
+                  />
+                </Skeleton>
+              </Table.Cell>
+            ) : null}
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </SkeletonContext.Provider>
   );
 }
+
+const PLACEHOLDER_INVITATIONS: OrganizationProfileInvitation[] = [
+  {
+    id: 'orginv_placeholder_1',
+    email: 'jordan.reyes@northwind.co',
+    invitedAtLabel: 'Mar 12, 2026',
+    roleLabel: 'Member',
+  },
+  {
+    id: 'orginv_placeholder_2',
+    email: 'priya.nair@northwind.co',
+    invitedAtLabel: 'Apr 3, 2026',
+    roleLabel: 'Admin',
+  },
+  {
+    id: 'orginv_placeholder_3',
+    email: 'sam.whitfield@northwind.co',
+    invitedAtLabel: 'May 21, 2026',
+    roleLabel: 'Member',
+  },
+];

@@ -62,6 +62,21 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(screen.queryByRole('button', { name: 'Manage Bob Smith' })).toBeNull();
   });
 
+  it('shows loading until the first page of members arrives', async () => {
+    serve();
+    const list = holdRequests('get', '/v1/organizations/:organizationId/memberships');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const table = () => screen.getByRole('table', { name: 'Members' });
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Loading members');
+    expect(within(table()).getAllByRole('row')).toHaveLength(1);
+    expect(within(table()).queryByRole('button')).toBeNull();
+    list.release();
+    expect(await within(table()).findByText('Bob Smith')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Members loaded');
+    expect(within(table()).getAllByRole('row')).toHaveLength(3);
+  });
+
   it('does not load roles for a member who cannot change them', async () => {
     serve();
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');

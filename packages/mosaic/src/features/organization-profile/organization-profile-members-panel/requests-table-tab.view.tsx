@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 import { useState } from 'react';
@@ -9,7 +10,7 @@ import { Icon } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Pagination } from '../../../components/pagination';
 import { Section } from '../../../components/section';
-import { Spinner } from '../../../components/spinner';
+import { Skeleton, SkeletonContext } from '../../../components/skeleton';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { usePendingAction } from '../../../hooks/use-pending-action';
@@ -46,8 +47,9 @@ export function RequestsTableTabView({
   onRetry,
 }: RequestsTableTabViewProps) {
   const m = useMessages('requestsTableTab');
+  const skeleton = isLoading || (isFetching && requests.length === 0);
   const { table, pagination } = useServerDataTable({
-    data: requests,
+    data: skeleton ? PLACEHOLDER_REQUESTS : requests,
     totalCount,
     getRowId,
     sortableColumns: [],
@@ -67,6 +69,7 @@ export function RequestsTableTabView({
       role='group'
       aria-label={m.title}
     >
+      <VisuallyHidden role='status'>{skeleton ? m.loading : m.loaded}</VisuallyHidden>
       {onInvite ? (
         <Table.Toolbar>
           <Button
@@ -106,8 +109,7 @@ export function RequestsTableTabView({
         <RequestsTableBody
           rows={table.rows}
           columnCount={columnCount}
-          isLoading={isLoading}
-          isFetching={isFetching}
+          skeleton={skeleton}
           isError={isError}
           onRetry={onRetry}
           hasActions={hasActions}
@@ -134,8 +136,7 @@ export function RequestsTableTabView({
 function RequestsTableBody({
   rows,
   columnCount,
-  isLoading,
-  isFetching,
+  skeleton,
   isError,
   onRetry,
   hasActions,
@@ -152,8 +153,7 @@ function RequestsTableBody({
     toggleSelected: () => void;
   }>;
   columnCount: number;
-  isLoading: boolean;
-  isFetching: boolean;
+  skeleton: boolean;
   isError: boolean;
   onRetry?: () => void;
   hasActions: boolean;
@@ -164,19 +164,7 @@ function RequestsTableBody({
   registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('requestsTableTab');
-  if (isLoading || (isFetching && rows.length === 0)) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
-          <span role='status'>
-            <Spinner />
-            <VisuallyHidden>{m.loading}</VisuallyHidden>
-          </span>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  if (isError) {
+  if (!skeleton && isError) {
     return (
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
@@ -207,59 +195,73 @@ function RequestsTableBody({
     );
   }
   return (
-    <Table.Body>
-      {rows.map(row => {
-        const request = row.original;
-        return (
-          <Table.Row
-            key={request.id}
-            selected={hasBulkAction && row.getIsSelected()}
-          >
-            {hasBulkAction ? (
-              <Table.SelectCell
-                aria-label={fill(m.select, { name: request.email })}
-                checked={row.getIsSelected()}
-                onToggleSelected={row.toggleSelected}
-              />
-            ) : null}
-            <Table.Cell>
-              <Item.Root>
-                <Item.Media>
-                  <Avatar.Root
-                    size='fit'
-                    aria-hidden
-                  >
-                    {request.imageUrl ? (
-                      <Avatar.Image
-                        src={request.imageUrl}
-                        alt=''
-                      />
-                    ) : null}
-                    <Avatar.Fallback />
-                  </Avatar.Root>
-                </Item.Media>
-                <Item.Content>
-                  <Item.Label>{request.name ?? request.email}</Item.Label>
-                  {request.name ? <Item.Description>{request.email}</Item.Description> : null}
-                </Item.Content>
-              </Item.Root>
-            </Table.Cell>
-            <Table.Cell noWrap>{request.requestedAtLabel}</Table.Cell>
-            {hasActions ? (
-              <Table.Cell align='end'>
-                <RequestActions
-                  request={request}
-                  onAccept={onAccept ? () => onAccept(request.id) : undefined}
-                  onDecline={onDecline ? () => onDecline(request.id) : undefined}
-                  registerAcceptTrigger={registerAcceptTrigger}
-                  registerDeclineTrigger={registerDeclineTrigger}
+    <SkeletonContext.Provider value={skeleton}>
+      <Table.Body {...(skeleton ? { 'aria-hidden': true, ...inertProps(true) } : {})}>
+        {rows.map(row => {
+          const request = row.original;
+          return (
+            <Table.Row
+              key={request.id}
+              selected={hasBulkAction && row.getIsSelected()}
+            >
+              {hasBulkAction ? (
+                <Table.SelectCell
+                  aria-label={fill(m.select, { name: request.email })}
+                  checked={row.getIsSelected()}
+                  onToggleSelected={row.toggleSelected}
                 />
+              ) : null}
+              <Table.Cell>
+                <Item.Root>
+                  <Skeleton>
+                    <Item.Media>
+                      <Avatar.Root
+                        size='fit'
+                        aria-hidden
+                      >
+                        {request.imageUrl ? (
+                          <Avatar.Image
+                            src={request.imageUrl}
+                            alt=''
+                          />
+                        ) : null}
+                        <Avatar.Fallback />
+                      </Avatar.Root>
+                    </Item.Media>
+                  </Skeleton>
+                  <Item.Content>
+                    <Item.Label>
+                      <Skeleton>{request.name ?? request.email}</Skeleton>
+                    </Item.Label>
+                    {request.name ? (
+                      <Item.Description>
+                        <Skeleton>{request.email}</Skeleton>
+                      </Item.Description>
+                    ) : null}
+                  </Item.Content>
+                </Item.Root>
               </Table.Cell>
-            ) : null}
-          </Table.Row>
-        );
-      })}
-    </Table.Body>
+              <Table.Cell noWrap>
+                <Skeleton>{request.requestedAtLabel}</Skeleton>
+              </Table.Cell>
+              {hasActions ? (
+                <Table.Cell align='end'>
+                  <Skeleton visible={false}>
+                    <RequestActions
+                      request={request}
+                      onAccept={onAccept ? () => onAccept(request.id) : undefined}
+                      onDecline={onDecline ? () => onDecline(request.id) : undefined}
+                      registerAcceptTrigger={registerAcceptTrigger}
+                      registerDeclineTrigger={registerDeclineTrigger}
+                    />
+                  </Skeleton>
+                </Table.Cell>
+              ) : null}
+            </Table.Row>
+          );
+        })}
+      </Table.Body>
+    </SkeletonContext.Provider>
   );
 }
 
@@ -325,3 +327,24 @@ function RequestActions({
     </>
   );
 }
+
+const PLACEHOLDER_REQUESTS: OrganizationProfileRequest[] = [
+  {
+    id: 'orgreq_placeholder_1',
+    email: 'jordan.reyes@northwind.co',
+    name: 'Jordan Reyes',
+    requestedAtLabel: 'Mar 12, 2026',
+  },
+  {
+    id: 'orgreq_placeholder_2',
+    email: 'priya.nair@northwind.co',
+    name: 'Priya Nair',
+    requestedAtLabel: 'Apr 3, 2026',
+  },
+  {
+    id: 'orgreq_placeholder_3',
+    email: 'sam.whitfield@northwind.co',
+    name: 'Sam Whitfield',
+    requestedAtLabel: 'May 21, 2026',
+  },
+];

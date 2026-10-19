@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
@@ -12,7 +13,7 @@ import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
 import { Pagination } from '../../../components/pagination';
 import { Select } from '../../../components/select';
-import { Spinner } from '../../../components/spinner';
+import { Skeleton, SkeletonContext } from '../../../components/skeleton';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { useServerDataTable } from '../../../hooks/use-server-data-table';
@@ -56,7 +57,7 @@ export function MembersTableTabView({
 }: MembersTableTabViewProps) {
   const m = useMessages('membersTableTab');
   const { table, pagination } = useServerDataTable({
-    data: members,
+    data: isLoading ? PLACEHOLDER_MEMBERS : members,
     totalCount,
     getRowId,
     isRowSelectable: canManageMember,
@@ -81,6 +82,7 @@ export function MembersTableTabView({
   return (
     <>
       <div {...mergeStyleProps(themeProps('members-table-tab'), stylex.props(tableTabStyles.root))}>
+        <VisuallyHidden role='status'>{isLoading ? m.loading : m.loaded}</VisuallyHidden>
         <Table.Toolbar>
           <Table.Search
             ref={searchInputRef}
@@ -223,19 +225,7 @@ function MembersTableBody({
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('membersTableTab');
-  if (isLoading) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
-          <span role='status'>
-            <Spinner />
-            <VisuallyHidden>{m.loading}</VisuallyHidden>
-          </span>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  if (isError) {
+  if (!isLoading && isError) {
     return (
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
@@ -268,21 +258,24 @@ function MembersTableBody({
     );
   }
   return (
-    <Table.Body>
-      {rows.map(row => (
-        <MemberRow
-          key={row.original.id}
-          member={row.original}
-          roles={roles}
-          selected={row.getIsSelected()}
-          onToggleSelected={hasBulkAction ? row.toggleSelected : undefined}
-          onChangeRole={onChangeRole}
-          isChangingRole={isChangingRole}
-          onRemoveClick={onRemoveClick ? () => onRemoveClick(row.original) : undefined}
-          triggerRef={registerTrigger(row.original.id)}
-        />
-      ))}
-    </Table.Body>
+    <SkeletonContext.Provider value={isLoading}>
+      <Table.Body {...(isLoading ? { 'aria-hidden': true, ...inertProps(true) } : {})}>
+        {rows.map(row => (
+          <MemberRow
+            key={row.original.id}
+            member={row.original}
+            roles={roles}
+            selected={row.getIsSelected()}
+            onToggleSelected={hasBulkAction ? row.toggleSelected : undefined}
+            onChangeRole={onChangeRole}
+            isChangingRole={isChangingRole}
+            onRemoveClick={onRemoveClick ? () => onRemoveClick(row.original) : undefined}
+            triggerRef={registerTrigger(row.original.id)}
+            skeleton={isLoading}
+          />
+        ))}
+      </Table.Body>
+    </SkeletonContext.Provider>
   );
 }
 
@@ -295,6 +288,7 @@ function MemberRow({
   isChangingRole,
   onRemoveClick,
   triggerRef,
+  skeleton,
 }: {
   member: OrganizationProfileMember;
   roles: MembersTableTabViewProps['roles'];
@@ -304,6 +298,7 @@ function MemberRow({
   isChangingRole: boolean;
   onRemoveClick?: () => void;
   triggerRef?: Ref<HTMLButtonElement>;
+  skeleton: boolean;
 }) {
   const m = useMessages('membersTableTab');
   const manageable = canManageMember(member);
@@ -323,67 +318,137 @@ function MemberRow({
       ) : null}
       <Table.Cell>
         <Entity.Root>
-          <Entity.Media>
-            <Avatar.Root
-              size='fit'
-              aria-hidden
-            >
-              {member.imageUrl ? (
-                <Avatar.Image
-                  src={member.imageUrl}
-                  alt=''
-                />
-              ) : null}
-              <Avatar.Fallback />
-            </Avatar.Root>
-          </Entity.Media>
+          <Skeleton>
+            <Entity.Media>
+              <Avatar.Root
+                size='fit'
+                aria-hidden
+              >
+                {member.imageUrl ? (
+                  <Avatar.Image
+                    src={member.imageUrl}
+                    alt=''
+                  />
+                ) : null}
+                <Avatar.Fallback />
+              </Avatar.Root>
+            </Entity.Media>
+          </Skeleton>
           <Entity.Content>
             <Entity.Label>
-              {member.name}
-              {member.isCurrentUser ? (
-                <Badge>{m.you}</Badge>
-              ) : member.isDeprovisioned ? (
-                <Badge>{m.deprovisioned}</Badge>
-              ) : member.isBanned ? (
-                <Badge color='negative'>{m.banned}</Badge>
-              ) : null}
+              <Skeleton>{member.name}</Skeleton>
+              {skeleton ? null : <MemberBadge member={member} />}
             </Entity.Label>
-            <Entity.Description>{member.email}</Entity.Description>
+            <Entity.Description>
+              <Skeleton>{member.email}</Skeleton>
+            </Entity.Description>
           </Entity.Content>
         </Entity.Root>
       </Table.Cell>
-      <Table.Cell noWrap>{member.joinedAtLabel}</Table.Cell>
+      <Table.Cell noWrap>
+        <Skeleton>{member.joinedAtLabel}</Skeleton>
+      </Table.Cell>
       <Table.Cell>
-        {onChangeRole && !member.isDeprovisioned && roles.some(role => role.value === member.role) ? (
-          <Select.Root
-            items={roles}
-            value={member.role}
-            onValueChange={value => value && onChangeRole(member.id, value)}
-          >
-            <Select.Trigger
-              variant='ghost'
-              disabled={member.isCurrentUser || isChangingRole}
-              aria-label={fill(m.changeRole, { name: member.name })}
-              placeholder={member.roleLabel}
-            />
-            <Select.Popup />
-          </Select.Root>
-        ) : (
-          member.roleLabel
-        )}
+        <MemberRole
+          member={member}
+          roles={roles}
+          onChangeRole={onChangeRole}
+          isChangingRole={isChangingRole}
+          skeleton={skeleton}
+        />
       </Table.Cell>
       {onRemoveClick ? (
         <Table.Cell align='end'>
           {manageable ? (
-            <ActionMenu
-              label={fill(m.manage, { name: member.name })}
-              triggerRef={triggerRef}
-              disabled={isChangingRole}
-              actions={[{ label: m.remove, color: 'negative', onClick: onRemoveClick }]}
-            />
+            <Skeleton visible={false}>
+              <ActionMenu
+                label={fill(m.manage, { name: member.name })}
+                triggerRef={triggerRef}
+                disabled={isChangingRole}
+                actions={[{ label: m.remove, color: 'negative', onClick: onRemoveClick }]}
+              />
+            </Skeleton>
           ) : null}
         </Table.Cell>
       ) : null}
     </Table.Row>
   );
 }
+
+function MemberBadge({ member }: { member: OrganizationProfileMember }) {
+  const m = useMessages('membersTableTab');
+  if (member.isCurrentUser) {
+    return <Badge>{m.you}</Badge>;
+  }
+  if (member.isDeprovisioned) {
+    return <Badge>{m.deprovisioned}</Badge>;
+  }
+  if (member.isBanned) {
+    return <Badge color='negative'>{m.banned}</Badge>;
+  }
+  return null;
+}
+
+function MemberRole({
+  member,
+  roles,
+  onChangeRole,
+  isChangingRole,
+  skeleton,
+}: {
+  member: OrganizationProfileMember;
+  roles: MembersTableTabViewProps['roles'];
+  onChangeRole?: MembersTableTabViewProps['onChangeRole'];
+  isChangingRole: boolean;
+  skeleton: boolean;
+}) {
+  const m = useMessages('membersTableTab');
+  if (skeleton) {
+    return <Skeleton>{member.roleLabel}</Skeleton>;
+  }
+  if (!onChangeRole || member.isDeprovisioned || !roles.some(role => role.value === member.role)) {
+    return member.roleLabel;
+  }
+  return (
+    <Select.Root
+      items={roles}
+      value={member.role}
+      onValueChange={value => value && onChangeRole(member.id, value)}
+    >
+      <Select.Trigger
+        variant='ghost'
+        disabled={member.isCurrentUser || isChangingRole}
+        aria-label={fill(m.changeRole, { name: member.name })}
+        placeholder={member.roleLabel}
+      />
+      <Select.Popup />
+    </Select.Root>
+  );
+}
+
+const PLACEHOLDER_MEMBERS: OrganizationProfileMember[] = [
+  {
+    id: 'orgmem_placeholder_1',
+    name: 'Jordan Reyes',
+    email: 'jordan.reyes@northwind.co',
+    joinedAtLabel: 'Mar 12, 2026',
+    role: 'org:admin',
+    roleLabel: 'Admin',
+  },
+  {
+    id: 'orgmem_placeholder_2',
+    name: 'Priya Nair',
+    email: 'priya.nair@northwind.co',
+    joinedAtLabel: 'Apr 3, 2026',
+    role: 'org:member',
+    roleLabel: 'Member',
+  },
+  {
+    id: 'orgmem_placeholder_3',
+    name: 'Sam Whitfield',
+    email: 'sam.whitfield@northwind.co',
+    joinedAtLabel: 'May 21, 2026',
+    role: 'org:member',
+    roleLabel: 'Member',
+  },
+];

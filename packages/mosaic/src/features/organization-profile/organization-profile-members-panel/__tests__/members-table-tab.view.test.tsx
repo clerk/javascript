@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -92,7 +92,7 @@ describe('MembersTableTabView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No members found');
+    expect(within(screen.getByRole('table')).getByRole('status')).toHaveTextContent('No members found');
     rerender(
       <MosaicProvider>
         <MembersTableTabView
@@ -105,6 +105,20 @@ describe('MembersTableTabView', () => {
     expect(screen.getByText('Grace Hopper')).toBeVisible();
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
   });
+  it('shows roles as text instead of a role picker while members load', () => {
+    renderView({
+      members: [],
+      totalCount: 0,
+      isLoading: true,
+      onChangeRole: vi.fn(),
+      roles: [
+        { value: 'org:admin', label: 'Admin' },
+        { value: 'org:member', label: 'Member' },
+      ],
+    });
+    expect(screen.queryAllByRole('combobox', { hidden: true })).toHaveLength(0);
+  });
+
   it('forwards table controls and clears selection when changing the result set', async () => {
     const user = userEvent.setup();
     const { props } = renderView({
