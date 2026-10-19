@@ -12,7 +12,7 @@ export interface ReverificationDialogProps {
 export function ReverificationDialog({ controller, finalFocus }: ReverificationDialogProps): JSX.Element {
   return (
     <Dialog.Root
-      open={controller.status !== 'idle'}
+      open={controller.visible}
       onOpenChange={open => {
         if (!open) {
           controller.onCancel?.();
