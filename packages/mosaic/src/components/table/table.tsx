@@ -13,7 +13,7 @@ import { Icon } from '../icon';
 import type { InputProps } from '../input';
 import { InputGroup } from '../input-group';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { aligns, columns, stickySides, styles } from './table.styles';
+import { aligns, columnWidth, layouts, stickySides, styles } from './table.styles';
 
 type TableSection = 'header' | 'body';
 
@@ -25,7 +25,11 @@ export type TableSort = 'ascending' | 'descending' | 'none';
 
 export type TableSticky = keyof typeof stickySides;
 
-export type TableProps = MosaicElementProps<'table'>;
+export type TableLayout = keyof typeof layouts;
+
+export interface TableProps extends MosaicElementProps<'table'> {
+  layout?: TableLayout;
+}
 
 export type TableToolbarProps = MosaicComponentProps<'div'>;
 
@@ -96,7 +100,10 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
   );
 });
 
-const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable({ xstyle, ...rest }, ref) {
+const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable(
+  { layout = 'auto', xstyle, ...rest },
+  ref,
+) {
   return (
     <div {...mergeStyleProps(themeProps('table-shell'), stylex.props(reset.base, scrollAreaRoot, styles.shell))}>
       <div
@@ -109,7 +116,11 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
       >
         <table
           ref={ref}
-          {...mergeStyleProps(themeProps('table'), stylex.props(reset.base, styles.table, xstyle), rest)}
+          {...mergeStyleProps(
+            themeProps('table', { layout }),
+            stylex.props(reset.base, styles.table, layouts[layout], xstyle),
+            rest,
+          )}
         />
       </div>
     </div>
@@ -144,7 +155,7 @@ const Column = React.forwardRef<HTMLTableColElement, TableColumnProps>(function 
     ref,
     props: mergeStyleProps(
       themeProps('table-column'),
-      stylex.props(reset.base, width !== undefined && columns.width(width), xstyle),
+      stylex.props(reset.base, width !== undefined && columnWidth.fixed(width), xstyle),
       rest,
     ),
   });

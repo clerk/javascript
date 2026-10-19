@@ -8,9 +8,14 @@ import { Table } from '@clerk/mosaic/components/table';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import type { OnChangeFn, SortingState } from '@clerk/mosaic/primitives/hooks';
 import { useDataTable } from '@clerk/mosaic/primitives/hooks';
+import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+const styles = stylex.create({
+  columnWidthsTable: { minWidth: '36rem' },
+});
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -436,7 +441,10 @@ export function ColumnWidths() {
   const table = useDataTable({ data: apiKeys, getRowId: row => row.id });
 
   return (
-    <Table.Root>
+    <Table.Root
+      layout='fixed'
+      xstyle={styles.columnWidthsTable}
+    >
       <Table.ColumnGroup>
         <Table.Column />
         <Table.Column />
