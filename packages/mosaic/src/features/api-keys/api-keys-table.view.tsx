@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { Spinner } from '../../components/spinner';
+import { Skeleton, SkeletonContext } from '../../components/skeleton';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
@@ -49,7 +50,7 @@ export function APIKeysTableView({
   onRetry,
 }: APIKeysTableViewProps) {
   const { table, sortHeader, pagination } = useServerDataTable({
-    data: apiKeys,
+    data: isLoading ? PLACEHOLDER_API_KEYS : apiKeys,
     totalCount,
     getRowId,
     sortableColumns: ['name', 'createdAt', 'lastUsed'],
@@ -70,6 +71,7 @@ export function APIKeysTableView({
   return (
     <>
       <div {...mergeStyleProps(themeProps('api-keys-table'), stylex.props(styles.root))}>
+        <VisuallyHidden role='status'>{isLoading ? m.loading : m.loaded}</VisuallyHidden>
         <Table.Toolbar>
           <Table.Search
             ref={searchInputRef}
@@ -119,81 +121,82 @@ export function APIKeysTableView({
               ) : null}
             </Table.Row>
           </Table.Header>
-          <Table.Body>
-            {/* TODO: Replace with a shared Table.Loading built on a Mosaic Skeleton component (skeleton rows sized to the columns). */}
-            {isLoading ? (
-              <Table.Empty colSpan={columnCount}>
-                <span role='status'>
-                  <Spinner />
-                  <VisuallyHidden>{m.loading}</VisuallyHidden>
-                </span>
-              </Table.Empty>
-            ) : isError ? (
-              <Table.Empty colSpan={columnCount}>
-                <EmptyState.Root>
-                  <EmptyState.Icon glyph={ExclamationCircle} />
-                  <EmptyState.Label>{m.loadError}</EmptyState.Label>
-                  <EmptyState.Description>{m.loadErrorDescription}</EmptyState.Description>
-                  {onRetry ? (
-                    <EmptyState.Actions>
-                      <Button
-                        variant='outline'
-                        color='neutral'
-                        onClick={onRetry}
-                      >
-                        {m.retry}
-                      </Button>
-                    </EmptyState.Actions>
-                  ) : null}
-                </EmptyState.Root>
-              </Table.Empty>
-            ) : table.rows.length === 0 ? (
-              <Table.Empty colSpan={columnCount}>
-                <EmptyState.Root>
-                  <EmptyState.Icon glyph={Key} />
-                  <EmptyState.Label>{emptyState.label}</EmptyState.Label>
-                  <EmptyState.Description>{emptyState.description}</EmptyState.Description>
-                </EmptyState.Root>
-              </Table.Empty>
-            ) : (
-              table.rows.map(row => (
-                <Table.Row
-                  key={row.id}
-                  selected={Boolean(onBulkAction) && row.getIsSelected()}
-                >
-                  {onBulkAction ? (
-                    <Table.SelectCell
-                      aria-label={fill(m.select, { name: row.original.name })}
-                      checked={row.getIsSelected()}
-                      onToggleSelected={row.toggleSelected}
-                    />
-                  ) : null}
-                  <Table.Cell>
-                    <APIKeyMetadata
-                      messages={m}
-                      apiKey={row.original}
-                    />
-                  </Table.Cell>
-                  <Table.Cell noWrap>
-                    <Text>{row.original.createdAtLabel}</Text>
-                  </Table.Cell>
-                  <Table.Cell noWrap>
-                    <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
-                  </Table.Cell>
-                  {revoke ? (
-                    <Table.Cell align='end'>
-                      <APIKeyActions
+          <SkeletonContext.Provider value={isLoading}>
+            <Table.Body {...(isLoading ? { 'aria-hidden': true, ...inertProps(true) } : {})}>
+              {!isLoading && isError ? (
+                <Table.Empty colSpan={columnCount}>
+                  <EmptyState.Root>
+                    <EmptyState.Icon glyph={ExclamationCircle} />
+                    <EmptyState.Label>{m.loadError}</EmptyState.Label>
+                    <EmptyState.Description>{m.loadErrorDescription}</EmptyState.Description>
+                    {onRetry ? (
+                      <EmptyState.Actions>
+                        <Button
+                          variant='outline'
+                          color='neutral'
+                          onClick={onRetry}
+                        >
+                          {m.retry}
+                        </Button>
+                      </EmptyState.Actions>
+                    ) : null}
+                  </EmptyState.Root>
+                </Table.Empty>
+              ) : table.rows.length === 0 ? (
+                <Table.Empty colSpan={columnCount}>
+                  <EmptyState.Root>
+                    <EmptyState.Icon glyph={Key} />
+                    <EmptyState.Label>{emptyState.label}</EmptyState.Label>
+                    <EmptyState.Description>{emptyState.description}</EmptyState.Description>
+                  </EmptyState.Root>
+                </Table.Empty>
+              ) : (
+                table.rows.map(row => (
+                  <Table.Row
+                    key={row.id}
+                    selected={Boolean(onBulkAction) && row.getIsSelected()}
+                  >
+                    {onBulkAction ? (
+                      <Table.SelectCell
+                        aria-label={fill(m.select, { name: row.original.name })}
+                        checked={row.getIsSelected()}
+                        onToggleSelected={row.toggleSelected}
+                      />
+                    ) : null}
+                    <Table.Cell>
+                      <APIKeyMetadata
                         messages={m}
                         apiKey={row.original}
-                        registerTrigger={registerTrigger}
-                        onSelect={apiKey => revoke.open(apiKey)}
+                        skeleton={isLoading}
                       />
                     </Table.Cell>
-                  ) : null}
-                </Table.Row>
-              ))
-            )}
-          </Table.Body>
+                    <Table.Cell noWrap>
+                      <Text>
+                        <Skeleton>{row.original.createdAtLabel}</Skeleton>
+                      </Text>
+                    </Table.Cell>
+                    <Table.Cell noWrap>
+                      <Text>
+                        <Skeleton>{row.original.lastUsedAtLabel ?? m.neverUsed}</Skeleton>
+                      </Text>
+                    </Table.Cell>
+                    {revoke ? (
+                      <Table.Cell align='end'>
+                        <Skeleton visible={false}>
+                          <APIKeyActions
+                            messages={m}
+                            apiKey={row.original}
+                            registerTrigger={registerTrigger}
+                            onSelect={apiKey => revoke.open(apiKey)}
+                          />
+                        </Skeleton>
+                      </Table.Cell>
+                    ) : null}
+                  </Table.Row>
+                ))
+              )}
+            </Table.Body>
+          </SkeletonContext.Provider>
         </Table.Root>
         {pagination ? (
           <Pagination
@@ -222,26 +225,45 @@ export function APIKeysTableView({
   );
 }
 
-function APIKeyMetadata({ messages: m, apiKey }: { messages: APIKeysTableMessages; apiKey: APIKey }) {
+function APIKeyMetadata({
+  messages: m,
+  apiKey,
+  skeleton,
+}: {
+  messages: APIKeysTableMessages;
+  apiKey: APIKey;
+  skeleton: boolean;
+}) {
+  const id = truncateWithEndVisible(apiKey.id, 10, 4);
+  const expiry =
+    apiKey.expiresAtLabel === null
+      ? m.neverExpires
+      : fill(m.expires, {
+          expiresDate: apiKey.expiresAtLabel,
+        });
   return (
     <div {...stylex.props(styles.metadata)}>
-      <Text xstyle={styles.name}>{apiKey.name}</Text>
+      <Text xstyle={styles.name}>
+        <Skeleton>{apiKey.name}</Skeleton>
+      </Text>
       <Text
         size='xs'
         color='foreground-secondary'
       >
-        {truncateWithEndVisible(apiKey.id, 10, 4)} ·{' '}
-        <Text
-          render={<span />}
-          size='xs'
-          color={apiKey.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
-        >
-          {apiKey.expiresAtLabel === null
-            ? m.neverExpires
-            : fill(m.expires, {
-                expiresDate: apiKey.expiresAtLabel,
-              })}
-        </Text>
+        {skeleton ? (
+          <Skeleton>{`${id} · ${expiry}`}</Skeleton>
+        ) : (
+          <>
+            {id} ·{' '}
+            <Text
+              render={<span />}
+              size='xs'
+              color={apiKey.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
+            >
+              {expiry}
+            </Text>
+          </>
+        )}
       </Text>
     </div>
   );
@@ -277,3 +299,27 @@ function APIKeyActions({
     </Menu.Root>
   );
 }
+
+const PLACEHOLDER_API_KEYS: APIKey[] = [
+  {
+    id: 'ak_placeholder0000000000000001',
+    name: 'Production',
+    createdAtLabel: 'Mar 12, 2026',
+    expiresAtLabel: 'Mar 12, 2027',
+    lastUsedAtLabel: '5 minutes ago',
+  },
+  {
+    id: 'ak_placeholder0000000000000002',
+    name: 'Deploy script',
+    createdAtLabel: 'Mar 18, 2026',
+    expiresAtLabel: null,
+    lastUsedAtLabel: null,
+  },
+  {
+    id: 'ak_placeholder0000000000000003',
+    name: 'Reporting',
+    createdAtLabel: 'Apr 2, 2026',
+    expiresAtLabel: null,
+    lastUsedAtLabel: '3 hours ago',
+  },
+];

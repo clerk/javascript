@@ -169,10 +169,13 @@ describe('APIKeysTable', () => {
       await renderWithClerk(<APIKeysTable subject={alice.id} />);
 
       expect(await screen.findByRole('status')).toHaveTextContent('Loading API keys');
+      expect(within(table()).getAllByRole('row')).toHaveLength(1);
+      expect(within(table()).queryByRole('button')).toBeNull();
       const loadingWidths = columnWidths();
       list.release();
       expect(await within(table()).findByText('Web app')).toBeVisible();
-      expect(screen.queryByRole('status')).toBeNull();
+      expect(screen.getByRole('status')).toHaveTextContent('API keys loaded');
+      expect(within(table()).getAllByRole('row')).toHaveLength(3);
       expect(columnWidths()).toEqual(loadingWidths);
     });
 
