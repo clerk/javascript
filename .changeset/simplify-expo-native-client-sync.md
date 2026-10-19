@@ -2,4 +2,4 @@
 '@clerk/expo': minor
 ---
 
-Rewrite the sync between the Clerk JS client and the native Clerk SDK. Both now share a single device token stored by the native SDK, and startup makes fewer requests. This fixes a stale token in the app's `tokenCache` signing out a session that was signed in natively, and the two SDKs ending up on different tokens when both rotated the device token at the same time. If you use the native components, update `@clerk/expo-native-components` to 0.2.0 or later.
+Rewrite the sync between the Clerk JS client and the native Clerk SDK. Both now share a single device token stored by the native SDK, and startup makes fewer requests. This fixes a stale token in the app's `tokenCache` signing out a session that was signed in natively, and the two SDKs ending up on different tokens when both rotated the device token at the same time. If you use the native components, update `@clerk/expo-native-components` to 0.3.0 or later.
