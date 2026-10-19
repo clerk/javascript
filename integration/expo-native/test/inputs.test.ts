@@ -73,6 +73,12 @@ describe('the device and app a run is told to use', () => {
     const target = readTarget(BOTH_PLATFORMS_APP, { CLERK_E2E_PLATFORM: 'ios', CLERK_E2E_DEVICE: UDID, CLERK_E2E_APP_PATH: '/tmp/E2EHost.app', CLERK_E2E_DEV_SERVER: 'http://localhost:8081', CLERK_E2E_DEVICE_SESSION: 'mine' });
     assert.deepEqual([target.build, target.session], [{ path: '/tmp/E2EHost.app', devServer: 'http://localhost:8081' }, 'mine']);
   });
+
+  it('refuses a dev server with a borrowed Android emulator, whose dev-client app would start through adb on this machine', () => {
+    const borrowed = { CLERK_E2E_PLATFORM: 'android', CLERK_E2E_DEVICE: 'emulator-5554', CLERK_E2E_DEVICE_DAEMON_URL: 'https://quick-fox-jumps.trycloudflare.com/agent-device', CLERK_E2E_DEVICE_DAEMON_TOKEN_FILE: '/tmp/token' };
+    assert.equal(readTarget(BOTH_PLATFORMS_APP, borrowed).device.kind, 'borrowed');
+    assert.throws(() => readTarget(BOTH_PLATFORMS_APP, { ...borrowed, CLERK_E2E_DEV_SERVER: 'http://localhost:8081' }), /CLERK_E2E_DEV_SERVER and CLERK_E2E_DEVICE_DAEMON_URL are both set/);
+  });
 });
 
 describe('the Clerk instance a run is told to use', () => {

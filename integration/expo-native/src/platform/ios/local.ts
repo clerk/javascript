@@ -237,7 +237,7 @@ export function localIosBackend(options: { readonly os?: NodeJS.Platform } = {})
             ? { id: 'template', ok: true, detail: `${TEMPLATE_NAME} (${template.runtime.replace(/^.*SimRuntime\./, '')})` }
             : { id: 'template', ok: false, detail: `${TEMPLATE_NAME} is ${template.state}; lanes clone it only while it is shut down`, fix: `xcrun simctl shutdown "${TEMPLATE_NAME}"` },
         await proxyTrustCheck(template),
-        await lanePortsCheck(claimsDir),
+        xcode.code === 0 ? await lanePortsCheck(claimsDir) : { id: 'lane-ports', ok: true, state: 'not-run', detail: 'not run: needs xcode' },
       ];
       return { toolchain, device };
     },

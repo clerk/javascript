@@ -190,16 +190,21 @@ async function liveChecks(settings: RemoteSettings, deps: RemoteDeps, github: Gi
   } finally {
     if (runId !== null) {
       const stopAt = Date.now();
-      const ended = await endSession(github, runId, session);
-      const sessionJob = (await viewJobs(github, runId)).find((job) => job.name === 'session');
-      checks.push(
-        check(
-          'live-stop',
-          ended.problem === null && !ended.cancelled,
-          ended.problem ?? `${ended.cancelled ? 'the stop route did not end the run, so it was cancelled' : 'the stop route ended the run'}: run ${ended.conclusion}, session job ${sessionJob?.status ?? 'not started'} ${Math.round((Date.now() - stopAt) / 1000)}s after the stop`,
-          `open ${runUrl(runId)} and cancel it`,
-        ),
-      );
+      const fix = `open ${runUrl(runId)} and cancel it`;
+      try {
+        const ended = await endSession(github, runId, session);
+        const sessionJob = (await viewJobs(github, runId)).find((job) => job.name === 'session');
+        checks.push(
+          check(
+            'live-stop',
+            ended.problem === null && !ended.cancelled,
+            ended.problem ?? `${ended.cancelled ? 'the stop route did not end the run, so it was cancelled' : 'the stop route ended the run'}: run ${ended.conclusion}, session job ${sessionJob?.status ?? 'not started'} ${Math.round((Date.now() - stopAt) / 1000)}s after the stop`,
+            fix,
+          ),
+        );
+      } catch (error) {
+        checks.push(check('live-stop', false, failureText(error), fix));
+      }
     }
     forgetSession(settings, request.session);
   }

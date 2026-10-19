@@ -127,6 +127,7 @@ const RECORDER_START_MINUTES = 1 / 6;
 
 // The CLI times the video from this answer, and a recorder can take a second or more to start on a runner.
 export function printed(child: ChildProcess, words: string, limitMs: number): Promise<{ readonly outcome: 'printed' | 'exited' | 'silent'; readonly output: string }> {
+  const wanted = words.toLowerCase();
   return new Promise((done) => {
     let seen = '';
     const settle = (outcome: 'printed' | 'exited' | 'silent') => {
@@ -138,7 +139,7 @@ export function printed(child: ChildProcess, words: string, limitMs: number): Pr
     const timer = setTimeout(() => settle('silent'), limitMs);
     const read = (chunk: Buffer) => {
       seen += chunk.toString();
-      if (seen.toLowerCase().includes(words)) settle('printed');
+      if (seen.toLowerCase().includes(wanted)) settle('printed');
     };
     child.stdout?.on('data', read);
     child.stderr?.on('data', read);

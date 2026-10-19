@@ -128,7 +128,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     const marked = (await devices()).has(serial) && (await isOwnLane(serial, nonce));
     const owned = ownedProcess(slot, nonce);
     if (marked) await adb(serial, ['emu', 'kill']);
-    else if (owned !== null) process.kill(-owned.pid, 'SIGTERM');
+    else if (owned !== null) terminateGroup(owned.pid);
     else {
       forgetProcess(slot, nonce);
       return;
