@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { Avatar } from '../../../components/avatar';
 import { Button, SubmitButton } from '../../../components/button';
 import { EmptyState } from '../../../components/empty-state';
+import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
-import { Item } from '../../../components/item';
 import { Pagination } from '../../../components/pagination';
 import { Section } from '../../../components/section';
 import { Skeleton, SkeletonContext } from '../../../components/skeleton';
@@ -212,9 +212,9 @@ function RequestsTableBody({
                 />
               ) : null}
               <Table.Cell>
-                <Item.Root>
+                <Entity.Root>
                   <Skeleton shape='pill'>
-                    <Item.Media>
+                    <Entity.Media>
                       <Avatar.Root
                         size='fit'
                         aria-hidden
@@ -227,19 +227,19 @@ function RequestsTableBody({
                         ) : null}
                         <Avatar.Fallback />
                       </Avatar.Root>
-                    </Item.Media>
+                    </Entity.Media>
                   </Skeleton>
-                  <Item.Content>
-                    <Item.Label>
+                  <Entity.Content>
+                    <Entity.Label>
                       <Skeleton>{request.name ?? request.email}</Skeleton>
-                    </Item.Label>
+                    </Entity.Label>
                     {request.name ? (
-                      <Item.Description>
+                      <Entity.Description>
                         <Skeleton>{request.email}</Skeleton>
-                      </Item.Description>
+                      </Entity.Description>
                     ) : null}
-                  </Item.Content>
-                </Item.Root>
+                  </Entity.Content>
+                </Entity.Root>
               </Table.Cell>
               <Table.Cell noWrap>
                 <Skeleton>{request.requestedAtLabel}</Skeleton>

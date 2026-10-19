@@ -7,8 +7,8 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { EmptyState } from '../../../components/empty-state';
+import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
-import { Item } from '../../../components/item';
 import { Pagination } from '../../../components/pagination';
 import { Skeleton, SkeletonContext } from '../../../components/skeleton';
 import { Table } from '../../../components/table';
@@ -209,9 +209,9 @@ function InvitationsTableBody({
               />
             ) : null}
             <Table.Cell>
-              <Item.Root>
+              <Entity.Root>
                 <Skeleton shape='pill'>
-                  <Item.Media>
+                  <Entity.Media>
                     <Avatar.Root
                       size='fit'
                       aria-hidden
@@ -224,14 +224,14 @@ function InvitationsTableBody({
                       ) : null}
                       <Avatar.Fallback />
                     </Avatar.Root>
-                  </Item.Media>
+                  </Entity.Media>
                 </Skeleton>
-                <Item.Content>
-                  <Item.Label>
+                <Entity.Content>
+                  <Entity.Label>
                     <Skeleton>{row.original.email}</Skeleton>
-                  </Item.Label>
-                </Item.Content>
-              </Item.Root>
+                  </Entity.Label>
+                </Entity.Content>
+              </Entity.Root>
             </Table.Cell>
             <Table.Cell noWrap>
               <Skeleton>{row.original.invitedAtLabel}</Skeleton>
