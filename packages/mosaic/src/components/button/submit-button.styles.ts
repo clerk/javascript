@@ -16,6 +16,7 @@ export const styles = stylex.create({
   // enter with no pointer involved. That half is handled where the fills are declared, by the
   // `:not([data-pending])` on each cell's active selector in `button.styles.ts`.
   rootPending: {
+    opacity: 1,
     pointerEvents: 'none',
   },
 
