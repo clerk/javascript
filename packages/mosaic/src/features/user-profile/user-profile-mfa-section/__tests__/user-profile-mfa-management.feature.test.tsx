@@ -85,6 +85,94 @@ describe('User profile MFA management', () => {
     }
   });
 
+  async function renderTwoSmsMethodsNeedingReverification() {
+    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const second = fapiPhoneNumber({
+      ...phone,
+      id: 'phone_2',
+      phone_number: '+15555550202',
+      reserved_for_second_factor: true,
+    });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second] }), mfaEnvironment(), {
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me/phone_numbers/phone_2');
+    return fapi;
+  }
+
+  const secondManage = () => screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' });
+  const defaultUpdates = (fapi: Awaited<ReturnType<typeof renderMfa>>) =>
+    fapi.mfa.phoneUpdates.filter(update => update.default === true);
+
+  it('verifies the session before changing the default method and returns focus to its menu', async () => {
+    const fapi = await renderTwoSmsMethodsNeedingReverification();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
+    await waitFor(() => expect(defaultUpdates(fapi)).toEqual([{ id: 'phone_2', reserved: undefined, default: true }]));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(secondManage()).toHaveFocus());
+  });
+
+  it('lets the user cancel verification quietly and retry the default change', async () => {
+    const fapi = await renderTwoSmsMethodsNeedingReverification();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(defaultUpdates(fapi)).toEqual([]);
+    expect(screen.queryByRole('alert')).toBeNull();
+    await waitFor(() => expect(secondManage()).toHaveFocus());
+
+    await user.click(secondManage());
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(defaultUpdates(fapi)).toEqual([{ id: 'phone_2', reserved: undefined, default: true }]));
+  });
+
+  it('keeps the verification dialog open while retrying and reports an ordinary retry error', async () => {
+    const fapi = await renderTwoSmsMethodsNeedingReverification();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    const replay = holdRequests('post', '/v1/me/phone_numbers/:id');
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(replay.requests).toHaveLength(1));
+
+    expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+    await user.keyboard('{Escape}');
+    expect(dialog).toBeVisible();
+
+    replay.fail('action_blocked', 'Unable to update the default method.');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
+    expect(defaultUpdates(fapi)).toEqual([]);
+  });
+
+  it('waits for a verification factor before opening the default-change dialog', async () => {
+    await renderTwoSmsMethodsNeedingReverification();
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    start.release();
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+  });
+
   it('shows a safe message when authenticator setup throws an unexpected error', async () => {
     serveFapi({
       environment: mfaEnvironment(),
