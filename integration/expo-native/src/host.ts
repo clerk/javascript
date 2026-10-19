@@ -77,11 +77,13 @@ async function withFixtureLock<T>(progress: (line: string) => void, fn: () => Pr
     () =>
       new VerifyFailure(
         'NOT_READY',
-        `another verify process in this worktree has been building the expo-native fixture for ${FIXTURE_LOCK_MINUTES} minutes`,
+        `another verify process in this worktree has held the expo-native fixture for ${FIXTURE_LOCK_MINUTES} minutes`,
         '{cli} down, then {cli} up',
       ),
     owner =>
-      progress(`build   waiting for pid ${owner.pid}, which is building the expo-native fixture in this worktree`),
+      progress(
+        `build   waiting for pid ${owner.pid}, which is building or starting the expo-native fixture in this worktree`,
+      ),
   );
   try {
     return await fn();
@@ -523,49 +525,51 @@ export const host: HostAdapter = {
     if (lease.backend === 'remote' || productFor(lease.backend) === 'standalone')
       return { devServer: null, processes: [] };
     const port = metroPort(lease);
-    return withCleanup(
-      stopRuntime,
-      async started => {
-        refuseOutOfScope();
-        await rebuildStaleSiblings(progress);
-        const watch = await ensureWatch(started, progress);
-        await waitForWatchToCatchUp();
-        const metro = await ensureServed(
-          await ensureMetro(started, port, lease.platform, progress),
-          port,
-          lease.platform,
-          progress,
-        );
-        if (lease.platform === 'android') {
-          const adb = sdkTool('adb');
-          const reverse = await run(adb, ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
-          if (reverse.code !== 0)
-            throw new VerifyFailure(
-              'NOT_READY',
-              `adb reverse tcp:${port} failed: ${reverse.stderr.trim()}`,
-              '{cli} down --platform android, then {cli} up --platform android',
-            );
-          await run(adb, ['-s', lease.deviceId, 'shell', 'am', 'force-stop', APP_ID]);
-          const prefs = await run(
-            adb,
-            [
-              '-s',
-              lease.deviceId,
-              'shell',
-              `run-as ${APP_ID} sh -c 'mkdir -p shared_prefs && cat > shared_prefs/expo.modules.devmenu.sharedpreferences.xml'`,
-            ],
-            { input: ANDROID_DEV_MENU_PREFS },
+    return withFixtureLock(progress, () =>
+      withCleanup(
+        stopRuntime,
+        async started => {
+          refuseOutOfScope();
+          await rebuildStaleSiblings(progress);
+          const watch = await ensureWatch(started, progress);
+          await waitForWatchToCatchUp();
+          const metro = await ensureServed(
+            await ensureMetro(started, port, lease.platform, progress),
+            port,
+            lease.platform,
+            progress,
           );
-          if (prefs.code !== 0)
-            throw new VerifyFailure(
-              'NOT_READY',
-              `could not turn off the dev menu onboarding: ${prefs.stderr.trim()}`,
-              '{cli} down --platform android, then {cli} up --platform android',
+          if (lease.platform === 'android') {
+            const adb = sdkTool('adb');
+            const reverse = await run(adb, ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
+            if (reverse.code !== 0)
+              throw new VerifyFailure(
+                'NOT_READY',
+                `adb reverse tcp:${port} failed: ${reverse.stderr.trim()}`,
+                '{cli} down --platform android, then {cli} up --platform android',
+              );
+            await run(adb, ['-s', lease.deviceId, 'shell', 'am', 'force-stop', APP_ID]);
+            const prefs = await run(
+              adb,
+              [
+                '-s',
+                lease.deviceId,
+                'shell',
+                `run-as ${APP_ID} sh -c 'mkdir -p shared_prefs && cat > shared_prefs/expo.modules.devmenu.sharedpreferences.xml'`,
+              ],
+              { input: ANDROID_DEV_MENU_PREFS },
             );
-        }
-        return { devServer: `http://localhost:${port}`, processes: [watch, metro] };
-      },
-      progress,
+            if (prefs.code !== 0)
+              throw new VerifyFailure(
+                'NOT_READY',
+                `could not turn off the dev menu onboarding: ${prefs.stderr.trim()}`,
+                '{cli} down --platform android, then {cli} up --platform android',
+              );
+          }
+          return { devServer: `http://localhost:${port}`, processes: [watch, metro] };
+        },
+        progress,
+      ),
     );
   },
   logPredicates: { ios: `process == "${IOS_PRODUCT}" AND senderImagePath CONTAINS "${IOS_PRODUCT}"` },

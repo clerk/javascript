@@ -8,7 +8,7 @@ To prove a change, use the CLI. `.claude/skills/verify-clerk-expo/SKILL.md` has 
 
 ## Run a test by hand
 
-You need Node 24.8 or newer on 24, Xcode and a booted iOS simulator, or the Android SDK and a running emulator, and the publishable key and secret key of a Clerk development instance.
+You need Node 24.15 or newer on 24, because the fixture build runs `pnpm install`. You also need Xcode and a booted iOS simulator, or the Android SDK and a running emulator, and the publishable key and secret key of a Clerk development instance.
 
 ```sh
 cd integration/expo-native
