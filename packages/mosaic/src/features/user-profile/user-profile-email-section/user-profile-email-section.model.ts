@@ -88,6 +88,9 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
   const [removeEmail, reverification] = useReverificationFlow((user: UserResource, id: string) =>
     byId(user.emailAddresses, id, 'email address').destroy(),
   );
+  const [setPrimaryEmail, setPrimaryReverification] = useReverificationFlow((user: UserResource, id: string) =>
+    user.update({ primaryEmailAddressId: id }),
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -121,8 +124,9 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
         }
       : undefined,
     getEmailVerifier: id => verifierFor(byId(user.emailAddresses, id, 'email address')),
-    onSetPrimaryEmail: id => saveAsUser(current => current.update({ primaryEmailAddressId: id })),
+    onSetPrimaryEmail: id => saveAsUser(current => setPrimaryEmail(current, id)),
     onRemoveEmail: access.canRemove ? id => saveAsUser(current => removeEmail(current, id)) : undefined,
     reverification,
+    setPrimaryReverification,
   };
 }

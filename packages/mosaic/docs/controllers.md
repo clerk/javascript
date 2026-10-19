@@ -53,7 +53,9 @@ return {
 
 `run` resolves `true` on success, so the caller can close a dialog or move
 focus. To hold pending through an OAuth redirect, await a delay inside the
-action (`user-profile-connected-accounts-section.controller.ts`). It is not for:
+action (`user-profile-connected-accounts-section.controller.ts`). When the user
+cancels a reverification challenge, `run` resolves `false` without showing an
+error and releases the lock. It is not for:
 
 - a form → `useForm`
 - a confirm step → `useConfirmController` with `Confirmation` / `Destructive`
@@ -94,6 +96,12 @@ const remove = useConfirmController<UserProfileEmail>({
   reverification,
 });
 ```
+
+For a direct action without a confirmation step, pass the controller from
+`useReverificationFlow` to `ReverificationDialog` (`blocks/reverification/`) in the view. Keep the direct
+action under `usePendingAction` so its lock and ordinary errors stay with the
+section. The dialog opens from the reverification status, and offers dismissal
+only while the controller has a cancel callback.
 
 A single open boolean earns nothing. A two-state machine with one event is a
 boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in
