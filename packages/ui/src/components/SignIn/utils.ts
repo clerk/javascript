@@ -138,6 +138,11 @@ const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 
 export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null | undefined) =>
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
 
+/** Whether the sign-in's first factor was a verified password reset. */
+export const isResettingPassword = (resource: SignInResource) =>
+  isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
+  resource.firstFactorVerification?.status === 'verified';
+
 export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
   if (identifier.type === 'tel') {
     return 'phoneNumber';
