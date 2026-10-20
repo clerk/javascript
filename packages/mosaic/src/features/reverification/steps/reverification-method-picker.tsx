@@ -1,4 +1,6 @@
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -38,6 +40,7 @@ export interface ReverificationMethodPickerProps {
   onSelect: (methodId: string) => void;
   onHelp: () => void;
   onBack?: () => void;
+  focusRef?: Ref<HTMLElement>;
 }
 
 export function ReverificationMethodPicker({
@@ -47,8 +50,9 @@ export function ReverificationMethodPicker({
   onSelect,
   onHelp,
   onBack,
+  focusRef,
 }: ReverificationMethodPickerProps) {
-  const firstMethodRef = useFlowAutoFocus<HTMLDivElement>();
+  const firstMethodRef = useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLDivElement>()]);
 
   return (
     <>

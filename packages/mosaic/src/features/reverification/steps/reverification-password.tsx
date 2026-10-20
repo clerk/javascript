@@ -1,4 +1,5 @@
-import type { FormEvent } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import type { FormEvent, Ref } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -25,6 +26,7 @@ export interface ReverificationPasswordProps {
   onValueChange: (value: string) => void;
   onSubmit: () => void;
   onCancel?: () => void;
+  focusRef?: Ref<HTMLElement>;
 }
 
 export function ReverificationPassword({
@@ -35,6 +37,7 @@ export function ReverificationPassword({
   onValueChange,
   onSubmit,
   onCancel,
+  focusRef,
 }: ReverificationPasswordProps) {
   const formId = useId();
 
@@ -64,7 +67,7 @@ export function ReverificationPassword({
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Input
-              ref={useFlowAutoFocus<HTMLInputElement>()}
+              ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
               name='password'
               type='password'
               autoComplete='current-password'
