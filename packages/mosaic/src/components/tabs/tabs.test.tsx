@@ -29,7 +29,7 @@ describe('Mosaic Tabs', () => {
     expect(screen.getByRole('tablist')).toHaveClass('cl-tabs-list');
     expect(screen.getByRole('tab', { name: 'Members' })).toHaveClass('cl-tabs-tab');
     expect(screen.getByText('Member list')).toBeVisible();
-    expect(screen.getByText('Invitation list')).not.toBeVisible();
+    expect(screen.queryByText('Invitation list')).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('tab', { name: 'Invitations' }));
 

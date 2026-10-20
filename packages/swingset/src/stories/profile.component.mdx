@@ -128,13 +128,11 @@ its parent.
 
 ## Page transitions
 
-An unselected page carries the `hidden` attribute, and a transition across it is CSS alone —
-the CSS a customer adds against a `<UserProfile />` they do not render. `@starting-style` gives the
-page that just lost `hidden` a frame to enter from; `transition-behavior: allow-discrete` on
-`display` holds the page that just gained it until its exit finishes. Stack the pages in one grid
-cell and the two cross-fade in place. `shouldForceMount` on `ContentPanel` is there for a transition
-that needs the primitive's own timing attributes instead (`data-starting-style` /
-`data-ending-style`, `--cl-tab-transition-direction`).
+A transition across pages is CSS alone — the CSS a customer adds against a `<UserProfile />` they
+do not render. The entering page carries `data-starting-style` for its first frame; the leaving page
+carries `data-ending-style` and keeps its content until its exit finishes, then gains `hidden`.
+`--cl-tab-transition-direction` is `1` when moving to a later page and `-1` to an earlier one. Stack
+the pages in one grid cell and the two cross-fade in place. An unselected page renders no content.
 
 <Story
   name='Transitions'

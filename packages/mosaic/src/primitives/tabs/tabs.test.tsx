@@ -1,6 +1,7 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from 'react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -104,7 +105,7 @@ describe('Tabs', () => {
     it('shows selected panel content', () => {
       renderTabs();
       expect(screen.getByText('Account content')).toBeVisible();
-      expect(screen.getByText('Settings content')).not.toBeVisible();
+      expect(screen.queryByText('Settings content')).not.toBeInTheDocument();
     });
 
     it('selects tab on click', async () => {
@@ -578,16 +579,141 @@ describe('Tabs', () => {
     it('marks deselected panels inert and leaves the selected panel interactive', () => {
       renderTabs({ defaultValue: 'tab1' });
 
-      const selected = screen.getByText('Account content');
-      const deselected = screen.getByText('Settings content');
+      const [selected, deselected] = screen.getAllByRole('tabpanel', { hidden: true });
 
       expect(selected).not.toHaveAttribute('inert');
       expect(deselected).toHaveAttribute('inert');
     });
   });
 
+  describe('panel children', () => {
+    function mockAnimations() {
+      let finish = () => {};
+      const finished = new Promise<void>(resolve => {
+        finish = resolve;
+      });
+      const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [{ finished }];
+      return {
+        finish: () =>
+          act(async () => {
+            finish();
+            await finished;
+          }),
+        restore: () => {
+          if (original) {
+            (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+          } else {
+            delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+          }
+        },
+      };
+    }
+
+    it('renders every panel element but only the selected panel children', () => {
+      renderTabs();
+
+      expect(screen.getAllByRole('tabpanel', { hidden: true })).toHaveLength(3);
+      expect(screen.getByText('Account content')).toBeVisible();
+      expect(screen.queryByText('Settings content')).not.toBeInTheDocument();
+      expect(screen.queryByText('Billing content')).not.toBeInTheDocument();
+    });
+
+    it('swaps children when the selection changes', async () => {
+      const user = userEvent.setup();
+      renderTabs();
+
+      await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+      expect(screen.getByText('Settings content')).toBeVisible();
+      expect(screen.queryByText('Account content')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('tabpanel', { hidden: true })[0]).toHaveAttribute('hidden');
+    });
+
+    it('keeps the leaving panel visible with its children until its exit animation finishes', async () => {
+      const user = userEvent.setup();
+      renderTabs();
+      const [leaving] = screen.getAllByRole('tabpanel', { hidden: true });
+      const animations = mockAnimations();
+      try {
+        await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+        expect(leaving).toHaveAttribute('data-ending-style');
+        expect(leaving).toHaveAttribute('inert');
+        expect(leaving).not.toHaveAttribute('hidden');
+        expect(screen.getByText('Account content')).toBeInTheDocument();
+
+        await animations.finish();
+
+        expect(leaving).toHaveAttribute('hidden');
+        expect(screen.queryByText('Account content')).not.toBeInTheDocument();
+      } finally {
+        animations.restore();
+      }
+    });
+
+    it('marks a newly selected panel with data-starting-style, but not the initial one', () => {
+      function Controlled({ value }: { value: string }) {
+        return (
+          <Tabs.Root value={value}>
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+          </Tabs.Root>
+        );
+      }
+      const view = render(<Controlled value='tab1' />);
+      const [first, second] = screen.getAllByRole('tabpanel', { hidden: true });
+      expect(first).not.toHaveAttribute('data-starting-style');
+
+      view.rerender(<Controlled value='tab2' />);
+
+      expect(second).toHaveAttribute('data-starting-style');
+      expect(second.style.getPropertyValue('--cl-tab-transition-direction')).toBe('1');
+    });
+
+    it('renders children before selection with keepMounted', () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+          <Tabs.Panel
+            value='tab2'
+            keepMounted
+          >
+            Settings content
+          </Tabs.Panel>
+        </Tabs.Root>,
+      );
+
+      expect(screen.getByText('Settings content')).not.toBeVisible();
+    });
+
+    it('server-renders only the selected panel children', () => {
+      const html = renderToString(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+          <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+        </Tabs.Root>,
+      );
+
+      expect(html).toContain('Account content');
+      expect(html).not.toContain('Settings content');
+    });
+  });
+
   describe('transition direction', () => {
-    function renderForceMounted() {
+    function renderTwoTabs() {
       return render(
         <Tabs.Root
           defaultValue='tab1'
@@ -597,27 +723,17 @@ describe('Tabs', () => {
             <Tabs.Tab value='tab1'>One</Tabs.Tab>
             <Tabs.Tab value='tab2'>Two</Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel
-            value='tab1'
-            shouldForceMount
-          >
-            One content
-          </Tabs.Panel>
-          <Tabs.Panel
-            value='tab2'
-            shouldForceMount
-          >
-            Two content
-          </Tabs.Panel>
+          <Tabs.Panel value='tab1'>One content</Tabs.Panel>
+          <Tabs.Panel value='tab2'>Two content</Tabs.Panel>
         </Tabs.Root>,
       );
     }
 
     it('does not flip direction backward when re-selecting the active tab', async () => {
       const user = userEvent.setup();
-      renderForceMounted();
+      renderTwoTabs();
 
-      const panel = screen.getByText('Two content');
+      const panel = screen.getAllByRole('tabpanel', { hidden: true })[1];
 
       // Moving forward to tab2 sets direction = 1.
       await user.click(screen.getByRole('tab', { name: 'Two' }));
