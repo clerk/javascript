@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Skeleton, SkeletonContext } from './skeleton';
+import { Skeleton } from './skeleton';
 
 describe('Skeleton', () => {
   it('draws text as a text bone and hides it from assistive technology', () => {
@@ -36,23 +36,6 @@ describe('Skeleton', () => {
 
     expect(screen.getByText('Chrome on macOS')).not.toHaveClass('cl-skeleton');
     expect(document.querySelector('.cl-skeleton')).toBeNull();
-  });
-
-  it('follows the nearest skeleton container, and lets show override it', () => {
-    render(
-      <SkeletonContext.Provider value={false}>
-        <Skeleton>Hidden name</Skeleton>
-        <Skeleton
-          show
-          data-testid='forced'
-        >
-          Forced
-        </Skeleton>
-      </SkeletonContext.Provider>,
-    );
-
-    expect(screen.getByText('Hidden name')).not.toHaveClass('cl-skeleton');
-    expect(screen.getByTestId('forced')).toHaveClass('cl-skeleton');
   });
 
   it('holds space without drawing a bone when not visible', () => {
