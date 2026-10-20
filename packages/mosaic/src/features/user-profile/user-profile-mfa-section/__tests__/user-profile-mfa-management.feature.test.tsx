@@ -111,7 +111,8 @@ describe('User profile MFA management', () => {
     await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
 
     await waitFor(() => expect(defaultUpdates(fapi)).toEqual([{ id: 'phone_2', reserved: undefined, default: true }]));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
@@ -146,7 +147,8 @@ describe('User profile MFA management', () => {
     await screen.findByText('Enter your current password to continue');
     const dialog = screen.getByRole('dialog');
     const replay = holdRequests('post', '/v1/me/phone_numbers/:id');
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
     await waitFor(() => expect(replay.requests).toHaveLength(1));
 
     expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
