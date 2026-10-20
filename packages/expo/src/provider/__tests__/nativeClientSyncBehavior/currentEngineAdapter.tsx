@@ -122,8 +122,6 @@ export const renderWithNativeSync: RenderWithNativeSync = async (scenario = {}) 
   // coordinator and default in-memory token cache are module singletons.
   vi.resetModules();
   const { ClerkProvider } = await import('../../ClerkProvider');
-  const { synchronizeNativeClientToJs, waitForPendingJsToNativeSync } =
-    await import('../../nativeClientSyncCoordinator');
 
   const view = render(
     <ClerkProvider
@@ -163,8 +161,6 @@ export const renderWithNativeSync: RenderWithNativeSync = async (scenario = {}) 
       return result;
     },
     settle,
-    awaitJsToNativeSync: () => waitForPendingJsToNativeSync(),
-    pullNativeToJs: () => synchronizeNativeClientToJs(),
     releaseNativeStartup,
     unmount: () => view.unmount(),
   };

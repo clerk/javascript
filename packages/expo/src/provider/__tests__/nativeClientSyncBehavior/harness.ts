@@ -30,10 +30,6 @@ export type NativeSyncHarness = {
   nativeModuleCalls: string[];
   run: <T>(action: () => T | Promise<T>) => Promise<T>;
   settle: () => Promise<void>;
-  /** What biometric flows do before a native operation: wait until native reflects JS. */
-  awaitJsToNativeSync: () => Promise<void>;
-  /** What biometric flows do after a native operation: bring JS up to date with native. */
-  pullNativeToJs: () => Promise<void>;
   releaseNativeStartup: () => void;
   unmount: () => void;
 };
