@@ -7,7 +7,9 @@ type AfterResponseHook = (requestInit: FakeRequestInit, response: { headers: Hea
 export type FakeSessionResource = {
   id: string;
   status: 'active';
-  user: { id: string; profileVersion: number };
+  activityVersion: number;
+  updatedAt: Date;
+  user: { id: string; profileVersion: number; updatedAt: Date };
 };
 
 export type JsEmission = {
@@ -19,7 +21,13 @@ type ListenerCallback = (resources: { client: FakeClientResource; session: FakeS
 type StatusListener = (status: string) => void;
 
 function toSessionResource(session: FakeServerClientJSON['sessions'][number]): FakeSessionResource {
-  return { id: session.id, status: 'active', user: { id: session.userId, profileVersion: session.profileVersion } };
+  return {
+    id: session.id,
+    status: 'active',
+    activityVersion: session.activityVersion,
+    updatedAt: new Date(session.profileVersion + session.activityVersion),
+    user: { id: session.userId, profileVersion: session.profileVersion, updatedAt: new Date(session.profileVersion) },
+  };
 }
 
 /**
@@ -57,6 +65,7 @@ export class FakeClientResource {
         id: session.id,
         userId: session.user.id,
         profileVersion: session.user.profileVersion,
+        activityVersion: session.activityVersion,
       })),
     };
   }
@@ -245,6 +254,7 @@ export class FakeClerk {
       await this.handleUnauthenticated();
       return false;
     }
+    this.#applyPiggybackedClient(response);
     return true;
   }
 

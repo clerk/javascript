@@ -1,3 +1,3 @@
-export { renderWithNativeSync } from './currentEngineAdapter';
+export { renderWithNativeSync } from './newEngineAdapter';
 export { FakeClerkServer } from './fakeServer';
 export type { NativeSyncHarness, NativeSyncScenario } from './harness';

@@ -5,18 +5,10 @@
 import ExpoModulesCore
 import Foundation
 
-// MARK: - Records
-
-struct ConfigureOptions: Record {
-  @Field var bearerToken: String?
-  @Field var proxyUrl: String?
-}
-
 // MARK: - Module
 
 public class ClerkExpoModule: Module {
   private static let nativeAuthFlowChangedEvent = "clerkNativeAuthFlowChanged"
-  private static let nativeClientChangedEvent = "clerkNativeClientChanged"
   private static let nativeClientInvalidatedEvent = "clerkNativeClientInvalidated"
 
   private static weak var sharedInstance: ClerkExpoModule?
@@ -24,15 +16,12 @@ public class ClerkExpoModule: Module {
   public func definition() -> ModuleDefinition {
     Name("ClerkExpo")
 
-    Events(Self.nativeAuthFlowChangedEvent, Self.nativeClientChangedEvent, Self.nativeClientInvalidatedEvent)
+    Events(Self.nativeAuthFlowChangedEvent, Self.nativeClientInvalidatedEvent)
 
     OnCreate {
       Self.sharedInstance = self
       ClerkNativeBridge.setAuthFlowChangedEmitter { body in
         Self.emitAuthFlowChanged(body)
-      }
-      ClerkNativeBridge.setClientChangedEmitter { body in
-        Self.emitClientChanged(body)
       }
       ClerkNativeBridge.setClientInvalidatedEmitter {
         Self.emitClientInvalidated()
@@ -43,21 +32,8 @@ public class ClerkExpoModule: Module {
       if Self.sharedInstance === self {
         Self.sharedInstance = nil
         ClerkNativeBridge.setAuthFlowChangedEmitter(nil)
-        ClerkNativeBridge.setClientChangedEmitter(nil)
         ClerkNativeBridge.setClientInvalidatedEmitter(nil)
       }
-    }
-
-    AsyncFunction("configure") { (publishableKey: String, bearerToken: String?, promise: Promise) in
-      self.configure(publishableKey, bearerToken: bearerToken, proxyUrl: nil, promise: promise)
-    }
-
-    AsyncFunction("configureWithOptions") { (publishableKey: String, options: ConfigureOptions, promise: Promise) in
-      self.configure(publishableKey, bearerToken: options.bearerToken, proxyUrl: options.proxyUrl, promise: promise)
-    }
-
-    AsyncFunction("getClientToken") { (promise: Promise) in
-      self.getClientToken(promise: promise)
     }
 
     AsyncFunction("configureNative") {
@@ -109,21 +85,6 @@ public class ClerkExpoModule: Module {
 
     AsyncFunction("getAuthFlowState") { (promise: Promise) in
       self.getAuthFlowState(promise: promise)
-    }
-
-    AsyncFunction("syncClientStateFromJs") {
-      (deviceToken: String?,
-       sourceId: String?,
-       didChangeClient: Bool,
-       didChangeDeviceToken: Bool,
-       promise: Promise) in
-      self.syncClientStateFromJs(
-        deviceToken,
-        sourceId: sourceId,
-        didChangeClient: didChangeClient,
-        didChangeDeviceToken: didChangeDeviceToken,
-        promise: promise
-      )
     }
 
     AsyncFunction("getTrustedDeviceAvailability") {
@@ -185,57 +146,12 @@ public class ClerkExpoModule: Module {
     }
   }
 
-  // MARK: - configure
-
-  private func configure(_ publishableKey: String, bearerToken: String?, proxyUrl: String?, promise: Promise) {
-    Task {
-      do {
-        try await ClerkNativeBridge.shared.configure(
-          publishableKey: publishableKey, bearerToken: bearerToken, proxyUrl: proxyUrl)
-        promise.resolve()
-      } catch {
-        promise.reject("E_CONFIGURE_FAILED", error.localizedDescription)
-      }
-    }
-  }
-
-  // MARK: - getClientToken
-
-  private func getClientToken(promise: Promise) {
-    Task {
-      let token = await ClerkNativeBridge.shared.getClientToken()
-      promise.resolve(token)
-    }
-  }
-
   // MARK: - getAuthFlowState
 
   private func getAuthFlowState(promise: Promise) {
     Task { @MainActor in
       let state = ClerkNativeBridge.shared.getAuthFlowState()
       promise.resolve(state)
-    }
-  }
-
-  // MARK: - syncClientStateFromJs
-
-  private func syncClientStateFromJs(_ deviceToken: String?,
-                                     sourceId: String?,
-                                     didChangeClient: Bool,
-                                     didChangeDeviceToken: Bool,
-                                     promise: Promise) {
-    Task {
-      do {
-        try await ClerkNativeBridge.shared.syncClientStateFromJs(
-          deviceToken: deviceToken,
-          sourceId: sourceId,
-          didChangeClient: didChangeClient,
-          didChangeDeviceToken: didChangeDeviceToken
-        )
-        promise.resolve()
-      } catch {
-        promise.reject("E_SYNC_FROM_JS_FAILED", error.localizedDescription)
-      }
     }
   }
 
@@ -349,20 +265,6 @@ public class ClerkExpoModule: Module {
       fallbackCode: fallbackCode
     )
     promise.reject(descriptor.code, descriptor.message)
-  }
-
-  /// Emits a native client change event to JS from anywhere in the native layer.
-  /// Used by native views to ask ClerkProvider to reload JS client state.
-  static func emitClientChanged(_ body: [String: Any]? = nil) {
-    let eventBody = body ?? [:]
-
-    guard let instance = sharedInstance else {
-      return
-    }
-
-    DispatchQueue.main.async { [weak instance] in
-      instance?.sendEvent(Self.nativeClientChangedEvent, eventBody)
-    }
   }
 
   static func emitClientInvalidated() {

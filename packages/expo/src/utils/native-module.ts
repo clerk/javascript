@@ -11,19 +11,8 @@ export const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'andro
 
 export type ClerkExpoNativeModule = {
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
-  configure(publishableKey: string, bearerToken: string | null): Promise<void>;
-  configureWithOptions?(
-    publishableKey: string,
-    options: { bearerToken: string | null; proxyUrl: string | null },
-  ): Promise<void>;
-  getClientToken(): Promise<string | null>;
-  syncClientStateFromJs(
-    deviceToken: string | null,
-    sourceId: string | null,
-    didChangeClient: boolean,
-    didChangeDeviceToken: boolean,
-  ): Promise<void>;
-} & Partial<NativeAuthFlowModule & NativeBiometricCredentialModule & NativeClientSyncModule>;
+} & NativeClientSyncModule &
+  Partial<NativeAuthFlowModule & NativeBiometricCredentialModule>;
 
 function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   if (!module || typeof module !== 'object') {
@@ -32,9 +21,10 @@ function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   const maybeModule = module as Record<string, unknown>;
 
   return (
-    typeof maybeModule.configure === 'function' &&
-    typeof maybeModule.getClientToken === 'function' &&
-    typeof maybeModule.syncClientStateFromJs === 'function'
+    typeof maybeModule.configureNative === 'function' &&
+    typeof maybeModule.getDeviceToken === 'function' &&
+    typeof maybeModule.setDeviceToken === 'function' &&
+    typeof maybeModule.refreshClient === 'function'
   );
 }
 
@@ -57,7 +47,10 @@ function loadNativeModule(): ClerkExpoNativeModule | null {
   }
 
   if (__DEV__ && nativeModule) {
-    console.warn('[ClerkExpo] Native module does not satisfy the expected contract.');
+    console.error(
+      '[ClerkExpo] The native Clerk module in this app binary is incompatible with this version of @clerk/expo, so native components are disabled. ' +
+        'Install the @clerk/expo-native-components version required by @clerk/expo, then rebuild the app.',
+    );
   }
 
   return null;

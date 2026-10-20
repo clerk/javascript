@@ -13,8 +13,11 @@ export type NativeSyncScenario = {
   persistentTokenCache?: boolean;
   nativeDeviceToken?: string | null;
   nativeModule?: 'present' | 'absent';
+  /** The native SDK fails to configure, e.g. a native build that cannot initialize Clerk. */
+  failNativeConfigure?: boolean;
   disableNativeClientSync?: boolean;
   delayNativeStartup?: boolean;
+  strictMode?: boolean;
 };
 
 /**
