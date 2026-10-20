@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
 import { EmptyState } from '../empty-state';
 import { Table } from './table';
 import { stickySides, styles } from './table.styles';
@@ -325,7 +326,7 @@ describe('Mosaic Table', () => {
           <Table.Body>
             <Table.Empty colSpan={2}>
               <EmptyState.Root>
-                <EmptyState.Icon name='magnifying-glass' />
+                <EmptyState.Icon glyph={MagnifyingGlass} />
                 <EmptyState.Label>No results</EmptyState.Label>
                 <EmptyState.Description>Try a different search.</EmptyState.Description>
               </EmptyState.Root>

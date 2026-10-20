@@ -2,6 +2,11 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { ChevronUp } from '../../icons/glyphs/chevron-up';
+import { ChevronUpDown } from '../../icons/glyphs/chevron-up-down';
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { X } from '../../icons/glyphs/x';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -68,7 +73,7 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
       {...themeProps('table-search')}
     >
       <InputGroup.Start>
-        <Icon name='magnifying-glass' />
+        <Icon glyph={MagnifyingGlass} />
       </InputGroup.Start>
       <InputGroup.Input
         ref={mergedRef}
@@ -92,7 +97,7 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
               inputRef.current?.focus();
             }}
           >
-            <Icon name='x' />
+            <Icon glyph={X} />
           </Button>
         </InputGroup.End>
       ) : null}
@@ -221,9 +226,9 @@ export interface TableHeaderCellProps extends Omit<MosaicComponentProps<'th'>, '
 }
 
 const sortIcons = {
-  ascending: 'chevron-up',
-  descending: 'chevron-down',
-  none: 'chevron-up-down',
+  ascending: ChevronUp,
+  descending: ChevronDown,
+  none: ChevronUpDown,
 } as const;
 
 const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(function MosaicTableHeaderCell(
@@ -265,7 +270,7 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
         >
           {children}
           <Icon
-            name={sortIcons[sort]}
+            glyph={sortIcons[sort]}
             size='sm'
             placement='inline-end'
           />

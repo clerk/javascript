@@ -16,6 +16,7 @@ import { activeElement, contains, getDocument, getTarget, useLatestRef } from '@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { X } from '../../icons/glyphs/x';
 import { useAnimationsFinished, useTransitionStatus } from '../../primitives/hooks';
 import { isElement, isRef, mergeProps, useRender } from '../../primitives/utils';
 import { getComputedStyle } from '../../primitives/utils/dom';
@@ -327,7 +328,7 @@ const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(funct
       aria-label={ariaLabel ?? 'Clear selection'}
       {...mergeStyleProps(themeProps('action-bar-dismiss'), rest)}
     >
-      <Icon name='x' />
+      <Icon glyph={X} />
     </Action>
   );
 });

@@ -3,6 +3,8 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { Pen } from '../../../icons/glyphs/pen';
+import { X } from '../../../icons/glyphs/x';
 import { useMessages } from '../../../localization';
 import { FileUpload } from '../../../primitives/file-upload';
 import type { UserProfilePictureController } from './user-profile-picture.controller';
@@ -90,11 +92,11 @@ function ProfilePictureActions({
   const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
+    actions.push({ label: m.picture.change, icon: Pen, onClick: openFilePicker });
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
+    actions.push({ label: m.picture.remove, icon: X, onClick: onRemove });
   }
 
   if (actions.length > 0) {

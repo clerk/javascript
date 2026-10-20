@@ -6,6 +6,12 @@ import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 import { Section } from '@clerk/mosaic/components/section';
 import { Skeleton } from '@clerk/mosaic/components/skeleton';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
+import { ArrowUpRight } from '@clerk/mosaic/icons/glyphs/arrow-up-right';
+import { DeviceLaptop } from '@clerk/mosaic/icons/glyphs/device-laptop';
+import { DevicePhone } from '@clerk/mosaic/icons/glyphs/device-phone';
+import { EllipsisHorizontal } from '@clerk/mosaic/icons/glyphs/ellipsis-horizontal';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
+import { Users } from '@clerk/mosaic/icons/glyphs/users';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useEffect, useState } from 'react';
@@ -215,7 +221,7 @@ export function Cards() {
                 variant='outline'
               >
                 <Icon
-                  name='plus'
+                  glyph={Plus}
                   placement='inline-start'
                   size='sm'
                 />
@@ -241,7 +247,7 @@ export function Cards() {
                       size='sm'
                       variant='ghost'
                     >
-                      <Icon name='ellipsis-horizontal' />
+                      <Icon glyph={EllipsisHorizontal} />
                     </Button>
                   </Section.Actions>
                 </Section.Item>
@@ -289,7 +295,7 @@ export function HeaderDescription() {
                     size='sm'
                     variant='ghost'
                   >
-                    <Icon name='ellipsis-horizontal' />
+                    <Icon glyph={EllipsisHorizontal} />
                   </Button>
                 </Section.Actions>
               </Section.Item>
@@ -326,7 +332,7 @@ export function ConnectedAccounts() {
                   size='sm'
                   variant='ghost'
                 >
-                  <Icon name='ellipsis-horizontal' />
+                  <Icon glyph={EllipsisHorizontal} />
                 </Button>
               </Section.Actions>
             </Section.Item>
@@ -345,7 +351,7 @@ export function ConnectedAccounts() {
                 >
                   Connect
                   <Icon
-                    name='arrow-up-right'
+                    glyph={ArrowUpRight}
                     placement='inline-end'
                     size='sm'
                   />
@@ -374,7 +380,7 @@ export function IconFrameMedia() {
               <Section.Media size='lg'>
                 <IconFrame>
                   <Icon
-                    name='users'
+                    glyph={Users}
                     size='lg'
                   />
                 </IconFrame>
@@ -515,7 +521,7 @@ export function ContainedHeader() {
                   variant='outline'
                 >
                   <Icon
-                    name='plus'
+                    glyph={Plus}
                     placement='inline-start'
                     size='sm'
                   />
@@ -541,7 +547,7 @@ export function ContainedHeader() {
                         size='sm'
                         variant='ghost'
                       >
-                        <Icon name='ellipsis-horizontal' />
+                        <Icon glyph={EllipsisHorizontal} />
                       </Button>
                     </Section.Actions>
                   </Section.Item>
@@ -556,9 +562,9 @@ export function ContainedHeader() {
 }
 
 const loadingItems = [
-  { icon: 'device-laptop', label: 'Chrome on macOS', description: 'San Francisco, US · Active now' },
-  { icon: 'device-phone', label: 'Safari on iOS', description: 'San Francisco, US · 2 hours ago' },
-  { icon: 'device-laptop', label: 'Firefox on Windows', description: 'Denver, US · 3 days ago' },
+  { icon: DeviceLaptop, label: 'Chrome on macOS', description: 'San Francisco, US · Active now' },
+  { icon: DevicePhone, label: 'Safari on iOS', description: 'San Francisco, US · 2 hours ago' },
+  { icon: DeviceLaptop, label: 'Firefox on Windows', description: 'Denver, US · 3 days ago' },
 ] as const;
 
 export function Loading() {
@@ -599,7 +605,7 @@ export function Loading() {
                     <Section.Media size='lg'>
                       <IconFrame>
                         <Icon
-                          name={item.icon}
+                          glyph={item.icon}
                           size='lg'
                         />
                       </IconFrame>

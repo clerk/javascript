@@ -13,6 +13,9 @@ import { Spinner } from '../../../components/spinner';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { useServerDataTable } from '../../../hooks/use-server-data-table';
+import { Envelope } from '../../../icons/glyphs/envelope';
+import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
+import { Plus } from '../../../icons/glyphs/plus';
 import { fill, useMessages } from '../../../localization';
 import { mergeStyleProps, themeProps } from '../../../props';
 import type { InvitationsTableTabViewProps, OrganizationProfileInvitation } from './invitations-table-tab.types';
@@ -66,7 +69,7 @@ export function InvitationsTableTabView({
               ref={inviteButtonRef}
               onClick={onInvite}
             >
-              <Icon name='plus' />
+              <Icon glyph={Plus} />
               {m.invite}
             </Button>
           </Table.Toolbar>
@@ -172,7 +175,7 @@ function InvitationsTableBody({
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
           <EmptyState.Root role='alert'>
-            <EmptyState.Icon name='exclamation-circle' />
+            <EmptyState.Icon glyph={ExclamationCircle} />
             <EmptyState.Label>{m.loadError}</EmptyState.Label>
             {onRetry ? (
               <EmptyState.Actions>
@@ -189,7 +192,7 @@ function InvitationsTableBody({
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
           <EmptyState.Root role='status'>
-            <EmptyState.Icon name='envelope' />
+            <EmptyState.Icon glyph={Envelope} />
             <EmptyState.Label>{m.noInvitations}</EmptyState.Label>
             <EmptyState.Description>{m.noInvitationsDescription}</EmptyState.Description>
           </EmptyState.Root>

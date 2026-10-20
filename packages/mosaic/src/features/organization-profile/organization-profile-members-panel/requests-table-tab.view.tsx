@@ -14,6 +14,9 @@ import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useServerDataTable } from '../../../hooks/use-server-data-table';
+import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
+import { Plus } from '../../../icons/glyphs/plus';
+import { Users } from '../../../icons/glyphs/users';
 import { fill, useMessages } from '../../../localization';
 import { mergeStyleProps, themeProps } from '../../../props';
 import { styles } from './requests-table-tab.styles';
@@ -69,7 +72,7 @@ export function RequestsTableTabView({
             ref={inviteButtonRef}
             onClick={onInvite}
           >
-            <Icon name='plus' />
+            <Icon glyph={Plus} />
             {m.invite}
           </Button>
         </Table.Toolbar>
@@ -175,7 +178,7 @@ function RequestsTableBody({
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
           <EmptyState.Root role='alert'>
-            <EmptyState.Icon name='exclamation-circle' />
+            <EmptyState.Icon glyph={ExclamationCircle} />
             <EmptyState.Label>{m.loadError}</EmptyState.Label>
             {onRetry ? (
               <EmptyState.Actions>
@@ -192,7 +195,7 @@ function RequestsTableBody({
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
           <EmptyState.Root role='status'>
-            <EmptyState.Icon name='users' />
+            <EmptyState.Icon glyph={Users} />
             <EmptyState.Label>{m.noRequests}</EmptyState.Label>
             <EmptyState.Description>{m.noRequestsDescription}</EmptyState.Description>
           </EmptyState.Root>

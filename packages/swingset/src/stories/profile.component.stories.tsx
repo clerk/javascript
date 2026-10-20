@@ -6,6 +6,9 @@ import type { ProfileRootProps } from '@clerk/mosaic/components/profile';
 import { Profile } from '@clerk/mosaic/components/profile';
 import { Section } from '@clerk/mosaic/components/section';
 import { Text } from '@clerk/mosaic/components/text';
+import { CreditCard } from '@clerk/mosaic/icons/glyphs/credit-card';
+import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
+import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -37,9 +40,9 @@ function knobsAsProps(props: Record<string, unknown>) {
 }
 
 const pages = [
-  { id: 'general', label: 'General', icon: 'user-circle' as const },
-  { id: 'security', label: 'Security', icon: 'shield-check' as const },
-  { id: 'billing', label: 'Billing', icon: 'credit-card' as const },
+  { id: 'general', label: 'General', icon: UserCircle },
+  { id: 'security', label: 'Security', icon: ShieldCheck },
+  { id: 'billing', label: 'Billing', icon: CreditCard },
 ];
 
 function Placeholder({ title }: { title: string }) {
@@ -173,7 +176,7 @@ function Surface({
             value={item.id}
             icon={
               <Icon
-                name={item.icon}
+                glyph={item.icon}
                 size='sm'
               />
             }

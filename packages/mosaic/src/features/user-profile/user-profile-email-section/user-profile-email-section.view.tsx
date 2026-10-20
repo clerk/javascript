@@ -3,6 +3,7 @@ import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { Plus } from '../../../icons/glyphs/plus';
 import { fill, useMessages } from '../../../localization';
 import { UserProfileContactListRowView } from '../user-profile-contact-list-row.view';
 import { UserProfileAddEmailDialog } from './user-profile-add-email.dialog';
@@ -35,7 +36,7 @@ export function UserProfileEmailSectionView({
       }
     >
       <Icon
-        name='plus'
+        glyph={Plus}
         placement='inline-start'
         size='sm'
       />

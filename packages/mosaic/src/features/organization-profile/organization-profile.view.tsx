@@ -58,7 +58,7 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
                   entry.custom.icon
                 ) : (
                   <Icon
-                    name={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
+                    glyph={ORGANIZATION_PROFILE_PAGE_ICONS[entry.id]}
                     size='sm'
                   />
                 )

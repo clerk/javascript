@@ -7,6 +7,7 @@ import type { DialogFocusTarget } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { Plus } from '../../../icons/glyphs/plus';
 import { fill, useMessages } from '../../../localization';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
 import { styles } from './user-profile-passkeys-section.styles';
@@ -73,7 +74,7 @@ export function UserProfilePasskeysSectionView({
                   onClick={onAdd}
                 >
                   <Icon
-                    name='plus'
+                    glyph={Plus}
                     placement='inline-start'
                     size='sm'
                   />
