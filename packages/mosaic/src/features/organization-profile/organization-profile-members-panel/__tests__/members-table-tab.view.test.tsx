@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useConfirmController } from '../../../../blocks/confirm';
 import { MosaicProvider } from '../../../../mosaic-provider';
+import { MembersTableTab } from '../members-table-tab';
 import type { MembersTableTabViewProps, OrganizationProfileMember } from '../members-table-tab.types';
 import { MembersTableTabView } from '../members-table-tab.view';
 
@@ -66,17 +67,29 @@ function renderView(overrides: Partial<MembersTableTabViewProps> = {}) {
   };
 }
 
+function renderTab(overrides: Partial<MembersTableTabViewProps> = {}) {
+  const props = propsFor(overrides);
+  return {
+    props,
+    ...render(
+      <MosaicProvider>
+        <MembersTableTab {...props} />
+      </MosaicProvider>,
+    ),
+  };
+}
+
 describe('MembersTableTabView', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   it('chooses loading, retained rows, and filtered empty results from the supplied state', () => {
-    const { props, rerender } = renderView({ members: [], totalCount: 0, isLoading: true });
+    const { props, rerender } = renderTab({ members: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading members');
     rerender(
       <MosaicProvider>
-        <MembersTableTabView
+        <MembersTableTab
           {...props}
           isLoading={false}
         />
@@ -85,7 +98,7 @@ describe('MembersTableTabView', () => {
     expect(screen.getByText('No members yet')).toBeVisible();
     rerender(
       <MosaicProvider>
-        <MembersTableTabView
+        <MembersTableTab
           {...props}
           isLoading={false}
           searchValue='Nobody'
@@ -95,7 +108,7 @@ describe('MembersTableTabView', () => {
     expect(within(screen.getByRole('table')).getByRole('status')).toHaveTextContent('No members found');
     rerender(
       <MosaicProvider>
-        <MembersTableTabView
+        <MembersTableTab
           {...propsFor()}
           isFetching
           searchValue='Nobody'
@@ -106,7 +119,7 @@ describe('MembersTableTabView', () => {
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
   });
   it('shows roles as text instead of a role picker while members load', () => {
-    renderView({
+    renderTab({
       members: [],
       totalCount: 0,
       isLoading: true,

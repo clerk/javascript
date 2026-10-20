@@ -103,10 +103,12 @@ describe('connected organization invitations', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Loading invitations');
     expect(within(table()).getAllByRole('row')).toHaveLength(1);
     expect(within(table()).queryByRole('button')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
     const loadingWidths = columnWidths();
     list.release();
-    expect(await within(table()).findByText('ada@example.com')).toBeVisible();
+    expect(await screen.findByText('ada@example.com')).toBeVisible();
     expect(screen.getByRole('status')).toHaveTextContent('Invitations loaded');
+    expect(screen.getByRole('button', { name: 'Invite' })).toBeVisible();
     expect(within(table()).getAllByRole('row')).toHaveLength(2);
     expect(columnWidths()).toEqual(loadingWidths);
   });
@@ -259,8 +261,8 @@ describe('connected organization invitations', () => {
         <OrganizationProfileMembersPanel />
       </MosaicLocalizationProvider>,
     );
-    const table = within(await screen.findByRole('table', { name: 'Invitations' }));
-    expect(await table.findByRole('cell', { name: 'Administrateur' })).toBeVisible();
+    expect(await screen.findByRole('cell', { name: 'Administrateur' })).toBeVisible();
+    const table = within(screen.getByRole('table', { name: 'Invitations' }));
     expect(table.getByRole('cell', { name: 'Membre' })).toBeVisible();
     expect(table.queryByRole('cell', { name: 'Admin' })).toBeNull();
   });

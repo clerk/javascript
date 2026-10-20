@@ -75,10 +75,12 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Loading members');
     expect(within(table()).getAllByRole('row')).toHaveLength(1);
     expect(within(table()).queryByRole('button')).toBeNull();
+    expect(screen.queryByRole('searchbox', { name: 'Search members' })).toBeNull();
     const loadingWidths = columnWidths();
     list.release();
-    expect(await within(table()).findByText('Bob Smith')).toBeVisible();
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
     expect(screen.getByRole('status')).toHaveTextContent('Members loaded');
+    expect(screen.getByRole('searchbox', { name: 'Search members' })).toBeVisible();
     expect(within(table()).getAllByRole('row')).toHaveLength(3);
     expect(columnWidths()).toEqual(loadingWidths);
   });

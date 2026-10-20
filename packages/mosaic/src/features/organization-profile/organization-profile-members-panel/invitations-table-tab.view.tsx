@@ -1,4 +1,3 @@
-import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
@@ -10,7 +9,6 @@ import { EmptyState } from '../../../components/empty-state';
 import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
 import { Pagination } from '../../../components/pagination';
-import { Skeleton, SkeletonContext } from '../../../components/skeleton';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { useServerDataTable } from '../../../hooks/use-server-data-table';
@@ -38,14 +36,13 @@ export function InvitationsTableTabView({
   pageSize,
   onPageChange,
   onBulkAction,
-  isLoading,
   isFetching = false,
   isError = false,
   onRetry,
 }: InvitationsTableTabViewProps) {
   const m = useMessages('invitationsTableTab');
   const { table, pagination } = useServerDataTable({
-    data: isLoading ? PLACEHOLDER_INVITATIONS : invitations,
+    data: invitations,
     totalCount,
     getRowId,
     sortableColumns: [],
@@ -65,7 +62,7 @@ export function InvitationsTableTabView({
         role='group'
         aria-label={m.title}
       >
-        <VisuallyHidden role='status'>{isLoading ? m.loading : m.loaded}</VisuallyHidden>
+        <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>
         {onInvite ? (
           <Table.Toolbar>
             <Button
@@ -82,7 +79,7 @@ export function InvitationsTableTabView({
         <Table.Root
           layout='fixed'
           aria-label={m.title}
-          aria-busy={isLoading || isFetching}
+          aria-busy={isFetching}
         >
           <Table.ColumnGroup>
             {onBulkAction ? <Table.Column /> : null}
@@ -114,7 +111,6 @@ export function InvitationsTableTabView({
           <InvitationsTableBody
             rows={table.rows}
             columnCount={columnCount}
-            isLoading={isLoading}
             isError={isError}
             onRetry={onRetry}
             hasBulkAction={Boolean(onBulkAction)}
@@ -149,7 +145,6 @@ export function InvitationsTableTabView({
 function InvitationsTableBody({
   rows,
   columnCount,
-  isLoading,
   isError,
   onRetry,
   hasBulkAction,
@@ -163,7 +158,6 @@ function InvitationsTableBody({
     toggleSelected: () => void;
   }>;
   columnCount: number;
-  isLoading: boolean;
   isError: boolean;
   onRetry?: () => void;
   hasBulkAction: boolean;
@@ -171,7 +165,7 @@ function InvitationsTableBody({
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('invitationsTableTab');
-  if (!isLoading && isError) {
+  if (isError) {
     return (
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
@@ -202,92 +196,59 @@ function InvitationsTableBody({
     );
   }
   return (
-    <SkeletonContext.Provider value={isLoading}>
-      <Table.Body {...(isLoading ? { 'aria-hidden': true, ...inertProps(true) } : {})}>
-        {rows.map(row => (
-          <Table.Row
-            key={row.id}
-            selected={hasBulkAction && row.getIsSelected()}
-          >
-            {hasBulkAction ? (
-              <Table.SelectCell
-                aria-label={fill(m.select, { name: row.original.email })}
-                checked={row.getIsSelected()}
-                onToggleSelected={row.toggleSelected}
+    <Table.Body>
+      {rows.map(row => (
+        <Table.Row
+          key={row.id}
+          selected={hasBulkAction && row.getIsSelected()}
+        >
+          {hasBulkAction ? (
+            <Table.SelectCell
+              aria-label={fill(m.select, { name: row.original.email })}
+              checked={row.getIsSelected()}
+              onToggleSelected={row.toggleSelected}
+            />
+          ) : null}
+          <Table.Cell>
+            <Entity.Root>
+              <Entity.Media>
+                <Avatar.Root
+                  size='fit'
+                  aria-hidden
+                >
+                  {row.original.imageUrl ? (
+                    <Avatar.Image
+                      src={row.original.imageUrl}
+                      alt=''
+                    />
+                  ) : null}
+                  <Avatar.Fallback />
+                </Avatar.Root>
+              </Entity.Media>
+              <Entity.Content>
+                <Entity.Label>{row.original.email}</Entity.Label>
+              </Entity.Content>
+            </Entity.Root>
+          </Table.Cell>
+          <Table.Cell noWrap>{row.original.invitedAtLabel}</Table.Cell>
+          <Table.Cell>{row.original.roleLabel}</Table.Cell>
+          {onRevokeClick ? (
+            <Table.Cell align='end'>
+              <ActionMenu
+                label={fill(m.manage, { name: row.original.email })}
+                triggerRef={registerTrigger(row.original.id)}
+                actions={[
+                  {
+                    label: m.revoke,
+                    color: 'negative',
+                    onClick: () => onRevokeClick(row.original),
+                  },
+                ]}
               />
-            ) : null}
-            <Table.Cell>
-              <Entity.Root>
-                <Skeleton shape='pill'>
-                  <Entity.Media>
-                    <Avatar.Root
-                      size='fit'
-                      aria-hidden
-                    >
-                      {row.original.imageUrl ? (
-                        <Avatar.Image
-                          src={row.original.imageUrl}
-                          alt=''
-                        />
-                      ) : null}
-                      <Avatar.Fallback />
-                    </Avatar.Root>
-                  </Entity.Media>
-                </Skeleton>
-                <Entity.Content>
-                  <Entity.Label>
-                    <Skeleton>{row.original.email}</Skeleton>
-                  </Entity.Label>
-                </Entity.Content>
-              </Entity.Root>
             </Table.Cell>
-            <Table.Cell noWrap>
-              <Skeleton>{row.original.invitedAtLabel}</Skeleton>
-            </Table.Cell>
-            <Table.Cell>
-              <Skeleton>{row.original.roleLabel}</Skeleton>
-            </Table.Cell>
-            {onRevokeClick ? (
-              <Table.Cell align='end'>
-                <Skeleton visible={false}>
-                  <ActionMenu
-                    label={fill(m.manage, { name: row.original.email })}
-                    triggerRef={registerTrigger(row.original.id)}
-                    actions={[
-                      {
-                        label: m.revoke,
-                        color: 'negative',
-                        onClick: () => onRevokeClick(row.original),
-                      },
-                    ]}
-                  />
-                </Skeleton>
-              </Table.Cell>
-            ) : null}
-          </Table.Row>
-        ))}
-      </Table.Body>
-    </SkeletonContext.Provider>
+          ) : null}
+        </Table.Row>
+      ))}
+    </Table.Body>
   );
 }
-
-const PLACEHOLDER_INVITATIONS: OrganizationProfileInvitation[] = [
-  {
-    id: 'orginv_placeholder_1',
-    email: 'jordan.reyes@northwind.co',
-    invitedAtLabel: 'Mar 12, 2026',
-    roleLabel: 'Member',
-  },
-  {
-    id: 'orginv_placeholder_2',
-    email: 'priya.nair@northwind.co',
-    invitedAtLabel: 'Apr 3, 2026',
-    roleLabel: 'Admin',
-  },
-  {
-    id: 'orginv_placeholder_3',
-    email: 'sam.whitfield@northwind.co',
-    invitedAtLabel: 'May 21, 2026',
-    roleLabel: 'Member',
-  },
-];

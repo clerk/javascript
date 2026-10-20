@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
 import { MosaicProvider } from '../../../../mosaic-provider';
+import { RequestsTableTab } from '../requests-table-tab';
 import type { RequestsTableTabViewProps } from '../requests-table-tab.types';
 import { RequestsTableTabView } from '../requests-table-tab.view';
 
@@ -25,6 +26,18 @@ function renderView(overrides: Partial<RequestsTableTabViewProps> = {}) {
     ...render(
       <MosaicProvider>
         <RequestsTableTabView {...props} />
+      </MosaicProvider>,
+    ),
+  };
+}
+
+function renderTab(overrides: Partial<RequestsTableTabViewProps> = {}) {
+  const props = propsFor(overrides);
+  return {
+    props,
+    ...render(
+      <MosaicProvider>
+        <RequestsTableTab {...props} />
       </MosaicProvider>,
     ),
   };
@@ -72,11 +85,11 @@ describe('RequestsTableTabView', () => {
   );
 
   it('chooses loading, retained rows, an empty list, and the error state from the supplied state', () => {
-    const { props, rerender } = renderView({ requests: [], totalCount: 0, isLoading: true });
+    const { props, rerender } = renderTab({ requests: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading requests');
     rerender(
       <MosaicProvider>
-        <RequestsTableTabView
+        <RequestsTableTab
           {...props}
           isLoading={false}
           isFetching
@@ -86,7 +99,7 @@ describe('RequestsTableTabView', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading requests');
     rerender(
       <MosaicProvider>
-        <RequestsTableTabView
+        <RequestsTableTab
           {...props}
           isLoading={false}
         />
@@ -95,7 +108,7 @@ describe('RequestsTableTabView', () => {
     expect(within(screen.getByRole('table')).getByRole('status')).toHaveTextContent('No pending requests');
     rerender(
       <MosaicProvider>
-        <RequestsTableTabView
+        <RequestsTableTab
           {...propsFor()}
           isFetching
         />
@@ -105,7 +118,7 @@ describe('RequestsTableTabView', () => {
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
     rerender(
       <MosaicProvider>
-        <RequestsTableTabView
+        <RequestsTableTab
           {...propsFor()}
           isError
           onRetry={vi.fn()}
