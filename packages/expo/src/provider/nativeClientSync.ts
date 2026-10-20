@@ -121,12 +121,18 @@ function configureOnce(
 ) {
   if (configuration?.publishableKey !== publishableKey || configuration.proxyUrl !== proxyUrl) {
     let configured = false;
+    let timedOut = false;
     const configuring = (async () => {
       const seed = await readSeedDeviceToken(tokenCache);
       await native
         .configureNative(publishableKey, seed, proxyUrl)
         .catch(() => native.configureNative(publishableKey, seed, proxyUrl));
+      const latest = timedOut ? ((await tokenCache.getToken(CLERK_CLIENT_JWT_KEY)) ?? null) : seed;
+      const didHandOff = !!latest && latest !== seed && (await native.setDeviceToken(latest, seed));
       configured = true;
+      if (didHandOff) {
+        void native.refreshClient().catch(error => warn('Failed to refresh the native client.', error));
+      }
     })().catch(error => {
       warn('Native client sync is disabled because the native Clerk SDK failed to configure.', error);
     });
@@ -134,7 +140,10 @@ function configureOnce(
       configuring,
       CONFIGURE_TIMEOUT_MS,
       () => new Error('Timed out configuring the native Clerk SDK.'),
-    ).catch(error => warn('Native client sync is waiting for the native Clerk SDK to configure.', error));
+    ).catch(error => {
+      timedOut = true;
+      warn('Native client sync is waiting for the native Clerk SDK to configure.', error);
+    });
     configuration = {
       publishableKey,
       proxyUrl,
