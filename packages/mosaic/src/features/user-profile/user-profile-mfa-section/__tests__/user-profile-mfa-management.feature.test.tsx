@@ -455,6 +455,22 @@ describe('User profile MFA management', () => {
     expect(fapi.mfa.backupCodeCreations).toBe(0);
   });
 
+  it('cancels a loading verification when the backup-code dialog closes so regeneration can start again', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    start.release();
+
+    await regenerate(user);
+    await screen.findByRole('list', { name: 'Backup codes' });
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
   it('copies server-issued backup codes and closes their one-time surface', async () => {
     const fapi = await renderMfa();
     const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();

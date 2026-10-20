@@ -561,11 +561,11 @@ export function useUserProfileMfaController(model: ReadyModel) {
     showAddControl: showAddTrigger || dialogOpen,
     reverifying,
     onDialogOpenChange: (open: boolean) => {
-      if (!open && reverifying) {
-        if (!reverification.onCancel) {
+      if (!open) {
+        if (reverifying && !reverification.onCancel) {
           return;
         }
-        reverification.onCancel();
+        reverification.onCancel?.();
       }
       send({ type: open ? 'OPEN' : 'CLOSE' });
     },
