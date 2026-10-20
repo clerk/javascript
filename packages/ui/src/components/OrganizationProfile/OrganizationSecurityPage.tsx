@@ -5,7 +5,7 @@ import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { useProtect } from '../../common';
-import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
+import { useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/ConfigureDirectorySyncWizard';
 import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
@@ -41,9 +41,10 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
 };
 
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
-  const { shouldShowSelfServeSSO } = useOrganizationProfileContext();
-  const canManageConnections = useProtect({ permission: 'org:sys_entconns:manage' }) && shouldShowSelfServeSSO;
+  const canManageConnections = useProtect({ permission: 'org:sys_entconns:manage' });
   const canManageSSOBypass = useProtect({ permission: 'org:sys_entconns_sso_bypass:manage' });
+  const { shouldShowSelfServeSSO, shouldShowSelfServeDirectorySync } = useOrganizationProfileContext();
+  const canManageSso = canManageConnections && shouldShowSelfServeSSO;
 
   const {
     organization,
@@ -59,10 +60,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     enterpriseConnectionMutations,
     organizationDomains,
     organizationDomainMutations,
-  } = useOrganizationEnterpriseConnection({ manage: canManageConnections });
+  } = useOrganizationEnterpriseConnection({ manage: canManageSso });
 
-  const { userSettings } = useEnvironment();
-  const showDirectorySync = canManageConnections && userSettings.enterpriseSSO.self_serve_directory_sync;
+  const showDirectorySync = canManageConnections && shouldShowSelfServeDirectorySync;
   const showSSOBypass = canManageSSOBypass && enterpriseConnections.length > 0;
 
   const [requestedView, setRequestedView] = useState<SecurityPageView>({ kind: 'overview' });
@@ -161,8 +161,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         enterpriseConnectionMutations={enterpriseConnectionMutations}
         organizationName={organization?.name ?? ''}
         contentRef={contentRef}
-        onConfigure={canManageConnections ? openWizard : undefined}
-        onOpenConnection={canManageConnections ? openConnection : undefined}
+        onConfigure={canManageSso ? openWizard : undefined}
+        onOpenConnection={canManageSso ? openConnection : undefined}
       />
       {showSSOBypass && <SecuritySSOBypassSection onManage={() => setRequestedView({ kind: 'ssoBypass' })} />}
       {showDirectorySync && (
