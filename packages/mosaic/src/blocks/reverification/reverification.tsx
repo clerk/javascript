@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { Card } from '../../components/card';
 import type { DialogFocusTarget } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
@@ -10,6 +12,8 @@ export interface ReverificationDialogProps {
 }
 
 export function ReverificationDialog({ controller, finalFocus }: ReverificationDialogProps): JSX.Element {
+  const initialFocusRef = useRef<HTMLElement>(null);
+
   return (
     <Dialog.Root
       open={controller.visible}
@@ -23,13 +27,17 @@ export function ReverificationDialog({ controller, finalFocus }: ReverificationD
     >
       <Dialog.Popup
         variant='card'
+        initialFocus={controller.status === 'error' ? undefined : initialFocusRef}
         finalFocus={finalFocus}
       >
         <Card.Root
           elevation='overlay'
           renderBranding={false}
         >
-          <Reverification controller={controller} />
+          <Reverification
+            controller={controller}
+            initialFocusRef={initialFocusRef}
+          />
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>

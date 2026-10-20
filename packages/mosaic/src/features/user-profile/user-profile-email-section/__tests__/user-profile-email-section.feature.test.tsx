@@ -270,7 +270,8 @@ describe('email reverification', () => {
 
     await manageEmail(actor, 'bob@example.com', 'Set as primary');
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await actor.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_second'));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
@@ -311,7 +312,8 @@ describe('email reverification', () => {
     await screen.findByText('Enter your current password to continue');
     const dialog = screen.getByRole('dialog');
     const replay = holdRequests('post', '/v1/me');
-    await actor.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
     await waitFor(() => expect(replay.requests).toHaveLength(1));
 
     expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
@@ -341,6 +343,23 @@ describe('email reverification', () => {
 
     start.release();
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+  });
+
+  it('focuses Close when the dialog opens on a verification that could not start', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection({
+      ...signedInWithEmails([PRIMARY, second]),
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me');
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+
+    await manageEmail(actor, 'bob@example.com', 'Set as primary');
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    start.fail('verification_failed', 'Unable to start verification.');
+
+    const dialog = await screen.findByRole('dialog');
+    await waitFor(() => expect(within(dialog).getAllByRole('button', { name: 'Close' })[0]).toHaveFocus());
   });
 });
 
