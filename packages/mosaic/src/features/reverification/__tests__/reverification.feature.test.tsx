@@ -1418,7 +1418,7 @@ describe('Reverification', () => {
       );
       const user = await startVerification();
       expect(await screen.findByText(STEP.password)).toBeVisible();
-      vi.spyOn(clerk.session, 'attemptFirstFactorVerification').mockRejectedValue('not an error');
+      vi.spyOn(clerk.session!, 'attemptFirstFactorVerification').mockRejectedValue('not an error');
 
       await user.type(passwordField(), `${PASSWORD}{Enter}`);
 
