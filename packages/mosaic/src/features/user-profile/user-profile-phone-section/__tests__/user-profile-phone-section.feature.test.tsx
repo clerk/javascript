@@ -275,7 +275,8 @@ describe('phone reverification', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await actor.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_phone_number_id).toBe('idn_work'));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
@@ -312,7 +313,8 @@ describe('phone reverification', () => {
     await screen.findByText('Enter your current password to continue');
     const dialog = screen.getByRole('dialog');
     const replay = holdRequests('post', '/v1/me');
-    await actor.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
     await waitFor(() => expect(replay.requests).toHaveLength(1));
 
     expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
