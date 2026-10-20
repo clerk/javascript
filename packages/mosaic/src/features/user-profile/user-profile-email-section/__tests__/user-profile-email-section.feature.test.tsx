@@ -1,5 +1,5 @@
 import type { EmailAddressJSON, EnterpriseAccountConnectionJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -357,7 +357,7 @@ describe('email reverification', () => {
 
     const dialog = await screen.findByRole('dialog');
     await waitFor(() => expect(within(dialog).getAllByRole('button', { name: 'Close' })[0]).toHaveFocus());
-    });
+  });
 
   const challengedSeed = (environment = fapiEnvironment()): FakeFapiSeed => ({
     ...signedInWithEmails([], environment),
@@ -471,6 +471,39 @@ describe('email reverification', () => {
     expect(email).toHaveValue('new@example.com');
     await waitFor(() => expect(email).toHaveAccessibleDescription('That email is taken.'));
     expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(0);
+  });
+
+  it('focuses the email field when returning to the form after verifying', async () => {
+    const { actor } = await renderSection(challengedSeed());
+    const retry = holdRequests('post', '/v1/me/email_addresses');
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(retry.requests).toHaveLength(1));
+    retry.fail('form_param_invalid', 'That email is taken.', 'email_address');
+
+    const email = await screen.findByRole('textbox', { name: 'Email' });
+    await waitFor(() => expect(email).toHaveFocus());
+  });
+
+  it('cancels an in-progress verification when the active session changes', async () => {
+    const seed = challengedSeed();
+    const { actor, fapi, clerk } = await renderSection({
+      ...seed,
+      client: fapiClient([
+        ...seed.client.sessions,
+        fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2', username: 'bob' }) }),
+      ]),
+    });
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await screen.findByPlaceholderText('Enter your password');
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(fapi.client.sessions.map(session => session.user.email_addresses)).toEqual([[], []]);
   });
 
   it('closes the host from the challenge error card', async () => {

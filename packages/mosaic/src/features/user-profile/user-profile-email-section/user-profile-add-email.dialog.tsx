@@ -145,6 +145,7 @@ interface EnterEmailStepProps {
 function EnterEmailStep(props: EnterEmailStepProps) {
   const m = useMessages('userProfileAddEmail');
   const emailFormId = useId();
+  const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -173,7 +174,7 @@ function EnterEmailStep(props: EnterEmailStepProps) {
         >
           <Field.Label>{m.email.label}</Field.Label>
           <Input
-            ref={props.inputRef}
+            ref={inputRef}
             name='emailAddress'
             type='email'
             autoComplete='email'
