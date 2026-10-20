@@ -1,5 +1,16 @@
 # Change Log
 
+## 7.9.18
+
+### Patch Changes
+
+- Fix the return type of `auth.protect()` when a predicate is passed together with the `token` option. The result is now typed from the accepted token types, so `auth.protect(() => true, { token: 'api_key' })` resolves to the API key auth object instead of a session auth object. ([#10211](https://github.com/clerk/javascript/pull/10211)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`85dec02`](https://github.com/clerk/javascript/commit/85dec028a0320c32023fa58139e269db0202b1eb), [`b799bad`](https://github.com/clerk/javascript/commit/b799bad6057c469f777506b4bc40b1c44b0d4cb4), [`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/backend@3.26.0
+  - @clerk/shared@4.41.0
+  - @clerk/react@6.18.0
+
 ## 7.9.17
 
 ### Patch Changes
