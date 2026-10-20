@@ -24,6 +24,16 @@ function serializeClient(native: FakeNativeClerk): string {
 function createCurrentNativeModule(native: FakeNativeClerk, calls: string[]): ClerkExpoNativeModule {
   const listeners = new Set<(snapshot: NativeClientSnapshot) => void>();
 
+  const configure = async (bearerToken: string | null) => {
+    await native.waitForStartup();
+    if (bearerToken && (bearerToken !== native.token || !native.client)) {
+      await native.adoptToken(bearerToken);
+    } else {
+      await native.refreshClient();
+    }
+    native.isConfigured = true;
+  };
+
   native.onChange((change, origin) => {
     const snapshot: NativeClientSnapshot = {
       changed: { client: change.client, deviceToken: change.deviceToken },
@@ -45,15 +55,13 @@ function createCurrentNativeModule(native: FakeNativeClerk, calls: string[]): Cl
       listeners.add(typedListener);
       return { remove: () => listeners.delete(typedListener) };
     },
-    configure: async (_publishableKey: string, bearerToken: string | null) => {
+    configure: (_publishableKey: string, bearerToken: string | null) => {
       calls.push('configure');
-      await native.waitForStartup();
-      if (bearerToken && (bearerToken !== native.token || !native.client)) {
-        await native.adoptToken(bearerToken);
-      } else {
-        await native.refreshClient();
-      }
-      native.isConfigured = true;
+      return configure(bearerToken);
+    },
+    configureWithOptions: (_publishableKey: string, options: { bearerToken: string | null }) => {
+      calls.push('configureWithOptions');
+      return configure(options.bearerToken);
     },
     getClientToken: () => {
       calls.push('getClientToken');
