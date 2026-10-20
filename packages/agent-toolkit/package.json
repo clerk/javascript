@@ -74,5 +74,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "deprecated": "This package is no longer supported."
 }
