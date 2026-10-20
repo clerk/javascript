@@ -121,16 +121,9 @@ export function renderClerkAgentRulesBlock(eol = '\n') {
 
 ## Clerk: your training data is out of date
 
-This project uses Clerk. The installed SDKs are newer than your training data. APIs,
-component names, and file conventions may have changed. Read the Clerk SDK section(s)
-below before writing or editing any auth code.
+Read the Clerk sections below before touching auth code. Only use Clerk APIs that exist in the installed package's types. Clerk docs: https://clerk.com/docs.md
 
-Never recall a Clerk API from memory. If a symbol is not in the installed package's
-types, it does not exist.
-
-This block is written by the Clerk SDK when a supported dev server starts, or by
-\`npx @clerk/upgrade --agents-md\`. Removing it from a diff can recreate the uncommitted
-change; commit it with your work.
+The Clerk SDK writes this block. Commit it with your work.
 
 ${PLUGIN_SECTION}
 

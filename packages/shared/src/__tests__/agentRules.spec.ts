@@ -237,4 +237,8 @@ describe('Clerk plugin rules', () => {
   it('uses the requested line endings', () => {
     expect(renderClerkSdkPluginBlock('\r\n')).not.toMatch(/[^\r]\n/);
   });
+
+  it('links agents to the Markdown Clerk docs in the root block', () => {
+    expect(renderClerkAgentRulesBlock()).toContain('Clerk docs: https://clerk.com/docs.md');
+  });
 });
