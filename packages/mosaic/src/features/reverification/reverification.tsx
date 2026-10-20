@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { useState } from 'react';
 
 import { type ReverificationController, useReverificationController } from './reverification.controller';
@@ -27,6 +28,7 @@ export function useReverificationFlow<F extends ReverificationFetcher = Reverifi
 export interface ReverificationProps {
   controller: ReverificationController;
   onClose?: () => void;
+  initialFocusRef?: Ref<HTMLElement>;
 }
 
 function held(controller: ReverificationController): ReverificationController {
@@ -42,7 +44,7 @@ function held(controller: ReverificationController): ReverificationController {
   }
 }
 
-export function Reverification({ controller, onClose }: ReverificationProps) {
+export function Reverification({ controller, onClose, initialFocusRef }: ReverificationProps) {
   const [lastShown, setLastShown] = useState<ReverificationController | null>(null);
   // Reverification controller is memoized, but even if that breaks, this
   // component still only does a cheap immediate re-render and then continues
@@ -66,5 +68,10 @@ export function Reverification({ controller, onClose }: ReverificationProps) {
     );
   }
 
-  return <ReverificationView {...shown} />;
+  return (
+    <ReverificationView
+      {...shown}
+      focusRef={initialFocusRef}
+    />
+  );
 }

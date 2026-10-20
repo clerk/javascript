@@ -38,7 +38,7 @@ type Engine = {
 
 const noop = () => undefined;
 
-let configuration: { publishableKey: string; proxyUrl: string | null; ready: Promise<boolean> } | null = null;
+let configuration: { publishableKey: string; proxyUrl: string | null; ready: () => Promise<boolean> } | null = null;
 let activeEngine: Engine | null = null;
 
 function warn(message: string, error?: unknown): void {
@@ -120,26 +120,31 @@ function configureOnce(
   tokenCache: TokenCache,
 ) {
   if (configuration?.publishableKey !== publishableKey || configuration.proxyUrl !== proxyUrl) {
-    const ready = (async () => {
+    let configured = false;
+    const configuring = (async () => {
       const seed = await readSeedDeviceToken(tokenCache);
-      await withTimeout(
-        native.configureNative(publishableKey, seed, proxyUrl),
-        CONFIGURE_TIMEOUT_MS,
-        () => new Error('Timed out configuring the native Clerk SDK.'),
-      );
-    })();
+      await native
+        .configureNative(publishableKey, seed, proxyUrl)
+        .catch(() => native.configureNative(publishableKey, seed, proxyUrl));
+      configured = true;
+    })().catch(error => {
+      warn('Native client sync is disabled because the native Clerk SDK failed to configure.', error);
+    });
+    const startup = withTimeout(
+      configuring,
+      CONFIGURE_TIMEOUT_MS,
+      () => new Error('Timed out configuring the native Clerk SDK.'),
+    ).catch(error => warn('Native client sync is waiting for the native Clerk SDK to configure.', error));
     configuration = {
       publishableKey,
       proxyUrl,
-      ready: ready
-        .then(() => true)
-        .catch(error => {
-          warn('Native client sync is disabled because the native Clerk SDK failed to configure.', error);
-          return false;
-        }),
+      ready: async () => {
+        await startup;
+        return configured;
+      },
     };
   }
-  return configuration.ready;
+  return configuration.ready();
 }
 
 /**

@@ -275,17 +275,15 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
-    it('surfaces a failed native refresh through the sync barrier until a later refresh succeeds', async () => {
-      const { server, token } = seedDevice(['user_1']);
+    it('converges after a failed native refresh', async () => {
+      const { server, token, sessionIds } = seedDevice(['user_1', 'user_2'], 'user_1');
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
-      const failure = new Error('native refresh failed');
 
-      h.native.failNextClientRefresh(failure);
-      await h.run(() => h.js.updateProfile());
-      await expect(h.run(() => h.awaitJsToNativeSync())).rejects.toBe(failure);
+      h.native.failNextClientRefresh(new Error('native refresh failed'));
+      await h.run(() => h.js.setActive({ session: sessionIds.user_2 }));
+      await h.settle();
 
-      await h.run(() => h.js.updateProfile());
-      await expect(h.run(() => h.awaitJsToNativeSync())).resolves.toBeUndefined();
+      expect(h.native.activeSessionId).toBe(sessionIds.user_2);
       await expectConverged(h);
     });
 
@@ -370,7 +368,6 @@ describe('native client sync behavior', () => {
       expect(await h.jsDeviceToken()).toBe(rotatedToken);
       expect(h.native.token).toBe(token);
       expect(h.nativeModuleCalls.filter(call => call !== 'configureNative' && call !== 'addListener')).toEqual([]);
-      await expect(h.run(() => h.awaitJsToNativeSync())).resolves.toBeUndefined();
     });
 
     it('mirrors the shared device token into the app token cache', async () => {
@@ -393,64 +390,6 @@ describe('native client sync behavior', () => {
       await h.run(() => h.releaseNativeStartup());
 
       await waitFor(() => expect(h.native.activeSessionId).toBe(sessionId));
-      await expectConverged(h);
-    });
-  });
-
-  describe('explicit synchronization barrier (biometric flows)', () => {
-    it('lets a native operation observe the latest JS state and JS observe the native result', async () => {
-      const { server, token, sessionIds } = seedDevice(['user_1', 'user_2'], 'user_1');
-      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
-
-      await h.run(async () => {
-        await h.js.setActive({ session: sessionIds.user_2 });
-        await h.awaitJsToNativeSync();
-      });
-      expect(h.native.activeSessionId).toBe(sessionIds.user_2);
-
-      h.native.holdChangeNotifications();
-      await h.run(async () => {
-        await h.native.setActiveSession(sessionIds.user_1);
-        await h.pullNativeToJs();
-      });
-      expect(h.js.session?.id).toBe(sessionIds.user_1);
-
-      await h.run(() => h.native.releaseChangeNotifications());
-      await h.settle();
-      expect(h.js.session?.id).toBe(sessionIds.user_1);
-      await expectConverged(h);
-    });
-
-    it('lets JS observe a session created by a native sign-in once the pull resolves', async () => {
-      const h = await start();
-
-      await h.run(() => h.awaitJsToNativeSync());
-      h.native.holdChangeNotifications();
-      const sessionId = await h.run(async () => {
-        const createdSessionId = await h.native.signIn('user_1');
-        await h.pullNativeToJs();
-        return createdSessionId;
-      });
-
-      expect(h.js.client?.signedInSessions.map(session => session.id)).toContain(sessionId);
-      expect(h.js.session?.id).toBe(sessionId);
-    });
-
-    it('rejects with environment_unavailable when native does not finish a refresh in time', async () => {
-      const h = await start({ delayNativeStartup: true });
-      await h.run(() => h.js.signIn('user_1'));
-
-      vi.useFakeTimers();
-      try {
-        const barrier = expect(h.awaitJsToNativeSync()).rejects.toMatchObject({ code: 'environment_unavailable' });
-        await vi.advanceTimersByTimeAsync(5_000);
-        await barrier;
-      } finally {
-        vi.useRealTimers();
-      }
-
-      await h.run(() => h.releaseNativeStartup());
-      await expect(h.run(() => h.awaitJsToNativeSync())).resolves.toBeUndefined();
       await expectConverged(h);
     });
   });

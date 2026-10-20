@@ -1,8 +1,7 @@
-import { UNSAFE_PortalProvider as PortalProvider } from '@clerk/shared/react';
 import type { CustomPage, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
@@ -18,7 +17,9 @@ import {
   fapiSuggestion,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { PortalProvider } from '../../../primitives/portal';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
 
@@ -92,13 +93,12 @@ async function open() {
 }
 
 async function openSettings(user: User, label: string) {
-  await user.click(within(requiredPopup()).getByRole('button', { name: 'Settings' }));
-  await user.click(await screen.findByRole('menuitem', { name: label }));
+  await openMenu(user, within(requiredPopup()).getByRole('button', { name: 'Settings' }));
+  await user.click(screen.getByRole('menuitem', { name: label }));
 }
 
 async function openAccounts(user: User) {
-  await user.click(screen.getByRole('button', { name: 'Switch account' }));
-  return screen.findByRole('menu');
+  return openMenu(user, screen.getByRole('button', { name: 'Switch account' }));
 }
 
 function requiredPopup() {
@@ -396,9 +396,10 @@ describe('UserButton', () => {
     });
 
     it('hands the opened profile the portal root the app provides', async () => {
-      const container = document.createElement('div');
+      const container = document.body.appendChild(document.createElement('div'));
+      onTestFinished(() => container.remove());
       serveFapi(signedIn());
-      const { clerk } = await renderWithClerk(<PortalProvider getContainer={() => container}>{tree()}</PortalProvider>);
+      const { clerk } = await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
@@ -483,9 +484,10 @@ describe('UserButton', () => {
     });
 
     it('hands the CreateOrganization modal the portal root the app provides', async () => {
-      const container = document.createElement('div');
+      const container = document.body.appendChild(document.createElement('div'));
+      onTestFinished(() => container.remove());
       serveFapi(signedIn());
-      const { clerk } = await renderWithClerk(<PortalProvider getContainer={() => container}>{tree()}</PortalProvider>);
+      const { clerk } = await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
       const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
       const user = await open();
 

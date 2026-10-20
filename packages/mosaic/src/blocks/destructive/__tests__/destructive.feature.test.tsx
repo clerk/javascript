@@ -9,6 +9,7 @@ import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { Button } from '../../../components/button';
 import { Menu } from '../../../components/menu';
@@ -185,15 +186,15 @@ describe('Destructive shared by rows', () => {
     );
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Actions for Production' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Actions for Production' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
     expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Delete Production?');
     await user.type(screen.getByRole('textbox', { name: 'Type Production to continue' }), 'Production');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
 
-    await user.click(screen.getByRole('button', { name: 'Actions for Staging' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Actions for Staging' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
     expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Delete Staging?');
     const stagingField = screen.getByRole('textbox', { name: 'Type Staging to continue' });
     expect(stagingField).toHaveValue('');

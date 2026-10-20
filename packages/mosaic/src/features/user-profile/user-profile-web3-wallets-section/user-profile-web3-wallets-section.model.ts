@@ -103,13 +103,16 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
-  const [removeWallet, reverification] = useReverificationFlow((current: UserResource, walletId: string) => {
+  const [removeWallet, removeReverification] = useReverificationFlow((current: UserResource, walletId: string) => {
     const wallet = current.web3Wallets.find(candidate => candidate.id === walletId);
     if (!wallet) {
       throw walletUnavailable();
     }
     return wallet.destroy();
   });
+  const [setPrimaryWallet, setPrimaryReverification] = useReverificationFlow(
+    (current: UserResource, walletId: string) => current.update({ primaryWeb3WalletId: walletId }),
+  );
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -203,7 +206,7 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
       if (!current.web3Wallets.some(wallet => wallet.id === walletId && wallet.verification.status === 'verified')) {
         throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
       }
-      await current.update({ primaryWeb3WalletId: walletId });
+      await setPrimaryWallet(current, walletId);
     },
     remove: web3Attribute.immutable
       ? undefined
@@ -213,6 +216,7 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
           }
           await removeWallet(requireCurrentUser(), walletId);
         },
-    reverification,
+    removeReverification,
+    setPrimaryReverification,
   };
 }

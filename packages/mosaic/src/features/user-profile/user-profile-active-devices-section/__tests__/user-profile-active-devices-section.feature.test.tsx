@@ -13,6 +13,7 @@ import {
   worker,
 } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicNowProvider } from '../../../../hooks/use-now';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../../localization';
@@ -132,12 +133,12 @@ describe('Active devices', () => {
     expect(screen.queryByRole('button', { name: 'Manage Safari on Expired laptop' })).toBeNull();
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Safari on MacBook Pro' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Safari on MacBook Pro' }));
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     expect(within(screen.getByRole('dialog')).queryByRole('button', { name: 'Sign out' })).toBeNull();
     await user.click(within(screen.getByRole('dialog')).getByText('Close'));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    await user.click(screen.getByRole('button', { name: 'Manage Safari on iPhone' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     expect(within(screen.getByRole('dialog')).getByText('192.0.2.1')).toBeInTheDocument();
     expect(within(screen.getByRole('dialog')).getByText('Paris, France')).toBeInTheDocument();
@@ -241,7 +242,7 @@ describe('Active devices', () => {
     );
     await renderWithClerk(<UserProfileActiveDevicesSection />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
     expect(
       within(screen.getByRole('alertdialog')).getByText(/Safari on iPhone will be signed out/),
@@ -294,7 +295,7 @@ describe('Active devices', () => {
     );
 
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
 
@@ -435,7 +436,7 @@ describe('Active devices', () => {
     view.rerender(<UserProfileActiveDevicesSection />);
     const user = userEvent.setup();
     try {
-      await user.click(await screen.findByRole('button', { name: 'Manage Safari on Old phone' }));
+      await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on Old phone' }));
       await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
       await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
       await waitFor(() => expect(requests).toBe(1));
@@ -508,7 +509,7 @@ describe('Active devices', () => {
       const openReverification = vi.spyOn(view.clerk, '__internal_openReverification').mockImplementation(() => {});
       view.rerender(<UserProfileActiveDevicesSection />);
       const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+      await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
       await user.click(screen.getByRole('menuitem', { name: surface === 'details' ? 'View details' : 'Sign out' }));
       const dialog = screen.getByRole(surface === 'details' ? 'dialog' : 'alertdialog');
       await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
@@ -534,7 +535,7 @@ describe('Active devices', () => {
     const user = userEvent.setup();
     const revoke = holdRequests('post', '/v1/me/sessions/sess_other/revoke');
     try {
-      await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+      await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
       await user.click(screen.getByRole('menuitem', { name: 'View details' }));
       const dialog = screen.getByRole('dialog');
       await user.dblClick(within(dialog).getByRole('button', { name: 'Sign out' }));
@@ -567,7 +568,7 @@ describe('Active devices', () => {
     );
     await renderWithClerk(<UserProfileActiveDevicesSection />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     const dialog = screen.getByRole('dialog');
     await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
@@ -593,7 +594,7 @@ describe('Active devices', () => {
     );
     await renderWithClerk(<UserProfileActiveDevicesSection />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
 
@@ -629,7 +630,7 @@ describe('Active devices', () => {
     const settled = createDeferredPromise();
     let removeListener: (() => void) | undefined;
     try {
-      await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+      await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
       await user.click(screen.getByRole('menuitem', { name: 'View details' }));
       await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
       await waitFor(() => expect(requests).toBe(1));
@@ -700,7 +701,7 @@ describe('Change language while viewing device details', () => {
     });
     const view = await renderWithClerk(section('en-US'));
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on Phone' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on Phone' }));
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     const dialog = screen.getByRole('dialog');
     await waitFor(() => expect(dialog).toBeVisible());
@@ -772,7 +773,7 @@ describe('Sign out an unavailable device', () => {
       </MosaicLocalizationProvider>,
     );
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on Phone' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Safari on Phone' }));
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     await waitFor(() => expect(screen.getByRole('dialog')).toBeVisible());
 

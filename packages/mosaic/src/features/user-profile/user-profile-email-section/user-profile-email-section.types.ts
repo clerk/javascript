@@ -16,6 +16,8 @@ export interface UserProfileEmailSectionViewProps {
   remove?: ConfirmController<UserProfileEmail>;
   finalFocus: DialogFocusTarget;
   verificationFinalFocus: DialogFocusTarget;
+  setPrimaryReverification: ReverificationController;
+  setPrimaryFinalFocus: DialogFocusTarget;
   onVerify: (id: string) => void;
   onSetPrimary: (id: string) => void;
 }
@@ -32,7 +34,8 @@ export type UserProfileEmailSectionModel =
       getEmailVerifier: (id: string) => UserProfileEmailVerifier;
       onSetPrimaryEmail: (id: string) => Promise<void>;
       onRemoveEmail?: (id: string) => Promise<void>;
-      reverification: ReverificationController;
+      removeReverification: ReverificationController;
+      setPrimaryReverification: ReverificationController;
     };
 
 export type ReadyEmailSectionModel = Extract<UserProfileEmailSectionModel, { status: 'ready' }>;

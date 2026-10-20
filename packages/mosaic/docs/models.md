@@ -115,6 +115,9 @@ drops the fallback instead of holding the space open. Keep the two apart.
   controller beside its callbacks (`user-profile-email-section.model.ts`). A
   cancelled challenge rejects the callback with a `reverification_cancelled`
   error, which `save` lets through for the controller to recognise.
+  A direct action can use the same flow with `ReverificationDialog`
+  (`blocks/reverification/`) in the view;
+  a confirmation action passes the controller to `useConfirmController`.
 - No local UI state. What is open and what is in flight belong to the controller.
 - No React state machinery beyond the Clerk hooks themselves. Certain Mosaic hooks
   can also count when they deal with "outside" state, like `useReverificationFlow`

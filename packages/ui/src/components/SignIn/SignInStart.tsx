@@ -11,7 +11,7 @@ import type {
   SignInCreateParams,
   SignInResource,
 } from '@clerk/shared/types';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
+import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -37,7 +37,7 @@ import {
 import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus } from '../../hooks';
+import { useIsWebAuthnSupported, useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
@@ -111,9 +111,7 @@ function SignInStartInternal(): JSX.Element {
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const onSecondFactor = () => navigate('factor-two');
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
-  // @ts-expect-error - This is not a public API
-  const { __internal_isWebAuthnSupported } = clerk;
-  const isWebSupported = (__internal_isWebAuthnSupported ?? isWebAuthnSupported)();
+  const isWebSupported = useIsWebAuthnSupported();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);

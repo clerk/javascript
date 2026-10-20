@@ -6,6 +6,7 @@ import { page } from 'vitest/browser';
 import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfile } from '../user-profile';
 import { signedIn } from '../user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
@@ -126,7 +127,7 @@ describe('UserProfile', () => {
     await renderWithClerk(<UserProfile additionalOAuthScopes={{ google: ['calendar'] }} />);
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Google' }));
     expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toBeEnabled();
   });
 });

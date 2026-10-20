@@ -23,7 +23,6 @@ export class FakeNativeClerk {
   token: string | null;
   client: FakeServerClientJSON | null = null;
   isConfigured = false;
-  /** Times native fetched its client from the Frontend API. */
   clientRefreshCount = 0;
   #listeners = new Set<NativeClientChangeListener>();
   #heldChanges: Array<[NativeClientChange, NativeChangeOrigin]> | null = null;
@@ -50,7 +49,6 @@ export class FakeNativeClerk {
     return () => this.#listeners.delete(listener);
   }
 
-  /** Native keeps its change notifications queued until `releaseChangeNotifications`. */
   holdChangeNotifications(): void {
     this.#heldChanges ??= [];
   }
@@ -63,7 +61,6 @@ export class FakeNativeClerk {
     }
   }
 
-  /** Native stays in its startup phase until the returned release function is called. */
   delayStartup(): () => void {
     let release!: () => void;
     this.#startupGate = new Promise(resolve => {
@@ -75,8 +72,6 @@ export class FakeNativeClerk {
   failNextClientRefresh(error: Error): void {
     this.#nextRefreshError = error;
   }
-
-  // Primitives used by engine adapters.
 
   async waitForStartup(): Promise<void> {
     await this.#startupGate;
@@ -106,8 +101,6 @@ export class FakeNativeClerk {
       listener(change, origin);
     }
   }
-
-  // Native user actions (native UI components, native-only flows).
 
   async signIn(userId: string): Promise<string> {
     const response = await this.#observe(() => this.server.signIn('native', this.token, userId));

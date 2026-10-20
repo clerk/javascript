@@ -70,6 +70,43 @@ describe('createNativeClientSync', () => {
     expect(native.configureNative).toHaveBeenNthCalledWith(2, 'pk_test_123', null, 'https://example.com/__clerk');
   });
 
+  test('retries a configure that rejects once', async () => {
+    const createNativeClientSync = await loadEngine();
+    const native = nativeModule();
+    vi.mocked(native.configureNative).mockRejectedValueOnce(new Error('keystore busy'));
+    const cache = userTokenCache(vi.fn().mockResolvedValue('seed-token'));
+
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+
+    await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('native-token');
+    expect(native.configureNative).toHaveBeenCalledTimes(2);
+  });
+
+  test('uses the app token cache while a slow configure is pending and the native token once it finishes', async () => {
+    vi.useFakeTimers();
+    try {
+      const createNativeClientSync = await loadEngine();
+      const native = nativeModule();
+      let finishConfigure!: () => void;
+      vi.mocked(native.configureNative).mockReturnValue(new Promise<void>(resolve => (finishConfigure = resolve)));
+      const cache = userTokenCache(vi.fn().mockResolvedValue('seed-token'));
+
+      const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+      const duringStartup = sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+      await vi.advanceTimersByTimeAsync(3_000);
+
+      await expect(duringStartup).resolves.toBe('seed-token');
+      expect(native.getDeviceToken).not.toHaveBeenCalled();
+
+      finishConfigure();
+      await vi.advanceTimersByTimeAsync(0);
+      await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('native-token');
+      expect(native.configureNative).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   test('waits for the app to become active and reads the seed again when the first read fails', async () => {
     const createNativeClientSync = await loadEngine();
     const native = nativeModule();

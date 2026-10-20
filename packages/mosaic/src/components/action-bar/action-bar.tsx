@@ -3,7 +3,6 @@ import {
   Composite,
   CompositeItem,
   FloatingFocusManager,
-  FloatingPortal,
   getOverflowAncestors,
   hide,
   limitShift,
@@ -17,6 +16,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useAnimationsFinished, useTransitionStatus } from '../../primitives/hooks';
+import { Portal } from '../../primitives/portal';
 import { isElement, isRef, mergeProps, useRender } from '../../primitives/utils';
 import { getComputedStyle } from '../../primitives/utils/dom';
 import type { MosaicComponentProps, XStyle } from '../../props';
@@ -174,7 +174,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
         {status}
       </VisuallyHidden>
       {mounted ? (
-        <FloatingPortal root={portalRoot}>
+        <Portal root={portalRoot}>
           <FloatingFocusManager
             context={floatingContext}
             modal={false}
@@ -242,7 +242,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
               />
             </div>
           </FloatingFocusManager>
-        </FloatingPortal>
+        </Portal>
       ) : null}
     </ActionBarContext.Provider>
   );

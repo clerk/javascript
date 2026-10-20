@@ -153,11 +153,7 @@ function StubPage({ id, title }: { id: string; title: string }) {
   );
 }
 
-function Surface({
-  forceMountPages,
-  stub,
-  ...props
-}: Partial<ProfileRootProps> & { forceMountPages?: boolean; stub?: boolean }) {
+function Surface({ stub, ...props }: Partial<ProfileRootProps> & { stub?: boolean }) {
   const [page, setPage] = useState('general');
   return (
     <Profile.Root
@@ -188,7 +184,6 @@ function Surface({
           <Profile.ContentPanel
             key={item.id}
             value={item.id}
-            shouldForceMount={forceMountPages}
           >
             {stub ? (
               <StubPage
@@ -303,11 +298,10 @@ export function Customized() {
 
 /**
  * A page transition, in CSS alone — the CSS a customer can add against a `<UserProfile />` they do
- * not render themselves. The primitive hides an unselected page with the `hidden` attribute, and
- * CSS can now transition across that: `@starting-style` gives the page that just lost `hidden` a
- * frame to enter from, and `transition-behavior: allow-discrete` holds the page that just gained
- * it on screen until its exit finishes. The pages share one grid cell so the two cross-fade in
- * place. Under `prefers-reduced-motion: reduce` the swap is instant.
+ * not render themselves. The entering page carries `data-starting-style` for its first frame and
+ * the leaving page carries `data-ending-style` until its exit finishes, then gains `hidden`. The
+ * pages share one grid cell so the two cross-fade in place. Under `prefers-reduced-motion: reduce`
+ * the swap is instant.
  */
 export function Transitions() {
   return (
@@ -327,23 +321,18 @@ export function Transitions() {
             transition:
               opacity var(--enter) var(--cl-ease-enter),
               scale var(--enter) var(--cl-ease-enter),
-              filter var(--enter) var(--cl-ease-enter),
-              display var(--enter) allow-discrete;
+              filter var(--enter) var(--cl-ease-enter);
             /* The entering page waits for the leaving one to mostly clear — a hand-off, not a
-               cross-fade. Not on \`display\`, which must show the page at once for the entrance to
-               have a frame to start from. */
-            transition-delay: var(--wait), var(--wait), var(--wait), 0s;
-
-            @starting-style {
-              opacity: 0;
-              scale: 0.98;
-              filter: blur(4px);
-            }
+               cross-fade. */
+            transition-delay: var(--wait);
           }
-          .cl-profile-content-panel[hidden] {
+          .cl-profile-content-panel[data-starting-style],
+          .cl-profile-content-panel[data-ending-style] {
             opacity: 0;
             scale: 0.98;
             filter: blur(4px);
+          }
+          .cl-profile-content-panel[data-ending-style] {
             transition-duration: var(--exit);
             transition-timing-function: var(--cl-ease-exit);
             transition-delay: 0s;

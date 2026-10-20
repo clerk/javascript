@@ -2,6 +2,7 @@ import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import type { ReactNode, Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
@@ -23,7 +24,8 @@ export interface UserProfileMfaSectionViewProps {
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
-  reverification?: ReverificationController;
+  removeReverification?: ReverificationController;
+  setDefaultReverification?: ReverificationController;
 }
 
 export function UserProfileMfaSectionView({
@@ -35,10 +37,17 @@ export function UserProfileMfaSectionView({
   onRegenerateBackupCodes,
   onRemove,
   onSetDefault,
-  reverification,
+  removeReverification,
+  setDefaultReverification,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const controller = useUserProfileMfaSectionLeafController({ methods, onAdd, onRemove, onSetDefault, reverification });
+  const controller = useUserProfileMfaSectionLeafController({
+    methods,
+    onAdd,
+    onRemove,
+    onSetDefault,
+    removeReverification,
+  });
 
   return (
     <>
@@ -83,6 +92,12 @@ export function UserProfileMfaSectionView({
           description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
           finalFocus={controller.finalRemovalFocus}
+        />
+      ) : null}
+      {setDefaultReverification ? (
+        <ReverificationDialog
+          controller={setDefaultReverification}
+          finalFocus={controller.setDefaultFinalFocus}
         />
       ) : null}
     </>

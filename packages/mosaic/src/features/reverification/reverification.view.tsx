@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
@@ -133,7 +135,8 @@ export function ReverificationView({
   onResend,
   canResend,
   resendRemainingSeconds,
-}: ReverificationViewProps): JSX.Element {
+  focusRef,
+}: ReverificationViewProps & { focusRef?: Ref<HTMLElement> }): JSX.Element {
   const m = useMessages('reverification');
 
   const otp = otpCopy(otpChannel, m);
@@ -163,6 +166,7 @@ export function ReverificationView({
         <>
           <Flow.Step ids={['password']}>
             <ReverificationPassword
+              focusRef={focusRef}
               messages={{
                 title: m.password.title,
                 description: m.password.description,
@@ -181,6 +185,7 @@ export function ReverificationView({
 
           <Flow.Step ids={['passkey']}>
             <ReverificationPasskey
+              focusRef={focusRef}
               messages={{
                 title: m.passkey.title,
                 description: m.passkey.description,
@@ -195,6 +200,7 @@ export function ReverificationView({
 
           <Flow.Step ids={['otp']}>
             <ReverificationOTP
+              focusRef={focusRef}
               messages={{
                 title: otp.title,
                 description: otp.description,
@@ -217,6 +223,7 @@ export function ReverificationView({
 
           <Flow.Step ids={['backup-code']}>
             <ReverificationBackupCode
+              focusRef={focusRef}
               messages={{
                 title: m.backupCodeMfa.title,
                 description: m.backupCodeMfa.description,
@@ -234,6 +241,7 @@ export function ReverificationView({
 
           <Flow.Step ids={['method-picker']}>
             <ReverificationMethodPicker
+              focusRef={focusRef}
               messages={{
                 title: m.alternativeMethods.title,
                 description: m.alternativeMethods.description,

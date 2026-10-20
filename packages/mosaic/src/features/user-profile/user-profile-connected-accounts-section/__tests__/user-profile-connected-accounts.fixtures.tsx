@@ -10,6 +10,7 @@ import {
   fapiUser,
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileProfilePanel } from '../../user-profile-profile-panel';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
@@ -73,6 +74,6 @@ export async function renderSection(accounts = [google], overrides: FakeFapiSeed
 }
 
 export async function startReconnect(user: ReturnType<typeof userEvent.setup>, provider: string) {
-  await user.click(screen.getByRole('button', { name: `Manage ${provider}` }));
+  await openMenu(user, screen.getByRole('button', { name: `Manage ${provider}` }));
   await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
 }

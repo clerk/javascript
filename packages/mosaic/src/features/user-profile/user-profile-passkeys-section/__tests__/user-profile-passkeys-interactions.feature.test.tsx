@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { openDialog } from '../../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
@@ -35,7 +36,7 @@ function accounts() {
 
 async function openRename() {
   const user = userEvent.setup();
-  await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+  await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
   const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
   return { user, input: within(dialog).getByRole('textbox', { name: 'Passkey name' }) };
 }
@@ -49,7 +50,7 @@ describe('Passkey interactions across resource changes', () => {
     await user.type(input, 'Alice work laptop');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    await user.click(screen.getByRole('button', { name: 'Manage Alice work laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice work laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     expect(screen.getByRole('textbox', { name: 'Passkey name' })).toHaveValue('Alice work laptop');
     expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('aria-disabled', 'true');
@@ -91,7 +92,7 @@ describe('Passkey interactions across resource changes', () => {
     accounts();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     const held = holdRequests('post', '/v1/me/passkeys/pk_a');
     const remove = screen.getByRole('button', { name: 'Remove' });
