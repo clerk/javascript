@@ -10,6 +10,7 @@ import {
   fapiUser,
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
@@ -44,7 +45,7 @@ describe('connected accounts', () => {
 
     expect(screen.getByText('You did not grant access to your Google account')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Connect Google' })).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Google' }));
     await user.click(screen.getByRole('menuitem', { name: 'Try again' }));
 
     await waitFor(() => expect(request.requests).toHaveLength(1));
@@ -104,10 +105,10 @@ describe('connected accounts', () => {
     request.fail('session_reverification_required', 'Verify your session.');
     expect(await screen.findByText('Verify your session.')).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Google' }));
     expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toBeEnabled();
     serveFapi(signedIn([disconnectedGoogle]));
-    await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Reconnect' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
   });
 
@@ -211,9 +212,9 @@ describe('connected accounts', () => {
     });
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Google' })).toBeInTheDocument());
     expect(clerk.user?.externalAccounts.find(item => item.id === google.id)?.approvedScopes).toBe('email calendar');
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
-    expect(screen.queryByRole('menuitem', { name: 'Reconnect' })).toBeNull();
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Google' }));
     expect(screen.getByRole('menuitem', { name: 'Remove' })).toBeEnabled();
+    expect(screen.queryByRole('menuitem', { name: 'Reconnect' })).toBeNull();
   });
 
   it.each(['switch', 'sign out'] as const)('aborts Reconnect after %s during redirect preparation', async change => {

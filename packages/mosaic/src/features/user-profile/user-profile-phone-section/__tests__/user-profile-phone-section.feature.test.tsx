@@ -21,6 +21,7 @@ import {
   fapiUser,
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfilePhoneSection } from '../user-profile-phone-section';
 
@@ -73,8 +74,8 @@ const listed = () =>
     .map(node => node.textContent);
 
 async function manage(actor: Actor, label: string, action: string) {
-  await actor.click(within(row()).getByRole('button', { name: `Manage ${label}` }));
-  await actor.click(await screen.findByRole('menuitem', { name: action }));
+  await openMenu(actor, within(row()).getByRole('button', { name: `Manage ${label}` }));
+  await actor.click(screen.getByRole('menuitem', { name: action }));
 }
 
 async function addPhone(actor: Actor, digits: string) {

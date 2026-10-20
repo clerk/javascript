@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { openDialog } from '../../../../__tests__/feature/dialog';
 import { fapiUrl, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
@@ -37,7 +38,7 @@ describe('Validating a passkey name', () => {
     }
     vi.spyOn(passkey, 'update').mockRejectedValue(new Error('Private native failure'));
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.type(input, ' renamed');
@@ -65,7 +66,7 @@ describe('Validating a passkey name', () => {
       </MosaicProvider>,
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.type(input, ' modifié');
@@ -89,7 +90,7 @@ describe('Validating a passkey name', () => {
     );
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     const save = screen.getByRole('button', { name: 'Save' });

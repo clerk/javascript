@@ -17,6 +17,7 @@ import {
   fapiSuggestion,
   fapiUser,
 } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { PortalProvider } from '../../../primitives/portal';
 import type { UserButtonProps } from '../user-button';
@@ -92,13 +93,12 @@ async function open() {
 }
 
 async function openSettings(user: User, label: string) {
-  await user.click(within(requiredPopup()).getByRole('button', { name: 'Settings' }));
-  await user.click(await screen.findByRole('menuitem', { name: label }));
+  await openMenu(user, within(requiredPopup()).getByRole('button', { name: 'Settings' }));
+  await user.click(screen.getByRole('menuitem', { name: label }));
 }
 
 async function openAccounts(user: User) {
-  await user.click(screen.getByRole('button', { name: 'Switch account' }));
-  return screen.findByRole('menu');
+  return openMenu(user, screen.getByRole('button', { name: 'Switch account' }));
 }
 
 function requiredPopup() {
