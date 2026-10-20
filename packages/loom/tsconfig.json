@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": true,
+    "types": ["node"],
+    "rootDir": "src",
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["src"]
+}

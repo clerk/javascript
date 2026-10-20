@@ -1,0 +1,46 @@
+{
+  "name": "@clerk/loom",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Private active-device sessions data client prototype",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "verify:core": "node scripts/verify-core.mjs"
+  },
+  "dependencies": {
+    "@clerk/shared": "workspace:*",
+    "@tanstack/query-core": "5.102.8",
+    "@tanstack/react-query": "5.102.8"
+  },
+  "devDependencies": {
+    "@clerk/react": "workspace:*",
+    "@types/react": "catalog:react",
+    "@types/react-dom": "catalog:react",
+    "jsdom": "26.1.0",
+    "react": "catalog:react",
+    "react-dom": "catalog:react",
+    "tsdown": "catalog:repo",
+    "typescript": "catalog:repo"
+  },
+  "peerDependencies": {
+    "react": "catalog:peer-react"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}
