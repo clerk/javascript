@@ -5,7 +5,7 @@ import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { useProtect } from '../../common';
-import { useEnvironment } from '../../contexts';
+import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/ConfigureDirectorySyncWizard';
 import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
@@ -41,7 +41,8 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
 };
 
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
-  const canManageConnections = useProtect({ permission: 'org:sys_entconns:manage' });
+  const { shouldShowSelfServeSSO } = useOrganizationProfileContext();
+  const canManageConnections = useProtect({ permission: 'org:sys_entconns:manage' }) && shouldShowSelfServeSSO;
   const canManageSSOBypass = useProtect({ permission: 'org:sys_entconns_sso_bypass:manage' });
 
   const {
