@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo-native-components",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Native Clerk components and native SDK integration for Expo, powered by clerk-ios and clerk-android",
   "keywords": [
     "react",
