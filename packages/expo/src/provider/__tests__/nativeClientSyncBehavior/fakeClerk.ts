@@ -1,6 +1,8 @@
-import type { TokenCache } from '../../../cache/types';
-import { CLERK_CLIENT_JWT_KEY } from '../../../constants';
 import type { FakeClerkServer, FakeServerClientJSON, FapiResponse } from './fakeServer';
+
+type FakeRequestInit = { url: URL; headers: Headers };
+type BeforeRequestHook = (requestInit: FakeRequestInit) => unknown;
+type AfterResponseHook = (requestInit: FakeRequestInit, response: { headers: Headers; payload: null }) => unknown;
 
 export type FakeSessionResource = {
   id: string;
@@ -62,8 +64,8 @@ export class FakeClientResource {
 
 /**
  * Stand-in for the clerk-js instance returned by `getClerkInstance`, with the same surface the existing
- * ClerkProvider tests mock. It talks to the fake Frontend API through the token cache it was built with,
- * mirroring the `__internal_onBeforeRequest` / `__internal_onAfterResponse` hooks in `createClerkInstance`.
+ * ClerkProvider tests mock. Each fake Frontend API request runs through the `__internal_onBeforeRequest` /
+ * `__internal_onAfterResponse` hooks the real `createClerkInstance` registers.
  */
 export class FakeClerk {
   loaded = false;
@@ -72,7 +74,8 @@ export class FakeClerk {
   session: FakeSessionResource | null = null;
   __internal_setActiveInProgress = false;
   readonly emissions: JsEmission[] = [];
-  tokenCache: TokenCache | undefined;
+  #beforeRequestHooks: BeforeRequestHook[] = [];
+  #afterResponseHooks: AfterResponseHook[] = [];
   #listeners: ListenerCallback[] = [];
   #statusListeners = new Set<StatusListener>();
   #onLoadedListeners: Array<() => void> = [];
@@ -80,17 +83,35 @@ export class FakeClerk {
 
   constructor(readonly server: FakeClerkServer) {}
 
+  __internal_onBeforeRequest(hook: BeforeRequestHook): void {
+    this.#beforeRequestHooks.push(hook);
+  }
+
+  __internal_onAfterResponse(hook: AfterResponseHook): void {
+    this.#afterResponseHooks.push(hook);
+  }
+
   async fapi<T extends FapiResponse>(request: (token: string | null) => Promise<T>): Promise<T> {
-    const token = (await this.tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
-    const response = await request(token);
-    if (response.token) {
-      await this.tokenCache?.saveToken(CLERK_CLIENT_JWT_KEY, response.token);
+    const requestInit = await this.#prepareRequest();
+    const response = await request(requestInit.headers.get('authorization') || null);
+    const headers = new Headers(response.token ? { authorization: response.token } : {});
+    for (const hook of this.#afterResponseHooks) {
+      await hook(requestInit, { headers, payload: null });
     }
     return response;
   }
 
   async currentDeviceToken(): Promise<string | null> {
-    return (await this.tokenCache?.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
+    const requestInit = await this.#prepareRequest();
+    return requestInit.headers.get('authorization') || null;
+  }
+
+  async #prepareRequest(): Promise<FakeRequestInit> {
+    const requestInit = { url: new URL('https://fapi.clerk.test/v1/client'), headers: new Headers() };
+    for (const hook of this.#beforeRequestHooks) {
+      await hook(requestInit);
+    }
+    return requestInit;
   }
 
   load = (): Promise<void> => {

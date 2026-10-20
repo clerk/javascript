@@ -1,3 +1,4 @@
+import type { Clerk } from '@clerk/clerk-js';
 import { act, render, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -113,14 +114,16 @@ export const renderWithNativeSync: RenderWithNativeSync = async (scenario = {}) 
   const releaseNativeStartup = scenario.delayNativeStartup ? native.delayStartup() : () => undefined;
   const nativeModuleCalls: string[] = [];
 
+  // Fresh engine modules per scenario: the native module is resolved at import time and the
+  // coordinator, Clerk instance and default in-memory token cache are module singletons.
+  vi.resetModules();
+  const { createClerkInstance } = await import('../../singleton/createClerkInstance');
   setActiveEnvironment({
-    js,
+    getClerkInstance: createClerkInstance(function () {
+      return js;
+    } as unknown as typeof Clerk) as unknown as (options?: unknown) => FakeClerk,
     nativeModule: scenario.nativeModule === 'absent' ? null : createCurrentNativeModule(native, nativeModuleCalls),
   });
-
-  // Fresh engine modules per scenario: the native module is resolved at import time and the
-  // coordinator and default in-memory token cache are module singletons.
-  vi.resetModules();
   const { ClerkProvider } = await import('../../ClerkProvider');
 
   const view = render(
