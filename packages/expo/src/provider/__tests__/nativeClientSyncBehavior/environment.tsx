@@ -4,7 +4,7 @@ import type { TokenCache } from '../../../cache/types';
 import type { FakeClerk } from './fakeClerk';
 
 type BehaviorEnvironment = {
-  js: FakeClerk | null;
+  getClerkInstance: ((options?: unknown) => FakeClerk) | null;
   nativeModule: unknown;
 };
 
@@ -13,7 +13,7 @@ const registryKey = Symbol.for('@clerk/expo/nativeClientSyncBehavior');
 const globalRegistry = globalThis as typeof globalThis & { [registryKey]?: BehaviorEnvironment };
 
 export function activeEnvironment(): BehaviorEnvironment {
-  globalRegistry[registryKey] ??= { js: null, nativeModule: null };
+  globalRegistry[registryKey] ??= { getClerkInstance: null, nativeModule: null };
   return globalRegistry[registryKey];
 }
 
@@ -21,13 +21,12 @@ export function setActiveEnvironment(environment: BehaviorEnvironment): void {
   globalRegistry[registryKey] = environment;
 }
 
-export function getClerkInstanceForActiveEnvironment(options?: { tokenCache?: TokenCache }): FakeClerk {
-  const { js } = activeEnvironment();
-  if (!js) {
+export function getClerkInstanceForActiveEnvironment(options?: unknown): FakeClerk {
+  const { getClerkInstance } = activeEnvironment();
+  if (!getClerkInstance) {
     throw new Error('No native client sync behavior environment is active.');
   }
-  js.tokenCache = options?.tokenCache;
-  return js;
+  return getClerkInstance(options);
 }
 
 /** Stands in for `InternalClerkProvider`, which loads the Clerk instance after mounting. */
@@ -38,7 +37,6 @@ export function LoadingClerkProvider({ children, Clerk }: { children?: ReactNode
   return <>{children}</>;
 }
 
-/** A persistent token cache such as one backed by `expo-secure-store`. */
 export class FakePersistentTokenCache implements TokenCache {
   #values = new Map<string, string>();
 
