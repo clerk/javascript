@@ -33,7 +33,9 @@ function lockPageScroll(): () => void {
   }
   const previousGutter = html.style.scrollbarGutter;
   const previousOverflow = { overflowX: scroller.style.overflowX, overflowY: scroller.style.overflowY };
-  html.style.scrollbarGutter = 'stable';
+  if (window.innerWidth > html.clientWidth) {
+    html.style.scrollbarGutter = 'stable';
+  }
   Object.assign(scroller.style, { overflowX: 'hidden', overflowY: 'hidden' });
   return () => {
     html.style.scrollbarGutter = previousGutter;

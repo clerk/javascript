@@ -55,12 +55,14 @@ const overlays: Array<[string, (open: boolean) => ReactElement]> = [
 
 afterEach(() => {
   cleanup();
+  Reflect.deleteProperty(document.documentElement, 'clientWidth');
   document.documentElement.removeAttribute('style');
   document.body.removeAttribute('style');
 });
 
 describe.each(overlays)('%s scroll lock', (_name, renderOverlay) => {
   it('locks the page and keeps the scrollbar gutter, then restores both on close', async () => {
+    showScrollbar(15);
     const { rerender } = render(renderOverlay(true));
     await screen.findByTestId('content');
 
@@ -71,6 +73,19 @@ describe.each(overlays)('%s scroll lock', (_name, renderOverlay) => {
 
     expect(document.body.style.cssText).toBe('');
     expect(document.documentElement.style.cssText).toBe('');
+  });
+
+  it('locks the page without reserving a gutter when the page shows no scrollbar', async () => {
+    showScrollbar(0);
+    const { rerender } = render(renderOverlay(true));
+    await screen.findByTestId('content');
+
+    expect(document.body.style.overflowY).toBe('hidden');
+    expect(document.documentElement.style.scrollbarGutter).toBe('');
+
+    rerender(renderOverlay(false));
+
+    expect(document.body.style.cssText).toBe('');
   });
 
   it('locks <html> instead of <body> when <html> is the element that scrolls', async () => {
@@ -122,3 +137,10 @@ describe('select in a dialog', () => {
     expect(document.body.style.cssText).toBe('');
   });
 });
+
+function showScrollbar(width: number): void {
+  Object.defineProperty(document.documentElement, 'clientWidth', {
+    configurable: true,
+    value: window.innerWidth - width,
+  });
+}
