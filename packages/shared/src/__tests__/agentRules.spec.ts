@@ -120,6 +120,99 @@ describe('writeClerkAgentRules', () => {
   });
 });
 
+describe('writeClerkAgentRules with an existing CLAUDE.md', () => {
+  it('adds an @AGENTS.md import when CLAUDE.md does not load AGENTS.md', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': 'Agent rules\n',
+      '/repo/CLAUDE.md': 'Claude rules\n',
+    });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.claudeMd).toBe('updated');
+    expect(memory.read('/repo/CLAUDE.md')).toBe('Claude rules\n\n@AGENTS.md\n');
+    expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:nextjs -->');
+  });
+
+  it('adds the import only once across runs', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': 'Agent rules\n',
+      '/repo/CLAUDE.md': 'Claude rules\n',
+    });
+
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.claudeMd).toBe('unchanged');
+    expect(memory.read('/repo/CLAUDE.md')).toBe('Claude rules\n\n@AGENTS.md\n');
+  });
+
+  it.each(['@AGENTS.md', '@./AGENTS.md'])('leaves CLAUDE.md alone when it already imports %s', importLine => {
+    const claude = `Claude rules\n\n${importLine}\n`;
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': 'Agent rules\n',
+      '/repo/CLAUDE.md': claude,
+    });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.claudeMd).toBe('unchanged');
+    expect(memory.read('/repo/CLAUDE.md')).toBe(claude);
+  });
+
+  it('leaves CLAUDE.md alone when it mirrors AGENTS.md, as a symlink does', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': 'Shared rules\n',
+      '/repo/CLAUDE.md': 'Shared rules\n',
+    });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.claudeMd).toBe('unchanged');
+    expect(memory.read('/repo/CLAUDE.md')).toBe('Shared rules\n');
+  });
+
+  it('writes the Clerk block into CLAUDE.md and skips the import when only CLAUDE.md exists', () => {
+    const memory = createMemoryFs({ '/repo/CLAUDE.md': 'Claude rules\n' });
+
+    const result = writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(result.agentsMd).toBe('updated');
+    expect(memory.read('/repo/AGENTS.md')).toBeUndefined();
+    expect(memory.read('/repo/CLAUDE.md')).toContain('<!-- BEGIN:clerk-agent-rules:nextjs -->');
+    expect(memory.read('/repo/CLAUDE.md')).not.toContain('@AGENTS.md');
+  });
+
+  it('keeps CRLF line endings in CLAUDE.md', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': 'Agent rules\r\n',
+      '/repo/CLAUDE.md': 'Claude rules\r\n',
+    });
+
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(memory.read('/repo/CLAUDE.md')).toBe('Claude rules\r\n\r\n@AGENTS.md\r\n');
+  });
+
+  it('reports the import but does not write it in dry-run mode', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': 'Agent rules\n',
+      '/repo/CLAUDE.md': 'Claude rules\n',
+    });
+
+    const result = writeClerkAgentRules({
+      cwd: '/repo',
+      dryRun: true,
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['nextjs'],
+    });
+
+    expect(result.claudeMd).toBe('updated');
+    expect(memory.read('/repo/CLAUDE.md')).toBe('Claude rules\n');
+  });
+});
+
 describe('Clerk plugin rules', () => {
   it('recommends the Clerk plugin and keeps the ask-before-changes rule in the root block', () => {
     const block = renderClerkAgentRulesBlock();
