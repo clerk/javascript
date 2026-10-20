@@ -5,7 +5,7 @@ import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 
-import { descriptors, Flex, localizationKeys } from '../../customizables';
+import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useHandleAuthenticateWithPasskey } from './shared';
 
 type SignInFactorTwoPasskeyCardProps = {
@@ -25,35 +25,37 @@ export const SignInFactorTwoPasskeyCard = (props: SignInFactorTwoPasskeyCardProp
   };
 
   return (
-    <Card.Root>
-      <Card.Content>
-        <Header.Root showLogo>
-          <Header.Title localizationKey={localizationKeys('signIn.passkeyMfa.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('signIn.passkeyMfa.subtitle')} />
-        </Header.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Flex
-          direction='col'
-          elementDescriptor={descriptors.main}
-          gap={4}
-        >
-          <Form.Root
-            onSubmit={handleSubmit}
-            gap={8}
+    <Flow.Part part='passkey2Fa'>
+      <Card.Root>
+        <Card.Content>
+          <Header.Root showLogo>
+            <Header.Title localizationKey={localizationKeys('signIn.passkeyMfa.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signIn.passkeyMfa.subtitle')} />
+          </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Flex
+            direction='col'
+            elementDescriptor={descriptors.main}
+            gap={4}
           >
-            <Form.SubmitButton hasArrow />
-          </Form.Root>
-          <Card.Action elementId='alternativeMethods'>
-            {onShowAlternativeMethodsClicked && (
-              <Card.ActionLink
-                localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-                onClick={onShowAlternativeMethodsClicked}
-              />
-            )}
-          </Card.Action>
-        </Flex>
-      </Card.Content>
-      <Card.Footer />
-    </Card.Root>
+            <Form.Root
+              onSubmit={handleSubmit}
+              gap={8}
+            >
+              <Form.SubmitButton hasArrow />
+            </Form.Root>
+            <Card.Action elementId='alternativeMethods'>
+              {onShowAlternativeMethodsClicked && (
+                <Card.ActionLink
+                  localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                  onClick={onShowAlternativeMethodsClicked}
+                />
+              )}
+            </Card.Action>
+          </Flex>
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    </Flow.Part>
   );
 };

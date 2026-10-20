@@ -9,7 +9,7 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { Button, Col, descriptors, localizationKeys } from '../../customizables';
+import { Button, Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { useAfterVerification } from './use-after-verification';
 
 type UVFactorTwoPasskeyCardProps = {
@@ -55,43 +55,45 @@ export const UVFactorTwoPasskeyCard = (props: UVFactorTwoPasskeyCardProps) => {
   };
 
   return (
-    <Card.Root>
-      <Card.Content>
-        <Header.Root>
-          <Header.Title localizationKey={localizationKeys('reverification.passkeyMfa.title')} />
-          <Header.Subtitle localizationKey={localizationKeys('reverification.passkeyMfa.subtitle')} />
-        </Header.Root>
-        <Card.Alert>{card.error}</Card.Alert>
-        <Col
-          elementDescriptor={descriptors.main}
-          gap={8}
-        >
-          <Form.Root>
-            <Col gap={3}>
-              <Button
-                type='button'
-                isLoading={card.isLoading}
-                onClick={e => {
-                  e.preventDefault();
-                  handlePasskeysAttempt();
-                }}
-                localizationKey={localizationKeys('reverification.passkeyMfa.blockButton__passkey')}
-                hasArrow
-              />
-              <Card.Action elementId='alternativeMethods'>
-                {showAlternativeMethods && onShowAlternativeMethodsClicked && (
-                  <Card.ActionLink
-                    localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
-                    onClick={onShowAlternativeMethodsClicked}
-                  />
-                )}
-              </Card.Action>
-            </Col>
-          </Form.Root>
-        </Col>
-      </Card.Content>
+    <Flow.Part part='passkey2Fa'>
+      <Card.Root>
+        <Card.Content>
+          <Header.Root>
+            <Header.Title localizationKey={localizationKeys('reverification.passkeyMfa.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('reverification.passkeyMfa.subtitle')} />
+          </Header.Root>
+          <Card.Alert>{card.error}</Card.Alert>
+          <Col
+            elementDescriptor={descriptors.main}
+            gap={8}
+          >
+            <Form.Root>
+              <Col gap={3}>
+                <Button
+                  type='button'
+                  isLoading={card.isLoading}
+                  onClick={e => {
+                    e.preventDefault();
+                    handlePasskeysAttempt();
+                  }}
+                  localizationKey={localizationKeys('reverification.passkeyMfa.blockButton__passkey')}
+                  hasArrow
+                />
+                <Card.Action elementId='alternativeMethods'>
+                  {showAlternativeMethods && onShowAlternativeMethodsClicked && (
+                    <Card.ActionLink
+                      localizationKey={localizationKeys('footerActionLink__useAnotherMethod')}
+                      onClick={onShowAlternativeMethodsClicked}
+                    />
+                  )}
+                </Card.Action>
+              </Col>
+            </Form.Root>
+          </Col>
+        </Card.Content>
 
-      <Card.Footer />
-    </Card.Root>
+        <Card.Footer />
+      </Card.Root>
+    </Flow.Part>
   );
 };
