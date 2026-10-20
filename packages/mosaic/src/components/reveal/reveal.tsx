@@ -4,32 +4,31 @@ import React from 'react';
 
 import { useTransition } from '../../primitives/hooks';
 import { Freeze, useRender } from '../../primitives/utils';
-import type { MosaicComponentProps } from '../../props';
+import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { reveal } from './reveal.styles';
 
-export interface RevealProps extends MosaicComponentProps<'div'> {
+export type RevealProps = MosaicElementProps<'div'> & {
   open: boolean;
-}
+};
 
 export const Reveal = React.forwardRef<HTMLDivElement, RevealProps>(function MosaicReveal(
-  { open, render, xstyle, children, ...rest },
+  { open, xstyle, children, ...rest },
   ref,
 ) {
   const element = React.useRef<HTMLElement | null>(null);
   const { mounted, transitionProps } = useTransition({ open, ref: element });
-  const hasBeenClosed = React.useRef(!open);
-  if (!open) {
-    hasBeenClosed.current = true;
+  const [hasBeenClosed, setHasBeenClosed] = React.useState(!open);
+  if (!open && !hasBeenClosed) {
+    setHasBeenClosed(true);
   }
-  const effectiveTransitionProps = hasBeenClosed.current
+  const effectiveTransitionProps = hasBeenClosed
     ? transitionProps
     : { ...transitionProps, 'data-starting-style': undefined, style: undefined };
 
   return useRender({
     defaultTagName: 'div',
-    render,
     ref: [ref, element],
     props: {
       ...mergeStyleProps(
