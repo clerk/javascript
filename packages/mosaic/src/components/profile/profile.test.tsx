@@ -141,7 +141,7 @@ describe('Profile', () => {
     expect(account).toHaveAttribute('aria-selected', 'true');
     expect(account).toHaveAttribute('aria-controls', page.id);
     expect(page).toHaveTextContent('Email addresses');
-    expect(screen.getByText('Security page')).not.toBeVisible();
+    expect(screen.queryByText('Security page')).not.toBeInTheDocument();
   });
 
   it('reports a selection, and moves it with the arrow keys', async () => {

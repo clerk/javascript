@@ -50,14 +50,14 @@ const [value, setValue] = useState('tab1');
 
 ## Parts
 
-| Part             | Default Element | Description                                                        |
-| ---------------- | --------------- | ------------------------------------------------------------------ |
-| `Tabs.Root`      | none (context)  | Provides active-value state, orientation, and activation mode      |
-| `Tabs.List`      | `<div>`         | `role="tablist"` container; sets up roving-tabindex navigation     |
-| `Tabs.Tab`       | `<button>`      | A keyboard-navigable tab trigger inside `Tabs.List`                |
-| `Tabs.Trigger`   | `<button>`      | Standalone tab trigger for use outside `Tabs.List` (not roving)    |
-| `Tabs.Panel`     | `<div>`         | `role="tabpanel"`; hidden via the `hidden` attribute when inactive |
-| `Tabs.Indicator` | `<span>`        | Decorative element for the selection (`aria-hidden`)               |
+| Part             | Default Element | Description                                                     |
+| ---------------- | --------------- | --------------------------------------------------------------- |
+| `Tabs.Root`      | none (context)  | Provides active-value state, orientation, and activation mode   |
+| `Tabs.List`      | `<div>`         | `role="tablist"` container; sets up roving-tabindex navigation  |
+| `Tabs.Tab`       | `<button>`      | A keyboard-navigable tab trigger inside `Tabs.List`             |
+| `Tabs.Trigger`   | `<button>`      | Standalone tab trigger for use outside `Tabs.List` (not roving) |
+| `Tabs.Panel`     | `<div>`         | `role="tabpanel"`; renders its children only while shown        |
+| `Tabs.Indicator` | `<span>`        | Decorative element for the selection (`aria-hidden`)            |
 
 All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
 attributes for their default element. `Tabs.Root` renders no element of its own.
@@ -83,10 +83,12 @@ attributes for their default element. `Tabs.Root` renders no element of its own.
 
 ### `Tabs.Panel`
 
-| Prop                          | Type                 | Default      | Description                                                                  |
-| ----------------------------- | -------------------- | ------------ | ---------------------------------------------------------------------------- |
-| <code>value</code>            | <code>string</code>  | — (required) | Must match a `Tabs.Tab` value                                                |
-| <code>shouldForceMount</code> | <code>boolean</code> | —            | Keep the panel in layout flow when inactive (enables enter/exit transitions) |
+| Prop                     | Type                 | Default      | Description                                    |
+| ------------------------ | -------------------- | ------------ | ---------------------------------------------- |
+| <code>value</code>       | <code>string</code>  | — (required) | Must match a `Tabs.Tab` value                  |
+| <code>keepMounted</code> | <code>boolean</code> | —            | Render the panel's children while it is hidden |
+
+A panel keeps its children through its exit animation, then gains `hidden` and unmounts them.
 
 `Tabs.List` and `Tabs.Indicator` take no additional props beyond standard HTML
 attributes for their default element.
@@ -95,15 +97,15 @@ attributes for their default element.
 
 Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute             | Applies To   | Description                                                      |
-| --------------------- | ------------ | ---------------------------------------------------------------- |
-| `data-selected`       | Tab, Trigger | Present on the active tab                                        |
-| `data-disabled`       | Tab, Trigger | Present when the tab is disabled                                 |
-| `data-hidden`         | Panel        | Present when the panel is not selected                           |
-| `data-open`           | Panel        | Present while open (force-mounted panels only)                   |
-| `data-closed`         | Panel        | Present while mounted-but-deselected (force-mounted panels only) |
-| `data-starting-style` | Panel        | Enter-animation first frame (force-mounted panels only)          |
-| `data-ending-style`   | Panel        | Exit-animation frame (force-mounted panels only)                 |
+| Attribute             | Applies To   | Description                                |
+| --------------------- | ------------ | ------------------------------------------ |
+| `data-selected`       | Tab, Trigger | Present on the active tab                  |
+| `data-disabled`       | Tab, Trigger | Present when the tab is disabled           |
+| `data-hidden`         | Panel        | Present when the panel is hidden           |
+| `data-open`           | Panel        | Present while selected                     |
+| `data-closed`         | Panel        | Present while deselected and animating out |
+| `data-starting-style` | Panel        | Enter-animation first frame                |
+| `data-ending-style`   | Panel        | Exit-animation frame                       |
 
 `Tabs.Indicator` carries `data-direction`: `forward` when the selection last moved to a later tab,
 `backward` when it moved to an earlier one. Pair it with CSS anchor positioning to place it under
@@ -127,5 +129,5 @@ the selected tab:
 }
 ```
 
-A force-mounted `Tabs.Panel` also exposes `--cl-tab-transition-direction` (`1` when moving
+`Tabs.Panel` also exposes `--cl-tab-transition-direction` (`1` when moving
 to a later tab, `-1` to an earlier one) for directional slide animations.
