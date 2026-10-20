@@ -112,6 +112,7 @@ function createSmsActions(
   userId: string,
   sessionId: string,
   refresh: () => Promise<void>,
+  makeDefault: (phone: PhoneNumberResource) => Promise<unknown>,
 ): Pick<ReadyModel, 'findOrCreatePhone' | 'enrollSms' | 'resendSms' | 'setDefault'> {
   const currentPhone = (phoneId: string) => {
     const current = requireIdentity(clerk, userId, sessionId);
@@ -155,7 +156,7 @@ function createSmsActions(
       if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
         throw phoneUnavailable();
       }
-      await phone.makeDefaultSecondFactor();
+      await makeDefault(phone);
       await refresh().catch(() => undefined);
     },
   };
@@ -188,7 +189,13 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   const { isLoaded: userLoaded, user } = useUser();
   const { isLoaded: sessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
-  const [removeMethod, reverification] = useReverificationFlow(removeMfaMethod);
+  const [removeMethod, removeReverification] = useReverificationFlow(removeMfaMethod);
+  const [makeDefault, setDefaultReverification] = useReverificationFlow((phone: PhoneNumberResource) =>
+    phone.makeDefaultSecondFactor(),
+  );
+  const [createBackupCode, backupCodesReverification] = useReverificationFlow((current: UserResource) =>
+    current.createBackupCode(),
+  );
 
   if (!userLoaded || !sessionLoaded || !environment) {
     return { status: 'loading' };
@@ -214,7 +221,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     await current.reload();
   };
 
-  const smsActions = smsEnabled ? createSmsActions(clerk, environment, userId, sessionId, refresh) : {};
+  const smsActions = smsEnabled ? createSmsActions(clerk, environment, userId, sessionId, refresh, makeDefault) : {};
 
   return {
     status: 'ready',
@@ -252,12 +259,14 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
             if (!currentFactors.includes('backup_code') || usableFactorCount(current, currentFactors) === 0) {
               throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
             }
-            const result = await current.createBackupCode();
+            const result = await createBackupCode(current);
             await refresh().catch(() => undefined);
             return result.codes;
           }
         : undefined,
     remove: methodId => removeMethod(requireIdentity(clerk, userId, sessionId), environment, methodId),
-    reverification,
+    removeReverification,
+    setDefaultReverification,
+    backupCodesReverification,
   };
 }
