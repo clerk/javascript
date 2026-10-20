@@ -104,5 +104,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "deprecated": "This package is no longer supported. Please see the Core 3 release for more information: https://clerk.com/changelog/2026-03-03-core-3"
 }
