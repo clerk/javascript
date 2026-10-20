@@ -12,7 +12,7 @@ import { UserProfileBackupCodesView } from './user-profile-backup-codes.view';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.types';
 
 export interface UserProfileMfaSetupViewProps extends UserProfileAddMfaViewProps {
-  step: UserProfileMfaAddableMethod | 'select' | 'reverify';
+  step: UserProfileMfaAddableMethod | 'select' | 'verify';
   reverification: ReverificationController;
   sms: UserProfileAddSmsViewProps;
   authenticator: Omit<UserProfileAddAuthenticatorViewProps, 'onBack'>;
@@ -59,7 +59,7 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
               onCancel={current.onCancel}
             />
           </Flow.Step>
-          <Flow.Step ids={['reverify']}>
+          <Flow.Step ids={['verify']}>
             <Reverification controller={current.reverification} />
           </Flow.Step>
         </>
