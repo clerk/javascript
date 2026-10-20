@@ -1,3 +1,3 @@
-import { enUS } from '@clerk/localizations/en-US';
+import { enUS } from '@clerk/localizations';
 
 export const defaultResource = enUS;
