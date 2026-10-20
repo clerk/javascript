@@ -67,7 +67,8 @@ export function useWeb3WalletsFixture({
 
   return useUserProfileWeb3WalletsController({
     wallets,
-    reverification: idleReverification,
+    removeReverification: idleReverification,
+    setPrimaryReverification: idleReverification,
     availableProviders: connectionProviders.filter(
       provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
     ),

@@ -6,6 +6,7 @@ import { defineConfig } from 'vitest/config';
 
 const mosaicPath = resolve(import.meta.dirname, 'src');
 const featureTests = 'src/**/*.feature.test.tsx';
+const webkitTests = 'src/**/*.webkit.test.tsx';
 
 export default defineConfig({
   plugins: [
@@ -34,6 +35,7 @@ export default defineConfig({
           name: 'primitives',
           environment: 'happy-dom',
           include: ['src/primitives/**/*.test.?(c|m)[jt]s?(x)', 'src/primitives/**/*.spec.?(c|m)[jt]s?(x)'],
+          exclude: [webkitTests],
           setupFiles: ['./src/primitives/test-utils/vitest.setup.ts'],
         },
       },
@@ -42,7 +44,7 @@ export default defineConfig({
         test: {
           name: 'mosaic',
           include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
-          exclude: ['src/primitives/**', featureTests],
+          exclude: ['src/primitives/**', featureTests, webkitTests],
           setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
         },
       },
@@ -69,6 +71,19 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'webkit',
+          include: [webkitTests],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'webkit' }],
           },
         },
       },

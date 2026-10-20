@@ -1,6 +1,6 @@
 import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
-import { useClerk, useOrganization, usePortalRoot, useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type {
   OrganizationProfileModalProps,
   OrganizationResource,
@@ -13,6 +13,7 @@ import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import type {
   SwitcherBrandingProps,
@@ -185,7 +186,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const clerk = useClerk();
   const router = useMosaicRouter();
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
-  const getContainer = usePortalRoot();
+  const getContainer = useGetPortalContainer();
   const environment = useMosaicEnvironment();
   const signInUrl = () => options?.signInUrl ?? clerk.buildSignInUrl();
   // Don't fetch orgsLists until we know orgs are enabled.

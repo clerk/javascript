@@ -3,6 +3,7 @@
 import { FloatingFocusManager, FloatingList, FloatingOverlay } from '@floating-ui/react';
 import React from 'react';
 
+import { useScrollLock } from '../hooks/use-scroll-lock';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { parsePlacement } from '../utils/side-offset';
 import { useSelectContext } from './select-context';
@@ -26,6 +27,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
       alignItemWithTrigger,
       multiple,
     } = useSelectContext();
+    useScrollLock(mounted && alignItemWithTrigger);
 
     const side = alignItemWithTrigger ? 'none' : parsePlacement(placement).side;
 
@@ -84,7 +86,7 @@ export const SelectPositioner = React.forwardRef<HTMLDivElement, SelectPositione
     return (
       <>
         {/* An overlay on the trigger only works while the page holds still beneath it. */}
-        {alignItemWithTrigger ? <FloatingOverlay lockScroll /> : null}
+        {alignItemWithTrigger ? <FloatingOverlay /> : null}
         <FloatingFocusManager
           context={floatingContext}
           modal={false}

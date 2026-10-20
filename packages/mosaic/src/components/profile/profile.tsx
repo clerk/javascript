@@ -556,12 +556,10 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
 
 export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
   value: string;
-  /** Keeps unselected pages mounted (`inert`, in flow) so a page transition can be styled. */
-  shouldForceMount?: boolean;
 }
 
 const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
-  { value, shouldForceMount, xstyle, ...rest },
+  { value, xstyle, ...rest },
   ref,
 ) {
   const { compact, pageTitleId } = useProfileContext('Profile.ContentPanel');
@@ -571,7 +569,6 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
         <Tabs.Panel
           ref={ref}
           value={value}
-          shouldForceMount={shouldForceMount}
           aria-labelledby={`${pageTitleId}-label`}
           // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
           {...(compact ? { role: 'group', tabIndex: undefined } : null)}

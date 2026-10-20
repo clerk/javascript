@@ -121,6 +121,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     menu: dynamic(() => import('../stories/menu.mdx')),
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),
+    portal: dynamic(() => import('../stories/portal.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
     'tag-input': dynamic(() => import('../stories/tag-input.mdx')),

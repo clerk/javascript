@@ -12,7 +12,7 @@ export function useUserProfileMfaSectionLeafController({
   onAdd,
   onRemove,
   onSetDefault,
-  reverification,
+  removeReverification,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -24,17 +24,17 @@ export function useUserProfileMfaSectionLeafController({
   });
   const remove = useConfirmController<UserProfileMfaMethod>({
     onConfirm: method => removalFocus.remove(method.id),
-    reverification,
+    reverification: removeReverification,
   });
   const [pickerOpen, setPickerOpen] = useState(false);
-  const defaultAction = usePendingAction<'default'>({ errorFallback: m.setDefaultError });
+  const defaultAction = usePendingAction({ errorFallback: m.setDefaultError });
 
   const setDefault = (id: string) => {
     const method = methods.find(method => method.id === id);
     if (!onSetDefault || method?.type !== 'sms' || !method.canSetDefault || method.isDefault) {
       return;
     }
-    void defaultAction.run('default', () => onSetDefault(id));
+    void defaultAction.run(id, () => onSetDefault(id));
   };
 
   return {
@@ -57,6 +57,7 @@ export function useUserProfileMfaSectionLeafController({
     },
     remove: onRemove ? remove : undefined,
     finalRemovalFocus: removalFocus.finalFocus,
+    setDefaultFinalFocus: () => (defaultAction.lastKey ? removalFocus.trigger(defaultAction.lastKey) : null),
     defaultError: defaultAction.error,
     setDefault: onSetDefault && !defaultAction.isPending ? setDefault : undefined,
   };
