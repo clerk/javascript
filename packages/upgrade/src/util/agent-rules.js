@@ -7,7 +7,7 @@ import { findWorkspaceRoot, getInstalledClerkPackages, getWorkspacePackageDirs }
 
 export function detectClerkAgentRuleSdks(dir) {
   const workspaceRoot = findWorkspaceRoot(dir);
-  const packageDirs = workspaceRoot ? getWorkspacePackageDirs(workspaceRoot) : [dir];
+  const packageDirs = workspaceRoot ? [workspaceRoot, ...getWorkspacePackageDirs(workspaceRoot)] : [dir];
   const sdks = new Set();
 
   for (const packageDir of packageDirs) {

@@ -95,3 +95,35 @@ describe('isAgentEnvironment', () => {
     expect(isAgentEnvironment()).toBe(false);
   });
 });
+
+describe('isAgentEnvironment with Cursor', () => {
+  beforeEach(() => {
+    agentEnvironmentVariables.forEach(name => {
+      vi.stubEnv(name, undefined);
+      vi.stubGlobal(name, undefined);
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it('returns true when CURSOR_EXTENSION_HOST_ROLE is agent-exec', () => {
+    vi.stubEnv('CURSOR_EXTENSION_HOST_ROLE', 'agent-exec');
+
+    expect(isAgentEnvironment()).toBe(true);
+  });
+
+  it('returns false for any other CURSOR_EXTENSION_HOST_ROLE value', () => {
+    vi.stubEnv('CURSOR_EXTENSION_HOST_ROLE', 'user');
+
+    expect(isAgentEnvironment()).toBe(false);
+  });
+
+  it('returns true when CURSOR_TRACE_ID is set', () => {
+    vi.stubEnv('CURSOR_TRACE_ID', 'abc123');
+
+    expect(isAgentEnvironment()).toBe(true);
+  });
+});

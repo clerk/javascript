@@ -246,13 +246,6 @@ async function main() {
 
   console.log('');
 
-  if (isInteractive) {
-    const sdks = detectClerkAgentRuleSdks(options.dir);
-    if (sdks.length > 0 && (await promptConfirm('Write Clerk AGENTS.md sections?', true))) {
-      writeAgentsMd(options, sdks);
-    }
-  }
-
   // Step 6: Handle upgrade status
   if (options.skipUpgrade) {
     renderText('Skipping package upgrade (--skip-upgrade flag)', 'yellow');
@@ -266,6 +259,13 @@ async function main() {
   // Step 6b: Handle package replacements
   if (config.packageReplacements?.length > 0 && !options.skipUpgrade) {
     await performPackageReplacements(packageManager, config, options);
+  }
+
+  if (isInteractive) {
+    const sdks = detectClerkAgentRuleSdks(options.dir);
+    if (sdks.length > 0 && (await promptConfirm('Write Clerk AGENTS.md sections?', true))) {
+      writeAgentsMd(options, sdks);
+    }
   }
 
   // Step 7: Run codemods
@@ -292,6 +292,7 @@ function writeAgentsMd(options, detectedSdks) {
 
   if (sdks.length === 0) {
     renderWarning('No Clerk SDK packages found for AGENTS.md');
+    process.exitCode = 1;
     return;
   }
 
