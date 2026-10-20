@@ -471,6 +471,24 @@ describe('User profile MFA management', () => {
     expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
+  it('shows the verification when it arrives after the backup-code dialog was closed', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const first = holdRequests('post', '/v1/me/backup_codes/');
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    await waitFor(() => expect(first.requests).toHaveLength(1));
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    first.release();
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByRole('dialog')).toContainElement(document.activeElement as HTMLElement));
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await screen.findByRole('list', { name: 'Backup codes' });
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
   it('copies server-issued backup codes and closes their one-time surface', async () => {
     const fapi = await renderMfa();
     const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
