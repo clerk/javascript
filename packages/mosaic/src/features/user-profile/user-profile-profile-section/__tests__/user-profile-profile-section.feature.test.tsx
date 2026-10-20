@@ -275,7 +275,10 @@ describe('the user profile profile section', () => {
 });
 
 describe('username reverification', () => {
-  async function renderUsernameNeedingReverification(prepare?: () => void) {
+  async function renderUsernameNeedingReverification(prepare?: () => void): Promise<{
+    fapi: ReturnType<typeof serveFapi>;
+    actor: ReturnType<typeof userEvent.setup>;
+  }> {
     const fapi = serveFapi({
       ...withUsername('alicesmith'),
       verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
@@ -292,7 +295,8 @@ describe('username reverification', () => {
     return { fapi, actor };
   }
 
-  const savedUsername = (fapi: ReturnType<typeof serveFapi>) => fapi.client.sessions[0]?.user?.username;
+  const savedUsername = (fapi: ReturnType<typeof serveFapi>): string | null | undefined =>
+    fapi.client.sessions[0]?.user?.username;
 
   it('asks to verify before saving the username, then saves it', async () => {
     const { fapi, actor } = await renderUsernameNeedingReverification();
@@ -318,9 +322,11 @@ describe('username reverification', () => {
     expect(screen.getByLabelText('Username')).toHaveValue('alicesmith');
   });
 
-  it('returns to the form with the field error when the save fails after verifying', async () => {
+  it('allows correcting and saving the username after a field error following verification', async () => {
     const updates: Array<ReturnType<typeof holdRequests>> = [];
+    let handlers: ReturnType<typeof worker.listHandlers> = [];
     const { fapi, actor } = await renderUsernameNeedingReverification(() => {
+      handlers = worker.listHandlers();
       updates.push(holdRequests('post', '/v1/me'));
     });
     const update = updates[0];
@@ -333,6 +339,15 @@ describe('username reverification', () => {
     expect(field).toHaveValue('alicia');
     await waitFor(() => expect(field).toHaveAccessibleDescription(/That username is taken/));
     expect(savedUsername(fapi)).toBe('alicesmith');
+
+    worker.resetHandlers(...handlers);
+    await actor.clear(field);
+    await actor.type(field, 'alicia2');
+    await actor.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(profile()).toHaveTextContent('alicia2');
+    expect(savedUsername(fapi)).toBe('alicia2');
   });
 
   it('focuses the username field when returning to the form after verifying', async () => {

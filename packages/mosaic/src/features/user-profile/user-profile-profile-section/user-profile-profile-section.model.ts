@@ -1,6 +1,7 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
+import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
 import { isAttributeAvailable } from '../user-profile.utils';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
@@ -26,14 +27,14 @@ function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameA
 
 export function useUserProfileProfileSectionModel(): UserProfileProfileSectionModel {
   const model = useUserProfileUserModel();
-  const [updateUsername, usernameReverification] = useReverificationFlow((current: UserResource, username: string) =>
-    current.update({ username }),
+  const [updateUsername, usernameReverification] = useReverificationFlow(
+    (currentUser: () => UserResource, username: string) => currentUser().update({ username }),
   );
   if (model.status !== 'ready') {
     return model;
   }
 
-  const { user, environment, saveAsUser } = model;
+  const { user, environment, currentUser, saveAsUser } = model;
   const { attributes, usernameSettings } = environment.userSettings;
   const usernameImmutable = Boolean(attributes.username?.immutable);
   const showUsername = isAttributeAvailable(attributes.username) && !(usernameImmutable && !user.username);
@@ -64,7 +65,7 @@ export function useUserProfileProfileSectionModel(): UserProfileProfileSectionMo
     onSubmitUsername:
       showUsername && !usernameImmutable
         ? username =>
-            saveAsUser(current => updateUsername(current, username), USERNAME_FIELDS, {
+            save(() => updateUsername(currentUser, username), USERNAME_FIELDS, {
               min_length: usernameSettings.min_length,
               max_length: usernameSettings.max_length,
             })
