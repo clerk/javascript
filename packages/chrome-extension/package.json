@@ -21,7 +21,10 @@
     "directory": "packages/chrome-extension"
   },
   "license": "MIT",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/esm/index.js",
+    "./dist/cjs/index.js"
+  ],
   "exports": {
     ".": {
       "import": {
