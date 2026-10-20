@@ -15,6 +15,27 @@ const device: ActiveDeviceSession = {
 };
 
 describe('active-device sessions', () => {
+  it('projects transport and hydration inputs onto serializable session fields', async () => {
+    const extra = {
+      ...device,
+      token: 'must-not-cache',
+      resourceMethod: () => {},
+      latestActivity: { ...device.latestActivity, token: 'must-not-cache' },
+    };
+    const transport = { read: () => Promise.resolve([extra]), revoke: () => Promise.resolve() };
+    const fetched = createLoomClient({ scope, transport });
+    const hydrated = createLoomClient({
+      scope,
+      transport,
+      hydration: { version: 1, scope, sessions: [extra], updatedAt: Date.now() },
+    });
+    for (const client of [fetched, hydrated]) {
+      expect(await client.fetch()).toEqual([device]);
+      expect(client.dehydrate()?.sessions).toEqual([device]);
+      expect(JSON.stringify(client.dehydrate())).not.toContain('must-not-cache');
+      client.dispose();
+    }
+  });
   it('accepts a matching server snapshot when the browser clock lags', async () => {
     const read = vi.fn(() => Promise.resolve([]));
     const loom = createLoomClient({

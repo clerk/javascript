@@ -1,4 +1,28 @@
-import type { ActiveDeviceSession, LoomHydration, SessionScope } from './types';
+import type { ActiveDeviceSession, LoomHydration, Sessions, SessionScope } from './types';
+
+export function sessionSnapshots(sessions: Sessions): Sessions {
+  return sessions.map(({ id, status, lastActiveAt, expireAt, abandonAt, hasActor, latestActivity }) => {
+    const {
+      id: activityId,
+      browserName,
+      browserVersion,
+      deviceType,
+      ipAddress,
+      city,
+      country,
+      isMobile,
+    } = latestActivity;
+    return {
+      id,
+      status,
+      lastActiveAt,
+      expireAt,
+      abandonAt,
+      hasActor,
+      latestActivity: { id: activityId, browserName, browserVersion, deviceType, ipAddress, city, country, isMobile },
+    };
+  });
+}
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -42,5 +66,10 @@ export function parseHydration(value: unknown, scope: SessionScope): LoomHydrati
   ) {
     throw new Error('Invalid Loom hydration snapshot.');
   }
-  return { version: 1, scope, sessions: value.sessions, updatedAt: Math.min(value.updatedAt, Date.now()) };
+  return {
+    version: 1,
+    scope,
+    sessions: sessionSnapshots(value.sessions),
+    updatedAt: Math.min(value.updatedAt, Date.now()),
+  };
 }

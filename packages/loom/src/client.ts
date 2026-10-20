@@ -1,7 +1,7 @@
 import type { QueryObserverResult } from '@tanstack/query-core';
 import { QueryClient, QueryObserver } from '@tanstack/query-core';
 
-import { parseHydration } from './hydration';
+import { parseHydration, sessionSnapshots } from './hydration';
 import type { LoomHydration, Sessions, SessionScope, SessionsTransport } from './types';
 
 type Options = { scope: SessionScope; transport: SessionsTransport; hydration?: unknown };
@@ -40,7 +40,7 @@ export class LoomClient {
         const revision = this.revision;
         const sessions = await this.transport.read(signal);
         this.assertCurrent(revision);
-        return sessions;
+        return sessionSnapshots(sessions);
       },
     };
   }
