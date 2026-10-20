@@ -587,7 +587,7 @@ describe('Web3 wallets', () => {
     const fapi = await renderTwoWalletsNeedingReverification();
     const user = userEvent.setup();
 
-    await user.click(secondManage());
+    await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
@@ -602,7 +602,7 @@ describe('Web3 wallets', () => {
     const fapi = await renderTwoWalletsNeedingReverification();
     const user = userEvent.setup();
 
-    await user.click(secondManage());
+    await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await screen.findByText('Enter your current password to continue');
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
@@ -612,7 +612,7 @@ describe('Web3 wallets', () => {
     expect(screen.queryByRole('alert')).toBeNull();
     await waitFor(() => expect(secondManage()).toHaveFocus());
 
-    await user.click(secondManage());
+    await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_2'));
   });
@@ -621,7 +621,7 @@ describe('Web3 wallets', () => {
     const fapi = await renderTwoWalletsNeedingReverification();
     const user = userEvent.setup();
 
-    await user.click(secondManage());
+    await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await screen.findByText('Enter your current password to continue');
     const dialog = screen.getByRole('dialog');
@@ -645,7 +645,7 @@ describe('Web3 wallets', () => {
     const start = holdRequests('post', '/v1/client/sessions/:id/verify');
     const user = userEvent.setup();
 
-    await user.click(secondManage());
+    await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(start.requests).toHaveLength(1));
     expect(screen.queryByRole('dialog')).toBeNull();
