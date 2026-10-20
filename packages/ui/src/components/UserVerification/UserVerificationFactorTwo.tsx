@@ -7,6 +7,7 @@ import { useIsWebAuthnSupported } from '@/hooks';
 import { useRouter } from '@/router';
 
 import { useSecondFactorSelection } from '../SignIn/useSecondFactorSelection';
+import { isOfferableSecondFactor } from '../SignIn/utils';
 import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
@@ -29,15 +30,16 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   const sessionVerification = data as SessionVerificationResource;
   const webAuthnSupported = useIsWebAuthnSupported();
 
+  // A passkey the device can't use stays in the list, so that when it's the only
+  // second factor the passkey card renders and reports the error instead of an
+  // endless loading card. useSecondFactorSelection never starts with it otherwise.
   const availableFactors = useMemo(() => {
     return (
       sessionVerification.supportedSecondFactors
         ?.filter(factor => SUPPORTED_STRATEGIES.includes(factor.strategy))
-        // Only include passkey if the device supports it.
-        ?.filter(factor => factor.strategy !== 'passkey' || webAuthnSupported)
         ?.sort(sortByPrimaryFactor) || null
     );
-  }, [sessionVerification.supportedSecondFactors, webAuthnSupported]);
+  }, [sessionVerification.supportedSecondFactors]);
 
   const {
     currentFactor,
@@ -49,8 +51,11 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   } = useSecondFactorSelection<SessionVerificationSecondFactor>(availableFactors);
 
   const secondFactorsExcludingCurrent = useMemo(
-    () => availableFactors?.filter(factor => !secondFactorsAreEqual(factor, currentFactor)),
-    [availableFactors, currentFactor],
+    () =>
+      availableFactors?.filter(
+        factor => isOfferableSecondFactor(factor, webAuthnSupported) && !secondFactorsAreEqual(factor, currentFactor),
+      ),
+    [availableFactors, currentFactor, webAuthnSupported],
   );
 
   const hasAlternativeStrategies = useMemo(

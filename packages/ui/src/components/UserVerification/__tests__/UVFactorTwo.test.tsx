@@ -94,7 +94,7 @@ describe('UserVerificationFactorTwo', () => {
     expect(queryByText('Use your passkey')).not.toBeInTheDocument();
   });
 
-  it('drops passkey when webauthn is not supported', async () => {
+  it('does not offer passkey as an alternative when webauthn is not supported', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ username: 'clerkuser' });
     });
@@ -105,10 +105,27 @@ describe('UserVerificationFactorTwo', () => {
 
     const { findByText, queryByText } = render(<UserVerificationFactorTwo />, { wrapper });
 
-    // The passkey factor is filtered out entirely, so the backup code card is
-    // the starting (and only) factor.
+    // The backup code card is the starting factor, and the passkey is not
+    // reachable as another method.
     await findByText('Enter a backup code');
     expect(queryByText('Use your passkey')).not.toBeInTheDocument();
+    expect(queryByText('Use another method')).not.toBeInTheDocument();
+  });
+
+  it('renders the passkey card when passkey is the only second factor and webauthn is not supported', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ username: 'clerkuser' });
+    });
+    vi.spyOn(fixtures.session, 'startVerification').mockResolvedValue({
+      status: 'needs_second_factor',
+      supportedSecondFactors: [{ strategy: 'passkey' }],
+    } as any);
+
+    const { findByText } = render(<UserVerificationFactorTwo />, { wrapper });
+
+    // Rather than an endless loading card, the passkey card renders so that
+    // attempting it reports why the passkey can't be used.
+    await findByText('Use your passkey');
   });
 
   mockWebAuthn(() => {
