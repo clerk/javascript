@@ -31,6 +31,7 @@ export function MembersTableTabView({
   searchInputRef,
   inviteButtonRef,
   onInvite,
+  isInviteDisabled,
   registerTrigger,
   remove,
   finalFocus,
@@ -88,6 +89,8 @@ export function MembersTableTabView({
           {onInvite ? (
             <Button
               ref={inviteButtonRef}
+              disabled={isInviteDisabled}
+              focusableWhenDisabled
               onClick={onInvite}
             >
               <Icon name='plus' />

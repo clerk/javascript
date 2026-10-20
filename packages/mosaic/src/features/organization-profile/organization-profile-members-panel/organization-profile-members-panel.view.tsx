@@ -18,6 +18,7 @@ export interface OrganizationProfileMembersPanelViewProps {
   invitations?: InvitationsTableTabViewProps;
   requests?: RequestsTableTabViewProps;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
+  isInviteDisabled?: boolean;
   inviteDialog?: OrganizationProfileInviteMembersDialogProps;
 }
 
@@ -26,6 +27,7 @@ export function OrganizationProfileMembersPanelView({
   invitations,
   requests,
   onInvite,
+  isInviteDisabled,
   inviteDialog,
 }: OrganizationProfileMembersPanelViewProps) {
   const m = useMessages('organizationProfile');
@@ -40,6 +42,7 @@ export function OrganizationProfileMembersPanelView({
         <MembersTableTabView
           {...members}
           onInvite={onInvite ?? members.onInvite}
+          isInviteDisabled={isInviteDisabled ?? members.isInviteDisabled}
         />
       ) : null,
     },
@@ -50,6 +53,7 @@ export function OrganizationProfileMembersPanelView({
         <InvitationsTableTabView
           {...invitations}
           onInvite={onInvite ?? invitations.onInvite}
+          isInviteDisabled={isInviteDisabled ?? invitations.isInviteDisabled}
         />
       ) : null,
     },
@@ -60,6 +64,7 @@ export function OrganizationProfileMembersPanelView({
         <RequestsTableTabView
           {...requests}
           onInvite={onInvite ?? requests.onInvite}
+          isInviteDisabled={isInviteDisabled ?? requests.isInviteDisabled}
         />
       ) : null,
     },

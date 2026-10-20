@@ -27,6 +27,7 @@ export function RequestsTableTabView({
   inviteButtonRef,
   tableContainerRef,
   onInvite,
+  isInviteDisabled,
   registerAcceptTrigger,
   registerDeclineTrigger,
   onAccept,
@@ -67,6 +68,8 @@ export function RequestsTableTabView({
         <Table.Toolbar>
           <Button
             ref={inviteButtonRef}
+            disabled={isInviteDisabled}
+            focusableWhenDisabled
             onClick={onInvite}
           >
             <Icon name='plus' />

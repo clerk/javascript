@@ -42,8 +42,8 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     },
   });
 
-  if (!invite || !roles) {
-    return { onInvite: undefined, inviteDialog: undefined };
+  if (!invite) {
+    return { onInvite: undefined, isInviteDisabled: false, inviteDialog: undefined };
   }
 
   const onOpenChange = (next: boolean) => {
@@ -54,6 +54,15 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     setRejectedEmailAddresses([]);
     setOpen(next);
   };
+
+  const onInvite = (event: MouseEvent<HTMLButtonElement>) => {
+    trigger.current = event.currentTarget;
+    onOpenChange(true);
+  };
+
+  if (!roles) {
+    return { onInvite, isInviteDisabled: true, inviteDialog: undefined };
+  }
 
   const inviteDialog: OrganizationProfileInviteMembersDialogProps = {
     open,
@@ -71,12 +80,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
     onSubmit: form.submit,
   };
 
-  const onInvite = (event: MouseEvent<HTMLButtonElement>) => {
-    trigger.current = event.currentTarget;
-    onOpenChange(true);
-  };
-
-  return { onInvite, inviteDialog };
+  return { onInvite, isInviteDisabled: false, inviteDialog };
 }
 
 function resolveDefaultRole({ roles }: MembersRoles, defaultRole: string | null) {

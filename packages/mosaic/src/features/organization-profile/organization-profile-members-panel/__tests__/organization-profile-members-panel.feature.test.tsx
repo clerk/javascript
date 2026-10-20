@@ -212,16 +212,35 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
   });
 
-  it('keeps members visible and role editing unavailable while roles load', async () => {
+  it('keeps the members table loading until roles load', async () => {
     serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    const { clerk, rerender } = await renderWithClerk(<div />);
+    const activeOrganization = clerk.organization;
+    if (!activeOrganization) {
+      throw new Error('Expected an active organization');
+    }
+    const getMemberships = vi.spyOn(activeOrganization, 'getMemberships');
+    rerender(<OrganizationProfileMembersPanel />);
+    await waitFor(() => expect(getMemberships).toHaveBeenCalled());
+    await act(async () => {
+      await getMemberships.mock.results[0]?.value;
+    });
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('Bob Smith')).toBeNull();
+    roles.release();
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
+  });
+
+  it('shows members to a reader without waiting for roles', async () => {
+    serve();
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-    await waitFor(() => expect(roles.requests).toHaveLength(1));
-    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeVisible();
+    expect(roles.requests).toHaveLength(0);
     roles.release();
-    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
   });
 
   it('shows the membership role label when the role is absent from available options', async () => {
