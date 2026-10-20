@@ -108,7 +108,7 @@ describe('User profile MFA management', () => {
     const fapi = await renderTwoSmsMethodsNeedingReverification();
     const user = userEvent.setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
@@ -123,7 +123,7 @@ describe('User profile MFA management', () => {
     const fapi = await renderTwoSmsMethodsNeedingReverification();
     const user = userEvent.setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     await screen.findByText('Enter your current password to continue');
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
@@ -133,7 +133,7 @@ describe('User profile MFA management', () => {
     expect(screen.queryByRole('alert')).toBeNull();
     await waitFor(() => expect(secondManage()).toHaveFocus());
 
-    await user.click(secondManage());
+    await openMenu(user, secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     await waitFor(() => expect(defaultUpdates(fapi)).toEqual([{ id: 'phone_2', reserved: undefined, default: true }]));
   });
@@ -142,7 +142,7 @@ describe('User profile MFA management', () => {
     const fapi = await renderTwoSmsMethodsNeedingReverification();
     const user = userEvent.setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     await screen.findByText('Enter your current password to continue');
     const dialog = screen.getByRole('dialog');
@@ -166,7 +166,7 @@ describe('User profile MFA management', () => {
     const start = holdRequests('post', '/v1/client/sessions/:id/verify');
     const user = userEvent.setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     await waitFor(() => expect(start.requests).toHaveLength(1));
     expect(screen.queryByRole('dialog')).toBeNull();
@@ -402,7 +402,7 @@ describe('User profile MFA management', () => {
   }
 
   const regenerate = async (user: ReturnType<typeof userEvent.setup>) => {
-    await user.click(await screen.findByRole('button', { name: 'Manage Backup codes' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Backup codes' }));
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
   };
 
