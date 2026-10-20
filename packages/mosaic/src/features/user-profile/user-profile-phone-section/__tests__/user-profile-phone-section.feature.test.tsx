@@ -1,5 +1,5 @@
 import type { EnterpriseAccountConnectionJSON, PhoneNumberJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -255,8 +255,142 @@ describe('the phone section for a user signed in through an enterprise connectio
 });
 
 describe('phone reverification', () => {
-  it.todo('confirms it is the user before a phone number is added, then adds it');
-  it.todo('leaves the add dialog open and untouched when the confirmation is dismissed');
+  const challenged = (overrides: Partial<FakeFapiSeed> = {}): FakeFapiSeed =>
+    signedIn([], {
+      verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+      ...overrides,
+    });
+  const savedPhones = (fapi: ReturnType<typeof serveFapi>) => fapi.client.sessions[0]?.user.phone_numbers;
+
+  it('confirms it is the user before a phone number is added, then verifies its code', async () => {
+    const { actor, fapi } = await renderSection(challenged());
+    demandReverificationOnce('/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    expect(savedPhones(fapi)).toHaveLength(0);
+    await actor.type(screen.getByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await enterCode(actor, VERIFICATION_CODE);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
+  it('closes quietly when confirmation is dismissed and starts clean on reopen', async () => {
+    const { actor, fapi } = await renderSection(challenged());
+    demandReverificationOnce('/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+    await screen.findByPlaceholderText('Enter your password');
+    await actor.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(savedPhones(fapi)).toHaveLength(0);
+    await actor.click(screen.getByRole('button', { name: 'Add phone number' }));
+    expect(screen.getByRole('textbox', { name: 'Phone' })).toHaveValue('');
+    await actor.type(screen.getByRole('textbox', { name: 'Phone' }), '8015550199');
+    await actor.click(screen.getByRole('button', { name: 'Send code' }));
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(listed()).toEqual([WORK_LABEL]);
+  });
+
+  it('keeps an initial create pending through duplicate submit and dismissal attempts', async () => {
+    const { actor } = await renderSection();
+    const create = holdRequests('post', '/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+    await waitFor(() => expect(create.requests).toHaveLength(1));
+    await actor.keyboard('{Escape}{Enter}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(create.requests).toHaveLength(1);
+
+    create.release();
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
+  it('allows cancellation while the session challenge loads', async () => {
+    const { actor, fapi } = await renderSection(challenged());
+    const start = holdRequests('post', '/v1/client/sessions/sess_1/verify');
+    demandReverificationOnce('/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    await actor.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(savedPhones(fapi)).toHaveLength(0);
+    start.release();
+  });
+
+  it('keeps the retried create locked and returns the phone field error without a duplicate', async () => {
+    const { actor, fapi } = await renderSection(challenged());
+    const retry = holdRequests('post', '/v1/me/phone_numbers');
+    demandReverificationOnce('/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(retry.requests).toHaveLength(1));
+    await actor.keyboard('{Escape}{Enter}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(retry.requests).toHaveLength(1);
+    retry.fail('form_identifier_exists', 'That phone number is taken.', 'phone_number');
+
+    const phone = await screen.findByRole('textbox', { name: 'Phone' });
+    await waitFor(() => expect(phone).toHaveAccessibleDescription(/That phone number is taken/));
+    expect(savedPhones(fapi)).toHaveLength(0);
+  });
+
+  it('focuses the phone field when returning to the form after verifying', async () => {
+    const { actor } = await renderSection(challenged());
+    const retry = holdRequests('post', '/v1/me/phone_numbers');
+    demandReverificationOnce('/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(retry.requests).toHaveLength(1));
+    retry.fail('form_identifier_exists', 'That phone number is taken.', 'phone_number');
+
+    const phone = await screen.findByRole('textbox', { name: 'Phone' });
+    await waitFor(() => expect(phone).toHaveFocus());
+  });
+
+  it('cancels an in-progress verification when the active session changes', async () => {
+    const seed = challenged();
+    const { actor, fapi, clerk } = await renderSection({
+      ...seed,
+      client: fapiClient([
+        ...seed.client.sessions,
+        fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2', username: 'bob' }) }),
+      ]),
+    });
+    demandReverificationOnce('/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+    await screen.findByPlaceholderText('Enter your password');
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(fapi.client.sessions.map(session => session.user.phone_numbers)).toEqual([[], []]);
+  });
+
+  it('closes the host from the challenge error card', async () => {
+    const { actor, fapi } = await renderSection(challenged());
+    holdRequests('post', '/v1/client/sessions/sess_1/verify').fail('some_new_error', 'Nope');
+    demandReverificationOnce('/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+    expect(await screen.findByText('Something went wrong')).toBeVisible();
+    const close = screen.getAllByRole('button', { name: 'Close' }).at(-1);
+    if (!close) {
+      throw new Error('Expected a close button');
+    }
+    await actor.click(close);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(savedPhones(fapi)).toHaveLength(0);
+  });
 
   it('sets a verified number as primary without a challenge when none is required', async () => {
     const { actor, fapi } = await renderSection(signedIn([HOME, WORK]));

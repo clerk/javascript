@@ -28,6 +28,9 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
   const [setPrimaryPhone, setPrimaryReverification] = useReverificationFlow((user: UserResource, id: string) =>
     user.update({ primaryPhoneNumberId: id }),
   );
+  const [createPhone, createReverification] = useReverificationFlow(
+    (currentUser: () => UserResource, phoneNumber: string) => currentUser().createPhoneNumber({ phoneNumber }),
+  );
   if (model.status !== 'ready') {
     return model;
   }
@@ -51,7 +54,7 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
     defaultPhoneCountry: toCountryIso(clerk.__internal_country),
     onCreatePhone: access.canCreate
       ? async phoneNumber => {
-          const request = currentUser().createPhoneNumber({ phoneNumber });
+          const request = createPhone(currentUser, phoneNumber);
           await save(() => request, ADD_PHONE_FIELDS);
           return toPhoneVerifier(await request);
         }
@@ -61,5 +64,6 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
     onRemovePhone: access.canRemove ? id => saveAsUser(current => removePhone(current, id)) : undefined,
     removeReverification,
     setPrimaryReverification,
+    createReverification,
   };
 }

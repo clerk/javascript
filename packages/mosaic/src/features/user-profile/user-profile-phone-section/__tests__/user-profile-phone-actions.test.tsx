@@ -22,6 +22,7 @@ function PhoneSection({
   onSetPrimaryPhone = () => Promise.resolve(),
   removeReverification = idleReverification,
   setPrimaryReverification = idleReverification,
+  createReverification = idleReverification,
   ...rest
 }: PhoneSectionProps) {
   const controller = useUserProfilePhoneSectionController({
@@ -30,6 +31,7 @@ function PhoneSection({
     onSetPrimaryPhone,
     removeReverification,
     setPrimaryReverification,
+    createReverification,
     ...rest,
   });
   return <UserProfilePhoneSectionView {...controller} />;
