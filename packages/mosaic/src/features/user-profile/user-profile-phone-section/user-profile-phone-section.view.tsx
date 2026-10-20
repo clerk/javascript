@@ -1,4 +1,5 @@
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
@@ -19,6 +20,8 @@ export function UserProfilePhoneSectionView({
   remove,
   finalFocus,
   verificationFinalFocus,
+  setPrimaryReverification,
+  setPrimaryFinalFocus,
   onVerify,
   onSetPrimary,
 }: UserProfilePhoneSectionViewProps) {
@@ -63,6 +66,10 @@ export function UserProfilePhoneSectionView({
         {...verification}
         defaultCountry={defaultPhoneCountry}
         finalFocus={verificationFinalFocus}
+      />
+      <ReverificationDialog
+        controller={setPrimaryReverification}
+        finalFocus={setPrimaryFinalFocus}
       />
       {remove ? (
         <Confirmation

@@ -256,8 +256,93 @@ describe('the phone section for a user signed in through an enterprise connectio
 
 describe('phone reverification', () => {
   it.todo('confirms it is the user before a phone number is added, then adds it');
-  it.todo('confirms it is the user before a phone number becomes the primary one');
   it.todo('leaves the add dialog open and untouched when the confirmation is dismissed');
+
+  it('sets a verified number as primary without a challenge when none is required', async () => {
+    const { actor, fapi } = await renderSection(signedIn([HOME, WORK]));
+
+    await manage(actor, WORK_LABEL, 'Set as primary');
+
+    await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_phone_number_id).toBe('idn_work'));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('verifies the session before setting a number as primary and returns focus to its menu', async () => {
+    const { actor, fapi } = await renderSection(
+      signedIn([HOME, WORK], { verification: { secrets: { password: 'hunter2' } } }),
+    );
+    demandReverificationOnce('/v1/me');
+
+    await manage(actor, WORK_LABEL, 'Set as primary');
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
+
+    await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_phone_number_id).toBe('idn_work'));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(within(row()).getByRole('button', { name: `Manage ${WORK_LABEL}` })).toHaveFocus();
+  });
+
+  it('lets the user cancel verification quietly and retry the primary action', async () => {
+    const { actor, fapi } = await renderSection(
+      signedIn([HOME, WORK], { verification: { secrets: { password: 'hunter2' } } }),
+    );
+    demandReverificationOnce('/v1/me');
+
+    await manage(actor, WORK_LABEL, 'Set as primary');
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    await actor.click(within(dialog).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user?.primary_phone_number_id).toBe('idn_home');
+    expect(within(row()).queryByRole('alert')).toBeNull();
+    expect(within(row()).getByRole('button', { name: `Manage ${WORK_LABEL}` })).toHaveFocus();
+
+    await manage(actor, WORK_LABEL, 'Set as primary');
+    await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_phone_number_id).toBe('idn_work'));
+  });
+
+  it('keeps the verification dialog open while retrying and reports an ordinary retry error', async () => {
+    const { actor, fapi } = await renderSection(
+      signedIn([HOME, WORK], { verification: { secrets: { password: 'hunter2' } } }),
+    );
+    demandReverificationOnce('/v1/me');
+
+    await manage(actor, WORK_LABEL, 'Set as primary');
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    const replay = holdRequests('post', '/v1/me');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
+    await waitFor(() => expect(replay.requests).toHaveLength(1));
+
+    expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+    await actor.keyboard('{Escape}');
+    expect(dialog).toBeVisible();
+    expect(fapi.client.sessions[0]?.user?.primary_phone_number_id).toBe('idn_home');
+
+    replay.fail('action_blocked', 'Unable to set primary number.');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() =>
+      expect(within(row()).getByRole('alert')).toHaveTextContent("This action couldn't be completed."),
+    );
+  });
+
+  it('waits for a verification factor before opening the dialog', async () => {
+    const { actor } = await renderSection(
+      signedIn([HOME, WORK], { verification: { secrets: { password: 'hunter2' } } }),
+    );
+    demandReverificationOnce('/v1/me');
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+
+    await manage(actor, WORK_LABEL, 'Set as primary');
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    start.release();
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+  });
 });
 
 describe('Removing a number', () => {
