@@ -253,6 +253,25 @@ describe.each([
     expect(container).toContainElement(dialog);
     container.remove();
   });
+
+  it('portals into a provider placed inside the dialog', async () => {
+    const outer = document.createElement('div');
+    const inner = document.createElement('div');
+    document.body.append(outer, inner);
+    render(
+      <PortalProvider container={outer}>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <PortalProvider container={inner}>{renderOverlay(<div data-testid='nested' />)}</PortalProvider>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </PortalProvider>,
+    );
+
+    expect(inner).toContainElement(await screen.findByTestId('nested'));
+    outer.remove();
+    inner.remove();
+  });
 });
 
 describe('useGetPortalContainer', () => {

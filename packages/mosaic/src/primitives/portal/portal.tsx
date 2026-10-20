@@ -24,14 +24,18 @@ const PortalContainerContext = React.createContext<PortalContainer | undefined>(
 const InsidePortalContext = React.createContext(false);
 
 export function PortalProvider(props: PortalProviderProps): React.ReactElement {
-  return <PortalContainerContext.Provider value={props.container}>{props.children}</PortalContainerContext.Provider>;
+  return (
+    <PortalContainerContext.Provider value={props.container}>
+      <InsidePortalContext.Provider value={false}>{props.children}</InsidePortalContext.Provider>
+    </PortalContainerContext.Provider>
+  );
 }
 
 export function Portal(props: PortalProps): React.ReactElement {
   const provided = usePortalRoot();
   return (
     <FloatingPortal root={props.root === undefined ? provided : props.root}>
-      <InsidePortalContext.Provider value={true}>{props.children}</InsidePortalContext.Provider>
+      <InsidePortalContext.Provider value>{props.children}</InsidePortalContext.Provider>
     </FloatingPortal>
   );
 }

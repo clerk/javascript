@@ -50,8 +50,8 @@ Or pass the element itself:
 - An overlay opened inside another overlay renders into its parent's portal, so a menu inside a
   Mosaic dialog stays in that dialog.
 - An explicit `root` on a part's `Portal`, or `portalRoot` on a component, wins over the provider.
-- `PortalProvider` works with or without `MosaicProvider`, and usually sits below it. Toasts follow
-  the provider only when it sits above `MosaicProvider`, since `MosaicProvider` renders them.
+- `PortalProvider` works with or without `MosaicProvider`. Toasts follow the provider only when it
+  sits above `MosaicProvider`, which renders them. Below it, toasts render in `document.body`.
 
 ## Props
 
