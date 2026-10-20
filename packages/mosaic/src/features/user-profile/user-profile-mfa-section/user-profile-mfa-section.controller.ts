@@ -424,7 +424,7 @@ function createSetupProps(
         ? 'select'
         : flow.kind === 'backup'
           ? context.pending === 'generate' && model.backupCodesReverification.visible
-            ? 'reverify'
+            ? 'verify'
             : 'backup-codes'
           : flow.kind,
     reverification: model.backupCodesReverification,
@@ -553,7 +553,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
 
   const showAddTrigger = model.addableMethods.length > 0;
   const reverification = model.backupCodesReverification;
-  const reverifying = setupProps.step === 'reverify';
+  const reverifying = setupProps.step === 'verify';
 
   return {
     dialogOpen,
