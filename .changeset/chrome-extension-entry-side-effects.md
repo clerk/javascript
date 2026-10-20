@@ -2,4 +2,4 @@
 '@clerk/chrome-extension': patch
 ---
 
-Mark the entry files that run setup code at load as having side effects. Previously `sideEffects: false` let bundlers without scope hoisting (such as Parcel in `plasmo build`) drop that setup, which left the extension popup blank in production builds.
+Mark the entry files that run setup code at load as having side effects. Previously `sideEffects: false` let bundlers such as Parcel, Rollup, Vite and webpack drop that setup in production builds. In Parcel (used by `plasmo build`), this left the extension popup blank.
