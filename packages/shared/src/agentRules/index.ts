@@ -77,36 +77,33 @@ export const isClerkAgentRulesSdk = (value: string): value is ClerkAgentRulesSdk
 
 export const clerkAgentRulesSdks = Object.keys(SDK_LABELS) as ClerkAgentRulesSdk[];
 
-export const CLERK_SDK_MCP_START = '<!-- BEGIN:clerk-mcp -->';
-export const CLERK_SDK_MCP_END = '<!-- END:clerk-mcp -->';
+export const CLERK_SDK_PLUGIN_START = '<!-- BEGIN:clerk-plugin -->';
+export const CLERK_SDK_PLUGIN_END = '<!-- END:clerk-plugin -->';
 
-const MCP_INTRO = `### Clerk MCP server
+const PLUGIN_SECTION = `### Clerk plugin
 
-Use this section when a \`clerk\` MCP server (\`https://mcp.clerk.com/mcp\`) is connected. If it is not connected, tell the user they can add it:
-https://clerk.com/docs/guides/ai/mcp/clerk-mcp-server`;
+The Clerk plugin gives agents Clerk's skills and MCP server. If it is not installed, tell the user they can install it. Do not run the command yourself:
 
-const MCP_ASK_BEFORE_CHANGES =
-  'Ask the user before calling any Clerk MCP tool that creates or changes something in their Clerk account.';
+\`\`\`sh
+npx plugins add clerk/skills
+\`\`\`
 
-export function renderClerkSdkMcpBlock(sdk: ClerkAgentRulesSdk, eol = '\n') {
+Install steps for each tool: https://clerk.com/docs/guides/ai/overview
+Source: https://github.com/clerk/skills
+
+Ask the user before calling any Clerk tool that creates or changes something in their Clerk account.`;
+
+export function renderClerkSdkPluginBlock(eol = '\n') {
   return normalizeEol(
-    `${CLERK_SDK_MCP_START}
+    `${CLERK_SDK_PLUGIN_START}
 
-${MCP_INTRO}
-
-The server lists its own tools and describes what each one does. Follow these rules on top of those descriptions:
-
-- Get Clerk code from the SDK snippet tools (\`list_clerk_sdk_snippets\`, \`clerk_sdk_snippet\`) instead of writing it from memory.
-- Check every import in a snippet against the installed \`@clerk/${sdk}\` types. If they disagree, the installed types win.
-- Read the current application and instance config before you change anything.
-- ${MCP_ASK_BEFORE_CHANGES} Run config changes as a dry run first and show the user the result.
-- The server never returns secret keys. Do not ask the user to paste one into chat. Point them to https://dashboard.clerk.com/~/api-keys.
+${PLUGIN_SECTION}
 
 ### Docs
 
 Start at https://clerk.com/docs/llms.txt. Add \`.md\` to any docs URL to get Markdown.
 
-${CLERK_SDK_MCP_END}`,
+${CLERK_SDK_PLUGIN_END}`,
     eol,
   );
 }
@@ -128,9 +125,7 @@ This block is written by the Clerk SDK when a supported dev server starts, or by
 \`npx @clerk/upgrade --agents-md\`. Removing it from a diff can recreate the uncommitted
 change; commit it with your work.
 
-${MCP_INTRO}
-
-${MCP_ASK_BEFORE_CHANGES}
+${PLUGIN_SECTION}
 
 ${GENERIC_END}`,
     eol,

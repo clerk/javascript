@@ -4,10 +4,10 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 import {
-  CLERK_SDK_MCP_END,
-  CLERK_SDK_MCP_START,
+  CLERK_SDK_PLUGIN_END,
+  CLERK_SDK_PLUGIN_START,
   clerkAgentRulesSdks,
-  renderClerkSdkMcpBlock,
+  renderClerkSdkPluginBlock,
 } from '../packages/shared/src/agentRules/index.ts';
 
 const check = process.argv.includes('--check');
@@ -23,15 +23,15 @@ for (const sdk of clerkAgentRulesSdks) {
     continue;
   }
 
-  const start = content.indexOf(CLERK_SDK_MCP_START);
-  const end = content.indexOf(CLERK_SDK_MCP_END, start);
+  const start = content.indexOf(CLERK_SDK_PLUGIN_START);
+  const end = content.indexOf(CLERK_SDK_PLUGIN_END, start);
 
   if (start === -1 || end === -1) {
-    problems.push(`${relative} has no ${CLERK_SDK_MCP_START} ... ${CLERK_SDK_MCP_END} markers`);
+    problems.push(`${relative} has no ${CLERK_SDK_PLUGIN_START} ... ${CLERK_SDK_PLUGIN_END} markers`);
     continue;
   }
 
-  const next = content.slice(0, start) + renderClerkSdkMcpBlock(sdk) + content.slice(end + CLERK_SDK_MCP_END.length);
+  const next = content.slice(0, start) + renderClerkSdkPluginBlock() + content.slice(end + CLERK_SDK_PLUGIN_END.length);
 
   if (next === content) {
     continue;
@@ -48,7 +48,7 @@ for (const sdk of clerkAgentRulesSdks) {
 if (problems.length > 0) {
   console.error(problems.join('\n'));
   if (check) {
-    console.error('Run `pnpm agents-md:sync` to update the Clerk MCP section in each SDK AGENTS.md.');
+    console.error('Run `pnpm agents-md:sync` to update the Clerk plugin section in each SDK AGENTS.md.');
   }
   process.exit(1);
 }

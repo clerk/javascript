@@ -16,4 +16,4 @@
 '@clerk/vue': patch
 ---
 
-Ship an `AGENTS.md` file in the package. It lists the current APIs for this version and how to use the Clerk MCP server, so AI coding agents can read it from `node_modules` instead of relying on outdated training data.
+Ship an `AGENTS.md` file in the package. It lists the current APIs for this version and recommends the Clerk plugin, so AI coding agents can read it from `node_modules` instead of relying on outdated training data.

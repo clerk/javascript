@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
-  CLERK_SDK_MCP_END,
-  CLERK_SDK_MCP_START,
+  CLERK_SDK_PLUGIN_END,
+  CLERK_SDK_PLUGIN_START,
   type FileSystemAdapter,
   renderClerkAgentRulesBlock,
-  renderClerkSdkMcpBlock,
+  renderClerkSdkPluginBlock,
   writeClerkAgentRules,
 } from '../agentRules';
 
@@ -120,26 +120,28 @@ describe('writeClerkAgentRules', () => {
   });
 });
 
-describe('Clerk MCP rules', () => {
-  it('adds the MCP intro and the ask-before-changes rule to the root block', () => {
+describe('Clerk plugin rules', () => {
+  it('recommends the Clerk plugin and keeps the ask-before-changes rule in the root block', () => {
     const block = renderClerkAgentRulesBlock();
 
-    expect(block).toContain('### Clerk MCP server');
-    expect(block).toContain('https://mcp.clerk.com/mcp');
-    expect(block).toContain('https://clerk.com/docs/guides/ai/mcp/clerk-mcp-server');
-    expect(block).toContain('Ask the user before calling any Clerk MCP tool');
+    expect(block).toContain('### Clerk plugin');
+    expect(block).toContain('npx plugins add clerk/skills');
+    expect(block).toContain('https://clerk.com/docs/guides/ai/overview');
+    expect(block).toContain('https://github.com/clerk/skills');
+    expect(block).toContain('Ask the user before calling any Clerk tool');
+    expect(block).not.toContain('mcp.clerk.com');
   });
 
-  it('renders a marked per-SDK MCP block that names the installed package', () => {
-    const block = renderClerkSdkMcpBlock('nextjs');
+  it('renders a marked per-SDK plugin block with the docs entry point', () => {
+    const block = renderClerkSdkPluginBlock();
 
-    expect(block.startsWith(CLERK_SDK_MCP_START)).toBe(true);
-    expect(block.endsWith(CLERK_SDK_MCP_END)).toBe(true);
-    expect(block).toContain('installed `@clerk/nextjs` types');
+    expect(block.startsWith(CLERK_SDK_PLUGIN_START)).toBe(true);
+    expect(block.endsWith(CLERK_SDK_PLUGIN_END)).toBe(true);
+    expect(block).toContain('npx plugins add clerk/skills');
     expect(block).toContain('https://clerk.com/docs/llms.txt');
   });
 
   it('uses the requested line endings', () => {
-    expect(renderClerkSdkMcpBlock('react', '\r\n')).not.toMatch(/[^\r]\n/);
+    expect(renderClerkSdkPluginBlock('\r\n')).not.toMatch(/[^\r]\n/);
   });
 });
