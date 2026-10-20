@@ -40,7 +40,7 @@ export interface WriteClerkAgentRulesOptions {
 export type WriteClerkAgentRulesResult = {
   targetDir: string;
   agentsMd: 'created' | 'updated' | 'unchanged';
-  claudeMd: 'created' | 'unchanged' | 'skipped';
+  claudeMd: 'created' | 'updated' | 'unchanged' | 'skipped';
 };
 
 const GENERIC_START = '<!-- BEGIN:clerk-agent-rules -->';
@@ -72,6 +72,13 @@ const uniqueSdks = (sdks: ClerkAgentRulesSdk[]) => [...new Set(sdks)].sort();
 
 const detectEol = (content: string) => (content.includes('\r\n') ? '\r\n' : '\n');
 const normalizeEol = (content: string, eol: string) => content.replace(/\r?\n/g, eol);
+
+const CLAUDE_AGENTS_IMPORT = /^\s*@(?:\.\/)?AGENTS\.md\s*$/m;
+
+const appendAgentsImport = (content: string) => {
+  const eol = detectEol(content);
+  return content.trim() ? `${content.trimEnd()}${eol}${eol}@AGENTS.md${eol}` : `@AGENTS.md${eol}`;
+};
 
 export const isClerkAgentRulesSdk = (value: string): value is ClerkAgentRulesSdk => value in SDK_LABELS;
 
@@ -248,7 +255,15 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
   }
 
   const targetStatus = fs.existsSync(targetFile) ? (next === existing ? 'unchanged' : 'updated') : 'created';
-  const shouldCreateClaude = targetFile === agentsPath && !fs.existsSync(claudePath);
+  const claudeExists = fs.existsSync(claudePath);
+  const shouldCreateClaude = targetFile === agentsPath && !claudeExists;
+  const claudeContent =
+    targetFile === agentsPath && claudeExists ? fs.readFileSync(claudePath, { encoding: 'utf8' }) : null;
+  const shouldImportAgentsInClaude =
+    claudeContent !== null &&
+    claudeContent !== existing &&
+    !claudeContent.includes(GENERIC_START) &&
+    !CLAUDE_AGENTS_IMPORT.test(claudeContent);
 
   if (!dryRun) {
     fs.mkdirSync?.(targetDir, { recursive: true });
@@ -258,11 +273,20 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
     if (shouldCreateClaude) {
       fs.writeFileSync(claudePath, '@AGENTS.md\n', { encoding: 'utf8', mode: 0o644 });
     }
+    if (shouldImportAgentsInClaude && claudeContent !== null) {
+      fs.writeFileSync(claudePath, appendAgentsImport(claudeContent), { encoding: 'utf8', mode: 0o644 });
+    }
   }
 
   return {
     targetDir,
     agentsMd: targetStatus,
-    claudeMd: shouldCreateClaude ? 'created' : fs.existsSync(claudePath) ? 'unchanged' : 'skipped',
+    claudeMd: shouldCreateClaude
+      ? 'created'
+      : shouldImportAgentsInClaude
+        ? 'updated'
+        : claudeExists
+          ? 'unchanged'
+          : 'skipped',
   };
 }
