@@ -471,19 +471,19 @@ describe('User profile MFA management', () => {
     expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
-  it('shows the verification when it arrives after the backup-code dialog was closed', async () => {
+  it('keeps the backup-code dialog open until the first response so a verification can appear', async () => {
     const fapi = await renderBackupCodesNeedingReverification();
     const first = holdRequests('post', '/v1/me/backup_codes/');
     const user = userEvent.setup();
 
     await regenerate(user);
     await waitFor(() => expect(first.requests).toHaveLength(1));
+    const dialog = screen.getByRole('dialog');
     await user.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(dialog).toBeVisible();
     first.release();
 
-    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await waitFor(() => expect(screen.getByRole('dialog')).toContainElement(document.activeElement as HTMLElement));
+    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
     await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
     await screen.findByRole('list', { name: 'Backup codes' });
     expect(fapi.mfa.backupCodeCreations).toBe(1);
