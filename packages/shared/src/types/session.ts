@@ -345,9 +345,15 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Initiates a verification flow using passkeys.
+   *
+   * By default the passkey verifies the first factor. Pass
+   * `{ level: 'second_factor' }` to satisfy the second factor of an
+   * in-progress multi-factor reverification instead. Any other `level`
+   * value is rejected. Throws a `ClerkWebAuthnError` when WebAuthn is
+   * unsupported or the passkey ceremony fails.
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    */
-  verifyWithPasskey: () => Promise<SessionVerificationResource>;
+  verifyWithPasskey: (params?: SessionVerifyWithPasskeyParams) => Promise<SessionVerificationResource>;
   __internal_toSnapshot: () => SessionJSONSnapshot;
   __internal_touch: (params?: SessionTouchParams) => Promise<ClientResource | undefined>;
 }
@@ -552,6 +558,7 @@ export type SessionVerifyAttemptFirstFactorParams =
 
 export type SessionVerifyPrepareSecondFactorParams =
   | PhoneCodeSecondFactorConfig
+  | PassKeyConfig
   /**
    * @experimental
    */
@@ -560,7 +567,17 @@ export type SessionVerifyAttemptSecondFactorParams =
   | PhoneCodeAttempt
   | TOTPAttempt
   | BackupCodeAttempt
+  | PasskeyAttempt
   /**
    * @experimental
    */
   | TrustedDeviceAttempt;
+
+export type SessionVerifyWithPasskeyParams = {
+  /**
+   * Which factor of the reverification the passkey should verify. Defaults
+   * to `'first_factor'`; pass `'second_factor'` to satisfy the second
+   * factor of an in-progress multi-factor reverification.
+   */
+  level?: 'first_factor' | 'second_factor';
+};
