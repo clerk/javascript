@@ -33,6 +33,17 @@ function userTokenCache(getToken: TokenCache['getToken']): TokenCache {
   return { getToken, saveToken: vi.fn().mockResolvedValue(undefined) };
 }
 
+function storedTokenCache(clientToken: string): TokenCache {
+  const stored: Record<string, string> = { [CLERK_CLIENT_JWT_KEY]: clientToken };
+  return {
+    getToken: key => Promise.resolve(stored[key] ?? null),
+    saveToken: (key, token) => {
+      stored[key] = token;
+      return Promise.resolve();
+    },
+  };
+}
+
 async function loadEngine() {
   const { createNativeClientSync } = await import('../nativeClientSync');
   return createNativeClientSync;
@@ -102,6 +113,74 @@ describe('createNativeClientSync', () => {
       await vi.advanceTimersByTimeAsync(0);
       await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('native-token');
       expect(native.configureNative).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('hands native a token rotated while a slow configure was pending', async () => {
+    vi.useFakeTimers();
+    try {
+      const createNativeClientSync = await loadEngine();
+      const native = nativeModule();
+      let nativeToken: string | null = null;
+      let finishConfigure!: () => void;
+      vi.mocked(native.configureNative).mockImplementation(
+        (_publishableKey, seed) =>
+          new Promise<void>(resolve => {
+            finishConfigure = () => {
+              nativeToken ??= seed;
+              resolve();
+            };
+          }),
+      );
+      vi.mocked(native.getDeviceToken).mockImplementation(() => Promise.resolve(nativeToken));
+      vi.mocked(native.setDeviceToken).mockImplementation((token, expected) => {
+        const didSet = nativeToken === expected;
+        if (didSet) {
+          nativeToken = token;
+        }
+        return Promise.resolve(didSet);
+      });
+      const cache = storedTokenCache('seed-token');
+
+      const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+      const duringStartup = sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+      await vi.advanceTimersByTimeAsync(3_000);
+      await expect(duringStartup).resolves.toBe('seed-token');
+      await sync.tokenCache.saveClientToken('signed-in-token', 'seed-token');
+
+      finishConfigure();
+      await vi.advanceTimersByTimeAsync(0);
+
+      await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('signed-in-token');
+      expect(native.setDeviceToken).toHaveBeenCalledWith('signed-in-token', 'seed-token');
+      expect(native.refreshClient).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('keeps the native token when native already had its own during a slow configure', async () => {
+    vi.useFakeTimers();
+    try {
+      const createNativeClientSync = await loadEngine();
+      const native = nativeModule();
+      let finishConfigure!: () => void;
+      vi.mocked(native.configureNative).mockReturnValue(new Promise<void>(resolve => (finishConfigure = resolve)));
+      vi.mocked(native.setDeviceToken).mockResolvedValue(false);
+      const cache = storedTokenCache('seed-token');
+
+      const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+      void sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+      await vi.advanceTimersByTimeAsync(3_000);
+      await sync.tokenCache.saveClientToken('signed-in-token', 'seed-token');
+
+      finishConfigure();
+      await vi.advanceTimersByTimeAsync(0);
+
+      await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('native-token');
+      expect(native.refreshClient).not.toHaveBeenCalled();
     } finally {
       vi.useRealTimers();
     }
