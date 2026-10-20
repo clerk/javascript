@@ -1,4 +1,5 @@
 import { useMergeRefs } from '@floating-ui/react';
+import type { RefObject } from 'react';
 import { useRef } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -40,10 +41,6 @@ export function UserProfileEditUsernameDialog({
 }: UserProfileEditUsernameDialogProps) {
   const m = useMessages('userProfileProfileSection').username;
   const usernameRef = useRef<HTMLInputElement>(null);
-  const { feedback } = form.fields.username;
-  const error = feedback?.type === 'error' ? feedback.message : undefined;
-  const { ref, ...control } = form.register('username');
-  const mergedRef = useMergeRefs([ref, usernameRef, useFlowAutoFocus<HTMLInputElement>()]);
 
   const edit = (
     <>
@@ -65,19 +62,10 @@ export function UserProfileEditUsernameDialog({
           />
         }
       >
-        <Field.Root
-          disabled={form.isSubmitting}
-          focusableWhenDisabled
-          invalid={error !== undefined}
-        >
-          <Field.Label>{m.fieldLabel}</Field.Label>
-          <Input
-            ref={mergedRef}
-            autoComplete='username'
-            {...control}
-          />
-          <Field.Feedback feedback={feedback} />
-        </Field.Root>
+        <UsernameField
+          form={form}
+          inputRef={usernameRef}
+        />
       </Card.Content>
       <Card.Footer>
         <Dialog.Close
@@ -144,5 +132,35 @@ export function UserProfileEditUsernameDialog({
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
+  );
+}
+
+function UsernameField({
+  form,
+  inputRef,
+}: {
+  form: UseFormResult<UserProfileEditUsernameValue>;
+  inputRef: RefObject<HTMLInputElement>;
+}) {
+  const m = useMessages('userProfileProfileSection').username;
+  const { feedback } = form.fields.username;
+  const error = feedback?.type === 'error' ? feedback.message : undefined;
+  const { ref, ...control } = form.register('username');
+  const mergedRef = useMergeRefs([ref, inputRef, useFlowAutoFocus<HTMLInputElement>()]);
+
+  return (
+    <Field.Root
+      disabled={form.isSubmitting}
+      focusableWhenDisabled
+      invalid={error !== undefined}
+    >
+      <Field.Label>{m.fieldLabel}</Field.Label>
+      <Input
+        ref={mergedRef}
+        autoComplete='username'
+        {...control}
+      />
+      <Field.Feedback feedback={feedback} />
+    </Field.Root>
   );
 }

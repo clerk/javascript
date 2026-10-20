@@ -335,6 +335,21 @@ describe('username reverification', () => {
     expect(savedUsername(fapi)).toBe('alicesmith');
   });
 
+  it('focuses the username field when returning to the form after verifying', async () => {
+    const updates: Array<ReturnType<typeof holdRequests>> = [];
+    const { actor } = await renderUsernameNeedingReverification(() => {
+      updates.push(holdRequests('post', '/v1/me'));
+    });
+    const update = updates[0];
+
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    update.fail('form_identifier_exists', 'That username is taken. Please try another.', 'username');
+
+    const field = await screen.findByLabelText('Username', undefined, { timeout: 3000 });
+    await waitFor(() => expect(field).toHaveFocus());
+  });
+
   it('closes the dialog from the verification error card', async () => {
     const { fapi, actor } = await renderUsernameNeedingReverification(() =>
       holdRequests('post', '/v1/client/sessions/sess_1/verify').fail('some_new_error', 'Nope'),
