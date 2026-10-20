@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@clerk/clerk-js": "workspace:*",
+    "@clerk/loom": "workspace:*",
     "@clerk/mosaic": "workspace:*",
     "@clerk/nextjs": "workspace:*",
+    "@clerk/react": "workspace:*",
     "@clerk/shared": "workspace:*",
     "@floating-ui/react": "catalog:repo",
     "@stylexjs/stylex": "0.19.0",

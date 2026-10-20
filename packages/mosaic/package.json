@@ -70,6 +70,8 @@
   },
   "devDependencies": {
     "@clerk/clerk-js": "workspace:^",
+    "@clerk/loom": "workspace:*",
+    "@clerk/react": "workspace:*",
     "@stylexjs/eslint-plugin": "0.19.0",
     "@stylexjs/rollup-plugin": "0.19.0",
     "@stylexjs/stylex": "0.19.0",
