@@ -124,7 +124,7 @@ describe('Mosaic Tabs', () => {
     const panelsAtom = stylex.props(styles.panels).className ?? '';
     const panelAtom = stylex.props(styles.panel).className ?? '';
     expect(ref.current).toHaveClass('cl-tabs-panels', panelsAtom, atom);
-    expect(screen.getByText('Member list')).toHaveClass('cl-tabs-panel', panelAtom);
+    expect(screen.getByRole('tabpanel')).toHaveClass('cl-tabs-panel', panelAtom);
   });
 
   it('renders a custom panel wrapper and merges its refs and classes', () => {

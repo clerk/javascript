@@ -695,6 +695,38 @@ describe('Tabs', () => {
       expect(screen.getByText('Settings content')).not.toBeVisible();
     });
 
+    it('holds the leaving panel content while its exit animation runs', async () => {
+      function Controlled() {
+        const [value, setValue] = useState('tab1');
+        return (
+          <Tabs.Root
+            value={value}
+            onValueChange={setValue}
+          >
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account for {value}</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+          </Tabs.Root>
+        );
+      }
+      const user = userEvent.setup();
+      render(<Controlled />);
+      const animations = mockAnimations();
+      try {
+        await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+        expect(screen.getByText('Account for tab1')).toBeInTheDocument();
+        expect(screen.queryByText('Account for tab2')).not.toBeInTheDocument();
+
+        await animations.finish();
+      } finally {
+        animations.restore();
+      }
+    });
+
     it('server-renders only the selected panel children', () => {
       const html = renderToString(
         <Tabs.Root defaultValue='tab1'>

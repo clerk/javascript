@@ -4,7 +4,7 @@ import { inertProps } from '@clerk/shared/inert';
 import React, { useRef } from 'react';
 
 import { useTransition } from '../hooks/use-transition';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, Freeze, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
 export interface TabsPanelProps extends ComponentProps<'div'> {
@@ -53,7 +53,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
       ...effectiveTransitionProps.style,
       '--cl-tab-transition-direction': direction === 'forward' ? '1' : '-1',
     },
-    children: keepMounted || mounted ? children : null,
+    children: keepMounted || mounted ? <Freeze frozen={!isSelected && mounted}>{children}</Freeze> : null,
   };
 
   const merged = mergeProps<'div'>(defaultProps, otherProps);

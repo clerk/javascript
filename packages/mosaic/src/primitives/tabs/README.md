@@ -184,6 +184,7 @@ Use this to drive directional slide animations:
 ## Important Notes
 
 - **Panel children unmount when the panel is hidden.** A deselected panel keeps its children, with `inert` and `data-ending-style`, until its exit animations finish, then gains `hidden` and unmounts them. State inside a panel resets when it is hidden; pass `keepMounted` to keep the children rendered.
+- **Leaving panel content freezes.** While a deselected panel animates out, its children are wrapped in `Freeze` (`../utils`) and hold their last frame instead of re-rendering under the animation.
 - **The initially selected panel appears instantly** (no enter animation on page load).
 - **`Tabs.Trigger` vs `Tabs.Tab`**: Use `Tabs.Tab` inside `Tabs.List` for keyboard-navigable tabs with roving tabindex. Use `Tabs.Trigger` for standalone tab buttons placed anywhere in the tree (e.g., in a sidebar).
 - **Disabled tabs use `aria-disabled`**, not the native `disabled` attribute, keeping them focusable for keyboard users.
