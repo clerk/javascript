@@ -93,6 +93,8 @@ export function APIKeysTableView({
           layout='fixed'
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
+          layout='fixed'
+          xstyle={styles.table}
         >
           <Table.ColumnGroup>
             {onBulkAction ? <Table.Column /> : null}
