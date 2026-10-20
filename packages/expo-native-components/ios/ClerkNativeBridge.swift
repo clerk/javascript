@@ -515,9 +515,7 @@ final class ClerkNativeBridge {
         _ = try? await Clerk.shared.refreshClient()
       }
     }
-    if didConfigure {
-      Self.postConfiguredNotification()
-    }
+    Self.postConfiguredNotification()
     shouldFlushPendingURL = true
   }
 
