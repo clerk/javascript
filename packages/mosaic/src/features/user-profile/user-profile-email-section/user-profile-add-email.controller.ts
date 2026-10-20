@@ -221,11 +221,10 @@ export function useUserProfileAddEmailController({
     isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {
       if (form.isSubmitting) {
-        if (!open && state === 'email' && reverification?.onCancel) {
-          reverification.onCancel();
-          send({ type: 'CANCEL' });
+        if (open || state !== 'email' || !reverification?.onCancel) {
+          return;
         }
-        return;
+        reverification.onCancel();
       }
       if (open) {
         emailForm.reset();
