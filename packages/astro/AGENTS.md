@@ -12,23 +12,23 @@ Read the installed `@clerk/astro` types before changing auth code. If a symbol i
 - The `as` prop was removed from `<SignInButton>`, `<SignUpButton>`, and `<SignOutButton>`. Use `asChild` with a child element.
 - Clerk Elements is removed. Never use it.
 
-<!-- BEGIN:clerk-mcp -->
+<!-- BEGIN:clerk-plugin -->
 
-### Clerk MCP server
+### Clerk plugin
 
-Use this section when a `clerk` MCP server (`https://mcp.clerk.com/mcp`) is connected. If it is not connected, tell the user they can add it:
-https://clerk.com/docs/guides/ai/mcp/clerk-mcp-server
+The Clerk plugin gives agents Clerk's skills and MCP server. If it is not installed, tell the user they can install it. Do not run the command yourself:
 
-The server lists its own tools and describes what each one does. Follow these rules on top of those descriptions:
+```sh
+npx plugins add clerk/skills
+```
 
-- Get Clerk code from the SDK snippet tools (`list_clerk_sdk_snippets`, `clerk_sdk_snippet`) instead of writing it from memory.
-- Check every import in a snippet against the installed `@clerk/astro` types. If they disagree, the installed types win.
-- Read the current application and instance config before you change anything.
-- Ask the user before calling any Clerk MCP tool that creates or changes something in their Clerk account. Run config changes as a dry run first and show the user the result.
-- The server never returns secret keys. Do not ask the user to paste one into chat. Point them to https://dashboard.clerk.com/~/api-keys.
+Install steps for each tool: https://clerk.com/docs/guides/ai/overview
+Source: https://github.com/clerk/skills
+
+Ask the user before calling any Clerk tool that creates or changes something in their Clerk account.
 
 ### Docs
 
 Start at https://clerk.com/docs/llms.txt. Add `.md` to any docs URL to get Markdown.
 
-<!-- END:clerk-mcp -->
+<!-- END:clerk-plugin -->
