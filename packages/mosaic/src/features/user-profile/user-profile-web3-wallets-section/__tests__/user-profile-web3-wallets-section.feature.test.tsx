@@ -590,7 +590,8 @@ describe('Web3 wallets', () => {
     await user.click(secondManage());
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_web3_wallet_id).toBe('wallet_2'));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
@@ -625,7 +626,8 @@ describe('Web3 wallets', () => {
     await screen.findByText('Enter your current password to continue');
     const dialog = screen.getByRole('dialog');
     const replay = holdRequests('post', '/v1/me');
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
     await waitFor(() => expect(replay.requests).toHaveLength(1));
 
     expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
