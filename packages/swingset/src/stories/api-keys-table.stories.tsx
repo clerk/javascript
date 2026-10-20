@@ -1,4 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
+import { APIKeysTableSkeleton } from '@clerk/mosaic/features/api-keys/api-keys-table.skeleton';
 import { APIKeysTableView } from '@clerk/mosaic/features/api-keys/api-keys-table.view';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
@@ -87,10 +88,14 @@ export function Loading() {
           Reload
         </Button>
       </div>
-      <APIKeysTableView
-        {...props}
-        isLoading={loading}
-      />
+      {loading ? (
+        <APIKeysTableSkeleton
+          messages={props.messages}
+          canManage
+        />
+      ) : (
+        <APIKeysTableView {...props} />
+      )}
     </div>
   );
 }
