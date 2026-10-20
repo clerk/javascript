@@ -7,10 +7,13 @@ import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useLocale, useMessages } from '../../../localization';
 import { formatDate } from '../../../utils/format-date';
 import type { useMembersTableModel } from './members-table-tab.model';
-import type { MembersRoles, OrganizationProfileMember } from './members-table-tab.types';
+import type { MembersRolesState, OrganizationProfileMember } from './members-table-tab.types';
 import { canManageMember } from './members-table-tab.utils';
 
-export function useMembersTableController(model: ReturnType<typeof useMembersTableModel>, roles: MembersRoles | null) {
+export function useMembersTableController(
+  model: ReturnType<typeof useMembersTableModel>,
+  { roles, isLoading: isLoadingRoles }: MembersRolesState,
+) {
   const locale = useLocale();
   const messages = useMessages('membersTableTab');
   const roleNames = useMessages('roles');
@@ -39,7 +42,7 @@ export function useMembersTableController(model: ReturnType<typeof useMembersTab
     totalCount: model.totalCount,
     page: model.page,
     onPageChange: model.fetchPage,
-    isLoading: model.isLoading,
+    isLoading: model.isLoading || isLoadingRoles,
     isFetching: model.isFetching,
     isError: model.isError,
     onRetry: model.retry,

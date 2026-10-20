@@ -551,7 +551,24 @@ describe('inviting members', () => {
     roles.release();
   });
 
-  it('does not offer Invite when roles fail to load', async () => {
+  it('offers Invite as unavailable until roles load', async () => {
+    serveInvite({ permissions: ['org:sys_memberships:manage'] });
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const user = userEvent.setup();
+    expect(await screen.findByText('ada@example.com')).toBeVisible();
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    const invite = screen.getByRole('button', { name: 'Invite' });
+    expect(invite).toHaveAttribute('aria-disabled', 'true');
+    await user.click(invite);
+    expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull();
+    roles.release();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Invite' })).not.toHaveAttribute('aria-disabled'));
+    await user.click(screen.getByRole('button', { name: 'Invite' }));
+    expect(await screen.findByRole('dialog', { name: 'Invite members' })).toBeVisible();
+  });
+
+  it('keeps Invite unavailable when roles fail to load', async () => {
     serveInvite();
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
@@ -560,7 +577,7 @@ describe('inviting members', () => {
     await userEvent.setup().click(await screen.findByRole('tab', { name: 'Invitations' }));
     expect(await screen.findByText('ada@example.com')).toBeVisible();
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage ada@example.com' })).toBeVisible());
-    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Invite' })).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('replaces a pending invitation for the same address', async () => {
