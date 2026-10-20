@@ -7,6 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { clerkApiError } from '../../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { SaveError } from '../../../../utils/errors';
+import type { ReverificationController } from '../../../reverification';
 import { useUserProfileEmailSectionController } from '../user-profile-email-section.controller';
 import type { ReadyEmailSectionModel } from '../user-profile-email-section.types';
 import { UserProfileEmailSectionView } from '../user-profile-email-section.view';
@@ -17,14 +18,24 @@ const codeVerifier = {
 };
 
 type EmailSectionProps = Partial<Omit<ReadyEmailSectionModel, 'status' | 'userId'>>;
+const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
 
 function EmailSection({
   emails = [{ id: 'email_1', value: 'test@example.com', isDefault: false, isVerified: true }],
   getEmailVerifier = () => codeVerifier,
   onSetPrimaryEmail = () => Promise.resolve(),
+  removeReverification = idleReverification,
+  setPrimaryReverification = idleReverification,
   ...rest
 }: EmailSectionProps) {
-  const controller = useUserProfileEmailSectionController({ emails, getEmailVerifier, onSetPrimaryEmail, ...rest });
+  const controller = useUserProfileEmailSectionController({
+    emails,
+    getEmailVerifier,
+    onSetPrimaryEmail,
+    removeReverification,
+    setPrimaryReverification,
+    ...rest,
+  });
   return <UserProfileEmailSectionView {...controller} />;
 }
 
