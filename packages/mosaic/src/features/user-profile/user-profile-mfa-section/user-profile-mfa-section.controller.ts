@@ -56,7 +56,6 @@ type MfaEvent =
   | { type: 'EDIT_CODE'; value: string }
   | { type: 'PHONE_RESOLVED'; id: string; phoneNumber: string }
   | { type: 'PRINT_FAILED' }
-  | { type: 'RESUME_BACKUP' }
   | { type: 'TICK' }
   | { type: 'RUN'; key: MfaAction; run: () => Promise<MfaFlow>; resolve: () => void; reject: (error: unknown) => void };
 
@@ -177,13 +176,6 @@ const mfaMachine = createMachine({
           })),
         },
         TICK: tick,
-        RESUME_BACKUP: {
-          actions: assign(context =>
-            context.pending === 'generate' && context.flow.kind === 'closed'
-              ? { flow: { kind: 'backup', codes: [] }, dismissed: false }
-              : {},
-          ),
-        },
         PHONE_RESOLVED: {
           actions: assign((context, event) => ({
             flow:
@@ -495,14 +487,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
   };
   const { resendSeconds } = context;
   const flow = context.flow;
-  const reverification = model.backupCodesReverification;
-  const reverifying = context.pending === 'generate' && reverification.visible;
   const dialogOpen = flow.kind !== 'closed';
-  useEffect(() => {
-    if (reverifying) {
-      send({ type: 'RESUME_BACKUP' });
-    }
-  }, [reverifying, send]);
   useEffect(() => {
     if (!dialogOpen || resendSeconds === 0) {
       return;
@@ -567,6 +552,8 @@ export function useUserProfileMfaController(model: ReadyModel) {
   };
 
   const showAddTrigger = model.addableMethods.length > 0;
+  const reverification = model.backupCodesReverification;
+  const reverifying = setupProps.step === 'verify';
 
   return {
     dialogOpen,
@@ -574,11 +561,11 @@ export function useUserProfileMfaController(model: ReadyModel) {
     showAddControl: showAddTrigger || dialogOpen,
     reverifying,
     onDialogOpenChange: (open: boolean) => {
-      if (!open) {
-        if (reverifying && !reverification.onCancel) {
+      if (!open && context.pending === 'generate') {
+        if (!reverification.onCancel) {
           return;
         }
-        reverification.onCancel?.();
+        reverification.onCancel();
       }
       send({ type: open ? 'OPEN' : 'CLOSE' });
     },
