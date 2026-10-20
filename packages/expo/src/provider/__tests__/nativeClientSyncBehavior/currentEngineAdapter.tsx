@@ -16,11 +16,6 @@ function serializeClient(native: FakeNativeClerk): string {
   return JSON.stringify(native.client);
 }
 
-/**
- * Today's `ClerkExpo` native module contract, modeled on the iOS bridge: `configure` adopts a bearer
- * token, `syncClientStateFromJs` adopts/refreshes and echoes a change tagged with the JS `sourceId`, and
- * native-originated changes are emitted as `clerkNativeClientChanged` snapshots.
- */
 function createCurrentNativeModule(native: FakeNativeClerk, calls: string[]): ClerkExpoNativeModule {
   const listeners = new Set<(snapshot: NativeClientSnapshot) => void>();
 

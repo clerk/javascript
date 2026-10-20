@@ -71,7 +71,6 @@ export class FakeClerk {
   client: FakeClientResource | undefined = undefined;
   session: FakeSessionResource | null = null;
   __internal_setActiveInProgress = false;
-  /** Every state emitted to Clerk listeners (what `useAuth` consumers observe). */
   readonly emissions: JsEmission[] = [];
   tokenCache: TokenCache | undefined;
   #listeners: ListenerCallback[] = [];
@@ -187,8 +186,6 @@ export class FakeClerk {
     this.updateClient(client);
     this.#emit();
   };
-
-  // JS user actions.
 
   async signIn(userId: string): Promise<string> {
     const response = await this.fapi(token => this.server.signIn('js', token, userId));

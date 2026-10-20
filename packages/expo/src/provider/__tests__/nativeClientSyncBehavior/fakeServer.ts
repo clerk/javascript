@@ -85,8 +85,6 @@ export class FakeClerkServer {
     await networkRoundTrip();
   }
 
-  // Seeding helpers (no request is logged).
-
   seedClient({ users = [], activeUser }: { users?: string[]; activeUser?: string } = {}): {
     token: string;
     clientId: string;
@@ -124,8 +122,6 @@ export class FakeClerkServer {
     return this.requests.filter(request => request.caller === caller && (!operation || request.operation === operation))
       .length;
   }
-
-  // Frontend API
 
   async getClient(caller: FapiCaller, token: string | null): Promise<FapiResponse> {
     await this.#request(caller, 'GET /client', token);

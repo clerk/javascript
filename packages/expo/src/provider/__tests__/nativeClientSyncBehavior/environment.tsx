@@ -38,7 +38,6 @@ export function LoadingClerkProvider({ children, Clerk }: { children?: ReactNode
   return <>{children}</>;
 }
 
-/** A persistent token cache such as one backed by `expo-secure-store`. */
 export class FakePersistentTokenCache implements TokenCache {
   #values = new Map<string, string>();
 
