@@ -75,5 +75,8 @@ export const isAutomatedEnvironment = (): boolean => {
 };
 
 export const isAgentEnvironment = (): boolean => {
-  return agentEnvironmentVariables.some(name => isTruthyEnvValue(getEnvVariable(name)));
+  return agentEnvironmentVariables.some(name => {
+    const value = getEnvVariable(name);
+    return name === 'CURSOR_EXTENSION_HOST_ROLE' ? value === 'agent-exec' : isTruthyEnvValue(value);
+  });
 };

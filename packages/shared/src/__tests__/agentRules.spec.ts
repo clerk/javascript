@@ -120,6 +120,36 @@ describe('writeClerkAgentRules', () => {
   });
 });
 
+describe('writeClerkAgentRules with an unmatched BEGIN marker', () => {
+  it('keeps text after an orphan shared BEGIN marker across runs', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': 'Team rules\n\n<!-- BEGIN:clerk-agent-rules -->\nold\n\n## My notes\nKeep this.\n',
+    });
+
+    for (let run = 0; run < 2; run++) {
+      writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+      const content = memory.read('/repo/AGENTS.md');
+      expect(content).toContain('Keep this.');
+      expect(content?.match(/<!-- BEGIN:clerk-agent-rules -->/g)).toHaveLength(1);
+    }
+  });
+
+  it('keeps text after an orphan SDK BEGIN marker across runs', () => {
+    const memory = createMemoryFs({
+      '/repo/AGENTS.md': '<!-- BEGIN:clerk-agent-rules:nextjs -->\nold\n\n## My notes\nKeep this.\n',
+    });
+
+    for (let run = 0; run < 2; run++) {
+      writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+      const content = memory.read('/repo/AGENTS.md');
+      expect(content).toContain('Keep this.');
+      expect(content?.match(/<!-- BEGIN:clerk-agent-rules:nextjs -->/g)).toHaveLength(1);
+    }
+  });
+});
+
 describe('writeClerkAgentRules with an existing CLAUDE.md', () => {
   it('adds an @AGENTS.md import when CLAUDE.md does not load AGENTS.md', () => {
     const memory = createMemoryFs({

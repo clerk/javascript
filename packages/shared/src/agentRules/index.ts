@@ -166,6 +166,10 @@ function upsertMarkedBlock(
     return content.slice(0, startIndex) + block + content.slice(endIndex + end.length);
   }
 
+  if (startIndex !== -1) {
+    return content;
+  }
+
   if (insertAfter) {
     const insertIndex = content.indexOf(insertAfter);
     if (insertIndex !== -1) {

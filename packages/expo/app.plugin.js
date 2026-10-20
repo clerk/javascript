@@ -7,6 +7,7 @@
  * 3. If @clerk/expo-native-components is installed, its config plugin is applied for the Clerk native SDKs
  */
 const { AndroidConfig, withAndroidManifest, withEntitlementsPlist, withInfoPlist } = require('@expo/config-plugins');
+const { isAgentEnvironment, isAutomatedEnvironment, isProductionEnvironment } = require('@clerk/shared/utils');
 
 const fs = require('fs');
 const path = require('path');
@@ -15,43 +16,8 @@ const CLERK_EXPO_NATIVE = '@clerk/expo-native-components';
 const CLERK_EXPO_NATIVE_OPTIONS = ['keychainService', 'theme'];
 let didWriteAgentRules = false;
 
-const isTruthyEnvValue = value => typeof value === 'string' && !!value && !['0', 'false', 'off', 'no'].includes(value);
-
-const isAgentEnvironment = () =>
-  [
-    'CLAUDECODE',
-    'CURSOR_AGENT',
-    'CURSOR_CLI',
-    'CURSOR_EXTENSION_HOST_ROLE',
-    'CURSOR_TRACE_ID',
-    'GITHUB_COPILOT_AGENT',
-    'GITHUB_COPILOT_CHAT',
-    'AGENT',
-    'AGENTS',
-  ].some(name => isTruthyEnvValue(process.env[name]));
-
-const isAutomatedEnvironment = () =>
-  [
-    'CI',
-    'CONTINUOUS_INTEGRATION',
-    'GITHUB_ACTIONS',
-    'GITLAB_CI',
-    'CIRCLECI',
-    'TRAVIS',
-    'BUILDKITE',
-    'BITBUCKET_BUILD_NUMBER',
-    'APPVEYOR',
-    'CODEBUILD_BUILD_ID',
-    'TF_BUILD',
-    'TEAMCITY_VERSION',
-    'JENKINS_URL',
-    'HUDSON_URL',
-    'BAMBOO_BUILDKEY',
-    'CF_PAGES',
-  ].some(name => isTruthyEnvValue(process.env[name]));
-
 const maybeWriteAgentRules = config => {
-  if (didWriteAgentRules || isAutomatedEnvironment() || !isAgentEnvironment()) {
+  if (didWriteAgentRules || isProductionEnvironment() || isAutomatedEnvironment() || !isAgentEnvironment()) {
     return;
   }
 
@@ -211,6 +177,7 @@ const withClerkExpo = (config, props = {}) => {
 module.exports = withClerkExpo;
 module.exports._testing = {
   addHostedAuthIntentFilter,
+  maybeWriteAgentRules,
   withClerkExpoNativeComponents,
   withClerkFaceIDPermission,
 };
