@@ -528,6 +528,18 @@ describe('Reverification', () => {
       // The card closes once the retried action has settled
       await untilClosed();
     });
+
+    it('reveals and hides the password on request', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      expect(passwordField()).toHaveAttribute('type', 'password');
+
+      await user.click(screen.getByRole('button', { name: 'Show password' }));
+      expect(passwordField()).toHaveAttribute('type', 'text');
+      await user.click(screen.getByRole('button', { name: 'Hide password' }));
+      expect(passwordField()).toHaveAttribute('type', 'password');
+    });
   });
 
   describe('email code', () => {
@@ -1406,7 +1418,7 @@ describe('Reverification', () => {
       );
       const user = await startVerification();
       expect(await screen.findByText(STEP.password)).toBeVisible();
-      vi.spyOn(clerk.session!, 'attemptFirstFactorVerification').mockRejectedValue('not an error');
+      vi.spyOn(clerk.session, 'attemptFirstFactorVerification').mockRejectedValue('not an error');
 
       await user.type(passwordField(), `${PASSWORD}{Enter}`);
 

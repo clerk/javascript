@@ -314,6 +314,8 @@ function PasswordPanel({
           description: 'Enter your current password to continue',
           fieldLabel: 'Password',
           fieldPlaceholder: 'Enter your password',
+          showPasswordLabel: 'Show password',
+          hidePasswordLabel: 'Hide password',
           secondaryActionLabel: 'Cancel',
           primaryActionLabel: 'Continue',
           pendingLabel: 'Verifying',

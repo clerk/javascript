@@ -172,6 +172,8 @@ export function ReverificationView({
                 description: m.password.description,
                 fieldLabel: m.formFieldLabel__password,
                 fieldPlaceholder: m.formFieldInputPlaceholder__password,
+                showPasswordLabel: m.formFieldAction__showPassword,
+                hidePasswordLabel: m.formFieldAction__hidePassword,
                 ...actions,
               }}
               value={value}
