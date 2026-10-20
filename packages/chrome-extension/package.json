@@ -21,7 +21,6 @@
     "directory": "packages/chrome-extension"
   },
   "license": "MIT",
-  "sideEffects": false,
   "exports": {
     ".": {
       "import": {
