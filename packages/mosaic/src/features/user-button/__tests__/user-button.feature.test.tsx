@@ -1,8 +1,7 @@
-import { UNSAFE_PortalProvider as PortalProvider } from '@clerk/shared/react';
 import type { CustomPage, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
@@ -19,6 +18,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { PortalProvider } from '../../../primitives/portal';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
 
@@ -396,9 +396,10 @@ describe('UserButton', () => {
     });
 
     it('hands the opened profile the portal root the app provides', async () => {
-      const container = document.createElement('div');
+      const container = document.body.appendChild(document.createElement('div'));
+      onTestFinished(() => container.remove());
       serveFapi(signedIn());
-      const { clerk } = await renderWithClerk(<PortalProvider getContainer={() => container}>{tree()}</PortalProvider>);
+      const { clerk } = await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
       const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
@@ -483,9 +484,10 @@ describe('UserButton', () => {
     });
 
     it('hands the CreateOrganization modal the portal root the app provides', async () => {
-      const container = document.createElement('div');
+      const container = document.body.appendChild(document.createElement('div'));
+      onTestFinished(() => container.remove());
       serveFapi(signedIn());
-      const { clerk } = await renderWithClerk(<PortalProvider getContainer={() => container}>{tree()}</PortalProvider>);
+      const { clerk } = await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
       const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
       const user = await open();
 
