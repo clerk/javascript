@@ -48,4 +48,5 @@ export type UserProfileMfaModel =
       setDefault?: (phoneId: string) => Promise<void>;
       removeReverification: ReverificationController;
       setDefaultReverification: ReverificationController;
+      backupCodesReverification: ReverificationController;
     };

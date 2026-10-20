@@ -193,6 +193,9 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   const [makeDefault, setDefaultReverification] = useReverificationFlow((phone: PhoneNumberResource) =>
     phone.makeDefaultSecondFactor(),
   );
+  const [createBackupCode, backupCodesReverification] = useReverificationFlow((current: UserResource) =>
+    current.createBackupCode(),
+  );
 
   if (!userLoaded || !sessionLoaded || !environment) {
     return { status: 'loading' };
@@ -256,7 +259,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
             if (!currentFactors.includes('backup_code') || usableFactorCount(current, currentFactors) === 0) {
               throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
             }
-            const result = await current.createBackupCode();
+            const result = await createBackupCode(current);
             await refresh().catch(() => undefined);
             return result.codes;
           }
@@ -264,5 +267,6 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     remove: methodId => removeMethod(requireIdentity(clerk, userId, sessionId), environment, methodId),
     removeReverification,
     setDefaultReverification,
+    backupCodesReverification,
   };
 }

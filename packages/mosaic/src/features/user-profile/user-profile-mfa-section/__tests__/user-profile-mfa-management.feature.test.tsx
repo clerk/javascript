@@ -389,6 +389,72 @@ describe('User profile MFA management', () => {
     expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
+  async function renderBackupCodesNeedingReverification() {
+    const fapi = await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
+      mfaEnvironment(),
+      { verification: { secrets: { password: 'hunter2' } } },
+    );
+    demandReverificationOnce('/v1/me/backup_codes');
+    return fapi;
+  }
+
+  const regenerate = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(await screen.findByRole('button', { name: 'Manage Backup codes' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+  };
+
+  it('verifies the session before regenerating backup codes and then shows them', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
+    const list = await screen.findByRole('list', { name: 'Backup codes' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(10);
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
+  it('lets the user cancel verification quietly and retry regenerating backup codes', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.mfa.backupCodeCreations).toBe(0);
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    await regenerate(user);
+    await screen.findByRole('list', { name: 'Backup codes' });
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
+  it('keeps the verification open while regenerating and reports an ordinary retry error', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    const replay = holdRequests('post', '/v1/me/backup_codes/');
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(replay.requests).toHaveLength(1));
+
+    expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+    await user.keyboard('{Escape}');
+    expect(dialog).toBeVisible();
+
+    replay.fail('action_blocked', 'Unable to create backup codes.');
+    await waitFor(() => expect(within(screen.getByRole('dialog')).getByRole('alert')).toBeVisible());
+    expect(screen.queryByRole('list', { name: 'Backup codes' })).toBeNull();
+    expect(fapi.mfa.backupCodeCreations).toBe(0);
+  });
+
   it('copies server-issued backup codes and closes their one-time surface', async () => {
     const fapi = await renderMfa();
     const write = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
