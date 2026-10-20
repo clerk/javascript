@@ -6,7 +6,10 @@ import type { LoomHydration, Sessions, SessionScope, SessionsTransport } from '.
 
 type Options = { scope: SessionScope; transport: SessionsTransport; hydration?: unknown };
 
+let nextOwnerId = 0;
+
 export class LoomClient {
+  readonly ownerId = ++nextOwnerId;
   readonly scope: SessionScope;
   readonly queryClient = new QueryClient();
   private disposed = false;

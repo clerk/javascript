@@ -38,10 +38,9 @@ export function parseHydration(value: unknown, scope: SessionScope): LoomHydrati
     !value.sessions.every(isSession) ||
     typeof value.updatedAt !== 'number' ||
     !Number.isFinite(value.updatedAt) ||
-    value.updatedAt > Date.now() ||
     value.updatedAt < 0
   ) {
     throw new Error('Invalid Loom hydration snapshot.');
   }
-  return { version: 1, scope, sessions: value.sessions, updatedAt: value.updatedAt };
+  return { version: 1, scope, sessions: value.sessions, updatedAt: Math.min(value.updatedAt, Date.now()) };
 }

@@ -15,8 +15,20 @@ const device: ActiveDeviceSession = {
 };
 
 describe('active-device sessions', () => {
+  it('accepts a matching server snapshot when the browser clock lags', async () => {
+    const read = vi.fn(() => Promise.resolve([]));
+    const loom = createLoomClient({
+      scope,
+      transport: { read, revoke: () => Promise.resolve() },
+      hydration: { version: 1, scope, sessions: [device], updatedAt: Date.now() + 30_000 },
+    });
+    expect(await loom.fetch()).toEqual([device]);
+    expect(read).not.toHaveBeenCalled();
+    expect(loom.getSnapshot()?.dataUpdatedAt).toBeLessThanOrEqual(Date.now());
+    loom.dispose();
+  });
   it('returns transport snapshots through plain JavaScript', async () => {
-    const read = vi.fn(async () => [device]);
+    const read = vi.fn(() => Promise.resolve([device]));
     const loom = createLoomClient({ scope, transport: { read, revoke: async () => {} } });
     expect(await loom.fetch()).toEqual([device]);
     expect(read).toHaveBeenCalledTimes(1);
@@ -59,7 +71,10 @@ describe('active-device sessions', () => {
   });
 
   it('notifies plain JavaScript observers and stops after unsubscribe', async () => {
-    const loom = createLoomClient({ scope, transport: { read: async () => [device], revoke: async () => {} } });
+    const loom = createLoomClient({
+      scope,
+      transport: { read: () => Promise.resolve([device]), revoke: async () => {} },
+    });
     const listener = vi.fn();
     const unsubscribe = loom.subscribe(listener);
     await loom.fetch();
@@ -108,7 +123,7 @@ describe('active-device sessions', () => {
     const loom = createLoomClient({
       scope,
       transport: {
-        read: async () => [device, other],
+        read: () => Promise.resolve([device, other]),
         revoke: id => (id === device.id ? a.promise : b.promise),
       },
     });
@@ -128,7 +143,7 @@ describe('active-device sessions', () => {
     const revoke = vi.fn().mockRejectedValue(failure);
     const loom = createLoomClient({
       scope,
-      transport: { read: async () => [device, { ...device, id: scope.sessionId }], revoke },
+      transport: { read: () => Promise.resolve([device, { ...device, id: scope.sessionId }]), revoke },
     });
     await loom.fetch();
     await expect(loom.revoke(scope.sessionId)).rejects.toThrow('unavailable');
@@ -142,11 +157,11 @@ describe('active-device sessions', () => {
   });
 
   it('isolates concurrent owners and only accepts matching initialization snapshots', async () => {
-    const read = vi.fn(async () => [device]);
+    const read = vi.fn(() => Promise.resolve([device]));
     const first = createLoomClient({ scope, transport: { read, revoke: async () => {} } });
     const second = createLoomClient({
       scope: { ...scope, userId: 'user_b' },
-      transport: { read: async () => [], revoke: async () => {} },
+      transport: { read: () => Promise.resolve([]), revoke: async () => {} },
     });
     await Promise.all([first.fetch(), second.fetch()]);
     expect(second.getSnapshot()?.data).toEqual([]);
