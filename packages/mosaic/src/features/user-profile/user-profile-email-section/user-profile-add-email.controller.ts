@@ -9,6 +9,7 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
+import type { ReverificationController } from '../../reverification';
 import type {
   UserProfileEmail,
   UserProfileEmailVerification,
@@ -22,6 +23,7 @@ export interface UserProfileAddEmailControllerOptions {
   initialEmailAddress?: string;
   username?: string;
   onCreate?: (emailAddress: string) => Promise<UserProfileEmailVerifier>;
+  reverification?: ReverificationController;
 }
 
 export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
@@ -163,6 +165,7 @@ export function useUserProfileAddEmailController({
   initialEmailAddress = '',
   username,
   onCreate,
+  reverification,
 }: UserProfileAddEmailControllerOptions): UserProfileAddEmailController {
   const errorText = useErrorText();
   const handle = useMemo(() => Dialog.createHandle(), []);
@@ -199,9 +202,9 @@ export function useUserProfileAddEmailController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const step = toStep(state, verification);
-  const form = step === 'email' ? emailForm : codeForm;
-  const formError = step === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
+  const step = emailForm.isSubmitting && reverification?.visible ? 'reverify' : toStep(state, verification);
+  const form = state === 'email' ? emailForm : codeForm;
+  const formError = state === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
@@ -210,13 +213,18 @@ export function useUserProfileAddEmailController({
     isResending: state === 'sending',
     open,
     step,
-    emailAddress: step === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
+    reverification,
+    emailAddress: state === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
     canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
     code: codeForm.values.code,
     errorMessage: formError?.message ?? form.error ?? machineError,
     isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {
       if (form.isSubmitting) {
+        if (!open && state === 'email' && reverification?.onCancel) {
+          reverification.onCancel();
+          send({ type: 'CANCEL' });
+        }
         return;
       }
       if (open) {
