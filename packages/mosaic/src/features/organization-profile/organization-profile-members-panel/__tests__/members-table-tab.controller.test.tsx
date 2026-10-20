@@ -24,12 +24,14 @@ describe('members table roles', () => {
   it('holds role editing until roles arrive and uses server labels', async () => {
     const model = createModel();
     const { result, rerender } = renderHook(({ roles }) => useMembersTableController(model, roles), {
-      initialProps: { roles: null as MembersRoles | null },
+      initialProps: { roles: { roles: null as MembersRoles | null, isLoading: true } },
     });
     expect(result.current.onChangeRole).toBeUndefined();
+    expect(result.current.isLoading).toBe(true);
 
     const roles = { roles: [{ key: 'org:reader', name: 'Reader' }], hasRoleSetMigration: false };
-    rerender({ roles });
+    rerender({ roles: { roles, isLoading: false } });
+    expect(result.current.isLoading).toBe(false);
     expect(result.current.roles).toEqual([{ value: 'org:reader', label: 'Reader' }]);
 
     await act(() => Promise.resolve(result.current.onChangeRole?.('member_1', 'org:reader')));
@@ -38,7 +40,7 @@ describe('members table roles', () => {
 
   it('keeps migration roles visible but prevents role changes', () => {
     const roles = { roles: [{ key: 'org:admin', name: 'Admin' }], hasRoleSetMigration: true };
-    const { result } = renderHook(() => useMembersTableController(createModel(), roles));
+    const { result } = renderHook(() => useMembersTableController(createModel(), { roles, isLoading: false }));
     expect(result.current.roles).toHaveLength(1);
     expect(result.current.hasRoleSetMigration).toBe(true);
     expect(result.current.onChangeRole).toBeUndefined();

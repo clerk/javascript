@@ -11,6 +11,11 @@ export interface MembersRoles {
   hasRoleSetMigration: boolean;
 }
 
+export interface MembersRolesState {
+  roles: MembersRoles | null;
+  isLoading: boolean;
+}
+
 export interface OrganizationProfileMember {
   id: string;
   name: string;
@@ -43,6 +48,7 @@ export interface MembersTableTabViewProps {
   searchInputRef?: Ref<HTMLInputElement>;
   inviteButtonRef?: Ref<HTMLButtonElement>;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
+  isInviteDisabled?: boolean;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<OrganizationProfileMember>;
   finalFocus?: DialogFocusTarget;

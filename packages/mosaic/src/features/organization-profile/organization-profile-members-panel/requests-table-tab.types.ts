@@ -22,6 +22,7 @@ export interface RequestsTableTabViewProps {
   inviteButtonRef?: Ref<HTMLButtonElement>;
   tableContainerRef?: Ref<HTMLDivElement>;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
+  isInviteDisabled?: boolean;
   registerAcceptTrigger?: (id: string) => Ref<HTMLButtonElement>;
   registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
   onAccept?: (id: string) => void | Promise<void>;

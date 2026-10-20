@@ -12,13 +12,13 @@ describe('members panel role loading', () => {
     const { result, rerender } = renderHook(() => useMembersPanelRolesController(loadRoles));
 
     expect(loadRoles).toHaveBeenCalledTimes(1);
-    expect(result.current).toBeNull();
+    expect(result.current).toEqual({ roles: null, isLoading: true });
     rerender();
     expect(loadRoles).toHaveBeenCalledTimes(1);
 
     const roles = { roles: [{ key: 'org:reader', name: 'Reader' }], hasRoleSetMigration: false };
     await act(() => Promise.resolve(request.resolve(roles)));
-    expect(result.current).toEqual(roles);
+    expect(result.current).toEqual({ roles, isLoading: false });
   });
 
   it('stays unavailable after a failed role load', async () => {
@@ -27,13 +27,13 @@ describe('members panel role loading', () => {
     const { result, rerender } = renderHook(() => useMembersPanelRolesController(loadRoles));
 
     await act(() => Promise.resolve(request.reject(new Error('failed'))));
-    expect(result.current).toBeNull();
+    expect(result.current).toEqual({ roles: null, isLoading: false });
     rerender();
     expect(loadRoles).toHaveBeenCalledTimes(1);
   });
 
   it('does not load without a loader', () => {
     const { result } = renderHook(() => useMembersPanelRolesController(undefined));
-    expect(result.current).toBeNull();
+    expect(result.current).toEqual({ roles: null, isLoading: false });
   });
 });
