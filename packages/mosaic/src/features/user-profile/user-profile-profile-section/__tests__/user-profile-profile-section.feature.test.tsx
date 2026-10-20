@@ -377,4 +377,28 @@ describe('username reverification', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(savedUsername(fapi)).toBe('alicesmith');
   });
+
+  it('cancels an in-progress username verification when the active session changes', async () => {
+    const fapi = serveFapi({
+      environment: fapiEnvironment({ attributes: { username: {} } }),
+      client: fapiClient([
+        fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', username: 'alicesmith' }) }),
+        fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2', username: 'bob' }) }),
+      ]),
+      verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+    });
+    demandReverificationOnce('/v1/me');
+    const { clerk } = await renderWithClerk(<UserProfileProfileSection />);
+    const actor = userEvent.setup();
+    await actor.click(within(profile()).getByRole('button', { name: 'Edit username' }));
+    await actor.clear(screen.getByLabelText('Username'));
+    await actor.type(screen.getByLabelText('Username'), 'alicia');
+    await actor.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByPlaceholderText('Enter your password');
+
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions.map(session => session.user.username)).toEqual(['alicesmith', 'bob']);
+  });
 });
