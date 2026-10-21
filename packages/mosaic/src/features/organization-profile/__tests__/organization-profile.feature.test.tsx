@@ -116,7 +116,8 @@ describe('OrganizationProfile', () => {
     );
     const user = userEvent.setup();
 
-    const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Create API key' }), {
+    await screen.findByText('API keys loaded');
+    const dialog = await openDialog(user, screen.getByRole('button', { name: 'Create API key' }), {
       name: 'Add new API key',
     });
     expect(within(dialog).getByRole('textbox', { name: 'Description' })).toBeVisible();
