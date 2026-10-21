@@ -9,8 +9,8 @@ import {
   writeClerkAgentRules,
 } from '../agentRules';
 
-const createMemoryFs = (files: Record<string, string> = {}) => {
-  const store = new Map(Object.entries(files));
+const createMemoryFs = (files: Record<string, string> = {}, { withRepoPackageJson = true } = {}) => {
+  const store = new Map(Object.entries(withRepoPackageJson ? { '/repo/package.json': '{}', ...files } : files));
   const dirs = new Set<string>();
 
   const fs: FileSystemAdapter = {
@@ -55,7 +55,7 @@ describe('writeClerkAgentRules', () => {
   });
 
   it('creates AGENTS.md and CLAUDE.md when neither exists', () => {
-    const memory = createMemoryFs();
+    const memory = createMemoryFs({ '/repo/app/package.json': '{}' });
 
     const result = writeClerkAgentRules({
       cwd: '/repo/app',
@@ -68,6 +68,25 @@ describe('writeClerkAgentRules', () => {
     expect(result.claudeMd).toBe('created');
     expect(memory.read('/repo/app/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:nextjs -->');
     expect(memory.read('/repo/app/CLAUDE.md')).toBe('@AGENTS.md\n');
+  });
+
+  it('writes nothing when no package.json is at or above the starting folder', () => {
+    const memory = createMemoryFs({}, { withRepoPackageJson: false });
+
+    const result = writeClerkAgentRules({ cwd: '/home/user', fs: memory.fs, path: pathAdapter, sdks: ['express'] });
+
+    expect(result).toEqual({ targetDir: '/home/user', agentsMd: 'skipped', claudeMd: 'skipped' });
+    expect(memory.read('/home/user/AGENTS.md')).toBeUndefined();
+    expect(memory.read('/home/user/CLAUDE.md')).toBeUndefined();
+  });
+
+  it('targets the nearest folder with a package.json when started in a subfolder', () => {
+    const memory = createMemoryFs();
+
+    writeClerkAgentRules({ cwd: '/repo/src', fs: memory.fs, path: pathAdapter, sdks: ['react'] });
+
+    expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:react -->');
+    expect(memory.read('/repo/src/AGENTS.md')).toBeUndefined();
   });
 
   it('targets the workspace root when one exists', () => {

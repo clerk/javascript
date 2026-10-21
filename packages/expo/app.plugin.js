@@ -22,14 +22,10 @@ const maybeWriteAgentRules = config => {
     return;
   }
 
-  const projectRoot = config?._internal?.projectRoot || process.cwd();
-  if (!fs.existsSync(path.join(projectRoot, 'package.json'))) {
-    return;
-  }
-
   didWriteAgentRules = true;
 
   try {
+    const projectRoot = config?._internal?.projectRoot || process.cwd();
     writeClerkAgentRules({ cwd: projectRoot, fs, path, sdks: ['expo'] });
   } catch {
     // Writing agent hints must never break Expo config evaluation.
