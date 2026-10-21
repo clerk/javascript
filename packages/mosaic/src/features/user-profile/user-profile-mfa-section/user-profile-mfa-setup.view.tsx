@@ -1,4 +1,4 @@
-import { Flow } from '../../../components/flow';
+import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
 import type { UserProfileAddAuthenticatorViewProps } from './user-profile-add-authenticator.view';
@@ -60,10 +60,21 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
             />
           </Flow.Step>
           <Flow.Step ids={['verify']}>
-            <Reverification controller={current.reverification} />
+            <ReverifyStep controller={current.reverification} />
           </Flow.Step>
         </>
       )}
     </Flow.Root>
+  );
+}
+
+function ReverifyStep(props: { controller: ReverificationController }) {
+  const initialFocusRef = useFlowAutoFocus<HTMLElement>();
+
+  return (
+    <Reverification
+      {...props}
+      initialFocusRef={initialFocusRef}
+    />
   );
 }
