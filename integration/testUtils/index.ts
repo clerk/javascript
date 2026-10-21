@@ -8,7 +8,7 @@ import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
 import { createOrganizationsService } from './organizationsService';
 import { withRetry } from './retryableClerkClient';
-import { setupOAuthTestingToken } from './setupOAuthTestingToken';
+import { setupTestingTokens } from './setupTestingTokens';
 import type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail, PlaywrightTest } from './usersService';
 import { createUserService } from './usersService';
 import { createWaitlistService } from './waitlistService';
@@ -56,15 +56,7 @@ export const createTestUtils = async <
   if (useTestingToken) {
     const { token } = await clerkClient.testingTokens.createTestingToken();
     const { frontendApi } = parsePublishableKey(app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'), { fatal: true });
-    await page.context().route(
-      url => url.origin === `https://${frontendApi}` && url.pathname.startsWith('/v1/'),
-      async route => {
-        const url = new URL(route.request().url());
-        url.searchParams.set('__clerk_testing_token', token);
-        await route.continue({ url: url.toString() });
-      },
-    );
-    await setupOAuthTestingToken({ context: page.context(), frontendApiOrigin: `https://${frontendApi}`, token });
+    await setupTestingTokens({ context: page.context(), frontendApiOrigin: `https://${frontendApi}`, token });
   }
 
   const browserHelpers = {

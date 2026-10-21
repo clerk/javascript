@@ -2,6 +2,7 @@ import { createClerkClient } from '@clerk/backend';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { environmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
 import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
@@ -56,6 +57,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
   test('sign up with custom oauth provider', async ({ page, context }) => {
     const u = await createTestUtils({ app, page, context });
+    const providerKeys = await resolveInstanceKeys('oauth-provider');
+    await createTestUtils({
+      app: {
+        ...app,
+        env: environmentConfig()
+          .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', providerKeys.pk)
+          .setEnvVariable('private', 'CLERK_SECRET_KEY', providerKeys.sk),
+      },
+      page,
+      context,
+    });
     await u.po.signUp.goTo();
 
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();

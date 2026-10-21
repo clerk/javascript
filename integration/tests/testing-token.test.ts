@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net';
 
 import { expect, type Page, test } from '@playwright/test';
 
-import { setupOAuthTestingToken } from '../testUtils/setupOAuthTestingToken';
+import { setupTestingTokens } from '../testUtils/setupTestingTokens';
 
 test.describe('OAuth testing tokens @nextjs', () => {
   let provider: Server;
@@ -49,7 +49,7 @@ test.describe('OAuth testing tokens @nextjs', () => {
   test.beforeEach(async ({ context }) => {
     consentPosts = [];
     consentTokens = [];
-    await setupOAuthTestingToken({ context, frontendApiOrigin: appOrigin, token: 'app-testing-token' });
+    await setupTestingTokens({ context, frontendApiOrigin: appOrigin, token: 'app-testing-token' });
   });
 
   test.afterAll(async () => {
@@ -122,7 +122,7 @@ test.describe('OAuth testing tokens @nextjs', () => {
   });
 
   test('uses the destination instance token when pages share a context', async ({ page, context }) => {
-    await setupOAuthTestingToken({ context, frontendApiOrigin: providerOrigin, token: 'other-app-token' });
+    await setupTestingTokens({ context, frontendApiOrigin: providerOrigin, token: 'other-app-token' });
     const newPage = await context.newPage();
     await consent(newPage, new URL('/v1/oauth_callback', appOrigin));
     expect(new URL(newPage.url()).searchParams.get('__clerk_testing_token')).toBe('app-testing-token');
@@ -133,9 +133,45 @@ test.describe('OAuth testing tokens @nextjs', () => {
   });
 
   test('uses the latest token without replaying consent when setup repeats', async ({ page, context }) => {
-    await setupOAuthTestingToken({ context, frontendApiOrigin: appOrigin, token: 'new-app-token' });
+    await setupTestingTokens({ context, frontendApiOrigin: appOrigin, token: 'new-app-token' });
     await consent(page, new URL('/v1/oauth_callback', appOrigin));
     expect(new URL(page.url()).searchParams.get('__clerk_testing_token')).toBe('new-app-token');
     expect(consentPosts).toHaveLength(1);
+  });
+
+  test('adds the instance token to direct API requests and preserves other parameters', async ({ page }) => {
+    await page.goto(`${appOrigin}/v1/client?existing=value`);
+    const received = JSON.parse((await page.locator('body').textContent()) || '{}');
+    expect(Object.fromEntries(new URL(received.url, appOrigin).searchParams)).toEqual({
+      existing: 'value',
+      __clerk_testing_token: 'app-testing-token',
+    });
+  });
+
+  test('uses the latest token for direct requests after repeated setup', async ({ page, context }) => {
+    await setupTestingTokens({ context, frontendApiOrigin: appOrigin, token: 'new-app-token' });
+    await page.goto(`${appOrigin}/v1/client`);
+    const received = JSON.parse((await page.locator('body').textContent()) || '{}');
+    expect(new URL(received.url, appOrigin).searchParams.get('__clerk_testing_token')).toBe('new-app-token');
+  });
+
+  test('keeps direct request tokens isolated when apps share a context', async ({ page, context }) => {
+    await setupTestingTokens({ context, frontendApiOrigin: providerOrigin, token: 'other-app-token' });
+    for (const [origin, token] of [
+      [appOrigin, 'app-testing-token'],
+      [providerOrigin, 'other-app-token'],
+    ]) {
+      await page.goto(`${origin}/v1/client`);
+      const received = JSON.parse((await page.locator('body').textContent()) || '{}');
+      expect(new URL(received.url, origin).searchParams.get('__clerk_testing_token')).toBe(token);
+    }
+  });
+
+  test('leaves unrelated requests unchanged', async ({ page }) => {
+    for (const url of [`${appOrigin}/other`, `${providerOrigin}/v1/client`]) {
+      await page.goto(url);
+      const received = JSON.parse((await page.locator('body').textContent()) || '{}');
+      expect(new URL(received.url, url).searchParams.has('__clerk_testing_token')).toBe(false);
+    }
   });
 });

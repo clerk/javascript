@@ -2,7 +2,7 @@ import type { BrowserContext } from '@playwright/test';
 
 const contextTokens = new WeakMap<BrowserContext, Map<string, string>>();
 
-export const setupOAuthTestingToken = async ({
+export const setupTestingTokens = async ({
   context,
   frontendApiOrigin,
   token,
@@ -21,17 +21,22 @@ export const setupOAuthTestingToken = async ({
   contextTokens.set(context, tokens);
 
   await context.route(
-    url => url.pathname.startsWith('/v1/me/oauth/consent/'),
+    url =>
+      (tokens.has(url.origin) && url.pathname.startsWith('/v1/')) || url.pathname.startsWith('/v1/me/oauth/consent/'),
     async route => {
-      if (route.request().method() !== 'POST') {
-        return route.fallback();
-      }
-
       const requestUrl = new URL(route.request().url());
       const requestToken = tokens.get(requestUrl.origin);
       if (requestToken) {
         requestUrl.searchParams.set('__clerk_testing_token', requestToken);
       }
+
+      if (route.request().method() !== 'POST' || !requestUrl.pathname.startsWith('/v1/me/oauth/consent/')) {
+        if (!requestToken) {
+          return route.fallback();
+        }
+        return route.continue({ url: requestUrl.toString() });
+      }
+
       const response = await route.fetch({ url: requestUrl.toString(), maxRedirects: 0 });
       const headers = response.headers();
       if (response.status() === 303 && headers.location) {
