@@ -23,14 +23,14 @@ export interface UserProfileAddEmailControllerOptions {
   initialEmailAddress?: string;
   username?: string;
   onCreate?: (emailAddress: string) => Promise<UserProfileEmailVerifier>;
-  reverification?: ReverificationController;
+  reverification: ReverificationController;
 }
 
-export type UserProfileAddEmailController = UserProfileAddEmailDialogProps & {
+export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
   onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => void;
-};
+}
 
 interface Context {
   verifyingId: string | undefined;
@@ -202,7 +202,8 @@ export function useUserProfileAddEmailController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const isReverifying = emailForm.isSubmitting && reverification?.visible;
+  const isReverifying = emailForm.isSubmitting && reverification.visible;
+  const step = isReverifying ? 'reverify' : toStep(state, verification);
   const form = state === 'email' ? emailForm : codeForm;
   const formError = state === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
@@ -212,9 +213,8 @@ export function useUserProfileAddEmailController({
     resendSeconds,
     isResending: state === 'sending',
     open,
-    ...(isReverifying
-      ? { step: 'reverify' as const, reverification }
-      : { step: toStep(state, verification), reverification }),
+    step,
+    reverification,
     emailAddress: state === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
     canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
     code: codeForm.values.code,
@@ -222,7 +222,7 @@ export function useUserProfileAddEmailController({
     isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {
       if (form.isSubmitting) {
-        if (open || state !== 'email' || !reverification?.onCancel) {
+        if (open || state !== 'email' || !reverification.onCancel) {
           return;
         }
         reverification.onCancel();

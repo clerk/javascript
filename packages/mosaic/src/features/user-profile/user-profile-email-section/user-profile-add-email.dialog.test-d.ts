@@ -1,6 +1,7 @@
 import { describe, expectTypeOf, test } from 'vitest';
 
 import type { ReverificationController } from '../../reverification';
+import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
 import type { UserProfileAddEmailDialogProps } from './user-profile-add-email.dialog';
 
 type BaseProps = Omit<UserProfileAddEmailDialogProps, 'step' | 'reverification'>;
@@ -13,15 +14,21 @@ describe('UserProfileAddEmailDialogProps', () => {
     >().not.toExtend<UserProfileAddEmailDialogProps>();
   });
 
-  test('accepts a controller for the reverification step', () => {
+  test('accepts a controller for every step', () => {
     expectTypeOf<
-      BaseProps & { step: 'reverify'; reverification: ReverificationController }
+      BaseProps & { step: UserProfileAddEmailDialogProps['step']; reverification: ReverificationController }
     >().toExtend<UserProfileAddEmailDialogProps>();
   });
 
-  test('allows the other steps without a controller', () => {
+  test('requires a controller for the other steps too', () => {
     expectTypeOf<
       BaseProps & { step: 'email' | 'verify' | 'link' | 'sso' }
-    >().toExtend<UserProfileAddEmailDialogProps>();
+    >().not.toExtend<UserProfileAddEmailDialogProps>();
+  });
+
+  test('requires the add-email controller to receive reverification', () => {
+    expectTypeOf<
+      Omit<UserProfileAddEmailControllerOptions, 'reverification'>
+    >().not.toExtend<UserProfileAddEmailControllerOptions>();
   });
 });

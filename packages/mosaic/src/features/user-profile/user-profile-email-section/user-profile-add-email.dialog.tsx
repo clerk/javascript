@@ -26,11 +26,13 @@ const styles = stylex.create({
   },
 });
 
-export type UserProfileAddEmailDialogProps = {
+export interface UserProfileAddEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   handle?: DialogHandle<unknown>;
   finalFocus?: DialogFocusTarget;
+  step: 'email' | 'reverify' | 'verify' | 'link' | 'sso';
+  reverification: ReverificationController;
   emailAddress: string;
   onEmailAddressChange: (value: string) => void;
   canSubmitEmail?: boolean;
@@ -43,10 +45,7 @@ export type UserProfileAddEmailDialogProps = {
   errorMessage?: string;
   isResending?: boolean;
   resendSeconds?: number;
-} & (
-  | { step: 'reverify'; reverification: ReverificationController }
-  | { step: 'email' | 'verify' | 'link' | 'sso'; reverification?: ReverificationController }
-);
+}
 
 export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps) {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -58,7 +57,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
       open={props.open}
       onOpenChange={props.onOpenChange}
       shouldCloseOnInteractOutside={props.step !== 'reverify'}
-      showCloseButton={props.step !== 'reverify' || Boolean(props.reverification?.onCancel)}
+      showCloseButton={props.step !== 'reverify' || Boolean(props.reverification.onCancel)}
     >
       <Dialog.Popup
         variant='card'
@@ -87,12 +86,10 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                   />
                 </Flow.Step>
                 <Flow.Step ids={['reverify']}>
-                  {current.step === 'reverify' ? (
-                    <ReverifyStep
-                      controller={current.reverification}
-                      onClose={() => current.onOpenChange(false)}
-                    />
-                  ) : null}
+                  <ReverifyStep
+                    controller={current.reverification}
+                    onClose={() => current.onOpenChange(false)}
+                  />
                 </Flow.Step>
                 <Flow.Step ids={['link']}>
                   <VerifyLinkStep
