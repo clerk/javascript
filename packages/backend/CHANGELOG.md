@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.26.1
+
+### Patch Changes
+
+- Stop accepting the legacy `cl_I7d4PD111III` JWT category as a session or handshake token. Clerk no longer issues it, so `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for a token carrying it, the same as for other non-session categories. ([#10286](https://github.com/clerk/javascript/pull/10286)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 3.26.0
 
 ### Minor Changes
