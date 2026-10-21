@@ -30,4 +30,4 @@ This change is automatically applied by the upgrade CLI:
 npx @clerk/upgrade --release core-3
 ```
 
-Without the `dynamic` prop, `ClerkProvider` doesn't need a `<Suspense>` boundary, but with `cacheComponents: true`, the code under it that reads the request does. That includes `<Show>`, `auth()`, `currentUser()`, and `<SignIn />`, `<SignUp />`, `<UserProfile />`, and `<OrganizationProfile />` on catch-all routes. With the `dynamic` prop, wrap `ClerkProvider` in `<Suspense>` too, once anything under it calls `useAuth()`. See [Cache Components](https://clerk.com/docs/guides/development/rendering-modes#cache-components) for where to add the boundaries.
+Without the `dynamic` prop, `ClerkProvider` doesn't need a `<Suspense>` boundary, but with `cacheComponents: true`, the code under it that reads the request does. That includes `<Show>`, `auth()`, `currentUser()`, and `<SignIn />`, `<SignUp />`, `<UserProfile />`, and `<OrganizationProfile />` on catch-all routes. With the `dynamic` prop, wrap `ClerkProvider` in `<Suspense>` too. See [Cache Components](https://clerk.com/docs/guides/development/rendering-modes#cache-components) for where to add the boundaries.
