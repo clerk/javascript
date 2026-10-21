@@ -1,5 +1,11 @@
 # @clerk/expo-native-components
 
+## 0.4.0
+
+### Minor Changes
+
+- Remove the legacy client sync functions. Older `@clerk/expo` versions need them to configure the native components, which render blank without them. Update `@clerk/expo` to the latest version when you update this package. ([#9956](https://github.com/clerk/javascript/pull/9956)) by [@mikepitre](https://github.com/mikepitre)
+
 ## 0.3.0
 
 ### Minor Changes
