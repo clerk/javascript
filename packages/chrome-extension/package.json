@@ -65,6 +65,16 @@
     "./types": {
       "types": "./dist/types/types/index.d.ts"
     },
+    "./vite": {
+      "import": {
+        "types": "./dist/types/vite.d.ts",
+        "default": "./dist/esm/vite.js"
+      },
+      "require": {
+        "types": "./dist/types/vite.d.ts",
+        "default": "./dist/cjs/vite.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/cjs/index.js",
@@ -78,7 +88,8 @@
     "internal",
     "legacy",
     "react",
-    "types"
+    "types",
+    "vite"
   ],
   "scripts": {
     "build": "tsup",
