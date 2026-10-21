@@ -1,3 +1,4 @@
+import { getClerkQueryClient } from '@clerk/shared/react';
 import type { ActClaim, SessionWithActivitiesJSON } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, screen, waitFor, within } from '@testing-library/react';
@@ -131,7 +132,7 @@ describe('Active devices', () => {
     expect(await screen.findByText('This device')).toBeVisible();
   });
 
-  it('shows its skeleton again when remounted', async () => {
+  it('shows cached devices instead of its skeleton when remounted', async () => {
     serveDevices([device('sess_current', 'active')]);
     const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
     expect(await screen.findByText('This device')).toBeVisible();
@@ -146,12 +147,11 @@ describe('Active devices', () => {
     );
     try {
       view.rerender(<UserProfileActiveDevicesSection />);
-      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
-      expect(screen.queryByText('This device')).toBeNull();
+      expect(screen.getByRole('status')).toHaveTextContent('Active devices loaded');
+      expect(screen.getByText('This device')).toBeVisible();
     } finally {
       pending.resolve();
     }
-    expect(await screen.findByText('This device')).toBeVisible();
   });
 
   it('shows its skeleton instead of the old devices while a new session loads', async () => {
@@ -186,6 +186,52 @@ describe('Active devices', () => {
       pending.resolve();
     }
     expect(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
+  });
+
+  it('refreshes devices on mount only once the cached list is two minutes old', async () => {
+    serveDevices([device('sess_current', 'active')]);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const view = await renderWithClerk(<div />);
+      const currentUser = view.clerk.user;
+      if (!currentUser) {
+        throw new Error('Expected a signed-in user');
+      }
+      const reads = vi.spyOn(currentUser, 'getSessions');
+      view.rerender(<UserProfileActiveDevicesSection />);
+      expect(await screen.findByText('This device')).toBeVisible();
+      expect(reads).toHaveBeenCalledTimes(1);
+
+      vi.setSystemTime(Date.now() + 119_000);
+      view.rerender(<div />);
+      view.rerender(<UserProfileActiveDevicesSection />);
+      expect(reads).toHaveBeenCalledTimes(1);
+
+      vi.setSystemTime(Date.now() + 2_000);
+      view.rerender(<div />);
+      view.rerender(<UserProfileActiveDevicesSection />);
+      await waitFor(() => expect(reads).toHaveBeenCalledTimes(2));
+      expect(screen.getByText('This device')).toBeVisible();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('drops cached devices on sign out', async () => {
+    serveDevices([device('sess_current', 'active')]);
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    expect(await screen.findByText('This device')).toBeVisible();
+    const cachedDevices = () =>
+      getClerkQueryClient()
+        ?.getQueryCache()
+        .getAll()
+        .filter(query => query.state.data !== undefined) ?? [];
+    expect(cachedDevices()).toHaveLength(1);
+
+    await act(() => view.clerk.signOut());
+
+    expect(view.container).toBeEmptyDOMElement();
+    expect(cachedDevices()).toHaveLength(0);
   });
 
   it('shows signed-in sessions and signs out another device inside the security panel', async () => {
