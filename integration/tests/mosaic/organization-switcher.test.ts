@@ -91,9 +91,9 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })(
       await trigger(page).click();
       await popup(page).getByRole('button', { name: 'Settings' }).click();
 
-      const profile = page.locator('.cl-organizationProfile-root');
-      await profile.getByText('Custom page').click();
-      await expect(page.getByText('custom-page-content')).toBeVisible();
+      const profile = page.getByRole('dialog', { name: 'Organization', exact: true });
+      await profile.getByRole('tab', { name: 'Custom page' }).click();
+      await expect(profile.getByText('custom-page-content')).toBeVisible();
     });
   },
 );
