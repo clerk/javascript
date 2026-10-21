@@ -91,6 +91,7 @@ export function UserProfileWeb3WalletRowView({
         {onConnect ? (
           <Section.Actions>
             <SubmitButton
+              ref={triggerRef}
               color='neutral'
               size='sm'
               variant='outline'
