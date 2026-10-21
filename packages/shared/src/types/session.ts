@@ -573,6 +573,7 @@ export type SessionVerifyAttemptSecondFactorParams =
    */
   | TrustedDeviceAttempt;
 
+/** @generateWithEmptyComment */
 export type SessionVerifyWithPasskeyParams = {
   /**
    * Which factor of the reverification the passkey should verify. Defaults
