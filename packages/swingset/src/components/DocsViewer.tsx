@@ -53,6 +53,27 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+    'organization-profile-security-panel': dynamic(() => import('../stories/organization-profile-security-panel.mdx')),
+    'organization-profile-billing-panel': dynamic(() => import('../stories/organization-profile-billing-panel.mdx')),
+    'organization-profile-domains-section': dynamic(
+      () => import('../stories/organization-profile-domains-section.mdx'),
+    ),
+    'organization-profile-sso-section': dynamic(() => import('../stories/organization-profile-sso-section.mdx')),
+    'organization-profile-sso-bypass-section': dynamic(
+      () => import('../stories/organization-profile-sso-bypass-section.mdx'),
+    ),
+    'organization-profile-directory-sync-section': dynamic(
+      () => import('../stories/organization-profile-directory-sync-section.mdx'),
+    ),
+    'organization-profile-subscription-section': dynamic(
+      () => import('../stories/organization-profile-subscription-section.mdx'),
+    ),
+    'organization-profile-payment-methods-section': dynamic(
+      () => import('../stories/organization-profile-payment-methods-section.mdx'),
+    ),
+    'organization-profile-billing-history-section': dynamic(
+      () => import('../stories/organization-profile-billing-history-section.mdx'),
+    ),
   },
   'api-keys': {
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
