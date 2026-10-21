@@ -1,12 +1,12 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
-import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
 import type {
   UserProfileModalContentProps,
   UserProfileModalOptions,
 } from '@clerk/mosaic/features/user-profile/user-profile.modal.types';
 import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
 import { createModalHook } from '@clerk/mosaic/modals/create-modal-hook';
 import { useEffect, useState } from 'react';
 
