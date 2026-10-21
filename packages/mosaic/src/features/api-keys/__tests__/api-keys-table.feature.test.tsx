@@ -83,7 +83,8 @@ async function expectFallback(seed: FakeFapiSeed, props: Partial<APIKeysTablePro
 }
 
 async function openCreate(user: User) {
-  return openDialog(user, await screen.findByRole('button', { name: 'Create API key' }), {
+  await loadedTable();
+  return openDialog(user, screen.getByRole('button', { name: 'Create API key' }), {
     name: 'Add new API key',
   });
 }
@@ -177,8 +178,8 @@ describe('APIKeysTable', () => {
       expect(within(table()).getByRole('columnheader', { name: 'Name' })).toBeVisible();
       expect(within(table()).getAllByRole('row')).toHaveLength(1);
       expect(within(table()).queryByRole('button')).toBeNull();
-      expect(screen.queryByRole('searchbox', { name: 'Search API keys' })).toBeNull();
-      expect(screen.queryByRole('button', { name: 'Create API key' })).toBeNull();
+      expect(screen.getByRole('searchbox', { name: 'Search API keys' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Create API key' })).toBeDisabled();
       const loadingWidths = columnWidths();
       list.release();
       expect(await within(await loadedTable()).findByText('Web app')).toBeVisible();

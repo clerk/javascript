@@ -1,4 +1,3 @@
-import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../../components/button';
@@ -22,23 +21,15 @@ export function APIKeysTableSkeleton({
   return (
     <div {...mergeStyleProps(themeProps('api-keys-table'), stylex.props(styles.root))}>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
-      <Table.Toolbar
-        aria-hidden
-        {...inertProps(true)}
-      >
-        <Skeleton show>
-          <Table.Search
-            label={m.search}
-            clearLabel={m.clearSearch}
-            value=''
-            onValueChange={() => undefined}
-          />
-        </Skeleton>
-        {canManage ? (
-          <Skeleton show>
-            <Button>{m.create}</Button>
-          </Skeleton>
-        ) : null}
+      <Table.Toolbar>
+        <Table.Search
+          label={m.search}
+          clearLabel={m.clearSearch}
+          value=''
+          onValueChange={() => undefined}
+          disabled
+        />
+        {canManage ? <Button disabled>{m.create}</Button> : null}
       </Table.Toolbar>
       <Table.Root
         aria-label={m.title}
@@ -62,40 +53,37 @@ export function APIKeysTableSkeleton({
             ) : null}
           </Table.Row>
         </Table.Header>
-        <Table.Body
-          aria-hidden
-          {...inertProps(true)}
-        >
+        <Table.Body aria-hidden>
           {PLACEHOLDER_API_KEYS.map(apiKey => (
             <Table.Row key={apiKey.id}>
               <Table.Cell>
                 <div {...stylex.props(styles.metadata)}>
                   <Text xstyle={styles.name}>
-                    <Skeleton show>{apiKey.name}</Skeleton>
+                    <Skeleton>{apiKey.name}</Skeleton>
                   </Text>
                   <Text size='xs'>
-                    <Skeleton show>{apiKey.details}</Skeleton>
+                    <Skeleton>{apiKey.details}</Skeleton>
                   </Text>
                 </div>
               </Table.Cell>
               <Table.Cell noWrap>
                 <Text>
-                  <Skeleton show>{apiKey.created}</Skeleton>
+                  <Skeleton>{apiKey.created}</Skeleton>
                 </Text>
               </Table.Cell>
               <Table.Cell noWrap>
                 <Text>
-                  <Skeleton show>{apiKey.lastUsed}</Skeleton>
+                  <Skeleton>{apiKey.lastUsed}</Skeleton>
                 </Text>
               </Table.Cell>
               {canManage ? (
                 <Table.Cell align='end'>
-                  <Skeleton
-                    show
-                    visible={false}
-                  >
+                  <Skeleton visible={false}>
                     <Menu.Root>
-                      <Menu.Trigger aria-label={m.actions} />
+                      <Menu.Trigger
+                        aria-label={m.actions}
+                        disabled
+                      />
                     </Menu.Root>
                   </Skeleton>
                 </Table.Cell>
