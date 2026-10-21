@@ -558,7 +558,9 @@ describe('createClerkBridge', () => {
       return channel === OAUTH_TRANSPORT_CHANNELS.getRedirectUrl;
     })?.[1];
 
-    expect(getRedirectUrlHandler?.(mainFrameEvent)).toBe('my-app://renderer/');
+    expect(getRedirectUrlHandler?.(mainFrameEvent)).toMatch(
+      /^my-app:\/\/renderer\/\?__clerk_oauth_attempt=[0-9a-f-]{36}$/,
+    );
   });
 
   it('rejects OAuth transport requests that do not originate from the main frame', async () => {
@@ -706,7 +708,7 @@ describe('createClerkBridge', () => {
     expect(rendererWindow.focus).not.toHaveBeenCalled();
   });
 
-  it('replaces a pending OAuth flow when a new one starts', async () => {
+  it('replaces a pending OAuth flow when a new one starts without settling the replaced one', async () => {
     vi.mocked(shell.openExternal).mockResolvedValue(undefined);
     createClerkBridge({
       storage,
@@ -719,13 +721,45 @@ describe('createClerkBridge', () => {
     const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
-    const firstPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
+    const firstSettled = vi.fn();
+    openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1').then(firstSettled, firstSettled);
     const secondPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
     const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
 
-    await expect(firstPromise).rejects.toThrow('replaced by a new one');
     openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
     await expect(secondPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
+    expect(firstSettled).not.toHaveBeenCalled();
+  });
+
+  it('ignores a callback from a replaced attempt', async () => {
+    vi.mocked(shell.openExternal).mockResolvedValue(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const findHandler = (channel: string) =>
+      vi.mocked(ipcMain.handle).mock.calls.find(([registered]) => registered === channel)?.[1];
+    const getRedirectUrl = () => String(findHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl)?.(mainFrameEvent));
+    const open = (url: string) => findHandler(OAUTH_TRANSPORT_CHANNELS.open)?.(mainFrameEvent, url);
+
+    const firstRedirectUrl = getRedirectUrl();
+    void open('https://accounts.example.com/oauth?attempt=1');
+    const secondRedirectUrl = getRedirectUrl();
+    const secondPromise = open('https://accounts.example.com/oauth?attempt=2');
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
+
+    const secondSettled = vi.fn();
+    secondPromise?.then(secondSettled, secondSettled);
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, `${firstRedirectUrl}&code=first`);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(secondSettled).not.toHaveBeenCalled();
+
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, `${secondRedirectUrl}&code=second`);
+    await expect(secondPromise).resolves.toEqual({ callbackUrl: `${secondRedirectUrl}&code=second` });
   });
 
   it('keeps a pending OAuth flow when a new request has an unsupported URL', async () => {
@@ -771,11 +805,10 @@ describe('createClerkBridge', () => {
     const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
-    const firstPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
+    void openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
     const secondPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
 
     rejectFirstLaunch(new Error('launch failed'));
-    await expect(firstPromise).rejects.toThrow('replaced by a new one');
 
     const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
     openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
@@ -803,12 +836,11 @@ describe('createClerkBridge', () => {
     const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
-    const firstPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
+    void openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
     const secondPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
     await new Promise(resolve => setTimeout(resolve, 0));
 
     resolveFirstLaunch();
-    await expect(firstPromise).rejects.toThrow('replaced by a new one');
 
     const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
     openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
