@@ -21,6 +21,7 @@ export function useUserProfileWeb3WalletsController({
   remove,
   removeReverification,
   setPrimaryReverification,
+  createReverification,
 }: Pick<
   ReadyWeb3WalletsModel,
   | 'wallets'
@@ -30,6 +31,7 @@ export function useUserProfileWeb3WalletsController({
   | 'remove'
   | 'removeReverification'
   | 'setPrimaryReverification'
+  | 'createReverification'
 >) {
   const messages = useMessages('userProfileWeb3Wallets');
   const action = usePendingAction({ errorFallback: messages.errors.generic });
@@ -91,7 +93,9 @@ export function useUserProfileWeb3WalletsController({
     remove: remove ? removeWallet : undefined,
     finalFocus: removalFocus.finalFocus,
     setPrimaryReverification,
+    createReverification,
     setPrimaryFinalFocus: () => (action.lastKey ? removalFocus.trigger(action.lastKey) : null),
+    createFinalFocus: () => (action.lastKey ? removalFocus.trigger(action.lastKey) : null),
     solanaPickerOpen: picker.open,
     solanaPickerError: picker.open && picker.provider.id === action.errorKey ? action.error : undefined,
     pendingWalletName: picker.open && picker.provider.id === action.pendingKey ? picker.walletName : undefined,

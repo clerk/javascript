@@ -46,6 +46,8 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
         finalFocus={controller.finalFocus}
         setPrimaryReverification={controller.setPrimaryReverification}
         setPrimaryFinalFocus={controller.setPrimaryFinalFocus}
+        createReverification={controller.createReverification}
+        createFinalFocus={controller.createFinalFocus}
       />
       <UserProfileSolanaWalletDialog
         open={controller.solanaPickerOpen}
