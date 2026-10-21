@@ -39,7 +39,7 @@ export interface WriteClerkAgentRulesOptions {
 
 export type WriteClerkAgentRulesResult = {
   targetDir: string;
-  agentsMd: 'created' | 'updated' | 'unchanged';
+  agentsMd: 'created' | 'updated' | 'unchanged' | 'skipped';
   claudeMd: 'created' | 'updated' | 'unchanged' | 'skipped';
 };
 
@@ -181,9 +181,10 @@ function upsertMarkedBlock(
   return `${content.trimEnd()}${eol}${eol}${block}${eol}`;
 }
 
-function findWorkspaceRoot(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
+function findTargetDir(fs: FileSystemAdapter, path: PathAdapter, cwd: string) {
   let current = path.resolve(cwd);
   const root = path.parse(current).root;
+  let nearestPackageDir: string | null = null;
 
   while (current !== root) {
     if (fs.existsSync(path.join(current, 'pnpm-workspace.yaml'))) {
@@ -192,6 +193,7 @@ function findWorkspaceRoot(fs: FileSystemAdapter, path: PathAdapter, cwd: string
 
     const packageJson = path.join(current, 'package.json');
     if (fs.existsSync(packageJson)) {
+      nearestPackageDir ??= current;
       try {
         const pkg = JSON.parse(fs.readFileSync(packageJson, { encoding: 'utf8' }));
         if (pkg.workspaces) {
@@ -205,7 +207,7 @@ function findWorkspaceRoot(fs: FileSystemAdapter, path: PathAdapter, cwd: string
     current = path.dirname(current);
   }
 
-  return null;
+  return nearestPackageDir;
 }
 
 function pickTargetFile(fs: FileSystemAdapter, path: PathAdapter, targetDir: string) {
@@ -231,7 +233,11 @@ function pickTargetFile(fs: FileSystemAdapter, path: PathAdapter, targetDir: str
 
 export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): WriteClerkAgentRulesResult {
   const { dryRun = false, fs, path, sdks } = options;
-  const targetDir = findWorkspaceRoot(fs, path, options.cwd) ?? path.resolve(options.cwd);
+  const targetDir = findTargetDir(fs, path, options.cwd);
+  if (!targetDir) {
+    return { targetDir: path.resolve(options.cwd), agentsMd: 'skipped', claudeMd: 'skipped' };
+  }
+
   const targetFile = pickTargetFile(fs, path, targetDir);
   const agentsPath = path.join(targetDir, 'AGENTS.md');
   const claudePath = path.join(targetDir, 'CLAUDE.md');
