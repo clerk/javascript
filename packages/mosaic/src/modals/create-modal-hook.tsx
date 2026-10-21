@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Dialog, DialogContext } from '../components/dialog';
 import { EmptyState } from '../components/empty-state';
+import { ExclamationCircle } from '../icons/glyphs/exclamation-circle';
 import { useMessages } from '../localization';
 import { useActor } from '../machine/use-machine';
 import type { PortalContainer } from '../primitives/portal';
@@ -105,7 +106,7 @@ function LoadFailed() {
   const dialog = React.useContext(DialogContext);
   return (
     <EmptyState.Root>
-      <EmptyState.Icon name='exclamation-circle' />
+      <EmptyState.Icon glyph={ExclamationCircle} />
       <EmptyState.Label id={dialog?.labelId}>{m.generic}</EmptyState.Label>
     </EmptyState.Root>
   );
