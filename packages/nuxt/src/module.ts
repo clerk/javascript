@@ -1,9 +1,4 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-
-import { writeClerkAgentRules } from '@clerk/shared/agentRules';
 import type { InternalClerkScriptProps, Without } from '@clerk/shared/types';
-import { isClerkAgentRulesWriteAllowed } from '@clerk/shared/utils';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
@@ -16,6 +11,8 @@ import {
   defineNuxtModule,
   updateRuntimeConfig,
 } from '@nuxt/kit';
+
+import { writeAgentRulesOnce } from './agent-rules';
 
 export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace' | 'publishableKey' | 'initialState'> &
   InternalClerkScriptProps & {
@@ -40,8 +37,6 @@ export type ModuleOptions = Without<PluginOptions, 'routerPush' | 'routerReplace
     skipServerMiddleware?: boolean;
   };
 
-let didWriteAgentRules = false;
-
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: PACKAGE_NAME,
@@ -52,13 +47,8 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   setup(options, nuxt) {
-    if (nuxt.options.dev && !didWriteAgentRules && isClerkAgentRulesWriteAllowed()) {
-      didWriteAgentRules = true;
-      try {
-        writeClerkAgentRules({ cwd: nuxt.options.rootDir, fs, path, sdks: ['nuxt'] });
-      } catch {
-        // Writing agent hints must never break a dev server.
-      }
+    if (nuxt.options.dev) {
+      writeAgentRulesOnce(nuxt.options.rootDir);
     }
 
     // These values must be set (even as undefined) to allow runtime config to work properly.
