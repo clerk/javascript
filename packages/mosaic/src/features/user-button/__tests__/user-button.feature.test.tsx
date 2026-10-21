@@ -501,6 +501,30 @@ describe('UserButton', () => {
       expect(openInviteMembers.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
     });
 
+    it('portals the user profile into the portal root around the button that opened it', async () => {
+      const container = document.body.appendChild(document.createElement('div'));
+      onTestFinished(() => container.remove());
+      serveFapi(signedIn());
+      await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
+      const user = await open();
+
+      await openSettings(user, 'Manage profile');
+
+      expect(container).toContainElement(await userProfile());
+    });
+
+    it('portals the organization profile into the portal root around the button that opened it', async () => {
+      const container = document.body.appendChild(document.createElement('div'));
+      onTestFinished(() => container.remove());
+      serveFapi(signedIn());
+      await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
+      const user = await open();
+
+      await openSettings(user, 'Manage organization');
+
+      expect(container).toContainElement(await organizationProfile());
+    });
+
     it('closes the opened organization profile once no organization is active', async () => {
       const { clerk } = await renderUserButton();
       const user = await open();

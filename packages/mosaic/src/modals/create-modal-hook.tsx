@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Button } from '../components/button';
 import { Dialog } from '../components/dialog';
+import type { PortalContainer } from '../primitives/portal';
+import { PortalProvider } from '../primitives/portal';
 import { withoutUndefined } from '../primitives/utils/object';
 import type { ModalContentProps, ModalHandle, ModalSurface } from './modal.types';
 import type { ModalController } from './modal-controller';
@@ -53,7 +55,7 @@ export function createModalHook<Options extends object>(
     const options = state.options ? { ...defaults, ...withoutUndefined(state.options) } : defaults;
     const [attempt, setAttempt] = React.useState(0);
 
-    return (
+    const dialog = (
       <Dialog.Root
         open={state.open}
         onOpenChange={open => {
@@ -71,6 +73,12 @@ export function createModalHook<Options extends object>(
           />
         </Dialog.Popup>
       </Dialog.Root>
+    );
+
+    return state.container === undefined ? (
+      dialog
+    ) : (
+      <PortalProvider container={state.container}>{dialog}</PortalProvider>
     );
   }
 
@@ -101,7 +109,7 @@ export function createModalHook<Options extends object>(
 
     return React.useMemo(
       () => ({
-        open: (options?: Options) => controller.open(options),
+        open: (options?: Options, container?: PortalContainer) => controller.open(options, container),
         close: controller.close,
         preload,
         isOpen,

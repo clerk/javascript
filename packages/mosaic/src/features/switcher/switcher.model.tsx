@@ -11,7 +11,7 @@ import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
-import { useGetPortalContainer } from '../../primitives/portal';
+import { useGetPortalContainer, usePortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
 import { useOrganizationProfileModal } from '../organization-profile/organization-profile.modal';
 import type { OrganizationProfileModalOptions } from '../organization-profile/organization-profile.modal.types';
@@ -190,6 +190,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const organizationProfile = useOrganizationProfileModal();
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
+  const portalContainer = usePortalContainer();
   const environment = useMosaicEnvironment();
   const signInUrl = () => options?.signInUrl ?? clerk.buildSignInUrl();
   // Don't fetch orgsLists until we know orgs are enabled.
@@ -202,7 +203,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => userProfile.open(modals?.userProfile),
+    openModal: () => userProfile.open(modals?.userProfile, portalContainer),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -211,10 +212,13 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
     openModal: () =>
-      organizationProfile.open({
-        ...modals?.organizationProfile,
-        afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
-      }),
+      organizationProfile.open(
+        {
+          ...modals?.organizationProfile,
+          afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
+        },
+        portalContainer,
+      ),
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });
