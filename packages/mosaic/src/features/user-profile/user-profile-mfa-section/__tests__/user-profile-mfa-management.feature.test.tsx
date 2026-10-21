@@ -504,7 +504,8 @@ describe('User profile MFA management', () => {
     await startSms(user);
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
 
     expect(await screen.findByText('CODE0001')).toBeVisible();
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: true, default: undefined });
@@ -521,7 +522,8 @@ describe('User profile MFA management', () => {
     await user.type(screen.getByRole('textbox', { name: 'Phone' }), '5555550303');
     await user.click(screen.getByRole('button', { name: 'Send code' }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
 
     await waitFor(() => expect(fapi.mfa.phonePreparations).toHaveLength(1));
     expect(fapi.mfa.phoneCreations).toHaveLength(1);
@@ -555,7 +557,8 @@ describe('User profile MFA management', () => {
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
 
     expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
     expect(fapi.mfa.totpCreations).toBe(1);
