@@ -1,9 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  agentEnvironmentVariables,
   automatedEnvironmentVariables,
-  isAgentEnvironment,
   isAutomatedEnvironment,
   isClerkAgentRulesWriteAllowed,
 } from '../utils/runtimeEnvironment';
@@ -64,68 +62,6 @@ describe('isAutomatedEnvironment', () => {
     vi.stubGlobal('CI', true);
 
     expect(isAutomatedEnvironment()).toBe(false);
-  });
-});
-
-describe('isAgentEnvironment', () => {
-  beforeEach(() => {
-    agentEnvironmentVariables.forEach(name => {
-      vi.stubEnv(name, undefined);
-      vi.stubGlobal(name, undefined);
-    });
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.unstubAllGlobals();
-  });
-
-  it('returns true when an agent environment variable is enabled', () => {
-    vi.stubEnv('CLAUDECODE', 'true');
-
-    expect(isAgentEnvironment()).toBe(true);
-  });
-
-  it('returns false when agent environment variables are explicitly falsey', () => {
-    const falseyValues = ['false', '0', 'off', 'no'];
-
-    agentEnvironmentVariables.forEach((name, index) => {
-      vi.stubEnv(name, falseyValues[index % falseyValues.length]);
-    });
-
-    expect(isAgentEnvironment()).toBe(false);
-  });
-});
-
-describe('isAgentEnvironment with Cursor', () => {
-  beforeEach(() => {
-    agentEnvironmentVariables.forEach(name => {
-      vi.stubEnv(name, undefined);
-      vi.stubGlobal(name, undefined);
-    });
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.unstubAllGlobals();
-  });
-
-  it('returns true when CURSOR_EXTENSION_HOST_ROLE is agent-exec', () => {
-    vi.stubEnv('CURSOR_EXTENSION_HOST_ROLE', 'agent-exec');
-
-    expect(isAgentEnvironment()).toBe(true);
-  });
-
-  it('returns false for any other CURSOR_EXTENSION_HOST_ROLE value', () => {
-    vi.stubEnv('CURSOR_EXTENSION_HOST_ROLE', 'user');
-
-    expect(isAgentEnvironment()).toBe(false);
-  });
-
-  it('returns true when CURSOR_TRACE_ID is set', () => {
-    vi.stubEnv('CURSOR_TRACE_ID', 'abc123');
-
-    expect(isAgentEnvironment()).toBe(true);
   });
 });
 
