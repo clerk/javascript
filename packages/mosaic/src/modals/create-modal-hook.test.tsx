@@ -1,4 +1,4 @@
-import { act, cleanup, render, renderHook, screen } from '@testing-library/react';
+import { act, cleanup, render, renderHook, screen, within } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
@@ -145,7 +145,7 @@ describe('createModalHook', () => {
     expect(load).toHaveBeenCalledTimes(1);
   });
 
-  it('renders preloaded content without a suspense fallback', async () => {
+  it('renders preloaded content as soon as it opens', async () => {
     const { useStubModal } = createStubModal();
     let handle: ModalHandle<StubOptions> | undefined;
     render(
@@ -163,6 +163,37 @@ describe('createModalHook', () => {
     act(() => handle?.open());
 
     expect(screen.getByText('Stub modal')).toBeInTheDocument();
+  });
+
+  it('opens nothing until the content has loaded', async () => {
+    let resolveLoad: (module: { default: typeof StubContent }) => void = () => {};
+    const load = vi.fn(
+      () =>
+        new Promise<{ default: typeof StubContent }>(resolve => {
+          resolveLoad = resolve;
+        }),
+    );
+    const useSlowModal = createModalHook({ id: 'slow', variant: 'card', load }, defaults => defaults.userProfile ?? {});
+    let handle: ModalHandle<StubOptions> | undefined;
+    render(
+      <MosaicProvider>
+        <Caller
+          useModal={useSlowModal}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+
+    act(() => handle?.open());
+    await flush();
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    resolveLoad({ default: StubContent });
+    await flush();
+
+    expect(screen.getByRole('dialog')).toContainElement(screen.getByText('Stub modal'));
   });
 
   it('opens a fresh copy of the options each time', async () => {
@@ -372,14 +403,10 @@ describe('createModalHook', () => {
     expect(readOptions()).toEqual({ pageOrder: ['security'], label: 'caller' });
   });
 
-  it('shows a retry inside the dialog when the content fails to load', async () => {
+  it('shows the error inside the dialog when the content fails to load', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    let failing = true;
-    const load = vi.fn(() =>
-      failing ? Promise.reject(new Error('chunk failed')) : Promise.resolve({ default: StubContent }),
-    );
-    const useFlakyModal = createModalHook(
-      { id: 'flaky', variant: 'card', load },
+    const useFailingModal = createModalHook(
+      { id: 'failing', variant: 'card', load: () => Promise.reject(new Error('chunk failed')) },
       defaults => defaults.userProfile ?? {},
     );
     let handle: ModalHandle<StubOptions> | undefined;
@@ -387,7 +414,7 @@ describe('createModalHook', () => {
       <MosaicProvider>
         <p>App content</p>
         <Caller
-          useModal={useFlakyModal}
+          useModal={useFailingModal}
           onHandle={h => (handle = h)}
         />
       </MosaicProvider>,
@@ -398,10 +425,84 @@ describe('createModalHook', () => {
     await flush();
 
     expect(screen.getByText('App content')).toBeInTheDocument();
-    expect(screen.queryByText('Stub modal')).not.toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Something went wrong. Please try again.' });
+    expect(within(dialog).queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('logs the error when the content fails to load', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const failure = new Error('chunk failed');
+    const useFailingModal = createModalHook(
+      { id: 'failing-logged', variant: 'card', load: () => Promise.reject(failure) },
+      defaults => defaults.userProfile ?? {},
+    );
+    let handle: ModalHandle<StubOptions> | undefined;
+    render(
+      <MosaicProvider>
+        <Caller
+          useModal={useFailingModal}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+
+    act(() => handle?.preload());
+    await flush();
+
+    expect(consoleError).toHaveBeenCalledWith(expect.any(String), failure);
+  });
+
+  it('shows the load failure in the localized copy', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const useFailingModal = createModalHook(
+      { id: 'failing', variant: 'card', load: () => Promise.reject(new Error('chunk failed')) },
+      defaults => defaults.userProfile ?? {},
+    );
+    let handle: ModalHandle<StubOptions> | undefined;
+    render(
+      <MosaicProvider localization={{ overrides: { errors: { generic: 'Could not open' } } }}>
+        <Caller
+          useModal={useFailingModal}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+
+    act(() => handle?.open());
+    await flush();
+
+    expect(screen.getByRole('dialog')).toHaveTextContent('Could not open');
+  });
+
+  it('loads the content again when reopened after a failed load', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    let failing = true;
+    const load = vi.fn(() =>
+      failing ? Promise.reject(new Error('chunk failed')) : Promise.resolve({ default: StubContent }),
+    );
+    const useFlakyModal = createModalHook(
+      { id: 'flaky-reopen', variant: 'card', load },
+      defaults => defaults.userProfile ?? {},
+    );
+    let handle: ModalHandle<StubOptions> | undefined;
+    render(
+      <MosaicProvider>
+        <Caller
+          useModal={useFlakyModal}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+    act(() => handle?.open());
+    await flush();
+    act(() => handle?.close());
+    await flush();
 
     failing = false;
-    act(() => screen.getByRole('button', { name: 'Try again' }).click());
+    act(() => handle?.open());
     await flush();
 
     expect(screen.getByText('Stub modal')).toBeInTheDocument();
@@ -433,10 +534,11 @@ describe('createModalHook', () => {
     await flush();
 
     expect(screen.getByText('App caught: profile crashed')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Something went wrong. Please try again.')).not.toBeInTheDocument();
   });
 
   it('loads the content on open after a failed preload', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     let failing = true;
     const load = vi.fn(() =>
       failing ? Promise.reject(new Error('chunk failed')) : Promise.resolve({ default: StubContent }),

@@ -1,11 +1,14 @@
 import React from 'react';
 
-import { Button } from '../components/button';
-import { Dialog } from '../components/dialog';
+import { Dialog, DialogContext } from '../components/dialog';
+import { EmptyState } from '../components/empty-state';
+import { useMessages } from '../localization';
+import { useActor } from '../machine/use-machine';
 import type { PortalContainer } from '../primitives/portal';
 import { PortalProvider } from '../primitives/portal';
 import { withoutUndefined } from '../primitives/utils/object';
-import type { ModalContentProps, ModalHandle, ModalSurface } from './modal.types';
+import type { ModalHandle, ModalSurface } from './modal.types';
+import { createModalContentLoader } from './modal-content-loader';
 import type { ModalController } from './modal-controller';
 import { createModalController } from './modal-controller';
 import type { ModalRegistry, MosaicModalDefaults } from './modal-host';
@@ -15,49 +18,21 @@ export function createModalHook<Options extends object>(
   surface: ModalSurface<Options>,
   selectDefaults: (defaults: MosaicModalDefaults) => Options,
 ): () => ModalHandle<Options> {
-  type Content = React.ComponentType<ModalContentProps<Options>>;
+  const contentLoader = createModalContentLoader(surface.load);
 
-  let loaded: Content | undefined;
-  let loading: Promise<{ default: Content }> | undefined;
-  const load = () => {
-    loading ??= surface.load().then(
-      module => {
-        loaded = module.default;
-        return module;
-      },
-      (error: unknown) => {
-        loading = undefined;
-        throw error;
-      },
-    );
-    return loading;
-  };
-  const preload = () => {
-    void load().catch(() => undefined);
-  };
-
-  function Attempt({ onRetry, ...props }: ModalContentProps<Options> & { onRetry: () => void }) {
-    const [Content] = React.useState<Content>(
-      () => loaded ?? React.lazy(() => load().catch(() => ({ default: LoadFailed }))),
-    );
-    return (
-      <RetryContext.Provider value={onRetry}>
-        <React.Suspense fallback='Loading…'>
-          <Content {...props} />
-        </React.Suspense>
-      </RetryContext.Provider>
-    );
-  }
+  const load = () => contentLoader.send({ type: 'LOAD' });
 
   function Slot({ controller }: { controller: ModalController<Options> }) {
     const state = React.useSyncExternalStore(controller.subscribe, controller.getState, controller.getState);
+    const [content] = useActor(contentLoader);
+    const { Content } = content.context;
+    const failed = content.value === 'failed';
     const defaults = selectDefaults(React.useContext(ModalDefaultsContext));
     const options = state.options ? { ...defaults, ...withoutUndefined(state.options) } : defaults;
-    const [attempt, setAttempt] = React.useState(0);
 
     const dialog = (
       <Dialog.Root
-        open={state.open}
+        open={state.open && (Content !== undefined || failed)}
         onOpenChange={open => {
           if (!open) {
             controller.close();
@@ -65,12 +40,15 @@ export function createModalHook<Options extends object>(
         }}
       >
         <Dialog.Popup variant={surface.variant}>
-          <Attempt
-            key={`${state.openCount}:${attempt}`}
-            options={options}
-            close={controller.close}
-            onRetry={() => setAttempt(current => current + 1)}
-          />
+          {Content ? (
+            <Content
+              key={state.openCount}
+              options={options}
+              close={controller.close}
+            />
+          ) : failed ? (
+            <LoadFailed />
+          ) : null}
         </Dialog.Popup>
       </Dialog.Root>
     );
@@ -109,9 +87,12 @@ export function createModalHook<Options extends object>(
 
     return React.useMemo(
       () => ({
-        open: (options?: Options, container?: PortalContainer) => controller.open(options, container),
+        open: (options?: Options, container?: PortalContainer) => {
+          load();
+          controller.open(options, container);
+        },
         close: controller.close,
-        preload,
+        preload: load,
         isOpen,
       }),
       [controller, isOpen],
@@ -119,14 +100,13 @@ export function createModalHook<Options extends object>(
   };
 }
 
-const RetryContext = React.createContext(() => {});
-
 function LoadFailed() {
-  const onRetry = React.useContext(RetryContext);
+  const m = useMessages('errors');
+  const dialog = React.useContext(DialogContext);
   return (
-    <>
-      <p>Something went wrong.</p>
-      <Button onClick={onRetry}>Try again</Button>
-    </>
+    <EmptyState.Root>
+      <EmptyState.Icon name='exclamation-circle' />
+      <EmptyState.Label id={dialog?.labelId}>{m.generic}</EmptyState.Label>
+    </EmptyState.Root>
   );
 }
