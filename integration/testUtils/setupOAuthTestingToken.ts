@@ -27,7 +27,12 @@ export const setupOAuthTestingToken = async ({
         return route.fallback();
       }
 
-      const response = await route.fetch({ maxRedirects: 0 });
+      const requestUrl = new URL(route.request().url());
+      const requestToken = tokens.get(requestUrl.origin);
+      if (requestToken) {
+        requestUrl.searchParams.set('__clerk_testing_token', requestToken);
+      }
+      const response = await route.fetch({ url: requestUrl.toString(), maxRedirects: 0 });
       const headers = response.headers();
       if (response.status() === 303 && headers.location) {
         const callback = new URL(headers.location, response.url());

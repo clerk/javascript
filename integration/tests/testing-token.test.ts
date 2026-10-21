@@ -12,6 +12,7 @@ test.describe('OAuth testing tokens @nextjs', () => {
   let providerOrigin: string;
   let appOrigin: string;
   let consentPosts: string[];
+  let consentTokens: (string | null)[];
 
   test.beforeAll(async () => {
     app = createServer((request, response) => {
@@ -28,6 +29,7 @@ test.describe('OAuth testing tokens @nextjs', () => {
         });
         request.on('end', () => {
           consentPosts.push(body);
+          consentTokens.push(url.searchParams.get('__clerk_testing_token'));
           response.writeHead(Number(url.searchParams.get('status') || 303), {
             location: url.searchParams.get('callback') || '/',
             'set-cookie': ['consent=accepted; Path=/', 'provider=authorized; Path=/'],
@@ -46,6 +48,7 @@ test.describe('OAuth testing tokens @nextjs', () => {
 
   test.beforeEach(async ({ context }) => {
     consentPosts = [];
+    consentTokens = [];
     await setupOAuthTestingToken({ context, frontendApiOrigin: appOrigin, token: 'app-testing-token' });
   });
 
@@ -80,6 +83,7 @@ test.describe('OAuth testing tokens @nextjs', () => {
     expect(response.status()).toBe(303);
     expect(response.headers()['x-consent-response']).toBe('preserved');
     expect(consentPosts).toEqual(['consent=allow']);
+    expect(consentTokens).toEqual([null]);
     const received = JSON.parse((await page.locator('body').textContent()) || '{}');
     expect(received.method).toBe('GET');
     expect(Object.fromEntries(new URL(received.url, appOrigin).searchParams)).toEqual({
@@ -122,6 +126,7 @@ test.describe('OAuth testing tokens @nextjs', () => {
     const newPage = await context.newPage();
     await consent(newPage, new URL('/v1/oauth_callback', appOrigin));
     expect(new URL(newPage.url()).searchParams.get('__clerk_testing_token')).toBe('app-testing-token');
+    expect(consentTokens).toEqual(['other-app-token']);
 
     await consent(page, new URL('/v1/oauth_callback', providerOrigin));
     expect(new URL(page.url()).searchParams.get('__clerk_testing_token')).toBe('other-app-token');
