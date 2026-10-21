@@ -2,21 +2,19 @@ import { buildTaskUrl } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useOrganization, useSession, useUser } from '@clerk/shared/react';
 import type {
+  OrganizationProfileModalProps,
   OrganizationResource,
   OrganizationSwitcherProps,
   UserButtonProps as ClerkUserButtonProps,
+  UserProfileModalProps,
   UserResource,
 } from '@clerk/shared/types';
 import { populateParamFromObject } from '@clerk/shared/url';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../hooks/use-mosaic-router';
-import { useGetPortalContainer, usePortalContainer } from '../../primitives/portal';
+import { useGetPortalContainer } from '../../primitives/portal';
 import { replaceInPages, shrinkTotal } from '../../utils/infinite-pages';
-import { useOrganizationProfileModal } from '../organization-profile/organization-profile.modal';
-import type { OrganizationProfileModalOptions } from '../organization-profile/organization-profile.modal.types';
-import { useUserProfileModal } from '../user-profile/user-profile.modal';
-import type { UserProfileModalOptions } from '../user-profile/user-profile.modal.types';
 import type {
   SwitcherBrandingProps,
   SwitcherCallbacks,
@@ -111,8 +109,8 @@ export type OrganizationSwitcherModelOptions = OrganizationProfileMode &
 
 /** Props forwarded to the profile modals this button opens. */
 export interface SwitcherModalProps {
-  userProfile?: Omit<UserProfileModalOptions, 'page'>;
-  organizationProfile?: Omit<OrganizationProfileModalOptions, 'page' | 'afterLeaveOrganizationUrl'>;
+  userProfile?: Pick<UserProfileModalProps, 'customPages' | 'additionalOAuthScopes' | 'apiKeysProps' | 'appearance'>;
+  organizationProfile?: Pick<OrganizationProfileModalProps, 'customPages' | 'appearance'>;
 }
 
 function resolveAfterUrl<T extends object>(
@@ -175,7 +173,8 @@ function toSession(sessionId: string, user: UserResource): SwitcherSession {
 }
 
 /**
- * @param modals - Props forwarded to the profile modals.
+ * @param modals - Props forwarded to the profile modals. Custom pages arrive already bridged, since only
+ *   the wrapper can render the portals behind them.
  */
 export function useSwitcherModel(options?: SwitcherModelOptions, modals?: SwitcherModalProps): SwitcherModel {
   const { isLoaded: isUserLoaded, user } = useUser();
@@ -186,11 +185,8 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   });
   const clerk = useClerk();
   const router = useMosaicRouter();
-  const userProfile = useUserProfileModal();
-  const organizationProfile = useOrganizationProfileModal();
   // The modal must portal into the app's own dialog root, or it renders behind the surface that opened it.
   const getContainer = useGetPortalContainer();
-  const portalContainer = usePortalContainer();
   const environment = useMosaicEnvironment();
   const signInUrl = () => options?.signInUrl ?? clerk.buildSignInUrl();
   // Don't fetch orgsLists until we know orgs are enabled.
@@ -203,7 +199,7 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
   const manageAccount = openOrNavigate({
     url: options?.userProfileUrl,
     mode: options?.userProfileMode,
-    openModal: () => userProfile.open(modals?.userProfile, portalContainer),
+    openModal: () => clerk.openUserProfile({ getContainer, ...modals?.userProfile }),
     buildUrl: () => clerk.buildUserProfileUrl(),
     navigate: router.navigate,
   });
@@ -212,13 +208,11 @@ export function useSwitcherModel(options?: SwitcherModelOptions, modals?: Switch
     url: options?.organizationProfileUrl,
     mode: options?.organizationProfileMode,
     openModal: () =>
-      organizationProfile.open(
-        {
-          ...modals?.organizationProfile,
-          afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
-        },
-        portalContainer,
-      ),
+      clerk.openOrganizationProfile({
+        getContainer,
+        ...modals?.organizationProfile,
+        afterLeaveOrganizationUrl: options?.afterLeaveOrganizationUrl,
+      }),
     buildUrl: () => clerk.buildOrganizationProfileUrl(),
     navigate: router.navigate,
   });

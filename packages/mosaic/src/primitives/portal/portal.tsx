@@ -40,12 +40,8 @@ export function Portal(props: PortalProps): React.ReactElement {
   );
 }
 
-export function usePortalContainer(): PortalContainer | undefined {
-  return React.useContext(PortalContainerContext);
-}
-
 export function useGetPortalContainer(): (() => HTMLElement | null) | undefined {
-  const container = usePortalContainer();
+  const container = React.useContext(PortalContainerContext);
   if (container === undefined) {
     return undefined;
   }

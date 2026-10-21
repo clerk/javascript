@@ -1,8 +1,7 @@
-import type { UserJSON, Web3WalletJSON } from '@clerk/shared/types';
+import type { CustomPage, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterAll, afterEach, beforeAll, describe, expect, it, onTestFinished, vi } from 'vitest';
-import { page } from 'vitest/browser';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
@@ -85,9 +84,6 @@ const popup = () => screen.queryByRole('dialog', { name: 'Account' });
 const waiting = () =>
   Array.from(popup()?.querySelectorAll('button') ?? []).some(button => button.getAttribute('aria-disabled') === 'true');
 const signOut = () => within(requiredPopup()).getByRole('button', { name: 'Sign out' });
-const userProfile = () => screen.findByRole('dialog', { name: 'User profile' });
-const organizationProfile = () => screen.findByRole('dialog', { name: 'Organization' });
-const pageTitle = (dialog: HTMLElement, name: string) => within(dialog).findByRole('heading', { level: 3, name });
 
 async function open() {
   const user = userEvent.setup();
@@ -386,154 +382,30 @@ describe('UserButton', () => {
     });
   });
 
-  describe('opening a profile with pages of its own', () => {
-    beforeAll(() => page.viewport(1280, 800));
-    afterAll(() => page.viewport(414, 896));
-
-    it('renders a custom page inside the opened profile', async () => {
-      await renderUserButton({
-        userProfileProps: { customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }] },
-      });
-      const user = await open();
-
-      await openSettings(user, 'Manage profile');
-      await user.click(await within(await userProfile()).findByRole('tab', { name: 'Terms' }));
-
-      expect(within(await userProfile()).getByText('Terms body')).toBeVisible();
-    });
-
-    it('opens the profile with its pages in the order it was given', async () => {
-      await renderUserButton({
-        userProfileProps: {
-          customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }],
-          pageOrder: ['account', 'terms'],
-        },
-      });
-      const user = await open();
-
-      await openSettings(user, 'Manage profile');
-
-      const dialog = await userProfile();
-      await within(dialog).findByRole('tab', { name: 'Terms' });
-      expect(
-        within(dialog)
-          .getAllByRole('tab')
-          .map(tab => tab.textContent),
-      ).toEqual(['Account', 'Terms', 'Security']);
-    });
-
-    it('opens the pages of whichever button opened it', async () => {
-      serveFapi(signedIn());
-      await renderWithClerk(
-        <>
-          <UserButton userProfileProps={{ customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms</p> }] }} />
-          <UserButton userProfileProps={{ customPages: [{ label: 'Usage', path: 'usage', content: <p>Usage</p> }] }} />
-        </>,
-      );
-      const user = userEvent.setup();
-      const [first, second] = screen.getAllByRole('button', { name: /Open account menu/ });
-
-      await user.click(first);
-      await openSettings(user, 'Manage profile');
-      await within(await userProfile()).findByRole('tab', { name: 'Terms' });
-      await user.keyboard('{Escape}');
-      await waitFor(() => expect(screen.queryByRole('dialog', { name: 'User profile' })).toBeNull());
-
-      await user.click(second);
-      await openSettings(user, 'Manage profile');
-
-      const dialog = await userProfile();
-      await within(dialog).findByRole('tab', { name: 'Usage' });
-      expect(within(dialog).queryByRole('tab', { name: 'Terms' })).toBeNull();
-    });
-  });
-
   describe('handing off', () => {
-    it('opens the user profile in a dialog of its own and closes when managing the account', async () => {
+    it('opens the UserProfile modal and closes when managing the account', async () => {
       const { clerk, navigate } = await renderUserButton();
-      const openUserProfile = vi.spyOn(clerk, 'openUserProfile');
+      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
       await openSettings(user, 'Manage profile');
 
-      const dialog = await userProfile();
-      expect(await pageTitle(dialog, 'Account')).toBeVisible();
-      expect(openUserProfile).not.toHaveBeenCalled();
+      expect(openUserProfile).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
       await waitFor(() => expect(popup()).toBeNull());
     });
 
-    it('closes the opened profile on Escape, and opens it again', async () => {
-      await renderUserButton();
-      const user = await open();
-      await openSettings(user, 'Manage profile');
-      await pageTitle(await userProfile(), 'Account');
-
-      await user.keyboard('{Escape}');
-      await waitFor(() => expect(screen.queryByRole('dialog', { name: 'User profile' })).toBeNull());
-
-      await user.click(trigger());
-      await openSettings(user, 'Manage profile');
-      expect(await pageTitle(await userProfile(), 'Account')).toBeVisible();
-    });
-
-    it('closes the opened profile once nobody is signed in', async () => {
-      const { clerk } = await renderUserButton({}, signedIn({ client: fapiClient([aliceSession]) }));
-      const user = await open();
-      await openSettings(user, 'Manage profile');
-      await pageTitle(await userProfile(), 'Account');
-
-      await act(() => clerk.signOut());
-
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    });
-
-    it('hands a modal it opens through Clerk the portal root the app provides', async () => {
+    it('hands the opened profile the portal root the app provides', async () => {
       const container = document.body.appendChild(document.createElement('div'));
       onTestFinished(() => container.remove());
       serveFapi(signedIn());
       const { clerk } = await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
-      const openInviteMembers = vi.spyOn(clerk, 'openInviteMembers').mockImplementation(() => {});
-      const user = await open();
-
-      await user.click(screen.getByRole('button', { name: 'Invite members' }));
-
-      expect(openInviteMembers.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
-    });
-
-    it('portals the user profile into the portal root around the button that opened it', async () => {
-      const container = document.body.appendChild(document.createElement('div'));
-      onTestFinished(() => container.remove());
-      serveFapi(signedIn());
-      await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
+      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
       await openSettings(user, 'Manage profile');
 
-      expect(container).toContainElement(await userProfile());
-    });
-
-    it('portals the organization profile into the portal root around the button that opened it', async () => {
-      const container = document.body.appendChild(document.createElement('div'));
-      onTestFinished(() => container.remove());
-      serveFapi(signedIn());
-      await renderWithClerk(<PortalProvider container={container}>{tree()}</PortalProvider>);
-      const user = await open();
-
-      await openSettings(user, 'Manage organization');
-
-      expect(container).toContainElement(await organizationProfile());
-    });
-
-    it('closes the opened organization profile once no organization is active', async () => {
-      const { clerk } = await renderUserButton();
-      const user = await open();
-      await openSettings(user, 'Manage organization');
-      await pageTitle(await organizationProfile(), 'General');
-
-      await act(() => clerk.setActive({ organization: null }));
-
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(openUserProfile.mock.calls[0]?.[0]?.getContainer?.()).toBe(container);
     });
 
     it('runs a custom menu item and closes', async () => {
@@ -547,18 +419,44 @@ describe('UserButton', () => {
       await waitFor(() => expect(popup()).toBeNull());
     });
 
-    it('opens the organization profile in a dialog of its own when managing the organization', async () => {
-      const { clerk, navigate } = await renderUserButton();
-      const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile');
+    it('renders a custom page into the element the opened profile hands back', async () => {
+      const { clerk } = await renderUserButton({
+        userProfileProps: { customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }] },
+      });
+      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
-      await openSettings(user, 'Manage organization');
-
-      const dialog = await organizationProfile();
-      expect(await pageTitle(dialog, 'General')).toBeVisible();
-      expect(openOrganizationProfile).not.toHaveBeenCalled();
-      expect(navigate).not.toHaveBeenCalled();
+      await openSettings(user, 'Manage profile');
       await waitFor(() => expect(popup()).toBeNull());
+
+      const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
+      expect(customPages).toHaveLength(1);
+      expect(customPages[0]).toMatchObject({ label: 'Terms', url: 'terms' });
+
+      const el = document.createElement('div');
+      document.body.appendChild(el);
+      act(() => {
+        customPages[0]?.mount?.(el);
+      });
+
+      expect(within(el).getByText('Terms body')).toBeInTheDocument();
+    });
+
+    it('opens the profile with its pages in the order it was given', async () => {
+      const { clerk } = await renderUserButton({
+        userProfileProps: {
+          customPages: [{ label: 'Terms', path: 'terms', content: <p>Terms body</p> }],
+          pageOrder: ['account', 'terms'],
+        },
+      });
+      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+      const user = await open();
+
+      await openSettings(user, 'Manage profile');
+      await waitFor(() => expect(popup()).toBeNull());
+
+      const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
+      expect(customPages.map((page: CustomPage) => page.label)).toEqual(['account', 'Terms', 'security']);
     });
 
     it('opens the InviteMembers modal and closes', async () => {
@@ -848,7 +746,8 @@ describe('UserButton', () => {
     });
 
     it('manages the account from its settings row, and signs out at the foot', async () => {
-      await renderUserButton({ mode: 'user' });
+      const { clerk } = await renderUserButton({ mode: 'user' });
+      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
       const user = await open();
 
       expect(
@@ -859,7 +758,7 @@ describe('UserButton', () => {
 
       await user.click(screen.getByRole('button', { name: 'Settings' }));
       expect(screen.queryByRole('menu')).toBeNull();
-      expect(await pageTitle(await userProfile(), 'Account')).toBeVisible();
+      expect(openUserProfile).toHaveBeenCalled();
     });
 
     it('lists every account in the flyout, then the way to add one, then signing out of them all', async () => {
@@ -887,7 +786,8 @@ describe('UserButton', () => {
     });
 
     it('heads the surface with the active organization, badged with the account, managing both', async () => {
-      await renderUserButton();
+      const { clerk } = await renderUserButton();
+      const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
 
       expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
       const user = await open();
@@ -909,7 +809,7 @@ describe('UserButton', () => {
         'Sign out',
       ]);
       await openSettings(user, 'Manage organization');
-      expect(await pageTitle(await organizationProfile(), 'General')).toBeVisible();
+      expect(openOrganizationProfile).toHaveBeenCalled();
     });
 
     it('keeps the identifier beneath the organization even when it is all that names the account', async () => {

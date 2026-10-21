@@ -218,10 +218,11 @@ all accounts**. The foot keeps **Sign out**.
 
 ## Profile modal
 
-The UserButton opens its profiles in modals that `MosaicProvider` mounts, so neither the button nor
-the app renders a dialog. This example backs the modal with fixture data, so it runs without a Clerk
-session. **Manage account** calls `open()`, and the app's own buttons call `open({ page })` on the same
-modal. Hovering one preloads the profile, so it opens without a wait.
+Mosaic's profile modals are mounted by `MosaicProvider`, so neither the opener nor the app renders a
+dialog. The exported UserButton still opens the clerk-js profile. This example backs the modal with
+fixture data, so it runs without a Clerk session. **Manage account** calls `open()`, and the app's own
+buttons call `open({ page })` on the same modal. Hovering one preloads the profile, so it opens without
+a wait.
 
 <Story
   name='ProfileModal'

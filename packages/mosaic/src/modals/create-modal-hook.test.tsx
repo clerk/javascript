@@ -1,6 +1,6 @@
 import { act, cleanup, render, renderHook, screen } from '@testing-library/react';
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { UserProfileModalOptions } from '../features/user-profile/user-profile.modal.types';
 import { MosaicProvider } from '../mosaic-provider';
@@ -209,6 +209,50 @@ describe('createModalHook', () => {
     await flush();
 
     expect(readOptions()).toEqual({ label: 'kept', page: 'account' });
+  });
+
+  it('portals into the container it was opened with', async () => {
+    const container = document.body.appendChild(document.createElement('div'));
+    onTestFinished(() => container.remove());
+    const { useStubModal } = createStubModal();
+    let handle: ModalHandle<StubOptions> | undefined;
+    render(
+      <MosaicProvider>
+        <Caller
+          useModal={useStubModal}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+
+    act(() => handle?.open({}, container));
+
+    expect(container).toContainElement(await screen.findByLabelText('Stub'));
+  });
+
+  it('leaves the container behind when the next caller opens without one', async () => {
+    const container = document.body.appendChild(document.createElement('div'));
+    onTestFinished(() => container.remove());
+    const { useStubModal } = createStubModal();
+    let handle: ModalHandle<StubOptions> | undefined;
+    render(
+      <MosaicProvider>
+        <Caller
+          useModal={useStubModal}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+    act(() => handle?.open({}, container));
+    await screen.findByLabelText('Stub');
+    act(() => handle?.close());
+    await flush();
+
+    act(() => handle?.open({}));
+
+    expect(container).not.toContainElement(await screen.findByLabelText('Stub'));
   });
 
   it('shallow-merges provider defaults under the options it was opened with', async () => {

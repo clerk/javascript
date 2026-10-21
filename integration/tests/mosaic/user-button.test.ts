@@ -35,7 +35,6 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
 
   const trigger = (page: Page) => page.getByRole('button', { name: /^Open account menu for / });
   const popup = (page: Page) => page.getByRole('dialog', { name: 'Account' });
-  const userProfile = (page: Page) => page.getByRole('dialog', { name: 'User profile' });
 
   async function signIn({ page, context }: { page: Page; context: BrowserContext }, path = '/') {
     const u = await createTestUtils({ app, page, context });
@@ -50,7 +49,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   async function openProfileSettings(page: Page) {
     await popup(page).getByRole('button', { name: 'Settings' }).click();
     const profileSettings = page.getByRole('menuitem', { name: 'Manage profile' });
-    await profileSettings.or(userProfile(page)).first().waitFor();
+    await profileSettings.or(page.locator('.cl-userProfile-root')).first().waitFor();
     if (await profileSettings.isVisible()) {
       await profileSettings.click();
     }
@@ -103,12 +102,13 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
   });
 
   test('renders a custom page inside the UserProfile modal', async ({ page, context }) => {
-    await signIn({ page, context }, '/custom');
+    const u = await signIn({ page, context }, '/custom');
 
     await trigger(page).click();
     await openProfileSettings(page);
+    await u.po.userProfile.waitForUserProfileModal();
 
-    await userProfile(page).getByRole('tab', { name: 'Custom page' }).click();
-    await expect(userProfile(page).getByText('custom-page-content')).toBeVisible();
+    await page.locator('.cl-userProfile-root').getByText('Custom page').click();
+    await expect(page.getByText('custom-page-content')).toBeVisible();
   });
 });

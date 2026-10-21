@@ -132,7 +132,8 @@ describe('OrganizationSwitcher', () => {
   });
 
   it('heads the surface with the active organization, and manages it from the rows beneath', async () => {
-    await renderSwitcher({}, noOffers());
+    const { clerk } = await renderSwitcher({}, noOffers());
+    const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
     const user = await openWithList();
 
     const header = requiredPopup().querySelector('.cl-organization-switcher-header') ?? requiredPopup();
@@ -147,8 +148,7 @@ describe('OrganizationSwitcher', () => {
 
     await user.click(screen.getByRole('button', { name: 'Settings' }));
     expect(screen.queryByRole('menu')).toBeNull();
-    const dialog = await screen.findByRole('dialog', { name: 'Organization' });
-    expect(await within(dialog).findByRole('heading', { level: 3, name: 'General' })).toBeVisible();
+    expect(openOrganizationProfile).toHaveBeenCalled();
   });
 
   it('falls back to the account, with nothing to manage, where no organization is active', async () => {
