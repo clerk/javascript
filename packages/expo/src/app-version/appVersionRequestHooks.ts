@@ -1,0 +1,68 @@
+import {
+  applyFetchedEnvironment,
+  applySupportedAppVersion,
+  applyUnsupportedAppVersion,
+  getAppVersionSupportGeneration,
+  getServerAnswerCount,
+  resetAppVersionSupport,
+} from './appVersionSupport';
+import { setNativeAppIdentityHeaders } from './nativeAppIdentity';
+
+const UNSUPPORTED_APP_VERSION_CODE = 'unsupported_app_version';
+const APP_VERSION_STATUS_HEADER = 'x-clerk-app-version-status';
+const ENVIRONMENT_PATH = '/environment';
+
+type AppVersionRequest = {
+  path?: string;
+  headers?: HeadersInit;
+};
+
+type AppVersionResponse = {
+  ok: boolean;
+  status: number;
+  headers: Headers;
+  payload: unknown;
+};
+
+export function createAppVersionRequestHooks() {
+  resetAppVersionSupport();
+  const generation = getAppVersionSupportGeneration();
+  const serverAnswersAtEnvironmentRequest = new WeakMap<AppVersionRequest, number>();
+
+  return {
+    beforeRequest(requestInit: AppVersionRequest) {
+      setNativeAppIdentityHeaders(requestInit.headers as Headers);
+      if (requestInit.path === ENVIRONMENT_PATH) {
+        serverAnswersAtEnvironmentRequest.set(requestInit, getServerAnswerCount());
+      }
+    },
+    afterResponse(requestInit: AppVersionRequest, response: AppVersionResponse) {
+      const unsupportedAppVersionError =
+        response.status === 403 ? findUnsupportedAppVersionError(response.payload) : null;
+      if (unsupportedAppVersionError) {
+        applyUnsupportedAppVersion(unsupportedAppVersionError.meta, generation);
+        return;
+      }
+      if (response.headers.get(APP_VERSION_STATUS_HEADER)?.toLowerCase() === 'supported') {
+        applySupportedAppVersion(generation);
+      }
+      const serverAnswersAtRequest = serverAnswersAtEnvironmentRequest.get(requestInit);
+      if (response.ok && serverAnswersAtRequest !== undefined) {
+        applyFetchedEnvironment(environmentJSON(response.payload), { generation, serverAnswersAtRequest });
+      }
+    },
+  };
+}
+
+function findUnsupportedAppVersionError(payload: unknown): { meta?: unknown } | null {
+  const errors = isRecord(payload) && Array.isArray(payload.errors) ? payload.errors : [];
+  return errors.find(error => isRecord(error) && error.code === UNSUPPORTED_APP_VERSION_CODE) ?? null;
+}
+
+function environmentJSON(payload: unknown): unknown {
+  return isRecord(payload) && isRecord(payload.response) ? payload.response : payload;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}

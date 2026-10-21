@@ -5,6 +5,7 @@ import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/rea
 import { useEffect, useMemo, useRef } from 'react';
 
 import type { TokenCache } from '../cache/types';
+import { UpdateRequiredModal } from '../update-required/UpdateRequiredModal';
 import { ClerkExpoModule } from '../utils/native-module';
 import { isNative, isWeb } from '../utils/runtime';
 import { maybeCompleteAuthSession } from './maybeCompleteAuthSession';
@@ -50,6 +51,12 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderPro
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_disableNativeClientSync?: boolean;
+  /**
+   * Shows `<UpdateRequiredView />` over your app on iOS and Android when its version is older than the minimum set in the Clerk Dashboard. The view covers the whole app and can't be dismissed until the user updates. Set this to `false` to show your own UI from `useAppVersionSupport()` instead, or to place `<UpdateRequiredView />` yourself.
+   *
+   * @default true
+   */
+  updateRequiredViewEnabled?: boolean;
 };
 
 const SDK_METADATA = {
@@ -68,6 +75,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
     experimental,
     __experimental_resourceCache,
     __experimental_disableNativeClientSync = false,
+    updateRequiredViewEnabled = true,
     ...rest
   } = props;
   const pk = publishableKey;
@@ -127,6 +135,7 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
       }}
     >
       {children}
+      {isNative() && updateRequiredViewEnabled && <UpdateRequiredModal />}
     </ClerkReactProvider>
   );
 }

@@ -13,6 +13,7 @@ export { getClerkInstance } from './provider/singleton';
 export * from './provider/ClerkProvider';
 export * from './hooks';
 export * from './components';
+export { UpdateRequiredView } from './update-required';
 export * from './biometric-credentials/errors';
 export * from './biometric-credentials/types';
 export { useBiometricCredentials } from './biometric-credentials/deprecatedRootExport';

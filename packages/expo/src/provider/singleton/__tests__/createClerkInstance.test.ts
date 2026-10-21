@@ -39,6 +39,16 @@ vi.mock('react-native', () => {
   };
 });
 
+vi.mock('../../../app-version/appVersionRequestHooks', () => ({
+  createAppVersionRequestHooks: () => ({
+    beforeRequest: ({ headers }: { headers: Headers }) => {
+      headers.set('x-bundle-id', 'com.example.app');
+      headers.set('x-app-version', '4.8.4');
+    },
+    afterResponse: () => {},
+  }),
+}));
+
 class MockClerk {
   public publishableKey: string;
   public proxyUrl: unknown;
@@ -384,6 +394,20 @@ describe('createClerkInstance', () => {
     });
 
     await expect(tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('fresh-token');
+  });
+
+  test('identifies the app and asks for the API version that enforces minimum versions', async () => {
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({
+      getToken: vi.fn().mockResolvedValue(null),
+      saveToken: vi.fn(),
+    });
+    requestInit.url.searchParams.set('__clerk_api_version', '2026-08-20');
+
+    await beforeRequest(requestInit);
+
+    expect(requestInit.url.searchParams.getAll('__clerk_api_version')).toEqual(['2026-10-09']);
+    expect(requestInit.headers.get('x-bundle-id')).toBe('com.example.app');
+    expect(requestInit.headers.get('x-app-version')).toBe('4.8.4');
   });
 
   test('waits until the app is active and retries when the token cache read fails in the background', async () => {

@@ -11,6 +11,10 @@ vi.mock('react-native', () => ({
   Platform: { OS: 'ios', constants: { reactNativeVersion: { major: 0, minor: 81, patch: 0 } } },
 }));
 
+vi.mock('../../../update-required/UpdateRequiredModal', () => ({
+  UpdateRequiredModal: () => null,
+}));
+
 vi.mock('expo-secure-store', () => ({
   AFTER_FIRST_UNLOCK: 0,
   deleteItemAsync: vi.fn(),
@@ -19,6 +23,7 @@ vi.mock('expo-secure-store', () => ({
 }));
 
 vi.mock('../../../utils/runtime', () => ({
+  isExpoGo: () => false,
   isNative: () => true,
   isWeb: () => false,
 }));
