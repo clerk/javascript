@@ -6,7 +6,7 @@ type ViteResolvedConfig = {
   root: string;
 };
 
-export function clerkAgentRulesVitePlugin(sdk: Extract<ClerkAgentRulesSdk, 'react' | 'vue'>) {
+export function clerkAgentRulesVitePlugin(sdk: Extract<ClerkAgentRulesSdk, 'chrome-extension' | 'react' | 'vue'>) {
   let didWrite = false;
 
   return {
