@@ -2,4 +2,4 @@
 '@clerk/upgrade': patch
 ---
 
-Correct the Core 3 note about `ClerkProvider` and Next.js Cache Components. It no longer says `ClerkProvider` may need a `<Suspense>` boundary. It now lists the code that does (`<Show>`, `auth()`, `currentUser()`, and catch-all `<SignIn />`, `<SignUp />`, `<UserProfile />`, and `<OrganizationProfile />`) and links to the Cache Components guide.
+Correct the Core 3 `<Suspense>` guidance for Next.js Cache Components. A plain `ClerkProvider` doesn't need a `<Suspense>` boundary. The code under it that reads the request does: `<Show>`, `auth()`, `currentUser()`, and `<SignIn />`, `<SignUp />`, `<UserProfile />`, and `<OrganizationProfile />` on catch-all routes. With the `dynamic` prop, `ClerkProvider` needs a boundary too once anything under it calls `useAuth()`.
