@@ -138,6 +138,7 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
       flow = { resolve, reject, timeout, window };
       pendingOAuthFlow = flow;
     });
+    callbackPromise.catch(() => {});
 
     try {
       await shell.openExternal(url);

@@ -781,4 +781,33 @@ describe('createClerkBridge', () => {
     openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
     await expect(secondPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
   });
+
+  it('does not leave an unhandled rejection when a flow is replaced while its browser is launching', async () => {
+    let resolveFirstLaunch: () => void = () => {};
+    vi.mocked(shell.openExternal)
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>(resolve => {
+            resolveFirstLaunch = resolve;
+          }),
+      )
+      .mockResolvedValueOnce(undefined);
+    createClerkBridge({
+      storage,
+      renderer: {
+        host: 'renderer',
+        scheme: 'my-app',
+      },
+    });
+
+    const openHandler = vi.mocked(ipcMain.handle).mock.calls.find(([channel]) => {
+      return channel === OAUTH_TRANSPORT_CHANNELS.open;
+    })?.[1];
+    const firstPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
+    void openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    resolveFirstLaunch();
+    await expect(firstPromise).rejects.toThrow('replaced by a new one');
+  });
 });
