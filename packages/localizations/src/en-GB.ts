@@ -1595,6 +1595,7 @@ export const enGB: LocalizationResource = {
       actionText: 'Don’t have any of these?',
       blockButton__backupCode: 'Use a backup code',
       blockButton__emailCode: 'Email code to {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Continue with your password',
       blockButton__phoneCode: 'Send SMS code to {{identifier}}',
@@ -1617,6 +1618,10 @@ export const enGB: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the code sent to your email to continue',
       title: 'Verification required',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Cannot proceed with verification. No suitable authentication factor is configured',
