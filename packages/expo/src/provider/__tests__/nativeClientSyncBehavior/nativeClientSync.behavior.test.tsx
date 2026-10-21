@@ -11,6 +11,14 @@ vi.mock('react-native', () => ({
   Platform: { OS: 'ios', constants: { reactNativeVersion: { major: 0, minor: 81, patch: 0 } } },
 }));
 
+vi.mock('../../../app-version/appVersionRequestHooks', () => ({
+  createAppVersionRequestHooks: () => ({
+    refreshOnForegroundWhileUnsupported: () => {},
+    beforeRequest: () => {},
+    afterResponse: () => {},
+  }),
+}));
+
 vi.mock('../../../update-required/UpdateRequiredModal', () => ({
   UpdateRequiredModal: () => null,
 }));

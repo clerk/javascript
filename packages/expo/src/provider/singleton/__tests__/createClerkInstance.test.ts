@@ -41,6 +41,7 @@ vi.mock('react-native', () => {
 
 vi.mock('../../../app-version/appVersionRequestHooks', () => ({
   createAppVersionRequestHooks: () => ({
+    refreshOnForegroundWhileUnsupported: () => {},
     beforeRequest: ({ headers }: { headers: Headers }) => {
       headers.set('x-bundle-id', 'com.example.app');
       headers.set('x-app-version', '4.8.4');

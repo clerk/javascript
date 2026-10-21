@@ -146,6 +146,11 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
       const clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
       __internal_clerk = clerk;
+      appVersionRequestHooks?.refreshOnForegroundWhileUnsupported(async () => {
+        if (clerk.loaded) {
+          await clerk.__internal_reloadInitialResources();
+        }
+      });
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API

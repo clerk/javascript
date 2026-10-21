@@ -1,5 +1,19 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+const appState = vi.hoisted(() => {
+  const listeners = new Set<(state: string) => void>();
+  return {
+    listeners,
+    addEventListener: (_type: string, listener: (state: string) => void) => {
+      listeners.add(listener);
+      return { remove: () => listeners.delete(listener) };
+    },
+    emit: (state: string) => listeners.forEach(listener => listener(state)),
+  };
+});
+
+vi.mock('react-native', () => ({ AppState: { addEventListener: appState.addEventListener } }));
+
 vi.mock('../nativeAppIdentity', () => ({
   getNativeAppIdentity: () => ({
     platform: 'ios',
@@ -45,6 +59,7 @@ const loadModules = async () => {
 describe('createAppVersionRequestHooks', () => {
   beforeEach(() => {
     vi.resetModules();
+    appState.listeners.clear();
   });
 
   test('identifies the app on every request', async () => {
@@ -121,5 +136,32 @@ describe('createAppVersionRequestHooks', () => {
     staleHooks.afterResponse({ path: '/client', headers: new Headers() }, unsupportedAppVersion);
 
     expect(status().isSupported).toBe(true);
+  });
+
+  test('reloads when the app returns to the foreground while unsupported', async () => {
+    const { createAppVersionRequestHooks } = await loadModules();
+    const hooks = createAppVersionRequestHooks();
+    const refresh = vi.fn().mockResolvedValue(undefined);
+    hooks.refreshOnForegroundWhileUnsupported(refresh);
+
+    appState.emit('active');
+    expect(refresh).not.toHaveBeenCalled();
+
+    hooks.afterResponse({ path: '/client', headers: new Headers() }, unsupportedAppVersion);
+    appState.emit('background');
+    appState.emit('active');
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  test('stops reloading for a Clerk instance that was replaced', async () => {
+    const { createAppVersionRequestHooks } = await loadModules();
+    const staleRefresh = vi.fn().mockResolvedValue(undefined);
+    createAppVersionRequestHooks().refreshOnForegroundWhileUnsupported(staleRefresh);
+    const hooks = createAppVersionRequestHooks();
+    hooks.afterResponse({ path: '/client', headers: new Headers() }, unsupportedAppVersion);
+
+    appState.emit('active');
+
+    expect(staleRefresh).not.toHaveBeenCalled();
   });
 });

@@ -1,8 +1,11 @@
+import { AppState, type NativeEventSubscription } from 'react-native';
+
 import {
   applyFetchedEnvironment,
   applySupportedAppVersion,
   applyUnsupportedAppVersion,
   getAppVersionSupportGeneration,
+  getAppVersionSupportStatus,
   getServerAnswerCount,
   resetAppVersionSupport,
 } from './appVersionSupport';
@@ -17,6 +20,8 @@ type AppVersionRequest = {
   headers?: HeadersInit;
 };
 
+let foregroundSubscription: NativeEventSubscription | null = null;
+
 type AppVersionResponse = {
   ok: boolean;
   status: number;
@@ -26,10 +31,19 @@ type AppVersionResponse = {
 
 export function createAppVersionRequestHooks() {
   resetAppVersionSupport();
+  foregroundSubscription?.remove();
+  foregroundSubscription = null;
   const generation = getAppVersionSupportGeneration();
   const serverAnswersAtEnvironmentRequest = new WeakMap<AppVersionRequest, number>();
 
   return {
+    refreshOnForegroundWhileUnsupported(refresh: () => Promise<unknown>) {
+      foregroundSubscription = AppState.addEventListener('change', state => {
+        if (state === 'active' && !getAppVersionSupportStatus().isSupported) {
+          void refresh().catch(() => {});
+        }
+      });
+    },
     beforeRequest(requestInit: AppVersionRequest) {
       setNativeAppIdentityHeaders(requestInit.headers as Headers);
       if (requestInit.path === ENVIRONMENT_PATH) {
