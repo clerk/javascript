@@ -270,9 +270,35 @@ describe('phone reverification', () => {
 
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
     expect(savedPhones(fapi)).toHaveLength(0);
-    await actor.type(screen.getByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
     await enterCode(actor, VERIFICATION_CODE);
 
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(listed()).toEqual([HOME_LABEL]);
+  });
+
+  it('focuses the session verification code before adding a phone number', async () => {
+    const { actor, fapi } = await renderSection(
+      challenged({
+        verification: {
+          firstFactors: [
+            { strategy: 'email_code', email_address_id: 'idn_email', safe_identifier: 'alice@example.com' },
+          ],
+          secrets: { email_code: VERIFICATION_CODE },
+        },
+      }),
+    );
+    demandReverificationOnce('/v1/me/phone_numbers');
+
+    await addPhone(actor, '8015550100');
+    const code = await screen.findByRole('textbox', { name: 'Verification code' });
+    await waitFor(() => expect(code).toHaveFocus());
+    await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+    await actor.keyboard(VERIFICATION_CODE);
+
+    await screen.findByRole('dialog', { name: 'Verify your phone number' });
+    await enterCode(actor, VERIFICATION_CODE);
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(listed()).toEqual([HOME_LABEL]);
   });
