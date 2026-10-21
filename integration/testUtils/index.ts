@@ -8,6 +8,7 @@ import { createEmailService } from './emailService';
 import { createInvitationService } from './invitationsService';
 import { createOrganizationsService } from './organizationsService';
 import { withRetry } from './retryableClerkClient';
+import { setupOAuthTestingToken } from './setupOAuthTestingToken';
 import type { FakeAPIKey, FakeOrganization, FakeUser, FakeUserWithEmail, PlaywrightTest } from './usersService';
 import { createUserService } from './usersService';
 import { createWaitlistService } from './waitlistService';
@@ -63,6 +64,7 @@ export const createTestUtils = async <
         await route.continue({ url: url.toString() });
       },
     );
+    await setupOAuthTestingToken({ context: page.context(), frontendApiOrigin: `https://${frontendApi}`, token });
   }
 
   const browserHelpers = {

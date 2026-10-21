@@ -12,7 +12,11 @@ import { createUserService } from '../testUtils/usersService';
 const grantOAuthConsent = async (page: Page) => {
   const allowAccessButton = page.getByRole('button', { name: 'Allow' });
   await expect(allowAccessButton).toBeVisible();
-  await allowAccessButton.click();
+  const [callback] = await Promise.all([
+    page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+    allowAccessButton.click(),
+  ]);
+  expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
 };
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flows @nextjs', ({ app }) => {

@@ -1,0 +1,44 @@
+import type { BrowserContext } from '@playwright/test';
+
+const contextTokens = new WeakMap<BrowserContext, Map<string, string>>();
+
+export const setupOAuthTestingToken = async ({
+  context,
+  frontendApiOrigin,
+  token,
+}: {
+  context: BrowserContext;
+  frontendApiOrigin: string;
+  token: string;
+}) => {
+  const existingTokens = contextTokens.get(context);
+  if (existingTokens) {
+    existingTokens.set(frontendApiOrigin, token);
+    return;
+  }
+
+  const tokens = new Map([[frontendApiOrigin, token]]);
+  contextTokens.set(context, tokens);
+
+  await context.route(
+    url => url.pathname.startsWith('/v1/me/oauth/consent/'),
+    async route => {
+      if (route.request().method() !== 'POST') {
+        return route.fallback();
+      }
+
+      const response = await route.fetch({ maxRedirects: 0 });
+      const headers = response.headers();
+      if (response.status() === 303 && headers.location) {
+        const callback = new URL(headers.location, response.url());
+        const callbackToken = tokens.get(callback.origin);
+        if (callbackToken && callback.pathname === '/v1/oauth_callback') {
+          callback.searchParams.set('__clerk_testing_token', callbackToken);
+          headers.location = callback.toString();
+        }
+      }
+
+      await route.fulfill({ response, headers });
+    },
+  );
+};
