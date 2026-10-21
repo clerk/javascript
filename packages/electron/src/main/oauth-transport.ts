@@ -123,27 +123,28 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
       throw new Error("Clerk: OAuth request did not originate from a window's main frame.");
     }
 
-    if (pendingOAuthFlow) {
-      throw new Error('Clerk: an OAuth flow is already pending.');
-    }
-
     assertExternalOAuthUrl(url);
+    disposePendingOAuthFlow(new Error('Clerk: OAuth flow was replaced by a new one.'));
 
     const window = BrowserWindow.fromWebContents(event.sender);
 
+    let flow: PendingOAuthFlow | null = null;
     const callbackPromise = new Promise<{ callbackUrl: string }>((resolve, reject) => {
       const timeout = setTimeout(() => {
         disposePendingOAuthFlow();
         reject(new Error('Clerk: OAuth callback timed out.'));
       }, CALLBACK_TIMEOUT_MS);
 
-      pendingOAuthFlow = { resolve, reject, timeout, window };
+      flow = { resolve, reject, timeout, window };
+      pendingOAuthFlow = flow;
     });
 
     try {
       await shell.openExternal(url);
     } catch (err) {
-      disposePendingOAuthFlow(err instanceof Error ? err : new Error(String(err)));
+      if (pendingOAuthFlow === flow) {
+        disposePendingOAuthFlow(err instanceof Error ? err : new Error(String(err)));
+      }
     }
 
     return callbackPromise;
