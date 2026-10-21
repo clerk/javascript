@@ -26,13 +26,11 @@ const styles = stylex.create({
   },
 });
 
-export interface UserProfileAddEmailDialogProps {
+export type UserProfileAddEmailDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   handle?: DialogHandle<unknown>;
   finalFocus?: DialogFocusTarget;
-  step: 'email' | 'reverify' | 'verify' | 'link' | 'sso';
-  reverification?: ReverificationController;
   emailAddress: string;
   onEmailAddressChange: (value: string) => void;
   canSubmitEmail?: boolean;
@@ -45,7 +43,10 @@ export interface UserProfileAddEmailDialogProps {
   errorMessage?: string;
   isResending?: boolean;
   resendSeconds?: number;
-}
+} & (
+  | { step: 'reverify'; reverification: ReverificationController }
+  | { step: 'email' | 'verify' | 'link' | 'sso'; reverification?: ReverificationController }
+);
 
 export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps) {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -86,7 +87,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                   />
                 </Flow.Step>
                 <Flow.Step ids={['reverify']}>
-                  {current.reverification ? (
+                  {current.step === 'reverify' ? (
                     <ReverifyStep
                       controller={current.reverification}
                       onClose={() => current.onOpenChange(false)}

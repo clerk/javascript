@@ -26,11 +26,11 @@ export interface UserProfileAddEmailControllerOptions {
   reverification?: ReverificationController;
 }
 
-export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
+export type UserProfileAddEmailController = UserProfileAddEmailDialogProps & {
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
   onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => void;
-}
+};
 
 interface Context {
   verifyingId: string | undefined;
@@ -202,8 +202,7 @@ export function useUserProfileAddEmailController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const isReverifying = emailForm.isSubmitting && Boolean(reverification?.visible);
-  const step = isReverifying ? 'reverify' : toStep(state, verification);
+  const isReverifying = emailForm.isSubmitting && reverification?.visible;
   const form = state === 'email' ? emailForm : codeForm;
   const formError = state === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
@@ -213,8 +212,9 @@ export function useUserProfileAddEmailController({
     resendSeconds,
     isResending: state === 'sending',
     open,
-    step,
-    reverification,
+    ...(isReverifying
+      ? { step: 'reverify' as const, reverification }
+      : { step: toStep(state, verification), reverification }),
     emailAddress: state === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
     canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
     code: codeForm.values.code,
@@ -266,7 +266,7 @@ export function useUserProfileAddEmailController({
 function toStep(
   state: string,
   verification: UserProfileEmailVerification | undefined,
-): UserProfileAddEmailDialogProps['step'] {
+): Exclude<UserProfileAddEmailDialogProps['step'], 'reverify'> {
   if (state === 'email') {
     return 'email';
   }

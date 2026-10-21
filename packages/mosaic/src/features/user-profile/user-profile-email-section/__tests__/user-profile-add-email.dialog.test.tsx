@@ -7,7 +7,7 @@ import { MosaicProvider } from '../../../../mosaic-provider';
 import type { UserProfileAddEmailDialogProps } from '../user-profile-add-email.dialog';
 import { UserProfileAddEmailDialog } from '../user-profile-add-email.dialog';
 
-function renderView(overrides: Partial<UserProfileAddEmailDialogProps> = {}) {
+function renderView(overrides: Partial<Exclude<UserProfileAddEmailDialogProps, { step: 'reverify' }>> = {}) {
   const props: UserProfileAddEmailDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
