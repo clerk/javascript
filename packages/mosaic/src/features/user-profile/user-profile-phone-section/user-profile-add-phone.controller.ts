@@ -143,7 +143,8 @@ export function useUserProfileAddPhoneController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const step = phoneForm.isSubmitting && reverification?.visible ? 'reverify' : state === 'phone' ? 'phone' : 'verify';
+  const isReverifying = phoneForm.isSubmitting && Boolean(reverification?.visible);
+  const step = isReverifying ? 'reverify' : state === 'phone' ? 'phone' : 'verify';
   const form = state === 'phone' ? phoneForm : codeForm;
   const formError = state === 'phone' ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
