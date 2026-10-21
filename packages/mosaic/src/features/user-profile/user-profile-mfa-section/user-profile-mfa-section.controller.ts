@@ -421,15 +421,15 @@ function createSetupProps(
   const sms = flow.kind === 'sms' ? flow : undefined;
   const authenticator = flow.kind === 'authenticator' ? flow : undefined;
   const backup = flow.kind === 'backup' ? flow : undefined;
+  const isReverifying = REVERIFIABLE_ACTIONS.includes(context.pending) && reverification.visible;
   return {
-    step:
-      REVERIFIABLE_ACTIONS.includes(context.pending) && reverification.visible
-        ? 'verify'
-        : flow.kind === 'closed'
-          ? 'select'
-          : flow.kind === 'backup'
-            ? 'backup-codes'
-            : flow.kind,
+    step: isReverifying
+      ? 'verify'
+      : flow.kind === 'closed'
+        ? 'select'
+        : flow.kind === 'backup'
+          ? 'backup-codes'
+          : flow.kind,
     reverification,
     methods: model.addableMethods,
     onSelect: actions.select,
