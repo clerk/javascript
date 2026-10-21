@@ -272,7 +272,7 @@ export class EnterpriseConnectionAPI extends AbstractAPI {
    * const { url } = await clerkClient.enterpriseConnections.createEnterpriseConnectionTestRun('entconn_123');
    * ```
    */
-  public async createEnterpriseConnectionTestRun(enterpriseConnectionId: string) {
+  public async createEnterpriseConnectionTestRun(enterpriseConnectionId: string): Promise<{ url: string }> {
     this.requireId(enterpriseConnectionId);
     return this.request<{ url: string }>({
       method: 'POST',
