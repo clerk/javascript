@@ -202,7 +202,8 @@ export function useUserProfileAddEmailController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const step = emailForm.isSubmitting && reverification?.visible ? 'reverify' : toStep(state, verification);
+  const isReverifying = emailForm.isSubmitting && Boolean(reverification?.visible);
+  const step = isReverifying ? 'reverify' : toStep(state, verification);
   const form = state === 'email' ? emailForm : codeForm;
   const formError = state === 'email' ? emailForm.fields.emailAddress.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
