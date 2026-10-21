@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   CLERK_SDK_PLUGIN_END,
   CLERK_SDK_PLUGIN_START,
   type FileSystemAdapter,
+  logClerkAgentRulesResult,
   renderClerkAgentRulesBlock,
   renderClerkSdkPluginBlock,
   writeClerkAgentRules,
@@ -68,6 +69,7 @@ describe('writeClerkAgentRules', () => {
     expect(result.claudeMd).toBe('created');
     expect(memory.read('/repo/app/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:nextjs -->');
     expect(memory.read('/repo/app/CLAUDE.md')).toBe('@AGENTS.md\n');
+    expect(result.files).toEqual(['/repo/app/AGENTS.md', '/repo/app/CLAUDE.md']);
   });
 
   it('writes nothing when no package.json is at or above the starting folder', () => {
@@ -75,7 +77,7 @@ describe('writeClerkAgentRules', () => {
 
     const result = writeClerkAgentRules({ cwd: '/home/user', fs: memory.fs, path: pathAdapter, sdks: ['express'] });
 
-    expect(result).toEqual({ targetDir: '/home/user', agentsMd: 'skipped', claudeMd: 'skipped' });
+    expect(result).toEqual({ targetDir: '/home/user', agentsMd: 'skipped', claudeMd: 'skipped', files: [] });
     expect(memory.read('/home/user/AGENTS.md')).toBeUndefined();
     expect(memory.read('/home/user/CLAUDE.md')).toBeUndefined();
   });
@@ -259,6 +261,33 @@ describe('writeClerkAgentRules with an existing CLAUDE.md', () => {
 
     expect(result.claudeMd).toBe('updated');
     expect(memory.read('/repo/CLAUDE.md')).toBe('Claude rules\n');
+  });
+});
+
+describe('logClerkAgentRulesResult', () => {
+  it('logs the files that changed', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    logClerkAgentRulesResult({
+      targetDir: '/repo',
+      agentsMd: 'created',
+      claudeMd: 'created',
+      files: ['/repo/AGENTS.md', '/repo/CLAUDE.md'],
+    });
+
+    expect(log).toHaveBeenCalledWith(
+      '[Clerk]: Updated /repo/AGENTS.md and /repo/CLAUDE.md for AI coding agents. Set CLERK_AGENTS_MD=false to turn this off.',
+    );
+    log.mockRestore();
+  });
+
+  it('stays quiet when nothing changed', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    logClerkAgentRulesResult({ targetDir: '/repo', agentsMd: 'unchanged', claudeMd: 'unchanged', files: [] });
+
+    expect(log).not.toHaveBeenCalled();
+    log.mockRestore();
   });
 });
 

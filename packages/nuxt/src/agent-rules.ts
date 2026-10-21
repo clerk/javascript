@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { writeClerkAgentRules } from '@clerk/shared/agentRules';
+import { logClerkAgentRulesResult, writeClerkAgentRules } from '@clerk/shared/agentRules';
 import { isClerkAgentRulesWriteAllowed } from '@clerk/shared/utils';
 
 let didWrite = false;
@@ -14,7 +14,7 @@ export function writeAgentRulesOnce(rootDir: string) {
   didWrite = true;
 
   try {
-    writeClerkAgentRules({ cwd: rootDir, fs, path, sdks: ['nuxt'] });
+    logClerkAgentRulesResult(writeClerkAgentRules({ cwd: rootDir, fs, path, sdks: ['nuxt'] }));
   } catch {
     // Writing agent hints must never break a dev server.
   }
