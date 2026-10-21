@@ -118,6 +118,10 @@ export function getButtonLabel(factor: SessionVerificationFirstFactor): Localiza
       return localizationKeys('reverification.alternativeMethods.blockButton__password');
     case 'passkey':
       return localizationKeys('reverification.alternativeMethods.blockButton__passkey');
+    case 'enterprise_sso':
+      return localizationKeys('reverification.alternativeMethods.blockButton__enterpriseSSO', {
+        name: factor.enterpriseConnectionName || '',
+      });
     default:
       throw new Error(`Invalid sign in strategy: "${(factor as any).strategy}"`);
   }

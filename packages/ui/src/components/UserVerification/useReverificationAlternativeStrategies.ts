@@ -49,7 +49,7 @@ export function useReverificationAlternativeStrategies<T = SignInFirstFactor>({
       supportedFirstFactors
         ? (supportedFirstFactors
             .filter(f => !f.strategy.startsWith('oauth_'))
-            .filter(factor => factorHasLocalStrategy(factor))
+            .filter(factor => factorHasLocalStrategy(factor) || factor.strategy === 'enterprise_sso')
             .filter(factor => !firstFactorsAreEqual(factor, filterOutFactor))
             // Only include passkey if the device supports it.
             // @ts-ignore Types are not public yet.

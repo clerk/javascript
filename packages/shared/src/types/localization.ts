@@ -654,6 +654,10 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       actionLink: LocalizationValue;
     };
+    enterpriseSSO: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
     emailCode: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -702,6 +706,7 @@ export type __internal_LocalizationResource = {
       blockButton__totp: LocalizationValue;
       blockButton__passkey: LocalizationValue;
       blockButton__backupCode: LocalizationValue;
+      blockButton__enterpriseSSO: LocalizationValue<'name'>;
       getHelp: {
         title: LocalizationValue;
         content: LocalizationValue;
