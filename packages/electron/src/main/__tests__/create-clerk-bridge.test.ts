@@ -804,10 +804,14 @@ describe('createClerkBridge', () => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
     const firstPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=1');
-    void openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
+    const secondPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth?attempt=2');
     await new Promise(resolve => setTimeout(resolve, 0));
 
     resolveFirstLaunch();
     await expect(firstPromise).rejects.toThrow('replaced by a new one');
+
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
+    await expect(secondPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
   });
 });
