@@ -35,6 +35,7 @@ export function useUserProfilePhonesFixture({
     phones,
     removeReverification: idleReverification,
     setPrimaryReverification: idleReverification,
+    createReverification: idleReverification,
     ...flow,
     onSetPrimaryPhone: id => {
       setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })));
