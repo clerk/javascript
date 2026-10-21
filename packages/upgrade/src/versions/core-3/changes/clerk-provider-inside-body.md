@@ -30,4 +30,4 @@ This change is automatically applied by the upgrade CLI:
 npx @clerk/upgrade --release core-3
 ```
 
-If you're using Next.js 16 with `cacheComponents: true`, you may also need to wrap `ClerkProvider` in a `<Suspense>` boundary.
+Without the `dynamic` prop, `ClerkProvider` doesn't need a `<Suspense>` boundary, but with `cacheComponents: true`, the code under it that reads the request does. That includes `<Show>`, `auth()`, `currentUser()`, and `<SignIn />`, `<SignUp />`, `<UserProfile />`, and `<OrganizationProfile />` on catch-all routes. See [Cache Components](https://clerk.com/docs/guides/development/rendering-modes#cache-components) for where to add the boundaries.
