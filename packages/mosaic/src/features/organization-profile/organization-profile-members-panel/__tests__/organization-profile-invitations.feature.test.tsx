@@ -586,7 +586,7 @@ describe('inviting members', () => {
     const { user, dialog } = await openInviteDialog();
     await addEmails(dialog, 'ada@example.com');
     await user.click(dialog.getByRole('button', { name: 'Send invites' }));
-    await waitFor(() => expect(screen.getByRole('heading', { name: 'Invitations sent' })).toBeVisible());
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Invitation sent' })).toBeVisible());
     expect(fapi.organizationInvitations.map(item => [item.email_address, item.status, item.role])).toEqual([
       ['ada@example.com', 'pending', 'org:admin'],
       ['ada@example.com', 'revoked', 'org:member'],

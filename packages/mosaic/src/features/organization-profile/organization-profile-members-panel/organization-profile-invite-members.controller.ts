@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 
 import { useForm } from '../../../components/form';
 import { useToastManager } from '../../../components/toast';
-import { useMessages } from '../../../localization';
+import { plural, useLocale, useMessages } from '../../../localization';
 import type { InviteMembersInput } from './invitations-table-tab.model';
 import type { MembersRoles } from './members-table-tab.types';
 import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
@@ -22,6 +22,7 @@ export interface InviteMembersControllerOptions {
 export function useInviteMembersController({ roles, defaultRole, invite }: InviteMembersControllerOptions) {
   const m = useMessages('organizationProfileInviteMembers');
   const roleNames = useMessages('roles');
+  const locale = useLocale();
   const toast = useToastManager();
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
@@ -38,7 +39,7 @@ export function useInviteMembersController({ roles, defaultRole, invite }: Invit
       await invite({ emailAddresses, role, roles, onRejected: setRejectedEmailAddresses });
       // TODO: Skip closing and the success toast when the panel unmounted or its identity changed during the invite or the list revalidation; useForm has no success hook that is dropped on unmount.
       setOpen(false);
-      toast.add({ type: 'success', label: m.sent });
+      toast.add({ type: 'success', label: plural(m.sent, emailAddresses.length, locale) });
     },
   });
 

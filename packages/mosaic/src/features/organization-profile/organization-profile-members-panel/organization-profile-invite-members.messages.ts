@@ -8,6 +8,6 @@ export const organizationProfileInviteMembersMessages = {
   rolePlaceholder: 'Select a role',
   cancel: 'Cancel',
   submit: 'Send invites',
-  sent: 'Invitations sent',
+  sent: { one: 'Invitation sent', other: 'Invitations sent' },
   error: 'Unable to send invitations. Please try again.',
 };
