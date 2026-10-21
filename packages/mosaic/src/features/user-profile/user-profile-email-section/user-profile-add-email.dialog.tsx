@@ -87,7 +87,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                 </Flow.Step>
                 <Flow.Step ids={['reverify']}>
                   {current.reverification ? (
-                    <Reverification
+                    <ReverifyStep
                       controller={current.reverification}
                       onClose={() => current.onOpenChange(false)}
                     />
@@ -129,6 +129,17 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
+  );
+}
+
+function ReverifyStep(props: { controller: ReverificationController; onClose: () => void }) {
+  const initialFocusRef = useFlowAutoFocus<HTMLElement>();
+
+  return (
+    <Reverification
+      {...props}
+      initialFocusRef={initialFocusRef}
+    />
   );
 }
 
