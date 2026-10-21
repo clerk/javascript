@@ -25,7 +25,7 @@ vi.mock('../verify.js', async importOriginal => {
 vi.mock('../../jwt/verifyJwt.js', () => ({
   decodeJwt: vi.fn().mockReturnValue({
     data: {
-      header: { typ: 'JWT', alg: 'RS256', kid: 'test-kid' },
+      header: { typ: 'JWT', alg: 'RS256', kid: 'test-kid', cat: 'cl_B7d4PD111AAA' },
       payload: {
         sub: 'user_123',
         __raw: 'raw-token',

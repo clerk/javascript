@@ -14,7 +14,7 @@ import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
-import { JWT_CATEGORY_M2M_TOKEN } from './jwtCategories';
+import { isNonSessionJwtCategory, JWT_CATEGORY_JWT_TEMPLATE } from './jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import {
@@ -120,9 +120,10 @@ export async function verifyToken(
   const { header } = decodedResult;
   const { kid } = header;
 
-  // Reject machine JWTs (e.g. M2M) tagged with a non-session category but signed by the same
-  // instance key, regardless of transport. Reciprocal of the machine verifier's `cat` check.
-  if (header.cat === JWT_CATEGORY_M2M_TOKEN) {
+  // Reject JWTs signed by the same instance key that are not session tokens: machine JWTs
+  // (reciprocal of the machine verifier's `cat` check) and uncategorized tokens such as OIDC
+  // `id_token`s (AISEC-21). JWT-template tokens stay verifiable here for direct callers.
+  if (header.cat !== JWT_CATEGORY_JWT_TEMPLATE && isNonSessionJwtCategory(header.cat)) {
     return {
       errors: [
         new TokenVerificationError({
