@@ -1,5 +1,6 @@
 import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
+import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -161,7 +162,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
           label: 'App settings',
           icon: (
             <Icon
-              name='cog-6-teeth'
+              glyph={Cog6Teeth}
               size='sm'
             />
           ),

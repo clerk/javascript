@@ -61,7 +61,7 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
                 entry.custom.icon
               ) : (
                 <Icon
-                  name={USER_PROFILE_PAGE_ICONS[entry.id]}
+                  glyph={USER_PROFILE_PAGE_ICONS[entry.id]}
                   size='sm'
                 />
               )

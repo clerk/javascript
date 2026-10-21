@@ -10,6 +10,7 @@ import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
+import { ChevronRight } from '../../../icons/glyphs/chevron-right';
 import { rtl } from '../../../styles/rtl.styles';
 
 const styles = stylex.create({
@@ -22,7 +23,7 @@ export interface ReverificationMethod {
   id: string;
   label: string;
   description?: string;
-  icon: IconProps['name'];
+  icon: IconProps['glyph'];
 }
 
 export interface ReverificationMethodPickerMessages {
@@ -79,7 +80,7 @@ export function ReverificationMethodPicker({
               >
                 <Item.Media>
                   <IconFrame filled>
-                    <Icon name={method.icon} />
+                    <Icon glyph={method.icon} />
                   </IconFrame>
                 </Item.Media>
                 <Item.Content>
@@ -91,7 +92,7 @@ export function ReverificationMethodPicker({
                     <Spinner size='sm' />
                   ) : (
                     <Icon
-                      name='chevron-right'
+                      glyph={ChevronRight}
                       xstyle={rtl.mirror}
                     />
                   )}

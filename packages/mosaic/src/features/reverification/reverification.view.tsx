@@ -4,7 +4,11 @@ import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { Spinner } from '../../components/spinner';
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Code } from '../../icons/glyphs/code';
+import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
+import { SecurityPasskey } from '../../icons/glyphs/security-passkey';
+import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import type { MosaicMessages } from '../../localization';
 import { fill, useMessages } from '../../localization';
 import { styles } from './reverification.styles';
@@ -24,13 +28,13 @@ import { ReverificationPassword } from './steps/reverification-password';
 type Messages = MosaicMessages['reverification'];
 
 const methodIcon = {
-  password: 'security-lock-square',
-  passkey: 'security-passkey',
-  email_code: 'code',
-  phone_code: 'security-phone',
-  totp: 'security-lock-square',
-  backup_code: 'security-phone',
-} as const satisfies Record<ReverificationMethod['strategy'], IconName>;
+  password: SecurityLockSquare,
+  passkey: SecurityPasskey,
+  email_code: Code,
+  phone_code: SecurityPhone,
+  totp: SecurityLockSquare,
+  backup_code: SecurityPhone,
+} as const satisfies Record<ReverificationMethod['strategy'], IconComponent>;
 
 function methodLabel(method: ReverificationMethod, m: Messages): string {
   const identifier = 'identifier' in method ? method.identifier : '';

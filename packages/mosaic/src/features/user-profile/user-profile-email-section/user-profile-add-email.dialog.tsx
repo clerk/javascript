@@ -14,6 +14,7 @@ import { Input } from '../../../components/input';
 import { Item } from '../../../components/item';
 import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
+import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, rich, useMessages } from '../../../localization';
 import { styles as panelStyles } from '../user-profile-profile-panel.styles';
 
@@ -372,7 +373,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             >
               {m.sso.connect}
               <Icon
-                name='arrow-up-right'
+                glyph={ArrowUpRight}
                 placement='inline-end'
                 size='sm'
               />

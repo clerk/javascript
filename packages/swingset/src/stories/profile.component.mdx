@@ -25,6 +25,8 @@ dismiss into the navigation; standalone it paints the same frame and takes its o
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Profile } from '@clerk/mosaic/components/profile';
+import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
+import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
 
 <Profile.Root
   value={page}
@@ -34,13 +36,13 @@ import { Profile } from '@clerk/mosaic/components/profile';
   <Profile.Nav>
     <Profile.NavItem
       value='account'
-      icon={<Icon name='user-circle' size='sm' />}
+      icon={<Icon glyph={UserCircle} size='sm' />}
     >
       Account
     </Profile.NavItem>
     <Profile.NavItem
       value='security'
-      icon={<Icon name='shield-check' size='sm' />}
+      icon={<Icon glyph={ShieldCheck} size='sm' />}
       badge={<Badge>2</Badge>}
     >
       Security

@@ -5,6 +5,7 @@ import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
+import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
 
 export interface UserProfileAddMfaDialogProps {
@@ -52,7 +53,7 @@ export function UserProfileAddMfaDialog({
           }
         >
           <Icon
-            name='plus'
+            glyph={Plus}
             placement='inline-start'
             size='sm'
           />

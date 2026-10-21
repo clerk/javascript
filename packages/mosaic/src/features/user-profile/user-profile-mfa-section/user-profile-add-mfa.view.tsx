@@ -2,6 +2,10 @@ import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
+import { ChevronRight } from '../../../icons/glyphs/chevron-right';
+import { Numbers } from '../../../icons/glyphs/numbers';
+import { SecurityLockSquare } from '../../../icons/glyphs/security-lock-square';
+import { SecurityPhone } from '../../../icons/glyphs/security-phone';
 import { useMessages } from '../../../localization';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
@@ -11,9 +15,9 @@ export interface UserProfileAddMfaViewProps {
 }
 
 const icons = {
-  sms: 'security-phone',
-  authenticator: 'security-lock-square',
-  'backup-codes': 'numbers',
+  sms: SecurityPhone,
+  authenticator: SecurityLockSquare,
+  'backup-codes': Numbers,
 } as const;
 
 export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaViewProps) {
@@ -41,7 +45,7 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
             >
               <Item.Media>
                 <IconFrame filled>
-                  <Icon name={icons[type]} />
+                  <Icon glyph={icons[type]} />
                 </IconFrame>
               </Item.Media>
               <Item.Content>
@@ -49,7 +53,7 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
                 <Item.Description>{m.addDialog.methods[type]}</Item.Description>
               </Item.Content>
               <Item.Actions>
-                <Icon name='chevron-right' />
+                <Icon glyph={ChevronRight} />
               </Item.Actions>
             </Item.Root>
           ))}

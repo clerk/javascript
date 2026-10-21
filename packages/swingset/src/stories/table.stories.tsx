@@ -6,6 +6,8 @@ import { Menu } from '@clerk/mosaic/components/menu';
 import type { TableSort } from '@clerk/mosaic/components/table';
 import { Table } from '@clerk/mosaic/components/table';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
+import { MagnifyingGlass } from '@clerk/mosaic/icons/glyphs/magnifying-glass';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
 import type { OnChangeFn, SortingState } from '@clerk/mosaic/primitives/hooks';
 import { useDataTable } from '@clerk/mosaic/primitives/hooks';
 import * as stylex from '@stylexjs/stylex';
@@ -333,7 +335,7 @@ export function Empty() {
       <Table.Body>
         <Table.Empty>
           <EmptyState.Root>
-            <EmptyState.Icon name='magnifying-glass' />
+            <EmptyState.Icon glyph={MagnifyingGlass} />
             <EmptyState.Label>No API keys</EmptyState.Label>
             <EmptyState.Description>
               Create a key to start making requests from your application.
@@ -341,7 +343,7 @@ export function Empty() {
             <EmptyState.Actions>
               <Button size='sm'>
                 <Icon
-                  name='plus'
+                  glyph={Plus}
                   placement='inline-start'
                 />
                 Create key

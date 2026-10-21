@@ -1,4 +1,9 @@
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Building } from '../../icons/glyphs/building';
+import { CreditCard } from '../../icons/glyphs/credit-card';
+import { Key } from '../../icons/glyphs/key';
+import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
+import { Users } from '../../icons/glyphs/users';
 import { applyOrder } from '../../utils/apply-order';
 import type {
   CustomOrganizationProfilePage,
@@ -14,12 +19,12 @@ export const ORGANIZATION_PROFILE_PAGE_IDS: readonly OrganizationProfilePageId[]
   'apiKeys',
 ];
 
-export const ORGANIZATION_PROFILE_PAGE_ICONS: Record<OrganizationProfilePageId, IconName> = {
-  general: 'building',
-  members: 'users',
-  security: 'security-lock-square',
-  billing: 'credit-card',
-  apiKeys: 'key',
+export const ORGANIZATION_PROFILE_PAGE_ICONS: Record<OrganizationProfilePageId, IconComponent> = {
+  general: Building,
+  members: Users,
+  security: SecurityLockSquare,
+  billing: CreditCard,
+  apiKeys: Key,
 };
 
 export type OrganizationProfileNavEntry =

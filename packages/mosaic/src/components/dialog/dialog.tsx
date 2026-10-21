@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useAccessibleDescriptionWarning } from '../../hooks/use-accessible-description-warning';
 import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
+import { X } from '../../icons/glyphs/x';
 import type {
   DialogFocusTarget,
   DialogHandle,
@@ -270,7 +271,7 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
         )}
         {...mergeStyleProps(themeProps('dialog-close-button'), stylex.props(xstyle), rest)}
       >
-        <Icon name='x' />
+        <Icon glyph={X} />
       </Primitive.Close>
     </span>
   );
