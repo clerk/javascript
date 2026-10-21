@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { writeClerkAgentRules } from '@clerk/shared/agentRules';
 import type { ClerkOptions } from '@clerk/shared/types';
-import { isAgentEnvironment, isAutomatedEnvironment } from '@clerk/shared/utils';
+import { isClerkAgentRulesWriteAllowed } from '@clerk/shared/utils';
 import type { AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
 
@@ -39,7 +39,7 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
       name: '@clerk/astro/integration',
       hooks: {
         'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
-          if (command === 'dev' && !didWriteAgentRules && !isAutomatedEnvironment() && isAgentEnvironment()) {
+          if (command === 'dev' && !didWriteAgentRules && isClerkAgentRulesWriteAllowed()) {
             didWriteAgentRules = true;
             try {
               writeClerkAgentRules({ cwd: fileURLToPath(config.root), fs, path, sdks: ['astro'] });

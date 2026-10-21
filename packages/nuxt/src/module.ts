@@ -3,7 +3,7 @@ import * as path from 'node:path';
 
 import { writeClerkAgentRules } from '@clerk/shared/agentRules';
 import type { InternalClerkScriptProps, Without } from '@clerk/shared/types';
-import { isAgentEnvironment, isAutomatedEnvironment } from '@clerk/shared/utils';
+import { isClerkAgentRulesWriteAllowed } from '@clerk/shared/utils';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
@@ -52,7 +52,7 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   setup(options, nuxt) {
-    if (nuxt.options.dev && !didWriteAgentRules && !isAutomatedEnvironment() && isAgentEnvironment()) {
+    if (nuxt.options.dev && !didWriteAgentRules && isClerkAgentRulesWriteAllowed()) {
       didWriteAgentRules = true;
       try {
         writeClerkAgentRules({ cwd: nuxt.options.rootDir, fs, path, sdks: ['nuxt'] });

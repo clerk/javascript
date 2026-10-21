@@ -80,3 +80,8 @@ export const isAgentEnvironment = (): boolean => {
     return name === 'CURSOR_EXTENSION_HOST_ROLE' ? value === 'agent-exec' : isTruthyEnvValue(value);
   });
 };
+
+export const isClerkAgentRulesWriteAllowed = (): boolean => {
+  const optOut = getEnvVariable('CLERK_AGENTS_MD').toLowerCase();
+  return !['0', 'false', 'off', 'no'].includes(optOut) && !isProductionEnvironment() && !isAutomatedEnvironment();
+};

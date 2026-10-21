@@ -1,6 +1,6 @@
 import type { FileSystemAdapter, PathAdapter } from '@clerk/shared/agentRules';
 import { writeClerkAgentRules } from '@clerk/shared/agentRules';
-import { isAgentEnvironment, isAutomatedEnvironment, isProductionEnvironment } from '@clerk/shared/utils';
+import { isClerkAgentRulesWriteAllowed } from '@clerk/shared/utils';
 
 type NodeProcess = {
   cwd: () => string;
@@ -10,7 +10,7 @@ type NodeProcess = {
 let didWrite = false;
 
 export function writeAgentRulesOnce() {
-  if (didWrite || isProductionEnvironment() || isAutomatedEnvironment() || !isAgentEnvironment()) {
+  if (didWrite || !isClerkAgentRulesWriteAllowed()) {
     return;
   }
 

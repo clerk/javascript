@@ -1,12 +1,12 @@
 import { writeClerkAgentRules } from '@clerk/shared/agentRules';
-import { isAgentEnvironment, isAutomatedEnvironment, isProductionEnvironment } from '@clerk/shared/utils';
+import { isClerkAgentRulesWriteAllowed } from '@clerk/shared/utils';
 
 import { nodeCwdOrThrow, nodeFsOrThrow, nodePathOrThrow } from './fs/utils';
 
 let didWrite = false;
 
 export function writeAgentRulesOnce() {
-  if (didWrite || isProductionEnvironment() || isAutomatedEnvironment() || !isAgentEnvironment()) {
+  if (didWrite || !isClerkAgentRulesWriteAllowed()) {
     return;
   }
 
