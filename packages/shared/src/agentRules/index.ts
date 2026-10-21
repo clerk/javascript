@@ -41,6 +41,7 @@ export type WriteClerkAgentRulesResult = {
   targetDir: string;
   agentsMd: 'created' | 'updated' | 'unchanged' | 'skipped';
   claudeMd: 'created' | 'updated' | 'unchanged' | 'skipped';
+  files: string[];
 };
 
 const GENERIC_START = '<!-- BEGIN:clerk-agent-rules -->';
@@ -235,7 +236,7 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
   const { dryRun = false, fs, path, sdks } = options;
   const targetDir = findTargetDir(fs, path, options.cwd);
   if (!targetDir) {
-    return { targetDir: path.resolve(options.cwd), agentsMd: 'skipped', claudeMd: 'skipped' };
+    return { targetDir: path.resolve(options.cwd), agentsMd: 'skipped', claudeMd: 'skipped', files: [] };
   }
 
   const targetFile = pickTargetFile(fs, path, targetDir);
@@ -291,5 +292,17 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
         : claudeExists
           ? 'unchanged'
           : 'skipped',
+    files: [
+      ...(targetStatus === 'unchanged' ? [] : [targetFile]),
+      ...(shouldCreateClaude || shouldImportAgentsInClaude ? [claudePath] : []),
+    ],
   };
+}
+
+export function logClerkAgentRulesResult({ files }: WriteClerkAgentRulesResult) {
+  if (files.length > 0) {
+    console.log(
+      `[Clerk]: Updated ${files.join(' and ')} for AI coding agents. Set CLERK_AGENTS_MD=false to turn this off.`,
+    );
+  }
 }

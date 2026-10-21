@@ -12,7 +12,9 @@ vi.mock('../agentRules', async importOriginal => ({
 
 describe('createClerkAgentRulesWriter', () => {
   beforeEach(() => {
-    vi.mocked(writeClerkAgentRules).mockReset();
+    vi.mocked(writeClerkAgentRules)
+      .mockReset()
+      .mockReturnValue({ targetDir: '/app', agentsMd: 'unchanged', claudeMd: 'unchanged', files: [] });
     for (const name of automatedEnvironmentVariables) {
       vi.stubEnv(name, '');
     }

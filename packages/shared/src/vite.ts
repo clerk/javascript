@@ -1,4 +1,4 @@
-import { type ClerkAgentRulesSdk, writeClerkAgentRules } from './agentRules';
+import { type ClerkAgentRulesSdk, logClerkAgentRulesResult, writeClerkAgentRules } from './agentRules';
 import { isClerkAgentRulesWriteAllowed } from './utils';
 
 type ViteResolvedConfig = {
@@ -21,7 +21,7 @@ export function clerkAgentRulesVitePlugin(sdk: Extract<ClerkAgentRulesSdk, 'chro
 
       try {
         const [fs, path] = await Promise.all([import('node:fs'), import('node:path')]);
-        writeClerkAgentRules({ cwd: config.root, fs, path, sdks: [sdk] });
+        logClerkAgentRulesResult(writeClerkAgentRules({ cwd: config.root, fs, path, sdks: [sdk] }));
       } catch {
         // Writing agent hints must never break a dev server.
       }
