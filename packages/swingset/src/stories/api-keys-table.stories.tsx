@@ -7,7 +7,7 @@ import { useAPIKeysTableFixture } from './fixtures/api-keys-table';
 export { default as __source } from './api-keys-table.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'API Keys',
+  group: 'Misc',
   status: 'wip',
   title: 'APIKeysTable',
   label: 'API keys table',

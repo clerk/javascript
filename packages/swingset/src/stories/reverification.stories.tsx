@@ -20,7 +20,7 @@ import type { StoryMeta } from '@/lib/types';
 export { default as __source } from './reverification.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'Reverification',
+  group: 'Misc',
   status: 'stable',
   title: 'Reverification',
   source: 'packages/mosaic/src/features/reverification/reverification.view.tsx',
