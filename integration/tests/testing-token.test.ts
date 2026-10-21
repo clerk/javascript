@@ -15,9 +15,11 @@ test.describe('OAuth testing tokens @nextjs', () => {
 
   test.beforeAll(async () => {
     app = createServer((request, response) => {
+      response.setHeader('Content-Type', 'text/plain');
       response.end(JSON.stringify({ url: request.url, method: request.method }));
     }).listen(0, '127.0.0.1');
     provider = createServer((request, response) => {
+      response.setHeader('Content-Type', 'text/plain');
       const url = new URL(request.url || '/', providerOrigin);
       if (request.method === 'POST' && url.pathname.startsWith('/v1/me/oauth/consent/')) {
         let body = '';
