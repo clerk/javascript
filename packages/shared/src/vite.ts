@@ -1,5 +1,5 @@
 import { type ClerkAgentRulesSdk, writeClerkAgentRules } from './agentRules';
-import { isAgentEnvironment, isAutomatedEnvironment } from './utils';
+import { isClerkAgentRulesWriteAllowed } from './utils';
 
 type ViteResolvedConfig = {
   command: 'build' | 'serve';
@@ -13,7 +13,7 @@ export function clerkAgentRulesVitePlugin(sdk: Extract<ClerkAgentRulesSdk, 'reac
     name: `clerk-agent-rules-${sdk}`,
     apply: 'serve' as const,
     async configResolved(config: ViteResolvedConfig) {
-      if (didWrite || config.command !== 'serve' || isAutomatedEnvironment() || !isAgentEnvironment()) {
+      if (didWrite || config.command !== 'serve' || !isClerkAgentRulesWriteAllowed()) {
         return;
       }
 

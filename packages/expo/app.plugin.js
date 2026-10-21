@@ -7,7 +7,8 @@
  * 3. If @clerk/expo-native-components is installed, its config plugin is applied for the Clerk native SDKs
  */
 const { AndroidConfig, withAndroidManifest, withEntitlementsPlist, withInfoPlist } = require('@expo/config-plugins');
-const { isAgentEnvironment, isAutomatedEnvironment, isProductionEnvironment } = require('@clerk/shared/utils');
+const { writeClerkAgentRules } = require('@clerk/shared/agentRules');
+const { isClerkAgentRulesWriteAllowed } = require('@clerk/shared/utils');
 
 const fs = require('fs');
 const path = require('path');
@@ -17,7 +18,7 @@ const CLERK_EXPO_NATIVE_OPTIONS = ['keychainService', 'theme'];
 let didWriteAgentRules = false;
 
 const maybeWriteAgentRules = config => {
-  if (didWriteAgentRules || isProductionEnvironment() || isAutomatedEnvironment() || !isAgentEnvironment()) {
+  if (didWriteAgentRules || !isClerkAgentRulesWriteAllowed()) {
     return;
   }
 
@@ -29,7 +30,7 @@ const maybeWriteAgentRules = config => {
   didWriteAgentRules = true;
 
   try {
-    require('@clerk/shared/agentRules').writeClerkAgentRules({ cwd: projectRoot, fs, path, sdks: ['expo'] });
+    writeClerkAgentRules({ cwd: projectRoot, fs, path, sdks: ['expo'] });
   } catch {
     // Writing agent hints must never break Expo config evaluation.
   }

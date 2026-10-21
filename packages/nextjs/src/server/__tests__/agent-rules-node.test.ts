@@ -1,12 +1,10 @@
 import { writeClerkAgentRules } from '@clerk/shared/agentRules';
-import { isAgentEnvironment, isAutomatedEnvironment } from '@clerk/shared/utils';
+import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@clerk/shared/agentRules', () => ({ writeClerkAgentRules: vi.fn() }));
-vi.mock('@clerk/shared/utils', async importOriginal => ({
-  ...(await importOriginal<typeof import('@clerk/shared/utils')>()),
-  isAgentEnvironment: vi.fn(),
-  isAutomatedEnvironment: vi.fn(),
+vi.mock('@clerk/shared/agentRules', async importOriginal => ({
+  ...(await importOriginal<typeof import('@clerk/shared/agentRules')>()),
+  writeClerkAgentRules: vi.fn(),
 }));
 vi.mock('../fs/utils', () => ({
   nodeCwdOrThrow: () => () => '/app',
@@ -20,8 +18,10 @@ describe('writeAgentRulesOnce', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.mocked(writeClerkAgentRules).mockReset();
-    vi.mocked(isAgentEnvironment).mockReturnValue(true);
-    vi.mocked(isAutomatedEnvironment).mockReturnValue(false);
+    for (const name of automatedEnvironmentVariables) {
+      vi.stubEnv(name, '');
+    }
+    vi.stubEnv('CLERK_AGENTS_MD', '');
     vi.stubEnv('NODE_ENV', 'development');
   });
 
@@ -29,7 +29,7 @@ describe('writeAgentRulesOnce', () => {
     vi.unstubAllEnvs();
   });
 
-  it('writes the Next.js rules once per process', async () => {
+  it('writes the rules once per process in development, with or without an AI agent', async () => {
     const writeAgentRulesOnce = await loadWriteAgentRulesOnce();
 
     writeAgentRulesOnce();
@@ -39,16 +39,8 @@ describe('writeAgentRulesOnce', () => {
     expect(writeClerkAgentRules).toHaveBeenCalledWith(expect.objectContaining({ cwd: '/app', sdks: ['nextjs'] }));
   });
 
-  it('skips outside an agent environment', async () => {
-    vi.mocked(isAgentEnvironment).mockReturnValue(false);
-
-    (await loadWriteAgentRulesOnce())();
-
-    expect(writeClerkAgentRules).not.toHaveBeenCalled();
-  });
-
   it('skips in CI', async () => {
-    vi.mocked(isAutomatedEnvironment).mockReturnValue(true);
+    vi.stubEnv('CI', 'true');
 
     (await loadWriteAgentRulesOnce())();
 
@@ -57,6 +49,14 @@ describe('writeAgentRulesOnce', () => {
 
   it('skips in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
+
+    (await loadWriteAgentRulesOnce())();
+
+    expect(writeClerkAgentRules).not.toHaveBeenCalled();
+  });
+
+  it('skips when CLERK_AGENTS_MD is false', async () => {
+    vi.stubEnv('CLERK_AGENTS_MD', 'false');
 
     (await loadWriteAgentRulesOnce())();
 
