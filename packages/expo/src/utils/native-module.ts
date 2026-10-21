@@ -34,7 +34,7 @@ function loadNativeModule(): ClerkExpoNativeModule | null {
     nativeModule = NativeClerkModule;
   } catch (e) {
     if (__DEV__) {
-      console.warn('[ClerkExpo] Native module not available:', e);
+      console.warn('Clerk: Native module not available:', e);
     }
   }
 
@@ -44,7 +44,7 @@ function loadNativeModule(): ClerkExpoNativeModule | null {
 
   if (__DEV__ && nativeModule) {
     console.error(
-      '[ClerkExpo] The native Clerk module in this app binary is incompatible with this version of @clerk/expo, so native components are disabled. ' +
+      'Clerk: The native Clerk module in this app binary is incompatible with this version of @clerk/expo, so native components are disabled. ' +
         'Install the @clerk/expo-native-components version required by @clerk/expo, then rebuild the app.',
     );
   }

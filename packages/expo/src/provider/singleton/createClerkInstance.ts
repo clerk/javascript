@@ -327,7 +327,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
         if (__DEV__ && !nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
           console.error(
-            'The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/~/native-applications',
+            'Clerk: The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/~/native-applications',
           );
           nativeApiErrorShown = true;
         }

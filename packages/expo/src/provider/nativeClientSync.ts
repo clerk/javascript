@@ -43,7 +43,7 @@ let activeEngine: Engine | null = null;
 
 function warn(message: string, error?: unknown): void {
   if (__DEV__) {
-    console.warn(`[ClerkExpo] ${message}`, error);
+    console.warn(`Clerk: ${message}`, error);
   }
 }
 
