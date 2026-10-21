@@ -13,6 +13,7 @@ import type { UserProfileDevice } from './user-profile-active-devices.types';
 export type UserProfileActiveDevicesModel =
   | { status: 'loading' }
   | { status: 'hidden' }
+  | { status: 'loadingDevices' }
   | {
       status: 'ready';
       identity: string;
@@ -106,7 +107,7 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   }
 
   if (query.identity !== identity || query.status === 'loading') {
-    return { status: 'loading' };
+    return { status: 'loadingDevices' };
   }
   return {
     status: 'ready',

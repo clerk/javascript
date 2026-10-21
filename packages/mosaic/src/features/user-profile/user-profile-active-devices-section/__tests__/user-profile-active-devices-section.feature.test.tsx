@@ -87,26 +87,105 @@ function serveDevices(
 }
 
 describe('Active devices', () => {
-  it('honors the loading fallback, including rendering nothing by default', async () => {
+  it('shows its skeleton under a live title while loading, then the devices', async () => {
+    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
+    const pending = createDeferredPromise();
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), async () => {
+        await pending.promise;
+        return undefined;
+      }),
+    );
+    try {
+      await renderWithClerk(<UserProfileActiveDevicesSection />);
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
+      expect(screen.getByRole('heading', { name: 'Active devices' })).toBeVisible();
+      expect(screen.getByText('Chrome on macOS')).not.toBeVisible();
+      expect(screen.queryByText('This device')).toBeNull();
+      expect(screen.queryByRole('button', { name: /^Manage / })).toBeNull();
+    } finally {
+      pending.resolve();
+    }
+    expect(await screen.findByRole('button', { name: 'Manage Safari on iPhone' })).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Active devices loaded');
+  });
+
+  it('shows its skeleton, not the fallback, while the devices load', async () => {
     serveDevices([device('sess_current', 'active')]);
     const pending = createDeferredPromise();
     worker.use(
       http.get(fapiUrl('/v1/me/sessions/active'), async () => {
         await pending.promise;
-        return HttpResponse.json([device('sess_current', 'active')]);
+        return undefined;
       }),
     );
     try {
-      const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
-      expect(view.container).toBeEmptyDOMElement();
-      view.rerender(<UserProfileActiveDevicesSection fallback={<p>Loading devices</p>} />);
-      expect(screen.getByText('Loading devices')).toBeVisible();
+      const view = await renderWithClerk(<UserProfileActiveDevicesSection fallback={<p>Loading devices</p>} />);
+      expect(screen.queryByText('Loading devices')).toBeNull();
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
       view.rerender(<UserProfileActiveDevicesSection fallback={null} />);
-      expect(view.container).toBeEmptyDOMElement();
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
     } finally {
       pending.resolve();
     }
     expect(await screen.findByText('This device')).toBeVisible();
+  });
+
+  it('shows its skeleton again when remounted', async () => {
+    serveDevices([device('sess_current', 'active')]);
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    expect(await screen.findByText('This device')).toBeVisible();
+    view.rerender(<div />);
+
+    const pending = createDeferredPromise();
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), async () => {
+        await pending.promise;
+        return undefined;
+      }),
+    );
+    try {
+      view.rerender(<UserProfileActiveDevicesSection />);
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
+      expect(screen.queryByText('This device')).toBeNull();
+    } finally {
+      pending.resolve();
+    }
+    expect(await screen.findByText('This device')).toBeVisible();
+  });
+
+  it('shows its skeleton instead of the old devices while a new session loads', async () => {
+    const nextUser = fapiUser({ id: 'user_2' });
+    serveFapi({
+      client: fapiClient([
+        fapiSession({ id: 'sess_current', user: alice }),
+        fapiSession({ id: 'sess_next', user: nextUser }),
+      ]),
+      activeDevices: [
+        device('sess_current', 'active'),
+        device('sess_other', 'active', { device_type: 'Old phone' }),
+        { ...device('sess_next', 'active', { device_type: 'Next laptop' }), ownerUserId: nextUser.id },
+      ],
+    });
+    const pending = createDeferredPromise();
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), async ({ request }) => {
+        if (new URL(request.url).searchParams.get('_clerk_session_id') === 'sess_next') {
+          await pending.promise;
+        }
+        return undefined;
+      }),
+    );
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    try {
+      expect(await screen.findByRole('button', { name: 'Manage Safari on Old phone' })).toBeVisible();
+      await act(() => view.clerk.setActive({ session: 'sess_next' }));
+      expect(screen.getByRole('status')).toHaveTextContent('Loading active devices');
+      expect(screen.queryByRole('button', { name: 'Manage Safari on Old phone' })).toBeNull();
+    } finally {
+      pending.resolve();
+    }
+    expect(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
   });
 
   it('shows signed-in sessions and signs out another device inside the security panel', async () => {
