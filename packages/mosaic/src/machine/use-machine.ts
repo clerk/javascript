@@ -43,6 +43,7 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
     actorRef.current = createActor(machine, options);
   }
   const actor = actorRef.current;
+  const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);
 
   useEffect(() => {
     actor.start();
@@ -58,12 +59,12 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
     }
   });
 
-  const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);
-
   const onDoneRef = useRef(options?.onDone);
   onDoneRef.current = options?.onDone;
+  const doneReportedRef = useRef(false);
   useEffect(() => {
-    if (snapshot.status === 'done') {
+    if (snapshot.status === 'done' && !doneReportedRef.current) {
+      doneReportedRef.current = true;
       onDoneRef.current?.();
     }
   }, [snapshot.status]);
