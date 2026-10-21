@@ -7,6 +7,7 @@ import { defineConfig } from 'vitest/config';
 const mosaicPath = resolve(import.meta.dirname, 'src');
 const featureTests = 'src/**/*.feature.test.tsx';
 const webkitTests = 'src/**/*.webkit.test.tsx';
+const concurrencyTests = 'src/**/*.concurrency.feature.test.tsx';
 
 export default defineConfig({
   plugins: [
@@ -65,6 +66,39 @@ export default defineConfig({
         test: {
           name: 'feature',
           include: [featureTests],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.browser.mts')],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+      {
+        extends: true,
+        publicDir: 'test/public',
+        cacheDir: 'node_modules/.vite-react-19',
+        resolve: {
+          alias: [
+            { find: /^react-dom(\/.*)?$/, replacement: 'react-dom-19$1' },
+            { find: /^react(\/.*)?$/, replacement: 'react-19$1' },
+          ],
+        },
+        optimizeDeps: {
+          include: [
+            '@clerk/clerk-js',
+            '@wallet-standard/core',
+            '@testing-library/jest-dom/matchers',
+            '@testing-library/react',
+            '@testing-library/user-event',
+            'msw',
+            'msw/browser',
+          ],
+        },
+        test: {
+          name: 'concurrency-react-19',
+          include: [concurrencyTests],
           setupFiles: [resolve(import.meta.dirname, 'vitest.setup.browser.mts')],
           browser: {
             enabled: true,

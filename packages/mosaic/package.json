@@ -87,7 +87,9 @@
     "playwright": "1.62.1",
     "qrcode.react": "4.2.0",
     "react": "catalog:react",
+    "react-19": "npm:react@19.2.8",
     "react-dom": "catalog:react",
+    "react-dom-19": "npm:react-dom@19.2.8",
     "tsdown": "catalog:repo",
     "vitest-axe": "^0.1.0"
   },
