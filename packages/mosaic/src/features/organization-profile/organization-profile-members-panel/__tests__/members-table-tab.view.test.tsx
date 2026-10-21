@@ -84,6 +84,12 @@ describe('MembersTableTabView', () => {
     vi.restoreAllMocks();
   });
 
+  it('does not report members as loaded when they fail to load', () => {
+    renderView({ isError: true, onRetry: vi.fn() });
+    expect(screen.getByRole('alert')).toHaveTextContent('Unable to load members');
+    expect(screen.queryByText('Members loaded')).toBeNull();
+  });
+
   it('chooses loading, retained rows, and filtered empty results from the supplied state', () => {
     const { props, rerender } = renderTab({ members: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading members');

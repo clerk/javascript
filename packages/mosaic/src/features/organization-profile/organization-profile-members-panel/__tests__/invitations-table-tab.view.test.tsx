@@ -59,6 +59,12 @@ describe('InvitationsTableTabView', () => {
     vi.restoreAllMocks();
   });
 
+  it('does not report invitations as loaded when they fail to load', () => {
+    renderView({ isError: true, onRetry: vi.fn() });
+    expect(screen.getByRole('alert')).toHaveTextContent('Unable to load invitations');
+    expect(screen.queryByText('Invitations loaded')).toBeNull();
+  });
+
   it('chooses loading, retained rows, an empty list, and the error state from the supplied state', () => {
     const { props, rerender } = renderTab({ invitations: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading invitations');

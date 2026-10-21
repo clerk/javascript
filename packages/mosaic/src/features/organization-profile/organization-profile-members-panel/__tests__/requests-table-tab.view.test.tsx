@@ -84,6 +84,12 @@ describe('RequestsTableTabView', () => {
     },
   );
 
+  it('does not report requests as loaded when they fail to load', () => {
+    renderView({ isError: true, onRetry: vi.fn() });
+    expect(screen.getByRole('alert')).toHaveTextContent('Unable to load requests');
+    expect(screen.queryByText('Requests loaded')).toBeNull();
+  });
+
   it('chooses loading, retained rows, an empty list, and the error state from the supplied state', () => {
     const { props, rerender } = renderTab({ requests: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading requests');

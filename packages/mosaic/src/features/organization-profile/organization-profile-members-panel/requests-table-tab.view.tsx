@@ -65,7 +65,7 @@ export function RequestsTableTabView({
       role='group'
       aria-label={m.title}
     >
-      <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>
+      {isError ? null : <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>}
       {onInvite ? (
         <Table.Toolbar>
           <Button
