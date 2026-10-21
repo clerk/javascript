@@ -6,6 +6,7 @@ import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import { toLocalizableError } from '../../../utils/errors';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfileMfaAddableMethod, UserProfileMfaModel } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 import type { UserProfileMfaSetupViewProps } from './user-profile-mfa-setup.view';
@@ -61,6 +62,7 @@ type MfaEvent =
 
 const { createMachine, assign, fromPromise } = setup<MfaContext, MfaEvent>();
 const RESEND_COOLDOWN_SECONDS = 30;
+const REVERIFIABLE_ACTIONS: readonly (MfaAction | undefined)[] = ['generate', 'sms', 'prepareAuthenticator'];
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 
 const mfaMachine = createMachine({
@@ -413,6 +415,7 @@ function createSetupProps(
   send: MfaSend,
   actions: MfaSetupActions,
   errorText: ReturnType<typeof useErrorText>,
+  reverification: ReverificationController,
 ): UserProfileMfaSetupViewProps {
   const flow = context.flow;
   const sms = flow.kind === 'sms' ? flow : undefined;
@@ -420,14 +423,14 @@ function createSetupProps(
   const backup = flow.kind === 'backup' ? flow : undefined;
   return {
     step:
-      flow.kind === 'closed'
-        ? 'select'
-        : flow.kind === 'backup'
-          ? context.pending === 'generate' && model.backupCodesReverification.visible
-            ? 'verify'
-            : 'backup-codes'
-          : flow.kind,
-    reverification: model.backupCodesReverification,
+      REVERIFIABLE_ACTIONS.includes(context.pending) && reverification.visible
+        ? 'verify'
+        : flow.kind === 'closed'
+          ? 'select'
+          : flow.kind === 'backup'
+            ? 'backup-codes'
+            : flow.kind,
+    reverification,
     methods: model.addableMethods,
     onSelect: actions.select,
     onBack: actions.back,
@@ -521,6 +524,10 @@ export function useUserProfileMfaController(model: ReadyModel) {
     }
   };
 
+  const reverification =
+    [model.createPhoneReverification, model.enrollSmsReverification, model.authenticatorReverification].find(
+      controller => controller.visible,
+    ) ?? model.backupCodesReverification;
   const setupProps = createSetupProps(
     model,
     context,
@@ -539,6 +546,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
       print,
     },
     errorText,
+    reverification,
   );
 
   const sectionProps: UserProfileMfaSectionViewProps = {
@@ -552,7 +560,6 @@ export function useUserProfileMfaController(model: ReadyModel) {
   };
 
   const showAddTrigger = model.addableMethods.length > 0;
-  const reverification = model.backupCodesReverification;
   const reverifying = setupProps.step === 'verify';
 
   return {
@@ -561,7 +568,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
     showAddControl: showAddTrigger || dialogOpen,
     reverifying,
     onDialogOpenChange: (open: boolean) => {
-      if (!open && context.pending === 'generate') {
+      if (!open && REVERIFIABLE_ACTIONS.includes(context.pending)) {
         if (!reverification.onCancel) {
           return;
         }
