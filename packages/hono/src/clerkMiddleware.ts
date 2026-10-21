@@ -3,10 +3,13 @@ import { createClerkClient } from '@clerk/backend';
 import type { AuthenticateRequestOptions, AuthOptions, GetAuthFnNoRequest } from '@clerk/backend/internal';
 import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import { clerkFrontendApiProxy, DEFAULT_PROXY_PATH, matchProxyPath, stripTrailingSlashes } from '@clerk/backend/proxy';
+import { createClerkAgentRulesWriter } from '@clerk/shared/agentRulesWriter';
 import type { MiddlewareHandler } from 'hono';
 import { env } from 'hono/adapter';
 
 import type { FrontendApiProxyOptions } from './types';
+
+const writeAgentRulesOnce = createClerkAgentRulesWriter('hono');
 
 type ClerkEnv = {
   CLERK_SECRET_KEY: string;
@@ -39,6 +42,8 @@ export type ClerkMiddlewareOptions = Omit<AuthenticateRequestOptions, 'acceptsTo
  * ```
  */
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareHandler => {
+  writeAgentRulesOnce();
+
   return async (c, next) => {
     const clerkEnv = env<ClerkEnv>(c);
     const {

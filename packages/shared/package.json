@@ -71,6 +71,16 @@
         "default": "./dist/agentRules/index.js"
       }
     },
+    "./agentRulesWriter": {
+      "import": {
+        "types": "./dist/agentRulesWriter.d.mts",
+        "default": "./dist/agentRulesWriter.mjs"
+      },
+      "require": {
+        "types": "./dist/agentRulesWriter.d.ts",
+        "default": "./dist/agentRulesWriter.js"
+      }
+    },
     "./vite": {
       "import": {
         "types": "./dist/vite.d.mts",
