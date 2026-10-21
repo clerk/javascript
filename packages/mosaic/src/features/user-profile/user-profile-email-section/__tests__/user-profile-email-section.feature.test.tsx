@@ -378,12 +378,37 @@ describe('email reverification', () => {
 
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
     expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(0);
-    await actor.type(screen.getByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
     await enterCode(actor, VERIFICATION_CODE);
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(emailsListed()).toEqual(['new@example.com']);
   });
+  it('focuses the session verification code before adding an email address', async () => {
+    const { actor, fapi } = await renderSection({
+      ...signedInWithEmails([PRIMARY]),
+      verification: {
+        firstFactors: [
+          { strategy: 'email_code', email_address_id: PRIMARY.id, safe_identifier: PRIMARY.email_address },
+        ],
+        secrets: { email_code: VERIFICATION_CODE },
+      },
+    });
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    const code = await screen.findByRole('textbox', { name: 'Verification code' });
+    await waitFor(() => expect(code).toHaveFocus());
+    await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+    await actor.keyboard(VERIFICATION_CODE);
+
+    await screen.findByRole('dialog', { name: 'Verify your email' });
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(emailsListed()).toEqual(['alice@example.com', 'new@example.com']);
+  });
+
   it('closes quietly when confirmation is dismissed and starts clean on reopen', async () => {
     const { actor, fapi } = await renderSection(challengedSeed());
     demandReverificationOnce('/v1/me/email_addresses');
