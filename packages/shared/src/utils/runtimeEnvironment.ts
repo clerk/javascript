@@ -63,6 +63,11 @@ export const isAutomatedEnvironment = (): boolean => {
 };
 
 export const isClerkAgentRulesWriteAllowed = (): boolean => {
-  const optOut = getEnvVariable('CLERK_AGENTS_MD').toLowerCase();
-  return !['0', 'false', 'off', 'no'].includes(optOut) && !isProductionEnvironment() && !isAutomatedEnvironment();
+  const optOut = (getEnvVariable('CLERK_AGENTS_MD') || '').toLowerCase();
+  return (
+    !['0', 'false', 'off', 'no'].includes(optOut) &&
+    !isProductionEnvironment() &&
+    !isTestEnvironment() &&
+    !isAutomatedEnvironment()
+  );
 };
