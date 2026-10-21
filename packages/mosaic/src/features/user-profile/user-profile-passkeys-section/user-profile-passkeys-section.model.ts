@@ -65,6 +65,7 @@ export type UserProfilePasskeysModel =
       validateName: UserProfilePasskeyNameValidator;
       onRemove: (id: string) => Promise<void>;
       reverification: ReverificationController;
+      addReverification: ReverificationController;
     };
 
 function getPasskeysProjection(
@@ -93,6 +94,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   const locale = useLocale();
   const messages = useMessages('userProfilePasskeys');
   const [deletePasskey, reverification] = useReverificationFlow((passkey: PasskeyResource) => passkey.delete());
+  const [createPasskey, addReverification] = useReverificationFlow((current: UserResource) => current.createPasskey());
   const validateName: UserProfilePasskeyNameValidator = name =>
     new TextEncoder().encode(name).length > 256 ? { type: 'error', message: messages.nameTooLongError } : undefined;
 
@@ -162,7 +164,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
               global: { code: 'passkey_account_unavailable', message: messages.accountUnavailableError },
             });
           }
-          await save(() => current.createPasskey());
+          await save(() => createPasskey(current));
         }
       : undefined,
     onRename: async (id, name) => {
@@ -184,5 +186,6 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       await save(() => deletePasskey(passkey));
     },
     reverification,
+    addReverification,
   };
 }
