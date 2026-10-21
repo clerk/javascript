@@ -9,26 +9,6 @@ import { createModalController } from './modal-controller';
 import type { ModalRegistry, MosaicModalDefaults } from './modal-host';
 import { ModalDefaultsContext, ModalRegistryContext } from './modal-host';
 
-class LoadBoundary extends React.Component<{ onRetry: () => void; children: React.ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  render() {
-    if (this.state.failed) {
-      return (
-        <>
-          <p>Something went wrong.</p>
-          <Button onClick={this.props.onRetry}>Try again</Button>
-        </>
-      );
-    }
-    return this.props.children;
-  }
-}
-
 export function createModalHook<Options extends object>(
   surface: ModalSurface<Options>,
   selectDefaults: (defaults: MosaicModalDefaults) => Options,
@@ -54,12 +34,16 @@ export function createModalHook<Options extends object>(
     void load().catch(() => undefined);
   };
 
-  function Attempt(props: ModalContentProps<Options>) {
-    const [Content] = React.useState<Content>(() => loaded ?? React.lazy(load));
+  function Attempt({ onRetry, ...props }: ModalContentProps<Options> & { onRetry: () => void }) {
+    const [Content] = React.useState<Content>(
+      () => loaded ?? React.lazy(() => load().catch(() => ({ default: LoadFailed }))),
+    );
     return (
-      <React.Suspense fallback='Loading…'>
-        <Content {...props} />
-      </React.Suspense>
+      <RetryContext.Provider value={onRetry}>
+        <React.Suspense fallback='Loading…'>
+          <Content {...props} />
+        </React.Suspense>
+      </RetryContext.Provider>
     );
   }
 
@@ -79,15 +63,12 @@ export function createModalHook<Options extends object>(
         }}
       >
         <Dialog.Popup variant={surface.variant}>
-          <LoadBoundary
+          <Attempt
             key={`${state.openCount}:${attempt}`}
-            onRetry={() => setAttempt(attempt + 1)}
-          >
-            <Attempt
-              options={options}
-              close={controller.close}
-            />
-          </LoadBoundary>
+            options={options}
+            close={controller.close}
+            onRetry={() => setAttempt(current => current + 1)}
+          />
         </Dialog.Popup>
       </Dialog.Root>
     );
@@ -128,4 +109,16 @@ export function createModalHook<Options extends object>(
       [controller, isOpen],
     );
   };
+}
+
+const RetryContext = React.createContext(() => {});
+
+function LoadFailed() {
+  const onRetry = React.useContext(RetryContext);
+  return (
+    <>
+      <p>Something went wrong.</p>
+      <Button onClick={onRetry}>Try again</Button>
+    </>
+  );
 }

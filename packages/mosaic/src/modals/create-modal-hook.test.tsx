@@ -49,6 +49,18 @@ function Caller({
   return null;
 }
 
+class AppBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
+  state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  render() {
+    return this.state.error ? <p>App caught: {this.state.error.message}</p> : this.props.children;
+  }
+}
+
 describe('createModalHook', () => {
   it('opens and closes the surface and reports isOpen', async () => {
     const { useStubModal } = createStubModal();
@@ -349,6 +361,35 @@ describe('createModalHook', () => {
     await flush();
 
     expect(screen.getByText('Stub modal')).toBeInTheDocument();
+  });
+
+  it('lets an error the loaded content throws reach the app', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    function BrokenContent(): React.ReactElement {
+      throw new Error('profile crashed');
+    }
+    const useBrokenModal = createModalHook(
+      { id: 'broken', variant: 'card', load: () => Promise.resolve({ default: BrokenContent }) },
+      defaults => defaults.userProfile ?? {},
+    );
+    let handle: ModalHandle<StubOptions> | undefined;
+    render(
+      <AppBoundary>
+        <MosaicProvider>
+          <Caller
+            useModal={useBrokenModal}
+            onHandle={h => (handle = h)}
+          />
+        </MosaicProvider>
+      </AppBoundary>,
+    );
+    await flush();
+
+    act(() => handle?.open());
+    await flush();
+
+    expect(screen.getByText('App caught: profile crashed')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
   });
 
   it('loads the content on open after a failed preload', async () => {
