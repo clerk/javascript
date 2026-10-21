@@ -55,21 +55,18 @@ export function MembersTableTabSkeleton({
     <div {...mergeStyleProps(themeProps('members-table-tab'), stylex.props(tableTabStyles.root))}>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
       <Table.Toolbar>
-        <Skeleton show>
-          <Table.Search
-            label={m.search}
-            clearLabel={m.clearSearch}
-            value=''
-            onValueChange={() => undefined}
-          />
-        </Skeleton>
+        <Table.Search
+          label={m.search}
+          clearLabel={m.clearSearch}
+          value=''
+          onValueChange={() => undefined}
+          disabled
+        />
         {hasInvite ? (
-          <Skeleton show>
-            <Button disabled>
-              <Icon name='plus' />
-              {m.invite}
-            </Button>
-          </Skeleton>
+          <Button disabled>
+            <Icon name='plus' />
+            {m.invite}
+          </Button>
         ) : null}
       </Table.Toolbar>
       <Table.Root

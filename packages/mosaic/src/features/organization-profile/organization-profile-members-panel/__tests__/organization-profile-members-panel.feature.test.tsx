@@ -75,7 +75,7 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Loading members');
     expect(within(table()).getAllByRole('row')).toHaveLength(1);
     expect(within(table()).queryByRole('button')).toBeNull();
-    expect(screen.queryByRole('searchbox', { name: 'Search members' })).toBeNull();
+    expect(screen.getByRole('searchbox', { name: 'Search members' })).toBeDisabled();
     const loadingWidths = columnWidths();
     list.release();
     expect(await screen.findByText('Bob Smith')).toBeVisible();

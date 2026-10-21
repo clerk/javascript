@@ -133,7 +133,7 @@ describe('connected organization requests', () => {
     expect(within(panel()).getByRole('status')).toHaveTextContent('Loading requests');
     expect(within(table()).getAllByRole('row')).toHaveLength(1);
     expect(within(table()).queryByRole('button')).toBeNull();
-    expect(within(panel()).queryByRole('button', { name: 'Invite' })).toBeNull();
+    expect(within(panel()).getByRole('button', { name: 'Invite' })).toBeDisabled();
     const loadingWidths = columnWidths();
     list.release();
     expect(await within(panel()).findByText('Ada Lovelace')).toBeVisible();

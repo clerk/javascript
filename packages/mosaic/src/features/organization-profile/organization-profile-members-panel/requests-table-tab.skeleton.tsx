@@ -57,12 +57,10 @@ export function RequestsTableTabSkeleton({
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
       {hasInvite ? (
         <Table.Toolbar>
-          <Skeleton show>
-            <Button disabled>
-              <Icon name='plus' />
-              {m.invite}
-            </Button>
-          </Skeleton>
+          <Button disabled>
+            <Icon name='plus' />
+            {m.invite}
+          </Button>
         </Table.Toolbar>
       ) : null}
       <Table.Root

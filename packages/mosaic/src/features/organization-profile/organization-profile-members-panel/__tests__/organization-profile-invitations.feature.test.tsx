@@ -103,7 +103,7 @@ describe('connected organization invitations', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Loading invitations');
     expect(within(table()).getAllByRole('row')).toHaveLength(1);
     expect(within(table()).queryByRole('button')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Invite' })).toBeDisabled();
     const loadingWidths = columnWidths();
     list.release();
     expect(await screen.findByText('ada@example.com')).toBeVisible();
@@ -560,7 +560,9 @@ describe('inviting members', () => {
     const user = userEvent.setup();
     for (const tab of ['Members', 'Invitations', 'Requests']) {
       await user.click(await screen.findByRole('tab', { name: tab }));
-      expect(await within(screen.getByRole('tabpanel')).findByRole('button', { name: 'Invite' })).toBeVisible();
+      await waitFor(() =>
+        expect(within(screen.getByRole('tabpanel')).getByRole('button', { name: 'Invite' })).toBeEnabled(),
+      );
     }
   });
 
