@@ -37,4 +37,6 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   finalFocus?: DialogFocusTarget;
   reconnectReverification?: ReverificationController;
   reconnectFinalFocus?: DialogFocusTarget;
+  connectReverification?: ReverificationController;
+  connectFinalFocus?: DialogFocusTarget;
 }
