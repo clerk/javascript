@@ -159,6 +159,48 @@ describe('Loom account status', () => {
     view.unmount();
   });
 
+  it('enables Connect when the live user has no linked accounts', async () => {
+    serveFapi({
+      environment: fapiEnvironment({
+        user_settings: {
+          social: {
+            oauth_google: {
+              enabled: true,
+              required: false,
+              authenticatable: true,
+              strategy: 'oauth_google',
+              name: 'Google',
+              logo_url: null,
+            },
+          },
+        },
+      }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', external_accounts: [] }) })]),
+    });
+    const clerk = new Clerk(publishableKey());
+    await clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() });
+    const view = render(tree(clerk, seed(clerk, { externalAccounts: [] })));
+    expect(await screen.findByRole('button', { name: 'Connect Google' })).toBeEnabled();
+    view.unmount();
+  });
+
+  it('submits a new password through the Loom action and closes the editor', async () => {
+    const fapi = serveFapi({
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', password_enabled: false }) })]),
+    });
+    const clerk = new Clerk(publishableKey());
+    await clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() });
+    const view = render(tree(clerk, seed(clerk, { passwordEnabled: false }), true));
+    const actor = userEvent.setup();
+    await actor.click(await screen.findByRole('button', { name: 'Set password' }));
+    await actor.type(screen.getByLabelText('New password'), 'new-password-123');
+    await actor.type(screen.getByLabelText('Confirm password'), 'new-password-123');
+    await actor.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.passwordUpdates[0]?.get('new_password')).toBe('new-password-123');
+    view.unmount();
+  });
+
   it('renders reconciled rows while host actions resolve their own resources', async () => {
     const user = fapiUser({
       id: 'user_1',

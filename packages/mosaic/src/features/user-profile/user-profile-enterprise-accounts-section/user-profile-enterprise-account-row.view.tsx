@@ -14,16 +14,18 @@ export function UserProfileEnterpriseAccountRowView({
   onConnect,
   isPending,
   disabled,
+  showConnectDisabled,
 }: {
   account: UserProfileEnterpriseAccount;
   onConnect?: (id: string) => void;
   isPending?: boolean;
   disabled?: boolean;
+  showConnectDisabled?: boolean;
 }) {
   const m = useMessages('userProfileEnterpriseAccountsSection');
   const iconUrl = account.iconUrl?.trim();
   return (
-    <Section.Row xstyle={onConnect && styles.connectRow}>
+    <Section.Row xstyle={(onConnect || showConnectDisabled) && styles.connectRow}>
       <Section.Item>
         <Section.Media size='lg'>
           <IconFrame>
@@ -63,7 +65,7 @@ export function UserProfileEnterpriseAccountRowView({
             </Section.Description>
           ) : null}
         </Section.Content>
-        {onConnect ? (
+        {onConnect || showConnectDisabled ? (
           <Section.Actions>
             <SubmitButton
               type='button'
@@ -73,8 +75,8 @@ export function UserProfileEnterpriseAccountRowView({
               aria-label={fill(m.connectProvider, { provider: account.name })}
               isPending={isPending}
               pendingLabel={m.connecting}
-              disabled={disabled}
-              onClick={() => onConnect(account.id)}
+              disabled={disabled || !onConnect}
+              onClick={onConnect ? () => onConnect(account.id) : undefined}
             >
               {m.connect}
               <Icon

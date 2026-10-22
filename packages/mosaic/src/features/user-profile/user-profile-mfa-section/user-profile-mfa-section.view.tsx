@@ -20,6 +20,7 @@ export interface UserProfileMfaSectionViewProps {
   addableMethods?: readonly UserProfileMfaAddableMethod[];
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
+  actionsEligible?: boolean;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
@@ -33,6 +34,7 @@ export function UserProfileMfaSectionView({
   addableMethods,
   addButtonRef,
   addControl,
+  actionsEligible,
   onAdd,
   onRegenerateBackupCodes,
   onRemove,
@@ -77,6 +79,7 @@ export function UserProfileMfaSectionView({
           <UserProfileMfaRowView
             key={method.id}
             method={method}
+            showDisabledMenu={actionsEligible && !onRemove && !onSetDefault && !onRegenerateBackupCodes}
             triggerRef={controller.registerTrigger(method.id)}
             onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}

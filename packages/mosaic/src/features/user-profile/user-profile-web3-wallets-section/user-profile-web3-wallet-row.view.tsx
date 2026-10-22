@@ -20,6 +20,8 @@ export function UserProfileWeb3WalletRowView({
   onConnect,
   onSetPrimary,
   onRemove,
+  showConnectDisabled,
+  showManageDisabled,
 }: {
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
   triggerRef?: Ref<HTMLButtonElement>;
@@ -28,6 +30,8 @@ export function UserProfileWeb3WalletRowView({
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
+  showConnectDisabled?: boolean;
+  showManageDisabled?: boolean;
 }) {
   const m = useMessages('userProfileWeb3Wallets');
   const iconUrl = wallet.iconUrl?.trim();
@@ -42,9 +46,17 @@ export function UserProfileWeb3WalletRowView({
   if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
     actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(linkedWallet) });
   }
+  if (linkedWallet && showManageDisabled) {
+    if (!linkedWallet.isPrimary && linkedWallet.isVerified) {
+      actions.push({ label: m.setPrimary, disabled: true });
+    }
+    if (linkedWallet.canRemove !== false) {
+      actions.push({ label: m.remove, color: 'negative', disabled: true });
+    }
+  }
 
   return (
-    <Section.Row xstyle={onConnect && styles.connectRow}>
+    <Section.Row xstyle={!linkedWallet && styles.connectRow}>
       <Section.Item>
         {wallet.provider || iconUrl ? (
           <Section.Media size='lg'>
@@ -87,7 +99,7 @@ export function UserProfileWeb3WalletRowView({
             </Section.Description>
           ) : null}
         </Section.Content>
-        {onConnect ? (
+        {onConnect || showConnectDisabled ? (
           <Section.Actions>
             <SubmitButton
               color='neutral'
@@ -96,7 +108,7 @@ export function UserProfileWeb3WalletRowView({
               isPending={isPending}
               disabled={isDisabled && !isPending}
               aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
-              onClick={() => onConnect(wallet.id)}
+              onClick={onConnect ? () => onConnect(wallet.id) : undefined}
             >
               {m.connect}
               <Icon

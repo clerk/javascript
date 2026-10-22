@@ -51,6 +51,9 @@ export function useUserProfileWeb3WalletsController({
   });
 
   const onConnect = (id: string) => {
+    if (!connect) {
+      return;
+    }
     const provider = availableProviders.find(candidate => candidate.id === id);
     if (!provider) {
       return;
@@ -66,7 +69,7 @@ export function useUserProfileWeb3WalletsController({
   };
 
   const connectSolana = (walletName: string) => {
-    if (!picker.open) {
+    if (!picker.open || !connect) {
       return;
     }
     return action.run(picker.provider.id, async () => {
@@ -95,7 +98,7 @@ export function useUserProfileWeb3WalletsController({
     solanaPickerOpen: picker.open,
     solanaPickerError: picker.open && picker.provider.id === action.errorKey ? action.error : undefined,
     pendingWalletName: picker.open && picker.provider.id === action.pendingKey ? picker.walletName : undefined,
-    onConnect,
+    onConnect: connect ? onConnect : undefined,
     onSetPrimary: (walletId: string) => action.run(walletId, () => setPrimary(walletId)),
     connectSolana,
     closeSolanaPicker: () => {

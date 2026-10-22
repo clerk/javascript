@@ -13,7 +13,10 @@ export interface UserProfileProfilePanelProps {
   children?: ReactNode;
   profileSection?: ReactNode;
   emailSection?: ReactNode;
+  phoneSection?: ReactNode;
   connectedAccountsSection?: ReactNode;
+  enterpriseAccountsSection?: ReactNode;
+  web3WalletsSection?: ReactNode;
   dangerSection?: ReactNode;
 }
 
@@ -21,7 +24,10 @@ export function UserProfileProfilePanel({
   children,
   profileSection,
   emailSection,
+  phoneSection,
   connectedAccountsSection,
+  enterpriseAccountsSection,
+  web3WalletsSection,
   dangerSection,
 }: UserProfileProfilePanelProps) {
   return (
@@ -30,10 +36,10 @@ export function UserProfileProfilePanel({
         <>
           {profileSection ?? <UserProfileProfileSection />}
           {emailSection ?? <UserProfileEmailSection />}
-          <UserProfilePhoneSection />
+          {phoneSection ?? <UserProfilePhoneSection />}
           {connectedAccountsSection ?? <UserProfileConnectedAccountsSection />}
-          <UserProfileEnterpriseAccountsSection />
-          <UserProfileWeb3WalletsSection />
+          {enterpriseAccountsSection ?? <UserProfileEnterpriseAccountsSection />}
+          {web3WalletsSection ?? <UserProfileWeb3WalletsSection />}
           {dangerSection ?? <UserProfileDangerSection />}
         </>
       )}

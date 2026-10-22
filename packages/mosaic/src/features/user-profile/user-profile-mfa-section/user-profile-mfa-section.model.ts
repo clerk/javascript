@@ -5,17 +5,15 @@ import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@cl
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useReverificationFlow } from '../../reverification';
+import { projectMfa } from './user-profile-mfa-section.project';
 import type {
   MfaEnrollmentResult,
   MfaPhone,
   SmsEnrollmentResult,
-  UserProfileMfaAddableMethod,
-  UserProfileMfaMethod,
   UserProfileMfaModel,
 } from './user-profile-mfa-section.types';
 
 type ReadyModel = Extract<UserProfileMfaModel, { status: 'ready' }>;
-type MfaSnapshotData = Pick<ReadyModel, 'methods' | 'addableMethods' | 'phones'>;
 
 function configuredFactors(environment: EnvironmentResource | undefined): string[] {
   return Object.values(environment?.userSettings.attributes ?? {}).flatMap(attribute =>
@@ -58,52 +56,6 @@ function requireRemovable(user: UserResource, environment: EnvironmentResource):
   if (environment.userSettings.signUp.mfa?.required && usableFactorCount(user, configuredFactors(environment)) <= 1) {
     throw new ClerkRuntimeError('This method cannot be removed.', { code: 'mfa_method_cannot_remove' });
   }
-}
-
-function describeMfa(user: UserResource, environment: EnvironmentResource): MfaSnapshotData {
-  const secondFactors = configuredFactors(environment);
-  const smsEnabled = secondFactors.includes('phone_code');
-  const totpEnabled = secondFactors.includes('totp');
-  const backupEnabled = secondFactors.includes('backup_code');
-  const reservedPhones = verifiedReservedPhones(user);
-  const usableCount = usableFactorCount(user, secondFactors);
-  const canRemove = !environment.userSettings.signUp.mfa?.required || usableCount > 1;
-  const authenticatorEnrolled = totpEnabled && user.totpEnabled;
-  const methods: UserProfileMfaMethod[] = [];
-  if (authenticatorEnrolled) {
-    methods.push({ id: 'authenticator', type: 'authenticator', isDefault: true, canRemove });
-  }
-  for (const phone of smsEnabled
-    ? [...reservedPhones].sort((left, right) => Number(right.defaultSecondFactor) - Number(left.defaultSecondFactor))
-    : []) {
-    methods.push({
-      id: phone.id,
-      type: 'sms',
-      description: phone.phoneNumber,
-      isDefault: !authenticatorEnrolled && phone.defaultSecondFactor,
-      canRemove,
-      canSetDefault: !authenticatorEnrolled && !phone.defaultSecondFactor,
-    });
-  }
-  if (backupEnabled && user.backupCodeEnabled) {
-    methods.push({ id: 'backup-codes', type: 'backup-codes' });
-  }
-  const addableMethods: UserProfileMfaAddableMethod[] = [];
-  if (smsEnabled) {
-    addableMethods.push('sms');
-  }
-  if (totpEnabled && !user.totpEnabled) {
-    addableMethods.push('authenticator');
-  }
-  if (backupEnabled && usableCount > 0 && !user.backupCodeEnabled) {
-    addableMethods.push('backup-codes');
-  }
-
-  return {
-    methods,
-    addableMethods,
-    phones: user.phoneNumbers.filter(phone => !phone.reservedForSecondFactor).map(summarizePhone),
-  };
 }
 
 function createSmsActions(
@@ -214,7 +166,10 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
 
   const userId = user.id;
   const sessionId = session.id;
-  const { methods, addableMethods, phones } = describeMfa(user, environment);
+  const { methods, addableMethods, phones } = projectMfa(user, {
+    secondFactors,
+    required: Boolean(environment.userSettings.signUp.mfa?.required),
+  });
   const usableCount = usableFactorCount(user, secondFactors);
   const refresh = async () => {
     const current = requireIdentity(clerk, userId, sessionId);

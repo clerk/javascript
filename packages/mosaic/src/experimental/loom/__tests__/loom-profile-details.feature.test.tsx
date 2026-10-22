@@ -8,7 +8,14 @@ import { Suspense } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { fapiUrl, holdRequests, publishableKey, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEmailAddress, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import {
+  fapiClient,
+  fapiEmailAddress,
+  fapiEnvironment,
+  fapiSession,
+  fapiUser,
+  fapiVerification,
+} from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { LoomComposedProfile } from '../loom-composed-profile';
@@ -44,6 +51,31 @@ function details(clerk: Clerk, hydration?: Parameters<typeof LoomProvider>[0]['h
 }
 
 describe('Loom profile details', () => {
+  it('enables profile actions from a direct Loom host without Clerk React context', async () => {
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const clerk = new Clerk(publishableKey());
+    await clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() });
+    const view = render(
+      <MosaicProvider>
+        <LoomProvider clerk={clerk}>
+          <Suspense fallback={<p>Loading</p>}>
+            <LoomProfileDetails />
+          </Suspense>
+        </LoomProvider>
+      </MosaicProvider>,
+    );
+    expect(await screen.findByRole('button', { name: 'Edit name' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Edit username' })).toBeEnabled();
+    const actor = userEvent.setup();
+    await actor.click(screen.getByRole('button', { name: 'Edit name' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+    await actor.clear(within(dialog).getByLabelText('First name'));
+    await actor.type(within(dialog).getByLabelText('First name'), 'Alicia');
+    await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+    expect(await screen.findByText('Alicia Smith')).toBeInTheDocument();
+    view.unmount();
+  });
+
   it('reconciles a ClerkJS avatar upload and removal into the Loom display', async () => {
     const fapi = serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
     const clerk = new Clerk(publishableKey());
@@ -65,6 +97,45 @@ describe('Loom profile details', () => {
     );
     expect(screen.getByRole('button', { name: 'Upload' })).toBeEnabled();
     expect(fapi.client.sessions[0]?.user.has_image).toBe(false);
+    view.unmount();
+  });
+
+  it('sets a verified Loom email as primary through the existing menu', async () => {
+    const verified = fapiVerification('email_code', { status: 'verified' });
+    const second = fapiEmailAddress({ id: 'idn_2', email_address: 'bob@example.com', verification: verified });
+    const first = fapiEmailAddress({ id: 'idn_1', email_address: 'alice@example.com', verification: verified });
+    const fapi = serveFapi({
+      client: fapiClient([
+        fapiSession({
+          id: 'sess_1',
+          user: fapiUser({
+            id: 'user_1',
+            email_addresses: [first, second],
+            primary_email_address_id: first.id,
+          }),
+        }),
+      ]),
+    });
+    const clerk = new Clerk(publishableKey());
+    await clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() });
+    const view = render(
+      <ClerkContextProvider
+        clerk={clerk}
+        clerkStatus={clerk.status}
+      >
+        <MosaicProvider>
+          <LoomProvider clerk={clerk}>
+            <LoomComposedProfile />
+          </LoomProvider>
+        </MosaicProvider>
+      </ClerkContextProvider>,
+    );
+    const actor = userEvent.setup();
+    const email = await screen.findByRole('group', { name: 'Email' });
+    await openMenu(actor, within(email).getByRole('button', { name: 'Manage bob@example.com' }));
+    await actor.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    await waitFor(() => expect(fapi.client.sessions[0]?.user.primary_email_address_id).toBe('idn_2'));
+    expect(within(email).getByText('bob@example.com').parentElement).toHaveTextContent('Primary');
     view.unmount();
   });
 

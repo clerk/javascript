@@ -2,7 +2,7 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { createWeb3 } from '@clerk/shared/internal/clerk-js/web3';
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { UserResource, VerificationResource, Web3WalletResource } from '@clerk/shared/types';
+import type { UserResource } from '@clerk/shared/types';
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
@@ -14,8 +14,8 @@ import type {
   UserProfileWeb3WalletsModel,
 } from './user-profile-web3-wallets-section.types';
 
-export type Web3WalletEntry = Pick<Web3WalletResource, 'id' | 'web3Wallet'> & {
-  verification: Pick<VerificationResource, 'strategy' | 'status' | 'expireAt'>;
+export type Web3WalletEntry = { id: string; web3Wallet: string } & {
+  verification: { strategy: string | null; status: string | null; expireAt: Date | null };
 };
 
 export type Web3WalletsProjection =

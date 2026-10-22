@@ -7,15 +7,9 @@ import { PasswordEditor } from '../../features/user-profile/user-profile-passwor
 import { UserProfilePasswordSectionView } from '../../features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import { useMessages } from '../../localization';
 import { useLoomConnectedAccounts, useLoomDanger, useLoomPassword } from './loom-account-status.model';
-import { useLoomProfileIdentity } from './loom-profile-details.model';
 import { LoomSectionBoundary } from './loom-section-boundary';
 
 export function LoomConnectedAccounts() {
-  const identity = useLoomProfileIdentity();
-  return identity ? <ConnectedAccountsContent /> : null;
-}
-
-function ConnectedAccountsContent() {
   const { display, actions, userId } = useLoomConnectedAccounts();
   if (display.status === 'hidden') {
     return null;
@@ -37,14 +31,9 @@ function ConnectedAccountsContent() {
 export function LoomPassword() {
   return (
     <LoomSectionBoundary failure='Could not load password status.'>
-      <PasswordSection />
+      <PasswordContent />
     </LoomSectionBoundary>
   );
-}
-
-function PasswordSection() {
-  const identity = useLoomProfileIdentity();
-  return identity ? <PasswordContent /> : null;
 }
 
 function PasswordContent() {
@@ -78,11 +67,6 @@ function PasswordContent() {
 }
 
 export function LoomDanger() {
-  const identity = useLoomProfileIdentity();
-  return identity ? <DangerContent /> : null;
-}
-
-function DangerContent() {
   const { visible, actions } = useLoomDanger();
   const controller = useConfirmController({ onConfirm: actions.onDelete, reverification: actions.reverification });
   return visible ? (

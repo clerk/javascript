@@ -19,12 +19,14 @@ export function UserProfilePasskeyRowView({
   onRename,
   validateName,
   onRemove,
+  showDisabledMenu,
 }: {
   passkey: UserProfilePasskey;
   triggerRef?: Ref<HTMLButtonElement>;
   onRename?: (id: string, name: string) => void | Promise<void>;
   validateName?: UserProfilePasskeyNameValidator;
   onRemove?: () => void;
+  showDisabledMenu?: boolean;
 }) {
   const m = useMessages('userProfilePasskeys');
   const renameDialog = useMemo(() => Dialog.createHandle(), []);
@@ -45,6 +47,10 @@ export function UserProfilePasskeyRowView({
   }
   if (onRemove) {
     actions.push({ label: m.removeAction, color: 'negative', onClick: onRemove });
+  }
+  if (showDisabledMenu && actions.length === 0) {
+    actions.push({ label: m.rename, disabled: true });
+    actions.push({ label: m.removeAction, color: 'negative', disabled: true });
   }
 
   return (

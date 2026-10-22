@@ -14,13 +14,14 @@ export function UserProfileWeb3WalletsSectionView({
   onConnect,
   onSetPrimary,
   registerTrigger,
+  actionsEligible,
   remove,
   finalFocus,
   setPrimaryReverification,
   setPrimaryFinalFocus,
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
-  const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
+  const hasRows = wallets.length > 0 || availableProviders.length > 0;
   const isBusy = pendingId !== undefined;
 
   return (
@@ -41,23 +42,23 @@ export function UserProfileWeb3WalletsSectionView({
                 <UserProfileWeb3WalletRowView
                   key={wallet.id}
                   wallet={wallet}
-                  triggerRef={registerTrigger(wallet.id)}
+                  triggerRef={registerTrigger?.(wallet.id)}
                   isDisabled={isBusy}
+                  showManageDisabled={actionsEligible && !onSetPrimary && !remove}
                   onSetPrimary={onSetPrimary}
                   onRemove={remove ? wallet => remove.open(wallet) : undefined}
                 />
               ))}
-              {onConnect
-                ? availableProviders.map(provider => (
-                    <UserProfileWeb3WalletRowView
-                      key={provider.id}
-                      wallet={provider}
-                      isPending={pendingId === provider.id}
-                      isDisabled={isBusy}
-                      onConnect={onConnect}
-                    />
-                  ))
-                : null}
+              {availableProviders.map(provider => (
+                <UserProfileWeb3WalletRowView
+                  key={provider.id}
+                  wallet={provider}
+                  isPending={pendingId === provider.id}
+                  isDisabled={isBusy || !onConnect}
+                  showConnectDisabled={!onConnect}
+                  onConnect={onConnect}
+                />
+              ))}
             </Section.Body>
           </Section.Group>
         </Section.Root>

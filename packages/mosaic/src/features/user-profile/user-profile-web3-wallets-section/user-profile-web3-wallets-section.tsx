@@ -26,7 +26,7 @@ export function UserProfileWeb3WalletsSection({ fallback }: UserProfileWeb3Walle
   );
 }
 
-function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
+export function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
   const controller = useUserProfileWeb3WalletsController(model);
   return (
     <>
@@ -35,9 +35,13 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
         sectionRef={controller.sectionRef}
         availableProviders={controller.availableProviders}
         pendingId={controller.pendingId}
-        onConnect={id => {
-          void controller.onConnect(id);
-        }}
+        onConnect={
+          controller.onConnect
+            ? id => {
+                void controller.onConnect?.(id);
+              }
+            : undefined
+        }
         onSetPrimary={id => {
           void controller.onSetPrimary(id);
         }}

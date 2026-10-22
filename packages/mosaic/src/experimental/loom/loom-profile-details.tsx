@@ -1,15 +1,7 @@
 import { UserProfileProfileSectionContent } from '../../features/user-profile/user-profile-profile-section/user-profile-profile-section';
-import { useLoomProfileDetailsModel, useLoomProfileIdentity } from './loom-profile-details.model';
+import { useLoomProfileDetailsModel } from './loom-profile-details.model';
 
 export function LoomProfileDetails() {
-  const identity = useLoomProfileIdentity();
-  if (!identity) {
-    return null;
-  }
-  return <ConnectedProfileDetails />;
-}
-
-function ConnectedProfileDetails() {
   const state = useLoomProfileDetailsModel();
   if (!state) {
     return null;

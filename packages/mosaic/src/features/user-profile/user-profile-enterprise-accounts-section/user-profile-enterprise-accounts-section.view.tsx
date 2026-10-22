@@ -11,6 +11,7 @@ export interface UserProfileEnterpriseAccountsSectionViewProps {
   connections?: UserProfileEnterpriseConnection[];
   pendingId?: string;
   onConnect?: (id: string) => void;
+  connectionsStatus?: 'ready' | 'loading' | 'unavailable';
 }
 
 export function UserProfileEnterpriseAccountsSectionView({
@@ -18,9 +19,10 @@ export function UserProfileEnterpriseAccountsSectionView({
   connections = [],
   pendingId,
   onConnect,
+  connectionsStatus = 'ready',
 }: UserProfileEnterpriseAccountsSectionViewProps) {
   const m = useMessages('userProfileEnterpriseAccountsSection');
-  if (accounts.length === 0 && (connections.length === 0 || !onConnect)) {
+  if (accounts.length === 0 && connections.length === 0 && connectionsStatus === 'ready') {
     return null;
   }
   return (
@@ -38,17 +40,25 @@ export function UserProfileEnterpriseAccountsSectionView({
               account={account}
             />
           ))}
-          {onConnect
-            ? connections.map(connection => (
-                <UserProfileEnterpriseAccountRowView
-                  key={connection.id}
-                  account={connection}
-                  onConnect={onConnect}
-                  isPending={pendingId === connection.id}
-                  disabled={pendingId !== undefined}
-                />
-              ))
-            : null}
+          {connections.map(connection => (
+            <UserProfileEnterpriseAccountRowView
+              key={connection.id}
+              account={connection}
+              onConnect={onConnect}
+              showConnectDisabled={!onConnect}
+              isPending={pendingId === connection.id}
+              disabled={pendingId !== undefined || !onConnect}
+            />
+          ))}
+          {connectionsStatus !== 'ready' ? (
+            <Section.Item>
+              <Section.Content>
+                <Section.Description role='status'>
+                  {connectionsStatus === 'loading' ? m.connectionsLoading : m.connectionsUnavailable}
+                </Section.Description>
+              </Section.Content>
+            </Section.Item>
+          ) : null}
         </Section.Body>
       </Section.Group>
     </Section.Root>

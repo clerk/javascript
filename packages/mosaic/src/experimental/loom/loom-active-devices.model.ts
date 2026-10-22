@@ -1,6 +1,5 @@
 import { useLoom, useSessions } from '@clerk/loom/react';
 import { differenceInCalendarDays } from '@clerk/shared/date';
-import { useSession } from '@clerk/shared/react';
 
 import { useReverificationFlow } from '../../features/reverification';
 import type { UserProfileDevice } from '../../features/user-profile/user-profile-active-devices-section/user-profile-active-devices.types';
@@ -11,12 +10,12 @@ import { toLocalizableError } from '../../utils/errors';
 export function useLoomActiveDevicesModel() {
   const client = useLoom();
   const query = useSessions();
-  const { session } = useSession();
   const [revoke, reverification] = useReverificationFlow((id: string) => client.revoke(id));
   const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
   const m = useMessages('userProfileActiveDevices');
   const errorText = useErrorText();
+  const currentHasActor = Boolean(query.data?.find(item => item.id === client.scope.sessionId)?.hasActor);
   const devices: UserProfileDevice[] = (query.data ?? [])
     .filter(item => item.status === 'active' || item.status === 'pending')
     .sort((a, b) => Number(b.id === client.scope.sessionId) - Number(a.id === client.scope.sessionId))
@@ -40,7 +39,7 @@ export function useLoomActiveDevicesModel() {
         description: [lastActive ? fill(m.lastSeen, { date: lastActive }) : '', location].filter(Boolean).join(' · '),
         type: isMobile ? 'mobile' : 'desktop',
         isCurrent,
-        isUserDevice: Boolean(session?.actor && !item.hasActor && !isCurrent),
+        isUserDevice: currentHasActor && !item.hasActor && !isCurrent,
         isImpersonationDevice: item.hasActor && !isCurrent,
         lastActive,
         model: activity.deviceType || undefined,

@@ -19,11 +19,13 @@ export interface UserProfilePasskeysSectionViewProps {
   sectionRef?: Ref<HTMLDivElement>;
   addButtonRef?: Ref<HTMLButtonElement>;
   onAdd?: () => void;
+  addEligible?: boolean;
+  actionsEligible?: boolean;
   isAdding?: boolean;
   addError?: string;
   onRename?: (id: string, name: string) => void | Promise<void>;
   validateName?: UserProfilePasskeyNameValidator;
-  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<UserProfilePasskey>;
   finalFocus?: DialogFocusTarget;
 }
@@ -33,6 +35,8 @@ export function UserProfilePasskeysSectionView({
   sectionRef,
   addButtonRef,
   onAdd,
+  addEligible,
+  actionsEligible,
   isAdding,
   addError,
   onRename,
@@ -60,7 +64,7 @@ export function UserProfilePasskeysSectionView({
                 <Field.Error>{addError}</Field.Error>
               </Field.Message>
             </Section.Content>
-            {onAdd ? (
+            {onAdd || addEligible ? (
               <Section.Actions>
                 <Button
                   ref={addButtonRef}
@@ -68,7 +72,7 @@ export function UserProfilePasskeysSectionView({
                   color='neutral'
                   size='sm'
                   variant='outline'
-                  disabled={isAdding}
+                  disabled={isAdding || !onAdd}
                   aria-busy={isAdding}
                   onClick={onAdd}
                 >
@@ -89,7 +93,8 @@ export function UserProfilePasskeysSectionView({
                   <UserProfilePasskeyRowView
                     key={passkey.id}
                     passkey={passkey}
-                    triggerRef={registerTrigger(passkey.id)}
+                    triggerRef={registerTrigger?.(passkey.id)}
+                    showDisabledMenu={actionsEligible}
                     onRename={onRename}
                     validateName={validateName}
                     onRemove={remove ? () => remove.open(passkey) : undefined}
