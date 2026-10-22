@@ -14,15 +14,12 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it on 
   await host.tap(screen.getByTestId('google-sign-in-button'));
   if (platform === 'android') {
     const googlePage = screen.getByTestId(/^com\.google\.android\.gms:id\//);
-    let opened = false;
-    for (const until = Date.now() + GOOGLE_UI_TIMEOUT_MS; !opened && Date.now() < until; ) {
-      opened = await googlePage.count().then(
-        count => count > 0,
-        () => false,
-      );
-      if (!opened) await new Promise(resolve => setTimeout(resolve, 1_000));
-    }
-    expect(opened, 'a page of Google Play services is on screen').toBe(true);
+    await expect
+      .poll(() => googlePage.count().catch(() => 0), {
+        timeout: GOOGLE_UI_TIMEOUT_MS,
+        message: 'a page of Google Play services is on screen',
+      })
+      .toBeGreaterThan(0);
     return;
   }
   await expect(screen.getByText(/accounts\.google\.com/)).toBeVisible({ timeout: GOOGLE_UI_TIMEOUT_MS });
