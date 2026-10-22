@@ -15,7 +15,7 @@ import {
   useUserOptions,
 } from './react-context';
 import { sameScope } from './scope';
-import type { LoomHydration, PrefetchedProfile, ProfileSnapshot } from './types';
+import type { LoomHydration, PrefetchedProfile, ProfileSnapshot, UserNameInput } from './types';
 
 const noClient = () => undefined;
 const noSubscription = () => () => {};
@@ -126,10 +126,22 @@ function ProviderLifetime({ clerk, hydration: legacyHydration, prefetch, childre
 export { QueryErrorResetBoundary } from '@tanstack/react-query';
 
 export function useUser() {
-  return useQuery(useUserOptions());
+  const owner = useLoom();
+  const result = useQuery(useUserOptions());
+  const updateName = useMemo(
+    () => (owner.canUpdateName ? (input: UserNameInput) => owner.updateName(input) : undefined),
+    [owner],
+  );
+  return { ...result, updateName };
 }
 export function useSuspenseUser() {
-  return useSuspenseQuery(useUserOptions());
+  const owner = useLoom();
+  const result = useSuspenseQuery(useUserOptions());
+  const updateName = useMemo(
+    () => (owner.canUpdateName ? (input: UserNameInput) => owner.updateName(input) : undefined),
+    [owner],
+  );
+  return { ...result, updateName };
 }
 
 export function useSuspenseProfile(): ProfileSnapshot {

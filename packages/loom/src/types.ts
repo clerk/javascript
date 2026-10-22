@@ -53,6 +53,8 @@ export type UserSnapshot = Readonly<{
   }>[];
 }>;
 
+export type UserNameInput = Readonly<{ firstName: string; lastName: string }>;
+
 export type LoomHydration = Readonly<{
   version: 5;
   scope: SessionScope;

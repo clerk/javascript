@@ -8,7 +8,7 @@ import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 import type { UserProfileNameAttribute, UserProfileProfileSectionModel } from './user-profile-profile-section.types';
 
-const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
+export const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
 
 function toManagedBy(account: ProfileUser['enterpriseAccounts'][number] | undefined): UserProfileManagedBy | undefined {

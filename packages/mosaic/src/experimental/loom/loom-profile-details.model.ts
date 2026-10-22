@@ -1,11 +1,13 @@
-import { useLoom, useSuspenseProfile } from '@clerk/loom/react';
+import { useLoom, useSuspenseProfile, useSuspenseUser } from '@clerk/loom/react';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 
 import {
+  NAME_FIELDS,
   projectProfileDetails,
   useUserProfileProfileActions,
 } from '../../features/user-profile/user-profile-profile-section/user-profile-profile-section.model';
 import type { ProfileDetailsState } from '../../features/user-profile/user-profile-profile-section/user-profile-profile-section.types';
+import { save } from '../../utils/errors';
 
 export function useLoomProfileIdentity(): boolean {
   const loom = useLoom();
@@ -33,6 +35,7 @@ export function useLoomProfileActionsContext() {
 
 export function useLoomProfileDetailsModel(): ProfileDetailsState {
   const profile = useSuspenseProfile();
+  const { updateName } = useSuspenseUser();
   const actions = useUserProfileProfileActions(useLoomProfileActionsContext());
   const display = projectProfileDetails(profile.user, {
     first_name: profile.settings.firstName,
@@ -49,7 +52,8 @@ export function useLoomProfileDetailsModel(): ProfileDetailsState {
       ...display,
       ...(actions.status === 'ready' ? actions : {}),
       status: 'ready',
-      onSubmitName: display.nameManagedBy ? undefined : actions.status === 'ready' ? actions.onSubmitName : undefined,
+      onSubmitName:
+        display.nameManagedBy || !updateName ? undefined : value => save(() => updateName(value), NAME_FIELDS),
       onSubmitUsername:
         display.showUsername && !profile.settings.username.immutable && actions.status === 'ready'
           ? actions.onSubmitUsername

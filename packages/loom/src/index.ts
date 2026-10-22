@@ -4,6 +4,7 @@ export type {
   ProfileSettings,
   ProfileSnapshot,
   UserSnapshot,
+  UserNameInput,
   ActiveDeviceSession,
   LoomHydration,
   Sessions,

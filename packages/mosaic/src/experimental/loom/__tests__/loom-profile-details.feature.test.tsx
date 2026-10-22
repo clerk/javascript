@@ -3,10 +3,11 @@ import { LoomProvider } from '@clerk/loom/react';
 import { ClerkContextProvider } from '@clerk/shared/react';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { Suspense } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { holdRequests, publishableKey, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { fapiUrl, holdRequests, publishableKey, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEmailAddress, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { LoomComposedProfile } from '../loom-composed-profile';
@@ -362,10 +363,51 @@ describe('Loom profile details', () => {
     const refresh = holdRequests('get', '/v1/me');
     await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
-    expect(screen.queryByText('Alicia Smith')).not.toBeInTheDocument();
+    expect(screen.getByText('Alicia Smith')).toBeInTheDocument();
+    expect(screen.queryByText('Alice Smith')).not.toBeInTheDocument();
     refresh.release();
     expect(await screen.findByText('Alicia Smith')).toBeInTheDocument();
+    view.unmount();
+  });
+
+  it('keeps the name dialog open and maps a Clerk field error', async () => {
+    serveFapi({
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]),
+    });
+    const clerk = new Clerk(publishableKey());
+    await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
+    const view = render(details(clerk));
+    await screen.findByText('Alice Smith');
+    worker.use(
+      http.post(
+        fapiUrl('/v1/me'),
+        () =>
+          HttpResponse.json(
+            {
+              errors: [
+                {
+                  code: 'form_param_invalid',
+                  message: 'Invalid first name',
+                  long_message: 'First name is invalid',
+                  meta: { param_name: 'first_name' },
+                },
+              ],
+            },
+            { status: 422 },
+          ),
+        { once: true },
+      ),
+    );
+    const actor = userEvent.setup();
+    await actor.click(screen.getByRole('button', { name: 'Edit name' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+    await actor.clear(within(dialog).getByLabelText('First name'));
+    await actor.type(within(dialog).getByLabelText('First name'), 'Invalid');
+    await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(within(dialog).getByLabelText('First name')).toHaveAttribute('aria-invalid', 'true'));
+    expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeInTheDocument();
+    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     view.unmount();
   });
 

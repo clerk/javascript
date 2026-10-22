@@ -24,12 +24,14 @@ export default function LoomDemoLayout({ children }: { children: ReactNode }) {
   return (
     <main className='mx-auto flex w-full max-w-6xl flex-col gap-6 p-3 sm:p-8'>
       <LivePageHeader title={password ? 'Password with Loom' : 'User profile with Loom'}>
-        Loom streams profile sections from the server and keeps their display data. Clerk connects account actions.
+        Loom streams profile data and owns its user snapshot. Name edits update that snapshot through ClerkJS. Other
+        account actions use ClerkJS directly.
       </LivePageHeader>
       {children}
       <nav className='flex gap-4 text-sm underline'>
         <Link href='/live/loom'>Full profile</Link>
         <Link href='/live/loom/password'>Standalone Password</Link>
+        <Link href='/live/user-profile/user-profile'>Ordinary user profile</Link>
       </nav>
       <details className='min-w-0'>
         <summary className='cursor-pointer text-sm font-medium'>App code</summary>
@@ -37,7 +39,8 @@ export default function LoomDemoLayout({ children }: { children: ReactNode }) {
           <p className='text-muted-foreground text-sm'>
             These are the executing app files. Mosaic imports are private prototype paths. The parent app layout uses
             ClerkProvider. Each client passes useClerk() directly to LoomProvider. Prefetch requires React 19 or Next
-            App Router. Loom owns streaming and cache hydration; ClerkJS owns account actions.
+            App Router. Loom owns streaming, cache hydration, and the name command. ClerkJS executes the name write and
+            other account actions.
           </p>
           {sources.map(({ name, source }) => (
             <section

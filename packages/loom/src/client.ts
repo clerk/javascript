@@ -3,13 +3,22 @@ import { QueryClient, QueryObserver } from '@tanstack/query-core';
 
 import { parseHydration, sessionSnapshots } from './hydration';
 import { profileSettingsSnapshot } from './profile-settings';
-import type { LoomHydration, ProfileSettings, Sessions, SessionScope, SessionsTransport, UserSnapshot } from './types';
+import type {
+  LoomHydration,
+  ProfileSettings,
+  Sessions,
+  SessionScope,
+  SessionsTransport,
+  UserNameInput,
+  UserSnapshot,
+} from './types';
 import { userSnapshot } from './user';
 
 type Options = {
   scope: SessionScope;
   transport?: SessionsTransport;
   readUser?: (signal: AbortSignal) => Promise<UserSnapshot>;
+  updateName?: (input: UserNameInput) => Promise<UserSnapshot>;
   readProfileSettings?: (signal: AbortSignal) => Promise<ProfileSettings>;
   hydration?: unknown;
 };
@@ -26,13 +35,17 @@ export class LoomClient {
   private readonly mutations = new Set<AbortController>();
   private readonly transport: SessionsTransport | undefined;
   private readonly readUser: Options['readUser'];
+  private readonly writeName: Options['updateName'];
   private userRevision = 0;
+  private nameUpdateInFlight = false;
+  private deferredUserInvalidation = false;
   private readonly readProfileSettings: Options['readProfileSettings'];
 
   constructor(options: Options) {
     this.scope = Object.freeze({ ...options.scope });
     this.transport = options.transport;
     this.readUser = options.readUser;
+    this.writeName = options.updateName;
     this.readProfileSettings = options.readProfileSettings;
     if (options.hydration !== undefined) {
       const state = parseHydration(options.hydration, this.scope);
@@ -202,11 +215,54 @@ export class LoomClient {
 
   async invalidateUser(): Promise<void> {
     this.assertLive();
+    if (this.nameUpdateInFlight) {
+      this.deferredUserInvalidation = true;
+      return;
+    }
     this.userRevision++;
     const queryKey = this.userQueryOptions().queryKey;
     await this.queryClient.cancelQueries({ queryKey, exact: true });
     this.assertLive();
     await this.queryClient.invalidateQueries({ queryKey, exact: true });
+  }
+
+  get canUpdateName(): boolean {
+    return this.writeName !== undefined && !this.disposed;
+  }
+
+  async updateName(input: UserNameInput): Promise<UserSnapshot> {
+    this.assertLive();
+    if (!this.writeName) {
+      throw new Error('Loom name update is unavailable.');
+    }
+    if (this.nameUpdateInFlight) {
+      throw new Error('Loom name update is already in progress.');
+    }
+    this.nameUpdateInFlight = true;
+    let failed = false;
+    const queryKey = this.userQueryOptions().queryKey;
+    try {
+      this.userRevision++;
+      await this.queryClient.cancelQueries({ queryKey, exact: true });
+      this.assertLive();
+      const user = userSnapshot(await this.writeName(input), this.scope.userId);
+      this.assertLive();
+      this.userRevision++;
+      await this.queryClient.cancelQueries({ queryKey, exact: true });
+      this.assertLive();
+      this.queryClient.setQueryData<UserSnapshot>(queryKey, user);
+      return user;
+    } catch (error) {
+      failed = true;
+      throw error;
+    } finally {
+      this.nameUpdateInFlight = false;
+      const reconcile = failed && this.deferredUserInvalidation && !this.disposed;
+      this.deferredUserInvalidation = false;
+      if (reconcile) {
+        void this.invalidateUser().catch(() => {});
+      }
+    }
   }
 
   profileSettingsQueryOptions() {

@@ -371,3 +371,51 @@ describe('host user query', () => {
     binding.dispose();
   });
 });
+
+describe('host name updates', () => {
+  it('accepts the returned resource after a synchronous listener without fetching over it', async () => {
+    const { host, emit, request } = hostFixture();
+    const boundUser = {
+      ...host.user,
+      update: vi.fn((input: { firstName: string; lastName: string }) => {
+        boundUser.firstName = 'Intermediate';
+        emit();
+        return Promise.resolve({ ...boundUser, ...input });
+      }),
+    };
+    const binding = bindClerk({ ...host, user: boundUser });
+    const loom = binding.getSnapshot();
+    expect(await loom?.updateName({ firstName: 'Augusta', lastName: 'Lovelace' })).toMatchObject({
+      firstName: 'Augusta',
+      lastName: 'Lovelace',
+    });
+    expect(request).not.toHaveBeenCalled();
+    expect(loom?.queryClient.getQueryData(loom.userQueryOptions().queryKey)).toMatchObject({ firstName: 'Augusta' });
+    binding.dispose();
+  });
+
+  it('refuses a managed name at call time and rejects a result after sign-out', async () => {
+    const { host, emit } = hostFixture();
+    const pending = Promise.withResolvers<typeof host.user>();
+    const update = vi.fn(() => pending.promise);
+    const boundHost: ClerkSessionsHost = { ...host, user: { ...host.user, update } };
+    const binding = bindClerk(boundHost);
+    const loom = binding.getSnapshot();
+    if (!loom || !boundHost.user) {
+      expect.fail('Expected live user');
+    }
+    boundHost.user.enterpriseAccounts = [{ active: true }];
+    await expect(loom.updateName({ firstName: 'Augusta', lastName: 'Lovelace' })).rejects.toThrow('managed');
+    expect(update).not.toHaveBeenCalled();
+    boundHost.user.enterpriseAccounts = [];
+    const result = loom.updateName({ firstName: 'Augusta', lastName: 'Lovelace' });
+    const rejected = expect(result).rejects.toThrow();
+    await vi.waitFor(() => expect(update).toHaveBeenCalledTimes(1));
+    boundHost.user = null;
+    emit();
+    pending.resolve({ ...host.user, firstName: 'Augusta' });
+    await rejected;
+    expect(binding.getSnapshot()).toBeNull();
+    binding.dispose();
+  });
+});

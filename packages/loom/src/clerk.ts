@@ -27,6 +27,8 @@ export type ClerkSessionsHost = {
           emailAddress: string;
           verification?: { status: string | null } | null;
         }[];
+        enterpriseAccounts?: readonly { active: boolean }[];
+        update?: (input: UserNameInput) => Promise<unknown>;
       }
     | null
     | undefined;
@@ -115,6 +117,26 @@ export function bindClerk(host: ClerkSessionsHost, hydration?: LoomHydration) {
         hydration: seed && sameScope(seed.scope, scope) ? seed : undefined,
         readProfileSettings: async signal => parseProfileSettings(await request('GET', '/environment', signal)),
         readUser: async signal => parseUser(await request('GET', '/me', signal), scope.userId),
+        updateName:
+          typeof host.user?.update === 'function'
+            ? async input => {
+                if (disposed || !sameScope(scope, scopeOf(host)) || !host.user) {
+                  throw new Error('Clerk identity changed.');
+                }
+                const current = host.user;
+                if (current.enterpriseAccounts?.some(account => account.active)) {
+                  throw new Error('Name is managed by enterprise SSO.');
+                }
+                if (typeof current.update !== 'function') {
+                  throw new Error('Clerk name update is unavailable.');
+                }
+                const updated = await current.update(input);
+                if (disposed || !sameScope(scope, scopeOf(host)) || host.user?.id !== current.id) {
+                  throw new Error('Clerk identity changed.');
+                }
+                return resourceUserSnapshot(updated, scope.userId);
+              }
+            : undefined,
         transport: {
           read: async signal => parseSessions(await request('GET', '/me/sessions/active', signal)),
           revoke: async (id, signal) => {
@@ -163,5 +185,5 @@ import { createLoomClient, type LoomClient } from './client';
 import { parseSessions, throwResponseError } from './fapi';
 import { parseProfileSettings } from './profile-settings';
 import { createClerkScope, sameScope } from './scope';
-import type { LoomHydration, SessionScope } from './types';
+import type { LoomHydration, SessionScope, UserNameInput } from './types';
 import { parseUser, resourceUserSnapshot } from './user';

@@ -619,6 +619,7 @@ function UserProfile() {
     <>
       <output>{query.data.firstName}</output>
       <span>{regular.isEnabled ? 'Live user' : 'Seeded user'}</span>
+      <span>{query.updateName && regular.updateName ? 'Can edit name' : 'Name read only'}</span>
       <button
         type='button'
         onClick={() => void query.refetch()}
@@ -671,9 +672,10 @@ describe('user SSR and Suspense', () => {
     const container = document.createElement('div');
     container.innerHTML = renderToString(tree);
     expect(container.textContent).toContain('Ada');
+    expect(container.textContent).toContain('Name read only');
     document.body.append(container);
     host.loaded = true;
-    host.user = publicUser;
+    host.user = { ...publicUser, update: input => Promise.resolve({ ...publicUser, ...input }) };
     host.session = { id: 'sess_current' };
     const onRecoverableError = vi.fn();
     const root = hydrateRoot(container, tree, { onRecoverableError });
@@ -681,6 +683,7 @@ describe('user SSR and Suspense', () => {
       await Promise.resolve();
     });
     expect(container.textContent).toContain('Live user');
+    expect(container.textContent).toContain('Can edit name');
     expect(request).not.toHaveBeenCalled();
     expect(onRecoverableError).not.toHaveBeenCalled();
     request.mockResolvedValue(userResponse());
