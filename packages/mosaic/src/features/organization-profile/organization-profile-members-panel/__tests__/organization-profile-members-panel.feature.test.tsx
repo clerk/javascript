@@ -1,3 +1,4 @@
+import { getClerkQueryClient } from '@clerk/shared/react';
 import type { RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -40,6 +41,7 @@ const adminRole: RoleJSON = {
   updated_at: 0,
 };
 const memberRole: RoleJSON = { ...adminRole, id: 'role_member', key: 'org:member', name: 'Member' };
+const manage = ['org:sys_memberships:read', 'org:sys_memberships:manage'];
 
 function serve(permissions: string[] = ['org:sys_memberships:read']) {
   const currentMembership = fapiMembership(organization, { permissions });
@@ -211,7 +213,7 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeVisible();
   });
 
-  it('loads fresh roles after switching sessions in the same organization', async () => {
+  it('keeps cached roles after switching sessions in the same organization', async () => {
     const fapi = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     const currentUser = fapi.client.sessions[0]?.user;
     if (!currentUser) {
@@ -228,11 +230,9 @@ describe('OrganizationProfileMembersPanel', () => {
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     fapi.hasRoleSetMigration = false;
     await act(() => clerk.setActive({ session: 'sess_2' }));
-    await waitFor(() => expect(roles.requests).toHaveLength(1));
-    expect(screen.queryByText(/role migration is in progress/)).toBeNull();
-    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
+    expect(await screen.findByText(/role migration is in progress/)).toBeVisible();
+    expect(roles.requests).toHaveLength(0);
     roles.release();
-    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
   });
 
   it('keeps the members table loading until roles load', async () => {
@@ -438,5 +438,76 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByText('Carol Jones')).toBeVisible();
     expect(screen.queryByText('Bob Smith')).toBeNull();
     expect(screen.getByRole('searchbox', { name: 'Search members' })).toHaveValue('');
+  });
+
+  it('shows cached roles without loading again when the panel remounts', async () => {
+    serve(manage);
+    const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    view.rerender(<div />);
+    const activeOrganization = view.clerk.organization;
+    if (!activeOrganization) {
+      throw new Error('Expected an active organization');
+    }
+    const getRoles = vi.spyOn(activeOrganization, 'getRoles');
+
+    view.rerender(<OrganizationProfileMembersPanel />);
+
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
+    expect(screen.getByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    expect(getRoles).not.toHaveBeenCalled();
+  });
+
+  it('loads the roles of the organization it switches to', async () => {
+    const other = fapiOrganization({ id: 'org_2', name: 'Other' });
+    const first = fapiMembership(organization, { permissions: manage });
+    const second = fapiMembership(other, { permissions: manage });
+    const alice = fapiUser({ id: 'user_1', organization_memberships: [first, second] });
+    const carol = fapiMembership(other, {
+      id: 'orgmem_carol',
+      public_user_data: {
+        user_id: 'user_3',
+        first_name: 'Carol',
+        last_name: 'Jones',
+        identifier: 'carol@example.com',
+        image_url: '',
+        has_image: false,
+      },
+    });
+    const fapi = serveFapi({
+      client: fapiClient([fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: organization.id })]),
+      memberships: [first, bob, second, carol],
+      roles: [adminRole, memberRole],
+    });
+    const { clerk } = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+
+    fapi.roles = [memberRole, { ...adminRole, id: 'role_owner', key: 'org:owner', name: 'Owner' }];
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    await act(() => clerk.setActive({ organization: other.id }));
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    expect(new URL(roles.requests[0]?.url ?? '').pathname).toBe('/v1/organizations/org_2/roles');
+    roles.release();
+
+    await userEvent.setup().click(await screen.findByRole('combobox', { name: /^Change role for Carol Jones/ }));
+    expect(await screen.findByRole('option', { name: 'Owner' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Admin' })).toBeNull();
+  });
+
+  it('drops cached roles on sign out', async () => {
+    serve(manage);
+    const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    const cachedRoles = () =>
+      getClerkQueryClient()
+        ?.getQueryCache()
+        .getAll()
+        .filter(query => query.queryKey[0] === 'mosaic-organization-roles' && query.state.data !== undefined) ?? [];
+    expect(cachedRoles()).toHaveLength(1);
+
+    await act(() => view.clerk.signOut());
+
+    expect(view.container).toBeEmptyDOMElement();
+    expect(cachedRoles()).toHaveLength(0);
   });
 });
