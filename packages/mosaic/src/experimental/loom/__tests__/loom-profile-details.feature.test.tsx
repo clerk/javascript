@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 
 import { fapiUrl, holdRequests, publishableKey, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEmailAddress, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { LoomComposedProfile } from '../loom-composed-profile';
 import { LoomProfileDetails } from '../loom-profile-details';
@@ -43,6 +44,30 @@ function details(clerk: Clerk, hydration?: Parameters<typeof LoomProvider>[0]['h
 }
 
 describe('Loom profile details', () => {
+  it('reconciles a ClerkJS avatar upload and removal into the Loom display', async () => {
+    const fapi = serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const clerk = new Clerk(publishableKey());
+    await clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() });
+    const view = render(details(clerk));
+    const actor = userEvent.setup();
+    await screen.findByText('Alice Smith');
+    const input = view.container.querySelector('input[type="file"]');
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error('Missing image input');
+    }
+    expect(screen.queryByRole('button', { name: 'Manage profile picture' })).not.toBeInTheDocument();
+    await actor.upload(input, new File(['avatar'], 'avatar.png', { type: 'image/png' }));
+    await openMenu(actor, await screen.findByRole('button', { name: 'Manage profile picture' }));
+    expect(fapi.client.sessions[0]?.user.has_image).toBe(true);
+    await actor.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Manage profile picture' })).not.toBeInTheDocument(),
+    );
+    expect(screen.getByRole('button', { name: 'Upload' })).toBeEnabled();
+    expect(fapi.client.sessions[0]?.user.has_image).toBe(false);
+    view.unmount();
+  });
+
   it('shows disabled picture and email actions from hydration before Clerk loads', async () => {
     serveFapi({});
     const clerk = new Clerk(publishableKey());

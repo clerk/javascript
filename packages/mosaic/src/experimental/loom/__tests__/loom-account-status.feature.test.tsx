@@ -365,7 +365,7 @@ it('loads standalone Password from the existing Clerk host', async () => {
   });
   const clerk = new Clerk(publishableKey());
   await clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() });
-  const pending = holdRequests('get', '/environment');
+  const pending = holdRequests('get', '/v1/environment');
   const view = render(
     <ClerkContextProvider
       clerk={clerk}
@@ -380,9 +380,48 @@ it('loads standalone Password from the existing Clerk host', async () => {
     </ClerkContextProvider>,
   );
   expect(await screen.findByText('Standalone profile')).toBeInTheDocument();
+  await waitFor(() => expect(pending.requests).toHaveLength(1));
   expect(screen.queryByText('No password set')).not.toBeInTheDocument();
   pending.release();
   expect(await screen.findByText('No password set')).toBeInTheDocument();
+  view.unmount();
+});
+
+it('shares user and settings reads between Password consumers without loading devices', async () => {
+  serveFapi({
+    environment: fapiEnvironment(),
+    client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', password_enabled: false }) })]),
+  });
+  const clerk = new Clerk(publishableKey());
+  await clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() });
+  const users = holdRequests('get', '/v1/me');
+  const settings = holdRequests('get', '/v1/environment');
+  const devices = holdRequests('get', '/v1/me/sessions/active');
+  const view = render(
+    <ClerkContextProvider
+      clerk={clerk}
+      clerkStatus={clerk.status}
+    >
+      <MosaicProvider>
+        <LoomProvider clerk={clerk}>
+          <p>Standalone profile</p>
+          <LoomPassword />
+          <LoomPassword />
+        </LoomProvider>
+      </MosaicProvider>
+    </ClerkContextProvider>,
+  );
+  await waitFor(() => expect(users.requests).toHaveLength(1));
+  expect(screen.getByText('Standalone profile')).toBeInTheDocument();
+  expect(screen.queryByText('No password set')).not.toBeInTheDocument();
+  users.release();
+  await waitFor(() => expect(settings.requests).toHaveLength(1));
+  settings.release();
+  expect(await screen.findAllByText('No password set')).toHaveLength(2);
+  expect(users.requests).toHaveLength(1);
+  expect(settings.requests).toHaveLength(1);
+  expect(devices.requests).toHaveLength(0);
+  devices.release();
   view.unmount();
 });
 

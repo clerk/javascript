@@ -198,10 +198,18 @@ try {
   const profile = await prefetchProfile(context);
   assert.equal(publicReads, 1);
   assert.equal((await profile.settings).kind, 'ready');
+  const portableProfile = JSON.parse(
+    JSON.stringify({ hydration: profile.hydration, settings: await profile.settings }),
+  );
+  assert.equal(portableProfile.settings.kind, 'ready');
+  assert.deepEqual(portableProfile.settings.hydration.scope, portableProfile.hydration.scope);
+  assert.deepEqual(portableProfile.hydration.user.data, userOnly.user.data);
+  assert.equal(typeof window, 'undefined');
+  assert.equal(typeof document, 'undefined');
   assert.deepEqual(profile.hydration.user.data, userOnly.user.data);
   assert.equal(profile.hydration.user.data.externalAccounts[0].id, 'eac_google');
   assert.equal(profile.hydration.user.data.externalAccounts[0].verification.error.longMessage, 'Reconnect');
-  assert.equal(JSON.stringify(profile).includes('must-not-hydrate'), false);
+  assert.equal(JSON.stringify(portableProfile).includes('must-not-hydrate'), false);
 } finally {
   globalThis.fetch = originalFetch;
 }
