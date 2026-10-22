@@ -1,0 +1,38 @@
+import * as Stories from './logs-table.stories';
+
+# LogsTable
+
+A table of the active organization's activity: who did what, from which IP address, and when. It lists events newest first, with search across members, IP addresses, and event types, and page navigation. Selecting an event opens a dialog with its full details. Members without permission to read logs see a notice in place of the table. `perPage` sets how many events a page lists, 10 by default.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Table', href: '/components/table', layer: 'Components' },
+    { name: 'Entity', href: '/components/entity', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'EmptyState', href: '/components/empty-state', layer: 'Components' },
+    { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'DataList', href: '/components/data-list', layer: 'Components' },
+  ]}
+/>
+
+## Examples
+
+### Empty
+
+<Story
+  name='Empty'
+  storyModule={Stories}
+/>
+
+### No permission
+
+<Story
+  name='NoPermission'
+  storyModule={Stories}
+/>
