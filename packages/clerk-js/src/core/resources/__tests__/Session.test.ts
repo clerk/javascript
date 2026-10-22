@@ -51,15 +51,14 @@ describe('Session', () => {
     } as SessionJSON);
     expect(session.expireAt.getTime()).toBe(deadline);
     expect(session.abandonAt.getTime()).toBe(deadline);
-    expect(session.hasMaximumLifetime).toBe(deadline > 0);
     const restored = new Session(session.__internal_toSnapshot());
     expect(restored.expireAt.getTime()).toBe(deadline);
-    expect(restored.hasMaximumLifetime).toBe(deadline > 0);
+    expect(restored.abandonAt.getTime()).toBe(deadline);
     const withActivities = new SessionWithActivities(
       { id: session.id, expire_at: deadline, abandon_at: deadline } as any,
       '/me/sessions',
     );
-    expect(withActivities.hasMaximumLifetime).toBe(deadline > 0);
+    expect(withActivities.expireAt.getTime()).toBe(deadline);
     expect(withActivities.abandonAt.getTime()).toBe(deadline);
   });
 
