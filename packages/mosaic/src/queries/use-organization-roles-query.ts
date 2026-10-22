@@ -24,6 +24,7 @@ export function useOrganizationRolesQuery({ enabled }: { enabled: boolean }) {
     queryFn: () => organization?.getRoles({ pageSize: ROLES_PAGE_SIZE }),
     staleTime: 2 * 60_000,
     retry: false,
+    retryOnMount: false,
     enabled: enabled && Boolean(organization),
   });
 }

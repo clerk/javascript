@@ -32,8 +32,7 @@ export function useMembersPanelAccessModel() {
 
 export function useMembersPanelRolesModel(canManage: boolean): MembersPanelRoles {
   const environment = useMosaicEnvironment();
-  const query = useOrganizationRolesQuery({ enabled: canManage });
-  const result = canManage ? query.data : undefined;
+  const { data: result, isLoading } = useOrganizationRolesQuery({ enabled: canManage });
   return {
     defaultRole: environment?.organizationSettings.domains.defaultRole ?? null,
     roles: result
@@ -42,6 +41,6 @@ export function useMembersPanelRolesModel(canManage: boolean): MembersPanelRoles
           hasRoleSetMigration: result.has_role_set_migration ?? false,
         }
       : null,
-    isLoading: query.isLoading,
+    isLoading,
   };
 }

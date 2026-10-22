@@ -492,4 +492,25 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByRole('option', { name: 'Owner' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Admin' })).toBeNull();
   });
+
+  it('does not request roles again when the panel remounts after they fail', async () => {
+    serve(manage);
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    roles.fail('roles_unavailable', 'Roles unavailable');
+    await waitFor(() => expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false'));
+    view.rerender(<div />);
+    const activeOrganization = view.clerk.organization;
+    if (!activeOrganization) {
+      throw new Error('Expected an active organization');
+    }
+    const getRoles = vi.spyOn(activeOrganization, 'getRoles');
+
+    view.rerender(<OrganizationProfileMembersPanel />);
+
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
+    expect(getRoles).not.toHaveBeenCalled();
+  });
 });
