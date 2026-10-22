@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { Card } from '../../../components/card';
 import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
-import { Flow, useFlowAutoFocus } from '../../../components/flow';
+import { Flow } from '../../../components/flow';
 import type { CountryIso } from '../../../components/phone-input';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
@@ -68,7 +68,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                 </Flow.Step>
                 <Flow.Step ids={['reverify']}>
                   {current.reverification ? (
-                    <ReverifyStep
+                    <Reverification
                       controller={current.reverification}
                       onClose={() => current.onOpenChange(false)}
                     />
@@ -93,16 +93,5 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
-  );
-}
-
-function ReverifyStep(props: { controller: ReverificationController; onClose: () => void }) {
-  const initialFocusRef = useFlowAutoFocus<HTMLElement>();
-
-  return (
-    <Reverification
-      {...props}
-      initialFocusRef={initialFocusRef}
-    />
   );
 }
