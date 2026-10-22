@@ -233,6 +233,7 @@ import {
   Sizes as RadioSizes,
   States as RadioStates,
 } from '../stories/radio.stories';
+import { Default as RevealDefault, meta as revealMeta } from '../stories/reveal.component.stories';
 import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
@@ -642,6 +643,8 @@ const radioModule: StoryModule = {
   States: RadioStates,
   Sizes: RadioSizes,
 };
+
+const revealModule: StoryModule = { meta: revealMeta, Default: RevealDefault };
 
 const dataListModule: StoryModule = {
   meta: dataListMeta,
@@ -1088,6 +1091,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   radioModule,
+  revealModule,
   sectionModule,
   segmentedControlModule,
   selectComponentModule,

@@ -5,11 +5,10 @@ import { useState } from 'react';
 import { Avatar } from '../../../components/avatar';
 import { Button, SubmitButton } from '../../../components/button';
 import { EmptyState } from '../../../components/empty-state';
+import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
-import { Item } from '../../../components/item';
 import { Pagination } from '../../../components/pagination';
 import { Section } from '../../../components/section';
-import { Spinner } from '../../../components/spinner';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { usePendingAction } from '../../../hooks/use-pending-action';
@@ -40,7 +39,6 @@ export function RequestsTableTabView({
   pageSize,
   onPageChange,
   onBulkAction,
-  isLoading,
   isFetching = false,
   isError = false,
   onRetry,
@@ -67,6 +65,7 @@ export function RequestsTableTabView({
       role='group'
       aria-label={m.title}
     >
+      {isError ? null : <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>}
       {onInvite ? (
         <Table.Toolbar>
           <Button
@@ -81,9 +80,17 @@ export function RequestsTableTabView({
         </Table.Toolbar>
       ) : null}
       <Table.Root
+        layout='fixed'
+        minWidth='33rem'
         aria-label={m.title}
-        aria-busy={isLoading || isFetching}
+        aria-busy={isFetching}
       >
+        <Table.ColumnGroup>
+          {onBulkAction ? <Table.Column /> : null}
+          <Table.Column />
+          <Table.Column width='9rem' />
+          {hasActions ? <Table.Column width='10rem' /> : null}
+        </Table.ColumnGroup>
         <Table.Header>
           <Table.Row>
             {onBulkAction ? (
@@ -106,8 +113,6 @@ export function RequestsTableTabView({
         <RequestsTableBody
           rows={table.rows}
           columnCount={columnCount}
-          isLoading={isLoading}
-          isFetching={isFetching}
           isError={isError}
           onRetry={onRetry}
           hasActions={hasActions}
@@ -134,8 +139,6 @@ export function RequestsTableTabView({
 function RequestsTableBody({
   rows,
   columnCount,
-  isLoading,
-  isFetching,
   isError,
   onRetry,
   hasActions,
@@ -152,8 +155,6 @@ function RequestsTableBody({
     toggleSelected: () => void;
   }>;
   columnCount: number;
-  isLoading: boolean;
-  isFetching: boolean;
   isError: boolean;
   onRetry?: () => void;
   hasActions: boolean;
@@ -164,18 +165,6 @@ function RequestsTableBody({
   registerDeclineTrigger?: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('requestsTableTab');
-  if (isLoading || (isFetching && rows.length === 0)) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
-          <span role='status'>
-            <Spinner />
-            <VisuallyHidden>{m.loading}</VisuallyHidden>
-          </span>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
   if (isError) {
     return (
       <Table.Body>
@@ -223,8 +212,8 @@ function RequestsTableBody({
               />
             ) : null}
             <Table.Cell>
-              <Item.Root>
-                <Item.Media>
+              <Entity.Root>
+                <Entity.Media>
                   <Avatar.Root
                     size='fit'
                     aria-hidden
@@ -237,12 +226,12 @@ function RequestsTableBody({
                     ) : null}
                     <Avatar.Fallback />
                   </Avatar.Root>
-                </Item.Media>
-                <Item.Content>
-                  <Item.Label>{request.name ?? request.email}</Item.Label>
-                  {request.name ? <Item.Description>{request.email}</Item.Description> : null}
-                </Item.Content>
-              </Item.Root>
+                </Entity.Media>
+                <Entity.Content>
+                  <Entity.Label>{request.name ?? request.email}</Entity.Label>
+                  {request.name ? <Entity.Description>{request.email}</Entity.Description> : null}
+                </Entity.Content>
+              </Entity.Root>
             </Table.Cell>
             <Table.Cell noWrap>{request.requestedAtLabel}</Table.Cell>
             {hasActions ? (

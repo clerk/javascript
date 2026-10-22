@@ -1,12 +1,12 @@
 'use client';
 
 import { inertProps } from '@clerk/shared/inert';
-import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { useFlowContext } from './flow-context';
-import { FlowStepContext, type FlowStepContextValue, useFlowStepActive } from './flow-step-context';
+import { FlowStepContext, type FlowStepContextValue } from './flow-step-context';
 
 export interface FlowStepProps extends ComponentProps<'div'> {
   ids: readonly string[];
@@ -17,9 +17,12 @@ function focusIsWithin(root: HTMLElement): boolean {
   return active === null || active === root.ownerDocument.body || root.contains(active);
 }
 
-function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | null {
+function firstFocusableInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | null {
   let first: HTMLElement | null = null;
   for (const element of elements) {
+    if (element.closest('[inert]')) {
+      continue;
+    }
     if (!first || first.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING) {
       first = element;
     }
@@ -29,7 +32,10 @@ function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | nu
 
 export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(props, forwardedRef) {
   const { render, ids, children, ...otherProps } = props;
-  const parentActive = useFlowStepActive();
+  const parentStep = useContext(FlowStepContext);
+  const parentActive = parentStep?.active ?? true;
+  const registerWithParent = parentStep?.registerFocusTarget;
+  const unregisterWithParent = parentStep?.unregisterFocusTarget;
   const { value, direction, rootRef, registerActiveStep, unregisterActiveStep } = useFlowContext();
   const open = ids.includes(value);
   const stepRef = useRef<HTMLDivElement | null>(null);
@@ -65,19 +71,27 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
       return;
     }
 
-    const target = firstInDocumentOrder(focusTargetsRef.current);
+    const target = firstFocusableInDocumentOrder(focusTargetsRef.current);
     const root = rootRef.current;
     if (target && root && root.contains(target) && focusIsWithin(root)) {
       target.focus({ preventScroll: true });
     }
   }, [open, rootRef]);
 
-  const registerFocusTarget = useCallback((element: HTMLElement) => {
-    focusTargetsRef.current.add(element);
-  }, []);
-  const unregisterFocusTarget = useCallback((element: HTMLElement) => {
-    focusTargetsRef.current.delete(element);
-  }, []);
+  const registerFocusTarget = useCallback(
+    (element: HTMLElement) => {
+      focusTargetsRef.current.add(element);
+      registerWithParent?.(element);
+    },
+    [registerWithParent],
+  );
+  const unregisterFocusTarget = useCallback(
+    (element: HTMLElement) => {
+      focusTargetsRef.current.delete(element);
+      unregisterWithParent?.(element);
+    },
+    [unregisterWithParent],
+  );
   const stepContext = useMemo<FlowStepContextValue>(
     () => ({ active: open && parentActive, registerFocusTarget, unregisterFocusTarget }),
     [open, parentActive, registerFocusTarget, unregisterFocusTarget],

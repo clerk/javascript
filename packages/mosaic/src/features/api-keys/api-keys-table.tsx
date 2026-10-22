@@ -5,6 +5,7 @@ import { useMessages } from '../../localization';
 import { useAPIKeysTableController } from './api-keys-table.controller';
 import { resolveAPIKeysTableMessages } from './api-keys-table.messages';
 import { PAGE_SIZE } from './api-keys-table.model';
+import { APIKeysTableSkeleton } from './api-keys-table.skeleton';
 import type { APIKeysTableMessages } from './api-keys-table.types';
 import { APIKeysTableView } from './api-keys-table.view';
 
@@ -42,7 +43,7 @@ function SubjectAPIKeysTable({
     overrides,
   );
   const pageSize = perPage !== undefined && Number.isInteger(perPage) && perPage > 0 ? perPage : PAGE_SIZE;
-  const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController({
+  const { isLoaded, isAvailable, isLoading, manage, ...controller } = useAPIKeysTableController({
     subject,
     pageSize,
     showDescription,
@@ -51,6 +52,14 @@ function SubjectAPIKeysTable({
 
   if (!isLoaded || !isAvailable) {
     return fallback ?? null;
+  }
+  if (isLoading) {
+    return (
+      <APIKeysTableSkeleton
+        messages={messages}
+        canManage={Boolean(manage)}
+      />
+    );
   }
 
   return (

@@ -93,6 +93,17 @@ describe('Mosaic import boundaries', { timeout: 30_000 }, () => {
     expect(messages[0]).toContain('model');
   });
 
+  test.each([
+    "import { useUserSessionsQuery } from '../queries/use-user-sessions-query';",
+    "import { useUserSessionsQuery } from '@/queries/use-user-sessions-query.ts';",
+  ])('rejects Clerk queries in views and controllers: %s', async source => {
+    for (const file of ['sample.view.tsx', 'sample.controller.ts']) {
+      const messages = await restrictedImports(file, source);
+      expect(messages).toHaveLength(1);
+      expect(messages[0]).toContain('model');
+    }
+  });
+
   test.each(['sample.model.ts', 'sample.model.tsx'])(
     '%s sends React interaction state to the controller',
     async file => {
