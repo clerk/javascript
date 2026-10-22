@@ -2,12 +2,9 @@ import { useSyncExternalStore } from 'react';
 import { Image, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
 
 import type { AppVersionSupportStatus, UpdateRequiredDisplay } from '../app-version/appVersionSupport';
-import {
-  getAppVersionSupportStatus,
-  getUpdateRequiredDisplay,
-  subscribeToAppVersionSupport,
-} from '../app-version/appVersionSupport';
+import { getUpdateRequiredDisplay, subscribeToAppVersionSupport } from '../app-version/appVersionSupport';
 import { getNativeAppIdentity, getNativeAppName } from '../app-version/nativeAppIdentity';
+import { useAppVersionSupport } from '../hooks/useAppVersionSupport';
 import { type UpdateRequiredColors, updateRequiredColors } from './colors';
 
 const GOOGLE_PLAY_HOST = 'play.google.com';
@@ -27,11 +24,7 @@ const MAX_ACTIONS_WIDTH = 320;
  * ```
  */
 export function UpdateRequiredView(): JSX.Element {
-  const status = useSyncExternalStore(
-    subscribeToAppVersionSupport,
-    getAppVersionSupportStatus,
-    getAppVersionSupportStatus,
-  );
+  const status = useAppVersionSupport();
   const display = useSyncExternalStore(
     subscribeToAppVersionSupport,
     getUpdateRequiredDisplay,

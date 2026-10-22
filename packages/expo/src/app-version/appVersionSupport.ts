@@ -135,11 +135,11 @@ function resolveEnvironmentStatus(environment: unknown): AppVersionSupportStatus
     return supportedStatus();
   }
   const minimumVersion = stringOrNull(policy.minimum_version);
-  const comparison = minimumVersion ? compareVersions(identity, minimumVersion) : null;
+  const meetsMinimum = minimumVersion ? isAtLeast(identity, minimumVersion) : null;
   return {
-    isSupported: comparison === null || comparison >= 0,
+    isSupported: meetsMinimum !== false,
     currentVersion: identity.version,
-    minimumVersion: comparison === null ? null : minimumVersion,
+    minimumVersion: meetsMinimum === null ? null : minimumVersion,
     updateUrl: httpUrlOrNull(policy.update_url),
   };
 }
@@ -158,7 +158,7 @@ function appIdentifier(entry: MinimumVersionJSON, platform: NativeAppPlatform): 
   return stringOrNull(platform === 'ios' ? entry.bundle_id : entry.package_name);
 }
 
-function compareVersions(identity: NativeAppIdentity, minimumVersion: string): number | null {
+function isAtLeast(identity: NativeAppIdentity, minimumVersion: string): boolean | null {
   const current = parseVersion(identity.platform, identity.version);
   const required = parseVersion(identity.platform, minimumVersion);
   if (!current || !required) {
@@ -167,10 +167,10 @@ function compareVersions(identity: NativeAppIdentity, minimumVersion: string): n
   for (let index = 0; index < Math.max(current.length, required.length); index++) {
     const difference = (current[index] ?? 0) - (required[index] ?? 0);
     if (difference !== 0) {
-      return difference;
+      return difference > 0;
     }
   }
-  return 0;
+  return true;
 }
 
 function parseVersion(platform: NativeAppPlatform, version: string): number[] | null {
@@ -256,6 +256,6 @@ function stringOrNull(value: unknown): string | null {
   return typeof value === 'string' && value.length > 0 ? value : null;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

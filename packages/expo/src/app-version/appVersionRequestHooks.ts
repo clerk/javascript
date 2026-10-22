@@ -7,6 +7,7 @@ import {
   getAppVersionSupportGeneration,
   getAppVersionSupportStatus,
   getServerAnswerCount,
+  isRecord,
   resetAppVersionSupport,
 } from './appVersionSupport';
 import { setNativeAppIdentityHeaders } from './nativeAppIdentity';
@@ -20,14 +21,14 @@ type AppVersionRequest = {
   headers?: HeadersInit;
 };
 
-let foregroundSubscription: NativeEventSubscription | null = null;
-
 type AppVersionResponse = {
   ok: boolean;
   status: number;
   headers: Headers;
   payload: unknown;
 };
+
+let foregroundSubscription: NativeEventSubscription | null = null;
 
 export function createAppVersionRequestHooks() {
   resetAppVersionSupport();
@@ -75,8 +76,4 @@ function findUnsupportedAppVersionError(payload: unknown): { meta?: unknown } | 
 
 function environmentJSON(payload: unknown): unknown {
   return isRecord(payload) && isRecord(payload.response) ? payload.response : payload;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

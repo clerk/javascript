@@ -1,15 +1,11 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { getAppVersionSupportStatus, subscribeToAppVersionSupport } from './appVersionSupport';
+import { useAppVersionSupport } from '../hooks/useAppVersionSupport';
 
 type LoadableClerk = { status?: string } | null;
 
 export function useClerkRestartWhenSupported(clerk: LoadableClerk, discardClerk: () => void): number {
-  const { isSupported } = useSyncExternalStore(
-    subscribeToAppVersionSupport,
-    getAppVersionSupportStatus,
-    getAppVersionSupportStatus,
-  );
+  const { isSupported } = useAppVersionSupport();
   const [restarts, setRestarts] = useState(0);
   const wasUnsupported = useRef(false);
 

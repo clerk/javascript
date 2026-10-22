@@ -1,18 +1,13 @@
-import { useSyncExternalStore } from 'react';
 import { Modal } from 'react-native';
 
-import { getAppVersionSupportStatus, subscribeToAppVersionSupport } from '../app-version/appVersionSupport';
+import { useAppVersionSupport } from '../hooks/useAppVersionSupport';
 import { UpdateRequiredView } from './UpdateRequiredView';
 
 export function UpdateRequiredModal(): JSX.Element {
-  const status = useSyncExternalStore(
-    subscribeToAppVersionSupport,
-    getAppVersionSupportStatus,
-    getAppVersionSupportStatus,
-  );
+  const { isSupported } = useAppVersionSupport();
   return (
     <Modal
-      visible={!status.isSupported}
+      visible={!isSupported}
       animationType='fade'
       presentationStyle='fullScreen'
       onRequestClose={() => {}}
