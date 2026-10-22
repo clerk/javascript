@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const ArrowLeftRight = glyph(
+  'arrow-left-right',
   <>
     <path
       d='M4.83323 7.5L2.63797 5.30474C2.37762 5.04439 2.37762 4.62228 2.63797 4.36193L4.83323 2.16667'

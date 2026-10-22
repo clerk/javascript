@@ -1,3 +1,5 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
+
 import type { LocalizableError } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { TransitionResult } from '../../machine/types';
@@ -120,7 +122,7 @@ function submitOrStay<TValues extends object>(
   if (isValidating(next)) {
     return { context: { ...patch, submitQueued: true } };
   }
-  return { target: 'submitting', context: { ...patch, submitQueued: false, error: undefined } };
+  return { target: 'submitting', context: { ...patch, submitQueued: false } };
 }
 
 function displayableFields<TValues extends object>(
@@ -247,11 +249,21 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
       },
       submitting: {
         invoke: fromPromise(async ctx => ctx.onSubmit(ctx.values), {
-          onDone: 'editing',
-          onError: {
+          onDone: {
             target: 'editing',
-            actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
+            actions: assign(() => ({ error: undefined })),
           },
+          onError: [
+            {
+              guard: (_, e) => Boolean(e.error) && isReverificationCancelledError(e.error),
+              target: 'editing',
+              actions: assign(() => ({ error: undefined })),
+            },
+            {
+              target: 'editing',
+              actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
+            },
+          ],
         }),
       },
     },

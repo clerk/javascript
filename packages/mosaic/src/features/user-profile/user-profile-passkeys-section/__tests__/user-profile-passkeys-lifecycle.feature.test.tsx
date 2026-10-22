@@ -2,6 +2,7 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { openDialog } from '../../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
@@ -11,26 +12,12 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import {
-  UserProfileSecurityPanelView,
-  type UserProfileSecurityPanelViewProps,
-} from '../../user-profile-security-panel.view';
-import { passkeysSectionNode, UserProfilePasskeysSection } from '../user-profile-passkeys-section';
-import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.model';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 
 afterEach(() => vi.restoreAllMocks());
-
-function SecurityHost(props: Pick<UserProfileSecurityPanelViewProps, 'mfaMethods' | 'devices'> = {}) {
-  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
-  return (
-    <UserProfileSecurityPanelView
-      {...props}
-      passkeysSlot={passkeysSlot}
-    />
-  );
-}
 
 function serveAccounts(enabled = true) {
   vi.spyOn(navigator, 'webdriver', 'get').mockReturnValue(false);
@@ -104,7 +91,7 @@ describe('Changing the active passkey account', () => {
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.fail('form_param_invalid', 'Alice credential failed');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Alice credential failed');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Alice credential failed'));
     await act(() => clerk.setActive({ session: 'sess_b' }));
     expect(await screen.findByText('Bob phone')).toBeVisible();
     expect(screen.queryByRole('alert')).toBeNull();
@@ -180,28 +167,6 @@ describe('Composing passkeys in Security', () => {
     expect(screen.queryByRole('group', { name: 'Passkeys' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
   });
-
-  it('does not leave an empty Authentication region when a connected passkeys slot is hidden', async () => {
-    serveAccounts(false);
-    await renderWithClerk(<SecurityHost />);
-    expect(screen.queryByText('Passkeys')).toBeNull();
-    expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-  });
-
-  it('orders connected passkeys before MFA and active devices', async () => {
-    serveAccounts();
-    await renderWithClerk(
-      <SecurityHost
-        mfaMethods={[]}
-        devices={[]}
-      />,
-    );
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Passkeys');
-    expect(
-      screen.getByText('Passkeys').compareDocumentPosition(screen.getByText('2-step verification')) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
 });
 
 describe('Submitting passkey actions', () => {
@@ -209,7 +174,7 @@ describe('Submitting passkey actions', () => {
     serveAccounts();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     await user.keyboard('{ArrowDown}{Enter}');
     const dialog = await screen.findByRole('dialog');
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
@@ -252,7 +217,7 @@ describe('Submitting passkey actions', () => {
     );
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Création annulée.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Création annulée.'));
   });
 });
 
@@ -356,7 +321,7 @@ describe('Passkey identity and policy at action time', () => {
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     await waitFor(() => expect(creation.requests).toHaveLength(1));
     creation.fail('form_param_invalid', 'Old session error');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Old session error');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Old session error'));
     await act(() => clerk.setActive({ session: 'sess_a2' }));
     expect(clerk.session?.id).toBe('sess_a2');
     expect(screen.queryByRole('alert')).toBeNull();
@@ -367,7 +332,7 @@ describe('Passkey identity and policy at action time', () => {
     serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await waitFor(() => expect(screen.getByRole('dialog')).toBeVisible());
     await act(() => clerk.setActive({ session: 'sess_b' }));
@@ -379,9 +344,9 @@ describe('Passkey identity and policy at action time', () => {
     serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
     await user.type(input, 'Blocked rename');
     const environment = clerk.__internal_environment;
@@ -445,9 +410,9 @@ describe('Replacing instance policy while editing', () => {
       </MosaicProvider>,
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
     await user.type(input, 'Blocked rename');
     const nextEnvironment = fapiEnvironment();

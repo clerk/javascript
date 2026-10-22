@@ -1,37 +1,27 @@
-import { useMemo, useRef } from 'react';
-
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
-import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import { truncateWithEndVisible } from '../../../utils/truncate-text-with-end-visible';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
-import type {
-  UserProfileWeb3Wallet,
-  UserProfileWeb3WalletsSectionViewProps,
-} from './user-profile-web3-wallets-section.types';
+import type { UserProfileWeb3WalletsSectionViewProps } from './user-profile-web3-wallets-section.types';
 
 export function UserProfileWeb3WalletsSectionView({
   wallets,
-  fallbackFocus,
+  sectionRef,
   availableProviders = [],
   pendingId,
   onConnect,
   onSetPrimary,
-  onRemove,
+  registerTrigger,
+  remove,
+  finalFocus,
+  setPrimaryReverification,
+  setPrimaryFinalFocus,
+  createReverification,
+  createFinalFocus,
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
-  const section = useRef<HTMLDivElement>(null);
-  const removalFocus = useListRemovalFocus({
-    ids: wallets.map(wallet => wallet.id),
-    onRemove,
-    fallback: () =>
-      section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
-      section.current ??
-      fallbackFocus?.() ??
-      null,
-  });
-  const removeWallet = useMemo(() => Confirmation.createHandle<UserProfileWeb3Wallet>(), []);
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
   const isBusy = pendingId !== undefined;
 
@@ -40,7 +30,7 @@ export function UserProfileWeb3WalletsSectionView({
       {hasRows ? (
         <Section.Root>
           <Section.Group
-            ref={section}
+            ref={sectionRef}
             tabIndex={-1}
           >
             <Section.Header>
@@ -53,10 +43,10 @@ export function UserProfileWeb3WalletsSectionView({
                 <UserProfileWeb3WalletRowView
                   key={wallet.id}
                   wallet={wallet}
-                  triggerRef={removalFocus.registerTrigger(wallet.id)}
+                  triggerRef={registerTrigger(wallet.id)}
                   isDisabled={isBusy}
                   onSetPrimary={onSetPrimary}
-                  onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
+                  onRemove={remove ? wallet => remove.open(wallet) : undefined}
                 />
               ))}
               {onConnect
@@ -64,6 +54,7 @@ export function UserProfileWeb3WalletsSectionView({
                     <UserProfileWeb3WalletRowView
                       key={provider.id}
                       wallet={provider}
+                      triggerRef={registerTrigger(provider.id)}
                       isPending={pendingId === provider.id}
                       isDisabled={isBusy}
                       onConnect={onConnect}
@@ -74,9 +65,9 @@ export function UserProfileWeb3WalletsSectionView({
           </Section.Group>
         </Section.Root>
       ) : null}
-      {onRemove ? (
+      {remove ? (
         <Confirmation
-          handle={removeWallet}
+          controller={remove}
           title={m.removeDialog.title}
           description={wallet =>
             fill(wallet.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
@@ -85,8 +76,19 @@ export function UserProfileWeb3WalletsSectionView({
           }
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
-          finalFocus={removalFocus.finalFocus}
-          onConfirm={wallet => removalFocus.remove(wallet.id)}
+          finalFocus={finalFocus}
+        />
+      ) : null}
+      {setPrimaryReverification ? (
+        <ReverificationDialog
+          controller={setPrimaryReverification}
+          finalFocus={setPrimaryFinalFocus}
+        />
+      ) : null}
+      {createReverification ? (
+        <ReverificationDialog
+          controller={createReverification}
+          finalFocus={createFinalFocus}
         />
       ) : null}
     </>

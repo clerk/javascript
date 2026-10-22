@@ -1,5 +1,43 @@
 # @clerk/electron
 
+## 0.1.3
+
+### Patch Changes
+
+- Fix OAuth sign-in staying blocked after a user abandons the browser tab. Starting a new OAuth sign-in now replaces the pending one instead of failing with `Clerk: an OAuth flow is already pending.` until the 3-minute callback timeout. If the user later finishes the abandoned browser tab, its callback is ignored and no longer completes the newer sign-in. ([#10337](https://github.com/clerk/javascript/pull/10337)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+  - @clerk/clerk-js@6.40.0
+  - @clerk/react@6.18.0
+
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`c0ba3bc`](https://github.com/clerk/javascript/commit/c0ba3bc728d76bd40f80c2c4c506cbfeb5d0807a), [`560ff50`](https://github.com/clerk/javascript/commit/560ff507af494b43210fd2d9a7bd109c4eb6902c)]:
+  - @clerk/clerk-js@6.39.1
+
+## 0.1.0
+
+### Minor Changes
+
+- - OAuth sign-in without the `renderer` option in `createClerkBridge()` now throws a Clerk error that asks for it. Previously it failed with Electron's "No handler registered" error. ([#10000](https://github.com/clerk/javascript/pull/10000)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  - Telemetry now reports `@clerk/electron` instead of `@clerk/react`.
+  - Add a `@clerk/electron/react/experimental` entry point that re-exports `@clerk/react/experimental`.
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/clerk-js@6.39.0
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+
 ## 0.0.52
 
 ### Patch Changes

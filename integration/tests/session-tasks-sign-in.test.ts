@@ -2,7 +2,7 @@ import { createClerkClient } from '@clerk/backend';
 import { test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
-import { instanceKeys } from '../presets/envs';
+import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 import { withRetry } from '../testUtils/retryableClerkClient';
@@ -16,26 +16,26 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     let user: FakeUser;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       user = u.services.users.createFakeUser(test);
       await u.services.users.createBapiUser(user);
     });
 
     test.afterAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       await user.deleteIfExists();
       await u.services.organizations.deleteAll();
       await app.teardown();
     });
 
     test.afterEach(async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.page.signOut();
       await u.page.context().clearCookies();
     });
 
     test('with email and password, navigate to task on after sign-in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Performs sign-in
       await u.po.signIn.goTo();
@@ -61,12 +61,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     });
 
     test('with sso, navigate to task on after sign-in', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
 
       // Create a clerkClient for the OAuth provider instance
       const client = createClerkClient({
-        secretKey: instanceKeys.get('oauth-provider').sk,
-        publishableKey: instanceKeys.get('oauth-provider').pk,
+        secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+        publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
       });
       const users = createUserService(withRetry(client));
       const userFromOAuth = users.createFakeUser(test, {
@@ -78,7 +78,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       // Performs sign-in with SSO
       await u.po.signIn.goTo();
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
       await u.po.signIn.setIdentifier(userFromOAuth.email);
       await u.po.signIn.continue();
       await u.po.signIn.enterTestOtpCode();

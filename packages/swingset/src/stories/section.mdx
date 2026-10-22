@@ -53,6 +53,11 @@ fixed leading slot sized to the text, for a provider logo or a lock.
 than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at
 the same width.
 
+A section that loads its own data has a separate skeleton component: the same `Section` markup with
+the titles as real text and each piece of fetched content wrapped in [Skeleton](/components/skeleton),
+plus a visually hidden status message. Whatever owns the loading state renders the skeleton while
+data loads, then swaps in the real section. `Section` itself has no loading state.
+
 `Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
 On a page, put the sections in `Panel.Sections` so the group titles sit one level below the page
 title. See [Panel](/components/panel) and [Heading](/components/heading).
@@ -139,5 +144,12 @@ External CSS can move the card from `.cl-section-body` to `.cl-section-group`, s
 
 <Story
   name='ContainedHeader'
+  storyModule={SectionStories}
+/>
+
+### Loading
+
+<Story
+  name='Loading'
   storyModule={SectionStories}
 />

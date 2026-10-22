@@ -1,3 +1,4 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
 import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/passwords/complexity';
 import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
@@ -9,6 +10,8 @@ import type { FieldFeedback } from '../../../components/form';
 import { FormSubmitError } from '../../../components/form';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import { toManagedBy } from '../user-profile-managed-by.model';
 import { passwordFormError } from './user-profile-password-errors';
@@ -33,7 +36,30 @@ export type UserProfilePasswordModel =
       identifier: string;
       validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
       updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
+      reverification: ReverificationController;
     });
+
+type PasswordUpdateTarget = UserProfilePasswordPolicy & { userId: string; sessionId: string };
+
+function getAvailablePasswordUser(
+  user: UserResource | null | undefined,
+  sessionId: string | null | undefined,
+  environment: EnvironmentResource | undefined,
+  target: PasswordUpdateTarget,
+  unavailableMessage: string,
+): UserResource {
+  if (
+    !user ||
+    user.id !== target.userId ||
+    sessionId !== target.sessionId ||
+    !environment?.userSettings.instanceIsPasswordBased ||
+    user.enterpriseAccounts.some(account => account.active) ||
+    user.passwordEnabled !== (target.mode === 'change')
+  ) {
+    throw new FormSubmitError({ message: unavailableMessage });
+  }
+  return user;
+}
 
 type PasswordPolicyResult =
   | { status: 'hidden' }
@@ -52,9 +78,8 @@ function getPasswordPolicy(
     return { status: 'hidden' };
   }
 
-  // TODO: When session reverification is supported, require the current password only when reverification is disabled.
   const policy: UserProfilePasswordPolicy = user.passwordEnabled
-    ? { mode: 'change', requiresCurrentPassword: true }
+    ? { mode: 'change', requiresCurrentPassword: !environment.authConfig.reverification }
     : { mode: 'set', requiresCurrentPassword: false };
 
   const enterpriseAccount = user.enterpriseAccounts.find(account => account.active);
@@ -100,6 +125,24 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     [passwordSettings, moduleManager, m, locale, errorMessages],
   );
 
+  const [updatePasswordWithReverification, reverification] = useReverificationFlow(
+    async (input: UserProfileEditPasswordValue, target: PasswordUpdateTarget) => {
+      const currentUser = getAvailablePasswordUser(
+        clerk.user,
+        clerk.session?.id,
+        environment,
+        target,
+        m.errors.unavailable,
+      );
+
+      await currentUser.updatePassword({
+        newPassword: input.newPassword,
+        signOutOfOtherSessions: input.signOutOfOtherSessions,
+        ...(target.requiresCurrentPassword ? { currentPassword: input.currentPassword } : {}),
+      });
+    },
+  );
+
   if (!isUserLoaded || !isSessionLoaded || !environment) {
     return { status: 'loading' };
   }
@@ -120,35 +163,23 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     return policy;
   }
 
-  const userId = policy.userId;
   const sessionId = session.id;
+  const target: PasswordUpdateTarget = { ...policy, sessionId };
 
   return {
     ...policy,
     sessionId,
     identifier: session.publicUserData.identifier ?? '',
     validatePassword,
-    // TODO: Add session reverification for password updates; surface API errors until then.
-    updatePassword: async ({ currentPassword, newPassword, signOutOfOtherSessions }) => {
-      const currentUser = clerk.user;
-      if (
-        !currentUser ||
-        currentUser.id !== userId ||
-        clerk.session?.id !== sessionId ||
-        !environment.userSettings.instanceIsPasswordBased ||
-        currentUser.enterpriseAccounts.some(account => account.active) ||
-        currentUser.passwordEnabled !== (policy.mode === 'change')
-      ) {
-        throw new FormSubmitError({ message: m.errors.unavailable });
-      }
-
+    reverification,
+    updatePassword: async input => {
       try {
-        await currentUser.updatePassword({
-          newPassword,
-          signOutOfOtherSessions,
-          ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
-        });
+        getAvailablePasswordUser(clerk.user, clerk.session?.id, environment, target, m.errors.unavailable);
+        await updatePasswordWithReverification(input, target);
       } catch (error) {
+        if (isReverificationCancelledError(error) || error instanceof FormSubmitError) {
+          throw error;
+        }
         throw passwordFormError(
           error,
           policy.requiresCurrentPassword,

@@ -1,7 +1,8 @@
 import type { DeletedObjectResource } from './deletedObject';
-import type { ClerkResourceJSON } from './json';
+import type { ClerkResourceJSON, RoleJSON } from './json';
 import type { ClerkPaginatedResponse } from './pagination';
 import type { ClerkResource } from './resource';
+import type { RoleResource } from './role';
 
 /**
  * The SCIM provider backing a Directory Sync directory. Derived server-side
@@ -107,6 +108,21 @@ export interface DirectorySyncResource extends ClerkResource {
    * completes.
    */
   getSyncStatus: () => Promise<DirectorySyncStatusResource>;
+  /**
+   * Gets a page of the groups the identity provider has pushed into the directory.
+   */
+  getGroups: (params?: GetDirectorySyncGroupsParams) => Promise<DirectorySyncGroupsPage>;
+  /**
+   * Gets the group role mappings in priority order, together with the organization's default role.
+   */
+  getGroupRoleMappings: () => Promise<DirectorySyncGroupRoleMappingsResource>;
+  /**
+   * Replaces every group role mapping. The list order is the priority, and a group left out is unmapped.
+   * Members' roles are reassigned in the background.
+   */
+  replaceGroupRoleMappings: (
+    params: ReplaceDirectorySyncGroupRoleMappingsParams,
+  ) => Promise<DirectorySyncGroupRoleMappingsResource>;
   __internal_toSnapshot: () => DirectorySyncJSONSnapshot;
 }
 
@@ -148,6 +164,8 @@ export type UpdateDirectorySyncParams = {
   enabled?: boolean;
   /** Partial attribute mapping to merge into the stored one; `null` values remove keys. */
   attributeMapping?: Record<string, string | null>;
+  /** Turns group role mapping on (`true`) or off (`false`). */
+  groupRoleMappingEnabled?: boolean;
 };
 
 export type CreateDirectorySyncParams = {
@@ -192,4 +210,80 @@ export type SetDirectorySyncCredentialsParams = {
   serviceAccountJson: string;
   /** The directory administrator the service account impersonates when reading the directory. */
   subjectEmail: string;
+};
+
+export interface DirectorySyncGroupJSON {
+  object: 'directory_group';
+  id: string;
+  display_name: string;
+  updated_at: number;
+}
+
+export interface DirectorySyncGroupResource {
+  id: string;
+  /** The group's name as the identity provider pushed it. */
+  displayName: string;
+  updatedAt: Date | null;
+}
+
+export interface DirectorySyncGroupsPageJSON {
+  data: DirectorySyncGroupJSON[];
+  cursor: {
+    starting_after: string | null;
+    ending_before: string | null;
+    has_next_page: boolean;
+  };
+}
+
+export interface DirectorySyncGroupsPage {
+  data: DirectorySyncGroupResource[];
+  /** Pass as `startingAfter` to fetch the next page; `null` on the last page. */
+  startingAfter: string | null;
+  hasNextPage: boolean;
+}
+
+export type GetDirectorySyncGroupsParams = {
+  /** At most 500. */
+  limit?: number;
+  startingAfter?: string;
+};
+
+export interface DirectorySyncGroupRoleMappingJSON {
+  object: 'directory_group_role_mapping';
+  id: string;
+  directory_id: string;
+  directory_group_id: string;
+  directory_group_display_name: string;
+  role?: RoleJSON | null;
+  precedence: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export interface DirectorySyncGroupRoleMappingResource {
+  id: string;
+  directoryGroupId: string;
+  directoryGroupDisplayName: string;
+  /** `null` if the mapped role no longer exists. */
+  role: RoleResource | null;
+  /** 1 is the highest priority. */
+  precedence: number;
+}
+
+export interface DirectorySyncGroupRoleMappingsJSON {
+  data: DirectorySyncGroupRoleMappingJSON[];
+  total_count: number;
+  default_role: RoleJSON | null;
+}
+
+export interface DirectorySyncGroupRoleMappingsResource {
+  /** The mappings in priority order. */
+  data: DirectorySyncGroupRoleMappingResource[];
+  /** The role members in no mapped group receive. It cannot be changed through the directory. */
+  defaultRole: RoleResource | null;
+}
+
+export type ReplaceDirectorySyncGroupRoleMappingsParams = {
+  /** In priority order. `role` is an organization role key, such as `org:admin`. At most 100 entries. */
+  mappings: { directoryGroupId: string; role: string }[];
 };

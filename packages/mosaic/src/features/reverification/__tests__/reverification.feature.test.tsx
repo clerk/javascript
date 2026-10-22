@@ -142,7 +142,7 @@ function Host({ action }: { action: () => Promise<unknown> }) {
       <output aria-label='Outcome'>{outcome}</output>
       {running ? (
         <Card.Root renderBranding={false}>
-          <Reverification {...reverification} />
+          <Reverification controller={reverification} />
           {reverification.onCancel ? (
             <button
               type='button'
@@ -174,16 +174,10 @@ function HoldingHost({ action }: { action: () => Promise<unknown> }) {
       >
         Run action
       </button>
-      <button
-        type='button'
-        onClick={reverification.reset}
-      >
-        Reset
-      </button>
       <output aria-label='Outcome'>{outcome}</output>
       <output aria-label='Visible'>{String(reverification.visible)}</output>
       <Card.Root renderBranding={false}>
-        <Reverification {...reverification} />
+        <Reverification controller={reverification} />
         {reverification.onCancel ? (
           <button
             type='button'
@@ -514,13 +508,15 @@ describe('Reverification', () => {
       const touch = holdRequests('post', TOUCH);
       await user.click(screen.getByRole('button', { name: 'Continue' }));
       await waitFor(() => expect(attempt.requests).toHaveLength(1));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
       attempt.release();
 
       // The last step stays visible and pending while the session is being activated
       await waitFor(() => expect(touch.requests).toHaveLength(1));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
       expect(action).toHaveBeenCalledTimes(1);
       touch.release();
@@ -531,6 +527,18 @@ describe('Reverification', () => {
 
       // The card closes once the retried action has settled
       await untilClosed();
+    });
+
+    it('reveals and hides the password on request', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      expect(passwordField()).toHaveAttribute('type', 'password');
+
+      await user.click(screen.getByRole('button', { name: 'Show password' }));
+      expect(passwordField()).toHaveAttribute('type', 'text');
+      await user.click(screen.getByRole('button', { name: 'Hide password' }));
+      expect(passwordField()).toHaveAttribute('type', 'password');
     });
   });
 
@@ -554,11 +562,11 @@ describe('Reverification', () => {
       expect(prepare.requests).toHaveLength(1);
 
       // A wrong code submits automatically on the last digit and shows the server error
-      // The field is disabled and shows the verifying label while the attempt is in flight
+      // The field is read-only and shows the verifying label while the attempt is in flight
       const attempt = holdRequests('post', ATTEMPT_FIRST);
       await user.keyboard(WRONG_CODE.slice(3));
       await waitFor(() => expect(attempt.requests).toHaveLength(1));
-      expect(slots().every(slot => slot.disabled)).toBe(true);
+      expect(slots().every(slot => slot.readOnly && slot.getAttribute('aria-disabled') === 'true')).toBe(true);
       expect(verifying()).toBeInTheDocument();
       attempt.release();
       expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
@@ -931,7 +939,8 @@ describe('Reverification', () => {
       secondPrepare.release();
 
       // The code step opens with an empty field and no error once the code is sent
-      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      await screen.findByRole('group', { name: 'Verification code' });
+      expect(screen.getByText(STEP.emailCode)).toBeVisible();
       await waitFor(() => expect(slotValues()).toEqual(['', '', '', '', '', '']));
       expect(screen.queryByText('Incorrect code')).toBeNull();
 
@@ -1020,7 +1029,8 @@ describe('Reverification', () => {
 
       // The last step stays visible and pending while the session is being activated
       await waitFor(() => expect(touch.requests).toHaveLength(1));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
       touch.fail();
 
@@ -1057,7 +1067,8 @@ describe('Reverification', () => {
 
       // The last step stays visible and pending while the action is being retried
       await waitFor(() => expect(action).toHaveBeenCalledTimes(2));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
       expect(verifying()).toBeInTheDocument();
 
       // Dismissing is not available
@@ -1066,7 +1077,8 @@ describe('Reverification', () => {
       // A second call rejects with request_already_in_progress
       await user.click(screen.getByRole('button', { name: 'Run action' }));
       await waitFor(() => expect(outcome()).toBe('rejected: request_already_in_progress'));
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
 
       // An error thrown by the retried action rejects the action and closes the card
       rejectRetry(new Error('retry failed'));
@@ -1087,8 +1099,8 @@ describe('Reverification', () => {
       return renderWithClerk(<HoldingHost action={action} />);
     };
 
-    it('keeps the last card on screen, inert, after a dismissal until it is reset', async () => {
-      await renderHolding(guardedAction());
+    it('keeps the last card on screen, inert, after a dismissal, until the next challenge replaces it', async () => {
+      await renderHolding(vi.fn().mockResolvedValue(reverificationError()));
       const user = await startVerification();
       await user.type(await screen.findByLabelText('Password'), 'half-typed');
 
@@ -1097,26 +1109,39 @@ describe('Reverification', () => {
 
       expect(screen.getByText(STEP.password)).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
-      expect(passwordField()).toBeDisabled();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
+      expect(passwordField()).toHaveAttribute('readonly');
 
-      await user.click(screen.getByRole('button', { name: 'Reset' }));
-      expect(screen.queryByText(STEP.password)).toBeNull();
+      await user.click(screen.getByRole('button', { name: 'Run action' }));
+      await waitFor(() => expect(passwordField()).toBeEnabled());
+      expect(passwordField()).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
     });
 
-    it('keeps the last card on screen after the action completes until the next run', async () => {
-      await renderHolding(guardedAction());
+    it('keeps the last card on screen after the action completes, until the next challenge replaces it', async () => {
+      await renderHolding(
+        vi
+          .fn()
+          .mockResolvedValueOnce(reverificationError())
+          .mockResolvedValueOnce({ done: true })
+          .mockResolvedValueOnce(reverificationError())
+          .mockResolvedValue({ done: true }),
+      );
       const user = await startVerification();
       await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
       await untilResolved();
 
       expect(screen.getByText(STEP.password)).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
+      expect(passwordField()).toHaveAttribute('aria-disabled', 'true');
 
       await user.click(screen.getByRole('button', { name: 'Run action' }));
-      await waitFor(() => expect(screen.queryByText(STEP.password)).toBeNull());
+      await waitFor(() => expect(passwordField()).toBeEnabled());
+      expect(passwordField()).toHaveValue('');
+      expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
     });
 
-    it('is visible once there is a card of its own to show, until it is reset', async () => {
+    it('is visible once there is a card of its own to show, until the run ends', async () => {
       await renderHolding(guardedAction());
       const start = holdRequests('post', VERIFY);
       const visible = () => screen.getByLabelText('Visible').textContent;
@@ -1133,10 +1158,8 @@ describe('Reverification', () => {
 
       await dismiss(user);
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
-      expect(visible()).toBe('true');
-
-      await user.click(screen.getByRole('button', { name: 'Reset' }));
       expect(visible()).toBe('false');
+      expect(screen.getByText(STEP.password)).toBeVisible();
     });
 
     it('does not keep anything on screen when no reverification was needed', async () => {

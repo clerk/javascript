@@ -3,7 +3,10 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { Api } from '../../../icons/glyphs/api';
+import { ChevronRight } from '../../../icons/glyphs/chevron-right';
 import type { MosaicIconOverrides } from '../../../icons/overrides';
+import { iconRegistry } from '../../../icons/registry';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { space } from '../../../tokens.stylex';
 import { Banner } from '../../banner';
@@ -20,10 +23,15 @@ const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
 const override: MosaicIconOverrides = { 'chevron-right': <span data-testid='override' /> };
 
 describe('Mosaic Icon', () => {
+  it.each(Object.entries(iconRegistry))('names the %s glyph by its registry key', (name, glyph) => {
+    expect(glyph.iconName).toBe(name);
+  });
+
   it.each([
     ['neutral', 'information-circle'],
     ['warning', 'exclamation-circle'],
-    ['negative', 'exclamation-circle'],
+    ['negative', 'x-circle'],
+    ['positive', 'checkmark-circle'],
   ] as const)('applies the canonical %s icon override in a banner', (color, name) => {
     const { getByTestId } = wrap(<Banner.Root color={color}>Notice</Banner.Root>, {
       [name]: <svg data-testid='canonical-icon' />,
@@ -124,7 +132,7 @@ describe('Mosaic Icon', () => {
     const ref = React.createRef<SVGSVGElement>();
     const { container } = wrap(
       <Icon
-        name={name}
+        glyph={iconRegistry[name]}
         ref={ref}
         size='sm'
         aria-label={name}
@@ -154,7 +162,7 @@ describe('Mosaic Icon', () => {
   it.each(['chevron-double-left', 'chevron-double-right'] as const)(
     'preserves the thinner Figma stroke for %s',
     name => {
-      const { container } = wrap(<Icon name={name} />);
+      const { container } = wrap(<Icon glyph={iconRegistry[name]} />);
 
       for (const path of container.querySelectorAll('path')) {
         expect(path).toHaveAttribute('stroke-width', '1.33333');
@@ -166,7 +174,7 @@ describe('Mosaic Icon', () => {
     const ref = React.createRef<SVGSVGElement>();
     const { container } = wrap(
       <Icon
-        name='api'
+        glyph={Api}
         size='lg'
         aria-label='API'
         ref={ref}
@@ -182,7 +190,7 @@ describe('Mosaic Icon', () => {
   });
 
   it('renders the default glyph for a known name', () => {
-    const { container } = wrap(<Icon name='chevron-right' />);
+    const { container } = wrap(<Icon glyph={ChevronRight} />);
     const svg = container.querySelector('svg.cl-icon');
     expect(svg).not.toBeNull();
     expect(svg?.querySelector('path')).not.toBeNull();
@@ -191,7 +199,7 @@ describe('Mosaic Icon', () => {
   it.each(['security-phone', 'security-lock-square', 'security-passkey'] as const)(
     'renders the %s glyph on its 18px canvas',
     name => {
-      const { container } = wrap(<Icon name={name} />);
+      const { container } = wrap(<Icon glyph={iconRegistry[name]} />);
       const svg = container.querySelector('svg');
 
       expect(svg).toHaveAttribute('viewBox', '0 0 18 18');
@@ -203,7 +211,7 @@ describe('Mosaic Icon', () => {
     ['device-phone', ['#646464', '#646464', '#343434', '#575757', 'black', 'black']],
     ['device-laptop', ['black', '#575757', 'black', '#444444', 'black']],
   ] as const)('preserves the supplied %s palette', (name, palette) => {
-    const { container } = wrap(<Icon name={name} />);
+    const { container } = wrap(<Icon glyph={iconRegistry[name]} />);
     const paths = Array.from(container.querySelectorAll('path'));
 
     expect(container.querySelector('svg')).toHaveAttribute('viewBox', '0 0 18 18');
@@ -211,14 +219,14 @@ describe('Mosaic Icon', () => {
   });
 
   it('applies the default size when none is passed', () => {
-    const { container } = wrap(<Icon name='chevron-right' />);
+    const { container } = wrap(<Icon glyph={ChevronRight} />);
     expect(container.querySelector('svg')).toHaveAttribute('data-size', 'md');
   });
 
   it('wires the size variant and xstyle atoms through to the element', () => {
     const { container } = wrap(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         size='lg'
         xstyle={containerStyles.lineBox}
       />,
@@ -231,7 +239,7 @@ describe('Mosaic Icon', () => {
   it('lets a container xstyle override the size atoms instead of stacking a second class', () => {
     const { container } = wrap(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         xstyle={containerStyles.lineBox}
       />,
     );
@@ -241,14 +249,14 @@ describe('Mosaic Icon', () => {
   });
 
   it('emits no placement attribute when the icon is not placed', () => {
-    const { container } = wrap(<Icon name='chevron-right' />);
+    const { container } = wrap(<Icon glyph={ChevronRight} />);
     expect(container.querySelector('svg')).not.toHaveAttribute('data-icon');
   });
 
   it('reflects placement as data-icon so a container can select on it', () => {
     const { container } = wrap(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         placement='inline-end'
       />,
     );
@@ -258,7 +266,7 @@ describe('Mosaic Icon', () => {
   it('does not leak the placement prop itself to the DOM', () => {
     const { container } = wrap(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         placement='inline-start'
       />,
     );
@@ -270,7 +278,7 @@ describe('Mosaic Icon', () => {
   it('reflects placement on an override element too', () => {
     const { getByTestId } = wrap(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         placement='inline-end'
       />,
       override,
@@ -279,7 +287,7 @@ describe('Mosaic Icon', () => {
   });
 
   it('renders the override element instead of the default glyph', () => {
-    const { getByTestId, container } = wrap(<Icon name='chevron-right' />, override);
+    const { getByTestId, container } = wrap(<Icon glyph={ChevronRight} />, override);
     expect(getByTestId('override')).not.toBeNull();
     expect(container.querySelector('svg')).toBeNull();
   });
@@ -287,7 +295,7 @@ describe('Mosaic Icon', () => {
   it('applies the same slot class and size variant to an override as to the built-in glyph', () => {
     const { getByTestId } = wrap(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         size='lg'
       />,
       override,
@@ -300,7 +308,7 @@ describe('Mosaic Icon', () => {
   it("merges the override element's own className rather than clobbering it", () => {
     const { getByTestId } = wrap(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         xstyle={containerStyles.lineBox}
       />,
       {
@@ -322,7 +330,7 @@ describe('Mosaic Icon', () => {
   it('forwards svg props from the Icon call site onto the override element', () => {
     const { getByTestId } = wrap(
       <Icon
-        name='chevron-right'
+        glyph={ChevronRight}
         aria-label='Next'
       />,
       override,
@@ -331,7 +339,7 @@ describe('Mosaic Icon', () => {
   });
 
   it('falls through to the default when a different name is overridden', () => {
-    const { container, queryByTestId } = wrap(<Icon name='chevron-right' />, {
+    const { container, queryByTestId } = wrap(<Icon glyph={ChevronRight} />, {
       'chevron-left': <span data-testid='override' />,
     });
     expect(queryByTestId('override')).toBeNull();
@@ -343,7 +351,7 @@ describe('Mosaic Icon', () => {
     const { container } = wrap(
       <Icon
         ref={ref}
-        name='chevron-right'
+        glyph={ChevronRight}
         aria-label='Next'
       />,
     );

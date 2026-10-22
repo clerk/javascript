@@ -1,29 +1,68 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useConfirmController } from '../../blocks/confirm';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { useNow } from '../../hooks/use-now';
 import { useLocale } from '../../localization';
-import { formatDate, formatRelativeTime } from './api-keys-table.format';
+import { formatDate } from '../../utils/format-date';
+import { formatRelativeTime } from './api-keys-table.format';
 import { useAPIKeysTableModel } from './api-keys-table.model';
 import type { APIKey, APIKeyRecord, APIKeysTableMessages } from './api-keys-table.types';
 import { useCreateAPIKeyController } from './create-api-key.controller';
 
 const SEARCH_DEBOUNCE_MS = 500;
 
-export function useAPIKeysTableController(subject: string, messages: APIKeysTableMessages) {
+export interface APIKeysTableControllerOptions {
+  subject: string;
+  pageSize: number;
+  showDescription: boolean;
+  messages: APIKeysTableMessages;
+}
+
+export function useAPIKeysTableController({
+  subject,
+  pageSize,
+  showDescription,
+  messages,
+}: APIKeysTableControllerOptions) {
   const [query, setQuery] = useState('');
-  const model = useAPIKeysTableModel(subject, query);
+  const model = useAPIKeysTableModel(subject, pageSize, query);
   const locale = useLocale();
   const now = useNow({ updateInterval: 60_000 });
   const [searchValue, setSearchValue] = useState('');
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const create = useCreateAPIKeyController({ messages, onCreate: model.create });
+  const create = useCreateAPIKeyController({ messages, showDescription, onCreate: model.create });
+  const apiKeys = model.data.map(key => toAPIKey(key, locale, now));
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const createButtonRef = useRef<HTMLButtonElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: apiKeys.map(key => key.id),
+    onRemove: model.canManage
+      ? async id => {
+          const emptiesPage = model.page > 1 && model.data.length === 1;
+          await model.revoke(id);
+          if (emptiesPage) {
+            model.fetchPage(model.page - 1);
+          }
+        }
+      : undefined,
+    fallback: () => createButtonRef.current ?? searchInputRef.current,
+  });
+  const revoke = useConfirmController<APIKey>({
+    onConfirm: key => removalFocus.remove(key.id),
+    errorFallback: messages.revokeError,
+  });
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
   return {
     isLoaded: model.isLoaded,
     isAvailable: model.isAvailable,
-    apiKeys: model.data.map(key => toAPIKey(key, locale, now)),
+    apiKeys,
+    searchInputRef,
+    createButtonRef,
+    registerTrigger: removalFocus.registerTrigger,
+    finalFocus: removalFocus.finalFocus,
     totalCount: model.count,
     page: model.page,
     searchValue,
@@ -40,19 +79,7 @@ export function useAPIKeysTableController(subject: string, messages: APIKeysTabl
         model.fetchPage(1);
       }, SEARCH_DEBOUNCE_MS);
     },
-    manage: model.canManage
-      ? {
-          onCreate: create.onOpen,
-          createDialog: create.dialog,
-          onRevoke: async (id: string) => {
-            const emptiesPage = model.page > 1 && model.data.length === 1;
-            await model.revoke(id);
-            if (emptiesPage) {
-              model.fetchPage(model.page - 1);
-            }
-          },
-        }
-      : undefined,
+    manage: model.canManage ? { onCreate: create.onOpen, createDialog: create.dialog, revoke } : undefined,
   };
 }
 

@@ -1,5 +1,54 @@
 # Change Log
 
+## 7.9.19
+
+### Patch Changes
+
+- Updated dependencies [[`49c8afd`](https://github.com/clerk/javascript/commit/49c8afd12724d83418a0c1b85d009c389330dcb6)]:
+  - @clerk/backend@3.26.1
+
+## 7.9.18
+
+### Patch Changes
+
+- Fix the return type of `auth.protect()` when a predicate is passed together with the `token` option. The result is now typed from the accepted token types, so `auth.protect(() => true, { token: 'api_key' })` resolves to the API key auth object instead of a session auth object. ([#10211](https://github.com/clerk/javascript/pull/10211)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`85dec02`](https://github.com/clerk/javascript/commit/85dec028a0320c32023fa58139e269db0202b1eb), [`b799bad`](https://github.com/clerk/javascript/commit/b799bad6057c469f777506b4bc40b1c44b0d4cb4), [`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/backend@3.26.0
+  - @clerk/shared@4.41.0
+  - @clerk/react@6.18.0
+
+## 7.9.17
+
+### Patch Changes
+
+- Updated dependencies [[`57aeba8`](https://github.com/clerk/javascript/commit/57aeba8420be67296a8dda5b049586bf42c2767f)]:
+  - @clerk/backend@3.25.0
+
+## 7.9.16
+
+### Patch Changes
+
+- Updated dependencies [[`9159465`](https://github.com/clerk/javascript/commit/9159465ac02cafec69a3e4e2235cddd1ed3639b7)]:
+  - @clerk/backend@3.24.0
+
+## 7.9.15
+
+### Patch Changes
+
+- Fix `auth.protect()` skipping authorization checks for machine tokens. The `role`, `permission`, `feature`, `plan`, and `reverification` params and the predicate callback are now evaluated for API key, OAuth token, and M2M token requests. Param-based checks respond with a 401 for those requests. ([#10198](https://github.com/clerk/javascript/pull/10198)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `getAuth()` and `auth()` returning OAuth and M2M tokens as signed-in user sessions. They now return a signed-out state for machine tokens. To authenticate OAuth or M2M tokens on a route, use `auth({ acceptsToken })`. ([#10213](https://github.com/clerk/javascript/pull/10213)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 7.9.14
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+  - @clerk/backend@3.23.2
+
 ## 7.9.13
 
 ### Patch Changes

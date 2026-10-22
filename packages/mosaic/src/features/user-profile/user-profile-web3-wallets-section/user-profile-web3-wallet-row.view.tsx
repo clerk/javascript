@@ -5,10 +5,12 @@ import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { SubmitButton } from '../../../components/button';
-import { Icon, IconFrame } from '../../../components/icon';
+import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
+import { UserProfileProviderMedia } from '../user-profile-provider-media';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.types';
 
@@ -30,7 +32,6 @@ export function UserProfileWeb3WalletRowView({
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
 }) {
   const m = useMessages('userProfileWeb3Wallets');
-  const iconUrl = wallet.iconUrl?.trim();
   const linkedWallet = 'address' in wallet ? wallet : undefined;
   const address = linkedWallet?.address;
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
@@ -46,26 +47,12 @@ export function UserProfileWeb3WalletRowView({
   return (
     <Section.Row xstyle={onConnect && styles.connectRow}>
       <Section.Item>
-        {wallet.provider || iconUrl ? (
-          <Section.Media size='lg'>
-            <IconFrame>
-              {iconUrl ? (
-                <img
-                  src={iconUrl}
-                  alt=''
-                  aria-hidden
-                  {...stylex.props(styles.icon)}
-                />
-              ) : (
-                <span
-                  aria-hidden
-                  {...stylex.props(styles.fallback)}
-                >
-                  {wallet.provider?.trim().charAt(0).toUpperCase()}
-                </span>
-              )}
-            </IconFrame>
-          </Section.Media>
+        {wallet.provider ? (
+          <UserProfileProviderMedia
+            provider={wallet.provider}
+            iconUrl={wallet.iconUrl}
+            monochromeIcon={wallet.monochromeIcon}
+          />
         ) : null}
         <Section.Content>
           <Section.Label>
@@ -90,6 +77,7 @@ export function UserProfileWeb3WalletRowView({
         {onConnect ? (
           <Section.Actions>
             <SubmitButton
+              ref={triggerRef}
               color='neutral'
               size='sm'
               variant='outline'
@@ -100,7 +88,7 @@ export function UserProfileWeb3WalletRowView({
             >
               {m.connect}
               <Icon
-                name='arrow-up-right'
+                glyph={ArrowUpRight}
                 placement='inline-end'
                 size='sm'
               />
@@ -111,7 +99,6 @@ export function UserProfileWeb3WalletRowView({
             <ActionMenu
               triggerRef={triggerRef}
               actions={actions}
-              disabled={isDisabled}
               label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
             />
           </Section.Actions>

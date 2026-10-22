@@ -193,6 +193,31 @@ describe('Client Singleton', () => {
     expect(client.signIn.status).toBe('needs_second_factor');
   });
 
+  it('restores a session without a maximum lifetime from a client snapshot', () => {
+    const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
+    const clientJSON: ClientJSON = {
+      object: 'client',
+      id: 'test_id',
+      status: 'active',
+      last_active_session_id: 'session_1',
+      sign_in: null,
+      sign_up: null,
+      sessions: [{ ...createSession({ id: 'session_1', status: 'active' }, user), expire_at: 0, abandon_at: 0 }],
+      created_at: Date.now() - 1000,
+      updated_at: Date.now(),
+    } as any;
+
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
+    const snapshot = new Client(clientJSON).__internal_toSnapshot();
+    // @ts-expect-error We cannot mess with the singleton when tests are running in parallel
+    const [restored] = new Client(snapshot).sessions;
+
+    expect(snapshot.sessions[0]).toMatchObject({ expire_at: 0, abandon_at: 0 });
+    expect(restored.expireAt.getTime()).toBe(0);
+    expect(restored.abandonAt.getTime()).toBe(0);
+    expect(restored.status).toBe('active');
+  });
+
   it('replaces sign up and sign in identity when fromJSON receives new ids', () => {
     const user = createUser({ first_name: 'John', last_name: 'Doe', id: 'user_1' });
     const session = createSession({ id: 'session_1' }, user);

@@ -309,9 +309,45 @@ export const teIN: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1604,6 +1640,11 @@ export const teIN: LocalizationResource = {
         'మీ పాస్‌కీని ఉపయోగించడం మీ గుర్తింపును నిర్ధారిస్తుంది. మీ పరికరం మీ వేలిముద్ర, ముఖం లేదా స్క్రీన్ లాక్ కోసం అడగవచ్చు.',
       title: 'మీ పాస్‌కీని ఉపయోగించండి',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'మరొక పద్ధతిని ఉపయోగించండి',
       subtitle: 'కొనసాగించడానికి మీ ప్రస్తుత పాస్‌వర్డ్‌ను నమోదు చేయండి',
@@ -1754,6 +1795,10 @@ export const teIN: LocalizationResource = {
       subtitle:
         'మీ పాస్‌కీని ఉపయోగించడం అది మీరని నిర్ధారిస్తుంది. మీ పరికరం మీ వేలిముద్ర, ముఖం లేదా స్క్రీన్ లాక్ కోసం అడగవచ్చు.',
       title: 'మీ పాస్‌కీని ఉపయోగించండి',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'మరొక పద్ధతిని ఉపయోగించండి',

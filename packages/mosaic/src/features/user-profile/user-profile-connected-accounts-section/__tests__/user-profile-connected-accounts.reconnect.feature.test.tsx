@@ -1,8 +1,8 @@
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
+import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiExternalAccount,
@@ -10,7 +10,9 @@ import {
   fapiUser,
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 import {
   deferred,
@@ -43,7 +45,7 @@ describe('connected accounts', () => {
 
     expect(screen.getByText('You did not grant access to your Google account')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Connect Google' })).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Google' }));
     await user.click(screen.getByRole('menuitem', { name: 'Try again' }));
 
     await waitFor(() => expect(request.requests).toHaveLength(1));
@@ -92,27 +94,13 @@ describe('connected accounts', () => {
     expect(open).not.toHaveBeenCalled();
   });
 
-  it('shows a verification-required Reconnect error and permits another attempt', async () => {
-    const { clerk } = await renderSection([disconnectedGoogle]);
-    const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
-    const request = holdRequests('post', '/v1/me/external_accounts');
-    const user = userEvent.setup();
-
-    await startReconnect(user, 'Google');
-    await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('session_reverification_required', 'Verify your session.');
-    expect(await screen.findByText('Verify your session.')).toBeInTheDocument();
-    expect(screen.queryByRole('dialog')).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
-    expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toBeEnabled();
-    serveFapi(signedIn([disconnectedGoogle]));
-    await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
-  });
-
   it('preserves modal state when reconnecting', async () => {
     serveFapi(signedIn([disconnectedGoogle]));
-    await renderWithClerk(<UserProfileConnectedAccountsSection mode='modal' />);
+    await renderWithClerk(
+      <UserProfileProvider mode='modal'>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
+    );
     const request = holdRequests('post', '/v1/me/external_accounts');
     const user = userEvent.setup();
 
@@ -128,7 +116,9 @@ describe('connected accounts', () => {
   it('reauthorizes a connected account when it lacks requested scopes', async () => {
     serveFapi(signedIn([google]));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['email', 'calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['email', 'calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
     );
     const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
     const request = holdRequests('post', '/v1/me/external_accounts/idn_google/reauthorize');
@@ -146,7 +136,9 @@ describe('connected accounts', () => {
   it('shows a failed reauthorization and allows another attempt', async () => {
     serveFapi(signedIn([google]));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
     );
     const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
     const request = holdRequests('post', '/v1/me/external_accounts/idn_google/reauthorize');
@@ -167,7 +159,9 @@ describe('connected accounts', () => {
     const callback = deferred<{ callbackUrl: string }>();
     const open = vi.fn(() => callback.promise);
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['email', 'calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['email', 'calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
       {
         __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
       },
@@ -200,9 +194,9 @@ describe('connected accounts', () => {
     });
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Google' })).toBeInTheDocument());
     expect(clerk.user?.externalAccounts.find(item => item.id === google.id)?.approvedScopes).toBe('email calendar');
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
-    expect(screen.queryByRole('menuitem', { name: 'Reconnect' })).toBeNull();
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Google' }));
     expect(screen.getByRole('menuitem', { name: 'Remove' })).toBeEnabled();
+    expect(screen.queryByRole('menuitem', { name: 'Reconnect' })).toBeNull();
   });
 
   it.each(['switch', 'sign out'] as const)('aborts Reconnect after %s during redirect preparation', async change => {
@@ -218,7 +212,9 @@ describe('connected accounts', () => {
     const getRedirectUrl = vi.fn(() => redirect.promise);
     const open = vi.fn(() => Promise.resolve({ callbackUrl: 'https://app.example/callback' }));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
       {
         __internal_oauthTransport: { getRedirectUrl, open },
       },
@@ -247,7 +243,9 @@ describe('connected accounts', () => {
   it('allows another connection when reauthorizing an account fails to navigate', async () => {
     serveFapi(signedIn([google]));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['calendar'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ google: ['calendar'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
     );
     const navigate = vi.spyOn(clerk, 'navigate').mockRejectedValueOnce(new Error('Navigation failed'));
     const user = userEvent.setup();
@@ -262,4 +260,81 @@ describe('connected accounts', () => {
   });
 
   it.todo('keeps the provider visibly pending when Try again replaces its failed account with a Connect row');
+});
+
+describe('reconnect reverification', () => {
+  async function renderDisconnectedNeedingReverification() {
+    serveFapi(signedIn([disconnectedGoogle], { verification: { secrets: { password: 'hunter2' } } }));
+    const view = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+    const navigate = vi.spyOn(view.clerk, 'navigate').mockImplementation(() => Promise.resolve());
+    demandReverificationOnce('/v1/me/external_accounts');
+    return { navigate };
+  }
+
+  const manageGoogle = () => screen.getByRole('button', { name: 'Manage Google' });
+
+  it('verifies the session before recreating a disconnected account, then continues to the provider', async () => {
+    const { navigate } = await renderDisconnectedNeedingReverification();
+    const user = userEvent.setup();
+
+    await startReconnect(user, 'Google');
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('lets the user cancel verification quietly and retry the reconnect', async () => {
+    const { navigate } = await renderDisconnectedNeedingReverification();
+    const user = userEvent.setup();
+
+    await startReconnect(user, 'Google');
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(navigate).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).toBeNull();
+    await waitFor(() => expect(manageGoogle()).toHaveFocus());
+
+    await startReconnect(user, 'Google');
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
+  });
+
+  it('keeps the verification dialog open while retrying and reports an ordinary retry error', async () => {
+    const { navigate } = await renderDisconnectedNeedingReverification();
+    const user = userEvent.setup();
+
+    await startReconnect(user, 'Google');
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    const replay = holdRequests('post', '/v1/me/external_accounts');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+    await waitFor(() => expect(replay.requests).toHaveLength(1));
+
+    expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+    await user.keyboard('{Escape}');
+    expect(dialog).toBeVisible();
+
+    replay.fail('action_blocked', 'Unable to reconnect.');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('waits for a verification factor before opening the reconnect dialog', async () => {
+    await renderDisconnectedNeedingReverification();
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+    const user = userEvent.setup();
+
+    await startReconnect(user, 'Google');
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    start.release();
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+  });
 });

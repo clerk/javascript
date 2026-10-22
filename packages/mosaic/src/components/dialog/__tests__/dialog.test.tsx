@@ -96,6 +96,17 @@ describe('Mosaic Dialog', () => {
     expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-variant', 'profile');
   });
 
+  it('reflects the fullscreen variant as data-variant on the popup and the viewport', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup variant='fullscreen'>Body</Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-variant', 'fullscreen');
+    expect(document.querySelector('.cl-dialog-viewport')).toHaveAttribute('data-variant', 'fullscreen');
+  });
+
   it('composes consumer xstyle onto the popup', () => {
     const caller = stylex.create({ popup: { marginTop: '8px' } });
     render(
@@ -161,6 +172,57 @@ describe('Mosaic Dialog', () => {
     );
 
     expect(ref.current).toBe(document.querySelector('.cl-dialog-popup'));
+  });
+});
+
+describe('shouldCloseOnInteractOutside', () => {
+  function Verify({ shouldCloseOnInteractOutside }: { shouldCloseOnInteractOutside?: boolean }) {
+    return (
+      <Dialog.Root
+        defaultOpen
+        shouldCloseOnInteractOutside={shouldCloseOnInteractOutside}
+      >
+        <Dialog.Popup>
+          <Surface title='Verify it is you' />
+        </Dialog.Popup>
+      </Dialog.Root>
+    );
+  }
+
+  it('closes on an outside press by default', async () => {
+    const user = userEvent.setup();
+    render(<Verify />);
+
+    await user.click(document.querySelector('.cl-dialog-backdrop') as HTMLElement);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('stays open on an outside press when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.click(document.querySelector('.cl-dialog-backdrop') as HTMLElement);
+
+    expect(screen.getByRole('dialog', { name: 'Verify it is you' })).toBeInTheDocument();
+  });
+
+  it('still closes on Escape when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('keeps the corner dismiss when false', async () => {
+    const user = userEvent.setup();
+    render(<Verify shouldCloseOnInteractOutside={false} />);
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });
 
@@ -231,13 +293,13 @@ describe('nested Mosaic Dialogs', () => {
     render(<Nested />);
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.body.style.overflowY).toBe('hidden');
 
     await user.keyboard('{Escape}');
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.body.style.overflowY).toBe('hidden');
 
     await user.keyboard('{Escape}');
-    expect(document.body.style.overflow).toBe('');
+    expect(document.body.style.overflowY).toBe('');
   });
 
   it('warns when a profile opens inside another dialog', async () => {
@@ -248,6 +310,17 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="profile"'));
+    warn.mockRestore();
+  });
+
+  it('warns when a fullscreen profile opens inside another dialog', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(<Nested innerVariant='fullscreen' />);
+
+    await user.click(screen.getByRole('button', { name: 'Add email' }));
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
     warn.mockRestore();
   });
 
@@ -547,13 +620,13 @@ describe('compactPlacement', () => {
   // Written out rather than imported: an atom is named from its property, value AND condition, so
   // the probe only yields the popup's own atom if the query string matches `dialog.styles.ts`
   // exactly. A drift here shows up as a failing test rather than as a silently empty assertion.
-  const PHONE = '@container cl-dialog (width < 48rem)';
+  const SHEET = '@media (width < 40rem)';
   const probe = stylex.create({
-    anchored: { alignSelf: { [PHONE]: 'end', default: null } },
-    clipped: { overflow: { [PHONE]: 'clip', default: null } },
+    anchored: { alignSelf: { [SHEET]: 'end', default: null } },
+    clipped: { overflow: { [SHEET]: 'clip', default: null } },
   });
 
-  const renderPlacement = (compactPlacement: 'center' | 'sheet', variant: DialogVariant = 'card') =>
+  const renderPlacement = (compactPlacement: 'center' | 'sheet' | undefined, variant: DialogVariant = 'card') =>
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup
@@ -565,7 +638,13 @@ describe('compactPlacement', () => {
       </Dialog.Root>,
     );
 
-  it('centers by default, anchoring nothing to the bottom edge', () => {
+  it('makes a card a sheet by default', () => {
+    renderPlacement(undefined);
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+  });
+
+  it('centers when asked, anchoring nothing to the bottom edge', () => {
     renderPlacement('center');
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
@@ -586,6 +665,23 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
+    warn.mockRestore();
+  });
+
+  it('warns when a fullscreen profile is given a placement', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPlacement('sheet', 'fullscreen');
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
+    warn.mockRestore();
+  });
+
+  it('keeps a profile centered by default without warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPlacement(undefined, 'profile');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
     warn.mockRestore();
   });
 });

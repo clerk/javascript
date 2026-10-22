@@ -1,10 +1,16 @@
 import type { Web3Strategy } from '@clerk/shared/types';
+import type { Ref } from 'react';
+
+import type { ConfirmController } from '../../../blocks/confirm';
+import type { DialogFocusTarget } from '../../../components/dialog';
+import type { ReverificationController } from '../../reverification';
 
 export interface UserProfileWeb3Provider {
   id: Web3Strategy;
   walletPicker?: 'solana';
   provider: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   connectError?: string;
 }
 
@@ -13,6 +19,7 @@ export interface UserProfileWeb3Wallet {
   address: string;
   provider?: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   isPrimary?: boolean;
   isVerified: boolean;
   canRemove?: boolean;
@@ -20,13 +27,19 @@ export interface UserProfileWeb3Wallet {
 }
 
 export interface UserProfileWeb3WalletsSectionViewProps {
-  fallbackFocus?: () => HTMLElement | null;
   wallets: UserProfileWeb3Wallet[];
+  sectionRef?: Ref<HTMLDivElement>;
   availableProviders?: UserProfileWeb3Provider[];
   pendingId?: string;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
-  onRemove?: (id: string) => void | Promise<void>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+  remove?: ConfirmController<UserProfileWeb3Wallet>;
+  finalFocus?: DialogFocusTarget;
+  setPrimaryReverification?: ReverificationController;
+  setPrimaryFinalFocus?: DialogFocusTarget;
+  createReverification?: ReverificationController;
+  createFinalFocus?: DialogFocusTarget;
 }
 
 export type UserProfileWeb3WalletsModel =
@@ -40,6 +53,9 @@ export type UserProfileWeb3WalletsModel =
       connect: (strategy: Web3Strategy, walletName?: string) => Promise<void>;
       setPrimary: (walletId: string) => Promise<void>;
       remove?: (walletId: string) => Promise<void>;
+      removeReverification: ReverificationController;
+      setPrimaryReverification: ReverificationController;
+      createReverification: ReverificationController;
     };
 
 export type ReadyWeb3WalletsModel = Extract<UserProfileWeb3WalletsModel, { status: 'ready' }>;

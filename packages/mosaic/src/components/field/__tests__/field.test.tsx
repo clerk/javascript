@@ -751,3 +751,29 @@ describe('Mosaic Field', () => {
     consoleWarn.mockRestore();
   });
 });
+
+describe('Field focusableWhenDisabled', () => {
+  const renderEmailField = (disabled: boolean) => (
+    <Field.Root
+      disabled={disabled}
+      focusableWhenDisabled
+    >
+      <Field.Label>Email</Field.Label>
+      <Input />
+    </Field.Root>
+  );
+
+  it('keeps a focused input focused and uneditable while disabled', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(renderEmailField(false));
+    const input = screen.getByRole('textbox', { name: 'Email' });
+    await user.click(input);
+
+    rerender(renderEmailField(true));
+
+    expect(input).toHaveFocus();
+    expect(input).not.toBeDisabled();
+    expect(input).toHaveAttribute('aria-disabled', 'true');
+    expect(input).toHaveAttribute('readonly');
+  });
+});

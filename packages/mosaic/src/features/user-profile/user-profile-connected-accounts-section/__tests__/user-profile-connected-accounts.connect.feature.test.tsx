@@ -3,7 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  fapiUrl,
+  holdRequests,
+  serveFapi,
+  worker,
+} from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -15,6 +21,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
+import { UserProfileProvider } from '../../user-profile.provider';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 import {
   deferred,
@@ -100,7 +107,9 @@ describe('connected accounts', () => {
   it('sends requested scopes and the current URL to connect', async () => {
     serveFapi(signedIn([]));
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ github: ['repo'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ github: ['repo'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
     );
     const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
     const request = holdRequests('post', '/v1/me/external_accounts');
@@ -149,16 +158,40 @@ describe('connected accounts', () => {
     request.fail();
   });
 
-  it('shows a verification-required Connect error', async () => {
-    await renderSection([]);
-    const request = holdRequests('post', '/v1/me/external_accounts');
+  it('verifies the session before connecting a provider, then continues to it', async () => {
+    serveFapi(signedIn([], { verification: { secrets: { password: 'hunter2' } } }));
+    const view = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+    const navigate = vi.spyOn(view.clerk, 'navigate').mockImplementation(() => Promise.resolve());
+    demandReverificationOnce('/v1/me/external_accounts');
+    const user = userEvent.setup();
 
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
-    await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('session_reverification_required', 'Verify your session.');
-    expect(await screen.findByText('Verify your session.')).toBeInTheDocument();
-    expect(screen.queryByRole('dialog')).toBeNull();
-    expect(screen.getByRole('button', { name: 'Connect GitHub' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('lets the user cancel connect verification quietly and connect again', async () => {
+    serveFapi(signedIn([], { verification: { secrets: { password: 'hunter2' } } }));
+    const view = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+    const navigate = vi.spyOn(view.clerk, 'navigate').mockImplementation(() => Promise.resolve());
+    demandReverificationOnce('/v1/me/external_accounts');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(navigate).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).toBeNull();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect GitHub' })).toHaveFocus());
+
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
   });
 
   it('shows the OAuth error when FAPI returns no verification URL', async () => {
@@ -183,7 +216,11 @@ describe('connected accounts', () => {
 
   it('preserves modal state when connecting', async () => {
     serveFapi(signedIn([]));
-    await renderWithClerk(<UserProfileConnectedAccountsSection mode='modal' />);
+    await renderWithClerk(
+      <UserProfileProvider mode='modal'>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
+    );
     const request = holdRequests('post', '/v1/me/external_accounts');
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
@@ -374,7 +411,9 @@ describe('connected accounts', () => {
     const callback = deferred<{ callbackUrl: string }>();
     const open = vi.fn(() => callback.promise);
     const { clerk } = await renderWithClerk(
-      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ github: ['repo'] }} />,
+      <UserProfileProvider additionalOAuthScopes={{ github: ['repo'] }}>
+        <UserProfileConnectedAccountsSection />
+      </UserProfileProvider>,
       {
         __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
       },

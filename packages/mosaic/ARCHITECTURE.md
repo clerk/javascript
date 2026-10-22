@@ -82,7 +82,7 @@ import { MosaicProvider } from './mosaic-provider';
 <MosaicProvider icons={{ 'chevron-right': <MyChevron /> }}>{children}</MosaicProvider>;
 ```
 
-`<Icon name='chevron-right' />` renders the override in place of the built-in glyph and applies Mosaic's own sizing props to it, so a swapped glyph stays visually consistent with the rest. Outside a provider, `useMosaicIcons()` returns `{}` and every icon falls back to `iconRegistry`.
+`<Icon glyph={ChevronRight} />` looks the override up by the glyph's `iconName`, renders it in place of the built-in glyph and applies Mosaic's own sizing props to it, so a swapped glyph stays visually consistent with the rest. Outside a provider, `useMosaicIcons()` returns `{}` and every icon renders the glyph it was passed. Callers import each glyph directly so the bundle carries only the glyphs in use; `iconRegistry` holds every glyph for catalogs and tests and must not be imported from shipped code.
 
 ## Component authoring pattern
 
@@ -338,7 +338,7 @@ How it holds that state is a complexity call. `UserButton` earns a machine — a
 action is async, `open` and `pendingKey` constrain each other, and dismissing
 must not abandon an in-flight invoke — so the machine is declared in the same
 file with `setup<Context, Event>()`, and its context carries the injected effect.
-Abridged from `features/user-button/user-button.controller.tsx`:
+Abridged from `features/switcher/switcher.controller.tsx`:
 
 ```tsx
 const { createMachine, assign, fromPromise } = setup<UserButtonMachineContext, UserButtonMachineEvent>();
@@ -430,7 +430,7 @@ branch on rather than two.
 A controller whose own state is a single boolean is the same layer with `useState`
 inside it — still no Clerk, still returning plain props. The async part goes to a
 shared hook (`useForm` here) rather than a hand-rolled pending flag. From
-`features/user-profile/user-profile-account-section/user-profile-edit-username.controller.ts`:
+`features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts`:
 
 ```tsx
 export function useUserProfileEditUsernameController({ username = '', required = false, onSubmit }) {
@@ -490,17 +490,17 @@ export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, .
 
 A **block** is a view fragment that owns one piece of state nothing outside it can
 use, and takes the rest as props. `blocks/destructive` is the example: it holds the
-half-typed confirmation phrase and compares it, while `open`, `isDeleting`, and
-`errorMessage` come from the controller, because those are what decide whether the
-dialog closes or explains itself. `blocks/confirmation` is the same shape for a
-confirm step with no typed phrase.
+half-typed confirmation phrase and compares it, while open, pending and the error
+come from its controller, because those are what decide whether the dialog closes
+or explains itself. `blocks/confirmation` is the same shape for a confirm step
+with no typed phrase.
 
-Each block ships its own controller (`useDestructiveController`,
-`useConfirmationController`) that owns the pending and error state, so a feature
-passes it the effect and spreads the result onto the block rather than wiring that
-state by hand. Each also has a handle form (`DestructiveHandle`, and its
-`Confirmation` equivalent) for one dialog shared by several triggers, where the
-clicked row arrives as a payload.
+Both blocks are driven by one controller, `useConfirmController` (`blocks/confirm/`),
+created in the wrapper or controller layer and handed to the block as `controller`.
+It owns the dialog's lifecycle and the reverification step, and it carries a
+payload: a dialog shared by a list is opened from any row with `open(payload)`, the
+copy is derived from that payload, and the action receives it back. A dialog that
+sits next to its button takes the button as `trigger` instead.
 
 ### Testing a flow
 

@@ -4,13 +4,13 @@ import { Icon, IconFrame } from '../../components/icon';
 import type { ProviderLogoGlyph } from '../../components/provider-logo';
 import { ProviderLogo } from '../../components/provider-logo';
 import { Section } from '../../components/section';
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
 import { styles } from './user-profile-profile-panel.styles';
 
 export type UserProfileProviderIconProps =
   | { logo: ProviderLogoGlyph }
   | { iconUrl: string }
-  | { name: IconName }
+  | { glyph: IconComponent }
   | { initial: string };
 
 function ProviderIconContent(props: UserProfileProviderIconProps) {
@@ -31,10 +31,10 @@ function ProviderIconContent(props: UserProfileProviderIconProps) {
       />
     );
   }
-  if ('name' in props) {
+  if ('glyph' in props) {
     return (
       <Icon
-        name={props.name}
+        glyph={props.glyph}
         xstyle={styles.providerIcon}
       />
     );

@@ -4,6 +4,7 @@ import { Icon } from '../../components/icon';
 import type { ProviderLogoGlyph } from '../../components/provider-logo';
 import { ProviderLogo } from '../../components/provider-logo';
 import { Section, sectionCompactStyles } from '../../components/section';
+import { Lock } from '../../icons/glyphs/lock';
 import { fill, useMessages } from '../../localization';
 
 /** The enterprise connection a row's value comes from, which is why the row has nothing to edit. */
@@ -32,7 +33,7 @@ export function UserProfileManagedByLabel({
         ) : (
           <Icon
             aria-hidden
-            name='lock'
+            glyph={Lock}
             size='sm'
           />
         )

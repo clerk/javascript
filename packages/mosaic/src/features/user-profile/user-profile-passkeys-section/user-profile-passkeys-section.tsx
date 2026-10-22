@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 
-import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import { useUserProfilePasskeysSectionController } from './user-profile-passkeys-section.controller';
 import type { UserProfilePasskeysModel } from './user-profile-passkeys-section.model';
 import { useUserProfilePasskeysModel } from './user-profile-passkeys-section.model';
+import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
 
 export interface UserProfilePasskeysSectionProps {
   fallback?: ReactNode;

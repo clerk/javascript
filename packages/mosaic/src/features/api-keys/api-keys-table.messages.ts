@@ -3,6 +3,7 @@ import type { APIKeysTableMessages, APIKeysTableSubjectKind } from './api-keys-t
 
 export const apiKeysTableMessages = {
   loading: 'Loading API keys',
+  loaded: 'API keys loaded',
   loadError: 'Could not load API keys',
   loadErrorDescription: 'Something went wrong. Please try again.',
   retry: 'Try again',
@@ -32,6 +33,8 @@ export const apiKeysTableMessages = {
   createTitle: 'Add new API key',
   createDescription: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
   nameLabel: 'Secret key name',
+  descriptionLabel: 'Description',
+  descriptionPlaceholder: 'Explain why you’re generating this key',
   expirationLabel: 'Expiration',
   noExpiration: 'This key will never expire',
   expirationPlaceholder: 'Select expiration',

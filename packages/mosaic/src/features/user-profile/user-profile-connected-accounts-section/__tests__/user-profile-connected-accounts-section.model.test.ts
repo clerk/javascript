@@ -1,12 +1,12 @@
 import type { OAuthProvider } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
+import { oauthLogos } from '../../../../components/provider-logo/oauth.generated';
 import {
   createProviderCatalog,
   projectConnectedAccounts,
   recoveryFor,
 } from '../user-profile-connected-accounts-section.model';
-import { oauthLogos } from '../../../../components/provider-logo/oauth.generated';
 
 type AccountInput = {
   id: string;

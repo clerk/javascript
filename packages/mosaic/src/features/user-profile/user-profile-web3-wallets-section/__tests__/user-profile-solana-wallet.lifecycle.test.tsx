@@ -33,6 +33,7 @@ vi.mock('../user-profile-web3-wallets-section.model', () => ({
       availableProviders: [{ id: 'web3_solana_signature', provider: 'Solana', walletPicker: 'solana' }],
       connect: async () => {},
       setPrimary: async () => {},
+      reverification: { status: 'idle', visible: false },
     }) satisfies ReadyWeb3WalletsModel,
 }));
 

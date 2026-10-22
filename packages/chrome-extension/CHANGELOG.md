@@ -1,5 +1,55 @@
 # Change Log
 
+## 3.1.98
+
+### Patch Changes
+
+- Fix production builds that drop the setup code `@clerk/chrome-extension` runs when it loads. The package no longer declares `sideEffects: false`, which let bundlers such as Parcel skip that setup. With `plasmo build`, this left the extension popup blank. Measured Plasmo and esbuild bundle sizes are unchanged. ([#10313](https://github.com/clerk/javascript/pull/10313)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`8e8746d`](https://github.com/clerk/javascript/commit/8e8746d177c363b8e8d98887f04cc07c277f34df), [`1c450df`](https://github.com/clerk/javascript/commit/1c450dfcf5d0161c97ff5686545a31b24d8dcbd7)]:
+  - @clerk/ui@1.41.1
+
+## 3.1.97
+
+### Patch Changes
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18), [`7f4b9a8`](https://github.com/clerk/javascript/commit/7f4b9a8dbf4aaabe3efeedc2d7e2c227d655a247)]:
+  - @clerk/shared@4.41.0
+  - @clerk/clerk-js@6.40.0
+  - @clerk/ui@1.41.0
+  - @clerk/react@6.18.0
+
+## 3.1.96
+
+### Patch Changes
+
+- Updated dependencies [[`c0ba3bc`](https://github.com/clerk/javascript/commit/c0ba3bc728d76bd40f80c2c4c506cbfeb5d0807a), [`560ff50`](https://github.com/clerk/javascript/commit/560ff507af494b43210fd2d9a7bd109c4eb6902c)]:
+  - @clerk/clerk-js@6.39.1
+
+## 3.1.95
+
+### Patch Changes
+
+- Updated dependencies [[`f9aa91e`](https://github.com/clerk/javascript/commit/f9aa91e611a271b0c8e9ebc9cc3075f1d255172c)]:
+  - @clerk/ui@1.40.2
+
+## 3.1.94
+
+### Patch Changes
+
+- Updated dependencies [[`3b4ceb6`](https://github.com/clerk/javascript/commit/3b4ceb677056fb20dc1f44b7657edc5aeeb5e1cb)]:
+  - @clerk/ui@1.40.1
+
+## 3.1.93
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/clerk-js@6.39.0
+  - @clerk/shared@4.40.0
+  - @clerk/ui@1.40.0
+  - @clerk/react@6.17.8
+
 ## 3.1.92
 
 ### Patch Changes

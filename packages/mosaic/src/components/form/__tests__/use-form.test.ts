@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
@@ -130,7 +131,7 @@ describe('useForm', () => {
 
   it('shows the generic message and logs the cause for an unrecognized rejection', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const causes: unknown[] = [new Error('Nope'), 'boom'];
+    const causes: unknown[] = [new Error('Nope'), 'boom', undefined, null, 0];
     for (const cause of causes) {
       const { result } = renderHook(() =>
         useForm({
@@ -148,6 +149,37 @@ describe('useForm', () => {
       expect(result.current.error).toBe('Something went wrong. Please try again.');
       expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', cause);
     }
+    log.mockRestore();
+  });
+
+  it('returns to editing with the draft and no message when a reverification is cancelled', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const outcomes: Array<() => Promise<void>> = [
+      () => Promise.reject(new FormSubmitError({ message: 'Username is taken.' })),
+      () =>
+        Promise.reject(
+          new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
+        ),
+    ];
+    const { result } = renderHook(() =>
+      useForm({ initialValues: { username: '' }, onSubmit: () => (outcomes.shift() ?? resolved)() }),
+    );
+    act(() => result.current.setValue('username', 'alex'));
+    await act(async () => {
+      result.current.submit();
+      await tick();
+    });
+    expect(result.current.error).toBe('Username is taken.');
+
+    await act(async () => {
+      result.current.submit();
+      await tick();
+    });
+
+    expect(result.current.isSubmitting).toBe(false);
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.values).toEqual({ username: 'alex' });
+    expect(log).not.toHaveBeenCalled();
     log.mockRestore();
   });
 
@@ -232,7 +264,7 @@ describe('useForm', () => {
     expect(result.current.canSubmit).toBe(false);
   });
 
-  it('clears the message on the next submit', async () => {
+  it('holds the message until the next submit settles', async () => {
     let fail = true;
     const { result } = renderHook(() =>
       useForm({
@@ -245,8 +277,19 @@ describe('useForm', () => {
       await tick();
     });
     expect(result.current.error).toBe('Nope');
-    fail = false;
+
     act(() => result.current.submit());
+    expect(result.current.isSubmitting).toBe(true);
+    expect(result.current.error).toBe('Nope');
+
+    await act(async () => tick());
+    expect(result.current.error).toBe('Nope');
+
+    fail = false;
+    await act(async () => {
+      result.current.submit();
+      await tick();
+    });
     expect(result.current.error).toBeUndefined();
   });
 

@@ -2,6 +2,7 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -339,7 +340,7 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
           {...transitionProps}
           style={{ ...messageProps.style, ...transitionProps.style }}
         >
-          <FeedbackBody icon='exclamation-circle'>{message}</FeedbackBody>
+          <FeedbackBody icon={ExclamationCircle}>{message}</FeedbackBody>
         </span>
       ),
     },

@@ -1,3 +1,8 @@
+import type { Ref } from 'react';
+
+import type { ConfirmController } from '../../../blocks/confirm';
+import type { DialogFocusTarget } from '../../../components/dialog';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfileProviderIconProps } from '../user-profile-provider-icon';
 
 export type ConnectedAccountActionResult = 'redirecting' | void;
@@ -21,11 +26,17 @@ export interface UserProfileConnectedAccount extends ConnectedAccountProviderDis
 }
 
 export interface UserProfileConnectedAccountsSectionViewProps {
-  fallbackFocus?: () => HTMLElement | null;
   accounts: UserProfileConnectedAccount[];
+  sectionRef?: Ref<HTMLDivElement>;
   availableProviders?: UserProfileConnectionProvider[];
   pendingId?: string;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
-  onRemove?: (id: string) => void | Promise<void>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+  remove?: ConfirmController<UserProfileConnectedAccount>;
+  finalFocus?: DialogFocusTarget;
+  reconnectReverification?: ReverificationController;
+  reconnectFinalFocus?: DialogFocusTarget;
+  connectReverification?: ReverificationController;
+  connectFinalFocus?: DialogFocusTarget;
 }

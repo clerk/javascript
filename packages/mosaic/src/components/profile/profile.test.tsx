@@ -4,13 +4,14 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { UserCircle } from '../../icons/glyphs/user-circle';
 import { MosaicProvider } from '../../mosaic-provider';
 import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { HeadingLevelProvider } from '../heading';
 import { Icon } from '../icon';
-import { Panel } from '../panel';
+import { Panel, usePanelTitle } from '../panel';
 import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
 import { Profile } from './profile';
@@ -27,7 +28,7 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
       <Profile.Nav>
         <Profile.NavItem
           value='account'
-          icon={<Icon name='user-circle' />}
+          icon={<Icon glyph={UserCircle} />}
         >
           Account
         </Profile.NavItem>
@@ -141,7 +142,7 @@ describe('Profile', () => {
     expect(account).toHaveAttribute('aria-selected', 'true');
     expect(account).toHaveAttribute('aria-controls', page.id);
     expect(page).toHaveTextContent('Email addresses');
-    expect(screen.getByText('Security page')).not.toBeVisible();
+    expect(screen.queryByText('Security page')).not.toBeInTheDocument();
   });
 
   it('reports a selection, and moves it with the arrow keys', async () => {
@@ -469,6 +470,28 @@ describe('Profile', () => {
     it.each([
       ['sheet', 3],
       ['select', 2],
+    ])('falls back to the corner dismiss in a fullscreen dialog in the %s layout', (_, width) => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup variant='fullscreen'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('button', { name: 'Back to app' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+
+      act(() => observe?.(width));
+
+      expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+    });
+
+    it.each([
+      ['sheet', 3],
+      ['select', 2],
     ])('shows the page as a group named by the page title in the %s layout', (_, width) => {
       renderSurface();
       act(() => observe?.(width));
@@ -529,6 +552,36 @@ describe('Profile', () => {
       expect(titleRef.current).toBe(title());
     });
 
+    it('makes the page title the panel title inside a profile page', () => {
+      let panelTitle: () => HTMLDivElement | null = () => null;
+      function ReadPanelTitle() {
+        panelTitle = usePanelTitle();
+        return null;
+      }
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Nav>
+              <Profile.NavItem value='account'>Account</Profile.NavItem>
+            </Profile.Nav>
+            <Profile.Content pageTitle='Account'>
+              <Profile.ContentPanel value='account'>
+                <Panel.Root>
+                  <Panel.Title>Account</Panel.Title>
+                  <Panel.Sections>
+                    <ReadPanelTitle />
+                  </Panel.Sections>
+                </Panel.Root>
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+
+      expect(panelTitle()).toBe(screen.getByRole('heading', { level: 3, name: 'Account' }));
+    });
+
     it('returns the tablist to the column when the width comes back', () => {
       renderSurface();
       act(() => observe?.(3));
@@ -554,17 +607,24 @@ describe('Profile', () => {
   });
 
   describe('inside a dialog', () => {
-    function renderInDialog() {
+    function renderInDialog(props: Partial<ProfileRootProps> = {}) {
       return render(
         <MosaicProvider>
           <Dialog.Root defaultOpen>
             <Dialog.Popup variant='profile'>
-              <Surface />
+              <Surface {...props} />
             </Dialog.Popup>
           </Dialog.Root>
         </MosaicProvider>,
       );
     }
+
+    it('brings its own surface even when asked to be flush', () => {
+      renderInDialog({ elevation: 'flush' });
+
+      expect(document.querySelector('.cl-profile')).toHaveAttribute('data-elevation', 'card');
+      expect(document.querySelector('.cl-profile-content')).not.toHaveAttribute('data-inline');
+    });
 
     it('names the dialog and carries its dismiss', () => {
       renderInDialog();
@@ -594,6 +654,76 @@ describe('Profile', () => {
       expect(screen.getByRole('alertdialog', { name: 'User profile' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    });
+
+    describe('fullscreen', () => {
+      function renderFullscreen(
+        onOpenChange = vi.fn(),
+        localization?: React.ComponentProps<typeof MosaicProvider>['localization'],
+      ) {
+        return render(
+          <MosaicProvider localization={localization}>
+            <Dialog.Root
+              defaultOpen
+              onOpenChange={onOpenChange}
+            >
+              <Dialog.Popup variant='fullscreen'>
+                <Surface />
+              </Dialog.Popup>
+            </Dialog.Root>
+          </MosaicProvider>,
+        );
+      }
+
+      it('puts a back button first in the navigation in place of the corner dismiss', () => {
+        renderFullscreen();
+
+        const back = screen.getByRole('button', { name: 'Back to app' });
+        expect(screen.getByRole('navigation', { name: 'User profile' })).toContainElement(back);
+        expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+        expect(back.compareDocumentPosition(screen.getByRole('tablist'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+
+      it('dismisses the dialog from the back button', async () => {
+        const onOpenChange = vi.fn();
+        renderFullscreen(onOpenChange);
+
+        await userEvent.setup().click(screen.getByRole('button', { name: 'Back to app' }));
+
+        expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+      });
+
+      it('reads the back button label from the catalog', () => {
+        renderFullscreen(vi.fn(), { overrides: { 'profile.backToApp': 'Retour à l’application' } });
+
+        expect(screen.getByRole('button', { name: 'Retour à l’application' })).toBeInTheDocument();
+      });
+    });
+
+    it('has no back button in a profile dialog, or standalone', () => {
+      const standalone = renderSurface();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+      standalone.unmount();
+
+      renderInDialog();
+      expect(screen.queryByRole('button', { name: 'Back to app' })).not.toBeInTheDocument();
+    });
+
+    it('follows showCloseButton on the dialog', () => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root
+            defaultOpen
+            showCloseButton={false}
+          >
+            <Dialog.Popup variant='profile'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+
+      expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
     });
 
     it('carries no dismiss standalone', () => {
