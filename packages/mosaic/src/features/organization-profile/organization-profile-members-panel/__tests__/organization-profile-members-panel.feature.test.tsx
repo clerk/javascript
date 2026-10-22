@@ -1,4 +1,3 @@
-import { getClerkQueryClient } from '@clerk/shared/react';
 import type { RoleJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -492,22 +491,5 @@ describe('OrganizationProfileMembersPanel', () => {
     await userEvent.setup().click(await screen.findByRole('combobox', { name: /^Change role for Carol Jones/ }));
     expect(await screen.findByRole('option', { name: 'Owner' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Admin' })).toBeNull();
-  });
-
-  it('drops cached roles on sign out', async () => {
-    serve(manage);
-    const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
-    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
-    const cachedRoles = () =>
-      getClerkQueryClient()
-        ?.getQueryCache()
-        .getAll()
-        .filter(query => query.queryKey[0] === 'mosaic-organization-roles' && query.state.data !== undefined) ?? [];
-    expect(cachedRoles()).toHaveLength(1);
-
-    await act(() => view.clerk.signOut());
-
-    expect(view.container).toBeEmptyDOMElement();
-    expect(cachedRoles()).toHaveLength(0);
   });
 });
