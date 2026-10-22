@@ -1,3 +1,4 @@
+import { web3Logos } from '@clerk/mosaic/components/provider-logo/web3.generated';
 import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.view';
 
 import type { StoryMeta } from '@/lib/types';
@@ -35,7 +36,7 @@ export function ConnectOnly() {
 export function UnverifiedWallet() {
   const fixture = useWeb3WalletsFixture({
     initialWallets: [{ ...primaryWallet, isPrimary: false, isVerified: false }],
-    availableProviders: [{ id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: primaryWallet.iconUrl }],
+    availableProviders: [{ id: 'web3_metamask_signature', provider: 'MetaMask', icon: { logo: web3Logos.metamask } }],
   });
   return (
     <UserProfileWeb3WalletsSectionView
@@ -52,7 +53,7 @@ export function ConnectionError() {
       {
         id: 'web3_metamask_signature',
         provider: 'MetaMask',
-        iconUrl: primaryWallet.iconUrl,
+        icon: { logo: web3Logos.metamask },
         connectError: 'Wallet extension not found. Check your wallet and try again.',
       },
     ],

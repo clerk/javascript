@@ -2,18 +2,28 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { createWeb3 } from '@clerk/shared/internal/clerk-js/web3';
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { UserResource, VerificationResource, Web3WalletResource } from '@clerk/shared/types';
+import type { UserResource, VerificationResource, Web3ProviderData, Web3WalletResource } from '@clerk/shared/types';
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
+import { getWeb3Logo } from '../../../components/provider-logo/web3.generated';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { useReverificationFlow } from '../../reverification';
-import { isMonochromeProvider } from '../user-profile-provider.utils';
+import type { UserProfileProviderIconProps } from '../user-profile-provider-icon';
+import { toProviderIcon } from '../user-profile-provider-icon.model';
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
   UserProfileWeb3WalletsModel,
 } from './user-profile-web3-wallets-section.types';
+
+function toWeb3Icon(provider: Web3ProviderData): UserProfileProviderIconProps {
+  return toProviderIcon({
+    logo: getWeb3Logo(provider.provider),
+    iconUrl: iconImageUrl(provider.provider),
+    label: provider.name,
+  });
+}
 
 export type Web3WalletEntry = Pick<Web3WalletResource, 'id' | 'web3Wallet'> & {
   verification: Pick<VerificationResource, 'strategy' | 'status' | 'expireAt'>;
@@ -78,8 +88,7 @@ export function projectWeb3Wallets({
         id: wallet.id,
         address: wallet.web3Wallet,
         provider: provider?.name,
-        iconUrl: provider ? iconImageUrl(provider.provider) : undefined,
-        monochromeIcon: provider ? isMonochromeProvider(provider.provider) : false,
+        icon: provider ? toWeb3Icon(provider) : undefined,
         isPrimary: wallet.id === primaryId,
         isVerified: wallet.verification.status === 'verified',
       };
@@ -91,8 +100,7 @@ export function projectWeb3Wallets({
             id: provider.strategy,
             walletPicker: provider.provider === 'solana' ? 'solana' : undefined,
             provider: provider.name,
-            iconUrl: iconImageUrl(provider.provider),
-            monochromeIcon: isMonochromeProvider(provider.provider),
+            icon: toWeb3Icon(provider),
           }))
       : [],
   };

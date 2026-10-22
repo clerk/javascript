@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { web3Logos } from '../../../../components/provider-logo/web3.generated';
 import { normalizedWeb3Wallet, projectWeb3Wallets } from '../user-profile-web3-wallets-section.model';
 
 const metamask = {
@@ -29,7 +30,7 @@ describe('Web3 wallet projection', () => {
     });
   });
 
-  it('marks monochrome provider logos', () => {
+  it('uses bundled Web3 logos', () => {
     const okx = {
       ...metamask,
       id: 'wallet_okx',
@@ -43,10 +44,10 @@ describe('Web3 wallet projection', () => {
     });
     expect(result).toMatchObject({
       wallets: [
-        { id: 'wallet_metamask', monochromeIcon: false },
-        { id: 'wallet_okx', monochromeIcon: true },
+        { id: 'wallet_metamask', icon: { logo: web3Logos.metamask } },
+        { id: 'wallet_okx', icon: { logo: web3Logos.okx_wallet } },
       ],
-      availableProviders: [{ id: 'web3_coinbase_wallet_signature', monochromeIcon: false }],
+      availableProviders: [{ id: 'web3_coinbase_wallet_signature', icon: { logo: web3Logos.coinbase_wallet } }],
     });
   });
 
