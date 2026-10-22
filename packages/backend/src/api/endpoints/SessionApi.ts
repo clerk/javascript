@@ -9,6 +9,30 @@ import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/sessions';
 
+export type ActiveDeviceSessions = Readonly<{
+  object: 'active_device_sessions';
+  subject: Readonly<{ instance_id: string; user_id: string; session_id: string }>;
+  sessions: readonly Readonly<{
+    id: string;
+    status: string;
+    last_active_at: number | null;
+    expire_at: number;
+    abandon_at: number;
+    has_actor: boolean;
+    latest_activity: Readonly<{
+      object: 'session_activity';
+      id: string;
+      device_type?: string;
+      browser_name?: string;
+      browser_version?: string;
+      country?: string;
+      city?: string;
+      ip_address?: string;
+      is_mobile: boolean;
+    }> | null;
+  }>[];
+}>;
+
 /** @generateWithEmptyComment */
 export type SessionListParams = ClerkPaginationRequest<{
   /** The ID of the client to get sessions for. */
@@ -45,6 +69,16 @@ export type CreateSessionParams = {
 
 /** @generateWithEmptyComment */
 export class SessionAPI extends AbstractAPI {
+  public async getActiveDevices(sessionId: string, options: { signal?: AbortSignal } = {}) {
+    this.requireId(sessionId);
+    return this.request<ActiveDeviceSessions>({
+      method: 'GET',
+      path: joinPaths(basePath, sessionId, 'active_devices'),
+      headerParams: { 'Cache-Control': 'no-store' },
+      fetchOptions: { cache: 'no-store', redirect: 'error', signal: options.signal },
+    });
+  }
+
   /**
    * Gets a list of sessions for either the specified client or user. Requires either `clientId` or `userId` to be provided. By default, the list is returned in descending order by creation date (newest first).
    * @returns A [`PaginatedResourceResponse`](https://clerk.com/docs/reference/backend/types/paginated-resource-response) object with a `data` property containing an array of [`Session`](https://clerk.com/docs/reference/backend/types/backend-session) objects and a `totalCount` property containing the total number of sessions.

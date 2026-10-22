@@ -11,6 +11,7 @@ import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from './user-profile-connected-accounts-section.styles';
 import type {
+  ConnectedAccountActionEligibility,
   ConnectedAccountProviderDisplay,
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
@@ -55,7 +56,7 @@ export function UserProfileConnectProviderRowView({
   provider: UserProfileConnectionProvider;
   isPending: boolean;
   isDisabled: boolean;
-  onConnect: (id: string) => void;
+  onConnect?: (id: string) => void;
 }) {
   const m = useMessages('userProfileConnectedAccounts');
   return (
@@ -80,8 +81,8 @@ export function UserProfileConnectProviderRowView({
             color='neutral'
             aria-label={fill(m.connectLabel, { provider: provider.provider })}
             isPending={isPending}
-            disabled={isDisabled && !isPending}
-            onClick={() => onConnect(provider.id)}
+            disabled={!onConnect || (isDisabled && !isPending)}
+            onClick={() => onConnect?.(provider.id)}
           >
             {m.connect}
             <Icon
@@ -99,12 +100,14 @@ export function UserProfileConnectProviderRowView({
 
 export function UserProfileConnectedAccountRowView({
   account,
+  eligibility,
   triggerRef,
   isDisabled = false,
   onReconnect,
   onRemove,
 }: {
   account: UserProfileConnectedAccount;
+  eligibility?: ConnectedAccountActionEligibility;
   triggerRef?: Ref<HTMLButtonElement>;
   isDisabled?: boolean;
   onReconnect?: (id: string) => void;
@@ -112,14 +115,21 @@ export function UserProfileConnectedAccountRowView({
 }) {
   const m = useMessages('userProfileConnectedAccounts');
   const actions: ActionMenuAction[] = [];
-  if ((account.status === 'reconnect' || account.status === 'error') && onReconnect && !isDisabled) {
-    actions.push({
-      label: account.status === 'reconnect' ? m.reconnect : m.tryAgain,
-      onClick: () => onReconnect(account.id),
-    });
+  const canShowReconnect =
+    eligibility?.canReconnect ??
+    (Boolean(onReconnect) && !isDisabled && (account.status === 'reconnect' || account.status === 'error'));
+  if (canShowReconnect) {
+    const label = account.status === 'reconnect' ? m.reconnect : m.tryAgain;
+    actions.push(
+      onReconnect && !isDisabled ? { label, onClick: () => onReconnect(account.id) } : { label, disabled: true },
+    );
   }
-  if (onRemove) {
-    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(account) });
+  if (eligibility?.canRemove ?? Boolean(onRemove)) {
+    actions.push(
+      onRemove
+        ? { label: m.remove, color: 'negative', onClick: () => onRemove(account) }
+        : { label: m.remove, color: 'negative', disabled: true },
+    );
   }
   return (
     <Section.Row>

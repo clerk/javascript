@@ -196,6 +196,16 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return this.#publishableKey;
   }
 
+  getFapiClient() {
+    const clerk = this.clerkjs;
+    if (!clerk?.loaded || typeof clerk.getFapiClient !== 'function') {
+      throw new Error(
+        'Clerk transport is unavailable. Wait for Clerk to load and use a runtime with transport support.',
+      );
+    }
+    return clerk.getFapiClient();
+  }
+
   get loaded(): boolean {
     return this.clerkjs?.loaded || false;
   }

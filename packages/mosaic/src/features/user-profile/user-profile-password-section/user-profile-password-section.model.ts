@@ -12,6 +12,7 @@ import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
+import { type UserProfileActionContext, useUserProfileUserModel } from '../user-profile-user.model';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValue, UserProfilePasswordPolicy } from './user-profile-password-section.types';
@@ -69,11 +70,11 @@ function getPasswordPolicy(
   environment: EnvironmentResource,
 ): PasswordPolicyResult {
   if (!user) {
-    return { status: 'hidden' };
+    return { status: 'hidden' as const };
   }
 
   if (!environment.userSettings.instanceIsPasswordBased) {
-    return { status: 'hidden' };
+    return { status: 'hidden' as const };
   }
 
   const policy: UserProfilePasswordPolicy = user.passwordEnabled
@@ -92,7 +93,8 @@ function getPasswordPolicy(
   return { status: 'ready', userId: user.id, ...policy };
 }
 
-export function useUserProfilePasswordModel(): UserProfilePasswordModel {
+export function useUserProfilePasswordActions(context?: UserProfileActionContext) {
+  const actionUser = useUserProfileUserModel(context);
   const clerk = useClerk();
   const m = useMessages('userProfilePasswordSection');
   const locale = useLocale();
@@ -125,6 +127,10 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
 
   const [updatePasswordWithReverification, reverification] = useReverificationFlow(
     async (input: UserProfileEditPasswordValue, target: PasswordUpdateTarget) => {
+      if (actionUser.status !== 'ready') {
+        throw new FormSubmitError({ message: m.errors.unavailable });
+      }
+      actionUser.currentUser();
       const currentUser = getAvailablePasswordUser(
         clerk.user,
         clerk.session?.id,
@@ -141,21 +147,17 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     },
   );
 
-  if (!isUserLoaded || !isSessionLoaded || !environment) {
-    return { status: 'loading' };
+  if (!isUserLoaded || !isSessionLoaded || !environment || actionUser.status !== 'ready') {
+    return { status: 'loading' as const };
   }
 
   if (!session) {
-    return { status: 'hidden' };
+    return { status: 'hidden' as const };
   }
 
   const policy = getPasswordPolicy(user, environment);
   if (policy.status === 'readonly') {
-    return {
-      status: 'readonly',
-      mode: policy.mode,
-      managedBy: { name: policy.enterpriseConnectionName || m.enterpriseConnection },
-    };
+    return { status: 'hidden' as const };
   }
   if (policy.status !== 'ready') {
     return policy;
@@ -170,10 +172,12 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     identifier: session.publicUserData.identifier ?? '',
     validatePassword,
     reverification,
-    updatePassword: async input => {
+    updatePassword: async (input: UserProfileEditPasswordValue) => {
       try {
         getAvailablePasswordUser(clerk.user, clerk.session?.id, environment, target, m.errors.unavailable);
+        actionUser.currentUser();
         await updatePasswordWithReverification(input, target);
+        context?.onMutation();
       } catch (error) {
         if (isReverificationCancelledError(error) || error instanceof FormSubmitError) {
           throw error;
@@ -189,4 +193,47 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
       }
     },
   };
+}
+
+export function projectPassword(
+  user: {
+    passwordEnabled: boolean;
+    enterpriseAccounts: readonly { active: boolean; enterpriseConnection: { name: string } | null }[];
+  },
+  passwordEnabled: boolean,
+) {
+  return {
+    visible: passwordEnabled,
+    hasPassword: user.passwordEnabled,
+    managedBy: user.enterpriseAccounts.find(account => account.active)?.enterpriseConnection?.name,
+    managed: user.enterpriseAccounts.some(account => account.active),
+  };
+}
+
+export function useUserProfilePasswordModel(): UserProfilePasswordModel {
+  const { isLoaded: isSessionLoaded, session } = useSession();
+  const actions = useUserProfilePasswordActions();
+  const model = useUserProfileUserModel();
+  const m = useMessages('userProfilePasswordSection');
+  if (model.status !== 'ready') {
+    return model;
+  }
+  if (!isSessionLoaded) {
+    return { status: 'loading' };
+  }
+  if (!session) {
+    return { status: 'hidden' };
+  }
+  const display = projectPassword(model.user, model.environment.userSettings.instanceIsPasswordBased);
+  if (!display.visible) {
+    return { status: 'hidden' };
+  }
+  if (display.managed) {
+    return {
+      status: 'readonly',
+      mode: display.hasPassword ? 'change' : 'set',
+      managedBy: { name: display.managedBy || m.enterpriseConnection },
+    };
+  }
+  return actions;
 }

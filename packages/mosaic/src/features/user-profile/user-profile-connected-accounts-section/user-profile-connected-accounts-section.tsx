@@ -25,9 +25,18 @@ export function UserProfileConnectedAccountsSection({ fallback }: UserProfileCon
   );
 }
 
-function ConnectedAccounts({ model }: { model: Extract<UserProfileConnectedAccountsModel, { status: 'ready' }> }) {
+export function ConnectedAccounts({
+  model,
+  showEligibleActions,
+}: {
+  model: Extract<UserProfileConnectedAccountsModel, { status: 'ready' }>;
+  showEligibleActions?: boolean;
+}) {
   const controller = useUserProfileConnectedAccountsController({
     accounts: model.accounts,
+    canManageAccount: model.canManageAccount,
+    canReconnectAccount: model.canReconnectAccount,
+    canConnectProvider: model.canConnectProvider,
     availableProviders: model.availableProviders,
     onConnect: model.connect,
     onReconnect: model.reconnect,
@@ -36,5 +45,10 @@ function ConnectedAccounts({ model }: { model: Extract<UserProfileConnectedAccou
     reconnectReverification: model.reconnectReverification,
   });
 
-  return <UserProfileConnectedAccountsSectionView {...controller} />;
+  return (
+    <UserProfileConnectedAccountsSectionView
+      {...controller}
+      showEligibleActions={showEligibleActions}
+    />
+  );
 }

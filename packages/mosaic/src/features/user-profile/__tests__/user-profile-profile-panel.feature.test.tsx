@@ -42,6 +42,14 @@ describe('UserProfileProfilePanel', () => {
     expect(sectionHeadings()).toEqual(['Email', 'Profile']);
   });
 
+  it('replaces only the details section when given a profile section', async () => {
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    await renderWithClerk(<UserProfileProfilePanel profileSection={<section>Snapshot details</section>} />);
+
+    expect(screen.getByText('Snapshot details')).toBeInTheDocument();
+    expect(sectionHeadings()).toEqual(['Email', 'Danger zone']);
+  });
+
   it('keeps the panel title when every child section is hidden', async () => {
     serveFapi({ client: fapiClient() });
     await renderWithClerk(<UserProfileProfilePanel />);

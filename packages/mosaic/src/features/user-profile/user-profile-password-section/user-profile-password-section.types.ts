@@ -20,6 +20,7 @@ export interface UserProfileEditPasswordValue {
 export interface UserProfilePasswordSectionViewProps {
   action?: ReactNode;
   hasPassword?: boolean;
+  showReadonlyStatus?: boolean;
   /** Replaces the edit action with the enterprise provider’s name. */
   managedBy?: UserProfileManagedBy;
 }

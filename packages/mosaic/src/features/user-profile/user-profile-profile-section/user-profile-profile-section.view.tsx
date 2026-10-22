@@ -16,6 +16,7 @@ export function UserProfileProfileSectionView({
   username,
   usernameAction,
   picture,
+  eligibility,
 }: UserProfileProfileSectionViewProps) {
   const m = useMessages('userProfileProfileSection');
 
@@ -33,6 +34,7 @@ export function UserProfileProfileSectionView({
             name={name}
             imageUrl={imageUrl}
             hasImage={hasImage}
+            eligibility={eligibility}
           />
           {showName ? (
             <UserProfileNameRowView

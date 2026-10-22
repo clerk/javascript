@@ -1,5 +1,5 @@
 import type { EmailAddressJSON, EnterpriseAccountConnectionJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -22,7 +22,9 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
+import type { UserProfileEmailVerifier } from '../../user-profile-contact.types';
 import { UserProfileEmailSection } from '../user-profile-email-section';
+import { useUserProfileEmailSectionModel } from '../user-profile-email-section.model';
 
 const VERIFIED = fapiVerification('email_code', { status: 'verified' });
 const PRIMARY = fapiEmailAddress({ id: 'idn_primary', email_address: 'alice@example.com', verification: VERIFIED });
@@ -68,6 +70,27 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile email section', () => {
+  it('refuses a retained verifier after the account changes', async () => {
+    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
+    const alice = fapiUser({ id: 'user_1', email_addresses: [pending] });
+    const bob = fapiUser({ id: 'user_2', email_addresses: [fapiEmailAddress({ id: 'idn_other' })] });
+    serveFapi({
+      client: fapiClient([fapiSession({ id: 'sess_1', user: alice }), fapiSession({ id: 'sess_2', user: bob })]),
+    });
+    let retained: UserProfileEmailVerifier | undefined;
+    function CaptureVerifier() {
+      const model = useUserProfileEmailSectionModel();
+      if (model.status === 'ready' && !retained) {
+        retained = model.getEmailVerifier('idn_pending');
+      }
+      return null;
+    }
+    const { clerk } = await renderWithClerk(<CaptureVerifier />);
+    expect(retained).toBeDefined();
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+    expect(() => retained?.start()).toThrow();
+    await expect(retained?.verifyCode('123456')).rejects.toThrow();
+  });
   it('adds an address and verifies the code it was sent', async () => {
     const { actor } = await renderSection(signedInWithEmails([]));
     expect(emailRow()).toHaveTextContent('No email addresses added');

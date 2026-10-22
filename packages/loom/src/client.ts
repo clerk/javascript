@@ -2,9 +2,17 @@ import type { QueryObserverResult } from '@tanstack/query-core';
 import { QueryClient, QueryObserver } from '@tanstack/query-core';
 
 import { parseHydration, sessionSnapshots } from './hydration';
-import type { LoomHydration, Sessions, SessionScope, SessionsTransport } from './types';
+import { profileSettingsSnapshot } from './profile-settings';
+import type { LoomHydration, ProfileSettings, Sessions, SessionScope, SessionsTransport, UserSnapshot } from './types';
+import { userSnapshot } from './user';
 
-type Options = { scope: SessionScope; transport: SessionsTransport; hydration?: unknown };
+type Options = {
+  scope: SessionScope;
+  transport?: SessionsTransport;
+  readUser?: (signal: AbortSignal) => Promise<UserSnapshot>;
+  readProfileSettings?: (signal: AbortSignal) => Promise<ProfileSettings>;
+  hydration?: unknown;
+};
 
 let nextOwnerId = 0;
 
@@ -16,20 +24,39 @@ export class LoomClient {
   private revision = 0;
   private readonly subscriptions = new Set<() => void>();
   private readonly mutations = new Set<AbortController>();
-  private readonly transport: SessionsTransport;
+  private readonly transport: SessionsTransport | undefined;
+  private readonly readUser: Options['readUser'];
+  private userRevision = 0;
+  private readonly readProfileSettings: Options['readProfileSettings'];
 
   constructor(options: Options) {
     this.scope = Object.freeze({ ...options.scope });
     this.transport = options.transport;
+    this.readUser = options.readUser;
+    this.readProfileSettings = options.readProfileSettings;
     if (options.hydration !== undefined) {
       const state = parseHydration(options.hydration, this.scope);
-      this.queryClient.setQueryData(this.queryOptions().queryKey, state.sessions, { updatedAt: state.updatedAt });
+      if (state.sessions) {
+        this.queryClient.setQueryData(this.queryOptions().queryKey, state.sessions.data, {
+          updatedAt: state.sessions.updatedAt,
+        });
+      }
+      if (state.profileSettings) {
+        this.queryClient.setQueryData(this.profileSettingsQueryOptions().queryKey, state.profileSettings.data, {
+          updatedAt: state.profileSettings.updatedAt,
+        });
+      }
+      if (state.user) {
+        this.queryClient.setQueryData(this.userQueryOptions().queryKey, state.user.data, {
+          updatedAt: state.user.updatedAt,
+        });
+      }
     }
   }
 
   queryOptions() {
     return {
-      queryKey: ['loom', 1, this.scope.instanceKey, this.scope.userId, this.scope.sessionId, 'sessions'] as const,
+      queryKey: ['loom', 5, this.scope.instanceKey, this.scope.userId, this.scope.sessionId, 'sessions'] as const,
       staleTime: 30_000,
       gcTime: 300_000,
       retry: false as const,
@@ -38,6 +65,9 @@ export class LoomClient {
       queryFn: async ({ signal }: { signal: AbortSignal }): Promise<Sessions> => {
         this.assertLive();
         const revision = this.revision;
+        if (!this.transport) {
+          throw new Error('Loom sessions transport is unavailable.');
+        }
         const sessions = await this.transport.read(signal);
         this.assertCurrent(revision);
         return sessionSnapshots(sessions);
@@ -89,6 +119,9 @@ export class LoomClient {
     const controller = new AbortController();
     this.mutations.add(controller);
     try {
+      if (!this.transport) {
+        throw new Error('Loom sessions transport is unavailable.');
+      }
       await this.transport.revoke(id, controller.signal);
       this.assertLive();
       this.revision++;
@@ -104,11 +137,117 @@ export class LoomClient {
 
   dehydrate(): LoomHydration | undefined {
     this.assertLive();
-    const state = this.getSnapshot();
-    if (state?.status !== 'success' || state.data === undefined) {
-      return undefined;
+    const sessions = this.getSnapshot();
+    const user = this.queryClient.getQueryState<UserSnapshot>(this.userQueryOptions().queryKey);
+    const settings = this.queryClient.getQueryState<ProfileSettings>(this.profileSettingsQueryOptions().queryKey);
+    const state: LoomHydration = {
+      version: 5,
+      scope: this.scope,
+      ...(settings?.status === 'success' && settings.data !== undefined
+        ? { profileSettings: { data: settings.data, updatedAt: settings.dataUpdatedAt } }
+        : {}),
+      ...(sessions?.status === 'success' && sessions.data !== undefined
+        ? { sessions: { data: sessions.data, updatedAt: sessions.dataUpdatedAt } }
+        : {}),
+      ...(user?.status === 'success' && user.data !== undefined
+        ? { user: { data: user.data, updatedAt: user.dataUpdatedAt } }
+        : {}),
+    };
+    return state.sessions || state.user || state.profileSettings ? parseHydration(state, this.scope) : undefined;
+  }
+
+  userQueryOptions() {
+    return {
+      queryKey: ['loom', 5, this.scope.instanceKey, this.scope.userId, this.scope.sessionId, 'user'] as const,
+      staleTime: 30_000,
+      gcTime: 300_000,
+      retry: false as const,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      queryFn: async ({ signal }: { signal: AbortSignal }): Promise<UserSnapshot> => {
+        this.assertLive();
+        const revision = this.userRevision;
+        if (!this.readUser) {
+          throw new Error('Loom user transport is unavailable.');
+        }
+        const user = await this.readUser(signal);
+        this.assertUserCurrent(revision);
+        return userSnapshot(user, this.scope.userId);
+      },
+    };
+  }
+
+  async fetchUser(): Promise<UserSnapshot> {
+    this.assertLive();
+    const revision = this.userRevision;
+    const user = await this.queryClient.fetchQuery(this.userQueryOptions());
+    this.assertUserCurrent(revision);
+    return user;
+  }
+
+  async prefetchUser(): Promise<void> {
+    this.assertLive();
+    await this.queryClient.prefetchQuery(this.userQueryOptions());
+  }
+
+  async refreshUser(): Promise<UserSnapshot> {
+    this.assertLive();
+    await this.queryClient.invalidateQueries({
+      queryKey: this.userQueryOptions().queryKey,
+      exact: true,
+      refetchType: 'none',
+    });
+    return this.fetchUser();
+  }
+
+  async invalidateUser(): Promise<void> {
+    this.assertLive();
+    this.userRevision++;
+    const queryKey = this.userQueryOptions().queryKey;
+    await this.queryClient.cancelQueries({ queryKey, exact: true });
+    this.assertLive();
+    await this.queryClient.invalidateQueries({ queryKey, exact: true });
+  }
+
+  profileSettingsQueryOptions() {
+    return {
+      queryKey: [
+        'loom',
+        5,
+        this.scope.instanceKey,
+        this.scope.userId,
+        this.scope.sessionId,
+        'profile-settings',
+      ] as const,
+      staleTime: 30_000,
+      gcTime: 300_000,
+      retry: false as const,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      queryFn: async ({ signal }: { signal: AbortSignal }): Promise<ProfileSettings> => {
+        this.assertLive();
+        if (!this.readProfileSettings) {
+          throw new Error('Loom profile settings transport is unavailable.');
+        }
+        const settings = await this.readProfileSettings(signal);
+        this.assertLive();
+        return profileSettingsSnapshot(settings);
+      },
+    };
+  }
+
+  async fetchProfileSettings(): Promise<ProfileSettings> {
+    this.assertLive();
+    const settings = await this.queryClient.fetchQuery(this.profileSettingsQueryOptions());
+    this.assertLive();
+    return settings;
+  }
+
+  private assertUserCurrent(revision: number): void {
+    this.assertLive();
+    if (revision !== this.userRevision) {
+      throw new Error('Loom user read was superseded by a profile update.');
     }
-    return { version: 1, scope: this.scope, sessions: state.data, updatedAt: state.dataUpdatedAt };
   }
 
   dispose(): void {

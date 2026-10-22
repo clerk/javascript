@@ -2,7 +2,7 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useClerk } from '@clerk/shared/react';
 import type {
   ClerkAPIError,
   CustomOauthProvider,
@@ -12,15 +12,14 @@ import type {
   OAuthScope,
   OAuthStrategy,
   UserResource,
-  VerificationResource,
 } from '@clerk/shared/types';
 
-import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import { useUserProfileOptions } from '../user-profile.provider';
+import { type UserProfileActionContext, useUserProfileUserModel } from '../user-profile-user.model';
 import type {
   ConnectedAccountActionResult,
   ConnectedAccountProviderDisplay,
@@ -28,14 +27,17 @@ import type {
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';
 
-type AccountData = Pick<ExternalAccountResource, 'id' | 'provider' | 'approvedScopes' | 'username' | 'emailAddress'> & {
-  verification:
-    | (Pick<VerificationResource, 'strategy'> & { error: Pick<ClerkAPIError, 'code' | 'longMessage'> | null })
-    | null;
+type AccountData = {
+  id: string;
+  provider: string;
+  approvedScopes: string;
+  username?: string | null;
+  emailAddress: string;
+  verification: { strategy: string | null; error: Pick<ClerkAPIError, 'code' | 'longMessage'> | null } | null;
 };
 type ProjectedUser = {
-  verifiedExternalAccounts: AccountData[];
-  unverifiedExternalAccounts: AccountData[];
+  verifiedExternalAccounts: readonly AccountData[];
+  unverifiedExternalAccounts: readonly AccountData[];
 };
 
 export type AdditionalOAuthScopes = Partial<Record<OAuthProvider, OAuthScope[]>>;
@@ -80,7 +82,7 @@ type SocialSettings = Partial<
 export function createProviderCatalog(
   enabledStrategies: readonly string[],
   social: SocialSettings,
-  accounts: AccountData[] = [],
+  accounts: readonly AccountData[] = [],
 ): ConnectedAccountProvider[] {
   const enabled = new Set(enabledStrategies);
   const providers: ConnectedAccountProvider[] = OAUTH_PROVIDERS.map(({ strategy, provider, name }) => ({
@@ -123,7 +125,7 @@ export function createProviderCatalog(
 }
 
 function findAdditionalScopes(account: AccountData, scopes: AdditionalOAuthScopes | undefined): string[] {
-  const requested = scopes?.[account.provider] ?? [];
+  const requested = Object.entries(scopes ?? {}).find(([provider]) => provider === account.provider)?.[1] ?? [];
   const approved = account.approvedScopes.split(' ');
   return requested.some(scope => !approved.includes(scope)) ? requested : [];
 }
@@ -160,12 +162,13 @@ function toAccountRow(
   scopes: AdditionalOAuthScopes | undefined,
 ): UserProfileConnectedAccount {
   const error = account.verification?.error;
-  const { status } = recoveryFor(account, scopes, providers);
+  const { status, plan } = recoveryFor(account, scopes, providers);
   return {
     id: account.id,
     ...(providers.find(provider => provider.provider === account.provider)?.display ?? { provider: account.provider }),
     identifier: account.username || account.emailAddress || undefined,
     status,
+    eligibility: { canRemove: true, canReconnect: Boolean(plan) },
     verificationError: status === 'error' ? error?.longMessage : undefined,
   };
 }
@@ -217,6 +220,9 @@ export type UserProfileConnectedAccountsModel =
       remove: (accountId: string) => Promise<void>;
       removeReverification: ReverificationController;
       reconnectReverification: ReverificationController;
+      canManageAccount?: (id: string) => boolean;
+      canReconnectAccount?: (id: string) => boolean;
+      canConnectProvider?: (id: string) => boolean;
     };
 
 function unavailable() {
@@ -225,57 +231,57 @@ function unavailable() {
   });
 }
 
-export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
+export function useUserProfileConnectedAccountsActions(context?: UserProfileActionContext) {
   const { additionalOAuthScopes, mode } = useUserProfileOptions();
   const clerk = useClerk();
-  const { isLoaded, user } = useUser();
-  const environment = useMosaicEnvironment();
+  const model = useUserProfileUserModel(context);
   const router = useMosaicRouter();
-  const [removeAccount, removeReverification] = useReverificationFlow((current: UserResource, accountId: string) => {
-    const account = current.externalAccounts.find(candidate => candidate.id === accountId);
+  const [removeAccount, removeReverification] = useReverificationFlow((_current: UserResource, accountId: string) => {
+    if (model.status !== 'ready') {
+      throw unavailable();
+    }
+    const account = model.currentUser().externalAccounts.find(candidate => candidate.id === accountId);
     if (!account) {
       throw unavailable();
     }
     return account.destroy();
   });
   const [recreateAccount, reconnectReverification] = useReverificationFlow(
-    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
-      current.createExternalAccount(params),
+    (_current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) => {
+      if (model.status !== 'ready') {
+        throw unavailable();
+      }
+      return model.currentUser().createExternalAccount(params);
+    },
   );
 
-  if (!isLoaded || !environment) {
-    return { status: 'loading' };
+  if (model.status !== 'ready') {
+    return model;
   }
-  if (!user) {
-    return { status: 'hidden', reason: 'no_user' };
-  }
-
-  const providers = createProviderCatalog(
-    environment.userSettings.socialProviderStrategies,
-    environment.userSettings.social,
-    user.externalAccounts,
-  );
-  const projection = projectConnectedAccounts({
-    user,
-    providers,
-    socialEnabled: environment.userSettings.socialProviderStrategies.length > 0,
-    allowCreation: allowsIdentificationCreation(user, environment.userSettings.enterpriseSSO),
-    additionalOAuthScopes,
-  });
-  if (projection.status === 'hidden') {
-    return { status: 'hidden', reason: 'unavailable' };
-  }
-
-  const userId = user.id;
-  const transport = clerk.__internal_oauthTransport;
-
-  const requireCurrentUser = () => {
-    const current = clerk.user;
-    if (!current || current.id !== userId) {
-      throw unavailable();
+  const { environment, currentUser: requireCurrentUser } = model;
+  const currentProviders = () =>
+    createProviderCatalog(
+      environment.userSettings.socialProviderStrategies,
+      environment.userSettings.social,
+      requireCurrentUser().externalAccounts,
+    );
+  const availableProvider = (id: string) => {
+    const current = requireCurrentUser();
+    const provider = currentProviders().find(candidate => candidate.enabled && candidate.strategy === id);
+    if (
+      !provider ||
+      !allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO) ||
+      current.externalAccounts.some(
+        account =>
+          account.provider === provider.provider &&
+          (account.verification?.status === 'verified' || account.verification?.error),
+      )
+    ) {
+      return undefined;
     }
-    return current;
+    return provider;
   };
+  const transport = clerk.__internal_oauthTransport;
 
   const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
   const withModalState = (url: string, socialProvider?: string) =>
@@ -295,6 +301,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       const nonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce');
       const current = requireCurrentUser();
       await (nonce ? current.reload({ rotatingTokenNonce: nonce }) : current.reload());
+      context?.onMutation();
       return;
     }
 
@@ -303,15 +310,23 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   };
 
   return {
-    ...projection,
-    userId,
-    connect: async strategyId => {
-      const provider = providers.find(candidate => candidate.enabled && candidate.strategy === strategyId);
+    status: 'ready' as const,
+    canManageAccount: (id: string) => model.user.externalAccounts.some(account => account.id === id),
+    canReconnectAccount: (id: string) => {
+      const account = model.user.externalAccounts.find(account => account.id === id);
+      return Boolean(account && recoveryFor(account, additionalOAuthScopes, currentProviders()).plan);
+    },
+    canConnectProvider: (id: string) => Boolean(availableProvider(id)),
+    connect: async (strategyId: string) => {
+      const provider = availableProvider(strategyId);
       if (!provider) {
         throw unavailable();
       }
       const redirectUrl = await getRedirectUrl();
       const current = requireCurrentUser();
+      if (!availableProvider(strategyId)) {
+        throw unavailable();
+      }
       const response = await current.createExternalAccount({
         strategy: provider.strategy,
         redirectUrl: withModalState(redirectUrl, provider.provider),
@@ -319,14 +334,14 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       });
       return completeVerification(response);
     },
-    reconnect: async accountId => {
+    reconnect: async (accountId: string) => {
       const redirectUrl = await getRedirectUrl();
       const current = requireCurrentUser();
       const account = current.externalAccounts.find(candidate => candidate.id === accountId);
       if (!account) {
         throw unavailable();
       }
-      const { plan: recovery } = recoveryFor(account, additionalOAuthScopes, providers);
+      const { plan: recovery } = recoveryFor(account, additionalOAuthScopes, currentProviders());
       if (!recovery) {
         throw unavailable();
       }
@@ -344,10 +359,35 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
             });
       return completeVerification(response);
     },
-    remove: async accountId => {
+    remove: async (accountId: string) => {
       await removeAccount(requireCurrentUser(), accountId);
+      context?.onMutation();
     },
     removeReverification,
     reconnectReverification,
   };
+}
+
+export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
+  const model = useUserProfileUserModel();
+  const actions = useUserProfileConnectedAccountsActions();
+  const { additionalOAuthScopes } = useUserProfileOptions();
+  if (model.status !== 'ready' || actions.status !== 'ready') {
+    return model.status === 'hidden' ? { status: 'hidden', reason: 'no_user' } : { status: 'loading' };
+  }
+  const providers = createProviderCatalog(
+    model.environment.userSettings.socialProviderStrategies,
+    model.environment.userSettings.social,
+    model.user.externalAccounts,
+  );
+  const projection = projectConnectedAccounts({
+    user: model.user,
+    providers,
+    socialEnabled: model.environment.userSettings.socialProviderStrategies.length > 0,
+    allowCreation: allowsIdentificationCreation(model.user, model.environment.userSettings.enterpriseSSO),
+    additionalOAuthScopes,
+  });
+  return projection.status === 'hidden'
+    ? { status: 'hidden', reason: 'unavailable' }
+    : { ...projection, ...actions, userId: model.user.id };
 }

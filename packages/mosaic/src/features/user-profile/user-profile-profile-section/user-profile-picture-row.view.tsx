@@ -6,21 +6,24 @@ import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import { FileUpload } from '../../../primitives/file-upload';
 import type { UserProfilePictureController } from './user-profile-picture.controller';
+import type { ProfileActionEligibility } from './user-profile-profile-section.types';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 /** Matches the limit the row's own description advertises. */
 const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
 
-export interface UserProfilePictureRowViewProps extends UserProfilePictureController {
+export interface UserProfilePictureRowViewProps extends Partial<UserProfilePictureController> {
   name: string;
   imageUrl?: string;
   hasImage?: boolean;
+  eligibility?: ProfileActionEligibility;
 }
 
 export function UserProfilePictureRowView({
   name,
   imageUrl,
   hasImage = false,
+  eligibility,
   previewUrl,
   isPending,
   error,
@@ -40,7 +43,7 @@ export function UserProfilePictureRowView({
     <FileUpload.Root
       accept={PROFILE_PICTURE_MIME_TYPES}
       maxSize={PROFILE_PICTURE_MAX_BYTES}
-      disabled={isPending}
+      disabled={!onChange || isPending}
       aria-busy={isPending || undefined}
       render={<Section.Row />}
       onReject={onReject}
@@ -66,8 +69,10 @@ export function UserProfilePictureRowView({
           <Section.Description>{m.picture.description}</Section.Description>
         </Section.Content>
         <ProfilePictureActions
-          canChange={Boolean(onChange)}
+          canChange={eligibility?.canChangePicture ?? Boolean(onChange)}
+          canRemove={eligibility?.canRemovePicture ?? Boolean(onRemove)}
           hasImage={hasImage}
+          readyToChange={Boolean(onChange)}
           onRemove={onRemove}
         />
       </Section.Item>
@@ -79,10 +84,14 @@ export function UserProfilePictureRowView({
 function ProfilePictureActions({
   hasImage,
   canChange,
+  canRemove,
+  readyToChange,
   onRemove,
 }: {
   hasImage: boolean;
   canChange: boolean;
+  canRemove: boolean;
+  readyToChange: boolean;
   onRemove?: () => void;
 }) {
   const m = useMessages('userProfileProfileSection');
@@ -90,11 +99,19 @@ function ProfilePictureActions({
   const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
+    actions.push(
+      readyToChange
+        ? { label: m.picture.change, icon: 'pen', onClick: openFilePicker }
+        : { label: m.picture.change, icon: 'pen', disabled: true },
+    );
   }
 
-  if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
+  if (hasImage && canRemove) {
+    actions.push(
+      onRemove
+        ? { label: m.picture.remove, icon: 'x', onClick: onRemove }
+        : { label: m.picture.remove, icon: 'x', disabled: true },
+    );
   }
 
   if (actions.length > 0) {
@@ -117,6 +134,7 @@ function ProfilePictureActions({
               color='neutral'
               size='sm'
               variant='outline'
+              disabled={!readyToChange}
             />
           }
         >

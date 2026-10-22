@@ -35,6 +35,11 @@
       "import": "./dist/esm/server/index.js",
       "require": "./dist/cjs/server/index.js"
     },
+    "./internal/server": {
+      "types": "./dist/types/server/internal.d.ts",
+      "import": "./dist/esm/server/internal.js",
+      "require": "./dist/cjs/server/internal.js"
+    },
     "./errors": {
       "types": "./dist/types/errors.d.ts",
       "import": "./dist/esm/errors.js",

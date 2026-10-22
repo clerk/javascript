@@ -1,11 +1,8 @@
 'use client';
 
 import type { Clerk } from '@clerk/clerk-js';
-import { ClerkLoomProvider, useLoom } from '@clerk/loom/react';
-import { Button } from '@clerk/mosaic/components/button';
-import { LoomActiveDevices } from '@clerk/mosaic/experimental/loom/loom-active-devices';
-import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
-import { ClerkProvider, SignIn, useUser } from '@clerk/react';
+import { LoomProvider, useLoom, useSessions } from '@clerk/loom/react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -14,20 +11,26 @@ export default function LoomPage() {
   const [clerk, setClerk] = useState<Clerk | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    let active = true;
-    if (publishableKey) {
-      void import('@clerk/clerk-js')
-        .then(({ Clerk }) => {
-          if (active) {
-            setClerk(new Clerk(publishableKey));
-          }
-        })
-        .catch(() => {
-          if (active) {
-            setError('Could not load Clerk. Reload this page to retry.');
-          }
-        });
+    if (!publishableKey) {
+      return;
     }
+    let active = true;
+    void import('@clerk/clerk-js')
+      .then(async ({ Clerk }) => {
+        if (!active) {
+          return;
+        }
+        const instance = new Clerk(publishableKey);
+        await instance.load();
+        if (active) {
+          setClerk(instance);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setError('Could not load Clerk. Reload this page to retry.');
+        }
+      });
     return () => {
       active = false;
     };
@@ -42,35 +45,28 @@ export default function LoomPage() {
     return <p>Loading Clerk</p>;
   }
   return (
-    <ClerkProvider
-      Clerk={clerk}
-      publishableKey={publishableKey}
-    >
-      <main className='mx-auto max-w-2xl space-y-6 p-8'>
-        <h1 className='text-2xl font-semibold'>Loom active devices</h1>
-        <Account host={clerk} />
-      </main>
-    </ClerkProvider>
-  );
-}
-
-function Account({ host }: { host: Clerk }) {
-  const { isLoaded, isSignedIn } = useUser();
-  if (!isLoaded) {
-    return <p>Loading account</p>;
-  }
-  if (!isSignedIn) {
-    return <SignIn routing='hash' />;
-  }
-  return (
-    <ClerkLoomProvider
-      host={host}
-      fallback={<p>Loading devices</p>}
-    >
-      <MosaicProvider>
+    <main className='mx-auto max-w-2xl space-y-6 p-8'>
+      <h1 className='text-2xl font-semibold'>Loom active devices</h1>
+      <Link
+        href='/live/loom'
+        className='underline'
+      >
+        User profile server preview
+      </Link>
+      <LoomProvider
+        clerk={clerk}
+        fallback={
+          <button
+            type='button'
+            onClick={() => void clerk.redirectToSignIn({ redirectUrl: '/loom' })}
+          >
+            Sign in to view devices
+          </button>
+        }
+      >
         <Devices />
-      </MosaicProvider>
-    </ClerkLoomProvider>
+      </LoomProvider>
+    </main>
   );
 }
 
@@ -79,16 +75,41 @@ function Devices() {
   const [show, setShow] = useState(false);
   return (
     <div className='space-y-4'>
-      <Button
+      <button
         type='button'
-        variant='outline'
         onMouseEnter={() => void loom.prefetch()}
         onFocus={() => void loom.prefetch()}
         onClick={() => setShow(value => !value)}
       >
         {show ? 'Hide devices' : 'Show devices'}
-      </Button>
-      {show && <LoomActiveDevices />}
+      </button>
+      {show && <DeviceList />}
     </div>
+  );
+}
+
+function DeviceList() {
+  const loom = useLoom();
+  const query = useSessions();
+  return (
+    <section>
+      <button
+        type='button'
+        disabled={query.isFetching}
+        onClick={() => void query.refetch()}
+      >
+        Refresh devices
+      </button>
+      {query.isPending ? <p role='status'>Loading devices</p> : null}
+      {query.error ? <p role='alert'>Could not load devices. Refresh to retry.</p> : null}
+      {query.data?.length === 0 ? <p>No active devices</p> : null}
+      <ul>
+        {query.data?.map(session => (
+          <li key={session.id}>
+            {session.id === loom.scope.sessionId ? 'This device' : session.latestActivity.deviceType || 'Other device'}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

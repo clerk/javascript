@@ -7,9 +7,11 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import type { MosaicMessages } from '../../localization';
 import { fill, useMessages } from '../../localization';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { UserProfileContact } from './user-profile-contact.types';
+import type { UserProfileContactAccess } from './user-profile-contact.utils';
 import { styles } from './user-profile-profile-panel.styles';
 
 export interface UserProfileContactListRowViewProps {
@@ -19,6 +21,8 @@ export interface UserProfileContactListRowViewProps {
   kind: 'email' | 'phone';
   label: string;
   items: UserProfileContact[];
+  canManage?: (id: string) => boolean;
+  eligibility?: Pick<UserProfileContactAccess, 'canRemove'>;
   onAdd?: () => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
@@ -30,6 +34,8 @@ export function UserProfileContactListRowView({
   kind,
   label,
   items,
+  canManage,
+  eligibility,
   onAdd,
   onVerify,
   onSetPrimary,
@@ -82,24 +88,14 @@ export function UserProfileContactListRowView({
             </Section.Item>
           ) : (
             items.map(item => {
-              const actions: ActionMenuAction[] = [];
-
-              if (!item.isVerified && onVerify) {
-                actions.push({
-                  label: item.isDefault ? m.completeVerification : m[kind].verify,
-                  onClick: () => onVerify(item.id),
-                });
-              } else if (item.isVerified && !item.isDefault && onSetPrimary) {
-                actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
-              }
-
-              if (onRemove) {
-                actions.push({
-                  label: m[kind].remove,
-                  color: 'negative',
-                  onClick: () => onRemove(item),
-                });
-              }
+              const actions = toContactActions(item, m, {
+                kind,
+                canManage,
+                eligibility,
+                onVerify,
+                onSetPrimary,
+                onRemove,
+              });
 
               return (
                 <Section.Item key={item.id}>
@@ -128,4 +124,65 @@ export function UserProfileContactListRowView({
       </Section.Body>
     </Section.Group>
   );
+}
+
+function toContactActions(
+  item: UserProfileContact,
+  m: MosaicMessages['userProfileContact'],
+  {
+    kind,
+    canManage,
+    eligibility,
+    onVerify,
+    onSetPrimary,
+    onRemove,
+  }: Pick<
+    UserProfileContactListRowViewProps,
+    'kind' | 'canManage' | 'eligibility' | 'onVerify' | 'onSetPrimary' | 'onRemove'
+  >,
+): ActionMenuAction[] {
+  const actions: ActionMenuAction[] = [];
+  const canManageItem = canManage?.(item.id) !== false;
+  const verificationAction = toContactVerificationAction(item, m, {
+    kind,
+    canManage,
+    eligibility,
+    onVerify,
+    onSetPrimary,
+  });
+  if (verificationAction) {
+    actions.push(verificationAction);
+  }
+
+  if (eligibility?.canRemove || (eligibility === undefined && canManageItem && onRemove)) {
+    actions.push(
+      canManageItem && onRemove
+        ? { label: m[kind].remove, color: 'negative', onClick: () => onRemove(item) }
+        : { label: m[kind].remove, color: 'negative', disabled: true },
+    );
+  }
+  return actions;
+}
+
+function toContactVerificationAction(
+  item: UserProfileContact,
+  m: MosaicMessages['userProfileContact'],
+  {
+    kind,
+    canManage,
+    eligibility,
+    onVerify,
+    onSetPrimary,
+  }: Pick<UserProfileContactListRowViewProps, 'kind' | 'canManage' | 'eligibility' | 'onVerify' | 'onSetPrimary'>,
+): ActionMenuAction | undefined {
+  const canManageItem = canManage?.(item.id) !== false;
+  if (!item.isVerified && (eligibility || (canManageItem && onVerify))) {
+    const label = item.isDefault ? m.completeVerification : m[kind].verify;
+    return canManageItem && onVerify ? { label, onClick: () => onVerify(item.id) } : { label, disabled: true };
+  } else if (item.isVerified && !item.isDefault && (eligibility || (canManageItem && onSetPrimary))) {
+    return canManageItem && onSetPrimary
+      ? { label: m.setPrimary, onClick: () => onSetPrimary(item.id) }
+      : { label: m.setPrimary, disabled: true };
+  }
+  return undefined;
 }

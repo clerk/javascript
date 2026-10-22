@@ -1,4 +1,4 @@
-import type { AttributeData, UserResource, VerificationResource } from '@clerk/shared/types';
+import type { AttributeData } from '@clerk/shared/types';
 
 import { isAttributeAvailable } from './user-profile.utils';
 import type { UserProfileContact } from './user-profile-contact.types';
@@ -10,7 +10,9 @@ export interface UserProfileContactAccess {
 }
 
 export function toContactAccess(
-  attribute: AttributeData | undefined,
+  attribute:
+    | Pick<AttributeData, 'enabled' | 'immutable' | 'used_for_first_factor' | 'used_for_second_factor'>
+    | undefined,
   count: number,
   canAddIdentifications: boolean,
 ): UserProfileContactAccess {
@@ -20,7 +22,15 @@ export function toContactAccess(
   return { show: available && (canCreate || count > 0), canCreate, canRemove: mutable };
 }
 
-export function canAddIdentifications(user: UserResource, enterpriseSSOEnabled: boolean): boolean {
+export function canAddIdentifications(
+  user: {
+    enterpriseAccounts: readonly {
+      active: boolean;
+      enterpriseConnection: { disableAdditionalIdentifications: boolean } | null;
+    }[];
+  },
+  enterpriseSSOEnabled: boolean,
+): boolean {
   return (
     !enterpriseSSOEnabled ||
     !user.enterpriseAccounts.some(
@@ -37,7 +47,7 @@ export function byId<T extends { id: string }>(items: T[], id: string, kind: str
   return item;
 }
 
-type Identification = { id: string; verification: Pick<VerificationResource, 'status' | 'expireAt'> };
+type Identification = { id: string; verification: { status: string | null; expireAt: Date | null } };
 
 export function sortByVerification<T extends Identification>(items: T[], primaryId: string | null): T[] {
   const others = items.filter(item => item.id !== primaryId);

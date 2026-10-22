@@ -15,9 +15,10 @@ export function UserProfilePasswordSectionView({
   action,
   hasPassword = false,
   managedBy,
+  showReadonlyStatus = false,
 }: UserProfilePasswordSectionViewProps) {
   const m = useMessages('userProfilePasswordSection');
-  if (!hasPassword && !managedBy && !action) {
+  if (!hasPassword && !managedBy && !action && !showReadonlyStatus) {
     return null;
   }
 

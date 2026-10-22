@@ -27,11 +27,11 @@ describe('active-device sessions', () => {
     const hydrated = createLoomClient({
       scope,
       transport,
-      hydration: { version: 1, scope, sessions: [extra], updatedAt: Date.now() },
+      hydration: { version: 5, scope, sessions: { data: [extra], updatedAt: Date.now() } },
     });
     for (const client of [fetched, hydrated]) {
       expect(await client.fetch()).toEqual([device]);
-      expect(client.dehydrate()?.sessions).toEqual([device]);
+      expect(client.dehydrate()?.sessions?.data).toEqual([device]);
       expect(JSON.stringify(client.dehydrate())).not.toContain('must-not-cache');
       client.dispose();
     }
@@ -41,7 +41,7 @@ describe('active-device sessions', () => {
     const loom = createLoomClient({
       scope,
       transport: { read, revoke: () => Promise.resolve() },
-      hydration: { version: 1, scope, sessions: [device], updatedAt: Date.now() + 30_000 },
+      hydration: { version: 5, scope, sessions: { data: [device], updatedAt: Date.now() + 30_000 } },
     });
     expect(await loom.fetch()).toEqual([device]);
     expect(read).not.toHaveBeenCalled();

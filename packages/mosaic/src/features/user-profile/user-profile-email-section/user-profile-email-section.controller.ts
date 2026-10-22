@@ -9,6 +9,8 @@ import type { ReadyEmailSectionModel, UserProfileEmailSectionViewProps } from '.
 
 export function useUserProfileEmailSectionController({
   emails,
+  eligibility,
+  canManageEmail,
   username,
   onCreateEmail,
   getEmailVerifier,
@@ -32,6 +34,8 @@ export function useUserProfileEmailSectionController({
 
   return {
     emails,
+    eligibility,
+    canManageEmail,
     canAdd: Boolean(onCreateEmail),
     verification,
     error: setPrimary.error,

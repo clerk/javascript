@@ -51,13 +51,15 @@ export function useLoomActiveDevicesModel() {
     });
   return {
     devices,
-    revoke,
+    revoke: query.isEnabled ? revoke : undefined,
     reverification,
     pending: query.isPending,
     refreshing: query.isFetching,
     error: query.error ? errorText(toLocalizableError(query.error)) : undefined,
-    refresh: async () => {
-      await query.refetch();
-    },
+    refresh: query.isEnabled
+      ? async () => {
+          await query.refetch();
+        }
+      : undefined,
   };
 }

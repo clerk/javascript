@@ -9,6 +9,8 @@ import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfileDangerSection } from '../user-profile-danger-section';
 
 let isLoaded: boolean;
+let currentUserId: string;
+let currentSessionId: string | null;
 let deleteSelfEnabled: boolean;
 let signedInSessions: { user?: { id: string } }[];
 let deleteUser: ReturnType<typeof vi.fn>;
@@ -21,10 +23,17 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     useUser: () => ({
       isLoaded,
       isSignedIn: isLoaded,
-      user: isLoaded ? { id: 'user_1', deleteSelfEnabled, delete: deleteUser } : undefined,
+      user: isLoaded ? { id: currentUserId, deleteSelfEnabled, delete: deleteUser } : undefined,
     }),
     useSession: () => ({ session: { id: 'sess_1' } }),
     useClerk: () => ({
+      loaded: true,
+      get user() {
+        return { id: currentUserId, deleteSelfEnabled, delete: deleteUser };
+      },
+      get session() {
+        return currentSessionId ? { id: currentSessionId } : null;
+      },
       setActive,
       client: { signedInSessions },
       buildAfterSignOutUrl: () => '/signed-out',
@@ -51,6 +60,8 @@ async function openDialog(user: ReturnType<typeof userEvent.setup>) {
 describe('UserProfileDangerSection', () => {
   beforeEach(() => {
     isLoaded = true;
+    currentUserId = 'user_1';
+    currentSessionId = 'sess_1';
     deleteSelfEnabled = true;
     signedInSessions = [];
     deleteUser = vi.fn(() => Promise.resolve());
@@ -164,5 +175,54 @@ describe('UserProfileDangerSection', () => {
 
     const reopened = await openDialog(user);
     expect(within(reopened).getByRole('textbox')).toHaveValue('');
+  });
+
+  it('rejects a retained delete confirmation after the active user changes', async () => {
+    const user = userEvent.setup();
+    renderSection();
+    const dialog = await openDialog(user);
+    await user.type(within(dialog).getByRole('textbox'), 'Delete account');
+    currentUserId = 'user_2';
+    await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
+    expect(deleteUser).not.toHaveBeenCalled();
+    expect(setActive).not.toHaveBeenCalled();
+  });
+
+  it('rejects a retained delete confirmation after the active session changes', async () => {
+    const user = userEvent.setup();
+    renderSection();
+    const dialog = await openDialog(user);
+    await user.type(within(dialog).getByRole('textbox'), 'Delete account');
+    currentSessionId = 'sess_2';
+    await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
+    expect(deleteUser).not.toHaveBeenCalled();
+    expect(setActive).not.toHaveBeenCalled();
+  });
+  it('does not sign out a replacement session after deletion completes', async () => {
+    const pending = createDeferredPromise();
+    deleteUser = vi.fn(() => pending.promise);
+    const user = userEvent.setup();
+    renderSection();
+    const dialog = await openDialog(user);
+    await user.type(within(dialog).getByRole('textbox'), 'Delete account');
+    await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
+    await waitFor(() => expect(deleteUser).toHaveBeenCalledOnce());
+    currentSessionId = 'sess_2';
+    pending.resolve();
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(setActive).not.toHaveBeenCalled();
+  });
+
+  it('redirects after successful deletion naturally clears the active session', async () => {
+    deleteUser = vi.fn(() => {
+      currentSessionId = null;
+      return Promise.resolve();
+    });
+    const user = userEvent.setup();
+    renderSection();
+    const dialog = await openDialog(user);
+    await user.type(within(dialog).getByRole('textbox'), 'Delete account');
+    await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
+    await waitFor(() => expect(setActive).toHaveBeenCalledWith({ session: null, redirectUrl: '/signed-out' }));
   });
 });

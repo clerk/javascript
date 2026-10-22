@@ -1,4 +1,4 @@
-import { useClerk, useUser } from '@clerk/shared/react';
+import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
@@ -20,12 +20,21 @@ export type UserProfileUserModel =
       ) => Promise<void>;
     };
 
-export function useUserProfileUserModel(): UserProfileUserModel {
+export type UserProfileActionContext = Readonly<{
+  scope: Readonly<{ userId: string; sessionId: string; instanceKey: string }>;
+  onMutation: () => void;
+}>;
+
+type UserProfileUserAccess =
+  | Exclude<UserProfileUserModel, { status: 'ready' }>
+  | Omit<Extract<UserProfileUserModel, { status: 'ready' }>, 'environment'>;
+
+export function useUserProfileUserAccess(context?: UserProfileActionContext): UserProfileUserAccess {
   const { isLoaded, user } = useUser();
   const clerk = useClerk();
-  const environment = useMosaicEnvironment();
+  const { session } = useSession();
 
-  if (!isLoaded || !environment) {
+  if (!isLoaded) {
     return { status: 'loading' };
   }
 
@@ -34,10 +43,26 @@ export function useUserProfileUserModel(): UserProfileUserModel {
   }
 
   const userId = user.id;
+  const sessionId = session?.id;
+  const instanceKey = JSON.stringify([clerk.publishableKey, clerk.frontendApi, clerk.proxyUrl ?? '', clerk.domain]);
+  if (
+    context &&
+    (context.scope.userId !== userId ||
+      context.scope.sessionId !== sessionId ||
+      context.scope.instanceKey !== instanceKey)
+  ) {
+    return { status: 'loading' };
+  }
 
   const currentUser = (): UserResource => {
     const current = clerk.user;
-    if (!current || current.id !== userId) {
+    if (
+      !clerk.loaded ||
+      !current ||
+      current.id !== userId ||
+      clerk.session?.id !== sessionId ||
+      JSON.stringify([clerk.publishableKey, clerk.frontendApi, clerk.proxyUrl ?? '', clerk.domain]) !== instanceKey
+    ) {
       throw new SaveError({ global: UNEXPECTED_ERROR });
     }
     return current;
@@ -46,8 +71,19 @@ export function useUserProfileUserModel(): UserProfileUserModel {
   return {
     status: 'ready',
     user,
-    environment,
     currentUser,
-    saveAsUser: (run, fields = [], params) => save(() => run(currentUser()), fields, params),
+    saveAsUser: async (run, fields = [], params) => {
+      await save(() => run(currentUser()), fields, params);
+      context?.onMutation();
+    },
   };
+}
+
+export function useUserProfileUserModel(context?: UserProfileActionContext): UserProfileUserModel {
+  const model = useUserProfileUserAccess(context);
+  const environment = useMosaicEnvironment();
+  if (model.status !== 'ready') {
+    return model;
+  }
+  return environment ? { ...model, environment } : { status: 'loading' };
 }

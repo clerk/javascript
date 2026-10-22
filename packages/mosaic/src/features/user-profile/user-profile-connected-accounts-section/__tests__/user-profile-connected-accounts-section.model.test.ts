@@ -216,6 +216,21 @@ describe('projectConnectedAccounts', () => {
     expect(projection.status === 'ready' && projection.availableProviders).toEqual([]);
   });
 
+  it('keeps a retry control ineligible when its provider has no recovery plan', () => {
+    const projection = projectConnectedAccounts({
+      user: userWith([
+        account({ id: 'idn_unknown', provider: 'google', strategy: 'unknown', errorCode: 'oauth_fetch_user_error' }),
+      ]),
+      providers: social('oauth_google'),
+      socialEnabled: true,
+      allowCreation: true,
+    });
+    expect(projection.status === 'ready' && projection.accounts[0]).toMatchObject({
+      status: 'reconnect',
+      eligibility: { canRemove: true, canReconnect: false },
+    });
+  });
+
   it('shows recovery errors as reconnect and other errors with their message', () => {
     const projection = projectConnectedAccounts({
       user: userWith([
@@ -238,8 +253,18 @@ describe('projectConnectedAccounts', () => {
       allowCreation: true,
     });
     expect(projection.status === 'ready' && projection.accounts).toMatchObject([
-      { id: 'idn_reconnect', status: 'reconnect', verificationError: undefined },
-      { id: 'idn_error', status: 'error', verificationError: 'This account is already connected.' },
+      {
+        id: 'idn_reconnect',
+        status: 'reconnect',
+        eligibility: { canRemove: true, canReconnect: true },
+        verificationError: undefined,
+      },
+      {
+        id: 'idn_error',
+        status: 'error',
+        eligibility: { canRemove: true, canReconnect: true },
+        verificationError: 'This account is already connected.',
+      },
     ]);
   });
 });

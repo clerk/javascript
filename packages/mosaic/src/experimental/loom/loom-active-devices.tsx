@@ -11,8 +11,8 @@ export function LoomActiveDevices() {
       <Button
         type='button'
         variant='outline'
-        disabled={model.refreshing}
-        onClick={() => void model.refresh()}
+        disabled={!model.refresh || model.refreshing}
+        onClick={() => void model.refresh?.()}
       >
         Refresh devices
       </Button>

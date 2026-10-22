@@ -5,10 +5,14 @@ import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 
 export interface UserProfileDangerSectionViewProps {
-  controller: ConfirmController;
+  controller?: ConfirmController;
+  showDeleteAction?: boolean;
 }
 
-export function UserProfileDangerSectionView({ controller }: UserProfileDangerSectionViewProps) {
+export function UserProfileDangerSectionView({
+  controller,
+  showDeleteAction = Boolean(controller),
+}: UserProfileDangerSectionViewProps) {
   const m = useMessages('userProfileDangerSection');
 
   return (
@@ -26,26 +30,39 @@ export function UserProfileDangerSectionView({ controller }: UserProfileDangerSe
                 <Section.Label>{m.sectionLabel}</Section.Label>
                 <Section.Description>{m.sectionDescription}</Section.Description>
               </Section.Content>
-              <Section.Actions>
-                <Destructive
-                  controller={controller}
-                  trigger={
-                    <Button
-                      color='negative'
-                      size='sm'
-                      variant='outline'
-                    >
-                      {m.actionLabel}
-                    </Button>
-                  }
-                  title={m.dialogTitle}
-                  description={m.dialogDescription}
-                  fieldLabel={fill(m.fieldLabel, { phrase: m.fieldPlaceholder })}
-                  confirmationValue={m.fieldPlaceholder}
-                  actionLabel={m.actionLabel}
-                  cancelLabel={m.cancelLabel}
-                />
-              </Section.Actions>
+              {controller ? (
+                <Section.Actions>
+                  <Destructive
+                    controller={controller}
+                    trigger={
+                      <Button
+                        color='negative'
+                        size='sm'
+                        variant='outline'
+                      >
+                        {m.actionLabel}
+                      </Button>
+                    }
+                    title={m.dialogTitle}
+                    description={m.dialogDescription}
+                    fieldLabel={fill(m.fieldLabel, { phrase: m.fieldPlaceholder })}
+                    confirmationValue={m.fieldPlaceholder}
+                    actionLabel={m.actionLabel}
+                    cancelLabel={m.cancelLabel}
+                  />
+                </Section.Actions>
+              ) : showDeleteAction ? (
+                <Section.Actions>
+                  <Button
+                    color='negative'
+                    size='sm'
+                    variant='outline'
+                    disabled
+                  >
+                    {m.actionLabel}
+                  </Button>
+                </Section.Actions>
+              ) : null}
             </Section.Item>
           </Section.Row>
         </Section.Body>

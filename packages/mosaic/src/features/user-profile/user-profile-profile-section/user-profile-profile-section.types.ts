@@ -12,6 +12,13 @@ export interface UserProfileNameAttribute {
   required?: boolean;
 }
 
+export interface ProfileActionEligibility {
+  canEditName: boolean;
+  canEditUsername: boolean;
+  canChangePicture: boolean;
+  canRemovePicture: boolean;
+}
+
 export interface UserProfileProfileSectionViewProps {
   name: string;
   imageUrl?: string;
@@ -27,7 +34,8 @@ export interface UserProfileProfileSectionViewProps {
   showUsername: boolean;
   username: string;
   usernameAction?: ReactNode;
-  picture: UserProfilePictureController;
+  picture?: UserProfilePictureController;
+  eligibility?: ProfileActionEligibility;
 }
 
 export type UserProfileProfileSectionModel =
@@ -45,7 +53,8 @@ export type UserProfileProfileSectionModel =
       nameManagedBy?: UserProfileManagedBy;
       imageUrl: string;
       hasImage: boolean;
-      onProfilePictureChange: (file: File) => Promise<void>;
+      eligibility?: ProfileActionEligibility;
+      onProfilePictureChange?: (file: File) => Promise<void>;
       onRemoveProfilePicture?: () => Promise<void>;
       onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
       showUsername: boolean;
@@ -55,3 +64,16 @@ export type UserProfileProfileSectionModel =
     };
 
 export type ReadyProfileSectionModel = Extract<UserProfileProfileSectionModel, { status: 'ready' }>;
+
+export type ProfileDetailsSnapshot = Readonly<{
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  username: string | null;
+  imageUrl: string;
+  hasImage: boolean;
+}>;
+
+export type ProfileDetailsState =
+  | { kind: 'snapshot'; user: ProfileDetailsSnapshot }
+  | { kind: 'interactive'; model: ReadyProfileSectionModel };

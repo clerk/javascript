@@ -1,5 +1,6 @@
 import { Clerk } from '@clerk/clerk-js';
-import { ClerkLoomProvider, useLoom, useSessions } from '@clerk/loom/react';
+import type { LoomHydration } from '@clerk/loom';
+import { LoomProvider, useLoom, useSessions } from '@clerk/loom/react';
 import { ClerkProvider } from '@clerk/react';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -7,11 +8,11 @@ import { http, HttpResponse } from 'msw';
 import { StrictMode, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, publishableKey, serveFapi, worker } from '../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiSession, fapiUser } from '../../__tests__/feature/fapi';
-import { openMenu } from '../../__tests__/feature/menu';
-import { MosaicProvider } from '../../mosaic-provider';
-import { LoomActiveDevices } from './loom-active-devices';
+import { fapiUrl, publishableKey, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
+import { MosaicProvider } from '../../../mosaic-provider';
+import { LoomActiveDevices } from '../loom-active-devices';
 
 function setup() {
   const user = fapiUser({ id: 'user_loom' });
@@ -72,12 +73,12 @@ async function mount(ui = <LoomActiveDevices />) {
         routerPush={() => Promise.resolve()}
         routerReplace={() => Promise.resolve()}
       >
-        <ClerkLoomProvider
-          host={clerk}
+        <LoomProvider
+          clerk={clerk}
           fallback={<p>Waiting for Clerk</p>}
         >
           <MosaicProvider>{ui}</MosaicProvider>
-        </ClerkLoomProvider>
+        </LoomProvider>
       </ClerkProvider>
     </StrictMode>,
   );
@@ -86,6 +87,50 @@ async function mount(ui = <LoomActiveDevices />) {
 }
 
 describe('Loom with real ClerkProvider and Mosaic', () => {
+  it('shows prefetched devices without offering mutations before the Loom host is available', async () => {
+    const devices = setup();
+    const hydration: LoomHydration = {
+      version: 5,
+      scope: { instanceKey: 'server', userId: 'user_loom', sessionId: 'sess_current' },
+      sessions: {
+        updatedAt: Date.now(),
+        data: devices.map(device => ({
+          id: device.id,
+          status: device.status,
+          expireAt: device.expire_at,
+          abandonAt: device.abandon_at,
+          lastActiveAt: device.last_active_at,
+          hasActor: false,
+          latestActivity: {
+            id: device.latest_activity.id,
+            browserName: device.latest_activity.browser_name,
+            deviceType: device.latest_activity.device_type,
+          },
+        })),
+      },
+    };
+    const clerk = new Clerk(publishableKey());
+    render(
+      <ClerkProvider
+        Clerk={clerk}
+        publishableKey={publishableKey()}
+      >
+        <LoomProvider
+          clerk={null}
+          hydration={hydration}
+        >
+          <MosaicProvider>
+            <LoomActiveDevices />
+          </MosaicProvider>
+        </LoomProvider>
+      </ClerkProvider>,
+    );
+    expect(await screen.findByText('This device')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Refresh devices' })).toBeDisabled();
+    const menu = await openMenu(userEvent.setup(), screen.getByRole('button', { name: 'Manage Safari on iPhone' }));
+    expect(within(menu).queryByRole('menuitem', { name: 'Sign out' })).toBeNull();
+  });
+
   it('creates a fresh owner after the real provider is fully remounted', async () => {
     setup();
     const reads = vi.fn();

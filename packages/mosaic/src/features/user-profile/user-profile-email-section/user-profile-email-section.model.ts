@@ -7,7 +7,7 @@ import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../user-profile-contact.types';
 import { byId, canAddIdentifications, toContactAccess, toContacts } from '../user-profile-contact.utils';
-import { useUserProfileUserModel } from '../user-profile-user.model';
+import { type UserProfileActionContext, useUserProfileUserModel } from '../user-profile-user.model';
 import type { UserProfileAddEmailField } from './user-profile-add-email.controller';
 import type { UserProfileEmailSectionModel } from './user-profile-email-section.types';
 
@@ -29,11 +29,11 @@ function verifyRedirectUrl(userProfileUrl: string): string {
 }
 
 function startEmailVerification(
-  email: EmailAddressResource,
+  currentEmail: () => EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
 ): UserProfileEmailVerification {
-  if (email.matchesSsoConnection) {
+  if (currentEmail().matchesSsoConnection) {
     return {
       method: 'sso',
       /*
@@ -48,10 +48,11 @@ function startEmailVerification(
       */
       connect: () =>
         save(async () => {
-          const prepared = await email.prepareVerification({
+          const prepared = await currentEmail().prepareVerification({
             strategy: 'enterprise_sso',
             redirectUrl: window.location.href,
           });
+          currentEmail();
           const url = prepared.verification.externalVerificationRedirectURL;
           if (!url) {
             throw new Error('Enterprise SSO verification did not return a redirect URL');
@@ -61,35 +62,42 @@ function startEmailVerification(
     };
   }
   if (linkRedirectUrl === undefined) {
-    return { method: 'code', sent: save(() => email.prepareVerification({ strategy: 'email_code' })) };
+    return { method: 'code', sent: save(() => currentEmail().prepareVerification({ strategy: 'email_code' })) };
   }
-  const { startEmailLinkFlow, cancelEmailLinkFlow } = email.createEmailLinkFlow();
+  const { startEmailLinkFlow, cancelEmailLinkFlow } = currentEmail().createEmailLinkFlow();
   return {
     method: 'link',
-    verified: save(() => startEmailLinkFlow({ redirectUrl: linkRedirectUrl })),
+    verified: save(() => {
+      currentEmail();
+      return startEmailLinkFlow({ redirectUrl: linkRedirectUrl });
+    }),
     cancel: cancelEmailLinkFlow,
   };
 }
 
 function toEmailVerifier(
-  email: EmailAddressResource,
+  currentEmail: () => EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
 ): UserProfileEmailVerifier {
   return {
-    start: () => startEmailVerification(email, linkRedirectUrl, router),
-    verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
+    start: () => startEmailVerification(currentEmail, linkRedirectUrl, router),
+    verifyCode: code => save(() => currentEmail().attemptVerification({ code }), ADD_EMAIL_FIELDS),
   };
 }
 
-export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
-  const model = useUserProfileUserModel();
+export function useUserProfileEmailActions(context?: UserProfileActionContext) {
+  const model = useUserProfileUserModel(context);
   const router = useMosaicRouter();
-  const [removeEmail, removeReverification] = useReverificationFlow((user: UserResource, id: string) =>
-    byId(user.emailAddresses, id, 'email address').destroy(),
+  const [removeEmail, removeReverification] = useReverificationFlow((_user: UserResource, id: string) =>
+    byId(model.status === 'ready' ? model.currentUser().emailAddresses : [], id, 'email address').destroy(),
   );
-  const [setPrimaryEmail, setPrimaryReverification] = useReverificationFlow((user: UserResource, id: string) =>
-    user.update({ primaryEmailAddressId: id }),
+  const [setPrimaryEmail, setPrimaryReverification] = useReverificationFlow((_user: UserResource, id: string) =>
+    model.status === 'ready'
+      ? model
+          .currentUser()
+          .update({ primaryEmailAddressId: byId(model.currentUser().emailAddresses, id, 'email address').id })
+      : Promise.reject(new Error('User unavailable.')),
   );
   if (model.status !== 'ready') {
     return model;
@@ -104,29 +112,44 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
   );
 
   if (!access.show) {
-    return { status: 'hidden' };
+    return { status: 'hidden' as const };
   }
 
   const verifiesByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
   const linkRedirectUrl = verifiesByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
-  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router);
+  const verifierFor = (id: string) =>
+    toEmailVerifier(() => byId(currentUser().emailAddresses, id, 'email address'), linkRedirectUrl, router);
 
   return {
-    status: 'ready',
-    userId: user.id,
-    emails: toContacts(user.emailAddresses, user.primaryEmailAddressId, email => email.emailAddress),
-    username: user.username ?? undefined,
+    status: 'ready' as const,
+    canManageEmail: (id: string) => user.emailAddresses.some(email => email.id === id),
     onCreateEmail: access.canCreate
-      ? async emailAddress => {
+      ? async (emailAddress: string) => {
           const request = currentUser().createEmailAddress({ email: emailAddress });
           await save(() => request, ADD_EMAIL_FIELDS);
-          return verifierFor(await request);
+          currentUser();
+          context?.onMutation();
+          return verifierFor((await request).id);
         }
       : undefined,
-    getEmailVerifier: id => verifierFor(byId(user.emailAddresses, id, 'email address')),
-    onSetPrimaryEmail: id => saveAsUser(current => setPrimaryEmail(current, id)),
-    onRemoveEmail: access.canRemove ? id => saveAsUser(current => removeEmail(current, id)) : undefined,
+    getEmailVerifier: verifierFor,
+    onSetPrimaryEmail: (id: string) => saveAsUser(current => setPrimaryEmail(current, id)),
+    onRemoveEmail: access.canRemove ? (id: string) => saveAsUser(current => removeEmail(current, id)) : undefined,
     removeReverification,
     setPrimaryReverification,
+  };
+}
+
+export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
+  const model = useUserProfileUserModel();
+  const actions = useUserProfileEmailActions();
+  if (model.status !== 'ready' || actions.status !== 'ready') {
+    return { status: model.status === 'hidden' || actions.status === 'hidden' ? 'hidden' : 'loading' };
+  }
+  return {
+    ...actions,
+    userId: model.user.id,
+    username: model.user.username ?? undefined,
+    emails: toContacts(model.user.emailAddresses, model.user.primaryEmailAddressId, email => email.emailAddress),
   };
 }

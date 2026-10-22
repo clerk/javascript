@@ -16,6 +16,9 @@ import type {
 } from './user-profile-connected-accounts-section.types';
 
 export interface UserProfileConnectedAccountsControllerOptions {
+  canManageAccount?: (id: string) => boolean;
+  canReconnectAccount?: (id: string) => boolean;
+  canConnectProvider?: (id: string) => boolean;
   accounts: UserProfileConnectedAccount[];
   availableProviders: UserProfileConnectionProvider[];
   onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
@@ -26,6 +29,9 @@ export interface UserProfileConnectedAccountsControllerOptions {
 }
 
 export interface UserProfileConnectedAccountsController {
+  canManageAccount?: (id: string) => boolean;
+  canReconnectAccount?: (id: string) => boolean;
+  canConnectProvider?: (id: string) => boolean;
   accounts: UserProfileConnectedAccount[];
   availableProviders: UserProfileConnectionProvider[];
   pendingId: string | undefined;
@@ -43,6 +49,9 @@ const OAUTH_REDIRECT_HOLD_MS = 2000;
 
 export function useUserProfileConnectedAccountsController({
   accounts,
+  canManageAccount,
+  canReconnectAccount,
+  canConnectProvider,
   availableProviders,
   onConnect,
   onReconnect,
@@ -75,6 +84,9 @@ export function useUserProfileConnectedAccountsController({
     });
 
   return {
+    canManageAccount,
+    canReconnectAccount,
+    canConnectProvider,
     accounts: accounts.map(account =>
       actions.errorKey === account.id ? { ...account, reconnectError: actions.error } : account,
     ),

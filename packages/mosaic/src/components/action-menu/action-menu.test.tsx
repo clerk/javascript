@@ -36,6 +36,29 @@ describe('Mosaic ActionMenu', () => {
 
     expect(onClick).toHaveBeenCalledOnce();
   });
+  it('keeps an eligible action visible but inert until its handler exists', async () => {
+    const onClick = vi.fn();
+    const user = userEvent.setup();
+    const view = renderMenu([{ label: 'Rename', disabled: true }]);
+    const trigger = screen.getByRole('button', { name: 'Manage passkey' });
+    expect(trigger).toBeDisabled();
+    await user.click(trigger);
+    await user.keyboard('{Tab}{Enter}');
+    expect(screen.queryByRole('menuitem', { name: 'Rename' })).not.toBeInTheDocument();
+
+    view.rerender(
+      <MosaicProvider>
+        <ActionMenu
+          label='Manage passkey'
+          actions={[{ label: 'Rename', onClick }]}
+        />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Manage passkey' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Rename' }));
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
   it('disables both the trigger and existing menu items while busy', async () => {
     const onClick = vi.fn();
     const actions = [{ label: 'Remove', onClick }];

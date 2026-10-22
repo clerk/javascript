@@ -42,6 +42,44 @@ describe('isomorphicClerk', () => {
     vi.useRealTimers();
   });
 
+  describe('getFapiClient', () => {
+    it('forwards to the current runtime and preserves its receiver', () => {
+      const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      const first = { request: vi.fn() };
+      const second = { request: vi.fn() };
+      const runtime = {
+        loaded: true,
+        transport: first,
+        getFapiClient() {
+          return this.transport;
+        },
+      };
+      Object.defineProperty(clerk, 'clerkjs', { configurable: true, value: runtime });
+      expect(clerk.getFapiClient()).toBe(first);
+      Object.defineProperty(clerk, 'clerkjs', { value: { ...runtime, transport: second } });
+      expect(clerk.getFapiClient()).toBe(second);
+    });
+
+    it('rejects before readiness without queueing a transport call', () => {
+      const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      expect(() => clerk.getFapiClient()).toThrow('Clerk transport is unavailable');
+      const getFapiClient = vi.fn(() => ({ request: vi.fn() }));
+      const runtime = { loaded: false, getFapiClient };
+      Object.defineProperty(clerk, 'clerkjs', { value: runtime });
+      expect(() => clerk.getFapiClient()).toThrow('Clerk transport is unavailable');
+      expect(getFapiClient).not.toHaveBeenCalled();
+      runtime.loaded = true;
+      clerk.getFapiClient();
+      expect(getFapiClient).toHaveBeenCalledTimes(1);
+    });
+
+    it('rejects a loaded runtime without transport support', () => {
+      const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      Object.defineProperty(clerk, 'clerkjs', { value: { loaded: true } });
+      expect(() => clerk.getFapiClient()).toThrow('Clerk transport is unavailable');
+    });
+  });
+
   it('instantiates a IsomorphicClerk instance', () => {
     expect(() => {
       new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });

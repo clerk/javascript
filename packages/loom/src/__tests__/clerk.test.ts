@@ -1,5 +1,6 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { describe, expect, it, vi } from 'vitest';
+import type { LoadedClerk } from '@clerk/shared/types';
+import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { bindClerk, type ClerkSessionsHost } from '../clerk';
 
@@ -15,7 +16,7 @@ const session = {
 
 function hostFixture() {
   const listeners = new Set<() => void>();
-  const request = vi.fn<ClerkSessionsHost['getFapiClient'] extends () => { request: infer R } ? R : never>();
+  const request = vi.fn<ReturnType<NonNullable<ClerkSessionsHost['getFapiClient']>>['request']>();
   request.mockResolvedValue(Object.assign(new Response(null, { status: 200 }), { payload: [session] }));
   const host = {
     loaded: true,
@@ -23,7 +24,20 @@ function hostFixture() {
     frontendApi: 'clerk.test',
     proxyUrl: undefined,
     domain: '',
-    user: { id: 'user_a' },
+    user: {
+      id: 'user_a',
+      firstName: 'Ada',
+      lastName: null,
+      username: null,
+      imageUrl: 'https://img.example/ada',
+      hasImage: false,
+      primaryEmailAddressId: null,
+      emailAddresses: [],
+      passwordEnabled: false,
+      deleteSelfEnabled: true,
+      externalAccounts: [],
+      enterpriseAccounts: [],
+    },
     session: { id: 'sess_current' },
     getFapiClient: () => ({ request }),
     on: (_event: 'status', listener: () => void) => {
@@ -52,6 +66,18 @@ function hostFixture() {
 }
 
 describe('host ClerkJS bridge', () => {
+  it('accepts the SDK facade as a structural host', () => {
+    expectTypeOf<LoadedClerk>().toExtend<ClerkSessionsHost>();
+  });
+
+  it('rejects a loaded host without transport support', async () => {
+    const { host } = hostFixture();
+    const { getFapiClient: _transport, ...legacyHost } = host;
+    const binding = bindClerk(legacyHost);
+    await expect(binding.getSnapshot()?.fetch()).rejects.toThrow('Clerk transport is unavailable');
+    binding.dispose();
+  });
+
   it('uses the host transport with captured identity and parses fresh snapshots', async () => {
     const { host, request } = hostFixture();
     const binding = bindClerk(host);
@@ -143,9 +169,205 @@ describe('host ClerkJS bridge', () => {
     request.mockReturnValueOnce(pending.promise);
     const binding = bindClerk(host);
     const result = binding.getSnapshot()?.fetch();
-    host.user = { id: 'user_b' };
+    host.user = { ...host.user, id: 'user_b' };
     pending.resolve(Object.assign(new Response(), { payload: [session] }));
     await expect(result).rejects.toThrow('identity');
+    binding.dispose();
+  });
+});
+
+describe('host user query', () => {
+  const response = (firstName = 'Ada', id = 'user_a') =>
+    Object.assign(new Response(), {
+      payload: {
+        response: {
+          id,
+          first_name: firstName,
+          last_name: null,
+          username: null,
+          image_url: 'https://img.example/ada',
+          has_image: false,
+          primary_email_address_id: null,
+          email_addresses: [],
+          password_enabled: false,
+          delete_self_enabled: true,
+          external_accounts: [],
+          enterprise_accounts: [],
+        },
+      },
+    });
+  it('invalidates the user query when displayed picture or email data changes in place', async () => {
+    const { host, request, emit } = hostFixture();
+    const hostUser: ClerkSessionsHost['user'] = host.user;
+    if (!hostUser) {
+      throw new Error('Missing host user');
+    }
+    hostUser.emailAddresses = [{ id: 'email_a', emailAddress: 'ada@example.com', verification: { status: null } }];
+    request.mockImplementation(() =>
+      Promise.resolve(
+        Object.assign(new Response(), {
+          payload: {
+            response: {
+              id: hostUser.id,
+              first_name: hostUser.firstName,
+              last_name: hostUser.lastName,
+              username: hostUser.username,
+              image_url: hostUser.imageUrl,
+              has_image: hostUser.hasImage,
+              primary_email_address_id: hostUser.primaryEmailAddressId,
+              password_enabled: hostUser.passwordEnabled,
+              delete_self_enabled: hostUser.deleteSelfEnabled,
+              enterprise_accounts: [],
+              external_accounts: hostUser.externalAccounts?.map(account => ({
+                id: account.id,
+                provider: account.provider,
+                username: account.username,
+                email_address: account.emailAddress,
+                verification: account.verification,
+              })),
+              email_addresses: hostUser.emailAddresses?.map(email => ({
+                id: email.id,
+                email_address: email.emailAddress,
+                verification: email.verification,
+              })),
+            },
+          },
+        }),
+      ),
+    );
+    const binding = bindClerk(host);
+    const client = binding.getSnapshot();
+    if (!client) {
+      throw new Error('Missing owner');
+    }
+    await client.fetchUser();
+    const { QueryObserver } = await import('@tanstack/query-core');
+    const observer = new QueryObserver(client.queryClient, client.userQueryOptions());
+    const stop = observer.subscribe(() => {});
+    hostUser.imageUrl = 'https://img.example/new';
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.imageUrl).toBe('https://img.example/new'));
+    const email = hostUser.emailAddresses?.[0];
+    if (!email) {
+      throw new Error('Missing email');
+    }
+    email.verification = { status: 'verified' };
+    emit();
+    await vi.waitFor(() =>
+      expect(client.dehydrate()?.user?.data.emailAddresses[0]?.verification?.status).toBe('verified'),
+    );
+    hostUser.primaryEmailAddressId = 'email_a';
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.primaryEmailAddressId).toBe('email_a'));
+    hostUser.passwordEnabled = true;
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.passwordEnabled).toBe(true));
+    hostUser.deleteSelfEnabled = false;
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.deleteSelfEnabled).toBe(false));
+    const account: {
+      id: string;
+      provider: string;
+      username: string | null;
+      emailAddress: string;
+      verification: { status: string | null };
+    } = {
+      id: 'external_a',
+      provider: 'google',
+      username: null,
+      emailAddress: 'ada@example.com',
+      verification: { status: null },
+    };
+    hostUser.externalAccounts = [account];
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.externalAccounts[0]?.id).toBe('external_a'));
+    account.provider = 'github';
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.externalAccounts[0]?.provider).toBe('github'));
+    account.username = 'ada';
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.externalAccounts[0]?.username).toBe('ada'));
+    account.emailAddress = 'new@example.com';
+    emit();
+    await vi.waitFor(() =>
+      expect(client.dehydrate()?.user?.data.externalAccounts[0]?.emailAddress).toBe('new@example.com'),
+    );
+    account.verification = { status: 'verified' };
+    emit();
+    await vi.waitFor(() =>
+      expect(client.dehydrate()?.user?.data.externalAccounts[0]?.verification?.status).toBe('verified'),
+    );
+    account.id = 'external_b';
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.externalAccounts[0]?.id).toBe('external_b'));
+    emit();
+    expect(request).toHaveBeenCalledTimes(12);
+    stop();
+    binding.dispose();
+  });
+  it('uses captured /me scope and refreshes only when the host profile tuple changes', async () => {
+    const { host, request, emit } = hostFixture();
+    request.mockResolvedValue(response());
+    const binding = bindClerk(host);
+    const client = binding.getSnapshot();
+    if (!client) {
+      throw new Error('Missing owner');
+    }
+    await client.fetchUser();
+    const { QueryObserver } = await import('@tanstack/query-core');
+    const observer = new QueryObserver(client.queryClient, client.userQueryOptions());
+    const stop = observer.subscribe(() => {});
+    emit();
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledWith(
+      expect.objectContaining({ path: '/me', sessionId: 'sess_current', signal: expect.any(AbortSignal) }),
+    );
+    request.mockResolvedValue(response('Grace'));
+    host.user.firstName = 'Grace';
+    emit();
+    await vi.waitFor(() => expect(client.dehydrate()?.user?.data.firstName).toBe('Grace'));
+    emit();
+    expect(request).toHaveBeenCalledTimes(2);
+    stop();
+    binding.dispose();
+  });
+  it.each(['user', 'session', 'dispose'])('rejects delayed user responses after %s changes', async kind => {
+    const { host, request, emit } = hostFixture();
+    const pending = Promise.withResolvers<Response & { payload: unknown }>();
+    request.mockReturnValue(pending.promise);
+    const binding = bindClerk(host);
+    const old = binding.getSnapshot();
+    const result = old?.fetchUser();
+    const rejected = expect(result).rejects.toBeDefined();
+    if (kind === 'dispose') {
+      binding.dispose();
+    } else {
+      if (kind === 'user') {
+        host.user.id = 'user_b';
+      } else {
+        host.session.id = 'sess_new';
+      }
+      emit();
+    }
+    pending.resolve(response());
+    await rejected;
+    binding.dispose();
+  });
+  it('rejects a mismatched user and supersedes an older profile read', async () => {
+    const { host, request, emit } = hostFixture();
+    request.mockResolvedValueOnce(response('Wrong', 'other'));
+    const binding = bindClerk(host);
+    const client = binding.getSnapshot();
+    await expect(client?.fetchUser()).rejects.toThrow('authenticated');
+    const pending = Promise.withResolvers<Response & { payload: unknown }>();
+    request.mockReturnValueOnce(pending.promise).mockResolvedValue(response('Grace'));
+    const result = client?.fetchUser();
+    const rejected = expect(result).rejects.toBeDefined();
+    host.user.firstName = 'Grace';
+    emit();
+    pending.resolve(response());
+    await rejected;
+    expect((await client?.fetchUser())?.firstName).toBe('Grace');
     binding.dispose();
   });
 });

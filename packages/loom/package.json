@@ -17,6 +17,14 @@
     "./clerk": {
       "types": "./dist/clerk.d.ts",
       "default": "./dist/clerk.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    },
+    "./nextjs": {
+      "types": "./dist/nextjs.d.ts",
+      "default": "./dist/nextjs.js"
     }
   },
   "scripts": {
@@ -26,7 +34,8 @@
     "lint": "eslint src",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "verify:core": "node scripts/verify-core.mjs"
+    "verify:core": "node scripts/verify-core.mjs",
+    "verify:server": "node scripts/verify-server.mjs"
   },
   "dependencies": {
     "@clerk/shared": "workspace:*",
@@ -34,7 +43,7 @@
     "@tanstack/react-query": "5.102.8"
   },
   "devDependencies": {
-    "@clerk/react": "workspace:*",
+    "@clerk/nextjs": "workspace:*",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "jsdom": "26.1.0",
@@ -44,9 +53,13 @@
     "typescript": "catalog:repo"
   },
   "peerDependencies": {
+    "@clerk/nextjs": "workspace:*",
     "react": "catalog:peer-react"
   },
   "peerDependenciesMeta": {
+    "@clerk/nextjs": {
+      "optional": true
+    },
     "react": {
       "optional": true
     }

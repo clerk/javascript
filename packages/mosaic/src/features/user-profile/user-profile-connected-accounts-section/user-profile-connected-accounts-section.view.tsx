@@ -16,6 +16,10 @@ export type {
 
 export function UserProfileConnectedAccountsSectionView({
   accounts,
+  showEligibleActions,
+  canManageAccount,
+  canReconnectAccount,
+  canConnectProvider,
   sectionRef,
   availableProviders = [],
   pendingId,
@@ -28,7 +32,7 @@ export function UserProfileConnectedAccountsSectionView({
   reconnectFinalFocus,
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
-  const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
+  const hasRows = accounts.length > 0 || availableProviders.length > 0;
   const isBusy = pendingId !== undefined;
 
   return (
@@ -49,23 +53,24 @@ export function UserProfileConnectedAccountsSectionView({
                 <UserProfileConnectedAccountRowView
                   key={account.id}
                   account={account}
-                  triggerRef={registerTrigger(account.id)}
+                  eligibility={showEligibleActions ? account.eligibility : undefined}
+                  triggerRef={registerTrigger?.(account.id)}
                   isDisabled={isBusy}
-                  onReconnect={onReconnect}
-                  onRemove={remove ? account => remove.open(account) : undefined}
+                  onReconnect={canReconnectAccount?.(account.id) === false ? undefined : onReconnect}
+                  onRemove={
+                    remove && canManageAccount?.(account.id) !== false ? account => remove.open(account) : undefined
+                  }
                 />
               ))}
-              {onConnect
-                ? availableProviders.map(provider => (
-                    <UserProfileConnectProviderRowView
-                      key={provider.id}
-                      provider={provider}
-                      isPending={pendingId === provider.id}
-                      isDisabled={isBusy}
-                      onConnect={onConnect}
-                    />
-                  ))
-                : null}
+              {availableProviders.map(provider => (
+                <UserProfileConnectProviderRowView
+                  key={provider.id}
+                  provider={provider}
+                  isPending={pendingId === provider.id}
+                  isDisabled={isBusy}
+                  onConnect={canConnectProvider?.(provider.id) === false ? undefined : onConnect}
+                />
+              ))}
             </Section.Body>
           </Section.Group>
         </Section.Root>

@@ -5,7 +5,7 @@ import type {
 } from '@clerk/shared/types';
 
 type EnterpriseUser = {
-  enterpriseAccounts: (Pick<EnterpriseAccountResource, 'active'> & {
+  enterpriseAccounts: readonly (Pick<EnterpriseAccountResource, 'active'> & {
     enterpriseConnection?: Pick<EnterpriseAccountConnectionResource, 'disableAdditionalIdentifications'> | null;
   })[];
 };

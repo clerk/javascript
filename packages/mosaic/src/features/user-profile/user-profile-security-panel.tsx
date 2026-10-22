@@ -8,14 +8,15 @@ import { UserProfileSecurityPanelView } from './user-profile-security-panel.view
 
 export interface UserProfileSecurityPanelProps {
   children?: ReactNode;
+  passwordSection?: ReactNode;
 }
 
-export function UserProfileSecurityPanel({ children }: UserProfileSecurityPanelProps) {
+export function UserProfileSecurityPanel({ children, passwordSection }: UserProfileSecurityPanelProps) {
   return (
     <UserProfileSecurityPanelView>
       {children ?? (
         <>
-          <UserProfilePasswordSection />
+          {passwordSection ?? <UserProfilePasswordSection />}
           <UserProfilePasskeysSection />
           <UserProfileMfaSection />
           <UserProfileActiveDevicesSection />

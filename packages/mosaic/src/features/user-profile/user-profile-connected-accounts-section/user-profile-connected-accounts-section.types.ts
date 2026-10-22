@@ -17,22 +17,32 @@ export interface UserProfileConnectionProvider extends ConnectedAccountProviderD
   connectError?: string;
 }
 
+export interface ConnectedAccountActionEligibility {
+  canRemove: boolean;
+  canReconnect: boolean;
+}
+
 export interface UserProfileConnectedAccount extends ConnectedAccountProviderDisplay {
   id: string;
   identifier?: string;
   status: 'connected' | 'reconnect' | 'error';
   verificationError?: string;
   reconnectError?: string;
+  eligibility?: ConnectedAccountActionEligibility;
 }
 
 export interface UserProfileConnectedAccountsSectionViewProps {
+  canManageAccount?: (id: string) => boolean;
+  canReconnectAccount?: (id: string) => boolean;
+  canConnectProvider?: (id: string) => boolean;
   accounts: UserProfileConnectedAccount[];
+  showEligibleActions?: boolean;
   sectionRef?: Ref<HTMLDivElement>;
   availableProviders?: UserProfileConnectionProvider[];
   pendingId?: string;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
-  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+  registerTrigger?: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<UserProfileConnectedAccount>;
   finalFocus?: DialogFocusTarget;
   reconnectReverification?: ReverificationController;

@@ -11,20 +11,30 @@ import { UserProfileWeb3WalletsSection } from './user-profile-web3-wallets-secti
 
 export interface UserProfileProfilePanelProps {
   children?: ReactNode;
+  profileSection?: ReactNode;
+  emailSection?: ReactNode;
+  connectedAccountsSection?: ReactNode;
+  dangerSection?: ReactNode;
 }
 
-export function UserProfileProfilePanel({ children }: UserProfileProfilePanelProps) {
+export function UserProfileProfilePanel({
+  children,
+  profileSection,
+  emailSection,
+  connectedAccountsSection,
+  dangerSection,
+}: UserProfileProfilePanelProps) {
   return (
     <UserProfileProfilePanelView>
       {children ?? (
         <>
-          <UserProfileProfileSection />
-          <UserProfileEmailSection />
+          {profileSection ?? <UserProfileProfileSection />}
+          {emailSection ?? <UserProfileEmailSection />}
           <UserProfilePhoneSection />
-          <UserProfileConnectedAccountsSection />
+          {connectedAccountsSection ?? <UserProfileConnectedAccountsSection />}
           <UserProfileEnterpriseAccountsSection />
           <UserProfileWeb3WalletsSection />
-          <UserProfileDangerSection />
+          {dangerSection ?? <UserProfileDangerSection />}
         </>
       )}
     </UserProfileProfilePanelView>

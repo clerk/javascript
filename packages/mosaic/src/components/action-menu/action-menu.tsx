@@ -4,12 +4,14 @@ import type { IconName } from '../../icons/registry';
 import { Icon } from '../icon';
 import { Menu } from '../menu';
 
-export interface ActionMenuAction {
+type ActionMenuActionAppearance = {
   label: string;
   color?: 'neutral' | 'negative';
   icon?: IconName;
-  onClick: () => void;
-}
+};
+
+export type ActionMenuAction = ActionMenuActionAppearance &
+  ({ onClick: () => void; disabled?: boolean } | { onClick?: never; disabled: true });
 
 export interface ActionMenuProps {
   label: string;
@@ -28,7 +30,7 @@ export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuP
       <Menu.Trigger
         ref={triggerRef}
         aria-label={label}
-        disabled={disabled}
+        disabled={disabled || actions.every(action => action.disabled)}
       />
       <Menu.Popup>
         {actions.map(action => (
@@ -37,7 +39,7 @@ export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuP
             color={action.color}
             label={action.label}
             onClick={action.onClick}
-            disabled={disabled}
+            disabled={disabled || action.disabled}
           >
             {action.icon ? (
               <Menu.Media>

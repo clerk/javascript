@@ -1,2 +1,12 @@
 export { createLoomClient, LoomClient } from './client';
-export type { ActiveDeviceSession, LoomHydration, Sessions, SessionsTransport, SessionScope } from './types';
+export type {
+  PrefetchedProfile,
+  ProfileSettings,
+  ProfileSnapshot,
+  UserSnapshot,
+  ActiveDeviceSession,
+  LoomHydration,
+  Sessions,
+  SessionsTransport,
+  SessionScope,
+} from './types';

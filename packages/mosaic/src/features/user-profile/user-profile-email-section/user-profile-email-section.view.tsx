@@ -11,6 +11,8 @@ import type { UserProfileEmailSectionViewProps } from './user-profile-email-sect
 
 export function UserProfileEmailSectionView({
   emails,
+  eligibility,
+  canManageEmail,
   canAdd,
   verification,
   error,
@@ -44,6 +46,21 @@ export function UserProfileEmailSectionView({
       />
       {m.add}
     </Dialog.Trigger>
+  ) : eligibility?.canCreate ? (
+    <Button
+      aria-label={m.email.add}
+      color='neutral'
+      size='sm'
+      variant='outline'
+      disabled
+    >
+      <Icon
+        name='plus'
+        placement='inline-start'
+        size='sm'
+      />
+      {m.add}
+    </Button>
   ) : undefined;
 
   return (
@@ -52,6 +69,8 @@ export function UserProfileEmailSectionView({
         rowRef={rowRef}
         triggerRef={registerTrigger}
         items={emails}
+        canManage={canManageEmail}
+        eligibility={eligibility}
         kind='email'
         label={m.email.label}
         addAction={addEmailAction}

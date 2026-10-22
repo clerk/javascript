@@ -198,6 +198,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
       signInUrl,
       signUpUrl,
       ...resolvedParams,
+      frontendApiProxy: frontendApiProxyConfig,
     };
 
     // Propagates the request data to be accessed on the server application runtime from helpers such as `clerkClient`
@@ -225,10 +226,13 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         }));
       }
 
-      const requestState = await resolvedClerkClient.authenticateRequest(
-        clerkRequest,
-        createAuthenticateRequestOptions(clerkRequest, options),
-      );
+      const authenticationOptions = createAuthenticateRequestOptions(clerkRequest, options);
+      requestDataStore.set('requestData', {
+        ...options,
+        proxyUrl: authenticationOptions.proxyUrl,
+        domain: authenticationOptions.domain,
+      });
+      const requestState = await resolvedClerkClient.authenticateRequest(clerkRequest, authenticationOptions);
 
       return runHandlerWithRequestState({
         clerkRequest,
@@ -238,6 +242,7 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         handler,
         options,
         resolvedParams,
+        authenticationOptions,
         logger,
       });
     });
@@ -281,6 +286,7 @@ type RunHandlerWithRequestStateArgs = {
     signUpUrl: string;
   };
   resolvedParams: ClerkMiddlewareOptions;
+  authenticationOptions: AuthenticateRequestOptions;
   logger: LoggerNoCommit<Logger>;
 };
 
@@ -296,6 +302,7 @@ async function runHandlerWithRequestState({
   handler,
   options,
   resolvedParams,
+  authenticationOptions,
   logger,
 }: RunHandlerWithRequestStateArgs): Promise<Response> {
   const { publishableKey } = options;
@@ -390,7 +397,15 @@ async function runHandlerWithRequestState({
     clerkRequest,
     handlerResult,
     requestState,
-    resolvedParams,
+    {
+      ...resolvedParams,
+      ...(authenticationOptions.proxyUrl || resolvedParams.proxyUrl !== undefined
+        ? { proxyUrl: authenticationOptions.proxyUrl }
+        : {}),
+      ...(authenticationOptions.domain || resolvedParams.domain !== undefined
+        ? { domain: authenticationOptions.domain }
+        : {}),
+    },
     {},
     authObject.tokenType === 'session_token' ? null : makeAuthObjectSerializable(authObject),
   );
@@ -403,7 +418,7 @@ type AuthenticateRequest = Pick<ClerkClient, 'authenticateRequest'>['authenticat
 export const createAuthenticateRequestOptions = (
   clerkRequest: ClerkRequest,
   options: ClerkMiddlewareOptions,
-): Parameters<AuthenticateRequest>[1] => {
+): NonNullable<Parameters<AuthenticateRequest>[1]> => {
   // Auto-derive proxyUrl from frontendApiProxy config if not explicitly set
   let resolvedOptions = options;
   if (options.frontendApiProxy && !options.proxyUrl) {
