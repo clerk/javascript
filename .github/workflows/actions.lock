@@ -92,6 +92,20 @@ workflows:
         - 'slackapi/slack-github-action@v1.27.1'
     '.github/workflows/validate-renovate-config.yml':
         - 'actions/checkout@v4.4.0'
+    '.github/workflows/verify-e2e.yml':
+        - 'actions/cache@v4.3.0'
+        - 'actions/checkout@v4.4.0'
+        - 'actions/setup-java@v4.9.1'
+        - 'actions/setup-node@v4.4.0'
+        - 'actions/upload-artifact@v4.6.2'
+        - 'pnpm/action-setup@v4.3.0'
+    '.github/workflows/verify-remote.yml':
+        - 'actions/checkout@v4.4.0'
+        - 'actions/setup-java@v4.9.1'
+        - 'actions/setup-node@v4.4.0'
+        - 'actions/upload-artifact@v4.6.2'
+        - 'gradle/actions@v6.3.0'
+        - 'pnpm/action-setup@v4.3.0'
 dependencies:
     'actions-cool/check-user-permission@v2.4.0':
         ref: 'v2.4.0'
