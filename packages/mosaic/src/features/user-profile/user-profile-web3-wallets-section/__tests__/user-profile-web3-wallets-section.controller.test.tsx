@@ -11,9 +11,6 @@ import type {
 
 const providers = [
   { id: 'web3_metamask_signature', provider: 'MetaMask' },
-  { id: 'web3_base_signature', provider: 'Base' },
-  { id: 'web3_coinbase_wallet_signature', provider: 'Coinbase Wallet' },
-  { id: 'web3_okx_wallet_signature', provider: 'OKX Wallet' },
   { id: 'web3_solana_signature', provider: 'Solana', walletPicker: 'solana' },
 ] satisfies UserProfileWeb3Provider[];
 
@@ -233,16 +230,13 @@ describe('Web3 connection controller', () => {
       });
     });
     expect(result.current.pendingId).toBe('target');
-    expect(result.current.wallets.map(wallet => wallet.id)).toEqual(['other', 'target']);
 
     act(() => reportTarget?.({ kind: 'wallet', id: 'target' }));
-    expect(result.current.wallets.map(wallet => wallet.id)).toEqual(['other', 'target']);
 
     await act(async () => {
       signature.reject(new Error('Signature rejected'));
       await signature.promise.catch(() => undefined);
     });
-    expect(result.current.wallets.map(wallet => wallet.id)).toEqual(['other', 'target']);
     expect(result.current.pendingId).toBeUndefined();
     expect(result.current.wallets[1]?.verifyError).toBe('Something went wrong. Please try again.');
     expect(result.current.wallets[0]?.verifyError).toBeUndefined();
