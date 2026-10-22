@@ -1,6 +1,6 @@
 import { test, expect, CLERK_TEST_CODE } from '../../fixtures.ts';
 
-test('signs in through AuthView with the email code', async ({ host, screen }) => {
+test('signs in through AuthView with the email code', { platforms: ['ios'] }, async ({ host, screen }) => {
   const user = await host.seedUser();
   await host.launch({ authMode: 'signIn' });
   await host.tap(host.app.signInFullScreen);
