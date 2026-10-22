@@ -326,6 +326,7 @@ describe('Client Singleton', () => {
     expect(snapshot.sessions[0]).toMatchObject({ expire_at: 0, abandon_at: 0 });
     expect(restored.expireAt.getTime()).toBe(0);
     expect(restored.abandonAt.getTime()).toBe(0);
+    expect(restored.hasMaximumLifetime).toBe(false);
     expect(restored.status).toBe('active');
   });
 

@@ -217,6 +217,10 @@ export interface SessionResource extends ClerkResource {
    */
   status: SessionStatus;
   expireAt: Date;
+  /**
+   * Whether the session has a maximum lifetime. `false` when `expireAt` is Unix epoch zero. A session without a maximum lifetime can still end through sign-out or revocation, so use `status` to check whether it is active. `undefined` in ClerkJS versions that predate this property.
+   */
+  readonly hasMaximumLifetime?: boolean;
   abandonAt: Date;
   /**
    * An array where each item represents the number of minutes since the last verification of a first or second factor: `[firstFactorAge, secondFactorAge]`.
@@ -291,6 +295,10 @@ export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;
   status: string;
   expireAt: Date;
+  /**
+   * Whether the session has a maximum lifetime. `false` when `expireAt` is Unix epoch zero. `undefined` in ClerkJS versions that predate this property.
+   */
+  readonly hasMaximumLifetime?: boolean;
   abandonAt: Date;
   lastActiveAt: Date;
   latestActivity: SessionActivity;
