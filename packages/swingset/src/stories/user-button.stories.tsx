@@ -1,11 +1,22 @@
+import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
+import type {
+  UserProfileModalContentProps,
+  UserProfileModalOptions,
+} from '@clerk/mosaic/features/user-profile/user-profile.modal.types';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
+import { defineModalSurface } from '@clerk/mosaic/modals/define-modal-surface';
+import type { ModalSurfaces } from '@clerk/mosaic/modals/modal.types';
+import { ModalHost } from '@clerk/mosaic/modals/modal-host';
+import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
 import { nestLabsWithClerkApp, usePrototype } from './fixtures/switcher';
+import { useUserProfileFixture } from './fixtures/user-profile';
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -192,6 +203,75 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
       ]}
       menuItemOrder={['docs', 'settings', 'inviteMembers', 'app-settings']}
     />
+  );
+}
+
+const integrationsPage = {
+  label: 'Integrations',
+  path: 'integrations',
+  content: <p>An app-provided page, passed to the profile modal as a custom page.</p>,
+};
+
+function FixtureUserProfile({ options }: UserProfileModalContentProps) {
+  const { pages } = useUserProfileFixture();
+  const [activePage, setActivePage] = useState(options?.page ?? 'account');
+
+  return (
+    <UserProfileView
+      activePage={activePage}
+      pages={pages}
+      customPages={options?.customPages}
+      pageOrder={options?.pageOrder}
+      onPageChange={setActivePage}
+    />
+  );
+}
+
+const fixtureUserProfileModal = defineModalSurface<UserProfileModalOptions>({
+  id: 'fixtureUserProfile',
+  variant: 'profile',
+  load: () => Promise.resolve({ default: FixtureUserProfile }),
+});
+
+const fixtureModalSurfaces: ModalSurfaces = [fixtureUserProfileModal];
+
+export function ProfileModal(_args: Record<string, unknown>) {
+  return (
+    <ModalHost surfaces={fixtureModalSurfaces}>
+      <ProfileModalTriggers />
+    </ModalHost>
+  );
+}
+
+function ProfileModalTriggers() {
+  const prototype = usePrototype({ singleSession: true });
+  const userProfile = useModal(fixtureUserProfileModal);
+
+  return (
+    <div className='flex flex-wrap items-center gap-2'>
+      <SwitcherView
+        {...prototype}
+        mode='user'
+        onManageAccount={() => {
+          prototype.onManageAccount?.();
+          userProfile.open({ customPages: [integrationsPage] });
+        }}
+      />
+      <Button
+        variant='outline'
+        onClick={() => userProfile.open({ page: 'security', customPages: [integrationsPage] })}
+        onPointerEnter={userProfile.preload}
+      >
+        Open security
+      </Button>
+      <Button
+        variant='outline'
+        onClick={() => userProfile.open({ page: 'integrations', customPages: [integrationsPage] })}
+        onPointerEnter={userProfile.preload}
+      >
+        Open integrations
+      </Button>
+    </div>
   );
 }
 

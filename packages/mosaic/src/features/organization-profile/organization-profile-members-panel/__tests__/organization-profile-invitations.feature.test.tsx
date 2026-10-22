@@ -90,6 +90,29 @@ describe('connected organization invitations', () => {
     members.release();
   });
 
+  it('shows loading until the first page of invitations arrives', async () => {
+    serve(['org:sys_memberships:manage']);
+    const list = holdRequests('get', '/v1/organizations/:organizationId/invitations');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const table = () => screen.getByRole('table', { name: 'Invitations' });
+    const columnWidths = () =>
+      within(table())
+        .getAllByRole('columnheader')
+        .map(cell => cell.getBoundingClientRect().width);
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Loading invitations');
+    expect(within(table()).getAllByRole('row')).toHaveLength(1);
+    expect(within(table()).queryByRole('button')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Invite' })).toBeDisabled();
+    const loadingWidths = columnWidths();
+    list.release();
+    expect(await screen.findByText('ada@example.com')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Invitations loaded');
+    expect(screen.getByRole('button', { name: 'Invite' })).toBeVisible();
+    expect(within(table()).getAllByRole('row')).toHaveLength(2);
+    expect(columnWidths()).toEqual(loadingWidths);
+  });
+
   it('shows a failed initial load and retries the invitation list', async () => {
     serve(['org:sys_memberships:manage']);
     const initial = holdRequests('get', '/v1/organizations/:organizationId/invitations');
@@ -238,8 +261,8 @@ describe('connected organization invitations', () => {
         <OrganizationProfileMembersPanel />
       </MosaicLocalizationProvider>,
     );
-    const table = within(await screen.findByRole('table', { name: 'Invitations' }));
-    expect(await table.findByRole('cell', { name: 'Administrateur' })).toBeVisible();
+    expect(await screen.findByRole('cell', { name: 'Administrateur' })).toBeVisible();
+    const table = within(screen.getByRole('table', { name: 'Invitations' }));
     expect(table.getByRole('cell', { name: 'Membre' })).toBeVisible();
     expect(table.queryByRole('cell', { name: 'Admin' })).toBeNull();
   });
@@ -537,7 +560,9 @@ describe('inviting members', () => {
     const user = userEvent.setup();
     for (const tab of ['Members', 'Invitations', 'Requests']) {
       await user.click(await screen.findByRole('tab', { name: tab }));
-      expect(await within(screen.getByRole('tabpanel')).findByRole('button', { name: 'Invite' })).toBeVisible();
+      await waitFor(() =>
+        expect(within(screen.getByRole('tabpanel')).getByRole('button', { name: 'Invite' })).toBeEnabled(),
+      );
     }
   });
 
