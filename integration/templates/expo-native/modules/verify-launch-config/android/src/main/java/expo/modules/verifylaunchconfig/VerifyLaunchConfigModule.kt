@@ -18,7 +18,7 @@ class VerifyLaunchConfigModule : Module() {
     }
 
     Function("applyStorageScope") { scope: String ->
-      val context = appContext.reactContext ?: return@Function
+      val context = checkNotNull(appContext.reactContext) { "applyStorageScope ran without a React context, so the stored Clerk state was not cleared" }
       val preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
       if (preferences.getString(STORAGE_SCOPE_KEY, null) == scope) {
         return@Function
