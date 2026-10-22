@@ -4,17 +4,17 @@ import { inertProps } from '@clerk/shared/inert';
 import React, { useRef } from 'react';
 
 import { useTransition } from '../hooks/use-transition';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, Freeze, mergeProps, useRender } from '../utils';
 import { useTabsContext } from './tabs-context';
 
 export interface TabsPanelProps extends ComponentProps<'div'> {
   value: string;
-  /** When true, removes `hidden` so the panel stays in layout flow. */
-  shouldForceMount?: boolean;
+  /** When true, renders the panel's children while it is hidden. */
+  keepMounted?: boolean;
 }
 
 export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(function TabsPanel(props, ref) {
-  const { render, value: panelValue, shouldForceMount, ...otherProps } = props;
+  const { render, value: panelValue, keepMounted, children, ...otherProps } = props;
   const { value: selectedValue, tabsId, direction } = useTabsContext();
 
   const isSelected = selectedValue === panelValue;
@@ -22,7 +22,7 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
   const panelId = `${tabsId}-panel-${panelValue}`;
 
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const { transitionProps } = useTransition({
+  const { mounted, transitionProps } = useTransition({
     open: isSelected,
     ref: panelRef,
   });
@@ -35,12 +35,11 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     hasBeenDeselected.current = true;
   }
 
-  const effectiveTransitionProps =
-    shouldForceMount && !hasBeenDeselected.current
-      ? { ...transitionProps, 'data-starting-style': undefined, style: undefined }
-      : transitionProps;
+  const effectiveTransitionProps = !hasBeenDeselected.current
+    ? { ...transitionProps, 'data-starting-style': undefined, style: undefined }
+    : transitionProps;
 
-  const state = { hidden: !isSelected };
+  const state = { hidden: !mounted };
 
   const defaultProps = {
     id: panelId,
@@ -48,16 +47,13 @@ export const TabsPanel = React.forwardRef<HTMLDivElement, TabsPanelProps>(functi
     'aria-labelledby': tabId,
     tabIndex: 0,
     ...inertProps(!isSelected),
-    hidden: !isSelected && !shouldForceMount ? true : undefined,
-    ...(shouldForceMount
-      ? {
-          ...effectiveTransitionProps,
-          style: {
-            ...effectiveTransitionProps.style,
-            '--cl-tab-transition-direction': direction === 'forward' ? '1' : '-1',
-          },
-        }
-      : {}),
+    hidden: mounted ? undefined : true,
+    ...effectiveTransitionProps,
+    style: {
+      ...effectiveTransitionProps.style,
+      '--cl-tab-transition-direction': direction === 'forward' ? '1' : '-1',
+    },
+    children: keepMounted || mounted ? <Freeze frozen={!isSelected && mounted}>{children}</Freeze> : null,
   };
 
   const merged = mergeProps<'div'>(defaultProps, otherProps);

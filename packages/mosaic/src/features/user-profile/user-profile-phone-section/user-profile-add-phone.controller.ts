@@ -9,6 +9,7 @@ import type { ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfilePhone, UserProfilePhoneVerifier } from '../user-profile-contact.types';
 import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
 
@@ -16,6 +17,7 @@ export type UserProfileAddPhoneField = 'phoneNumber' | 'code';
 
 export interface UserProfileAddPhoneControllerOptions {
   onCreate?: (phoneNumber: string) => Promise<UserProfilePhoneVerifier>;
+  reverification?: ReverificationController;
 }
 
 export interface UserProfileAddPhoneController extends UserProfileAddPhoneDialogProps {
@@ -107,6 +109,7 @@ const machine = createMachine({
 
 export function useUserProfileAddPhoneController({
   onCreate,
+  reverification,
 }: UserProfileAddPhoneControllerOptions): UserProfileAddPhoneController {
   const errorText = useErrorText();
   const handle = useMemo(() => Dialog.createHandle(), []);
@@ -140,9 +143,10 @@ export function useUserProfileAddPhoneController({
     return () => clearTimeout(timer);
   }, [open, resendSeconds, send]);
 
-  const step = state === 'phone' ? 'phone' : 'verify';
-  const form = step === 'phone' ? phoneForm : codeForm;
-  const formError = step === 'phone' ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
+  const isReverifying = phoneForm.isSubmitting && Boolean(reverification?.visible);
+  const step = isReverifying ? 'reverify' : state === 'phone' ? 'phone' : 'verify';
+  const form = state === 'phone' ? phoneForm : codeForm;
+  const formError = state === 'phone' ? phoneForm.fields.phoneNumber.feedback : codeForm.fields.code.feedback;
   const machineError = error?.global ? errorText(error.global) : undefined;
 
   return {
@@ -151,13 +155,17 @@ export function useUserProfileAddPhoneController({
     isResending: state === 'sending',
     open,
     step,
-    phoneNumber: step === 'phone' ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
+    reverification,
+    phoneNumber: state === 'phone' ? phoneForm.values.phoneNumber : snapshot.context.phoneNumber,
     code: codeForm.values.code,
     errorMessage: formError?.message ?? form.error ?? machineError,
     isPending: form.isSubmitting,
     onOpenChange: open => {
       if (form.isSubmitting) {
-        return;
+        if (open || state !== 'phone' || !reverification?.onCancel) {
+          return;
+        }
+        reverification.onCancel();
       }
       if (open) {
         phoneForm.reset();

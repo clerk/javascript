@@ -1,3 +1,4 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useEffect } from 'react';
 
 import { type ErrorDescription, fill, type MosaicMessages, useErrorText, useMessages } from '../../../localization';
@@ -221,6 +222,9 @@ const mfaMachine = createMachine({
               if (context.dismissed) {
                 return { pending: undefined, dismissed: false };
               }
+              if (isReverificationCancelledError(event.error)) {
+                return { flow: { kind: 'closed' }, pending: undefined };
+              }
               if (flow.kind !== 'authenticator' && flow.kind !== 'sms' && flow.kind !== 'backup') {
                 return { pending: undefined };
               }
@@ -415,7 +419,15 @@ function createSetupProps(
   const authenticator = flow.kind === 'authenticator' ? flow : undefined;
   const backup = flow.kind === 'backup' ? flow : undefined;
   return {
-    step: flow.kind === 'closed' ? 'select' : flow.kind === 'backup' ? 'backup-codes' : flow.kind,
+    step:
+      flow.kind === 'closed'
+        ? 'select'
+        : flow.kind === 'backup'
+          ? context.pending === 'generate' && model.backupCodesReverification.visible
+            ? 'verify'
+            : 'backup-codes'
+          : flow.kind,
+    reverification: model.backupCodesReverification,
     methods: model.addableMethods,
     onSelect: actions.select,
     onBack: actions.back,
@@ -535,15 +547,29 @@ export function useUserProfileMfaController(model: ReadyModel) {
     onRegenerateBackupCodes: model.generateBackupCodes ? generateBackupCodes : undefined,
     onRemove: model.remove,
     onSetDefault: model.setDefault,
+    removeReverification: model.removeReverification,
+    setDefaultReverification: model.setDefaultReverification,
   };
 
   const showAddTrigger = model.addableMethods.length > 0;
+  const reverification = model.backupCodesReverification;
+  const reverifying = setupProps.step === 'verify';
 
   return {
     dialogOpen,
     showAddTrigger,
     showAddControl: showAddTrigger || dialogOpen,
-    onDialogOpenChange: (open: boolean) => send({ type: open ? 'OPEN' : 'CLOSE' }),
+    reverifying,
+    onDialogOpenChange: (open: boolean) => {
+      if (!open && context.pending === 'generate') {
+        if (!reverification.onCancel) {
+          return;
+        }
+        reverification.onCancel();
+      }
+      send({ type: open ? 'OPEN' : 'CLOSE' });
+    },
+    showCloseButton: !reverifying || Boolean(reverification.onCancel),
     sectionProps,
     setupProps,
   };

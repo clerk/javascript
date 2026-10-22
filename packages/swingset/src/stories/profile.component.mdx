@@ -5,7 +5,8 @@ import * as ProfileStories from './profile.component.stories';
 A surface you navigate: a column of destinations beside the page each one opens. The user profile
 and the organization profile are both one of these — `UserProfileView` composes it from the pages an
 instance has content for. Rendered as the content of a `profile` dialog it names the dialog, carries
-its dismiss, and fills the popup; standalone it paints the same frame and takes its own height.
+its dismiss, and fills the popup; in a `fullscreen` dialog it fills the viewport and moves its
+dismiss into the navigation; standalone it paints the same frame and takes its own height.
 
 ## Playground
 
@@ -24,6 +25,8 @@ its dismiss, and fills the popup; standalone it paints the same frame and takes 
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Profile } from '@clerk/mosaic/components/profile';
+import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
+import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
 
 <Profile.Root
   value={page}
@@ -33,13 +36,13 @@ import { Profile } from '@clerk/mosaic/components/profile';
   <Profile.Nav>
     <Profile.NavItem
       value='account'
-      icon={<Icon name='user-circle' size='sm' />}
+      icon={<Icon glyph={UserCircle} size='sm' />}
     >
       Account
     </Profile.NavItem>
     <Profile.NavItem
       value='security'
-      icon={<Icon name='shield-check' size='sm' />}
+      icon={<Icon glyph={ShieldCheck} size='sm' />}
       badge={<Badge>2</Badge>}
     >
       Security
@@ -71,6 +74,7 @@ reaches the page title instead.
 | `Profile.Root`         | `div` (the container)   | `cl-profile`               |
 | —                      | `span` (query sentinel) | `cl-profile-sentinel`      |
 | `Profile.Nav`          | `nav` (labelled)        | `cl-profile-nav`           |
+| —                      | back `button`           | `cl-profile-back-button`   |
 | —                      | tablist                 | `cl-profile-nav-list`      |
 | `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`      |
 | `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`       |
@@ -80,6 +84,10 @@ reaches the page title instead.
 
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog. While compact, `ContentPanel` is a `div[role=group]` named by the page title.
+
+The back `button` renders only inside a `fullscreen` dialog, where it replaces `Dialog.CloseButton`.
+It is first in the navigation, sized like a `NavItem`, and its label is the `profile.backToApp`
+message. Below `48rem` the corner dismiss returns and it does not render.
 
 ## Heading levels
 
@@ -122,13 +130,11 @@ its parent.
 
 ## Page transitions
 
-An unselected page carries the `hidden` attribute, and a transition across it is CSS alone —
-the CSS a customer adds against a `<UserProfile />` they do not render. `@starting-style` gives the
-page that just lost `hidden` a frame to enter from; `transition-behavior: allow-discrete` on
-`display` holds the page that just gained it until its exit finishes. Stack the pages in one grid
-cell and the two cross-fade in place. `shouldForceMount` on `ContentPanel` is there for a transition
-that needs the primitive's own timing attributes instead (`data-starting-style` /
-`data-ending-style`, `--cl-tab-transition-direction`).
+A transition across pages is CSS alone — the CSS a customer adds against a `<UserProfile />` they
+do not render. The entering page carries `data-starting-style` for its first frame; the leaving page
+carries `data-ending-style` and keeps its content until its exit finishes, then gains `hidden`.
+`--cl-tab-transition-direction` is `1` when moving to a later page and `-1` to an earlier one. Stack
+the pages in one grid cell and the two cross-fade in place. An unselected page renders no content.
 
 <Story
   name='Transitions'

@@ -15,6 +15,7 @@ export const TokenVerificationErrorReason = {
   TokenInvalid: 'token-invalid',
   TokenInvalidAlgorithm: 'token-invalid-algorithm',
   TokenInvalidAuthorizedParties: 'token-invalid-authorized-parties',
+  TokenInvalidIssuer: 'token-invalid-issuer',
   TokenInvalidSignature: 'token-invalid-signature',
   TokenNotActiveYet: 'token-not-active-yet',
   TokenIatInTheFuture: 'token-iat-in-the-future',

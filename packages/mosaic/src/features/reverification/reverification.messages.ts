@@ -73,6 +73,8 @@ export const reverificationMessages = {
   footerActionLink__useAnotherMethod: 'Use another method',
   formButtonPrimary: 'Continue',
   formButtonReset: 'Cancel',
+  formFieldAction__hidePassword: 'Hide password',
+  formFieldAction__showPassword: 'Show password',
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__password: 'Password',

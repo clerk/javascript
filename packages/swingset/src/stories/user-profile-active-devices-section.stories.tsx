@@ -1,3 +1,4 @@
+import { UserProfileActiveDevicesSectionSkeleton } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.skeleton';
 import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 
 import type { StoryMeta } from '@/lib/types';
@@ -11,7 +12,7 @@ export { default as __source } from './user-profile-active-devices-section.stori
 
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
+  status: 'stable',
   title: 'UserProfileActiveDevicesSection',
   label: 'Active devices',
   navigation: { category: 'Sections' },
@@ -42,4 +43,8 @@ export function Impersonation() {
       signOutAll={undefined}
     />
   );
+}
+
+export function Loading() {
+  return <UserProfileActiveDevicesSectionSkeleton />;
 }

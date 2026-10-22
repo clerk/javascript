@@ -12,6 +12,8 @@ import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useServerDataTable } from '../../hooks/use-server-data-table';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
+import { Key } from '../../icons/glyphs/key';
 import { fill } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
@@ -86,9 +88,17 @@ export function APIKeysTableView({
           ) : null}
         </Table.Toolbar>
         <Table.Root
+          layout='fixed'
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
         >
+          <Table.ColumnGroup>
+            {onBulkAction ? <Table.Column /> : null}
+            <Table.Column />
+            <Table.Column width='9rem' />
+            <Table.Column width='9rem' />
+            {revoke ? <Table.Column width='4rem' /> : null}
+          </Table.ColumnGroup>
           <Table.Header>
             <Table.Row>
               {onBulkAction ? (
@@ -121,7 +131,7 @@ export function APIKeysTableView({
             ) : isError ? (
               <Table.Empty colSpan={columnCount}>
                 <EmptyState.Root>
-                  <EmptyState.Icon name='exclamation-circle' />
+                  <EmptyState.Icon glyph={ExclamationCircle} />
                   <EmptyState.Label>{m.loadError}</EmptyState.Label>
                   <EmptyState.Description>{m.loadErrorDescription}</EmptyState.Description>
                   {onRetry ? (
@@ -140,7 +150,7 @@ export function APIKeysTableView({
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>
                 <EmptyState.Root>
-                  <EmptyState.Icon name='key' />
+                  <EmptyState.Icon glyph={Key} />
                   <EmptyState.Label>{emptyState.label}</EmptyState.Label>
                   <EmptyState.Description>{emptyState.description}</EmptyState.Description>
                 </EmptyState.Root>

@@ -151,7 +151,7 @@ describe('useAuthViewState', () => {
     await waitFor(() => {
       expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
     });
-    expect(consoleError).toHaveBeenCalledWith('[useAuthViewState] Failed to get native auth-flow state:', error);
+    expect(consoleError).toHaveBeenCalledWith('Clerk: Failed to get native auth-flow state:', error);
   });
 
   test('falls back to JS session state when the native listener cannot be installed', async () => {
@@ -167,6 +167,6 @@ describe('useAuthViewState', () => {
     await waitFor(() => {
       expect(result.current).toEqual({ isLoaded: true, isAuthFlowComplete: true });
     });
-    expect(consoleError).toHaveBeenCalledWith('[useAuthViewState] Failed to observe native auth-flow state:', error);
+    expect(consoleError).toHaveBeenCalledWith('Clerk: Failed to observe native auth-flow state:', error);
   });
 });

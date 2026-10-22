@@ -1,5 +1,49 @@
 # @clerk/ui
 
+## 1.41.1
+
+### Patch Changes
+
+- In Electron apps, the social sign-in and sign-up buttons become clickable again when the user returns to the app without finishing OAuth in the browser. Before, they stayed disabled for up to 3 minutes. ([#10337](https://github.com/clerk/javascript/pull/10337)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `<OrganizationProfile />` Security page showing Directory Sync and SSO setup actions to organization admins when the organization isn't allowed to set up enterprise SSO and Directory Sync. Those organizations now see their enterprise connections read-only, alongside the SSO bypass section. ([#10321](https://github.com/clerk/javascript/pull/10321)) by [@kalafut](https://github.com/kalafut)
+
+## 1.41.0
+
+### Minor Changes
+
+- Support passkeys as a second factor during sign-in and session reverification. ([#9127](https://github.com/clerk/javascript/pull/9127)) by [@dmoerner](https://github.com/dmoerner)
+
+  When a user has a passkey, the prebuilt `<SignIn/>` and `<UserVerification/>`
+  components preselect it as the second factor, as they already do for the first
+  factor. Other methods stay available under "Use another method".
+
+  To use it, your instance must allow passkeys to satisfy the second factor. This
+  is on by default for instances created after 2026-07-08, and can be turned on
+  in the Dashboard for older ones. Web apps also need to opt in to the passkey
+  second factor update in the Dashboard.
+
+  If you build a custom flow, `supportedSecondFactors` can now include `passkey`.
+  Call `signIn.authenticateWithPasskey()` to complete it.
+
+  Passkeys are no longer preselected, for either factor, where the SDK reports
+  that WebAuthn is unavailable (for example, Electron apps without passkey
+  support enabled).
+
+### Patch Changes
+
+- Fix the OrganizationProfile sidebar to hide API keys when the user has neither `org:sys_api_keys:read` nor `org:sys_api_keys:manage` permission. ([#10290](https://github.com/clerk/javascript/pull/10290)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`9066bf9`](https://github.com/clerk/javascript/commit/9066bf9f4499278f8d1dc065ce8096476308f109), [`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/localizations@4.24.0
+  - @clerk/shared@4.41.0
+
+## 1.40.2
+
+### Patch Changes
+
+- Fix `<SignUp />` asking a returning user to fill in missing fields after a verification challenge. When someone signs up with a social account that already belongs to a user, they are now signed in to that account once the challenge clears, as they are when no challenge is shown. ([#10158](https://github.com/clerk/javascript/pull/10158)) by [@mwickett](https://github.com/mwickett)
+
 ## 1.40.1
 
 ### Patch Changes

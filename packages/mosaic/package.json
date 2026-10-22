@@ -1,6 +1,6 @@
 {
   "name": "@clerk/mosaic",
-  "version": "0.1.8",
+  "version": "0.1.11",
   "description": "Clerk Mosaic UI components",
   "keywords": [
     "clerk",
@@ -60,6 +60,7 @@
     "test": "vitest run --project primitives --project mosaic",
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
     "test:feature": "vitest run --project feature",
+    "test:webkit": "vitest run --project webkit",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

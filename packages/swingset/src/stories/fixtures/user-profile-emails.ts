@@ -6,6 +6,7 @@ import { useUserProfileEmailSectionController } from '@clerk/mosaic/features/use
 import type { UserProfileEmailSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-email-section/user-profile-email-section.types';
 import { useState } from 'react';
 
+import { idleReverification } from './reverification';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 
 export const exampleEmails: UserProfileEmail[] = [
@@ -40,6 +41,9 @@ export function useUserProfileEmailsFixture({
 
   return useUserProfileEmailSectionController({
     emails,
+    removeReverification: idleReverification,
+    setPrimaryReverification: idleReverification,
+    createReverification: idleReverification,
     username,
     ...flow,
     onSetPrimaryEmail: id => {

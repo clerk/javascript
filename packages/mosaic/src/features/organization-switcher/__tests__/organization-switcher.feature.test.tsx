@@ -197,6 +197,46 @@ describe('OrganizationSwitcher', () => {
     expect(within(trigger()).getByText('Other')).toBeInTheDocument();
   });
 
+  describe('an accepted invitation', () => {
+    const fullFirstPage = Array.from({ length: 10 }, (_, i) =>
+      fapiMembership(fapiOrganization({ id: `org_page_${i}`, name: `Page ${i}` })),
+    );
+    const enabledRow = async (name: string) => {
+      const row = await screen.findByRole('button', { name });
+      await waitFor(() => expect(row).not.toHaveAttribute('aria-disabled', 'true'));
+      return row;
+    };
+
+    it('stays reachable, and follows afterSelectOrganizationUrl, before the memberships list its organization', async () => {
+      serveFapi(
+        noOffers({
+          client: fapiClient([personalSession]),
+          memberships: fullFirstPage,
+          invitations: [fapiInvitation('inv_1', gamma)],
+        }),
+      );
+      const nextPage = holdRequests('get', '/v1/me/organization_memberships', { offset: '10' });
+      const { navigate } = await renderWithClerk(tree({ afterSelectOrganizationUrl: '/orgs/:id' }));
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Accept' }));
+      await user.click(await enabledRow('Gamma'));
+
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith('/orgs/org_3'));
+      nextPage.release();
+    });
+
+    it('lists once, as a membership, when the memberships list its organization', async () => {
+      await renderSwitcher({}, noOffers({ invitations: [fapiInvitation('inv_1', gamma)] }));
+      const user = await openWithList();
+
+      await user.click(screen.getByRole('button', { name: 'Accept' }));
+      await enabledRow('Gamma');
+
+      expect(reading('Gamma')).toEqual(['Gamma']);
+    });
+  });
+
   it('carries custom rows beside Settings, in the order given', async () => {
     const terms = { id: 'terms', label: 'Terms of service', href: 'https://example.com/terms' };
     const support = { id: 'support', label: 'Support', onClick: vi.fn() };
@@ -210,7 +250,7 @@ describe('OrganizationSwitcher', () => {
     await renderSwitcher({}, noOffers());
     await openWithList();
 
-    for (const slot of ['trigger', 'popover', 'header', 'item', 'group', 'separator']) {
+    for (const slot of ['trigger', 'trigger-label', 'popover', 'header', 'item', 'group', 'separator']) {
       expect(document.querySelector(`.cl-organization-switcher-${slot}`)).not.toBeNull();
     }
     expect(document.querySelector('[class*="cl-user-button"]')).toBeNull();
@@ -244,5 +284,46 @@ describe('OrganizationSwitcher', () => {
       memberships.release();
       await waitFor(() => expect(screen.queryByText('Loading organizations…')).toBeNull());
     });
+  });
+});
+
+describe('OrganizationSwitcher custom trigger badges', () => {
+  it.each([
+    { seed: signedIn(), badge: 'organization:org_1', name: 'Acme' },
+    { seed: signedIn({ client: fapiClient([personalSession]) }), badge: 'user:user_1', name: 'Alice Smith' },
+  ])('shows a badge for the displayed identity as $badge', async ({ seed, badge, name }) => {
+    await renderSwitcher(
+      { renderTriggerBadge: ({ kind, id }) => Promise.resolve({ id: 'pro', label: `${kind}:${id}` }) },
+      seed,
+    );
+
+    await waitFor(() => expect(within(trigger()).getByText(badge)).toBeInTheDocument());
+    expect(within(trigger()).getByText(badge).closest('.cl-badge')).toHaveAttribute('data-badge-id', 'pro');
+    expect(within(trigger()).getByText(name)).toBeInTheDocument();
+  });
+
+  it('does not request a badge when no organization or personal account is displayed', async () => {
+    const renderTriggerBadge = vi.fn(() => Promise.resolve({ id: 'custom', label: 'Custom plan' }));
+    await renderSwitcher(
+      { hidePersonal: true, renderTriggerBadge },
+      signedIn({ client: fapiClient([personalSession]) }),
+    );
+
+    expect(trigger()).toHaveTextContent('No organization selected');
+    expect(renderTriggerBadge).not.toHaveBeenCalled();
+  });
+
+  it('hides the badge for null and keeps the organization name', async () => {
+    const { rerender } = await renderSwitcher({
+      renderTriggerBadge: () => Promise.resolve({ id: 'pro', label: 'Pro plan' }),
+    });
+    await waitFor(() => expect(within(trigger()).getByText('Pro plan')).toBeInTheDocument());
+
+    const renderTriggerBadge = vi.fn(() => Promise.resolve(null));
+    rerender(tree({ renderTriggerBadge }));
+    await waitFor(() => expect(renderTriggerBadge).toHaveBeenCalled());
+    expect(trigger()).not.toHaveTextContent('Pro plan');
+    expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+    expect(trigger()).toHaveAccessibleName('Open organization menu for Acme');
   });
 });

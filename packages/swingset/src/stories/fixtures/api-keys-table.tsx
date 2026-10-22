@@ -82,10 +82,12 @@ export function useAPIKeysTableFixture({
   initialKeys = exampleAPIKeys,
   enableSorting = false,
   subjectKind = 'user',
+  showDescription = false,
 }: {
   initialKeys?: FixtureAPIKey[];
   enableSorting?: boolean;
   subjectKind?: APIKeysTableSubjectKind;
+  showDescription?: boolean;
 } = {}): APIKeysTableViewProps {
   const locale = useLocale();
   const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), subjectKind);
@@ -109,6 +111,7 @@ export function useAPIKeysTableFixture({
 
   const create = useCreateAPIKeyController({
     messages,
+    showDescription,
     onCreate: async ({ name, expiresAt }) => {
       const result = await createExampleAPIKey();
       setItems(current => [

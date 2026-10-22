@@ -80,6 +80,7 @@ function MenuInner(props: MenuProps) {
   const labelsRef = useRef<Array<string | null>>([]);
   const arrowRef = useRef<SVGSVGElement | null>(null);
   const pressPointerTypeRef = useRef<string | null>(null);
+  const openFrameRef = useRef<number | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
 
   const resolvedPlacement = placementProp ?? (isNested ? 'right-start' : 'bottom-start');
@@ -138,7 +139,23 @@ function MenuInner(props: MenuProps) {
           if (isNested || event.button !== 0 || (pointerType !== 'mouse' && pointerType !== 'pen')) {
             return;
           }
-          floatingContext.onOpenChange(!open || isHoverOpen(floatingContext), event.nativeEvent, 'click');
+          if (openFrameRef.current !== null) {
+            cancelAnimationFrame(openFrameRef.current);
+            openFrameRef.current = null;
+            return;
+          }
+          if (open && !isHoverOpen(floatingContext)) {
+            floatingContext.onOpenChange(false, event.nativeEvent, 'click');
+            return;
+          }
+          // Safari blurs an already-focused button on press, moving focus to its nearest focusable
+          // ancestor. Opening now lets that blur reach the open menu and close it, so open on the
+          // next frame, after the press has settled, as Base UI's `useClick` does.
+          const nativeEvent = event.nativeEvent;
+          openFrameRef.current = requestAnimationFrame(() => {
+            openFrameRef.current = null;
+            floatingContext.onOpenChange(true, nativeEvent, 'click');
+          });
         },
       },
     }),
@@ -179,6 +196,15 @@ function MenuInner(props: MenuProps) {
     listNavigation,
     typeahead,
   ]);
+
+  useEffect(
+    () => () => {
+      if (openFrameRef.current !== null) {
+        cancelAnimationFrame(openFrameRef.current);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!tree) {
