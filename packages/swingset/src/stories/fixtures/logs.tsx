@@ -1,6 +1,6 @@
 import type { SelectItem } from '@clerk/mosaic/components/select';
-import { LogsPanelView } from '@clerk/mosaic/features/logs/logs-panel.view';
 import type { LogEvent, LogEventActor, LogEventLocation, LogEventSource } from '@clerk/mosaic/features/logs/logs.types';
+import { LogsPanelView } from '@clerk/mosaic/features/logs/logs-panel.view';
 import { useLocale } from '@clerk/mosaic/localization';
 import { useMemo, useState } from 'react';
 
