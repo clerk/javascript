@@ -211,6 +211,30 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.claims).toEqual({ foo: 'bar' });
   });
 
+  it('does not forward the incoming User-Agent when verifying an API key', async () => {
+    const token = 'ak_LCWGdaM8mv8K4PC/57IICZQXAeWfCgF30DZaFXHoGn9=';
+
+    server.use(
+      http.post(
+        'https://api.clerk.test/api_keys/verify',
+        validateHeaders(({ request }) => {
+          expect(request.headers.get('User-Agent')).toBe('@clerk/backend@0.0.0-test');
+          return HttpResponse.json(mockVerificationResults.api_key);
+        }),
+      ),
+    );
+
+    const result = await verifyMachineAuthToken(token, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      // Incoming request UA is on AuthenticateContext; it must not go to BAPI.
+      userAgent: 'Python-urllib/3.11',
+    } as Parameters<typeof verifyMachineAuthToken>[1]);
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toBeDefined();
+  });
+
   it('verifies provided Machine token with instance secret key', async () => {
     const token = 'mt_8XOIucKvqHVr5tYP123456789abcdefghij';
 
