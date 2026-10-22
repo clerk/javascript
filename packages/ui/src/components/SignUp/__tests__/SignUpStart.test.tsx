@@ -31,6 +31,21 @@ describe('SignUpStart', () => {
       screen.getByText('Email address');
     });
 
+    it('sets standard autocomplete tokens on sign-up fields', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+        f.withPhoneNumber({ required: true });
+        f.withUsername({ required: true });
+        f.withName({ required: true });
+      });
+      render(<SignUpStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: 'First name' })).toHaveAttribute('autocomplete', 'given-name');
+      expect(screen.getByRole('textbox', { name: 'Last name' })).toHaveAttribute('autocomplete', 'family-name');
+      expect(screen.getByLabelText('Email address', { selector: 'input' })).toHaveAttribute('autocomplete', 'email');
+      expect(screen.getByLabelText('Phone number', { selector: 'input' })).toHaveAttribute('autocomplete', 'tel');
+      expect(screen.getByRole('textbox', { name: 'Username' })).toHaveAttribute('autocomplete', 'username');
+    });
+
     it('enables sign up with phone number', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withPhoneNumber({ required: true });
