@@ -34,6 +34,7 @@ let frame = 0;
 // viewport to match, so a box that already fits the visible band means the browser is moving fixed
 // content itself, and an inset would lift the dialog twice. Safari leaves `svh` alone.
 let smallViewportProbe: HTMLElement | null = null;
+let fixedBoxProbe: HTMLElement | null = null;
 
 /**
  * The gap between the bottom of the layout viewport and the bottom of the visual viewport — which
@@ -55,7 +56,8 @@ export function measureKeyboardInset(): number {
   if (smallViewportProbe && smallViewportProbe.offsetHeight - viewport.height <= KEYBOARD_THRESHOLD) {
     return 0;
   }
-  return Math.max(0, Math.round(document.documentElement.clientHeight - (viewport.height + viewport.offsetTop)));
+  const layoutHeight = fixedBoxProbe?.offsetHeight ?? document.documentElement.clientHeight;
+  return Math.max(0, Math.round(layoutHeight - (viewport.height + viewport.offsetTop)));
 }
 
 function publish(): void {
@@ -92,6 +94,9 @@ export function acquireKeyboardInset(): () => void {
     smallViewportProbe.style.cssText =
       'position:fixed;top:0;height:100svh;width:0;visibility:hidden;pointer-events:none';
     document.body.appendChild(smallViewportProbe);
+    fixedBoxProbe = document.createElement('div');
+    fixedBoxProbe.style.cssText = 'position:fixed;top:0;bottom:0;width:0;visibility:hidden;pointer-events:none';
+    document.body.appendChild(fixedBoxProbe);
     publish();
     viewport.addEventListener('resize', schedulePublish);
     viewport.addEventListener('scroll', schedulePublish);
@@ -102,6 +107,8 @@ export function acquireKeyboardInset(): () => void {
       frame = 0;
       smallViewportProbe?.remove();
       smallViewportProbe = null;
+      fixedBoxProbe?.remove();
+      fixedBoxProbe = null;
       document.documentElement.style.removeProperty(PROPERTY);
       document.documentElement.style.removeProperty(OFFSET_PROPERTY);
     };

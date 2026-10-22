@@ -28,14 +28,23 @@ export function guardKeyboardFocus(element: HTMLElement): () => void {
       revealAboveKeyboard(active, element, viewport);
     }
   };
+  const pinned = { left: window.scrollX, top: window.scrollY };
+  const onWindowScroll = () => {
+    if (measureKeyboardInset() === 0 || (window.scrollX === pinned.left && window.scrollY === pinned.top)) {
+      return;
+    }
+    window.scrollTo({ ...pinned, behavior: 'instant' });
+  };
 
   element.addEventListener('blur', onBlur, true);
   element.addEventListener('focusin', onFocusIn);
   viewport.addEventListener('resize', onResize);
+  window.addEventListener('scroll', onWindowScroll);
   return () => {
     element.removeEventListener('blur', onBlur, true);
     element.removeEventListener('focusin', onFocusIn);
     viewport.removeEventListener('resize', onResize);
+    window.removeEventListener('scroll', onWindowScroll);
   };
 }
 

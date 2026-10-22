@@ -8,6 +8,7 @@ class FakeViewport extends EventTarget {
   scale = 1;
 }
 
+const initialScrollY = Object.getOwnPropertyDescriptor(window, 'scrollY');
 let viewport: FakeViewport;
 let container: HTMLDivElement;
 let release: () => void;
@@ -50,6 +51,10 @@ beforeEach(() => {
 
 afterEach(() => {
   release();
+  vi.restoreAllMocks();
+  if (initialScrollY) {
+    Object.defineProperty(window, 'scrollY', initialScrollY);
+  }
   container.remove();
   Reflect.deleteProperty(window, 'visualViewport');
   Reflect.deleteProperty(document.documentElement, 'clientHeight');
@@ -119,5 +124,24 @@ describe('guardKeyboardFocus', () => {
     second.focus();
 
     expect(scroll.scrollTo).toHaveBeenCalledWith({ top: 520, behavior: 'smooth' });
+  });
+
+  it('puts the page back when the browser scrolls it to reveal a field with the keyboard up', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    openKeyboard();
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 120 });
+
+    window.dispatchEvent(new Event('scroll'));
+
+    expect(scrollTo).toHaveBeenCalledWith({ left: 0, top: 0, behavior: 'instant' });
+  });
+
+  it('leaves page scrolling alone while the keyboard is down', () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 120 });
+
+    window.dispatchEvent(new Event('scroll'));
+
+    expect(scrollTo).not.toHaveBeenCalled();
   });
 });

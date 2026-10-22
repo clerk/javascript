@@ -12,6 +12,9 @@ let viewport: FakeViewport;
 // What a fixed `100svh` box measures: Safari keeps it at the full height, Chrome on iOS shrinks it
 // to the visible band as the keyboard opens.
 let smallViewportHeight = 768;
+// What a fixed box from the top edge to the bottom edge measures: the box the dialog's overlay
+// fills, which iOS can make taller than the document's client height.
+let fixedBoxHeight = 768;
 const offsetHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight');
 
 function inset() {
@@ -29,11 +32,15 @@ function nextFrame() {
 beforeEach(() => {
   viewport = new FakeViewport();
   smallViewportHeight = 768;
+  fixedBoxHeight = 768;
   Object.defineProperty(window, 'visualViewport', { configurable: true, value: viewport });
   Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
     configurable: true,
     get(this: HTMLElement) {
-      return this.style.height === '100svh' ? smallViewportHeight : 0;
+      if (this.style.height === '100svh') {
+        return smallViewportHeight;
+      }
+      return this.style.position === 'fixed' && this.style.bottom === '0px' ? fixedBoxHeight : 0;
     },
   });
 });
@@ -76,6 +83,19 @@ describe('acquireKeyboardInset', () => {
 
     release();
     expect(offset()).toBe('');
+  });
+
+  it('measures the keyboard against the box the overlay fills, not the document height', async () => {
+    fixedBoxHeight = 852;
+    smallViewportHeight = 852;
+    const release = acquireKeyboardInset();
+
+    viewport.height = 500;
+    viewport.dispatchEvent(new Event('resize'));
+    await nextFrame();
+
+    expect(inset()).toBe('352px');
+    release();
   });
 
   it('drops a pending update when released', async () => {
