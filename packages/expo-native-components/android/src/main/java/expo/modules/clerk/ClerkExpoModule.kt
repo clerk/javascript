@@ -14,6 +14,7 @@ import com.clerk.api.FrameworkIntegrationApi
 import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.session.Session
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
@@ -42,8 +43,16 @@ private fun debugLog(tag: String, message: String) {
     }
 }
 
-internal fun clientSignedOut(previous: Client?, current: Client?): Boolean =
-    previous?.sessions.orEmpty().isNotEmpty() && current?.sessions.orEmpty().isEmpty()
+internal fun signedInSessionEnded(previous: Client?, current: Client?): Boolean {
+    if (current == null) return false
+    val remaining = current.signedInSessionIds()
+    return previous?.signedInSessionIds().orEmpty().any { it !in remaining }
+}
+
+private fun Client.signedInSessionIds(): Set<String> =
+    sessions
+        .filter { it.status == Session.SessionStatus.ACTIVE || it.status == Session.SessionStatus.PENDING }
+        .mapTo(mutableSetOf()) { it.id }
 
 class ClerkExpoModule : Module() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -214,8 +223,13 @@ class ClerkExpoModule : Module() {
         }
 
         clientInvalidationObserverJob = coroutineScope.launch {
+            var previousClient: Client? = null
             Clerk.clientFlow.collect { client ->
                 clientInvalidationTracker.observe(clientFingerprint(client))
+                if (signedInSessionEnded(previousClient, client)) {
+                    launch { clearRestoreCredential() }
+                }
+                previousClient = client
             }
         }
     }
@@ -277,14 +291,10 @@ class ClerkExpoModule : Module() {
 
         coroutineScope.launch {
             try {
-                val previousClient = Clerk.clientFlow.value
                 val result = Clerk.refreshClient()
                 clientInvalidationTracker.observe(clientFingerprint())
                 when (result) {
-                    is ClerkResult.Success -> {
-                        clearRestoreCredentialAfterSignOut(previousClient, Clerk.clientFlow.value)
-                        promise.resolve(null)
-                    }
+                    is ClerkResult.Success -> promise.resolve(null)
                     is ClerkResult.Failure -> promise.reject(
                         "E_REFRESH_CLIENT_FAILED",
                         result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
@@ -297,10 +307,9 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    private suspend fun clearRestoreCredentialAfterSignOut(previous: Client?, current: Client?) {
-        if (!clientSignedOut(previous, current)) return
+    private suspend fun clearRestoreCredential() {
         if (Clerk.restoreCredentials.clear() is ClerkResult.Failure) {
-            debugLog(TAG, "refreshClient - restore credential cleanup did not complete")
+            debugLog(TAG, "Restore credential cleanup after a session ended did not complete")
         }
     }
 

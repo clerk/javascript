@@ -6,7 +6,7 @@ import { AuthView } from '../AuthView';
 
 const mocks = vi.hoisted(() => {
   return {
-    NativeClerkAuthView: vi.fn((_props: Record<string, any>) => null),
+    NativeClerkAuthView: vi.fn((_props: Record<string, unknown>) => null),
     platform: { OS: 'android' },
   };
 });
