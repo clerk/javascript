@@ -114,15 +114,15 @@ describe('createAppVersionRequestHooks', () => {
     expect(status()).toMatchObject({ isSupported: false, minimumVersion: '2.0' });
   });
 
-  test('an environment that loads during a rejection keeps the block', async () => {
+  test('an environment that loads after a rejection keeps the block', async () => {
     const { createAppVersionRequestHooks, status } = await loadModules();
     const hooks = createAppVersionRequestHooks();
     const environmentRequest = { path: '/environment', headers: new Headers() };
     const clientRequest = { path: '/client', headers: new Headers() };
-    hooks.beforeRequest(environmentRequest);
     hooks.beforeRequest(clientRequest);
-
     hooks.afterResponse(clientRequest, unsupportedAppVersion);
+
+    hooks.beforeRequest(environmentRequest);
     hooks.afterResponse(environmentRequest, response({ payload: { native_app_settings: {} } }));
 
     expect(status().isSupported).toBe(false);

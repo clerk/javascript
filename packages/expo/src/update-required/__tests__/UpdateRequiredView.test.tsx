@@ -78,10 +78,7 @@ describe('UpdateRequiredView', () => {
     options: { updateUrl: string; supportEmail?: string },
   ) => {
     act(() => {
-      store.applyFetchedEnvironment(environment(options), {
-        generation: store.getAppVersionSupportGeneration(),
-        serverAnswersAtRequest: store.getServerAnswerCount(),
-      });
+      store.applyFetchedEnvironment(environment(options), store.getAppVersionSupportGeneration());
     });
   };
 

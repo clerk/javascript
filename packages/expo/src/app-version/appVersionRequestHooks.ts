@@ -6,7 +6,6 @@ import {
   applyUnsupportedAppVersion,
   getAppVersionSupportGeneration,
   getAppVersionSupportStatus,
-  getServerAnswerCount,
   isRecord,
   resetAppVersionSupport,
 } from './appVersionSupport';
@@ -35,7 +34,6 @@ export function createAppVersionRequestHooks() {
   foregroundSubscription?.remove();
   foregroundSubscription = null;
   const generation = getAppVersionSupportGeneration();
-  const serverAnswersAtEnvironmentRequest = new WeakMap<AppVersionRequest, number>();
 
   return {
     refreshOnForegroundWhileUnsupported(refresh: () => Promise<unknown>) {
@@ -47,9 +45,6 @@ export function createAppVersionRequestHooks() {
     },
     beforeRequest(requestInit: AppVersionRequest) {
       setNativeAppIdentityHeaders(requestInit.headers as Headers);
-      if (requestInit.path === ENVIRONMENT_PATH) {
-        serverAnswersAtEnvironmentRequest.set(requestInit, getServerAnswerCount());
-      }
     },
     afterResponse(requestInit: AppVersionRequest, response: AppVersionResponse) {
       const unsupportedAppVersionError =
@@ -61,9 +56,8 @@ export function createAppVersionRequestHooks() {
       if (response.headers.get(APP_VERSION_STATUS_HEADER)?.toLowerCase() === 'supported') {
         applySupportedAppVersion(generation);
       }
-      const serverAnswersAtRequest = serverAnswersAtEnvironmentRequest.get(requestInit);
-      if (response.ok && serverAnswersAtRequest !== undefined) {
-        applyFetchedEnvironment(environmentJSON(response.payload), { generation, serverAnswersAtRequest });
+      if (response.ok && requestInit.path === ENVIRONMENT_PATH) {
+        applyFetchedEnvironment(environmentJSON(response.payload), generation);
       }
     },
   };

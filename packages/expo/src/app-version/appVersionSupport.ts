@@ -43,8 +43,7 @@ const ANDROID_VERSION_CODE = /^[1-9]\d*$/;
 
 const listeners = new Set<() => void>();
 let environmentStatus: AppVersionSupportStatus | null = null;
-let serverStatus: AppVersionSupportStatus | null = null;
-let serverAnswerCount = 0;
+let serverAnswer: { isSupported: true } | { isSupported: false; status: AppVersionSupportStatus } | null = null;
 let generation = 0;
 let status = supportedStatus();
 let display = EMPTY_DISPLAY;
@@ -67,28 +66,17 @@ export function getAppVersionSupportGeneration(): number {
   return generation;
 }
 
-export function getServerAnswerCount(): number {
-  return serverAnswerCount;
-}
-
 export function resetAppVersionSupport(): void {
   generation += 1;
   environmentStatus = null;
-  serverStatus = null;
+  serverAnswer = null;
   display = EMPTY_DISPLAY;
   publish({ displayChanged: true });
 }
 
-export function applyFetchedEnvironment(
-  environment: unknown,
-  { generation: requestGeneration, serverAnswersAtRequest }: { generation: number; serverAnswersAtRequest: number },
-): void {
+export function applyFetchedEnvironment(environment: unknown, requestGeneration: number): void {
   if (requestGeneration !== generation) {
     return;
-  }
-  const answeredDuringFetch = serverAnswersAtRequest !== serverAnswerCount;
-  if (!answeredDuringFetch || serverStatus?.isSupported !== false) {
-    serverStatus = null;
   }
   environmentStatus = resolveEnvironmentStatus(environment);
   const nextDisplay = resolveDisplay(environment);
@@ -103,13 +91,15 @@ export function applyUnsupportedAppVersion(meta: unknown, requestGeneration: num
   if (requestGeneration !== generation) {
     return;
   }
-  serverAnswerCount += 1;
   const fields = isRecord(meta) ? meta : {};
-  serverStatus = {
+  serverAnswer = {
     isSupported: false,
-    currentVersion: stringOrNull(fields.current_version) ?? getNativeAppIdentity()?.version ?? null,
-    minimumVersion: stringOrNull(fields.minimum_version) ?? environmentStatus?.minimumVersion ?? null,
-    updateUrl: httpUrlOrNull(fields.update_url) ?? environmentStatus?.updateUrl ?? null,
+    status: {
+      isSupported: false,
+      currentVersion: stringOrNull(fields.current_version) ?? getNativeAppIdentity()?.version ?? null,
+      minimumVersion: stringOrNull(fields.minimum_version) ?? environmentStatus?.minimumVersion ?? null,
+      updateUrl: httpUrlOrNull(fields.update_url) ?? environmentStatus?.updateUrl ?? null,
+    },
   };
   publish();
 }
@@ -118,8 +108,7 @@ export function applySupportedAppVersion(requestGeneration: number): void {
   if (requestGeneration !== generation) {
     return;
   }
-  serverAnswerCount += 1;
-  serverStatus = environmentStatus?.isSupported ? environmentStatus : supportedStatus();
+  serverAnswer = { isSupported: true };
   publish();
 }
 
@@ -215,7 +204,13 @@ function supportedStatus(): AppVersionSupportStatus {
 }
 
 function publish({ displayChanged = false }: { displayChanged?: boolean } = {}): void {
-  const next = serverStatus ?? environmentStatus ?? supportedStatus();
+  const next = !serverAnswer
+    ? (environmentStatus ?? supportedStatus())
+    : !serverAnswer.isSupported
+      ? serverAnswer.status
+      : environmentStatus?.isSupported
+        ? environmentStatus
+        : supportedStatus();
   const statusChanged = !sameStatus(next, status);
   if (statusChanged) {
     status = next;

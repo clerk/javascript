@@ -45,10 +45,7 @@ describe('appVersionSupport', () => {
   });
 
   const fetchEnvironment = (store: Awaited<ReturnType<typeof loadStore>>, json: unknown) => {
-    store.applyFetchedEnvironment(json, {
-      generation: store.getAppVersionSupportGeneration(),
-      serverAnswersAtRequest: store.getServerAnswerCount(),
-    });
+    store.applyFetchedEnvironment(json, store.getAppVersionSupportGeneration());
   };
 
   test('reports a supported app before anything is known', async () => {
@@ -170,36 +167,37 @@ describe('appVersionSupport', () => {
     });
   });
 
-  test('an environment requested after a rejection lifts it', async () => {
+  test('an environment does not lift a rejection', async () => {
     const store = await loadStore();
-    store.applyUnsupportedAppVersion(null, store.getAppVersionSupportGeneration());
+    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.getAppVersionSupportGeneration());
 
     fetchEnvironment(store, environment());
 
-    expect(store.getAppVersionSupportStatus().isSupported).toBe(true);
+    expect(store.getAppVersionSupportStatus()).toMatchObject({ isSupported: false, minimumVersion: '2.0' });
   });
 
-  test('an environment in flight during a rejection keeps the block', async () => {
+  test('an environment does not block an app a response marked supported', async () => {
     const store = await loadStore();
-    const serverAnswersAtRequest = store.getServerAnswerCount();
-    const generation = store.getAppVersionSupportGeneration();
+    store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
 
-    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, generation);
-    store.applyFetchedEnvironment(environment(), { generation, serverAnswersAtRequest });
+    fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
 
-    expect(store.getAppVersionSupportStatus().isSupported).toBe(false);
+    expect(store.getAppVersionSupportStatus()).toEqual({
+      isSupported: true,
+      currentVersion: '1.9.9',
+      minimumVersion: null,
+      updateUrl: null,
+    });
   });
 
-  test('a supported answer during the fetch does not hide the environment block', async () => {
+  test('a supported answer shows the minimum a later environment sets', async () => {
+    mocks.identity = { platform: 'ios', appIdentifier: 'com.example.app', version: '2.1', displayVersion: '2.1' };
     const store = await loadStore();
-    const serverAnswersAtRequest = store.getServerAnswerCount();
-    const generation = store.getAppVersionSupportGeneration();
+    store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
 
-    store.applySupportedAppVersion(generation);
-    store.applyFetchedEnvironment(environment({ ios: [iosPolicy('2.0')] }), { generation, serverAnswersAtRequest });
+    fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
 
-    expect(store.getAppVersionSupportStatus().isSupported).toBe(false);
-    expect(store.getAppVersionSupportStatus().minimumVersion).toBe('2.0');
+    expect(store.getAppVersionSupportStatus()).toMatchObject({ isSupported: true, minimumVersion: '2.0' });
   });
 
   test('a supported answer keeps the minimum and store page the environment set', async () => {
