@@ -36,30 +36,27 @@ type ProviderProps = {
   fallback?: ReactNode;
 } & ({ prefetch?: PrefetchedProfile; hydration?: never } | { hydration?: LoomHydration; prefetch?: never });
 
-export function LoomProvider(props: ProviderProps) {
-  const [input, setInput] = useState({ hydration: props.hydration, prefetch: props.prefetch, revision: 0 });
-  if (input.hydration !== props.hydration || input.prefetch !== props.prefetch) {
-    setInput({ hydration: props.hydration, prefetch: props.prefetch, revision: input.revision + 1 });
-  }
-  if (props.prefetch && typeof React.use !== 'function') {
+export function LoomProvider({
+  clerk,
+  hydration: legacyHydration,
+  prefetch,
+  children,
+  fallback = null,
+}: ProviderProps) {
+  if (prefetch && typeof React.use !== 'function') {
     throw new Error('Loom profile prefetch requires React 19 or the Next.js App Router.');
   }
-  return (
-    <ProviderLifetime
-      key={input.revision}
-      {...props}
-    />
-  );
-}
-
-function ProviderLifetime({ clerk, hydration: legacyHydration, prefetch, children, fallback = null }: ProviderProps) {
-  const hydration = prefetch?.hydration ?? legacyHydration;
-  const bootstrap = useMemo(
-    () => (hydration === undefined ? null : new BootstrapClient(parseHydration(hydration))),
-    [hydration],
-  );
+  const [input, setInput] = useState({ hydration: legacyHydration, prefetch });
+  const bootstrap = useMemo(() => {
+    const hydration = input.prefetch?.hydration ?? input.hydration;
+    return hydration === undefined ? null : new BootstrapClient(parseHydration(hydration));
+  }, [input]);
   const streamAllowed = useRef(true);
-  const replay = useRef<{ clerk: ClerkSessionsHost; hydration: LoomHydration | undefined } | null>(null);
+  const replay = useRef<{
+    clerk: ClerkSessionsHost;
+    bootstrap: BootstrapClient | null;
+    hydration: LoomHydration | undefined;
+  } | null>(null);
   const [owner, setOwner] = useState<{
     clerk: ClerkSessionsHost;
     binding: ReturnType<typeof bindClerk>;
@@ -69,19 +66,22 @@ function ProviderLifetime({ clerk, hydration: legacyHydration, prefetch, childre
     if (!clerk) {
       return;
     }
-    const initial =
-      replay.current === null
-        ? bootstrap?.dehydrate()
-        : replay.current.clerk === clerk
-          ? replay.current.hydration
-          : undefined;
+    let initial: LoomHydration | undefined;
+    if (replay.current === null) {
+      initial = bootstrap?.dehydrate();
+    } else if (replay.current.clerk === clerk) {
+      initial = replay.current.bootstrap === bootstrap ? replay.current.hydration : bootstrap?.dehydrate();
+    }
     const binding = bindClerk(clerk, initial);
-    replay.current = { clerk, hydration: undefined };
+    replay.current = { clerk, bootstrap, hydration: undefined };
     setOwner({ clerk, binding, bootstrapAllowed: initial !== undefined });
     return () => {
-      streamAllowed.current &&= binding.getHydrationAllowed();
+      if (binding.getReadySnapshot() !== undefined) {
+        streamAllowed.current &&= binding.getHydrationAllowed();
+      }
       replay.current = {
         clerk,
+        bootstrap,
         hydration:
           binding.getSnapshot()?.dehydrate() ?? (binding.getReadySnapshot() === undefined ? initial : undefined),
       };
@@ -94,10 +94,15 @@ function ProviderLifetime({ clerk, hydration: legacyHydration, prefetch, childre
     binding?.getReadySnapshot ?? noClient,
     noClient,
   );
-  if ((owner && owner.clerk !== clerk) || (binding && !binding.getHydrationAllowed())) {
+  if ((owner && owner.clerk !== clerk) || (binding && live !== undefined && !binding.getHydrationAllowed())) {
     streamAllowed.current = false;
   }
-  const waiting = owner === null || (owner.clerk === clerk && owner.bootstrapAllowed);
+  const waiting =
+    owner === null ||
+    (owner.clerk === clerk && (owner.bootstrapAllowed || (live === undefined && streamAllowed.current)));
+  if (live === undefined && waiting && (input.hydration !== legacyHydration || input.prefetch !== prefetch)) {
+    setInput({ hydration: legacyHydration, prefetch });
+  }
   const client = live === undefined ? (waiting ? bootstrap : null) : live;
   if (!client) {
     return <>{fallback}</>;
@@ -111,11 +116,11 @@ function ProviderLifetime({ clerk, hydration: legacyHydration, prefetch, childre
       {prefetch &&
       streamAllowed.current &&
       sameScope(prefetch.hydration.scope, client.scope) &&
-      hydration?.user?.data.imageUrl ? (
+      prefetch.hydration.user?.data.imageUrl ? (
         <link
           rel='preload'
           as='image'
-          href={hydration.user.data.imageUrl}
+          href={prefetch.hydration.user.data.imageUrl}
         />
       ) : null}
       {children}

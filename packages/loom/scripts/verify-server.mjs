@@ -118,7 +118,11 @@ assert.deepEqual(JSON.parse(JSON.stringify(hydration?.sessions?.data)), [
 ]);
 assert.equal(JSON.stringify(hydration).includes('must-not-hydrate'), false);
 assert.equal(
-  [...modules].some(url => /(?:react|mosaic|clerk-js|next|nextjs|backend)(?:[/@.-]|$)/i.test(url)),
+  [...modules].some(url =>
+    /(?:react|mosaic|clerk-js|next|nextjs|backend)(?:[/@.-]|$)/i.test(
+      url.replace(new URL('../../../', import.meta.url).href, ''),
+    ),
+  ),
   false,
 );
 console.log(`Built server: ${modules.size} modules loaded; minimal hydration and no framework or backend runtime.`);

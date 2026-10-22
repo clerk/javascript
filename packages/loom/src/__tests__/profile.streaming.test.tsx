@@ -216,11 +216,14 @@ it.each(['signout', 'other'])('discards the stream after %s and return to the sa
   expect(request.mock.calls.map(([request]) => request.path)).toEqual(['/me', '/environment']);
 });
 
-it('replaces an unresolved prefetch lifetime without waiting for its old promise', async () => {
+it.each(['new hydration', 'same hydration'])('replaces unresolved prefetch with %s without waiting', async kind => {
   const { host } = clerkHost();
   const old = Promise.withResolvers<ProfileSettingsSeed>();
   const first = seed(host, old.promise);
-  const second = seed(host, Promise.resolve(ready(host)));
+  const second =
+    kind === 'same hydration'
+      ? { ...first, settings: Promise.resolve(ready(host)) }
+      : seed(host, Promise.resolve(ready(host)));
   const tree = (prefetch: PrefetchedProfile) => (
     <StrictMode>
       <LoomProvider
@@ -239,6 +242,33 @@ it('replaces an unresolved prefetch lifetime without waiting for its old promise
   expect(container.textContent).toContain('Ada names enabled');
   await act(() => old.resolve({ kind: 'unavailable' }));
   expect(container.textContent).toContain('Ada names enabled');
+});
+
+it('accepts a late prefetch before the host first becomes ready', async () => {
+  const { host, request, emitStatus } = clerkHost();
+  const tree = (prefetch?: PrefetchedProfile) => (
+    <StrictMode>
+      <LoomProvider
+        clerk={host}
+        prefetch={prefetch}
+        fallback={<p>Waiting</p>}
+      >
+        <Danger />
+      </LoomProvider>
+    </StrictMode>
+  );
+  await render(tree());
+  expect(container.textContent).toBe('Waiting');
+  await render(tree(seed(host, Promise.resolve(ready(host)))));
+  expect(container.textContent).toContain('Ada can delete account');
+  await act(() => {
+    host.loaded = true;
+    host.user = publicUser;
+    host.session = { id: 'sess_current' };
+    emitStatus();
+  });
+  expect(container.textContent).toContain('Ada can delete account');
+  expect(request).not.toHaveBeenCalled();
 });
 
 it('ignores a ready settings result from another scope', async () => {
@@ -349,6 +379,102 @@ it('does not replace a user edited while the shared settings stream is pending',
   });
   expect(container.textContent).toContain('Edited names enabled');
   expect(owner?.dehydrate()?.user?.data.firstName).toBe('Edited');
+});
+
+it('keeps a confirmed name edit when navigation restores an older profile snapshot', async () => {
+  const { host, request } = clerkHost();
+  const edited = { ...publicUser, firstName: 'Edited' };
+  host.loaded = true;
+  host.session = { id: 'sess_current' };
+  host.user = { ...publicUser, update: vi.fn(() => Promise.resolve(edited)) };
+  const prefetch = seed(host, Promise.resolve(ready(host)));
+  let owner: ReturnType<typeof useLoom> | undefined;
+  function Capture() {
+    owner = useLoom();
+    return <Danger />;
+  }
+  const tree = (value: PrefetchedProfile) => (
+    <LoomProvider
+      clerk={host}
+      prefetch={value}
+    >
+      <Capture />
+    </LoomProvider>
+  );
+  await render(tree(prefetch));
+  if (!owner) {
+    throw new Error('Missing live owner.');
+  }
+  const liveOwner = owner;
+  await act(async () => {
+    await liveOwner.updateName({ firstName: 'Edited', lastName: '' });
+    await new Promise(resolve => setTimeout(resolve, 0));
+  });
+  expect(container.textContent).toContain('Edited can delete account');
+  await render(tree({ ...prefetch, hydration: { ...prefetch.hydration } }));
+  expect(container.textContent).toContain('Edited can delete account');
+  expect(owner).toBe(liveOwner);
+  expect(request).not.toHaveBeenCalled();
+});
+
+it('does not let a navigation snapshot replace the authenticated scope', async () => {
+  const { host, request } = clerkHost();
+  host.loaded = true;
+  host.session = { id: 'sess_current' };
+  host.user = publicUser;
+  const first = seed(host, Promise.resolve(ready(host)));
+  let owner: ReturnType<typeof useLoom> | undefined;
+  function Capture() {
+    owner = useLoom();
+    return <Danger />;
+  }
+  const tree = (prefetch: PrefetchedProfile) => (
+    <LoomProvider
+      clerk={host}
+      prefetch={prefetch}
+    >
+      <Capture />
+    </LoomProvider>
+  );
+  await render(tree(first));
+  const liveOwner = owner;
+  await render(
+    tree({
+      ...first,
+      hydration: {
+        ...first.hydration,
+        scope: { ...first.hydration.scope, userId: 'user_b' },
+        user: { data: { ...publicUser, id: 'user_b', firstName: 'Other' }, updatedAt: Date.now() },
+      },
+    }),
+  );
+  expect(container.textContent).toContain('Ada can delete account');
+  expect(container.textContent).not.toContain('Other');
+  expect(owner).toBe(liveOwner);
+  expect(request).not.toHaveBeenCalled();
+});
+
+it('does not revive bootstrap when the host and prefetch are replaced together', async () => {
+  const first = clerkHost();
+  const second = clerkHost();
+  first.host.loaded = true;
+  first.host.session = { id: 'sess_current' };
+  first.host.user = publicUser;
+  const tree = (host: typeof first.host, prefetch: PrefetchedProfile) => (
+    <LoomProvider
+      clerk={host}
+      prefetch={prefetch}
+      fallback={<p>Waiting</p>}
+    >
+      <Danger />
+    </LoomProvider>
+  );
+  await render(tree(first.host, seed(first.host, Promise.resolve(ready(first.host)))));
+  expect(container.textContent).toContain('Ada can delete account');
+  await render(tree(second.host, seed(second.host, Promise.resolve(ready(second.host)))));
+  expect(container.textContent).toBe('Waiting');
+  expect(first.resourceListeners.size + first.statusListeners.size).toBe(0);
+  expect(second.request).not.toHaveBeenCalled();
 });
 
 it('rechecks a query created while the old settings promise was suspended', async () => {

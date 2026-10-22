@@ -18,7 +18,9 @@ assert.deepEqual(await client.fetch(), []);
 client.dispose();
 hooks.deregister();
 assert.equal(
-  [...modules].some(url => /(?:react|mosaic|clerk-js)(?:[/@.-]|$)/i.test(url)),
+  [...modules].some(url =>
+    /(?:react|mosaic|clerk-js)(?:[/@.-]|$)/i.test(url.replace(new URL('../../../', import.meta.url).href, '')),
+  ),
   false,
 );
 console.log(`Built core: ${modules.size} modules loaded; no React, Mosaic, or ClerkJS runtime.`);
