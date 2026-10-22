@@ -1,12 +1,9 @@
-import * as stylex from '@stylexjs/stylex';
-
 import { ActionMenu } from '../../../components/action-menu';
 import { Section } from '../../../components/section';
 import { Skeleton } from '../../../components/skeleton';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { useMessages } from '../../../localization';
 import { UserProfileSecurityIcon } from '../user-profile-security-icon';
-import { styles } from '../user-profile-security-panel.styles';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 const PLACEHOLDER_DEVICES: UserProfileDevice[] = [
@@ -17,7 +14,7 @@ const PLACEHOLDER_DEVICES: UserProfileDevice[] = [
 export function UserProfileActiveDevicesSectionSkeleton() {
   const m = useMessages('userProfileActiveDevices');
   return (
-    <div {...stylex.props(styles.sectionCards)}>
+    <>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
       <Section.Root>
         <Section.Group>
@@ -30,22 +27,19 @@ export function UserProfileActiveDevicesSectionSkeleton() {
             <Section.Items aria-hidden>
               {PLACEHOLDER_DEVICES.map(device => (
                 <Section.Item key={device.id}>
-                  <Skeleton show>
+                  <Skeleton>
                     <UserProfileSecurityIcon name={device.type} />
                   </Skeleton>
                   <Section.Content>
                     <Section.Label>
-                      <Skeleton show>{device.name}</Skeleton>
+                      <Skeleton>{device.name}</Skeleton>
                     </Section.Label>
                     <Section.Description>
-                      <Skeleton show>{device.description}</Skeleton>
+                      <Skeleton>{device.description}</Skeleton>
                     </Section.Description>
                   </Section.Content>
                   <Section.Actions>
-                    <Skeleton
-                      show
-                      visible={false}
-                    >
+                    <Skeleton visible={false}>
                       <ActionMenu
                         actions={[{ label: m.viewDetails, onClick: () => undefined }]}
                         label={m.viewDetails}
@@ -59,6 +53,6 @@ export function UserProfileActiveDevicesSectionSkeleton() {
           </Section.Body>
         </Section.Group>
       </Section.Root>
-    </div>
+    </>
   );
 }

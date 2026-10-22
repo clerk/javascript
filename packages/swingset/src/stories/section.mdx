@@ -53,10 +53,10 @@ fixed leading slot sized to the text, for a provider logo or a lock.
 than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at
 the same width.
 
-`Section.Group skeleton` puts a card in its loading state: every [Skeleton](/components/skeleton)
-inside it shows, and the card is inert and hidden from assistive technology, so pair it with a
-visually hidden status message. Wrap the content that is loading in `Skeleton`; content that isn't
-wrapped renders as it is. When to show the skeleton, and for how long, is up to the caller.
+A section that loads its own data has a separate skeleton component: the same `Section` markup with
+the titles as real text and each piece of fetched content wrapped in [Skeleton](/components/skeleton),
+plus a visually hidden status message. Whatever owns the loading state renders the skeleton while
+data loads, then swaps in the real section. `Section` itself has no loading state.
 
 `Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
 On a page, put the sections in `Panel.Sections` so the group titles sit one level below the page
