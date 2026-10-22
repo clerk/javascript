@@ -29,7 +29,10 @@ const raw = {
   enterprise_accounts: [],
   private_metadata: { secret: 'private' },
 };
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 describe('profile prefetch', () => {
   it('loads one user and public environment using trusted canonical routing', async () => {
@@ -151,7 +154,7 @@ it.each(['other.example.com', 'localhost', '127.0.0.1', 'user:password@example.c
         identity: { userId: 'user_a', sessionId: 'sess_a' },
         resolveBackend: () => Promise.resolve({ routing: { ...routing, frontendApi }, client: { users: { getUser } } }),
       }),
-    ).resolves.toBeUndefined();
+    ).rejects.toThrow('routing');
     expect(fetch).not.toHaveBeenCalled();
     expect(getUser).not.toHaveBeenCalled();
   },
@@ -159,24 +162,30 @@ it.each(['other.example.com', 'localhost', '127.0.0.1', 'user:password@example.c
 
 it('cancels the public environment request when the user read fails', async () => {
   let signal: AbortSignal | null | undefined;
+  const pendingUser = Promise.withResolvers<unknown>();
+  const aborted = vi.fn();
   vi.stubGlobal(
     'fetch',
     vi.fn((_url: URL, options: RequestInit) => {
       signal = options.signal;
+      signal?.addEventListener('abort', aborted, { once: true });
       return new Promise<Response>(() => {});
     }),
   );
-  await expect(
-    prefetchProfile({
-      identity: { userId: 'user_a', sessionId: 'sess_a' },
-      resolveBackend: () =>
-        Promise.resolve({
-          routing,
-          client: { users: { getUser: () => Promise.reject(new Error('User unavailable')) } },
-        }),
-    }),
-  ).resolves.toBeUndefined();
+  const pending = prefetchProfile({
+    identity: { userId: 'user_a', sessionId: 'sess_a' },
+    resolveBackend: () =>
+      Promise.resolve({
+        routing,
+        client: { users: { getUser: () => pendingUser.promise } },
+      }),
+  });
+  const rejection = expect(pending).rejects.toThrow('Loom profile user read failed.');
+  await vi.waitFor(() => expect(signal).toBeInstanceOf(AbortSignal));
+  pendingUser.reject(new Error('secret credential'));
+  await rejection;
   expect(signal?.aborted).toBe(true);
+  expect(aborted).toHaveBeenCalledTimes(1);
 });
 
 it.each(['google', 'facebook', 'github'])('preserves %s errors without optional long_message', provider => {
@@ -282,6 +291,176 @@ it('cancels an active refresh on a second mutation instead of accepting its stal
 });
 
 describe('user-ready profile prefetch', () => {
+  it('recovers an interrupted settings body and removes the abort listener', async () => {
+    const response = Response.json(environment);
+    vi.spyOn(response, 'json').mockRejectedValue(new TypeError('secret transport detail'));
+    const fetch = vi.fn((_url: URL, options: RequestInit) => {
+      if (!options.signal) {
+        throw new Error('Missing abort signal');
+      }
+      vi.spyOn(options.signal, 'removeEventListener');
+      return Promise.resolve(response);
+    });
+    vi.stubGlobal('fetch', fetch);
+    const profile = await prefetchProfile({
+      identity: { userId: 'user_a', sessionId: 'sess_a' },
+      resolveBackend: () =>
+        Promise.resolve({ routing, client: { users: { getUser: () => Promise.resolve({ raw }) } } }),
+    });
+    expect(await profile?.settings).toEqual({ kind: 'unavailable' });
+    const signal = fetch.mock.calls[0]?.[1].signal;
+    expect(signal?.removeEventListener).toHaveBeenCalledWith('abort', expect.any(Function));
+  });
+
+  it('sanitizes parser exceptions that contain an invalid provider URL', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        Promise.resolve(
+          Response.json({
+            ...environment,
+            user_settings: {
+              ...environment.user_settings,
+              social: {
+                ...environment.user_settings.social,
+                oauth_github: { ...environment.user_settings.social.oauth_github, logo_url: 'secret invalid URL' },
+              },
+            },
+          }),
+        ),
+      ),
+    );
+    const profile = await prefetchProfile({
+      identity: { userId: 'user_a', sessionId: 'sess_a' },
+      resolveBackend: () =>
+        Promise.resolve({ routing, client: { users: { getUser: () => Promise.resolve({ raw }) } } }),
+    });
+    await expect(profile?.settings).rejects.toEqual(new Error('Invalid Loom profile settings response.'));
+  });
+
+  it.each(['fetch', 'body'])('bounds a stalled settings %s without holding user data', async stage => {
+    vi.useFakeTimers();
+    let signal: AbortSignal | null | undefined;
+    const response = Response.json(environment);
+    const body = Promise.withResolvers<unknown>();
+    if (stage === 'body') {
+      vi.spyOn(response, 'json').mockReturnValue(body.promise);
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((_url: URL, options: RequestInit) => {
+        signal = options.signal;
+        return stage === 'fetch' ? new Promise<Response>(() => {}) : Promise.resolve(response);
+      }),
+    );
+    const profile = await prefetchProfile({
+      identity: { userId: 'user_a', sessionId: 'sess_a' },
+      resolveBackend: () =>
+        Promise.resolve({ routing, client: { users: { getUser: () => Promise.resolve({ raw }) } } }),
+    });
+    expect(profile?.hydration.user.data.firstName).toBe('Ada');
+    const settled = vi.fn();
+    void profile?.settings.then(settled);
+    await vi.advanceTimersByTimeAsync(4_999);
+    expect(settled).not.toHaveBeenCalled();
+    expect(signal?.aborted).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await profile?.settings).toEqual({ kind: 'unavailable' });
+    expect(signal?.aborted).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+    body.resolve(environment);
+    expect(await profile?.settings).toEqual({ kind: 'unavailable' });
+  });
+
+  it.each(['success', 'http failure', 'invalid data', 'user failure'])(
+    'removes the optional deadline after %s',
+    async outcome => {
+      vi.useFakeTimers();
+      const fetch = vi.fn(() =>
+        outcome === 'user failure'
+          ? new Promise<Response>(() => {})
+          : Promise.resolve(
+              outcome === 'http failure'
+                ? new Response(null, { status: 503 })
+                : Response.json(outcome === 'invalid data' ? {} : environment),
+            ),
+      );
+      vi.stubGlobal('fetch', fetch);
+      const pending = prefetchProfile({
+        identity: { userId: 'user_a', sessionId: 'sess_a' },
+        resolveBackend: () =>
+          Promise.resolve({
+            routing,
+            client: {
+              users: {
+                getUser: () =>
+                  outcome === 'user failure' ? Promise.reject(new Error('secret')) : Promise.resolve({ raw }),
+              },
+            },
+          }),
+      });
+      if (outcome === 'user failure') {
+        await expect(pending).rejects.toThrow('user read failed');
+      } else {
+        const profile = await pending;
+        if (outcome === 'invalid data') {
+          await expect(profile?.settings).rejects.toThrow('Invalid Loom profile settings response.');
+        } else {
+          await profile?.settings;
+        }
+      }
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+
+  it.each(['invalid JSON', 'invalid data', 'unexpected fetch error'])(
+    'observes %s safely while the required user is pending',
+    async outcome => {
+      const pendingUser = Promise.withResolvers<unknown>();
+      const fetch = vi.fn(() =>
+        outcome === 'unexpected fetch error'
+          ? Promise.reject(new Error('secret credential'))
+          : Promise.resolve(
+              outcome === 'invalid JSON'
+                ? new Response('secret invalid JSON')
+                : Response.json({ secret: 'credential' }),
+            ),
+      );
+      vi.stubGlobal('fetch', fetch);
+      const pending = prefetchProfile({
+        identity: { userId: 'user_a', sessionId: 'sess_a' },
+        resolveBackend: () => Promise.resolve({ routing, client: { users: { getUser: () => pendingUser.promise } } }),
+      });
+      await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+      await new Promise(resolve => setTimeout(resolve, 0));
+      pendingUser.resolve({ raw });
+      const profile = await pending;
+      await expect(profile?.settings).rejects.toThrow(
+        outcome === 'unexpected fetch error'
+          ? 'Loom profile settings request failed.'
+          : 'Invalid Loom profile settings response.',
+      );
+    },
+  );
+
+  it('rejects a backend user from another authenticated identity', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(Response.json(environment))),
+    );
+    await expect(
+      prefetchProfile({
+        identity: { userId: 'user_a', sessionId: 'sess_a' },
+        resolveBackend: () =>
+          Promise.resolve({
+            routing,
+            client: { users: { getUser: () => Promise.resolve({ raw: { ...raw, id: 'user_b' } }) } },
+          }),
+      }),
+    ).rejects.toThrow('Invalid Loom profile user response.');
+  });
+
   it('starts both reads once and returns real user data before settings', async () => {
     const pendingUser = Promise.withResolvers<unknown>();
     const pendingSettings = Promise.withResolvers<Response>();
@@ -314,7 +493,7 @@ describe('user-ready profile prefetch', () => {
     const pendingUser = Promise.withResolvers<unknown>();
     vi.stubGlobal(
       'fetch',
-      vi.fn(() => Promise.reject(new Error('secret credential'))),
+      vi.fn(() => Promise.reject(new TypeError('secret credential'))),
     );
     const pending = prefetchProfile({
       identity: { userId: 'user_a', sessionId: 'sess_a' },
@@ -329,28 +508,56 @@ describe('user-ready profile prefetch', () => {
   });
 
   it('sanitizes backend setup failure', async () => {
-    expect(
-      await prefetchProfile({
+    await expect(
+      prefetchProfile({
         identity: { userId: 'user_a', sessionId: 'sess_a' },
         resolveBackend: () => Promise.reject(new Error('secret credential')),
       }),
-    ).toBeUndefined();
+    ).rejects.toThrow('Loom profile backend resolution failed.');
   });
 
-  it('keeps simultaneous authenticated scopes isolated', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(() => Promise.resolve(Response.json(environment))),
-    );
-    const getUser = vi.fn((id: string) => Promise.resolve({ raw: { ...raw, id } }));
-    const resolveBackend = () => Promise.resolve({ routing, client: { users: { getUser } } });
-    const [first, second] = await Promise.all([
-      prefetchProfile({ identity: { userId: 'user_a', sessionId: 'sess_a' }, resolveBackend }),
-      prefetchProfile({ identity: { userId: 'user_b', sessionId: 'sess_b' }, resolveBackend }),
+  it.each(['user', 'session', 'instance'])('isolates concurrent requests differing by %s', async difference => {
+    const fetch = vi.fn((_url: URL) => Promise.resolve(Response.json(environment)));
+    vi.stubGlobal('fetch', fetch);
+    const firstUser = Promise.withResolvers<unknown>();
+    const secondUser = Promise.withResolvers<unknown>();
+    const firstRead = vi.fn(() => firstUser.promise);
+    const secondRead = vi.fn(() => secondUser.promise);
+    const secondIdentity = {
+      userId: difference === 'user' ? 'user_b' : 'user_a',
+      sessionId: difference === 'session' ? 'sess_b' : 'sess_a',
+    };
+    const secondRouting =
+      difference === 'instance'
+        ? {
+            ...routing,
+            publishableKey: `pk_test_${btoa('other.clerk.accounts.dev$')}`,
+            frontendApi: 'other.clerk.accounts.dev',
+          }
+        : routing;
+    const pendingFirst = prefetchProfile({
+      identity: { userId: 'user_a', sessionId: 'sess_a' },
+      resolveBackend: () => Promise.resolve({ routing, client: { users: { getUser: firstRead } } }),
+    });
+    const pendingSecond = prefetchProfile({
+      identity: secondIdentity,
+      resolveBackend: () => Promise.resolve({ routing: secondRouting, client: { users: { getUser: secondRead } } }),
+    });
+    await vi.waitFor(() => expect(firstRead).toHaveBeenCalledExactlyOnceWith('user_a'));
+    expect(secondRead).toHaveBeenCalledExactlyOnceWith(secondIdentity.userId);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    secondUser.resolve({ raw: { ...raw, id: secondIdentity.userId, first_name: 'Second request' } });
+    const second = await pendingSecond;
+    firstUser.resolve({ raw });
+    const first = await pendingFirst;
+    expect(first?.hydration.scope).not.toEqual(second?.hydration.scope);
+    expect(first?.hydration.user.data.firstName).toBe('Ada');
+    expect(second?.hydration.user.data.firstName).toBe('Second request');
+    expect(await first?.settings).toMatchObject({ hydration: { scope: first?.hydration.scope } });
+    expect(await second?.settings).toMatchObject({ hydration: { scope: second?.hydration.scope } });
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      new URL('https://example.clerk.accounts.dev/v1/environment'),
+      new URL(`https://${secondRouting.frontendApi}/v1/environment`),
     ]);
-    expect(first?.hydration.user?.data.id).toBe('user_a');
-    expect(second?.hydration.user?.data.id).toBe('user_b');
-    expect(await first?.settings).toMatchObject({ hydration: { scope: { userId: 'user_a' } } });
-    expect(await second?.settings).toMatchObject({ hydration: { scope: { userId: 'user_b' } } });
   });
 });

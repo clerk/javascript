@@ -4,7 +4,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 
 import { createLoomClient } from '../client';
 import { parseProfileSettings } from '../profile-settings';
-import { LoomProvider, useLoom, useSuspenseProfile, useSuspenseUser } from '../react';
+import { LoomProvider, QueryErrorResetBoundary, useLoom, useSuspenseProfile, useSuspenseUser } from '../react';
 import { LoomClientProvider } from '../react-context';
 import type { PrefetchedProfile, ProfileSettingsSeed } from '../types';
 import environment from './fixtures/environment.json';
@@ -311,15 +311,68 @@ it('ignores a ready settings result from another scope', async () => {
   expect(request).toHaveBeenCalledTimes(1);
 });
 
-class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+class Boundary extends Component<{ children: ReactNode; reset?: () => void }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
   }
   render() {
-    return this.state.failed ? <p>Unavailable</p> : this.props.children;
+    return this.state.failed ? (
+      <button
+        type='button'
+        onClick={() => {
+          this.props.reset?.();
+          this.setState({ failed: false });
+        }}
+      >
+        Unavailable
+      </button>
+    ) : (
+      this.props.children
+    );
   }
 }
+
+it('retries a rejected server settings seed through the live query', async () => {
+  const { host, request, emitStatus } = clerkHost();
+  const settings = Promise.withResolvers<ProfileSettingsSeed>();
+  const prefetch = seed(host, settings.promise);
+  request.mockResolvedValue(Object.assign(new Response(), { payload: environment }));
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  await render(
+    <LoomProvider
+      clerk={host}
+      prefetch={prefetch}
+    >
+      <Danger />
+      <QueryErrorResetBoundary>
+        {({ reset }) => (
+          <Boundary reset={reset}>
+            <Suspense fallback={null}>
+              <Profile />
+              <Profile />
+            </Suspense>
+          </Boundary>
+        )}
+      </QueryErrorResetBoundary>
+    </LoomProvider>,
+  );
+  await act(() => settings.reject(new Error('Invalid Loom profile settings response.')));
+  expect(container.textContent).toContain('Unavailable');
+  expect(request).not.toHaveBeenCalled();
+  await act(() => {
+    host.loaded = true;
+    host.user = publicUser;
+    host.session = { id: 'sess_current' };
+    emitStatus();
+  });
+  expect(container.textContent).toContain('Ada can delete account');
+  await act(() => container.querySelector('button')?.click());
+  expect(container.textContent).not.toContain('Unavailable');
+  expect(container.querySelectorAll('p')).toHaveLength(2);
+  expect(container.textContent).toContain('Ada names enabled');
+  expect(request.mock.calls.map(([request]) => request.path)).toEqual(['/environment']);
+});
 
 it('recovers unavailable settings after Clerk connects without removing user-only content', async () => {
   const { host, request, emitStatus } = clerkHost();

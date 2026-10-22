@@ -21,10 +21,12 @@ export async function prefetchUser() {
 }
 
 export async function prefetchProfile() {
+  let identity;
   try {
     const { userId, sessionId } = await auth();
-    return await prefetchRequestProfile({ identity: { userId, sessionId }, resolveBackend: getClerkClientAndRouting });
+    identity = { userId, sessionId };
   } catch {
-    return undefined;
+    throw new Error('Loom profile authentication failed.');
   }
+  return prefetchRequestProfile({ identity, resolveBackend: getClerkClientAndRouting });
 }

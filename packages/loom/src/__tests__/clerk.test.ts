@@ -3,6 +3,7 @@ import type { LoadedClerk } from '@clerk/shared/types';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { bindClerk, type ClerkSessionsHost } from '../clerk';
+import environment from './fixtures/environment.json';
 
 const session = {
   id: 'sess_other',
@@ -331,28 +332,41 @@ describe('host user query', () => {
     stop();
     binding.dispose();
   });
-  it.each(['user', 'session', 'dispose'])('rejects delayed user responses after %s changes', async kind => {
-    const { host, request, emit } = hostFixture();
-    const pending = Promise.withResolvers<Response & { payload: unknown }>();
-    request.mockReturnValue(pending.promise);
-    const binding = bindClerk(host);
-    const old = binding.getSnapshot();
-    const result = old?.fetchUser();
-    const rejected = expect(result).rejects.toBeDefined();
-    if (kind === 'dispose') {
-      binding.dispose();
-    } else {
-      if (kind === 'user') {
-        host.user.id = 'user_b';
+  it.each(['user', 'session', 'instance', 'sign-out', 'dispose'])(
+    'rejects delayed user responses after %s changes',
+    async kind => {
+      const { host, request, emit } = hostFixture();
+      const boundHost: ClerkSessionsHost = host;
+      const pending = Promise.withResolvers<Response & { payload: unknown }>();
+      request.mockReturnValue(pending.promise);
+      const binding = bindClerk(boundHost);
+      const old = binding.getSnapshot();
+      const result = old?.fetchUser();
+      const rejected = expect(result).rejects.toBeDefined();
+      await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(1));
+      if (kind === 'dispose') {
+        binding.dispose();
       } else {
-        host.session.id = 'sess_new';
+        if (kind === 'user') {
+          host.user.id = 'user_b';
+        } else if (kind === 'instance') {
+          host.publishableKey = 'pk_test_b';
+          host.frontendApi = 'other.clerk.test';
+        } else if (kind === 'sign-out') {
+          boundHost.user = null;
+          boundHost.session = null;
+        } else {
+          host.session.id = 'sess_new';
+        }
+        emit();
       }
-      emit();
-    }
-    pending.resolve(response());
-    await rejected;
-    binding.dispose();
-  });
+      pending.resolve(response());
+      await rejected;
+      expect(old?.queryClient.getQueryData(old.userQueryOptions().queryKey)).toBeUndefined();
+      expect(binding.getSnapshot()?.dehydrate()?.user).toBeUndefined();
+      binding.dispose();
+    },
+  );
   it('rejects a mismatched user and supersedes an older profile read', async () => {
     const { host, request, emit } = hostFixture();
     request.mockResolvedValueOnce(response('Wrong', 'other'));
@@ -370,6 +384,46 @@ describe('host user query', () => {
     expect((await client?.fetchUser())?.firstName).toBe('Grace');
     binding.dispose();
   });
+});
+
+describe('host settings query retirement', () => {
+  it.each(['user', 'session', 'instance', 'sign-out', 'dispose'])(
+    'discards a transport response already in flight when %s changes',
+    async kind => {
+      const { host, request, emit } = hostFixture();
+      const boundHost: ClerkSessionsHost = host;
+      const pending = Promise.withResolvers<Response & { payload: unknown }>();
+      request.mockReturnValue(pending.promise);
+      const binding = bindClerk(boundHost);
+      const old = binding.getSnapshot();
+      const result = old?.fetchProfileSettings();
+      const rejected = expect(result).rejects.toBeDefined();
+      await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(1));
+      expect(request).toHaveBeenCalledWith(expect.objectContaining({ path: '/environment' }));
+      if (kind === 'dispose') {
+        binding.dispose();
+      } else {
+        if (kind === 'user') {
+          host.user.id = 'user_b';
+        } else if (kind === 'session') {
+          host.session.id = 'sess_b';
+        } else if (kind === 'instance') {
+          host.publishableKey = 'pk_test_b';
+          host.frontendApi = 'other.clerk.test';
+        } else {
+          boundHost.user = null;
+          boundHost.session = null;
+        }
+        emit();
+      }
+      expect(request.mock.calls[0]?.[0].signal.aborted).toBe(true);
+      pending.resolve(Object.assign(new Response(), { payload: environment }));
+      await rejected;
+      expect(old?.queryClient.getQueryData(old.profileSettingsQueryOptions().queryKey)).toBeUndefined();
+      expect(binding.getSnapshot()?.dehydrate()?.profileSettings).toBeUndefined();
+      binding.dispose();
+    },
+  );
 });
 
 describe('host name updates', () => {

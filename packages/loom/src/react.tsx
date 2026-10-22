@@ -1,4 +1,4 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useQueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query';
 import * as React from 'react';
 import { type ReactNode, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type {} from 'react/canary';
@@ -151,6 +151,7 @@ export function useSuspenseUser() {
 
 export function useSuspenseProfile(): ProfileSnapshot {
   const owner = useLoom();
+  const errorReset = useQueryErrorResetBoundary();
   const user = useSuspenseUser();
   const prefetch = useProfilePrefetch();
   const allowed = useHydrationAllowed();
@@ -159,6 +160,7 @@ export function useSuspenseProfile(): ProfileSnapshot {
   if (
     prefetch &&
     allowed &&
+    !errorReset.isReset() &&
     sameScope(prefetch.hydration.scope, owner.scope) &&
     !owner.queryClient.getQueryState(options.queryKey)
   ) {

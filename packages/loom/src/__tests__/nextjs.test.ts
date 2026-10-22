@@ -142,8 +142,8 @@ it('prefetches only user through existing request routing and skips signed-out b
   );
 });
 
-it('keeps profile auth failure inside the safe prefetch boundary', async () => {
+it('rejects profile auth failures with a safe message instead of looking signed out', async () => {
   mocks.auth.mockRejectedValue(new Error('secret auth failure'));
-  expect(await prefetchProfile()).toBeUndefined();
+  await expect(prefetchProfile()).rejects.toThrow('Loom profile authentication failed.');
   expect(mocks.context).not.toHaveBeenCalled();
 });

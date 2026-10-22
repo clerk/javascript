@@ -1,4 +1,5 @@
 import { parsePublishableKey } from '@clerk/shared/keys';
+import { createDeferredPromise, timeLimit } from '@clerk/shared/utils';
 
 import { createLoomClient } from './client';
 import { parseSessions, throwResponseError } from './fapi';
@@ -243,40 +244,93 @@ export async function prefetchProfile(context: ServerUserContext): Promise<Prefe
   if (!userId || !sessionId) {
     return undefined;
   }
-  const controller = new AbortController();
+  let backend: Awaited<ReturnType<ServerUserContext['resolveBackend']>>;
   try {
-    const { client, routing } = await context.resolveBackend();
-    const hostname = parsePublishableKey(routing.publishableKey)?.frontendApi;
-    if (
-      !hostname ||
-      hostname.toLowerCase() !== routing.frontendApi.toLowerCase() ||
-      !/^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i.test(hostname)
-    ) {
-      return undefined;
-    }
-    const scope = createClerkScope(routing, { userId, sessionId });
-    const user = client.users.getUser(userId).then(value => backendUserSnapshot(value, userId));
-    const settings = (async (): Promise<ProfileSettingsSeed> => {
-      try {
-        const response = await fetch(new URL('/v1/environment', `https://${hostname}`), {
-          method: 'GET',
-          cache: 'no-store',
-          redirect: 'error',
-          signal: controller.signal,
-        });
+    backend = await context.resolveBackend();
+  } catch {
+    throw new Error('Loom profile backend resolution failed.');
+  }
+  const { client, routing } = backend;
+  const hostname = parsePublishableKey(routing.publishableKey)?.frontendApi;
+  if (
+    !hostname ||
+    hostname.toLowerCase() !== routing.frontendApi.toLowerCase() ||
+    !/^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i.test(hostname)
+  ) {
+    throw new Error('Invalid Loom profile routing.');
+  }
+  const scope = createClerkScope(routing, { userId, sessionId });
+  const controller = new AbortController();
+  const aborted = createDeferredPromise();
+  const cancelSettings = () => aborted.resolve();
+  controller.signal.addEventListener('abort', cancelSettings, { once: true });
+  const settings = timeLimit(
+    Promise.race([
+      (async (): Promise<ProfileSettingsSeed> => {
+        let response: Response;
+        try {
+          response = await fetch(new URL('/v1/environment', `https://${hostname}`), {
+            method: 'GET',
+            cache: 'no-store',
+            redirect: 'error',
+            signal: controller.signal,
+          });
+        } catch (error) {
+          if (controller.signal.aborted || error instanceof TypeError) {
+            return { kind: 'unavailable' };
+          }
+          throw new Error('Loom profile settings request failed.');
+        }
         if (!response.ok) {
           return { kind: 'unavailable' };
         }
-        const data = parseProfileSettings(await response.json());
-        return { kind: 'ready', hydration: { version: 5, scope, profileSettings: { data, updatedAt: Date.now() } } };
-      } catch {
+        let payload: unknown;
+        try {
+          payload = await response.json();
+        } catch (error) {
+          if (controller.signal.aborted || error instanceof TypeError) {
+            return { kind: 'unavailable' };
+          }
+          throw new Error('Invalid Loom profile settings response.');
+        }
+        try {
+          const data = parseProfileSettings(payload);
+          return { kind: 'ready', hydration: { version: 5, scope, profileSettings: { data, updatedAt: Date.now() } } };
+        } catch {
+          throw new Error('Invalid Loom profile settings response.');
+        }
+      })(),
+      aborted.promise.then(() => ({ kind: 'unavailable' as const })),
+    ]),
+    5_000,
+    controller,
+  )
+    .catch((error: unknown): ProfileSettingsSeed => {
+      if (controller.signal.aborted) {
         return { kind: 'unavailable' };
       }
-    })();
-    const data = await user;
+      throw error;
+    })
+    .finally(() => {
+      controller.signal.removeEventListener('abort', cancelSettings);
+    });
+  void settings.catch(() => {});
+  try {
+    let value: unknown;
+    try {
+      value = await client.users.getUser(userId);
+    } catch {
+      throw new Error('Loom profile user read failed.');
+    }
+    let data;
+    try {
+      data = backendUserSnapshot(value, userId);
+    } catch {
+      throw new Error('Invalid Loom profile user response.');
+    }
     return { hydration: { version: 5, scope, user: { data, updatedAt: Date.now() } }, settings };
-  } catch {
+  } catch (error) {
     controller.abort();
-    return undefined;
+    throw error;
   }
 }
