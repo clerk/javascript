@@ -181,12 +181,10 @@ describe('APIKeysTable', () => {
       expect(within(table()).queryByRole('button')).toBeNull();
       expect(screen.getByRole('searchbox', { name: 'Search API keys' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Create API key' })).toBeDisabled();
-      const loadingWidths = columnWidths();
       list.release();
       expect(await within(await loadedTable()).findByText('Web app')).toBeVisible();
       expect(screen.getByRole('status')).toHaveTextContent('API keys loaded');
       expect(within(table()).getAllByRole('row')).toHaveLength(3);
-      expect(columnWidths()).toEqual(loadingWidths);
     });
 
     it('shows its skeleton, not the fallback, while the first page loads', async () => {
@@ -210,10 +208,6 @@ describe('APIKeysTable', () => {
       const list = holdRequests('get', '/api_keys');
       await renderWithClerk(<APIKeysTable subject={alice.id} />);
       await screen.findByRole('status');
-      const columnWidths = () =>
-        within(table())
-          .getAllByRole('columnheader')
-          .map(header => header.getBoundingClientRect().width);
       const loadingWidths = columnWidths();
 
       list.release();

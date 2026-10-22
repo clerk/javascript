@@ -87,7 +87,6 @@ export function APIKeysTableView({
           ) : null}
         </Table.Toolbar>
         <Table.Root
-          layout='fixed'
           aria-label={m.title}
           aria-busy={isFetching}
           layout='fixed'
