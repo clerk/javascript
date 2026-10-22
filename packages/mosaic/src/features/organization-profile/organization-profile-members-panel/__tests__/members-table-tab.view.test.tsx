@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useConfirmController } from '../../../../blocks/confirm';
 import { MosaicProvider } from '../../../../mosaic-provider';
+import { MembersTableTab } from '../members-table-tab';
 import type { MembersTableTabViewProps, OrganizationProfileMember } from '../members-table-tab.types';
 import { MembersTableTabView } from '../members-table-tab.view';
 
@@ -66,17 +67,35 @@ function renderView(overrides: Partial<MembersTableTabViewProps> = {}) {
   };
 }
 
+function renderTab(overrides: Partial<MembersTableTabViewProps> = {}) {
+  const props = propsFor(overrides);
+  return {
+    props,
+    ...render(
+      <MosaicProvider>
+        <MembersTableTab {...props} />
+      </MosaicProvider>,
+    ),
+  };
+}
+
 describe('MembersTableTabView', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
+  it('does not report members as loaded when they fail to load', () => {
+    renderView({ isError: true, onRetry: vi.fn() });
+    expect(screen.getByRole('alert')).toHaveTextContent('Unable to load members');
+    expect(screen.queryByText('Members loaded')).toBeNull();
+  });
+
   it('chooses loading, retained rows, and filtered empty results from the supplied state', () => {
-    const { props, rerender } = renderView({ members: [], totalCount: 0, isLoading: true });
+    const { props, rerender } = renderTab({ members: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading members');
     rerender(
       <MosaicProvider>
-        <MembersTableTabView
+        <MembersTableTab
           {...props}
           isLoading={false}
         />
@@ -85,17 +104,17 @@ describe('MembersTableTabView', () => {
     expect(screen.getByText('No members yet')).toBeVisible();
     rerender(
       <MosaicProvider>
-        <MembersTableTabView
+        <MembersTableTab
           {...props}
           isLoading={false}
           searchValue='Nobody'
         />
       </MosaicProvider>,
     );
-    expect(screen.getByRole('status')).toHaveTextContent('No members found');
+    expect(within(screen.getByRole('table')).getByRole('status')).toHaveTextContent('No members found');
     rerender(
       <MosaicProvider>
-        <MembersTableTabView
+        <MembersTableTab
           {...propsFor()}
           isFetching
           searchValue='Nobody'
@@ -105,6 +124,20 @@ describe('MembersTableTabView', () => {
     expect(screen.getByText('Grace Hopper')).toBeVisible();
     expect(screen.getByRole('table')).toHaveAttribute('aria-busy', 'true');
   });
+  it('shows roles as text instead of a role picker while members load', () => {
+    renderTab({
+      members: [],
+      totalCount: 0,
+      isLoading: true,
+      onChangeRole: vi.fn(),
+      roles: [
+        { value: 'org:admin', label: 'Admin' },
+        { value: 'org:member', label: 'Member' },
+      ],
+    });
+    expect(screen.queryAllByRole('combobox', { hidden: true })).toHaveLength(0);
+  });
+
   it('forwards table controls and clears selection when changing the result set', async () => {
     const user = userEvent.setup();
     const { props } = renderView({

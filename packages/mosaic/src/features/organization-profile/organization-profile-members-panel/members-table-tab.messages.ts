@@ -12,6 +12,7 @@ export const membersTableTabMessages = {
   noMembers: 'No members yet',
   noMembersDescription: 'Invite people to add them to this organization.',
   loading: 'Loading members',
+  loaded: 'Members loaded',
   loadError: 'Unable to load members',
   retry: 'Try again',
   roleChangeError: 'Unable to change this member’s role. Please try again.',

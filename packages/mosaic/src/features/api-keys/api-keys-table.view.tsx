@@ -88,9 +88,17 @@ export function APIKeysTableView({
           ) : null}
         </Table.Toolbar>
         <Table.Root
+          layout='fixed'
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
         >
+          <Table.ColumnGroup>
+            {onBulkAction ? <Table.Column /> : null}
+            <Table.Column />
+            <Table.Column width='9rem' />
+            <Table.Column width='9rem' />
+            {revoke ? <Table.Column width='4rem' /> : null}
+          </Table.ColumnGroup>
           <Table.Header>
             <Table.Row>
               {onBulkAction ? (

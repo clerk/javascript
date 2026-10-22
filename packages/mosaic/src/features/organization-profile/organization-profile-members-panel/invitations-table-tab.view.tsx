@@ -6,10 +6,9 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { EmptyState } from '../../../components/empty-state';
+import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
-import { Item } from '../../../components/item';
 import { Pagination } from '../../../components/pagination';
-import { Spinner } from '../../../components/spinner';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { useServerDataTable } from '../../../hooks/use-server-data-table';
@@ -37,7 +36,6 @@ export function InvitationsTableTabView({
   pageSize,
   onPageChange,
   onBulkAction,
-  isLoading,
   isFetching = false,
   isError = false,
   onRetry,
@@ -64,6 +62,7 @@ export function InvitationsTableTabView({
         role='group'
         aria-label={m.title}
       >
+        {isError ? null : <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>}
         {onInvite ? (
           <Table.Toolbar>
             <Button
@@ -78,9 +77,17 @@ export function InvitationsTableTabView({
           </Table.Toolbar>
         ) : null}
         <Table.Root
+          layout='fixed'
           aria-label={m.title}
-          aria-busy={isLoading || isFetching}
+          aria-busy={isFetching}
         >
+          <Table.ColumnGroup>
+            {onBulkAction ? <Table.Column /> : null}
+            <Table.Column />
+            <Table.Column width='9rem' />
+            <Table.Column width='8rem' />
+            {revoke ? <Table.Column width='4rem' /> : null}
+          </Table.ColumnGroup>
           <Table.Header>
             <Table.Row>
               {onBulkAction ? (
@@ -104,7 +111,6 @@ export function InvitationsTableTabView({
           <InvitationsTableBody
             rows={table.rows}
             columnCount={columnCount}
-            isLoading={isLoading}
             isError={isError}
             onRetry={onRetry}
             hasBulkAction={Boolean(onBulkAction)}
@@ -139,7 +145,6 @@ export function InvitationsTableTabView({
 function InvitationsTableBody({
   rows,
   columnCount,
-  isLoading,
   isError,
   onRetry,
   hasBulkAction,
@@ -153,7 +158,6 @@ function InvitationsTableBody({
     toggleSelected: () => void;
   }>;
   columnCount: number;
-  isLoading: boolean;
   isError: boolean;
   onRetry?: () => void;
   hasBulkAction: boolean;
@@ -161,18 +165,6 @@ function InvitationsTableBody({
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('invitationsTableTab');
-  if (isLoading) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
-          <span role='status'>
-            <Spinner />
-            <VisuallyHidden>{m.loading}</VisuallyHidden>
-          </span>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
   if (isError) {
     return (
       <Table.Body>
@@ -218,8 +210,8 @@ function InvitationsTableBody({
             />
           ) : null}
           <Table.Cell>
-            <Item.Root>
-              <Item.Media>
+            <Entity.Root>
+              <Entity.Media>
                 <Avatar.Root
                   size='fit'
                   aria-hidden
@@ -232,11 +224,11 @@ function InvitationsTableBody({
                   ) : null}
                   <Avatar.Fallback />
                 </Avatar.Root>
-              </Item.Media>
-              <Item.Content>
-                <Item.Label>{row.original.email}</Item.Label>
-              </Item.Content>
-            </Item.Root>
+              </Entity.Media>
+              <Entity.Content>
+                <Entity.Label>{row.original.email}</Entity.Label>
+              </Entity.Content>
+            </Entity.Root>
           </Table.Cell>
           <Table.Cell noWrap>{row.original.invitedAtLabel}</Table.Cell>
           <Table.Cell>{row.original.roleLabel}</Table.Cell>
