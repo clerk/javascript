@@ -122,12 +122,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     }
   }, [countryProp, valueProp]);
 
-  React.useEffect(() => {
-    if (!open) {
-      setQuery('');
-    }
-  }, [open]);
-
   const filteredCountries = React.useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     if (!normalizedQuery) {
@@ -157,6 +151,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       onCountryChange?.(nextCountry.iso);
       setValue(toE164(nextCountry, nationalNumber));
       setOpen(false);
+      setQuery('');
       inputRef.current?.focus();
     },
     [countryProp, nationalNumber, onCountryChange, setValue],
@@ -194,7 +189,12 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       >
         <Popover.Root
           open={open}
-          onOpenChange={setOpen}
+          onOpenChange={nextOpen => {
+            setOpen(nextOpen);
+            if (!nextOpen) {
+              setQuery('');
+            }
+          }}
           initialFocus='first'
           placement='bottom-start'
           sideOffset={8}

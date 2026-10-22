@@ -164,6 +164,31 @@ describe('Mosaic PhoneInput', () => {
     expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveFocus();
   });
 
+  it('clears the country search when the popup is dismissed', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+    await user.type(screen.getByRole('combobox', { name: 'Search countries' }), 'Greece');
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('combobox', { name: 'Search countries' })).not.toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+
+    expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveValue('');
+  });
+
+  it('clears the country search after a country is chosen', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+    await user.type(screen.getByRole('combobox', { name: 'Search countries' }), 'Greece');
+    await user.keyboard('{ArrowDown}{Enter}');
+    await user.click(screen.getByRole('button', { name: 'Country, Greece' }));
+
+    expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveValue('');
+  });
+
   it('renders the country list inside the popup', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);
