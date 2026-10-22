@@ -40,7 +40,7 @@ To run against a dev client instead, `integration/expo-native/bin/control-clerk-
 
 ## The instance
 
-The tests expect the settings in `src/core/instances/base.json`, which the CLI puts on the application it creates. On an instance with those settings, every test file that has no settings file beside it passes by hand.
+The tests expect the settings in `src/core/instances/base.json` of `@clerk/internal-mobile-e2e`, which the CLI puts on the application it creates. On an instance with those settings, every test file that has no settings file beside it passes by hand.
 
 An instance left at Clerk's defaults passes only part of the suite. The tests that sign in with a ticket, or sign up with an email address and a password, pass. The tests that need a phone number, an email code at sign-in, organizations, or a second account on the device fail, because a new instance has none of those turned on.
 
@@ -65,7 +65,7 @@ The CLI's `run` puts the instance on the declared settings before the file start
 
 ## Layout
 
-- `e2e.config.ts` and `specs/` are the e2e project. `specs/features/` has the tests, `specs/fixtures.ts` has the `host` fixture they use, `specs/app.ts` names the test app, and `specs/support/` is the tests' support code. `specs/support/inputs.ts` is the only file that reads the settings above.
-- `bin/` and `src/` are the CLI. Under the CLI the test process gets the same settings, with one difference: in place of the secret key it gets the address and token of a stand-in that the CLI runs on this machine. The stand-in forwards the three Backend API calls the tests make, for this run's test users only, so the test process never holds the key.
-- `test/` and `testing/` are the unit tests of both. `npm test` runs them, with no device, key, or network.
-- `src/core/`, `specs/support/`, `specs/fixtures.ts`, and `e2e.config.ts` are the same files, byte for byte, in clerk-ios, clerk-android, and clerk/javascript. `src/core/MANIFEST` lists them, and the CLI's `doctor` fails when they differ from it.
+- `e2e.config.ts` and `specs/` are the e2e project. `specs/features/` has the tests, `specs/fixtures.ts` configures the shared `host` fixture they use, and `specs/app.ts` names the test app. The fixture and its support code come from `@clerk/internal-mobile-e2e`, whose `specs/support/inputs.ts` is the only file that reads the settings above.
+- `bin/` and `src/` are the Expo side of the CLI. The shared CLI comes from `@clerk/internal-mobile-e2e`, pinned to a commit in `package.json`. Under the CLI the test process gets the same settings, with one difference: in place of the secret key it gets the address and token of a stand-in that the CLI runs on this machine. The stand-in forwards the three Backend API calls the tests make, for this run's test users only, so the test process never holds the key.
+- `test/` has the unit tests of the Expo side. `npm test` runs them, with no device, key, or network.
+- To change the shared core, follow the README of `@clerk/internal-mobile-e2e`, then bump the commit pin here.

@@ -1,4 +1,4 @@
-import '../testing/git-env.ts';
+import '@clerk/internal-mobile-e2e/testing/git-env';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -6,9 +6,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { app } from '../specs/app.ts';
-import { selectBackend } from '../src/core/devices.ts';
-import { answer } from '../src/core/remote/recipe.ts';
-import { VerifyFailure, type LocalLease, type RemoteLease } from '../src/core/types.ts';
+import { selectBackend } from '@clerk/internal-mobile-e2e/core/devices';
+import { answer } from '@clerk/internal-mobile-e2e/core/remote/recipe';
+import { VerifyFailure, type LocalLease, type RemoteLease } from '@clerk/internal-mobile-e2e/core/types';
 import {
   artifact,
   buildFixture,

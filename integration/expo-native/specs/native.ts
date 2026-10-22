@@ -1,5 +1,5 @@
-import { expect, type Locator } from 'e2e';
-import type { SecretLike, SeededUser } from './support/types.ts';
+import { expect, type Locator } from '@clerk/internal-mobile-e2e/specs/fixtures';
+import type { SecretLike, SeededUser } from '@clerk/internal-mobile-e2e/specs/support/types';
 
 interface Screen {
   getByTestId(id: string): Locator;

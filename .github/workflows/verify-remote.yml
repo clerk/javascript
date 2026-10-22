@@ -11,7 +11,7 @@ on:
         description: Session id the driver chose
         required: true
       request:
-        description: The session request as one JSON string (src/core/remote/protocol.ts)
+        description: The session request as one JSON string (src/core/remote/protocol.ts of @clerk/internal-mobile-e2e)
         required: true
 
 permissions:
@@ -35,17 +35,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4.4.0
         with:
-          sparse-checkout: integration/expo-native/src/core
+          sparse-checkout: integration/expo-native
           persist-credentials: false
       - uses: actions/setup-node@v4.4.0
         with:
           node-version: 24.15.0
+      - name: Install the package's pinned tools
+        timeout-minutes: 3
+        run: npm ci --prefix "$PACKAGE" --no-audit --no-fund
       - name: Read the request
         id: plan
         env:
           VERIFY_REQUEST: ${{ inputs.request }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: node "$PACKAGE/src/core/remote/session-agent.ts" plan
+        run: |
+          "$PACKAGE/node_modules/.bin/internal-mobile-e2e-session-agent" plan
       - name: Check the runner label
         if: steps.plan.outputs.mode == 'session'
         env:
@@ -100,6 +104,13 @@ jobs:
           cache-read-only: false
           cache-disabled: ${{ !startsWith(needs.plan.outputs.runner, 'blacksmith-') }}
           add-job-summary: never
+
+      - name: Install the package's pinned tools
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          npm ci --prefix "$PACKAGE" --no-audit --no-fund
+          "$PACKAGE/node_modules/.bin/agent-device" --version
 
       - name: Make the work directory and name the device
         id: device
@@ -159,12 +170,12 @@ jobs:
           if [ "${ASSET%.tgz}" != "$ASSET" ]; then tar -xzf "$WORK/$ASSET" -C "$WORK"; else mv "$WORK/$ASSET" "$WORK/cloudflared"; fi
           chmod +x "$WORK/cloudflared"
           VERIFY_SESSION_CLOUDFLARED="$WORK/cloudflared" \
-            nohup node "$PACKAGE/src/core/remote/session-agent.ts" serve > "$WORK/agent.log" 2>&1 &
+            nohup "$PACKAGE/node_modules/.bin/internal-mobile-e2e-session-agent" serve > "$WORK/agent.log" 2>&1 &
           disown
           for _ in $(seq 1 600); do
             [ -s "$WORK/tunnel" ] && break
             sleep 1
-            pgrep -f 'session-agent.ts serve' > /dev/null || { echo "::error::the session agent ended before a tunnel came up"; break; }
+            pgrep -f 'internal-mobile-e2e-session-agent serve' > /dev/null || { echo "::error::the session agent ended before a tunnel came up"; break; }
           done
           [ -s "$WORK/tunnel" ] || { echo "::error::no tunnel came up"; tail -n 20 "$WORK/agent.log" "$WORK/tunnel.log" || true; exit 1; }
           echo "host=$(cat "$WORK/tunnel")" >> "$GITHUB_OUTPUT"
@@ -186,13 +197,6 @@ jobs:
             || { echo "::error::sdkmanager could not install $IMAGE"; tail -20 "$VERIFY_SESSION_WORK/sdkmanager.log"; exit 1; }
           nohup node "$PACKAGE/src/platform/android/session-lane.ts" boot "$VERIFY_SESSION_WORK" > "$VERIFY_SESSION_WORK/lane.log" 2>&1 &
           disown
-
-      - name: Install the package's pinned tools
-        timeout-minutes: 10
-        run: |
-          set -euo pipefail
-          npm ci --prefix "$PACKAGE" --no-audit --no-fund
-          "$PACKAGE/node_modules/.bin/agent-device" --version
 
       - name: Wait for the simulator
         if: steps.device.outputs.id != '' && env.PLATFORM == 'ios'
@@ -230,7 +234,7 @@ jobs:
         run: |
           set -uo pipefail
           while [ ! -f "$VERIFY_SESSION_WORK/ended" ]; do
-            pgrep -f 'session-agent.ts serve' > /dev/null || [ -f "$VERIFY_SESSION_WORK/ended" ] || { echo "::error::the session agent died"; tail -30 "$VERIFY_SESSION_WORK/agent.log"; exit 1; }
+            pgrep -f 'internal-mobile-e2e-session-agent serve' > /dev/null || [ -f "$VERIFY_SESSION_WORK/ended" ] || { echo "::error::the session agent died"; tail -30 "$VERIFY_SESSION_WORK/agent.log"; exit 1; }
             sleep 3
           done
           echo "session ended: $(cat "$VERIFY_SESSION_WORK/ended")"
@@ -240,7 +244,7 @@ jobs:
         env:
           ID: ${{ steps.device.outputs.id }}
         run: |
-          pkill -f 'session-agent.ts serve' || true
+          pkill -f 'internal-mobile-e2e-session-agent serve' || true
           grep -as '^build ' "$VERIFY_SESSION_WORK/build.log" || true
           if [ -z "$ID" ]; then exit 0; fi
           if [ "$PLATFORM" = ios ]; then xcrun simctl shutdown "$ID" || true; else adb -s "$ID" emu kill || true; fi

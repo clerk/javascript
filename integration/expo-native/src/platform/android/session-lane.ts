@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { BuiltApp } from '../../core/types.ts';
+import type { BuiltApp } from '@clerk/internal-mobile-e2e/core/types';
 import { LANE_READY, LANE_FAILED } from './emulator.ts';
 import { laneSerial, localAndroidBackend } from './local.ts';
 
