@@ -12,9 +12,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
-  'organization-switcher': {
-    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
-  },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
@@ -54,10 +51,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
   },
-  'api-keys': {
+  misc: {
+    'organization-switcher': dynamic(() => import('../stories/organization-switcher.mdx')),
     'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
-  },
-  reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
   blocks: {
