@@ -446,17 +446,14 @@ describe('OrganizationProfileMembersPanel', () => {
     const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
     view.rerender(<div />);
-    const activeOrganization = view.clerk.organization;
-    if (!activeOrganization) {
-      throw new Error('Expected an active organization');
-    }
-    const getRoles = vi.spyOn(activeOrganization, 'getRoles');
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
 
     view.rerender(<OrganizationProfileMembersPanel />);
 
     expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
     expect(screen.getByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
-    expect(getRoles).not.toHaveBeenCalled();
+    expect(roles.requests).toHaveLength(0);
+    roles.release();
   });
 
   it('loads the roles of the organization it switches to', async () => {
@@ -495,24 +492,40 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(screen.queryByRole('option', { name: 'Admin' })).toBeNull();
   });
 
-  it('does not request roles again when the panel remounts after they fail', async () => {
+  it('requests failed roles again on remount only once the failure is two minutes old', async () => {
     serve(manage);
-    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
-    const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
-    await waitFor(() => expect(roles.requests).toHaveLength(1));
-    roles.fail('roles_unavailable', 'Roles unavailable');
-    await waitFor(() => expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false'));
-    view.rerender(<div />);
-    const activeOrganization = view.clerk.organization;
-    if (!activeOrganization) {
-      throw new Error('Expected an active organization');
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      worker.use(
+        http.get(
+          fapiUrl('/v1/organizations/:organizationId/roles'),
+          () =>
+            HttpResponse.json(
+              { errors: [{ code: 'roles_unavailable', message: 'roles_unavailable' }] },
+              { status: 400 },
+            ),
+          { once: true },
+        ),
+      );
+      const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
+      await waitFor(() => expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false'));
+      const retried = holdRequests('get', '/v1/organizations/:organizationId/roles');
+
+      vi.setSystemTime(Date.now() + 119_000);
+      view.rerender(<div />);
+      view.rerender(<OrganizationProfileMembersPanel />);
+      expect(await screen.findByText('Bob Smith')).toBeVisible();
+      expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
+      expect(retried.requests).toHaveLength(0);
+
+      vi.setSystemTime(Date.now() + 2_000);
+      view.rerender(<div />);
+      view.rerender(<OrganizationProfileMembersPanel />);
+      await waitFor(() => expect(retried.requests).toHaveLength(1));
+      retried.release();
+      expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    } finally {
+      vi.useRealTimers();
     }
-    const getRoles = vi.spyOn(activeOrganization, 'getRoles');
-
-    view.rerender(<OrganizationProfileMembersPanel />);
-
-    expect(await screen.findByText('Bob Smith')).toBeVisible();
-    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
-    expect(getRoles).not.toHaveBeenCalled();
   });
 });

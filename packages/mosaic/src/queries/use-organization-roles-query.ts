@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 
 const ORGANIZATION_ROLES_KEY = 'mosaic-organization-roles';
 const ROLES_PAGE_SIZE = 20;
+const ROLES_STALE_TIME = 2 * 60_000;
 
 export function useOrganizationRolesQuery({ enabled }: { enabled: boolean }) {
   const { organization } = useOrganization();
@@ -22,9 +23,9 @@ export function useOrganizationRolesQuery({ enabled }: { enabled: boolean }) {
   return __internal_useClerkQuery({
     queryKey,
     queryFn: () => organization?.getRoles({ pageSize: ROLES_PAGE_SIZE }),
-    staleTime: 2 * 60_000,
+    staleTime: ROLES_STALE_TIME,
     retry: false,
-    retryOnMount: false,
+    retryOnMount: query => Date.now() - query.state.errorUpdatedAt >= ROLES_STALE_TIME,
     enabled: enabled && Boolean(organization),
   });
 }
