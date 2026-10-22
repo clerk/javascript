@@ -6,6 +6,7 @@ import { bindClerk, type ClerkSessionsHost } from '../clerk';
 import { throwResponseError } from '../fapi';
 import { parseUser } from '../user';
 import environment from './fixtures/environment.json';
+import { userSeed } from './fixtures/react';
 
 const session = {
   id: 'sess_other',
@@ -84,6 +85,19 @@ function hostFixture() {
 }
 
 describe('host ClerkJS bridge', () => {
+  it('keeps a matching user seed regardless of property insertion order', async () => {
+    const { host, request } = hostFixture();
+    const hydration = userSeed(host);
+    const { firstName, ...rest } = host.user;
+    const binding = bindClerk(host, {
+      ...hydration,
+      user: { data: { firstName, ...rest }, updatedAt: Date.now() },
+    });
+    await expect(binding.getSnapshot()?.fetchUser()).resolves.toMatchObject({ firstName: 'Ada' });
+    expect(request).not.toHaveBeenCalled();
+    binding.dispose();
+  });
+
   it('accepts the SDK facade as a structural host', () => {
     expectTypeOf<LoadedClerk>().toExtend<ClerkSessionsHost>();
   });

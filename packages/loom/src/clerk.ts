@@ -95,6 +95,10 @@ export function bindClerk(host: ClerkSessionsHost, hydration?: LoomHydration) {
     client?.dispose();
     client = null;
     if (scope) {
+      let initial = seed && sameScope(seed.scope, scope) ? seed : undefined;
+      if (initial?.user && profile !== JSON.stringify(userSnapshot(initial.user.data, scope.userId))) {
+        initial = initial.sessions || initial.profileSettings ? { ...initial, user: undefined } : undefined;
+      }
       const request = async (method: string, path: string, signal: AbortSignal) => {
         if (disposed || !sameScope(scope, scopeOf(host))) {
           throw new Error('Clerk identity changed.');
@@ -115,7 +119,7 @@ export function bindClerk(host: ClerkSessionsHost, hydration?: LoomHydration) {
       };
       client = createLoomClient({
         scope,
-        hydration: seed && sameScope(seed.scope, scope) ? seed : undefined,
+        hydration: initial,
         readProfileSettings: async signal => parseProfileSettings(await request('GET', '/environment', signal)),
         readUser: async signal => {
           if (disposed || !sameScope(scope, scopeOf(host))) {
@@ -199,4 +203,4 @@ import { parseSessions, throwResponseError } from './fapi';
 import { parseProfileSettings } from './profile-settings';
 import { createClerkScope, sameScope } from './scope';
 import type { LoomHydration, SessionScope, UserNameInput } from './types';
-import { resourceUserSnapshot } from './user';
+import { resourceUserSnapshot, userSnapshot } from './user';

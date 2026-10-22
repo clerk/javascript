@@ -654,6 +654,41 @@ function userResponse(firstName = 'Grace', id = 'user_a') {
 }
 
 describe('user SSR and Suspense', () => {
+  it('reconciles conflicting loaded data after deterministic server hydration', async () => {
+    const { host, request } = clerkHost();
+    const tree = (
+      <StrictMode>
+        <LoomProvider
+          clerk={host}
+          hydration={userSeed(host)}
+        >
+          <Suspense fallback={<p>Loading user</p>}>
+            <UserProfile />
+          </Suspense>
+        </LoomProvider>
+      </StrictMode>
+    );
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(tree);
+    expect(container.textContent).toContain('Ada');
+    document.body.append(container);
+    host.loaded = true;
+    host.user = { ...publicUser, firstName: 'Edited' };
+    host.session = { id: 'sess_current' };
+    request.mockResolvedValue(userResponse());
+    const onRecoverableError = vi.fn();
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+    act(() => {
+      root = hydrateRoot(container, tree, { onRecoverableError });
+    });
+    expect(await screen.findByText('Grace')).toBeDefined();
+    expect(container.textContent).not.toContain('Ada');
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    expect(request).toHaveBeenCalledTimes(1);
+    act(() => root?.unmount());
+    container.remove();
+  });
+
   it('renders user-only seed and hydrates matching loaded host without a duplicate request', async () => {
     const { host, request } = clerkHost();
     const hydration = userSeed(host);

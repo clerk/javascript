@@ -470,6 +470,65 @@ it('keeps a confirmed name edit when navigation restores an older profile snapsh
   expect(request).not.toHaveBeenCalled();
 });
 
+it.each(['Edited', 'Ada'])(
+  'reconciles a restored route snapshot with the backend when the current name is %s',
+  async firstName => {
+    const { host, request } = clerkHost();
+    host.loaded = true;
+    host.session = { id: 'sess_current' };
+    host.user = {
+      ...publicUser,
+      update: input => {
+        const updated = { ...publicUser, ...input };
+        host.user = updated;
+        return Promise.resolve(updated);
+      },
+    };
+    const prefetch = seed(host, Promise.resolve(ready(host)));
+    const read = Promise.withResolvers<typeof publicUser>();
+    const readUser = vi.fn(() => read.promise);
+    host.__internal_readUser = readUser;
+    let owner: ReturnType<typeof useLoom> | undefined;
+    function Capture() {
+      owner = useLoom();
+      return <Danger />;
+    }
+    const tree = () => (
+      <LoomProvider
+        clerk={host}
+        prefetch={prefetch}
+      >
+        <Suspense fallback={<p>Waiting</p>}>
+          <Profile />
+          <Capture />
+        </Suspense>
+      </LoomProvider>
+    );
+    await render(tree());
+    expect(container.textContent).toContain('Ada names enabled');
+    expect(readUser).not.toHaveBeenCalled();
+    if (!owner) {
+      throw new Error('Missing live owner.');
+    }
+    const liveOwner = owner;
+    await act(async () => {
+      await liveOwner.updateName({ firstName: 'Edited', lastName: '' });
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    expect(container.textContent).toContain('Edited names enabled');
+    await render(null);
+    await render(tree());
+    expect(readUser).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      read.resolve({ ...publicUser, firstName });
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    expect(container.textContent).toContain(`${firstName} names enabled`);
+    expect(container.textContent).toContain(`${firstName} can delete account`);
+    expect(request).not.toHaveBeenCalled();
+  },
+);
+
 it('does not let a navigation snapshot replace the authenticated scope', async () => {
   const { host, request } = clerkHost();
   host.loaded = true;
