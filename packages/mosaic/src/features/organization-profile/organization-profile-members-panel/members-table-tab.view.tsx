@@ -12,10 +12,12 @@ import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
 import { Pagination } from '../../../components/pagination';
 import { Select } from '../../../components/select';
-import { Spinner } from '../../../components/spinner';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
 import { useServerDataTable } from '../../../hooks/use-server-data-table';
+import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
+import { Plus } from '../../../icons/glyphs/plus';
+import { Users } from '../../../icons/glyphs/users';
 import { fill, useMessages } from '../../../localization';
 import { mergeStyleProps, themeProps } from '../../../props';
 import { styles } from './members-table-tab.styles';
@@ -43,7 +45,6 @@ export function MembersTableTabView({
   onSearchChange,
   onPageChange,
   onBulkAction,
-  isLoading,
   isFetching = false,
   isError = false,
   onRetry,
@@ -78,6 +79,7 @@ export function MembersTableTabView({
   return (
     <>
       <div {...mergeStyleProps(themeProps('members-table-tab'), stylex.props(tableTabStyles.root))}>
+        {isError ? null : <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>}
         <Table.Toolbar>
           <Table.Search
             ref={searchInputRef}
@@ -93,7 +95,7 @@ export function MembersTableTabView({
               focusableWhenDisabled
               onClick={onInvite}
             >
-              <Icon name='plus' />
+              <Icon glyph={Plus} />
               {m.invite}
             </Button>
           ) : null}
@@ -103,9 +105,18 @@ export function MembersTableTabView({
           roleError={roleError}
         />
         <Table.Root
+          layout='fixed'
+          minWidth='37rem'
           aria-label={m.title}
-          aria-busy={isLoading || isFetching}
+          aria-busy={isFetching}
         >
+          <Table.ColumnGroup>
+            {onBulkAction ? <Table.Column /> : null}
+            <Table.Column />
+            <Table.Column width='9rem' />
+            <Table.Column width='10rem' />
+            {remove ? <Table.Column width='4rem' /> : null}
+          </Table.ColumnGroup>
           <Table.Header>
             <Table.Row>
               {onBulkAction ? (
@@ -130,7 +141,6 @@ export function MembersTableTabView({
             rows={table.rows}
             columnCount={columnCount}
             query={query}
-            isLoading={isLoading}
             isError={isError}
             onRetry={onRetry}
             roles={roles}
@@ -196,7 +206,6 @@ function MembersTableBody({
   rows,
   columnCount,
   query,
-  isLoading,
   isError,
   onRetry,
   roles,
@@ -209,7 +218,6 @@ function MembersTableBody({
   rows: Array<{ original: OrganizationProfileMember; getIsSelected: () => boolean; toggleSelected: () => void }>;
   columnCount: number;
   query: string;
-  isLoading: boolean;
   isError: boolean;
   onRetry?: () => void;
   roles: MembersTableTabViewProps['roles'];
@@ -220,24 +228,12 @@ function MembersTableBody({
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('membersTableTab');
-  if (isLoading) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
-          <span role='status'>
-            <Spinner />
-            <VisuallyHidden>{m.loading}</VisuallyHidden>
-          </span>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
   if (isError) {
     return (
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
           <EmptyState.Root role='alert'>
-            <EmptyState.Icon name='exclamation-circle' />
+            <EmptyState.Icon glyph={ExclamationCircle} />
             <EmptyState.Label>{m.loadError}</EmptyState.Label>
             {onRetry ? (
               <EmptyState.Actions>
@@ -254,7 +250,7 @@ function MembersTableBody({
       <Table.Body>
         <Table.Empty colSpan={columnCount}>
           <EmptyState.Root role='status'>
-            <EmptyState.Icon name='users' />
+            <EmptyState.Icon glyph={Users} />
             <EmptyState.Label>{query ? m.empty : m.noMembers}</EmptyState.Label>
             <EmptyState.Description>
               {query ? fill(m.emptyDescription, { query }) : m.noMembersDescription}

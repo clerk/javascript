@@ -17,6 +17,7 @@ workflows:
         - 'actions-cool/check-user-permission@v2.4.0'
         - 'actions/checkout@v4.4.0'
         - 'actions/github-script@v7.1.0'
+        - 'actions/setup-node@v4.4.0'
         - 'actions/upload-artifact@v4.6.2'
         - 'pnpm/action-setup@v4.3.0'
         - 'useblacksmith/cache@v5'
@@ -48,10 +49,8 @@ workflows:
         - 'actions/checkout@v4.4.0'
         - 'actions/setup-java@v4.9.1'
         - 'actions/setup-node@v4.4.0'
-        - 'actions/upload-artifact@v4.6.2'
         - 'gradle/actions@v6.3.0'
         - 'pnpm/action-setup@v4.3.0'
-        - 'reactivecircus/android-emulator-runner@v2.38.0'
     '.github/workflows/labeler-apply.yml':
         - 'actions/checkout@v4.4.0'
         - 'actions/download-artifact@v4.3.0'
@@ -202,11 +201,6 @@ dependencies:
         commit: 'sha1-4ed28566c2bdcdaee6dca2b46b9666d01b4ed8a4'
         owner_id: 56475783
         repo_id: 280818415
-    'reactivecircus/android-emulator-runner@v2.38.0':
-        ref: 'v2.38.0'
-        commit: 'sha1-a421e43855164a8197daf9d8d40fe71c6996bb0d'
-        owner_id: 51352484
-        repo_id: 219782401
     'slackapi/slack-github-action@v1.27.1':
         ref: 'v1.27.1'
         commit: 'sha1-fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3'

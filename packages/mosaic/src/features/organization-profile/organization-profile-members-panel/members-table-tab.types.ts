@@ -16,6 +16,10 @@ export interface MembersRolesState {
   isLoading: boolean;
 }
 
+export interface MembersPanelRoles extends MembersRolesState {
+  defaultRole: string | null;
+}
+
 export interface OrganizationProfileMember {
   id: string;
   name: string;

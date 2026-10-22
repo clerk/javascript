@@ -2,10 +2,10 @@ import { differenceInCalendarDays } from '@clerk/shared/date';
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/shared/types';
-import { useEffect, useState } from 'react';
 
 import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
+import { useUserSessionsQuery } from '../../../queries/use-user-sessions-query';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
@@ -13,6 +13,7 @@ import type { UserProfileDevice } from './user-profile-active-devices.types';
 export type UserProfileActiveDevicesModel =
   | { status: 'loading' }
   | { status: 'hidden' }
+  | { status: 'loadingDevices' }
   | {
       status: 'ready';
       identity: string;
@@ -22,10 +23,6 @@ export type UserProfileActiveDevicesModel =
     };
 
 export type ReadyActiveDevicesModel = Extract<UserProfileActiveDevicesModel, { status: 'ready' }>;
-
-type SessionsQuery =
-  | { status: 'loading'; identity: string | undefined }
-  | { status: 'ready'; identity: string; sessions: SessionWithActivitiesResource[] };
 
 function isActiveDevice(session: SessionWithActivitiesResource): boolean {
   return session.status === 'active' || session.status === 'pending';
@@ -52,25 +49,8 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
     target.revoke(),
   );
 
+  const { data: sessions } = useUserSessionsQuery();
   const identity = userId && sessionId ? `${userId}:${sessionId}` : undefined;
-  const [query, setQuery] = useState<SessionsQuery>({ status: 'loading', identity });
-
-  useEffect(() => {
-    const currentUser = clerk.user;
-    if (!identity || !currentUser || currentUser.id !== userId || clerk.session?.id !== sessionId) {
-      return;
-    }
-    let active = true;
-    setQuery({ status: 'loading', identity });
-    void currentUser.getSessions().then(sessions => {
-      if (active && clerk.user?.id === userId && clerk.session?.id === sessionId) {
-        setQuery({ status: 'ready', identity, sessions });
-      }
-    });
-    return () => {
-      active = false;
-    };
-  }, [clerk, userId, sessionId, identity]);
 
   const toDevice = (item: SessionWithActivitiesResource): UserProfileDevice => {
     const activity = item.latestActivity;
@@ -105,19 +85,19 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
     return { status: 'hidden' };
   }
 
-  if (query.identity !== identity || query.status === 'loading') {
-    return { status: 'loading' };
+  if (!sessions) {
+    return { status: 'loadingDevices' };
   }
   return {
     status: 'ready',
     identity,
-    devices: query.sessions
+    devices: sessions
       .filter(isActiveDevice)
       .sort((a, b) => Number(b.id === sessionId) - Number(a.id === sessionId))
       .map(toDevice),
     revoke: async id => {
       const currentUser = clerk.user;
-      const target = query.sessions.find(item => item.id === id && isActiveDevice(item));
+      const target = sessions.find(item => item.id === id && isActiveDevice(item));
       if (
         !target ||
         !currentUser ||

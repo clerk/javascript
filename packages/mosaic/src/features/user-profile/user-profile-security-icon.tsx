@@ -1,16 +1,21 @@
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { DeviceLaptop } from '../../icons/glyphs/device-laptop';
+import { DevicePhone } from '../../icons/glyphs/device-phone';
+import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
+import { SecurityPasskey } from '../../icons/glyphs/security-passkey';
+import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import { styles } from './user-profile-security-panel.styles';
 
 export type UserProfileSecurityIconName = 'authenticator' | 'backup-codes' | 'desktop' | 'mobile' | 'passkey' | 'sms';
 
 const icons = {
-  authenticator: 'security-lock-square',
-  'backup-codes': 'security-phone',
-  desktop: 'device-laptop',
-  mobile: 'device-phone',
-  passkey: 'security-passkey',
-  sms: 'security-phone',
+  authenticator: SecurityLockSquare,
+  'backup-codes': SecurityPhone,
+  desktop: DeviceLaptop,
+  mobile: DevicePhone,
+  passkey: SecurityPasskey,
+  sms: SecurityPhone,
 } as const;
 
 export function UserProfileSecurityIcon({ name }: { name: UserProfileSecurityIconName }) {
@@ -20,7 +25,7 @@ export function UserProfileSecurityIcon({ name }: { name: UserProfileSecurityIco
       xstyle={styles.media}
     >
       <Icon
-        name={icons[name]}
+        glyph={icons[name]}
         size='lg'
         xstyle={styles.icon}
       />

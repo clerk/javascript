@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const ArrowCompress = glyph(
+  'arrow-compress',
   <>
     <path
       d='M13.5 6.83333H9.16667V2.5M9.16667 6.83333L13.5 2.5'

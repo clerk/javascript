@@ -45,6 +45,11 @@ export default [
               allowTypeImports: true,
             },
             {
+              regex: '(^|/)queries/',
+              message: 'Read Clerk queries in the model and pass plain data to the controller or view.',
+              allowTypeImports: true,
+            },
+            {
               regex: '(^|/)use-mosaic-environment(?:[.]ts)?$',
               importNames: ['useMosaicEnvironment'],
               message: 'Read the Mosaic environment in the model and pass plain data to the controller or view.',

@@ -115,6 +115,10 @@ export const columnWidth = stylex.create({
   fixed: (width: string) => ({ width }),
 });
 
+export const tableMinWidth = stylex.create({
+  fixed: (minWidth: string) => ({ minWidth }),
+});
+
 export const aligns = stylex.create({
   start: { textAlign: 'start' },
   center: { textAlign: 'center' },

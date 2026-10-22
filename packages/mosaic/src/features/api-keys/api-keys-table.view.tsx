@@ -7,11 +7,12 @@ import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { Spinner } from '../../components/spinner';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useServerDataTable } from '../../hooks/use-server-data-table';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
+import { Key } from '../../icons/glyphs/key';
 import { fill } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
@@ -41,7 +42,6 @@ export function APIKeysTableView({
   onBulkAction,
   sort,
   onSortChange,
-  isLoading,
   isFetching = false,
   isError = false,
   onRetry,
@@ -68,6 +68,7 @@ export function APIKeysTableView({
   return (
     <>
       <div {...mergeStyleProps(themeProps('api-keys-table'), stylex.props(styles.root))}>
+        <VisuallyHidden role='status'>{isError ? m.loadError : m.loaded}</VisuallyHidden>
         <Table.Toolbar>
           <Table.Search
             ref={searchInputRef}
@@ -87,8 +88,14 @@ export function APIKeysTableView({
         </Table.Toolbar>
         <Table.Root
           aria-label={m.title}
-          aria-busy={isLoading || isFetching}
+          aria-busy={isFetching}
+          layout='fixed'
+          minWidth='36rem'
         >
+          <APIKeysTableColumns
+            selectable={Boolean(onBulkAction)}
+            revocable={Boolean(revoke)}
+          />
           <Table.Header>
             <Table.Row>
               {onBulkAction ? (
@@ -110,18 +117,10 @@ export function APIKeysTableView({
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {/* TODO: Replace with a shared Table.Loading built on a Mosaic Skeleton component (skeleton rows sized to the columns). */}
-            {isLoading ? (
-              <Table.Empty colSpan={columnCount}>
-                <span role='status'>
-                  <Spinner />
-                  <VisuallyHidden>{m.loading}</VisuallyHidden>
-                </span>
-              </Table.Empty>
-            ) : isError ? (
+            {isError ? (
               <Table.Empty colSpan={columnCount}>
                 <EmptyState.Root>
-                  <EmptyState.Icon name='exclamation-circle' />
+                  <EmptyState.Icon glyph={ExclamationCircle} />
                   <EmptyState.Label>{m.loadError}</EmptyState.Label>
                   <EmptyState.Description>{m.loadErrorDescription}</EmptyState.Description>
                   {onRetry ? (
@@ -140,7 +139,7 @@ export function APIKeysTableView({
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>
                 <EmptyState.Root>
-                  <EmptyState.Icon name='key' />
+                  <EmptyState.Icon glyph={Key} />
                   <EmptyState.Label>{emptyState.label}</EmptyState.Label>
                   <EmptyState.Description>{emptyState.description}</EmptyState.Description>
                 </EmptyState.Root>
@@ -213,6 +212,13 @@ export function APIKeysTableView({
 }
 
 function APIKeyMetadata({ messages: m, apiKey }: { messages: APIKeysTableMessages; apiKey: APIKey }) {
+  const id = truncateWithEndVisible(apiKey.id, 10, 4);
+  const expiry =
+    apiKey.expiresAtLabel === null
+      ? m.neverExpires
+      : fill(m.expires, {
+          expiresDate: apiKey.expiresAtLabel,
+        });
   return (
     <div {...stylex.props(styles.metadata)}>
       <Text xstyle={styles.name}>{apiKey.name}</Text>
@@ -220,17 +226,13 @@ function APIKeyMetadata({ messages: m, apiKey }: { messages: APIKeysTableMessage
         size='xs'
         color='foreground-secondary'
       >
-        {truncateWithEndVisible(apiKey.id, 10, 4)} ·{' '}
+        {id} ·{' '}
         <Text
           render={<span />}
           size='xs'
           color={apiKey.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
         >
-          {apiKey.expiresAtLabel === null
-            ? m.neverExpires
-            : fill(m.expires, {
-                expiresDate: apiKey.expiresAtLabel,
-              })}
+          {expiry}
         </Text>
       </Text>
     </div>
@@ -265,5 +267,17 @@ function APIKeyActions({
         </Menu.Item>
       </Menu.Popup>
     </Menu.Root>
+  );
+}
+
+export function APIKeysTableColumns({ selectable, revocable }: { selectable: boolean; revocable: boolean }) {
+  return (
+    <Table.ColumnGroup>
+      {selectable ? <Table.Column /> : null}
+      <Table.Column />
+      <Table.Column width='9rem' />
+      <Table.Column width='9rem' />
+      {revocable ? <Table.Column width='4rem' /> : null}
+    </Table.ColumnGroup>
   );
 }

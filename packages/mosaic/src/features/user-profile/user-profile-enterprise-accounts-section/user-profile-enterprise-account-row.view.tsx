@@ -4,6 +4,7 @@ import { Badge } from '../../../components/badge';
 import { SubmitButton } from '../../../components/button';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from './user-profile-enterprise-accounts-section.styles';
@@ -78,7 +79,7 @@ export function UserProfileEnterpriseAccountRowView({
             >
               {m.connect}
               <Icon
-                name='arrow-up-right'
+                glyph={ArrowUpRight}
                 placement='inline-end'
                 size='sm'
               />

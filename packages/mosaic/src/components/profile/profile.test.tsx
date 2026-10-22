@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { UserCircle } from '../../icons/glyphs/user-circle';
 import { MosaicProvider } from '../../mosaic-provider';
 import { Badge } from '../badge';
 import { Card } from '../card';
@@ -27,7 +28,7 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
       <Profile.Nav>
         <Profile.NavItem
           value='account'
-          icon={<Icon name='user-circle' />}
+          icon={<Icon glyph={UserCircle} />}
         >
           Account
         </Profile.NavItem>
@@ -606,17 +607,24 @@ describe('Profile', () => {
   });
 
   describe('inside a dialog', () => {
-    function renderInDialog() {
+    function renderInDialog(props: Partial<ProfileRootProps> = {}) {
       return render(
         <MosaicProvider>
           <Dialog.Root defaultOpen>
             <Dialog.Popup variant='profile'>
-              <Surface />
+              <Surface {...props} />
             </Dialog.Popup>
           </Dialog.Root>
         </MosaicProvider>,
       );
     }
+
+    it('brings its own surface even when asked to be flush', () => {
+      renderInDialog({ elevation: 'flush' });
+
+      expect(document.querySelector('.cl-profile')).toHaveAttribute('data-elevation', 'card');
+      expect(document.querySelector('.cl-profile-content')).not.toHaveAttribute('data-inline');
+    });
 
     it('names the dialog and carries its dismiss', () => {
       renderInDialog();

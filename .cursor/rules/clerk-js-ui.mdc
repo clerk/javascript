@@ -1,6 +1,6 @@
 ---
 description: Coding rules for Clerk-JS UI and AIO Components
-globs: packages/clerk-js/src/ui/**/*.ts,packages/clerk-js/src/ui/**/*.tsx
+globs: packages/ui/src/**/*.ts,packages/ui/src/**/*.tsx
 alwaysApply: false
 ---
 # Clerk-JS UI Patterns & Architecture
@@ -11,10 +11,9 @@ The UI system uses a powerful element descriptor pattern for styling and customi
 ### How to add new descriptors
 - Scan the provided files for places that require a descriptor.
 - Element descriptors should be always be camelCase
-- First add them as types in `packages/types/src/appearance.ts` then build the package
-- After append them to `APPEARANCE_KEYS` in `packages/clerk-js/src/ui/customizables/elementDescriptors.ts`
+- First add them as types to `ElementsConfig` in `packages/ui/src/internal/appearance.ts`
+- After append them to `APPEARANCE_KEYS` in `packages/ui/src/customizables/elementDescriptors.ts`
 - Use them in the original files.
-- If linting errors occur try to `cd ./packages/types && pnpm build`.
 
 ### Basic Usage
 ```tsx

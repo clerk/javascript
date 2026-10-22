@@ -34,6 +34,7 @@ function ConnectedAccounts({ model }: { model: Extract<UserProfileConnectedAccou
     onRemove: model.remove,
     removeReverification: model.removeReverification,
     reconnectReverification: model.reconnectReverification,
+    connectReverification: model.connectReverification,
   });
 
   return <UserProfileConnectedAccountsSectionView {...controller} />;

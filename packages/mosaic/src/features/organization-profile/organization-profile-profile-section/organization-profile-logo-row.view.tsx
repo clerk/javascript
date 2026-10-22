@@ -5,6 +5,8 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { Pen } from '../../../icons/glyphs/pen';
+import { X } from '../../../icons/glyphs/x';
 import type { LocalizableError } from '../../../localization';
 import { useErrorText, useMessages } from '../../../localization';
 import type { FileRejection, FileRejectionReason } from '../../../primitives/file-upload';
@@ -118,11 +120,11 @@ function LogoActions({
   const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.logo.change, icon: 'pen', onClick: openFilePicker });
+    actions.push({ label: m.logo.change, icon: Pen, onClick: openFilePicker });
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.logo.remove, icon: 'x', onClick: () => void onRemove() });
+    actions.push({ label: m.logo.remove, icon: X, onClick: () => void onRemove() });
   }
 
   if (actions.length > 0) {

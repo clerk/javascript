@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.1.98
+
+### Patch Changes
+
+- Fix production builds that drop the setup code `@clerk/chrome-extension` runs when it loads. The package no longer declares `sideEffects: false`, which let bundlers such as Parcel skip that setup. With `plasmo build`, this left the extension popup blank. Measured Plasmo and esbuild bundle sizes are unchanged. ([#10313](https://github.com/clerk/javascript/pull/10313)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`8e8746d`](https://github.com/clerk/javascript/commit/8e8746d177c363b8e8d98887f04cc07c277f34df), [`1c450df`](https://github.com/clerk/javascript/commit/1c450dfcf5d0161c97ff5686545a31b24d8dcbd7)]:
+  - @clerk/ui@1.41.1
+
 ## 3.1.97
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @clerk/ui
 
+## 1.41.1
+
+### Patch Changes
+
+- In Electron apps, the social sign-in and sign-up buttons become clickable again when the user returns to the app without finishing OAuth in the browser. Before, they stayed disabled for up to 3 minutes. ([#10337](https://github.com/clerk/javascript/pull/10337)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `<OrganizationProfile />` Security page showing Directory Sync and SSO setup actions to organization admins when the organization isn't allowed to set up enterprise SSO and Directory Sync. Those organizations now see their enterprise connections read-only, alongside the SSO bypass section. ([#10321](https://github.com/clerk/javascript/pull/10321)) by [@kalafut](https://github.com/kalafut)
+
 ## 1.41.0
 
 ### Minor Changes

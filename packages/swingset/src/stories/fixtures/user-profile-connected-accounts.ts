@@ -49,6 +49,7 @@ export function useConnectedAccountsFixture({
     accounts,
     removeReverification: idleReverification,
     reconnectReverification: idleReverification,
+    connectReverification: idleReverification,
     availableProviders,
     // eslint-disable-next-line @typescript-eslint/require-await
     onConnect: async (id: string) => {

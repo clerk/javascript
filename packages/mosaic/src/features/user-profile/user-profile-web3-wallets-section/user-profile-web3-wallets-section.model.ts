@@ -113,6 +113,9 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   const [setPrimaryWallet, setPrimaryReverification] = useReverificationFlow(
     (current: UserResource, walletId: string) => current.update({ primaryWeb3WalletId: walletId }),
   );
+  const [createWallet, createReverification] = useReverificationFlow((current: UserResource, web3Wallet: string) =>
+    current.createWeb3Wallet({ web3Wallet }),
+  );
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -176,7 +179,7 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         wallet =>
           wallet.verification.status !== 'verified' && normalizedWeb3Wallet(wallet.web3Wallet) === normalizedIdentifier,
       );
-      const wallet = existing ?? (await current.createWeb3Wallet({ web3Wallet: identifier }));
+      const wallet = existing ?? (await createWallet(current, identifier));
       requireCurrentUser();
       if (!wallet) {
         throw new ClerkRuntimeError('The wallet could not be created.', { code: 'web3_wallet_creation_failed' });
@@ -218,5 +221,6 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         },
     removeReverification,
     setPrimaryReverification,
+    createReverification,
   };
 }

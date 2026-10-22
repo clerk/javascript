@@ -18,6 +18,8 @@ export function UserProfileWeb3WalletsSectionView({
   finalFocus,
   setPrimaryReverification,
   setPrimaryFinalFocus,
+  createReverification,
+  createFinalFocus,
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
@@ -52,6 +54,7 @@ export function UserProfileWeb3WalletsSectionView({
                     <UserProfileWeb3WalletRowView
                       key={provider.id}
                       wallet={provider}
+                      triggerRef={registerTrigger(provider.id)}
                       isPending={pendingId === provider.id}
                       isDisabled={isBusy}
                       onConnect={onConnect}
@@ -80,6 +83,12 @@ export function UserProfileWeb3WalletsSectionView({
         <ReverificationDialog
           controller={setPrimaryReverification}
           finalFocus={setPrimaryFinalFocus}
+        />
+      ) : null}
+      {createReverification ? (
+        <ReverificationDialog
+          controller={createReverification}
+          finalFocus={createFinalFocus}
         />
       ) : null}
     </>

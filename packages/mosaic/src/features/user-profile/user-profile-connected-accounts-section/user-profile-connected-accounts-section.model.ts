@@ -217,6 +217,7 @@ export type UserProfileConnectedAccountsModel =
       remove: (accountId: string) => Promise<void>;
       removeReverification: ReverificationController;
       reconnectReverification: ReverificationController;
+      connectReverification: ReverificationController;
     };
 
 function unavailable() {
@@ -239,6 +240,10 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
     return account.destroy();
   });
   const [recreateAccount, reconnectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
+  const [createAccount, connectReverification] = useReverificationFlow(
     (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
       current.createExternalAccount(params),
   );
@@ -312,7 +317,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       }
       const redirectUrl = await getRedirectUrl();
       const current = requireCurrentUser();
-      const response = await current.createExternalAccount({
+      const response = await createAccount(current, {
         strategy: provider.strategy,
         redirectUrl: withModalState(redirectUrl, provider.provider),
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
@@ -349,5 +354,6 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
     },
     removeReverification,
     reconnectReverification,
+    connectReverification,
   };
 }

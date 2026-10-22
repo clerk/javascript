@@ -10,7 +10,7 @@ import type { UserProfilePasskeysSectionViewProps } from './user-profile-passkey
 
 type PasskeysControllerInput = Pick<
   Extract<UserProfilePasskeysModel, { status: 'ready' }>,
-  'passkeys' | 'onAdd' | 'onRename' | 'validateName' | 'onRemove' | 'reverification'
+  'passkeys' | 'onAdd' | 'onRename' | 'validateName' | 'onRemove' | 'reverification' | 'addReverification'
 >;
 
 export function useUserProfilePasskeysSectionController({
@@ -20,6 +20,7 @@ export function useUserProfilePasskeysSectionController({
   validateName,
   onRemove,
   reverification,
+  addReverification,
 }: PasskeysControllerInput): UserProfilePasskeysSectionViewProps {
   const messages = useMessages('userProfilePasskeys');
   const add = usePendingAction<'add'>({ errorFallback: messages.saveError });
@@ -47,5 +48,7 @@ export function useUserProfilePasskeysSectionController({
     registerTrigger: removalFocus.registerTrigger,
     remove,
     finalFocus: removalFocus.finalFocus,
+    addReverification,
+    addFinalFocus: addButtonRef,
   };
 }

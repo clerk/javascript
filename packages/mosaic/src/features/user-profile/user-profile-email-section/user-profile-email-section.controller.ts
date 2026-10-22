@@ -16,8 +16,13 @@ export function useUserProfileEmailSectionController({
   onRemoveEmail,
   removeReverification,
   setPrimaryReverification,
+  createReverification,
 }: Omit<ReadyEmailSectionModel, 'status' | 'userId'>): UserProfileEmailSectionViewProps {
-  const verification = useUserProfileAddEmailController({ username, onCreate: onCreateEmail });
+  const verification = useUserProfileAddEmailController({
+    username,
+    onCreate: onCreateEmail,
+    reverification: createReverification,
+  });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
