@@ -30,22 +30,23 @@ export const useDragGesture = ({
 
     const element = e.currentTarget;
     const { pointerId } = e;
-    const origin = { x: e.clientX, y: e.clientY };
+    const originX = e.clientX;
+    const originY = e.clientY;
     let dragging = false;
 
     const onPointerMove = (moveEvent: PointerEvent): void => {
       if (moveEvent.pointerId !== pointerId) {
         return;
       }
-      const offset = { x: moveEvent.clientX - origin.x, y: moveEvent.clientY - origin.y };
+      const offset = { x: moveEvent.clientX - originX, y: moveEvent.clientY - originY };
       if (!dragging) {
-        if (Math.hypot(offset.x, offset.y) < DRAG_THRESHOLD) {
+        if (offset.x * offset.x + offset.y * offset.y < DRAG_THRESHOLD * DRAG_THRESHOLD) {
           return;
         }
         dragging = true;
         element.setPointerCapture(pointerId);
-        document.body.style.setProperty('user-select', 'none');
-        document.body.style.setProperty('-webkit-user-select', 'none');
+        document.body.style.userSelect = 'none';
+        document.body.style.webkitUserSelect = 'none';
         onDragStart?.();
       }
       onDrag(offset);
@@ -57,7 +58,7 @@ export const useDragGesture = ({
       }
     };
 
-    const end = (cancelled = false): void => {
+    const end = (cancelled: boolean): void => {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerEnd);
       window.removeEventListener('pointercancel', onPointerEnd);
@@ -68,13 +69,10 @@ export const useDragGesture = ({
       if (element.hasPointerCapture(pointerId)) {
         element.releasePointerCapture(pointerId);
       }
-      document.body.style.removeProperty('user-select');
-      document.body.style.removeProperty('-webkit-user-select');
-      if (cancelled) {
-        (onDragCancel ?? onDragEnd)?.();
-      } else {
-        onDragEnd?.();
-      }
+      document.body.style.userSelect = '';
+      document.body.style.webkitUserSelect = '';
+      const onEnd = (cancelled && onDragCancel) || onDragEnd;
+      onEnd?.();
     };
 
     window.addEventListener('pointermove', onPointerMove);

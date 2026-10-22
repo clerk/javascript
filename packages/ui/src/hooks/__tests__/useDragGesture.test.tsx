@@ -72,6 +72,15 @@ describe('useDragGesture', () => {
     expect(onDrag.mock.calls).toEqual([[{ x: 6, y: 0 }], [{ x: -19.5, y: 30.25 }]]);
     expect(captured.has(1)).toBe(true);
     expect(document.body.style.getPropertyValue('user-select')).toBe('none');
+    expect(document.body.style.webkitUserSelect).toBe('none');
+  });
+
+  it('starts dragging exactly at the diagonal threshold', () => {
+    const { target, onDragStart, onDrag } = renderDragTarget();
+    pointer(target, 'pointerdown', { clientX: 100, clientY: 100 });
+    pointer(window, 'pointermove', { clientX: 103, clientY: 104 });
+    expect(onDragStart).toHaveBeenCalledTimes(1);
+    expect(onDrag).toHaveBeenCalledWith({ x: 3, y: 4 });
   });
 
   it.each(['pointerup', 'pointercancel'])('ends the drag on %s and restores selection', type => {
@@ -84,6 +93,7 @@ describe('useDragGesture', () => {
     expect(onDrag).toHaveBeenCalledTimes(1);
     expect(captured.size).toBe(0);
     expect(document.body.style.getPropertyValue('user-select')).toBe('');
+    expect(document.body.style.webkitUserSelect).toBe('');
   });
 
   it('ignores other pointers', () => {

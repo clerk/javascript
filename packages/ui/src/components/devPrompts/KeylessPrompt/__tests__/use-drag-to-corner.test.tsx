@@ -59,7 +59,7 @@ describe('useDragToCorner gestures', () => {
     pointer(window, 'pointercancel', 100, 100);
     expect(target.dataset.dragging).toBe('false');
     expect(target.style.transform).toBe(position);
-    expect(target.style.transition).not.toContain('350ms');
+    expect(target.style.transition).toBe('');
     finishTransition(target);
     expect(save).not.toHaveBeenCalled();
     expect(target.dataset.corner).toBe('bottom-right');

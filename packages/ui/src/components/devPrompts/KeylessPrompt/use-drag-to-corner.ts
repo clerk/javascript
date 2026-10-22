@@ -291,6 +291,9 @@ export function useDragToCorner(): UseDragToCornerResult {
       velocities.current = [];
       dragStartDimensions.current = null;
       setIsDragging(false);
+      if (containerRef.current) {
+        containerRef.current.style.transition = '';
+      }
     },
     onDragEnd: () => {
       const velocity = calculateVelocity(velocities.current);
