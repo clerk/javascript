@@ -38,8 +38,10 @@ export function UserProfileWeb3WalletRowView({
   const address = linkedWallet?.address;
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
   const actions: ActionMenuAction[] = [];
-  const canVerify = Boolean(linkedWallet?.canVerify && onVerify);
 
+  if (linkedWallet?.canVerify && onVerify) {
+    actions.push({ label: m.verify, onClick: () => onVerify(wallet.id) });
+  }
   if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
   }
@@ -79,9 +81,9 @@ export function UserProfileWeb3WalletRowView({
             </Section.Description>
           ) : null}
         </Section.Content>
-        {onConnect || canVerify || actions.length > 0 ? (
+        {onConnect || actions.length > 0 ? (
           <Section.Actions>
-            {onConnect || (canVerify && onVerify) ? (
+            {onConnect ? (
               <SubmitButton
                 ref={triggerRef}
                 color='neutral'
@@ -89,22 +91,20 @@ export function UserProfileWeb3WalletRowView({
                 variant='outline'
                 isPending={isPending}
                 disabled={isDisabled && !isPending}
-                aria-label={fill(onConnect ? m.connectLabel : m.verifyLabel, { provider: wallet.provider ?? '' })}
-                onClick={() => (onConnect ?? onVerify)?.(wallet.id)}
+                aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
+                onClick={() => onConnect(wallet.id)}
               >
-                {onConnect ? m.connect : m.verify}
-                {onConnect ? (
-                  <Icon
-                    glyph={ArrowUpRight}
-                    placement='inline-end'
-                    size='sm'
-                  />
-                ) : null}
+                {m.connect}
+                <Icon
+                  glyph={ArrowUpRight}
+                  placement='inline-end'
+                  size='sm'
+                />
               </SubmitButton>
             ) : null}
             {actions.length > 0 ? (
               <ActionMenu
-                triggerRef={canVerify ? undefined : triggerRef}
+                triggerRef={triggerRef}
                 actions={actions}
                 label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
               />

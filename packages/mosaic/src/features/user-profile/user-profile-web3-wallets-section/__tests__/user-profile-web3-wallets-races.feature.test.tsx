@@ -13,6 +13,7 @@ import {
   fapiVerification,
   fapiWeb3Wallet,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section';
 
@@ -79,7 +80,7 @@ describe('Web3 wallet selection races', () => {
           expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'),
         );
       } else {
-        await waitFor(() => expect(screen.getByRole('button', { name: 'Verify MetaMask' })).toBeEnabled());
+        await waitFor(() => expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toBeEnabled());
         await waitFor(() =>
           expect(screen.getByRole('alert')).toHaveTextContent('This wallet provider is unavailable.'),
         );
@@ -103,7 +104,9 @@ describe('Web3 wallet selection races', () => {
       savedWallet('coinbase', '0xABCD', 'web3_coinbase_wallet_signature'),
     ]);
     const creation = holdRequests('post', '/v1/me/web3_wallets');
-    await userEvent.setup().click(screen.getAllByRole('button', { name: 'Verify MetaMask' })[1]);
+    const user = userEvent.setup();
+    await openMenu(user, screen.getAllByRole('button', { name: 'Manage MetaMask' })[1]);
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
     await waitFor(() =>
       expect(
         fapi.client.sessions[0]?.user.web3_wallets.find(wallet => wallet.id === 'target')?.verification?.status,
@@ -131,14 +134,15 @@ describe('Web3 wallet selection races', () => {
     await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
     await user.keyboard('hunter2{Enter}');
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Verify MetaMask' })).toHaveFocus());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toHaveFocus());
     signature.reject(new Error('User rejected the request.'));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     request.mockImplementation(({ method }) =>
       Promise.resolve(method === 'eth_requestAccounts' ? ['0xabcd'] : 'signature'),
     );
     const creation = holdRequests('post', '/v1/me/web3_wallets');
-    await user.click(screen.getByRole('button', { name: 'Verify MetaMask' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1);
     expect(creation.requests).toHaveLength(0);

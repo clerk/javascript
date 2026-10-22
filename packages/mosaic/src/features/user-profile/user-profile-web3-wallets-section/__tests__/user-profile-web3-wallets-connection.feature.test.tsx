@@ -13,6 +13,7 @@ import {
   fapiVerification,
   fapiWeb3Wallet,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section';
 
@@ -79,7 +80,9 @@ describe('Web3 connection rows', () => {
     const creation = holdRequests('post', '/v1/me/web3_wallets');
 
     expect(screen.queryByRole('button', { name: `Connect ${name}` })).toBeNull();
-    await userEvent.setup().click(screen.getByRole('button', { name: `Verify ${name}` }));
+    const user = userEvent.setup();
+    await openMenu(user, screen.getByRole('button', { name: `Manage ${name}` }));
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
     expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual(['saved_wallet']);
     expect(creation.requests).toHaveLength(0);
@@ -128,7 +131,9 @@ describe('Web3 connection rows', () => {
     const creation = holdRequests('post', '/v1/me/web3_wallets');
     const preparation = holdRequests('post', '/v1/me/web3_wallets/:id/prepare_verification');
 
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Verify MetaMask' }));
+    const user = userEvent.setup();
+    await openMenu(user, screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Select the wallet account that matches this address.');
     expect(creation.requests).toHaveLength(0);
     expect(preparation.requests).toHaveLength(0);
@@ -190,7 +195,8 @@ describe('Web3 connection rows', () => {
 
     await userEvent.setup().click(await screen.findByRole('button', { name: `Connect ${name}` }));
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1));
-    expect(screen.getByRole('button', { name: `Verify ${name}` })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('button', { name: `Manage ${name}` })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: `Verify ${name}` })).toBeNull();
     expect(screen.queryByRole('button', { name: `Connect ${name}` })).toBeNull();
     expect(screen.getByText('Verifying')).toBeInTheDocument();
     expect(screen.getByTitle('0x1234567890abcdef')).toBeInTheDocument();
@@ -257,12 +263,11 @@ describe('Web3 connection rows', () => {
       await userEvent.setup().click(await screen.findByRole('button', { name: 'Test Solana' }));
 
       await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1));
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Verify Solana' })).toHaveAttribute('aria-busy', 'true'),
-      );
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Solana' })).toBeInTheDocument());
+      expect(screen.queryByRole('button', { name: 'Verify Solana' })).toBeNull();
       expect(screen.queryByRole('button', { name: 'Connect Solana' })).toBeNull();
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Verify Solana' })).toHaveFocus());
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Solana' })).toHaveFocus());
       expect(screen.getByText('Verifying')).toBeInTheDocument();
 
       signature.resolve([{ signature: new Uint8Array([4, 5, 6]) }]);
@@ -352,8 +357,10 @@ describe('Web3 connection rows', () => {
       const preparation = holdRequests('post', '/v1/me/web3_wallets/:id/prepare_verification');
 
       expect(screen.queryByRole('button', { name: 'Connect Solana' })).toBeNull();
-      await userEvent.setup().click(screen.getByRole('button', { name: 'Verify Solana' }));
-      await userEvent.setup().click(await screen.findByRole('button', { name: 'Saved Solana' }));
+      const user = userEvent.setup();
+      await openMenu(user, screen.getByRole('button', { name: 'Manage Solana' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+      await user.click(await screen.findByRole('button', { name: 'Saved Solana' }));
       if (outcome !== 'mismatch') {
         await waitFor(() => expect(preparation.requests).toHaveLength(1));
         preparation.release();
@@ -362,12 +369,13 @@ describe('Web3 connection rows', () => {
             expect(screen.getByRole('alert')).toHaveTextContent('You have rejected the signature request.'),
           );
           await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-          expect(screen.getByRole('button', { name: 'Verify Solana' })).toBeEnabled();
+          expect(screen.getByRole('button', { name: 'Manage Solana' })).toBeEnabled();
           expect(screen.queryByRole('button', { name: 'Connect Solana' })).toBeNull();
           expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('unverified');
           expect(signatures).toBe(1);
-          await userEvent.setup().click(screen.getByRole('button', { name: 'Verify Solana' }));
-          await userEvent.setup().click(await screen.findByRole('button', { name: 'Saved Solana' }));
+          await openMenu(user, screen.getByRole('button', { name: 'Manage Solana' }));
+          await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+          await user.click(await screen.findByRole('button', { name: 'Saved Solana' }));
         }
         await waitFor(() =>
           expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'),
