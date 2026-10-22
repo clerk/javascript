@@ -65,7 +65,7 @@ function PasswordView() {
 }
 ```
 
-Focus moves only for a step that transitions in; the initially active step is left to whatever container opened it. Focus is applied with `preventScroll` as soon as the step enters, and only when focus is currently on the body or inside `Flow.Root`, so it never steals from elsewhere on the page. Style `Flow.Root` with `overflow: clip` rather than `hidden` so focusing an element that is still sliding in cannot scroll the viewport. When several mounted elements are marked, the first in DOM order is focused. Outside a `Flow.Step` the hook returns a no-op ref.
+Focus moves only for a step that transitions in; the initially active step is left to whatever container opened it. Focus is applied with `preventScroll` as soon as the step enters, and only when focus is currently on the body or inside `Flow.Root`, so it never steals from elsewhere on the page. Style `Flow.Root` with `overflow: clip` rather than `hidden` so focusing an element that is still sliding in cannot scroll the viewport. When several mounted elements are marked, the first in DOM order is focused. A mark inside a nested flow also counts for every step that encloses it, so a step whose content is another flow focuses that flow's active step when it enters. Outside a `Flow.Step` the hook returns a no-op ref.
 
 ## Transition attributes
 

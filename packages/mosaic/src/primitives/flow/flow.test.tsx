@@ -451,6 +451,29 @@ describe('Flow', () => {
       expect(screen.getByTestId('second')).toHaveFocus();
     });
 
+    it('focuses a marked element in a nested flow when the step holding it enters', () => {
+      const outer = (value: string) => (
+        <Flow.Root value={value}>
+          <Flow.Step ids={['form']}>
+            <AutoFocusInput data-testid='form-input' />
+          </Flow.Step>
+          <Flow.Step ids={['reverify']}>
+            <Flow.Root value='password'>
+              <Flow.Step ids={['password']}>
+                <AutoFocusInput data-testid='nested-input' />
+              </Flow.Step>
+            </Flow.Root>
+          </Flow.Step>
+        </Flow.Root>
+      );
+      const { rerender } = render(outer('form'));
+      screen.getByTestId('form-input').focus();
+
+      rerender(outer('reverify'));
+
+      expect(screen.getByTestId('nested-input')).toHaveFocus();
+    });
+
     it('ignores a marked element portaled outside the root', () => {
       const otpStep = (
         <Flow.Step ids={['otp']}>{createPortal(<AutoFocusInput data-testid='portaled' />, document.body)}</Flow.Step>
