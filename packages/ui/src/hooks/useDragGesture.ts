@@ -11,12 +11,16 @@ type UseDragGestureOptions = {
   onDragEnd?: () => void;
 };
 
-export const useDragGesture = ({ onDragStart, onDrag, onDragEnd }: UseDragGestureOptions) => {
+export const useDragGesture = ({
+  onDragStart,
+  onDrag,
+  onDragEnd,
+}: UseDragGestureOptions): { onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void } => {
   const endGesture = useRef<(() => void) | null>(null);
 
   useEffect(() => () => endGesture.current?.(), []);
 
-  const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
+  const onPointerDown = (e: ReactPointerEvent<HTMLElement>): void => {
     if (e.button !== 0 || (e.target instanceof Element && e.target.closest('a'))) {
       return;
     }
@@ -27,7 +31,7 @@ export const useDragGesture = ({ onDragStart, onDrag, onDragEnd }: UseDragGestur
     const origin = { x: e.clientX, y: e.clientY };
     let dragging = false;
 
-    const onPointerMove = (moveEvent: PointerEvent) => {
+    const onPointerMove = (moveEvent: PointerEvent): void => {
       if (moveEvent.pointerId !== pointerId) {
         return;
       }
@@ -45,13 +49,13 @@ export const useDragGesture = ({ onDragStart, onDrag, onDragEnd }: UseDragGestur
       onDrag(offset);
     };
 
-    const onPointerEnd = (endEvent: PointerEvent) => {
+    const onPointerEnd = (endEvent: PointerEvent): void => {
       if (endEvent.pointerId === pointerId) {
         end();
       }
     };
 
-    const end = () => {
+    const end = (): void => {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerEnd);
       window.removeEventListener('pointercancel', onPointerEnd);
