@@ -62,7 +62,7 @@ type MfaEvent =
 
 const { createMachine, assign, fromPromise } = setup<MfaContext, MfaEvent>();
 const RESEND_COOLDOWN_SECONDS = 30;
-const REVERIFIABLE_ACTIONS: readonly (MfaAction | undefined)[] = ['generate', 'sms', 'prepareAuthenticator'];
+const REVERIFIABLE_ACTIONS: readonly MfaAction[] = ['generate', 'sms', 'prepareAuthenticator'];
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 
 const mfaMachine = createMachine({
@@ -421,15 +421,20 @@ function createSetupProps(
   const sms = flow.kind === 'sms' ? flow : undefined;
   const authenticator = flow.kind === 'authenticator' ? flow : undefined;
   const backup = flow.kind === 'backup' ? flow : undefined;
-  const isReverifying = REVERIFIABLE_ACTIONS.includes(context.pending) && reverification.visible;
+  const isReverifying =
+    context.pending !== undefined && REVERIFIABLE_ACTIONS.includes(context.pending) && reverification.visible;
+  let step: UserProfileMfaSetupViewProps['step'];
+  if (isReverifying) {
+    step = 'verify';
+  } else if (flow.kind === 'closed') {
+    step = 'select';
+  } else if (flow.kind === 'backup') {
+    step = 'backup-codes';
+  } else {
+    step = flow.kind;
+  }
   return {
-    step: isReverifying
-      ? 'verify'
-      : flow.kind === 'closed'
-        ? 'select'
-        : flow.kind === 'backup'
-          ? 'backup-codes'
-          : flow.kind,
+    step,
     reverification,
     methods: model.addableMethods,
     onSelect: actions.select,
@@ -561,6 +566,8 @@ export function useUserProfileMfaController(model: ReadyModel) {
 
   const showAddTrigger = model.addableMethods.length > 0;
   const reverifying = setupProps.step === 'verify';
+  const hasPendingReverification = context.pending !== undefined && REVERIFIABLE_ACTIONS.includes(context.pending);
+  const canClose = !hasPendingReverification || Boolean(reverification.onCancel);
 
   return {
     dialogOpen,
@@ -568,15 +575,15 @@ export function useUserProfileMfaController(model: ReadyModel) {
     showAddControl: showAddTrigger || dialogOpen,
     reverifying,
     onDialogOpenChange: (open: boolean) => {
-      if (!open && REVERIFIABLE_ACTIONS.includes(context.pending)) {
-        if (!reverification.onCancel) {
-          return;
-        }
-        reverification.onCancel();
+      if (!open && !canClose) {
+        return;
+      }
+      if (!open && hasPendingReverification) {
+        reverification.onCancel?.();
       }
       send({ type: open ? 'OPEN' : 'CLOSE' });
     },
-    showCloseButton: !reverifying || Boolean(reverification.onCancel),
+    showCloseButton: canClose,
     sectionProps,
     setupProps,
   };

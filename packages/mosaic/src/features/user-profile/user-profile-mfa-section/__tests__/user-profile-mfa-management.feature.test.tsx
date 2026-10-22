@@ -9,6 +9,7 @@ import {
   fapiUrl,
   holdRequests,
   serveFapi,
+  VERIFICATION_CODE,
   worker,
 } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
@@ -370,9 +371,10 @@ describe('User profile MFA management', () => {
     }
     expect(screen.getByRole('button', { name: 'Copy and close' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
     held.release();
     await waitFor(() => expect(screen.getByText('CODE0100')).toBeVisible());
+    expect(screen.getByRole('button', { name: 'Close' })).toBeVisible();
     for (const name of ['Print', 'Download', 'Copy and close']) {
       expect(screen.getByRole('button', { name })).toBeEnabled();
     }
@@ -481,9 +483,13 @@ describe('User profile MFA management', () => {
     await regenerate(user);
     await waitFor(() => expect(first.requests).toHaveLength(1));
     const dialog = screen.getByRole('dialog');
-    await user.keyboard('{Escape}');
-    expect(dialog).toBeVisible();
-    first.release();
+    try {
+      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+      await user.keyboard('{Escape}');
+      expect(dialog).toBeVisible();
+    } finally {
+      first.release();
+    }
 
     expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
     await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
@@ -509,6 +515,37 @@ describe('User profile MFA management', () => {
 
     expect(await screen.findByText('CODE0001')).toBeVisible();
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: true, default: undefined });
+  });
+
+  it('keeps SMS code verification open until its reservation challenge can be cancelled', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }), mfaEnvironment(), {
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me/phone_numbers/phone_1');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    const code = await screen.findByRole('textbox', { name: 'Verification code' });
+    const attempt = holdRequests('post', '/v1/me/phone_numbers/phone_1/attempt_verification');
+    await user.type(code, VERIFICATION_CODE);
+    await waitFor(() => expect(attempt.requests).toHaveLength(1));
+    const dialog = screen.getByRole('dialog');
+    try {
+      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+      await user.keyboard('{Escape}');
+      expect(dialog).toBeVisible();
+    } finally {
+      attempt.release();
+    }
+
+    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
+    await user.click(within(dialog).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.mfa.phoneAttempts).toEqual([{ id: 'phone_1', code: VERIFICATION_CODE }]);
+    expect(fapi.mfa.phoneUpdates).toEqual([]);
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('verifies the session before creating a phone for SMS MFA, then sends its code', async () => {

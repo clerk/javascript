@@ -100,9 +100,13 @@ describe('User profile MFA interaction boundaries', () => {
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
     await waitFor(() => expect(held.requests).toHaveLength(1));
     const dialog = screen.getByRole('dialog');
-    await user.keyboard('{Escape}');
-    expect(dialog).toBeVisible();
-    held.release();
+    try {
+      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+      await user.keyboard('{Escape}');
+      expect(dialog).toBeVisible();
+    } finally {
+      held.release();
+    }
     expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
     expect(fapi.mfa.totpCreations).toBe(1);
   });
