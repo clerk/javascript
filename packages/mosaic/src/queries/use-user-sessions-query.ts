@@ -26,6 +26,7 @@ export function useUserSessionsQuery() {
     [userId, sessionId],
   );
 
+  // Only runs while this hook is mounted, matching the shared hooks. Sign-out after unmount leaves the entry until it is garbage collected.
   __internal_useClearQueriesOnSignOut({
     isSignedOut: user === null,
     authenticated,
@@ -34,6 +35,7 @@ export function useUserSessionsQuery() {
 
   return __internal_useClerkQuery({
     queryKey,
+    // getSessions() also caches on the user, so a refetch only gets fresh data once the user resource is rebuilt.
     queryFn: () => user?.getSessions(),
     staleTime: 2 * 60_000,
     enabled: Boolean(user && session),
