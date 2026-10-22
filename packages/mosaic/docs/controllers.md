@@ -11,7 +11,7 @@ where its effects come from.
 
 Worked examples:
 
-- `packages/mosaic/src/features/user-button/user-button.controller.tsx` — wraps a model
+- `packages/mosaic/src/features/switcher/switcher.controller.tsx` — wraps a model
 - `packages/mosaic/src/features/user-profile/user-profile-profile-section/user-profile-edit-username.controller.ts`
   — takes its one effect as a prop
 
@@ -53,7 +53,9 @@ return {
 
 `run` resolves `true` on success, so the caller can close a dialog or move
 focus. To hold pending through an OAuth redirect, await a delay inside the
-action (`user-profile-connected-accounts-section.controller.ts`). It is not for:
+action (`user-profile-connected-accounts-section.controller.ts`). When the user
+cancels a reverification challenge, `run` resolves `false` without showing an
+error and releases the lock. It is not for:
 
 - a form → `useForm`
 - a confirm step → `useConfirmController` with `Confirmation` / `Destructive`
@@ -75,24 +77,32 @@ with `open(payload)`; the copy props read the payload and `onConfirm` receives i
 A dialog next to its button has no payload and takes the button as `trigger`.
 
 An action Clerk may interrupt for step-up verification goes through
-`useReverificationFlow` first. It reads Clerk hooks, so the wrapper calls it next
-to the model and hands the controller the wrapped action together with the
-`reverification` it returns; the controller passes both on, and the block shows
-the verify step inside the same dialog:
+`useReverificationFlow` in the model, which wraps the raw Clerk call and returns
+the `reverification` controller beside the mapped callback (see
+[Models](models.md)). The controller passes it on, and the block shows the
+verify step inside the same dialog:
 
 ```ts
-// wrapper
-const [revoke, reverification] = useReverificationFlow((id: string) => model.revoke(id));
-const controller = useInvitationsController({ ...model, revoke, reverification });
+// model
+const [removeEmail, reverification] = useReverificationFlow((user: UserResource, id: string) =>
+  byId(user.emailAddresses, id, 'email address').destroy(),
+);
+return { ..., onRemoveEmail: id => saveAsUser(current => removeEmail(current, id)), reverification };
 
 // controller
-const removalFocus = useListRemovalFocus({ ids, onRemove: revoke, fallback });
-const remove = useConfirmController<Invitation>({
-  onConfirm: invitation => removalFocus.remove(invitation.id),
+const removalFocus = useListRemovalFocus({ ids, onRemove: onRemoveEmail, fallback });
+const remove = useConfirmController<UserProfileEmail>({
+  onConfirm: email => removalFocus.remove(email.id),
   reverification,
-  errorFallback: m.revokeError,
 });
 ```
+
+For a direct action without a confirmation step, pass the controller from
+`useReverificationFlow` to `ReverificationDialog` (`blocks/reverification/`) in the view. Keep the direct
+action under `usePendingAction` so its lock and ordinary errors stay with the
+section. The dialog opens once `visible` is true, so it skips the loading card, and offers
+dismissal only while the controller has a cancel callback. Return focus with the hook's
+`lastKey`, which outlives the run, unlike `pendingKey`.
 
 A single open boolean earns nothing. A two-state machine with one event is a
 boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in
@@ -306,7 +316,8 @@ One path, so every error a user sees goes through the `errors.*` catalog:
   error as a `SaveError` with each error routed to the field it names. The form
   machine turns a `SaveError` into field and global errors. A controller can also
   reject a submit with `FormSubmitError` (`components/form`) to set field errors
-  itself.
+  itself. A submit that rejects because the user cancelled a reverification
+  is not an error: the form returns to editing with its values and no message.
 - **Owners hold an `ErrorDescription`.** It is either a `LocalizableError`
   (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`, the original
   failure). `toLocalizableError` logs the second as

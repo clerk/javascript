@@ -1,9 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { IconComponent } from '../../icons/glyph';
 import { useMosaicIcons } from '../../icons/overrides';
-import type { IconName } from '../../icons/registry';
-import { iconRegistry } from '../../icons/registry';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
@@ -11,13 +10,13 @@ import { iconScope } from './icon.markers.stylex';
 import { sizes, styles } from './icon.styles';
 
 export interface IconProps extends MosaicElementProps<'svg'> {
-  name: IconName;
+  glyph: IconComponent;
   size?: 'sm' | 'md' | 'lg' | 'inherit';
   placement?: 'inline-start' | 'inline-end';
 }
 
 /**
- * Renders a Mosaic icon by name. The glyph can be swapped per-name via the `icons` prop on
+ * Renders a Mosaic glyph. The glyph can be swapped by its name via the `icons` prop on
  * `MosaicProvider`; Mosaic's sizing is applied to the override exactly as it is to the built-in
  * glyph, so the two stay visually consistent.
  *
@@ -27,10 +26,10 @@ export interface IconProps extends MosaicElementProps<'svg'> {
  * follow the writing mode rather than naming a physical edge.
  */
 export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIcon(
-  { name, size = 'md', placement, xstyle, ...rest },
+  { glyph: Glyph, size = 'md', placement, xstyle, ...rest },
   ref,
 ) {
-  const override = useMosaicIcons()[name];
+  const override = useMosaicIcons()[Glyph.iconName];
   // The placement axis reflects as `data-icon`, not `data-placement`, so a container selects the
   // child by what it is: `:has([data-icon='inline-end'])` can't match some other placed descendant.
   const props = mergeStyleProps(
@@ -50,7 +49,6 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
     return React.cloneElement(override, mergeStyleProps(props, { className: overrideClassName }));
   }
 
-  const Glyph = iconRegistry[name];
   return (
     <Glyph
       ref={ref}

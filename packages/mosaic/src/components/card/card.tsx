@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { X } from '../../icons/glyphs/x';
 import { useFlowStepActive } from '../../primitives/flow';
 import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
@@ -105,7 +106,7 @@ function HeaderCloseButton() {
         />
       )}
     >
-      <Icon name='x' />
+      <Icon glyph={X} />
     </Dialog.Close>
   );
 }

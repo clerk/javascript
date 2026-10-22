@@ -1,5 +1,40 @@
 # Change Log
 
+## 6.40.0
+
+### Minor Changes
+
+- Support passkeys as a second factor during sign-in and session reverification. ([#9127](https://github.com/clerk/javascript/pull/9127)) by [@dmoerner](https://github.com/dmoerner)
+
+  When a user has a passkey, the prebuilt `<SignIn/>` and `<UserVerification/>`
+  components preselect it as the second factor, as they already do for the first
+  factor. Other methods stay available under "Use another method".
+
+  To use it, your instance must allow passkeys to satisfy the second factor. This
+  is on by default for instances created after 2026-07-08, and can be turned on
+  in the Dashboard for older ones. Web apps also need to opt in to the passkey
+  second factor update in the Dashboard.
+
+  If you build a custom flow, `supportedSecondFactors` can now include `passkey`.
+  Call `signIn.authenticateWithPasskey()` to complete it.
+
+  Passkeys are no longer preselected, for either factor, where the SDK reports
+  that WebAuthn is unavailable (for example, Electron apps without passkey
+  support enabled).
+
+### Patch Changes
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+
+## 6.39.1
+
+### Patch Changes
+
+- Fix `oidcPrompt` being ignored for OAuth strategies in `signIn.sso()` and `signIn.authenticateWithRedirect()`. The value is now sent when the sign-in is created, so a prompt such as `select_account` reaches the OAuth provider. ([#10125](https://github.com/clerk/javascript/pull/10125)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- `session.getToken()` no longer skips the network request when `navigator.onLine` reports `false`. Some environments, such as Chrome behind certain VPN clients, can report offline while the network works, which caused every token refresh to fail with `clerk_offline`. HTTP errors from the Frontend API, including ones with non-JSON bodies such as a proxy's HTML 502, are now surfaced as-is instead of being relabeled as `ClerkOfflineError`. When a resource cache is configured (e.g. Expo), a 5xx response during startup now falls back to the cached resources, and non-JSON 5xx responses no longer clear the Chrome extension's stored development browser token. ([#10264](https://github.com/clerk/javascript/pull/10264)) by [@paulogdm](https://github.com/paulogdm)
+
 ## 6.39.0
 
 ### Minor Changes

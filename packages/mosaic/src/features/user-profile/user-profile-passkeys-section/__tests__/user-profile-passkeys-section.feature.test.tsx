@@ -20,12 +20,13 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
-import { UserProfilePasskeysSectionView } from '../../user-profile-passkeys-section.view';
 import { UserProfileSecurityPanelView } from '../../user-profile-security-panel.view';
-import { passkeysSectionNode, UserProfilePasskeysSection } from '../user-profile-passkeys-section';
+import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
 import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section.model';
+import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 
 function ReadonlyPasskeys() {
   const model = useUserProfilePasskeysModel();
@@ -38,8 +39,11 @@ function ReadonlyPasskeys() {
 }
 
 function SecurityPanel() {
-  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
-  return <UserProfileSecurityPanelView passkeysSlot={passkeysSlot} />;
+  return (
+    <UserProfileSecurityPanelView>
+      <UserProfilePasskeysSection />
+    </UserProfileSecurityPanelView>
+  );
 }
 
 function servePasskeys(passkeys: PasskeyJSON[] = [fapiPasskey({ id: 'pk_1' })], overrides: FakeFapiSeed = {}) {
@@ -115,7 +119,7 @@ describe('Seeing passkeys', () => {
     expect(screen.getByRole('group', { name: 'Clés d’accès' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Ajouter une clé' })).toBeVisible();
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Gérer Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Gérer Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Renommer' }));
     const rename = screen.getByRole('dialog', { name: 'Renommer la clé' });
     expect(rename).toHaveTextContent('Choisissez un nouveau nom.');
@@ -123,7 +127,7 @@ describe('Seeing passkeys', () => {
     expect(within(rename).getByRole('button', { name: 'Enregistrer' })).toBeVisible();
     await user.click(within(rename).getByRole('button', { name: 'Annuler' }));
 
-    await user.click(screen.getByRole('button', { name: 'Gérer Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Gérer Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Supprimer la clé' }));
     const removal = screen.getByRole('alertdialog', { name: 'Supprimer la clé' });
     expect(removal).toHaveAccessibleDescription('Laptop sera supprimée de ce compte.');
@@ -223,6 +227,27 @@ describe('Seeing passkeys', () => {
     expect(screen.queryByRole('group', { name: 'Passkeys' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
   });
+
+  it("shows the new user's passkeys after switching sessions", async () => {
+    servePasskeys([], {
+      client: fapiClient([
+        fapiSession({
+          id: 'sess_a',
+          user: fapiUser({ id: 'user_a', passkeys: [fapiPasskey({ id: 'pk_a', name: 'Alice laptop' })] }),
+        }),
+        fapiSession({
+          id: 'sess_b',
+          user: fapiUser({ id: 'user_b', passkeys: [fapiPasskey({ id: 'pk_b', name: 'Bob phone' })] }),
+        }),
+      ]),
+    });
+    const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
+    expect(screen.getByText('Alice laptop')).toBeVisible();
+    await act(() => clerk.setActive({ session: 'sess_b' }));
+    expect(await screen.findByText('Bob phone')).toBeVisible();
+    expect(screen.getAllByRole('group', { name: 'Passkeys' })).toHaveLength(1);
+    expect(screen.queryByText('Alice laptop')).toBeNull();
+  });
 });
 
 describe('Adding a passkey', () => {
@@ -248,27 +273,62 @@ describe('Adding a passkey', () => {
     expect(add).toBeEnabled();
   });
 
-  it.each(['session_reverification_required', 'form_param_invalid'])(
-    'shows %s and allows a manual retry',
-    async code => {
-      const fapi = servePasskeys([]);
-      fakeAuthenticator();
-      await renderWithClerk(<UserProfilePasskeysSection />);
-      const creation = holdRequests('post', '/v1/me/passkeys');
-      const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-      await waitFor(() => expect(creation.requests).toHaveLength(1));
-      creation.fail(code);
-      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(code));
-      expect(screen.queryByRole('dialog')).toBeNull();
-      expect(creation.requests).toHaveLength(1);
-      const retried = serveFapi(fapi);
-      await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-      expect(await screen.findByText('Chrome on macOS')).toBeVisible();
-      expect(retried.client.sessions[0]?.user.passkeys).toHaveLength(1);
-      expect(screen.queryByRole('alert')).toBeNull();
-    },
-  );
+  it('shows a creation error and allows a manual retry', async () => {
+    const fapi = servePasskeys([]);
+    fakeAuthenticator();
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    const creation = holdRequests('post', '/v1/me/passkeys');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    await waitFor(() => expect(creation.requests).toHaveLength(1));
+    creation.fail('form_param_invalid');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_param_invalid'));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(creation.requests).toHaveLength(1);
+    const retried = serveFapi(fapi);
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
+    expect(retried.client.sessions[0]?.user.passkeys).toHaveLength(1);
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('verifies the session before adding a passkey, then creates it', async () => {
+    const fapi = servePasskeys([], { verification: { secrets: { password: 'hunter2' } } });
+    const authenticator = fakeAuthenticator();
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    demandReverificationOnce('/v1/me/passkeys');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
+    expect(authenticator).toHaveBeenCalledOnce();
+  });
+
+  it('lets the user cancel passkey verification quietly and add one again', async () => {
+    const fapi = servePasskeys([], { verification: { secrets: { password: 'hunter2' } } });
+    const authenticator = fakeAuthenticator();
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    demandReverificationOnce('/v1/me/passkeys');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(0);
+    expect(authenticator).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
+  });
 
   it('uses the localized fallback when FAPI rejects creation without a message', async () => {
     servePasskeys([]);
@@ -316,7 +376,7 @@ describe('Renaming a passkey', () => {
     const fapi = servePasskeys();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     const dialog = screen.getByRole('dialog');
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
@@ -360,7 +420,7 @@ describe('Renaming a passkey', () => {
       </MosaicProvider>,
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await user.type(screen.getByRole('textbox', { name: 'Passkey name' }), ' modifié');
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -374,7 +434,7 @@ describe('Renaming a passkey', () => {
     const fapi = servePasskeys();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     const input = screen.getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
@@ -400,13 +460,13 @@ describe('Removing a passkey', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
     const trigger = screen.getByRole('button', { name: 'Manage $& laptop' });
-    await user.click(trigger);
+    await openMenu(user, trigger);
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription('$& laptop will be removed from this account.');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
-    await user.click(trigger);
+    await openMenu(user, trigger);
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
@@ -423,7 +483,7 @@ describe('Removing a passkey', () => {
     ]);
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: `Manage ${removed}` }));
+    await openMenu(user, screen.getByRole('button', { name: `Manage ${removed}` }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
@@ -435,7 +495,7 @@ describe('Removing a passkey', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     const removal = holdRequests('post', '/v1/me/passkeys/pk_1');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(removal.requests).toHaveLength(1));
@@ -453,7 +513,7 @@ describe('Removing a passkey', () => {
     await renderWithClerk(<UserProfilePasskeysSection />);
     demandReverificationOnce('/v1/me/passkeys/pk_1');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
 
@@ -474,7 +534,6 @@ describe('Satellite passkeys', () => {
     expect(screen.getByRole('group', { name: 'Passkeys' })).toBeVisible();
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).toBeNull();
-    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
   });
 
   it('removes the final passkey without Add', async () => {
@@ -484,7 +543,7 @@ describe('Satellite passkeys', () => {
     view.rerender(<SecurityPanel />);
     const removal = holdRequests('post', '/v1/me/passkeys/pk_1');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(removal.requests).toHaveLength(1));

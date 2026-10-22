@@ -7,6 +7,7 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { VisuallyHidden } from '../../../components/visually-hidden';
 import type { MosaicMessages } from '../../../localization';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
 import { UserProfileSecurityIcon } from '../user-profile-security-icon';
@@ -38,6 +39,7 @@ export function UserProfileActiveDevicesSectionView({
 
   return (
     <div {...stylex.props(styles.sectionCards)}>
+      <VisuallyHidden role='status'>{m.loaded}</VisuallyHidden>
       <Section.Root>
         <Section.Group>
           <Section.Header>

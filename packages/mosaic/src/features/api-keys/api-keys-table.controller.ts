@@ -12,14 +12,26 @@ import { useCreateAPIKeyController } from './create-api-key.controller';
 
 const SEARCH_DEBOUNCE_MS = 500;
 
-export function useAPIKeysTableController(subject: string, messages: APIKeysTableMessages) {
+export interface APIKeysTableControllerOptions {
+  subject: string;
+  pageSize: number;
+  showDescription: boolean;
+  messages: APIKeysTableMessages;
+}
+
+export function useAPIKeysTableController({
+  subject,
+  pageSize,
+  showDescription,
+  messages,
+}: APIKeysTableControllerOptions) {
   const [query, setQuery] = useState('');
-  const model = useAPIKeysTableModel(subject, query);
+  const model = useAPIKeysTableModel(subject, pageSize, query);
   const locale = useLocale();
   const now = useNow({ updateInterval: 60_000 });
   const [searchValue, setSearchValue] = useState('');
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const create = useCreateAPIKeyController({ messages, onCreate: model.create });
+  const create = useCreateAPIKeyController({ messages, showDescription, onCreate: model.create });
   const apiKeys = model.data.map(key => toAPIKey(key, locale, now));
   const searchInputRef = useRef<HTMLInputElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);

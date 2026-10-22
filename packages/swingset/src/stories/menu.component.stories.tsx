@@ -1,6 +1,14 @@
 import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Menu } from '@clerk/mosaic/components/menu';
+import { Popover } from '@clerk/mosaic/components/popover';
+import { Building } from '@clerk/mosaic/icons/glyphs/building';
+import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
+import { LogOut } from '@clerk/mosaic/icons/glyphs/log-out';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
+import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
+import { X } from '@clerk/mosaic/icons/glyphs/x';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -22,13 +30,13 @@ export function Default() {
       <Menu.Popup>
         <Menu.Item label='Add organization'>
           <Menu.Media>
-            <Icon name='plus' />
+            <Icon glyph={Plus} />
           </Menu.Media>
           <Menu.Label>Add organization</Menu.Label>
         </Menu.Item>
         <Menu.Item label='Sign out'>
           <Menu.Media>
-            <Icon name='log-out' />
+            <Icon glyph={LogOut} />
           </Menu.Media>
           <Menu.Label>Sign out</Menu.Label>
         </Menu.Item>
@@ -37,7 +45,7 @@ export function Default() {
           color='negative'
         >
           <Menu.Media>
-            <Icon name='x' />
+            <Icon glyph={X} />
           </Menu.Media>
           <Menu.Label>Delete user</Menu.Label>
         </Menu.Item>
@@ -72,7 +80,7 @@ export function Accounts() {
             <Menu.Label>{account.identifier}</Menu.Label>
             {account.active ? (
               <Icon
-                name='checkmark'
+                glyph={Checkmark}
                 size='sm'
               />
             ) : null}
@@ -174,5 +182,59 @@ export function Overflowing() {
         ))}
       </Menu.Popup>
     </Menu.Root>
+  );
+}
+
+export function OpenOnHover() {
+  return (
+    <Menu.Root openOnHover>
+      <Menu.Trigger>Settings</Menu.Trigger>
+      <Menu.Popup>
+        <Menu.Item label='Manage profile'>
+          <Menu.Media>
+            <Icon glyph={UserCircle} />
+          </Menu.Media>
+          <Menu.Label>Manage profile</Menu.Label>
+        </Menu.Item>
+        <Menu.Item label='Manage organization'>
+          <Menu.Media>
+            <Icon glyph={Building} />
+          </Menu.Media>
+          <Menu.Label>Manage organization</Menu.Label>
+        </Menu.Item>
+      </Menu.Popup>
+    </Menu.Root>
+  );
+}
+
+export function OpenOnHoverInPopover() {
+  return (
+    <Popover.Root>
+      <Popover.Trigger render={props => <Button {...props}>Open popover</Button>} />
+      <Popover.Popup aria-label='Account'>
+        <Menu.Root
+          openOnHover
+          placement='right-start'
+          sideOffset={{ x: 12, y: 8 }}
+          fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
+        >
+          <Menu.Trigger>Settings</Menu.Trigger>
+          <Menu.Popup>
+            <Menu.Item label='Manage profile'>
+              <Menu.Media>
+                <Icon glyph={UserCircle} />
+              </Menu.Media>
+              <Menu.Label>Manage profile</Menu.Label>
+            </Menu.Item>
+            <Menu.Item label='Manage organization'>
+              <Menu.Media>
+                <Icon glyph={Building} />
+              </Menu.Media>
+              <Menu.Label>Manage organization</Menu.Label>
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Root>
+      </Popover.Popup>
+    </Popover.Root>
   );
 }

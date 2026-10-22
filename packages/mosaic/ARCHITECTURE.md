@@ -82,7 +82,7 @@ import { MosaicProvider } from './mosaic-provider';
 <MosaicProvider icons={{ 'chevron-right': <MyChevron /> }}>{children}</MosaicProvider>;
 ```
 
-`<Icon name='chevron-right' />` renders the override in place of the built-in glyph and applies Mosaic's own sizing props to it, so a swapped glyph stays visually consistent with the rest. Outside a provider, `useMosaicIcons()` returns `{}` and every icon falls back to `iconRegistry`.
+`<Icon glyph={ChevronRight} />` looks the override up by the glyph's `iconName`, renders it in place of the built-in glyph and applies Mosaic's own sizing props to it, so a swapped glyph stays visually consistent with the rest. Outside a provider, `useMosaicIcons()` returns `{}` and every icon renders the glyph it was passed. Callers import each glyph directly so the bundle carries only the glyphs in use; `iconRegistry` holds every glyph for catalogs and tests and must not be imported from shipped code.
 
 ## Component authoring pattern
 
@@ -338,7 +338,7 @@ How it holds that state is a complexity call. `UserButton` earns a machine — a
 action is async, `open` and `pendingKey` constrain each other, and dismissing
 must not abandon an in-flight invoke — so the machine is declared in the same
 file with `setup<Context, Event>()`, and its context carries the injected effect.
-Abridged from `features/user-button/user-button.controller.tsx`:
+Abridged from `features/switcher/switcher.controller.tsx`:
 
 ```tsx
 const { createMachine, assign, fromPromise } = setup<UserButtonMachineContext, UserButtonMachineEvent>();

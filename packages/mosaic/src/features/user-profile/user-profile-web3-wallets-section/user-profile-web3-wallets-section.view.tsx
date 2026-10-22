@@ -1,4 +1,5 @@
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 import { truncateWithEndVisible } from '../../../utils/truncate-text-with-end-visible';
@@ -15,6 +16,10 @@ export function UserProfileWeb3WalletsSectionView({
   registerTrigger,
   remove,
   finalFocus,
+  setPrimaryReverification,
+  setPrimaryFinalFocus,
+  createReverification,
+  createFinalFocus,
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
@@ -49,6 +54,7 @@ export function UserProfileWeb3WalletsSectionView({
                     <UserProfileWeb3WalletRowView
                       key={provider.id}
                       wallet={provider}
+                      triggerRef={registerTrigger(provider.id)}
                       isPending={pendingId === provider.id}
                       isDisabled={isBusy}
                       onConnect={onConnect}
@@ -71,6 +77,18 @@ export function UserProfileWeb3WalletsSectionView({
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
           finalFocus={finalFocus}
+        />
+      ) : null}
+      {setPrimaryReverification ? (
+        <ReverificationDialog
+          controller={setPrimaryReverification}
+          finalFocus={setPrimaryFinalFocus}
+        />
+      ) : null}
+      {createReverification ? (
+        <ReverificationDialog
+          controller={createReverification}
+          finalFocus={createFinalFocus}
         />
       ) : null}
     </>

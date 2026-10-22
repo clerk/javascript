@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react';
 import type userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
 
 import { type FakeFapiSeed, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import {
@@ -11,8 +10,9 @@ import {
   fapiUser,
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
-import { UserProfileProfilePanelView } from '../../user-profile-profile-panel.view';
+import { UserProfileProfilePanel } from '../../user-profile-profile-panel';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 
 export const google = fapiExternalAccount({ id: 'idn_google', provider: 'google', username: 'jdoe' });
@@ -65,21 +65,15 @@ export function deferred<T>() {
 
 export async function renderSection(accounts = [google], overrides: FakeFapiSeed = {}) {
   const fapi = serveFapi(signedIn(accounts, overrides));
-  const titleRef = createRef<HTMLDivElement>();
   const view = await renderWithClerk(
-    <UserProfileProfilePanelView
-      name='Jane Doe'
-      username=''
-      emails={[]}
-      phones={[]}
-      titleRef={titleRef}
-      connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
-    />,
+    <UserProfileProfilePanel>
+      <UserProfileConnectedAccountsSection />
+    </UserProfileProfilePanel>,
   );
   return { ...view, fapi };
 }
 
 export async function startReconnect(user: ReturnType<typeof userEvent.setup>, provider: string) {
-  await user.click(screen.getByRole('button', { name: `Manage ${provider}` }));
+  await openMenu(user, screen.getByRole('button', { name: `Manage ${provider}` }));
   await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
 }

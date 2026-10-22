@@ -1631,6 +1631,11 @@ export const nlNL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Gebruik een andere methode',
       subtitle: 'Voer het wachtwoord in dat bij je account hoort',
@@ -1779,6 +1784,10 @@ export const nlNL: LocalizationResource = {
     passkey: {
       subtitle: 'Gebruik je toegangssleutel voor authenticatie.',
       title: 'Authenticatie met toegangssleutel',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Gebruik een andere methode',

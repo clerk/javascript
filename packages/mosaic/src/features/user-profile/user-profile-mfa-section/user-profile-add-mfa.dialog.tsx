@@ -5,6 +5,7 @@ import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
+import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
 
 export interface UserProfileAddMfaDialogProps {
@@ -13,6 +14,8 @@ export interface UserProfileAddMfaDialogProps {
   children: ReactNode;
   disabled?: boolean;
   hideTrigger?: boolean;
+  reverifying?: boolean;
+  showCloseButton?: boolean;
   triggerRef?: Ref<HTMLButtonElement>;
 }
 
@@ -22,6 +25,8 @@ export function UserProfileAddMfaDialog({
   children,
   disabled,
   hideTrigger,
+  reverifying = false,
+  showCloseButton = true,
   triggerRef: triggerRefProp,
 }: UserProfileAddMfaDialogProps) {
   const m = useMessages('userProfileMfa');
@@ -31,6 +36,8 @@ export function UserProfileAddMfaDialog({
     <Dialog.Root
       open={open}
       onOpenChange={onOpenChange}
+      shouldCloseOnInteractOutside={!reverifying}
+      showCloseButton={showCloseButton}
     >
       {!hideTrigger ? (
         <Dialog.Trigger
@@ -46,7 +53,7 @@ export function UserProfileAddMfaDialog({
           }
         >
           <Icon
-            name='plus'
+            glyph={Plus}
             placement='inline-start'
             size='sm'
           />

@@ -92,6 +92,26 @@ describe('Select', () => {
       expect(value?.textContent).toBe('Pick a fruit...');
     });
 
+    it('shows placeholder over a function child when no value is selected', () => {
+      render(
+        <Select.Root
+          items={fruits}
+          multiple
+        >
+          <Select.Trigger>
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick fruits...'
+            >
+              {(values: string[]) => `${values.length} fruits`}
+            </Select.Value>
+          </Select.Trigger>
+        </Select.Root>,
+      );
+      const value = document.querySelector('[data-testid="select-value"]');
+      expect(value?.textContent).toBe('Pick fruits...');
+    });
+
     it('resolves label from items before options mount', () => {
       renderSelect({ defaultValue: 'banana' });
       const value = document.querySelector('[data-testid="select-value"]');
@@ -748,11 +768,11 @@ describe('Select', () => {
       await user.click(screen.getByRole('combobox'));
 
       expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'none');
-      expect(document.body).toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).toHaveStyle({ overflowY: 'hidden' });
 
       await user.keyboard('{Escape}');
       await waitFor(() => expect(screen.queryByTestId('select-positioner')).not.toBeInTheDocument());
-      expect(document.body).not.toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
     });
 
     it('positions like a menu when opened by touch', async () => {
@@ -763,7 +783,7 @@ describe('Select', () => {
       await user.pointer({ keys: '[TouchA]', target: trigger });
 
       expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'bottom');
-      expect(document.body).not.toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
     });
 
     it('positions like a menu when the trigger hugs the viewport edge', async () => {
@@ -921,6 +941,180 @@ describe('Select', () => {
       const options = screen.getAllByRole('option');
       expect(options[0]).toHaveAttribute('aria-disabled', 'false');
       expect(options[0]).toHaveAttribute('data-active');
+    });
+  });
+
+  describe('multiple', () => {
+    function renderMultiple(
+      props: Omit<React.ComponentProps<typeof Select.Root>, 'multiple' | 'children'> & {
+        value?: string[];
+        defaultValue?: string[];
+        onValueChange?: (value: string[]) => void;
+        renderValue?: (value: string[]) => React.ReactNode;
+        disabledValue?: string;
+      },
+    ) {
+      const { renderValue, disabledValue, ...rootProps } = props;
+      return render(
+        <Select.Root
+          items={fruits}
+          alignItemWithTrigger={false}
+          {...rootProps}
+          multiple
+        >
+          <Select.Trigger>
+            <Select.Value
+              data-testid='select-value'
+              placeholder='Pick fruits...'
+            >
+              {renderValue}
+            </Select.Value>
+          </Select.Trigger>
+          <Select.Positioner data-testid='select-positioner'>
+            <Select.Popup data-testid='select-popup'>
+              {fruits.map(({ label, value }) => (
+                <Select.Option
+                  key={value}
+                  value={value}
+                  label={label}
+                  disabled={value === disabledValue}
+                >
+                  {label}
+                </Select.Option>
+              ))}
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Root>,
+      );
+    }
+
+    function valueText() {
+      return document.querySelector('[data-testid="select-value"]')?.textContent;
+    }
+
+    it('adds and removes values on click and keeps the popup open', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderMultiple({ defaultValue: ['apple'], onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Cherry'));
+      expect(onValueChange).toHaveBeenLastCalledWith(['apple', 'cherry']);
+
+      await user.click(screen.getByText('Apple'));
+      expect(onValueChange).toHaveBeenLastCalledWith(['cherry']);
+
+      expect(screen.getByRole('combobox')).toHaveAttribute('data-open', '');
+      const options = screen.getAllByRole('option');
+      expect(options[0]).toHaveAttribute('aria-selected', 'false');
+      expect(options[2]).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('toggles the active option with Enter and keeps the popup open', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderMultiple({ onValueChange });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{Enter}');
+
+      expect(onValueChange).toHaveBeenCalledTimes(1);
+      expect(onValueChange.mock.calls[0]?.[0]).toHaveLength(1);
+      expect(screen.getByRole('combobox')).toHaveAttribute('data-open', '');
+
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('combobox')).toHaveAttribute('data-closed', '');
+    });
+
+    it('marks every selected option and the listbox as multiselectable', () => {
+      renderMultiple({ defaultValue: ['apple', 'cherry'], defaultOpen: true });
+
+      const options = screen.getAllByRole('option');
+      expect(options.map(option => option.getAttribute('aria-selected'))).toEqual(['true', 'false', 'true']);
+      expect(screen.getByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
+    });
+
+    it('shows the placeholder for an empty selection', () => {
+      renderMultiple({ defaultValue: [] });
+      expect(valueText()).toBe('Pick fruits...');
+    });
+
+    it('joins the selected labels in value order', () => {
+      renderMultiple({ defaultValue: ['cherry', 'apple'] });
+      expect(valueText()).toBe('Cherry, Apple');
+    });
+
+    it('passes the selected values to a Value render function', () => {
+      renderMultiple({
+        defaultValue: ['banana', 'cherry'],
+        renderValue: value => `${value.length} selected`,
+      });
+      expect(valueText()).toBe('2 selected');
+    });
+
+    it('keeps the labels after the popup closes', async () => {
+      const user = userEvent.setup();
+      renderMultiple({});
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Banana'));
+      await user.click(screen.getByText('Apple'));
+      await user.keyboard('{Escape}');
+
+      expect(valueText()).toBe('Banana, Apple');
+    });
+
+    it('keeps the displayed values when the controlled parent rejects the change', async () => {
+      const user = userEvent.setup();
+      renderMultiple({ value: ['apple'], onValueChange: () => {} });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Banana'));
+
+      expect(valueText()).toBe('Apple');
+      expect(screen.getAllByRole('option')[1]).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('does not toggle a disabled option', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderMultiple({ onValueChange, disabledValue: 'banana' });
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByText('Banana'));
+
+      expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('opens on the last selected value', async () => {
+      const user = userEvent.setup();
+      renderMultiple({ defaultValue: ['apple', 'cherry'] });
+
+      const trigger = screen.getByRole('combobox');
+      trigger.focus();
+      await user.keyboard('{ArrowDown}');
+
+      const options = screen.getAllByRole('option');
+      await waitFor(() => expect(document.activeElement).toBe(options[2]));
+      expect(options[2]).toHaveAttribute('data-active', '');
+    });
+
+    it('reopens on the first option after the last value is removed', async () => {
+      const user = userEvent.setup();
+      renderMultiple({ defaultValue: ['cherry'] });
+
+      const trigger = screen.getByRole('combobox');
+      await user.click(trigger);
+      await user.click(screen.getByRole('option', { name: 'Cherry' }));
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+
+      trigger.focus();
+      await user.keyboard('{ArrowDown}');
+
+      const options = screen.getAllByRole('option');
+      await waitFor(() => expect(document.activeElement).toBe(options[0]));
     });
   });
 });

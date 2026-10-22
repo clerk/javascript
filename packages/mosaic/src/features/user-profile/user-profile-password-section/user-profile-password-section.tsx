@@ -14,10 +14,6 @@ export interface UserProfilePasswordSectionProps {
 
 export function UserProfilePasswordSection({ fallback = null }: UserProfilePasswordSectionProps) {
   const model = useUserProfilePasswordModel();
-  return renderPasswordSection(model, fallback);
-}
-
-export function renderPasswordSection(model: UserProfilePasswordModel, fallback: ReactNode): ReactNode {
   if (model.status === 'loading') {
     return fallback || null;
   }
@@ -47,6 +43,7 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
     policy: model,
     validatePassword: model.validatePassword,
     onSubmit: model.updatePassword,
+    reverification: model.reverification,
   });
 
   return (
@@ -61,6 +58,8 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
           onOpenChange={controller.onOpenChange}
           hasPassword={hasPassword}
           requiresCurrentPassword={model.requiresCurrentPassword}
+          reverification={model.reverification}
+          step={controller.step}
           trigger={
             <Button
               color='neutral'

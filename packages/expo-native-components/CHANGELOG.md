@@ -1,5 +1,37 @@
 # @clerk/expo-native-components
 
+## 0.4.0
+
+### Minor Changes
+
+- Remove the legacy client sync functions. Older `@clerk/expo` versions need them to configure the native components, which render blank without them. Update `@clerk/expo` to the latest version when you update this package. ([#9956](https://github.com/clerk/javascript/pull/9956)) by [@mikepitre](https://github.com/mikepitre)
+
+## 0.3.0
+
+### Minor Changes
+
+- Add native module support for the upcoming single-token client sync between `@clerk/expo` and the Clerk iOS and Android SDKs. The native SDK's stored device token becomes the one token both runtimes use, and each side is notified to reload its own client when the other changes it. Existing sync behavior is unchanged until `@clerk/expo` adopts it. ([#9957](https://github.com/clerk/javascript/pull/9957)) by [@mikepitre](https://github.com/mikepitre)
+
+## 0.2.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Fix Android builds on Expo SDK 58. Compiling `@clerk/expo-native-components` no longer fails with `Unresolved reference 'LocalSavedStateRegistryOwner'`. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Apply the Clerk theme to custom user-profile page backgrounds and navigation bars on iOS. ([#10272](https://github.com/clerk/javascript/pull/10272)) by [@juliusmarminge](https://github.com/juliusmarminge)
+
+## 0.1.1
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.11` to `1.2.1`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.2.1. ([#10250](https://github.com/clerk/javascript/pull/10250)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Native components now respect the `proxyUrl` passed to `<ClerkProvider>` and route Frontend API requests through the configured proxy. Applying the proxy requires a new app binary; a JS-only OTA update safely keeps the previous behavior. ([#9373](https://github.com/clerk/javascript/pull/9373)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 0.1.0
 
 ### Minor Changes

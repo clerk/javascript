@@ -6,6 +6,8 @@ import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
 import type { MosaicLocalization } from './localization';
 import { MosaicLocalizationProvider, resolveLocalization } from './localization';
+import type { ModalSurfaces } from './modals/modal.types';
+import { ModalHost } from './modals/modal-host';
 
 export interface MosaicProviderProps {
   children: React.ReactNode;
@@ -27,9 +29,13 @@ export function MosaicProvider({ children, icons, localization }: MosaicProvider
     <MosaicIconsProvider value={iconsValue}>
       <MosaicLocalizationProvider value={localizationValue}>
         <MosaicNowProvider value={now}>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <ModalHost surfaces={modalSurfaces}>{children}</ModalHost>
+          </ToastProvider>
         </MosaicNowProvider>
       </MosaicLocalizationProvider>
     </MosaicIconsProvider>
   );
 }
+
+const modalSurfaces: ModalSurfaces = [];

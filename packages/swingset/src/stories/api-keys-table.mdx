@@ -2,7 +2,9 @@ import * as Stories from './api-keys-table.stories';
 
 # APIKeysTable
 
-A table of the API keys that belong to a user or an organization, with search, page navigation, creation, and revocation confirmed by typing the key name. `APIKeysTable` takes the `subject` whose keys it lists, reads them from Clerk, and offers creation and revocation only when the signed-in user may manage them. The user and organization profile API keys panels render it under their own title. Pass `messages` to replace any of its strings.
+A table of the API keys that belong to a user or an organization, with search, page navigation, creation, and revocation confirmed by typing the key name. `APIKeysTable` takes the `subject` whose keys it lists, reads them from Clerk, and offers creation and revocation only when the signed-in user may manage them. The user and organization profile API keys panels render it under their own title. `perPage` sets how many keys a page lists, 10 by default. Pass `messages` to replace any of its strings.
+
+After a key is created, its secret is shown once. The secret dialog stays open on Escape and outside clicks until the secret has been copied, or a copy has failed.
 
 ## Example
 
@@ -35,6 +37,12 @@ A table of the API keys that belong to a user or an organization, with search, p
 An organization subject explains organization keys in its empty state.
 
 <Story name='Organization' storyModule={Stories} />
+
+### Description
+
+`showDescription` adds an optional Description field to the create dialog. The description is saved with the key.
+
+<Story name='Description' storyModule={Stories} />
 
 ### Empty
 

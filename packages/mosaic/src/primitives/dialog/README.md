@@ -133,17 +133,17 @@ the close was pointer-driven, where focus is left where the pointer put it (see 
 
 ## Parts
 
-| Part                 | Default Element | Description                                     |
-| -------------------- | --------------- | ----------------------------------------------- |
-| `Dialog.Root`        | —               | Root context provider                           |
-| `Dialog.Trigger`     | `<button>`      | Opens/closes the dialog on click                |
-| `Dialog.Portal`      | —               | Portals children (defaults to `document.body`)  |
-| `Dialog.Backdrop`    | `<div>`         | Semi-transparent overlay surface                |
-| `Dialog.Viewport`    | `<div>`         | Fixed centering container; owns scroll lock     |
-| `Dialog.Popup`       | `<div>`         | The dialog content container                    |
-| `Dialog.Title`       | `<h2>`          | Dialog heading, wired to `aria-labelledby`      |
-| `Dialog.Description` | `<p>`           | Dialog description, wired to `aria-describedby` |
-| `Dialog.Close`       | `<button>`      | Closes the dialog on click                      |
+| Part                 | Default Element | Description                                                                         |
+| -------------------- | --------------- | ----------------------------------------------------------------------------------- |
+| `Dialog.Root`        | —               | Root context provider                                                               |
+| `Dialog.Trigger`     | `<button>`      | Opens/closes the dialog on click                                                    |
+| `Dialog.Portal`      | —               | Portals children (defaults to the `PortalProvider` container, else `document.body`) |
+| `Dialog.Backdrop`    | `<div>`         | Semi-transparent overlay surface                                                    |
+| `Dialog.Viewport`    | `<div>`         | Fixed centering container; owns scroll lock                                         |
+| `Dialog.Popup`       | `<div>`         | The dialog content container                                                        |
+| `Dialog.Title`       | `<h2>`          | Dialog heading, wired to `aria-labelledby`                                          |
+| `Dialog.Description` | `<p>`           | Dialog description, wired to `aria-describedby`                                     |
+| `Dialog.Close`       | `<button>`      | Closes the dialog on click                                                          |
 
 ## Props
 
@@ -185,11 +185,11 @@ dismisses but Escape does not — unrepresentable.
 
 ### `Dialog.Portal`
 
-| Prop   | Type                                                          | Default         | Description                      |
-| ------ | ------------------------------------------------------------- | --------------- | -------------------------------- |
-| `root` | `HTMLElement \| null \| React.RefObject<HTMLElement \| null>` | `document.body` | Container element to portal into |
+| Prop   | Type                                                          | Default                                              | Description                      |
+| ------ | ------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------- |
+| `root` | `HTMLElement \| null \| React.RefObject<HTMLElement \| null>` | the `PortalProvider` container, else `document.body` | Container element to portal into |
 
-When `root` is provided, the dialog is portaled into that container instead of `document.body`. Consumers handle layout via CSS on the container (or by omitting `Dialog.Viewport` and styling their own).
+When `root` is provided, the dialog is portaled into that container instead of the default. Consumers handle layout via CSS on the container (or by omitting `Dialog.Viewport` and styling their own).
 
 ### `Dialog.Viewport`
 

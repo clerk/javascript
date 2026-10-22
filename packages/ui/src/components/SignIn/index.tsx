@@ -98,7 +98,7 @@ function SignInRoutes(): JSX.Element {
             {/* No canActivate guard — same resolution race as the sign-in
                 protect-check route above; the card owns its own routing. */}
             <Route path='protect-check'>
-              <LazySignUpProtectCheck />
+              <LazySignUpProtectCheck oauthCallbackParams={buildCombinedFlowOAuthCallbackParams(signUpContext)} />
             </Route>
             <Route
               path='verify-email-address'

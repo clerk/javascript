@@ -8,6 +8,9 @@ children, `Panel.Title` renders the page's heading, and `Panel.Sections` stacks 
 [Profile](/components/profile) page, `Panel.Title` renders nothing: the profile renders the page title,
 and a ref on `Panel.Title` reaches it.
 
+Wrap the title in [Skeleton](/components/skeleton) for a loading state:
+`<Panel.Title><Skeleton show={loading}>Account</Skeleton></Panel.Title>`.
+
 ## Example
 
 <Story
@@ -61,6 +64,19 @@ Every part takes `xstyle`, `ref`, and `render` along with its element's props.
 | A panel alone                           | `h2`          | `h3`            |
 | Inside `Profile.ContentPanel`           | `h3`          | `h4`            |
 | Inside `HeadingLevelProvider level={4}` | `h4`          | `h5`            |
+
+## Focus
+
+`Panel.Title` takes `tabIndex={-1}`, so it can receive focus without joining the tab order. Content
+inside `Panel.Root` reaches the title with `usePanelTitle()`, which returns a function that gives
+the title element. Inside a profile page, that is the profile's page title.
+
+```tsx
+import { usePanelTitle } from '@clerk/mosaic/components/panel';
+
+const panelTitle = usePanelTitle();
+panelTitle()?.focus();
+```
 
 ## Styling
 

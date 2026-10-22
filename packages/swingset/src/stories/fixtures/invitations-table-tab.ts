@@ -2,7 +2,7 @@ import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type {
   InvitationsTableTabViewProps,
   OrganizationProfileInvitation,
-} from '@clerk/mosaic/features/organization-profile/invitations-table-tab.types';
+} from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/invitations-table-tab.types';
 import { useListRemovalFocus } from '@clerk/mosaic/hooks/use-list-removal-focus';
 import { useLocale } from '@clerk/mosaic/localization';
 import { useRef, useState } from 'react';

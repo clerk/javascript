@@ -183,6 +183,11 @@ import {
   SaveFails as OrganizationProfileProfileSectionSaveFails,
 } from '../stories/organization-profile-profile-section.stories';
 import {
+  Default as OrganizationSwitcherDefault,
+  meta as organizationSwitcherMeta,
+  NoOrganizationSelected as OrganizationSwitcherNoOrganizationSelected,
+} from '../stories/organization-switcher.stories';
+import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
   Error as OtpComponentError,
@@ -214,12 +219,20 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import { meta as portalMeta } from '../stories/portal.stories';
 import {
   Customized as ProfileCustomized,
   Default as ProfileDefault,
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
+import {
+  Default as RadioDefault,
+  Descriptions as RadioDescriptions,
+  meta as radioMeta,
+  Sizes as RadioSizes,
+  States as RadioStates,
+} from '../stories/radio.stories';
 import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
@@ -274,6 +287,22 @@ import {
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import {
+  Elements as SkeletonElements,
+  HoldSpace as SkeletonHoldSpace,
+  meta as skeletonMeta,
+  NotShown as SkeletonNotShown,
+  Primary as SkeletonPrimary,
+  Shapes as SkeletonShapes,
+  TextContent as SkeletonTextContent,
+} from '../stories/skeleton.stories';
+import {
+  Default as SwitchDefault,
+  meta as switchMeta,
+  Sizes as SwitchSizes,
+  States as SwitchStates,
+  WithField as SwitchWithField,
+} from '../stories/switch.stories';
+import {
   Default as TableDefault,
   Empty as TableEmpty,
   meta as tableMeta,
@@ -316,7 +345,6 @@ import {
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
-  Organizations as UserButtonOrganizations,
   User as UserButtonUser,
 } from '../stories/user-button.stories';
 import {
@@ -532,6 +560,16 @@ const avatarModule: StoryModule = {
   Shapes: AvatarShapes,
 };
 
+const skeletonModule: StoryModule = {
+  meta: skeletonMeta,
+  Primary: SkeletonPrimary,
+  TextContent: SkeletonTextContent,
+  Elements: SkeletonElements,
+  Shapes: SkeletonShapes,
+  HoldSpace: SkeletonHoldSpace,
+  NotShown: SkeletonNotShown,
+};
+
 const badgeModule: StoryModule = {
   meta: badgeMeta,
   Primary: BadgePrimary,
@@ -597,6 +635,13 @@ const profileComponentModule: StoryModule = {
   Customized: ProfileCustomized,
   Transitions: ProfileTransitions,
 };
+const radioModule: StoryModule = {
+  meta: radioMeta,
+  Default: RadioDefault,
+  Descriptions: RadioDescriptions,
+  States: RadioStates,
+  Sizes: RadioSizes,
+};
 
 const dataListModule: StoryModule = {
   meta: dataListMeta,
@@ -623,8 +668,13 @@ const itemModule: StoryModule = {
 const userButtonModule: StoryModule = {
   meta: userButtonMeta,
   Combined: UserButtonCombined,
-  Organizations: UserButtonOrganizations,
   User: UserButtonUser,
+};
+
+const organizationSwitcherModule: StoryModule = {
+  meta: organizationSwitcherMeta,
+  Default: OrganizationSwitcherDefault,
+  NoOrganizationSelected: OrganizationSwitcherNoOrganizationSelected,
 };
 
 const headingModule: StoryModule = {
@@ -719,6 +769,7 @@ const flowModule: StoryModule = { meta: flowMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
+const portalModule: StoryModule = { meta: portalMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tagInputModule: StoryModule = { meta: tagInputMeta };
@@ -766,6 +817,14 @@ const segmentedControlModule: StoryModule = {
   meta: segmentedControlMeta,
   Default: SegmentedControlDefault,
   Disabled: SegmentedControlDisabled,
+};
+
+const switchModule: StoryModule = {
+  meta: switchMeta,
+  Default: SwitchDefault,
+  States: SwitchStates,
+  Sizes: SwitchSizes,
+  WithField: SwitchWithField,
 };
 
 const tabsComponentModule: StoryModule = {
@@ -958,6 +1017,8 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
+  // Organization Switcher
+  organizationSwitcherModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels
@@ -1000,6 +1061,7 @@ export const registry: StoryModule[] = [
   actionBarModule,
   avatarModule,
   badgeModule,
+  skeletonModule,
   bannerModule,
   buttonModule,
   cardComponentModule,
@@ -1025,9 +1087,11 @@ export const registry: StoryModule[] = [
   panelModule,
   popoverComponentModule,
   profileComponentModule,
+  radioModule,
   sectionModule,
   segmentedControlModule,
   selectComponentModule,
+  switchModule,
   tableModule,
   tabsComponentModule,
   tagInputComponentModule,
@@ -1048,6 +1112,7 @@ export const registry: StoryModule[] = [
   menuModule,
   otpModule,
   popoverModule,
+  portalModule,
   selectModule,
   tabsModule,
   tagInputModule,

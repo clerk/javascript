@@ -9,6 +9,7 @@ import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { Button } from '../../../components/button';
 import { Menu } from '../../../components/menu';
@@ -273,16 +274,16 @@ describe('Confirmation shared by rows', () => {
     expect(screen.queryByRole('alertdialog')).toBeNull();
 
     const firstTrigger = screen.getByRole('button', { name: 'Actions for Preston' });
-    await user.click(firstTrigger);
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove' }));
+    await openMenu(user, firstTrigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
     expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Remove Preston?');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     await waitFor(() => expect(firstTrigger).toHaveFocus());
 
     const secondTrigger = screen.getByRole('button', { name: 'Actions for Jane' });
-    await user.click(secondTrigger);
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove' }));
+    await openMenu(user, secondTrigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
     const dialog = await screen.findByRole('alertdialog');
     expect(dialog).toHaveAccessibleName('Remove Jane?');
     expect(dialog).toHaveAccessibleDescription('Jane will be removed from the organization.');
@@ -297,12 +298,10 @@ describe('Confirmation shared by rows', () => {
 function ReverifiedHost({
   action,
   cleanupMs,
-  settleMs,
   beforeRunMs,
 }: {
   action: () => Promise<unknown>;
   cleanupMs?: number;
-  settleMs?: number;
   beforeRunMs?: number;
 }) {
   const [run, reverification] = useReverificationFlow(action);
@@ -312,11 +311,7 @@ function ReverifiedHost({
         await new Promise(resolve => setTimeout(resolve, beforeRunMs));
       }
       try {
-        const result = await run();
-        if (settleMs !== undefined) {
-          await new Promise(resolve => setTimeout(resolve, settleMs));
-        }
-        return result;
+        return await run();
       } catch (error) {
         if (cleanupMs !== undefined) {
           await new Promise(resolve => setTimeout(resolve, cleanupMs));
@@ -435,9 +430,13 @@ describe('Confirmation with reverification', () => {
   }
 
   for (const settleMs of [undefined, 400]) {
-    it(`does not go back to the confirm step after a successful verification (host settles after ${settleMs ?? 0}ms)`, async () => {
+    it(`does not go back to the confirm step after a successful verification (action settles after ${settleMs ?? 0}ms)`, async () => {
       serveFapi(passwordVerification);
-      const { user } = await renderReverified({ action: interruptedOnce(), settleMs });
+      const action = vi
+        .fn()
+        .mockResolvedValueOnce(reverificationError())
+        .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ done: true }), settleMs ?? 0)));
+      const { user } = await renderReverified({ action });
       await confirmIntoVerification(user);
 
       const field = await screen.findByLabelText('Password');

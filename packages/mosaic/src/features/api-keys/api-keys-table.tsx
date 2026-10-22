@@ -10,8 +10,14 @@ import { APIKeysTableView } from './api-keys-table.view';
 
 export interface APIKeysTableProps {
   subject: string;
+  perPage?: number;
+  showDescription?: boolean;
   messages?: Partial<APIKeysTableMessages>;
   fallback?: ReactNode;
+}
+
+export interface APIKeysPageProps extends Pick<APIKeysTableProps, 'perPage' | 'showDescription'> {
+  hide?: boolean;
 }
 
 export function APIKeysTable(props: APIKeysTableProps) {
@@ -23,13 +29,25 @@ export function APIKeysTable(props: APIKeysTableProps) {
   );
 }
 
-function SubjectAPIKeysTable({ subject, messages: overrides, fallback }: APIKeysTableProps) {
+function SubjectAPIKeysTable({
+  subject,
+  perPage,
+  showDescription = false,
+  messages: overrides,
+  fallback,
+}: APIKeysTableProps) {
   const messages = resolveAPIKeysTableMessages(
     useMessages('apiKeysTable'),
     isOrganizationId(subject) ? 'organization' : 'user',
     overrides,
   );
-  const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController(subject, messages);
+  const pageSize = perPage !== undefined && Number.isInteger(perPage) && perPage > 0 ? perPage : PAGE_SIZE;
+  const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController({
+    subject,
+    pageSize,
+    showDescription,
+    messages,
+  });
 
   if (!isLoaded || !isAvailable) {
     return fallback ?? null;
@@ -38,7 +56,7 @@ function SubjectAPIKeysTable({ subject, messages: overrides, fallback }: APIKeys
   return (
     <APIKeysTableView
       messages={messages}
-      pageSize={PAGE_SIZE}
+      pageSize={pageSize}
       {...controller}
       {...manage}
     />

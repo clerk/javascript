@@ -1,7 +1,9 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -13,11 +15,12 @@ import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../.
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
+import { SkeletonContext } from '../skeleton';
 import { sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
-export type SectionGroupProps = MosaicComponentProps<'div'>;
+export type SectionGroupProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionHeaderProps = MosaicComponentProps<'div'>;
 export type SectionTitleProps = Omit<HeadingProps, 'size'>;
 export type SectionBodyProps = MosaicComponentProps<'div'>;
@@ -55,7 +58,7 @@ const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoo
 });
 
 const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function SectionGroup(
-  { render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
+  { skeleton = false, render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
   ref,
 ) {
   const [titleId, setTitleId] = React.useState<string>();
@@ -64,15 +67,29 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      role: 'group',
-      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleId),
-    },
+    props: skeleton
+      ? {
+          'aria-hidden': true,
+          ...inertProps(true),
+          ...mergeStyleProps(
+            themeProps('section-group', { skeleton }),
+            stylex.props(reset.base, styles.group, xstyle),
+            rest,
+          ),
+        }
+      : {
+          role: 'group',
+          ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
+          'aria-label': ariaLabel,
+          'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleId),
+        },
   });
 
-  return <SectionGroupContext.Provider value={setTitleId}>{element}</SectionGroupContext.Provider>;
+  return (
+    <SectionGroupContext.Provider value={setTitleId}>
+      <SkeletonContext.Provider value={skeleton}>{element}</SkeletonContext.Provider>
+    </SectionGroupContext.Provider>
+  );
 });
 
 const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function SectionHeader(
@@ -339,7 +356,7 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
           {...transitionProps}
           style={{ ...messageProps.style, ...transitionProps.style }}
         >
-          <FeedbackBody icon='exclamation-circle'>{message}</FeedbackBody>
+          <FeedbackBody icon={ExclamationCircle}>{message}</FeedbackBody>
         </span>
       ),
     },

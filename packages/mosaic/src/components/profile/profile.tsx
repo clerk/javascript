@@ -2,6 +2,9 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ArrowLeft } from '../../icons/glyphs/arrow-left';
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { useMessages } from '../../localization';
 import { Select as SelectPrimitive } from '../../primitives/select';
 import type { TabsProps } from '../../primitives/tabs';
 import { Tabs } from '../../primitives/tabs';
@@ -11,16 +14,18 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
+import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
+import type { DialogContextValue } from '../dialog';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { Icon } from '../icon';
 import { SelectPopup } from '../select';
 import { VisuallyHidden } from '../visually-hidden';
-import type { ProfileContextValue, ProfileNavLayout } from './profile.context';
+import type { ProfileContextValue, ProfileDismiss, ProfileNavLayout } from './profile.context';
 import { ContentPanelContext, ProfileContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
@@ -30,6 +35,13 @@ function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
     return 'sheet';
   }
   return sentinelWidth >= 2 ? 'select' : 'column';
+}
+
+function dismissOf(dialog: DialogContextValue | null, backInNav: boolean): ProfileDismiss {
+  if (!isInDialog(dialog) || !dialog.showCloseButton) {
+    return 'none';
+  }
+  return backInNav ? 'back' : 'corner';
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -68,7 +80,8 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
-  const inline = elevation === 'flush';
+  const inline = elevation === 'flush' && !isInDialog(dialog);
+  const fullscreen = dialog?.variant === 'fullscreen';
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
   const [sentinel, setSentinel] = React.useState<HTMLSpanElement | null>(null);
@@ -80,6 +93,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     return autoUpdate(sentinel, () => setNavLayout(navLayoutFor(getDimensions(sentinel).width)));
   }, [sentinel]);
   const compact = navLayout !== 'column';
+  const dismiss = dismissOf(dialog, fullscreen && !compact);
   const pageTitleId = React.useId();
   const pageTitleRef = React.useRef<HTMLHeadingElement | null>(null);
   const navTriggerRef = React.useRef<HTMLButtonElement | null>(null);
@@ -116,6 +130,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       pageTitleRef,
       navTriggerRef,
       inline,
+      dismiss,
     }),
     [
       titleId,
@@ -130,6 +145,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       navItems,
       pageTitleId,
       inline,
+      dismiss,
     ],
   );
   const element = useRender({
@@ -139,7 +155,13 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
-        stylex.props(reset.base, styles.root, isInDialog(dialog) && styles.rootInDialog, xstyle),
+        stylex.props(
+          reset.base,
+          styles.root,
+          isInDialog(dialog) && styles.rootInDialog,
+          fullscreen && styles.rootFullscreen,
+          xstyle,
+        ),
         rest,
       ),
       children: (
@@ -150,7 +172,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM so it takes the dialog's opening focus, as in `Card.Header`. */}
-          {isInDialog(dialog) && dialog.showCloseButton ? <Dialog.CloseButton /> : null}
+          {dismiss === 'corner' ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),
@@ -159,6 +181,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
                 styles.layout,
                 inline && styles.layoutInline,
                 dialog !== null && !inline && styles.layoutInDialog,
+                fullscreen && styles.layoutFullscreen,
               ),
             )}
           >
@@ -209,6 +232,32 @@ type NavItemMode = 'tab' | 'option';
 // `Profile.Nav` children render again as the select's options.
 const NavItemModeContext = React.createContext<NavItemMode>('tab');
 
+function BackButton() {
+  const m = useMessages('profile');
+  return (
+    <Dialog.Close
+      {...mergeStyleProps(
+        themeProps('profile-back-button'),
+        stylex.props(reset.base, styles.navItem, focusOutline.visible, styles.backItem),
+      )}
+    >
+      <span
+        aria-hidden
+        {...mergeStyleProps(themeProps('profile-back-button-icon'), stylex.props(reset.base, styles.navItemIcon))}
+      >
+        <Icon
+          glyph={ArrowLeft}
+          size='sm'
+          xstyle={rtl.mirror}
+        />
+      </span>
+      <span {...mergeStyleProps(themeProps('profile-back-button-label'), stylex.props(styles.navItemLabel))}>
+        {m.backToApp}
+      </span>
+    </Dialog.Close>
+  );
+}
+
 function NavBranding() {
   return (
     <div {...mergeStyleProps(themeProps('profile-branding'), stylex.props(reset.base, styles.branding))}>
@@ -225,8 +274,18 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   { children, render, xstyle, ...rest },
   ref,
 ) {
-  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, setNavItems, navTriggerRef, inline } =
-    useProfileContext('Profile.Nav');
+  const {
+    titleId,
+    renderBranding,
+    compact,
+    navLayout,
+    navOpen,
+    closeNav,
+    setNavItems,
+    navTriggerRef,
+    inline,
+    dismiss,
+  } = useProfileContext('Profile.Nav');
   useSafeLayoutEffect(() => {
     setNavItems(children);
   }, [children, setNavItems]);
@@ -244,6 +303,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       ),
       children: (
         <>
+          {dismiss === 'back' ? <BackButton /> : null}
           <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
             {children}
           </Tabs.List>
@@ -382,7 +442,7 @@ function PageTitle({ title }: { title: React.ReactNode }) {
     <>
       {label}
       <Icon
-        name='chevron-down'
+        glyph={ChevronDown}
         size='sm'
         {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
       />
@@ -498,12 +558,10 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
 
 export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
   value: string;
-  /** Keeps unselected pages mounted (`inert`, in flow) so a page transition can be styled. */
-  shouldForceMount?: boolean;
 }
 
 const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
-  { value, shouldForceMount, xstyle, ...rest },
+  { value, xstyle, ...rest },
   ref,
 ) {
   const { compact, pageTitleId } = useProfileContext('Profile.ContentPanel');
@@ -513,7 +571,6 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
         <Tabs.Panel
           ref={ref}
           value={value}
-          shouldForceMount={shouldForceMount}
           aria-labelledby={`${pageTitleId}-label`}
           // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
           {...(compact ? { role: 'group', tabIndex: undefined } : null)}
@@ -531,7 +588,7 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  * <Profile.Root value={page} onValueChange={setPage}>
  *   <Profile.Title>User profile</Profile.Title>
  *   <Profile.Nav>
- *     <Profile.NavItem value='account' icon={<Icon name='user-circle' size='sm' />}>Account</Profile.NavItem>
+ *     <Profile.NavItem value='account' icon={<Icon glyph={UserCircle} size='sm' />}>Account</Profile.NavItem>
  *   </Profile.Nav>
  *   <Profile.Content pageTitle='Account'>
  *     <Profile.ContentPanel value='account'>…</Profile.ContentPanel>

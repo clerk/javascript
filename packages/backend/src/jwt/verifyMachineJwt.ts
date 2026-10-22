@@ -72,8 +72,9 @@ async function resolveKeyAndVerifyJwt(
     }
 
     const { data: payload, errors: verifyErrors } = await verifyJwt(token, {
-      ...options,
       key,
+      audience: options.audience,
+      clockSkewInMs: options.clockSkewInMs,
       ...(headerType ? { headerType } : {}),
     });
 
