@@ -119,7 +119,7 @@ export function applySupportedAppVersion(requestGeneration: number): void {
     return;
   }
   serverAnswerCount += 1;
-  serverStatus = supportedStatus();
+  serverStatus = environmentStatus?.isSupported ? environmentStatus : supportedStatus();
   publish();
 }
 

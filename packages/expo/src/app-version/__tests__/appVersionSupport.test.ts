@@ -202,6 +202,35 @@ describe('appVersionSupport', () => {
     expect(store.getAppVersionSupportStatus().minimumVersion).toBe('2.0');
   });
 
+  test('a supported answer keeps the minimum and store page the environment set', async () => {
+    mocks.identity = { platform: 'ios', appIdentifier: 'com.example.app', version: '2.1', displayVersion: '2.1' };
+    const store = await loadStore();
+    fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
+
+    store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+
+    expect(store.getAppVersionSupportStatus()).toEqual({
+      isSupported: true,
+      currentVersion: '2.1',
+      minimumVersion: '2.0',
+      updateUrl: APP_STORE_URL,
+    });
+  });
+
+  test('a supported answer drops a minimum the server no longer enforces', async () => {
+    const store = await loadStore();
+    fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
+
+    store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+
+    expect(store.getAppVersionSupportStatus()).toEqual({
+      isSupported: true,
+      currentVersion: '1.9.9',
+      minimumVersion: null,
+      updateUrl: null,
+    });
+  });
+
   test('ignores answers for a Clerk instance that was replaced', async () => {
     const store = await loadStore();
     const staleGeneration = store.getAppVersionSupportGeneration();
