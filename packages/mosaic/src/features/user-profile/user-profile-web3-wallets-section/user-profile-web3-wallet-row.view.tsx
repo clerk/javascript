@@ -106,6 +106,8 @@ export function UserProfileWeb3WalletRowView({
               <ActionMenu
                 triggerRef={triggerRef}
                 actions={actions}
+                disabled={isDisabled}
+                focusableWhenDisabled
                 label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
               />
             ) : null}
