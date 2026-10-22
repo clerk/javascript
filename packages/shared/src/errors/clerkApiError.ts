@@ -35,6 +35,7 @@ export class ClerkAPIError<Meta extends ClerkAPIErrorMeta = any> implements Cler
         linkUrl: json.meta?.link_url,
         linkText: json.meta?.link_text,
         data: json.meta?.data,
+        lockoutExpiresInSeconds: json.meta?.lockout_expires_in_seconds,
       } as unknown as Meta,
     };
     this.code = parsedError.code;

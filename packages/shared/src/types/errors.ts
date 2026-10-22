@@ -30,6 +30,7 @@ export interface ClerkAPIErrorJSON {
     link_url?: string;
     link_text?: string;
     data?: Record<string, string | number | boolean>;
+    lockout_expires_in_seconds?: number;
   };
 }
 
@@ -122,6 +123,11 @@ export interface ClerkAPIError {
      * sensitive.
      */
     data?: Record<string, string | number | boolean>;
+    /**
+     * Seconds until a `user_locked` account can try again. Taken from
+     * `meta.lockout_expires_in_seconds` on the API error.
+     */
+    lockoutExpiresInSeconds?: number;
   };
 }
 
