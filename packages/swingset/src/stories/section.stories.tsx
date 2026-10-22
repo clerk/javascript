@@ -660,7 +660,7 @@ function LoadingDevices() {
                   <Section.Media size='lg'>
                     <IconFrame>
                       <Icon
-                        name={item.icon}
+                        glyph={item.icon}
                         size='lg'
                       />
                     </IconFrame>
