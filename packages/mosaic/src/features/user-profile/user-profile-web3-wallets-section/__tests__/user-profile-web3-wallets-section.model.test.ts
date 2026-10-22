@@ -29,6 +29,19 @@ describe('Web3 wallet projection', () => {
     });
   });
 
+  it('marks monochrome provider logos', () => {
+    const result = projectWeb3Wallets({
+      wallets: [metamask],
+      primaryId: null,
+      enabledStrategies: ['web3_metamask_signature', 'web3_okx_wallet_signature'],
+      allowCreation: true,
+    });
+    expect(result).toMatchObject({
+      wallets: [{ id: 'wallet_metamask', monochromeIcon: false }],
+      availableProviders: [{ id: 'web3_okx_wallet_signature', monochromeIcon: true }],
+    });
+  });
+
   it('WEB3-02 keeps unverified wallets and their provider available', () => {
     const result = projectWeb3Wallets({
       wallets: [{ ...metamask, verification: { ...metamask.verification, status: 'unverified' } }],
