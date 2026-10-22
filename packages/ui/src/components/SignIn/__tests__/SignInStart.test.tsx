@@ -162,25 +162,6 @@ describe('SignInStart', () => {
         screen.getByText('Use passkey instead');
       });
 
-      it('puts webauthn after the field name when passkey autofill is on', async () => {
-        const { wrapper } = await createFixtures(f => {
-          f.withEmailAddress();
-          f.withPasskey();
-          f.withPasskeySettings({
-            allow_autofill: true,
-            show_sign_in_button: false,
-          });
-        });
-
-        render(<SignInStart />, { wrapper });
-        await waitFor(() => {
-          expect(screen.getByRole('textbox', { name: /email address/i })).toHaveAttribute(
-            'autocomplete',
-            'email webauthn',
-          );
-        });
-      });
-
       it('enables login with passkey via autofill', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
@@ -202,6 +183,10 @@ describe('SignInStart', () => {
             flow: 'autofill',
           });
         });
+        expect(screen.getByRole('textbox', { name: /email address/i })).toHaveAttribute(
+          'autocomplete',
+          'email webauthn',
+        );
       });
 
       it('does not display related-origin errors from passkey autofill', async () => {
