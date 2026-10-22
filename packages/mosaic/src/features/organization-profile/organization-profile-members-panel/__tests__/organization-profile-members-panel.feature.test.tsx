@@ -86,15 +86,15 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(columnWidths()).toEqual(loadingWidths);
   });
 
-  it('does not load roles for a member who cannot change them', async () => {
-    serve();
-    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+  it('loads roles for a member who can only read members', async () => {
+    const fapi = serve();
+    fapi.hasRoleSetMigration = true;
 
     await renderWithClerk(<OrganizationProfileMembersPanel />);
 
-    expect(await screen.findByText('Bob Smith')).toBeVisible();
-    expect(roles.requests).toHaveLength(0);
-    roles.release();
+    expect(await screen.findByText(/role migration is in progress/)).toBeVisible();
+    expect(screen.getByText('Bob Smith')).toBeVisible();
+    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
   });
 
   it('does not fetch or show the list without read permission', async () => {
@@ -256,13 +256,15 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
   });
 
-  it('shows members to a reader without waiting for roles', async () => {
+  it('keeps the members table loading for a reader until roles load', async () => {
     serve();
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
-    expect(await screen.findByText('Bob Smith')).toBeVisible();
-    expect(roles.requests).toHaveLength(0);
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'true');
     roles.release();
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
   });
 
   it('shows the membership role label when the role is absent from available options', async () => {

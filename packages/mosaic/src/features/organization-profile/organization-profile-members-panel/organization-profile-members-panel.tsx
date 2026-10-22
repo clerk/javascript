@@ -39,7 +39,7 @@ function ConnectedMembersPanel({
   canManageInvitations: boolean;
   canManageRequests: boolean;
 }) {
-  const roles = useMembersPanelRolesModel(canManageInvitations);
+  const roles = useMembersPanelRolesModel(canReadMembers || canManageInvitations);
   const model = useInvitationsTableModel();
   const invitations = useInvitationsTableController(model);
   const invite = useInviteMembersController({

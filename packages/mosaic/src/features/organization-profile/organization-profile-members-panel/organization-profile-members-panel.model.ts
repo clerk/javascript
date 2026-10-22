@@ -30,9 +30,9 @@ export function useMembersPanelAccessModel() {
   };
 }
 
-export function useMembersPanelRolesModel(canManage: boolean): MembersPanelRoles {
+export function useMembersPanelRolesModel(canReadRoles: boolean): MembersPanelRoles {
   const environment = useMosaicEnvironment();
-  const { data: result, isLoading } = useOrganizationRolesQuery({ enabled: canManage });
+  const { data: result, isLoading } = useOrganizationRolesQuery({ enabled: canReadRoles });
   return {
     defaultRole: environment?.organizationSettings.domains.defaultRole ?? null,
     roles: result

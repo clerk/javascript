@@ -568,12 +568,9 @@ describe('inviting members', () => {
 
   it('does not offer Invite without the manage permission', async () => {
     serveInvite({ permissions: ['org:sys_memberships:read'] });
-    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-    expect(roles.requests).toHaveLength(0);
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
-    roles.release();
   });
 
   it('offers Invite as unavailable until roles load', async () => {
