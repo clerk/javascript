@@ -13,8 +13,8 @@ import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosName } from '@/lib/chaos';
 
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
-import { LogsPanelExample, useLogsTableFixture } from './logs-table';
 import { useInvitationsTableFixture } from './invitations-table-tab';
+import { LogsPanelExample, useLogsTableFixture } from './logs-table';
 import { useMembersTableFixture } from './members-table-tab';
 import { useInviteMembersFixture } from './organization-profile-invite-members';
 import { useRequestsTableFixture } from './requests-table-tab';
