@@ -654,6 +654,67 @@ describe('Web3 wallets', () => {
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
   });
 
+  async function renderMetaMaskNeedingReverification() {
+    vi.stubGlobal('ethereum', {
+      request: vi.fn(({ method }: { method: string }) =>
+        Promise.resolve(method === 'personal_sign' ? 'signature' : ['0x1234567890abcdef']),
+      ),
+    });
+    const fapi = await renderWeb3({}, { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/web3_wallets');
+    return fapi;
+  }
+
+  it('verifies the session before connecting a wallet, then verifies the wallet', async () => {
+    const fapi = await renderMetaMaskNeedingReverification();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
+    expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(await screen.findByRole('button', { name: 'Manage MetaMask' })).toBeInTheDocument();
+  });
+
+  it('lets the user cancel connection verification quietly and connect again', async () => {
+    const fapi = await renderMetaMaskNeedingReverification();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(0);
+    expect(screen.queryByRole('alert')).toBeNull();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toHaveFocus());
+    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+    await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
+  });
+
+  it('reports a wallet creation error after connection verification', async () => {
+    await renderMetaMaskNeedingReverification();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
+    await screen.findByText('Enter your current password to continue');
+    const replay = holdRequests('post', '/v1/me/web3_wallets');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+    await waitFor(() => expect(replay.requests).toHaveLength(1));
+
+    replay.fail('wallet_creation_failed');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('wallet_creation_failed'));
+    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+  });
+
   it('verifies the session when removal demands it, then removes the wallet', async () => {
     const fapi = await renderWeb3(
       { web3_wallets: [fapiWeb3Wallet({ id: 'wallet_1', web3_wallet: '0x1234567890abcdef' })] },
@@ -990,8 +1051,6 @@ describe('Web3 wallets', () => {
     },
   );
 
-  // TODO: Add session reverification for wallet connection, primary updates, and removal;
-  // surface API errors until then.
   // TODO: Share Solana discovery and filtering only after verifying parity with the legacy UI.
   // TODO: Share identification sorting only after verifying parity for legacy email, phone, and wallet sections.
   // TODO: Add recovery for abandoned MetaMask connections. In Brave, closing the locked wallet prompt

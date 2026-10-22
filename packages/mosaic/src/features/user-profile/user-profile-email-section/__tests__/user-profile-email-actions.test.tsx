@@ -26,6 +26,7 @@ function EmailSection({
   onSetPrimaryEmail = () => Promise.resolve(),
   removeReverification = idleReverification,
   setPrimaryReverification = idleReverification,
+  createReverification = idleReverification,
   ...rest
 }: EmailSectionProps) {
   const controller = useUserProfileEmailSectionController({
@@ -34,6 +35,7 @@ function EmailSection({
     onSetPrimaryEmail,
     removeReverification,
     setPrimaryReverification,
+    createReverification,
     ...rest,
   });
   return <UserProfileEmailSectionView {...controller} />;

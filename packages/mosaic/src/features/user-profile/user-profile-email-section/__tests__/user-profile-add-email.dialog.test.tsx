@@ -4,14 +4,18 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../../mosaic-provider';
+import type { ReverificationController } from '../../../reverification';
 import type { UserProfileAddEmailDialogProps } from '../user-profile-add-email.dialog';
 import { UserProfileAddEmailDialog } from '../user-profile-add-email.dialog';
+
+const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
 
 function renderView(overrides: Partial<UserProfileAddEmailDialogProps> = {}) {
   const props: UserProfileAddEmailDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
     step: 'email',
+    reverification: idleReverification,
     emailAddress: 'person@example.com',
     onEmailAddressChange: vi.fn(),
     code: '',
@@ -40,6 +44,7 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddEmailDialogProps, 
         open
         onOpenChange={() => undefined}
         step='verify'
+        reverification={idleReverification}
         emailAddress='person@example.com'
         onEmailAddressChange={() => undefined}
         code={code}

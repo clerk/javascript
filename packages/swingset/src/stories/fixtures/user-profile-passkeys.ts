@@ -42,6 +42,7 @@ export function usePasskeysFixture({
   return useUserProfilePasskeysSectionController({
     passkeys,
     reverification: idleReverification,
+    addReverification: idleReverification,
     onAdd: async () => {
       await attempt('add');
       const id = nextId.current++;

@@ -36,6 +36,8 @@ export interface UserProfileWeb3WalletsSectionViewProps {
   finalFocus?: DialogFocusTarget;
   setPrimaryReverification?: ReverificationController;
   setPrimaryFinalFocus?: DialogFocusTarget;
+  createReverification?: ReverificationController;
+  createFinalFocus?: DialogFocusTarget;
 }
 
 export type UserProfileWeb3WalletsModel =
@@ -51,6 +53,7 @@ export type UserProfileWeb3WalletsModel =
       remove?: (walletId: string) => Promise<void>;
       removeReverification: ReverificationController;
       setPrimaryReverification: ReverificationController;
+      createReverification: ReverificationController;
     };
 
 export type ReadyWeb3WalletsModel = Extract<UserProfileWeb3WalletsModel, { status: 'ready' }>;

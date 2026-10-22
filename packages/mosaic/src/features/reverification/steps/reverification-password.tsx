@@ -8,6 +8,8 @@ import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
+import { Eye } from '../../../icons/glyphs/eye';
+import { EyeSlash } from '../../../icons/glyphs/eye-slash';
 
 export interface ReverificationPasswordMessages {
   title: string;
@@ -86,7 +88,7 @@ export function ReverificationPassword({
                   aria-label={visible ? messages.hidePasswordLabel : messages.showPasswordLabel}
                   onClick={() => setVisible(current => !current)}
                 >
-                  <Icon name={visible ? 'eye-slash' : 'eye'} />
+                  <Icon glyph={visible ? EyeSlash : Eye} />
                 </Button>
               </InputGroup.End>
             </InputGroup.Root>
