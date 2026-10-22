@@ -76,6 +76,37 @@ describe('SignInStart', () => {
       screen.getByText(/email address/i);
     });
 
+    it('sets autocomplete=email on an email-only identifier field', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /email address/i })).toHaveAttribute('autocomplete', 'email');
+    });
+
+    it('sets autocomplete=username when email and username are both enabled', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withUsername();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /email address or username/i })).toHaveAttribute(
+        'autocomplete',
+        'username',
+      );
+    });
+
+    it('sets autocomplete=tel on a phone identifier field', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /phone number/i })).toHaveAttribute('autocomplete', 'tel');
+    });
+
     it('enables login with username', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUsername();
@@ -129,6 +160,25 @@ describe('SignInStart', () => {
         });
         render(<SignInStart />, { wrapper });
         screen.getByText('Use passkey instead');
+      });
+
+      it('puts webauthn after the field name when passkey autofill is on', async () => {
+        const { wrapper } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: false,
+          });
+        });
+
+        render(<SignInStart />, { wrapper });
+        await waitFor(() => {
+          expect(screen.getByRole('textbox', { name: /email address/i })).toHaveAttribute(
+            'autocomplete',
+            'email webauthn',
+          );
+        });
       });
 
       it('enables login with passkey via autofill', async () => {

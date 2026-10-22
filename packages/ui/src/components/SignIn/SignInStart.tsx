@@ -57,6 +57,11 @@ import {
   getSignUpAttributeFromIdentifier,
 } from './utils';
 
+function identifierAutoComplete(identifier: SignInStartIdentifier, webauthn: boolean): string {
+  const token = identifier === 'phone_number' ? 'tel' : identifier === 'email_address' ? 'email' : 'username';
+  return webauthn ? `${token} webauthn` : token;
+}
+
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
   const { navigate } = useRouter();
@@ -671,7 +676,7 @@ function SignInStartInternal(): JSX.Element {
                           onActionClicked={switchToNextIdentifier}
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
-                          autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
+                          autoComplete={identifierAutoComplete(identifierAttribute, isWebAuthnAutofillSupported)}
                           isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>
