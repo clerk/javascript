@@ -208,22 +208,50 @@ export interface TableRowProps extends MosaicComponentProps<'tr'> {
 }
 
 const Row = React.forwardRef<HTMLTableRowElement, TableRowProps>(function MosaicTableRow(
-  { selected, render, xstyle, ...rest },
+  { selected, onClick, render, xstyle, ...rest },
   ref,
 ) {
   const section = React.useContext(TableSectionContext);
+  const interactive = onClick !== undefined;
   return useRender({
     defaultTagName: 'tr',
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('table-row', { selected }),
-      stylex.props(reset.base, section === 'body' && styles.bodyRow, selected && styles.selectedRow, xstyle),
-      { 'aria-selected': selected ? true : undefined },
+      themeProps('table-row', { selected, interactive }),
+      stylex.props(
+        reset.base,
+        section === 'body' && styles.bodyRow,
+        interactive && styles.interactiveRow,
+        selected && styles.selectedRow,
+        xstyle,
+      ),
+      {
+        'aria-selected': selected ? true : undefined,
+        onClick: interactive
+          ? (event: React.MouseEvent<HTMLTableRowElement>) => {
+              if (isRowOwnClick(event)) {
+                onClick(event);
+              }
+            }
+          : undefined,
+      },
       rest,
     ),
   });
 });
+
+const nestedControlSelector =
+  'a[href], button, input, select, textarea, label, [role="button"], [role="link"], [role="checkbox"], [role="menuitem"]';
+
+const isRowOwnClick = (event: React.MouseEvent<HTMLElement>) => {
+  const { target, currentTarget } = event;
+  if (!(target instanceof Element) || !currentTarget.contains(target)) {
+    return false;
+  }
+  const control = target.closest(nestedControlSelector);
+  return control === null || !currentTarget.contains(control);
+};
 
 export interface TableHeaderCellProps extends Omit<MosaicComponentProps<'th'>, 'align'> {
   align?: TableAlign;
