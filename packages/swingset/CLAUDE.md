@@ -14,7 +14,9 @@ pnpm build --filter @clerk/swingset  # next build
 pnpm format --filter @clerk/swingset # format-package.mjs (--check for CI)
 ```
 
-There are no tests or lint scripts in this package, yet.
+There is no lint script in this package.
+
+Swingset has no tests, and none should be added. Don't add test files, a Vitest config, or a `test` script here. Test components and flows in `@clerk/mosaic`, next to the code they cover. Stories and fixtures exist only to drive the explorer, so don't add options or exports to them for tests.
 
 ## Key architecture facts
 
@@ -24,15 +26,18 @@ These require reading several files together; the `README.md` covers the step-by
 
 - **Knobs are generated from a story's declared variant surface.** A story's `meta.styles` is a hand-written `{ _variants, _defaultVariants }` object describing the component's variant props — StyleX compiles its styles away, so there is no runtime recipe to derive this from. `lib/generateKnobs.ts` turns each variant into a control: variants whose keys are only `true`/`false` become boolean toggles, everything else becomes a select. Knob values are passed as props straight into the story component. This is why story functions take `Record<string, unknown>` and cast to the real prop type.
 
-- **`lib/registry.ts` is the single source of truth for which components exist**, and they are imported *explicitly* (never `import *`) so sidebar order is deterministic. `getSidebarGroups`, `getModuleBySlug`, and slugging (`lib/slug.ts`, from `meta.title`) read from it. Adding a component touches up to three wiring points: `registry.ts` (sidebar entry + per-page playground lookup), `DocsViewer.tsx`'s `docModules` map (MDX docs), and the hardcoded redirect in `app/page.tsx`.
+- **`lib/registry.ts` is the single source of truth for which components exist**, and they are imported *explicitly* (never `import *`) so sidebar order is deterministic. `getSidebarGroups`, `getModuleBySlug`, and slugging (`lib/slug.ts`, from `meta.title`) read from it. Adding a component touches up to three wiring points: `registry.ts` (sidebar entry + per-page playground lookup), `DocsViewer.tsx`'s `docModules` map (MDX docs), and the hardcoded redirect in `app/(explorer)/page.tsx`.
   - ⚠️ **Add each new import and its first usage in the same edit.** The on-save lint-fix (`unused-imports/no-unused-imports` is an `error`) deletes any import that isn't referenced yet, so importing a story export in `registry.ts` (or a component in a `*.stories.tsx`) *before* the code that uses it silently drops the import and you get `X is not defined` at runtime. After wiring, `grep` the new symbol to confirm both the import and its use survived. (Repo-wide footgun; see `clerk-monorepo` skill `references/setup-and-footguns.md`.)
 
-- **Routing.** Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives *inside* the overview. `app/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (client components / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
+- **Routing.** Route groups split the app: `(explorer)` is the component playground, `(clerk)` is the Live Sandbox (`/live`, `/sign-in`, `/sign-up`) and needs keys from `packages/swingset/.env.local`. Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives *inside* the overview. `app/(explorer)/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (client components / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
+
+- **Live Sandbox pages.** Every `app/(clerk)/live/*/page.tsx` opens with `LivePageHeader` (`app/(clerk)/live-page-header.tsx`), which renders the page's `h1` and, beside it, the entry's status badge (`StatusBadge`) looked up from the live route map in `lib/live-navigation.ts`. The badge belongs in the title row, where the reader is looking, mirroring the docs pages' `DocTitle` — never in the sticky header chrome. Don't hand-write an `h1` on a live page; pass the title and description to `LivePageHeader` so the badge stays attached. The live sidebar is also the inventory for the User Profile and Organization Profile groups: every Panels/Sections entry from the registry appears there, and one without a route in `liveRoutes` renders as a gray `todo` placeholder (`live/todo/[group]/[component]`, a dashed gray box labelled TODO). When you add a live harness for one, add its route to `liveRoutes` and the placeholder disappears.
 
 - **Shared playground state.** `DocsViewer` wraps each overview in a `PlaygroundProvider` (`PlaygroundContext.tsx`), keyed by slug and seeded from the component's `meta` via `getModuleBySlug`. It owns the knob values (props). The `<Preview>` and the interactive `<PropTable>` both read/write this single context, so editing a prop in the table updates the preview above it.
 
 - **Every story renders inside `MosaicProvider`.** `StoryPreview` (the MDX `<Preview>`) renders a named story with the playground's knob values as props and exposes a Reset button. `StoryEmbed` (the MDX `<Story>`) renders a single static variation with default knob values and no controls.
   - The header's **RTL** switch (`DirectionToggle`, state in `DirectionProvider`) sets `dir` on `<html>`. It has to sit that high because popover and menu popups portal to `<body>`, so a `dir` on the preview container would never reach them; swingset's own chrome flips along with the story.
+  - The header's **Chaos** switch (`ChaosToggle`, state in `ChaosProvider`) stress-tests layouts with worst-case copy and data. `StoryMosaicProvider` (used by both story renderers) passes `chaosLocalization` from `lib/chaos.ts` as the `localization` prop, and remounts the story on toggle so fixture state reseeds. That catalog is generated from `mosaicMessages`, so new messages need no wiring. Fixtures opt their seed data in with `useChaosFixture(data, toChaos)`, building the chaos version from the helpers in `lib/chaos.ts` (`chaosName`, `chaosEmail`, `chaosText`, `chaosRows`). When you add a fixture, wrap its seed data the same way. Stories that mount their own `MosaicProvider` (the Localization page) ignore the catalog.
 
 - **The prop table is the knob surface.** `PropTable` (MDX `<PropTable>`) derives rows from `meta.styles._variants`/`_defaultVariants`, then appends the `className` + `style` escape-hatch rows every Mosaic component accepts. Each variant row renders a `KnobControl` in its **Value** column, seeded with the prop's default and bound to the playground context. The escape-hatch rows and `extra` stay static.
 
@@ -56,14 +61,15 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 ### Layers
 
-`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, `Reverification`, and `Localization` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
+`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `Organization Switcher`, `User Profile`, `Reverification`, and `Localization` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
 
 | Group        | What lives here                                                | Archetype |
 | ------------ | -------------------------------------------------------------- | --------- |
 | `User Button` | Composed flow UI (e.g. `UserButton`)                          | C         |
+| `Organization Switcher` | Composed flow UI (e.g. `OrganizationSwitcher`)      | C         |
 | `User Profile` | Composed flow UI (e.g. `UserProfileProfilePanel`)             | C         |
 | `Components` | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A         |
-| `Primitives` | Headless `@clerk/headless` primitives (`Accordion`)            | B         |
+| `Primitives` | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`) | B         |
 | `Styles`     | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`) | B (adapted) |
 | `Hooks`      | Headless hooks (`useDataTable`)                                | B (adapted) |
 | `Localization` | The `localization` prop on `MosaicProvider`: catalogs, overrides, locale, and the message helpers | B (adapted) |
@@ -98,7 +104,7 @@ export const meta: StoryMeta = {
 
 - `title` is the component's export name; it produces the slug and is what readers match against code. Set `label` only when the sidebar should read differently (the slug and page heading still come from `title`).
 - `status` marks the entry's maturity — `'stable'`, `'wip'`, or `'todo'` (planned, not yet implemented; e.g. `Table`) — rendered as a colored dot (green / amber / gray) to the left of the entry in the sidebar, and as a dot-plus-label badge to the right of the page's `# Title` h1. It is explicit: omitting it displays no status anywhere (not every entry carries one, e.g. `Scroll Area`). A todo entry is `meta` alone plus a one-paragraph MDX page; it skips its archetype's required sections (and `source`) until the component exists.
-- `substatus` optionally says *why* a wip entry is wip — one of `'needs wire-up'` (view runs on mock data, not yet connected to its model/controller), `'needs design'`, `'needs a11y'`, `'needs docs'`, `'needs polish'`. It renders in the page badge (`wip: needs wire-up`) and the sidebar dot's tooltip. Most wip entries won't need one; it is ignored on stable entries.
+- `substatus` optionally says *why* a wip entry is wip — one of `'needs wire-up'` (view runs on mock data, not yet connected to its model/controller), `'needs reverification'` (wired to FAPI, but a sensitive action still runs without session reverification), `'needs design'`, `'needs a11y'`, `'needs docs'`, `'needs polish'`. It renders in the page badge (`wip: needs wire-up`) and the sidebar dot's tooltip. Most wip entries won't need one; it is ignored on stable entries.
 - `source` is always a path **relative to the monorepo root**, pointing at the file that exports the documented component. Always set it — it powers the "View source" link.
 - `styles` declares the component's variant props and is **required for archetype A's simple (knob-driven) form** (it generates the knobs and the `<PropTable>`). Keep it in sync with the component's real prop union by hand — StyleX compiles its styles away, so nothing derives it for you. Omit it for compound A components, and for B and C.
 
@@ -183,7 +189,7 @@ import * as PopoverStories from './popover.component.stories';
 
 # Popover
 
-<!-- Intro: state it's the styled Mosaic component built on the `@clerk/headless`
+<!-- Intro: state it's the styled Mosaic component built on the underlying headless
      primitive, and that it inherits the primitive's behavior/ARIA. -->
 
 ## Example
@@ -250,7 +256,7 @@ The story is `meta` (no `styles`) plus a single `Default` export that renders th
 These compose lower layers, so the docs lead with the composition rather than knobs. Required MDX:
 
 ```mdx
-import * as UserButtonStories from './user-button.stories';
+import * as SwitcherStories from './user-button.stories';
 
 # UserButton
 
@@ -258,7 +264,7 @@ import * as UserButtonStories from './user-button.stories';
 
 <Story
   name='Default'
-  storyModule={UserButtonStories}
+  storyModule={SwitcherStories}
   composition={[
     { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
     { name: 'Item', href: '/components/item', layer: 'Components' },
@@ -285,5 +291,5 @@ import * as UserButtonStories from './user-button.stories';
 - [ ] `Components`-layer story files export `__source` (the `?raw` self-import) so every `<Story>` example gets a "View code" footer.
 - [ ] MDX sections match the archetype's required order exactly.
 - [ ] Every props-table row states its default in the **Default** column (auto `<PropTable>` fills it from `meta.styles._defaultVariants`; `—` / `(required)` when none).
-- [ ] Wiring done per `README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/page.tsx` redirect if this is now the first component.
+- [ ] Wiring done per `README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/(explorer)/page.tsx` redirect if this is now the first component.
 - [ ] `pnpm format --filter @clerk/swingset` is clean.

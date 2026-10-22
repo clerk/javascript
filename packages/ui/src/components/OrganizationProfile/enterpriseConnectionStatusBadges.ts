@@ -4,7 +4,7 @@ import type { OrganizationEnterpriseConnectionStatus } from '../ConfigureSSO/dom
 
 export const STATUS_BADGES: Record<
   OrganizationEnterpriseConnectionStatus,
-  { id: string; colorScheme?: 'primary' | 'danger' | 'warning' | 'success'; label: LocalizationKey }
+  { id: string; colorScheme: 'primary'; label: LocalizationKey }
 > = {
   unconfigured: {
     id: 'unconfigured',
@@ -13,17 +13,17 @@ export const STATUS_BADGES: Record<
   },
   in_progress: {
     id: 'inProgress',
-    colorScheme: 'warning',
+    colorScheme: 'primary',
     label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__inProgress'),
   },
   active: {
     id: 'active',
-    colorScheme: 'success',
+    colorScheme: 'primary',
     label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__active'),
   },
   inactive: {
     id: 'inactive',
-    colorScheme: 'danger',
+    colorScheme: 'primary',
     label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__inactive'),
   },
 };

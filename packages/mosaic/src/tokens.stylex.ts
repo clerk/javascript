@@ -377,11 +377,12 @@ export const durationVars = stylex.defineVars(durationDefaults);
 //
 // It belongs on properties that MOVE — transform, translate, scale, insets — where
 // the overshoot is what makes motion read as physical rather than mechanical, which
-// in practice means the `slow`/`slower` end of the duration scale. Color and opacity
-// take plain `linear` instead: their interpolation is already perceptually
-// non-uniform, so an ease on top only makes the midpoint drag, and an overshoot
-// extrapolates past the target color for no gain. That is a rule about the property,
-// not the duration — a transform at `fast` still wants this curve.
+// in practice means the `slow`/`slower` end of the duration scale. A color or opacity
+// change on an element that stays put takes plain `linear` instead: their interpolation
+// is already perceptually non-uniform, so an ease on top only makes the midpoint drag,
+// and an overshoot extrapolates past the target color for no gain. A fade that brings a
+// surface in or out takes `--cl-ease-enter` / `--cl-ease-exit`. That is a rule about the
+// property, not the duration — a transform at `fast` still wants this curve.
 //
 // `--cl-ease-exit` is its counterpart for things LEAVING, In Quad
 // (https://www.easing.dev/in-quad). Swift Out run backwards spends 90% of its travel
@@ -397,13 +398,18 @@ export const durationVars = stylex.defineVars(durationDefaults);
 // Use it where the overshoot is read as a correction rather than as physicality — a large
 // surface, or one whose arrival is already carried by a companion signal such as a scrim.
 // `Dialog` takes it for that reason; a small element moving a short distance still wants
-// `--cl-ease-default`, where the settle is the whole point. Same property rule applies: it
-// belongs on things that MOVE, and opacity still takes `linear`.
+// `--cl-ease-default`, where the settle is the whole point. It is also the curve for an
+// entrance fade, since opacity has nothing past `1` to overshoot into.
+//
+// `--cl-ease-in-out` is In Out Cubic (https://www.easing.dev/in-out-cubic), for a layout
+// change that departs from rest and arrives at rest with nothing entering or leaving — a
+// collapsing track, where an exit curve would accelerate into the landing.
 
 const easingDefaults = {
   '--cl-ease-default': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
   '--cl-ease-enter': 'cubic-bezier(0, 0, 0.2, 1)',
   '--cl-ease-exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
+  '--cl-ease-in-out': 'cubic-bezier(0.645, 0.045, 0.355, 1)',
 } as const;
 
 export const easingVars = stylex.defineVars(easingDefaults);

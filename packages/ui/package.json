@@ -1,6 +1,6 @@
 {
   "name": "@clerk/ui",
-  "version": "1.33.1",
+  "version": "1.41.1",
   "description": "Internal package that contains the UI components for the Clerk frontend SDKs",
   "repository": {
     "type": "git",
@@ -71,6 +71,8 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map",
     "register"
   ],
   "scripts": {
@@ -92,11 +94,11 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",
     "lint:publint": "publint",
-    "showerrors": "tsc",
+    "showerrors": "tsc -p tsconfig.src.json",
     "test": "vitest run",
     "test:ci": "vitest run --maxWorkers=70%",
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit -p tsconfig.src.json"
   },
   "dependencies": {
     "@clerk/localizations": "workspace:^",
@@ -105,10 +107,8 @@
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "catalog:repo",
     "@formkit/auto-animate": "^0.8.2",
-    "@solana/wallet-adapter-base": "catalog:module-manager",
-    "@solana/wallet-adapter-react": "catalog:module-manager",
-    "@solana/wallet-standard": "catalog:module-manager",
     "@swc/helpers": "catalog:repo",
+    "@wallet-standard/core": "catalog:module-manager",
     "copy-to-clipboard": "3.3.3",
     "core-js": "catalog:repo",
     "csstype": "3.1.3",

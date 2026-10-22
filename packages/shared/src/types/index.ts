@@ -5,6 +5,7 @@ export type * from './authConfig';
 export type * from './authObject';
 export type * from './backupCode';
 export type * from './billing';
+export type * from './biometricCredential';
 export type * from './clerk';
 export type * from './client';
 export type * from './commerceSettings';

@@ -1,5 +1,3 @@
-import type { OnChangeFn, SortingState } from '@clerk/headless/hooks';
-import { useDataTable } from '@clerk/headless/hooks';
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { EmptyState } from '@clerk/mosaic/components/empty-state';
@@ -8,9 +6,18 @@ import { Menu } from '@clerk/mosaic/components/menu';
 import type { TableSort } from '@clerk/mosaic/components/table';
 import { Table } from '@clerk/mosaic/components/table';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
+import { MagnifyingGlass } from '@clerk/mosaic/icons/glyphs/magnifying-glass';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
+import type { OnChangeFn, SortingState } from '@clerk/mosaic/primitives/hooks';
+import { useDataTable } from '@clerk/mosaic/primitives/hooks';
+import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+const styles = stylex.create({
+  columnWidthsTable: { minWidth: '36rem' },
+});
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
 // renders a code footer with its function's source. See `StoryModule.__source`.
@@ -19,7 +26,7 @@ export { default as __source } from './table.stories?raw';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Table',
-  status: 'wip',
+  status: 'stable',
   layout: 'wide',
   source: 'packages/mosaic/src/components/table/table.tsx',
 };
@@ -201,6 +208,48 @@ export function Default() {
   );
 }
 
+export function Search() {
+  const [search, setSearch] = React.useState('');
+  const filtered = apiKeys.filter(key => key.name.toLowerCase().includes(search.trim().toLowerCase()));
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <Table.Toolbar>
+        <Table.Search
+          label='Search API keys'
+          clearLabel='Clear search'
+          value={search}
+          onValueChange={setSearch}
+        />
+        <Button>Create API key</Button>
+      </Table.Toolbar>
+      <Table.Root aria-label='API keys'>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Created</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {filtered.length ? (
+            filtered.map(key => (
+              <Table.Row key={key.id}>
+                <Table.Cell>{key.name}</Table.Cell>
+                <Table.Cell noWrap>{key.created}</Table.Cell>
+              </Table.Row>
+            ))
+          ) : (
+            <Table.Empty>
+              <EmptyState.Root role='status'>
+                <EmptyState.Label>No API keys found</EmptyState.Label>
+              </EmptyState.Root>
+            </Table.Empty>
+          )}
+        </Table.Body>
+      </Table.Root>
+    </div>
+  );
+}
+
 export function Sorting() {
   const { sorting, setSorting, sorted } = useSortedApiKeys(apiKeys);
 
@@ -286,7 +335,7 @@ export function Empty() {
       <Table.Body>
         <Table.Empty>
           <EmptyState.Root>
-            <EmptyState.Icon name='magnifying-glass' />
+            <EmptyState.Icon glyph={MagnifyingGlass} />
             <EmptyState.Label>No API keys</EmptyState.Label>
             <EmptyState.Description>
               Create a key to start making requests from your application.
@@ -294,7 +343,7 @@ export function Empty() {
             <EmptyState.Actions>
               <Button size='sm'>
                 <Icon
-                  name='plus'
+                  glyph={Plus}
                   placement='inline-start'
                 />
                 Create key
@@ -336,5 +385,118 @@ export function Overflow() {
         </Table.Body>
       </Table.Root>
     </div>
+  );
+}
+
+export function StickyColumn() {
+  const columns = ['Environment', 'Last used', 'Created', 'Expires', 'Created by', 'Scopes'];
+
+  return (
+    <div style={{ maxWidth: 480 }}>
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            {columns.map(column => (
+              <Table.HeaderCell key={column}>{column}</Table.HeaderCell>
+            ))}
+            <Table.HeaderCell sticky='end'>
+              <VisuallyHidden>Actions</VisuallyHidden>
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {apiKeys.map(key => (
+            <Table.Row
+              key={key.id}
+              selected={key.id === 'k2'}
+            >
+              <Table.Cell noWrap>{key.name}</Table.Cell>
+              <Table.Cell>{key.environment}</Table.Cell>
+              <Table.Cell noWrap>{key.lastUsed}</Table.Cell>
+              <Table.Cell noWrap>{key.created}</Table.Cell>
+              <Table.Cell>Never</Table.Cell>
+              <Table.Cell>cameron@clerk.com</Table.Cell>
+              <Table.Cell noWrap>read, write</Table.Cell>
+              <Table.Cell
+                sticky='end'
+                align='end'
+              >
+                <Menu.Root placement='bottom-end'>
+                  <Menu.Trigger aria-label={`Manage ${key.name}`} />
+                  <Menu.Popup>
+                    <Menu.Item label='Revoke'>
+                      <Menu.Label>Revoke</Menu.Label>
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Root>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </div>
+  );
+}
+
+export function ColumnWidths() {
+  const table = useDataTable({ data: apiKeys, getRowId: row => row.id });
+
+  return (
+    <Table.Root
+      layout='fixed'
+      xstyle={styles.columnWidthsTable}
+    >
+      <Table.ColumnGroup>
+        <Table.Column />
+        <Table.Column />
+        <Table.Column width='9rem' />
+        <Table.Column width='9rem' />
+        <Table.Column width='4rem' />
+      </Table.ColumnGroup>
+      <Table.Header>
+        <Table.Row>
+          <Table.SelectAllCell
+            aria-label='Select all keys'
+            checked={table.getIsAllRowsSelected()}
+            indeterminate={table.getIsSomeRowsSelected()}
+            onChange={() => table.toggleAllRowsSelected()}
+          />
+          <Table.HeaderCell>Name</Table.HeaderCell>
+          <Table.HeaderCell>Last used</Table.HeaderCell>
+          <Table.HeaderCell>Created</Table.HeaderCell>
+          <Table.HeaderCell align='end'>
+            <VisuallyHidden>Actions</VisuallyHidden>
+          </Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {table.rows.map(row => (
+          <Table.Row
+            key={row.id}
+            selected={row.getIsSelected()}
+          >
+            <Table.SelectCell
+              aria-label={`Select ${row.original.name}`}
+              checked={row.getIsSelected()}
+              onToggleSelected={row.toggleSelected}
+            />
+            <Table.Cell>{row.original.name}</Table.Cell>
+            <Table.Cell noWrap>{row.original.lastUsed}</Table.Cell>
+            <Table.Cell noWrap>{row.original.created}</Table.Cell>
+            <Table.Cell align='end'>
+              <Menu.Root placement='bottom-end'>
+                <Menu.Trigger aria-label={`Manage ${row.original.name}`} />
+                <Menu.Popup>
+                  <Menu.Item label='Revoke'>
+                    <Menu.Label>Revoke</Menu.Label>
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Root>
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table.Root>
   );
 }

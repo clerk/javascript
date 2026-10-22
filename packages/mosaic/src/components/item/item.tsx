@@ -1,12 +1,12 @@
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
-import { truncationStyles } from '../../utils/typography.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import * as slots from './item.styles';
 
 /** The row's height and gap, and the width of the media column inside it. */

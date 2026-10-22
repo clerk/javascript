@@ -1,27 +1,33 @@
-import type { UserProfilePasskey } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
+import { useUserProfilePasskeysSectionController } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.controller';
+import type {
+  UserProfilePasskey,
+  UserProfilePasskeysSectionViewProps,
+} from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.view';
 import { useRef, useState } from 'react';
 
-interface PasskeysFixture {
-  passkeys: UserProfilePasskey[];
-  addError: string | undefined;
-  onAdd: () => void;
-  onRename: (id: string, name: string) => Promise<void>;
-  onRemove: (id: string) => Promise<void>;
-}
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosName, chaosRows, chaosText } from '@/lib/chaos';
+
+import { idleReverification } from './reverification';
+
+const examplePasskeys: UserProfilePasskey[] = [
+  { id: 'laptop', name: 'MacBook', createdAtLabel: 'Created today', lastUsedAtLabel: 'Last used 1 hour ago' },
+  { id: 'phone', name: 'iPhone', createdAtLabel: 'Created yesterday' },
+];
 
 export function usePasskeysFixture({
   empty = false,
   failOnce = false,
-}: { empty?: boolean; failOnce?: boolean } = {}): PasskeysFixture {
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>(
-    empty
-      ? []
-      : [
-          { id: 'laptop', name: 'MacBook', createdAtLabel: 'Created today', lastUsedAtLabel: 'Last used 1 hour ago' },
-          { id: 'phone', name: 'iPhone', createdAtLabel: 'Created yesterday' },
-        ],
+}: { empty?: boolean; failOnce?: boolean } = {}): UserProfilePasskeysSectionViewProps {
+  const seed = useChaosFixture(examplePasskeys, items =>
+    chaosRows(items, 12).map((passkey, index) => ({
+      ...passkey,
+      name: chaosName(index),
+      createdAtLabel: chaosText(passkey.createdAtLabel),
+      lastUsedAtLabel: chaosText(passkey.lastUsedAtLabel),
+    })),
   );
-  const [addError, setAddError] = useState<string>();
+  const [passkeys, setPasskeys] = useState(empty ? [] : seed);
   const failures = useRef(new Set<string>());
   const nextId = useRef(1);
 
@@ -33,22 +39,19 @@ export function usePasskeysFixture({
     }
   };
 
-  return {
+  return useUserProfilePasskeysSectionController({
     passkeys,
-    addError,
-    onAdd: () => {
-      if (failOnce && !failures.current.has('add')) {
-        failures.current.add('add');
-        setAddError('Could not create a passkey. Please try again.');
-        return;
-      }
-      setAddError(undefined);
+    reverification: idleReverification,
+    addReverification: idleReverification,
+    onAdd: async () => {
+      await attempt('add');
       const id = nextId.current++;
       setPasskeys(current => [
         ...current,
         { id: `new-${id}`, name: `New passkey ${id}`, createdAtLabel: 'Created just now' },
       ]);
     },
+    validateName: () => undefined,
     onRename: async (id, name) => {
       await attempt('rename');
       setPasskeys(current => current.map(passkey => (passkey.id === id ? { ...passkey, name } : passkey)));
@@ -57,5 +60,5 @@ export function usePasskeysFixture({
       await attempt('remove');
       setPasskeys(current => current.filter(passkey => passkey.id !== id));
     },
-  };
+  });
 }

@@ -47,6 +47,7 @@ export const ERROR_CODES = {
   FRAUD_DEVICE_BLOCKED: 'device_blocked',
   FRAUD_ACTION_BLOCKED: 'action_blocked',
   PROTECT_CHECK_ALREADY_RESOLVED: 'protect_check_already_resolved',
+  PROTECT_CHECK_REQUIRED: 'protect_check_required',
   PROTECT_CHECK_TIMED_OUT: 'protect_check_timed_out',
   PROTECT_CHECK_UNSUPPORTED_ENVIRONMENT: 'protect_check_unsupported_environment',
   SIGNUP_RATE_LIMIT_EXCEEDED: 'signup_rate_limit_exceeded',
@@ -66,7 +67,7 @@ export const SIGN_UP_MODES = {
 } satisfies Record<string, SignUpModes>;
 
 // This is the currently supported version of the Frontend API
-export const SUPPORTED_FAPI_VERSION = '2026-05-12';
+export const SUPPORTED_FAPI_VERSION = '2026-08-20';
 
 export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
 export const CAPTCHA_INVISIBLE_CLASSNAME = 'clerk-invisible-captcha';

@@ -7,7 +7,7 @@ function throwRemovedControlComponentError(
   componentName: 'SignedIn' | 'SignedOut' | 'Protect',
   errorUrl: string,
 ): never {
-  throw new Error(`Clerk: <${componentName}> is not available in @clerk/nextjs Core 3. Learn more at ${errorUrl}.`);
+  throw new Error(`Clerk: <${componentName}> is not available in @clerk/nextjs Core 3. Learn more at ${errorUrl}`);
 }
 
 /**

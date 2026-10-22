@@ -14,7 +14,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpEmailLinksFlow]
     let emailLinkOnlyAddress: string;
 
     test.beforeAll(async () => {
-      const u = createTestUtils({ app });
+      const u = await createTestUtils({ app });
       fakeUser = u.services.users.createFakeUser(test, { emailLinkTestEmail: true });
       emailLinkOnlyUser = u.services.users.createFakeUser(test, {
         emailLinkTestEmail: true,
@@ -37,7 +37,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpEmailLinksFlow]
 
     test('sign up with email link', async ({ page, context }) => {
       test.setTimeout(150_000);
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -63,7 +63,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpEmailLinksFlow]
 
     test('sign in with email link', async ({ page, context }) => {
       test.setTimeout(150_000);
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(fakeUser.email);
       await u.po.signIn.continue();
@@ -89,7 +89,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSignInOrUpEmailLinksFlow]
       browser,
     }) => {
       test.setTimeout(300_000);
-      const u = createTestUtils({ app, page, context, browser });
+      const u = await createTestUtils({ app, page, context, browser });
 
       await u.po.signIn.goTo();
       await u.po.signIn.setIdentifier(emailLinkOnlyAddress);

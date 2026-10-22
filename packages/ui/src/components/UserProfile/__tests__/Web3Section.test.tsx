@@ -178,4 +178,30 @@ describe('Web3Section', () => {
       });
     });
   });
+
+  // Regression: connecting the last unconnected strategy used to crash the whole
+  // UserProfile with "Rendered fewer hooks than expected", because the action menu
+  // returned early before calling `useReverification`.
+  it('keeps rendering after the last enabled wallet strategy gets connected', async () => {
+    // GIVEN MetaMask is the only enabled web3 strategy and the user has not connected it
+    const withMetamaskEnabled = createFixtures.config(f => {
+      f.withWeb3Wallet();
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+    });
+    const { wrapper, fixtures } = await createFixtures(withMetamaskEnabled);
+    const { getByRole, getByText, queryByRole, rerender } = render(<Web3Section />, { wrapper });
+    getByRole('button', { name: /Connect wallet/i });
+
+    // WHEN the user resource updates with a verified MetaMask wallet, as it does after attemptVerification
+    const { fixtures: connected } = await createFixtures(withMetamaskWallet);
+    (fixtures.clerk as any).__internal_lastEmittedResources = {
+      ...(fixtures.clerk as any).__internal_lastEmittedResources,
+      user: connected.clerk.user,
+    };
+    rerender(<Web3Section />);
+
+    // THEN the wallet is listed and the connect menu is gone
+    getByText(/0x1234...5678/);
+    expect(queryByRole('button', { name: /Connect wallet/i })).toBeNull();
+  });
 });

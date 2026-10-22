@@ -1,6 +1,5 @@
 'use client';
 
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { Layers2Icon } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
@@ -10,7 +9,9 @@ import { toUsageSnippet } from '@/lib/exampleSnippet';
 import { extractStorySource } from '@/lib/extractStorySource';
 import { generateKnobs, initKnobValues } from '@/lib/generateKnobs';
 import type { StoryModule } from '@/lib/types';
+import { cn, fillsFrame } from '@/lib/utils';
 
+import { StoryMosaicProvider } from './ChaosProvider';
 import { CodeFooter } from './CodeFooter';
 import type { CompositionPiece } from './Composition';
 import { CompositionPanel } from './Composition';
@@ -62,10 +63,15 @@ export function StoryEmbed({ name, storyModule, showCode = true, composition }: 
 
   return (
     <div className='not-prose border-border bg-background my-4 overflow-hidden rounded-lg border'>
-      <div className='flex min-h-20 items-center justify-center p-2.5 sm:p-6'>
-        <MosaicProvider>
+      <div
+        className={cn(
+          'flex min-h-20 items-center justify-center p-2.5 sm:p-6',
+          fillsFrame(storyModule) && '[&>*]:w-full',
+        )}
+      >
+        <StoryMosaicProvider>
           <StoryComp {...defaultValues} />
-        </MosaicProvider>
+        </StoryMosaicProvider>
       </div>
 
       {source ? <CodeFooter source={source} /> : null}

@@ -66,6 +66,7 @@ export interface SignInResource extends ClerkResource {
    * upgrading the SDK alone does not enable it.
    */
   protectCheck: ProtectCheckResource | null;
+  timezone: string | null;
 
   create: (params: SignInCreateParams) => Promise<SignInResource>;
 
@@ -136,4 +137,5 @@ export interface SignInJSON extends ClerkResourceJSON {
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;
   protect_check?: ProtectCheckJSON | null;
+  timezone: string | null;
 }

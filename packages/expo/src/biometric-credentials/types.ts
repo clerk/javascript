@@ -1,4 +1,11 @@
-import type { SetActive, SignInResource, SignInStatus } from '@clerk/shared/types';
+import type {
+  SessionResource,
+  SessionVerificationLevel,
+  SessionVerificationStatus,
+  SetActive,
+  SignInResource,
+  SignInStatus,
+} from '@clerk/shared/types';
 
 export type BiometricCredentialUnavailableReason =
   | 'environment_unavailable'
@@ -55,10 +62,24 @@ export type SignInWithBiometricsParams = {
   reason?: string;
 };
 
+/** Options for starting biometric reverification of the active session. */
+export type ReverifyWithBiometricsParams = {
+  level?: SessionVerificationLevel;
+  reason?: string;
+};
+
+/** The verification outcome and its session, without creating or activating a session. */
+export type BiometricReverificationResult = {
+  id: string | null;
+  status: SessionVerificationStatus | (string & {});
+  level: SessionVerificationLevel | (string & {});
+  session: SessionResource;
+};
+
 export type BiometricSignInResult = {
   status: SignInStatus | (string & {});
   createdSessionId: string | null;
-  /** The synchronized JS sign-in resource used to continue any remaining authentication steps. */
+  /** The sign-in resource used to continue any remaining authentication steps. */
   signIn: SignInResource;
   /** Activates a session after the sign-in reaches `complete`. */
   setActive: SetActive;
@@ -69,5 +90,13 @@ export type UseBiometricCredentialsReturn = {
   list: () => Promise<BiometricCredential[]>;
   enroll: (params?: EnrollBiometricCredentialParams) => Promise<BiometricCredential>;
   revoke: (id: string) => Promise<BiometricCredential>;
+  /**
+   * Revokes this app installation's biometric credential for the signed-in user.
+   *
+   * Call it before signing out, since it needs an active or pending session. Resolves with `null` if there is nothing
+   * to revoke.
+   */
+  revokeCurrentDeviceCredential: () => Promise<BiometricCredential | null>;
   signIn: (params?: SignInWithBiometricsParams) => Promise<BiometricSignInResult>;
+  reverify: (params?: ReverifyWithBiometricsParams) => Promise<BiometricReverificationResult>;
 };

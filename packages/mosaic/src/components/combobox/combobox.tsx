@@ -1,14 +1,15 @@
 'use client';
 
-import type { ComboboxProps } from '@clerk/headless/combobox';
-import { Combobox as HeadlessCombobox } from '@clerk/headless/combobox';
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Checkmark } from '../../icons/glyphs/checkmark';
+import type { ComboboxProps } from '../../primitives/combobox';
+import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Icon } from '../icon';
 import { Input, type InputVariant } from '../input';
 import { useOptionalInputGroupContext } from '../input-group/input-group.context';
@@ -176,7 +177,7 @@ export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, Combobo
       >
         {children ?? (
           <Icon
-            name='checkmark'
+            glyph={Checkmark}
             size='sm'
           />
         )}

@@ -1,161 +1,161 @@
-import type { FormEvent } from 'react';
-import { useEffect, useId, useState } from 'react';
+import type { FormEvent, RefObject } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import type { DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
+import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
+import type { ConfirmBlockProps, ConfirmStepProps } from '../confirm/confirm-shell';
+import { ConfirmShell } from '../confirm/confirm-shell';
 
-export interface DestructiveProps {
-  /** Whether the dialog is open */
-  open: boolean;
-  /** Callback when open state changes */
-  onOpenChange: (open: boolean) => void;
-  /** Element that opens the dialog */
-  trigger?: DialogTriggerProps['render'];
-  /** Dialog heading */
-  title: string;
-  /** What the action destroys */
-  description: string;
-  /** Label above the confirmation input */
-  fieldLabel: string;
-  /** Phrase the user must type to confirm. Also the input's placeholder */
-  confirmationValue: string;
-  /** Text of the delete button */
-  actionLabel: string;
-  /** Text of the cancel button (default: "Cancel") */
-  cancelLabel?: string;
-  /** Callback when delete is confirmed, by button or by Enter */
-  onDelete: () => void;
-  /** Whether the delete action is in progress */
-  isDeleting?: boolean;
-  /** Error message to display if the delete action fails */
-  errorMessage?: string;
+export interface DestructiveProps<Payload = void> extends ConfirmBlockProps<Payload> {
+  /** Label above the confirmation input, or a function of the payload */
+  fieldLabel: FromPayload<Payload, string>;
+  /** Phrase the user must type to confirm, or a function of the payload. Also the input's placeholder */
+  confirmationValue: FromPayload<Payload, string>;
 }
 
-/**
- * Type-to-confirm dialog for an action that cannot be undone. The delete button stays inert
- * until the typed phrase matches `confirmationValue`.
- *
- * Controlled: the caller owns `open`, `isDeleting`, and `errorMessage`. The block holds only
- * the typed phrase.
- *
- * @example
- * <Destructive
- *   open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
- *   onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
- *   trigger={<Button color='negative'>Delete account</Button>}
- *   title='Delete account?'
- *   description='All of your data will be permanently deleted.'
- *   fieldLabel='Type “Delete account” below to continue'
- *   confirmationValue='Delete account'
- *   actionLabel='Delete account'
- *   onDelete={() => send({ type: 'CONFIRM' })}
- *   isDeleting={snapshot.value === 'deleting'}
- *   errorMessage={snapshot.context.errorMessage}
- * />
- */
-export function Destructive({
-  open,
-  onOpenChange,
-  trigger,
+interface DestructiveStepProps<Payload> extends ConfirmStepProps<Payload> {
+  fieldLabel: string;
+  confirmationValue: string;
+  typedValue: string;
+  onTypedValueChange: (value: string) => void;
+  inputRef: RefObject<HTMLInputElement>;
+}
+
+function DestructiveStep<Payload>({
   title,
   description,
+  actionLabel,
+  cancelLabel,
+  isPending,
+  errorMessage,
+  confirm,
   fieldLabel,
   confirmationValue,
-  actionLabel,
-  cancelLabel = 'Cancel',
-  onDelete,
-  isDeleting = false,
-  errorMessage,
-}: DestructiveProps) {
+  typedValue,
+  onTypedValueChange,
+  inputRef,
+}: DestructiveStepProps<Payload>) {
   const formId = useId();
-  const [typedValue, setTypedValue] = useState('');
-
-  // The caller may close the dialog without going through the trigger or Cancel, so the
-  // field is cleared on close rather than in a handler.
-  useEffect(() => {
-    if (!open) {
-      setTypedValue('');
-    }
-  }, [open]);
-
   const isConfirmed = typedValue === confirmationValue;
-
   // The action sits in the footer, outside the form, so `form={formId}` associates the two.
   // That is what makes Enter in the field submit. Both guards are re-checked here because
   // neither spelling stops a native submit: `focusableWhenDisabled` only marks the button
   // `aria-disabled`, and `isPending` only cancels the press.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isConfirmed && !isDeleting) {
-      onDelete();
+    if (isConfirmed && !isPending) {
+      confirm();
     }
   };
 
   return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <Dialog.Popup variant='card'>
-        <Card.Root
-          elevation='overlay'
-          renderBranding={false}
+    <>
+      <Card.Header>
+        <Card.Title>{title}</Card.Title>
+        <Card.Description>{description}</Card.Description>
+      </Card.Header>
+      <Card.Content>
+        <form
+          id={formId}
+          onSubmit={handleSubmit}
         >
-          <Card.Header>
-            <Card.Title>{title}</Card.Title>
-            <Card.Description>{description}</Card.Description>
-          </Card.Header>
-          <Card.Content>
-            <form
-              id={formId}
-              onSubmit={handleSubmit}
-            >
-              <Field.Root invalid={Boolean(errorMessage)}>
-                <Field.Label>{fieldLabel}</Field.Label>
-                <Input
-                  // Not a credential, so 1Password is told to leave it alone rather than
-                  // cover it with an autofill overlay.
-                  data-1p-ignore
-                  placeholder={confirmationValue}
-                  value={typedValue}
-                  disabled={isDeleting}
-                  onChange={event => setTypedValue(event.target.value)}
-                />
-                <Field.Message>
-                  <Field.Error>{errorMessage}</Field.Error>
-                </Field.Message>
-              </Field.Root>
-            </form>
-          </Card.Content>
-          <Card.Footer>
-            <Dialog.Close
-              render={
-                <Button
-                  variant='outline'
-                  fullWidth
-                >
-                  {cancelLabel}
-                </Button>
-              }
+          <Field.Root invalid={Boolean(errorMessage)}>
+            <Field.Label>{fieldLabel}</Field.Label>
+            <Input
+              ref={inputRef}
+              // Not a credential, so 1Password is told to leave it alone rather than
+              // cover it with an autofill overlay.
+              data-1p-ignore
+              placeholder={confirmationValue}
+              value={typedValue}
+              disabled={isPending}
+              onChange={event => onTypedValueChange(event.target.value)}
             />
-            <SubmitButton
-              form={formId}
+            <Field.Message>
+              <Field.Error>{errorMessage}</Field.Error>
+            </Field.Message>
+          </Field.Root>
+        </form>
+      </Card.Content>
+      <Card.Footer>
+        <Dialog.Close
+          render={
+            <Button
+              variant='outline'
               fullWidth
-              color='negative'
-              isPending={isDeleting}
-              disabled={!isConfirmed}
-              focusableWhenDisabled
             >
-              {actionLabel}
-            </SubmitButton>
-          </Card.Footer>
-        </Card.Root>
-      </Dialog.Popup>
-    </Dialog.Root>
+              {cancelLabel}
+            </Button>
+          }
+        />
+        <SubmitButton
+          form={formId}
+          fullWidth
+          color='negative'
+          isPending={isPending}
+          disabled={!isConfirmed}
+          focusableWhenDisabled
+        >
+          {actionLabel}
+        </SubmitButton>
+      </Card.Footer>
+    </>
+  );
+}
+
+/**
+ * Type-to-confirm dialog for an action that cannot be undone. The delete button stays inert
+ * until the typed phrase matches `confirmationValue`.
+ *
+ * An alert dialog: an outside press leaves it open, and the confirm step has no corner dismiss. The
+ * verify step a reverified action swaps in shows one, except while the action is being retried.
+ *
+ * Driven by a `useConfirmController`, the same way as `Confirmation`. The block holds the typed
+ * phrase and clears it when the dialog closes.
+ *
+ * @example
+ * const deleteAccount = useConfirmController({ onConfirm: deleteAccountWithReverification, reverification });
+ *
+ * <Destructive
+ *   controller={deleteAccount}
+ *   trigger={<Button color='negative'>Delete account</Button>}
+ *   title='Delete account?'
+ *   description='All of your data will be permanently deleted.'
+ *   fieldLabel='Type “Delete account” below to continue'
+ *   confirmationValue='Delete account'
+ *   actionLabel='Delete account'
+ * />
+ */
+export function Destructive<Payload = void>({ fieldLabel, confirmationValue, ...props }: DestructiveProps<Payload>) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [typedValue, setTypedValue] = useState('');
+  const { isOpen } = props.controller;
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTypedValue('');
+    }
+  }, [isOpen]);
+
+  return (
+    <ConfirmShell
+      {...props}
+      initialFocus={inputRef}
+    >
+      {step => (
+        <DestructiveStep
+          {...step}
+          fieldLabel={resolve(fieldLabel, step.payload)}
+          confirmationValue={resolve(confirmationValue, step.payload)}
+          typedValue={typedValue}
+          onTypedValueChange={setTypedValue}
+          inputRef={inputRef}
+        />
+      )}
+    </ConfirmShell>
   );
 }

@@ -1,22 +1,5 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "preserveWatchOutput": true,
-    "outDir": "dist",
-    "declaration": true,
-    "declarationMap": true,
-    "types": ["@rspack/core/module"]
-  },
-  "exclude": [
-    "node_modules",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/__tests__/**",
-    "./src/test/**"
-  ],
-  "include": ["src", "src/global.d.ts"],
-  "references": [{ "path": "./tsconfig.test.json" }]
+  "files": [],
+  "include": [],
+  "references": [{ "path": "./tsconfig.src.json" }, { "path": "./tsconfig.test.json" }]
 }

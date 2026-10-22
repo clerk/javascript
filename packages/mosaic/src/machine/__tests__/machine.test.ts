@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred, tick } from '../../__tests__/async';
 import { assign, isAssignAction } from '../assign';
-import { createActor, mockActor } from '../createActor';
-import { createMachine } from '../createMachine';
+import { createActor, mockActor } from '../create-actor';
+import { createMachine } from '../create-machine';
 import type { DoneInvokeEvent } from '../types';
 import {
   createDeleteOrgMachine,
@@ -10,20 +11,6 @@ import {
   type DeleteOrgContext,
   type DeleteOrgEvent,
 } from './delete-organization-machine';
-
-/** Flush microtasks (and the macrotask queue) so invoked promises settle. */
-const tick = () => new Promise<void>(resolve => setTimeout(resolve, 0));
-
-/** A promise whose resolution is controlled by the test (for in-flight assertions). */
-function deferred<T>() {
-  let resolve!: (value: T) => void;
-  let reject!: (reason?: unknown) => void;
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-}
 
 describe('createMachine — introspection (the swingset seam)', () => {
   it('exposes states, initial, context and id without running anything', () => {
@@ -505,6 +492,21 @@ describe('createActor — observable contract', () => {
     unsubscribe();
     actor.send({ type: 'OPEN' });
     expect(seen).toEqual(['confirming', 'idle']); // no further notifications
+  });
+
+  it('does not notify a listener another listener unsubscribed during the same pass', () => {
+    const actor = createActor(createMachine({ initial: 'a', states: { a: { on: { GO: 'b' } }, b: {} } }));
+    actor.start();
+
+    const calls: string[] = [];
+    const unsubscribeA = actor.subscribe(() => calls.push('A'));
+    actor.subscribe(() => {
+      calls.push('B');
+      unsubscribeA();
+    });
+
+    actor.send({ type: 'GO' });
+    expect(calls).toEqual(['B']);
   });
 
   it('getSnapshot is referentially stable until a change occurs', () => {
@@ -1028,5 +1030,29 @@ describe('createActor — inline transition functions (TransitionFn)', () => {
     const actor = createActor(machine);
     actor.start();
     expect(actor.can({ type: 'GO' })).toBe(false);
+  });
+});
+
+describe('createActor — unknown states', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('warns when a transition targets a state the machine does not define', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const actor = createActor(createMachine({ initial: 'a', states: { a: { on: { GO: 'ghost' } } } }));
+    actor.start();
+
+    actor.send({ type: 'GO' });
+
+    expect(warn).toHaveBeenCalledWith('[Clerk] Machine has no state "ghost".');
+  });
+
+  it('does not warn for an empty graph', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const actor = createActor(createMachine({ initial: '', states: {} }));
+    actor.start();
+
+    expect(warn).not.toHaveBeenCalled();
   });
 });

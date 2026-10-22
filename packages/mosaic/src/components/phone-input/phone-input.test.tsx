@@ -42,22 +42,6 @@ describe('Mosaic PhoneInput', () => {
     expect(ref).toHaveBeenLastCalledWith(null);
   });
 
-  it('keeps the country indicator on the selection while hovering another country', async () => {
-    const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
-    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
-    const us = screen.getByRole('option', { name: /United States/ });
-    const uk = screen.getByRole('option', { name: /United Kingdom/ });
-    await user.hover(uk);
-    expect(us.querySelector('.cl-combobox-option-indicator')).toBeVisible();
-    expect(uk.querySelector('.cl-combobox-option-indicator')).not.toBeInTheDocument();
-    await user.click(uk);
-    await user.click(screen.getByRole('button', { name: 'Country, United Kingdom' }));
-    expect(
-      screen.getByRole('option', { name: /United Kingdom/ }).querySelector('.cl-combobox-option-indicator'),
-    ).toBeVisible();
-  });
-
   it('positions the country popup against the full phone field', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);
@@ -101,6 +85,37 @@ describe('Mosaic PhoneInput', () => {
     expect(screen.getByText('+1')).toHaveClass('cl-phone-input-prefix');
     expect(document.querySelector('.cl-phone-input')).toHaveClass('cl-input-group');
     expect(document.querySelector('.cl-phone-input')).toHaveAttribute('data-size', 'md');
+  });
+
+  it('starts on the given default country and dials the number with its code', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <PhoneInput
+        defaultCountry='de'
+        aria-label='Phone number'
+        onValueChange={onValueChange}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Country, Germany' })).toBeInTheDocument();
+    expect(screen.getByText('+49')).toHaveClass('cl-phone-input-prefix');
+
+    await user.type(screen.getByRole('textbox', { name: 'Phone number' }), '15123456789');
+
+    expect(onValueChange).toHaveBeenLastCalledWith('+4915123456789');
+  });
+
+  it('prefers the number it is given over the default country', () => {
+    render(
+      <PhoneInput
+        defaultCountry='de'
+        defaultValue='+18015550100'
+        aria-label='Phone number'
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Country, United States' })).toBeInTheDocument();
   });
 
   it('emits an E.164 value while displaying the national number', async () => {

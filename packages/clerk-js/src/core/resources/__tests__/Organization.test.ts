@@ -90,6 +90,10 @@ describe('Organization', () => {
             idp_certificate: 'MIICertificatePlaceholder',
             idp_certificate_issued_at: 1672531200000,
             idp_certificate_expires_at: 1704067200000,
+            idp_certificates: [
+              { certificate: 'MIICertificatePlaceholder', issued_at: 1672531200000, expires_at: 1704067200000 },
+              { certificate: 'MIINextCertificatePlaceholder', issued_at: null, expires_at: null },
+            ],
             idp_metadata_url: 'https://idp.acme.com/metadata',
             idp_metadata: '',
             acs_url: 'https://clerk.example.com/v1/saml/acs',
@@ -120,6 +124,13 @@ describe('Organization', () => {
       expect(connections).toHaveLength(1);
       expect(connections[0].name).toBe('Acme Corp SSO');
       expect(connections[0].allowOrganizationAccountLinking).toBe(true);
+      expect(connections[0].samlConnection?.idpCertificates).toEqual([
+        { certificate: 'MIICertificatePlaceholder', issuedAt: 1672531200000, expiresAt: 1704067200000 },
+        { certificate: 'MIINextCertificatePlaceholder', issuedAt: null, expiresAt: null },
+      ]);
+      expect(connections[0].__internal_toSnapshot().saml_connection?.idp_certificates).toEqual(
+        enterpriseConnectionsJSON[0].saml_connection?.idp_certificates,
+      );
     });
 
     it('creates an enterprise connection without forwarding organization_id in the body', async () => {
@@ -157,7 +168,7 @@ describe('Organization', () => {
         // Even though callers may still pass this for convenience, the SDK
         // must not include it in the body — the org URL is authoritative.
         organizationId: ORG_ID,
-        saml: { idpEntityId: 'https://idp.example.com' },
+        saml: { idpEntityId: 'https://idp.example.com', idpCertificates: ['cert_a', 'cert_b'] },
       });
 
       // @ts-ignore
@@ -169,6 +180,7 @@ describe('Organization', () => {
           name: 'New SSO',
           domains: ['acme.com'],
           saml_idp_entity_id: 'https://idp.example.com',
+          saml_idp_certificates: ['cert_a', 'cert_b'],
         },
       });
 
@@ -246,6 +258,7 @@ describe('Organization', () => {
         active: false,
         syncUserAttributes: true,
         organizationId: ORG_ID,
+        saml: { idpCertificates: ['cert_a', 'cert_b'] },
       });
 
       // @ts-ignore
@@ -256,6 +269,7 @@ describe('Organization', () => {
           name: 'Updated',
           active: false,
           sync_user_attributes: true,
+          saml_idp_certificates: ['cert_a', 'cert_b'],
         },
       });
 
@@ -466,6 +480,49 @@ describe('Organization', () => {
         body: { user_id: 'user_1' },
       });
       expect(entry.userId).toBe('user_1');
+    });
+
+    it('adds users in chunks of 100 and merges the partial results', async () => {
+      const userIds = Array.from({ length: 150 }, (_, i) => `user_${i}`);
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: { data: [entryJSON], errors: [{ user_id: 'user_5', code: 'sso_bypass_domain_not_served' }] },
+        })
+        .mockResolvedValueOnce({
+          response: { data: [{ ...entryJSON, user_id: 'user_120' }], errors: [] },
+        });
+      // @ts-ignore
+      BaseResource._fetch = fetchMock;
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.addUsers({ userIds });
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock).toHaveBeenNthCalledWith(1, {
+        method: 'POST',
+        path: `${ALLOWLIST_PATH}/bulk`,
+        body: { user_id: userIds.slice(0, 100) },
+      });
+      expect(fetchMock).toHaveBeenNthCalledWith(2, {
+        method: 'POST',
+        path: `${ALLOWLIST_PATH}/bulk`,
+        body: { user_id: userIds.slice(100) },
+      });
+      expect(result.data.map(entry => entry.userId)).toEqual(['user_1', 'user_120']);
+      expect(result.errors).toEqual([{ userId: 'user_5', code: 'sso_bypass_domain_not_served' }]);
+    });
+
+    it('sends nothing for an empty batch', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn();
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.addUsers({ userIds: [] });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).not.toHaveBeenCalled();
+      expect(result).toEqual({ data: [], errors: [] });
     });
 
     it('removes a user by id', async () => {

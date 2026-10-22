@@ -68,8 +68,8 @@ row is built to the trigger's measurements — the same height, the same text in
 so the label does not appear to move when the list opens.
 
 That only holds while every row is the height of the trigger. An item with a `description` renders
-a second line, so a list with any description hangs below the trigger instead. Pass
-`alignItemWithTrigger` yourself to override either default.
+a second line, so a list with any description hangs below the trigger instead. A `multiple` select
+also hangs below the trigger. Pass `alignItemWithTrigger` yourself to override these defaults.
 
 The overlay also gives way on its own where it would not work: a touch opening, or a trigger within
 20px of the top or bottom of the viewport, places the list below the trigger like a menu.
@@ -113,6 +113,43 @@ same `value`, `label`, `description`, and `disabled`.
   ))}
 </Select.Popup>
 ```
+
+### Media
+
+Give `Select.Option` children to lead a row with an icon, image, or avatar. `Select.Media` is a
+20px square column that sits at the top of the row, beside the label; `Select.Content` stacks
+`Select.Label` over an optional `Select.Description`.
+The option's `label` prop still names it for typeahead and for the trigger, which shows the label
+only. Pass `alignItemWithTrigger={false}`, since the row's text no longer lines up with the
+trigger's.
+
+```tsx
+<Select.Root
+  items={organizations}
+  alignItemWithTrigger={false}
+>
+  <Select.Trigger />
+  <Select.Popup>
+    <Select.Option
+      value='acme'
+      label='Acme Inc.'
+    >
+      <Select.Media>
+        <Avatar.Root size='fit'>…</Avatar.Root>
+      </Select.Media>
+      <Select.Content>
+        <Select.Label>Acme Inc.</Select.Label>
+        <Select.Description>Owner</Select.Description>
+      </Select.Content>
+    </Select.Option>
+  </Select.Popup>
+</Select.Root>
+```
+
+<Story
+  name='Media'
+  storyModule={SelectStories}
+/>
 
 ### Field
 
@@ -161,6 +198,38 @@ const [value, setValue] = useState('member');
   storyModule={SelectStories}
 />
 
+### Multiple
+
+`multiple` makes the value a `string[]`. Picking an option adds or removes it and keeps the list
+open, and every selected row shows the check. The trigger lists the selected labels separated by
+commas; pass a function as its children to render the value yourself.
+
+```tsx
+function renderValue(value: string[]) {
+  if (value.length === 0) {
+    return 'Select languages';
+  }
+
+  const firstLanguage = languages.find(language => language.value === value[0])?.label;
+  const additionalLanguages = value.length > 1 ? ` (+${value.length - 1} more)` : '';
+  return `${firstLanguage}${additionalLanguages}`;
+}
+
+<Select.Root
+  items={languages}
+  multiple
+  defaultValue={['javascript', 'typescript']}
+>
+  <Select.Trigger>{renderValue}</Select.Trigger>
+  <Select.Popup />
+</Select.Root>;
+```
+
+<Story
+  name='Multiple'
+  storyModule={SelectStories}
+/>
+
 ### Scrolling
 
 A list with more options than fit is cut at the viewport edge and scrolled so the selected row still
@@ -175,25 +244,26 @@ with the shared ScrollArea treatment. Nothing to opt into — `Select.Popup` com
 
 ## Parts
 
-| Part             | Slot                                 | Description                                                                         |
-| ---------------- | ------------------------------------ | ----------------------------------------------------------------------------------- |
-| `Select.Root`    | —                                    | State provider; owns the value, the items, open/close, and keyboard nav.            |
-| `Select.Trigger` | `select-trigger`                     | Opens the listbox. Defaults to a neutral `md` `Button`; `variant` picks the chrome. |
-| ↳ value          | `select-value`                       | The selected label, or the placeholder.                                             |
-| ↳ icon           | `select-trigger-icon`                | The trailing chevron.                                                               |
-| `Select.Popup`   | `select-positioner` / `select-popup` | Portals, positions, and renders the listbox surface.                                |
-| ↳ viewport       | `select-viewport`                    | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.      |
-| `Select.Option`  | `select-option`                      | A single choice. `data-selected`, `data-active`, `data-disabled`, `data-described`. |
-| ↳ content        | `select-option-content`              | Stacks the label over the description.                                              |
-| ↳ label          | `select-option-label`                | The option's text. Truncates to one line.                                           |
-| ↳ description    | `select-option-description`          | The optional second line.                                                           |
-| ↳ indicator      | `select-option-indicator`            | The check. Present on every row, visible on the selected one.                       |
+| Part                 | Slot                                 | Description                                                                         |
+| -------------------- | ------------------------------------ | ----------------------------------------------------------------------------------- |
+| `Select.Root`        | —                                    | State provider; owns the value, the items, open/close, and keyboard nav.            |
+| `Select.Trigger`     | `select-trigger`                     | Opens the listbox. Defaults to a neutral `md` `Button`; `variant` picks the chrome. |
+| ↳ value              | `select-value`                       | The selected labels, or the placeholder.                                            |
+| ↳ icon               | `select-trigger-icon`                | The trailing chevron.                                                               |
+| `Select.Popup`       | `select-positioner` / `select-popup` | Portals, positions, and renders the listbox surface.                                |
+| ↳ viewport           | `select-viewport`                    | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.      |
+| `Select.Option`      | `select-option`                      | A single choice. `data-selected`, `data-active`, `data-disabled`, `data-described`. |
+| `Select.Media`       | `select-option-media`                | A 20px square leading column, top-aligned, that holds an icon, image, or avatar.    |
+| `Select.Content`     | `select-option-content`              | Stacks the label over the description.                                              |
+| `Select.Label`       | `select-option-label`                | The option's text. Truncates to one line.                                           |
+| `Select.Description` | `select-option-description`          | The optional second line.                                                           |
+| ↳ indicator          | `select-option-indicator`            | The check. Present on every row, visible on each selected one.                      |
 
 ## Styling
 
 The Mosaic select is themed with **StyleX**. Each styled part carries a stable `.cl-<slot>` class
 (the slots above) alongside the StyleX atoms. Consumers never target the hashed atomic classes —
-override by targeting the `.cl-*` slot from a CSS layer that wins over `@clerk/ui/styles.css`:
+override by targeting the `.cl-*` slot from a CSS layer that wins over `@clerk/mosaic/styles.css`:
 
 ```css
 @import '@clerk/mosaic/styles.css' layer(components);

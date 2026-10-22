@@ -13,6 +13,8 @@ import * as DialogStories from './dialog.component.stories';
   meta={DialogStories.meta}
   extra={[
     { name: 'role', type: "'dialog' | 'alertdialog'", default: "'dialog'" },
+    { name: 'shouldCloseOnInteractOutside', type: 'boolean', default: "true (always false for 'alertdialog')" },
+    { name: 'showCloseButton', type: 'boolean', default: "true for 'dialog', false for 'alertdialog'" },
     { name: 'open', type: 'boolean' },
     { name: 'defaultOpen', type: 'boolean', default: 'false' },
     { name: 'onOpenChange', type: '(open: boolean, details: DialogOpenChangeDetails) => void' },
@@ -67,10 +69,11 @@ committing.
 
 ### Variant
 
-| Value     | Width                                    | For                                                                  |
-| --------- | ---------------------------------------- | -------------------------------------------------------------------- |
-| `card`    | `25rem`, height from content             | Everything a `Card` holds — a flow, a confirmation, a form (default) |
-| `profile` | Width from its surface, fills the height | Account profile and settings — a surface you navigate                |
+| Value        | Width                                       | For                                                                  |
+| ------------ | ------------------------------------------- | -------------------------------------------------------------------- |
+| `card`       | Width from its `Card`, height from content  | Everything a `Card` holds — a flow, a confirmation, a form (default) |
+| `profile`    | Width from its surface, fills the height    | Account profile and settings — a surface you navigate                |
+| `fullscreen` | Fills the viewport at every width, no inset | The same profile surface taking the whole screen                     |
 
 ### Every dialog brings its own surface
 
@@ -78,6 +81,8 @@ The dialog **paints nothing**. A `card` holds a `Card`, and a `profile` holds a 
 `UserProfileView`): the dialog positions and animates the popup, and the surface inside paints it.
 
 A popup with no surface inside renders an unpainted box.
+
+A `card` dialog is as wide as its `Card`. Pass `size='lg'` to `Card.Root` for a form that needs more room.
 
 <Story
   name='CardSurface'
@@ -103,22 +108,26 @@ import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profil
 </Dialog.Root>;
 ```
 
+`fullscreen` holds the same `Profile` and fills the viewport at every width, with no inset around
+it. The profile replaces its corner dismiss with a "Back to app" row above the navigation; below
+`48rem`, where the navigation collapses into the page title, the corner dismiss returns.
+
 ### Compact placement
 
-`compactPlacement='sheet'` bottom-anchors the surface in the compact container query and slides it up from the
-edge instead of centring it.
+In the compact band, a window under `40rem`, a card is a bottom sheet: flush to the sides and the
+bottom edge, sliding up from it. `compactPlacement='center'` keeps it centered there instead.
 
 <Story
   name='Sheet'
   storyModule={DialogStories}
 />
 
-| Value    | Compact band (`< 48rem`)                                      | Above it |
-| -------- | ------------------------------------------------------------- | -------- |
-| `center` | Centred (default)                                             | Centred  |
-| `sheet`  | Bottom-anchored, slides up; full width until the surface caps | Centred  |
+| Value    | Compact band (`< 40rem`)             | Above it |
+| -------- | ------------------------------------ | -------- |
+| `sheet`  | Bottom-anchored, slides up (default) | Centered |
+| `center` | Centered                             | Centered |
 
-A `profile` takes no placement and warns in dev if given one.
+A `profile` and a `fullscreen` take no placement and warn in dev if given one.
 
 ### Alert dialogs
 
@@ -136,7 +145,8 @@ What follows from the role:
 - No outside-press dismissal; Escape still cancels.
 - A name **and** a description are required — `Card.Title` and `Card.Description`; both warn in dev
   when missing.
-- `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns.
+- `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns, unless the root sets
+  `showCloseButton`.
 
 ### Confirming a discard
 
@@ -157,10 +167,9 @@ The gap to the screen edge is a fixed inset, not a percentage:
 | `48rem–90rem` | `2rem`       | `2rem` |
 | `>= 90rem`    | `3rem`       | `3rem` |
 
-The bands are **container queries** against the dialog's viewport element (named `cl-dialog`), not
-media queries.
-
-Below `48rem` a `compactPlacement='sheet'` dialog pins to the bottom and slides up.
+The inset bands are **container queries** against the dialog's viewport element (named
+`cl-dialog`). The compact placement band is a media query: below `40rem` a card dialog pins to the
+bottom and slides up, unless `compactPlacement='center'`.
 
 ### Close button
 
@@ -172,14 +181,15 @@ the DOM. Point `initialFocus` on `Dialog.Popup` at the field that should have it
 
 ### Dismissal
 
-`role` decides what closes the dialog. There is no prop for it.
+Escape always closes. `shouldCloseOnInteractOutside={false}` keeps a `dialog` open on an outside
+press, for a task an accidental press would throw away, such as entering a verification code. An
+`alertdialog` never closes on an outside press.
 
-| Role          | Escape | Outside press | Programmatic |
-| ------------- | ------ | ------------- | ------------ |
-| `dialog`      | ✅     | ✅            | ✅           |
-| `alertdialog` | ✅     | ❌            | ✅           |
-
-The two map to the native [`<dialog closedby>`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/closedBy) values `any` and `closerequest`.
+| Root                                                 | Escape | Outside press | Programmatic |
+| ---------------------------------------------------- | ------ | ------------- | ------------ |
+| `role='dialog'`                                      | ✅     | ✅            | ✅           |
+| `role='dialog' shouldCloseOnInteractOutside={false}` | ✅     | ❌            | ✅           |
+| `role='alertdialog'`                                 | ✅     | ❌            | ✅           |
 
 ### Keyboard
 
@@ -246,14 +256,15 @@ State attributes:
 
 A dialog opened inside another is one of two relationships, decided by the variant beneath it:
 
-|                     | Nested                     | Stack                              |
-| ------------------- | -------------------------- | ---------------------------------- |
-| Opens over          | a `profile`                | a `card`                           |
-| Its own scrim       | Yes, lighter than the base | None — one scrim serves the stack  |
-| The surface beneath | Unchanged                  | Dims and recedes                   |
-| Attributes          | `data-nested`              | `data-stacked` / `data-stack-base` |
+|                     | Nested                      | Stack                              |
+| ------------------- | --------------------------- | ---------------------------------- |
+| Opens over          | a `profile` or `fullscreen` | a `card`                           |
+| Its own scrim       | Yes, lighter than the base  | None — one scrim serves the stack  |
+| The surface beneath | Unchanged                   | Dims and recedes                   |
+| Attributes          | `data-nested`               | `data-stacked` / `data-stack-base` |
 
-A `profile` never opens inside another dialog — it warns in dev. A `card` is what opens over one.
+A `profile` and a `fullscreen` never open inside another dialog — they warn in dev. A `card` is
+what opens over one.
 
 ---
 
@@ -286,7 +297,8 @@ handle also has `open()` / `close()` / `isOpen` for opens with no trigger elemen
 ### Multiple triggers
 
 Several triggers can share one dialog through a handle. Give each an `id` and a `payload`, and make
-the root's children a function of `{ payload }`. Type it with `Dialog.createHandle<Payload>()`.
+the root's children a function of `{ payload }`. Type it with `Dialog.createHandle<Payload>()`, and
+every trigger on that handle must pass a payload.
 
 <Story
   name='MultipleTriggers'

@@ -2,7 +2,7 @@ import * as FlowStories from './flow.stories';
 
 # Flow
 
-A controlled step viewport from `@clerk/headless`. It maps controller states to presentational steps, keeps an outgoing step mounted until its CSS animation finishes, and publishes the measurements needed to animate the viewport height. It ships no styles.
+A controlled step viewport. It maps controller states to presentational steps, keeps an outgoing step mounted until its CSS animation finishes, and publishes the measurements needed to animate the viewport height. It ships no styles.
 
 ## Example
 
@@ -16,7 +16,7 @@ The controls in this demo stand in for a controller. The animation CSS belongs t
 ## Usage
 
 ```tsx
-import { Flow } from '@clerk/headless/flow';
+import { Flow } from '@clerk/mosaic/primitives/flow';
 
 <Flow.Root
   value={controller.status}

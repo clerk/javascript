@@ -3,30 +3,29 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../../../components/dialog';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
+import { UserProfileBillingPanelView } from '../user-profile-billing-panel.view';
+import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 const pages: UserProfileViewProps['pages'] = {
-  account: { name: 'Preston Booth', username: 'prestonxyz' },
-  security: { hasPassword: true },
-  billing: {
-    subscription: {
-      planName: 'Basic Plan',
-      priceLabel: '$12 / Month',
-      totalDueLabel: '$12.00',
-      renewsAtLabel: 'Renews Aug 26',
-    },
-    paymentMethods: [],
-    historyItems: [],
-  },
-  apiKeys: {
-    apiKeys: [],
-    searchValue: '',
-    selectedIds: [],
-    onSearchChange: vi.fn(),
-    onSelectionChange: vi.fn(),
-  },
+  account: <UserProfileProfilePanelView />,
+  security: <UserProfileSecurityPanelView />,
+  billing: (
+    <UserProfileBillingPanelView
+      subscription={{
+        planName: 'Basic Plan',
+        priceLabel: '$12 / Month',
+        totalDueLabel: '$12.00',
+        renewsAtLabel: 'Renews Aug 26',
+      }}
+      paymentMethods={[]}
+      historyItems={[]}
+    />
+  ),
+  apiKeys: <p>API keys content</p>,
 };
 
 function renderView(overrides: Partial<UserProfileViewProps> = {}) {
@@ -100,7 +99,7 @@ describe('UserProfileView', () => {
     const terms = screen.getByRole('tab', { name: 'Terms' });
     expect(screen.getAllByRole('tab').at(-1)).toBe(terms);
     expect(terms).toContainElement(screen.getByTestId('terms-icon'));
-    expect(screen.getByText('Terms of service')).not.toBeVisible();
+    expect(screen.queryByText('Terms of service')).not.toBeInTheDocument();
 
     await user.click(terms);
     expect(onPageChange).toHaveBeenCalledWith('terms');
@@ -157,5 +156,43 @@ describe('UserProfileView', () => {
     const popup = screen.getByRole('dialog', { name: 'User profile' });
     expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
     expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+  });
+
+  it('replaces the close button with a back button in a fullscreen dialog', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <MosaicProvider>
+        <Dialog.Root
+          defaultOpen
+          onOpenChange={onOpenChange}
+        >
+          <Dialog.Popup variant='fullscreen'>
+            <UserProfileView
+              activePage='account'
+              pages={pages}
+              onPageChange={vi.fn()}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+
+    const popup = screen.getByRole('dialog', { name: 'User profile' });
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    const back = screen.getByRole('button', { name: 'Back to app' });
+    expect(popup).toContainElement(back);
+
+    await userEvent.setup().click(back);
+
+    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+  });
+
+  it('warns when there are no pages to show', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    renderView({ pages: {} });
+
+    expect(warn).toHaveBeenCalledWith('[Clerk] UserProfile has no pages to show.');
+    warn.mockRestore();
   });
 });

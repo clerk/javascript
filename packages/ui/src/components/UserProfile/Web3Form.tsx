@@ -25,14 +25,13 @@ export const AddWeb3WalletActionMenu = () => {
   const unconnectedStrategies = enabledStrategies.filter(strategy => {
     return !connectedStrategies.includes(strategy) && strategyToDisplayData[strategy];
   });
+  const createWeb3Wallet = useReverification((identifier: string) =>
+    user?.createWeb3Wallet({ web3Wallet: identifier }),
+  );
 
   if (unconnectedStrategies.length === 0) {
     return null;
   }
-
-  const createWeb3Wallet = useReverification((identifier: string) =>
-    user?.createWeb3Wallet({ web3Wallet: identifier }),
-  );
 
   // If the user selects `web3_solana_signature` as their strategy,
   // we need to obtain the wallet name to use when connecting and signing the message during the auth flow

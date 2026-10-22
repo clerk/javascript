@@ -1,13 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { SpinDelayOptions } from '../../hooks/useSpinDelay';
-import { useSpinDelay } from '../../hooks/useSpinDelay';
+import type { SpinDelayOptions } from '../../hooks/use-spin-delay';
+import { useSpinDelay } from '../../hooks/use-spin-delay';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
+import { withTruncatableLabel } from '../../utils/truncatable-label';
 import { Spinner } from '../spinner';
 import type { ButtonProps } from './button';
-import { Button, withTruncatableLabel } from './button';
+import { Button } from './button';
+import { ButtonContext } from './button.context';
 import { styles } from './submit-button.styles';
 
 export interface SubmitButtonProps extends ButtonProps {
@@ -24,8 +26,8 @@ export interface SubmitButtonProps extends ButtonProps {
    */
   pendingLabel?: string;
   /**
-   * Tunes when the spinner appears and how long it stays. `delay` (default `300`) is how long the
-   * action has to run before the spinner is drawn at all; `minDuration` (default `200`) is how
+   * Tunes when the spinner appears and how long it stays. `delay` (default `150`) is how long the
+   * action has to run before the spinner is drawn at all; `minDuration` (default `400`) is how
    * long it stays once drawn. Neither affects the pending state itself, which always applies
    * immediately. Set `delay: 0` for an action already known to be slow.
    */
@@ -35,13 +37,6 @@ export interface SubmitButtonProps extends ButtonProps {
 // The spinner scale stops at `md`, so `xs` and `sm` share the small ring while `md` and `lg`
 // share the larger one.
 const spinnerSizes = { xs: 'sm', sm: 'sm', md: 'md', lg: 'md' } as const;
-
-// Long enough that a request served from cache or a local mutation never draws a spinner, short
-// enough that a press which is going to take a while doesn't sit there looking ignored. Set here
-// rather than on `useSpinDelay` itself: a button is pressed and watched, so it wants a tighter
-// window than a hook shared with background loads. `minDuration` has no such tension, so it takes
-// the hook's default.
-const DEFAULT_SPIN_DELAY = 300;
 
 /**
  * A `Button` that submits its form, with a pending affordance. Takes every `Button` prop;
@@ -58,42 +53,37 @@ const DEFAULT_SPIN_DELAY = 300;
  * <SubmitButton color='negative' isPending={isDeleting}>Delete</SubmitButton>
  */
 export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProps>(function MosaicSubmitButton(
-  { isPending = false, pendingLabel = 'pending', size = 'md', spinDelay, xstyle, children, onClick, ...rest },
+  {
+    isPending = false,
+    pendingLabel = 'pending',
+    size = 'md',
+    spinDelay,
+    disabled: disabledProp,
+    focusableWhenDisabled = false,
+    xstyle,
+    children,
+    ...rest
+  },
   ref,
 ) {
-  const { delay = DEFAULT_SPIN_DELAY, minDuration } = spinDelay ?? {};
-
+  const defaults = React.useContext(ButtonContext);
+  const disabled = defaults.disabled || disabledProp || false;
   // `isPending` drives the semantics, this drives the pixels. The split is deliberate: the button
   // has to go inert and start announcing the moment the action does, or a fast action gets
   // submitted twice and assistive tech misses it — but drawing a spinner that fast only produces
   // a flash, so the visual waits out the delay and then sticks around long enough to be read.
-  const showPending = useSpinDelay(isPending || null, { delay, minDuration }) !== null;
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (isPending) {
-      // `aria-disabled` is advisory — it doesn't stop the native submit — so the press is
-      // cancelled here instead. The `disabled` attribute would do both, but it drops the button
-      // out of the tab order mid-action, taking focus with it just as the spinner is announced.
-      //
-      // TODO: fold this into the headless button's `focusableWhenDisabled` once it lands
-      // (clerk/javascript#9319, #9320), which owns the same behavior one layer down.
-      event.preventDefault();
-      return;
-    }
-    onClick?.(event);
-  };
+  const showPending = useSpinDelay(isPending || null, spinDelay) !== null;
 
   return (
     <Button
       ref={ref}
       type='submit'
       size={size}
-      // Spread rather than set to `undefined`: `mergeProps` copies every key the caller passes,
-      // so an explicit `aria-disabled={undefined}` would erase the one `focusableWhenDisabled`
-      // puts there when the button is disabled but not pending.
-      {...(isPending ? { 'aria-busy': true, 'aria-disabled': true, 'data-pending': '' } : null)}
-      onClick={handleClick}
-      xstyle={[styles.root, isPending && styles.rootPending, xstyle]}
+      disabled={disabled || isPending}
+      focusableWhenDisabled={focusableWhenDisabled || (isPending && !disabled)}
+      aria-busy={isPending || undefined}
+      data-pending={isPending ? '' : undefined}
+      xstyle={[styles.root, isPending && !disabled && styles.rootPending, xstyle]}
       {...rest}
     >
       <span

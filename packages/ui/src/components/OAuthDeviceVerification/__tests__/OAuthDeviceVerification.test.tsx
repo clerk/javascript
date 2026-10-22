@@ -141,6 +141,22 @@ describe('OAuthDeviceVerification', () => {
     expect(getByText("You'll stay signed in until you sign out or revoke access.")).toBeVisible();
   });
 
+  it('hides the scope list when only offline_access is requested', async () => {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { ...originalLocation, search: '?user_code=BFWS-ZBZM' },
+    });
+    const { wrapper } = await setup({
+      ...verificationInfo,
+      scopes: [{ scope: 'offline_access', description: 'Offline access', requiresConsent: true }],
+    });
+    const { getByText, queryByText } = render(<OAuthDeviceVerification />, { wrapper });
+
+    await waitFor(() => expect(getByText('Allow TV App to access your account?')).toBeVisible());
+    expect(getByText("You'll stay signed in until you sign out or revoke access.")).toBeVisible();
+    expect(queryByText('This will allow TV App access to:')).toBeNull();
+  });
+
   it('keeps an invalid URL prefill editable without calling FAPI', async () => {
     Object.defineProperty(window, 'location', {
       configurable: true,

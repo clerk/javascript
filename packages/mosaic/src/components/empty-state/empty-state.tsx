@@ -1,11 +1,11 @@
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Icon, IconFrame } from '../icon';
 import { styles } from './empty-state.styles';
 
@@ -24,11 +24,11 @@ const Root = React.forwardRef<HTMLDivElement, EmptyStateProps>(function MosaicEm
 });
 
 export interface EmptyStateIconProps extends Omit<MosaicElementProps<'span'>, 'children'> {
-  name: IconName;
+  glyph: IconComponent;
 }
 
 const EmptyStateIcon = React.forwardRef<HTMLSpanElement, EmptyStateIconProps>(function MosaicEmptyStateIcon(
-  { name, xstyle, ...rest },
+  { glyph, xstyle, ...rest },
   ref,
 ) {
   return (
@@ -38,7 +38,7 @@ const EmptyStateIcon = React.forwardRef<HTMLSpanElement, EmptyStateIconProps>(fu
     >
       <IconFrame filled>
         <Icon
-          name={name}
+          glyph={glyph}
           size='lg'
         />
       </IconFrame>

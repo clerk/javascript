@@ -75,6 +75,8 @@ export type { CountryIso, PhoneInputProps } from '../components/phone-input';
 export { Item } from '../components/item';
 export type { ItemProps } from '../components/item';
 export { Menu } from '../components/menu';
+export { TagInput } from '../components/tag-input';
+export type { TagInputProps } from '../components/tag-input';
 export { Otp } from '../components/otp';
 export type { OtpProps, OtpStatus } from '../components/otp';
 export type {
@@ -89,6 +91,8 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaAxis, ScrollAreaGutter } from '../components/scroll-area';
+export { Radio } from '../components/radio';
+export type { RadioGroupProps, RadioItemProps } from '../components/radio';
 export { Select } from '../components/select';
 export type {
   SelectItem,
@@ -112,6 +116,17 @@ export type {
   TableSelectCellProps,
   TableSort,
 } from '../components/table';
+export { SegmentedControl } from '../components/segmented-control';
+export type { SegmentedControlItemProps, SegmentedControlRootProps } from '../components/segmented-control';
+export { Tabs } from '../components/tabs';
+export type {
+  TabsListProps,
+  TabsPanelProps,
+  TabsPanelsProps,
+  TabsRootProps,
+  TabsTabProps,
+  TabsTriggerProps,
+} from '../components/tabs';
 export { Section } from '../components/section';
 export type {
   SectionActionsProps,
@@ -131,6 +146,8 @@ export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
+export { useToastManager } from '../components/toast';
+export type { ToastType } from '../components/toast';
 export { Tooltip } from '../components/tooltip';
 export type { TooltipPopupProps, TooltipRootProps, TooltipTriggerProps } from '../components/tooltip';
 export { VisuallyHidden } from '../components/visually-hidden';
@@ -145,6 +162,8 @@ export type {
   PopoverTitleProps,
   PopoverTriggerProps,
 } from '../components/popover';
+export { Panel } from '../components/panel';
+export type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from '../components/panel';
 export { Profile } from '../components/profile';
 export type {
   ProfileContentProps,
@@ -152,10 +171,10 @@ export type {
   ProfileNavItemProps,
   ProfileNavProps,
   ProfileContentPanelProps,
-  ProfilePageTitleProps,
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
 export { UserButton } from '../features/user-button/user-button';
 
 import {
@@ -209,3 +228,12 @@ export type SpacingVarName = keyof typeof spacingVars;
 export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';
+export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
+export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
+
+export { APIKeysTableView } from '../features/api-keys/api-keys-table.view';
+export { UserProfileEnterpriseAccountsSectionView } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';
+
+export { MembersTableTabView } from '../features/organization-profile/organization-profile-members-panel/members-table-tab.view';
+export { InvitationsTableTabView } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.view';
+export { RequestsTableTabView } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.view';

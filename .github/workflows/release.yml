@@ -48,7 +48,7 @@ jobs:
     name: Release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
 
     permissions:
       actions: read
@@ -67,7 +67,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           fetch-depth: 0
           show-progress: false
@@ -79,7 +79,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Release uses --force, so turbo cache is not needed
@@ -98,7 +98,7 @@ jobs:
 
       - name: Download electron-passkeys native binaries
         if: ${{ steps.detect-native.outputs.should-build == 'true' }}
-        uses: dawidd6/action-download-artifact@b6e2e70617bc3265edd6dab6c906732b2f1ae151 # v21
+        uses: dawidd6/action-download-artifact@v21
         with:
           github_token: ${{ github.token }}
           workflow: electron-passkeys.yml
@@ -116,7 +116,7 @@ jobs:
 
       - name: Create Release PR
         id: changesets
-        uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1
+        uses: changesets/action@v1.8.0
         with:
           commit: "ci(repo): Version packages"
           title: "ci(repo): Version packages"
@@ -130,8 +130,7 @@ jobs:
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
-        continue-on-error: true
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           result-encoding: string
           retries: 3
@@ -148,17 +147,25 @@ jobs:
               const targets = [
                 { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
                 { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
-                { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
+                { repo: 'clerk', workflow_id: 'docs-typedoc.yml', inputs: { javascript_ref: context.sha }, critical: true },
               ];
               const results = await Promise.allSettled(
-                targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+                targets.map(({ repo, workflow_id, inputs }) =>
+                  github.rest.actions.createWorkflowDispatch({ owner: 'clerk', repo, workflow_id, ref: 'main', inputs })
+                )
               );
               const failures = results
                 .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
                 .filter(Boolean);
               if (failures.length) {
-                failures.forEach(f => core.error(`Dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
-                core.setFailed(`${failures.length} downstream dispatch(es) failed`);
+                failures.forEach(f => {
+                  const message = `Dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`;
+                  if (f.target.critical) {
+                    core.setFailed(message);
+                  } else {
+                    core.warning(message);
+                  }
+                });
               }
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
@@ -171,8 +178,7 @@ jobs:
       # if the packages are already live.
       - name: Recover downstream notifications
         if: always() && steps.changesets.conclusion == 'failure'
-        continue-on-error: true
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           result-encoding: string
           retries: 3
@@ -230,24 +236,32 @@ jobs:
             const targets = [
               { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
               { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
-              { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
+              { repo: 'clerk', workflow_id: 'docs-typedoc.yml', inputs: { javascript_ref: context.sha }, critical: true },
             ];
             const results = await Promise.allSettled(
-              targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+              targets.map(({ repo, workflow_id, inputs }) =>
+                github.rest.actions.createWorkflowDispatch({ owner: 'clerk', repo, workflow_id, ref: 'main', inputs })
+              )
             );
             const failures = results
               .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
               .filter(Boolean);
             if (failures.length) {
-              failures.forEach(f => core.error(`Recovery dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
-              core.setFailed(`${failures.length} recovery dispatch(es) failed`);
+              failures.forEach(f => {
+                const message = `Recovery dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`;
+                if (f.target.critical) {
+                  core.setFailed(message);
+                } else {
+                  core.warning(message);
+                }
+              });
             } else {
               core.notice('Recovery dispatch completed successfully');
             }
 
       - name: Generate notification payload
         id: notification
-        if: steps.changesets.outputs.published == 'true'
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' }}
         env:
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
           GH_ACTOR: ${{ github.actor }}
@@ -261,8 +275,8 @@ jobs:
 
       - name: Send commit log to Slack
         id: slack
-        if: steps.changesets.outputs.published == 'true'
-        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' && steps.notification.outcome == 'success' }}
+        uses: slackapi/slack-github-action@v1.27.1
         with:
           payload: ${{ steps.notification.outputs.payload }}
         env:
@@ -271,7 +285,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.changesets.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
+        uses: slackapi/slack-github-action@v1.27.1
         with:
           payload: |
             {
@@ -293,13 +307,13 @@ jobs:
     name: Canary release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -308,7 +322,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Remote cache disabled in OIDC publish path.
@@ -336,7 +350,7 @@ jobs:
       - name: Trigger workflows on related repos
         if: steps.publish.outcome == 'success'
         continue-on-error: true
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           result-encoding: string
           retries: 3
@@ -371,7 +385,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.publish.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
+        uses: slackapi/slack-github-action@v1.27.1
         with:
           payload: |
             {
@@ -402,7 +416,7 @@ jobs:
 
     steps:
       - name: Limit action to Clerk members
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           result-encoding: string
           retries: 3
@@ -423,7 +437,7 @@ jobs:
 
       - name: Extract snapshot name
         id: extract-snapshot-name
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         with:
           script: |
             const match = context.payload.comment.body.match(/!snapshot (.*)/)
@@ -435,7 +449,7 @@ jobs:
             core.setOutput('name', name);
 
       - name: Validate PR and dispatch snapshot release
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           SNAPSHOT_NAME: ${{ steps.extract-snapshot-name.outputs.name }}
         with:
@@ -485,7 +499,7 @@ jobs:
             }
 
       - name: Acknowledge request
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@v3.1.0
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: eyes
@@ -494,7 +508,7 @@ jobs:
     name: Snapshot release
     if: ${{ github.event_name == 'workflow_dispatch' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
 
     permissions:
       contents: read
@@ -503,7 +517,7 @@ jobs:
 
     steps:
       - name: Validate dispatch inputs
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           SNAPSHOT_NAME: ${{ inputs.snapshot_name }}
           HEAD_SHA: ${{ inputs.head_sha }}
@@ -518,7 +532,7 @@ jobs:
             }
 
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -527,7 +541,7 @@ jobs:
 
       - name: Setup
         id: config
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: false # OIDC publish job; do not restore poisonable cache state.
           turbo-enabled: false # Remote cache disabled in OIDC publish path.
@@ -556,7 +570,7 @@ jobs:
       - name: Package info
         if: steps.version-packages.outputs.success == '1'
         id: package-info
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           SNAPSHOT_NAME: ${{ inputs.snapshot_name }}
         with:
@@ -585,14 +599,14 @@ jobs:
 
       - name: Update Comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@v3.1.0
         with:
           comment-id: ${{ inputs.comment_id }}
           reactions: heart
 
       - name: Minimize previous snapshot comments
         if: steps.version-packages.outputs.success == '1'
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7.1.0
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
         with:
@@ -623,7 +637,7 @@ jobs:
 
       - name: Create snapshot release comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@v3.1.0
         with:
           issue-number: ${{ inputs.pr_number }}
           body: |
@@ -652,7 +666,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -661,7 +675,7 @@ jobs:
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})
-        uses: ./.github/actions/init
+        uses: $/.github/actions/init
         with:
           cache-enabled: true
           node-version: ${{ matrix.version }}

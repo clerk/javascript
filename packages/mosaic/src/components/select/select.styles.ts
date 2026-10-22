@@ -34,8 +34,8 @@ export const positioner = stylex.create({
 
 export const popup = stylex.create({
   base: {
-    // A real border, not a shadow ring, so it occupies the 1px of layout the alignment counts on.
-    borderColor: `light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
+    // Transparent, not removed: it holds the 1px of layout the alignment counts on, and forced colors paints it.
+    borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-lg'],
     borderStyle: 'solid',
     borderWidth: '1px',
@@ -129,6 +129,18 @@ export const option = stylex.create({
   },
 });
 
+export const media = stylex.create({
+  base: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    width: space['5'],
+  },
+});
+
 export const content = stylex.create({
   base: {
     display: 'flex',
@@ -148,10 +160,12 @@ export const description = stylex.create({
 // Rendered on every row and shown only on the selected one, so labels never shift with selection.
 export const indicator = stylex.create({
   base: {
+    alignSelf: 'flex-start',
     color: colorVars['--cl-color-foreground-secondary'],
     visibility: {
       default: 'hidden',
       [stylex.when.ancestor('[data-selected]', selectOptionScope)]: 'visible',
     },
+    height: space['5'],
   },
 });

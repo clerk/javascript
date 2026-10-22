@@ -1,8 +1,10 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import type {
+  AttemptBiometricCredentialParams,
   BackupCodeJSON,
   BackupCodeResource,
+  BiometricCredentialResource,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
   CreatePhoneNumberParams,
@@ -23,10 +25,12 @@ import type {
   OrganizationMembershipResource,
   PasskeyResource,
   PhoneNumberResource,
+  PrepareBiometricCredentialParams,
   RemoveUserPasswordParams,
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
+  TrustedDeviceChallengeResource,
   UpdateUserMetadataParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
@@ -45,6 +49,7 @@ import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '..
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
+  BiometricCredential,
   DeletedObject,
   EmailAddress,
   EnterpriseAccount,
@@ -99,6 +104,7 @@ export class User extends BaseResource implements UserResource {
   legalAcceptedAt: Date | null = null;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
+  timezone: string | null = null;
 
   private cachedSessionsWithActivities: SessionWithActivities[] | null = null;
 
@@ -226,6 +232,26 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as BackupCodeJSON;
 
     return new BackupCode(json);
+  };
+
+  __experimental_getBiometricCredentials = (): Promise<BiometricCredentialResource[]> => {
+    return BiometricCredential.list();
+  };
+
+  __experimental_prepareBiometricCredential = (
+    params: PrepareBiometricCredentialParams,
+  ): Promise<TrustedDeviceChallengeResource> => {
+    return BiometricCredential.prepare(params);
+  };
+
+  __experimental_attemptBiometricCredential = (
+    params: AttemptBiometricCredentialParams,
+  ): Promise<BiometricCredentialResource> => {
+    return BiometricCredential.attempt(params);
+  };
+
+  __experimental_revokeBiometricCredential = (biometricCredentialId: string): Promise<BiometricCredentialResource> => {
+    return BiometricCredential.revoke(biometricCredentialId);
   };
 
   update = async (params: UpdateUserParams): Promise<UserResource> => {
@@ -458,6 +484,7 @@ export class User extends BaseResource implements UserResource {
     this.createOrganizationEnabled = data.create_organization_enabled || false;
     this.createOrganizationsLimit = data.create_organizations_limit || null;
     this.deleteSelfEnabled = data.delete_self_enabled || false;
+    this.timezone = data.timezone ?? null;
 
     if (data.last_sign_in_at) {
       this.lastSignInAt = unixEpochToDate(data.last_sign_in_at);
@@ -506,6 +533,7 @@ export class User extends BaseResource implements UserResource {
       legal_accepted_at: this.legalAcceptedAt?.getTime() || null,
       updated_at: this.updatedAt?.getTime() || null,
       created_at: this.createdAt?.getTime() || null,
+      timezone: this.timezone,
     };
   }
 }

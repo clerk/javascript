@@ -5,7 +5,6 @@ import { Geist } from 'next/font/google';
 import Script from 'next/script';
 import type React from 'react';
 
-import { ClientRoot } from '@/components/ClientRoot';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { cn } from '@/lib/utils';
 
@@ -32,9 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body className='antialiased'>
-        <ThemeProvider>
-          <ClientRoot>{children}</ClientRoot>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

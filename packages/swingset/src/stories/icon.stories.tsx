@@ -1,7 +1,10 @@
 import type { IconProps } from '@clerk/mosaic/components/icon';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { ChevronLeft } from '@clerk/mosaic/icons/glyphs/chevron-left';
+import { ChevronRight } from '@clerk/mosaic/icons/glyphs/chevron-right';
+import type { IconName } from '@clerk/mosaic/icons/registry';
 import { iconRegistry } from '@clerk/mosaic/icons/registry';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -26,7 +29,7 @@ export const meta: StoryMeta = {
 
 // Story functions accept Record<string,unknown> (knob values) and cast to IconProps.
 // The cast is unavoidable: knobs are dynamically typed; Icon has a strict prop interface.
-// `name` is required and not a variant, so each story pins it.
+// `glyph` is required and not a variant, so each story pins it.
 function knobsAsProps(props: Record<string, unknown>) {
   return props as unknown as IconProps;
 }
@@ -35,7 +38,7 @@ export function Default(props: Record<string, unknown>) {
   return (
     <Icon
       {...knobsAsProps(props)}
-      name='chevron-right'
+      glyph={ChevronRight}
     />
   );
 }
@@ -45,26 +48,26 @@ export function Sizes(props: Record<string, unknown>) {
     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
       <Icon
         {...knobsAsProps(props)}
-        name='chevron-right'
+        glyph={ChevronRight}
         size='sm'
       />
       <Icon
         {...knobsAsProps(props)}
-        name='chevron-right'
+        glyph={ChevronRight}
         size='md'
       />
       <Icon
         {...knobsAsProps(props)}
-        name='chevron-right'
+        glyph={ChevronRight}
         size='lg'
       />
     </div>
   );
 }
 
-const deviceIllustrationNames: IconProps['name'][] = ['device-phone', 'device-laptop'];
+const deviceIllustrationNames: IconName[] = ['device-phone', 'device-laptop'];
 
-function IconGallery({ names }: { names: readonly IconProps['name'][] }) {
+function IconGallery({ names }: { names: readonly IconName[] }) {
   return (
     <div
       style={{
@@ -91,9 +94,8 @@ function IconGallery({ names }: { names: readonly IconProps['name'][] }) {
           }}
         >
           <Icon
-            name={name}
+            glyph={iconRegistry[name]}
             size='lg'
-            aria-hidden
           />
           <code style={{ fontSize: 11, lineHeight: 1.5, overflowWrap: 'anywhere' }}>{name}</code>
         </div>
@@ -136,8 +138,8 @@ export function Override() {
       }}
     >
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <Icon name='chevron-right' />
-        <Icon name='chevron-left' />
+        <Icon glyph={ChevronRight} />
+        <Icon glyph={ChevronLeft} />
       </div>
     </MosaicProvider>
   );

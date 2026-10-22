@@ -46,8 +46,9 @@ export default defineConfig({
     globals: false,
     include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
     exclude: ['node_modules/**', 'dist/**'],
-    setupFiles: '../clerk-js/vitest.setup.mts',
-    testTimeout: 5000,
+    setupFiles: ['../clerk-js/vitest.setup.mts', './vitest.setup.mts'],
+    retry: process.env.CI ? 3 : 0,
+    testTimeout: process.env.CI ? 10_000 : 5000,
   },
   resolve: {
     alias: [

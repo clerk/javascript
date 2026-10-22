@@ -5,7 +5,7 @@ export const userButtonMessages = {
   popup: {
     label: 'Account',
   },
-  workspaces: {
+  organizations: {
     personal: 'Personal account',
     notSelected: 'No organization selected',
     loading: 'Loading organizations…',
@@ -17,16 +17,16 @@ export const userButtonMessages = {
     pending: 'pending',
   },
   accounts: {
-    actionsFor: 'Actions for {identifier}',
     switch: 'Switch account',
     add: 'Add account',
     signOut: 'Sign out',
     signOutAll: 'Sign out of all accounts',
   },
   manage: {
-    invite: 'Invite',
-    account: 'Manage account',
+    invite: 'Invite members',
+    settings: 'Settings',
+    profile: 'Manage profile',
     organization: 'Manage organization',
-    createOrganization: 'Create organization',
+    createOrganization: 'Add organization',
   },
 } as const;

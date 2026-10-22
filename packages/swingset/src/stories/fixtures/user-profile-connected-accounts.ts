@@ -1,14 +1,21 @@
+import { useUserProfileConnectedAccountsController } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.controller';
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
-} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { useState } from 'react';
 
-export const connectedAccount = {
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosText } from '@/lib/chaos';
+
+import { idleReverification } from './reverification';
+
+export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
   identifier: 'test@example.com',
   iconUrl: 'https://img.clerk.com/static/google.svg',
+  status: 'connected',
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
   { id: 'google', provider: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
@@ -17,7 +24,7 @@ const connectionProviders: UserProfileConnectionProvider[] = [
 
 export function useConnectedAccountsFixture({
   initialAccounts = [connectedAccount],
-  providers = connectionProviders,
+  providers: initialProviders = connectionProviders,
   removalState,
 }: {
   initialAccounts?: UserProfileConnectedAccount[];
@@ -25,22 +32,43 @@ export function useConnectedAccountsFixture({
   removalState?: 'pending' | 'error';
 } = {}) {
   const [hasRemovalFailed, setHasRemovalFailed] = useState(false);
-  const [accounts, setAccounts] = useState(initialAccounts);
+  const seed = useChaosFixture(initialAccounts, items =>
+    items.map((account, index) => ({
+      ...account,
+      provider: chaosText(account.provider),
+      identifier: chaosEmail(index),
+    })),
+  );
+  const [accounts, setAccounts] = useState(seed);
+  const providers = useChaosFixture(initialProviders, items =>
+    items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
+  );
   const availableProviders = providers.filter(provider => !accounts.some(account => account.id === provider.id));
 
-  return {
+  return useUserProfileConnectedAccountsController({
     accounts,
+    removeReverification: idleReverification,
+    reconnectReverification: idleReverification,
+    connectReverification: idleReverification,
     availableProviders,
-    onConnect: (id: string) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    onConnect: async (id: string) => {
       const provider = providers.find(item => item.id === id);
       if (provider) {
         setAccounts(current => [
           ...current,
-          { id: provider.id, provider: provider.provider, iconUrl: provider.iconUrl, identifier: 'test@example.com' },
+          {
+            id: provider.id,
+            provider: provider.provider,
+            iconUrl: provider.iconUrl,
+            identifier: 'test@example.com',
+            status: 'connected',
+          },
         ]);
       }
     },
-    onReconnect: (id: string) =>
+    // eslint-disable-next-line @typescript-eslint/require-await
+    onReconnect: async (id: string) =>
       setAccounts(current =>
         current.map(account =>
           account.id === id
@@ -58,5 +86,5 @@ export function useConnectedAccountsFixture({
       }
       setAccounts(current => current.filter(item => item.id !== id));
     },
-  };
+  });
 }

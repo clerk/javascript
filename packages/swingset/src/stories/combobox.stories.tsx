@@ -5,6 +5,7 @@ import { Combobox } from '@clerk/mosaic/components/combobox';
 import { Field } from '@clerk/mosaic/components/field';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
+import { ChevronDown } from '@clerk/mosaic/icons/glyphs/chevron-down';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -37,9 +38,8 @@ export function Default() {
               render={<Button />}
             >
               <Icon
-                name='chevron-down'
+                glyph={ChevronDown}
                 size='sm'
-                aria-hidden='true'
               />
             </Combobox.Trigger>
           </InputGroup.End>
@@ -82,9 +82,8 @@ export function Scrolling() {
               render={<Button />}
             >
               <Icon
-                name='chevron-down'
+                glyph={ChevronDown}
                 size='sm'
-                aria-hidden='true'
               />
             </Combobox.Trigger>
           </InputGroup.End>

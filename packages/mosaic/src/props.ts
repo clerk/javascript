@@ -1,6 +1,7 @@
-import type { ComponentProps } from '@clerk/headless/utils';
 import type * as stylex from '@stylexjs/stylex';
 import type React from 'react';
+
+import type { ComponentProps } from './primitives/utils';
 
 /**
  * What `xstyle` accepts: exactly what `stylex.props(...)` does, since that is where a part
@@ -132,7 +133,7 @@ function mergeTwoProps(base: PropsObject, overrides: PropsObject): PropsObject {
  * The result keeps the last bag's prop types (minus the pair, which comes back merged), so a
  * required prop the part forwards through `rest` is still checked by the element it lands on.
  *
- * Distinct from `@clerk/headless`'s `mergeProps`: this only fuses `className`/`style`
+ * Distinct from `primitives/utils`'s `mergeProps`: this only fuses `className`/`style`
  * and does not chain event handlers.
  */
 export function mergeStyleProps<Rest extends PropsObject>(

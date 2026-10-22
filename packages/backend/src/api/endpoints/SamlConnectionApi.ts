@@ -35,7 +35,9 @@ type CreateSamlConnectionParams = {
   organizationId?: string;
   idpEntityId?: string;
   idpSsoUrl?: string;
+  /** @deprecated Use `idpCertificates` instead. */
   idpCertificate?: string;
+  idpCertificates?: string[];
   idpMetadataUrl?: string;
   idpMetadata?: string;
   attributeMapping?: {
@@ -53,7 +55,9 @@ type UpdateSamlConnectionParams = {
   organizationId?: string;
   idpEntityId?: string;
   idpSsoUrl?: string;
+  /** @deprecated Use `idpCertificates` instead. */
   idpCertificate?: string;
+  idpCertificates?: string[];
   idpMetadataUrl?: string;
   idpMetadata?: string;
   attributeMapping?: {

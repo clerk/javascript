@@ -394,6 +394,32 @@ describe('OrganizationProfile', () => {
   });
 
   describe('API Keys visibility', () => {
+    it.each([
+      { permissions: [], visible: false },
+      { permissions: ['org:sys_memberships:read'], visible: false },
+      { permissions: ['org:sys_api_keys:read'], visible: true },
+      { permissions: ['org:sys_api_keys:manage'], visible: true },
+      { permissions: ['org:sys_api_keys:read', 'org:sys_api_keys:manage'], visible: true },
+    ])('sets API Keys visibility to $visible for permissions $permissions', async ({ permissions, visible }) => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Org1', permissions }],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+
+      render(<OrganizationProfile />, { wrapper });
+
+      if (visible) {
+        expect(await screen.findByText('API keys')).toBeDefined();
+      } else {
+        await waitFor(() => expect(screen.queryByText('API keys')).toBeNull());
+      }
+    });
+
     it('does not include API Keys when hide prop is true', async () => {
       const { wrapper, fixtures, props } = await createFixtures(f => {
         f.withOrganizations();
@@ -594,7 +620,7 @@ describe('OrganizationProfile', () => {
       renderSecurityRoute(wrapper);
 
       expect(await screen.findByText(SECURITY_DESCRIPTION)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Configure' })).toBeInTheDocument();
     });
 
     it('blocks the security page on the guarded route when the user lacks the manage enterprise connections permission', async () => {
@@ -608,7 +634,7 @@ describe('OrganizationProfile', () => {
       expect(fixtures.clerk.organization?.getEnterpriseConnections).not.toHaveBeenCalled();
       expect(screen.queryByRole('heading', { name: 'Security' })).not.toBeInTheDocument();
       expect(screen.queryByText(SECURITY_DESCRIPTION)).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
     });
   });
 

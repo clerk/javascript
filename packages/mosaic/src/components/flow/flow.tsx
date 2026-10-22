@@ -1,10 +1,10 @@
-import { Flow as HeadlessFlow, type FlowDirection } from '@clerk/headless/flow';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Flow as HeadlessFlow, type FlowDirection } from '../../primitives/flow';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { styles } from './flow.styles';
 
 export interface FlowRootProps<State> extends Omit<MosaicComponentProps<'div'>, 'children'> {

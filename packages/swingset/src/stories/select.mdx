@@ -2,7 +2,7 @@ import * as SelectStories from './select.stories';
 
 # Select
 
-A custom dropdown for picking one value from a list, from `@clerk/headless`. It is a
+A custom dropdown for picking one value from a list. It is a
 **headless** primitive: it supplies value and open state, portalling, floating-ui
 positioning (with optional native-`<select>`-style item alignment), keyboard navigation
 with typeahead, and ARIA wiring, but ships **no styles** — you bring your own CSS by
@@ -22,7 +22,7 @@ work); the trigger reflects the selected value.
 ## Usage
 
 ```tsx
-import { Select } from '@clerk/headless/select';
+import { Select } from '@clerk/mosaic/primitives/select';
 
 <Select.Root>
   <Select.Trigger>
@@ -58,6 +58,31 @@ const [value, setValue] = useState('apple');
 </Select.Root>;
 ```
 
+### Multiple
+
+`multiple` makes the value a `string[]`. Picking an option adds or removes it and keeps the
+popup open. `Select.Value` shows the selected labels joined with commas; pass a function as
+its children to render the selection yourself.
+
+<Story
+  name='Multiple'
+  storyModule={SelectStories}
+/>
+
+```tsx
+<Select.Root
+  multiple
+  defaultValue={['apple', 'cherry']}
+>
+  <Select.Trigger>
+    <Select.Value placeholder='Choose fruits…'>
+      {value => (value.length > 0 ? `${value.length} selected` : 'Choose fruits…')}
+    </Select.Value>
+  </Select.Trigger>
+  {/* portal */}
+</Select.Root>;
+```
+
 ## Parts
 
 | Part                | Default Element | Description                                                          |
@@ -81,9 +106,10 @@ props. `Select.Portal` is optional.
 
 | Prop                              | Type                                 | Default                     | Description                                                        |
 | --------------------------------- | ------------------------------------ | --------------------------- | ------------------------------------------------------------------ |
-| <code>value</code>                | <code>string</code>                  | —                           | Controlled selected value                                          |
-| <code>defaultValue</code>         | <code>string</code>                  | —                           | Initial selected value (uncontrolled)                              |
-| <code>onValueChange</code>        | <code>(value: string) => void</code> | —                           | Called when the selection changes                                  |
+| <code>multiple</code>             | <code>boolean</code>                 | <code>false</code>          | Allow selecting several options                                    |
+| <code>value</code>                | <code>string \| string[]</code>      | —                           | Controlled selected value; an array when `multiple`                |
+| <code>defaultValue</code>         | <code>string \| string[]</code>      | —                           | Initial selected value (uncontrolled); an array when `multiple`    |
+| <code>onValueChange</code>        | <code>(value) => void</code>         | —                           | Called with the new value when the selection changes               |
 | <code>open</code>                 | <code>boolean</code>                 | —                           | Controlled open state                                              |
 | <code>defaultOpen</code>          | <code>boolean</code>                 | <code>false</code>          | Initial open state (uncontrolled)                                  |
 | <code>onOpenChange</code>         | <code>(open: boolean) => void</code> | —                           | Called when the open state changes                                 |
@@ -96,9 +122,10 @@ props. `Select.Portal` is optional.
 
 ### `Select.Value`
 
-| Prop                     | Type                   | Default | Description                        |
-| ------------------------ | ---------------------- | ------- | ---------------------------------- |
-| <code>placeholder</code> | <code>ReactNode</code> | —       | Rendered when no value is selected |
+| Prop                     | Type                                                       | Default | Description                                                           |
+| ------------------------ | ---------------------------------------------------------- | ------- | --------------------------------------------------------------------- |
+| <code>placeholder</code> | <code>ReactNode</code>                                     | —       | Rendered when no value is selected                                    |
+| <code>children</code>    | <code>ReactNode \| ((value: string[]) => ReactNode)</code> | —       | Replaces the selected labels; a function receives the selected values |
 
 ### `Select.Option`
 
@@ -119,7 +146,7 @@ Each part emits `data-*` attributes you can target with any CSS solution:
 | --------------------- | ----------------- | -------------------------------------------------- |
 | `data-open`           | Trigger, Popup    | Present when the dropdown is open                  |
 | `data-closed`         | Trigger, Popup    | Present when closed (Popup stays mounted to exit)  |
-| `data-selected`       | Option            | Present on the currently selected option           |
+| `data-selected`       | Option            | Present on each selected option                    |
 | `data-active`         | Option            | Present on the keyboard-highlighted option         |
 | `data-disabled`       | Option            | Present on a disabled option                       |
 | `data-side`           | Positioner, Arrow | Resolved side: `top` / `bottom` / `left` / `right` |

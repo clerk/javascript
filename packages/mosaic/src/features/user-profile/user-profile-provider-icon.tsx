@@ -2,10 +2,10 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
 import { styles } from './user-profile-profile-panel.styles';
 
-type UserProfileProviderIconProps = { iconUrl: string; name?: never } | { iconUrl?: never; name: IconName };
+type UserProfileProviderIconProps = { iconUrl: string; glyph?: never } | { iconUrl?: never; glyph: IconComponent };
 
 export function UserProfileProviderIcon(props: UserProfileProviderIconProps) {
   return (
@@ -19,8 +19,7 @@ export function UserProfileProviderIcon(props: UserProfileProviderIconProps) {
           />
         ) : (
           <Icon
-            aria-hidden
-            name={props.name}
+            glyph={props.glyph}
             xstyle={styles.providerIcon}
           />
         )}

@@ -5,7 +5,6 @@ export type {
   ProfileNavItemProps,
   ProfileNavProps,
   ProfileContentPanelProps,
-  ProfilePageTitleProps,
   ProfileRootProps,
   ProfileTitleProps,
 } from './profile';

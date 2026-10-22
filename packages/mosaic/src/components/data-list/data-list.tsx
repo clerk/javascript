@@ -1,11 +1,11 @@
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { truncationStyles } from '../../utils/typography.styles';
+import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import * as slots from './data-list.styles';
 
 export type DataListProps = MosaicComponentProps<'dl'> & {

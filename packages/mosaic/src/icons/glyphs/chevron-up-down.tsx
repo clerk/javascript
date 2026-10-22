@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const ChevronUpDown = glyph(
+  'chevron-up-down',
   <>
     <path
       d='M5.33333 5.9999L7.5286 3.80464C7.78893 3.54429 8.21106 3.54429 8.47139 3.80464L10.6667 5.9999'

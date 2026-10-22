@@ -4,9 +4,10 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
 import { EmptyState } from '../empty-state';
 import { Table } from './table';
-import { styles } from './table.styles';
+import { stickySides, styles } from './table.styles';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -32,12 +33,99 @@ function renderTable(props: Partial<React.ComponentProps<typeof Table.Root>> = {
 }
 
 describe('Mosaic Table', () => {
+  it('reports search changes and returns focus to the input when cleared', async () => {
+    const user = userEvent.setup();
+    const ref = React.createRef<HTMLInputElement>();
+    const onValueChange = vi.fn();
+    function Example() {
+      const [value, setValue] = React.useState('');
+      return (
+        <Table.Toolbar>
+          <Table.Search
+            ref={ref}
+            label='Search members'
+            clearLabel='Clear member search'
+            value={value}
+            onValueChange={next => {
+              onValueChange(next);
+              setValue(next);
+            }}
+          />
+        </Table.Toolbar>
+      );
+    }
+    render(<Example />);
+    const input = screen.getByRole('searchbox', { name: 'Search members' });
+    expect(ref.current).toBe(input);
+    expect(screen.queryByRole('button', { name: 'Clear member search' })).not.toBeInTheDocument();
+    await user.type(input, 'Ada');
+    expect(onValueChange).toHaveBeenLastCalledWith('Ada');
+    await user.click(screen.getByRole('button', { name: 'Clear member search' }));
+    expect(onValueChange).toHaveBeenLastCalledWith('');
+    expect(input).toHaveValue('');
+    expect(input).toHaveFocus();
+    expect(screen.queryByRole('button', { name: 'Clear member search' })).not.toBeInTheDocument();
+  });
+
   it('renders a table inside a scrolling shell', () => {
     renderTable();
     const table = screen.getByRole('table');
     expect(table).toHaveClass('cl-table');
     expect(table.parentElement).toHaveClass('cl-table-viewport');
     expect(table.parentElement?.parentElement).toHaveClass('cl-table-shell');
+  });
+
+  it('opts cells into no-wrap styling without changing neighboring cells', () => {
+    render(
+      <Table.Root>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell noWrap>September 23, 2026</Table.Cell>
+            <Table.Cell>A longer description can wrap</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table.Root>,
+    );
+    const date = screen.getByRole('cell', { name: 'September 23, 2026' });
+    const description = screen.getByRole('cell', { name: 'A longer description can wrap' });
+    expect(date).toHaveAttribute('data-no-wrap', '');
+    expect(date).toHaveClass(stylex.props(styles.noWrap).className ?? '');
+    expect(description).not.toHaveAttribute('data-no-wrap');
+    expect(description).not.toHaveClass(stylex.props(styles.noWrap).className ?? '');
+  });
+
+  it.each(['start', 'end'] as const)('pins header and body cells to the %s edge', side => {
+    render(
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell sticky={side}>Actions</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>Alpha</Table.Cell>
+            <Table.Cell sticky={side}>Edit</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table.Root>,
+    );
+    const stickyClass = stylex.props(styles.sticky, stickySides[side]).className ?? '';
+    for (const cell of [
+      screen.getByRole('columnheader', { name: 'Actions' }),
+      screen.getByRole('cell', { name: 'Edit' }),
+    ]) {
+      expect(cell).toHaveAttribute('data-sticky', side);
+      expect(cell).toHaveClass(...stickyClass.split(' '));
+    }
+    for (const cell of [
+      screen.getByRole('columnheader', { name: 'Name' }),
+      screen.getByRole('cell', { name: 'Alpha' }),
+    ]) {
+      expect(cell).not.toHaveAttribute('data-sticky');
+      expect(cell).not.toHaveClass(stylex.props(styles.sticky).className ?? '');
+    }
   });
 
   it('lets the keyboard reach the scrolling viewport', () => {
@@ -238,7 +326,7 @@ describe('Mosaic Table', () => {
           <Table.Body>
             <Table.Empty colSpan={2}>
               <EmptyState.Root>
-                <EmptyState.Icon name='magnifying-glass' />
+                <EmptyState.Icon glyph={MagnifyingGlass} />
                 <EmptyState.Label>No results</EmptyState.Label>
                 <EmptyState.Description>Try a different search.</EmptyState.Description>
               </EmptyState.Root>

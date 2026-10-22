@@ -1,10 +1,20 @@
+import { ActionMenu } from '@clerk/mosaic/components/action-menu';
 import { Avatar } from '@clerk/mosaic/components/avatar';
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 import { Section } from '@clerk/mosaic/components/section';
+import { Skeleton } from '@clerk/mosaic/components/skeleton';
+import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
+import { ArrowUpRight } from '@clerk/mosaic/icons/glyphs/arrow-up-right';
+import { DeviceLaptop } from '@clerk/mosaic/icons/glyphs/device-laptop';
+import { DevicePhone } from '@clerk/mosaic/icons/glyphs/device-phone';
+import { EllipsisHorizontal } from '@clerk/mosaic/icons/glyphs/ellipsis-horizontal';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
+import { Users } from '@clerk/mosaic/icons/glyphs/users';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
+import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -13,6 +23,14 @@ export { default as __source } from './section.stories?raw';
 const styles = stylex.create({
   rootMax: {
     maxWidth: 560,
+  },
+  loadingStack: {
+    alignItems: 'flex-start',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: space['4'],
+    maxWidth: 560,
+    width: '100%',
   },
   descriptionFlex: {
     alignItems: 'center',
@@ -47,252 +65,243 @@ export const meta: StoryMeta = {
 export function Default() {
   return (
     <Section.Root xstyle={styles.rootMax}>
-      <Section.Title>Profile</Section.Title>
       <Section.Group>
-        <Section.Row>
-          <Section.Item>
-            <Section.Media size='lg'>
-              <Avatar.Root size='fit'>
-                <Avatar.Image
-                  alt='Preston Booth'
-                  src='https://avatars.githubusercontent.com/u/51144033?v=4'
-                />
-                <Avatar.Fallback>PB</Avatar.Fallback>
-              </Avatar.Root>
-            </Section.Media>
-            <Section.Content>
-              <Section.Label>Profile picture</Section.Label>
-              <Section.Description>Recommend size 1:1, up to 10MB.</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Upload
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Profile</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          <Section.Row>
+            <Section.Item>
+              <Section.Media size='lg'>
+                <Avatar.Root size='fit'>
+                  <Avatar.Image
+                    alt='Preston Booth'
+                    src='https://avatars.githubusercontent.com/u/51144033?v=4'
+                  />
+                  <Avatar.Fallback>PB</Avatar.Fallback>
+                </Avatar.Root>
+              </Section.Media>
+              <Section.Content>
+                <Section.Label>Profile picture</Section.Label>
+                <Section.Description>Recommend size 1:1, up to 10MB.</Section.Description>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  Upload
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
 
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Name</Section.Label>
-              <Section.Description>Preston Booth</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Edit name
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
+          <Section.Row>
+            <Section.Item>
+              <Section.Content>
+                <Section.Label>Name</Section.Label>
+                <Section.Description>Preston Booth</Section.Description>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  Edit name
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
 
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Username</Section.Label>
-              <Section.Description>Prestonb.xyz</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Edit username
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
+          <Section.Row>
+            <Section.Item>
+              <Section.Content>
+                <Section.Label>Username</Section.Label>
+                <Section.Description>Prestonb.xyz</Section.Description>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  Edit username
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
 
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Email</Section.Label>
-              <Section.Description>item1@clerk.dev</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Update email
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
+          <Section.Row>
+            <Section.Item>
+              <Section.Content>
+                <Section.Label>Email</Section.Label>
+                <Section.Description>item1@clerk.dev</Section.Description>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  Update email
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
 }
 
-export function MultipleEmailAndPhoneNumbers() {
+export function Cards() {
   return (
     <Section.Root xstyle={styles.rootMax}>
-      <Section.Title>Profile</Section.Title>
       <Section.Group>
-        <Section.Row>
-          <Section.Item>
-            <Section.Media size='lg'>
-              <Avatar.Root size='fit'>
-                <Avatar.Image
-                  alt='Preston Booth'
-                  src='https://avatars.githubusercontent.com/u/51144033?v=4'
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Profile</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          <Section.Row>
+            <Section.Item>
+              <Section.Content>
+                <Section.Label>Name</Section.Label>
+                <Section.Description>Preston Booth</Section.Description>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  Edit name
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
+          <Section.Row>
+            <Section.Item>
+              <Section.Content>
+                <Section.Label>Username</Section.Label>
+                <Section.Description>Prestonb.xyz</Section.Description>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  Edit username
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
+        </Section.Body>
+      </Section.Group>
+      {[
+        { label: 'Email', values: ['item1@clerk.dev', 'item2@clerk.dev'] },
+        { label: 'Phone', values: ['+1 801-888-8181'] },
+      ].map(({ label, values }) => (
+        <Section.Group key={label}>
+          <Section.Header>
+            <Section.Content>
+              <Section.Title>{label}</Section.Title>
+            </Section.Content>
+            <Section.Actions>
+              <Button
+                aria-label={`Add ${label.toLowerCase()}`}
+                color='neutral'
+                size='sm'
+                variant='outline'
+              >
+                <Icon
+                  glyph={Plus}
+                  placement='inline-start'
+                  size='sm'
                 />
-                <Avatar.Fallback>PB</Avatar.Fallback>
-              </Avatar.Root>
-            </Section.Media>
-            <Section.Content>
-              <Section.Label>Profile picture</Section.Label>
-              <Section.Description>Recommend size 1:1, up to 10MB.</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Upload
+                Add
               </Button>
             </Section.Actions>
-          </Section.Item>
-        </Section.Row>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              {values.map((value, index) => (
+                <Section.Item key={value}>
+                  <Section.Content>
+                    <Section.Description xstyle={styles.descriptionFlex}>
+                      {value}
+                      {index === 0 ? <Badge color='neutral'>Primary</Badge> : null}
+                    </Section.Description>
+                  </Section.Content>
+                  <Section.Actions>
+                    <Button
+                      aria-label={`Manage ${value}`}
+                      color='neutral'
+                      shape='square'
+                      size='sm'
+                      variant='ghost'
+                    >
+                      <Icon glyph={EllipsisHorizontal} />
+                    </Button>
+                  </Section.Actions>
+                </Section.Item>
+              ))}
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      ))}
+    </Section.Root>
+  );
+}
 
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Name</Section.Label>
-              <Section.Description>Preston Booth</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Edit name
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
-
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Username</Section.Label>
-              <Section.Description>Prestonb.xyz</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Edit username
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
-
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Email</Section.Label>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Add email
-              </Button>
-            </Section.Actions>
-          </Section.Item>
+export function HeaderDescription() {
+  return (
+    <Section.Root xstyle={styles.rootMax}>
+      <Section.Group>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Active devices</Section.Title>
+            <Section.Description>Devices signed in to this account.</Section.Description>
+          </Section.Content>
+          <Section.Actions>
+            <Button
+              color='neutral'
+              size='sm'
+              variant='outline'
+            >
+              Sign out all
+            </Button>
+          </Section.Actions>
+        </Section.Header>
+        <Section.Body>
           <Section.Items>
-            <Section.Item>
-              <Section.Content>
-                <Section.Description xstyle={styles.descriptionFlex}>
-                  item1@clerk.dev
-                  <Badge color='neutral'>Primary</Badge>
-                </Section.Description>
-              </Section.Content>
-              <Section.Actions>
-                <Button
-                  aria-label='Manage item1@clerk.dev'
-                  color='neutral'
-                  shape='square'
-                  size='sm'
-                  variant='ghost'
-                >
-                  <Icon name='ellipsis-horizontal' />
-                </Button>
-              </Section.Actions>
-            </Section.Item>
-            <Section.Item>
-              <Section.Content>
-                <Section.Description>item2@clerk.dev</Section.Description>
-              </Section.Content>
-              <Section.Actions>
-                <Button
-                  aria-label='Manage item2@clerk.dev'
-                  color='neutral'
-                  shape='square'
-                  size='sm'
-                  variant='ghost'
-                >
-                  <Icon name='ellipsis-horizontal' />
-                </Button>
-              </Section.Actions>
-            </Section.Item>
+            {['Chrome on macOS', 'Safari on iOS'].map(name => (
+              <Section.Item key={name}>
+                <Section.Content>
+                  <Section.Label>{name}</Section.Label>
+                  <Section.Description>Last seen today</Section.Description>
+                </Section.Content>
+                <Section.Actions>
+                  <Button
+                    aria-label={`Manage ${name}`}
+                    color='neutral'
+                    shape='square'
+                    size='sm'
+                    variant='ghost'
+                  >
+                    <Icon glyph={EllipsisHorizontal} />
+                  </Button>
+                </Section.Actions>
+              </Section.Item>
+            ))}
           </Section.Items>
-        </Section.Row>
-
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Phone</Section.Label>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Add phone number
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-          <Section.Items>
-            <Section.Item>
-              <Section.Content>
-                <Section.Description xstyle={styles.descriptionFlex}>
-                  +1 801-888-8181
-                  <Badge color='neutral'>Primary</Badge>
-                </Section.Description>
-              </Section.Content>
-              <Section.Actions>
-                <Button
-                  aria-label='Manage +1 801-888-8181'
-                  color='neutral'
-                  shape='square'
-                  size='sm'
-                  variant='ghost'
-                >
-                  <Icon name='ellipsis-horizontal' />
-                </Button>
-              </Section.Actions>
-            </Section.Item>
-          </Section.Items>
-        </Section.Row>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
@@ -301,50 +310,56 @@ export function MultipleEmailAndPhoneNumbers() {
 export function ConnectedAccounts() {
   return (
     <Section.Root xstyle={styles.rootMax}>
-      <Section.Title>Connected accounts</Section.Title>
       <Section.Group>
-        <Section.Row>
-          <Section.Item>
-            <ProviderMedia provider='google' />
-            <Section.Content>
-              <Section.Label>Google</Section.Label>
-              <Section.Description>test@google.com</Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                aria-label='Manage Google'
-                color='neutral'
-                shape='square'
-                size='sm'
-                variant='ghost'
-              >
-                <Icon name='ellipsis-horizontal' />
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
-        <Section.Row>
-          <Section.Item>
-            <ProviderMedia provider='apple' />
-            <Section.Content>
-              <Section.Label>Apple</Section.Label>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='neutral'
-                size='sm'
-                variant='outline'
-              >
-                Connect
-                <Icon
-                  name='arrow-up-right'
-                  placement='inline-end'
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Connected accounts</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          <Section.Row>
+            <Section.Item>
+              <ProviderMedia provider='google' />
+              <Section.Content>
+                <Section.Label>Google</Section.Label>
+                <Section.Description>test@google.com</Section.Description>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  aria-label='Manage Google'
+                  color='neutral'
+                  shape='square'
                   size='sm'
-                />
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
+                  variant='ghost'
+                >
+                  <Icon glyph={EllipsisHorizontal} />
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
+          <Section.Row>
+            <Section.Item>
+              <ProviderMedia provider='apple' />
+              <Section.Content>
+                <Section.Label>Apple</Section.Label>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  Connect
+                  <Icon
+                    glyph={ArrowUpRight}
+                    placement='inline-end'
+                    size='sm'
+                  />
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
@@ -353,24 +368,30 @@ export function ConnectedAccounts() {
 export function IconFrameMedia() {
   return (
     <Section.Root xstyle={styles.rootMax}>
-      <Section.Title>Team</Section.Title>
       <Section.Group>
-        <Section.Row>
-          <Section.Item>
-            <Section.Media size='lg'>
-              <IconFrame>
-                <Icon
-                  name='users'
-                  size='lg'
-                />
-              </IconFrame>
-            </Section.Media>
-            <Section.Content>
-              <Section.Label>Engineering</Section.Label>
-              <Section.Description>12 members</Section.Description>
-            </Section.Content>
-          </Section.Item>
-        </Section.Row>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Team</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          <Section.Row>
+            <Section.Item>
+              <Section.Media size='lg'>
+                <IconFrame>
+                  <Icon
+                    glyph={Users}
+                    size='lg'
+                  />
+                </IconFrame>
+              </Section.Media>
+              <Section.Content>
+                <Section.Label>Engineering</Section.Label>
+                <Section.Description>12 members</Section.Description>
+              </Section.Content>
+            </Section.Item>
+          </Section.Row>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
@@ -379,28 +400,239 @@ export function IconFrameMedia() {
 export function Destructive() {
   return (
     <Section.Root>
-      <Section.Title>Danger zone</Section.Title>
       <Section.Group>
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>Delete account</Section.Label>
-              <Section.Description>
-                Permanently delete this profile and all its data. This cannot be undone.
-              </Section.Description>
-            </Section.Content>
-            <Section.Actions>
-              <Button
-                color='negative'
-                size='sm'
-                variant='outline'
-              >
-                Delete account
-              </Button>
-            </Section.Actions>
-          </Section.Item>
-        </Section.Row>
+        <Section.Header>
+          <Section.Content>
+            <Section.Title>Danger zone</Section.Title>
+          </Section.Content>
+        </Section.Header>
+        <Section.Body>
+          <Section.Row>
+            <Section.Item wrap>
+              <Section.Content>
+                <Section.Label>Delete account</Section.Label>
+                <Section.Description>
+                  Permanently delete this profile and all its data. This cannot be undone.
+                </Section.Description>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  color='negative'
+                  size='sm'
+                  variant='outline'
+                >
+                  Delete account
+                </Button>
+              </Section.Actions>
+            </Section.Item>
+          </Section.Row>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
+  );
+}
+
+export function ContainedHeader() {
+  return (
+    <>
+      <style>{`
+        @scope {
+          .cl-section-group {
+            border: 1px solid var(--cl-color-border) !important;
+            border-radius: var(--cl-radius-xl) !important;
+            background: var(--cl-color-background) !important;
+          }
+          .cl-section-header {
+            margin: 0 1rem !important;
+            padding-block: 0.75rem !important;
+            min-height: 3.25rem !important;
+            width: auto !important;
+          }
+          .cl-section-body {
+            margin-inline: 1rem !important;
+            padding-inline: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            background: none !important;
+          }
+          .cl-section-header + .cl-section-body {
+            border-top: 1px solid var(--cl-color-border) !important;
+          }
+        }
+      `}</style>
+      <Section.Root xstyle={styles.rootMax}>
+        <Section.Group>
+          <Section.Header>
+            <Section.Content>
+              <Section.Title>Profile</Section.Title>
+            </Section.Content>
+          </Section.Header>
+          <Section.Body>
+            <Section.Row>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>Name</Section.Label>
+                  <Section.Description>Preston Booth</Section.Description>
+                </Section.Content>
+                <Section.Actions>
+                  <Button
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                  >
+                    Edit name
+                  </Button>
+                </Section.Actions>
+              </Section.Item>
+            </Section.Row>
+            <Section.Row>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>Username</Section.Label>
+                  <Section.Description>Prestonb.xyz</Section.Description>
+                </Section.Content>
+                <Section.Actions>
+                  <Button
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                  >
+                    Edit username
+                  </Button>
+                </Section.Actions>
+              </Section.Item>
+            </Section.Row>
+          </Section.Body>
+        </Section.Group>
+        {[
+          { label: 'Email', values: ['item1@clerk.dev', 'item2@clerk.dev'] },
+          { label: 'Phone', values: ['+1 801-888-8181'] },
+        ].map(({ label, values }) => (
+          <Section.Group key={label}>
+            <Section.Header>
+              <Section.Content>
+                <Section.Title>{label}</Section.Title>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  aria-label={`Add ${label.toLowerCase()}`}
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  <Icon
+                    glyph={Plus}
+                    placement='inline-start'
+                    size='sm'
+                  />
+                  Add
+                </Button>
+              </Section.Actions>
+            </Section.Header>
+            <Section.Body>
+              <Section.Items>
+                {values.map((value, index) => (
+                  <Section.Item key={value}>
+                    <Section.Content>
+                      <Section.Description xstyle={styles.descriptionFlex}>
+                        {value}
+                        {index === 0 ? <Badge color='neutral'>Primary</Badge> : null}
+                      </Section.Description>
+                    </Section.Content>
+                    <Section.Actions>
+                      <Button
+                        aria-label={`Manage ${value}`}
+                        color='neutral'
+                        shape='square'
+                        size='sm'
+                        variant='ghost'
+                      >
+                        <Icon glyph={EllipsisHorizontal} />
+                      </Button>
+                    </Section.Actions>
+                  </Section.Item>
+                ))}
+              </Section.Items>
+            </Section.Body>
+          </Section.Group>
+        ))}
+      </Section.Root>
+    </>
+  );
+}
+
+const loadingItems = [
+  { icon: DeviceLaptop, label: 'Chrome on macOS', description: 'San Francisco, US · Active now' },
+  { icon: DevicePhone, label: 'Safari on iOS', description: 'San Francisco, US · 2 hours ago' },
+  { icon: DeviceLaptop, label: 'Firefox on Windows', description: 'Denver, US · 3 days ago' },
+] as const;
+
+export function Loading() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!loading) {
+      return;
+    }
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  return (
+    <div {...stylex.props(styles.loadingStack)}>
+      <Button
+        color='neutral'
+        size='sm'
+        variant='outline'
+        disabled={loading}
+        onClick={() => setLoading(true)}
+      >
+        Reload
+      </Button>
+      <VisuallyHidden role='status'>{loading ? 'Loading active devices' : 'Active devices loaded'}</VisuallyHidden>
+      <Section.Root>
+        <Section.Group skeleton={loading}>
+          <Section.Header>
+            <Section.Title>
+              <Skeleton>Active devices</Skeleton>
+            </Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              {loadingItems.map(item => (
+                <Section.Item key={item.label}>
+                  <Skeleton>
+                    <Section.Media size='lg'>
+                      <IconFrame>
+                        <Icon
+                          glyph={item.icon}
+                          size='lg'
+                        />
+                      </IconFrame>
+                    </Section.Media>
+                  </Skeleton>
+                  <Section.Content>
+                    <Section.Label>
+                      <Skeleton>{item.label}</Skeleton>
+                    </Section.Label>
+                    <Section.Description>
+                      <Skeleton>{item.description}</Skeleton>
+                    </Section.Description>
+                  </Section.Content>
+                  <Section.Actions>
+                    <Skeleton visible={false}>
+                      <ActionMenu
+                        label={`Manage ${item.label}`}
+                        actions={[{ label: 'View details', onClick: () => undefined }]}
+                      />
+                    </Skeleton>
+                  </Section.Actions>
+                </Section.Item>
+              ))}
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>
+    </div>
   );
 }

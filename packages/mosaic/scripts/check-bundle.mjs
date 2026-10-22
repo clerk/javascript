@@ -10,7 +10,6 @@ if (!source.startsWith("'use client';") && !source.startsWith('"use client";')) 
 
 const forbidden = [
   { name: '@clerk/ui', pattern: /(?:from|import)\s*['"]@clerk\/ui(?:\/[^'"]*)?['"]/ },
-  { name: '@clerk/headless', pattern: /(?:from|import)\s*['"]@clerk\/headless(?:\/[^'"]*)?['"]/ },
   { name: 'Emotion', pattern: /(?:from|import)\s*['"]@emotion\// },
   { name: 'StyleX', pattern: /(?:from|import)\s*['"]@stylexjs\// },
 ];
@@ -21,12 +20,20 @@ if (hits.length > 0) {
   throw new Error(`Published Mosaic JS still references ${hits.join(', ')}.`);
 }
 
+if (/^\/\/#region src\/icons\/registry\b/m.test(source)) {
+  throw new Error('Published Mosaic JS bundles the icon registry; import glyphs directly so unused ones tree-shake.');
+}
+
 if (!/(?:from|import)\s*['"]@clerk\/shared(?:\/[^'"]*)?['"]/.test(source)) {
   throw new Error(
     'Published Mosaic JS does not import @clerk/shared; Clerk context would not resolve from the host SDK.',
   );
 }
 
+if (!/(?:from|import)\s*['"]@floating-ui\/react(?:\/[^'"]*)?['"]/.test(source)) {
+  throw new Error('Published Mosaic JS does not import @floating-ui/react; it should be an external dependency.');
+}
+
 console.log(
-  '✅ Mosaic bundle is client-boundaried, imports @clerk/shared, and is free of UI, Headless, Emotion, and StyleX runtime imports',
+  '✅ Mosaic bundle is client-boundaried, imports @clerk/shared and @floating-ui/react, and is free of UI, Emotion, and StyleX runtime imports',
 );

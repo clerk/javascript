@@ -1,9 +1,14 @@
+import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { Panel } from '@clerk/mosaic/components/panel';
 import type { ProfileRootProps } from '@clerk/mosaic/components/profile';
 import { Profile } from '@clerk/mosaic/components/profile';
 import { Section } from '@clerk/mosaic/components/section';
 import { Text } from '@clerk/mosaic/components/text';
+import { CreditCard } from '@clerk/mosaic/icons/glyphs/credit-card';
+import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
+import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -14,7 +19,7 @@ export { default as __source } from './profile.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Profile',
   layout: 'wide',
   source: 'packages/mosaic/src/components/profile/profile.tsx',
@@ -35,17 +40,17 @@ function knobsAsProps(props: Record<string, unknown>) {
 }
 
 const pages = [
-  { id: 'general', label: 'General', icon: 'user-circle' as const },
-  { id: 'security', label: 'Security', icon: 'shield-check' as const },
-  { id: 'billing', label: 'Billing', icon: 'credit-card' as const },
+  { id: 'general', label: 'General', icon: UserCircle },
+  { id: 'security', label: 'Security', icon: ShieldCheck },
+  { id: 'billing', label: 'Billing', icon: CreditCard },
 ];
 
 function Placeholder({ title }: { title: string }) {
   return (
-    <div style={{ display: 'grid', gap: '0.5rem' }}>
-      <Profile.PageTitle>{title}</Profile.PageTitle>
+    <Panel.Root>
+      <Panel.Title>{title}</Panel.Title>
       <Text>Content for the {title.toLowerCase()} page.</Text>
-    </div>
+    </Panel.Root>
   );
 }
 
@@ -111,45 +116,47 @@ const stubSections: Record<string, { title: string; rows: { label: string; descr
 
 function StubPage({ id, title }: { id: string; title: string }) {
   return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      <Profile.PageTitle>{title}</Profile.PageTitle>
-      {stubSections[id]?.map(section => (
-        <Section.Root key={section.title}>
-          <Section.Title>{section.title}</Section.Title>
-          <Section.Group>
-            <Section.Row>
-              <Section.Items>
+    <Panel.Root>
+      <Panel.Title>{title}</Panel.Title>
+      <Panel.Sections>
+        {stubSections[id]?.map(section => (
+          <Section.Root key={section.title}>
+            <Section.Group>
+              <Section.Header>
+                <Section.Content>
+                  <Section.Title>{section.title}</Section.Title>
+                </Section.Content>
+              </Section.Header>
+              <Section.Body>
                 {section.rows.map(row => (
-                  <Section.Item key={row.label}>
-                    <Section.Content>
-                      <Section.Label>{row.label}</Section.Label>
-                      <Section.Description>{row.description}</Section.Description>
-                    </Section.Content>
-                    <Section.Actions>
-                      <Button
-                        color='neutral'
-                        size='sm'
-                        variant='outline'
-                      >
-                        Edit
-                      </Button>
-                    </Section.Actions>
-                  </Section.Item>
+                  <Section.Row key={row.label}>
+                    <Section.Item>
+                      <Section.Content>
+                        <Section.Label>{row.label}</Section.Label>
+                        <Section.Description>{row.description}</Section.Description>
+                      </Section.Content>
+                      <Section.Actions>
+                        <Button
+                          color='neutral'
+                          size='sm'
+                          variant='outline'
+                        >
+                          Edit
+                        </Button>
+                      </Section.Actions>
+                    </Section.Item>
+                  </Section.Row>
                 ))}
-              </Section.Items>
-            </Section.Row>
-          </Section.Group>
-        </Section.Root>
-      ))}
-    </div>
+              </Section.Body>
+            </Section.Group>
+          </Section.Root>
+        ))}
+      </Panel.Sections>
+    </Panel.Root>
   );
 }
 
-function Surface({
-  forceMountPages,
-  stub,
-  ...props
-}: Partial<ProfileRootProps> & { forceMountPages?: boolean; stub?: boolean }) {
+function Surface({ stub, ...props }: Partial<ProfileRootProps> & { stub?: boolean }) {
   const [page, setPage] = useState('general');
   return (
     <Profile.Root
@@ -165,21 +172,21 @@ function Surface({
             value={item.id}
             icon={
               <Icon
-                name={item.icon}
+                glyph={item.icon}
                 size='sm'
               />
             }
+            badge={item.id === 'security' ? <Badge>2</Badge> : undefined}
           >
             {item.label}
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle={pages.find(item => item.id === page)?.label}>
         {pages.map(item => (
           <Profile.ContentPanel
             key={item.id}
             value={item.id}
-            shouldForceMount={forceMountPages}
           >
             {stub ? (
               <StubPage
@@ -294,11 +301,10 @@ export function Customized() {
 
 /**
  * A page transition, in CSS alone — the CSS a customer can add against a `<UserProfile />` they do
- * not render themselves. The primitive hides an unselected page with the `hidden` attribute, and
- * CSS can now transition across that: `@starting-style` gives the page that just lost `hidden` a
- * frame to enter from, and `transition-behavior: allow-discrete` holds the page that just gained
- * it on screen until its exit finishes. The pages share one grid cell so the two cross-fade in
- * place. Under `prefers-reduced-motion: reduce` the swap is instant.
+ * not render themselves. The entering page carries `data-starting-style` for its first frame and
+ * the leaving page carries `data-ending-style` until its exit finishes, then gains `hidden`. The
+ * pages share one grid cell so the two cross-fade in place. Under `prefers-reduced-motion: reduce`
+ * the swap is instant.
  */
 export function Transitions() {
   return (
@@ -309,7 +315,8 @@ export function Transitions() {
             display: grid;
           }
           .cl-profile-content-panel {
-            grid-area: 1 / 1;
+            grid-row: 2;
+            grid-column: 1;
             /* Seven tenths of the scale's steps: quick enough to feel like a swap, slow enough to see. */
             --enter: calc(var(--cl-duration-slow) * 0.7);
             --exit: calc(var(--cl-duration-base) * 0.7);
@@ -317,23 +324,18 @@ export function Transitions() {
             transition:
               opacity var(--enter) var(--cl-ease-enter),
               scale var(--enter) var(--cl-ease-enter),
-              filter var(--enter) var(--cl-ease-enter),
-              display var(--enter) allow-discrete;
+              filter var(--enter) var(--cl-ease-enter);
             /* The entering page waits for the leaving one to mostly clear — a hand-off, not a
-               cross-fade. Not on \`display\`, which must show the page at once for the entrance to
-               have a frame to start from. */
-            transition-delay: var(--wait), var(--wait), var(--wait), 0s;
-
-            @starting-style {
-              opacity: 0;
-              scale: 0.98;
-              filter: blur(4px);
-            }
+               cross-fade. */
+            transition-delay: var(--wait);
           }
-          .cl-profile-content-panel[hidden] {
+          .cl-profile-content-panel[data-starting-style],
+          .cl-profile-content-panel[data-ending-style] {
             opacity: 0;
             scale: 0.98;
             filter: blur(4px);
+          }
+          .cl-profile-content-panel[data-ending-style] {
             transition-duration: var(--exit);
             transition-timing-function: var(--cl-ease-exit);
             transition-delay: 0s;

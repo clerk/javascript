@@ -1,12 +1,12 @@
-import type { OtpProps as PrimitiveOtpProps } from '@clerk/headless/otp';
-import { Otp as Primitive } from '@clerk/headless/otp';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { OtpProps as PrimitiveOtpProps } from '../../primitives/otp';
+import { Otp as Primitive } from '../../primitives/otp';
 import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { inputStyles } from '../../utils/input.styles';
-import { reset } from '../../utils/reset.styles';
+import { inputStyles } from '../../styles/input.styles';
+import { reset } from '../../styles/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { styles } from './otp.styles';
 
@@ -83,6 +83,7 @@ export const Otp = React.forwardRef<HTMLInputElement, OtpProps>(function MosaicO
       {...rest}
       length={length}
       disabled={disabled}
+      focusableWhenDisabled={fieldProps?.focusableWhenDisabled}
       required={required}
       id={fieldProps?.id ?? id}
       {...mergeStyleProps(themeProps('otp', { status, disabled }), stylex.props(reset.base, styles.root, xstyle))}

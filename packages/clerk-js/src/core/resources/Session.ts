@@ -1,11 +1,12 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { isBrowserOnline, isValidBrowserOnline } from '@clerk/shared/browser';
+import { isValidBrowserOnline } from '@clerk/shared/browser';
 import {
   ClerkOfflineError,
   ClerkRuntimeError,
   ClerkWebAuthnError,
   is4xxError,
   is429Error,
+  isClerkAPIResponseError,
   MissingExpiredTokenError,
 } from '@clerk/shared/error';
 import {
@@ -41,17 +42,18 @@ import type {
   SessionVerifyCreateParams,
   SessionVerifyPrepareFirstFactorParams,
   SessionVerifyPrepareSecondFactorParams,
+  SessionVerifyWithPasskeyParams,
   TokenResource,
   UserResource,
 } from '@clerk/shared/types';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
-import { unixEpochToDate } from '@/utils/date';
+import { unixEpochToDate, unixEpochToDeadline } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
 import { getTabState, isTabFocused } from '@/utils/isTabFocused';
 import { TokenId } from '@/utils/tokenId';
 
-import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
+import { clerkInvalidStrategy, clerkInvalidVerificationLevel, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
@@ -89,6 +91,10 @@ export class Session extends BaseResource implements SessionResource {
 
   static isSessionResource(resource: unknown): resource is Session {
     return !!resource && resource instanceof Session;
+  }
+
+  get hasMaximumLifetime(): boolean {
+    return this.expireAt.getTime() > 0;
   }
 
   constructor(data: SessionJSON | SessionJSONSnapshot) {
@@ -196,8 +202,8 @@ export class Session extends BaseResource implements SessionResource {
 
       return result;
     } catch (error) {
-      // If the browser is offline after retries, throw ClerkOfflineError
-      if (!isValidBrowserOnline()) {
+      // If FAPI fetch fails and the browser is offline after retries, throw ClerkOfflineError
+      if (!isClerkAPIResponseError(error) && !isValidBrowserOnline()) {
         throw new ClerkOfflineError('Network request failed while offline. The browser appears to be disconnected.');
       }
       throw error;
@@ -279,6 +285,9 @@ export class Session extends BaseResource implements SessionResource {
         break;
       case 'passkey':
         config = {};
+        break;
+      case 'trusted_device':
+        config = { trustedDeviceId: factor.trustedDeviceId };
         break;
       case 'enterprise_sso':
         config = {
@@ -382,10 +391,29 @@ export class Session extends BaseResource implements SessionResource {
     return new SessionVerification(json);
   };
 
-  verifyWithPasskey = async (): Promise<SessionVerificationResource> => {
-    const prepareResponse = await this.prepareFirstFactorVerification({ strategy: 'passkey' });
+  /**
+   * Initiates a reverification flow using passkeys.
+   *
+   * By default the passkey verifies the first factor. Pass `{ level: 'second_factor' }` to satisfy
+   * the second factor of an in-progress multi-factor reverification instead. Any other `level`
+   * value is rejected.
+   *
+   * Throws a `ClerkWebAuthnError` when WebAuthn is unsupported or the passkey ceremony fails.
+   * @returns A `SessionVerification` instance with its status and supported factors.
+   */
+  verifyWithPasskey = async (params?: SessionVerifyWithPasskeyParams): Promise<SessionVerificationResource> => {
+    const level = params?.level ?? 'first_factor';
+    if (level !== 'first_factor' && level !== 'second_factor') {
+      clerkInvalidVerificationLevel('Session.verifyWithPasskey', level);
+    }
 
-    const { nonce = null } = prepareResponse.firstFactorVerification;
+    const prepareResponse =
+      level === 'second_factor'
+        ? await this.prepareSecondFactorVerification({ strategy: 'passkey' })
+        : await this.prepareFirstFactorVerification({ strategy: 'passkey' });
+
+    const { nonce = null } =
+      level === 'second_factor' ? prepareResponse.secondFactorVerification : prepareResponse.firstFactorVerification;
 
     /**
      * The UI should always prevent from this method being called if WebAuthn is not supported.
@@ -415,6 +443,13 @@ export class Session extends BaseResource implements SessionResource {
       throw error;
     }
 
+    if (level === 'second_factor') {
+      return this.attemptSecondFactorVerification({
+        strategy: 'passkey',
+        publicKeyCredential,
+      });
+    }
+
     return this.attemptFirstFactorVerification({
       strategy: 'passkey',
       publicKeyCredential,
@@ -438,11 +473,23 @@ export class Session extends BaseResource implements SessionResource {
   attemptSecondFactorVerification = async (
     attemptFactor: SessionVerifyAttemptSecondFactorParams,
   ): Promise<SessionVerificationResource> => {
+    let config;
+    switch (attemptFactor.strategy) {
+      case 'passkey': {
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(attemptFactor.publicKeyCredential)),
+        };
+        break;
+      }
+      default:
+        config = { ...attemptFactor };
+    }
+
     const json = (
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_second_factor`,
-        body: attemptFactor as any,
+        body: { ...config, strategy: attemptFactor.strategy } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 
@@ -456,8 +503,8 @@ export class Session extends BaseResource implements SessionResource {
 
     this.id = data.id;
     this.status = data.status;
-    this.expireAt = unixEpochToDate(data.expire_at);
-    this.abandonAt = unixEpochToDate(data.abandon_at);
+    this.expireAt = unixEpochToDeadline(data.expire_at);
+    this.abandonAt = unixEpochToDeadline(data.abandon_at);
     this.factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;
@@ -531,8 +578,6 @@ export class Session extends BaseResource implements SessionResource {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
       result = cachedToken.getRawString() || null;
-    } else if (!isBrowserOnline()) {
-      throw new ClerkRuntimeError('Browser is offline, skipping token fetch', { code: 'network_error' });
     } else {
       result = await this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate, skipCache);
     }

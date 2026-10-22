@@ -13,7 +13,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
   let memberUser: FakeUser;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     fakeOrganization = await u.services.users.createFakeOrganization(user.id);
@@ -35,14 +35,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
     await app.teardown();
   });
 
-  test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.signOut();
-    await u.page.context().clearCookies();
-  });
-
   test('<Show when="signed-out"> renders when not authenticated', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/show-component');
     await u.page.waitForClerkJsLoaded();
 
@@ -51,7 +45,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
   });
 
   test('<Show when="signed-in"> renders when authenticated', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -63,7 +57,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
   });
 
   test('<Show> with permission condition renders for admin with manage permission', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -80,7 +74,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
   });
 
   test('<Show> with role condition renders fallback for non-admin', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await u.page.goToRelative('/sign-in');
     await u.po.signIn.waitForMounted();

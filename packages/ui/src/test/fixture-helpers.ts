@@ -1,3 +1,4 @@
+import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ClientJSON,
   DisplayConfigJSON,
@@ -16,7 +17,6 @@ import type {
   VerificationJSON,
 } from '@clerk/shared/types';
 
-import { SIGN_UP_MODES } from '@/core/constants';
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';
 
@@ -118,7 +118,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
 
   type SignInWithEnterpriseSSOParams = {
     identifier?: string;
-    enterpriseConnections?: Array<{ id: string; name: string }>;
+    enterpriseConnections?: Array<{ id: string; name: string; logoPublicUrl?: string; provider?: string }>;
     supportSSOBypass?: boolean;
   };
 
@@ -128,6 +128,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportEmailCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
+    supportPasskey?: boolean;
     supportResetPasswordEmail?: boolean;
     supportResetPasswordPhone?: boolean;
   };
@@ -171,10 +172,12 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       identifier,
       supported_identifiers: ['email_address'],
       supported_first_factors: enterpriseConnections?.length
-        ? enterpriseConnections.map(({ id, name }) => ({
+        ? enterpriseConnections.map(({ id, name, logoPublicUrl, provider }) => ({
             strategy: 'enterprise_sso',
             enterprise_connection_id: id,
             enterprise_connection_name: name,
+            enterprise_connection_logo_public_url: logoPublicUrl,
+            enterprise_connection_provider: provider,
           }))
         : [{ strategy: 'enterprise_sso' }],
       ...(supportSSOBypass && {
@@ -224,6 +227,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supportEmailCode,
       supportTotp,
       supportBackupCode,
+      supportPasskey,
       supportResetPasswordEmail,
       supportResetPasswordPhone,
     } = params || {};
@@ -252,6 +256,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
         ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: 'n*****@clerk.com' }] : []),
         ...(supportTotp ? [{ strategy: 'totp', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportBackupCode ? [{ strategy: 'backup_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
+        ...(supportPasskey ? [{ strategy: 'passkey' }] : []),
       ],
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;

@@ -84,15 +84,22 @@ export const item = stylex.create({
   base: {
     borderRadius: '0.375rem',
     borderStyle: 'none',
-    gap: space['1'],
+    gap: space['0.5'],
     outline: 'none',
-    paddingInline: space['1'],
+    paddingInline: space['1.5'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
         ':hover': colorVars['--cl-color-neutral-alpha-100'],
+      },
+    },
+    color: {
+      default: colorVars['--cl-color-foreground-secondary'],
+      ':is([data-active])': colorVars['--cl-color-foreground'],
+      '@media (hover: hover)': {
+        ':hover': colorVars['--cl-color-foreground'],
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
@@ -102,7 +109,7 @@ export const item = stylex.create({
     flexShrink: 0,
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
+    fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
     outlineOffset: 0,
@@ -139,7 +146,7 @@ export const media = stylex.create({
     justifyContent: 'center',
   },
   xs: { width: space['4'] },
-  sm: { width: space['6'] },
+  sm: { width: space['5'] },
 });
 
 // The item lays its children out in one flat row, so the label is what has to take the space

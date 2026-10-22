@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileBillingPanelView } from '../user-profile-billing-panel.view';
 
 const subscription = {
@@ -53,14 +53,15 @@ describe('UserProfileBillingPanelView', () => {
   it('composes subscription, payment methods, and billing history', () => {
     renderView();
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Billing' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: 'Subscription' })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Payment methods' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Billing' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Subscription' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Payment methods' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Payment methods' })).toBeInTheDocument();
     expect(screen.getByText('Basic Plan')).toBeInTheDocument();
     expect(screen.getByText('$12.00')).toBeInTheDocument();
     expect(screen.getByText('Visa •••• 0644')).toBeInTheDocument();
     expect(screen.getByText('Default')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: 'History' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'History' })).toBeInTheDocument();
     expect(screen.getByText('May 26, 2026')).toBeInTheDocument();
     expect(screen.getByText('Paid')).toBeInTheDocument();
   });
