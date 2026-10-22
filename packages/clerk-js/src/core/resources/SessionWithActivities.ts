@@ -6,7 +6,7 @@ import type {
   SessionWithActivitiesResource,
 } from '@clerk/shared/types';
 
-import { unixEpochToDate, unixEpochToSessionDeadline } from '../../utils/date';
+import { unixEpochToDate, unixEpochToDeadline } from '../../utils/date';
 import { BaseResource } from './internal';
 
 const mapSessionActivityJSONToSessionActivity = (data: SessionActivityJSON): SessionActivity => ({
@@ -65,8 +65,8 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
 
     this.id = data.id;
     this.status = data.status;
-    this.expireAt = unixEpochToSessionDeadline(data.expire_at);
-    this.abandonAt = unixEpochToSessionDeadline(data.abandon_at);
+    this.expireAt = unixEpochToDeadline(data.expire_at);
+    this.abandonAt = unixEpochToDeadline(data.abandon_at);
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.latestActivity = mapSessionActivityJSONToSessionActivity(data.latest_activity ?? ({} as SessionActivityJSON));
     this.actor = data.actor;

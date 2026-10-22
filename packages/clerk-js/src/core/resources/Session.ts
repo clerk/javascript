@@ -28,7 +28,7 @@ import type {
 } from '@clerk/shared/types';
 import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
-import { unixEpochToDate, unixEpochToSessionDeadline } from '@/utils/date';
+import { unixEpochToDate, unixEpochToDeadline } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
 import {
   convertJSONToPublicKeyRequestOptions,
@@ -309,8 +309,8 @@ export class Session extends BaseResource implements SessionResource {
 
     this.id = data.id;
     this.status = data.status;
-    this.expireAt = unixEpochToSessionDeadline(data.expire_at);
-    this.abandonAt = unixEpochToSessionDeadline(data.abandon_at);
+    this.expireAt = unixEpochToDeadline(data.expire_at);
+    this.abandonAt = unixEpochToDeadline(data.abandon_at);
     this.factorVerificationAge = data.factor_verification_age;
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.lastActiveOrganizationId = data.last_active_organization_id;

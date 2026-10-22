@@ -7,6 +7,6 @@ export function unixEpochToDate(epochInSeconds?: number): Date {
   return isValidDate(date) ? date : new Date();
 }
 
-export function unixEpochToSessionDeadline(epochInMilliseconds?: number): Date {
-  return epochInMilliseconds === 0 ? new Date(0) : unixEpochToDate(epochInMilliseconds);
+export function unixEpochToDeadline(epoch?: number): Date {
+  return epoch === 0 ? new Date(0) : unixEpochToDate(epoch);
 }
