@@ -6,7 +6,7 @@ import type {
   SessionWithActivitiesResource,
 } from '@clerk/shared/types';
 
-import { unixEpochToDate } from '../../utils/date';
+import { unixEpochToDate, unixEpochToDeadline } from '../../utils/date';
 import { BaseResource } from './internal';
 
 const mapSessionActivityJSONToSessionActivity = (data: SessionActivityJSON): SessionActivity => ({
@@ -29,6 +29,10 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
   lastActiveAt!: Date;
   latestActivity!: SessionActivity;
   actor!: ActClaim | null;
+
+  get hasMaximumLifetime(): boolean {
+    return this.expireAt.getTime() > 0;
+  }
 
   constructor(data: SessionWithActivitiesJSON, pathRoot: string) {
     super();
@@ -65,8 +69,8 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
 
     this.id = data.id;
     this.status = data.status;
-    this.expireAt = unixEpochToDate(data.expire_at);
-    this.abandonAt = unixEpochToDate(data.abandon_at);
+    this.expireAt = unixEpochToDeadline(data.expire_at);
+    this.abandonAt = unixEpochToDeadline(data.abandon_at);
     this.lastActiveAt = unixEpochToDate(data.last_active_at || undefined);
     this.latestActivity = mapSessionActivityJSONToSessionActivity(data.latest_activity ?? ({} as SessionActivityJSON));
     this.actor = data.actor;
