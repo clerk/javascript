@@ -1,5 +1,5 @@
 import type { UserJSON, Web3Strategy } from '@clerk/shared/types';
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -103,6 +103,113 @@ describe('Web3 wallet selection races', () => {
     expect(creation.requests).toHaveLength(0);
     creation.release();
   });
+
+  it('blocks removal from the closing menu while verification is pending', async () => {
+    const selection = deferred<string[]>();
+    const request = vi.fn(() => selection.promise);
+    vi.stubGlobal('ethereum', { request });
+    const { fapi } = await renderWallets([savedWallet('saved_wallet', '0xabcd')]);
+    const user = userEvent.setup();
+    await openMenu(user, screen.getByRole('button', { name: 'Manage MetaMask' }));
+    const remove = screen.getByRole('menuitem', { name: 'Remove wallet' });
+    const popup = remove.closest('.cl-menu-popup');
+    if (!(popup instanceof HTMLElement)) {
+      throw new Error('Missing menu popup');
+    }
+    await waitFor(() => expect(popup).not.toHaveAttribute('data-starting-style'));
+    await Promise.all(popup.getAnimations().map(animation => animation.finished));
+    expect(getComputedStyle(popup).opacity).toBe('1');
+    popup.style.setProperty('transition-duration', '10s', 'important');
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+    expect(request).toHaveBeenCalledWith({ method: 'eth_requestAccounts' });
+    expect(popup).toHaveAttribute('data-ending-style');
+    expect(remove).toBeInTheDocument();
+    const bounds = remove.getBoundingClientRect();
+    const target = document.elementFromPoint(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+    if (!(target instanceof HTMLElement)) {
+      throw new Error('Missing pointer target');
+    }
+    await user.click(target);
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1);
+    selection.reject(new Error('User rejected the request.'));
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+  });
+
+  it.each(['verify', 'connect'] as const)(
+    'blocks wallet removal during %s and restores it after settling',
+    async action => {
+      const selection = deferred<string[]>();
+      const signature = deferred<string>();
+      const request = vi.fn(({ method }: { method: string }) =>
+        method === 'eth_requestAccounts' ? selection.promise : signature.promise,
+      );
+      vi.stubGlobal('ethereum', { request });
+      const wallets = [savedWallet('other_wallet', '0x1234', 'web3_coinbase_wallet_signature')];
+      if (action === 'verify') {
+        wallets.push(savedWallet('saved_wallet', '0xabcd'));
+      }
+      const { fapi } = await renderWallets(wallets);
+      const user = userEvent.setup();
+      if (action === 'verify') {
+        await openMenu(user, screen.getByRole('button', { name: 'Manage MetaMask' }));
+        await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
+      } else {
+        await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+      }
+      await waitFor(() => expect(request).toHaveBeenCalledWith({ method: 'eth_requestAccounts' }));
+      await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+      const otherTrigger = screen.getByRole('button', { name: 'Manage Coinbase Wallet' });
+      expect(otherTrigger).toHaveAttribute('aria-disabled', 'true');
+      await user.click(otherTrigger);
+      expect(screen.queryByRole('menu')).toBeNull();
+
+      selection.resolve(['0xabcd']);
+      await waitFor(() => expect(request).toHaveBeenCalledWith({ method: 'personal_sign', params: expect.any(Array) }));
+      expect(screen.getByText('Verifying')).toBeInTheDocument();
+      const pendingWallet = fapi.client.sessions[0]?.user.web3_wallets.find(wallet => wallet.web3_wallet === '0xabcd');
+      expect(pendingWallet).toBeDefined();
+      for (const trigger of screen.getAllByRole('button', { name: /^Manage / })) {
+        expect(trigger).toHaveAttribute('aria-disabled', 'true');
+        await user.click(trigger);
+        trigger.focus();
+        expect(trigger).toHaveFocus();
+        await user.keyboard('{Enter} {ArrowDown}');
+        await act(() => new Promise<void>(resolve => requestAnimationFrame(() => resolve())));
+        expect(screen.queryByRole('menu')).toBeNull();
+      }
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+      expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(2);
+
+      if (action === 'verify') {
+        signature.resolve('signature');
+        await waitFor(() =>
+          expect(
+            fapi.client.sessions[0]?.user.web3_wallets.find(wallet => wallet.id === pendingWallet?.id)?.verification
+              ?.status,
+          ).toBe('verified'),
+        );
+      } else {
+        signature.reject(new Error('User rejected the request.'));
+        await waitFor(() =>
+          expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+        );
+        expect(
+          fapi.client.sessions[0]?.user.web3_wallets.find(wallet => wallet.id === pendingWallet?.id)?.verification
+            ?.status,
+        ).toBe('unverified');
+      }
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Manage MetaMask' })).not.toHaveAttribute('aria-disabled', 'true'),
+      );
+      expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toContain(pendingWallet?.id);
+      await openMenu(user, screen.getByRole('button', { name: 'Manage MetaMask' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+      expect(fapi.client.sessions[0]?.user.web3_wallets.map(wallet => wallet.id)).toEqual(['other_wallet']);
+    },
+  );
 
   it('returns focus to the saved row after creation reverification and retries the rejected signature', async () => {
     const signature = deferred<string>();
