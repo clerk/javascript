@@ -61,6 +61,23 @@ describe('FraudProtectionService', () => {
     expect(fn1).toHaveBeenCalledTimes(1);
   });
 
+  it('does not submit a challenge after its request owner changes', async () => {
+    let retired = false;
+    const assertCurrent = () => {
+      if (retired) {
+        throw new Error('Retired owner');
+      }
+    };
+    const read = vi.fn().mockRejectedValueOnce(createCaptchaError()).mockResolvedValue('user');
+    const result = sut.execute(mockClerk, read, assertCurrent).catch(error => error);
+    await vi.waitFor(() => expect(mockManagedInModal).toHaveBeenCalledTimes(1));
+    retired = true;
+    solveCaptcha({ token: 'old-owner-challenge' });
+    expect(await result).toMatchObject({ message: 'Retired owner' });
+    expect(mockClient.getOrCreateInstance().__internal_sendCaptchaToken).not.toHaveBeenCalled();
+    expect(read).toHaveBeenCalledTimes(1);
+  });
+
   it('does not handle requests that threw an unrelated error', async () => {
     const unrelatedError = new ClerkAPIResponseError('hello', {
       data: [{ code: 'no-idea' } as any],

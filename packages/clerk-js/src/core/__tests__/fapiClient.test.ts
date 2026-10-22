@@ -1,4 +1,5 @@
 import type { InstanceType } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { SUPPORTED_FAPI_VERSION } from '../constants';
@@ -74,6 +75,60 @@ afterAll(() => {
 });
 
 describe('buildUrl(options)', () => {
+  it('rejects a retired owner before running response callbacks', async () => {
+    const reply = createDeferredPromise<Response>();
+    const fetchMock = vi.mocked(global.fetch);
+    fetchMock.mockImplementationOnce(() => reply.promise);
+    const client = createFapiClient(baseFapiClientOptions);
+    const onResponse = vi.fn();
+    client.onAfterResponse(onResponse);
+    let retired = false;
+    const pending = client.request(
+      { method: 'GET', path: '/me' },
+      {
+        assertCurrent: () => {
+          if (retired) {
+            throw new Error('Retired owner');
+          }
+        },
+      },
+    );
+    const result = pending.catch(error => error);
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    retired = true;
+    reply.resolve(
+      Object.assign(new Response(), {
+        status: 200,
+        ok: true,
+        json: () => Promise.resolve({ response: { id: 'user_a' } }),
+      }),
+    );
+    expect(await result).toMatchObject({ message: 'Retired owner' });
+    expect(onResponse).not.toHaveBeenCalled();
+  });
+
+  it('retains the session selected before an asynchronous request callback', async () => {
+    let sessionId = 'sess_a';
+    const entered = createDeferredPromise<void>();
+    const release = createDeferredPromise<void>();
+    const client = createFapiClient({ ...baseFapiClientOptions, getSessionId: () => sessionId });
+    client.onBeforeRequest(async () => {
+      entered.resolve();
+      await release.promise;
+    });
+    const pending = client.request({ method: 'GET', path: '/me', sessionId });
+    await entered.promise;
+    sessionId = 'sess_b';
+    release.resolve();
+    await pending;
+    const request = vi.mocked(global.fetch).mock.calls.at(-1)?.[0];
+    expect(request).toBeInstanceOf(URL);
+    if (!(request instanceof URL)) {
+      throw new Error('Expected a request URL.');
+    }
+    expect(request.searchParams.get('_clerk_session_id')).toBe('sess_a');
+  });
+
   it('returns the full frontend API URL', () => {
     expect(fapiClient.buildUrl({ path: '/foo' }).href).toBe(
       `https://clerk.example.com/v1/foo?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,

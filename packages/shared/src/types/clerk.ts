@@ -257,6 +257,7 @@ export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
  * The `Clerk` class serves as the central interface for working with Clerk's authentication and user management functionality in your application. As a top-level class in the Clerk SDK, it provides access to key methods and properties for managing users, sessions, API keys, billing, organizations, and more.
  */
 export interface Clerk {
+  __internal_readUser?: (input: { userId: string; sessionId: string; signal: AbortSignal }) => Promise<UserResource>;
   getFapiClient?: () => {
     request: (request: RequestInit & { path?: string; sessionId?: string }) => Promise<Response & { payload: unknown }>;
   };

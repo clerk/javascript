@@ -3,6 +3,8 @@ import type { LoadedClerk } from '@clerk/shared/types';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { bindClerk, type ClerkSessionsHost } from '../clerk';
+import { throwResponseError } from '../fapi';
+import { parseUser } from '../user';
 import environment from './fixtures/environment.json';
 
 const session = {
@@ -41,6 +43,21 @@ function hostFixture() {
     },
     session: { id: 'sess_current' },
     getFapiClient: () => ({ request }),
+    __internal_readUser: async ({
+      userId,
+      sessionId,
+      signal,
+    }: {
+      userId: string;
+      sessionId: string;
+      signal: AbortSignal;
+    }) => {
+      const response = await request({ method: 'GET', path: '/me', sessionId, signal });
+      if (!response.ok) {
+        throwResponseError(response);
+      }
+      return parseUser(response.payload, userId);
+    },
     on: (_event: 'status', listener: () => void) => {
       listeners.add(listener);
     },
@@ -76,6 +93,15 @@ describe('host ClerkJS bridge', () => {
     const { getFapiClient: _transport, ...legacyHost } = host;
     const binding = bindClerk(legacyHost);
     await expect(binding.getSnapshot()?.fetch()).rejects.toThrow('Clerk transport is unavailable');
+    binding.dispose();
+  });
+
+  it('rejects a legacy user host without falling back to its raw transport', async () => {
+    const { host, request } = hostFixture();
+    const { __internal_readUser: _readUser, ...legacyHost } = host;
+    const binding = bindClerk(legacyHost);
+    await expect(binding.getSnapshot()?.fetchUser()).rejects.toThrow('Clerk user read is unavailable');
+    expect(request).not.toHaveBeenCalled();
     binding.dispose();
   });
 

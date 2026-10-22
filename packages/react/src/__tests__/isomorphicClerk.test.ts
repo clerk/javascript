@@ -80,6 +80,36 @@ describe('isomorphicClerk', () => {
     });
   });
 
+  describe('__internal_readUser', () => {
+    it('forwards to the current runtime and preserves its receiver', async () => {
+      const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      const input = { userId: 'user_a', sessionId: 'sess_a', signal: new AbortController().signal };
+      const runtime = {
+        loaded: true,
+        user: { id: 'user_a' },
+        __internal_readUser: vi.fn(function (this: { user: { id: string } }, received: typeof input) {
+          expect(received).toBe(input);
+          return Promise.resolve(this.user);
+        }),
+      };
+      Object.defineProperty(clerk, 'clerkjs', { configurable: true, value: runtime });
+      expect(await clerk.__internal_readUser(input)).toBe(runtime.user);
+      Object.defineProperty(clerk, 'clerkjs', { value: { ...runtime, user: { id: 'user_b' } } });
+      expect(await clerk.__internal_readUser(input)).toEqual({ id: 'user_b' });
+    });
+
+    it.each([undefined, { loaded: false }, { loaded: true }])(
+      'rejects an unavailable runtime without raw fallback',
+      runtime => {
+        const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+        Object.defineProperty(clerk, 'clerkjs', { value: runtime });
+        expect(() =>
+          clerk.__internal_readUser({ userId: 'user_a', sessionId: 'sess_a', signal: new AbortController().signal }),
+        ).toThrow('Clerk user read is unavailable');
+      },
+    );
+  });
+
   it('instantiates a IsomorphicClerk instance', () => {
     expect(() => {
       new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });

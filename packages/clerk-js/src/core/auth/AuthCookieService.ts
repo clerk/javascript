@@ -122,9 +122,10 @@ export class AuthCookieService {
     return !this.clerk.user;
   }
 
-  public async handleUnauthenticatedDevBrowser() {
+  public async handleUnauthenticatedDevBrowser(assertCurrent?: () => void) {
+    assertCurrent?.();
     this.devBrowser.clear();
-    await this.devBrowser.setup();
+    await this.devBrowser.setup(assertCurrent);
   }
 
   public decorateUrlWithDevBrowserToken(url: URL): URL {

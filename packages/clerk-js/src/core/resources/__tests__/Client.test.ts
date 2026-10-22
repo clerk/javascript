@@ -39,13 +39,16 @@ describe('Client Singleton', () => {
       const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
       await client.__internal_sendCaptchaToken({ captcha_token: 'test_captcha_token' });
       // @ts-expect-error This is a private method that we are mocking
-      expect(BaseResource._baseFetch).toHaveBeenCalledWith({
-        method: 'POST',
-        path: `/client/verify`,
-        body: {
-          captcha_token: 'test_captcha_token',
+      expect(BaseResource._baseFetch).toHaveBeenCalledWith(
+        {
+          method: 'POST',
+          path: `/client/verify`,
+          body: {
+            captcha_token: 'test_captcha_token',
+          },
         },
-      });
+        {},
+      );
     });
 
     it('ignores null response payload', async () => {
@@ -69,13 +72,16 @@ describe('Client Singleton', () => {
       const client = Client.getOrCreateInstance().fromJSON(clientObjectJSON);
       await client.__internal_sendCaptchaToken({ captcha_token: 'test_captcha_token' });
       // @ts-expect-error This is a private method that we are mocking
-      expect(BaseResource._baseFetch).toHaveBeenCalledWith({
-        method: 'POST',
-        path: `/client/verify`,
-        body: {
-          captcha_token: 'test_captcha_token',
+      expect(BaseResource._baseFetch).toHaveBeenCalledWith(
+        {
+          method: 'POST',
+          path: `/client/verify`,
+          body: {
+            captcha_token: 'test_captcha_token',
+          },
         },
-      });
+        {},
+      );
       expect(client.id).toBe('test_id');
     });
   });

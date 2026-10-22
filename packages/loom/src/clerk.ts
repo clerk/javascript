@@ -36,6 +36,7 @@ export type ClerkSessionsHost = {
   addListener: (listener: () => void) => () => void;
   on: (event: 'status', listener: () => void) => void;
   off: (event: 'status', listener: () => void) => void;
+  __internal_readUser?: (input: { userId: string; sessionId: string; signal: AbortSignal }) => Promise<unknown>;
   getFapiClient?: () => {
     request: (request: {
       method: string;
@@ -116,7 +117,19 @@ export function bindClerk(host: ClerkSessionsHost, hydration?: LoomHydration) {
         scope,
         hydration: seed && sameScope(seed.scope, scope) ? seed : undefined,
         readProfileSettings: async signal => parseProfileSettings(await request('GET', '/environment', signal)),
-        readUser: async signal => parseUser(await request('GET', '/me', signal), scope.userId),
+        readUser: async signal => {
+          if (disposed || !sameScope(scope, scopeOf(host))) {
+            throw new Error('Clerk identity changed.');
+          }
+          if (typeof host.__internal_readUser !== 'function') {
+            throw new Error('Clerk user read is unavailable. Use a Clerk host with user read support.');
+          }
+          const user = await host.__internal_readUser({ userId: scope.userId, sessionId: scope.sessionId, signal });
+          if (disposed || !sameScope(scope, scopeOf(host))) {
+            throw new Error('Clerk identity changed.');
+          }
+          return resourceUserSnapshot(user, scope.userId);
+        },
         updateName:
           typeof host.user?.update === 'function'
             ? async input => {
@@ -186,4 +199,4 @@ import { parseSessions, throwResponseError } from './fapi';
 import { parseProfileSettings } from './profile-settings';
 import { createClerkScope, sameScope } from './scope';
 import type { LoomHydration, SessionScope, UserNameInput } from './types';
-import { parseUser, resourceUserSnapshot } from './user';
+import { resourceUserSnapshot } from './user';

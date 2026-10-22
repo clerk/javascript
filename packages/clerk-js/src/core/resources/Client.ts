@@ -13,6 +13,7 @@ import { eventBus } from '../events';
 import type { FapiResponseJSON } from '../fapiClient';
 import { SessionTokenCache } from '../tokenCache';
 import { shouldKeepExistingLastActiveToken } from '../tokenFreshness';
+import type { BaseFetchOptions } from './Base';
 import { BaseResource, Session, SignIn, SignUp } from './internal';
 
 export function getClientResourceFromPayload<J>(responseJSON: FapiResponseJSON<J> | null): ClientResource | undefined {
@@ -74,8 +75,10 @@ export class Client extends BaseResource implements ClientResource {
     return this._basePut();
   }
 
-  fetch({ fetchMaxTries, abortSignal }: { fetchMaxTries?: number; abortSignal?: AbortSignal } = {}): Promise<this> {
-    return this._baseGet({ fetchMaxTries, abortSignal });
+  fetch(
+    options: Pick<BaseFetchOptions, 'fetchMaxTries' | 'abortSignal' | 'clerk' | 'assertCurrent'> = {},
+  ): Promise<this> {
+    return this._baseGet(options);
   }
 
   async destroy(): Promise<void> {
@@ -135,8 +138,11 @@ export class Client extends BaseResource implements ClientResource {
       .toString();
   }
 
-  public __internal_sendCaptchaToken(params: unknown): Promise<ClientResource> {
-    return this._basePostBypass({ body: params, path: this.path() + '/verify' });
+  public __internal_sendCaptchaToken(
+    params: unknown,
+    opts?: Pick<BaseFetchOptions, 'clerk' | 'assertCurrent'>,
+  ): Promise<ClientResource> {
+    return this._basePostBypass({ body: params, path: this.path() + '/verify' }, opts);
   }
 
   fromJSON(data: ClientJSON | ClientJSONSnapshot | null): this {

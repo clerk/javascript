@@ -206,6 +206,14 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     return clerk.getFapiClient();
   }
 
+  __internal_readUser(input: { userId: string; sessionId: string; signal: AbortSignal }) {
+    const clerk = this.clerkjs;
+    if (!clerk?.loaded || typeof clerk.__internal_readUser !== 'function') {
+      throw new Error('Clerk user read is unavailable. Use a Clerk runtime with user read support.');
+    }
+    return clerk.__internal_readUser(input);
+  }
+
   get loaded(): boolean {
     return this.clerkjs?.loaded || false;
   }

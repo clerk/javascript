@@ -31,6 +31,7 @@ type FapiQueryStringParameters = {
 
 type FapiRequestOptions = {
   fetchMaxTries?: number;
+  assertCurrent?: () => void;
 };
 
 export type FapiResponse<T> = Response & {
@@ -116,9 +117,10 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     onAfterResponseCallbacks.push(callback);
   }
 
-  async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
+  async function runBeforeRequestCallbacks(requestInit: FapiRequestInit, assertCurrent?: () => void) {
     const windowCallback = typeof window !== 'undefined' && (window as any).__internal_onBeforeRequest;
     for await (const callback of [windowCallback, ...onBeforeRequestCallbacks].filter(s => s)) {
+      assertCurrent?.();
       if ((await callback(requestInit)) === false) {
         return false;
       }
@@ -126,9 +128,14 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     return true;
   }
 
-  async function runAfterResponseCallbacks(requestInit: FapiRequestInit, response: FapiResponse<unknown>) {
+  async function runAfterResponseCallbacks(
+    requestInit: FapiRequestInit,
+    response: FapiResponse<unknown>,
+    assertCurrent?: () => void,
+  ) {
     const windowCallback = typeof window !== 'undefined' && (window as any).__internal_onAfterResponse;
     for await (const callback of [windowCallback, ...onAfterResponseCallbacks].filter(s => s)) {
+      assertCurrent?.();
       if ((await callback(requestInit, response)) === false) {
         return false;
       }
@@ -224,6 +231,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     _requestInit: FapiRequestInit,
     requestOptions?: FapiRequestOptions,
   ): Promise<FapiResponse<T>> {
+    requestOptions?.assertCurrent?.();
     const requestInit = { ..._requestInit };
     const { method = 'GET' } = requestInit;
     let { body } = requestInit;
@@ -276,7 +284,8 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     }
 
     // TODO @userland-errors:
-    const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
+    const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit, requestOptions?.assertCurrent);
+    requestOptions?.assertCurrent?.();
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.
     // The original HTTP method is used as a query string parameter instead of as an actual method to
     // avoid triggering a CORS OPTION request as it currently breaks cookie dropping in Safari.
@@ -293,26 +302,32 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
         // TODO @userland-errors:
-        response = await retry(() => fetch(url, fetchOpts), {
-          // This retry handles only network errors, not 4xx or 5xx responses,
-          // so we want to try once immediately to handle simple network blips.
-          // Since fapiClient is responsible for the network layer only,
-          // callers need to use their own retry logic where needed.
-          retryImmediately: true,
-          // And then exponentially back off with a max delay of 5 seconds.
-          initialDelay: 700,
-          maxDelayBetweenRetries: 5000,
-          shouldRetry: (_: unknown, iterations: number) => {
-            // We want to retry only GET requests, as other methods are not idempotent,
-            // and stop as soon as the caller aborted the request.
-            return overwrittenRequestMethod === 'GET' && iterations < maxTries && !fetchOpts.signal?.aborted;
+        response = await retry(
+          () => {
+            requestOptions?.assertCurrent?.();
+            return fetch(url, fetchOpts);
           },
-          onBeforeRetry: (iteration: number): void => {
-            // Add the retry attempt to the query string params.
-            // We use params to keep the request simple for CORS.
-            url.searchParams.set('_clerk_retry_attempt', iteration.toString());
+          {
+            // This retry handles only network errors, not 4xx or 5xx responses,
+            // so we want to try once immediately to handle simple network blips.
+            // Since fapiClient is responsible for the network layer only,
+            // callers need to use their own retry logic where needed.
+            retryImmediately: true,
+            // And then exponentially back off with a max delay of 5 seconds.
+            initialDelay: 700,
+            maxDelayBetweenRetries: 5000,
+            shouldRetry: (_: unknown, iterations: number) => {
+              // We want to retry only GET requests, as other methods are not idempotent,
+              // and stop as soon as the caller aborted the request.
+              return overwrittenRequestMethod === 'GET' && iterations < maxTries && !fetchOpts.signal?.aborted;
+            },
+            onBeforeRetry: (iteration: number): void => {
+              // Add the retry attempt to the query string params.
+              // We use params to keep the request simple for CORS.
+              url.searchParams.set('_clerk_retry_attempt', iteration.toString());
+            },
           },
-        });
+        );
       } else {
         response = new Response('{}', requestInit); // Mock an empty json response
       }
@@ -335,13 +350,15 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
             throw e;
           });
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json ?? null });
+    requestOptions?.assertCurrent?.();
     if (!response.ok) {
       debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');
     }
     if (json !== undefined) {
       // TODO @userland-errors:
-      await runAfterResponseCallbacks(requestInit, fapiResponse);
+      await runAfterResponseCallbacks(requestInit, fapiResponse, requestOptions?.assertCurrent);
     }
+    requestOptions?.assertCurrent?.();
     return fapiResponse;
   }
 

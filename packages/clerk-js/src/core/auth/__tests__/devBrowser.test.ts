@@ -1,6 +1,8 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { FapiClient } from '../../fapiClient';
+import { createFapiClient } from '../../fapiClient';
 import { createDevBrowser } from '../devBrowser';
 
 type RecursivePartial<T> = {
@@ -8,6 +10,46 @@ type RecursivePartial<T> = {
 };
 
 describe('Thrown errors', () => {
+  it('does not commit a development token after recovery ownership changes', async () => {
+    const reply = createDeferredPromise<Response>();
+    vi.mocked(global.fetch).mockImplementationOnce(() => reply.promise);
+    const client = createFapiClient({
+      frontendApi: 'white-koala-42.clerk.accounts.dev',
+      instanceType: 'development',
+      getSessionId: () => 'sess_a',
+    });
+    const browser = createDevBrowser({
+      frontendApi: 'white-koala-42.clerk.accounts.dev',
+      fapiClient: client,
+      cookieSuffix: 'owned-recovery',
+      cookieOptions: { usePartitionedCookies: () => false },
+    });
+    browser.clear();
+    let retired = false;
+    const pending = browser
+      .setup(() => {
+        if (retired) {
+          throw new Error('Retired owner');
+        }
+      })
+      .catch(error => error);
+    await vi.waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+    retired = true;
+    browser.setDevBrowser('new-owner-token');
+    reply.resolve(
+      Object.assign(new Response(), {
+        ok: true,
+        json: () => Promise.resolve({ id: 'old-owner-token' }),
+      }),
+    );
+    try {
+      expect(await pending).toMatchObject({ message: 'Retired owner' });
+      expect(browser.getDevBrowser()).toBe('new-owner-token');
+    } finally {
+      browser.clear();
+    }
+  });
+
   beforeEach(() => {
     // @ts-ignore
     global.fetch = vi.fn(() =>
