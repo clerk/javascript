@@ -347,6 +347,42 @@ describe('Mosaic PhoneInput', () => {
     expect(screen.getByRole('button', { name: 'Country, Canada' })).toBeInTheDocument();
   });
 
+  it('follows an outside value that restores a number typed earlier', async () => {
+    const user = userEvent.setup();
+    function ControlledPhoneInput() {
+      const [value, setValue] = React.useState('');
+      return (
+        <>
+          <PhoneInput
+            aria-label='Phone number'
+            value={value}
+            onValueChange={setValue}
+          />
+          <button
+            type='button'
+            onClick={() => setValue('+306901234567')}
+          >
+            Use Greek number
+          </button>
+          <button
+            type='button'
+            onClick={() => setValue('+12025550123')}
+          >
+            Use US number
+          </button>
+        </>
+      );
+    }
+    render(<ControlledPhoneInput />);
+
+    await user.type(screen.getByRole('textbox', { name: 'Phone number' }), '2025550123');
+    await user.click(screen.getByRole('button', { name: 'Use Greek number' }));
+    await user.click(screen.getByRole('button', { name: 'Use US number' }));
+
+    expect(screen.getByRole('button', { name: 'Country, United States' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveValue('(202) 555-0123');
+  });
+
   it('submits the normalized value through a hidden input', async () => {
     const user = userEvent.setup();
     render(

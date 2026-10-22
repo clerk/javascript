@@ -114,7 +114,9 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   const mergedInputRef = useMergeRefs([inputRef, forwardedRef]);
 
   React.useEffect(() => {
-    if (valueProp === undefined || valueProp === emittedValueRef.current) {
+    const emittedValue = emittedValueRef.current;
+    emittedValueRef.current = null;
+    if (valueProp === undefined || valueProp === emittedValue) {
       return;
     }
     if (countryProp === undefined && valueProp) {
