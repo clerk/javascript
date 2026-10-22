@@ -37,13 +37,13 @@ const colorDefaults = {
   '--cl-color-neutral-alpha-300': 'color-mix(in oklab, var(--cl-color-neutral) 12%, transparent)',
 
   '--cl-color-background': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
-  '--cl-color-background-subtle': neutralMix(3, 4),
+  '--cl-color-background-subtle': neutralMix(3, 8.05),
 
   '--cl-color-foreground': neutralMix(79.5, 98),
-  '--cl-color-foreground-secondary': neutralMix(56, 64.25),
+  '--cl-color-foreground-secondary': neutralMix(56, 83.64),
   '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
-  '--cl-color-border': neutralMix(5.5, 8),
+  '--cl-color-border': neutralMix(5.5, 13.15),
   '--cl-color-border-subtle': neutralMix(3, 4.25),
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
@@ -55,9 +55,12 @@ const colorDefaults = {
   '--cl-color-negative-foreground': 'oklch(1 0 0)',
   '--cl-color-negative-subtle': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
   '--cl-color-negative-border': 'light-dark(oklch(0.8155 0.0983 19.41), oklch(0.3958 0.1331 25.72))',
-  '--cl-color-negative-alpha-100': 'color-mix(in oklab, var(--cl-color-negative) 6%, transparent)',
-  '--cl-color-negative-alpha-200': 'color-mix(in oklab, var(--cl-color-negative) 8%, transparent)',
-  '--cl-color-negative-alpha-300': 'color-mix(in oklab, var(--cl-color-negative) 12%, transparent)',
+  '--cl-color-negative-alpha-100':
+    'light-dark(color-mix(in oklab, var(--cl-color-negative) 6%, transparent), oklch(0.9854 0.0013 286.38 / 6%))',
+  '--cl-color-negative-alpha-200':
+    'light-dark(color-mix(in oklab, var(--cl-color-negative) 8%, transparent), oklch(0.9854 0.0013 286.38 / 8%))',
+  '--cl-color-negative-alpha-300':
+    'light-dark(color-mix(in oklab, var(--cl-color-negative) 12%, transparent), oklch(0.9854 0.0013 286.38 / 12%))',
 
   '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
   '--cl-color-positive-foreground': 'oklch(1 0 0)',
@@ -75,8 +78,7 @@ const colorDefaults = {
   '--cl-color-warning-alpha-200': 'color-mix(in oklab, var(--cl-color-warning) 8%, transparent)',
   '--cl-color-warning-alpha-300': 'color-mix(in oklab, var(--cl-color-warning) 12%, transparent)',
 
-  '--cl-color-input':
-    'light-dark(var(--cl-color-background), color-mix(in oklab, var(--cl-color-neutral) 4%, var(--cl-color-background)))',
+  '--cl-color-input': 'var(--cl-color-background)',
   '--cl-color-input-placeholder': neutralMix(28, 64),
 
   '--cl-color-ring': neutralMix(80, 90),
