@@ -90,8 +90,9 @@ describe('Web3 wallets', () => {
     },
   );
 
-  it('keeps an unverified wallet available to connect without offering to make it primary', async () => {
-    await renderWeb3({
+  it('shows one saved wallet row with Verify after a fresh mount', async () => {
+    const user = fapiUser({
+      id: 'user_1',
       web3_wallets: [
         fapiWeb3Wallet({
           id: 'wallet_1',
@@ -100,8 +101,15 @@ describe('Web3 wallets', () => {
         }),
       ],
     });
+    serveFapi({ environment: web3Environment(), client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
+    const view = await renderWithClerk(<UserProfileWeb3WalletsSection />);
     expect(screen.getByText('Unverified')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Verify MetaMask' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).toBeNull();
+    view.rerender(null);
+    view.rerender(<UserProfileWeb3WalletsSection />);
+    expect(screen.getByRole('button', { name: 'Verify MetaMask' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).toBeNull();
     await openMenu(userEvent.setup(), screen.getByRole('button', { name: 'Manage MetaMask' }));
     expect(screen.getByRole('menuitem', { name: 'Remove wallet' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).toBeNull();
@@ -144,7 +152,7 @@ describe('Web3 wallets', () => {
     );
   });
 
-  it('reuses the created Ethereum wallet when Connect is retried after signature rejection', async () => {
+  it('verifies the saved Ethereum wallet after signature rejection without creating another', async () => {
     const address = '0xabcdef1234567890';
     let accountRequests = 0;
     let signatureRequests = 0;
@@ -175,7 +183,7 @@ describe('Web3 wallets', () => {
     expect(pendingId).toBeDefined();
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1);
 
-    await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+    await user.click(screen.getByRole('button', { name: 'Verify MetaMask' }));
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
     expect(creation.requests).toHaveLength(1);

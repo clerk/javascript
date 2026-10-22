@@ -38,6 +38,9 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
         onConnect={id => {
           void controller.onConnect(id);
         }}
+        onVerify={id => {
+          void controller.onVerify(id);
+        }}
         onSetPrimary={id => {
           void controller.onSetPrimary(id);
         }}

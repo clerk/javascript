@@ -12,6 +12,7 @@ export function UserProfileWeb3WalletsSectionView({
   availableProviders = [],
   pendingId,
   onConnect,
+  onVerify,
   onSetPrimary,
   registerTrigger,
   remove,
@@ -44,7 +45,9 @@ export function UserProfileWeb3WalletsSectionView({
                   key={wallet.id}
                   wallet={wallet}
                   triggerRef={registerTrigger(wallet.id)}
+                  isPending={pendingId === wallet.id}
                   isDisabled={isBusy}
+                  onVerify={onVerify}
                   onSetPrimary={onSetPrimary}
                   onRemove={remove ? wallet => remove.open(wallet) : undefined}
                 />
