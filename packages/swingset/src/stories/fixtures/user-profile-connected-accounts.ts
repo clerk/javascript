@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosText } from '@/lib/chaos';
+import { oauthLogos } from '@clerk/mosaic/components/provider-logo/oauth.generated';
 
 import { idleReverification } from './reverification';
 
@@ -14,12 +15,12 @@ export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
   identifier: 'test@example.com',
-  iconUrl: 'https://img.clerk.com/static/google.svg',
+  icon: { logo: oauthLogos.google },
   status: 'connected',
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
-  { id: 'google', provider: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
-  { id: 'apple', provider: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg' },
+  { id: 'google', provider: 'Google', icon: { logo: oauthLogos.google } },
+  { id: 'apple', provider: 'Apple', icon: { logo: oauthLogos.apple } },
 ];
 
 export function useConnectedAccountsFixture({
@@ -60,7 +61,7 @@ export function useConnectedAccountsFixture({
           {
             id: provider.id,
             provider: provider.provider,
-            iconUrl: provider.iconUrl,
+            icon: provider.icon,
             identifier: 'test@example.com',
             status: 'connected',
           },

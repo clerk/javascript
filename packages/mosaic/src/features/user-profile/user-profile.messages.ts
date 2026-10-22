@@ -1,6 +1,7 @@
 export const userProfileMessages = {
   /** Names the surface: its navigation landmark, and the dialog it opens in. */
   label: 'User profile',
+  enterpriseConnection: 'your enterprise connection',
   pages: {
     account: 'Account',
     security: 'Security',

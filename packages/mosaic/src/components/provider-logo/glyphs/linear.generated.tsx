@@ -1,0 +1,11 @@
+import type { ProviderLogoGlyph } from '../provider-logo.types';
+
+export const linear: ProviderLogoGlyph = {
+  id: 'linear',
+  viewBox: '0 0 100 100',
+  render: () => (
+    <g fill='currentColor'>
+      <path d='M1.2 61.5c-.2-1 1-1.5 1.6-.8l36.5 36.5c.7.7.1 1.8-.8 1.6A50 50 0 0 1 1.2 61.5M0 47q0 .4.3.7l52 52.1q.4.3.8.3a50 50 0 0 0 7-1 1 1 0 0 0 .5-1.6l-58-58a1 1 0 0 0-1.7.5 50 50 0 0 0-.9 7m4.2-17.2q-.2.6.2 1.1l64.8 64.8q.5.5 1 .2l5.3-2.7q.8-.6.2-1.5L8.4 24.3a1 1 0 0 0-1.5.2Q5.4 27 4.2 29.7m8.5-11.6a1 1 0 0 1 0-1.4A50 50 0 0 1 100 50a50 50 0 0 1-16.7 37.4 1 1 0 0 1-1.4 0z' />
+    </g>
+  ),
+};

@@ -3,7 +3,6 @@ export const userProfilePasswordSectionMessages = {
   masked: '••••••••••••••••••',
   noPasswordSet: 'No password set',
   managedBy: 'Managed by {name}',
-  enterpriseConnection: 'your enterprise connection',
   change: 'Change password',
   set: 'Set password',
 

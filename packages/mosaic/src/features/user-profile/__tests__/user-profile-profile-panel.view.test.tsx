@@ -107,7 +107,13 @@ describe('UserProfileProfilePanelView', () => {
         <UserProfileWeb3WalletsSectionView
           registerTrigger={() => null}
           wallets={[
-            { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
+            {
+              id: 'metamask',
+              provider: 'MetaMask',
+              address: 'test',
+              isVerified: true,
+              icon: { iconUrl: '/metamask.svg' },
+            },
           ]}
         />
       ),
@@ -131,7 +137,7 @@ describe('UserProfileProfilePanelView', () => {
               id: 'primary',
               address: '0x1234567890abcdef1234567890abcdef12345678',
               provider: 'MetaMask',
-              iconUrl: 'https://example.com/metamask.svg',
+              icon: { iconUrl: 'https://example.com/metamask.svg' },
               isPrimary: true,
               isVerified: true,
             },

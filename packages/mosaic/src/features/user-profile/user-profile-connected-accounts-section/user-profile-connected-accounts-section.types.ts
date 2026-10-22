@@ -3,13 +3,13 @@ import type { Ref } from 'react';
 import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import type { ReverificationController } from '../../reverification';
+import type { UserProfileProviderIconProps } from '../user-profile-provider-icon';
 
 export type ConnectedAccountActionResult = 'redirecting' | void;
 
 export interface ConnectedAccountProviderDisplay {
   provider: string;
-  iconUrl?: string;
-  monochromeIcon?: boolean;
+  icon: UserProfileProviderIconProps;
 }
 
 export interface UserProfileConnectionProvider extends ConnectedAccountProviderDisplay {

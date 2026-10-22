@@ -6,19 +6,20 @@ import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosText } from '@/lib/chaos';
+import { enterpriseLogos } from '@clerk/mosaic/components/provider-logo/enterprise.generated';
 
 export const accounts: UserProfileEnterpriseAccount[] = [
   {
     id: 'account_okta',
     name: 'Acme Okta',
     emailAddress: 'alex@acme.com',
-    iconUrl: 'https://img.clerk.com/static/okta.svg',
+    icon: { logo: enterpriseLogos.saml_okta },
   },
-  { id: 'account_custom', name: 'Internal SSO', emailAddress: 'alex@internal.acme.com' },
+  { id: 'account_custom', name: 'Internal SSO', emailAddress: 'alex@internal.acme.com', icon: { initial: 'I' } },
 ];
 const connections: UserProfileEnterpriseConnection[] = [
-  { id: 'connection_google', name: 'Google Workspace', iconUrl: 'https://img.clerk.com/static/google.svg' },
-  { id: 'connection_saml', name: 'Partner SAML' },
+  { id: 'connection_google', name: 'Google Workspace', icon: { logo: enterpriseLogos.saml_google } },
+  { id: 'connection_saml', name: 'Partner SAML', icon: { initial: 'P' } },
 ];
 
 export function useEnterpriseAccountsFixture({
@@ -57,7 +58,7 @@ export function useEnterpriseAccountsFixture({
       setTimeout(() => {
         setLinkedAccounts(current => [
           ...current,
-          { id: `account_${id}`, name: connection.name, iconUrl: connection.iconUrl, emailAddress: 'alex@acme.com' },
+          { id: `account_${id}`, name: connection.name, icon: connection.icon, emailAddress: 'alex@acme.com' },
         ]);
         setAvailableConnections(current => current.filter(item => item.id !== id));
         setPendingId(undefined);

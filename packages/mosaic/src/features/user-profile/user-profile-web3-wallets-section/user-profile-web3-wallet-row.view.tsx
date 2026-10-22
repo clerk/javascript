@@ -10,7 +10,7 @@ import { Section } from '../../../components/section';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
-import { UserProfileProviderMedia } from '../user-profile-provider-media';
+import { UserProfileProviderIcon } from '../user-profile-provider-icon';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.types';
 
@@ -47,13 +47,7 @@ export function UserProfileWeb3WalletRowView({
   return (
     <Section.Row xstyle={onConnect && styles.connectRow}>
       <Section.Item>
-        {wallet.provider ? (
-          <UserProfileProviderMedia
-            provider={wallet.provider}
-            iconUrl={wallet.iconUrl}
-            monochromeIcon={wallet.monochromeIcon}
-          />
-        ) : null}
+        {wallet.icon ? <UserProfileProviderIcon {...wallet.icon} /> : null}
         <Section.Content>
           <Section.Label>
             <span

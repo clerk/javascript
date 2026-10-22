@@ -3,18 +3,20 @@ import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStatePara
 import { __internal_useUserEnterpriseConnections, useClerk, useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource, UserResource } from '@clerk/shared/types';
 
+import { getEnterpriseLogo } from '../../../components/provider-logo/enterprise.generated';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import { useUserProfileOptions } from '../user-profile.provider';
+import { toProviderIcon } from '../user-profile-provider-icon.model';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
   UserProfileEnterpriseConnection,
 } from './user-profile-enterprise-accounts-section.types';
 
-type Account = Pick<EnterpriseAccountResource, 'id' | 'emailAddress' | 'enterpriseConnectionId'> & {
+type Account = Pick<EnterpriseAccountResource, 'id' | 'emailAddress' | 'enterpriseConnectionId' | 'provider'> & {
   verification?: { error?: { longMessage?: string | null } | null } | null;
   enterpriseConnection: {
     active: boolean;
@@ -23,7 +25,7 @@ type Account = Pick<EnterpriseAccountResource, 'id' | 'emailAddress' | 'enterpri
   } | null;
 };
 
-type Connection = Pick<EnterpriseConnectionResource, 'id' | 'name' | 'allowOrganizationAccountLinking'> & {
+type Connection = Pick<EnterpriseConnectionResource, 'id' | 'name' | 'allowOrganizationAccountLinking' | 'provider'> & {
   logoPublicUrl?: string | null;
 };
 
@@ -50,13 +52,25 @@ export function projectEnterpriseAccounts({
     .map(account => ({
       id: account.id ?? '',
       name: account.enterpriseConnection?.name ?? '',
-      iconUrl: account.enterpriseConnection?.logoPublicUrl ?? undefined,
+      icon: toProviderIcon({
+        logo: getEnterpriseLogo(account.provider),
+        iconUrl: account.enterpriseConnection?.logoPublicUrl,
+        label: account.enterpriseConnection?.name ?? '',
+      }),
       emailAddress: account.emailAddress,
       requiresAction: Boolean(account.verification?.error?.longMessage),
     }));
   const linkableConnections = connections
     .filter(connection => connection.allowOrganizationAccountLinking && !linkedConnectionIds.has(connection.id))
-    .map(connection => ({ id: connection.id, name: connection.name, iconUrl: connection.logoPublicUrl ?? undefined }));
+    .map(connection => ({
+      id: connection.id,
+      name: connection.name,
+      icon: toProviderIcon({
+        logo: getEnterpriseLogo(connection.provider),
+        iconUrl: connection.logoPublicUrl,
+        label: connection.name,
+      }),
+    }));
 
   return visibleAccounts.length || linkableConnections.length
     ? { status: 'ready', accounts: visibleAccounts, connections: linkableConnections }

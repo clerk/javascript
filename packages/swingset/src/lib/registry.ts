@@ -227,6 +227,12 @@ import {
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
 import {
+  ColorSchemes as ProviderLogoColorSchemes,
+  Default as ProviderLogoDefault,
+  meta as providerLogoMeta,
+  Sizes as ProviderLogoSizes,
+} from '../stories/provider-logo.stories';
+import {
   Default as RadioDefault,
   Descriptions as RadioDescriptions,
   meta as radioMeta,
@@ -758,6 +764,13 @@ const iconFrameModule: StoryModule = {
   BrandIcons: IconFrameBrandIcons,
 };
 
+const providerLogoModule: StoryModule = {
+  meta: providerLogoMeta,
+  Default: ProviderLogoDefault,
+  Sizes: ProviderLogoSizes,
+  ColorSchemes: ProviderLogoColorSchemes,
+};
+
 // Headless primitives carry just `meta` (no story functions). Like every component
 // they're documented as a single overview page; their live demos come from `<Story>` /
 // `<Preview>` embeds in the MDX, which import the stories module directly.
@@ -1082,6 +1095,7 @@ export const registry: StoryModule[] = [
   headingModule,
   iconModule,
   iconFrameModule,
+  providerLogoModule,
   menuComponentModule,
   otpComponentModule,
   paginationModule,

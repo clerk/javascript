@@ -10,7 +10,7 @@ import { Section } from '../../../components/section';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
-import { UserProfileProviderMedia } from '../user-profile-provider-media';
+import { UserProfileProviderIcon } from '../user-profile-provider-icon';
 import { styles } from './user-profile-connected-accounts-section.styles';
 import type {
   UserProfileConnectedAccount,
@@ -34,11 +34,7 @@ export function UserProfileConnectProviderRowView({
   return (
     <Section.Row xstyle={styles.connectRow}>
       <Section.Item>
-        <UserProfileProviderMedia
-          provider={provider.provider}
-          iconUrl={provider.iconUrl}
-          monochromeIcon={provider.monochromeIcon}
-        />
+        <UserProfileProviderIcon {...provider.icon} />
         <Section.Content>
           <Section.Label>
             <span
@@ -102,11 +98,7 @@ export function UserProfileConnectedAccountRowView({
   return (
     <Section.Row>
       <Section.Item>
-        <UserProfileProviderMedia
-          provider={account.provider}
-          iconUrl={account.iconUrl}
-          monochromeIcon={account.monochromeIcon}
-        />
+        <UserProfileProviderIcon {...account.icon} />
         <Section.Content>
           <Section.Label>
             <span

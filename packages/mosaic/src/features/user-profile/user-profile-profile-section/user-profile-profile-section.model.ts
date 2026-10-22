@@ -1,10 +1,10 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
-import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
+import type { AttributeData, UserResource } from '@clerk/shared/types';
 
 import { save } from '../../../utils/errors';
 import { useReverificationFlow } from '../../reverification';
 import { isAttributeAvailable } from '../user-profile.utils';
-import type { UserProfileManagedBy } from '../user-profile-managed-by';
+import { toManagedBy } from '../user-profile-managed-by.model';
 import { useUserProfileUserModel } from '../user-profile-user.model';
 import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
@@ -12,14 +12,6 @@ import type { UserProfileNameAttribute, UserProfileProfileSectionModel } from '.
 
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
-
-function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfileManagedBy | undefined {
-  if (!account) {
-    return undefined;
-  }
-  const connection = account.enterpriseConnection;
-  return { name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, '') };
-}
 
 function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameAttribute {
   return { enabled: attribute?.enabled ?? false, required: attribute?.required ?? false };
@@ -38,7 +30,8 @@ export function useUserProfileProfileSectionModel(): UserProfileProfileSectionMo
   const { attributes, usernameSettings } = environment.userSettings;
   const usernameImmutable = Boolean(attributes.username?.immutable);
   const showUsername = isAttributeAvailable(attributes.username) && !(usernameImmutable && !user.username);
-  const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
+  const managingAccount = user.enterpriseAccounts.find(account => account.active);
+  const nameManagedBy = managingAccount ? toManagedBy(managingAccount) : undefined;
 
   return {
     status: 'ready',

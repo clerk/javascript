@@ -1,3 +1,5 @@
+import { enterpriseLogos } from '@clerk/mosaic/components/provider-logo/enterprise.generated';
+import type { UserProfileManagedBy } from '@clerk/mosaic/features/user-profile/user-profile-managed-by';
 import { UserProfileProfileSectionView } from '@clerk/mosaic/features/user-profile/user-profile-profile-section/user-profile-profile-section.view';
 import type { FormError } from '@clerk/mosaic/utils/errors';
 
@@ -21,7 +23,7 @@ export const meta: StoryMeta = {
 function ProfileSection(options: {
   nameFailWith?: FormError;
   usernameFailWith?: FormError;
-  nameManagedBy?: { name: string };
+  nameManagedBy?: UserProfileManagedBy;
 }) {
   const profile = useUserProfileProfileFixture(options);
 
@@ -37,7 +39,7 @@ export function Default() {
  * action.
  */
 export function NameManagedByConnection() {
-  return <ProfileSection nameManagedBy={{ name: 'Okta' }} />;
+  return <ProfileSection nameManagedBy={{ name: 'Okta', logo: enterpriseLogos.saml_okta }} />;
 }
 
 /** Every save is rejected, so the dialog shows both halves of a failure at once. */

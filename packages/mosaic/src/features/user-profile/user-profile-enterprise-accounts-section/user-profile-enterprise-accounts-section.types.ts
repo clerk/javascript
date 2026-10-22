@@ -1,7 +1,9 @@
+import type { UserProfileProviderIconProps } from '../user-profile-provider-icon';
+
 export interface UserProfileEnterpriseConnection {
   id: string;
   name: string;
-  iconUrl?: string;
+  icon: UserProfileProviderIconProps;
   connectError?: string;
 }
 

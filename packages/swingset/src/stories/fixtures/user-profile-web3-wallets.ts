@@ -1,3 +1,4 @@
+import { web3Logos } from '@clerk/mosaic/components/provider-logo/web3.generated';
 import { useUserProfileWeb3WalletsController } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section.controller';
 import type {
   UserProfileWeb3Provider,
@@ -16,11 +17,11 @@ interface DemoWallet extends UserProfileWeb3Wallet {
 }
 
 const providers: UserProfileWeb3Provider[] = [
-  { id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
+  { id: 'web3_metamask_signature', provider: 'MetaMask', icon: { logo: web3Logos.metamask } },
   {
     id: 'web3_coinbase_wallet_signature',
     provider: 'Coinbase Wallet',
-    iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
+    icon: { logo: web3Logos.coinbase_wallet },
   },
 ];
 
@@ -28,7 +29,7 @@ export const primaryWallet: DemoWallet = {
   id: 'wallet_1',
   providerId: 'web3_metamask_signature',
   provider: 'MetaMask',
-  iconUrl: 'https://img.clerk.com/static/metamask.svg',
+  icon: { logo: web3Logos.metamask },
   address: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
   isPrimary: true,
   isVerified: true,
@@ -38,7 +39,7 @@ export const secondaryWallet: DemoWallet = {
   id: 'wallet_2',
   providerId: 'web3_coinbase_wallet_signature',
   provider: 'Coinbase Wallet',
-  iconUrl: 'https://img.clerk.com/static/coinbase_wallet.svg',
+  icon: { logo: web3Logos.coinbase_wallet },
   address: '0x1234567890abcdef1234567890abcdef12345678',
   isVerified: true,
 };
@@ -90,7 +91,7 @@ export function useWeb3WalletsFixture({
           ...current,
           {
             provider: provider.provider,
-            iconUrl: provider.iconUrl,
+            icon: provider.icon,
             id: `wallet_${id}`,
             providerId: id,
             address: '0x1234567890abcdef1234567890abcdef12345678',

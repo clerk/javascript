@@ -4,13 +4,13 @@ import type { Ref } from 'react';
 import type { ConfirmController } from '../../../blocks/confirm';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import type { ReverificationController } from '../../reverification';
+import type { UserProfileProviderIconProps } from '../user-profile-provider-icon';
 
 export interface UserProfileWeb3Provider {
   id: Web3Strategy;
   walletPicker?: 'solana';
   provider: string;
-  iconUrl?: string;
-  monochromeIcon?: boolean;
+  icon: UserProfileProviderIconProps;
   connectError?: string;
 }
 
@@ -18,8 +18,7 @@ export interface UserProfileWeb3Wallet {
   id: string;
   address: string;
   provider?: string;
-  iconUrl?: string;
-  monochromeIcon?: boolean;
+  icon?: UserProfileProviderIconProps;
   isPrimary?: boolean;
   isVerified: boolean;
   canRemove?: boolean;
