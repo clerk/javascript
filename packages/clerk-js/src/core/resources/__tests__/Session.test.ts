@@ -63,6 +63,23 @@ describe('Session', () => {
     expect(withActivities.abandonAt.getTime()).toBe(deadline);
   });
 
+  it('keeps zero only for session deadlines', () => {
+    const session = new Session({
+      id: 'session_lifetime',
+      status: 'active',
+      expire_at: 0,
+      abandon_at: 0,
+      created_at: 0,
+      updated_at: 0,
+      public_user_data: { user_id: 'user_1' },
+    } as SessionJSON);
+
+    expect(session.expireAt.getTime()).toBe(0);
+    expect(session.abandonAt.getTime()).toBe(0);
+    expect(session.createdAt.getTime()).toBe(Date.now());
+    expect(session.updatedAt.getTime()).toBe(Date.now());
+  });
+
   describe('getToken()', () => {
     let dispatchSpy;
 
