@@ -40,8 +40,9 @@ interface SelectBaseProps {
   /**
    * When true, the popup is positioned so the selected item overlays the
    * trigger — like a native `<select>`. Defaults to `true`. Falls back to
-   * menu-like placement below the trigger when opened by touch, or when the
-   * trigger sits too close to a viewport edge for the overlay to be usable.
+   * menu-like placement below the trigger when opened by touch, when nothing
+   * is selected, or when the trigger sits too close to a viewport edge for the
+   * overlay to be usable.
    */
   alignItemWithTrigger?: boolean;
   placement?: Placement;
@@ -67,7 +68,10 @@ export interface SelectMultipleProps extends SelectBaseProps {
 export type SelectProps = SelectSingleProps | SelectMultipleProps;
 
 function toValues(value: string | undefined): string[] | undefined {
-  return value === undefined ? undefined : [value];
+  if (value === undefined) {
+    return undefined;
+  }
+  return value === '' ? [] : [value];
 }
 
 function SelectInner(props: SelectProps) {
