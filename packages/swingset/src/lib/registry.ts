@@ -226,7 +226,6 @@ import {
   meta as profileComponentMeta,
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
-import { Default as RevealDefault, meta as revealMeta } from '../stories/reveal.component.stories';
 import {
   Default as RadioDefault,
   Descriptions as RadioDescriptions,
@@ -234,6 +233,7 @@ import {
   Sizes as RadioSizes,
   States as RadioStates,
 } from '../stories/radio.stories';
+import { Default as RevealDefault, meta as revealMeta } from '../stories/reveal.component.stories';
 import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
