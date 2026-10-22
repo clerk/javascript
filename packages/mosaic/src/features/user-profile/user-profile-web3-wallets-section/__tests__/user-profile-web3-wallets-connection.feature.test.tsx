@@ -88,7 +88,10 @@ describe('Web3 connection rows', () => {
 
   it('rejects a different MetaMask account before preparing or creating a saved wallet', async () => {
     vi.stubGlobal('ethereum', {
-      request: vi.fn(() => Promise.resolve(['0xabcdef1234567890'])),
+      request: vi.fn(({ method }: { method: string }) => {
+        expect(method).toBe('eth_requestAccounts');
+        return Promise.resolve(['0xabcdef1234567890']);
+      }),
     });
     const base = fapiEnvironment();
     const fapi = serveFapi({
@@ -258,6 +261,8 @@ describe('Web3 connection rows', () => {
         expect(screen.getByRole('button', { name: 'Verify Solana' })).toHaveAttribute('aria-busy', 'true'),
       );
       expect(screen.queryByRole('button', { name: 'Connect Solana' })).toBeNull();
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Verify Solana' })).toHaveFocus());
       expect(screen.getByText('Verifying')).toBeInTheDocument();
 
       signature.resolve([{ signature: new Uint8Array([4, 5, 6]) }]);
@@ -272,6 +277,7 @@ describe('Web3 connection rows', () => {
   it.each([
     ['SolanaAbCd', 'verified'],
     ['SolanaOther', 'mismatch'],
+    ['Solanaabcd', 'mismatch'],
     ['SolanaAbCd', 'retry'],
   ] as const)('checks a selected Solana account against the saved wallet (%s, %s)', async (address, outcome) => {
     let signatures = 0;
@@ -372,6 +378,7 @@ describe('Web3 connection rows', () => {
           expect(screen.getByRole('alert')).toHaveTextContent('Select the wallet account that matches this address.'),
         );
         expect(preparation.requests).toHaveLength(0);
+        expect(signatures).toBe(0);
         expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('unverified');
         preparation.release();
       }

@@ -35,6 +35,7 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
         sectionRef={controller.sectionRef}
         availableProviders={controller.availableProviders}
         pendingId={controller.pendingId}
+        error={controller.error}
         onConnect={id => {
           void controller.onConnect(id);
         }}
@@ -54,6 +55,7 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
       />
       <UserProfileSolanaWalletDialog
         open={controller.solanaPickerOpen}
+        finalFocus={controller.solanaFinalFocus}
         pendingWalletName={controller.pendingWalletName}
         error={controller.solanaPickerError}
         onOpenChange={open => {

@@ -18,6 +18,10 @@ type SolanaPicker =
   | { open: true; kind: 'connect'; provider: UserProfileWeb3Provider; walletName?: string }
   | { open: true; kind: 'verify'; walletId: string; walletName?: string };
 
+type WalletAction =
+  | { kind: 'connect'; providerId: UserProfileWeb3Provider['id']; target: Web3ConnectionTarget | null }
+  | { kind: 'verify' | 'primary'; walletId: string };
+
 export function useUserProfileWeb3WalletsController({
   wallets,
   availableProviders,
@@ -43,10 +47,7 @@ export function useUserProfileWeb3WalletsController({
   const messages = useMessages('userProfileWeb3Wallets');
   const action = usePendingAction({ errorFallback: messages.errors.generic });
   const [picker, setPicker] = useState<SolanaPicker>({ open: false });
-  const [connectionTarget, setConnectionTarget] = useState<{
-    providerId: UserProfileWeb3Provider['id'];
-    target: Web3ConnectionTarget;
-  }>();
+  const [owner, setOwner] = useState<WalletAction>();
   const sectionRef = useRef<HTMLDivElement>(null);
   const panelTitle = usePanelTitle();
   const removalFocus = useListRemovalFocus({
@@ -65,25 +66,18 @@ export function useUserProfileWeb3WalletsController({
 
   const runConnection = (provider: UserProfileWeb3Provider, walletName?: string) =>
     action.run(provider.id, async () => {
-      setConnectionTarget(undefined);
+      setOwner({ kind: 'connect', providerId: provider.id, target: null });
       if (walletName) {
         setPicker({ open: true, kind: 'connect', provider, walletName });
       }
-      let published = false;
       try {
         await connect(provider.id, walletName, target => {
-          published = target.kind === 'wallet';
-          setConnectionTarget({ providerId: provider.id, target });
-          if (provider.walletPicker === 'solana' && published) {
+          setOwner({ kind: 'connect', providerId: provider.id, target });
+          if (provider.walletPicker === 'solana' && target.kind === 'wallet') {
             setPicker({ open: false });
           }
         });
         setPicker({ open: false });
-      } catch (error) {
-        if (published) {
-          setPicker({ open: false });
-        }
-        throw error;
       } finally {
         setPicker(current =>
           current.open && current.kind === 'connect' ? { ...current, walletName: undefined } : current,
@@ -93,7 +87,7 @@ export function useUserProfileWeb3WalletsController({
 
   const runVerification = (walletId: string, walletName?: string) =>
     action.run(walletId, async () => {
-      setConnectionTarget(undefined);
+      setOwner({ kind: 'verify', walletId });
       if (walletName) {
         setPicker({ open: true, kind: 'verify', walletId, walletName });
       }
@@ -110,7 +104,10 @@ export function useUserProfileWeb3WalletsController({
       return;
     }
     return provider.walletPicker === 'solana'
-      ? action.run(provider.id, () => setPicker({ open: true, kind: 'connect', provider }))
+      ? action.run(provider.id, () => {
+          setOwner({ kind: 'connect', providerId: provider.id, target: null });
+          setPicker({ open: true, kind: 'connect', provider });
+        })
       : runConnection(provider);
   };
 
@@ -120,7 +117,10 @@ export function useUserProfileWeb3WalletsController({
       return;
     }
     return wallet.walletPicker === 'solana'
-      ? action.run(walletId, () => setPicker({ open: true, kind: 'verify', walletId }))
+      ? action.run(walletId, () => {
+          setOwner({ kind: 'verify', walletId });
+          setPicker({ open: true, kind: 'verify', walletId });
+        })
       : runVerification(walletId);
   };
 
@@ -133,25 +133,28 @@ export function useUserProfileWeb3WalletsController({
       : runVerification(picker.walletId, walletName);
   };
 
-  const targetWallet =
-    connectionTarget &&
-    (action.pendingKey === connectionTarget.providerId || action.errorKey === connectionTarget.providerId)
-      ? wallets.find(wallet =>
-          connectionTarget.target.kind === 'wallet'
-            ? wallet.id === connectionTarget.target.id
-            : wallet.providerId === connectionTarget.providerId &&
-              normalizedWeb3Wallet(wallet.address) === connectionTarget.target.address,
-        )
-      : undefined;
-  const pendingId = targetWallet && action.pendingKey ? targetWallet.id : action.pendingKey;
-  const errorId = targetWallet && action.errorKey ? targetWallet.id : action.errorKey;
+  const target = owner?.kind === 'connect' ? owner.target : null;
+  const matchingWallets = target
+    ? wallets.filter(wallet =>
+        target.kind === 'wallet'
+          ? wallet.id === target.id
+          : owner?.kind === 'connect' &&
+            wallet.providerId === owner.providerId &&
+            normalizedWeb3Wallet(wallet.address) === target.address,
+      )
+    : [];
+  const targetWallet = matchingWallets.length === 1 ? matchingWallets[0] : undefined;
+  const ownerId = owner?.kind === 'connect' ? (targetWallet?.id ?? owner.providerId) : owner?.walletId;
+  const pendingId = action.pendingKey ? ownerId : undefined;
+  const errorId = action.errorKey ? ownerId : undefined;
+  const actionFinalFocus = () => (ownerId ? removalFocus.trigger(ownerId) : null);
 
   return {
     wallets: wallets.map(wallet =>
       errorId === wallet.id
-        ? wallet.canVerify
-          ? { ...wallet, verifyError: action.error }
-          : { ...wallet, primaryError: action.error }
+        ? owner?.kind === 'primary'
+          ? { ...wallet, primaryError: action.error }
+          : { ...wallet, verifyError: action.error }
         : wallet,
     ),
     availableProviders: availableProviders.map(provider =>
@@ -159,6 +162,13 @@ export function useUserProfileWeb3WalletsController({
         ? { ...provider, connectError: action.error }
         : provider,
     ),
+    error:
+      !picker.open &&
+      errorId &&
+      !wallets.some(wallet => wallet.id === errorId) &&
+      !availableProviders.some(provider => provider.id === errorId)
+        ? action.error
+        : undefined,
     pendingId,
     sectionRef,
     registerTrigger: removalFocus.registerTrigger,
@@ -166,8 +176,9 @@ export function useUserProfileWeb3WalletsController({
     finalFocus: removalFocus.finalFocus,
     setPrimaryReverification,
     createReverification,
-    setPrimaryFinalFocus: () => (action.lastKey ? removalFocus.trigger(action.lastKey) : null),
-    createFinalFocus: () => (action.lastKey ? removalFocus.trigger(action.lastKey) : null),
+    setPrimaryFinalFocus: actionFinalFocus,
+    createFinalFocus: actionFinalFocus,
+    solanaFinalFocus: actionFinalFocus,
     solanaPickerOpen: picker.open,
     solanaPickerError:
       picker.open &&
@@ -178,7 +189,11 @@ export function useUserProfileWeb3WalletsController({
     pendingWalletName: picker.open ? picker.walletName : undefined,
     onConnect,
     onVerify,
-    onSetPrimary: (walletId: string) => action.run(walletId, () => setPrimary(walletId)),
+    onSetPrimary: (walletId: string) =>
+      action.run(walletId, () => {
+        setOwner({ kind: 'primary', walletId });
+        return setPrimary(walletId);
+      }),
     connectSolana,
     closeSolanaPicker: () => {
       if (!action.isPending) {

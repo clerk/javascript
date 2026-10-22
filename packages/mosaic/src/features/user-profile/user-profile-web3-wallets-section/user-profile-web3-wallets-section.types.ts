@@ -35,6 +35,7 @@ export interface UserProfileWeb3WalletsSectionViewProps {
   sectionRef?: Ref<HTMLDivElement>;
   availableProviders?: UserProfileWeb3Provider[];
   pendingId?: string;
+  error?: string;
   onConnect?: (id: string) => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;

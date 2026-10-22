@@ -83,7 +83,7 @@ export function UserProfileWeb3WalletRowView({
           <Section.Actions>
             {onConnect || (canVerify && onVerify) ? (
               <SubmitButton
-                ref={actions.length === 0 ? triggerRef : undefined}
+                ref={triggerRef}
                 color='neutral'
                 size='sm'
                 variant='outline'
@@ -104,7 +104,7 @@ export function UserProfileWeb3WalletRowView({
             ) : null}
             {actions.length > 0 ? (
               <ActionMenu
-                triggerRef={triggerRef}
+                triggerRef={canVerify ? undefined : triggerRef}
                 actions={actions}
                 label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
               />

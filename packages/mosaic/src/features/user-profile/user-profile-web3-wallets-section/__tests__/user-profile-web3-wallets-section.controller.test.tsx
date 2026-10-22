@@ -91,6 +91,100 @@ describe('Web3 connection controller', () => {
     expect(result.current.wallets[0]?.verifyError).toBeUndefined();
   });
 
+  it('keeps a verification failure with its action when capability disappears', async () => {
+    const pending = deferred<void>();
+    const { result, rerender } = renderHook(
+      ({ canVerify }) =>
+        useUserProfileWeb3WalletsController({
+          wallets: [{ id: 'target', address: '0xabcd', isVerified: false, canVerify }],
+          availableProviders: [],
+          connect: vi.fn(),
+          verify: () => pending.promise,
+          setPrimary: vi.fn(),
+        }),
+      { initialProps: { canVerify: true } },
+    );
+    act(() => {
+      void result.current.onVerify('target');
+    });
+    rerender({ canVerify: false });
+    await act(async () => {
+      pending.reject(new Error('Rejected'));
+      await pending.promise.catch(() => undefined);
+    });
+    expect(result.current.wallets[0]?.verifyError).toBe('Something went wrong. Please try again.');
+    expect(result.current.wallets[0]?.primaryError).toBeUndefined();
+  });
+
+  it('does not assign an address-phase action to ambiguous duplicate wallets', async () => {
+    const pending = deferred<void>();
+    const connect: ReadyWeb3WalletsModel['connect'] = (_strategy, _name, onTarget) => {
+      onTarget?.({ kind: 'address', address: '0xabcd' });
+      return pending.promise;
+    };
+    const { result } = renderHook(() =>
+      useUserProfileWeb3WalletsController({
+        wallets: ['first', 'second'].map(id => ({
+          id,
+          address: '0xAbCd',
+          providerId: 'web3_metamask_signature',
+          isVerified: false,
+          canVerify: true,
+        })),
+        availableProviders: [providers[0]],
+        connect,
+        verify: vi.fn(),
+        setPrimary: vi.fn(),
+      }),
+    );
+    act(() => {
+      void result.current.onConnect('web3_metamask_signature');
+    });
+    expect(result.current.pendingId).toBe('web3_metamask_signature');
+    await act(async () => {
+      pending.resolve();
+      await pending.promise;
+    });
+  });
+
+  it('keeps the accepted owner when another action is blocked in the same render', async () => {
+    const pending = deferred<void>();
+    const connect: ReadyWeb3WalletsModel['connect'] = (_strategy, _name, onTarget) => {
+      onTarget?.({ kind: 'wallet', id: 'target' });
+      return Promise.reject(new Error('Rejected'));
+    };
+    const verify = vi.fn(() => pending.promise);
+    const setPrimary = vi.fn();
+    const { result } = renderHook(() =>
+      useUserProfileWeb3WalletsController({
+        wallets: [
+          { id: 'target', address: '0xabcd', isVerified: false, canVerify: true },
+          { id: 'other', address: '0x1234', isVerified: true },
+        ],
+        availableProviders: [providers[0]],
+        connect,
+        verify,
+        setPrimary,
+      }),
+    );
+    await act(async () => {
+      await result.current.onConnect('web3_metamask_signature');
+    });
+    act(() => {
+      void result.current.onVerify('target');
+      void result.current.onSetPrimary('other');
+      void result.current.onConnect('web3_metamask_signature');
+    });
+    expect(result.current.pendingId).toBe('target');
+    expect(setPrimary).not.toHaveBeenCalled();
+    await act(async () => {
+      pending.reject(new Error('Retry rejected'));
+      await pending.promise.catch(() => undefined);
+    });
+    expect(result.current.wallets[0]?.verifyError).toBe('Something went wrong. Please try again.');
+    expect(result.current.wallets[1]?.primaryError).toBeUndefined();
+  });
+
   it.each(providers)('moves pending and failure to the exact published $provider wallet', async provider => {
     const signature = deferred<void>();
     let reportTarget: Parameters<ReadyWeb3WalletsModel['connect']>[2];

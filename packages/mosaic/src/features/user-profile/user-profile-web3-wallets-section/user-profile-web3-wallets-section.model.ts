@@ -192,20 +192,13 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
       }
       const current = requireCurrentUser();
-      const currentProjection = projectWeb3Wallets({
-        wallets: current.web3Wallets,
-        primaryId: current.primaryWeb3WalletId,
-        enabledStrategies: environment.userSettings.web3FirstFactors,
-        allowCreation:
-          Boolean(environment.userSettings.attributes.web3_wallet?.enabled) &&
-          !environment.userSettings.attributes.web3_wallet?.immutable &&
-          allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO),
-      });
-      if (
-        currentProjection.status !== 'ready' ||
-        !currentProjection.availableProviders.some(candidate => candidate.id === strategy)
-      ) {
-        throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
+      const canConnect =
+        Boolean(environment.userSettings.attributes.web3_wallet?.enabled) &&
+        !environment.userSettings.attributes.web3_wallet?.immutable &&
+        allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO) &&
+        environment.userSettings.web3FirstFactors.includes(strategy);
+      if (!canConnect) {
+        throw walletUnavailable();
       }
       const normalizedIdentifier = normalizedWeb3Wallet(identifier);
       const existing = current.web3Wallets.find(
@@ -214,6 +207,9 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
           (wallet.verification.strategy === provider.strategy || wallet.verification.strategy === null) &&
           normalizedWeb3Wallet(wallet.web3Wallet) === normalizedIdentifier,
       );
+      if (!existing && current.web3Wallets.some(wallet => wallet.verification.strategy === strategy)) {
+        throw walletUnavailable();
+      }
       onTarget?.(existing ? { kind: 'wallet', id: existing.id } : { kind: 'address', address: normalizedIdentifier });
       const wallet = existing ?? (await createWallet(current, identifier));
       requireCurrentUser();
