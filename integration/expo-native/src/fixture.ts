@@ -33,6 +33,8 @@ interface Recipe {
   readonly label: string;
 }
 
+const PACKAGE_TEMPLATE = 'package.sdk-58.json';
+
 const EXPO_PACKAGES = ['expo-auth-session', 'expo-constants', 'expo-crypto', 'expo-secure-store', 'expo-web-browser'];
 
 const RECIPES: Readonly<Record<BuildProduct, Recipe>> = {
@@ -66,7 +68,7 @@ const SHARED_NATIVE_INPUTS = [
   'packages/expo-biometrics/expo-module.config.json',
   'packages/expo-biometrics/package.json',
   'integration/templates/expo-native/app.json',
-  'integration/templates/expo-native/package.sdk-58.json',
+  `integration/templates/expo-native/${PACKAGE_TEMPLATE}`,
   'integration/templates/expo-native/pnpm-workspace.yaml',
   'integration/templates/expo-native/modules',
 ] as const;
@@ -211,14 +213,14 @@ const dependenciesMarker = (site: FixtureSite) => join(site.fixture, 'node_modul
 
 function dependenciesOf(site: FixtureSite, product: BuildProduct): string {
   const template = createHash('sha256')
-    .update(readFileSync(join(site.fixture, 'package.sdk-58.json')))
+    .update(readFileSync(join(site.fixture, PACKAGE_TEMPLATE)))
     .digest('hex');
   return `${product} ${template}`;
 }
 
 async function installDependencies(site: FixtureSite, product: BuildProduct): Promise<void> {
   rmSync(dependenciesMarker(site), { force: true });
-  cpSync(join(site.fixture, 'package.sdk-58.json'), join(site.fixture, 'package.json'));
+  cpSync(join(site.fixture, PACKAGE_TEMPLATE), join(site.fixture, 'package.json'));
   await site.must(
     'pnpm add the workspace packages',
     'pnpm',

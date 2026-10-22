@@ -361,8 +361,8 @@ describe('the session workflow serves both platforms', () => {
   it('creates the simulator on the runtime the workflow names and readies it with the script the package ships', () => {
     assert.match(workflow, /\n  IOS_RUNTIME: com\.apple\.CoreSimulator\.SimRuntime\.iOS-\d+-\d+\n/);
     assert.ok(workflow.includes('xcrun simctl create "$DEVICE 1" "$DEVICE" "$IOS_RUNTIME"'));
-    assert.ok(workflow.includes('integration/expo-native/bin/boot-ios-simulators.sh wait'));
-    assert.ok(existsSync(join(import.meta.dirname, '..', 'bin', 'boot-ios-simulators.sh')));
+    assert.ok(workflow.includes('integration/expo-native/bin/configure-ios-simulators.sh'));
+    assert.ok(existsSync(join(import.meta.dirname, '..', 'bin', 'configure-ios-simulators.sh')));
   });
 
   it('installs pnpm and the JDK the fixture build needs before the agent starts building', () => {

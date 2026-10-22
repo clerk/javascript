@@ -57,6 +57,7 @@ jobs:
           fi
 
   e2e-tests:
+    name: Verify E2E (${{ matrix.platform }})
     needs: plan
     if: needs.plan.outputs.run == 'true'
     runs-on: ${{ matrix.runner }}
@@ -123,7 +124,7 @@ jobs:
             udid="$(xcrun simctl create "Clerk Verify Template iOS" "iPhone 17 Pro" "$IOS_RUNTIME")"
             xcrun simctl boot "$udid"
             xcrun simctl bootstatus "$udid" -b
-            CLERK_TEST_DEVICES="$udid" integration/expo-native/bin/boot-ios-simulators.sh wait
+            CLERK_TEST_DEVICES="$udid" integration/expo-native/bin/configure-ios-simulators.sh
             xcrun simctl shutdown "$udid"
           else
             IMAGE="system-images;android-36;google_apis;x86_64"

@@ -201,7 +201,7 @@ jobs:
           CLERK_TEST_DEVICES: ${{ steps.device.outputs.id }}
         run: |
           xcrun simctl bootstatus "$CLERK_TEST_DEVICES" -b
-          integration/expo-native/bin/boot-ios-simulators.sh wait
+          integration/expo-native/bin/configure-ios-simulators.sh
 
       - name: Wait for the emulator
         if: steps.device.outputs.id != '' && env.PLATFORM == 'android'
