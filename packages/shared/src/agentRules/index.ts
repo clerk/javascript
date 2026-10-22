@@ -247,15 +247,20 @@ export function writeClerkAgentRules(options: WriteClerkAgentRulesOptions): Writ
 
   let next = upsertMarkedBlock(existing, renderClerkAgentRulesBlock(eol), GENERIC_START, GENERIC_END, eol);
 
+  let insertAfter = GENERIC_END;
   for (const sdk of uniqueSdks(sdks)) {
+    const sdkEnd = `<!-- END:clerk-agent-rules:${sdk} -->`;
     next = upsertMarkedBlock(
       next,
       renderClerkSdkAgentRulesBlock(sdk, eol),
       `<!-- BEGIN:clerk-agent-rules:${sdk} -->`,
-      `<!-- END:clerk-agent-rules:${sdk} -->`,
+      sdkEnd,
       eol,
-      GENERIC_END,
+      insertAfter,
     );
+    if (next.includes(sdkEnd)) {
+      insertAfter = sdkEnd;
+    }
   }
 
   const targetStatus = fs.existsSync(targetFile) ? (next === existing ? 'unchanged' : 'updated') : 'created';

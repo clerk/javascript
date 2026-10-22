@@ -125,6 +125,22 @@ describe('writeClerkAgentRules', () => {
     expect(content).not.toContain('\nold\n');
   });
 
+  it('writes SDK blocks in sorted order', () => {
+    const memory = createMemoryFs();
+
+    writeClerkAgentRules({
+      cwd: '/repo',
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['vue', 'astro', 'react'],
+    });
+
+    const content = memory.read('/repo/AGENTS.md') ?? '';
+    const positions = ['astro', 'react', 'vue'].map(sdk => content.indexOf(`<!-- BEGIN:clerk-agent-rules:${sdk} -->`));
+    expect(positions.every(position => position !== -1)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  });
+
   it('does not write files in dry-run mode', () => {
     const memory = createMemoryFs();
 
