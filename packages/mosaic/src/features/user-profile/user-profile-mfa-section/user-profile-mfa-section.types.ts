@@ -49,4 +49,7 @@ export type UserProfileMfaModel =
       removeReverification: ReverificationController;
       setDefaultReverification: ReverificationController;
       backupCodesReverification: ReverificationController;
+      createPhoneReverification: ReverificationController;
+      enrollSmsReverification: ReverificationController;
+      authenticatorReverification: ReverificationController;
     };

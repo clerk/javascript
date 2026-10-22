@@ -92,22 +92,23 @@ describe('User profile MFA interaction boundaries', () => {
     expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
   });
 
-  it('keeps the dialog closed when dismissed while authenticator preparation is pending', async () => {
+  it('keeps the dialog open until authenticator preparation responds', async () => {
     const fapi = await renderMfa();
     const held = holdRequests('post', '/v1/me/totp');
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
     await waitFor(() => expect(held.requests).toHaveLength(1));
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    held.release();
-    await waitFor(() => expect(fapi.mfa.totpCreations).toBe(1));
-    expect(screen.queryByRole('dialog')).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(await screen.findByRole('dialog', { name: 'Add 2-step verification' })).toHaveAccessibleDescription(
-      'Choose a verification method',
-    );
+    const dialog = screen.getByRole('dialog');
+    try {
+      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+      await user.keyboard('{Escape}');
+      expect(dialog).toBeVisible();
+    } finally {
+      held.release();
+    }
+    expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
+    expect(fapi.mfa.totpCreations).toBe(1);
   });
 
   it('shows backup codes when dismissed while authenticator verification is pending', async () => {

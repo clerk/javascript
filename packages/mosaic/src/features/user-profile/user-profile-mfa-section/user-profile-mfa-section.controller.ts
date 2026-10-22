@@ -6,6 +6,7 @@ import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import { toLocalizableError } from '../../../utils/errors';
+import type { ReverificationController } from '../../reverification';
 import type { UserProfileMfaAddableMethod, UserProfileMfaModel } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 import type { UserProfileMfaSetupViewProps } from './user-profile-mfa-setup.view';
@@ -61,6 +62,7 @@ type MfaEvent =
 
 const { createMachine, assign, fromPromise } = setup<MfaContext, MfaEvent>();
 const RESEND_COOLDOWN_SECONDS = 30;
+const REVERIFIABLE_ACTIONS: readonly MfaAction[] = ['generate', 'sms', 'prepareAuthenticator'];
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 
 const mfaMachine = createMachine({
@@ -413,21 +415,27 @@ function createSetupProps(
   send: MfaSend,
   actions: MfaSetupActions,
   errorText: ReturnType<typeof useErrorText>,
+  reverification: ReverificationController,
 ): UserProfileMfaSetupViewProps {
   const flow = context.flow;
   const sms = flow.kind === 'sms' ? flow : undefined;
   const authenticator = flow.kind === 'authenticator' ? flow : undefined;
   const backup = flow.kind === 'backup' ? flow : undefined;
+  const isReverifying =
+    context.pending !== undefined && REVERIFIABLE_ACTIONS.includes(context.pending) && reverification.visible;
+  let step: UserProfileMfaSetupViewProps['step'];
+  if (isReverifying) {
+    step = 'verify';
+  } else if (flow.kind === 'closed') {
+    step = 'select';
+  } else if (flow.kind === 'backup') {
+    step = 'backup-codes';
+  } else {
+    step = flow.kind;
+  }
   return {
-    step:
-      flow.kind === 'closed'
-        ? 'select'
-        : flow.kind === 'backup'
-          ? context.pending === 'generate' && model.backupCodesReverification.visible
-            ? 'verify'
-            : 'backup-codes'
-          : flow.kind,
-    reverification: model.backupCodesReverification,
+    step,
+    reverification,
     methods: model.addableMethods,
     onSelect: actions.select,
     onBack: actions.back,
@@ -521,6 +529,11 @@ export function useUserProfileMfaController(model: ReadyModel) {
     }
   };
 
+  // The machine guarantees that only one is running/visible at a time
+  const reverification =
+    [model.createPhoneReverification, model.enrollSmsReverification, model.authenticatorReverification].find(
+      controller => controller.visible,
+    ) ?? model.backupCodesReverification;
   const setupProps = createSetupProps(
     model,
     context,
@@ -539,6 +552,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
       print,
     },
     errorText,
+    reverification,
   );
 
   const sectionProps: UserProfileMfaSectionViewProps = {
@@ -552,8 +566,9 @@ export function useUserProfileMfaController(model: ReadyModel) {
   };
 
   const showAddTrigger = model.addableMethods.length > 0;
-  const reverification = model.backupCodesReverification;
   const reverifying = setupProps.step === 'verify';
+  const hasPendingReverification = context.pending !== undefined && REVERIFIABLE_ACTIONS.includes(context.pending);
+  const canClose = !hasPendingReverification || Boolean(reverification.onCancel);
 
   return {
     dialogOpen,
@@ -561,15 +576,15 @@ export function useUserProfileMfaController(model: ReadyModel) {
     showAddControl: showAddTrigger || dialogOpen,
     reverifying,
     onDialogOpenChange: (open: boolean) => {
-      if (!open && context.pending === 'generate') {
-        if (!reverification.onCancel) {
-          return;
-        }
-        reverification.onCancel();
+      if (!open && !canClose) {
+        return;
+      }
+      if (!open && hasPendingReverification) {
+        reverification.onCancel?.();
       }
       send({ type: open ? 'OPEN' : 'CLOSE' });
     },
-    showCloseButton: !reverifying || Boolean(reverification.onCancel),
+    showCloseButton: canClose,
     sectionProps,
     setupProps,
   };
