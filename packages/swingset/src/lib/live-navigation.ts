@@ -38,6 +38,7 @@ const livePages = new Set([
   '/user-profile/user-profile-web3wallets-section',
   '/api-keys/api-keys-table',
   '/reverification/reverification',
+  '/user-button/user-button',
 ]);
 
 const inventoriedGroups = new Set(['User Profile', 'Organization Profile']);

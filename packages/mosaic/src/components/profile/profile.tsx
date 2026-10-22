@@ -80,7 +80,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
-  const inline = elevation === 'flush';
+  const inline = elevation === 'flush' && !isInDialog(dialog);
   const fullscreen = dialog?.variant === 'fullscreen';
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
