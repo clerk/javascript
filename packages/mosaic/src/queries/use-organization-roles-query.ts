@@ -25,7 +25,12 @@ export function useOrganizationRolesQuery({ enabled }: { enabled: boolean }) {
     queryFn: () => organization?.getRoles({ pageSize: ROLES_PAGE_SIZE }),
     staleTime: ROLES_STALE_TIME,
     retry: false,
-    retryOnMount: query => Date.now() - query.state.errorUpdatedAt >= ROLES_STALE_TIME,
+    retryOnMount: query => isFailureExpired(query.state.errorUpdatedAt),
+    refetchOnMount: query => isFailureExpired(query.state.errorUpdatedAt),
     enabled: enabled && Boolean(organization),
   });
+}
+
+function isFailureExpired(errorUpdatedAt: number) {
+  return Date.now() - errorUpdatedAt >= ROLES_STALE_TIME;
 }
