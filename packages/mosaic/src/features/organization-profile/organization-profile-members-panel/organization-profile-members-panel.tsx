@@ -6,7 +6,6 @@ import { useMembersTableController, useMembersTableSearchController } from './me
 import { useMembersTableModel } from './members-table-tab.model';
 import type { MembersRolesState } from './members-table-tab.types';
 import { useInviteMembersController } from './organization-profile-invite-members.controller';
-import { useMembersPanelRolesController } from './organization-profile-members-panel.controller';
 import { useMembersPanelAccessModel, useMembersPanelRolesModel } from './organization-profile-members-panel.model';
 import type { OrganizationProfileMembersPanelViewProps } from './organization-profile-members-panel.view';
 import { OrganizationProfileMembersPanelView } from './organization-profile-members-panel.view';
@@ -40,13 +39,12 @@ function ConnectedMembersPanel({
   canManageInvitations: boolean;
   canManageRequests: boolean;
 }) {
-  const rolesModel = useMembersPanelRolesModel(canManageInvitations);
-  const roles = useMembersPanelRolesController(rolesModel.loadRoles);
+  const roles = useMembersPanelRolesModel(canReadMembers || canManageInvitations);
   const model = useInvitationsTableModel();
   const invitations = useInvitationsTableController(model);
   const invite = useInviteMembersController({
     roles: roles.roles,
-    defaultRole: rolesModel.defaultRole,
+    defaultRole: roles.defaultRole,
     invite: model.invite,
   });
   const requestsModel = useRequestsTableModel(canManageRequests);

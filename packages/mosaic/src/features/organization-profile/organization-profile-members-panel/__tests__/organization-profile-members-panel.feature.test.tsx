@@ -40,6 +40,7 @@ const adminRole: RoleJSON = {
   updated_at: 0,
 };
 const memberRole: RoleJSON = { ...adminRole, id: 'role_member', key: 'org:member', name: 'Member' };
+const manage = ['org:sys_memberships:read', 'org:sys_memberships:manage'];
 
 function serve(permissions: string[] = ['org:sys_memberships:read']) {
   const currentMembership = fapiMembership(organization, { permissions });
@@ -85,15 +86,15 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(columnWidths()).toEqual(loadingWidths);
   });
 
-  it('does not load roles for a member who cannot change them', async () => {
-    serve();
-    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+  it('loads roles for a member who can only read members', async () => {
+    const fapi = serve();
+    fapi.hasRoleSetMigration = true;
 
     await renderWithClerk(<OrganizationProfileMembersPanel />);
 
-    expect(await screen.findByText('Bob Smith')).toBeVisible();
-    expect(roles.requests).toHaveLength(0);
-    roles.release();
+    expect(await screen.findByText(/role migration is in progress/)).toBeVisible();
+    expect(screen.getByText('Bob Smith')).toBeVisible();
+    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
   });
 
   it('does not fetch or show the list without read permission', async () => {
@@ -211,7 +212,7 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeVisible();
   });
 
-  it('loads fresh roles after switching sessions in the same organization', async () => {
+  it('keeps cached roles after switching sessions in the same organization', async () => {
     const fapi = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     const currentUser = fapi.client.sessions[0]?.user;
     if (!currentUser) {
@@ -228,11 +229,9 @@ describe('OrganizationProfileMembersPanel', () => {
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     fapi.hasRoleSetMigration = false;
     await act(() => clerk.setActive({ session: 'sess_2' }));
-    await waitFor(() => expect(roles.requests).toHaveLength(1));
-    expect(screen.queryByText(/role migration is in progress/)).toBeNull();
-    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
+    expect(await screen.findByText(/role migration is in progress/)).toBeVisible();
+    expect(roles.requests).toHaveLength(0);
     roles.release();
-    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
   });
 
   it('keeps the members table loading until roles load', async () => {
@@ -257,13 +256,15 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
   });
 
-  it('shows members to a reader without waiting for roles', async () => {
+  it('keeps the members table loading for a reader until roles load', async () => {
     serve();
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
-    expect(await screen.findByText('Bob Smith')).toBeVisible();
-    expect(roles.requests).toHaveLength(0);
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'true');
     roles.release();
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
   });
 
   it('shows the membership role label when the role is absent from available options', async () => {
@@ -438,5 +439,93 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByText('Carol Jones')).toBeVisible();
     expect(screen.queryByText('Bob Smith')).toBeNull();
     expect(screen.getByRole('searchbox', { name: 'Search members' })).toHaveValue('');
+  });
+
+  it('shows cached roles without loading again when the panel remounts', async () => {
+    serve(manage);
+    const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    view.rerender(<div />);
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+
+    view.rerender(<OrganizationProfileMembersPanel />);
+
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
+    expect(screen.getByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    expect(roles.requests).toHaveLength(0);
+    roles.release();
+  });
+
+  it('loads the roles of the organization it switches to', async () => {
+    const other = fapiOrganization({ id: 'org_2', name: 'Other' });
+    const first = fapiMembership(organization, { permissions: manage });
+    const second = fapiMembership(other, { permissions: manage });
+    const alice = fapiUser({ id: 'user_1', organization_memberships: [first, second] });
+    const carol = fapiMembership(other, {
+      id: 'orgmem_carol',
+      public_user_data: {
+        user_id: 'user_3',
+        first_name: 'Carol',
+        last_name: 'Jones',
+        identifier: 'carol@example.com',
+        image_url: '',
+        has_image: false,
+      },
+    });
+    const fapi = serveFapi({
+      client: fapiClient([fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: organization.id })]),
+      memberships: [first, bob, second, carol],
+      roles: [adminRole, memberRole],
+    });
+    const { clerk } = await renderWithClerk(<OrganizationProfileMembersPanel />);
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+
+    fapi.roles = [memberRole, { ...adminRole, id: 'role_owner', key: 'org:owner', name: 'Owner' }];
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    await act(() => clerk.setActive({ organization: other.id }));
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    expect(new URL(roles.requests[0]?.url ?? '').pathname).toBe('/v1/organizations/org_2/roles');
+    roles.release();
+
+    await userEvent.setup().click(await screen.findByRole('combobox', { name: /^Change role for Carol Jones/ }));
+    expect(await screen.findByRole('option', { name: 'Owner' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Admin' })).toBeNull();
+  });
+
+  it('requests failed roles again on remount only once the failure is two minutes old', async () => {
+    serve(manage);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      worker.use(
+        http.get(
+          fapiUrl('/v1/organizations/:organizationId/roles'),
+          () =>
+            HttpResponse.json(
+              { errors: [{ code: 'roles_unavailable', message: 'roles_unavailable' }] },
+              { status: 400 },
+            ),
+          { once: true },
+        ),
+      );
+      const view = await renderWithClerk(<OrganizationProfileMembersPanel />);
+      await waitFor(() => expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false'));
+      const retried = holdRequests('get', '/v1/organizations/:organizationId/roles');
+
+      vi.setSystemTime(Date.now() + 119_000);
+      view.rerender(<div />);
+      view.rerender(<OrganizationProfileMembersPanel />);
+      expect(await screen.findByText('Bob Smith')).toBeVisible();
+      expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
+      expect(retried.requests).toHaveLength(0);
+
+      vi.setSystemTime(Date.now() + 2_000);
+      view.rerender(<div />);
+      view.rerender(<OrganizationProfileMembersPanel />);
+      await waitFor(() => expect(retried.requests).toHaveLength(1));
+      retried.release();
+      expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
