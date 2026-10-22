@@ -1020,8 +1020,6 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
-  // Organization Switcher
-  organizationSwitcherModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels
@@ -1053,9 +1051,9 @@ export const registry: StoryModule[] = [
   // Organization Profile · Sections
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
-  // API Keys
+  // Misc
+  organizationSwitcherModule,
   apiKeysTableModule,
-  // Reverification
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,

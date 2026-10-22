@@ -10,6 +10,7 @@ export interface UserProfileWeb3Provider {
   walletPicker?: 'solana';
   provider: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   connectError?: string;
 }
 
@@ -18,6 +19,7 @@ export interface UserProfileWeb3Wallet {
   address: string;
   provider?: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   isPrimary?: boolean;
   isVerified: boolean;
   canRemove?: boolean;

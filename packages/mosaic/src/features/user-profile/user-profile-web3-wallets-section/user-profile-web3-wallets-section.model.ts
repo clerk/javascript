@@ -8,6 +8,7 @@ import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
 import { useReverificationFlow } from '../../reverification';
+import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
@@ -78,6 +79,7 @@ export function projectWeb3Wallets({
         address: wallet.web3Wallet,
         provider: provider?.name,
         iconUrl: provider ? iconImageUrl(provider.provider) : undefined,
+        monochromeIcon: provider ? isMonochromeProvider(provider.provider) : false,
         isPrimary: wallet.id === primaryId,
         isVerified: wallet.verification.status === 'verified',
       };
@@ -90,6 +92,7 @@ export function projectWeb3Wallets({
             walletPicker: provider.provider === 'solana' ? 'solana' : undefined,
             provider: provider.name,
             iconUrl: iconImageUrl(provider.provider),
+            monochromeIcon: isMonochromeProvider(provider.provider),
           }))
       : [],
   };

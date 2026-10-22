@@ -6,15 +6,14 @@ sweeps across every bone.
 
 ## What to render as bones
 
-When a surface loads as one unit (a panel, a table on first load), render the whole
-thing as bones, including titles, card headings and column headers that are already
-known: one loading state reads cleaner, shimmers as one surface, and swaps to content in one
-moment. A unit is what the user sees appear at once, however many requests feed it.
+Only fetched content becomes bones. Titles, card headings, column headers and other
+text that is known before the fetch stay real text, so the user can see what is
+loading.
 
 Content that isn't being fetched keeps rendering. A section loaded by a later request
-shows bones beside sections that have already loaded, and a table moving to another
-page turns its rows into bones while its headers and controls stay. Whether a table's
-controls are bones on first load is still open.
+shows its skeleton beside sections that have already loaded, and a table moving to
+another page turns its rows into bones while its headers and controls stay. Whether a
+table's controls are bones on first load is still open.
 
 Row actions in a section (menus, buttons) are wrapped with `visible={false}`: they
 keep their space, so the row holds its height, but no bone is drawn for them.
@@ -25,16 +24,26 @@ keep their space, so the row holds its height, but no bone is drawn for them.
   skeleton: `SubmitButton`, with `useSpinDelay` for anything else that spins.
 - No data is not loading. When the fetch returns nothing, render `EmptyState`;
   never leave a skeleton up as an empty state or as decoration.
-- A skeleton holds no working controls. Wrapped content is hidden, and a skeleton
-  container is `inert`, so anything interactive inside it is unreachable until the
-  content loads.
+- A skeleton holds no working controls. Wrapped content is hidden and the rows
+  are `aria-hidden`, and any control kept for its size is `disabled`.
 
 ## Building one
 
-Skeletons are composed, not built into components. Wrap the content that is loading in
-`Skeleton` (`src/components/skeleton/`); components carry no skeleton code of their
-own.
+A skeleton is its own component in `<feature>.skeleton.tsx`. It draws placeholder rows
+with the same components as the view. The view has no skeleton code. See
+`src/features/user-profile/user-profile-active-devices-section/`.
 
+- **The component that owns the loading state swaps them.** It renders the
+  skeleton while its data loads, then the real view: the active devices section
+  returns `<UserProfileActiveDevicesSectionSkeleton />` while its model is
+  `loadingDevices`, and `<UserProfileActiveDevicesSectionView />` once it is
+  ready.
+- **`fallback` is only for while Clerk loads.** A section's own data loading is
+  internal and uses its skeleton; callers don't pass anything for it.
+- **Wrap what is loading in `Skeleton`** (`src/components/skeleton/`); components
+  carry no skeleton code of their own. `Skeleton` always shows unless `show` is
+  `false`, as in `<Panel.Title><Skeleton show={loading}>…</Skeleton></Panel.Title>`
+  for content that stays mounted.
 - **What `Skeleton` draws.** Text children (strings) become a pill bar: one line,
   cap height, on the text's baseline, as wide as the text. Element children become
   a block the size of the element, which stays in the layout but hidden. So wrap
@@ -48,34 +57,18 @@ own.
 - **`visible={false}`** keeps the content's space without drawing a bone.
 - **`width` / `height`** size a skeleton that has no children. With children, the
   size comes from them.
-- **Containers turn skeletons on.** `Section.Group skeleton` shows every
-  `Skeleton` inside it, and makes the card `inert` and `aria-hidden`. A `Skeleton`
-  outside a container shows by default; inside a container that isn't loading it
-  renders its children as they are. `show` overrides either, as in
-  `<Panel.Title><Skeleton show={loading}>…</Skeleton></Panel.Title>`.
-- **Render the real view with mock data.** The view takes `skeleton`, passes it to
-  its container, and wraps each piece of loading content in `Skeleton`. Because
-  the skeleton is the view's own markup, it can't drift from it. While `skeleton`
-  is set, the view skips its dialogs and confirmations and leaves out badges.
-- **The `.skeleton.tsx` renders the view with placeholder data,** through the
-  real controller when the view takes controller output:
-  `useUserProfileActiveDevicesController({ devices: PLACEHOLDER_DEVICES })`, then
-  `<UserProfileActiveDevicesSectionView {...controller} skeleton />` (see
-  `user-profile-active-devices-section.skeleton.tsx`).
-- **Mock data decides row count, shape, and text length.** Text bars are as wide
-  as the mock strings, so write them at a typical length, and keep each to one
-  line of real content: text bars don't wrap. Aim at the most common loaded shape:
-  a typical count (2–3), every line present, and the branch real data usually
-  takes (a current device, not the empty state). When the count is known before
-  the fetch, use it instead: a table moving between pages with a known total shows
-  exactly `min(pageSize, total − offset)` rows. A first load or a new search can't
-  know, so it uses the typical count and accepts a shift. The page size is a
-  maximum, not a count.
-- **Announce it, start and finish.** The view always renders one `VisuallyHidden`
-  `role='status'` message: "Loading active devices" while `skeleton` is set, then
-  "Active devices loaded". A live region only announces changes to an element that
-  already exists, so the completion is announced only if that element survives the
-  swap (see "When to show it").
+- **Placeholder data decides row count, shape, and text length.** Text bars are as
+  wide as the placeholder strings, so write them at a typical length, and keep each
+  to one line of real content: text bars don't wrap. Aim at the most common loaded
+  shape: a typical count (2–3), every line present, and the branch real data
+  usually takes (a current device, not the empty state). When the count is known
+  before the fetch, use it instead: a table moving between pages with a known
+  total shows exactly `min(pageSize, total − offset)` rows. A first load or a new
+  search can't know, so it uses the typical count and accepts a shift. The page
+  size is a maximum, not a count.
+- **Announce it.** The skeleton renders a `VisuallyHidden` `role='status'`
+  message ("Loading active devices"), and the view renders its own ("Active
+  devices loaded").
 - **A component's own loading state** (not a skeleton), such as `Avatar.Fallback`
   while an image loads, takes `skeletonStyles.shimmer` from
   `src/styles/skeleton.styles.ts` for the same highlight.
@@ -114,10 +107,8 @@ peaking in the middle, sweeps left to right across two bone widths, over 1.6s
 
 ## When to show it
 
-Not decided by the skeleton. The wiring around a panel owns it. Keep the same view
-mounted and flip its `skeleton` prop, feeding it placeholder data while loading;
-don't swap a separate skeleton component for the real one. A swap remounts the
-status message, so screen readers never hear that loading finished. The planned gate is
+Not decided by the skeleton. The component that owns the loading state shows it for as
+long as the data is loading. The planned gate is
 `useSpinDelay(loading, { delay: 150, minDuration: 500 })` with the skeleton mounted
 but `visibility: hidden` until the delay passes, so a fast load never flashes it and
 nothing shifts when it appears.
