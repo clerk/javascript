@@ -23,6 +23,13 @@ export type SessionsTransport = Readonly<{
   revoke: (id: string, signal: AbortSignal) => Promise<void>;
 }>;
 
+export type EnterpriseConnection = Readonly<{
+  id: string;
+  name: string;
+  allowOrganizationAccountLinking: boolean;
+  logoPublicUrl: string | null;
+}>;
+
 export type UserSnapshot = Readonly<{
   id: string;
   firstName: string | null;
@@ -36,10 +43,47 @@ export type UserSnapshot = Readonly<{
     emailAddress: string;
     verification: UserVerification | null;
   }>[];
+  primaryPhoneNumberId?: string | null;
+  phoneNumbers?:
+    | readonly Readonly<{
+        id: string;
+        phoneNumber: string;
+        reservedForSecondFactor: boolean;
+        defaultSecondFactor: boolean;
+        verification: UserVerification | null;
+      }>[]
+    | null;
+  primaryWeb3WalletId?: string | null;
+  web3Wallets?:
+    | readonly Readonly<{
+        id: string;
+        web3Wallet: string;
+        verification: UserVerification | null;
+      }>[]
+    | null;
+  passkeys?:
+    | readonly Readonly<{
+        id: string;
+        name: string;
+        createdAt: number;
+        lastUsedAt: number | null;
+      }>[]
+    | null;
+  totpEnabled?: boolean | null;
+  backupCodeEnabled?: boolean | null;
   enterpriseAccounts: readonly Readonly<{
+    id?: string;
+    emailAddress?: string;
+    enterpriseConnectionId?: string | null;
+    verificationError?: string | null;
     active: boolean;
     provider: string;
-    enterpriseConnection: Readonly<{ name: string; disableAdditionalIdentifications: boolean }> | null;
+    enterpriseConnection: Readonly<{
+      active?: boolean;
+      name: string;
+      logoPublicUrl?: string | null;
+      disableAdditionalIdentifications: boolean;
+    }> | null;
   }>[];
   passwordEnabled: boolean;
   deleteSelfEnabled: boolean;
@@ -76,6 +120,13 @@ export type ProfileSettings = Readonly<{
   lastName: Readonly<{ enabled: boolean; required: boolean }>;
   username: ProfileAttribute;
   emailAddress: ProfileAttribute;
+  phoneNumber?: ProfileAttribute;
+  web3Wallet?: ProfileAttribute;
+  passkey?: ProfileAttribute;
+  secondFactors?: readonly string[];
+  web3FirstFactors?: readonly string[];
+  mfaRequired?: boolean;
+  applicationName?: string;
   passwordEnabled: boolean;
   enterpriseSsoEnabled: boolean;
   providers: readonly Readonly<{ strategy: string; enabled: boolean; name: string; logoUrl: string | null }>[];

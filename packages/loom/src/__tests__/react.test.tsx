@@ -675,16 +675,23 @@ describe('user SSR and Suspense', () => {
     host.loaded = true;
     host.user = { ...publicUser, firstName: 'Edited' };
     host.session = { id: 'sess_current' };
-    request.mockResolvedValue(userResponse());
+    const pending = Promise.withResolvers<Response & { payload: unknown }>();
+    request.mockReturnValue(pending.promise);
     const onRecoverableError = vi.fn();
     let root: ReturnType<typeof hydrateRoot> | undefined;
     act(() => {
       root = hydrateRoot(container, tree, { onRecoverableError });
     });
+    expect(container.textContent).toContain('Ada');
+    expect(container.textContent).not.toContain('Loading user');
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(request.mock.calls[0]?.[0].signal.aborted).toBe(true);
+    expect(request.mock.calls[1]?.[0].signal.aborted).toBe(false);
+    await act(() => pending.resolve(userResponse()));
     expect(await screen.findByText('Grace')).toBeDefined();
     expect(container.textContent).not.toContain('Ada');
     expect(onRecoverableError).not.toHaveBeenCalled();
-    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenCalledTimes(2);
     act(() => root?.unmount());
     container.remove();
   });

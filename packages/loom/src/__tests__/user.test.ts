@@ -14,6 +14,13 @@ const user = {
   imageUrl: 'https://img.example/ada',
   hasImage: true,
   primaryEmailAddressId: 'email_a',
+  primaryPhoneNumberId: null,
+  phoneNumbers: null,
+  primaryWeb3WalletId: null,
+  web3Wallets: null,
+  passkeys: null,
+  totpEnabled: null,
+  backupCodeEnabled: null,
   emailAddresses: [
     {
       id: 'email_a',

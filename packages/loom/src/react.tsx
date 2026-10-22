@@ -5,7 +5,10 @@ import type {} from 'react/canary';
 
 import { BootstrapClient } from './bootstrap';
 import { bindClerk, type ClerkSessionsHost } from './clerk';
+import { LoomClient } from './client';
 import { parseHydration } from './hydration';
+import type { ProfileActionOptions, ProfileActions } from './profile-actions-types';
+import { unavailableProfileActions } from './profile-actions-unavailable';
 import {
   LoomClientProvider,
   useHydrationAllowed,
@@ -24,6 +27,14 @@ export { useLoom } from './react-context';
 
 export function useSessions() {
   return useQuery(useSessionsOptions());
+}
+
+export function useEnterpriseConnections(enabled: boolean) {
+  const owner = useLoom();
+  return useQuery({
+    ...owner.enterpriseConnectionsQueryOptions(),
+    enabled: enabled && owner.canReadEnterpriseConnections,
+  });
 }
 
 export function useSuspenseSessions() {
@@ -139,20 +150,31 @@ export function useUser() {
   );
   return { ...result, updateName };
 }
-export function useSuspenseUser() {
+export function useSuspenseUser(actionOptions: ProfileActionOptions = {}) {
   const owner = useLoom();
+  useSyncExternalStore(
+    owner instanceof LoomClient ? owner.subscribeActions : noSubscription,
+    owner instanceof LoomClient ? owner.getActionRevision : () => 0,
+    () => 0,
+  );
   const result = useSuspenseQuery(useUserOptions());
   const updateName = useMemo(
     () => (owner.canUpdateName ? (input: UserNameInput) => owner.updateName(input) : undefined),
     [owner],
   );
-  return { ...result, updateName };
+  return {
+    ...result,
+    updateName,
+    actions: owner instanceof LoomClient ? owner.profileActions(actionOptions) : unavailableProfileActions,
+  };
 }
 
-export function useSuspenseProfile(): ProfileSnapshot {
+export function useSuspenseProfile(
+  actionOptions: ProfileActionOptions = {},
+): ProfileSnapshot & { actions: ProfileActions } {
   const owner = useLoom();
   const errorReset = useQueryErrorResetBoundary();
-  const user = useSuspenseUser();
+  const user = useSuspenseUser(actionOptions);
   const prefetch = useProfilePrefetch();
   const allowed = useHydrationAllowed();
   const options = owner.profileSettingsQueryOptions();
@@ -176,5 +198,5 @@ export function useSuspenseProfile(): ProfileSnapshot {
     }
   }
   const settings = useSuspenseQuery({ ...options, initialData: seed?.data, initialDataUpdatedAt: seed?.updatedAt });
-  return { scope: owner.scope, user: user.data, settings: settings.data };
+  return { scope: owner.scope, user: user.data, settings: settings.data, actions: user.actions };
 }

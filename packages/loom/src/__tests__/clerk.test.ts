@@ -84,6 +84,72 @@ function hostFixture() {
   };
 }
 
+it('reads scoped enterprise choices through the FAPI search parameter and response envelope', async () => {
+  const { host, request } = hostFixture();
+  request.mockResolvedValue(
+    Object.assign(new Response(null, { status: 200 }), {
+      payload: {
+        response: [{ id: 'ec_a', name: 'Acme', allow_organization_account_linking: true, logo_public_url: null }],
+      },
+    }),
+  );
+  const binding = bindClerk(host);
+  const owner = binding.getSnapshot();
+  if (!owner) {
+    throw new Error('Missing owner');
+  }
+  expect(await owner.queryClient.fetchQuery(owner.enterpriseConnectionsQueryOptions())).toEqual([
+    { id: 'ec_a', name: 'Acme', allowOrganizationAccountLinking: true, logoPublicUrl: null },
+  ]);
+  expect(request).toHaveBeenCalledWith(
+    expect.objectContaining({
+      method: 'GET',
+      path: '/me/enterprise_connections',
+      search: { with_organization_account_linking: 'true' },
+      sessionId: 'sess_current',
+    }),
+  );
+  binding.dispose();
+});
+
+it('does not carry enterprise choices across an account switch', async () => {
+  const { host, request, emit } = hostFixture();
+  request.mockResolvedValueOnce(
+    Object.assign(new Response(null, { status: 200 }), {
+      payload: {
+        response: [{ id: 'ec_a', name: 'Acme', allow_organization_account_linking: true, logo_public_url: null }],
+      },
+    }),
+  );
+  const binding = bindClerk(host);
+  const first = binding.getSnapshot();
+  if (!first) {
+    throw new Error('Missing first owner');
+  }
+  await first.queryClient.fetchQuery(first.enterpriseConnectionsQueryOptions());
+  host.user.id = 'user_b';
+  host.session.id = 'sess_b';
+  emit();
+  const second = binding.getSnapshot();
+  if (!second) {
+    throw new Error('Missing second owner');
+  }
+  expect(second).not.toBe(first);
+  expect(second.queryClient.getQueryData(second.enterpriseConnectionsQueryOptions().queryKey)).toBeUndefined();
+  request.mockResolvedValueOnce(
+    Object.assign(new Response(null, { status: 200 }), {
+      payload: {
+        response: [{ id: 'ec_b', name: 'Beta', allow_organization_account_linking: true, logo_public_url: null }],
+      },
+    }),
+  );
+  expect(await second.queryClient.fetchQuery(second.enterpriseConnectionsQueryOptions())).toMatchObject([
+    { id: 'ec_b', name: 'Beta' },
+  ]);
+  expect(first.canReadEnterpriseConnections).toBe(false);
+  binding.dispose();
+});
+
 describe('host ClerkJS bridge', () => {
   it('keeps a matching user seed regardless of property insertion order', async () => {
     const { host, request } = hostFixture();
@@ -237,6 +303,58 @@ describe('host user query', () => {
         },
       },
     });
+  it.each(['changed', 'malformed'])(
+    'retains the scoped seed during a %s host handoff and immediately reads fresh data',
+    async kind => {
+      const { host, request } = hostFixture();
+      const hydration = userSeed(host);
+      host.user.firstName = 'Edited';
+      if (kind === 'malformed') {
+        Object.assign(host.user, { emailAddresses: 'invalid' });
+      }
+      const pending = Promise.withResolvers<Response & { payload: unknown }>();
+      request.mockReturnValue(pending.promise);
+      const binding = bindClerk(host, hydration);
+      const client = binding.getSnapshot();
+      if (!client) {
+        throw new Error('Missing owner');
+      }
+      expect(client.queryClient.getQueryData(client.userQueryOptions().queryKey)).toMatchObject({ firstName: 'Ada' });
+      const result = client.fetchUser();
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(request).toHaveBeenCalledWith(expect.objectContaining({ path: '/me', sessionId: 'sess_current' }));
+      expect(client.queryClient.getQueryData(client.userQueryOptions().queryKey)).toMatchObject({ firstName: 'Ada' });
+      pending.resolve(response('Grace'));
+      await expect(result).resolves.toMatchObject({ firstName: 'Grace' });
+      expect(client.queryClient.getQueryData(client.userQueryOptions().queryKey)).toMatchObject({ firstName: 'Grace' });
+      binding.dispose();
+    },
+  );
+
+  it('keeps the scoped seed when the handoff refresh fails', async () => {
+    const { host, request } = hostFixture();
+    const hydration = userSeed(host);
+    host.user.firstName = 'Edited';
+    request.mockRejectedValue(new Error('offline'));
+    const binding = bindClerk(host, hydration);
+    const client = binding.getSnapshot();
+    if (!client) {
+      throw new Error('Missing owner');
+    }
+    await expect(client.fetchUser()).rejects.toThrow('offline');
+    expect(client.queryClient.getQueryData(client.userQueryOptions().queryKey)).toMatchObject({ firstName: 'Ada' });
+    binding.dispose();
+  });
+
+  it('refreshes an equal but stale scoped seed', async () => {
+    const { host, request } = hostFixture();
+    request.mockResolvedValue(response('Grace'));
+    const binding = bindClerk(host, userSeed(host, 1));
+    await expect(binding.getSnapshot()?.fetchUser()).resolves.toMatchObject({ firstName: 'Grace' });
+    expect(request).toHaveBeenCalledTimes(1);
+    binding.dispose();
+  });
+
   it('invalidates the user query when displayed picture or email data changes in place', async () => {
     const { host, request, emit } = hostFixture();
     const hostUser: ClerkSessionsHost['user'] = host.user;
@@ -379,8 +497,11 @@ describe('host user query', () => {
       const boundHost: ClerkSessionsHost = host;
       const pending = Promise.withResolvers<Response & { payload: unknown }>();
       request.mockReturnValue(pending.promise);
-      const binding = bindClerk(boundHost);
+      const hydration = userSeed(boundHost);
+      host.user.firstName = 'Edited';
+      const binding = bindClerk(boundHost, hydration);
       const old = binding.getSnapshot();
+      expect(old?.queryClient.getQueryData(old.userQueryOptions().queryKey)).toMatchObject({ firstName: 'Ada' });
       const result = old?.fetchUser();
       const rejected = expect(result).rejects.toBeDefined();
       await vi.waitFor(() => expect(request).toHaveBeenCalledTimes(1));

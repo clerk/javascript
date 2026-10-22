@@ -5,9 +5,17 @@ export type {
   ProfileSnapshot,
   UserSnapshot,
   UserNameInput,
+  EnterpriseConnection,
   ActiveDeviceSession,
   LoomHydration,
   Sessions,
   SessionsTransport,
   SessionScope,
 } from './types';
+
+export type {
+  ProfileActions,
+  ProfileActionOptions,
+  ProfileEmailVerifier,
+  ProfileEmailVerification,
+} from './profile-actions-types';

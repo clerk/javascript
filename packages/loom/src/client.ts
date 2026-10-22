@@ -2,8 +2,11 @@ import type { QueryObserverResult } from '@tanstack/query-core';
 import { QueryClient, QueryObserver } from '@tanstack/query-core';
 
 import { parseHydration, sessionSnapshots } from './hydration';
+import type { ProfileActionOptions, ProfileActions } from './profile-actions-types';
+import { unavailableProfileActions } from './profile-actions-unavailable';
 import { profileSettingsSnapshot } from './profile-settings';
 import type {
+  EnterpriseConnection,
   LoomHydration,
   ProfileSettings,
   Sessions,
@@ -15,11 +18,13 @@ import type {
 import { userSnapshot } from './user';
 
 type Options = {
+  profileActions?: (owner: LoomClient, options: ProfileActionOptions) => ProfileActions;
   scope: SessionScope;
   transport?: SessionsTransport;
   readUser?: (signal: AbortSignal) => Promise<UserSnapshot>;
   updateName?: (input: UserNameInput) => Promise<UserSnapshot>;
   readProfileSettings?: (signal: AbortSignal) => Promise<ProfileSettings>;
+  readEnterpriseConnections?: (signal: AbortSignal) => Promise<readonly EnterpriseConnection[]>;
   hydration?: unknown;
 };
 
@@ -30,6 +35,72 @@ export class LoomClient {
   readonly scope: SessionScope;
   readonly queryClient = new QueryClient();
   private disposed = false;
+  private readonly makeProfileActions: Options['profileActions'];
+  private actionRevision = 0;
+  onDispose(listener: () => void) {
+    this.assertLive();
+    this.subscriptions.add(listener);
+    return () => {
+      this.subscriptions.delete(listener);
+    };
+  }
+
+  private readonly actionListeners = new Set<() => void>();
+  private profileWrites = 0;
+  private profileNeedsRefresh = false;
+  private profileWriteOverlap = false;
+
+  subscribeActions = (listener: () => void) => {
+    this.actionListeners.add(listener);
+    return () => {
+      this.actionListeners.delete(listener);
+    };
+  };
+
+  getActionRevision = () => this.actionRevision;
+
+  notifyActions() {
+    this.actionRevision++;
+    for (const listener of this.actionListeners) {
+      listener();
+    }
+  }
+
+  profileActions(options: ProfileActionOptions = {}): ProfileActions {
+    return this.disposed
+      ? unavailableProfileActions
+      : (this.makeProfileActions?.(this, options) ?? unavailableProfileActions);
+  }
+
+  async mutateProfile(operation: () => Promise<unknown>): Promise<void> {
+    this.assertLive();
+    this.profileWriteOverlap ||= this.nameUpdateInFlight;
+    this.profileWrites++;
+    this.userRevision++;
+    const queryKey = this.userQueryOptions().queryKey;
+    try {
+      await this.queryClient.cancelQueries({ queryKey, exact: true });
+      this.assertLive();
+      await operation();
+      this.assertLive();
+      this.profileNeedsRefresh = true;
+    } finally {
+      this.profileWrites--;
+      if (!this.disposed && this.profileWrites === 0) {
+        const reconcile = this.profileNeedsRefresh || this.deferredUserInvalidation;
+        this.profileNeedsRefresh = false;
+        if (!this.nameUpdateInFlight) {
+          this.profileWriteOverlap = false;
+        }
+        this.deferredUserInvalidation = false;
+        if (reconcile) {
+          void this.invalidateUser().catch(() => {});
+        }
+        this.notifyActions();
+      }
+    }
+  }
+
   private revision = 0;
   private readonly subscriptions = new Set<() => void>();
   private readonly mutations = new Set<AbortController>();
@@ -40,13 +111,16 @@ export class LoomClient {
   private nameUpdateInFlight = false;
   private deferredUserInvalidation = false;
   private readonly readProfileSettings: Options['readProfileSettings'];
+  private readonly readEnterpriseConnections: Options['readEnterpriseConnections'];
 
   constructor(options: Options) {
+    this.makeProfileActions = options.profileActions;
     this.scope = Object.freeze({ ...options.scope });
     this.transport = options.transport;
     this.readUser = options.readUser;
     this.writeName = options.updateName;
     this.readProfileSettings = options.readProfileSettings;
+    this.readEnterpriseConnections = options.readEnterpriseConnections;
     if (options.hydration !== undefined) {
       const state = parseHydration(options.hydration, this.scope);
       if (state.sessions) {
@@ -215,7 +289,7 @@ export class LoomClient {
 
   async invalidateUser(): Promise<void> {
     this.assertLive();
-    if (this.nameUpdateInFlight) {
+    if (this.nameUpdateInFlight || this.profileWrites > 0) {
       this.deferredUserInvalidation = true;
       return;
     }
@@ -238,6 +312,7 @@ export class LoomClient {
     if (this.nameUpdateInFlight) {
       throw new Error('Loom name update is already in progress.');
     }
+    this.profileWriteOverlap ||= this.profileWrites > 0;
     this.nameUpdateInFlight = true;
     let failed = false;
     const queryKey = this.userQueryOptions().queryKey;
@@ -250,14 +325,19 @@ export class LoomClient {
       this.userRevision++;
       await this.queryClient.cancelQueries({ queryKey, exact: true });
       this.assertLive();
-      this.queryClient.setQueryData<UserSnapshot>(queryKey, user);
+      if (!this.profileWriteOverlap) {
+        this.queryClient.setQueryData<UserSnapshot>(queryKey, user);
+      }
       return user;
     } catch (error) {
       failed = true;
       throw error;
     } finally {
       this.nameUpdateInFlight = false;
-      const reconcile = failed && this.deferredUserInvalidation && !this.disposed;
+      const reconcile = ((failed && this.deferredUserInvalidation) || this.profileWriteOverlap) && !this.disposed;
+      if (this.profileWrites === 0) {
+        this.profileWriteOverlap = false;
+      }
       this.deferredUserInvalidation = false;
       if (reconcile) {
         void this.invalidateUser().catch(() => {});
@@ -292,6 +372,37 @@ export class LoomClient {
     };
   }
 
+  get canReadEnterpriseConnections(): boolean {
+    return this.readEnterpriseConnections !== undefined && !this.disposed;
+  }
+
+  enterpriseConnectionsQueryOptions() {
+    return {
+      queryKey: [
+        'loom',
+        5,
+        this.scope.instanceKey,
+        this.scope.userId,
+        this.scope.sessionId,
+        'enterprise-connections',
+      ] as const,
+      staleTime: 30_000,
+      gcTime: 300_000,
+      retry: false as const,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      queryFn: async ({ signal }: { signal: AbortSignal }): Promise<readonly EnterpriseConnection[]> => {
+        this.assertLive();
+        if (!this.readEnterpriseConnections) {
+          throw new Error('Loom enterprise connection read is unavailable.');
+        }
+        const connections = await this.readEnterpriseConnections(signal);
+        this.assertLive();
+        return connections;
+      },
+    };
+  }
+
   async fetchProfileSettings(): Promise<ProfileSettings> {
     this.assertLive();
     const settings = await this.queryClient.fetchQuery(this.profileSettingsQueryOptions());
@@ -311,6 +422,7 @@ export class LoomClient {
       return;
     }
     this.disposed = true;
+    this.actionListeners.clear();
     for (const unsubscribe of this.subscriptions) {
       unsubscribe();
     }
@@ -321,7 +433,7 @@ export class LoomClient {
     this.queryClient.clear();
   }
 
-  private assertLive(): void {
+  assertLive(): void {
     if (this.disposed) {
       throw new Error('Loom client is disposed.');
     }

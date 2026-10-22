@@ -98,6 +98,73 @@ it.each(['before', 'after'])(
   },
 );
 
+it('keeps streamed profile details visible while a differing live host refreshes', async () => {
+  const { host, request, emitStatus } = clerkHost();
+  const user = {
+    ...publicUser,
+    primaryEmailAddressId: 'email_a',
+    emailAddresses: [
+      {
+        id: 'email_a',
+        emailAddress: 'ada@example.com',
+        verification: { status: 'verified', strategy: null, expireAt: null, error: null },
+      },
+    ],
+  };
+  const prefetch = {
+    ...seed(host, Promise.resolve(ready(host))),
+    hydration: { ...userSeed(host), user: { data: user, updatedAt: Date.now() } },
+  };
+  const pending = Promise.withResolvers<typeof user>();
+  const readUser = vi.fn(() => pending.promise);
+  host.__internal_readUser = readUser;
+  function Details() {
+    const { user, settings } = useSuspenseProfile();
+    const owner = useLoom();
+    return (
+      <p>
+        {user.firstName} {user.emailAddresses[0]?.emailAddress}
+        {settings.firstName.enabled ? 'names enabled' : 'names disabled'}
+        {user.deleteSelfEnabled ? 'can delete account' : 'cannot delete account'}
+        {owner.canUpdateName ? 'editing ready' : 'editing unavailable'}
+      </p>
+    );
+  }
+  await render(
+    <StrictMode>
+      <LoomProvider
+        clerk={host}
+        prefetch={prefetch}
+      >
+        <Suspense fallback={<p>Waiting</p>}>
+          <Details />
+        </Suspense>
+      </LoomProvider>
+    </StrictMode>,
+  );
+  expect(container.textContent).toContain('Ada ada@example.com');
+  await act(() => {
+    host.loaded = true;
+    host.user = { ...user, firstName: 'Edited', update: () => Promise.resolve(user) };
+    host.session = { id: 'sess_current' };
+    emitStatus();
+  });
+  expect(readUser).toHaveBeenCalledWith(expect.objectContaining({ userId: 'user_a', sessionId: 'sess_current' }));
+  expect(container.textContent).not.toContain('Waiting');
+  expect(container.textContent).toContain('Ada ada@example.com');
+  expect(container.textContent).toContain('names enabled');
+  expect(container.textContent).toContain('can delete account');
+  expect(container.textContent).toContain('editing ready');
+  expect(container.querySelector('p')?.style.display).not.toBe('none');
+  await act(() => pending.resolve({ ...user, firstName: 'Grace' }));
+  await vi.waitFor(async () => {
+    await act(() => {});
+    expect(container.textContent).toContain('Grace ada@example.com');
+  });
+  expect(container.textContent).not.toContain('Waiting');
+  expect(request).not.toHaveBeenCalled();
+});
+
 it.each(['pending', 'error', 'invalidated', 'newer'])(
   'bypasses an unresolved stream for an existing %s query',
   async status => {

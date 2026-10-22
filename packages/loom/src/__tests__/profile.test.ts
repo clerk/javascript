@@ -5,7 +5,7 @@ import { createLoomClient } from '../client';
 import { parseHydration } from '../hydration';
 import { parseProfileSettings, profileSettingsSnapshot } from '../profile-settings';
 import { prefetchProfile } from '../server';
-import { backendUserSnapshot, parseUser } from '../user';
+import { backendUserSnapshot, parseUser, resourceUserSnapshot } from '../user';
 import environment from './fixtures/environment.json';
 
 const routing = {
@@ -35,6 +35,76 @@ afterEach(() => {
 });
 
 describe('profile prefetch', () => {
+  it('preserves a safe enterprise reconnect message when the browser resource takes over', () => {
+    const projected = resourceUserSnapshot(
+      {
+        id: 'user_a',
+        firstName: null,
+        lastName: null,
+        username: null,
+        imageUrl: '',
+        hasImage: false,
+        primaryEmailAddressId: null,
+        emailAddresses: [],
+        passwordEnabled: false,
+        deleteSelfEnabled: true,
+        externalAccounts: [],
+        enterpriseAccounts: [
+          {
+            id: 'eac_a',
+            active: true,
+            provider: 'saml',
+            emailAddress: 'ada@acme.example',
+            enterpriseConnection: { name: 'Acme', disableAdditionalIdentifications: false },
+            verification: { error: { longMessage: 'Reconnect required', secret: 'private' } },
+          },
+        ],
+      },
+      'user_a',
+    );
+    expect(projected.enterpriseAccounts[0]?.verificationError).toBe('Reconnect required');
+    expect(JSON.stringify(projected)).not.toContain('private');
+  });
+  it('keeps safe profile identifications and enrollment flags while excluding secrets', () => {
+    const projected = backendUserSnapshot(
+      {
+        raw: {
+          ...raw,
+          phone_numbers: [
+            {
+              id: 'phone_a',
+              phone_number: '+15551230000',
+              reserved_for_second_factor: true,
+              default_second_factor: true,
+              verification: { status: 'verified', secret: 'private' },
+              backup_codes: ['private'],
+            },
+          ],
+          primary_phone_number_id: 'phone_a',
+          web3_wallets: [
+            {
+              id: 'wallet_a',
+              web3_wallet: '0xabc',
+              verification: { status: 'verified', strategy: 'web3_metamask', message: 'private' },
+            },
+          ],
+          primary_web3_wallet_id: 'wallet_a',
+          passkeys: [{ id: 'passkey_a', name: 'Laptop', created_at: 123, last_used_at: null, credential: 'private' }],
+          totp_enabled: true,
+          backup_code_enabled: true,
+          totp_secret: 'private',
+        },
+      },
+      'user_a',
+    );
+    expect(projected.phoneNumbers?.[0]?.phoneNumber).toBe('+15551230000');
+    expect(projected.web3Wallets?.[0]?.web3Wallet).toBe('0xabc');
+    expect(projected.passkeys?.[0]?.name).toBe('Laptop');
+    expect(projected.totpEnabled).toBe(true);
+    expect(projected.backupCodeEnabled).toBe(true);
+    expect(JSON.stringify(projected)).not.toContain('private');
+    expect(backendUserSnapshot({ raw }, 'user_a').passkeys).toBeNull();
+  });
   it('loads one user and public environment using trusted canonical routing', async () => {
     const fetch = vi.fn(() => Promise.resolve(Response.json(environment)));
     vi.stubGlobal('fetch', fetch);
@@ -84,6 +154,11 @@ describe('profile settings boundary', () => {
     expect(profileSettingsSnapshot({ ...result, secret: 'private' })).toEqual(result);
     expect(result.firstName).toEqual({ enabled: true, required: false });
     expect(result.emailAddress.usedForFirstFactor).toBe(true);
+    expect(result.phoneNumber?.enabled).toBe(false);
+    expect(result.web3Wallet?.enabled).toBe(false);
+    expect(result.passkey?.enabled).toBe(false);
+    expect(result.mfaRequired).toBe(false);
+    expect(result.applicationName).toBe('My Application');
   });
   it('rejects malformed settings and duplicate or unsafe providers', () => {
     expect(() => parseProfileSettings({})).toThrow();
