@@ -3,6 +3,7 @@
 import { FloatingOverlay } from '@floating-ui/react';
 import React from 'react';
 
+import { useScrollLock } from '../hooks/use-scroll-lock';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useDialogContext } from './dialog-context';
 
@@ -18,8 +19,8 @@ export interface DialogViewportProps extends ComponentProps<'div'> {
 }
 
 /**
- * Fixed centering container for dialog content. Wraps `FloatingOverlay` to
- * provide scroll-locking and full-viewport positioning. Nest `Dialog.Popup`
+ * Fixed centering container for dialog content. Locks page scroll and wraps
+ * `FloatingOverlay` for full-viewport positioning. Nest `Dialog.Popup`
  * inside this component for standard modal behavior.
  *
  * Scroll-lock responsibility lives here, not on `Dialog.Backdrop`, so the
@@ -29,6 +30,7 @@ export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportPro
   function DialogViewport(props, ref) {
     const { render, lockScroll = true, overlay = true, ...otherProps } = props;
     const { open, mounted, isNested, transitionProps, modal } = useDialogContext();
+    useScrollLock(mounted && overlay && lockScroll);
 
     const state = { open, nested: isNested };
 
@@ -58,13 +60,6 @@ export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportPro
       return element;
     }
 
-    return (
-      <FloatingOverlay
-        lockScroll={lockScroll}
-        style={modal ? undefined : { pointerEvents: 'none' }}
-      >
-        {element}
-      </FloatingOverlay>
-    );
+    return <FloatingOverlay style={modal ? undefined : { pointerEvents: 'none' }}>{element}</FloatingOverlay>;
   },
 );

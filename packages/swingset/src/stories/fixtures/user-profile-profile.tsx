@@ -101,6 +101,7 @@ export function useUserProfileProfileFixture({
         form={editUsername.form}
         open={editUsername.isOpen}
         onOpenChange={editUsername.onOpenChange}
+        step={editUsername.step}
         title={username ? m.username.dialogTitle : m.username.addDialogTitle}
         trigger={
           <Button

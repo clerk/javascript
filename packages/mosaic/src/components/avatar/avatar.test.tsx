@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Pen } from '../../icons/glyphs/pen';
 import { Icon } from '../icon';
 import { Avatar } from './avatar';
 import { styles } from './avatar.styles';
@@ -351,7 +352,7 @@ describe('Mosaic Avatar', () => {
       >
         <Avatar.Fallback>CN</Avatar.Fallback>
         <Avatar.Icon>
-          <Icon name='pen' />
+          <Icon glyph={Pen} />
         </Avatar.Icon>
       </Avatar.Root>,
     );

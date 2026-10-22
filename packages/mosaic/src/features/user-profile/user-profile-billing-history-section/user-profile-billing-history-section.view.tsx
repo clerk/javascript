@@ -5,6 +5,8 @@ import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { ChevronLeft } from '../../../icons/glyphs/chevron-left';
+import { ChevronRight } from '../../../icons/glyphs/chevron-right';
 import { rtl } from '../../../styles/rtl.styles';
 import { styles } from './user-profile-billing-history-section.styles';
 
@@ -135,7 +137,7 @@ export function UserProfileBillingHistorySectionView({
                   onClick={() => onPageChange?.(pagination.page - 1)}
                 >
                   <Icon
-                    name='chevron-left'
+                    glyph={ChevronLeft}
                     xstyle={rtl.mirror}
                   />
                 </Button>
@@ -161,7 +163,7 @@ export function UserProfileBillingHistorySectionView({
                   onClick={() => onPageChange?.(pagination.page + 1)}
                 >
                   <Icon
-                    name='chevron-right'
+                    glyph={ChevronRight}
                     xstyle={rtl.mirror}
                   />
                 </Button>

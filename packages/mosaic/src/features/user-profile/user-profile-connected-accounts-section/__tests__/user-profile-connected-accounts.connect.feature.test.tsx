@@ -3,7 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  fapiUrl,
+  holdRequests,
+  serveFapi,
+  worker,
+} from '../../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
   fapiEnterpriseAccount,
@@ -152,16 +158,40 @@ describe('connected accounts', () => {
     request.fail();
   });
 
-  it('shows a verification-required Connect error', async () => {
-    await renderSection([]);
-    const request = holdRequests('post', '/v1/me/external_accounts');
+  it('verifies the session before connecting a provider, then continues to it', async () => {
+    serveFapi(signedIn([], { verification: { secrets: { password: 'hunter2' } } }));
+    const view = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+    const navigate = vi.spyOn(view.clerk, 'navigate').mockImplementation(() => Promise.resolve());
+    demandReverificationOnce('/v1/me/external_accounts');
+    const user = userEvent.setup();
 
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
-    await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('session_reverification_required', 'Verify your session.');
-    expect(await screen.findByText('Verify your session.')).toBeInTheDocument();
-    expect(screen.queryByRole('dialog')).toBeNull();
-    expect(screen.getByRole('button', { name: 'Connect GitHub' })).toBeEnabled();
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('lets the user cancel connect verification quietly and connect again', async () => {
+    serveFapi(signedIn([], { verification: { secrets: { password: 'hunter2' } } }));
+    const view = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+    const navigate = vi.spyOn(view.clerk, 'navigate').mockImplementation(() => Promise.resolve());
+    demandReverificationOnce('/v1/me/external_accounts');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(navigate).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).toBeNull();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect GitHub' })).toHaveFocus());
+
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
   });
 
   it('shows the OAuth error when FAPI returns no verification URL', async () => {

@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const Numbers = glyph(
+  'numbers',
   <>
     <g transform='translate(10.2368 4.6256)'>
       <path

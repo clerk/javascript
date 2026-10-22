@@ -2,6 +2,8 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ArrowLeft } from '../../icons/glyphs/arrow-left';
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { useMessages } from '../../localization';
 import { Select as SelectPrimitive } from '../../primitives/select';
 import type { TabsProps } from '../../primitives/tabs';
@@ -78,7 +80,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
-  const inline = elevation === 'flush';
+  const inline = elevation === 'flush' && !isInDialog(dialog);
   const fullscreen = dialog?.variant === 'fullscreen';
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
@@ -244,7 +246,7 @@ function BackButton() {
         {...mergeStyleProps(themeProps('profile-back-button-icon'), stylex.props(reset.base, styles.navItemIcon))}
       >
         <Icon
-          name='arrow-left'
+          glyph={ArrowLeft}
           size='sm'
           xstyle={rtl.mirror}
         />
@@ -440,7 +442,7 @@ function PageTitle({ title }: { title: React.ReactNode }) {
     <>
       {label}
       <Icon
-        name='chevron-down'
+        glyph={ChevronDown}
         size='sm'
         {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
       />
@@ -556,12 +558,10 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
 
 export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
   value: string;
-  /** Keeps unselected pages mounted (`inert`, in flow) so a page transition can be styled. */
-  shouldForceMount?: boolean;
 }
 
 const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
-  { value, shouldForceMount, xstyle, ...rest },
+  { value, xstyle, ...rest },
   ref,
 ) {
   const { compact, pageTitleId } = useProfileContext('Profile.ContentPanel');
@@ -571,7 +571,6 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
         <Tabs.Panel
           ref={ref}
           value={value}
-          shouldForceMount={shouldForceMount}
           aria-labelledby={`${pageTitleId}-label`}
           // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
           {...(compact ? { role: 'group', tabIndex: undefined } : null)}
@@ -589,7 +588,7 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  * <Profile.Root value={page} onValueChange={setPage}>
  *   <Profile.Title>User profile</Profile.Title>
  *   <Profile.Nav>
- *     <Profile.NavItem value='account' icon={<Icon name='user-circle' size='sm' />}>Account</Profile.NavItem>
+ *     <Profile.NavItem value='account' icon={<Icon glyph={UserCircle} size='sm' />}>Account</Profile.NavItem>
  *   </Profile.Nav>
  *   <Profile.Content pageTitle='Account'>
  *     <Profile.ContentPanel value='account'>…</Profile.ContentPanel>

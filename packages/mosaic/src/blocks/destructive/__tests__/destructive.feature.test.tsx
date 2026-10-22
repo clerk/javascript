@@ -7,8 +7,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { deferred } from '../../../__tests__/async';
 import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { openDialog } from '../../../__tests__/feature/dialog';
-import { serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { Button } from '../../../components/button';
 import { Menu } from '../../../components/menu';
@@ -185,15 +186,15 @@ describe('Destructive shared by rows', () => {
     );
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Actions for Production' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Actions for Production' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
     expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Delete Production?');
     await user.type(screen.getByRole('textbox', { name: 'Type Production to continue' }), 'Production');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
 
-    await user.click(screen.getByRole('button', { name: 'Actions for Staging' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Actions for Staging' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
     expect(await screen.findByRole('alertdialog')).toHaveAccessibleName('Delete Staging?');
     const stagingField = screen.getByRole('textbox', { name: 'Type Staging to continue' });
     expect(stagingField).toHaveValue('');
@@ -207,9 +208,17 @@ describe('Destructive shared by rows', () => {
   });
 });
 
-function ReverifiedHost({ action }: { action: () => Promise<unknown> }) {
+function ReverifiedHost({ action, before }: { action: () => Promise<unknown>; before?: () => Promise<void> }) {
   const [run, reverification] = useReverificationFlow(action);
-  const controller = useConfirmController({ onConfirm: run, reverification });
+  const controller = useConfirmController({
+    onConfirm: before
+      ? async () => {
+          await before();
+          await run();
+        }
+      : run,
+    reverification,
+  });
 
   return (
     <Destructive
@@ -251,5 +260,138 @@ describe('Destructive with reverification', () => {
     expect(field()).toHaveValue('Delete');
     expect(field()).toHaveAttribute('aria-invalid', 'true');
     expect(action).toHaveBeenCalledTimes(2);
+  });
+});
+
+function recordFrames() {
+  const frames: string[] = [];
+  const frame = () => {
+    const dialog = document.querySelector('[role="alertdialog"]');
+    if (!dialog) {
+      return 'gone';
+    }
+    const step = dialog.querySelector('.cl-flow-root')?.getAttribute('data-value') ?? 'none';
+    return `${step}/${dialog.hasAttribute('data-open') ? 'open' : 'closing'}`;
+  };
+  const push = () => {
+    const current = frame();
+    if (frames.at(-1) !== current) {
+      frames.push(current);
+    }
+  };
+  const observer = new MutationObserver(push);
+  observer.observe(document.body, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ['data-value', 'data-open', 'data-closed'],
+  });
+  push();
+  return { frames, stop: () => observer.disconnect() };
+}
+
+const VERIFY = '/v1/client/sessions/sess_1/verify';
+
+describe('Destructive with reverification frames', () => {
+  async function renderReverified(action: () => Promise<unknown>, before?: () => Promise<void>) {
+    serveFapi({
+      client: fapiClient([session]),
+      verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' as const }] },
+    });
+    await renderWithClerk(
+      <ReverifiedHost
+        action={action}
+        before={before}
+      />,
+    );
+    const user = userEvent.setup();
+    const open = () =>
+      openDialog(user, screen.getByRole('button', { name: 'Delete my account' }), {
+        role: 'alertdialog',
+        name: TITLE,
+      });
+    const closed = () => waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    return { user, open, closed };
+  }
+
+  it('closes from the verify step when the retried action succeeds', async () => {
+    const action = vi.fn().mockResolvedValueOnce(reverificationError()).mockResolvedValue({ done: true });
+    const { user, open, closed } = await renderReverified(action);
+    await open();
+    await user.type(field(), 'Delete{Enter}');
+    const password = await screen.findByLabelText('Password');
+    await waitFor(() => expect(screen.queryByText(TITLE)).toBeNull());
+
+    const recorder = recordFrames();
+    await user.type(password, 'hunter2{Enter}');
+    await closed();
+    recorder.stop();
+
+    expect(action).toHaveBeenCalledTimes(2);
+    expect(recorder.frames[0]).toBe('verify/open');
+    expect(recorder.frames).not.toContain('confirm/open');
+  });
+
+  it('closes from the verify step when the challenge is cancelled', async () => {
+    const action = vi.fn().mockResolvedValue(reverificationError());
+    const { user, open, closed } = await renderReverified(action);
+    await open();
+    await user.type(field(), 'Delete{Enter}');
+    await screen.findByLabelText('Password');
+    await waitFor(() => expect(screen.queryByText(TITLE)).toBeNull());
+
+    const recorder = recordFrames();
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await closed();
+    recorder.stop();
+
+    expect(recorder.frames[0]).toBe('verify/open');
+    expect(recorder.frames).not.toContain('confirm/open');
+  });
+
+  it('shows the confirm step until the next challenge is ready when confirming again after a cancel', async () => {
+    const action = vi.fn().mockResolvedValue(reverificationError());
+    const { user, open, closed } = await renderReverified(action);
+    await open();
+    await user.type(field(), 'Delete{Enter}');
+    await screen.findByLabelText('Password');
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await closed();
+
+    await open();
+    const verify = holdRequests('post', VERIFY);
+    const recorder = recordFrames();
+    await user.type(field(), 'Delete{Enter}');
+    await waitFor(() => expect(verify.requests).toHaveLength(1));
+    expect(recorder.frames).toEqual(['confirm/open']);
+    verify.release();
+
+    await screen.findByLabelText('Password');
+    recorder.stop();
+    expect(recorder.frames).toEqual(['confirm/open', 'verify/open']);
+    expect(action).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows the confirm step while an action does other work before the run, after a cancel', async () => {
+    const action = vi.fn().mockResolvedValue(reverificationError());
+    const gates = [deferred<void>(), deferred<void>()];
+    const { user, open, closed } = await renderReverified(action, () => gates[action.mock.calls.length].promise);
+    await open();
+    await user.type(field(), 'Delete{Enter}');
+    gates[0].resolve();
+    await screen.findByLabelText('Password');
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await closed();
+
+    await open();
+    const recorder = recordFrames();
+    await user.type(field(), 'Delete{Enter}');
+    await waitFor(() => expect(screen.getByRole('alertdialog').querySelector('[aria-busy="true"]')).not.toBeNull());
+    expect(recorder.frames).toEqual(['confirm/open']);
+    gates[1].resolve();
+
+    await screen.findByLabelText('Password');
+    recorder.stop();
+    expect(recorder.frames).toEqual(['confirm/open', 'verify/open']);
   });
 });

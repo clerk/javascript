@@ -11,12 +11,15 @@ import type {
   OAuthProviders,
   OAuthScope,
   OAuthStrategy,
+  UserResource,
   VerificationResource,
 } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
 import { useUserProfileOptions } from '../user-profile.provider';
 import type {
   ConnectedAccountActionResult,
@@ -212,7 +215,16 @@ export type UserProfileConnectedAccountsModel =
       connect: (strategy: string) => Promise<ConnectedAccountActionResult>;
       reconnect: (accountId: string) => Promise<ConnectedAccountActionResult>;
       remove: (accountId: string) => Promise<void>;
+      removeReverification: ReverificationController;
+      reconnectReverification: ReverificationController;
+      connectReverification: ReverificationController;
     };
+
+function unavailable() {
+  return new ClerkRuntimeError('This connected account is no longer available.', {
+    code: 'connected_account_unavailable',
+  });
+}
 
 export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
   const { additionalOAuthScopes, mode } = useUserProfileOptions();
@@ -220,6 +232,21 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
+  const [removeAccount, removeReverification] = useReverificationFlow((current: UserResource, accountId: string) => {
+    const account = current.externalAccounts.find(candidate => candidate.id === accountId);
+    if (!account) {
+      throw unavailable();
+    }
+    return account.destroy();
+  });
+  const [recreateAccount, reconnectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
+  const [createAccount, connectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -246,9 +273,6 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
 
   const userId = user.id;
   const transport = clerk.__internal_oauthTransport;
-
-  const unavailable = () =>
-    new ClerkRuntimeError('This connected account is no longer available.', { code: 'connected_account_unavailable' });
 
   const requireCurrentUser = () => {
     const current = clerk.user;
@@ -293,7 +317,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       }
       const redirectUrl = await getRedirectUrl();
       const current = requireCurrentUser();
-      const response = await current.createExternalAccount({
+      const response = await createAccount(current, {
         strategy: provider.strategy,
         redirectUrl: withModalState(redirectUrl, provider.provider),
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
@@ -318,7 +342,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
               additionalScopes: recovery.additionalScopes,
               redirectUrl: withModalState(redirectUrl),
             })
-          : await current.createExternalAccount({
+          : await recreateAccount(current, {
               strategy: recovery.strategy,
               redirectUrl: withModalState(redirectUrl),
               additionalScopes: recovery.additionalScopes,
@@ -326,11 +350,10 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       return completeVerification(response);
     },
     remove: async accountId => {
-      const account = requireCurrentUser().externalAccounts.find(candidate => candidate.id === accountId);
-      if (!account) {
-        throw unavailable();
-      }
-      await account.destroy();
+      await removeAccount(requireCurrentUser(), accountId);
     },
+    removeReverification,
+    reconnectReverification,
+    connectReverification,
   };
 }

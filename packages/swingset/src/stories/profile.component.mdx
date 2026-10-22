@@ -25,6 +25,8 @@ dismiss into the navigation; standalone it paints the same frame and takes its o
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Profile } from '@clerk/mosaic/components/profile';
+import { ShieldCheck } from '@clerk/mosaic/icons/glyphs/shield-check';
+import { UserCircle } from '@clerk/mosaic/icons/glyphs/user-circle';
 
 <Profile.Root
   value={page}
@@ -34,13 +36,13 @@ import { Profile } from '@clerk/mosaic/components/profile';
   <Profile.Nav>
     <Profile.NavItem
       value='account'
-      icon={<Icon name='user-circle' size='sm' />}
+      icon={<Icon glyph={UserCircle} size='sm' />}
     >
       Account
     </Profile.NavItem>
     <Profile.NavItem
       value='security'
-      icon={<Icon name='shield-check' size='sm' />}
+      icon={<Icon glyph={ShieldCheck} size='sm' />}
       badge={<Badge>2</Badge>}
     >
       Security
@@ -128,13 +130,11 @@ its parent.
 
 ## Page transitions
 
-An unselected page carries the `hidden` attribute, and a transition across it is CSS alone —
-the CSS a customer adds against a `<UserProfile />` they do not render. `@starting-style` gives the
-page that just lost `hidden` a frame to enter from; `transition-behavior: allow-discrete` on
-`display` holds the page that just gained it until its exit finishes. Stack the pages in one grid
-cell and the two cross-fade in place. `shouldForceMount` on `ContentPanel` is there for a transition
-that needs the primitive's own timing attributes instead (`data-starting-style` /
-`data-ending-style`, `--cl-tab-transition-direction`).
+A transition across pages is CSS alone — the CSS a customer adds against a `<UserProfile />` they
+do not render. The entering page carries `data-starting-style` for its first frame; the leaving page
+carries `data-ending-style` and keeps its content until its exit finishes, then gains `hidden`.
+`--cl-tab-transition-direction` is `1` when moving to a later page and `-1` to an earlier one. Stack
+the pages in one grid cell and the two cross-fade in place. An unselected page renders no content.
 
 <Story
   name='Transitions'

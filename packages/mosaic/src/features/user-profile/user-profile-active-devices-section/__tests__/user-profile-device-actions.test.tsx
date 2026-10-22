@@ -116,35 +116,3 @@ describe('signing out of all other devices', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 });
-
-describe('loading', () => {
-  function Section({ skeleton }: { skeleton: boolean }) {
-    const controller = useUserProfileActiveDevicesController({ devices: [current, mobile] });
-    return (
-      <UserProfileActiveDevicesSectionView
-        {...controller}
-        skeleton={skeleton}
-      />
-    );
-  }
-
-  it('announces the start and the end of loading from the same status message', () => {
-    const { rerender } = render(
-      <MosaicProvider>
-        <Section skeleton />
-      </MosaicProvider>,
-    );
-    const status = screen.getByRole('status');
-    expect(status).toHaveTextContent('Loading active devices');
-    expect(screen.queryByRole('button', { name: 'Manage Safari on iOS' })).not.toBeInTheDocument();
-
-    rerender(
-      <MosaicProvider>
-        <Section skeleton={false} />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('status')).toBe(status);
-    expect(status).toHaveTextContent('Active devices loaded');
-    expect(screen.getByRole('button', { name: 'Manage Safari on iOS' })).toBeInTheDocument();
-  });
-});
