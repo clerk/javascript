@@ -36,7 +36,7 @@ let smallViewportProbe: HTMLElement | null = null;
  * `offsetTop` is part of it because iOS scrolls the visual viewport to bring a focused field into
  * view, so the visible band moves as well as shrinks.
  */
-function measure(): number {
+export function measureKeyboardInset(): number {
   const viewport = window.visualViewport;
   if (!viewport) {
     return 0;
@@ -53,7 +53,7 @@ function measure(): number {
 }
 
 function publish(): void {
-  document.documentElement.style.setProperty(PROPERTY, `${measure()}px`);
+  document.documentElement.style.setProperty(PROPERTY, `${measureKeyboardInset()}px`);
 }
 
 function schedulePublish(): void {
