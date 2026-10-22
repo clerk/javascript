@@ -1,5 +1,6 @@
 import type { IconComponent } from '../../icons/glyph';
 import { Building } from '../../icons/glyphs/building';
+import { Clock } from '../../icons/glyphs/clock';
 import { CreditCard } from '../../icons/glyphs/credit-card';
 import { Key } from '../../icons/glyphs/key';
 import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
@@ -17,6 +18,7 @@ export const ORGANIZATION_PROFILE_PAGE_IDS: readonly OrganizationProfilePageId[]
   'security',
   'billing',
   'apiKeys',
+  'adminLogs',
 ];
 
 export const ORGANIZATION_PROFILE_PAGE_ICONS: Record<OrganizationProfilePageId, IconComponent> = {
@@ -25,6 +27,7 @@ export const ORGANIZATION_PROFILE_PAGE_ICONS: Record<OrganizationProfilePageId, 
   security: SecurityLockSquare,
   billing: CreditCard,
   apiKeys: Key,
+  adminLogs: Clock,
 };
 
 export type OrganizationProfileNavEntry =

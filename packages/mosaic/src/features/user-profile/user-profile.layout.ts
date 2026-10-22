@@ -1,4 +1,5 @@
 import type { IconComponent } from '../../icons/glyph';
+import { Clock } from '../../icons/glyphs/clock';
 import { Code } from '../../icons/glyphs/code';
 import { CreditCard } from '../../icons/glyphs/credit-card';
 import { ShieldCheck } from '../../icons/glyphs/shield-check';
@@ -7,13 +8,20 @@ import { applyOrder } from '../../utils/apply-order';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 
 /** The built-in pages in the order the profile lists them before a consumer reorders anything. */
-export const USER_PROFILE_PAGE_IDS: readonly UserProfilePageId[] = ['account', 'security', 'billing', 'apiKeys'];
+export const USER_PROFILE_PAGE_IDS: readonly UserProfilePageId[] = [
+  'account',
+  'security',
+  'billing',
+  'apiKeys',
+  'logs',
+];
 
 export const USER_PROFILE_PAGE_ICONS: Record<UserProfilePageId, IconComponent> = {
   account: UserCircle,
   security: ShieldCheck,
   billing: CreditCard,
   apiKeys: Code,
+  logs: Clock,
 };
 
 /** One row of the navigation: a built-in page by id, or a page of the consumer's own. */

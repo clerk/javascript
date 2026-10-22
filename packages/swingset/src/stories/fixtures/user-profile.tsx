@@ -27,6 +27,7 @@ import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
 
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
+import { UserProfileLogsPanelExample } from './logs';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
@@ -175,6 +176,7 @@ export function useUserProfileFixture() {
       />
     ),
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
+    logs: <UserProfileLogsPanelExample />,
   };
 
   return { activePage, setActivePage, pages, devices: activeDevices.devices };

@@ -6,5 +6,6 @@ export const userProfileMessages = {
     security: 'Security',
     billing: 'Billing',
     apiKeys: 'API Keys',
+    logs: 'Logs',
   },
 } as const;

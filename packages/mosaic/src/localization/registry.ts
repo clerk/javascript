@@ -1,6 +1,7 @@
 import { formMessages } from '../components/form/form.messages';
 import { profileMessages } from '../components/profile/profile.messages';
 import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
+import { logsMessages } from '../features/logs/logs.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
 import { invitationsTableTabMessages } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.messages';
@@ -36,6 +37,7 @@ export const mosaicMessages = {
   errors: errorMessages,
   roles: roleMessages,
   form: formMessages,
+  logs: logsMessages,
   membersTableTab: membersTableTabMessages,
   invitationsTableTab: invitationsTableTabMessages,
   requestsTableTab: requestsTableTabMessages,

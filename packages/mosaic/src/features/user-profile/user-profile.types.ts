@@ -19,7 +19,7 @@ export class UserProfileSaveError<TField extends string = string> extends FormSu
 }
 
 /** A page the UserProfile brings itself, named by the id its navigation knows it as. */
-export type UserProfilePageId = 'account' | 'security' | 'billing' | 'apiKeys';
+export type UserProfilePageId = 'account' | 'security' | 'billing' | 'apiKeys' | 'logs';
 
 /** The built-in pages an instance shows: `account` always, the rest as the environment allows. */
 export interface UserProfilePages {
@@ -27,6 +27,7 @@ export interface UserProfilePages {
   security?: ReactNode;
   billing?: ReactNode;
   apiKeys?: ReactNode;
+  logs?: ReactNode;
 }
 
 /** A page of your own inside the profile, reached from its navigation. */

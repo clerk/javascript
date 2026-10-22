@@ -6,6 +6,7 @@ export const organizationProfileMessages = {
     security: 'Security',
     billing: 'Billing',
     apiKeys: 'API Keys',
+    adminLogs: 'Admin Logs',
   },
   placeholder: '{page} is not built yet.',
 } as const;

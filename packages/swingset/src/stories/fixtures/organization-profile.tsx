@@ -13,6 +13,7 @@ import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosName } from '@/lib/chaos';
 
 import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
+import { OrganizationProfileAdminLogsPanelExample } from './logs';
 import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
 import { useInviteMembersFixture } from './organization-profile-invite-members';
@@ -99,6 +100,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     security: <OrganizationProfilePlaceholderPanelView page='security' />,
     billing: <OrganizationProfilePlaceholderPanelView page='billing' />,
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
+    adminLogs: <OrganizationProfileAdminLogsPanelExample />,
   };
 
   return { activePage, setActivePage, pages, profile, name };
