@@ -9,12 +9,14 @@ type UseDragGestureOptions = {
   onDragStart?: () => void;
   onDrag: (offset: Point) => void;
   onDragEnd?: () => void;
+  onDragCancel?: () => void;
 };
 
 export const useDragGesture = ({
   onDragStart,
   onDrag,
   onDragEnd,
+  onDragCancel,
 }: UseDragGestureOptions): { onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void } => {
   const endGesture = useRef<(() => void) | null>(null);
 
@@ -51,11 +53,11 @@ export const useDragGesture = ({
 
     const onPointerEnd = (endEvent: PointerEvent): void => {
       if (endEvent.pointerId === pointerId) {
-        end();
+        end(endEvent.type === 'pointercancel');
       }
     };
 
-    const end = (): void => {
+    const end = (cancelled = false): void => {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerEnd);
       window.removeEventListener('pointercancel', onPointerEnd);
@@ -68,13 +70,17 @@ export const useDragGesture = ({
       }
       document.body.style.removeProperty('user-select');
       document.body.style.removeProperty('-webkit-user-select');
-      onDragEnd?.();
+      if (cancelled) {
+        (onDragCancel ?? onDragEnd)?.();
+      } else {
+        onDragEnd?.();
+      }
     };
 
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerEnd);
     window.addEventListener('pointercancel', onPointerEnd);
-    endGesture.current = end;
+    endGesture.current = (): void => end(true);
   };
 
   return { onPointerDown };

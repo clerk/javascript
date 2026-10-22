@@ -25,7 +25,7 @@ const pointer = (target: EventTarget, type: string, init: MouseEventInit & { poi
   fireEvent(target, event);
 };
 
-const renderDragTarget = () => {
+const renderDragTarget = (onDragCancel?: () => void) => {
   const onDragStart = vi.fn();
   const onDrag = vi.fn<(offset: Point) => void>();
   const onDragEnd = vi.fn();
@@ -34,6 +34,7 @@ const renderDragTarget = () => {
       onDragStart={onDragStart}
       onDrag={onDrag}
       onDragEnd={onDragEnd}
+      onDragCancel={onDragCancel}
     />,
   );
   const target = result.getByTestId('target');
@@ -114,5 +115,33 @@ describe('useDragGesture', () => {
     expect(onDragEnd).toHaveBeenCalledTimes(1);
     expect(onDrag).toHaveBeenCalledTimes(1);
     expect(document.body.style.getPropertyValue('user-select')).toBe('');
+  });
+
+  it.each(['pointercancel', 'unmount', 'replacement press'])('cancels without committing on %s', reason => {
+    const onDragCancel = vi.fn();
+    const { target, captured, unmount, onDragEnd } = renderDragTarget(onDragCancel);
+    pointer(target, 'pointerdown', { clientX: 100, clientY: 100 });
+    pointer(window, 'pointermove', { clientX: 120, clientY: 100 });
+    if (reason === 'unmount') {
+      unmount();
+    } else if (reason === 'replacement press') {
+      pointer(target, 'pointerdown', { clientX: 120, clientY: 100 });
+    } else {
+      pointer(window, 'pointercancel');
+    }
+    expect(onDragCancel).toHaveBeenCalledTimes(1);
+    expect(onDragEnd).not.toHaveBeenCalled();
+    expect(captured.size).toBe(0);
+    expect(document.body.style.getPropertyValue('user-select')).toBe('');
+  });
+
+  it('commits a normal release when a cancellation callback is provided', () => {
+    const onDragCancel = vi.fn();
+    const { target, onDragEnd } = renderDragTarget(onDragCancel);
+    pointer(target, 'pointerdown', { clientX: 100, clientY: 100 });
+    pointer(window, 'pointermove', { clientX: 120, clientY: 100 });
+    pointer(window, 'pointerup');
+    expect(onDragEnd).toHaveBeenCalledTimes(1);
+    expect(onDragCancel).not.toHaveBeenCalled();
   });
 });

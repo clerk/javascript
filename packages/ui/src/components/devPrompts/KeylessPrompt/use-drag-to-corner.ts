@@ -287,6 +287,11 @@ export function useDragToCorner(): UseDragToCornerResult {
         lastTimestamp.current = now;
       }
     },
+    onDragCancel: () => {
+      velocities.current = [];
+      dragStartDimensions.current = null;
+      setIsDragging(false);
+    },
     onDragEnd: () => {
       const velocity = calculateVelocity(velocities.current);
       const allCorners = getCorners();
