@@ -30,15 +30,23 @@ describe('Web3 wallet projection', () => {
   });
 
   it('marks monochrome provider logos', () => {
+    const okx = {
+      ...metamask,
+      id: 'wallet_okx',
+      verification: { ...metamask.verification, strategy: 'web3_okx_wallet_signature' },
+    } as const;
     const result = projectWeb3Wallets({
-      wallets: [metamask],
+      wallets: [metamask, okx],
       primaryId: null,
-      enabledStrategies: ['web3_metamask_signature', 'web3_okx_wallet_signature'],
+      enabledStrategies: ['web3_metamask_signature', 'web3_okx_wallet_signature', 'web3_coinbase_wallet_signature'],
       allowCreation: true,
     });
     expect(result).toMatchObject({
-      wallets: [{ id: 'wallet_metamask', monochromeIcon: false }],
-      availableProviders: [{ id: 'web3_okx_wallet_signature', monochromeIcon: true }],
+      wallets: [
+        { id: 'wallet_metamask', monochromeIcon: false },
+        { id: 'wallet_okx', monochromeIcon: true },
+      ],
+      availableProviders: [{ id: 'web3_coinbase_wallet_signature', monochromeIcon: false }],
     });
   });
 
