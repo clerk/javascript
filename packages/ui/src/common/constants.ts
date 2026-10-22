@@ -63,7 +63,7 @@ const FirstFactorConfigs = Object.freeze({
     action: '',
     validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>(),
   },
-} as Record<SignInStartIdentifier | 'default', FirstFactorConfig>);
+} satisfies Record<SignInStartIdentifier | 'default', FirstFactorConfig>);
 
 export type SignInStartIdentifier = 'email_address' | 'username' | 'phone_number' | 'email_address_username';
 export const groupIdentifiers = (attributes: Attribute[]): SignInStartIdentifier[] => {
