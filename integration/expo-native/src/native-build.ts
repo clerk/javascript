@@ -18,8 +18,8 @@ import {
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { basename, delimiter, dirname, join } from 'node:path';
-import { run } from './core/exec.ts';
-import { VerifyFailure, type Platform } from './core/types.ts';
+import { run } from '@clerk/internal-mobile-e2e/core/exec';
+import { VerifyFailure, type Platform } from '@clerk/internal-mobile-e2e/core/types';
 
 export type Must = (
   what: string,

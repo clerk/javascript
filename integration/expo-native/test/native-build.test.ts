@@ -1,4 +1,4 @@
-import '../testing/git-env.ts';
+import '@clerk/internal-mobile-e2e/testing/git-env';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -15,7 +15,7 @@ import {
   nativeProjectKey,
   type FixtureSite,
 } from '../src/fixture.ts';
-import { VerifyFailure } from '../src/core/types.ts';
+import { VerifyFailure } from '@clerk/internal-mobile-e2e/core/types';
 import { nativeFingerprint } from '../src/native-build.ts';
 
 const hermes = (version: number, body: string): Buffer => {

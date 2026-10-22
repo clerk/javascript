@@ -1,4 +1,4 @@
-import '../testing/git-env.ts';
+import '@clerk/internal-mobile-e2e/testing/git-env';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
@@ -6,24 +6,30 @@ import net from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
-import { composeE2EConfig, engineDevice } from '../specs/support/config.ts';
-import { agentDevice } from '../specs/support/device.ts';
-import { inputsEnv, readTarget } from '../specs/support/inputs.ts';
-import { deviceOf } from '../src/core/devices.ts';
-import { chooseEgress, proxyPort } from '../src/core/launch.mjs';
-import { usedSecretValues } from '../specs/support/secret.ts';
-import type { ApiResponse, GitHub } from '../src/core/remote/github.ts';
-import { HANDOFF } from '../src/core/remote/handoff.ts';
-import { connectThroughProxy, egressCheck, remoteDoctorChecks } from '../src/core/remote/preflight.ts';
-import { RUN_TITLE, STEP } from '../src/core/remote/protocol.ts';
-import type { RemoteSettings } from '../src/core/remote/settings.ts';
-import type { LocalLease, RemoteLease } from '../src/core/types.ts';
-import { IOS_APP, SAMPLE_INPUTS } from '../testing/sample-inputs.ts';
+import { composeE2EConfig, engineDevice } from '@clerk/internal-mobile-e2e/specs/support/config';
+import { agentDevice } from '@clerk/internal-mobile-e2e/specs/support/device';
+import { inputsEnv, readTarget } from '@clerk/internal-mobile-e2e/specs/support/inputs';
+import { deviceOf } from '@clerk/internal-mobile-e2e/core/devices';
+import { chooseEgress, proxyPort } from '@clerk/internal-mobile-e2e/core/launch';
+import { usedSecretValues } from '@clerk/internal-mobile-e2e/specs/support/secret';
+import type { ApiResponse, GitHub } from '@clerk/internal-mobile-e2e/core/remote/github';
+import { HANDOFF } from '@clerk/internal-mobile-e2e/core/remote/handoff';
+import { connectThroughProxy, egressCheck, remoteDoctorChecks } from '@clerk/internal-mobile-e2e/core/remote/preflight';
+import { RUN_TITLE, STEP } from '@clerk/internal-mobile-e2e/core/remote/protocol';
+import type { RemoteSettings } from '@clerk/internal-mobile-e2e/core/remote/settings';
+import type { LocalLease, RemoteLease } from '@clerk/internal-mobile-e2e/core/types';
+import { IOS_APP, SAMPLE_INPUTS } from '@clerk/internal-mobile-e2e/testing/sample-inputs';
 
 describe('the session workflow and the driver agree', () => {
   const workflow = readFileSync(join(execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: import.meta.dirname, encoding: 'utf8' }).trim(), '.github', 'workflows', 'verify-remote.yml'), 'utf8');
   const names = [...workflow.matchAll(/^\s+- name: (.+)$/gm)].map((m) => m[1]!);
   const evaluated = (template: string, value: string) => template.replace(/\$\{\{[^}]+\}\}/, value);
+
+  it('runs only scripts that the package directory holds after npm ci', () => {
+    const scripts = [...workflow.matchAll(/node "\$PACKAGE\/([^"]+)"/g)].map((match) => match[1]!);
+    assert.ok(scripts.length > 0);
+    assert.deepEqual(scripts.filter((script) => !existsSync(join(import.meta.dirname, '..', script))), []);
+  });
 
   it('publishes the tunnel in a step name, which the jobs route returns while the job still runs', () => {
     const tunnel = names.find((name) => name.startsWith('verify-remote tunnel'))!;
@@ -41,19 +47,28 @@ describe('the session workflow and the driver agree', () => {
   });
 
   it('lets the plan step ask GitHub whether a requested commit is on the dispatched branch, with the read-only token of the run', () => {
-    const planStep = workflow.split(/\n(?= {6}- )/).find((step) => step.includes('session-agent.ts" plan'))!;
+    const planStep = workflow.split(/\n(?= {6}- )/).find((step) => step.includes('internal-mobile-e2e-session-agent" plan'))!;
     assert.match(planStep, /^ {10}GITHUB_TOKEN: \$\{\{ github\.token \}\}$/m);
     assert.match(workflow, /^permissions:\n {2}contents: read\n\n/m);
   });
 
   it('lets the session agent ask GitHub the same of every commit it is later asked to build', () => {
-    const agentStep = workflow.split(/\n(?= {6}- )/).find((step) => step.includes('session-agent.ts" serve'))!;
+    const agentStep = workflow.split(/\n(?= {6}- )/).find((step) => step.includes('internal-mobile-e2e-session-agent" serve'))!;
     assert.match(agentStep, /^ {10}GITHUB_TOKEN: \$\{\{ github\.token \}\}$/m);
   });
 
   it('tells the session agent the default branch of the repository, on which it builds no uncommitted changes', () => {
-    const agentStep = workflow.split(/\n(?= {6}- )/).find((step) => step.includes('session-agent.ts" serve'))!;
+    const agentStep = workflow.split(/\n(?= {6}- )/).find((step) => step.includes('internal-mobile-e2e-session-agent" serve'))!;
     assert.match(agentStep, /^ {10}VERIFY_SESSION_DEFAULT_BRANCH: \$\{\{ github\.event\.repository\.default_branch \}\}$/m);
+  });
+
+  it('watches and stops the session agent by the command it was started with', () => {
+    const patterns = [...workflow.matchAll(/\bp(?:grep|kill) -f '([^']+)'/g)].map((match) => match[1]!);
+    assert.ok(patterns.length > 0, 'the workflow watches the session agent');
+    for (const pattern of patterns) {
+      const [command, verb] = pattern.split(' ');
+      assert.ok(workflow.includes(`/.bin/${command}" ${verb}`), `${pattern} names a command the workflow starts`);
+    }
   });
 
   it('gives the agent the files and variables it waits on', () => {
@@ -137,7 +152,7 @@ describe('a borrowed device as the tests are told of it', () => {
 
 describe('choosing between a direct connection and HTTPS_PROXY', () => {
   it('happens in plain JavaScript that imports only Node built-ins, so a Node too old to load TypeScript can still run it and hand over to Node 24', () => {
-    const source = readFileSync(join(import.meta.dirname, '..', 'src', 'core', 'launch.mjs'), 'utf8');
+    const source = readFileSync(new URL(import.meta.resolve('@clerk/internal-mobile-e2e/core/launch')), 'utf8');
     const imported = [...source.matchAll(/\bfrom\s+'([^']+)'/g)].map((match) => match[1]!);
     assert.ok(imported.length > 0);
     assert.deepEqual(imported.filter((specifier) => !specifier.startsWith('node:')), []);

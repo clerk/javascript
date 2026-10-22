@@ -1,4 +1,4 @@
-import '../testing/git-env.ts';
+import '@clerk/internal-mobile-e2e/testing/git-env';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -7,11 +7,17 @@ import { join } from 'node:path';
 import { buildFixture, mustStep, nativeInputs, simulatorArch } from '../src/fixture.ts';
 import { host, metroPort, withCleanup } from '../src/host.ts';
 import { devClientEntry } from '../specs/app.ts';
-import { selectBackend } from '../src/core/devices.ts';
-import { resolveSpecs } from '../src/core/e2e.ts';
-import { STANDARD, declaredIn, planGroups, readSpecText } from '../src/core/instances/settings.ts';
-import { encodeLaunchArguments } from '../specs/support/launch.ts';
-import { VerifyFailure, type LaunchId, type PublishableKey, type RunId, type StorageScope } from '../src/core/types.ts';
+import { selectBackend } from '@clerk/internal-mobile-e2e/core/devices';
+import { resolveSpecs } from '@clerk/internal-mobile-e2e/core/e2e';
+import { STANDARD, declaredIn, planGroups, readSpecText } from '@clerk/internal-mobile-e2e/core/instances/settings';
+import { encodeLaunchArguments } from '@clerk/internal-mobile-e2e/specs/support/launch';
+import {
+  VerifyFailure,
+  type LaunchId,
+  type PublishableKey,
+  type RunId,
+  type StorageScope,
+} from '@clerk/internal-mobile-e2e/core/types';
 import { localAndroidBackend } from '../src/platform/android/local.ts';
 import { localIosBackend } from '../src/platform/ios/local.ts';
 

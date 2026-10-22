@@ -13,8 +13,8 @@ import {
 import { createRequire } from 'node:module';
 import { basename, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isRunning, run, sleep } from './core/exec.ts';
-import { remoteBackend } from './core/remote/backend.ts';
+import { isRunning, run, sleep } from '@clerk/internal-mobile-e2e/core/exec';
+import { remoteBackend } from '@clerk/internal-mobile-e2e/core/remote/backend';
 import {
   LOCAL_POOL,
   VerifyFailure,
@@ -23,8 +23,8 @@ import {
   type Platform,
   type RuntimeProcess,
   type ScratchPath,
-} from './core/types.ts';
-import { takeSlotLock } from './core/workspace.ts';
+} from '@clerk/internal-mobile-e2e/core/types';
+import { takeSlotLock } from '@clerk/internal-mobile-e2e/core/workspace';
 import {
   FIXTURE,
   IOS_PRODUCT,

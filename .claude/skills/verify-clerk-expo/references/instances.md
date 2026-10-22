@@ -4,7 +4,7 @@ Each worktree has one Clerk application of its own. `up` creates it through Cler
 
 ## The standard settings
 
-`src/core/instances/base.json` defines the settings every new application gets. It has two parts.
+`src/core/instances/base.json` of `@clerk/internal-mobile-e2e` defines the settings every new application gets. It has two parts.
 
 - `config` is the whole body of the Platform API request that puts an instance on the standard settings. Everything that can coexist is switched on except the email link: email code, phone code, password, username, authenticator app, backup codes, and organizations. The email link is off so that an email sign-in opens on the code screen.
 - `environment` lists the 62 leaves of the instance's public `/v1/environment` that a spec cannot run without. One of them, `user_settings.actions.delete_self`, has no `config` key. A new application lets a user delete their own account, and the check fails if Clerk changes that.

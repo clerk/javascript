@@ -3,9 +3,9 @@ import { createHash } from 'node:crypto';
 import { cpSync, existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { run } from './core/exec.ts';
-import { withoutClerkKeys } from './core/keys.ts';
-import { VerifyFailure, type Platform } from './core/types.ts';
+import { run } from '@clerk/internal-mobile-e2e/core/exec';
+import { withoutClerkKeys } from '@clerk/internal-mobile-e2e/core/keys';
+import { VerifyFailure, type Platform } from '@clerk/internal-mobile-e2e/core/types';
 import {
   embedJavaScript,
   expoFingerprint,

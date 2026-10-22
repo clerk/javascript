@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
-import type { CommandLine } from '../core/exec.ts';
-import type { SessionDevice, SessionDeviceFactory } from '../core/remote/protocol.ts';
-import type { Platform } from '../core/types.ts';
+import type { CommandLine } from '@clerk/internal-mobile-e2e/core/exec';
+import type { SessionDevice, SessionDeviceFactory } from '@clerk/internal-mobile-e2e/core/remote/protocol';
+import type { Platform } from '@clerk/internal-mobile-e2e/core/types';
 import { artifact, buildInputs } from '../fixture.ts';
 import {
   collectRecordingArgs,

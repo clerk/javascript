@@ -7,14 +7,14 @@
     "typecheck": "tsc -p ."
   },
   "devDependencies": {
-    "@e2e-dev/github": "0.4.0",
-    "@e2e-dev/mobile": "0.10.0",
+    "@clerk/internal-mobile-e2e": "github:clerk/internal-mobile-e2e#ad396e6014ad86cd3d29e58933c75ab59905b7ab",
     "@types/node": "24.19.1",
-    "ai": "7.0.128",
-    "e2e": "0.18.0",
     "typescript": "7.0.2"
   },
   "engines": {
     "node": ">=24.8.0 <25"
+  },
+  "allowScripts": {
+    "github:clerk/internal-mobile-e2e": true
   }
 }

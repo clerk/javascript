@@ -1,4 +1,4 @@
-import '../testing/git-env.ts';
+import '@clerk/internal-mobile-e2e/testing/git-env';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';

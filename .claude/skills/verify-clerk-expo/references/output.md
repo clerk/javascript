@@ -8,7 +8,7 @@ A verb prints progress lines to stderr while it works and its result to stdout w
 
 Every verb takes `--json`. The verb then prints no progress lines, and prints one JSON object to stdout.
 
-On success the object is `{ "ok": true, "verb": "<verb>", ... }`. The remaining keys depend on the verb. `src/core/types.ts` defines them as `DoctorReport`, `UpResult`, `RunResult`, `ScreenResult`, `AttachResult`, and `DownResult`.
+On success the object is `{ "ok": true, "verb": "<verb>", ... }`. The remaining keys depend on the verb. `src/core/types.ts` of `@clerk/internal-mobile-e2e` defines them as `DoctorReport`, `UpResult`, `RunResult`, `ScreenResult`, `AttachResult`, and `DownResult`.
 
 On an error the object is `{ "ok": false, "error": { "code", "message", "fix", "retryable" } }`.
 

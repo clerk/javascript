@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-import { ensureRuntime } from '../src/core/launch.mjs';
+import { fileURLToPath } from 'node:url';
+import { ensureRuntime } from '@clerk/internal-mobile-e2e/core/launch';
 
 await ensureRuntime();
-const { main } = await import('../src/core/cli.ts');
+const { main } = await import('@clerk/internal-mobile-e2e');
 const { host } = await import('../src/host.ts');
-process.exitCode = await main(process.argv.slice(2), host);
+const packageDir = fileURLToPath(new URL('../', import.meta.url));
+process.exitCode = await main(process.argv.slice(2), host, { packageDir });
