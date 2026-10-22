@@ -16,6 +16,13 @@ const MAX_ROUTE_RETRIES = 3;
 const BASE_DELAY_MS = 500;
 const JITTER_MAX_MS = 250;
 
+function isClosedPlaywrightTarget(error: unknown): boolean {
+  const message = String(error);
+  return (
+    message.includes('Target page, context or browser has been closed') || message.includes('Test ended')
+  );
+}
+
 /**
  * Bypasses bot protection by appending the testing token in the Frontend API requests.
  *
@@ -117,6 +124,9 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
           await route.fulfill({ response, json });
           return;
         } catch (error) {
+          if (isClosedPlaywrightTarget(error)) {
+            return;
+          }
           if (attempt < MAX_ROUTE_RETRIES) {
             const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * JITTER_MAX_MS;
             if (process.env.CLERK_TESTING_DEBUG) {

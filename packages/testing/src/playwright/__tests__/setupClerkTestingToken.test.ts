@@ -412,6 +412,34 @@ describe('setupClerkTestingToken', () => {
       warnSpy.mockRestore();
     });
 
+    it.each([
+      'Error: route.fetch: Target page, context or browser has been closed',
+      'Error: Test ended',
+    ])('does not retry or warn when Playwright closed the page (%s)', async message => {
+      const { context, getRouteHandler } = createMockContext();
+      await setupClerkTestingToken({ context });
+
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const route = {
+        request: () => ({ url: () => 'https://clerk.example.com/v1/client' }),
+        fetch: vi.fn(() => Promise.reject(new Error(message))),
+        fulfill: vi.fn(() => Promise.resolve()),
+        continue: vi.fn(() => Promise.resolve()),
+      } as unknown as Route;
+
+      await getRouteHandler()!(route);
+
+      expect(route.fetch).toHaveBeenCalledTimes(1);
+      expect(route.continue).not.toHaveBeenCalled();
+      expect(route.fulfill).not.toHaveBeenCalled();
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+      errorSpy.mockRestore();
+    });
+
     it('retries on thrown errors and warns after exhausting retries', async () => {
       const { context, getRouteHandler } = createMockContext();
       await setupClerkTestingToken({ context });
