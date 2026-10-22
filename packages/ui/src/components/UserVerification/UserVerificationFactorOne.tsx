@@ -16,6 +16,7 @@ import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorO
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { sortByPrimaryFactor } from './utils';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
+import { UVFactorOneEmailLinkCard } from './UVFactorOneEmailLinkCard';
 import { UVFactorOnePasskeysCard } from './UVFactorOnePasskeysCard';
 import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
 
@@ -36,6 +37,7 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
 const SUPPORTED_STRATEGIES: SessionVerificationFirstFactor['strategy'][] = [
   'password',
   'email_code',
+  'email_link',
   'phone_code',
   'passkey',
 ] as const;
@@ -140,6 +142,14 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
         <UVFactorOneEmailCodeCard
           factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+          factor={currentFactor}
+          showAlternativeMethods={hasAlternativeStrategies}
+        />
+      );
+    case 'email_link':
+      return (
+        <UVFactorOneEmailLinkCard
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
           showAlternativeMethods={hasAlternativeStrategies}
