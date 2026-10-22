@@ -5,37 +5,20 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../../__tests__/async';
 import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
-import {
-  fapiClient,
-  fapiEnvironment,
-  fapiSession,
-  fapiUser,
-  fapiVerification,
-  fapiWeb3Wallet,
-} from '../../../../__tests__/feature/fapi';
+import { fapiVerification, fapiWeb3Wallet } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section';
+import { signedInWallets } from './user-profile-web3-wallets.fixtures';
 
 async function renderWallets(wallets: UserJSON['web3_wallets'] = []) {
-  const base = fapiEnvironment();
-  const fapi = serveFapi({
-    environment: fapiEnvironment({
-      user_settings: {
-        attributes: {
-          ...base.user_settings.attributes,
-          web3_wallet: {
-            ...base.user_settings.attributes.web3_wallet,
-            enabled: true,
-            used_for_first_factor: true,
-            first_factors: ['web3_metamask_signature', 'web3_coinbase_wallet_signature'],
-          },
-        },
-      },
-    }),
-    client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', web3_wallets: wallets }) })]),
-    verification: { secrets: { password: 'hunter2' } },
-  });
+  const fapi = serveFapi(
+    signedInWallets(
+      ['web3_metamask_signature', 'web3_coinbase_wallet_signature'],
+      { web3_wallets: wallets },
+      { verification: { secrets: { password: 'hunter2' } } },
+    ),
+  );
   return { fapi, ...(await renderWithClerk(<UserProfileWeb3WalletsSection />)) };
 }
 
