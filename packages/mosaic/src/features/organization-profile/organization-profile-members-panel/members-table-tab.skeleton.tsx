@@ -9,6 +9,7 @@ import { Icon } from '../../../components/icon';
 import { Skeleton } from '../../../components/skeleton';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
+import { Plus } from '../../../icons/glyphs/plus';
 import { useMessages } from '../../../localization';
 import { mergeStyleProps, themeProps } from '../../../props';
 import type { OrganizationProfileMember } from './members-table-tab.types';
@@ -64,7 +65,7 @@ export function MembersTableTabSkeleton({
         />
         {hasInvite ? (
           <Button disabled>
-            <Icon name='plus' />
+            <Icon glyph={Plus} />
             {m.invite}
           </Button>
         ) : null}
