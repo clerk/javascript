@@ -2,7 +2,7 @@
 
 Private, unpublished `@clerk/loom` shares user and active-device queries through one owner, one QueryClient, and one React provider. The core loads without React, Mosaic, or ClerkJS. Browser authentication comes from the existing ClerkJS host.
 
-The user SSR example uses the existing Backend API `users.getUser` operation. It projects identity, name, picture URL and upload status, email addresses, password presence, delete availability, and external verification status and recovery errors, enterprise display policy. It does not serialize Backend resources, metadata, verification secrets, or credentials. Production credentials and rotation remain unverified.
+The user SSR example uses the existing Backend API `users.getUser` operation. Its allowlisted snapshot supplies profile details, picture, email addresses and phone numbers, connected and linked enterprise accounts, wallets, passkeys, password presence, MFA status, and delete availability. Public instance settings supply section visibility and action eligibility. The snapshot excludes Backend resources, metadata, verification secrets, backup codes, and credentials. Production credentials and rotation remain unverified.
 
 The earlier experimental Backend devices endpoint remains in this branch but is not used by the live showcase. Its deployment and release gate are unchanged. Historical evidence for that experiment is in [the investigation](INVESTIGATION.md) and [decision trail](DECISIONS.tsv).
 
@@ -22,7 +22,11 @@ Both routes sit outside Swingset's existing Clerk layout. The direct route creat
 
 In the isolated `loom-user-ssr` worktree, run `rtk proxy pnpm --filter @clerk/swingset exec next dev --port 6008` and use `http://127.0.0.1:6008` to keep this test login separate from localhost previews.
 
-Open `/live/loom` for the composed Mosaic Account and Security profile, or `/live/loom/password` for standalone Password. The composed page links to `/live/user-profile/user-profile` for comparison with the ordinary ClerkJS profile. One `prefetchProfile` operation returns the user snapshot and a shared settings promise. Profile hooks seed their scoped query when those settings arrive. The server response preloads the picture URL; the shared Avatar image renders after client mount. Before Clerk connects, these facts render read-only. Loom retains display ownership after readiness. Name edits use Loom's scoped cache command, which executes through the current ClerkJS user resource; existing ClerkJS action hooks handle username, picture, and other account controls. Unverified external accounts are not shown as connected. API keys are not included in this experimental composition. The dynamic, no-store route shares the live shell's existing `window.Clerk`; it does not create a second runtime. If server prefetch fails, the browser loads both profile queries. The live Active devices preview remains browser-only.
+Open `/live/loom` for the composed Mosaic Account and Security profile, or `/live/loom/password` for standalone Password. Compare with the ordinary profile at `/live/user-profile/user-profile`. One `prefetchProfile` operation returns the user snapshot and a shared settings promise. Profile hooks seed their scoped query when those settings arrive. The server response preloads the picture URL, and Avatar emits its image during SSR. Eligible controls render disabled until ClerkJS is ready. Loom retains display ownership and supplies action availability after handoff. Its commands use current ClerkJS resources or the host’s authenticated FAPI transport. Mosaic keeps forms, validation, and reverification.
+
+Phone, wallet, passkey, MFA, and linked enterprise rows use the same prefetch. Active-device details and eligible enterprise connection choices still require browser reads because their deployed server APIs are unavailable. These queries do not block other sections. The live test instance disables the newly migrated features; populated server rendering is covered by browser fixtures without changing that instance. Loom passkey labels use absolute UTC dates for deterministic hydration. Satellite passkey Add eligibility is not known before the host connects, so its disabled placeholder can disappear after handoff.
+
+Unverified external accounts are not shown as connected. API keys are not included in this experimental composition. The dynamic, no-store route shares the live shell's existing `window.Clerk`; it does not create a second runtime. If server prefetch fails, the browser loads both profile queries.
 
 React callers create or load the ClerkJS instance, then pass it to the single public provider. The provider owns the Loom binding and client lifecycle:
 
@@ -66,19 +70,15 @@ The Next helper starts the authenticated user and public settings reads together
 
 ```tsx
 import { prefetchProfile } from '@clerk/loom/nextjs';
-import { LoomComposedProfile, UserLivePreview } from './preview';
+import Profile from './profile';
 
-async function PrefetchedUserLivePreview() {
+async function PrefetchedProfile() {
   const prefetch = await prefetchProfile();
-  return (
-    <UserLivePreview prefetch={prefetch}>
-      <LoomComposedProfile />
-    </UserLivePreview>
-  );
+  return <Profile prefetch={prefetch} />;
 }
 ```
 
-The client preview retains the existing Clerk bridge and MosaicProvider. Its Loom provider is `<LoomProvider clerk={clerk} prefetch={prefetch}>{children}</LoomProvider>`. The standalone route passes `<LoomPassword />` as its child with the same `prefetchProfile()` call. These Mosaic source imports are private prototype exports, not published package APIs.
+The client `Profile` obtains the existing Clerk instance with `useClerk()` and renders `MosaicProvider` around `<LoomProvider clerk={clerk} prefetch={prefetch}><LoomComposedProfile /></LoomProvider>`. The standalone route renders `<LoomPassword />` inside the same providers with the same `prefetchProfile()` call. These Mosaic source imports are private prototype exports, not published package APIs.
 
 The `prefetch` prop requires React 19. Passing its server-created promise across HTTP also requires a framework streaming integration, verified here with Next App Router. The installed Next runtime supplies React 19; ordinary workspace React 18 continues to support the existing `hydration` and browser-query APIs. The two provider props are mutually exclusive.
 
