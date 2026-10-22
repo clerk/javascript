@@ -66,6 +66,7 @@ export function RequestsTableTabSkeleton({
       ) : null}
       <Table.Root
         layout='fixed'
+        minWidth='33rem'
         aria-label={m.title}
         aria-busy
       >

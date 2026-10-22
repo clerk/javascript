@@ -18,7 +18,7 @@ import { Icon } from '../icon';
 import type { InputProps } from '../input';
 import { InputGroup } from '../input-group';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { aligns, columnWidth, layouts, stickySides, styles } from './table.styles';
+import { aligns, columnWidth, layouts, stickySides, styles, tableMinWidth } from './table.styles';
 
 type TableSection = 'header' | 'body';
 
@@ -34,6 +34,7 @@ export type TableLayout = keyof typeof layouts;
 
 export interface TableProps extends MosaicElementProps<'table'> {
   layout?: TableLayout;
+  minWidth?: string;
 }
 
 export type TableToolbarProps = MosaicComponentProps<'div'>;
@@ -106,7 +107,7 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
 });
 
 const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable(
-  { layout = 'auto', xstyle, ...rest },
+  { layout = 'auto', minWidth, xstyle, ...rest },
   ref,
 ) {
   return (
@@ -123,7 +124,13 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
           ref={ref}
           {...mergeStyleProps(
             themeProps('table', { layout }),
-            stylex.props(reset.base, styles.table, layouts[layout], xstyle),
+            stylex.props(
+              reset.base,
+              styles.table,
+              layouts[layout],
+              minWidth !== undefined && tableMinWidth.fixed(minWidth),
+              xstyle,
+            ),
             rest,
           )}
         />
