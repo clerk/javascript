@@ -113,7 +113,7 @@ describe('SignInStart', () => {
       });
 
       render(<SignInStart />, { wrapper });
-      screen.getByText(/username/i);
+      expect(screen.getByRole('textbox', { name: /username/i })).toHaveAttribute('autocomplete', 'username');
     });
 
     it('enables login with phone number', async () => {
