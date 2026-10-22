@@ -50,6 +50,7 @@ type MfaEvent =
   | { type: 'OPEN' }
   | { type: 'CLOSE' }
   | { type: 'SELECT'; method: UserProfileMfaAddableMethod; phoneId: string; hasPhones: boolean }
+  | { type: 'ADD_PHONE' }
   | { type: 'BACK'; hasPhones: boolean }
   | { type: 'EDIT_PHONE_ID'; value: string }
   | { type: 'EDIT_PHONE_NUMBER'; value: string }
@@ -99,6 +100,14 @@ const mfaMachine = createMachine({
                   : { kind: 'authenticator', setup: context.savedSetup, code: '' },
           })),
         },
+        ADD_PHONE: {
+          actions: assign(context => ({
+            flow:
+              context.flow.kind === 'sms'
+                ? { ...context.flow, step: 'phone', origin: 'new', phoneId: undefined, phoneNumber: '', code: '' }
+                : context.flow,
+          })),
+        },
         BACK: {
           actions: assign((context, event) => {
             const flow = context.flow;
@@ -108,7 +117,7 @@ const mfaMachine = createMachine({
               };
             }
             if (flow.kind === 'sms' && flow.step === 'phone' && event.hasPhones) {
-              return { flow: { ...flow, step: 'select', error: undefined } };
+              return { flow: { ...flow, step: 'select', origin: 'existing', phoneId: undefined, error: undefined } };
             }
             return {
               flow: { kind: 'select' },
@@ -285,9 +294,9 @@ function createSmsActions(model: ReadyModel, flow: MfaFlow, resendSeconds: numbe
     }
     const current = flow;
     void run('sms', async () => {
-      let phoneId = current.phoneId ?? current.selectedPhoneId;
-      if (current.step === 'phone' && !phoneId) {
-        if (!findOrCreatePhone) {
+      let phoneId = current.step === 'phone' ? current.phoneId : (current.phoneId ?? current.selectedPhoneId);
+      if (!phoneId) {
+        if (current.step !== 'phone' || !findOrCreatePhone) {
           return current;
         }
         const phone = await findOrCreatePhone(current.phoneNumber);
@@ -437,7 +446,7 @@ function createSetupProps(
       phoneNumbers: model.phones,
       selectedPhoneId: sms?.selectedPhoneId ?? '',
       onSelectedPhoneIdChange: value => send({ type: 'EDIT_PHONE_ID', value }),
-      onAddPhone: () => send({ type: 'SELECT', method: 'sms', phoneId: '', hasPhones: false }),
+      onAddPhone: () => send({ type: 'ADD_PHONE' }),
       onBack: actions.back,
       phoneNumber: sms?.phoneNumber ?? '',
       onPhoneNumberChange: value => send({ type: 'EDIT_PHONE_NUMBER', value }),

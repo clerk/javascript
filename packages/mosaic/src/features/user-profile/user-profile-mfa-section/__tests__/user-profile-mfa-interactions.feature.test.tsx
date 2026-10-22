@@ -137,6 +137,19 @@ describe('User profile MFA interaction boundaries', () => {
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Phone' })).toHaveFocus());
   });
 
+  it('keeps the chosen phone after backing out of new phone entry', async () => {
+    await renderMfa();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    expect(screen.getByRole('combobox', { name: /Phone number/ })).toHaveTextContent('+1 (555) 555-0101');
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await user.click(await screen.findByRole('button', { name: 'Back' }));
+    await waitFor(() =>
+      expect(screen.getByRole('combobox', { name: /Phone number/ })).toHaveTextContent('+1 (555) 555-0101'),
+    );
+  });
+
   it('blocks duplicate authenticator verification through the native form while pending', async () => {
     const fapi = await renderMfa();
     const held = holdRequests('post', '/v1/me/totp/attempt_verification');
