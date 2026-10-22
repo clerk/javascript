@@ -277,7 +277,7 @@ describe('SessionTokenCache', () => {
       await broadcastListener(olderEvent);
       const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterOlder).toBeDefined();
-      expect(resultAfterOlder?.entry.createdAt).toBe(1666648190);
+      expect(resultAfterOlder?.entry.createdAt).toBe(1666648260);
 
       const newerEvent: MessageEvent<SessionTokenEvent> = {
         data: {
@@ -294,7 +294,7 @@ describe('SessionTokenCache', () => {
 
       const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterNewer).toBeDefined();
-      expect(resultAfterNewer?.entry.createdAt).toBe(1666648250);
+      expect(resultAfterNewer?.entry.createdAt).toBe(1666648260);
     });
 
     it('ignores a broadcast staler than the reconciled resolvedToken even when the resolver is staler', async () => {
@@ -555,9 +555,8 @@ describe('SessionTokenCache', () => {
 
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(highRaw);
 
-      // createdAt reflects high's iat (1666648250), not low's (1666648190): the slot's TTL is stamped
-      // from the published winner. A slot stamped with low's earlier iat would already be evicted at
-      // this point; one stamped with high's iat is still comfortably within its 120s TTL.
+      // TTL is the winner's lifetime (exp - iat) measured from cache time on the
+      // device clock, so 50s later the 120s token is still served.
       vi.advanceTimersByTime(50 * 1000);
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(highRaw);
     });
@@ -712,6 +711,29 @@ describe('SessionTokenCache', () => {
       const result = SessionTokenCache.get({ tokenId: 'soon_expired_token' });
       expect(result).toBeDefined();
       expect(result?.entry.tokenId).toBe('soon_expired_token');
+    });
+
+    it('does not serve a server-expired token when the device clock is behind', async () => {
+      const serverNow = 1_700_000_000;
+      const deviceLag = 40;
+      vi.setSystemTime(new Date((serverNow - deviceLag) * 1000));
+
+      const iat = serverNow;
+      const exp = serverNow + 60;
+      const jwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ iat, exp }))}.signature`;
+      const tokenResolver = Promise.resolve({
+        getRawString: () => jwt,
+        jwt: { claims: { exp, iat } },
+      } as any);
+
+      SessionTokenCache.set({ tokenId: 'skew_token', tokenResolver });
+      await tokenResolver;
+
+      vi.advanceTimersByTime(50 * 1000);
+      expect(SessionTokenCache.get({ tokenId: 'skew_token' })).toBeDefined();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId: 'skew_token' })).toBeUndefined();
     });
 
     it('returns token when expiresAt is undefined (promise not yet resolved)', () => {
