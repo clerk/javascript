@@ -392,6 +392,22 @@ describe('User profile MFA', () => {
     expect(fapi.mfa.phoneCreations).toHaveLength(0);
   });
 
+  it('clears a failed selected phone error when adding a new phone', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    prepare.fail('phone_number_invalid', 'Unable to send a code.');
+    await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await screen.findByRole('textbox', { name: 'Phone' });
+    expect(screen.queryByText('Unable to send a code.')).toBeNull();
+  });
+
   it('returns to the entered number after backing out of a new phone verification', async () => {
     const fapi = await renderMfa(fapiUser({ id: 'user_1' }));
     const user = userEvent.setup();

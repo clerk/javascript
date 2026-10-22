@@ -104,7 +104,15 @@ const mfaMachine = createMachine({
           actions: assign(context => ({
             flow:
               context.flow.kind === 'sms'
-                ? { ...context.flow, step: 'phone', origin: 'new', phoneId: undefined, phoneNumber: '', code: '' }
+                ? {
+                    ...context.flow,
+                    step: 'phone',
+                    origin: 'new',
+                    phoneId: undefined,
+                    phoneNumber: '',
+                    code: '',
+                    error: undefined,
+                  }
                 : context.flow,
           })),
         },
