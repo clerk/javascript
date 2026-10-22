@@ -474,6 +474,45 @@ describe('Flow', () => {
       expect(screen.getByTestId('nested-input')).toHaveFocus();
     });
 
+    it('focuses the active nested step when the outer step re-enters while another nested step leaves', () => {
+      const outer = (value: string, nested: string) => (
+        <Flow.Root value={value}>
+          <Flow.Step ids={['form']}>
+            <AutoFocusInput data-testid='form-input' />
+          </Flow.Step>
+          <Flow.Step
+            ids={['reverify']}
+            data-testid='reverify-step'
+          >
+            <Flow.Root value={nested}>
+              <Flow.Step
+                ids={['password']}
+                data-testid='password-step'
+              >
+                <AutoFocusInput data-testid='password-input' />
+              </Flow.Step>
+              <Flow.Step ids={['code']}>
+                <AutoFocusInput data-testid='code-input' />
+              </Flow.Step>
+            </Flow.Root>
+          </Flow.Step>
+        </Flow.Root>
+      );
+      const pending = () => [{ finished: new Promise(() => {}) }] as unknown as Animation[];
+      const { rerender } = render(outer('reverify', 'password'));
+      screen.getByTestId('password-input').focus();
+      screen.getByTestId('reverify-step').getAnimations = vi.fn(pending);
+      rerender(outer('form', 'password'));
+      screen.getByTestId('form-input').focus();
+      const leavingStep = screen.getByTestId('password-step');
+      leavingStep.getAnimations = vi.fn(pending);
+
+      rerender(outer('reverify', 'code'));
+
+      expect(leavingStep).toHaveAttribute('data-ending-style');
+      expect(screen.getByTestId('code-input')).toHaveFocus();
+    });
+
     it('ignores a marked element portaled outside the root', () => {
       const otpStep = (
         <Flow.Step ids={['otp']}>{createPortal(<AutoFocusInput data-testid='portaled' />, document.body)}</Flow.Step>

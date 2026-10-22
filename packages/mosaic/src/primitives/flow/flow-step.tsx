@@ -17,9 +17,12 @@ function focusIsWithin(root: HTMLElement): boolean {
   return active === null || active === root.ownerDocument.body || root.contains(active);
 }
 
-function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | null {
+function firstFocusableInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | null {
   let first: HTMLElement | null = null;
   for (const element of elements) {
+    if (element.closest('[inert]')) {
+      continue;
+    }
     if (!first || first.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING) {
       first = element;
     }
@@ -68,7 +71,7 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
       return;
     }
 
-    const target = firstInDocumentOrder(focusTargetsRef.current);
+    const target = firstFocusableInDocumentOrder(focusTargetsRef.current);
     const root = rootRef.current;
     if (target && root && root.contains(target) && focusIsWithin(root)) {
       target.focus({ preventScroll: true });
