@@ -190,6 +190,18 @@ describe('appVersionSupport', () => {
     expect(store.getAppVersionSupportStatus().isSupported).toBe(false);
   });
 
+  test('a supported answer during the fetch does not hide the environment block', async () => {
+    const store = await loadStore();
+    const serverAnswersAtRequest = store.getServerAnswerCount();
+    const generation = store.getAppVersionSupportGeneration();
+
+    store.applySupportedAppVersion(generation);
+    store.applyFetchedEnvironment(environment({ ios: [iosPolicy('2.0')] }), { generation, serverAnswersAtRequest });
+
+    expect(store.getAppVersionSupportStatus().isSupported).toBe(false);
+    expect(store.getAppVersionSupportStatus().minimumVersion).toBe('2.0');
+  });
+
   test('ignores answers for a Clerk instance that was replaced', async () => {
     const store = await loadStore();
     const staleGeneration = store.getAppVersionSupportGeneration();

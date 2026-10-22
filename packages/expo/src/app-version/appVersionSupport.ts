@@ -86,7 +86,8 @@ export function applyFetchedEnvironment(
   if (requestGeneration !== generation) {
     return;
   }
-  if (serverAnswersAtRequest === serverAnswerCount) {
+  const answeredDuringFetch = serverAnswersAtRequest !== serverAnswerCount;
+  if (!answeredDuringFetch || serverStatus?.isSupported !== false) {
     serverStatus = null;
   }
   environmentStatus = resolveEnvironmentStatus(environment);
