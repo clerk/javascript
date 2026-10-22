@@ -1,5 +1,16 @@
 # @clerk/tanstack-react-start
 
+## 0.29.16
+
+### Patch Changes
+
+- Update the TanStack Start and TanStack Router versions used for development and testing to releases patched for [CVE-2026-102989](https://tanstack.com/blog/tanstack-start-security-update-cve-2026-102989). The supported peer range is unchanged. ([#10262](https://github.com/clerk/javascript/pull/10262)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c508f42`](https://github.com/clerk/javascript/commit/c508f424b39b05ba644de248d8329600f0406ad9)]:
+  - @clerk/clerk-react@5.61.11
+  - @clerk/types@4.101.28
+  - @clerk/backend@2.33.8
+
 ## 0.29.15
 
 ### Patch Changes

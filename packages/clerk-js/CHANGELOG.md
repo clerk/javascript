@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.128.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/localizations@3.37.10
+
 ## 5.128.0
 
 ### Minor Changes
