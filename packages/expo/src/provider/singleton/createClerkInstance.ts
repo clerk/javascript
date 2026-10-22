@@ -22,7 +22,7 @@ import {
 } from '../../cache';
 import { MemoryTokenCache } from '../../cache/MemoryTokenCache';
 import type { TokenCache } from '../../cache/types';
-import { CLERK_CLIENT_JWT_KEY, NATIVE_APP_FAPI_VERSION } from '../../constants';
+import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { assertValidProxyUrl } from '../../utils/errors';
 import { isNative, waitUntilAppIsActive } from '../../utils/runtime';
@@ -321,7 +321,6 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         if (isNative()) {
           (requestInit.headers as Headers).set('x-mobile', '1');
           (requestInit.headers as Headers).set('x-expo-sdk-version', packageJson.version);
-          requestInit.url?.searchParams.set('__clerk_api_version', NATIVE_APP_FAPI_VERSION);
           appVersionRequestHooks?.beforeRequest(requestInit);
         }
       });

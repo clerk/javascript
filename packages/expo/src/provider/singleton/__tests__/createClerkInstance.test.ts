@@ -409,7 +409,7 @@ describe('createClerkInstance', () => {
     expect(getClerkInstance({ publishableKey: 'pk_test_123' })).toBe(second);
   });
 
-  test('identifies the app and asks for the API version that enforces minimum versions', async () => {
+  test('identifies the app without changing the API version', async () => {
     const { beforeRequest, requestInit } = await setUpBeforeRequest({
       getToken: vi.fn().mockResolvedValue(null),
       saveToken: vi.fn(),
@@ -418,7 +418,7 @@ describe('createClerkInstance', () => {
 
     await beforeRequest(requestInit);
 
-    expect(requestInit.url.searchParams.getAll('__clerk_api_version')).toEqual(['2026-10-09']);
+    expect(requestInit.url.searchParams.getAll('__clerk_api_version')).toEqual(['2026-08-20']);
     expect(requestInit.headers.get('x-bundle-id')).toBe('com.example.app');
     expect(requestInit.headers.get('x-app-version')).toBe('4.8.4');
   });
