@@ -3,7 +3,7 @@ import * as Stories from './organization-profile.stories';
 # OrganizationProfile
 
 The organization profile: a `Profile` whose navigation lists the General, Members, Security,
-Billing, and API Keys pages it was given content for, then any pages of the consumer's own, in the
+Billing, API Keys, and Logs pages it was given content for, then any pages of the consumer's own, in the
 order asked for. The Members panel owns its table tabs, including Members, Invitations, and Requests. Security and
 Billing hold their place with a placeholder.
 
@@ -17,6 +17,7 @@ and `showDescription` pass through to its `APIKeysTable`.
     { name: 'General panel', href: '/organization-profile/organization-profile-general-panel', layer: 'Organization Profile' },
     { name: 'Members panel', href: '/organization-profile/organization-profile-members-panel', layer: 'Organization Profile' },
     { name: 'API keys panel', href: '/organization-profile/organization-profile-api-keys-panel', layer: 'Organization Profile' },
+    { name: 'Logs panel', href: '/organization-profile/organization-profile-logs-panel', layer: 'Organization Profile' },
   ]}
 />
 
