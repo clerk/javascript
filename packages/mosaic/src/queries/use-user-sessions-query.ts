@@ -12,8 +12,8 @@ const USER_SESSIONS_KEY = 'mosaic-user-sessions';
 export function useUserSessionsQuery() {
   const { user } = useUser();
   const { session } = useSession();
-  const userId = user?.id ?? null;
-  const sessionId = session?.id ?? null;
+  const userId = user?.id;
+  const sessionId = session?.id;
 
   const { queryKey, stableKey, authenticated } = useMemo(
     () =>
