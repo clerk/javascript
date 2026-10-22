@@ -5,10 +5,9 @@ import { EmptyState } from '../components/empty-state';
 import { ExclamationCircle } from '../icons/glyphs/exclamation-circle';
 import { useMessages } from '../localization';
 import { useActor } from '../machine/use-machine';
+import type { PortalContainer } from '../primitives/portal';
 import { PortalProvider } from '../primitives/portal';
-import type { ModalSurface, ModalSurfaces } from './modal.types';
-import type { ModalController } from './modal-controller';
-import { createModalController } from './modal-controller';
+import type { ModalHandle, ModalSurface, ModalSurfaces } from './modal.types';
 
 export function ModalHost({
   surfaces,
@@ -36,14 +35,33 @@ export function ModalSurfaceHost<Options>({
   surface: ModalSurface<Options>;
   children: React.ReactNode;
 }): React.ReactElement {
-  const [controller] = React.useState(() => createModalController<Options>());
+  const [state, setState] = React.useState<ModalState<Options>>({
+    open: false,
+    options: undefined,
+    container: undefined,
+    openCount: 0,
+  });
+
+  const modal = React.useMemo<ModalHandle<Options>>(() => {
+    const preload = () => surface.loader.send({ type: 'LOAD' });
+    return {
+      open: (options, container) => {
+        preload();
+        setState(previous => ({ open: true, options, container, openCount: previous.openCount + 1 }));
+      },
+      close: () => setState(previous => (previous.open ? { ...previous, open: false } : previous)),
+      preload,
+      isOpen: state.open,
+    };
+  }, [surface, state.open]);
 
   return (
-    <surface.context.Provider value={controller}>
+    <surface.context.Provider value={modal}>
       {children}
       <ModalSlot
         surface={surface}
-        controller={controller}
+        state={state}
+        close={modal.close}
       />
     </surface.context.Provider>
   );
@@ -51,12 +69,13 @@ export function ModalSurfaceHost<Options>({
 
 function ModalSlot<Options>({
   surface,
-  controller,
+  state,
+  close,
 }: {
   surface: ModalSurface<Options>;
-  controller: ModalController<Options>;
+  state: ModalState<Options>;
+  close: () => void;
 }) {
-  const state = React.useSyncExternalStore(controller.subscribe, controller.getState, controller.getState);
   const [content] = useActor(surface.loader);
   const { Content } = content.context;
   const failed = content.value === 'failed';
@@ -66,7 +85,7 @@ function ModalSlot<Options>({
       open={state.open && (Content !== undefined || failed)}
       onOpenChange={open => {
         if (!open) {
-          controller.close();
+          close();
         }
       }}
     >
@@ -75,7 +94,7 @@ function ModalSlot<Options>({
           <Content
             key={state.openCount}
             options={state.options}
-            close={controller.close}
+            close={close}
           />
         ) : failed ? (
           <LoadFailed />
@@ -96,4 +115,11 @@ function LoadFailed() {
       <EmptyState.Label id={dialog?.labelId}>{m.generic}</EmptyState.Label>
     </EmptyState.Root>
   );
+}
+
+interface ModalState<Options> {
+  open: boolean;
+  options: Options | undefined;
+  container: PortalContainer | undefined;
+  openCount: number;
 }
