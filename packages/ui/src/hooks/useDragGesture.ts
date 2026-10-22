@@ -29,31 +29,29 @@ export const useDragGesture = ({
     endGesture.current?.();
 
     const element = e.currentTarget;
+    const bodyStyle = document.body.style;
     const { pointerId } = e;
     const originX = e.clientX;
     const originY = e.clientY;
-    let dragging = false;
-    let userSelect = '';
-    let webkitUserSelect = '';
+    let selectionStyles: [userSelect: string, webkitUserSelect: string] | undefined;
 
     const onPointerMove = (moveEvent: PointerEvent): void => {
       if (moveEvent.pointerId !== pointerId) {
         return;
       }
-      const offset = { x: moveEvent.clientX - originX, y: moveEvent.clientY - originY };
-      if (!dragging) {
-        if (offset.x * offset.x + offset.y * offset.y < DRAG_THRESHOLD * DRAG_THRESHOLD) {
+      const x = moveEvent.clientX - originX;
+      const y = moveEvent.clientY - originY;
+      if (!selectionStyles) {
+        if (x * x + y * y < DRAG_THRESHOLD * DRAG_THRESHOLD) {
           return;
         }
-        dragging = true;
         element.setPointerCapture(pointerId);
-        userSelect = document.body.style.userSelect;
-        webkitUserSelect = document.body.style.webkitUserSelect;
-        document.body.style.userSelect = 'none';
-        document.body.style.webkitUserSelect = 'none';
+        selectionStyles = [bodyStyle.userSelect, bodyStyle.webkitUserSelect];
+        bodyStyle.userSelect = 'none';
+        bodyStyle.webkitUserSelect = 'none';
         onDragStart?.();
       }
-      onDrag(offset);
+      onDrag({ x, y });
     };
 
     const onPointerEnd = (endEvent: PointerEvent): void => {
@@ -67,14 +65,14 @@ export const useDragGesture = ({
       window.removeEventListener('pointerup', onPointerEnd);
       window.removeEventListener('pointercancel', onPointerEnd);
       endGesture.current = null;
-      if (!dragging) {
+      if (!selectionStyles) {
         return;
       }
       if (element.hasPointerCapture(pointerId)) {
         element.releasePointerCapture(pointerId);
       }
-      document.body.style.userSelect = userSelect;
-      document.body.style.webkitUserSelect = webkitUserSelect;
+      bodyStyle.userSelect = selectionStyles[0];
+      bodyStyle.webkitUserSelect = selectionStyles[1];
       const onEnd = (cancelled && onDragCancel) || onDragEnd;
       onEnd?.();
     };
