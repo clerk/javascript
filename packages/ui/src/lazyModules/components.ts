@@ -37,6 +37,8 @@ const componentImportPaths = {
       /* webpackChunkName: "configureDirectorySync" */ '../components/ConfigureDirectorySync/ConfigureDirectorySync'
     ),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
+  AgentActionApproval: () =>
+    import(/* webpackChunkName: "agentActionApproval" */ '../components/AgentActionApproval/AgentActionApproval'),
   OAuthDeviceVerification: () =>
     import(
       /* webpackChunkName: "oauthDeviceVerification" */ '../components/OAuthDeviceVerification/OAuthDeviceVerification'
@@ -173,6 +175,10 @@ export const OAuthConsent = lazy(() =>
   componentImportPaths.OAuthConsent().then(module => ({ default: module.OAuthConsent })),
 );
 
+export const AgentActionApproval = lazy(() =>
+  componentImportPaths.AgentActionApproval().then(module => ({ default: module.AgentActionApproval })),
+);
+
 export const OAuthDeviceVerification = lazy(() =>
   componentImportPaths.OAuthDeviceVerification().then(module => ({ default: module.OAuthDeviceVerification })),
 );
@@ -216,6 +222,7 @@ export const ClerkComponents = {
   ConfigureSSO,
   ConfigureDirectorySync,
   OAuthConsent,
+  AgentActionApproval,
   OAuthDeviceVerification,
   SubscriptionDetails,
   TaskChooseOrganization,
