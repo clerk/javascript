@@ -207,17 +207,30 @@ describe('Loom profile details', () => {
         </MosaicProvider>
       </ClerkContextProvider>,
     );
-    expect(screen.getByRole('group', { name: 'Email' })).toBeInTheDocument();
+    expect(await screen.findByRole('group', { name: 'Email' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
     view.unmount();
   });
 
-  it('keeps snapshot email rows while attaching matching host actions', async () => {
+  it('renders reconciled email rows while retaining host action resources and button geometry', async () => {
     const hostUser = fapiUser({
       id: 'user_1',
       email_addresses: [fapiEmailAddress({ id: 'host_only', email_address: 'host@example.com' })],
     });
     serveFapi({ environment: fapiEnvironment(), client: fapiClient([fapiSession({ id: 'sess_1', user: hostUser })]) });
+    worker.use(
+      http.get(fapiUrl('/v1/me'), () =>
+        HttpResponse.json({
+          response: fapiUser({
+            id: 'user_1',
+            first_name: 'Alice',
+            image_url: 'https://img.example/alice',
+            password_enabled: false,
+            email_addresses: [fapiEmailAddress({ id: 'idn_1', email_address: 'snapshot@example.com' })],
+          }),
+        }),
+      ),
+    );
     const clerk = new Clerk(publishableKey());
     const hydration = {
       version: 5 as const,
@@ -279,7 +292,8 @@ describe('Loom profile details', () => {
     await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
     view.rerender(renderProfile());
     expect(screen.queryByText('host@example.com')).not.toBeInTheDocument();
-    expect(screen.getByText('snapshot@example.com')).toBeInTheDocument();
+    expect(await screen.findByText('snapshot@example.com')).toBeInTheDocument();
+    expect(clerk.user?.emailAddresses[0]?.emailAddress).toBe('host@example.com');
     expect(screen.getByRole('button', { name: 'Manage snapshot@example.com' })).toBeDisabled();
     const addAfter = screen.getByRole('button', { name: 'Add email' }).getBoundingClientRect();
     const manageAfter = screen.getByRole('button', { name: 'Manage snapshot@example.com' }).getBoundingClientRect();

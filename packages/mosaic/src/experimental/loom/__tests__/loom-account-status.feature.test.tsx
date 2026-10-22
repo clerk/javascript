@@ -24,6 +24,15 @@ import { LoomDanger, LoomPassword } from '../loom-account-status';
 import { LoomComposedProfile } from '../loom-composed-profile';
 import { profileSettings } from './profile-fixture';
 
+const reconciledUser = fapiUser({
+  id: 'user_1',
+  first_name: 'Alice',
+  password_enabled: false,
+  external_accounts: [
+    fapiExternalAccount({ id: 'cached_google', provider: 'google', approvedScopes: '', username: 'alice-google' }),
+  ],
+});
+
 function seed(clerk: Clerk, overrides: Partial<UserSnapshot> = {}) {
   return {
     version: 5 as const,
@@ -150,7 +159,7 @@ describe('Loom account status', () => {
     view.unmount();
   });
 
-  it('keeps cached rows while host actions resolve current resources', async () => {
+  it('renders reconciled rows while host actions resolve their own resources', async () => {
     const user = fapiUser({
       id: 'user_1',
       external_accounts: [
@@ -176,6 +185,7 @@ describe('Loom account status', () => {
     });
     const clerk = new Clerk(publishableKey());
     const hydration = seed(clerk);
+    worker.use(http.get(fapiUrl('/v1/me'), () => HttpResponse.json({ response: reconciledUser })));
     const view = render(tree(clerk, hydration));
     const accounts = screen.getByRole('group', { name: 'Connected accounts' });
     expect(within(accounts).getByText('alice-google')).toBeInTheDocument();
@@ -187,24 +197,26 @@ describe('Loom account status', () => {
     await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
     view.rerender(tree(clerk, hydration));
     expect(screen.queryByText('host-github')).not.toBeInTheDocument();
-    expect(screen.getByText('alice-google')).toBeInTheDocument();
+    expect(await screen.findByText('alice-google')).toBeInTheDocument();
+    expect(clerk.user?.externalAccounts[0]?.username).toBe('host-github');
     expect(screen.getByRole('button', { name: /Manage Google/ })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Connect GitHub' })).toBeDisabled();
     view.unmount();
   });
 
-  it('keeps cached accounts when host policy hides social providers', async () => {
+  it('keeps prefetched social settings after reconciling user data', async () => {
     serveFapi({
       environment: fapiEnvironment(),
       client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
     });
     const clerk = new Clerk(publishableKey());
     const hydration = seed(clerk);
+    worker.use(http.get(fapiUrl('/v1/me'), () => HttpResponse.json({ response: reconciledUser })));
     const view = render(tree(clerk, hydration));
     expect(screen.getByText('alice-google')).toBeInTheDocument();
     await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
     view.rerender(tree(clerk, hydration));
-    expect(screen.getByText('alice-google')).toBeInTheDocument();
+    expect(await screen.findByText('alice-google')).toBeInTheDocument();
     view.unmount();
   });
 
@@ -222,7 +234,7 @@ describe('Loom account status', () => {
     view.unmount();
   });
 
-  it('keeps cached password mode when host enterprise policy differs', async () => {
+  it('renders reconciled password status while host enterprise policy prevents edits', async () => {
     const user = fapiUser({
       id: 'user_1',
       password_enabled: true,
@@ -231,44 +243,51 @@ describe('Loom account status', () => {
     serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
     const clerk = new Clerk(publishableKey());
     const hydration = seed(clerk, { passwordEnabled: false });
+    worker.use(http.get(fapiUrl('/v1/me'), () => HttpResponse.json({ response: reconciledUser })));
     const view = render(tree(clerk, hydration, true));
     expect(screen.getByText('No password set')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Set password' })).toBeDisabled();
     await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
     view.rerender(tree(clerk, hydration, true));
-    expect(screen.getByRole('button', { name: 'Set password' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Set password' })).toBeDisabled();
+    expect(clerk.user?.passwordEnabled).toBe(true);
+    expect(clerk.user?.enterpriseAccounts).toHaveLength(1);
     expect(screen.queryByText('Managed by Company SSO')).not.toBeInTheDocument();
     expect(screen.getByText('No password set')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
     view.unmount();
   });
 
-  it('keeps cached password visibility when host policy hides passwords', async () => {
+  it('keeps prefetched password settings after reconciling user data', async () => {
     const environment = fapiEnvironment();
     environment.user_settings.attributes.password.enabled = false;
     serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]) });
     const clerk = new Clerk(publishableKey());
     const hydration = seed(clerk);
+    worker.use(http.get(fapiUrl('/v1/me'), () => HttpResponse.json({ response: reconciledUser })));
     const view = render(tree(clerk, hydration, true));
     expect(screen.getByText('No password set')).toBeInTheDocument();
     await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
     view.rerender(tree(clerk, hydration, true));
-    expect(screen.getByRole('group', { name: 'Password' })).toBeInTheDocument();
+    expect(await screen.findByRole('group', { name: 'Password' })).toBeInTheDocument();
     view.unmount();
   });
 
-  it('keeps cached danger visibility without an action when host disables deletion', async () => {
+  it('renders reconciled danger visibility without an action when host disables deletion', async () => {
     serveFapi({
       client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', delete_self_enabled: false }) })]),
     });
     const clerk = new Clerk(publishableKey());
     const hydration = seed(clerk);
+    worker.use(http.get(fapiUrl('/v1/me'), () => HttpResponse.json({ response: reconciledUser })));
     const view = render(tree(clerk, hydration));
     expect(screen.getByRole('group', { name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Delete account' })).toBeDisabled();
     await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
     view.rerender(tree(clerk, hydration));
-    expect(screen.getByRole('group', { name: 'Danger zone' })).toBeInTheDocument();
+    expect(await screen.findByRole('group', { name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Delete account' })).toBeDisabled();
+    expect(clerk.user?.deleteSelfEnabled).toBe(false);
     view.unmount();
   });
 
