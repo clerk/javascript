@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { UserCircle } from '../../icons/glyphs/user-circle';
 import { MosaicProvider } from '../../mosaic-provider';
 import { Badge } from '../badge';
 import { Card } from '../card';
@@ -27,7 +28,7 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
       <Profile.Nav>
         <Profile.NavItem
           value='account'
-          icon={<Icon name='user-circle' />}
+          icon={<Icon glyph={UserCircle} />}
         >
           Account
         </Profile.NavItem>
@@ -141,7 +142,7 @@ describe('Profile', () => {
     expect(account).toHaveAttribute('aria-selected', 'true');
     expect(account).toHaveAttribute('aria-controls', page.id);
     expect(page).toHaveTextContent('Email addresses');
-    expect(screen.getByText('Security page')).not.toBeVisible();
+    expect(screen.queryByText('Security page')).not.toBeInTheDocument();
   });
 
   it('reports a selection, and moves it with the arrow keys', async () => {

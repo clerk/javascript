@@ -13,6 +13,8 @@ import { isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shar
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
+import { LivePageHeader } from '../../../live-page-header';
+
 const SUCCESS_DELAY_MS = 3000;
 
 async function mockDelete(delaySuccess: boolean) {
@@ -86,7 +88,7 @@ function CardHarness() {
       </div>
       {requestPending ? (
         <Card.Root renderBranding={false}>
-          <Reverification {...reverification} />
+          <Reverification controller={reverification} />
         </Card.Root>
       ) : null}
       {message ? <p className={status === 'error' ? 'text-sm text-red-600' : 'text-sm'}>{message}</p> : null}
@@ -249,7 +251,7 @@ function DialogHarness() {
                     </Card.Footer>
                   </Flow.Step>
                   <Flow.Step ids={['verify']}>
-                    <Reverification {...reverification} />
+                    <Reverification controller={reverification} />
                   </Flow.Step>
                   <Flow.Step ids={['finalizing']}>
                     <Card.Header>
@@ -320,7 +322,7 @@ export default function ReverificationLivePage() {
     <MosaicProvider>
       <div className='mx-auto flex w-full max-w-3xl flex-col gap-10 p-3 sm:p-8'>
         <div className='flex flex-col gap-4'>
-          <h1 className='text-xl font-semibold'>Reverification</h1>
+          <LivePageHeader title='Reverification' />
           <div className='flex flex-wrap items-start justify-between gap-4'>
             <p className='text-muted-foreground max-w-xl text-sm'>
               Delete account hits a mock route that returns a reverification hint, then a fake success. The account is

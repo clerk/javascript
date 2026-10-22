@@ -20,6 +20,10 @@ if (hits.length > 0) {
   throw new Error(`Published Mosaic JS still references ${hits.join(', ')}.`);
 }
 
+if (/^\/\/#region src\/icons\/registry\b/m.test(source)) {
+  throw new Error('Published Mosaic JS bundles the icon registry; import glyphs directly so unused ones tree-shake.');
+}
+
 if (!/(?:from|import)\s*['"]@clerk\/shared(?:\/[^'"]*)?['"]/.test(source)) {
   throw new Error(
     'Published Mosaic JS does not import @clerk/shared; Clerk context would not resolve from the host SDK.',

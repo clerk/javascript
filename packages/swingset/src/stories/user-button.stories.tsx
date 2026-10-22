@@ -1,5 +1,6 @@
 import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
+import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -27,6 +28,19 @@ export function Combined(_args: Record<string, unknown>) {
     <SwitcherView
       {...prototype}
       mode='combined'
+      triggerVariant='full'
+    />
+  );
+}
+
+export function CombinedCondensedTrigger(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true });
+
+  return (
+    <SwitcherView
+      {...prototype}
+      mode='combined'
+      triggerVariant='condensed'
     />
   );
 }
@@ -99,7 +113,21 @@ export function WithoutTriggerBadge(_args: Record<string, unknown>) {
   return (
     <SwitcherView
       {...prototype}
+      triggerVariant='full'
       renderTriggerBadge={false}
+    />
+  );
+}
+
+export function CustomTriggerBadge(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true });
+
+  return (
+    <SwitcherView
+      {...prototype}
+      mode='combined'
+      triggerVariant='full'
+      renderTriggerBadge={() => Promise.resolve({ id: 'enterprise', label: 'Enterprise plan' })}
     />
   );
 }
@@ -134,7 +162,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
           label: 'App settings',
           icon: (
             <Icon
-              name='cog-6-teeth'
+              glyph={Cog6Teeth}
               size='sm'
             />
           ),

@@ -14,7 +14,10 @@ import { Input } from '../../../components/input';
 import { Item } from '../../../components/item';
 import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
+import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, rich, useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
+import { Reverification } from '../../reverification';
 import { styles as panelStyles } from '../user-profile-profile-panel.styles';
 
 const styles = stylex.create({
@@ -28,7 +31,8 @@ export interface UserProfileAddEmailDialogProps {
   onOpenChange: (open: boolean) => void;
   handle?: DialogHandle<unknown>;
   finalFocus?: DialogFocusTarget;
-  step: 'email' | 'verify' | 'link' | 'sso';
+  step: 'email' | 'reverify' | 'verify' | 'link' | 'sso';
+  reverification: ReverificationController;
   emailAddress: string;
   onEmailAddressChange: (value: string) => void;
   canSubmitEmail?: boolean;
@@ -52,6 +56,8 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
       handle={props.handle}
       open={props.open}
       onOpenChange={props.onOpenChange}
+      shouldCloseOnInteractOutside={props.step !== 'reverify'}
+      showCloseButton={props.step !== 'reverify' || Boolean(props.reverification.onCancel)}
     >
       <Dialog.Popup
         variant='card'
@@ -77,6 +83,12 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                     canSubmit={current.canSubmitEmail !== false}
                     isPending={current.isPending}
                     errorMessage={current.errorMessage}
+                  />
+                </Flow.Step>
+                <Flow.Step ids={['reverify']}>
+                  <ReverifyStep
+                    controller={current.reverification}
+                    onClose={() => current.onOpenChange(false)}
                   />
                 </Flow.Step>
                 <Flow.Step ids={['link']}>
@@ -118,6 +130,17 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
   );
 }
 
+function ReverifyStep(props: { controller: ReverificationController; onClose: () => void }) {
+  const initialFocusRef = useFlowAutoFocus<HTMLElement>();
+
+  return (
+    <Reverification
+      {...props}
+      initialFocusRef={initialFocusRef}
+    />
+  );
+}
+
 interface EnterEmailStepProps {
   inputRef: Ref<HTMLInputElement>;
   emailAddress: string;
@@ -131,6 +154,7 @@ interface EnterEmailStepProps {
 function EnterEmailStep(props: EnterEmailStepProps) {
   const m = useMessages('userProfileAddEmail');
   const emailFormId = useId();
+  const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -159,7 +183,7 @@ function EnterEmailStep(props: EnterEmailStepProps) {
         >
           <Field.Label>{m.email.label}</Field.Label>
           <Input
-            ref={props.inputRef}
+            ref={inputRef}
             name='emailAddress'
             type='email'
             autoComplete='email'
@@ -372,7 +396,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             >
               {m.sso.connect}
               <Icon
-                name='arrow-up-right'
+                glyph={ArrowUpRight}
                 placement='inline-end'
                 size='sm'
               />

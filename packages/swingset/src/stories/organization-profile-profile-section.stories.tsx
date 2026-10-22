@@ -8,8 +8,7 @@ export { default as __source } from './organization-profile-profile-section.stor
 
 export const meta: StoryMeta = {
   group: 'Organization Profile',
-  status: 'wip',
-  substatus: 'needs wire-up',
+  status: 'stable',
   title: 'OrganizationProfileProfileSection',
   label: 'Organization details',
   navigation: { category: 'Sections' },

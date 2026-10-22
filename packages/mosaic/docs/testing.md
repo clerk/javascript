@@ -159,6 +159,10 @@ in [Test placement](#test-placement).
     rejects: before start, in the wrong status, with a strategy the user
     doesn't have, and an email, phone, or passkey attempt that wasn't
     prepared. Wrong passwords and codes answer 422.
+- **`menu.ts`**: `openMenu(user, trigger)` clicks a menu trigger and resolves
+  with the open menu. A mouse press opens a menu one frame later, so a
+  `getByRole('menuitem')` or a key press straight after `user.click` races
+  it. Open menus with `openMenu`, then query their items.
 - **`render.tsx`**: `renderWithClerk(ui, loadOptions?)` renders inside
   `ClerkContextProvider` and `MosaicProvider`, loads Clerk, and returns
   `{ clerk, navigate, rerender, ... }`.

@@ -32,6 +32,7 @@ function EnterpriseAccounts({ model }: { model: Extract<UserProfileEnterpriseAcc
     accounts: model.accounts,
     connections: model.connections,
     onConnect: model.connect,
+    connectReverification: model.connectReverification,
     errorFallback: m.errors.generic,
   });
 

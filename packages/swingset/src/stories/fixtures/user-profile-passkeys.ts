@@ -1,12 +1,14 @@
+import { useUserProfilePasskeysSectionController } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.controller';
 import type {
   UserProfilePasskey,
   UserProfilePasskeysSectionViewProps,
-} from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
-import { useUserProfilePasskeysSectionController } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.controller';
+} from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section/user-profile-passkeys-section.view';
 import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosName, chaosRows, chaosText } from '@/lib/chaos';
+
+import { idleReverification } from './reverification';
 
 const examplePasskeys: UserProfilePasskey[] = [
   { id: 'laptop', name: 'MacBook', createdAtLabel: 'Created today', lastUsedAtLabel: 'Last used 1 hour ago' },
@@ -39,6 +41,8 @@ export function usePasskeysFixture({
 
   return useUserProfilePasskeysSectionController({
     passkeys,
+    reverification: idleReverification,
+    addReverification: idleReverification,
     onAdd: async () => {
       await attempt('add');
       const id = nextId.current++;

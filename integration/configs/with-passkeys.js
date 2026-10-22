@@ -16,6 +16,12 @@ export default defineConfig({
     },
     auth_passkey: {
       used_for_sign_in: true,
+      satisfies_second_factor: true,
+    },
+    auth_multi_factor: {
+      authenticator_app: {
+        enabled: true,
+      },
     },
   },
 });

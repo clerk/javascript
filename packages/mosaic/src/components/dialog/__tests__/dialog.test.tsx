@@ -293,13 +293,13 @@ describe('nested Mosaic Dialogs', () => {
     render(<Nested />);
 
     await user.click(screen.getByRole('button', { name: 'Add email' }));
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.body.style.overflowY).toBe('hidden');
 
     await user.keyboard('{Escape}');
-    expect(document.body.style.overflow).toBe('hidden');
+    expect(document.body.style.overflowY).toBe('hidden');
 
     await user.keyboard('{Escape}');
-    expect(document.body.style.overflow).toBe('');
+    expect(document.body.style.overflowY).toBe('');
   });
 
   it('warns when a profile opens inside another dialog', async () => {

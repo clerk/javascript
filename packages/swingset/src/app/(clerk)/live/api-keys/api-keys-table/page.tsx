@@ -5,6 +5,8 @@ import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useOrganization, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 
+import { LivePageHeader } from '../../../live-page-header';
+
 export default function APIKeysTableLivePage() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { organization } = useOrganization();
@@ -12,13 +14,10 @@ export default function APIKeysTableLivePage() {
   return (
     <MosaicProvider>
       <div className='mx-auto flex w-full max-w-3xl flex-col gap-6 p-3 sm:p-8'>
-        <div className='flex flex-col gap-1'>
-          <h1 className='text-xl font-semibold'>API keys table</h1>
-          <p className='text-muted-foreground text-sm'>
-            The API keys table for the signed-in user and their active organization, listing, creating, and revoking
-            real API keys. API keys must be enabled for the application.
-          </p>
-        </div>
+        <LivePageHeader title='API keys table'>
+          The API keys table for the signed-in user and their active organization, listing, creating, and revoking real
+          API keys. API keys must be enabled for the application.
+        </LivePageHeader>
         {!isLoaded ? <p className='text-muted-foreground text-sm'>Loading…</p> : null}
         {isLoaded && !isSignedIn ? (
           <p className='text-muted-foreground text-sm'>

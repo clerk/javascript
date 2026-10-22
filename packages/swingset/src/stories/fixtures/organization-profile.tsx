@@ -1,6 +1,9 @@
 import { useConfirmController } from '@clerk/mosaic/blocks/confirm';
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
+import { OrganizationProfileGeneralPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel.view';
+import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-members-panel.view';
+import { OrganizationProfilePlaceholderPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-placeholder-panel.view';
 import type { OrganizationProfileProfileSectionViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
 import { OrganizationProfileProfileSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
 import { SaveError } from '@clerk/mosaic/utils/errors';
@@ -74,25 +77,29 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     onSubmitSlug: async next => save('slug', () => setSlug(next)),
   };
 
-  const general: OrganizationProfileViewProps['pages']['general'] = {
-    children: (
-      <>
+  const pages: OrganizationProfileViewProps['pages'] = {
+    general: (
+      <OrganizationProfileGeneralPanelView>
         <OrganizationProfileProfileSectionView {...profile} />
         <OrganizationProfileDangerPreview
           name={name}
           memberCount={organization.memberCount}
         />
-      </>
+      </OrganizationProfileGeneralPanelView>
     ),
-  };
-
-  const pages: OrganizationProfileViewProps['pages'] = {
-    general,
-    members: { members, invitations, requests, onInvite, inviteDialog },
-    security: {},
-    billing: {},
+    members: (
+      <OrganizationProfileMembersPanelView
+        members={members}
+        invitations={invitations}
+        requests={requests}
+        onInvite={onInvite}
+        inviteDialog={inviteDialog}
+      />
+    ),
+    security: <OrganizationProfilePlaceholderPanelView page='security' />,
+    billing: <OrganizationProfilePlaceholderPanelView page='billing' />,
     apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
-  return { activePage, setActivePage, pages, general, profile, name };
+  return { activePage, setActivePage, pages, profile, name };
 }

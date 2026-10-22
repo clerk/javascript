@@ -3,7 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
-import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../../__tests__/feature/fake-fapi';
+import {
+  demandReverificationOnce,
+  type FakeFapiSeed,
+  fapiUrl,
+  holdRequests,
+  serveFapi,
+  worker,
+} from '../../../../__tests__/feature/fake-fapi';
 import type { FapiAttributeOverrides } from '../../../../__tests__/feature/fapi';
 import {
   fapiClient,
@@ -13,6 +20,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileProfileSection } from '../user-profile-profile-section';
 
@@ -91,8 +99,8 @@ describe('the user profile profile section', () => {
     expect(screen.queryByRole('button', { name: 'Manage profile picture' })).not.toBeInTheDocument();
     await actor.upload(fileInput(container), new File(['x'], 'me.png', { type: 'image/png' }));
 
-    await actor.click(await screen.findByRole('button', { name: 'Manage profile picture' }));
-    expect(await screen.findByRole('menuitem', { name: 'Remove avatar' })).toBeInTheDocument();
+    await openMenu(actor, await screen.findByRole('button', { name: 'Manage profile picture' }));
+    expect(screen.getByRole('menuitem', { name: 'Remove avatar' })).toBeInTheDocument();
   });
 
   it('says why an upload was refused', async () => {
@@ -139,7 +147,7 @@ describe('the user profile profile section', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
 
     failsWith('/v1/me/profile_image', { code: 'action_blocked', message: 'Blocked' }, 403);
-    await actor.click(screen.getByRole('button', { name: 'Manage profile picture' }));
+    await openMenu(actor, screen.getByRole('button', { name: 'Manage profile picture' }));
     await actor.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
@@ -267,5 +275,130 @@ describe('the user profile profile section', () => {
 });
 
 describe('username reverification', () => {
-  it.todo('confirms it is the user before the username changes');
+  async function renderUsernameNeedingReverification(prepare?: () => void): Promise<{
+    fapi: ReturnType<typeof serveFapi>;
+    actor: ReturnType<typeof userEvent.setup>;
+  }> {
+    const fapi = serveFapi({
+      ...withUsername('alicesmith'),
+      verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+    });
+    prepare?.();
+    demandReverificationOnce('/v1/me');
+    await renderWithClerk(<UserProfileProfileSection />);
+    const actor = userEvent.setup();
+    await actor.click(within(profile()).getByRole('button', { name: 'Edit username' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit username' });
+    await actor.clear(within(dialog).getByLabelText('Username'));
+    await actor.type(within(dialog).getByLabelText('Username'), 'alicia');
+    await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+    return { fapi, actor };
+  }
+
+  const savedUsername = (fapi: ReturnType<typeof serveFapi>): string | null | undefined =>
+    fapi.client.sessions[0]?.user?.username;
+
+  it('asks to verify before saving the username, then saves it', async () => {
+    const { fapi, actor } = await renderUsernameNeedingReverification();
+
+    const field = await screen.findByPlaceholderText('Enter your password');
+    expect(savedUsername(fapi)).toBe('alicesmith');
+    await actor.type(field, 'hunter2{Enter}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull(), { timeout: 3000 });
+    expect(savedUsername(fapi)).toBe('alicia');
+    expect(profile()).toHaveTextContent('alicia');
+  });
+
+  it('closes without saving when verification is dismissed, and reopens on the saved username', async () => {
+    const { fapi, actor } = await renderUsernameNeedingReverification();
+
+    await screen.findByPlaceholderText('Enter your password');
+    await actor.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(savedUsername(fapi)).toBe('alicesmith');
+    await actor.click(within(profile()).getByRole('button', { name: 'Edit username' }));
+    expect(screen.getByLabelText('Username')).toHaveValue('alicesmith');
+  });
+
+  it('allows correcting and saving the username after a field error following verification', async () => {
+    const updates: Array<ReturnType<typeof holdRequests>> = [];
+    let handlers: ReturnType<typeof worker.listHandlers> = [];
+    const { fapi, actor } = await renderUsernameNeedingReverification(() => {
+      handlers = worker.listHandlers();
+      updates.push(holdRequests('post', '/v1/me'));
+    });
+    const update = updates[0];
+
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    update.fail('form_identifier_exists', 'That username is taken. Please try another.', 'username');
+
+    const field = await screen.findByLabelText('Username', undefined, { timeout: 3000 });
+    expect(field).toHaveValue('alicia');
+    await waitFor(() => expect(field).toHaveAccessibleDescription(/That username is taken/));
+    expect(savedUsername(fapi)).toBe('alicesmith');
+
+    worker.resetHandlers(...handlers);
+    await actor.clear(field);
+    await actor.type(field, 'alicia2');
+    await actor.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(profile()).toHaveTextContent('alicia2');
+    expect(savedUsername(fapi)).toBe('alicia2');
+  });
+
+  it('focuses the username field when returning to the form after verifying', async () => {
+    const updates: Array<ReturnType<typeof holdRequests>> = [];
+    const { actor } = await renderUsernameNeedingReverification(() => {
+      updates.push(holdRequests('post', '/v1/me'));
+    });
+    const update = updates[0];
+
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    update.fail('form_identifier_exists', 'That username is taken. Please try another.', 'username');
+
+    const field = await screen.findByLabelText('Username', undefined, { timeout: 3000 });
+    await waitFor(() => expect(field).toHaveFocus());
+  });
+
+  it('closes the dialog from the verification error card', async () => {
+    const { fapi, actor } = await renderUsernameNeedingReverification(() =>
+      holdRequests('post', '/v1/client/sessions/sess_1/verify').fail('some_new_error', 'Nope'),
+    );
+
+    expect(await screen.findByText('Something went wrong')).toBeVisible();
+    const buttons = screen.getAllByRole('button', { name: 'Close' });
+    await actor.click(buttons[buttons.length - 1]);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(savedUsername(fapi)).toBe('alicesmith');
+  });
+
+  it('cancels an in-progress username verification when the active session changes', async () => {
+    const fapi = serveFapi({
+      environment: fapiEnvironment({ attributes: { username: {} } }),
+      client: fapiClient([
+        fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', username: 'alicesmith' }) }),
+        fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2', username: 'bob' }) }),
+      ]),
+      verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+    });
+    demandReverificationOnce('/v1/me');
+    const { clerk } = await renderWithClerk(<UserProfileProfileSection />);
+    const actor = userEvent.setup();
+    await actor.click(within(profile()).getByRole('button', { name: 'Edit username' }));
+    await actor.clear(screen.getByLabelText('Username'));
+    await actor.type(screen.getByLabelText('Username'), 'alicia');
+    await actor.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByPlaceholderText('Enter your password');
+
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions.map(session => session.user.username)).toEqual(['alicesmith', 'bob']);
+  });
 });

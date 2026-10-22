@@ -6,20 +6,25 @@ import { Dialog } from '../../../components/dialog';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
+import { UserProfileBillingPanelView } from '../user-profile-billing-panel.view';
+import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 const pages: UserProfileViewProps['pages'] = {
-  account: {},
-  security: {},
-  billing: {
-    subscription: {
-      planName: 'Basic Plan',
-      priceLabel: '$12 / Month',
-      totalDueLabel: '$12.00',
-      renewsAtLabel: 'Renews Aug 26',
-    },
-    paymentMethods: [],
-    historyItems: [],
-  },
+  account: <UserProfileProfilePanelView />,
+  security: <UserProfileSecurityPanelView />,
+  billing: (
+    <UserProfileBillingPanelView
+      subscription={{
+        planName: 'Basic Plan',
+        priceLabel: '$12 / Month',
+        totalDueLabel: '$12.00',
+        renewsAtLabel: 'Renews Aug 26',
+      }}
+      paymentMethods={[]}
+      historyItems={[]}
+    />
+  ),
   apiKeys: <p>API keys content</p>,
 };
 
@@ -94,7 +99,7 @@ describe('UserProfileView', () => {
     const terms = screen.getByRole('tab', { name: 'Terms' });
     expect(screen.getAllByRole('tab').at(-1)).toBe(terms);
     expect(terms).toContainElement(screen.getByTestId('terms-icon'));
-    expect(screen.getByText('Terms of service')).not.toBeVisible();
+    expect(screen.queryByText('Terms of service')).not.toBeInTheDocument();
 
     await user.click(terms);
     expect(onPageChange).toHaveBeenCalledWith('terms');

@@ -67,7 +67,7 @@ export function UserProfileDeviceDetailsDialog({
                       <Flow.Step ids={['confirm']}>{details}</Flow.Step>
                       <Flow.Step ids={['verify']}>
                         <Reverification
-                          {...reverification}
+                          controller={reverification}
                           onClose={() => controller.onOpenChange(false)}
                         />
                       </Flow.Step>

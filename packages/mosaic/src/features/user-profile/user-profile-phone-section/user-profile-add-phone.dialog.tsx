@@ -3,8 +3,10 @@ import { useRef } from 'react';
 import { Card } from '../../../components/card';
 import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
-import { Flow } from '../../../components/flow';
+import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import type { CountryIso } from '../../../components/phone-input';
+import type { ReverificationController } from '../../reverification';
+import { Reverification } from '../../reverification';
 import { EnterPhoneStep, VerifyPhoneStep } from '../user-profile-phone.steps';
 
 export interface UserProfileAddPhoneDialogProps {
@@ -12,7 +14,8 @@ export interface UserProfileAddPhoneDialogProps {
   onOpenChange: (open: boolean) => void;
   handle?: DialogHandle<unknown>;
   finalFocus?: DialogFocusTarget;
-  step: 'phone' | 'verify';
+  step: 'phone' | 'reverify' | 'verify';
+  reverification?: ReverificationController;
   phoneNumber: string;
   onPhoneNumberChange: (value: string) => void;
   defaultCountry?: CountryIso;
@@ -34,6 +37,8 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
       handle={props.handle}
       open={props.open}
       onOpenChange={props.onOpenChange}
+      shouldCloseOnInteractOutside={props.step !== 'reverify'}
+      showCloseButton={props.step !== 'reverify' || Boolean(props.reverification?.onCancel)}
     >
       <Dialog.Popup
         variant='card'
@@ -61,6 +66,14 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                     errorMessage={current.errorMessage}
                   />
                 </Flow.Step>
+                <Flow.Step ids={['reverify']}>
+                  {current.reverification ? (
+                    <ReverifyStep
+                      controller={current.reverification}
+                      onClose={() => current.onOpenChange(false)}
+                    />
+                  ) : null}
+                </Flow.Step>
                 <Flow.Step ids={['verify']}>
                   <VerifyPhoneStep
                     phoneNumber={current.phoneNumber}
@@ -80,5 +93,16 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
+  );
+}
+
+function ReverifyStep(props: { controller: ReverificationController; onClose: () => void }) {
+  const initialFocusRef = useFlowAutoFocus<HTMLElement>();
+
+  return (
+    <Reverification
+      {...props}
+      initialFocusRef={initialFocusRef}
+    />
   );
 }

@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const ArrowUp = glyph(
+  'arrow-up',
   <>
     <path
       d='M8 13.5V3'

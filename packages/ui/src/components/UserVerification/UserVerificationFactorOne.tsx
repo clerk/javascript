@@ -6,6 +6,7 @@ import { ErrorCard } from '@/ui/elements/ErrorCard';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { useEnvironment } from '../../contexts';
+import { useIsWebAuthnSupported } from '../../hooks';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from '../SignIn/utils';
@@ -56,12 +57,13 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     );
   }, [sessionVerification.supportedFirstFactors]);
   const { preferredSignInStrategy } = useEnvironment().displayConfig;
+  const webAuthnSupported = useIsWebAuthnSupported();
 
   const [{ currentFactor }, setFactor] = React.useState<{
     currentFactor: SignInFactor | undefined | null;
     prevCurrentFactor: SignInFactor | undefined | null;
   }>(() => ({
-    currentFactor: determineStartingSignInFactor(availableFactors, null, preferredSignInStrategy),
+    currentFactor: determineStartingSignInFactor(availableFactors, null, preferredSignInStrategy, webAuthnSupported),
     prevCurrentFactor: undefined,
   }));
 

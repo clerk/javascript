@@ -6,17 +6,23 @@ import { useEffect, useState } from 'react';
 
 import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 export type UserProfileActiveDevicesModel =
   | { status: 'loading' }
   | { status: 'hidden' }
+  | { status: 'loadingDevices' }
   | {
       status: 'ready';
       identity: string;
       devices: UserProfileDevice[];
       revoke: (id: string) => Promise<void>;
+      reverification: ReverificationController;
     };
+
+export type ReadyActiveDevicesModel = Extract<UserProfileActiveDevicesModel, { status: 'ready' }>;
 
 type SessionsQuery =
   | { status: 'loading'; identity: string | undefined }
@@ -43,6 +49,9 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   const m = useMessages('userProfileActiveDevices');
   const userId = user?.id;
   const sessionId = session?.id;
+  const [revokeSession, reverification] = useReverificationFlow((target: SessionWithActivitiesResource) =>
+    target.revoke(),
+  );
 
   const identity = userId && sessionId ? `${userId}:${sessionId}` : undefined;
   const [query, setQuery] = useState<SessionsQuery>({ status: 'loading', identity });
@@ -98,7 +107,7 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   }
 
   if (query.identity !== identity || query.status === 'loading') {
-    return { status: 'loading' };
+    return { status: 'loadingDevices' };
   }
   return {
     status: 'ready',
@@ -120,7 +129,8 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
       ) {
         throw new ClerkRuntimeError('This device is no longer available.', { code: 'active_device_unavailable' });
       }
-      await target.revoke();
+      await revokeSession(target);
     },
+    reverification,
   };
 }

@@ -1,6 +1,11 @@
 import { createContext, type ReactNode, useContext } from 'react';
 
 export interface OrganizationProfileOptions {
+  /**
+   * Where the user lands after leaving or deleting the organization.
+   *
+   * @default the instance's `afterLeaveOrganizationUrl`
+   */
   afterLeaveOrganizationUrl?: string;
 }
 

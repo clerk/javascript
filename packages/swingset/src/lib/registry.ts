@@ -219,6 +219,7 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import { meta as portalMeta } from '../stories/portal.stories';
 import {
   Customized as ProfileCustomized,
   Default as ProfileDefault,
@@ -294,6 +295,13 @@ import {
   Shapes as SkeletonShapes,
   TextContent as SkeletonTextContent,
 } from '../stories/skeleton.stories';
+import {
+  Default as SwitchDefault,
+  meta as switchMeta,
+  Sizes as SwitchSizes,
+  States as SwitchStates,
+  WithField as SwitchWithField,
+} from '../stories/switch.stories';
 import {
   Default as TableDefault,
   Empty as TableEmpty,
@@ -761,6 +769,7 @@ const flowModule: StoryModule = { meta: flowMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
+const portalModule: StoryModule = { meta: portalMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tagInputModule: StoryModule = { meta: tagInputMeta };
@@ -808,6 +817,14 @@ const segmentedControlModule: StoryModule = {
   meta: segmentedControlMeta,
   Default: SegmentedControlDefault,
   Disabled: SegmentedControlDisabled,
+};
+
+const switchModule: StoryModule = {
+  meta: switchMeta,
+  Default: SwitchDefault,
+  States: SwitchStates,
+  Sizes: SwitchSizes,
+  WithField: SwitchWithField,
 };
 
 const tabsComponentModule: StoryModule = {
@@ -1074,6 +1091,7 @@ export const registry: StoryModule[] = [
   sectionModule,
   segmentedControlModule,
   selectComponentModule,
+  switchModule,
   tableModule,
   tabsComponentModule,
   tagInputComponentModule,
@@ -1094,6 +1112,7 @@ export const registry: StoryModule[] = [
   menuModule,
   otpModule,
   popoverModule,
+  portalModule,
   selectModule,
   tabsModule,
   tagInputModule,
