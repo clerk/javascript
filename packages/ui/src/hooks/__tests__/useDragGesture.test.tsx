@@ -51,6 +51,7 @@ describe('useDragGesture', () => {
   afterEach(() => {
     pointer(window, 'pointercancel');
     document.body.style.removeProperty('user-select');
+    document.body.style.webkitUserSelect = '';
   });
 
   it('treats a press that moves less than the threshold as a click', () => {
@@ -94,6 +95,39 @@ describe('useDragGesture', () => {
     expect(captured.size).toBe(0);
     expect(document.body.style.getPropertyValue('user-select')).toBe('');
     expect(document.body.style.webkitUserSelect).toBe('');
+  });
+
+  it.each(['pointerup', 'pointercancel', 'unmount', 'replacement press'])(
+    'restores existing inline selection styles after %s',
+    reason => {
+      const { target, unmount } = renderDragTarget();
+      document.body.style.userSelect = 'text';
+      document.body.style.webkitUserSelect = 'all';
+      pointer(target, 'pointerdown', { clientX: 100, clientY: 100 });
+      pointer(window, 'pointermove', { clientX: 120, clientY: 100 });
+      expect(document.body.style.userSelect).toBe('none');
+      expect(document.body.style.webkitUserSelect).toBe('none');
+      if (reason === 'unmount') {
+        unmount();
+      } else if (reason === 'replacement press') {
+        pointer(target, 'pointerdown', { clientX: 120, clientY: 100 });
+      } else {
+        pointer(window, reason);
+      }
+      expect(document.body.style.userSelect).toBe('text');
+      expect(document.body.style.webkitUserSelect).toBe('all');
+    },
+  );
+
+  it('captures selection styles when dragging starts rather than on pointer down', () => {
+    const { target } = renderDragTarget();
+    pointer(target, 'pointerdown', { clientX: 100, clientY: 100 });
+    document.body.style.userSelect = 'all';
+    document.body.style.webkitUserSelect = 'text';
+    pointer(window, 'pointermove', { clientX: 120, clientY: 100 });
+    pointer(window, 'pointerup');
+    expect(document.body.style.userSelect).toBe('all');
+    expect(document.body.style.webkitUserSelect).toBe('text');
   });
 
   it('ignores other pointers', () => {

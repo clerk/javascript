@@ -33,6 +33,8 @@ export const useDragGesture = ({
     const originX = e.clientX;
     const originY = e.clientY;
     let dragging = false;
+    let userSelect = '';
+    let webkitUserSelect = '';
 
     const onPointerMove = (moveEvent: PointerEvent): void => {
       if (moveEvent.pointerId !== pointerId) {
@@ -45,6 +47,8 @@ export const useDragGesture = ({
         }
         dragging = true;
         element.setPointerCapture(pointerId);
+        userSelect = document.body.style.userSelect;
+        webkitUserSelect = document.body.style.webkitUserSelect;
         document.body.style.userSelect = 'none';
         document.body.style.webkitUserSelect = 'none';
         onDragStart?.();
@@ -69,8 +73,8 @@ export const useDragGesture = ({
       if (element.hasPointerCapture(pointerId)) {
         element.releasePointerCapture(pointerId);
       }
-      document.body.style.userSelect = '';
-      document.body.style.webkitUserSelect = '';
+      document.body.style.userSelect = userSelect;
+      document.body.style.webkitUserSelect = webkitUserSelect;
       const onEnd = (cancelled && onDragCancel) || onDragEnd;
       onEnd?.();
     };
