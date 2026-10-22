@@ -1,8 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { flushSync } from 'react-dom';
-import { createRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Icon } from '../icon';
@@ -14,45 +15,151 @@ declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean | undefined;
 }
 
-// jsdom never fires load/error on images, so drive `new window.Image()` manually. A `cached` src
-// reports `complete` the moment it is assigned, the way a browser does for an image it already
-// holds; an `unresolved` one fires neither event, holding the avatar mid-load.
-type Outcome = 'load' | 'error';
-let outcomes: Record<string, Outcome> = {};
 let cached = new Set<string>();
-let unresolved = new Set<string>();
+let cachedFailed = new Set<string>();
 
-class MockImage {
-  complete = false;
-  onload: (() => void) | null = null;
-  onerror: (() => void) | null = null;
-  set src(value: string) {
-    if (cached.has(value)) {
-      this.complete = true;
-      return;
-    }
-    if (unresolved.has(value)) {
-      return;
-    }
-    queueMicrotask(() => {
-      if (outcomes[value] === 'error') {
-        this.onerror?.();
-      } else {
-        this.onload?.();
-      }
-    });
-  }
-}
-
-vi.stubGlobal('Image', MockImage);
+vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockImplementation(function () {
+  const src = this.getAttribute('src');
+  return src !== null && (cached.has(src) || cachedFailed.has(src));
+});
+vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockImplementation(function () {
+  const src = this.getAttribute('src');
+  return src !== null && cached.has(src) ? 100 : 0;
+});
 
 afterEach(() => {
-  outcomes = {};
   cached = new Set();
-  unresolved = new Set();
+  cachedFailed = new Set();
 });
 
 describe('Mosaic Avatar', () => {
+  it('renders a source-bearing image on the server before hydration', () => {
+    const html = renderToString(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/server.png'
+          alt='Alex'
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+
+    expect(html).toContain('<img');
+    expect(html).toContain('src="https://example.com/server.png"');
+    expect(html).not.toContain('avatar__styles.imageHidden');
+  });
+
+  it('hydrates the server image in place', async () => {
+    cached.add('https://example.com/server.png');
+    const avatar = (
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/server.png'
+          alt='Alex'
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>
+    );
+    const container = document.body.appendChild(document.createElement('div'));
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    container.innerHTML = renderToString(avatar);
+    const serverImage = container.querySelector('img');
+    const root = hydrateRoot(container, avatar);
+
+    try {
+      await act(async () => {
+        await Promise.resolve();
+      });
+      expect(container.querySelector('img')).toBe(serverImage);
+      expect(container.querySelector('img')).toHaveAttribute('src', 'https://example.com/server.png');
+      expect(container.textContent).toBe('');
+      expect(consoleError.mock.calls.flat().join(' ')).not.toMatch(/Hydration failed|did not match|server HTML/);
+    } finally {
+      act(() => root.unmount());
+      container.remove();
+      consoleError.mockRestore();
+    }
+  });
+
+  it('keeps a cached failed image hidden and recovers on a source change', () => {
+    cachedFailed.add('https://example.com/bad.png');
+    cached.add('https://example.com/good.png');
+    const { rerender } = render(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/bad.png'
+          alt='Alex'
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    const image = screen.getByAltText('Alex');
+    expect(image).toHaveClass(stylex.props(styles.imageHidden).className ?? '');
+    expect(screen.getByText('CN')).toBeInTheDocument();
+
+    rerender(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/good.png'
+          alt='Alex'
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(screen.getByRole('img', { name: 'Alex' })).toBe(image);
+    expect(image).not.toHaveClass(stylex.props(styles.imageHidden).className ?? '');
+    expect(screen.queryByText('CN')).not.toBeInTheDocument();
+  });
+
+  it('keeps responsive attributes, forwards its ref, and composes image events', () => {
+    const ref = React.createRef<HTMLImageElement>();
+    const onLoad = vi.fn();
+    const onError = vi.fn();
+    const { rerender } = render(
+      <Avatar.Root>
+        <Avatar.Image
+          ref={ref}
+          src='https://example.com/a.png'
+          srcSet='https://example.com/a-2x.png 2x'
+          sizes='48px'
+          alt='Alex'
+          onLoad={onLoad}
+          onError={onError}
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    const image = screen.getByAltText('Alex');
+    expect(ref.current).toBe(image);
+    expect(image).toHaveAttribute('srcset', 'https://example.com/a-2x.png 2x');
+    expect(image).toHaveAttribute('sizes', '48px');
+    fireEvent.load(image);
+    expect(onLoad).toHaveBeenCalledOnce();
+    expect(screen.queryByText('CN')).not.toBeInTheDocument();
+
+    rerender(
+      <Avatar.Root>
+        <Avatar.Image
+          ref={ref}
+          src='https://example.com/a.png'
+          srcSet='https://example.com/b-2x.png 2x'
+          sizes='96px'
+          alt='Alex'
+          onLoad={onLoad}
+          onError={onError}
+        />
+        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    expect(ref.current).toBe(image);
+    expect(image).toHaveAttribute('srcset', 'https://example.com/b-2x.png 2x');
+    expect(image).toHaveAttribute('sizes', '96px');
+    expect(screen.getByTestId('fallback')).toHaveAttribute('data-pending', '');
+    fireEvent.error(image);
+    expect(onError).toHaveBeenCalledOnce();
+    expect(image).toHaveClass(stylex.props(styles.imageHidden).className ?? '');
+  });
+
   it('applies default variants and reflects them as data attributes', () => {
     render(
       <Avatar.Root data-testid='avatar'>
@@ -66,8 +173,7 @@ describe('Mosaic Avatar', () => {
     expect(avatar).toHaveAttribute('data-bordered', '');
   });
 
-  it('draws the inset outline on the image and fallback by default', async () => {
-    outcomes['https://example.com/a.png'] = 'load';
+  it('draws the inset outline on the image and fallback by default', () => {
     const overlay = stylex.props(styles.overlay).className ?? '';
     const { rerender } = render(
       <Avatar.Root>
@@ -84,11 +190,11 @@ describe('Mosaic Avatar', () => {
         <Avatar.Fallback>CN</Avatar.Fallback>
       </Avatar.Root>,
     );
-    expect(await screen.findByRole('img', { name: 'Alex' })).toHaveClass(overlay);
+    fireEvent.load(screen.getByAltText('Alex'));
+    expect(screen.getByRole('img', { name: 'Alex' })).toHaveClass(overlay);
   });
 
-  it('drops the inset outline when bordered is false', async () => {
-    outcomes['https://example.com/a.png'] = 'load';
+  it('drops the inset outline when bordered is false', () => {
     const overlay = stylex.props(styles.overlay).className ?? '';
     render(
       <Avatar.Root
@@ -104,7 +210,8 @@ describe('Mosaic Avatar', () => {
     );
     expect(screen.getByTestId('avatar')).not.toHaveAttribute('data-bordered');
     expect(screen.getByTestId('fallback')).not.toHaveClass(overlay);
-    expect(await screen.findByRole('img', { name: 'Alex' })).not.toHaveClass(overlay);
+    fireEvent.load(screen.getByAltText('Alex'));
+    expect(screen.getByRole('img', { name: 'Alex' })).not.toHaveClass(overlay);
   });
 
   it('reflects shape and size overrides', () => {
@@ -123,19 +230,6 @@ describe('Mosaic Avatar', () => {
   });
 
   it('shows the fallback while the image has not loaded', () => {
-    outcomes['https://example.com/a.png'] = 'error';
-    render(
-      <Avatar.Root>
-        <Avatar.Image src='https://example.com/a.png' />
-        <Avatar.Fallback>CN</Avatar.Fallback>
-      </Avatar.Root>,
-    );
-    expect(screen.getByText('CN').closest('.cl-avatar-fallback')).toBeInTheDocument();
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-  });
-
-  it('renders the image and hides the fallback once it loads', async () => {
-    outcomes['https://example.com/a.png'] = 'load';
     render(
       <Avatar.Root>
         <Avatar.Image
@@ -145,14 +239,29 @@ describe('Mosaic Avatar', () => {
         <Avatar.Fallback>CN</Avatar.Fallback>
       </Avatar.Root>,
     );
-    const img = await screen.findByRole('img', { name: 'Alex' });
+    expect(screen.getByText('CN').closest('.cl-avatar-fallback')).toBeInTheDocument();
+    expect(screen.getByAltText('Alex')).toHaveClass(stylex.props(styles.imageHidden).className ?? '');
+  });
+
+  it('renders the image and hides the fallback once it loads', () => {
+    render(
+      <Avatar.Root>
+        <Avatar.Image
+          src='https://example.com/a.png'
+          alt='Alex'
+        />
+        <Avatar.Fallback>CN</Avatar.Fallback>
+      </Avatar.Root>,
+    );
+    fireEvent.load(screen.getByAltText('Alex'));
+    const img = screen.getByRole('img', { name: 'Alex' });
     expect(img).toHaveClass('cl-avatar-image');
+    expect(img).not.toHaveClass(stylex.props(styles.imageHidden).className ?? '');
     expect(img).toHaveAttribute('src', 'https://example.com/a.png');
     expect(screen.queryByText('CN')).not.toBeInTheDocument();
   });
 
-  it('renders the image undraggable, and lets a consumer opt back in', async () => {
-    outcomes['https://example.com/a.png'] = 'load';
+  it('renders the image undraggable, and lets a consumer opt back in', () => {
     const { rerender } = render(
       <Avatar.Root>
         <Avatar.Image
@@ -161,7 +270,8 @@ describe('Mosaic Avatar', () => {
         />
       </Avatar.Root>,
     );
-    expect(await screen.findByRole('img', { name: 'Alex' })).toHaveAttribute('draggable', 'false');
+    fireEvent.load(screen.getByAltText('Alex'));
+    expect(screen.getByRole('img', { name: 'Alex' })).toHaveAttribute('draggable', 'false');
 
     rerender(
       <Avatar.Root>
@@ -172,7 +282,7 @@ describe('Mosaic Avatar', () => {
         />
       </Avatar.Root>,
     );
-    expect(await screen.findByRole('img', { name: 'Alex' })).toHaveAttribute('draggable', 'true');
+    expect(screen.getByRole('img', { name: 'Alex' })).toHaveAttribute('draggable', 'true');
   });
 
   // The rows this sits in remount whenever they change shape, and the header swaps between
@@ -228,8 +338,7 @@ describe('Mosaic Avatar', () => {
     }
   });
 
-  it('swaps straight to a cached image rather than falling back between the two', async () => {
-    outcomes['https://example.com/a.png'] = 'load';
+  it('swaps straight to a cached image rather than falling back between the two', () => {
     cached.add('https://example.com/b.png');
     const { rerender } = render(
       <Avatar.Root>
@@ -240,7 +349,7 @@ describe('Mosaic Avatar', () => {
         <Avatar.Fallback>CN</Avatar.Fallback>
       </Avatar.Root>,
     );
-    await screen.findByRole('img', { name: 'Alex' });
+    fireEvent.load(screen.getByAltText('Alex'));
 
     rerender(
       <Avatar.Root>
@@ -257,15 +366,20 @@ describe('Mosaic Avatar', () => {
   });
 
   it('keeps the fallback when the image errors', async () => {
-    outcomes['https://example.com/bad.png'] = 'error';
     render(
       <Avatar.Root>
-        <Avatar.Image src='https://example.com/bad.png' />
+        <Avatar.Image
+          src='https://example.com/bad.png'
+          alt='Alex'
+        />
         <Avatar.Fallback>CN</Avatar.Fallback>
       </Avatar.Root>,
     );
+    const image = screen.getByAltText('Alex');
+    fireEvent.error(image);
     await waitFor(() => expect(screen.getByText('CN')).toBeInTheDocument());
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getByAltText('Alex')).toBe(image);
+    expect(image).toHaveClass(stylex.props(styles.imageHidden).className ?? '');
   });
 
   it('holds the fallback content in a slot of its own rather than painting it', () => {
@@ -279,7 +393,6 @@ describe('Mosaic Avatar', () => {
   });
 
   it('pulses only while an image is still resolving', async () => {
-    unresolved.add('https://example.com/slow.png');
     const { rerender } = render(
       <Avatar.Root>
         <Avatar.Image src='https://example.com/slow.png' />
@@ -288,13 +401,13 @@ describe('Mosaic Avatar', () => {
     );
     expect(screen.getByTestId('fallback')).toHaveAttribute('data-pending', '');
 
-    outcomes['https://example.com/bad.png'] = 'error';
     rerender(
       <Avatar.Root>
         <Avatar.Image src='https://example.com/bad.png' />
         <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
       </Avatar.Root>,
     );
+    fireEvent.error(screen.getByAltText(''));
     await waitFor(() => expect(screen.getByTestId('fallback')).not.toHaveAttribute('data-pending'));
   });
 

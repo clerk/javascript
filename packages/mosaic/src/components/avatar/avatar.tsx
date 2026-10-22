@@ -1,4 +1,5 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -71,55 +72,55 @@ const AvatarRoot = React.forwardRef<HTMLSpanElement, AvatarProps>(function Mosai
 export type AvatarImageProps = MosaicElementProps<'img'>;
 
 const AvatarImage = React.forwardRef<HTMLImageElement, AvatarImageProps>(function MosaicAvatarImage(
-  { src, alt = '', xstyle, ...rest },
+  { src, srcSet, sizes, alt = '', onLoad, onError, xstyle, ...rest },
   ref,
 ) {
   const { bordered, status, onStatusChange } = useAvatarContext('Avatar.Image');
+  const imageRef = React.useRef<HTMLImageElement>(null);
+  const mergedRef = useMergeRefs([imageRef, ref]);
 
-  // Preload `src` and report status to the root, so the fallback shows until the image resolves.
-  // A layout effect, because it also has to catch the case below before anything is painted.
   useSafeLayoutEffect(() => {
-    if (!src) {
+    const image = imageRef.current;
+    if (!image || (!src && !srcSet)) {
       onStatusChange('error');
       return;
     }
 
-    const image = new window.Image();
-    image.src = src;
-
-    // An image the browser already holds is complete the moment it is asked for. Resolving it here
-    // rather than off an event keeps a remount (a row changing shape) or a swap between two avatars
-    // already on screen from dropping to the initials and back for a frame.
     if (image.complete) {
-      onStatusChange('loaded');
+      onStatusChange(image.naturalWidth > 0 ? 'loaded' : 'error');
       return;
     }
 
-    let active = true;
     onStatusChange('loading');
-    image.onload = () => active && onStatusChange('loaded');
-    image.onerror = () => active && onStatusChange('error');
-
-    return () => {
-      active = false;
-    };
-  }, [src, onStatusChange]);
-
-  if (status !== 'loaded') {
-    return null;
-  }
+  }, [src, srcSet, sizes, onStatusChange]);
 
   return (
     <img
-      ref={ref}
+      ref={mergedRef}
       src={src}
+      srcSet={srcSet}
+      sizes={sizes}
       alt={alt}
       // An avatar is an identity mark, not content to pull out of the page — dragging one
       // only ever produces a stray ghost image mid-interaction.
       draggable={false}
+      onLoad={event => {
+        onStatusChange('loaded');
+        onLoad?.(event);
+      }}
+      onError={event => {
+        onStatusChange('error');
+        onError?.(event);
+      }}
       {...mergeStyleProps(
         themeProps('avatar-image'),
-        stylex.props(reset.base, styles.image, bordered && styles.overlay, xstyle),
+        stylex.props(
+          reset.base,
+          styles.image,
+          bordered && styles.overlay,
+          (status === 'loading' || status === 'error' || (!src && !srcSet)) && styles.imageHidden,
+          xstyle,
+        ),
         rest,
       )}
     />
@@ -193,8 +194,8 @@ const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function M
 
 /**
  * Compound avatar. `Avatar.Root` positions and sizes the box; `Avatar.Image` renders
- * once its source loads; `Avatar.Fallback` holds the space until then, as a blank
- * placeholder that shimmers only while an image is actually on its way; `Avatar.Icon`
+ * from its source; `Avatar.Fallback` holds the space while the image is unavailable,
+ * as a blank placeholder that shimmers only while an image is actually on its way; `Avatar.Icon`
  * adds an optional corner affordance.
  */
 export const Avatar = {

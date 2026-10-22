@@ -48,6 +48,10 @@ export const styles = stylex.create({
     width: '100%',
   },
 
+  imageHidden: {
+    visibility: 'hidden',
+  },
+
   // fallback fills the box, centering its content and inheriting the sized font
   fallback: {
     borderRadius: 'inherit',
