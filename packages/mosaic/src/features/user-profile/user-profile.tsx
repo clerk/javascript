@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
+import type { APIKeysPageProps } from '../api-keys/api-keys-table';
 import { useUserProfilePages } from '../switcher/switcher.pages';
 import type { UserProfileOptions } from './user-profile.provider';
 import { UserProfileProvider } from './user-profile.provider';
@@ -28,6 +29,11 @@ export interface UserProfileProps
    * Rendered while Clerk is loading. Nothing renders once the answer is that nobody is signed in.
    */
   fallback?: ReactNode;
+  /**
+   * Options for the API keys page: `hide` leaves it out of the navigation, `perPage` sets how many
+   * keys a page lists, and `showDescription` adds an optional description when creating a key.
+   */
+  apiKeysProps?: APIKeysPageProps;
 }
 
 /**
@@ -75,6 +81,7 @@ export function UserProfile({
   defaultPage,
   additionalOAuthScopes,
   fallback,
+  apiKeysProps: { hide: hideAPIKeys = false, ...apiKeysProps } = {},
 }: UserProfileProps) {
   const model = useUserProfileUserModel();
   const builtInPages = useUserProfilePages();
@@ -103,7 +110,10 @@ export function UserProfile({
         pages={{
           account: <UserProfileProfilePanel />,
           security: <UserProfileSecurityPanel />,
-          apiKeys: builtInPages.includes('apiKeys') ? <UserProfileApiKeysPanel /> : undefined,
+          apiKeys:
+            builtInPages.includes('apiKeys') && !hideAPIKeys ? (
+              <UserProfileApiKeysPanel {...apiKeysProps} />
+            ) : undefined,
         }}
       />
     </UserProfileProvider>

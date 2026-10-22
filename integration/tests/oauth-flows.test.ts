@@ -2,6 +2,7 @@ import { createClerkClient } from '@clerk/backend';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import { environmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
 import { resolveInstanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
@@ -12,7 +13,11 @@ import { createUserService } from '../testUtils/usersService';
 const grantOAuthConsent = async (page: Page) => {
   const allowAccessButton = page.getByRole('button', { name: 'Allow' });
   await expect(allowAccessButton).toBeVisible();
-  await allowAccessButton.click();
+  const [callback] = await Promise.all([
+    page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+    allowAccessButton.click(),
+  ]);
+  expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
 };
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flows @nextjs', ({ app }) => {
@@ -52,6 +57,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('oauth flo
 
   test('sign up with custom oauth provider', async ({ page, context }) => {
     const u = await createTestUtils({ app, page, context });
+    const providerKeys = await resolveInstanceKeys('oauth-provider');
+    await createTestUtils({
+      app: {
+        ...app,
+        env: environmentConfig()
+          .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', providerKeys.pk)
+          .setEnvVariable('private', 'CLERK_SECRET_KEY', providerKeys.sk),
+      },
+      page,
+      context,
+    });
     await u.po.signUp.goTo();
 
     await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();

@@ -12,6 +12,8 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
@@ -225,7 +227,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                   {getFlagEmojiFromCountryIso(country.iso)}
                 </span>
                 <Icon
-                  name='chevron-down'
+                  glyph={ChevronDown}
                   size='md'
                 />
               </span>
@@ -257,7 +259,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 >
                   <InputGroup.Start>
                     <Icon
-                      name='magnifying-glass'
+                      glyph={MagnifyingGlass}
                       size='sm'
                     />
                   </InputGroup.Start>

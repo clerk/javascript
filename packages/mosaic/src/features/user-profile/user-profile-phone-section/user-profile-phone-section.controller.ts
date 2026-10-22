@@ -4,7 +4,6 @@ import { useRef } from 'react';
 import { useConfirmController } from '../../../blocks/confirm';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
-import type { ReverificationController } from '../../reverification';
 import type { UserProfilePhone } from '../user-profile-contact.types';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
 import type { ReadyPhoneSectionModel, UserProfilePhoneSectionViewProps } from './user-profile-phone-section.types';
@@ -16,11 +15,14 @@ export function useUserProfilePhoneSectionController({
   getPhoneVerifier,
   onSetPrimaryPhone,
   onRemovePhone,
-  reverification,
-}: Omit<ReadyPhoneSectionModel, 'status' | 'userId'> & {
-  reverification?: ReverificationController;
-}): UserProfilePhoneSectionViewProps {
-  const verification = useUserProfileAddPhoneController({ onCreate: onCreatePhone });
+  removeReverification,
+  setPrimaryReverification,
+  createReverification,
+}: Omit<ReadyPhoneSectionModel, 'status' | 'userId'>): UserProfilePhoneSectionViewProps {
+  const verification = useUserProfileAddPhoneController({
+    onCreate: onCreatePhone,
+    reverification: createReverification,
+  });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
@@ -30,7 +32,7 @@ export function useUserProfilePhoneSectionController({
   });
   const remove = useConfirmController<UserProfilePhone>({
     onConfirm: phone => removalFocus.remove(phone.id),
-    reverification,
+    reverification: removeReverification,
   });
 
   return {
@@ -44,6 +46,8 @@ export function useUserProfilePhoneSectionController({
     remove: onRemovePhone ? remove : undefined,
     finalFocus: removalFocus.finalFocus,
     verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
+    setPrimaryReverification,
+    setPrimaryFinalFocus: () => (setPrimary.lastKey ? removalFocus.trigger(setPrimary.lastKey) : null),
     onVerify: id => {
       const phone = phones.find(phone => phone.id === id);
       if (phone) {

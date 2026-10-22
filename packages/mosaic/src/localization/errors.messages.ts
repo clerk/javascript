@@ -3,6 +3,8 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   already_a_member_in_organization: 'Some of these email addresses already belong to members of this organization.',
   action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
   active_device_unavailable: 'This device is no longer available. Please try again.',
+  api_key_secret_unavailable:
+    'The API key was created, but its secret could not be shown. Revoke it and create a new one.',
   avatar_file_count_exceeded: 'Only one file can be uploaded at a time.',
   avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
   avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',

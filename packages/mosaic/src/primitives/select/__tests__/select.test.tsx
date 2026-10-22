@@ -768,11 +768,11 @@ describe('Select', () => {
       await user.click(screen.getByRole('combobox'));
 
       expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'none');
-      expect(document.body).toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).toHaveStyle({ overflowY: 'hidden' });
 
       await user.keyboard('{Escape}');
       await waitFor(() => expect(screen.queryByTestId('select-positioner')).not.toBeInTheDocument());
-      expect(document.body).not.toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
     });
 
     it('positions like a menu when opened by touch', async () => {
@@ -783,7 +783,7 @@ describe('Select', () => {
       await user.pointer({ keys: '[TouchA]', target: trigger });
 
       expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'bottom');
-      expect(document.body).not.toHaveStyle({ overflow: 'hidden' });
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
     });
 
     it('positions like a menu when the trigger hugs the viewport edge', async () => {

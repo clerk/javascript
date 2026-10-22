@@ -1,6 +1,6 @@
 import { useToastManager } from '@clerk/mosaic/components/toast';
 import type { OrganizationProfileInviteMembersDialogProps } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel/organization-profile-invite-members.dialog';
-import { useMessages } from '@clerk/mosaic/localization';
+import { plural, useLocale, useMessages } from '@clerk/mosaic/localization';
 import type { MouseEvent } from 'react';
 import { useRef, useState } from 'react';
 
@@ -19,6 +19,7 @@ export function useInviteMembersFixture(): {
   inviteDialog: OrganizationProfileInviteMembersDialogProps;
 } {
   const m = useMessages('organizationProfileInviteMembers');
+  const locale = useLocale();
   const roles = useChaosFixture(exampleRoles, items =>
     items.map(role => ({ ...role, label: chaosText(role.label), description: chaosText(role.description) })),
   );
@@ -64,7 +65,7 @@ export function useInviteMembersFixture(): {
           return;
         }
         setOpen(false);
-        toast.add({ type: 'success', label: m.sent });
+        toast.add({ type: 'success', label: plural(m.sent, emailAddresses.length, locale) });
       },
     },
   };

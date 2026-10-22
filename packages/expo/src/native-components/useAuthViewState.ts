@@ -90,13 +90,13 @@ export function useAuthViewState(): UseAuthViewStateReturn {
 
           setUseJsFallback(true);
           if (__DEV__) {
-            console.error('[useAuthViewState] Failed to get native auth-flow state:', error);
+            console.error('Clerk: Failed to get native auth-flow state:', error);
           }
         });
     } catch (error) {
       setUseJsFallback(true);
       if (__DEV__) {
-        console.error('[useAuthViewState] Failed to observe native auth-flow state:', error);
+        console.error('Clerk: Failed to observe native auth-flow state:', error);
       }
     }
 

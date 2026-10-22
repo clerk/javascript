@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Pen } from '../../icons/glyphs/pen';
 import { MosaicProvider } from '../../mosaic-provider';
 import { ActionMenu } from './action-menu';
 
@@ -27,7 +28,7 @@ describe('Mosaic ActionMenu', () => {
     const onClick = vi.fn();
     const user = userEvent.setup();
     renderMenu([
-      { label: 'Rename', icon: 'pen', onClick },
+      { label: 'Rename', icon: Pen, onClick },
       { label: 'Remove', color: 'negative', onClick: vi.fn() },
     ]);
 

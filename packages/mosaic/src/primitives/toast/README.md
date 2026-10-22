@@ -141,7 +141,7 @@ function CopyButton() {
 | Part                | Default Element | Description                                                                                   |
 | ------------------- | --------------- | --------------------------------------------------------------------------------------------- |
 | `Toast.Provider`    | —               | Owns the toast list, timers, and the queue. Renders no element.                               |
-| `Toast.Portal`      | —               | Renders its children into `document.body` (or `root`).                                        |
+| `Toast.Portal`      | —               | Renders its children into `root`, the `PortalProvider` container, or `document.body`.         |
 | `Toast.Viewport`    | `<div>`         | Landmark region that holds the toasts. Hover or focus inside pauses every timer.              |
 | `Toast.Positioner`  | `<div>`         | Positions one toast against an anchor element. Optional; wraps `Toast.Root`.                  |
 | `Toast.Root`        | `<div>`         | One toast. Focusable, closes on Escape, drives the exit transition.                           |
@@ -166,9 +166,9 @@ Element-rendering parts accept a `render` prop and the native attributes of thei
 
 ### `Toast.Portal`
 
-| Prop   | Type                                                    | Default         | Description       |
-| ------ | ------------------------------------------------------- | --------------- | ----------------- |
-| `root` | `HTMLElement \| null \| RefObject<HTMLElement \| null>` | `document.body` | Portal container. |
+| Prop   | Type                                                    | Default                                              | Description       |
+| ------ | ------------------------------------------------------- | ---------------------------------------------------- | ----------------- |
+| `root` | `HTMLElement \| null \| RefObject<HTMLElement \| null>` | the `PortalProvider` container, else `document.body` | Portal container. |
 
 ### `Toast.Positioner`
 

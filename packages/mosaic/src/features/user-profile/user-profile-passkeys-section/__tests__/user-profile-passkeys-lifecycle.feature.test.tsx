@@ -12,6 +12,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfilePasskeysSection } from '../user-profile-passkeys-section';
@@ -173,7 +174,7 @@ describe('Submitting passkey actions', () => {
     serveAccounts();
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     await user.keyboard('{ArrowDown}{Enter}');
     const dialog = await screen.findByRole('dialog');
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
@@ -331,7 +332,7 @@ describe('Passkey identity and policy at action time', () => {
     serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await waitFor(() => expect(screen.getByRole('dialog')).toBeVisible());
     await act(() => clerk.setActive({ session: 'sess_b' }));
@@ -343,7 +344,7 @@ describe('Passkey identity and policy at action time', () => {
     serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);
@@ -409,7 +410,7 @@ describe('Replacing instance policy while editing', () => {
       </MosaicProvider>,
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Alice laptop' }));
     const dialog = await openDialog(user, screen.getByRole('menuitem', { name: 'Rename' }));
     const input = within(dialog).getByRole('textbox', { name: 'Passkey name' });
     await user.clear(input);

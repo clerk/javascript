@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { clerkApiError } from '../../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { SaveError } from '../../../../utils/errors';
+import type { ReverificationController } from '../../../reverification';
 import { useUserProfilePhoneSectionController } from '../user-profile-phone-section.controller';
 import type { ReadyPhoneSectionModel } from '../user-profile-phone-section.types';
 import { UserProfilePhoneSectionView } from '../user-profile-phone-section.view';
@@ -13,14 +14,26 @@ import { UserProfilePhoneSectionView } from '../user-profile-phone-section.view'
 const phoneVerifier = { sendCode: () => Promise.resolve(), verifyCode: () => Promise.resolve() };
 
 type PhoneSectionProps = Partial<Omit<ReadyPhoneSectionModel, 'status' | 'userId'>>;
+const idleReverification = { status: 'idle', visible: false } satisfies ReverificationController;
 
 function PhoneSection({
   phones = [{ id: 'phone_1', value: '+18015550100', isDefault: false, isVerified: true }],
   getPhoneVerifier = () => phoneVerifier,
   onSetPrimaryPhone = () => Promise.resolve(),
+  removeReverification = idleReverification,
+  setPrimaryReverification = idleReverification,
+  createReverification = idleReverification,
   ...rest
 }: PhoneSectionProps) {
-  const controller = useUserProfilePhoneSectionController({ phones, getPhoneVerifier, onSetPrimaryPhone, ...rest });
+  const controller = useUserProfilePhoneSectionController({
+    phones,
+    getPhoneVerifier,
+    onSetPrimaryPhone,
+    removeReverification,
+    setPrimaryReverification,
+    createReverification,
+    ...rest,
+  });
   return <UserProfilePhoneSectionView {...controller} />;
 }
 

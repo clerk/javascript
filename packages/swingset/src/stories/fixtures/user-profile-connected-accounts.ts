@@ -8,6 +8,8 @@ import { useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosText } from '@/lib/chaos';
 
+import { idleReverification } from './reverification';
+
 export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
@@ -45,6 +47,9 @@ export function useConnectedAccountsFixture({
 
   return useUserProfileConnectedAccountsController({
     accounts,
+    removeReverification: idleReverification,
+    reconnectReverification: idleReverification,
+    connectReverification: idleReverification,
     availableProviders,
     // eslint-disable-next-line @typescript-eslint/require-await
     onConnect: async (id: string) => {

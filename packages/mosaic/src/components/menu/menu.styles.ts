@@ -95,6 +95,13 @@ export const item = stylex.create({
         ':hover': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
+    color: {
+      default: colorVars['--cl-color-foreground-secondary'],
+      ':is([data-active])': colorVars['--cl-color-foreground'],
+      '@media (hover: hover)': {
+        ':hover': colorVars['--cl-color-foreground'],
+      },
+    },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
     display: 'flex',
     // The viewport is a height-capped flex column: without this the rows squash to fit the cap

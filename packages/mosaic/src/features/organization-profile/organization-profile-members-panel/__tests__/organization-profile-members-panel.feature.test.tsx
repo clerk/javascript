@@ -12,6 +12,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../../localization';
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
@@ -59,6 +60,29 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByText('Bob Smith')).toBeVisible();
     expect(screen.getByText('bob@example.com')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Manage Bob Smith' })).toBeNull();
+  });
+
+  it('shows loading until the first page of members arrives', async () => {
+    serve();
+    const list = holdRequests('get', '/v1/organizations/:organizationId/memberships');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const table = () => screen.getByRole('table', { name: 'Members' });
+    const columnWidths = () =>
+      within(table())
+        .getAllByRole('columnheader')
+        .map(cell => cell.getBoundingClientRect().width);
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Loading members');
+    expect(within(table()).getAllByRole('row')).toHaveLength(1);
+    expect(within(table()).queryByRole('button')).toBeNull();
+    expect(screen.getByRole('searchbox', { name: 'Search members' })).toBeDisabled();
+    const loadingWidths = columnWidths();
+    list.release();
+    expect(await screen.findByText('Bob Smith')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Members loaded');
+    expect(screen.getByRole('searchbox', { name: 'Search members' })).toBeVisible();
+    expect(within(table()).getAllByRole('row')).toHaveLength(3);
+    expect(columnWidths()).toEqual(loadingWidths);
   });
 
   it('does not load roles for a member who cannot change them', async () => {
@@ -126,8 +150,8 @@ describe('OrganizationProfileMembersPanel', () => {
     await waitFor(() => expect(members.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeDisabled();
     members.release();
-    await user.click(await screen.findByRole('button', { name: 'Manage Bob Smith' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Bob Smith' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
     const dialog = await screen.findByRole('alertdialog', { name: 'Remove Bob Smith?' });
     await user.click(within(dialog).getByRole('button', { name: 'Remove from organization' }));
     await waitFor(() => expect(fapi.memberships.some(item => item.id === bob.id)).toBe(false));
@@ -138,8 +162,8 @@ describe('OrganizationProfileMembersPanel', () => {
     const fapi = serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Bob Smith' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Bob Smith' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
     const dialog = await screen.findByRole('alertdialog', { name: 'Remove Bob Smith?' });
     worker.use(
       http.post(fapiUrl('/v1/organizations/:organizationId/memberships/:userId'), () =>
@@ -211,16 +235,35 @@ describe('OrganizationProfileMembersPanel', () => {
     expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
   });
 
-  it('keeps members visible and role editing unavailable while roles load', async () => {
+  it('keeps the members table loading until roles load', async () => {
     serve(['org:sys_memberships:read', 'org:sys_memberships:manage']);
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    const { clerk, rerender } = await renderWithClerk(<div />);
+    const activeOrganization = clerk.organization;
+    if (!activeOrganization) {
+      throw new Error('Expected an active organization');
+    }
+    const getMemberships = vi.spyOn(activeOrganization, 'getMemberships');
+    rerender(<OrganizationProfileMembersPanel />);
+    await waitFor(() => expect(getMemberships).toHaveBeenCalled());
+    await act(async () => {
+      await getMemberships.mock.results[0]?.value;
+    });
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByText('Bob Smith')).toBeNull();
+    roles.release();
+    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
+    expect(screen.getByRole('table', { name: 'Members' })).toHaveAttribute('aria-busy', 'false');
+  });
+
+  it('shows members to a reader without waiting for roles', async () => {
+    serve();
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-    await waitFor(() => expect(roles.requests).toHaveLength(1));
-    expect(screen.queryByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Manage Bob Smith' })).toBeVisible();
+    expect(roles.requests).toHaveLength(0);
     roles.release();
-    expect(await screen.findByRole('combobox', { name: /^Change role for Bob Smith/ })).toBeVisible();
   });
 
   it('shows the membership role label when the role is absent from available options', async () => {
@@ -322,8 +365,8 @@ describe('OrganizationProfileMembersPanel', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Next members page' }));
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Manage Bob Smith' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Remove from organization' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Bob Smith' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
     await user.click(
       within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }),
     );

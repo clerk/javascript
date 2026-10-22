@@ -1,7 +1,7 @@
 import { setup } from '../../../machine/setup';
 import type { DoneInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
-import type { MembersRoles } from './members-table-tab.types';
+import type { MembersRoles, MembersRolesState } from './members-table-tab.types';
 
 interface RolesContext {
   loadRoles: (() => Promise<MembersRoles>) | undefined;
@@ -29,7 +29,12 @@ const rolesMachine = createMachine({
   },
 });
 
-export function useMembersPanelRolesController(loadRoles: (() => Promise<MembersRoles>) | undefined) {
+export function useMembersPanelRolesController(
+  loadRoles: (() => Promise<MembersRoles>) | undefined,
+): MembersRolesState {
   const [state] = useMachine(rolesMachine, { context: { loadRoles } });
-  return state.value === 'ready' ? state.context.result : null;
+  return {
+    roles: state.value === 'ready' ? state.context.result : null,
+    isLoading: state.value === 'loading',
+  };
 }

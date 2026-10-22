@@ -1,7 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Checkmark } from '../../icons/glyphs/checkmark';
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -221,9 +223,9 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
 
 type FieldFeedbackKind = 'error' | 'success' | 'info';
 
-const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon?: IconName; color: stylex.StyleXStyles }> = {
-  error: { slot: 'field-error', icon: 'exclamation-circle', color: feedbackStyles.error },
-  success: { slot: 'field-success', icon: 'checkmark', color: feedbackStyles.success },
+const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon?: IconComponent; color: stylex.StyleXStyles }> = {
+  error: { slot: 'field-error', icon: ExclamationCircle, color: feedbackStyles.error },
+  success: { slot: 'field-success', icon: Checkmark, color: feedbackStyles.success },
   info: { slot: 'field-info', color: feedbackStyles.info },
 };
 

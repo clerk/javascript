@@ -52,6 +52,7 @@ const esES: MosaicCatalog = {
 
 const colin = {
   sessionId: 'sess_colin',
+  userId: 'user_colin',
   name: 'Colin',
   identifier: 'colin@clerk.dev',
   imageUrl: 'https://avatars.githubusercontent.com/u/51144033?v=4',
@@ -59,6 +60,7 @@ const colin = {
 
 const braden = {
   sessionId: 'sess_braden',
+  userId: 'user_braden',
   name: 'Braden',
   identifier: 'braden@clerk.dev',
   imageUrl: 'https://avatars.githubusercontent.com/u/64913815?v=4',

@@ -1,10 +1,12 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
+import { openDialog } from '../../../__tests__/feature/dialog';
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
+import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfile } from '../user-profile';
 import { signedIn } from '../user-profile-connected-accounts-section/__tests__/user-profile-connected-accounts.fixtures';
@@ -55,6 +57,31 @@ describe('UserProfile', () => {
     },
   );
 
+  it.each([
+    { hide: true, tabs: ['Account', 'Security'] },
+    { hide: false, tabs: ['Account', 'Security', 'API Keys'] },
+  ])('lists API keys only when they are not hidden: $hide', async ({ hide, tabs }) => {
+    serve({ userAPIKeysEnabled: true });
+    await renderWithClerk(<UserProfile apiKeysProps={{ hide }} />);
+    expect(tabNames()).toEqual(tabs);
+  });
+
+  it('passes the API keys options to the API keys page', async () => {
+    serve({ userAPIKeysEnabled: true });
+    await renderWithClerk(
+      <UserProfile
+        defaultPage='apiKeys'
+        apiKeysProps={{ showDescription: true }}
+      />,
+    );
+    const user = userEvent.setup();
+
+    const dialog = await openDialog(user, await screen.findByRole('button', { name: 'Create API key' }), {
+      name: 'Add new API key',
+    });
+    expect(within(dialog).getByRole('textbox', { name: 'Description' })).toBeVisible();
+  });
+
   it('switches pages from the navigation', async () => {
     serve({ userAPIKeysEnabled: true });
     await renderWithClerk(<UserProfile />);
@@ -100,7 +127,7 @@ describe('UserProfile', () => {
     await renderWithClerk(<UserProfile additionalOAuthScopes={{ google: ['calendar'] }} />);
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Google' }));
     expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toBeEnabled();
   });
 });

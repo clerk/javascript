@@ -338,6 +338,13 @@ jobs:
           filter: 'blob:none'
           show-progress: false
 
+      - name: Fetch Expo native release tags
+        run: |
+          git fetch --depth=1 --no-tags origin \
+            'refs/tags/@clerk/expo-native-components@*:refs/tags/@clerk/expo-native-components@*' \
+            'refs/tags/@clerk/expo-google-signin@*:refs/tags/@clerk/expo-google-signin@*' \
+            'refs/tags/@clerk/expo-biometrics@*:refs/tags/@clerk/expo-biometrics@*'
+
       - name: Setup
         id: config
         uses: $/.github/actions/init-blacksmith

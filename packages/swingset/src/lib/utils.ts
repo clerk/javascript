@@ -8,5 +8,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function fillsFrame(storyModule: StoryModule): boolean {
-  return storyModule.meta.navigation?.category === 'Sections';
+  const category = storyModule.meta.navigation?.category;
+  return category === 'Sections' || category === 'Panels';
 }

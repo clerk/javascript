@@ -1,5 +1,37 @@
 # Change Log
 
+## 4.14.0
+
+### Minor Changes
+
+- Rewrite the sync between the Clerk JS client and the native Clerk SDK. Both now share a single device token stored by the native SDK. This fixes a stale token in the app's `tokenCache` signing out a session that was signed in natively, and the two SDKs ending up on different tokens when both rotated the device token at the same time. ([#9956](https://github.com/clerk/javascript/pull/9956)) by [@mikepitre](https://github.com/mikepitre)
+
+  If you use the native components, update `@clerk/expo-native-components` to 0.3.0 or later and ship a new app build. Builds made with an older version render the native components blank, so don't deliver this version to them as an over-the-air update. With EAS Update, the `fingerprint` runtime version policy keeps those builds from receiving it. With any other policy, change your runtime version when you make this upgrade.
+
+### Patch Changes
+
+- Show `@clerk/expo` warnings and errors in development builds. The build previously removed them. ([#10319](https://github.com/clerk/javascript/pull/10319)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+  - @clerk/clerk-js@6.40.0
+  - @clerk/react@6.18.0
+
+## 4.13.0
+
+### Minor Changes
+
+- Add Expo SDK 58 support. ([#9791](https://github.com/clerk/javascript/pull/9791)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`c0ba3bc`](https://github.com/clerk/javascript/commit/c0ba3bc728d76bd40f80c2c4c506cbfeb5d0807a), [`560ff50`](https://github.com/clerk/javascript/commit/560ff507af494b43210fd2d9a7bd109c4eb6902c)]:
+  - @clerk/clerk-js@6.39.1
+
 ## 4.12.0
 
 ### Minor Changes

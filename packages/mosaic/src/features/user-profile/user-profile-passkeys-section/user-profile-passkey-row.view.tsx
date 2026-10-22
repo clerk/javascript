@@ -6,6 +6,7 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Dialog } from '../../../components/dialog';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { SecurityPasskey } from '../../../icons/glyphs/security-passkey';
 import { fill, useMessages } from '../../../localization';
 import { styles } from './user-profile-passkeys-section.styles';
 import type { UserProfilePasskeyNameValidator } from './user-profile-passkeys-section.types';
@@ -56,7 +57,7 @@ export function UserProfilePasskeyRowView({
             bordered={false}
           >
             <Icon
-              name='security-passkey'
+              glyph={SecurityPasskey}
               size='md'
               xstyle={styles.icon}
             />
