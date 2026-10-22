@@ -529,6 +529,7 @@ export function useUserProfileMfaController(model: ReadyModel) {
     }
   };
 
+  // The machine guarantees that only one is running/visible at a time
   const reverification =
     [model.createPhoneReverification, model.enrollSmsReverification, model.authenticatorReverification].find(
       controller => controller.visible,
