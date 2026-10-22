@@ -21,6 +21,7 @@ import { allowsIdentificationCreation } from '../../../utils/allows-identificati
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import { useUserProfileOptions } from '../user-profile.provider';
+import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
   ConnectedAccountActionResult,
   ConnectedAccountProviderDisplay,
@@ -71,8 +72,6 @@ const RECONNECT_ERROR_CODES = [
   'external_account_email_address_verification_required',
 ];
 
-const MONOCHROME_PROVIDERS = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'];
-
 type SocialSettings = Partial<
   Record<string, Pick<OAuthProviders[OAuthStrategy], 'name' | 'logo_url'> & { strategy: string }>
 >;
@@ -90,7 +89,7 @@ export function createProviderCatalog(
     display: {
       provider: name,
       iconUrl: iconImageUrl(provider),
-      monochromeIcon: MONOCHROME_PROVIDERS.includes(provider),
+      monochromeIcon: isMonochromeProvider(provider),
     },
   }));
   const candidates = new Set([
