@@ -7,7 +7,6 @@ import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { Spinner } from '../../components/spinner';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
@@ -43,7 +42,6 @@ export function APIKeysTableView({
   onBulkAction,
   sort,
   onSortChange,
-  isLoading,
   isFetching = false,
   isError = false,
   onRetry,
@@ -70,6 +68,7 @@ export function APIKeysTableView({
   return (
     <>
       <div {...mergeStyleProps(themeProps('api-keys-table'), stylex.props(styles.root))}>
+        <VisuallyHidden role='status'>{isError ? m.loadError : m.loaded}</VisuallyHidden>
         <Table.Toolbar>
           <Table.Search
             ref={searchInputRef}
@@ -88,17 +87,15 @@ export function APIKeysTableView({
           ) : null}
         </Table.Toolbar>
         <Table.Root
-          layout='fixed'
           aria-label={m.title}
-          aria-busy={isLoading || isFetching}
+          aria-busy={isFetching}
+          layout='fixed'
+          minWidth='36rem'
         >
-          <Table.ColumnGroup>
-            {onBulkAction ? <Table.Column /> : null}
-            <Table.Column />
-            <Table.Column width='9rem' />
-            <Table.Column width='9rem' />
-            {revoke ? <Table.Column width='4rem' /> : null}
-          </Table.ColumnGroup>
+          <APIKeysTableColumns
+            selectable={Boolean(onBulkAction)}
+            revocable={Boolean(revoke)}
+          />
           <Table.Header>
             <Table.Row>
               {onBulkAction ? (
@@ -120,15 +117,7 @@ export function APIKeysTableView({
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {/* TODO: Replace with a shared Table.Loading built on a Mosaic Skeleton component (skeleton rows sized to the columns). */}
-            {isLoading ? (
-              <Table.Empty colSpan={columnCount}>
-                <span role='status'>
-                  <Spinner />
-                  <VisuallyHidden>{m.loading}</VisuallyHidden>
-                </span>
-              </Table.Empty>
-            ) : isError ? (
+            {isError ? (
               <Table.Empty colSpan={columnCount}>
                 <EmptyState.Root>
                   <EmptyState.Icon glyph={ExclamationCircle} />
@@ -223,6 +212,13 @@ export function APIKeysTableView({
 }
 
 function APIKeyMetadata({ messages: m, apiKey }: { messages: APIKeysTableMessages; apiKey: APIKey }) {
+  const id = truncateWithEndVisible(apiKey.id, 10, 4);
+  const expiry =
+    apiKey.expiresAtLabel === null
+      ? m.neverExpires
+      : fill(m.expires, {
+          expiresDate: apiKey.expiresAtLabel,
+        });
   return (
     <div {...stylex.props(styles.metadata)}>
       <Text xstyle={styles.name}>{apiKey.name}</Text>
@@ -230,17 +226,13 @@ function APIKeyMetadata({ messages: m, apiKey }: { messages: APIKeysTableMessage
         size='xs'
         color='foreground-secondary'
       >
-        {truncateWithEndVisible(apiKey.id, 10, 4)} ·{' '}
+        {id} ·{' '}
         <Text
           render={<span />}
           size='xs'
           color={apiKey.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
         >
-          {apiKey.expiresAtLabel === null
-            ? m.neverExpires
-            : fill(m.expires, {
-                expiresDate: apiKey.expiresAtLabel,
-              })}
+          {expiry}
         </Text>
       </Text>
     </div>
@@ -275,5 +267,17 @@ function APIKeyActions({
         </Menu.Item>
       </Menu.Popup>
     </Menu.Root>
+  );
+}
+
+export function APIKeysTableColumns({ selectable, revocable }: { selectable: boolean; revocable: boolean }) {
+  return (
+    <Table.ColumnGroup>
+      {selectable ? <Table.Column /> : null}
+      <Table.Column />
+      <Table.Column width='9rem' />
+      <Table.Column width='9rem' />
+      {revocable ? <Table.Column width='4rem' /> : null}
+    </Table.ColumnGroup>
   );
 }

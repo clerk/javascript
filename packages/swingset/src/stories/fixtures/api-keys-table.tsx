@@ -180,7 +180,6 @@ export function useAPIKeysTableFixture({
     page,
     pageSize,
     searchValue,
-    isLoading: false,
     searchInputRef,
     createButtonRef,
     onCreate: create.onOpen,

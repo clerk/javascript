@@ -36,7 +36,6 @@ export interface APIKeysTableViewProps {
   page: number;
   pageSize?: number;
   searchValue: string;
-  isLoading: boolean;
   isFetching?: boolean;
   isError?: boolean;
   onRetry?: () => void;

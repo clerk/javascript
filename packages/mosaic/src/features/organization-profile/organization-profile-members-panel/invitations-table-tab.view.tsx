@@ -78,6 +78,7 @@ export function InvitationsTableTabView({
         ) : null}
         <Table.Root
           layout='fixed'
+          minWidth='35rem'
           aria-label={m.title}
           aria-busy={isFetching}
         >
