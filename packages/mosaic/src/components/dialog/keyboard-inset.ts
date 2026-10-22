@@ -14,9 +14,15 @@
  * - A sheet stays flush to the bottom edge and pads its popup by it instead, so the sheet reaches
  *   down to the keyboard with no gap where iOS floats its address bar, which `visualViewport`
  *   counts as part of the keyboard.
+ *
+ * While the keyboard is up, iOS can also pan the visual viewport down to reveal a field, which
+ * moves the top of the visible band below the top of the overlay. That pan is published as
+ * `--_cl-keyboard-offset`, and the track pads its top edge by it, so the whole dialog stays inside
+ * the band and scrolls within it rather than leaving its top out of reach above the screen.
  */
 
 const PROPERTY = '--_cl-keyboard-inset';
+const OFFSET_PROPERTY = '--_cl-keyboard-offset';
 
 // Keyboard-sized changes only: browser toolbars collapsing and expanding stay below this.
 const KEYBOARD_THRESHOLD = 60;
@@ -53,7 +59,10 @@ export function measureKeyboardInset(): number {
 }
 
 function publish(): void {
-  document.documentElement.style.setProperty(PROPERTY, `${measureKeyboardInset()}px`);
+  const inset = measureKeyboardInset();
+  const offset = inset > 0 ? Math.round(Math.max(0, window.visualViewport?.offsetTop ?? 0)) : 0;
+  document.documentElement.style.setProperty(PROPERTY, `${inset}px`);
+  document.documentElement.style.setProperty(OFFSET_PROPERTY, `${offset}px`);
 }
 
 function schedulePublish(): void {
@@ -94,6 +103,7 @@ export function acquireKeyboardInset(): () => void {
       smallViewportProbe?.remove();
       smallViewportProbe = null;
       document.documentElement.style.removeProperty(PROPERTY);
+      document.documentElement.style.removeProperty(OFFSET_PROPERTY);
     };
   }
 

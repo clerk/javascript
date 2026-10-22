@@ -18,6 +18,10 @@ function inset() {
   return document.documentElement.style.getPropertyValue('--_cl-keyboard-inset');
 }
 
+function offset() {
+  return document.documentElement.style.getPropertyValue('--_cl-keyboard-offset');
+}
+
 function nextFrame() {
   return new Promise(resolve => requestAnimationFrame(resolve));
 }
@@ -55,6 +59,23 @@ describe('acquireKeyboardInset', () => {
     await nextFrame();
     expect(inset()).toBe('168px');
     release();
+  });
+
+  it('publishes how far the browser has panned the visible band while the keyboard is up', async () => {
+    const release = acquireKeyboardInset();
+    viewport.offsetTop = 40;
+    viewport.dispatchEvent(new Event('scroll'));
+    await nextFrame();
+    expect(offset()).toBe('0px');
+
+    viewport.height = 500;
+    viewport.offsetTop = 100;
+    viewport.dispatchEvent(new Event('resize'));
+    await nextFrame();
+    expect(offset()).toBe('100px');
+
+    release();
+    expect(offset()).toBe('');
   });
 
   it('drops a pending update when released', async () => {
