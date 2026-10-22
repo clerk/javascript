@@ -6,6 +6,7 @@ import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
 import type { MosaicLocalization } from './localization';
 import { MosaicLocalizationProvider, resolveLocalization } from './localization';
+import type { ModalSurfaces } from './modals/modal.types';
 import { ModalHost } from './modals/modal-host';
 
 export interface MosaicProviderProps {
@@ -29,10 +30,12 @@ export function MosaicProvider({ children, icons, localization }: MosaicProvider
       <MosaicLocalizationProvider value={localizationValue}>
         <MosaicNowProvider value={now}>
           <ToastProvider>
-            <ModalHost>{children}</ModalHost>
+            <ModalHost surfaces={modalSurfaces}>{children}</ModalHost>
           </ToastProvider>
         </MosaicNowProvider>
       </MosaicLocalizationProvider>
     </MosaicIconsProvider>
   );
 }
+
+const modalSurfaces: ModalSurfaces = [];

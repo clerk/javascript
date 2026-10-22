@@ -7,7 +7,10 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile.modal.types';
 import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
-import { createModalHook } from '@clerk/mosaic/modals/create-modal-hook';
+import { defineModalSurface } from '@clerk/mosaic/modals/define-modal-surface';
+import type { ModalSurfaces } from '@clerk/mosaic/modals/modal.types';
+import { ModalHost } from '@clerk/mosaic/modals/modal-host';
+import { useModal } from '@clerk/mosaic/modals/use-modal';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -211,27 +214,38 @@ const integrationsPage = {
 
 function FixtureUserProfile({ options }: UserProfileModalContentProps) {
   const { pages } = useUserProfileFixture();
-  const [activePage, setActivePage] = useState(options.page ?? 'account');
+  const [activePage, setActivePage] = useState(options?.page ?? 'account');
 
   return (
     <UserProfileView
       activePage={activePage}
       pages={pages}
-      customPages={options.customPages}
-      pageOrder={options.pageOrder}
+      customPages={options?.customPages}
+      pageOrder={options?.pageOrder}
       onPageChange={setActivePage}
     />
   );
 }
 
-const useFixtureUserProfileModal = createModalHook<UserProfileModalOptions>(
-  { id: 'fixtureUserProfile', variant: 'profile', load: () => Promise.resolve({ default: FixtureUserProfile }) },
-  defaults => defaults.userProfile ?? {},
-);
+const fixtureUserProfileModal = defineModalSurface<UserProfileModalOptions>({
+  id: 'fixtureUserProfile',
+  variant: 'profile',
+  load: () => Promise.resolve({ default: FixtureUserProfile }),
+});
+
+const fixtureModalSurfaces: ModalSurfaces = [fixtureUserProfileModal];
 
 export function ProfileModal(_args: Record<string, unknown>) {
+  return (
+    <ModalHost surfaces={fixtureModalSurfaces}>
+      <ProfileModalTriggers />
+    </ModalHost>
+  );
+}
+
+function ProfileModalTriggers() {
   const prototype = usePrototype({ singleSession: true });
-  const userProfile = useFixtureUserProfileModal();
+  const userProfile = useModal(fixtureUserProfileModal);
 
   return (
     <div className='flex flex-wrap items-center gap-2'>

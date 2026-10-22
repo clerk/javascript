@@ -1,63 +1,99 @@
 import React from 'react';
 
-import type { OrganizationProfileModalOptions } from '../features/organization-profile/organization-profile.modal.types';
-import type { UserProfileModalOptions } from '../features/user-profile/user-profile.modal.types';
-
-export interface MosaicModalDefaults {
-  userProfile?: UserProfileModalOptions;
-  organizationProfile?: OrganizationProfileModalOptions;
-}
-
-export interface ModalRegistry {
-  add: (id: string, slot: React.ReactElement) => void;
-  subscribe: (listener: () => void) => () => void;
-  getSlots: () => ReadonlyMap<string, React.ReactElement>;
-}
-
-function createModalRegistry(): ModalRegistry {
-  let slots: ReadonlyMap<string, React.ReactElement> = new Map();
-  const listeners = new Set<() => void>();
-
-  return {
-    add(id, slot) {
-      if (slots.has(id)) {
-        return;
-      }
-      slots = new Map(slots).set(id, slot);
-      listeners.forEach(listener => listener());
-    },
-    subscribe(listener) {
-      listeners.add(listener);
-      return () => listeners.delete(listener);
-    },
-    getSlots: () => slots,
-  };
-}
-
-export const ModalRegistryContext = React.createContext<ModalRegistry | null>(null);
-
-export const ModalDefaultsContext = React.createContext<MosaicModalDefaults>({});
-
-const noDefaults: MosaicModalDefaults = {};
+import { Dialog, DialogContext } from '../components/dialog';
+import { EmptyState } from '../components/empty-state';
+import { ExclamationCircle } from '../icons/glyphs/exclamation-circle';
+import { useMessages } from '../localization';
+import { useActor } from '../machine/use-machine';
+import { PortalProvider } from '../primitives/portal';
+import type { ModalSurface, ModalSurfaces } from './modal.types';
+import type { ModalController } from './modal-controller';
+import { createModalController } from './modal-controller';
 
 export function ModalHost({
-  defaults = noDefaults,
+  surfaces,
   children,
 }: {
-  defaults?: MosaicModalDefaults;
+  surfaces: ModalSurfaces;
   children: React.ReactNode;
 }): React.ReactElement {
-  const [registry] = React.useState(createModalRegistry);
-  const slots = React.useSyncExternalStore(registry.subscribe, registry.getSlots, registry.getSlots);
+  return (
+    <>
+      {surfaces.reduceRight<React.ReactNode>(
+        (inner, { id, Host }) => (
+          <Host key={id}>{inner}</Host>
+        ),
+        children,
+      )}
+    </>
+  );
+}
+
+export function ModalSurfaceHost<Options>({
+  surface,
+  children,
+}: {
+  surface: ModalSurface<Options>;
+  children: React.ReactNode;
+}): React.ReactElement {
+  const [controller] = React.useState(() => createModalController<Options>());
 
   return (
-    <ModalRegistryContext.Provider value={registry}>
-      <ModalDefaultsContext.Provider value={defaults}>
-        {children}
-        {Array.from(slots, ([id, slot]) => (
-          <React.Fragment key={id}>{slot}</React.Fragment>
-        ))}
-      </ModalDefaultsContext.Provider>
-    </ModalRegistryContext.Provider>
+    <surface.context.Provider value={controller}>
+      {children}
+      <ModalSlot
+        surface={surface}
+        controller={controller}
+      />
+    </surface.context.Provider>
+  );
+}
+
+function ModalSlot<Options>({
+  surface,
+  controller,
+}: {
+  surface: ModalSurface<Options>;
+  controller: ModalController<Options>;
+}) {
+  const state = React.useSyncExternalStore(controller.subscribe, controller.getState, controller.getState);
+  const [content] = useActor(surface.loader);
+  const { Content } = content.context;
+  const failed = content.value === 'failed';
+
+  const dialog = (
+    <Dialog.Root
+      open={state.open && (Content !== undefined || failed)}
+      onOpenChange={open => {
+        if (!open) {
+          controller.close();
+        }
+      }}
+    >
+      <Dialog.Popup variant={surface.variant}>
+        {Content ? (
+          <Content
+            key={state.openCount}
+            options={state.options}
+            close={controller.close}
+          />
+        ) : failed ? (
+          <LoadFailed />
+        ) : null}
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+
+  return state.container === undefined ? dialog : <PortalProvider container={state.container}>{dialog}</PortalProvider>;
+}
+
+function LoadFailed() {
+  const m = useMessages('errors');
+  const dialog = React.useContext(DialogContext);
+  return (
+    <EmptyState.Root>
+      <EmptyState.Icon glyph={ExclamationCircle} />
+      <EmptyState.Label id={dialog?.labelId}>{m.generic}</EmptyState.Label>
+    </EmptyState.Root>
   );
 }
