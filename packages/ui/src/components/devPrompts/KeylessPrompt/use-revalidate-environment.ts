@@ -1,5 +1,4 @@
 import { useClerk } from '@clerk/shared/react';
-import type { Clerk } from '@clerk/shared/types';
 import { useEffect, useReducer, useRef } from 'react';
 
 import { useEnvironment } from '../../../contexts';
@@ -21,8 +20,7 @@ function useRevalidateEnvironment() {
       'focus',
 
       async () => {
-        // @ts-expect-error -- private method for the time being
-        const environment = (clerk as Clerk).__internal_environment;
+        const environment = clerk.__internal_environment;
 
         if (!environment) {
           return;

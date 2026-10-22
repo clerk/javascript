@@ -111,5 +111,6 @@ export class Environment extends BaseResource implements EnvironmentResource {
       path: `/dev_tools/enable_environment_setting`,
       body: params,
     });
+    eventBus.emit(events.EnvironmentUpdate, null);
   }
 }

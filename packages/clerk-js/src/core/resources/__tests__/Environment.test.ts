@@ -1,9 +1,24 @@
 import type { EnvironmentJSONSnapshot } from '@clerk/shared/types';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { Environment } from '../internal';
+import { eventBus, events } from '../../events';
+import { BaseResource, Environment } from '../internal';
 
 describe('Environment', () => {
+  it('notifies observers after a development setting is enabled', async () => {
+    const environment = new Environment();
+    const fetch = vi.spyOn(BaseResource, '_fetch').mockResolvedValue(null);
+    const listener = vi.fn();
+    eventBus.on(events.EnvironmentUpdate, listener);
+    try {
+      await environment.__internal_enableEnvironmentSetting({ enable_organizations: true });
+      expect(listener).toHaveBeenCalledTimes(1);
+    } finally {
+      eventBus.off(events.EnvironmentUpdate, listener);
+      fetch.mockRestore();
+    }
+  });
+
   it('defaults values when instantiated without arguments', () => {
     const environment = new Environment();
 

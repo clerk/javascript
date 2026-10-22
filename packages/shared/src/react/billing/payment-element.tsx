@@ -1,7 +1,7 @@
 import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
 import React, { type PropsWithChildren, type ReactNode, useCallback, useMemo, useState } from 'react';
 
-import type { BillingCheckoutResource, CheckoutFlowResource, EnvironmentResource, ForPayerType } from '../../types';
+import type { BillingCheckoutResource, CheckoutFlowResource, ForPayerType } from '../../types';
 import { createContextAndHook } from '../hooks/createContextAndHook';
 import type { useCheckout } from '../hooks/useCheckout';
 import { useClerk } from '../hooks/useClerk';
@@ -27,8 +27,7 @@ type PaymentElementError = {
 
 const useInternalEnvironment = () => {
   const clerk = useClerk();
-  // @ts-expect-error `__internal_environment` is not typed
-  return clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
+  return clerk.__internal_environment;
 };
 
 const useLocalization = () => {

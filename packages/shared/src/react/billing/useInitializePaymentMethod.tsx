@@ -59,7 +59,7 @@ function useInitializePaymentMethod(options?: InitializePaymentMethodOptions): U
     enabled: isEnabled,
     staleTime: 1_000 * 60,
     refetchOnWindowFocus: false,
-    placeholderData: defineKeepPreviousDataFn(isEnabled),
+    placeholderData: defineKeepPreviousDataFn(Boolean(isEnabled)),
   });
 
   const [queryClient] = useClerkQueryClient();

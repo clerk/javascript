@@ -246,8 +246,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
           SessionJWTCache.init({ publishableKey, storage: createResourceCache });
 
           __internal_clerk.addListener(({ client }) => {
-            // @ts-expect-error - This is an internal API
-            const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
+            const environment = __internal_clerk?.__internal_environment;
             // Persisting a dummy would make the next boot see a populated cache and skip recovery.
             if (environment && !isDummyEnvironment(environment)) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());

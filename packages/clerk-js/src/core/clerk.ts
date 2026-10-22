@@ -266,6 +266,7 @@ export class Clerk implements ClerkInterface {
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
+  #environmentListeners = new Set<() => void>();
 
   #queryClient: QueryClient | undefined;
   #publishableKey = '';
@@ -3314,7 +3315,20 @@ export class Clerk implements ClerkInterface {
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
+    for (const listener of this.#environmentListeners) {
+      listener();
+    }
   }
+
+  __internal_subscribeEnvironment = (listener: () => void): (() => void) => {
+    const notify = () => listener();
+    this.#environmentListeners.add(notify);
+    eventBus.on(events.EnvironmentUpdate, notify);
+    return () => {
+      this.#environmentListeners.delete(notify);
+      eventBus.off(events.EnvironmentUpdate, notify);
+    };
+  };
 
   __internal_setCountry = (country: string | null) => {
     if (!this.__internal_country) {
@@ -3392,7 +3406,7 @@ export class Clerk implements ClerkInterface {
   // TODO: Fix this properly
   // eslint-disable-next-line @typescript-eslint/require-await
   __internal_setEnvironment = async (env: EnvironmentJSON) => {
-    this.environment = new Environment(env);
+    this.updateEnvironment(new Environment(env));
 
     // TODO @nikos update
     // if (Clerk.mountComponentRenderer) {

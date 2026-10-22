@@ -10,6 +10,7 @@ import type { EnvironmentJSONSnapshot } from './snapshots';
 import type { UserSettingsResource } from './userSettings';
 
 export interface EnvironmentResource extends ClerkResource {
+  fetch: (params?: { touch: boolean; fetchMaxTries?: number }) => Promise<EnvironmentResource>;
   userSettings: UserSettingsResource;
   organizationSettings: OrganizationSettingsResource;
   authConfig: AuthConfigResource;

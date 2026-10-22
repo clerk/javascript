@@ -11,8 +11,7 @@ export function useBillingIsEnabled(params?: { for?: ForPayerType; enabled?: boo
 
   const enabledFromParam = params?.enabled ?? true;
 
-  // @ts-expect-error `__internal_environment` is not typed
-  const environment = clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
+  const environment = clerk.__internal_environment;
 
   const user = useUserBase();
   const organization = useOrganizationBase();

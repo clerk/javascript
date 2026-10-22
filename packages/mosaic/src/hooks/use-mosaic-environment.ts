@@ -6,8 +6,7 @@ import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
  *
  * In the app-direct model (`ClerkProvider` → `MosaicProvider` → component) clerk-js's
  * own `useEnvironment()` context is not mounted, so the only host-agnostic way to reach
- * the environment is `clerk.__internal_environment`. Quarantining that one private
- * access here keeps the `@ts-expect-error` out of every caller.
+ * the environment is `clerk.__internal_environment`.
  *
  * This is a one-shot read off the Clerk singleton, NOT a reactive subscription: unlike
  * clerk-js's `EnvironmentProvider`, `useClerk()` does not re-render when the environment
@@ -24,6 +23,5 @@ export function useMosaicEnvironment(): EnvironmentResource | undefined {
 }
 
 export function getMosaicEnvironment(clerk: LoadedClerk): EnvironmentResource | undefined {
-  // @ts-expect-error -- clerk-js implements `__internal_environment`, but the shared `Clerk` type does not declare it.
-  return clerk.__internal_environment ?? undefined; // eslint-disable-line @typescript-eslint/no-unsafe-return -- The `@ts-expect-error` above leaves this access untyped; clerk-js returns `EnvironmentResource | null | undefined`.
+  return clerk.__internal_environment ?? undefined;
 }

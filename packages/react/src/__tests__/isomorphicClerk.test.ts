@@ -80,6 +80,54 @@ describe('isomorphicClerk', () => {
     });
   });
 
+  describe('__internal_subscribeEnvironment', () => {
+    it('subscribes after deferred loading and releases a replaced runtime', () => {
+      const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      const listener = vi.fn();
+      const firstOff = vi.fn();
+      const secondOff = vi.fn();
+      const first = { loaded: true, __internal_subscribeEnvironment: vi.fn(() => firstOff) };
+      const second = { loaded: true, __internal_subscribeEnvironment: vi.fn(() => secondOff) };
+      const unsubscribe = clerk.__internal_subscribeEnvironment(listener);
+      const replay = Reflect.get(clerk, 'replayInterceptedInvocations');
+      Reflect.apply(replay, clerk, [first]);
+      expect(first.__internal_subscribeEnvironment).toHaveBeenCalledWith(listener);
+      expect(listener).toHaveBeenCalledTimes(1);
+      Reflect.apply(replay, clerk, [second]);
+      expect(firstOff).toHaveBeenCalledTimes(1);
+      expect(second.__internal_subscribeEnvironment).toHaveBeenCalledWith(listener);
+      unsubscribe();
+      unsubscribe();
+      expect(secondOff).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not subscribe a cancelled deferred listener or require new runtime support', () => {
+      const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      const listener = vi.fn();
+      const unsubscribe = clerk.__internal_subscribeEnvironment(listener);
+      unsubscribe();
+      const replay = Reflect.get(clerk, 'replayInterceptedInvocations');
+      Reflect.apply(replay, clerk, [{ loaded: true }]);
+      expect(listener).not.toHaveBeenCalled();
+      expect(() => clerk.__internal_subscribeEnvironment(listener)()).not.toThrow();
+    });
+
+    it('preserves the current runtime receiver', () => {
+      const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+      const off = vi.fn();
+      const runtime = {
+        loaded: true,
+        off,
+        __internal_subscribeEnvironment() {
+          return this.off;
+        },
+      };
+      Object.defineProperty(clerk, 'clerkjs', { value: runtime });
+      clerk.__internal_subscribeEnvironment(vi.fn())();
+      expect(off).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('__internal_readUser', () => {
     it('forwards to the current runtime and preserves its receiver', async () => {
       const clerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
