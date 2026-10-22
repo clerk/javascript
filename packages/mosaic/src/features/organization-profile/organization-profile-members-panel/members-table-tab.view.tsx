@@ -106,6 +106,7 @@ export function MembersTableTabView({
         />
         <Table.Root
           layout='fixed'
+          minWidth='37rem'
           aria-label={m.title}
           aria-busy={isFetching}
         >

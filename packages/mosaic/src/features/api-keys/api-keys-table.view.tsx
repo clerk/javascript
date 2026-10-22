@@ -90,7 +90,7 @@ export function APIKeysTableView({
           aria-label={m.title}
           aria-busy={isFetching}
           layout='fixed'
-          xstyle={styles.table}
+          minWidth='36rem'
         >
           <APIKeysTableColumns
             selectable={Boolean(onBulkAction)}

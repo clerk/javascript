@@ -35,7 +35,7 @@ export function APIKeysTableSkeleton({
         aria-label={m.title}
         aria-busy
         layout='fixed'
-        xstyle={styles.table}
+        minWidth='36rem'
       >
         <APIKeysTableColumns
           selectable={false}

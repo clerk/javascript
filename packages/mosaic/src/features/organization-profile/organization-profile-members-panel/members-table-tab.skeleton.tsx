@@ -72,6 +72,7 @@ export function MembersTableTabSkeleton({
       </Table.Toolbar>
       <Table.Root
         layout='fixed'
+        minWidth='37rem'
         aria-label={m.title}
         aria-busy
       >
