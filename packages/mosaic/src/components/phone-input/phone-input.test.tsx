@@ -212,6 +212,116 @@ describe('Mosaic PhoneInput', () => {
     expect(onValueChange).toHaveBeenLastCalledWith('+306901234567');
   });
 
+  it('keeps the caret after a digit inserted mid-number', async () => {
+    const user = userEvent.setup();
+    render(
+      <PhoneInput
+        aria-label='Phone number'
+        defaultValue='+1202555012'
+      />,
+    );
+
+    const input = screen.getByRole<HTMLInputElement>('textbox', { name: 'Phone number' });
+    await user.click(input);
+    input.setSelectionRange(1, 1);
+    await user.keyboard('9');
+
+    expect(input).toHaveValue('(920) 255-5012');
+    expect(input.selectionStart).toBe(2);
+  });
+
+  it('stores only the digits it displays', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <PhoneInput
+        aria-label='Phone number'
+        onValueChange={onValueChange}
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Phone number' });
+    await user.type(input, '2025550123456789');
+
+    expect(input).toHaveValue('(202) 555-01234567');
+    expect(onValueChange).toHaveBeenLastCalledWith('+120255501234567');
+  });
+
+  it('caps a number without a pattern at the E.164 length', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <PhoneInput
+        aria-label='Phone number'
+        defaultCountry='af'
+        onValueChange={onValueChange}
+      />,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Phone number' });
+    await user.type(input, '1234567890123456');
+
+    expect(input).toHaveValue('1234567890123');
+    expect(onValueChange).toHaveBeenLastCalledWith('+931234567890123');
+  });
+
+  it('keeps a chosen country that shares its calling code while a controlled number is typed', async () => {
+    const user = userEvent.setup();
+    function ControlledPhoneInput() {
+      const [value, setValue] = React.useState('');
+      return (
+        <PhoneInput
+          aria-label='Phone number'
+          defaultCountry='ca'
+          value={value}
+          onValueChange={setValue}
+        />
+      );
+    }
+    render(<ControlledPhoneInput />);
+
+    await user.type(screen.getByRole('textbox', { name: 'Phone number' }), '6045');
+
+    expect(screen.getByRole('button', { name: 'Country, Canada' })).toBeInTheDocument();
+  });
+
+  it('follows an outside value from another calling code', () => {
+    const { rerender } = render(
+      <PhoneInput
+        aria-label='Phone number'
+        value='+12025550123'
+      />,
+    );
+
+    rerender(
+      <PhoneInput
+        aria-label='Phone number'
+        value='+306901234567'
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Country, Greece' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveValue('690 1234567');
+  });
+
+  it('follows an outside value from another country with the same calling code', () => {
+    const { rerender } = render(
+      <PhoneInput
+        aria-label='Phone number'
+        value='+12025550123'
+      />,
+    );
+
+    rerender(
+      <PhoneInput
+        aria-label='Phone number'
+        value='+16045551234'
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Country, Canada' })).toBeInTheDocument();
+  });
+
   it('submits the normalized value through a hidden input', async () => {
     const user = userEvent.setup();
     render(
