@@ -1,0 +1,16 @@
+import * as Stories from './organization-profile-logs-panel.stories';
+
+# OrganizationProfileLogsPanel
+
+The logs panel lists the active organization's activity under the panel title. It renders `LogsTable`, and passes `perPage` through to it. The panel shows for every member of the organization; members without permission to read logs see a notice in place of the table.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Panel', href: '/components/panel', layer: 'Components' },
+    { name: 'LogsTable', href: '/logs/logs-table', layer: 'Logs' },
+  ]}
+/>

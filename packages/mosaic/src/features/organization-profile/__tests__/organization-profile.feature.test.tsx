@@ -75,9 +75,9 @@ describe('OrganizationProfile', () => {
   });
 
   it.each([
-    { permissions: [], tabs: ['General'] },
-    { permissions: ['org:sys_memberships:read'], tabs: ['General', 'Members'] },
-    { permissions: ['org:sys_memberships:manage'], tabs: ['General', 'Members'] },
+    { permissions: [], tabs: ['General', 'Logs'] },
+    { permissions: ['org:sys_memberships:read'], tabs: ['General', 'Members', 'Logs'] },
+    { permissions: ['org:sys_memberships:manage'], tabs: ['General', 'Members', 'Logs'] },
   ])('lists members only with a memberships permission: $permissions', async ({ permissions, tabs }) => {
     serve({ permissions });
     await renderWithClerk(<OrganizationProfile />);
@@ -85,9 +85,9 @@ describe('OrganizationProfile', () => {
   });
 
   it.each([
-    { orgAPIKeysEnabled: false, permissions: ['org:sys_api_keys:read'], tabs: ['General'] },
-    { orgAPIKeysEnabled: true, permissions: [], tabs: ['General'] },
-    { orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'], tabs: ['General', 'API Keys'] },
+    { orgAPIKeysEnabled: false, permissions: ['org:sys_api_keys:read'], tabs: ['General', 'Logs'] },
+    { orgAPIKeysEnabled: true, permissions: [], tabs: ['General', 'Logs'] },
+    { orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'], tabs: ['General', 'API Keys', 'Logs'] },
   ])(
     'lists API keys only when organization API keys are enabled and permitted: $orgAPIKeysEnabled $permissions',
     async ({ orgAPIKeysEnabled, permissions, tabs }) => {
@@ -98,8 +98,8 @@ describe('OrganizationProfile', () => {
   );
 
   it.each([
-    { hide: true, tabs: ['General'] },
-    { hide: false, tabs: ['General', 'API Keys'] },
+    { hide: true, tabs: ['General', 'Logs'] },
+    { hide: false, tabs: ['General', 'API Keys', 'Logs'] },
   ])('lists API keys only when they are not hidden: $hide', async ({ hide, tabs }) => {
     serve({ orgAPIKeysEnabled: true, permissions: ['org:sys_api_keys:read'] });
     await renderWithClerk(<OrganizationProfile apiKeysProps={{ hide }} />);
@@ -144,7 +144,7 @@ describe('OrganizationProfile', () => {
         pageOrder={['usage', 'general']}
       />,
     );
-    expect(tabNames()).toEqual(['Usage', 'General', 'Members']);
+    expect(tabNames()).toEqual(['Usage', 'General', 'Members', 'Logs']);
     expect(profileNav().getByRole('tab', { name: 'Usage' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByText('Usage this month')).toBeVisible();
   });
@@ -152,7 +152,7 @@ describe('OrganizationProfile', () => {
   it('opens on the default page without reordering the navigation', async () => {
     serve();
     await renderWithClerk(<OrganizationProfile defaultPage='members' />);
-    expect(tabNames()).toEqual(['General', 'Members']);
+    expect(tabNames()).toEqual(['General', 'Members', 'Logs']);
     expect(profileNav().getByRole('tab', { name: 'Members' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('heading', { level: 3, name: 'Members' })).toBeVisible();
   });

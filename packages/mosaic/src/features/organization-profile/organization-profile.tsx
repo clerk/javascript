@@ -11,6 +11,7 @@ import type { OrganizationProfileViewProps } from './organization-profile.view';
 import { OrganizationProfileView } from './organization-profile.view';
 import { OrganizationProfileApiKeysPanel } from './organization-profile-api-keys-panel';
 import { OrganizationProfileGeneralPanel } from './organization-profile-general-panel';
+import { OrganizationProfileLogsPanel } from './organization-profile-logs-panel';
 import { OrganizationProfileMembersPanel } from './organization-profile-members-panel/organization-profile-members-panel';
 
 /** Everything `<OrganizationProfile />` takes: your own pages and their order, the page it opens on, and where leaving the organization lands. */
@@ -40,8 +41,8 @@ export interface OrganizationProfileProps
 
 /**
  * The active organization's profile: General, Members when the user may read or manage
- * memberships, and API keys when the instance enables them and the user may use them, with your own
- * pages alongside. It reads the organization from Clerk, so it takes no data. It renders `fallback`
+ * memberships, API keys when the instance enables them and the user may use them, and Logs, with
+ * your own pages alongside. It reads the organization from Clerk, so it takes no data. It renders `fallback`
  * until Clerk answers, and nothing at all when there is no active organization or nobody is signed in.
  *
  * @example
@@ -112,6 +113,7 @@ export function OrganizationProfile({
             model.pages.includes('apiKeys') && !hideAPIKeys ? (
               <OrganizationProfileApiKeysPanel {...apiKeysProps} />
             ) : undefined,
+          logs: model.pages.includes('logs') ? <OrganizationProfileLogsPanel /> : undefined,
         }}
       />
     </OrganizationProfileProvider>
