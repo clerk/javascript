@@ -1,5 +1,5 @@
 import { useMergeRefs } from '@floating-ui/react';
-import type { FormEvent, Ref } from 'react';
+import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -18,7 +18,8 @@ export interface ReverificationOtpMessages {
 }
 
 export interface ReverificationOtpResend {
-  label: string;
+  text: string;
+  label: ReactNode;
   disabled?: boolean;
   onClick: () => void;
 }
@@ -93,15 +94,18 @@ export function ReverificationOTP({
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
             {resend ? (
-              <Button
-                type='button'
-                size='sm'
-                variant='link'
-                disabled={resend.disabled || isPending}
-                onClick={resend.onClick}
-              >
-                {resend.label}
-              </Button>
+              <Field.Description>
+                {resend.text}{' '}
+                <Button
+                  type='button'
+                  size='sm'
+                  variant='link'
+                  disabled={resend.disabled || isPending}
+                  onClick={resend.onClick}
+                >
+                  {resend.label}
+                </Button>
+              </Field.Description>
             ) : null}
           </Field.Root>
         </form>
