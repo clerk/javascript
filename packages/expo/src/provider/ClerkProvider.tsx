@@ -4,6 +4,7 @@ import type { ClerkProviderProps as ReactClerkProviderProps } from '@clerk/react
 import { InternalClerkProvider as ClerkReactProvider, type Ui } from '@clerk/react/internal';
 import { useEffect, useMemo, useRef } from 'react';
 
+import { getNativeAppIdentity } from '../app-version/nativeAppIdentity';
 import { useClerkRestartWhenSupported } from '../app-version/useClerkRestartWhenSupported';
 import type { TokenCache } from '../cache/types';
 import { UpdateRequiredModal } from '../update-required/UpdateRequiredModal';
@@ -84,9 +85,19 @@ export function ClerkProvider<TUi extends Ui = Ui>(props: ClerkProviderProps<TUi
   const tokenCacheRef = useRef(tokenCache);
   tokenCacheRef.current = tokenCache;
   const nativeProxyUrl = typeof proxyUrl === 'string' && proxyUrl ? proxyUrl : null;
+  const nativeUpdateRequiredViewEnabled = updateRequiredViewEnabled && !getNativeAppIdentity();
   const nativeClientSync = useMemo(
-    () => (nativeModule ? createNativeClientSync(nativeModule, pk, nativeProxyUrl, () => tokenCacheRef.current) : null),
-    [nativeModule, pk, nativeProxyUrl],
+    () =>
+      nativeModule
+        ? createNativeClientSync(
+            nativeModule,
+            pk,
+            nativeProxyUrl,
+            () => tokenCacheRef.current,
+            nativeUpdateRequiredViewEnabled,
+          )
+        : null,
+    [nativeModule, pk, nativeProxyUrl, nativeUpdateRequiredViewEnabled],
   );
 
   const clerkInstance = isNative()
