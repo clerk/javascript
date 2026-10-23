@@ -1651,6 +1651,16 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan kata laluan semasa anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Kod pengesahan',
       resendButton: 'Tidak menerima kod? Hantar semula',
@@ -1662,6 +1672,21 @@ export const msMY: LocalizationResource = {
       resendButton: 'Tidak menerima kod? Hantar semula',
       subtitle: 'Masukkan kod yang dihantar ke telefon anda untuk meneruskan',
       title: 'Pengesahan diperlukan',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Kod pengesahan',

@@ -1647,6 +1647,16 @@ export const bnIN: LocalizationResource = {
       subtitle: 'চালিয়ে যেতে আপনার বর্তমান পাসওয়ার্ড লিখুন',
       title: 'যাচাইকরণ প্রয়োজন',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
@@ -1658,6 +1668,21 @@ export const bnIN: LocalizationResource = {
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
       subtitle: 'চালিয়ে যেতে আপনার ফোনে পাঠানো কোড লিখুন',
       title: 'যাচাইকরণ প্রয়োজন',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'যাচাইকরণ কোড',

@@ -269,6 +269,12 @@ export class Session extends BaseResource implements SessionResource {
           default: factor.default,
         } as PhoneCodeConfig;
         break;
+      case 'reset_password_email_code':
+        config = { emailAddressId: factor.emailAddressId };
+        break;
+      case 'reset_password_phone_code':
+        config = { phoneNumberId: factor.phoneNumberId };
+        break;
       case 'passkey':
         config = {};
         break;

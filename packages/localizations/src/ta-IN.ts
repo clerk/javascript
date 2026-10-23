@@ -1653,6 +1653,16 @@ export const taIN: LocalizationResource = {
       subtitle: 'தொடர உங்கள் தற்போதைய கடவுச்சொல்லை உள்ளிடவும்',
       title: 'சரிபார்ப்பு தேவை',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'சரிபார்ப்புக் குறியீடு',
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
@@ -1664,6 +1674,21 @@ export const taIN: LocalizationResource = {
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
       subtitle: 'தொடர உங்கள் தொலைபேசிக்கு அனுப்பப்பட்ட குறியீட்டை உள்ளிடவும்',
       title: 'சரிபார்ப்பு தேவை',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'சரிபார்ப்புக் குறியீடு',

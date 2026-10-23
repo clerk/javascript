@@ -1171,6 +1171,82 @@ describe('Session', () => {
     });
   });
 
+  describe('reset password reverification', () => {
+    const sessionJSON = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+
+    const verificationResponse = {
+      object: 'session_verification',
+      id: 'sessver_1',
+      status: 'needs_first_factor',
+      level: 'first_factor',
+      session: sessionJSON,
+      first_factor_verification: null,
+      second_factor_verification: null,
+      supported_first_factors: null,
+      supported_second_factors: null,
+    };
+
+    let requestSpy: Mock;
+
+    beforeEach(() => {
+      BaseResource.clerk = clerkMock();
+      requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+      requestSpy.mockResolvedValue({ payload: { response: verificationResponse }, status: 200 });
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it.each([
+      [{ strategy: 'reset_password_email_code', emailAddressId: 'idn_1' }],
+      [{ strategy: 'reset_password_phone_code', phoneNumberId: 'idn_2' }],
+    ] as const)('prepares a first factor with %o', async factor => {
+      const session = new Session(sessionJSON);
+
+      await session.prepareFirstFactorVerification(factor);
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: factor,
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_first_factor',
+        }),
+        expect.anything(),
+      );
+    });
+
+    it('attempts a first factor with the code and the new password', async () => {
+      const session = new Session(sessionJSON);
+      const attempt = {
+        strategy: 'reset_password_email_code',
+        code: '123456',
+        password: 'a-much-better-password-123',
+        signOutOfOtherSessions: true,
+      } as const;
+
+      await session.attemptFirstFactorVerification(attempt);
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: attempt,
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/attempt_first_factor',
+        }),
+        expect.anything(),
+      );
+    });
+  });
+
   describe('trusted device reverification', () => {
     const sessionJSON = {
       status: 'active',

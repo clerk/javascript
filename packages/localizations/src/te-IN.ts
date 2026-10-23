@@ -1650,6 +1650,16 @@ export const teIN: LocalizationResource = {
       subtitle: 'కొనసాగించడానికి మీ ప్రస్తుత పాస్‌వర్డ్‌ను నమోదు చేయండి',
       title: 'ధృవీకరణ అవసరం',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'ధృవీకరణ కోడ్',
       resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
@@ -1661,6 +1671,21 @@ export const teIN: LocalizationResource = {
       resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
       subtitle: 'కొనసాగించడానికి మీ ఫోన్‌కి పంపిన కోడ్‌ను నమోదు చేయండి',
       title: 'ధృవీకరణ అవసరం',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'ధృవీకరణ కోడ్',

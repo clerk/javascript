@@ -1641,6 +1641,16 @@ export const idID: LocalizationResource = {
       subtitle: 'Masukkan kata sandi Anda untuk melanjutkan',
       title: 'Verifikasi diperlukan',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Kode verifikasi',
       resendButton: 'Tidak menerima kode? Kirim ulang',
@@ -1652,6 +1662,21 @@ export const idID: LocalizationResource = {
       resendButton: 'Tidak menerima kode? Kirim ulang',
       subtitle: 'Masukkan kode yang dikirim ke telepon Anda untuk melanjutkan',
       title: 'Verifikasi diperlukan',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Kode verifikasi',

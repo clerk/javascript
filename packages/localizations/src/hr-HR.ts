@@ -1648,6 +1648,16 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite svoju trenutnu lozinku za nastavak',
       title: 'Potrebna verifikacija',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifikacijski kod',
       resendButton: 'Niste primili kod? Pošalji ponovno',
@@ -1659,6 +1669,21 @@ export const hrHR: LocalizationResource = {
       resendButton: 'Niste primili kod? Pošalji ponovno',
       subtitle: 'Unesite kod poslan na vaš telefon za nastavak',
       title: 'Potrebna verifikacija',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Verifikacijski kod',

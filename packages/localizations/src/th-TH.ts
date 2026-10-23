@@ -1639,6 +1639,16 @@ export const thTH: LocalizationResource = {
       subtitle: 'ใส่รหัสผ่านปัจจุบันของคุณเพื่อดำเนินการต่อ',
       title: 'ต้องการการยืนยัน',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'รหัสยืนยัน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
@@ -1650,6 +1660,21 @@ export const thTH: LocalizationResource = {
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
       subtitle: 'ใส่รหัสที่ส่งไปยังโทรศัพท์ของคุณเพื่อดำเนินการต่อ',
       title: 'ต้องการการยืนยัน',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'รหัสยืนยัน',

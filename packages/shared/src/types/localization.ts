@@ -713,6 +713,31 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       message: LocalizationValue;
     };
+    passwordPwned: {
+      title: LocalizationValue;
+      subtitle__saveNewPassword: LocalizationValue;
+      blockButton__resetPassword: LocalizationValue;
+      label__alternativeMethods: LocalizationValue;
+    };
+    passwordCompromised: {
+      title: LocalizationValue;
+      subtitle__saveNewPassword: LocalizationValue;
+    };
+    resetPassword: {
+      title: LocalizationValue;
+      formButtonPrimary: LocalizationValue;
+    };
+    resetPasswordCode: {
+      title: LocalizationValue;
+      title__saveNewPassword_email: LocalizationValue;
+      title__saveNewPassword_phone: LocalizationValue;
+      subtitle_email: LocalizationValue;
+      subtitle_phone: LocalizationValue;
+      subtitle__saveNewPassword_email: LocalizationValue;
+      subtitle__saveNewPassword_phone: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
   };
   userProfile: {
     mobileButton__menu: LocalizationValue;
