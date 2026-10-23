@@ -117,7 +117,7 @@ describe('Web3 connection rows', () => {
 
     await userEvent.setup().click(await screen.findByRole('button', { name: `Connect ${name}` }));
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1));
-    expect(screen.getByRole('button', { name: `Manage ${name}` })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: `Manage ${name}` })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: `Verify ${name}` })).toBeNull();
     expect(screen.queryByRole('button', { name: `Connect ${name}` })).toBeNull();
     expect(screen.getByText('Verifying')).toBeInTheDocument();
