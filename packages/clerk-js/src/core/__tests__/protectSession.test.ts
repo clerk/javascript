@@ -798,10 +798,14 @@ describe('ProtectSession token clock', () => {
       await vi.advanceTimersByTimeAsync(30_000);
       const retry = first.session?.getRequestParams();
       await vi.advanceTimersByTimeAsync(0);
-      serveInline(first.elements[1], { cid: first.session?.placeholders().cid, p: { t: serverNow + 30_000 } });
-      await expect(retry).resolves.not.toHaveProperty('__clerk_protect_token');
+      serveInline(first.elements[1], {
+        cid: first.session?.placeholders().cid,
+        p: { t: serverNow + 30_000 },
+        ready: Promise.resolve({ token: 'v1.refreshed.mac', exp: serverNow / 1_000 + 30 + lifetimeSeconds }),
+      });
+      await expect(retry).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
       expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({
-        token: 'v1.reloaded.mac',
+        token: 'v1.refreshed.mac',
         floor: nextFloor,
       });
     }
@@ -831,6 +835,124 @@ describe('ProtectSession token clock', () => {
     });
     await expect(refreshed).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
   });
+
+  it('shares a live token across page clocks without renewing its lifetime', async () => {
+    vi.setSystemTime(serverNow + hour);
+    const originalPerformance = performance;
+    const first = session([loader({ token_timeout_ms: 10_000 })]);
+    first.session?.start();
+    await vi.advanceTimersByTimeAsync(5_000);
+
+    vi.stubGlobal('performance', {
+      timeOrigin: originalPerformance.timeOrigin + 5_000,
+      now: () => originalPerformance.now() - 5_000,
+    });
+    vi.resetModules();
+    const { ProtectSession: OtherSession, __internal_resetProtectStorage: resetOtherStorage } =
+      await import('../protectSession');
+    const addListener = vi.spyOn(window, 'addEventListener');
+    const h = harness();
+    const other = OtherSession.create([loader()], h.applyLoader);
+    const receive = addListener.mock.calls.findLast(([type]) => type === 'storage')?.[1] as EventListener;
+
+    vi.stubGlobal('performance', originalPerformance);
+    serveInline(first.elements[0], {
+      cid: first.session?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.shared.mac', exp: serverNow / 1_000 + 70 }),
+    });
+    await expect(first.session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.shared.mac' });
+    const raw = localStorage.getItem('__clerk_protect_st') as string;
+
+    vi.stubGlobal('performance', {
+      timeOrigin: originalPerformance.timeOrigin + 5_000,
+      now: () => originalPerformance.now() - 5_000,
+    });
+    const update = new StorageEvent('storage', { key: '__clerk_protect_st', newValue: raw, storageArea: localStorage });
+    expect(other?.hasFreshToken()).toBe(false);
+    receive(update);
+    expect(other?.hasFreshToken()).toBe(true);
+    await expect(other?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.shared.mac' });
+    expect(h.elements).toHaveLength(0);
+
+    await vi.advanceTimersByTimeAsync(20_000);
+    vi.setSystemTime(Date.now() - 10_000);
+    await vi.advanceTimersByTimeAsync(40_001);
+    receive(update);
+    const nearExpiry = other?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(1_000);
+    await expect(nearExpiry).resolves.not.toHaveProperty('__clerk_protect_token');
+    await vi.advanceTimersByTimeAsync(5_000);
+    receive(update);
+    await expect(other?.getRequestParams()).resolves.not.toHaveProperty('__clerk_protect_token');
+    resetOtherStorage();
+  });
+
+  it.each([
+    { clocked: true, upgrade: false },
+    { clocked: false, upgrade: false },
+    { clocked: true, upgrade: true },
+    { clocked: false, upgrade: true },
+  ])(
+    'keeps a newer floor while pending, with loader clock $clocked and endpoint $upgrade',
+    async ({ clocked, upgrade }) => {
+      let release: (value: unknown) => void = () => undefined;
+      const ready = new Promise(resolve => {
+        release = resolve;
+      });
+      if (upgrade) {
+        global.fetch = vi.fn(() => Promise.resolve({ status: 200, json: () => ready })) as unknown as typeof fetch;
+      }
+      const { session: created, elements } = session([
+        loader({ token_url: upgrade ? 'https://loader.example.com/{cid}/token' : undefined }),
+      ]);
+      created?.start();
+      await vi.advanceTimersByTimeAsync(0);
+      serveInline(elements[0], {
+        cid: created?.placeholders().cid,
+        p: clocked ? { t: serverNow } : undefined,
+        ready,
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      localStorage.setItem(
+        '__clerk_protect_st',
+        storedEntry({
+          token: 'v1.other.mac',
+          floor: 1_000,
+          lifetime: {
+            exp: nowSeconds() + lifetimeSeconds,
+            expiresAt: performance.now() + lifetimeSeconds * 1_000,
+            timeOrigin: performance.timeOrigin + 1,
+          },
+        }),
+      );
+      release({ token: 'v1.pending.mac', exp: serverNow / 1_000 + lifetimeSeconds });
+      await expect(created?.getRequestParams()).resolves.not.toHaveProperty('__clerk_protect_token');
+      expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({
+        token: 'v1.other.mac',
+        floor: 1_000,
+      });
+
+      await vi.advanceTimersByTimeAsync(30_000);
+      if (upgrade) {
+        (global.fetch as Mock).mockImplementation(() =>
+          Promise.resolve(tokenResponse('v1.refreshed.mac', serverNow / 1_000 + 30 + lifetimeSeconds)),
+        );
+      }
+      const retry = created?.getRequestParams();
+      await vi.advanceTimersByTimeAsync(0);
+      serveInline(elements[1], {
+        cid: created?.placeholders().cid,
+        p: clocked ? { t: serverNow + 30_000 } : undefined,
+        ready: Promise.resolve({ token: 'v1.refreshed.mac', exp: serverNow / 1_000 + 30 + lifetimeSeconds }),
+      });
+      await expect(retry).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
+      expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({
+        token: 'v1.refreshed.mac',
+        floor: 1_000,
+      });
+    },
+  );
 
   it.each([null, {}, { exp: 1 }, { exp: nowSeconds() + lifetimeSeconds, expiresAt: 1, timeOrigin: 1 }])(
     'rejects malformed or foreign monotonic lifetimes: %j',
