@@ -25,10 +25,6 @@ function offset() {
   return document.documentElement.style.getPropertyValue('--_cl-keyboard-offset');
 }
 
-function nextFrame() {
-  return new Promise(resolve => requestAnimationFrame(resolve));
-}
-
 beforeEach(() => {
   viewport = new FakeViewport();
   smallViewportHeight = 768;
@@ -53,68 +49,61 @@ afterEach(() => {
 });
 
 describe('acquireKeyboardInset', () => {
-  it('publishes the latest inset once per frame', async () => {
+  it('publishes the inset as soon as the visible band changes', () => {
     const release = acquireKeyboardInset();
     expect(inset()).toBe('0px');
 
     viewport.height = 500;
     viewport.dispatchEvent(new Event('resize'));
+    expect(inset()).toBe('268px');
+
     viewport.offsetTop = 100;
     viewport.dispatchEvent(new Event('scroll'));
-    expect(inset()).toBe('0px');
-
-    await nextFrame();
     expect(inset()).toBe('168px');
     release();
   });
 
-  it('publishes how far the browser has panned the visible band while the keyboard is up', async () => {
+  it('publishes how far the browser has panned the visible band while the keyboard is up', () => {
     const release = acquireKeyboardInset();
     viewport.offsetTop = 40;
     viewport.dispatchEvent(new Event('scroll'));
-    await nextFrame();
     expect(offset()).toBe('0px');
 
     viewport.height = 500;
     viewport.offsetTop = 100;
     viewport.dispatchEvent(new Event('resize'));
-    await nextFrame();
     expect(offset()).toBe('100px');
 
     release();
     expect(offset()).toBe('');
   });
 
-  it('measures the keyboard against the box the overlay fills, not the document height', async () => {
+  it('measures the keyboard against the box the overlay fills, not the document height', () => {
     fixedBoxHeight = 852;
     smallViewportHeight = 852;
     const release = acquireKeyboardInset();
 
     viewport.height = 500;
     viewport.dispatchEvent(new Event('resize'));
-    await nextFrame();
 
     expect(inset()).toBe('352px');
     release();
   });
 
-  it('drops a pending update when released', async () => {
+  it('stops publishing when released', () => {
     const release = acquireKeyboardInset();
-    viewport.height = 500;
-    viewport.dispatchEvent(new Event('resize'));
     release();
 
-    await nextFrame();
+    viewport.height = 500;
+    viewport.dispatchEvent(new Event('resize'));
     expect(inset()).toBe('');
   });
 
-  it('leaves the inset at zero when the browser resizes for the keyboard itself', async () => {
+  it('leaves the inset at zero when the browser resizes for the keyboard itself', () => {
     const release = acquireKeyboardInset();
     viewport.height = 500;
     smallViewportHeight = 500;
     viewport.dispatchEvent(new Event('resize'));
-
-    await nextFrame();
     expect(inset()).toBe('0px');
     release();
   });

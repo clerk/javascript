@@ -29,7 +29,6 @@ const KEYBOARD_THRESHOLD = 60;
 
 let listeners = 0;
 let detach: (() => void) | null = null;
-let frame = 0;
 // A fixed `100svh` box. Chrome on iOS shrinks `svh` to the keyboard before it resizes the layout
 // viewport to match, so a box that already fits the visible band means the browser is moving fixed
 // content itself, and an inset would lift the dialog twice. Safari leaves `svh` alone.
@@ -67,16 +66,6 @@ function publish(): void {
   document.documentElement.style.setProperty(OFFSET_PROPERTY, `${offset}px`);
 }
 
-function schedulePublish(): void {
-  if (frame) {
-    return;
-  }
-  frame = requestAnimationFrame(() => {
-    frame = 0;
-    publish();
-  });
-}
-
 /**
  * Starts publishing the inset, refcounted so stacked dialogs share one set of listeners and the
  * last one to close tears them down. Returns a no-op where `visualViewport` is unavailable, which
@@ -98,13 +87,11 @@ export function acquireKeyboardInset(): () => void {
     fixedBoxProbe.style.cssText = 'position:fixed;top:0;bottom:0;width:0;visibility:hidden;pointer-events:none';
     document.body.appendChild(fixedBoxProbe);
     publish();
-    viewport.addEventListener('resize', schedulePublish);
-    viewport.addEventListener('scroll', schedulePublish);
+    viewport.addEventListener('resize', publish);
+    viewport.addEventListener('scroll', publish);
     detach = () => {
-      viewport.removeEventListener('resize', schedulePublish);
-      viewport.removeEventListener('scroll', schedulePublish);
-      cancelAnimationFrame(frame);
-      frame = 0;
+      viewport.removeEventListener('resize', publish);
+      viewport.removeEventListener('scroll', publish);
       smallViewportProbe?.remove();
       smallViewportProbe = null;
       fixedBoxProbe?.remove();

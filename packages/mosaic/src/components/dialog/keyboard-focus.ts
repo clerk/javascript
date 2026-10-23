@@ -7,16 +7,6 @@ export function guardKeyboardFocus(element: HTMLElement): () => void {
     return () => {};
   }
 
-  let redirecting = false;
-  const onBlur = (event: FocusEvent) => {
-    const next = event.relatedTarget;
-    if (redirecting || !opensKeyboard(next) || !element.contains(next) || measureKeyboardInset() === 0) {
-      return;
-    }
-    redirecting = true;
-    next.focus({ preventScroll: true });
-    redirecting = false;
-  };
   const onFocusIn = (event: FocusEvent) => {
     if (opensKeyboard(event.target)) {
       revealAboveKeyboard(event.target, element, viewport);
@@ -36,12 +26,10 @@ export function guardKeyboardFocus(element: HTMLElement): () => void {
     window.scrollTo({ ...pinned, behavior: 'instant' });
   };
 
-  element.addEventListener('blur', onBlur, true);
   element.addEventListener('focusin', onFocusIn);
   viewport.addEventListener('resize', onResize);
   window.addEventListener('scroll', onWindowScroll);
   return () => {
-    element.removeEventListener('blur', onBlur, true);
     element.removeEventListener('focusin', onFocusIn);
     viewport.removeEventListener('resize', onResize);
     window.removeEventListener('scroll', onWindowScroll);

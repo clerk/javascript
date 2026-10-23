@@ -52,7 +52,7 @@ export function guardKeyboardTouch(element: HTMLElement): () => void {
       submit.click();
       return;
     }
-    if (!opensKeyboard(target) || target === document.activeElement || target.matches(':disabled')) {
+    if (!isTap || !opensKeyboard(target) || target === document.activeElement || target.matches(':disabled')) {
       return;
     }
     event.preventDefault();
