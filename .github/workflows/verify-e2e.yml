@@ -221,6 +221,20 @@ jobs:
           retention-days: 3
           if-no-files-found: warn
 
+      - name: Record the flaky tests
+        if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
+        run: node scripts/verify-flaky.mjs record "$PACKAGE/.verify/runs" "$RUNNER_TEMP/verify-flaky.json"
+
+      - name: Keep the flaky tests for the daily digest
+        if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: verify-flaky-${{ matrix.platform }}
+          path: ${{ runner.temp }}/verify-flaky.json
+          retention-days: 3
+          overwrite: true
+          if-no-files-found: ignore
+
   verify-e2e:
     name: Expo E2E
     needs: e2e-tests
