@@ -213,6 +213,26 @@ describe('Mosaic PhoneInput', () => {
     expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveFocus();
   });
 
+  it('links the country search to its list and active option through selection', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+    const searchInput = screen.getByRole('combobox', { name: 'Search countries' });
+    const list = screen.getByRole('listbox');
+    const option = screen.getByRole('option', { name: /United Kingdom/ });
+    expect(list.id).toBeTruthy();
+    expect(searchInput).toHaveAttribute('aria-controls', list.id);
+
+    await user.keyboard('{ArrowDown}');
+    expect(option.id).toBeTruthy();
+    expect(searchInput).toHaveAttribute('aria-activedescendant', option.id);
+
+    await user.keyboard('{Enter}');
+    expect(screen.getByRole('button', { name: 'Country, United Kingdom' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveFocus();
+  });
+
   it('clears the country search when the popup is dismissed', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);
