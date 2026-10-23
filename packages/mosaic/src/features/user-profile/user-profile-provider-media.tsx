@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
 import { mergeStyleProps, themeProps } from '../../props';
+import { kebabCase } from '../../utils/kebab-case';
 import { styles } from './user-profile-provider-media.styles';
 
 export function UserProfileProviderMedia({
@@ -17,7 +18,7 @@ export function UserProfileProviderMedia({
   monochromeIcon?: boolean;
 }) {
   const url = iconUrl?.trim();
-  const slot = themeProps('provider-icon', { provider: iconId?.replaceAll('_', '-') });
+  const slot = themeProps('provider-icon', { provider: iconId && kebabCase(iconId) });
   const offset = iconId === 'apple' && styles.appleOffset;
   return (
     <Section.Media size='lg'>
