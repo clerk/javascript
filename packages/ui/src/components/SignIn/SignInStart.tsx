@@ -671,7 +671,11 @@ function SignInStartInternal(): JSX.Element {
                           onActionClicked={switchToNextIdentifier}
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
-                          autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
+                          autoComplete={
+                            isWebAuthnAutofillSupported
+                              ? `${currentIdentifier.autoComplete} webauthn`
+                              : currentIdentifier.autoComplete
+                          }
                           isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>

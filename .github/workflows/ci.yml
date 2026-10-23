@@ -157,7 +157,7 @@ jobs:
         if: steps.changed.outputs.package == 'true'
         run: npm ci --prefix "$PACKAGE"
 
-      - name: Run the package's unit tests, which include the check of the copied core against its manifest
+      - name: Run the package's unit tests
         if: steps.changed.outputs.package == 'true'
         run: npm test --prefix "$PACKAGE"
 
@@ -381,6 +381,10 @@ jobs:
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
+
+      - name: Run verify-attach script tests
+        if: matrix.node-version == '24.15.0'
+        run: pnpm vitest run --root scripts verify-attach
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4.6.2
