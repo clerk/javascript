@@ -22,7 +22,7 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
-    fontSize: space['4'],
+    fontSize: space['3'],
     justifyContent: 'center',
     height: space['4'],
     width: space['4'],
