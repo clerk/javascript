@@ -200,7 +200,7 @@ export function __internal_resetProtectStorage(): void {
   tokenLifetimes.clear();
   highestObservedFloor = 0;
   pagePerformance = undefined;
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
     window.removeEventListener('storage', receiveStoredToken);
   }
 }
@@ -716,7 +716,7 @@ export class ProtectSession {
 
     this.#tokenStorageKey = TOKEN_STORAGE_KEY;
     this.#lock = SafeLock(ACQUISITION_LOCK_KEY);
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
       window.addEventListener('storage', receiveStoredToken);
     }
   }

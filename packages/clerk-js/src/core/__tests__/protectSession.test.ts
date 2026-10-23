@@ -166,6 +166,16 @@ describe('interpolatePlaceholders', () => {
 });
 
 describe('ProtectSession.create', () => {
+  it('creates and resets a session when window has no event listener methods', () => {
+    vi.stubGlobal('window', {});
+    try {
+      expect(() => session([loader()])).not.toThrow();
+      expect(() => __internal_resetProtectStorage()).not.toThrow();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('returns nothing when no loader references a placeholder', () => {
     const { session: created } = session([loader({ attributes: { src: 'https://loader.example.com/loader.js' } })]);
 
