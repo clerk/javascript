@@ -110,6 +110,20 @@ const LINK_REPLACEMENTS = [
     'enterprise-connection-saml-connection-login-hint',
     '/docs/reference/backend/types/backend-enterprise-connection-saml-connection-login-hint',
   ],
+  ['enterprise-connection-test-run', '/docs/reference/backend/types/backend-enterprise-connection-test-run'],
+  ['enterprise-connection-test-run-log', '/docs/reference/backend/types/backend-enterprise-connection-test-run-log'],
+  [
+    'enterprise-connection-test-run-oauth-payload',
+    '/docs/reference/backend/types/backend-enterprise-connection-test-run-oauth-payload',
+  ],
+  [
+    'enterprise-connection-test-run-parsed-user-info',
+    '/docs/reference/backend/types/backend-enterprise-connection-test-run-parsed-user-info',
+  ],
+  [
+    'enterprise-connection-test-run-saml-payload',
+    '/docs/reference/backend/types/backend-enterprise-connection-test-run-saml-payload',
+  ],
   ['saml-connection-idp-certificate', '/docs/reference/backend/types/backend-saml-connection-idp-certificate'],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
