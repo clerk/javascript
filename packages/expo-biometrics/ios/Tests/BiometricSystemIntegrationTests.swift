@@ -128,9 +128,8 @@ final class BiometricKeyManagerTests: XCTestCase {
     XCTAssertEqual(BiometricsError.security(unknownError, fallback: .signingFailed).code, .signingFailed)
   }
 
-  // Record fields are reference-backed, so each case builds a fresh input.
-  private func makeInput(_ configure: (BiometricCredentialRecordInput) -> Void = { _ in }) -> BiometricCredentialRecordInput {
-    let input = BiometricCredentialRecordInput()
+  private func makeInput(_ configure: (inout BiometricCredentialRecordInput) -> Void = { _ in }) -> BiometricCredentialRecordInput {
+    var input = BiometricCredentialRecordInput()
     input.id = "tdc_1"
     input.localKeyId = "tdlk_1"
     input.userId = "user_1"
@@ -139,7 +138,7 @@ final class BiometricKeyManagerTests: XCTestCase {
     input.policy = "biometry_any"
     input.createdAt = 1_714_000_000_000.4
     input.updatedAt = 1_714_000_000_001
-    configure(input)
+    configure(&input)
     return input
   }
 
@@ -150,7 +149,7 @@ final class BiometricKeyManagerTests: XCTestCase {
     XCTAssertEqual(record.jsonObject["createdAt"] as? Int64, 1_714_000_000_000)
     XCTAssertEqual(record.jsonObject["updatedAt"] as? Int64, 1_714_000_000_001)
 
-    let invalidInputs: [(String, (BiometricCredentialRecordInput) -> Void)] = [
+    let invalidInputs: [(String, (inout BiometricCredentialRecordInput) -> Void)] = [
       ("policy", { $0.policy = "face_id" }),
       ("id", { $0.id = "" }),
       ("localKeyId", { $0.localKeyId = "" }),
