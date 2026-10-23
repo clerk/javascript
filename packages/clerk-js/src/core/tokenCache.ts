@@ -292,7 +292,6 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
     setInternal(
       {
-        createdAt: iat,
         tokenId: data.tokenId,
         tokenResolver: Promise.resolve(token),
       },
@@ -328,6 +327,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
     const nowSeconds = Math.floor(Date.now() / 1000);
     const createdAt = entry.createdAt ?? nowSeconds;
+    entry.createdAt = createdAt;
     const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
 
     // Chain the freshest known token across replacements. This never touches
@@ -402,13 +402,12 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         const expiresAt = winnerClaims.exp;
         const issuedAt = winnerClaims.iat;
         const expiresIn: Seconds = expiresAt - issuedAt;
-        // Timers run relative to now, while createdAt/expiresIn describe the token's
-        // real validity window for get(). An aged winner (alive for part of its
-        // lifetime already) must be evicted and refreshed by its real expiry, not a
-        // full lifetime from now.
-        const remainingTtl: Seconds = expiresAt - Math.floor(Date.now() / 1000);
+        // Measure elapsed time on the device clock from when we cached the
+        // entry (`live.createdAt`), not from JWT `iat`. Mixing server `iat`
+        // with `Date.now()` serves expired tokens when the device runs behind.
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        const remainingTtl: Seconds = expiresIn - (nowSeconds - live.createdAt);
 
-        live.createdAt = issuedAt;
         live.expiresIn = expiresIn;
 
         if (remainingTtl <= 0) {
