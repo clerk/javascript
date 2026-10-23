@@ -16,13 +16,13 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
 import { styles as buttonStyles } from '../button/button.styles';
-import { Combobox } from '../combobox';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
 import { sizes as inputSizes, styles as inputStyles } from '../input/input.styles';
 import { InputGroup } from '../input-group';
 import { Popover } from '../popover';
+import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { formatNationalNumber, getNationalNumber, toE164 } from './phone-input.format';
 import { styles } from './phone-input.styles';
 
@@ -246,7 +246,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
             {...themeProps('phone-input-popup')}
             xstyle={[reset.base, styles.popup]}
           >
-            <Combobox.Root
+            <HeadlessCombobox.Root
               open
               inputValue={query}
               onInputValueChange={setQuery}
@@ -289,18 +289,24 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                   />
                 </label>
               </Field.Root>
-              <Combobox.List
-                {...themeProps('phone-input-country-list')}
-                xstyle={styles.countryList}
+              <HeadlessCombobox.List
+                {...mergeStyleProps(
+                  themeProps('combobox-list'),
+                  themeProps('phone-input-country-list'),
+                  stylex.props(reset.base, scrollAreaRoot, ...scrollAreaViewport(), styles.countryList),
+                )}
               >
                 {filteredCountries.length > 0 ? (
                   filteredCountries.map(option => (
-                    <Combobox.Option
+                    <HeadlessCombobox.Option
                       key={option.iso}
                       value={option.iso}
                       label={option.name}
-                      {...themeProps('phone-input-country-option')}
-                      xstyle={styles.option}
+                      {...mergeStyleProps(
+                        themeProps('combobox-option'),
+                        themeProps('phone-input-country-option'),
+                        stylex.props(reset.base, styles.option),
+                      )}
                     >
                       <span
                         aria-hidden='true'
@@ -310,13 +316,15 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                       </span>
                       <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
                       <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
-                    </Combobox.Option>
+                    </HeadlessCombobox.Option>
                   ))
                 ) : (
-                  <Combobox.Empty>{noResultsMessage}</Combobox.Empty>
+                  <p {...mergeStyleProps(themeProps('combobox-empty'), stylex.props(reset.base, styles.empty))}>
+                    {noResultsMessage}
+                  </p>
                 )}
-              </Combobox.List>
-            </Combobox.Root>
+              </HeadlessCombobox.List>
+            </HeadlessCombobox.Root>
           </Popover.Popup>
         </Popover.Root>
 

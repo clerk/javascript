@@ -1,6 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  shadowVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 export const styles = stylex.create({
   triggerStart: {
@@ -109,12 +117,24 @@ export const styles = stylex.create({
     gap: space['0.5'],
     paddingBlock: space['0.5'],
     paddingInline: space['1'],
+    display: 'flex',
+    flexDirection: 'column',
+    maxHeight: '16rem',
   },
   option: {
+    borderRadius: radiusVars['--cl-radius-md'],
     gap: space['1'],
+    outline: {
+      default: 'none',
+      '@media (forced-colors: active)': {
+        default: null,
+        ':is([data-active])': '2px solid CanvasText',
+      },
+    },
     paddingBlock: space['1'],
+    alignItems: 'center',
     backgroundColor: {
-      default: null,
+      default: 'transparent',
       ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
         ':hover': colorVars['--cl-color-neutral-alpha-100'],
@@ -124,12 +144,24 @@ export const styles = stylex.create({
       default: colorVars['--cl-color-foreground-secondary'],
       ':where([data-active])': colorVars['--cl-color-foreground'],
     },
+    cursor: 'pointer',
+    display: 'flex',
+    flexShrink: 0,
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     paddingInlineEnd: space['1.5'],
     paddingInlineStart: space['1'],
     height: space['8'],
+  },
+  empty: {
+    paddingBlock: space['6'],
+    paddingInline: space['3'],
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    textAlign: 'center',
   },
   optionFlag: {
     alignItems: 'center',
