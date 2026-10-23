@@ -27,9 +27,15 @@ type AppVersionResponse = {
   payload: unknown;
 };
 
+type AppVersionRequestHooks = {
+  refreshOnForegroundWhileUnsupported: (refresh: () => Promise<unknown>) => void;
+  beforeRequest: (requestInit: AppVersionRequest) => void;
+  afterResponse: (requestInit: AppVersionRequest, response: AppVersionResponse) => void;
+};
+
 let foregroundSubscription: NativeEventSubscription | null = null;
 
-export function createAppVersionRequestHooks() {
+export function createAppVersionRequestHooks(): AppVersionRequestHooks {
   resetAppVersionSupport();
   foregroundSubscription?.remove();
   foregroundSubscription = null;
