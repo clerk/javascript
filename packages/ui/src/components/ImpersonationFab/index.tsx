@@ -182,7 +182,7 @@ const ImpersonationFabInternal = () => {
   };
 
   const dragStart = useRef<{ top: number; offsetRight: number } | null>(null);
-  const { onPointerDown } = useDragGesture({
+  const onPointerDown = useDragGesture({
     onDragStart: () => {
       const bounds = containerRef.current?.getBoundingClientRect();
       dragStart.current = bounds ? { top: bounds.top, offsetRight: window.innerWidth - bounds.right } : null;

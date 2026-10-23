@@ -1,7 +1,11 @@
+import { noop } from '@clerk/shared/utils';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { useEffect, useRef } from 'react';
 
 const DRAG_THRESHOLD = 5;
+let activeDrags = 0;
+let userSelect = '';
+let webkitUserSelect = '';
 
 export type Point = { x: number; y: number };
 
@@ -17,23 +21,23 @@ export const useDragGesture = ({
   onDrag,
   onDragEnd,
   onDragCancel,
-}: UseDragGestureOptions): { onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void } => {
-  const endGesture = useRef<(() => void) | null>(null);
+}: UseDragGestureOptions): ((e: ReactPointerEvent<HTMLElement>) => void) => {
+  const endGesture = useRef<() => void>(noop);
 
-  useEffect(() => () => endGesture.current?.(), []);
+  useEffect(() => () => endGesture.current(), []);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>): void => {
     if (e.button !== 0 || (e.target instanceof Element && e.target.closest('a'))) {
       return;
     }
-    endGesture.current?.();
+    endGesture.current();
 
     const element = e.currentTarget;
     const bodyStyle = document.body.style;
     const { pointerId } = e;
     const originX = e.clientX;
     const originY = e.clientY;
-    let selectionStyles: [userSelect: string, webkitUserSelect: string] | undefined;
+    let dragging = false;
 
     const onPointerMove = (moveEvent: PointerEvent): void => {
       if (moveEvent.pointerId !== pointerId) {
@@ -41,47 +45,51 @@ export const useDragGesture = ({
       }
       const x = moveEvent.clientX - originX;
       const y = moveEvent.clientY - originY;
-      if (!selectionStyles) {
+      if (!dragging) {
         if (x * x + y * y < DRAG_THRESHOLD * DRAG_THRESHOLD) {
           return;
         }
         element.setPointerCapture(pointerId);
-        selectionStyles = [bodyStyle.userSelect, bodyStyle.webkitUserSelect];
-        bodyStyle.userSelect = 'none';
-        bodyStyle.webkitUserSelect = 'none';
+        dragging = true;
+        if (++activeDrags === 1) {
+          userSelect = bodyStyle.userSelect;
+          webkitUserSelect = bodyStyle.webkitUserSelect;
+          bodyStyle.userSelect = 'none';
+          bodyStyle.webkitUserSelect = 'none';
+        }
         onDragStart?.();
       }
       onDrag({ x, y });
     };
 
-    const onPointerEnd = (endEvent: PointerEvent): void => {
-      if (endEvent.pointerId === pointerId) {
-        end(endEvent.type === 'pointercancel');
-      }
-    };
-
-    const end = (cancelled: boolean): void => {
-      window.removeEventListener('pointermove', onPointerMove);
-      window.removeEventListener('pointerup', onPointerEnd);
-      window.removeEventListener('pointercancel', onPointerEnd);
-      endGesture.current = null;
-      if (!selectionStyles) {
+    const end = (endEvent?: PointerEvent): void => {
+      if (endEvent && endEvent.pointerId !== pointerId) {
         return;
       }
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', end);
+      window.removeEventListener('pointercancel', end);
+      endGesture.current = noop;
+      if (!dragging) {
+        return;
+      }
+      dragging = false;
       if (element.hasPointerCapture(pointerId)) {
         element.releasePointerCapture(pointerId);
       }
-      bodyStyle.userSelect = selectionStyles[0];
-      bodyStyle.webkitUserSelect = selectionStyles[1];
-      const onEnd = (cancelled && onDragCancel) || onDragEnd;
+      if (--activeDrags === 0) {
+        bodyStyle.userSelect = userSelect;
+        bodyStyle.webkitUserSelect = webkitUserSelect;
+      }
+      const onEnd = endEvent && endEvent.type === 'pointerup' ? onDragEnd : onDragCancel || onDragEnd;
       onEnd?.();
     };
 
     window.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerEnd);
-    window.addEventListener('pointercancel', onPointerEnd);
-    endGesture.current = (): void => end(true);
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+    endGesture.current = end;
   };
 
-  return { onPointerDown };
+  return onPointerDown;
 };

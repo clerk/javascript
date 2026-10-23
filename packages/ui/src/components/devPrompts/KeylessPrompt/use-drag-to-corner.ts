@@ -254,7 +254,7 @@ export function useDragToCorner(): UseDragToCornerResult {
     }
   }, [corner]);
 
-  const { onPointerDown } = useDragGesture({
+  const onPointerDown = useDragGesture({
     onDragStart: () => {
       const container = containerRef.current;
       if (!container) {

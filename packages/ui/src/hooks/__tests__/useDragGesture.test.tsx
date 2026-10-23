@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Point } from '../useDragGesture';
@@ -7,7 +7,7 @@ import { useDragGesture } from '../useDragGesture';
 type Options = Parameters<typeof useDragGesture>[0];
 
 const DragTarget = (options: Options) => {
-  const { onPointerDown } = useDragGesture(options);
+  const onPointerDown = useDragGesture(options);
   return (
     <div
       data-testid='target'
@@ -37,7 +37,7 @@ const renderDragTarget = (onDragCancel?: () => void) => {
       onDragCancel={onDragCancel}
     />,
   );
-  const target = result.getByTestId('target');
+  const target = within(result.container).getByTestId('target');
   const captured = new Set<number>();
   Object.assign(target, {
     setPointerCapture: (id: number) => captured.add(id),
@@ -50,6 +50,7 @@ const renderDragTarget = (onDragCancel?: () => void) => {
 describe('useDragGesture', () => {
   afterEach(() => {
     pointer(window, 'pointercancel');
+    pointer(window, 'pointercancel', { pointerId: 2 });
     document.body.style.removeProperty('user-select');
     document.body.style.webkitUserSelect = '';
   });
@@ -128,6 +129,53 @@ describe('useDragGesture', () => {
     pointer(window, 'pointerup');
     expect(document.body.style.userSelect).toBe('all');
     expect(document.body.style.webkitUserSelect).toBe('text');
+  });
+
+  it.each([
+    [0, 'pointerup'],
+    [1, 'pointerup'],
+    [0, 'pointercancel'],
+    [1, 'pointercancel'],
+    [0, 'unmount'],
+    [1, 'unmount'],
+    [0, 'replacement press'],
+    [1, 'replacement press'],
+  ] as const)('keeps selection locked until both drags end (%s, %s)', (firstToEnd, reason) => {
+    const targets = [renderDragTarget(), renderDragTarget()];
+    document.body.style.userSelect = 'text';
+    document.body.style.webkitUserSelect = 'all';
+    targets.forEach(({ target }, index) => {
+      pointer(target, 'pointerdown', { pointerId: index + 1, clientX: 100, clientY: 100 });
+      pointer(window, 'pointermove', { pointerId: index + 1, clientX: 120, clientY: 100 });
+    });
+    if (reason === 'unmount') {
+      targets[firstToEnd].unmount();
+    } else if (reason === 'replacement press') {
+      pointer(targets[firstToEnd].target, 'pointerdown', { pointerId: firstToEnd + 1 });
+    } else {
+      pointer(window, reason, { pointerId: firstToEnd + 1 });
+    }
+    expect(document.body.style.userSelect).toBe('none');
+    expect(document.body.style.webkitUserSelect).toBe('none');
+    pointer(window, 'pointerup', { pointerId: 2 - firstToEnd });
+    expect(document.body.style.userSelect).toBe('text');
+    expect(document.body.style.webkitUserSelect).toBe('all');
+  });
+
+  it('does not unlock an active drag when another target is only clicked', () => {
+    const first = renderDragTarget();
+    const second = renderDragTarget();
+    document.body.style.userSelect = 'text';
+    document.body.style.webkitUserSelect = 'all';
+    pointer(first.target, 'pointerdown', { pointerId: 1, clientX: 100, clientY: 100 });
+    pointer(window, 'pointermove', { pointerId: 1, clientX: 120, clientY: 100 });
+    pointer(second.target, 'pointerdown', { pointerId: 2 });
+    pointer(window, 'pointerup', { pointerId: 2 });
+    expect(document.body.style.userSelect).toBe('none');
+    expect(document.body.style.webkitUserSelect).toBe('none');
+    pointer(window, 'pointerup', { pointerId: 1 });
+    expect(document.body.style.userSelect).toBe('text');
+    expect(document.body.style.webkitUserSelect).toBe('all');
   });
 
   it('ignores other pointers', () => {
