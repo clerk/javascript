@@ -84,7 +84,7 @@ describe('Session', () => {
 
     beforeEach(() => {
       dispatchSpy = vi.spyOn(eventBus, 'emit');
-      BaseResource.clerk = clerkMock();
+      BaseResource.clerk = clerkMock({ session: { id: 'session_1' } } as any);
     });
 
     afterEach(() => {
@@ -201,8 +201,9 @@ describe('Session', () => {
 
     it('hydrates token cache from lastActiveToken', async () => {
       BaseResource.clerk = clerkMock({
+        session: { id: 'session_1' },
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      });
+      } as any);
 
       const session = new Session({
         status: 'active',
@@ -228,8 +229,9 @@ describe('Session', () => {
 
     it('returns same token without API call when Session is reconstructed', async () => {
       BaseResource.clerk = clerkMock({
+        session: { id: 'session_1' },
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      });
+      } as any);
 
       SessionTokenCache.clear();
 
@@ -290,8 +292,9 @@ describe('Session', () => {
 
     it('dispatches token:update event on getToken with active organization', async () => {
       BaseResource.clerk = clerkMock({
+        session: { id: 'session_1' },
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      });
+      } as any);
 
       const session = new Session({
         status: 'active',
@@ -325,8 +328,9 @@ describe('Session', () => {
 
     it('does not dispatch token:update if template is provided', async () => {
       BaseResource.clerk = clerkMock({
+        session: { id: 'session_1' },
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      });
+      } as any);
 
       const session = new Session({
         status: 'active',
@@ -346,8 +350,9 @@ describe('Session', () => {
 
     it('dispatches token:update when provided organization ID matches current active organization', async () => {
       BaseResource.clerk = clerkMock({
+        session: { id: 'session_1' },
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      });
+      } as any);
 
       const session = new Session({
         status: 'active',
@@ -382,6 +387,26 @@ describe('Session', () => {
       await session.getToken({ organizationId: 'anotherOrganization' });
 
       expect(dispatchSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('does not dispatch token:update when getToken is called on a non-active session', async () => {
+      BaseResource.clerk = clerkMock({ session: { id: 'session_active' } } as any);
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_other',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const token = await session.getToken();
+
+      expect(token).toEqual(mockJwt);
+      expect(dispatchSpy.mock.calls.filter(call => call[0] === 'token:update')).toHaveLength(0);
     });
 
     describe('with offline browser and network failure', () => {
@@ -622,8 +647,9 @@ describe('Session', () => {
 
     it(`uses the current session's lastActiveOrganizationId by default, not clerk.organization.id`, async () => {
       BaseResource.clerk = clerkMock({
+        session: { id: 'session_1' },
         organization: new Organization({ id: 'oldActiveOrganization' } as OrganizationJSON),
-      });
+      } as any);
 
       const session = new Session({
         status: 'active',
