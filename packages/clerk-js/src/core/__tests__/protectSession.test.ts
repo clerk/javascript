@@ -653,7 +653,7 @@ describe('ProtectSession token clock', () => {
     await expect(next).resolves.toMatchObject({ __clerk_protect_status: 'no_token' });
   });
 
-  it('rejects a result when the browser clock moved backwards while loading', async () => {
+  it('reacquires after the browser clock moves backwards while loading', async () => {
     vi.setSystemTime(serverNow + 24 * hour);
     const { session: created, elements } = session([loader()]);
     created?.start();
@@ -666,6 +666,36 @@ describe('ProtectSession token clock', () => {
     });
 
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'no_token' });
+
+    const retry = created?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(elements).toHaveLength(2);
+    serveInline(elements[1], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+    await expect(retry).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+  });
+
+  it('reacquires when correcting the browser clock invalidates the cached token', async () => {
+    vi.setSystemTime(serverNow + 24 * hour);
+    const { session: created, elements } = session([loader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+
+    vi.setSystemTime(serverNow);
+    const retry = created?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(elements).toHaveLength(2);
+    serveInline(elements[1], { cid: created?.placeholders().cid, p: { t: serverNow } });
+    await expect(retry).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
   });
 
   it('preserves refresh and send margins after translating the expiry', async () => {

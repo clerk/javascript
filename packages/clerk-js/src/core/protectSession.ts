@@ -659,7 +659,8 @@ export class ProtectSession {
     if (readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor)) {
       return;
     }
-    if (Date.now() - this.#lastAttemptAt < this.#backoffMs()) {
+    const elapsed = Date.now() - this.#lastAttemptAt;
+    if (elapsed >= 0 && elapsed < this.#backoffMs()) {
       return;
     }
     this.#startAcquisition();
