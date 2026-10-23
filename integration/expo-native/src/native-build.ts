@@ -98,7 +98,7 @@ function nativeSources(result: unknown, platform: Platform): NativeSources {
   const named = new Set<string>();
   for (const source of result.sources) {
     if (!isRecord(source)) return { ok: false, why: 'it returned a source that is not an object' };
-    const { type, id, filePath, hash, contents } = source;
+    const { type, id, filePath, hash, contents, name, version } = source;
     if (type === 'contents' && typeof id === 'string' && (typeof contents === 'string' || Buffer.isBuffer(contents))) {
       named.add(id);
       lines.push(`contents ${id} ${contents.toString()}`);
@@ -108,6 +108,8 @@ function nativeSources(result: unknown, platform: Platform): NativeSources {
       (typeof hash === 'string' || hash === null)
     ) {
       if (hash !== null) lines.push(`${type} ${filePath} ${hash}`);
+    } else if (type === 'package' && typeof name === 'string' && typeof version === 'string') {
+      lines.push(`package ${name}@${version}`);
     } else {
       return { ok: false, why: `it returned a ${String(type)} source this CLI cannot read` };
     }
