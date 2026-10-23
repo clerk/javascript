@@ -2,8 +2,10 @@
 
 import type { ReactElement } from 'react';
 
+import { useComponentMountedTelemetry } from '../../hooks/use-component-mounted-telemetry';
 import type { SwitcherProps } from '../switcher/switcher';
 import { Switcher } from '../switcher/switcher';
+import { switcherTelemetry } from '../switcher/switcher.telemetry';
 import type { SwitcherMode } from '../switcher/switcher.types';
 import type { SwitcherTriggerVariant } from '../switcher/switcher.view';
 
@@ -104,11 +106,21 @@ export type UserButtonProps = SwitcherProps & UserButtonModeProps;
  */
 export function UserButton({ mode, triggerVariant = 'full', ...props }: UserButtonProps = {}): ReactElement {
   const combined = mode !== 'user';
+  const switcherMode = combined ? 'combined' : 'user';
+  const resolvedTriggerVariant = combined ? triggerVariant : 'condensed';
+  useComponentMountedTelemetry('UserButton', {
+    ...switcherTelemetry(props),
+    mode: switcherMode,
+    triggerVariant: resolvedTriggerVariant,
+    userProfileMode: props.userProfileUrl ? 'navigation' : 'modal',
+    userProfileCustomPages: props.userProfileProps?.customPages?.length ?? 0,
+  });
+
   return (
     <Switcher
       {...props}
-      mode={combined ? 'combined' : 'user'}
-      triggerVariant={combined ? triggerVariant : 'condensed'}
+      mode={switcherMode}
+      triggerVariant={resolvedTriggerVariant}
     />
   );
 }

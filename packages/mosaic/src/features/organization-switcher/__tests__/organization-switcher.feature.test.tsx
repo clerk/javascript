@@ -15,6 +15,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { captureTelemetry, debugTelemetry } from '../../../__tests__/feature/telemetry';
 import type { OrganizationSwitcherProps } from '../organization-switcher';
 import { OrganizationSwitcher } from '../organization-switcher';
 
@@ -325,5 +326,30 @@ describe('OrganizationSwitcher custom trigger badges', () => {
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
     expect(trigger()).toHaveAccessibleName('Open organization menu for Acme');
+  });
+});
+
+describe('OrganizationSwitcher telemetry', () => {
+  it('records one mount with its configuration once Clerk loads', async () => {
+    const telemetry = captureTelemetry();
+    serveFapi(signedIn());
+    await renderWithClerk(tree({ hidePersonal: true, createOrganizationUrl: '/new' }), debugTelemetry);
+    await open();
+
+    expect(telemetry.mounts('OrganizationSwitcher')).toEqual([
+      {
+        component: 'OrganizationSwitcher',
+        source: 'mosaic',
+        organizationProfileMode: 'modal',
+        createOrganizationMode: 'navigation',
+        hidePersonal: true,
+        skipInvitationScreen: false,
+        customMenuItems: 0,
+        organizationProfileCustomPages: 0,
+        customTriggerLabel: false,
+        customTriggerBadge: false,
+        fallback: false,
+      },
+    ]);
   });
 });
