@@ -166,6 +166,16 @@ describe('interpolatePlaceholders', () => {
 });
 
 describe('ProtectSession.create', () => {
+  it('creates and resets a session when window has no event listener methods', () => {
+    vi.stubGlobal('window', {});
+    try {
+      expect(() => session([loader()])).not.toThrow();
+      expect(() => __internal_resetProtectStorage()).not.toThrow();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('returns nothing when no loader references a placeholder', () => {
     const { session: created } = session([loader({ attributes: { src: 'https://loader.example.com/loader.js' } })]);
 
@@ -530,6 +540,549 @@ describe('ProtectSession inline token', () => {
     created?.start();
     await expect(created?.getRequestParams()).resolves.toBeUndefined();
     expect(elements).toHaveLength(0);
+  });
+});
+
+describe('ProtectSession token clock', () => {
+  const serverNow = Date.UTC(2024, 0, 1, 12);
+  const hour = 60 * 60 * 1_000;
+  const lifetimeSeconds = 43_200;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(serverNow);
+    Object.defineProperty(navigator, 'locks', {
+      configurable: true,
+      value: { request: (_key: string, _options: unknown, callback: () => Promise<unknown>) => callback() },
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+    delete (navigator as unknown as Record<string, unknown>).locks;
+  });
+
+  it.each([-48, -24, 24, 48])('accepts a fresh token with a browser clock offset of %s hours', async hours => {
+    vi.setSystemTime(serverNow + hours * hour);
+    const startedAt = Date.now();
+    const { session: created, elements } = session([loader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_status: 'ok',
+      __clerk_protect_token: 'v1.payload.mac',
+    });
+    expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string).exp).toBe(
+      startedAt / 1_000 + lifetimeSeconds,
+    );
+
+    const { session: otherTab, elements: otherElements } = session([loader()]);
+    expect(otherTab?.hasFreshToken()).toBe(true);
+    await expect(otherTab?.getRequestParams()).resolves.toEqual(await created?.getRequestParams());
+    expect(otherElements).toHaveLength(0);
+  });
+
+  it('deducts loader and ready delays from the cached lifetime', async () => {
+    vi.setSystemTime(serverNow + 24 * hour);
+    const startedAt = Date.now();
+    const { session: created, elements } = session([loader({ token_timeout_ms: 5_000 })]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(2_000);
+    let release: (value: unknown) => void = () => undefined;
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: new Promise(resolve => {
+        release = resolve;
+      }),
+    });
+    await vi.advanceTimersByTimeAsync(2_000);
+    release({ token: 'v1.payload.mac', exp: serverNow / 1_000 + 20 });
+    await vi.advanceTimersByTimeAsync(0);
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string).exp).toBe(startedAt / 1_000 + 20);
+  });
+
+  it('translates the expiry for a classic inline loader', async () => {
+    vi.setSystemTime(serverNow - 24 * hour);
+    const { session: created } = session([loader({ attributes: { 'data-cid': '{cid}' } })]);
+    (globalThis as unknown as Record<string, unknown>).__clerk_specter = {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    };
+    created?.start();
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+  });
+
+  it('keeps the original clock reference if another run publishes while ready is pending', async () => {
+    vi.setSystemTime(serverNow + 24 * hour);
+    const { session: created, elements } = session([loader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    let release: (value: unknown) => void = () => undefined;
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: new Promise(resolve => {
+        release = resolve;
+      }),
+    });
+    await vi.advanceTimersByTimeAsync(0);
+    (globalThis as unknown as Record<string, unknown>).__clerk_specter = { cid: 'another-run', p: { t: serverNow } };
+    release({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+  });
+
+  it('does not renew a token when a cached module publishes the same result again', async () => {
+    vi.setSystemTime(serverNow + 24 * hour);
+    const { session: created, elements } = session([loader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + 20 }),
+    });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+
+    await vi.advanceTimersByTimeAsync(35_000);
+    const next = created?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    elements[1].dispatchEvent(new Event('load'));
+
+    await expect(next).resolves.toMatchObject({ __clerk_protect_status: 'no_token' });
+  });
+
+  it('retains a fresh token when the browser clock moves backwards while loading', async () => {
+    vi.setSystemTime(serverNow + 24 * hour);
+    const { session: created, elements } = session([loader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    vi.setSystemTime(Date.now() - hour);
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    expect(elements).toHaveLength(1);
+  });
+
+  it('retains the original lifetime when the browser clock moves before the cached write time', async () => {
+    vi.setSystemTime(serverNow + 24 * hour);
+    const { session: created, elements } = session([loader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+
+    vi.setSystemTime(serverNow);
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    expect(elements).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(lifetimeSeconds * 1_000);
+    expect(created?.hasFreshToken()).toBe(false);
+  });
+
+  it.each([false, true])('reacquires an aged token after a partial clock correction, new session: %s', async other => {
+    vi.setSystemTime(serverNow + hour);
+    const first = session([loader()]);
+    first.session?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(first.elements[0], {
+      cid: first.session?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.original.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+    await expect(first.session?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.original.mac',
+    });
+
+    await vi.advanceTimersByTimeAsync(2 * hour);
+    vi.setSystemTime(serverNow + 2 * hour);
+    const target = other ? session([loader()]) : first;
+    await vi.advanceTimersByTimeAsync(10 * hour + 1);
+    expect(target.session?.hasFreshToken()).toBe(false);
+    const refreshed = target.session?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(target.elements).toHaveLength(other ? 1 : 2);
+    serveInline(target.elements.at(-1) as HTMLElement, {
+      cid: target.session?.placeholders().cid,
+      p: { t: serverNow + 12 * hour + 1 },
+      ready: Promise.resolve({ token: 'v1.refreshed.mac', exp: serverNow / 1_000 + 2 * lifetimeSeconds }),
+    });
+    await expect(refreshed).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
+  });
+
+  it('does not extend the send margin after a small backward correction while ready is pending', async () => {
+    vi.setSystemTime(serverNow + hour);
+    const { session: created, elements } = session([loader({ token_timeout_ms: 5_000 })]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    let release: (value: unknown) => void = () => undefined;
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: new Promise(resolve => {
+        release = resolve;
+      }),
+    });
+    await vi.advanceTimersByTimeAsync(2_000);
+    vi.setSystemTime(Date.now() - 1_000);
+    release({ token: 'v1.payload.mac', exp: serverNow / 1_000 + 8 });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+    await vi.advanceTimersByTimeAsync(1_000);
+    await expect(created?.getRequestParams()).resolves.not.toHaveProperty('__clerk_protect_token');
+  });
+
+  it.each([
+    [-24, 0],
+    [24, 0],
+    [0, 1_000],
+  ])('refreshes an unverifiable cached clock with %s hours of skew and floor %s', async (offset, nextFloor) => {
+    vi.setSystemTime(serverNow + offset * hour);
+    const originalPerformance = performance;
+    const first = session([loader()]);
+    first.session?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(first.elements[0], {
+      cid: first.session?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+    await expect(first.session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+
+    vi.setSystemTime(serverNow);
+    vi.stubGlobal('performance', {
+      timeOrigin: originalPerformance.timeOrigin + 1,
+      now: () => originalPerformance.now(),
+    });
+    vi.resetModules();
+    const { ProtectSession: ReloadedSession } = await import('../protectSession');
+    const h = harness();
+    const reloaded = ReloadedSession.create([loader()], h.applyLoader, nextFloor);
+    expect(reloaded?.hasFreshToken()).toBe(false);
+    const refreshed = reloaded?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(h.elements).toHaveLength(1);
+    serveInline(h.elements[0], {
+      cid: reloaded?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.reloaded.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+    await expect(refreshed).resolves.toMatchObject({ __clerk_protect_token: 'v1.reloaded.mac' });
+
+    vi.stubGlobal('performance', originalPerformance);
+    if (nextFloor === 0 && offset >= 0) {
+      await expect(first.session?.getRequestParams()).resolves.toMatchObject({
+        __clerk_protect_token: 'v1.payload.mac',
+      });
+      expect(first.elements).toHaveLength(1);
+    } else if (nextFloor === 0) {
+      const retry = first.session?.getRequestParams();
+      await vi.advanceTimersByTimeAsync(0);
+      expect(first.elements).toHaveLength(2);
+      serveInline(first.elements[1], {
+        cid: first.session?.placeholders().cid,
+        p: { t: serverNow },
+        ready: Promise.resolve({ token: 'v1.refreshed.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+      });
+      await expect(retry).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
+    } else {
+      expect(first.session?.hasFreshToken()).toBe(false);
+      await vi.advanceTimersByTimeAsync(30_000);
+      const retry = first.session?.getRequestParams();
+      await vi.advanceTimersByTimeAsync(0);
+      serveInline(first.elements[1], {
+        cid: first.session?.placeholders().cid,
+        p: { t: serverNow + 30_000 },
+        ready: Promise.resolve({ token: 'v1.refreshed.mac', exp: serverNow / 1_000 + 30 + lifetimeSeconds }),
+      });
+      await expect(retry).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
+      expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({
+        token: 'v1.refreshed.mac',
+        floor: nextFloor,
+      });
+    }
+  });
+
+  it('does not let a forward clock correction strand a cached token', async () => {
+    vi.setSystemTime(serverNow - 24 * hour);
+    const { session: created, elements } = session([loader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetimeSeconds }),
+    });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    await vi.advanceTimersByTimeAsync(2 * hour);
+    vi.setSystemTime(serverNow + 2 * hour);
+    expect(created?.hasFreshToken()).toBe(false);
+    const refreshed = created?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(elements).toHaveLength(2);
+    serveInline(elements[1], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow + 2 * hour },
+      ready: Promise.resolve({ token: 'v1.refreshed.mac', exp: serverNow / 1_000 + 2 * 3_600 + lifetimeSeconds }),
+    });
+    await expect(refreshed).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
+  });
+
+  it('shares a live token across page clocks without renewing its lifetime', async () => {
+    vi.setSystemTime(serverNow + hour);
+    const originalPerformance = performance;
+    const first = session([loader({ token_timeout_ms: 10_000 })]);
+    first.session?.start();
+    await vi.advanceTimersByTimeAsync(5_000);
+
+    vi.stubGlobal('performance', {
+      timeOrigin: originalPerformance.timeOrigin + 5_000,
+      now: () => originalPerformance.now() - 5_000,
+    });
+    vi.resetModules();
+    const { ProtectSession: OtherSession, __internal_resetProtectStorage: resetOtherStorage } =
+      await import('../protectSession');
+    const addListener = vi.spyOn(window, 'addEventListener');
+    const h = harness();
+    const other = OtherSession.create([loader()], h.applyLoader);
+    const receive = addListener.mock.calls.findLast(([type]) => type === 'storage')?.[1] as EventListener;
+
+    vi.stubGlobal('performance', originalPerformance);
+    serveInline(first.elements[0], {
+      cid: first.session?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.shared.mac', exp: serverNow / 1_000 + 70 }),
+    });
+    await expect(first.session?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.shared.mac' });
+    const raw = localStorage.getItem('__clerk_protect_st') as string;
+
+    vi.stubGlobal('performance', {
+      timeOrigin: originalPerformance.timeOrigin + 5_000,
+      now: () => originalPerformance.now() - 5_000,
+    });
+    const update = new StorageEvent('storage', { key: '__clerk_protect_st', newValue: raw, storageArea: localStorage });
+    expect(other?.hasFreshToken()).toBe(false);
+    receive(update);
+    expect(other?.hasFreshToken()).toBe(true);
+    await expect(other?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.shared.mac' });
+    expect(h.elements).toHaveLength(0);
+
+    await vi.advanceTimersByTimeAsync(20_000);
+    vi.setSystemTime(Date.now() - 10_000);
+    await vi.advanceTimersByTimeAsync(40_001);
+    receive(update);
+    const nearExpiry = other?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(1_000);
+    await expect(nearExpiry).resolves.not.toHaveProperty('__clerk_protect_token');
+    await vi.advanceTimersByTimeAsync(5_000);
+    receive(update);
+    await expect(other?.getRequestParams()).resolves.not.toHaveProperty('__clerk_protect_token');
+    resetOtherStorage();
+  });
+
+  it.each([
+    { clocked: true, upgrade: false },
+    { clocked: false, upgrade: false },
+    { clocked: true, upgrade: true },
+    { clocked: false, upgrade: true },
+  ])(
+    'keeps a newer floor while pending, with loader clock $clocked and endpoint $upgrade',
+    async ({ clocked, upgrade }) => {
+      let release: (value: unknown) => void = () => undefined;
+      const ready = new Promise(resolve => {
+        release = resolve;
+      });
+      if (upgrade) {
+        global.fetch = vi.fn(() => Promise.resolve({ status: 200, json: () => ready })) as unknown as typeof fetch;
+      }
+      const { session: created, elements } = session([
+        loader({ token_url: upgrade ? 'https://loader.example.com/{cid}/token' : undefined }),
+      ]);
+      created?.start();
+      await vi.advanceTimersByTimeAsync(0);
+      serveInline(elements[0], {
+        cid: created?.placeholders().cid,
+        p: clocked ? { t: serverNow } : undefined,
+        ready,
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      localStorage.setItem(
+        '__clerk_protect_st',
+        storedEntry({
+          token: 'v1.other.mac',
+          floor: 1_000,
+          lifetime: {
+            exp: nowSeconds() + lifetimeSeconds,
+            expiresAt: performance.now() + lifetimeSeconds * 1_000,
+            timeOrigin: performance.timeOrigin + 1,
+          },
+        }),
+      );
+      release({ token: 'v1.pending.mac', exp: serverNow / 1_000 + lifetimeSeconds });
+      await expect(created?.getRequestParams()).resolves.not.toHaveProperty('__clerk_protect_token');
+      expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({
+        token: 'v1.other.mac',
+        floor: 1_000,
+      });
+
+      await vi.advanceTimersByTimeAsync(30_000);
+      if (upgrade) {
+        (global.fetch as Mock).mockImplementation(() =>
+          Promise.resolve(tokenResponse('v1.refreshed.mac', serverNow / 1_000 + 30 + lifetimeSeconds)),
+        );
+      }
+      const retry = created?.getRequestParams();
+      await vi.advanceTimersByTimeAsync(0);
+      serveInline(elements[1], {
+        cid: created?.placeholders().cid,
+        p: clocked ? { t: serverNow + 30_000 } : undefined,
+        ready: Promise.resolve({ token: 'v1.refreshed.mac', exp: serverNow / 1_000 + 30 + lifetimeSeconds }),
+      });
+      await expect(retry).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
+      expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string)).toMatchObject({
+        token: 'v1.refreshed.mac',
+        floor: 1_000,
+      });
+    },
+  );
+
+  it.each([null, {}, { exp: 1 }, { exp: nowSeconds() + lifetimeSeconds, expiresAt: 1, timeOrigin: 1 }])(
+    'rejects malformed or foreign monotonic lifetimes: %j',
+    lifetime => {
+      localStorage.setItem('__clerk_protect_st', storedEntry({ lifetime }));
+      expect(session([loader()]).session?.hasFreshToken()).toBe(false);
+    },
+  );
+
+  it('reacquires an upgraded token after an aged clock correction', async () => {
+    vi.setSystemTime(serverNow + hour);
+    global.fetch = vi.fn(() =>
+      Promise.resolve(tokenResponse('v1.upgraded.mac', serverNow / 1_000 + lifetimeSeconds)),
+    ) as typeof fetch;
+    const { session: created, elements } = session([loader({ token_url: 'https://loader.example.com/{cid}/token' })]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], { cid: created?.placeholders().cid, p: { t: serverNow } });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.upgraded.mac' });
+
+    await vi.advanceTimersByTimeAsync(2 * hour);
+    vi.setSystemTime(serverNow + 2 * hour);
+    await vi.advanceTimersByTimeAsync(10 * hour + 1);
+    expect(created?.hasFreshToken()).toBe(false);
+    (global.fetch as Mock).mockImplementation(() =>
+      Promise.resolve(tokenResponse('v1.refreshed.mac', serverNow / 1_000 + 2 * lifetimeSeconds)),
+    );
+    const refreshed = created?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(elements).toHaveLength(2);
+    serveInline(elements[1], { cid: created?.placeholders().cid, p: { t: serverNow + 12 * hour + 1 } });
+    await expect(refreshed).resolves.toMatchObject({ __clerk_protect_token: 'v1.refreshed.mac' });
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('preserves refresh and send margins after translating the expiry', async () => {
+    vi.setSystemTime(serverNow - 24 * hour);
+    const { session: created, elements } = session([loader({ token_timeout_ms: 1_000 })]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      p: { t: serverNow },
+      ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + 70 }),
+    });
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    expect(created?.hasFreshToken()).toBe(true);
+
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(created?.hasFreshToken()).toBe(false);
+    await vi.advanceTimersByTimeAsync(54_000);
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.payload.mac' });
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    const expired = created?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(1_000);
+    await expect(expired).resolves.not.toHaveProperty('__clerk_protect_token');
+  });
+
+  it.each([-1, 0, 24 * 60 * 60 + 1, Number.POSITIVE_INFINITY, Number.NaN])(
+    'rejects a token with an invalid relative lifetime of %s seconds',
+    async lifetime => {
+      vi.setSystemTime(serverNow + 24 * hour);
+      const { session: created, elements } = session([loader()]);
+      created?.start();
+      await vi.advanceTimersByTimeAsync(0);
+      serveInline(elements[0], {
+        cid: created?.placeholders().cid,
+        p: { t: serverNow },
+        ready: Promise.resolve({ token: 'v1.payload.mac', exp: serverNow / 1_000 + lifetime }),
+      });
+
+      await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'no_token' });
+      expect(localStorage.getItem('__clerk_protect_st')).toBeNull();
+    },
+  );
+
+  it.each([undefined, null, {}, { t: '123' }, { t: Number.NaN }, { t: Number.POSITIVE_INFINITY }, { t: -1 }])(
+    'retains legacy validation when the loader clock is unavailable: %j',
+    async p => {
+      const { session: created, elements } = session([loader()]);
+      created?.start();
+      await vi.advanceTimersByTimeAsync(0);
+      serveInline(elements[0], { cid: created?.placeholders().cid, p });
+
+      await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+    },
+  );
+
+  it('uses the same clock reference for an optional token endpoint', async () => {
+    vi.setSystemTime(serverNow + 24 * hour);
+    const startedAt = Date.now();
+    global.fetch = vi.fn(() =>
+      Promise.resolve(tokenResponse('v1.upgraded.mac', serverNow / 1_000 + lifetimeSeconds)),
+    ) as typeof fetch;
+    const { session: created, elements } = session([loader({ token_url: 'https://loader.example.com/{cid}/token' })]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], { cid: created?.placeholders().cid, p: { t: serverNow } });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_status: 'ok',
+      __clerk_protect_token: 'v1.upgraded.mac',
+    });
+    expect(JSON.parse(localStorage.getItem('__clerk_protect_st') as string).exp).toBe(
+      startedAt / 1_000 + lifetimeSeconds,
+    );
+  });
+
+  it('does not use a clock reference from another loader run', async () => {
+    vi.setSystemTime(serverNow + 24 * hour);
+    global.fetch = vi.fn(() =>
+      Promise.resolve(tokenResponse('v1.upgraded.mac', serverNow / 1_000 + lifetimeSeconds)),
+    ) as typeof fetch;
+    const { session: created, elements } = session([loader({ token_url: 'https://loader.example.com/{cid}/token' })]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(0);
+    serveInline(elements[0], { cid: 'another-run', p: { t: serverNow } });
+
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'fetch_error' });
   });
 });
 

@@ -71,8 +71,8 @@ export class Protect {
     this.#session = ProtectSession.create(loaders, applyLoader, tokensInvalidBefore);
 
     for (const loader of loaders) {
-      // The session injects this one itself, under the acquisition lock, so exactly one tab per
-      // browser session runs it. Every other loader runs on every page load regardless.
+      // The session coordinates this loader and shares live results between open pages.
+      // Every other loader runs on every page load regardless.
       if (this.#session?.isTokenLoader(loader)) {
         continue;
       }
@@ -83,8 +83,7 @@ export class Protect {
       }
     }
 
-    // Acquisition is prefetched here rather than at sign-in, so a sign-in normally finds the token
-    // long since cached and acquisition stays off the latency-critical path.
+    // Prefetch acquisition here so its deadline starts before a sign-in needs the result.
     this.#session?.start();
   }
 
