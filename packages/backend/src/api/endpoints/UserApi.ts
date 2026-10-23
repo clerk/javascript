@@ -276,7 +276,7 @@ export type CreateUserParams = {
   createdAt?: Date;
   /** When set to `true`, the user is created already banned and cannot sign in. */
   banned?: boolean;
-  /** When set to `true`, the user is created already locked. Requires the [user lockout feature](https://clerk.com/docs/guides/secure/user-lockout#lock-a-user-programmatically) to be enabled on the instance. */
+  /** When set to `true`, the user is created already locked. Requires the [user lockout feature](https://clerk.com/docs/guides/protect/user-lockout#lock-a-user-programmatically) to be enabled on the instance. */
   locked?: boolean;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
@@ -800,7 +800,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  /** Removes a sign-in lock from the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), allowing them to sign in again. See the [guide on user locks](https://clerk.com/docs/guides/secure/user-lockout).
+  /** Removes a sign-in lock from the given [`User`](https://clerk.com/docs/reference/backend/types/backend-user), allowing them to sign in again. See the [guide on user locks](https://clerk.com/docs/guides/protect/user-lockout).
    * @param userId - The ID of the user to unlock.
    */
   public async unlockUser(userId: string) {
