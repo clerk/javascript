@@ -21,6 +21,8 @@ export interface UserProfileEmailSectionViewProps {
   verificationFinalFocus: DialogFocusTarget;
   setPrimaryReverification: ReverificationController;
   setPrimaryFinalFocus: DialogFocusTarget;
+  pendingPrimaryId?: string;
+  pendingVerifyId?: string;
   onVerify: (id: string) => void;
   onSetPrimary: (id: string) => void;
 }

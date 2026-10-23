@@ -87,6 +87,7 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
 }
 
 interface VerifyPhoneStepProps {
+  inputRef?: Ref<HTMLInputElement>;
   secondaryAction?: ReactNode;
   phoneNumber: string;
   code: string;
@@ -102,6 +103,7 @@ interface VerifyPhoneStepProps {
 export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
   const m = useMessages('userProfileAddPhone');
   const verifyFormId = useId();
+  const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
   const submitCode = (code?: string) => {
     if (!props.isPending && !props.isResending) {
@@ -138,7 +140,7 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
         >
           <Field.Label visuallyHidden>{m.verify.label}</Field.Label>
           <Otp
-            ref={useFlowAutoFocus<HTMLInputElement>()}
+            ref={inputRef}
             name='code'
             value={props.code}
             onValueChange={props.onCodeChange}

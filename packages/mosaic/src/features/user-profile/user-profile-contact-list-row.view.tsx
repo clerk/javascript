@@ -26,6 +26,10 @@ export interface UserProfileContactListRowViewProps {
   onAdd?: () => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
+  pendingPrimaryId?: string;
+  pendingVerifyId?: string;
+  verificationReadyId?: string;
+  primaryChallengeVisible?: boolean;
   onRemove?: (item: UserProfileContact) => void;
   children?: ReactNode;
 }
@@ -39,6 +43,10 @@ export function UserProfileContactListRowView({
   onAdd,
   onVerify,
   onSetPrimary,
+  pendingPrimaryId,
+  pendingVerifyId,
+  verificationReadyId,
+  primaryChallengeVisible,
   onRemove,
   addAction,
   rowRef,
@@ -94,6 +102,10 @@ export function UserProfileContactListRowView({
                 eligibility,
                 onVerify,
                 onSetPrimary,
+                pendingPrimaryId,
+                pendingVerifyId,
+                verificationReadyId,
+                primaryChallengeVisible,
                 onRemove,
               });
 
@@ -111,6 +123,10 @@ export function UserProfileContactListRowView({
                       <ActionMenu
                         triggerRef={triggerRef?.(item.id)}
                         actions={actions}
+                        disabled={
+                          (pendingPrimaryId ?? pendingVerifyId) !== undefined &&
+                          (pendingPrimaryId ?? pendingVerifyId) !== item.id
+                        }
                         label={fill(m.manageValue, { value: item.value })}
                       />
                     </Section.Actions>
@@ -135,21 +151,43 @@ function toContactActions(
     eligibility,
     onVerify,
     onSetPrimary,
+    pendingPrimaryId,
+    pendingVerifyId,
+    verificationReadyId,
+    primaryChallengeVisible,
     onRemove,
   }: Pick<
     UserProfileContactListRowViewProps,
-    'kind' | 'canManage' | 'eligibility' | 'onVerify' | 'onSetPrimary' | 'onRemove'
+    | 'kind'
+    | 'canManage'
+    | 'eligibility'
+    | 'onVerify'
+    | 'onSetPrimary'
+    | 'onRemove'
+    | 'verificationReadyId'
+    | 'pendingVerifyId'
+    | 'pendingPrimaryId'
+    | 'primaryChallengeVisible'
   >,
 ): ActionMenuAction[] {
   const actions: ActionMenuAction[] = [];
   const canManageItem = canManage?.(item.id) !== false;
-  const verificationAction = toContactVerificationAction(item, m, {
-    kind,
-    canManage,
-    eligibility,
-    onVerify,
-    onSetPrimary,
-  });
+  const verificationAction: ActionMenuAction | undefined =
+    pendingPrimaryId === item.id && onSetPrimary
+      ? {
+          label: m.setPrimary,
+          onClick: () => onSetPrimary(item.id),
+          progress: primaryChallengeVisible ? 'handoff' : 'pending',
+        }
+      : toContactVerificationAction(item, m, {
+          kind,
+          canManage,
+          eligibility,
+          onVerify,
+          pendingVerifyId,
+          verificationReadyId,
+          onSetPrimary,
+        });
   if (verificationAction) {
     actions.push(verificationAction);
   }
@@ -173,16 +211,22 @@ function toContactVerificationAction(
     eligibility,
     onVerify,
     onSetPrimary,
-  }: Pick<UserProfileContactListRowViewProps, 'kind' | 'canManage' | 'eligibility' | 'onVerify' | 'onSetPrimary'>,
+    pendingVerifyId,
+    verificationReadyId,
+  }: Pick<
+    UserProfileContactListRowViewProps,
+    'kind' | 'canManage' | 'eligibility' | 'onVerify' | 'onSetPrimary' | 'pendingVerifyId' | 'verificationReadyId'
+  >,
 ): ActionMenuAction | undefined {
-  const canManageItem = canManage?.(item.id) !== false;
-  if (!item.isVerified && (eligibility || (canManageItem && onVerify))) {
-    const label = item.isDefault ? m.completeVerification : m[kind].verify;
-    return canManageItem && onVerify ? { label, onClick: () => onVerify(item.id) } : { label, disabled: true };
-  } else if (item.isVerified && !item.isDefault && (eligibility || (canManageItem && onSetPrimary))) {
-    return canManageItem && onSetPrimary
-      ? { label: m.setPrimary, onClick: () => onSetPrimary(item.id) }
-      : { label: m.setPrimary, disabled: true };
+  if (item.isVerified && item.isDefault) {
+    return undefined;
   }
-  return undefined;
+  const action = item.isVerified ? onSetPrimary : onVerify;
+  const enabledAction = canManage?.(item.id) !== false && action;
+  if (!eligibility && !enabledAction) {
+    return undefined;
+  }
+  const label = item.isVerified ? m.setPrimary : item.isDefault ? m.completeVerification : m[kind].verify;
+  const progress = verificationReadyId === item.id ? 'handoff' : pendingVerifyId === item.id ? 'pending' : 'idle';
+  return enabledAction ? { label, onClick: () => enabledAction(item.id), progress } : { label, disabled: true };
 }

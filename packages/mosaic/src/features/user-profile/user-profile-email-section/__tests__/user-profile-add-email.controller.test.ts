@@ -6,7 +6,7 @@ import { SaveError } from '../../../../utils/errors';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from '../../user-profile-contact.types';
 import { useUserProfileAddEmailController } from '../user-profile-add-email.controller';
 
-const sentCode = (): UserProfileEmailVerification => ({ method: 'code', sent: Promise.resolve() });
+const sentCode = (): UserProfileEmailVerification => ({ method: 'code' });
 
 function sentLink(verified: Promise<void>, cancel = vi.fn()) {
   return (): UserProfileEmailVerification => ({ method: 'link', verified, cancel });
@@ -16,7 +16,11 @@ function verifier(
   start: () => UserProfileEmailVerification = sentCode,
   verifyCode: (code: string) => Promise<void> = () => Promise.resolve(),
 ) {
-  return { start: vi.fn(start), verifyCode: vi.fn(verifyCode) } satisfies UserProfileEmailVerifier;
+  return {
+    prepare: vi.fn(async () => start()),
+    cancel: vi.fn(),
+    verifyCode: vi.fn(verifyCode),
+  } satisfies UserProfileEmailVerifier;
 }
 
 const created = () => Promise.resolve(verifier());
@@ -114,7 +118,7 @@ describe('useUserProfileAddEmailController', () => {
     });
     expect(result.current.resendSeconds).toBe(30);
     act(() => result.current.onResend());
-    expect(email.start).toHaveBeenCalledTimes(1);
+    expect(email.prepare).toHaveBeenCalledTimes(1);
     for (let second = 0; second < 30; second++) {
       await act(async () => vi.advanceTimersByTimeAsync(1000));
     }
@@ -127,7 +131,7 @@ describe('useUserProfileAddEmailController', () => {
       result.current.onOpenChange(false);
       await Promise.resolve();
     });
-    expect(email.start).toHaveBeenCalledTimes(2);
+    expect(email.prepare).toHaveBeenCalledTimes(2);
     expect(email.verifyCode).not.toHaveBeenCalled();
     expect(result.current.open).toBe(true);
     expect(result.current.code).toBe('');
@@ -171,7 +175,7 @@ describe('useUserProfileAddEmailController', () => {
     expect(result.current.open).toBe(true);
     await waitFor(() => expect(result.current.step).toBe('verify'));
     expect(onCreate).toHaveBeenCalledExactlyOnceWith('new@example.com');
-    await waitFor(() => expect(email.start).toHaveBeenCalledOnce());
+    await waitFor(() => expect(email.prepare).toHaveBeenCalledOnce());
 
     act(() => result.current.onSubmit('123456'));
     await waitFor(() => expect(result.current.open).toBe(false));
@@ -183,11 +187,11 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier();
     const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate }));
 
-    act(() => result.current.onVerifyEmail(other, email));
+    await act(() => result.current.onVerifyEmail(other, email));
     expect(result.current.open).toBe(true);
     expect(result.current.step).toBe('verify');
     expect(result.current.emailAddress).toBe('other@example.com');
-    await waitFor(() => expect(email.start).toHaveBeenCalledOnce());
+    await waitFor(() => expect(email.prepare).toHaveBeenCalledOnce());
 
     act(() => result.current.onSubmit('123456'));
     await waitFor(() => expect(result.current.open).toBe(false));
@@ -200,11 +204,11 @@ describe('useUserProfileAddEmailController', () => {
     const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate: created }));
     expect(result.current.verifyingId).toBeUndefined();
 
-    act(() => result.current.onVerifyEmail(other, email));
+    await act(() => result.current.onVerifyEmail(other, email));
     expect(result.current.verifyingId).toBe('email_2');
     await waitFor(() => expect(result.current.step).toBe('verify'));
 
-    act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
+    await act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
     expect(result.current.verifyingId).toBe('email_2');
     expect(result.current.emailAddress).toBe('other@example.com');
 
@@ -216,21 +220,113 @@ describe('useUserProfileAddEmailController', () => {
     expect(result.current.verifyingId).toBeUndefined();
   });
 
-  it('stays on the code step when sending fails, and lets the user resend at once', async () => {
+  it('keeps preparation failure at the source and retries without creating another email', async () => {
     const email = verifier();
-    email.start.mockImplementationOnce(() => ({
-      method: 'code',
-      sent: Promise.reject(saveError('Too many requests')),
-    }));
-    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate: created }));
-
-    act(() => result.current.onVerifyEmail(other, email));
+    email.prepare.mockRejectedValueOnce(saveError('Too many requests'));
+    const onCreate = vi.fn(async () => email);
+    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate }));
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('new@example.com'));
+    await act(() => result.current.onSubmit());
     await waitFor(() => expect(result.current.errorMessage).toBe('Too many requests'));
-    expect(result.current.step).toBe('verify');
+    expect(result.current.step).toBe('email');
     expect(result.current.resendSeconds).toBe(0);
+    await act(() => result.current.onSubmit());
+    await waitFor(() => expect(result.current.step).toBe('verify'));
+    expect(onCreate).toHaveBeenCalledOnce();
+    expect(email.prepare).toHaveBeenCalledTimes(2);
+  });
 
+  it('creates a different email when the value changes after failed preparation', async () => {
+    const email = verifier();
+    email.prepare.mockRejectedValueOnce(saveError('Try again'));
+    const onCreate = vi.fn(async () => email);
+    const { result } = renderHook(() => useUserProfileAddEmailController({ onCreate }));
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('first@example.com'));
+    await act(() => result.current.onSubmit());
+    await waitFor(() => expect(result.current.errorMessage).toBe('Try again'));
+    act(() => result.current.onEmailAddressChange('second@example.com'));
+    await act(() => result.current.onSubmit());
+    await waitFor(() => expect(result.current.step).toBe('verify'));
+    expect(onCreate.mock.calls).toEqual([['first@example.com'], ['second@example.com']]);
+  });
+
+  it.each(['code', 'link'] as const)(
+    'keeps the ready %s destination through failed resend and starts cooldown after success',
+    async method => {
+      vi.useFakeTimers();
+      const email = verifier(method === 'link' ? sentLink(new Promise(() => {})) : sentCode);
+      const { result } = renderHook(() => useUserProfileAddEmailController({}));
+      await act(() => result.current.onVerifyEmail(other, email));
+      for (let second = 0; second < (method === 'link' ? 60 : 30); second++) {
+        await act(async () => vi.advanceTimersByTimeAsync(1000));
+      }
+      const held = createDeferredPromise();
+      email.prepare.mockImplementationOnce(async () => {
+        await held.promise;
+        return sentCode();
+      });
+      act(() => result.current.onResend());
+      expect(result.current.step).toBe(method === 'link' ? 'link' : 'verify');
+      expect(result.current.isResending).toBe(true);
+      expect(result.current.resendSeconds).toBe(0);
+      await act(async () => {
+        held.reject(saveError('Send failed'));
+        await Promise.resolve();
+      });
+      expect(result.current.step).toBe(method === 'link' ? 'link' : 'verify');
+      expect(result.current.errorMessage).toBe('Send failed');
+      expect(result.current.resendSeconds).toBe(0);
+      await act(() => result.current.onResend());
+      expect(result.current.resendSeconds).toBe(method === 'link' ? 60 : 30);
+      expect(result.current.errorMessage).toBeUndefined();
+    },
+  );
+
+  it('preserves a failed resend error after the previous link expired', async () => {
+    vi.useFakeTimers();
+    const expired = createDeferredPromise();
+    const email = verifier(sentLink(expired.promise.then(() => undefined)));
+    const { result } = renderHook(() => useUserProfileAddEmailController({}));
+    await act(() => result.current.onVerifyEmail(other, email));
+    await act(async () => {
+      expired.reject(saveError('Link expired'));
+      await Promise.resolve();
+    });
+    expect(result.current.errorMessage).toBe('Link expired');
+    for (let second = 0; second < 60; second++) {
+      await act(async () => vi.advanceTimersByTimeAsync(1000));
+    }
+    email.prepare.mockRejectedValueOnce(saveError('Too many requests'));
+    await act(() => result.current.onResend());
+    expect(result.current.step).toBe('link');
+    expect(result.current.errorMessage).toBe('Too many requests');
+    expect(result.current.resendSeconds).toBe(0);
+  });
+
+  it('cancels a held link resend without reopening the dialog when it settles', async () => {
+    vi.useFakeTimers();
+    const email = verifier(sentLink(new Promise(() => {})));
+    const { result } = renderHook(() => useUserProfileAddEmailController({}));
+    await act(() => result.current.onVerifyEmail(other, email));
+    for (let second = 0; second < 60; second++) {
+      await act(async () => vi.advanceTimersByTimeAsync(1000));
+    }
+    const held = createDeferredPromise();
+    email.prepare.mockImplementationOnce(async () => {
+      await held.promise;
+      return sentLink(new Promise(() => {}))();
+    });
     act(() => result.current.onResend());
-    await waitFor(() => expect(email.start).toHaveBeenCalledTimes(2));
+    act(() => result.current.onOpenChange(false));
+    expect(email.cancel).toHaveBeenCalled();
+    expect(result.current.open).toBe(false);
+    await act(async () => {
+      held.resolve();
+      await held.promise;
+    });
+    expect(result.current.open).toBe(false);
   });
 
   it('shows the error for the field that failed', async () => {
@@ -248,7 +344,7 @@ describe('useUserProfileAddEmailController', () => {
     const verified = createDeferredPromise();
     const { result } = renderHook(() => useUserProfileAddEmailController({}));
 
-    act(() => result.current.onVerifyEmail(other, verifier(sentLink(verified.promise.then(() => undefined)))));
+    await act(() => result.current.onVerifyEmail(other, verifier(sentLink(verified.promise.then(() => undefined)))));
     expect(result.current.step).toBe('link');
     expect(result.current.resendSeconds).toBe(60);
 
@@ -264,12 +360,12 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier(sentLink(new Promise(() => {}), cancel));
     const { result, unmount } = renderHook(() => useUserProfileAddEmailController({}));
 
-    act(() => result.current.onVerifyEmail(other, email));
+    await act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.step).toBe('link'));
     act(() => result.current.onOpenChange(false));
     expect(cancel).toHaveBeenCalledOnce();
 
-    act(() => result.current.onVerifyEmail(other, email));
+    await act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.step).toBe('link'));
     unmount();
     expect(cancel).toHaveBeenCalledTimes(2);
@@ -279,7 +375,7 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier(sentLink(Promise.reject(saveError('Link expired'))));
     const { result } = renderHook(() => useUserProfileAddEmailController({}));
 
-    act(() => result.current.onVerifyEmail(other, email));
+    await act(() => result.current.onVerifyEmail(other, email));
     await waitFor(() => expect(result.current.errorMessage).toBe('Link expired'));
     expect(result.current.step).toBe('link');
     expect(result.current.open).toBe(true);
@@ -290,7 +386,7 @@ describe('useUserProfileAddEmailController', () => {
     const email = verifier(() => ({ method: 'sso', connect }));
     const { result } = renderHook(() => useUserProfileAddEmailController({}));
 
-    act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
+    await act(() => result.current.onVerifyEmail({ id: 'email_3', value: 'person@acme.co' }, email));
     expect(result.current.step).toBe('sso');
     expect(result.current.resendSeconds).toBe(0);
 

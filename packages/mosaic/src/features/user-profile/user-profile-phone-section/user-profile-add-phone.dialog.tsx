@@ -28,6 +28,7 @@ export interface UserProfileAddPhoneDialogProps {
 
 export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps) {
   const phoneRef = useRef<HTMLInputElement>(null);
+  const codeRef = useRef<HTMLInputElement>(null);
 
   return (
     <Dialog.Root
@@ -37,7 +38,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
     >
       <Dialog.Popup
         variant='card'
-        initialFocus={props.step === 'phone' ? phoneRef : undefined}
+        initialFocus={props.step === 'phone' ? phoneRef : codeRef}
         finalFocus={props.finalFocus}
       >
         <Card.Root
@@ -63,6 +64,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                 </Flow.Step>
                 <Flow.Step ids={['verify']}>
                   <VerifyPhoneStep
+                    inputRef={codeRef}
                     phoneNumber={current.phoneNumber}
                     code={current.code}
                     onCodeChange={current.onCodeChange}

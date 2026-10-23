@@ -13,7 +13,8 @@ import type { ReadyEmailSectionModel } from '../user-profile-email-section.types
 import { UserProfileEmailSectionView } from '../user-profile-email-section.view';
 
 const codeVerifier = {
-  start: () => ({ method: 'code', sent: Promise.resolve() }) as const,
+  prepare: async () => ({ method: 'code' }) as const,
+  cancel: () => {},
   verifyCode: () => Promise.resolve(),
 };
 

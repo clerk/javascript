@@ -259,18 +259,27 @@ describe('Adding a passkey', () => {
     const creation = holdRequests('post', '/v1/me/passkeys');
     const user = userEvent.setup();
     const add = screen.getByRole('button', { name: 'Add passkey' });
-    await user.click(add);
-    await waitFor(() => expect(creation.requests).toHaveLength(1));
-    expect(add).toHaveTextContent(/^Add$/);
-    expect(add).toBeDisabled();
-    expect(add).toHaveAttribute('aria-busy', 'true');
-    await user.click(add);
-    expect(creation.requests).toHaveLength(1);
-    creation.release();
-    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
-    expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
-    expect(authenticator).toHaveBeenCalledOnce();
-    expect(add).toBeEnabled();
+    const bounds = add.getBoundingClientRect();
+    try {
+      await user.click(add);
+      await waitFor(() => expect(creation.requests).toHaveLength(1));
+      expect(add).toHaveTextContent(/^Add$/);
+      await waitFor(() => expect(within(add).getByRole('progressbar')).toBeVisible());
+      expect(add).toHaveAttribute('aria-disabled', 'true');
+      expect(add).toHaveAttribute('aria-busy', 'true');
+      expect(add.getBoundingClientRect().width).toBe(bounds.width);
+      expect(add.getBoundingClientRect().height).toBe(bounds.height);
+      expect(add).toHaveAccessibleName('Add passkey');
+      await user.keyboard('{Enter}');
+      expect(creation.requests).toHaveLength(1);
+      creation.release();
+      expect(await screen.findByText('Chrome on macOS')).toBeVisible();
+      expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
+      expect(authenticator).toHaveBeenCalledOnce();
+      expect(add).toBeEnabled();
+    } finally {
+      creation.release();
+    }
   });
 
   it.each(['session_reverification_required', 'form_param_invalid'])(

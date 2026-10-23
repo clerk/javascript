@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import type { DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
@@ -21,7 +21,7 @@ export interface UserProfileAddPhoneControllerOptions {
 export interface UserProfileAddPhoneController extends UserProfileAddPhoneDialogProps {
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
-  onVerifyPhone: (phone: Pick<UserProfilePhone, 'id' | 'value'>, verifier: UserProfilePhoneVerifier) => void;
+  onVerifyPhone: (phone: Pick<UserProfilePhone, 'id' | 'value'>, verifier: UserProfilePhoneVerifier) => Promise<void>;
 }
 
 interface Context {
@@ -34,7 +34,7 @@ interface Context {
 
 type Event =
   | { type: 'ADD' }
-  | { type: 'START'; id?: string; phoneNumber: string; verifier: UserProfilePhoneVerifier }
+  | { type: 'READY'; id?: string; phoneNumber: string; verifier: UserProfilePhoneVerifier }
   | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
   | { type: 'RESEND' }
@@ -50,14 +50,14 @@ const CODE_RESEND_SECONDS = 30;
 
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
-const start = {
-  target: 'sending',
-  actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
+const ready = {
+  target: 'verify',
+  actions: assign<Extract<Event, { type: 'READY' }>>((_, event) => ({
     verifyingId: event.id,
     phoneNumber: event.phoneNumber,
     verifier: event.verifier,
     error: undefined,
-    resendSeconds: 0,
+    resendSeconds: CODE_RESEND_SECONDS,
   })),
 };
 
@@ -78,11 +78,11 @@ const machine = createMachine({
           target: 'phone',
           actions: assign(() => ({ verifyingId: undefined, verifier: undefined, error: undefined, resendSeconds: 0 })),
         },
-        START: start,
+        READY: ready,
       },
     },
     phone: {
-      on: { CANCEL: 'idle', START: start },
+      on: { CANCEL: 'idle', READY: ready },
     },
     sending: {
       invoke: fromPromise(context => (context.verifier ? context.verifier.sendCode() : missingDependency()), {
@@ -111,12 +111,32 @@ export function useUserProfileAddPhoneController({
   const errorText = useErrorText();
   const handle = useMemo(() => Dialog.createHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
+  const created = useRef<{ value: string; verifier: UserProfilePhoneVerifier }>(undefined);
+  const mounted = useRef(true);
+  const generation = useRef(0);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const { resendSeconds, error } = snapshot.context;
   const phoneForm = useForm({
     initialValues: { phoneNumber: '' },
     onSubmit: async ({ phoneNumber }) => {
       if (onCreate) {
-        send({ type: 'START', phoneNumber, verifier: await onCreate(phoneNumber) });
+        if (created.current?.value !== phoneNumber) {
+          const verifier = await onCreate(phoneNumber);
+          if (!mounted.current) {
+            return;
+          }
+          created.current = { value: phoneNumber, verifier };
+        }
+        const { verifier } = created.current;
+        await verifier.sendCode();
+        if (mounted.current) {
+          send({ type: 'READY', phoneNumber, verifier });
+        }
       }
     },
   });
@@ -159,7 +179,9 @@ export function useUserProfileAddPhoneController({
       if (form.isSubmitting) {
         return;
       }
+      generation.current++;
       if (open) {
+        created.current = undefined;
         phoneForm.reset();
         codeForm.reset();
         send({ type: 'ADD' });
@@ -187,9 +209,16 @@ export function useUserProfileAddPhoneController({
       }
     },
     verifyingId: snapshot.context.verifyingId,
-    onVerifyPhone: (phone, verifier) => {
-      codeForm.reset();
-      send({ type: 'START', id: phone.id, phoneNumber: phone.value, verifier });
+    onVerifyPhone: async (phone, verifier) => {
+      if (actor.getSnapshot().value !== 'idle') {
+        return;
+      }
+      const started = generation.current;
+      await verifier.sendCode();
+      if (mounted.current && generation.current === started && actor.getSnapshot().value === 'idle') {
+        codeForm.reset();
+        send({ type: 'READY', id: phone.id, phoneNumber: phone.value, verifier });
+      }
     },
   };
 }
