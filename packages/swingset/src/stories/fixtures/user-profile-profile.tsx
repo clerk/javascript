@@ -13,7 +13,7 @@ import { SaveError } from '@clerk/mosaic/utils/errors';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosName } from '@/lib/chaos';
+import { chaosPerson, chaosUsername } from '@/lib/chaos';
 
 import { usePreviewImage } from './use-preview-image';
 
@@ -40,12 +40,9 @@ export function useUserProfileProfileFixture({
   usernameFailWith,
 }: UserProfileProfileFixtureOptions = {}): UserProfileProfileSectionViewProps {
   const m = useMessages('userProfileProfileSection');
-  const seed = useChaosFixture({ firstName: initialFirstName, lastName: initialLastName }, () => ({
-    firstName: chaosName(0),
-    lastName: chaosName(7),
-  }));
+  const seed = useChaosFixture({ firstName: initialFirstName, lastName: initialLastName }, () => chaosPerson(0));
   const [value, setValue] = useState<UserProfileEditNameValue>(seed);
-  const usernameSeed = useChaosFixture(initialUsername, () => chaosName(7).toLowerCase());
+  const usernameSeed = useChaosFixture(initialUsername, () => chaosUsername(0));
   const [username, setUsername] = useState(usernameSeed);
   const name = [value.firstName, value.lastName].filter(Boolean).join(' ');
   const { imageUrl, showFile, clearImage } = usePreviewImage(initialImageUrl);
