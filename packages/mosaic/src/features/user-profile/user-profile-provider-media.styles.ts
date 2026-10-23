@@ -14,7 +14,7 @@ export const styles = stylex.create({
     width: space['5'],
   },
   appleOffset: {
-    translate: '0 -1px',
+    transform: 'translateY(-1px)',
   },
   maskImage: (url: string) => ({ maskImage: `url(${JSON.stringify(url)})` }),
   fallback: {
