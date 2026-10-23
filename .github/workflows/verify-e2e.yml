@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-node@v4.4.0
         with:
           node-version: 24.15.0
-          cache: ${{ matrix.platform == 'android' && 'pnpm' || '' }}
+          cache: pnpm
 
       - name: Set up JDK 21
         if: matrix.platform == 'android'
