@@ -12,12 +12,24 @@ export function LoomProfileMfa() {
       methods={[...state.methods]}
       addableMethods={state.addableMethods}
       actionsEligible
-      addControl={state.addableMethods.length > 0 ? (
-        <Button aria-label={m.addLabel} color='neutral' size='sm' variant='outline' disabled>
-          <Icon name='plus' placement='inline-start' size='sm' />
-          {m.add}
-        </Button>
-      ) : undefined}
+      addControl={
+        state.addableMethods.length > 0 ? (
+          <Button
+            aria-label={m.addLabel}
+            color='neutral'
+            size='sm'
+            variant='outline'
+            disabled
+          >
+            <Icon
+              name='plus'
+              placement='inline-start'
+              size='sm'
+            />
+            {m.add}
+          </Button>
+        ) : undefined
+      }
     />
   ) : null;
 }

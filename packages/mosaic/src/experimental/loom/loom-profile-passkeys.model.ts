@@ -9,9 +9,11 @@ export function useLoomProfilePasskeysModel(): LoomPasskeysState | null {
   const { user, settings } = useProfileSnapshot();
   const locale = useLocale();
   const messages = useMessages('userProfilePasskeys');
-  const canAdd = !settings.enterpriseSsoEnabled || !user.enterpriseAccounts.some(
-    account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
-  );
+  const canAdd =
+    !settings.enterpriseSsoEnabled ||
+    !user.enterpriseAccounts.some(
+      account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
+    );
   if (!settings.passkey?.enabled || !canAdd) {
     return null;
   }

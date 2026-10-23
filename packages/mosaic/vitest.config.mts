@@ -10,7 +10,6 @@ const featureTests = 'src/**/*.feature.test.tsx';
 const webkitTests = 'src/**/*.webkit.test.tsx';
 const handoffTests = 'src/experimental/loom/__tests__/loom-handoff-react19.feature.test.tsx';
 const requireNext = createRequire(new URL('../swingset/package.json', import.meta.url));
-const requireLoom = createRequire(new URL('../loom/package.json', import.meta.url));
 const requireShared = createRequire(new URL('../shared/package.json', import.meta.url));
 const compiled = (entry: string) => requireNext.resolve(`next/dist/compiled/${entry}`);
 
@@ -21,7 +20,6 @@ const streamingReact = {
     { find: /^react-dom$/, replacement: compiled('react-dom') },
     { find: /^react-dom\/test-utils$/, replacement: compiled('react') },
     { find: /^react-dom\/(.*)$/, replacement: `${compiled('react-dom').replace(/index\.js$/, '')}$1` },
-    { find: /^@tanstack\/query-core$/, replacement: requireLoom.resolve('@tanstack/query-core') },
     { find: /^dequal$/, replacement: requireShared.resolve('dequal') },
   ],
   dedupe: ['react', 'react-dom'],
@@ -100,7 +98,6 @@ export default defineConfig({
         publicDir: 'test/public',
         optimizeDeps: {
           include: [
-            '@tanstack/query-core',
             '@clerk/clerk-js',
             '@wallet-standard/core',
             '@testing-library/jest-dom/matchers',

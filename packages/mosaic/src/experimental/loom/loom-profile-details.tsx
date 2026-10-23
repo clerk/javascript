@@ -13,18 +13,32 @@ export function LoomProfileDetails() {
       hasImage={model.hasImage}
       showName={model.firstNameAttribute.enabled !== false || model.lastNameAttribute.enabled !== false}
       nameManagedBy={model.nameManagedBy}
-      nameAction={model.eligibility.canEditName ? (
-        <Button color='neutral' size='sm' variant='outline' disabled>
-          {model.name ? m.name.edit : m.name.add}
-        </Button>
-      ) : undefined}
+      nameAction={
+        model.eligibility.canEditName ? (
+          <Button
+            color='neutral'
+            size='sm'
+            variant='outline'
+            disabled
+          >
+            {model.name ? m.name.edit : m.name.add}
+          </Button>
+        ) : undefined
+      }
       showUsername={model.showUsername}
       username={model.username}
-      usernameAction={model.eligibility.canEditUsername ? (
-        <Button color='neutral' size='sm' variant='outline' disabled>
-          {model.username ? m.username.edit : m.username.add}
-        </Button>
-      ) : undefined}
+      usernameAction={
+        model.eligibility.canEditUsername ? (
+          <Button
+            color='neutral'
+            size='sm'
+            variant='outline'
+            disabled
+          >
+            {model.username ? m.username.edit : m.username.add}
+          </Button>
+        ) : undefined
+      }
       eligibility={model.eligibility}
     />
   );

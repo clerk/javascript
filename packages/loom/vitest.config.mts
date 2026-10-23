@@ -35,7 +35,6 @@ export default defineConfig({
           name: 'streaming',
           environment: 'jsdom',
           include: ['src/**/*.streaming.test.tsx'],
-          server: { deps: { inline: ['@tanstack/react-query'] } },
         },
       },
       {
@@ -45,7 +44,6 @@ export default defineConfig({
           name: 'streaming-ssr',
           environment: 'node',
           include: ['src/**/*.streaming-ssr.test.tsx'],
-          server: { deps: { inline: ['@tanstack/react-query'] } },
         },
       },
     ],

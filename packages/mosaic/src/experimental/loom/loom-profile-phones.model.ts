@@ -1,6 +1,10 @@
 import { useProfileSnapshot } from '@clerk/loom/handoff';
 
-import { canAddIdentifications, toContactAccess, toContacts } from '../../features/user-profile/user-profile-contact.utils';
+import {
+  canAddIdentifications,
+  toContactAccess,
+  toContacts,
+} from '../../features/user-profile/user-profile-contact.utils';
 import type { PhoneSectionState } from '../../features/user-profile/user-profile-phone-section/user-profile-phone-section';
 
 export function useLoomProfilePhonesModel(): PhoneSectionState | null {

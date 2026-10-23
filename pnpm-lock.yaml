@@ -835,12 +835,6 @@ importers:
       '@clerk/shared':
         specifier: workspace:*
         version: link:../shared
-      '@tanstack/query-core':
-        specifier: 5.102.8
-        version: 5.102.8
-      '@tanstack/react-query':
-        specifier: 5.102.8
-        version: 5.102.8(react@18.3.1)
     devDependencies:
       '@clerk/nextjs':
         specifier: workspace:*
@@ -5949,11 +5943,6 @@ packages:
 
   '@tanstack/query-core@5.102.8':
     resolution: {integrity: sha512-ZNjkJ33CqvPNec/6lZBnHqLc3EVGPZ9ySLhYahU9TcuRFdmwXewuj0c4hwSWcGHqEUwcSrKeZ+oGcvPBqXcQcg==}
-
-  '@tanstack/react-query@5.102.8':
-    resolution: {integrity: sha512-TYBea4OuXWD7MhaSHq069TWbFe7rcwWN6kzT7JF0OKi1K6c1gTv2IzD6A6ExJsCMozdkqBWeuIUZmu4KQg0O5A==}
-    peerDependencies:
-      react: 18.3.1
 
   '@tanstack/react-router@1.170.41':
     resolution: {integrity: sha512-Mpvw8Wm5MGDbTqI8Yc9flLKxbOHwoWocv0H2aGKcgw2a017oK5nZWqa954P+DrUx/8fI98YNywnHP5XcD3tQ9w==}
@@ -21127,11 +21116,6 @@ snapshots:
   '@tanstack/history@1.162.4': {}
 
   '@tanstack/query-core@5.102.8': {}
-
-  '@tanstack/react-query@5.102.8(react@18.3.1)':
-    dependencies:
-      '@tanstack/query-core': 5.102.8
-      react: 18.3.1
 
   '@tanstack/react-router@1.170.41(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

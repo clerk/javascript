@@ -41,7 +41,6 @@ export type ClerkBackendApiRequestOptions = {
   queryParams?: Record<string, unknown>;
   headerParams?: Record<string, string>;
   formData?: FormData;
-  fetchOptions?: Pick<RequestInit, 'cache' | 'redirect' | 'signal'>;
 } & ClerkBackendApiRequestOptionsUrlOrPath &
   ClerkBackendApiRequestOptionsBodyParams;
 
@@ -110,16 +109,7 @@ export function buildRequest(options: BuildRequestOptions) {
       userAgent = USER_AGENT,
       skipApiVersionInUrl = false,
     } = options;
-    const {
-      path,
-      method,
-      queryParams,
-      headerParams,
-      bodyParams,
-      formData,
-      options: opts,
-      fetchOptions,
-    } = requestOptions;
+    const { path, method, queryParams, headerParams, bodyParams, formData, options: opts } = requestOptions;
     const { deepSnakecaseBodyParamKeys = false } = opts || {};
 
     if (requireSecretKey) {
@@ -168,7 +158,6 @@ export function buildRequest(options: BuildRequestOptions) {
           method,
           headers,
           body: formData,
-          ...fetchOptions,
         });
       } else {
         // Enforce application/json for all non form-data requests
@@ -192,7 +181,6 @@ export function buildRequest(options: BuildRequestOptions) {
           method,
           headers,
           ...buildBody(),
-          ...fetchOptions,
         });
       }
 

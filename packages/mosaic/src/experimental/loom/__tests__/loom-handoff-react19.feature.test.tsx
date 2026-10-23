@@ -9,7 +9,7 @@ import { hydrateRoot } from 'react-dom/client';
 import { renderToReadableStream, renderToString } from 'react-dom/server.browser';
 import { expect, it, vi } from 'vitest';
 
-import { publishableKey, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { holdRequests, publishableKey, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { LoomPassword } from '../loom-account-status';
@@ -116,7 +116,7 @@ it('hydrates server seed markup after real Clerk loads without a mismatch or det
   document.body.append(container);
   container.innerHTML = renderToString(profile(clerk, hydration));
   expect(container.textContent).toContain('Seed');
-  const readUser = vi.spyOn(clerk, '__internal_readUser');
+  const userReads = holdRequests('get', '/v1/me');
   await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
   const errors: unknown[] = [];
   const warnings = vi.spyOn(console, 'error');
@@ -134,7 +134,8 @@ it('hydrates server seed markup after real Clerk loads without a mismatch or det
   } finally {
     warnings.mockRestore();
   }
-  expect(readUser).not.toHaveBeenCalled();
+  expect(userReads.requests).toHaveLength(0);
+  userReads.release();
   expect(screen.queryByText('Seed')).toBeNull();
   root?.unmount();
   container.remove();

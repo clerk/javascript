@@ -4,6 +4,10 @@ import { useLoomProfilePasskeysModel } from './loom-profile-passkeys.model';
 export function LoomProfilePasskeys() {
   const state = useLoomProfilePasskeysModel();
   return state ? (
-    <UserProfilePasskeysSectionView passkeys={state.passkeys} addEligible={state.addEligible} actionsEligible />
+    <UserProfilePasskeysSectionView
+      passkeys={state.passkeys}
+      addEligible={state.addEligible}
+      actionsEligible
+    />
   ) : null;
 }

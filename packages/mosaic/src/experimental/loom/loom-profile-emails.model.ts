@@ -1,6 +1,10 @@
 import { useProfileSnapshot } from '@clerk/loom/handoff';
 
-import { canAddIdentifications, toContactAccess, toContacts } from '../../features/user-profile/user-profile-contact.utils';
+import {
+  canAddIdentifications,
+  toContactAccess,
+  toContacts,
+} from '../../features/user-profile/user-profile-contact.utils';
 import type { EmailSectionState } from '../../features/user-profile/user-profile-email-section/user-profile-email-section.types';
 
 export function useLoomProfileEmailsModel(): EmailSectionState | null {

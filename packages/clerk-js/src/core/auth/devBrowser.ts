@@ -11,7 +11,7 @@ import { createDevBrowserCookie } from './cookies/devBrowser';
 export interface DevBrowser {
   clear(): void;
 
-  setup(assertCurrent?: () => void): Promise<void>;
+  setup(): Promise<void>;
 
   getDevBrowser(): string | undefined;
 
@@ -60,8 +60,7 @@ export function createDevBrowser({
     removeDevBrowser();
   }
 
-  async function setup(assertCurrent?: () => void): Promise<void> {
-    assertCurrent?.();
+  async function setup(): Promise<void> {
     if (!isDevOrStagingUrl(frontendApi)) {
       return;
     }
@@ -103,7 +102,6 @@ export function createDevBrowser({
     const response = await fetch(createDevBrowserUrl.toString(), {
       method: 'POST',
     });
-    assertCurrent?.();
 
     if (!response.ok) {
       const data = await response.json();
@@ -116,7 +114,6 @@ export function createDevBrowser({
     }
 
     const data = await response.json();
-    assertCurrent?.();
     setDevBrowser(data?.id);
   }
 

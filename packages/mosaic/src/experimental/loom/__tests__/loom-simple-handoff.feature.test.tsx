@@ -3,7 +3,7 @@ import { LoomProvider } from '@clerk/loom/handoff';
 import { ClerkContextProvider } from '@clerk/shared/react';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { expect, it, vi } from 'vitest';
+import { expect, it } from 'vitest';
 
 import { holdRequests, publishableKey, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEmailAddress, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
@@ -42,7 +42,7 @@ it('keeps the selected Security page when a prefetched profile hands off to Cler
       updatedAt: Date.now(),
     },
   };
-  const readUser = vi.spyOn(clerk, '__internal_readUser');
+  const userReads = holdRequests('get', '/v1/me');
   const profile = () => (
     <ClerkContextProvider
       clerk={clerk}
@@ -82,7 +82,8 @@ it('keeps the selected Security page when a prefetched profile hands off to Cler
   }
   await act(() => liveUser.update({ firstName: 'Updated' }));
   await waitFor(() => expect(screen.getByText('Updated')).toBeVisible());
-  expect(readUser).not.toHaveBeenCalled();
+  expect(userReads.requests).toHaveLength(0);
+  userReads.release();
   view.unmount();
 });
 
@@ -92,7 +93,7 @@ it('uses the ordinary password action for standalone Password after Clerk loads'
   const fapi = serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
   const clerk = new Clerk(publishableKey());
   await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
-  const readUser = vi.spyOn(clerk, '__internal_readUser');
+  const userReads = holdRequests('get', '/v1/me');
   const pendingSettings = holdRequests('get', '/v1/environment');
   const view = render(
     <ClerkContextProvider
@@ -114,7 +115,8 @@ it('uses the ordinary password action for standalone Password after Clerk loads'
   await actor.type(screen.getByLabelText('Confirm password'), 'new-password-123');
   await actor.click(screen.getByRole('button', { name: 'Save changes' }));
   await waitFor(() => expect(fapi.passwordUpdates).toHaveLength(1));
-  expect(readUser).not.toHaveBeenCalled();
+  expect(userReads.requests).toHaveLength(0);
+  userReads.release();
   pendingSettings.release();
   view.unmount();
 });

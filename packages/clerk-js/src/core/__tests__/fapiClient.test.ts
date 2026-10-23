@@ -75,38 +75,6 @@ afterAll(() => {
 });
 
 describe('buildUrl(options)', () => {
-  it('rejects a retired owner before running response callbacks', async () => {
-    const reply = createDeferredPromise<Response>();
-    const fetchMock = vi.mocked(global.fetch);
-    fetchMock.mockImplementationOnce(() => reply.promise);
-    const client = createFapiClient(baseFapiClientOptions);
-    const onResponse = vi.fn();
-    client.onAfterResponse(onResponse);
-    let retired = false;
-    const pending = client.request(
-      { method: 'GET', path: '/me' },
-      {
-        assertCurrent: () => {
-          if (retired) {
-            throw new Error('Retired owner');
-          }
-        },
-      },
-    );
-    const result = pending.catch(error => error);
-    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
-    retired = true;
-    reply.resolve(
-      Object.assign(new Response(), {
-        status: 200,
-        ok: true,
-        json: () => Promise.resolve({ response: { id: 'user_a' } }),
-      }),
-    );
-    expect(await result).toMatchObject({ message: 'Retired owner' });
-    expect(onResponse).not.toHaveBeenCalled();
-  });
-
   it('retains the session selected before an asynchronous request callback', async () => {
     let sessionId = 'sess_a';
     const entered = createDeferredPromise<void>();

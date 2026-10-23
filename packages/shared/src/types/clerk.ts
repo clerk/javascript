@@ -259,11 +259,6 @@ export type ClerkStatus = 'degraded' | 'error' | 'loading' | 'ready';
  */
 export interface Clerk {
   __internal_environment?: EnvironmentResource | null;
-  __internal_subscribeEnvironment?: (listener: () => void) => () => void;
-  __internal_readUser?: (input: { userId: string; sessionId: string; signal: AbortSignal }) => Promise<UserResource>;
-  getFapiClient?: () => {
-    request: (request: RequestInit & { path?: string; sessionId?: string }) => Promise<Response & { payload: unknown }>;
-  };
 
   /**
    * The Clerk SDK version number.

@@ -72,32 +72,14 @@ describe('Clerk singleton', () => {
   const developmentPublishableKey = 'pk_test_Y2xlcmsuYWJjZWYuMTIzNDUuZGV2LmxjbGNsZXJrLmNvbSQ';
   const productionPublishableKey = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 
-  describe('__internal_subscribeEnvironment', () => {
-    it('notifies after replacement and stops after unsubscribe', async () => {
-      const clerk: Clerk = new Clerk(productionPublishableKey);
-      const seen: unknown[] = [];
-      const unsubscribe = clerk.__internal_subscribeEnvironment(() => seen.push(clerk.__internal_environment));
-      const first = new Environment();
-      clerk.updateEnvironment(first);
-      expect(seen).toEqual([first]);
-      await clerk.__internal_setEnvironment(first.__internal_toSnapshot());
-      expect(seen).toHaveLength(2);
-      expect(seen[1]).toBe(clerk.__internal_environment);
-      unsubscribe();
-      clerk.updateEnvironment(new Environment());
-      expect(seen).toHaveLength(2);
-    });
-
-    it('observes resource refreshes without replacing the environment', () => {
-      const clerk: Clerk = new Clerk(productionPublishableKey);
-      const listener = vi.fn();
-      const unsubscribe = clerk.__internal_subscribeEnvironment(listener);
-      eventBus.emit(events.EnvironmentUpdate, null);
-      expect(listener).toHaveBeenCalledTimes(1);
-      unsubscribe();
-      eventBus.emit(events.EnvironmentUpdate, null);
-      expect(listener).toHaveBeenCalledTimes(1);
-    });
+  it('keeps the established runtime without detached data APIs', () => {
+    const clerk = new Clerk(productionPublishableKey);
+    const environment = new Environment();
+    clerk.updateEnvironment(environment);
+    expect(clerk.__internal_environment).toBe(environment);
+    expect(clerk.getFapiClient()).toBeDefined();
+    expect('__internal_readUser' in clerk).toBe(false);
+    expect('__internal_subscribeEnvironment' in clerk).toBe(false);
   });
 
   const mockNavigate = vi.fn((to: string) => Promise.resolve(to));

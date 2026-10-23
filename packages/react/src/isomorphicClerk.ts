@@ -141,7 +141,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly options: IsomorphicClerkOptions;
   private readonly Clerk: ClerkProp;
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
-  #environmentSubscriptions = new Set<{ listener: () => void; unsubscribe?: () => void }>();
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
   private preopenEnableOrganizationsPrompt?: null | __internal_EnableOrganizationsPromptProps = null;
@@ -196,24 +195,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #stateProxy: StateProxy;
   get publishableKey(): string {
     return this.#publishableKey;
-  }
-
-  getFapiClient() {
-    const clerk = this.clerkjs;
-    if (!clerk?.loaded || typeof clerk.getFapiClient !== 'function') {
-      throw new Error(
-        'Clerk transport is unavailable. Wait for Clerk to load and use a runtime with transport support.',
-      );
-    }
-    return clerk.getFapiClient();
-  }
-
-  __internal_readUser(input: { userId: string; sessionId: string; signal: AbortSignal }) {
-    const clerk = this.clerkjs;
-    if (!clerk?.loaded || typeof clerk.__internal_readUser !== 'function') {
-      throw new Error('Clerk user read is unavailable. Use a Clerk runtime with user read support.');
-    }
-    return clerk.__internal_readUser(input);
   }
 
   get loaded(): boolean {
@@ -720,11 +701,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     this.clerkjs = clerkjs;
-    for (const subscription of this.#environmentSubscriptions) {
-      subscription.unsubscribe?.();
-      subscription.unsubscribe = clerkjs.__internal_subscribeEnvironment?.(subscription.listener);
-      subscription.listener();
-    }
 
     this.premountMethodCalls.forEach(cb => cb());
     this.premountAddListenerCalls.forEach((listenerExtras, listener) => {
@@ -919,19 +895,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   get __internal_environment(): EnvironmentResource | null | undefined {
     return this.clerkjs?.__internal_environment;
   }
-
-  __internal_subscribeEnvironment = (listener: () => void): (() => void) => {
-    const subscription = {
-      listener,
-      unsubscribe: this.clerkjs?.__internal_subscribeEnvironment?.(listener),
-    };
-    this.#environmentSubscriptions.add(subscription);
-    return () => {
-      if (this.#environmentSubscriptions.delete(subscription)) {
-        subscription.unsubscribe?.();
-      }
-    };
-  };
 
   get isSignedIn(): boolean {
     if (this.clerkjs) {

@@ -139,7 +139,6 @@ import type {
   UnsubscribeCallback,
   UserAvatarProps,
   UserButtonProps,
-  UserJSON,
   UserProfileProps,
   UserResource,
   WaitlistProps,
@@ -201,7 +200,7 @@ import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
 import { ProtectCheckGate } from './protectCheckGate';
 import type { SignIn, SignUp } from './resources/internal';
-import { BaseResource, Client, Environment, Organization, User, Waitlist } from './resources/internal';
+import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
@@ -266,7 +265,6 @@ export class Clerk implements ClerkInterface {
   protected internal_last_error: ClerkAPIError | null = null;
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
-  #environmentListeners = new Set<() => void>();
 
   #queryClient: QueryClient | undefined;
   #publishableKey = '';
@@ -604,33 +602,6 @@ export class Clerk implements ClerkInterface {
   }
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
-
-  public __internal_readUser = async ({
-    userId,
-    sessionId,
-    signal,
-  }: {
-    userId: string;
-    sessionId: string;
-    signal: AbortSignal;
-  }): Promise<UserResource> => {
-    const assertCurrent = () => {
-      signal.throwIfAborted();
-      if (!this.loaded || this.user?.id !== userId || this.session?.id !== sessionId) {
-        throw new Error('Clerk identity changed.');
-      }
-    };
-    assertCurrent();
-    const payload = await BaseResource._fetch<UserJSON>(
-      { method: 'GET', path: '/me', signal },
-      { clerk: this, assertCurrent },
-    );
-    assertCurrent();
-    if (payload?.response?.id !== userId) {
-      throw new Error('Clerk user response does not match the active user.');
-    }
-    return new User(payload.response);
-  };
 
   public load = async (options?: ClerkOptions): Promise<void> => {
     debugLogger.info('load() start', {}, 'clerk');
@@ -1956,8 +1927,7 @@ export class Clerk implements ClerkInterface {
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
-  public setActive = async (params: SetActiveParams, assertCurrent?: () => void): Promise<void> => {
-    assertCurrent?.();
+  public setActive = async (params: SetActiveParams): Promise<void> => {
     const { organization, redirectUrl, navigate: setActiveNavigate } = params;
     let { session } = params;
     this.__internal_setActiveInProgress = true;
@@ -2040,7 +2010,6 @@ export class Clerk implements ClerkInterface {
          */
         await onBeforeSetActive(newSession === null ? 'sign-out' : undefined);
       }
-      assertCurrent?.();
 
       const taskUrl =
         newSession?.status === 'pending' &&
@@ -2086,7 +2055,6 @@ export class Clerk implements ClerkInterface {
         } else {
           await this.#touchCurrentSession(newSession, touchIntent);
         }
-        assertCurrent?.();
         // If we do have the updatedClient, read from that, otherwise getSessionFromClient
         // will fallback to this.client. This makes no difference now, but will if we
         // decide to move the `updateClient` call out of this block later.
@@ -2096,7 +2064,6 @@ export class Clerk implements ClerkInterface {
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
       try {
         const token = await newSession?.getToken();
-        assertCurrent?.();
         if (!token) {
           eventBus.emit(events.TokenUpdate, { token: null });
         }
@@ -3039,24 +3006,12 @@ export class Clerk implements ClerkInterface {
   };
 
   // TODO: Deprecate this one, and mark it as internal. Is there actual benefit for external developers to use this ? Should they ever reach for it ?
-  public handleUnauthenticated = async (
-    opts: {
-      broadcast: boolean;
-      assertCurrent?: () => void;
-      abortSignal?: AbortSignal;
-    } = { broadcast: true },
-  ): Promise<unknown> => {
-    opts.assertCurrent?.();
+  public handleUnauthenticated = async (opts = { broadcast: true }): Promise<unknown> => {
     if (!this.client || !this.session) {
       return;
     }
     try {
-      const newClient = await Client.getOrCreateInstance().fetch(
-        opts.assertCurrent
-          ? { clerk: this, assertCurrent: opts.assertCurrent, abortSignal: opts.abortSignal }
-          : undefined,
-      );
-      opts.assertCurrent?.();
+      const newClient = await Client.getOrCreateInstance().fetch();
       this.updateClient(newClient);
       if (this.session) {
         return;
@@ -3064,33 +3019,23 @@ export class Clerk implements ClerkInterface {
       if (opts.broadcast) {
         eventBus.emit(events.UserSignOut, null);
       }
-      return this.setActive(
-        { session: null },
-        opts.assertCurrent
-          ? () => {
-              if (this.session !== null) {
-                throw new Error('Clerk identity changed.');
-              }
-            }
-          : undefined,
-      );
+      return this.setActive({ session: null });
     } catch (err) {
-      opts.assertCurrent?.();
       // `/client` can fail with either a 401, a 403, 500 or network errors.
       // 401 is already handled internally in our fetcher.
       // 403 means that the client is blocked, signing out the user is the only option.
       // 500 means that the client is not working, signing out the user is the only option, since the intention was to sign out the user.
       if (isClerkAPIResponseError(err) && [403, 500].includes(err.status)) {
-        return this.setActive({ session: null }, opts.assertCurrent);
+        return this.setActive({ session: null });
       } else {
         throw err;
       }
     }
   };
 
-  public __internal_handleUnauthenticatedDevBrowser = async (assertCurrent?: () => void): Promise<void> => {
+  public __internal_handleUnauthenticatedDevBrowser = async (): Promise<void> => {
     if (this.#authService) {
-      await this.#authService.handleUnauthenticatedDevBrowser(assertCurrent);
+      await this.#authService.handleUnauthenticatedDevBrowser();
     }
   };
 
@@ -3315,20 +3260,7 @@ export class Clerk implements ClerkInterface {
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
-    for (const listener of this.#environmentListeners) {
-      listener();
-    }
   }
-
-  __internal_subscribeEnvironment = (listener: () => void): (() => void) => {
-    const notify = () => listener();
-    this.#environmentListeners.add(notify);
-    eventBus.on(events.EnvironmentUpdate, notify);
-    return () => {
-      this.#environmentListeners.delete(notify);
-      eventBus.off(events.EnvironmentUpdate, notify);
-    };
-  };
 
   __internal_setCountry = (country: string | null) => {
     if (!this.__internal_country) {
@@ -3406,7 +3338,7 @@ export class Clerk implements ClerkInterface {
   // TODO: Fix this properly
   // eslint-disable-next-line @typescript-eslint/require-await
   __internal_setEnvironment = async (env: EnvironmentJSON) => {
-    this.updateEnvironment(new Environment(env));
+    this.environment = new Environment(env);
 
     // TODO @nikos update
     // if (Clerk.mountComponentRenderer) {

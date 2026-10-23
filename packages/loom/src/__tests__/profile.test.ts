@@ -307,6 +307,19 @@ it('validates profile hydration scope and timestamps and drops injected settings
   expect(() => parseHydration({ ...seed, profileSettings: { ...seed.profileSettings, updatedAt: NaN } })).toThrow();
 });
 
+it('projects mixed hydration to profile fields and rejects device-only hydration', () => {
+  const scope = { instanceKey: 'instance', userId: 'user_a', sessionId: 'sess_a' };
+  const profileSettings = { data: parseProfileSettings(environment), updatedAt: 10 };
+  const sessions = { data: [], updatedAt: 10 };
+
+  expect(parseHydration({ version: 5, scope, profileSettings, sessions })).toEqual({
+    version: 5,
+    scope,
+    profileSettings,
+  });
+  expect(() => parseHydration({ version: 5, scope, sessions })).toThrow('Invalid Loom hydration snapshot.');
+});
+
 describe('user-ready profile prefetch', () => {
   it('recovers an interrupted settings body and removes the abort listener', async () => {
     const response = Response.json(environment);
@@ -493,7 +506,7 @@ describe('user-ready profile prefetch', () => {
     pendingUser.resolve({ raw });
     const profile = await pending;
     expect(profile?.hydration.user?.data.firstName).toBe('Ada');
-    expect(profile?.hydration.sessions).toBeUndefined();
+    expect(Object.keys(profile?.hydration ?? {})).not.toContain('sessions');
     const ready = vi.fn();
     void profile?.settings.then(ready);
     expect(ready).not.toHaveBeenCalled();

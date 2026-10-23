@@ -9,125 +9,8 @@ const hooks = registerHooks({
     return result;
   },
 });
+const { prefetchProfile, prefetchUser } = await import('../dist/server.js');
 
-const { prefetchSessions, prefetchUser } = await import('../dist/server.js');
-const publishableKey = 'pk_test_fake';
-const hydration = await prefetchSessions({
-  identity: { userId: 'user_a', sessionId: 'sess_a' },
-  resolveBackend: async () => ({
-    client: {
-      sessions: {
-        getActiveDevices: async (sessionId, { signal }) => {
-          assert.equal(sessionId, 'sess_a');
-          assert.ok(signal instanceof AbortSignal);
-          return {
-            object: 'active_device_sessions',
-            subject: { instance_id: 'ins_a', user_id: 'user_a', session_id: 'sess_a' },
-            sessions: [
-              {
-                id: 'sess_a',
-                status: 'active',
-                last_active_at: null,
-                expire_at: 2,
-                abandon_at: 3,
-                has_actor: false,
-                latest_activity: { id: 'activity' },
-                secret: 'must-not-hydrate',
-              },
-            ],
-          };
-        },
-      },
-    },
-    routing: { publishableKey, frontendApi: 'clerk.example.com', proxyUrl: '/proxy', domain: 'example.com' },
-  }),
-});
-
-const userHydration = await prefetchUser({
-  identity: { userId: 'user_a', sessionId: 'sess_a' },
-  resolveBackend: async () => ({
-    client: {
-      users: {
-        getUser: async userId => ({
-          id: userId,
-          firstName: 'Ada',
-          lastName: null,
-          username: null,
-          imageUrl: 'https://img.example/ada',
-          hasImage: false,
-          primaryEmailAddressId: 'email_a',
-          passwordEnabled: false,
-          deleteSelfEnabled: true,
-          externalAccounts: [],
-          enterpriseAccounts: [],
-          emailAddresses: [
-            {
-              id: 'email_a',
-              emailAddress: 'ada@example.com',
-              verification: { status: 'verified', secret: 'must-not-hydrate' },
-            },
-          ],
-          privateMetadata: 'must-not-hydrate',
-          raw: 'must-not-hydrate',
-        }),
-      },
-    },
-    routing: { publishableKey, frontendApi: 'clerk.example.com', domain: '' },
-  }),
-});
-assert.deepEqual(userHydration?.user?.data, {
-  id: 'user_a',
-  firstName: 'Ada',
-  lastName: null,
-  username: null,
-  imageUrl: 'https://img.example/ada',
-  hasImage: false,
-  primaryEmailAddressId: 'email_a',
-  passwordEnabled: false,
-  deleteSelfEnabled: true,
-  externalAccounts: [],
-  enterpriseAccounts: [],
-  emailAddresses: [
-    {
-      id: 'email_a',
-      emailAddress: 'ada@example.com',
-      verification: { status: 'verified', strategy: null, expireAt: null, error: null },
-    },
-  ],
-});
-assert.equal(userHydration?.sessions, undefined);
-assert.equal(JSON.stringify(userHydration).includes('must-not-hydrate'), false);
-
-hooks.deregister();
-assert.deepEqual(hydration?.scope, {
-  instanceKey: JSON.stringify([publishableKey, 'clerk.example.com', '/proxy', 'example.com']),
-  userId: 'user_a',
-  sessionId: 'sess_a',
-});
-assert.equal(hydration?.version, 5);
-assert.deepEqual(JSON.parse(JSON.stringify(hydration?.sessions?.data)), [
-  {
-    id: 'sess_a',
-    status: 'active',
-    lastActiveAt: null,
-    expireAt: 2,
-    abandonAt: 3,
-    hasActor: false,
-    latestActivity: { id: 'activity' },
-  },
-]);
-assert.equal(JSON.stringify(hydration).includes('must-not-hydrate'), false);
-assert.equal(
-  [...modules].some(url =>
-    /(?:react|mosaic|clerk-js|next|nextjs|backend)(?:[/@.-]|$)/i.test(
-      url.replace(new URL('../../../', import.meta.url).href, ''),
-    ),
-  ),
-  false,
-);
-console.log(`Built server: ${modules.size} modules loaded; minimal hydration and no framework or backend runtime.`);
-
-const { prefetchProfile } = await import('../dist/server.js');
 const publicEnvironment = JSON.parse(
   await (
     await import('node:fs/promises')
@@ -213,4 +96,8 @@ try {
 } finally {
   globalThis.fetch = originalFetch;
 }
-console.log('Actual Backend User resource preserves raw verification errors for profile and user-only prefetch.');
+assert.equal(
+  [...modules].some(url => /(?:tanstack|react-query|clerk-js|nextjs)(?:[/@.-]|$)/i.test(url)),
+  false,
+);
+console.log('Built profile server prefetch projects user and settings without device or client runtime.');

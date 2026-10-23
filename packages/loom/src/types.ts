@@ -1,26 +1,7 @@
-import type { SessionActivity } from '@clerk/shared/types';
-
 export type SessionScope = Readonly<{
   instanceKey: string;
   userId: string;
   sessionId: string;
-}>;
-
-export type ActiveDeviceSession = Readonly<{
-  id: string;
-  status: string;
-  lastActiveAt: number | null;
-  expireAt: number;
-  abandonAt: number;
-  hasActor: boolean;
-  latestActivity: Readonly<SessionActivity>;
-}>;
-
-export type Sessions = readonly ActiveDeviceSession[];
-
-export type SessionsTransport = Readonly<{
-  read: (signal: AbortSignal) => Promise<Sessions>;
-  revoke: (id: string, signal: AbortSignal) => Promise<void>;
 }>;
 
 export type UserSnapshot = Readonly<{
@@ -93,7 +74,6 @@ export type UserSnapshot = Readonly<{
 export type LoomHydration = Readonly<{
   version: 5;
   scope: SessionScope;
-  sessions?: Readonly<{ data: Sessions; updatedAt: number }>;
   user?: Readonly<{ data: UserSnapshot; updatedAt: number }>;
   profileSettings?: Readonly<{ data: ProfileSettings; updatedAt: number }>;
 }>;

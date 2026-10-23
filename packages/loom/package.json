@@ -2,7 +2,7 @@
   "name": "@clerk/loom",
   "version": "0.0.0",
   "private": true,
-  "description": "Private active-device sessions data client prototype",
+  "description": "Private profile handoff prototype",
   "sideEffects": false,
   "type": "module",
   "exports": {
@@ -10,17 +10,9 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./react": {
-      "types": "./dist/react.d.ts",
-      "default": "./dist/react.js"
-    },
     "./handoff": {
       "types": "./dist/handoff.d.ts",
       "default": "./dist/handoff.js"
-    },
-    "./clerk": {
-      "types": "./dist/clerk.d.ts",
-      "default": "./dist/clerk.js"
     },
     "./server": {
       "types": "./dist/server.d.ts",
@@ -38,13 +30,10 @@
     "lint": "eslint src",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "verify:core": "node scripts/verify-core.mjs",
     "verify:server": "node scripts/verify-server.mjs"
   },
   "dependencies": {
-    "@clerk/shared": "workspace:*",
-    "@tanstack/query-core": "5.102.8",
-    "@tanstack/react-query": "5.102.8"
+    "@clerk/shared": "workspace:*"
   },
   "devDependencies": {
     "@clerk/nextjs": "workspace:*",

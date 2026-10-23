@@ -25,8 +25,7 @@ export class FraudProtection {
   ) {}
 
   // TODO @userland-errors:
-  public async execute<R>(clerk: Clerk, cb: () => Promise<R>, assertCurrent?: () => void): Promise<R> {
-    assertCurrent?.();
+  public async execute<R>(clerk: Clerk, cb: () => Promise<R>): Promise<R> {
     // TODO @userland-errors:
     if (this.captchaAttemptsExceeded()) {
       throw new ClerkRuntimeError(
@@ -40,10 +39,8 @@ export class FraudProtection {
         await this.inflightException;
       }
 
-      assertCurrent?.();
       return await cb();
     } catch (e) {
-      assertCurrent?.();
       if (!isClerkAPIResponseError(e)) {
         throw e;
       }
@@ -63,7 +60,6 @@ export class FraudProtection {
         await this.inflightException;
         // If this is resolved, it means the request finally resolved with 200
         // so we can replay the original request
-        assertCurrent?.();
         return await cb();
       }
 
@@ -73,16 +69,11 @@ export class FraudProtection {
 
       try {
         const captchaParams: any = await this.managedChallenge(clerk);
-        assertCurrent?.();
         if (captchaParams?.captchaError !== 'modal_component_not_ready') {
-          await this.client
-            .getOrCreateInstance()
-            .__internal_sendCaptchaToken(captchaParams, assertCurrent ? { clerk, assertCurrent } : undefined);
-          assertCurrent?.();
+          await this.client.getOrCreateInstance().__internal_sendCaptchaToken(captchaParams);
           this.captchaRetryCount = 0; // Reset the retry count on success
         }
       } catch (err) {
-        assertCurrent?.();
         this.captchaRetryCount++;
         throw err;
       } finally {
@@ -91,7 +82,6 @@ export class FraudProtection {
         this.inflightException = null;
       }
 
-      assertCurrent?.();
       return await cb();
     }
   }

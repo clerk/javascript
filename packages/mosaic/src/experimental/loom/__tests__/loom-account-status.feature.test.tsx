@@ -30,23 +30,31 @@ function profile(overrides: { passwordEnabled?: boolean; deleteSelfEnabled?: boo
         passwordEnabled: overrides.passwordEnabled ?? false,
         deleteSelfEnabled: overrides.deleteSelfEnabled ?? true,
         enterpriseAccounts: [],
-        externalAccounts: [{
-          id: 'google_1',
-          provider: 'google',
-          approvedScopes: '',
-          username: 'alice-google',
-          emailAddress: '',
-          verification: { status: 'verified' as const, strategy: null, expireAt: null, error: null },
-        }],
+        externalAccounts: [
+          {
+            id: 'google_1',
+            provider: 'google',
+            approvedScopes: '',
+            username: 'alice-google',
+            emailAddress: '',
+            verification: { status: 'verified' as const, strategy: null, expireAt: null, error: null },
+          },
+        ],
       },
       updatedAt: Date.now(),
     },
     profileSettings: { data: profileSettings, updatedAt: Date.now() },
   };
   return (
-    <ClerkContextProvider clerk={clerk} clerkStatus={clerk.status}>
+    <ClerkContextProvider
+      clerk={clerk}
+      clerkStatus={clerk.status}
+    >
       <MosaicProvider>
-        <LoomProvider clerk={null} hydration={hydration}>
+        <LoomProvider
+          clerk={null}
+          hydration={hydration}
+        >
           <LoomComposedProfile />
         </LoomProvider>
       </MosaicProvider>
@@ -74,17 +82,35 @@ it('server renders password presence with disabled action geometry', () => {
     const hydration = {
       version: 5 as const,
       scope: { instanceKey: 'server', userId: 'user_1', sessionId: 'sess_1' },
-      user: { data: {
-        id: 'user_1', firstName: 'Alice', lastName: null, username: null, imageUrl: '', hasImage: false,
-        primaryEmailAddressId: null, emailAddresses: [], passwordEnabled, deleteSelfEnabled: false,
-        enterpriseAccounts: [], externalAccounts: [],
-      }, updatedAt: Date.now() },
+      user: {
+        data: {
+          id: 'user_1',
+          firstName: 'Alice',
+          lastName: null,
+          username: null,
+          imageUrl: '',
+          hasImage: false,
+          primaryEmailAddressId: null,
+          emailAddresses: [],
+          passwordEnabled,
+          deleteSelfEnabled: false,
+          enterpriseAccounts: [],
+          externalAccounts: [],
+        },
+        updatedAt: Date.now(),
+      },
       profileSettings: { data: profileSettings, updatedAt: Date.now() },
     };
     return renderToString(
-      <ClerkContextProvider clerk={clerk} clerkStatus={clerk.status}>
+      <ClerkContextProvider
+        clerk={clerk}
+        clerkStatus={clerk.status}
+      >
         <MosaicProvider>
-          <LoomProvider clerk={null} hydration={hydration}>
+          <LoomProvider
+            clerk={null}
+            hydration={hydration}
+          >
             <UserProfileSecurityPanel passwordSection={<LoomPassword />} />
           </LoomProvider>
         </MosaicProvider>

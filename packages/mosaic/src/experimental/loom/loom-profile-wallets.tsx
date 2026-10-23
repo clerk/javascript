@@ -4,6 +4,10 @@ import { useLoomProfileWalletsModel } from './loom-profile-wallets.model';
 export function LoomProfileWallets() {
   const state = useLoomProfileWalletsModel();
   return state ? (
-    <UserProfileWeb3WalletsSectionView wallets={state.wallets} availableProviders={state.availableProviders} actionsEligible />
+    <UserProfileWeb3WalletsSectionView
+      wallets={state.wallets}
+      availableProviders={state.availableProviders}
+      actionsEligible
+    />
   ) : null;
 }

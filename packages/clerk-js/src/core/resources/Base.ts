@@ -20,8 +20,6 @@ export type BaseFetchOptions = ClerkResourceReloadParams & {
   skipUpdateClient?: boolean;
   fetchMaxTries?: number;
   abortSignal?: AbortSignal;
-  clerk?: Clerk;
-  assertCurrent?: () => void;
 };
 
 export type BaseMutateParams = {
@@ -41,11 +39,7 @@ type PendingCoalescedPost<T> = {
   expiresAt: number;
 };
 
-function assertProductionKeysOnDev(
-  statusCode: number,
-  payloadErrors?: ClerkAPIErrorJSON[],
-  clerk = BaseResource.clerk,
-) {
+function assertProductionKeysOnDev(statusCode: number, payloadErrors?: ClerkAPIErrorJSON[]) {
   if (!payloadErrors) {
     return;
   }
@@ -57,8 +51,8 @@ function assertProductionKeysOnDev(
   const safeError = payloadErrors[0];
   const safeErrorMessage = safeError.long_message;
 
-  if (safeError.code === 'origin_invalid' && isProductionFromPublishableKey(clerk.publishableKey)) {
-    const prodDomain = clerk.frontendApi.replace('clerk.', '');
+  if (safeError.code === 'origin_invalid' && isProductionFromPublishableKey(BaseResource.clerk.publishableKey)) {
+    const prodDomain = BaseResource.clerk.frontendApi.replace('clerk.', '');
     throw new ClerkAPIResponseError(
       `Clerk: Production Keys are only allowed for domain "${prodDomain}". \nAPI Error: ${safeErrorMessage}`,
       {
@@ -94,11 +88,7 @@ export abstract class BaseResource {
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
-    return FraudProtection.getInstance().execute(
-      opts.clerk ?? this.clerk,
-      () => this._baseFetch<J>(requestInit, opts),
-      opts.assertCurrent,
-    );
+    return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts));
   }
 
   // TODO @userland-errors:
@@ -106,10 +96,7 @@ export abstract class BaseResource {
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
   ): Promise<FapiResponseJSON<J> | null> {
-    opts.assertCurrent?.();
-    const clerk = opts.clerk ?? this.clerk;
-    const fapiClient = clerk.getFapiClient();
-    if (!fapiClient) {
+    if (!BaseResource.fapiClient) {
       clerkMissingFapiClientInResources();
     }
 
@@ -117,14 +104,10 @@ export abstract class BaseResource {
     const { fetchMaxTries } = opts;
 
     try {
-      fapiResponse = await fapiClient.request<J>(requestInit, {
-        fetchMaxTries,
-        ...(opts.assertCurrent ? { assertCurrent: opts.assertCurrent } : {}),
-      });
+      fapiResponse = await BaseResource.fapiClient.request<J>(requestInit, { fetchMaxTries });
     } catch (e) {
-      opts.assertCurrent?.();
       // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
-      if (this.shouldRethrowOfflineNetworkErrors(clerk)) {
+      if (this.shouldRethrowOfflineNetworkErrors()) {
         // TODO @userland-errors:
         throw new ClerkRuntimeError(e?.message || e, {
           code: 'network_error',
@@ -144,18 +127,17 @@ export abstract class BaseResource {
       }
     }
 
-    opts.assertCurrent?.();
     const { payload, status, statusText, headers } = fapiResponse;
 
     if (headers) {
       const country = headers.get('x-country');
 
-      clerk.__internal_setCountry(country ? country.toLowerCase() : null);
+      this.clerk.__internal_setCountry(country ? country.toLowerCase() : null);
     }
 
     // TODO: Link to Client payload piggybacking design document
     if ((requestInit.method !== 'GET' || opts.forceUpdateClient) && !opts.skipUpdateClient) {
-      this._updateClient<J>(payload, clerk);
+      this._updateClient<J>(payload);
     }
 
     if (status >= 200 && status <= 299) {
@@ -172,17 +154,12 @@ export abstract class BaseResource {
       // - requires_captcha: ignored here, handled by the captcha challenge flow
       // - all other 401s: refresh client/session via handleUnauthenticated
       if (status === 401 && code === 'dev_browser_unauthenticated') {
-        await clerk.__internal_handleUnauthenticatedDevBrowser(opts.assertCurrent);
+        await BaseResource.clerk.__internal_handleUnauthenticatedDevBrowser();
       } else if (status === 401 && code !== 'requires_captcha') {
-        await clerk.handleUnauthenticated(
-          opts.assertCurrent
-            ? { broadcast: true, assertCurrent: opts.assertCurrent, abortSignal: requestInit.signal ?? undefined }
-            : undefined,
-        );
+        await BaseResource.clerk.handleUnauthenticated();
       }
 
-      opts.assertCurrent?.();
-      assertProductionKeysOnDev(status, errors, clerk);
+      assertProductionKeysOnDev(status, errors);
 
       const apiResponseOptions: ConstructorParameters<typeof ClerkAPIResponseError>[1] = {
         data: errors,
@@ -205,10 +182,10 @@ export abstract class BaseResource {
     return null;
   }
 
-  protected static _updateClient<J>(responseJSON: FapiResponseJSON<J> | null, clerk = BaseResource.clerk): void {
+  protected static _updateClient<J>(responseJSON: FapiResponseJSON<J> | null): void {
     const client = getClientResourceFromPayload(responseJSON);
-    if (client && clerk) {
-      clerk.updateClient(client);
+    if (client && BaseResource.clerk) {
+      BaseResource.clerk.updateClient(client);
     }
   }
 
@@ -252,7 +229,6 @@ export abstract class BaseResource {
       opts,
     );
 
-    opts.assertCurrent?.();
     return this.fromJSON((json?.response || json) as J);
   }
 
@@ -263,13 +239,9 @@ export abstract class BaseResource {
     return this.fromJSON((json?.response || json) as J);
   }
 
-  protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(
-    params: BaseMutateParams,
-    opts: BaseFetchOptions = {},
-  ): Promise<this> {
+  protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
     const { action, body, method, path } = params;
-    const json = await BaseResource._baseFetch<J>({ method, path: path || this.path(action), body }, opts);
-    opts.assertCurrent?.();
+    const json = await BaseResource._baseFetch<J>({ method, path: path || this.path(action), body });
     return this.fromJSON((json?.response || json) as J);
   }
 
@@ -302,11 +274,8 @@ export abstract class BaseResource {
     return JSON.stringify([this.id, params.path, params.action, body]);
   }
 
-  protected async _basePostBypass<J extends ClerkResourceJSON>(
-    params: BaseMutateParams = {},
-    opts: BaseFetchOptions = {},
-  ): Promise<this> {
-    return this._baseMutateBypass<J>({ ...params, method: 'POST' }, opts);
+  protected async _basePostBypass<J extends ClerkResourceJSON>(params: BaseMutateParams = {}): Promise<this> {
+    return this._baseMutateBypass<J>({ ...params, method: 'POST' });
   }
 
   protected async _basePut<J extends ClerkResourceJSON | null>(params: BaseMutateParams = {}): Promise<this> {
@@ -321,8 +290,8 @@ export abstract class BaseResource {
     await this._baseMutate<J>({ ...params, method: 'DELETE' });
   }
 
-  private static shouldRethrowOfflineNetworkErrors(clerk = BaseResource.clerk): boolean {
-    const experimental = clerk?.__internal_getOption?.('experimental');
+  private static shouldRethrowOfflineNetworkErrors(): boolean {
+    const experimental = BaseResource.clerk?.__internal_getOption?.('experimental');
     return experimental?.rethrowOfflineNetworkErrors || false;
   }
 }

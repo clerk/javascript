@@ -1,7 +1,10 @@
 import { useProfileSnapshot, useUserSnapshot } from '@clerk/loom/handoff';
 
 import { useUserProfileOptions } from '../../features/user-profile/user-profile.provider';
-import { createProviderCatalog, projectConnectedAccounts } from '../../features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.model';
+import {
+  createProviderCatalog,
+  projectConnectedAccounts,
+} from '../../features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.model';
 import { projectPassword } from '../../features/user-profile/user-profile-password-section/user-profile-password-section.model';
 import { allowsIdentificationCreation } from '../../utils/allows-identification-creation';
 

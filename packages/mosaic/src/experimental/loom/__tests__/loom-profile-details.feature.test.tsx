@@ -12,21 +12,42 @@ import { profileSettings } from './profile-fixture';
 it('projects configured name and immutable username from the prefetched profile', () => {
   const clerk = new Clerk(publishableKey());
   const view = render(
-    <ClerkContextProvider clerk={clerk} clerkStatus={clerk.status}>
+    <ClerkContextProvider
+      clerk={clerk}
+      clerkStatus={clerk.status}
+    >
       <MosaicProvider>
-        <LoomProvider clerk={null} hydration={{
-          version: 5,
-          scope: { instanceKey: 'server', userId: 'user_1', sessionId: 'sess_1' },
-          user: { data: {
-            id: 'user_1', firstName: 'Alice', lastName: 'Smith', username: 'alice', imageUrl: '', hasImage: false,
-            primaryEmailAddressId: null, emailAddresses: [], passwordEnabled: false, deleteSelfEnabled: false,
-            enterpriseAccounts: [], externalAccounts: [],
-          }, updatedAt: Date.now() },
-          profileSettings: { data: {
-            ...profileSettings,
-            username: { ...profileSettings.username, immutable: true },
-          }, updatedAt: Date.now() },
-        }}>
+        <LoomProvider
+          clerk={null}
+          hydration={{
+            version: 5,
+            scope: { instanceKey: 'server', userId: 'user_1', sessionId: 'sess_1' },
+            user: {
+              data: {
+                id: 'user_1',
+                firstName: 'Alice',
+                lastName: 'Smith',
+                username: 'alice',
+                imageUrl: '',
+                hasImage: false,
+                primaryEmailAddressId: null,
+                emailAddresses: [],
+                passwordEnabled: false,
+                deleteSelfEnabled: false,
+                enterpriseAccounts: [],
+                externalAccounts: [],
+              },
+              updatedAt: Date.now(),
+            },
+            profileSettings: {
+              data: {
+                ...profileSettings,
+                username: { ...profileSettings.username, immutable: true },
+              },
+              updatedAt: Date.now(),
+            },
+          }}
+        >
           <LoomHandoff live={null}>
             <LoomProfileDetails />
           </LoomHandoff>
