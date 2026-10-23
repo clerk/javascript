@@ -6,6 +6,7 @@ import { localizationKeys } from '../localization/localizationKeys';
 type FirstFactorConfig = {
   label: string | LocalizationKey;
   type: string;
+  autoComplete: 'email' | 'tel' | 'username';
   placeholder: string | LocalizationKey;
   action?: string | LocalizationKey;
   validLastAuthenticationStrategies: ReadonlySet<LastAuthenticationStrategy>;
@@ -15,6 +16,7 @@ const FirstFactorConfigs = Object.freeze({
     label: localizationKeys('formFieldLabel__emailAddress_username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_username'),
     type: 'text',
+    autoComplete: 'username',
     action: localizationKeys('signIn.start.actionLink__use_email_username'),
     validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>([
       'email_code',
@@ -28,6 +30,7 @@ const FirstFactorConfigs = Object.freeze({
     label: localizationKeys('formFieldLabel__emailAddress'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     type: 'email',
+    autoComplete: 'email',
     action: localizationKeys('signIn.start.actionLink__use_email'),
     validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>([
       'email_code',
@@ -40,6 +43,7 @@ const FirstFactorConfigs = Object.freeze({
     label: localizationKeys('formFieldLabel__phoneNumber'),
     placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     type: 'tel',
+    autoComplete: 'tel',
     action: localizationKeys('signIn.start.actionLink__use_phone'),
     validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>(['phone_code', 'password']),
   },
@@ -47,6 +51,7 @@ const FirstFactorConfigs = Object.freeze({
     label: localizationKeys('formFieldLabel__username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__username'),
     type: 'text',
+    autoComplete: 'username',
     action: localizationKeys('signIn.start.actionLink__use_username'),
     validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>(['username', 'password']),
   },
@@ -54,10 +59,11 @@ const FirstFactorConfigs = Object.freeze({
     label: '',
     placeholder: '',
     type: 'text',
+    autoComplete: 'username',
     action: '',
     validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>(),
   },
-} as Record<SignInStartIdentifier | 'default', FirstFactorConfig>);
+} satisfies Record<SignInStartIdentifier | 'default', FirstFactorConfig>);
 
 export type SignInStartIdentifier = 'email_address' | 'username' | 'phone_number' | 'email_address_username';
 export const groupIdentifiers = (attributes: Attribute[]): SignInStartIdentifier[] => {
