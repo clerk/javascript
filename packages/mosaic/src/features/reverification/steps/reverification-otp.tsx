@@ -1,5 +1,5 @@
 import { useMergeRefs } from '@floating-ui/react';
-import type { FormEvent, Ref } from 'react';
+import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -19,7 +19,7 @@ export interface ReverificationOtpMessages {
 
 export interface ReverificationOtpResend {
   text: string;
-  label: string;
+  label: ReactNode;
   disabled?: boolean;
   onClick: () => void;
 }

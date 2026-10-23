@@ -16,9 +16,9 @@ import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, rich, useMessages } from '../../../localization';
+import { tabularNumbersStyle } from '../../../styles/typography.styles';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
-import { styles as panelStyles } from '../user-profile-profile-panel.styles';
 
 const styles = stylex.create({
   ssoConnection: {
@@ -253,13 +253,16 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
           </Field.Message>
-          <ResendButton
-            labels={m.verify}
-            onResend={props.onResend}
-            disabled={props.isPending}
-            isResending={props.isResending}
-            resendSeconds={props.resendSeconds}
-          />
+          <Field.Description>
+            {m.verify.resendText}{' '}
+            <ResendButton
+              labels={m.verify}
+              onResend={props.onResend}
+              disabled={props.isPending}
+              isResending={props.isResending}
+              resendSeconds={props.resendSeconds}
+            />
+          </Field.Description>
         </Field.Root>
       </Card.Content>
       <Card.Footer>
@@ -435,7 +438,7 @@ function ResendButton(props: ResendButtonProps) {
       ) : resendSeconds > 0 ? (
         <span>
           {rich(props.labels.resendCountdown, {
-            values: { seconds: <span {...stylex.props(panelStyles.countdown)}>{resendSeconds}</span> },
+            values: { seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendSeconds}</span> },
           })}
         </span>
       ) : (
