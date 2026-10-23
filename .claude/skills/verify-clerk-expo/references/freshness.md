@@ -35,7 +35,7 @@ The check dates a Metro revision it has not seen before by the second it was bui
 
 ## A remote lease has none of this
 
-A remote lease runs a standalone Release build with the JS embedded, so there is no watch build, no Metro, and none of the three checks. Its build key also covers the JS inputs, and a JS edit reaches the app by commit, push, `run`. See [remote.md](remote.md). The `Verify end-to-end tests` workflow sets `VERIFY_LOCAL_BUILD=standalone`, so its local devices run the same kind of app.
+A remote lease runs a standalone Release build with the JS embedded, so there is no watch build, no Metro, and none of the three checks. Its build key also covers the JS inputs, and a JS edit reaches the app by commit, push, `run`. See [remote.md](remote.md). The `Expo E2E` workflow sets `VERIFY_LOCAL_BUILD=standalone`, so its local devices run the same kind of app.
 
 ## Troubleshooting
 
