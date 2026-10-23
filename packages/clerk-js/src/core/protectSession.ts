@@ -56,6 +56,7 @@ const TOKEN_SEND_MARGIN_MS = 5 * 1_000;
 /** Bounds we hold the server-supplied `retry_in_ms` to. */
 const MIN_RETRY_DELAY_MS = 50;
 const MAX_RETRY_DELAY_MS = 1_000;
+const LATE_TOKEN_RETRY_DELAY_MS = 1_000;
 
 /** Lowercase RFC 4648 base32 — a `cid` has to survive case-insensitive, alphanumeric-only contexts. */
 const BASE32_ALPHABET = 'abcdefghijklmnopqrstuvwxyz234567';
@@ -723,15 +724,24 @@ export class ProtectSession {
     if (typeof late === 'string') {
       return;
     }
-    await this.#lock.acquireLockAndRun(() => {
-      const stored = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor);
-      // Keep whichever token is better: a newer invalidation floor first, then the later expiry.
-      if (!stored || (stored.floor <= this.#floor && stored.exp < late.exp)) {
-        writeStoredToken(this.#tokenStorageKey, late, this.#floor);
-        this.#consecutiveFailures = 0;
+    while (validateToken(late.token, late.exp, TOKEN_SEND_MARGIN_MS)) {
+      const saved = await this.#lock.acquireLockAndRun(() => {
+        if (!validateToken(late.token, late.exp, TOKEN_SEND_MARGIN_MS)) {
+          return Promise.resolve(true);
+        }
+        const stored = readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor);
+        // Keep whichever token is better: a newer invalidation floor first, then the later expiry.
+        if (!stored || (stored.floor <= this.#floor && stored.exp < late.exp)) {
+          writeStoredToken(this.#tokenStorageKey, late, this.#floor);
+          this.#consecutiveFailures = 0;
+        }
+        return Promise.resolve(true);
+      });
+      if (saved === true) {
+        return;
       }
-      return Promise.resolve();
-    });
+      await new Promise(resolve => setTimeout(resolve, LATE_TOKEN_RETRY_DELAY_MS));
+    }
   }
 
   /**

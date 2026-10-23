@@ -880,6 +880,92 @@ describe('ProtectSession late token', () => {
   });
 
   it.each([
+    { name: 'an empty store', stored: undefined, token: 'v1.payload.mac' },
+    { name: 'a longer-lived stored token', stored: { exp: 43_260, floor: 0 }, token: 'v1.leader.mac' },
+    { name: 'a newer invalidation floor', stored: { exp: 3_600, floor: 30 }, token: 'v1.leader.mac' },
+  ])('retries a timed-out lock and respects $name', async ({ stored, token }) => {
+    let calls = 0;
+    const request = vi.fn((_key: string, options: { signal: AbortSignal }, callback: () => Promise<unknown>) => {
+      if (++calls === 2) {
+        return new Promise((_resolve, reject) => {
+          options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+        });
+      }
+      return callback();
+    });
+    Object.defineProperty(navigator, 'locks', { value: { request }, configurable: true });
+
+    const { session: created, elements } = await timedOut();
+    await vi.advanceTimersByTimeAsync(2_000);
+    serveInline(elements[0], { cid: created?.placeholders().cid });
+    await vi.advanceTimersByTimeAsync(4_999);
+
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(localStorage.getItem(STORE_KEY)).toBeNull();
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+
+    if (stored) {
+      localStorage.setItem(
+        STORE_KEY,
+        storedEntry({ token, rid: 'c'.repeat(26), exp: nowSeconds() + stored.exp, floor: stored.floor }),
+      );
+    }
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(request).toHaveBeenCalledTimes(3);
+    await expect(created?.getRequestParams()).resolves.toMatchObject({
+      __clerk_protect_token: token,
+      __clerk_protect_status: 'ok',
+    });
+    expect(elements).toHaveLength(1);
+  });
+
+  it('stops retrying the lock when the late token is no longer usable', async () => {
+    let calls = 0;
+    const request = vi.fn((_key: string, options: { signal: AbortSignal }, callback: () => Promise<unknown>) => {
+      if (++calls > 1) {
+        return new Promise((_resolve, reject) => {
+          options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+        });
+      }
+      return callback();
+    });
+    Object.defineProperty(navigator, 'locks', { value: { request }, configurable: true });
+
+    const { session: created, elements } = await timedOut();
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      ready: Promise.resolve({ token: 'v1.late.mac', exp: nowSeconds() + 12 }),
+    });
+    await vi.advanceTimersByTimeAsync(20_000);
+
+    expect(request).toHaveBeenCalledTimes(3);
+    expect(localStorage.getItem(STORE_KEY)).toBeNull();
+  });
+
+  it('revalidates a late token after waiting for the lock', async () => {
+    let calls = 0;
+    const request = vi.fn((_key: string, _options: unknown, callback: () => Promise<unknown>) => {
+      if (++calls === 2) {
+        return new Promise(resolve => setTimeout(resolve, 4_000)).then(callback);
+      }
+      return callback();
+    });
+    Object.defineProperty(navigator, 'locks', { value: { request }, configurable: true });
+
+    const { session: created, elements } = await timedOut();
+    serveInline(elements[0], {
+      cid: created?.placeholders().cid,
+      ready: Promise.resolve({ token: 'v1.late.mac', exp: nowSeconds() + 7 }),
+    });
+    await vi.advanceTimersByTimeAsync(4_000);
+
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(localStorage.getItem(STORE_KEY)).toBeNull();
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it.each([
     ['minted for another page', { cid: 'someone-else' }],
     ['carrying no token', { ready: Promise.resolve({ status: 'no_token' }) }],
   ])('ignores a late result %s', async (_name, overrides) => {
