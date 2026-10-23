@@ -1,6 +1,6 @@
 import { Clerk } from '@clerk/clerk-js';
 import type { LoomHydration, PrefetchedProfile } from '@clerk/loom';
-import { LoomProvider } from '@clerk/loom/handoff';
+import { LoomHandoff, LoomProvider, useSuspenseUser } from '@clerk/loom/handoff';
 import { ClerkContextProvider } from '@clerk/shared/react';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -313,4 +313,192 @@ it('streams the profile shell before independent settings resolve', async () => 
     html += decoder.decode(chunk.value);
   }
   expect(html).toContain('Password');
+});
+
+it('suspends the native user read before Clerk loads, then exposes the exact native user and signed-out null', async () => {
+  const user = fapiUser({ id: 'user_1', first_name: 'Native' });
+  serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
+  const clerk = new Clerk(publishableKey());
+  const reads: ReturnType<typeof useSuspenseUser>[] = [];
+  let attempts = 0;
+  function NativeUser() {
+    attempts += 1;
+    const result = useSuspenseUser();
+    reads.push(result);
+    return <p>{result.user?.firstName ?? 'Signed out'}</p>;
+  }
+  const view = render(
+    <React.StrictMode>
+      <LoomProvider clerk={clerk}>
+        <ClerkContextProvider clerk={clerk}>
+          <React.Suspense fallback={<p>Waiting for Clerk</p>}>
+            <NativeUser />
+          </React.Suspense>
+        </ClerkContextProvider>
+      </LoomProvider>
+    </React.StrictMode>,
+  );
+  expect(screen.getByText('Waiting for Clerk')).toBeVisible();
+  expect(attempts).toBeGreaterThan(0);
+  expect(reads).toHaveLength(0);
+  await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
+  expect(await screen.findByText('Native')).toBeVisible();
+  expect(reads.at(-1)?.user).toBe(clerk.__internal_lastEmittedResources?.user);
+  expect(reads.at(-1)?.user).toBe(clerk.user);
+  await act(() => clerk.user?.update({ firstName: 'Updated native' }));
+  expect(await screen.findByText('Updated native')).toBeVisible();
+  expect(reads.at(-1)?.user).toBe(clerk.user);
+  expect(screen.queryByText('Waiting for Clerk')).toBeNull();
+  await act(() => clerk.signOut());
+  expect(await screen.findByText('Signed out')).toBeVisible();
+  expect(reads.at(-1)?.user).toBeNull();
+  view.unmount();
+});
+
+it('attempts the real native handoff while unresolved and retains its seed fallback', async () => {
+  serveFapi({
+    client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', first_name: 'Native' }) })]),
+  });
+  const clerk = new Clerk(publishableKey());
+  const telemetry = vi.fn(() => undefined);
+  Object.defineProperty(clerk, 'telemetry', { configurable: true, get: telemetry });
+  const view = render(
+    <LoomProvider
+      clerk={clerk}
+      hydration={seed(clerk)}
+    >
+      <LoomHandoff live={<p>Native panel</p>}>
+        <p>Seed panel</p>
+      </LoomHandoff>
+    </LoomProvider>,
+  );
+  expect(screen.getByText('Seed panel')).toBeVisible();
+  expect(telemetry).toHaveBeenCalled();
+  Reflect.deleteProperty(clerk, 'telemetry');
+  expect(screen.queryByText('Native panel')).toBeNull();
+  await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
+  expect(await screen.findByText('Native panel')).toBeVisible();
+  expect(screen.queryByText('Seed panel')).toBeNull();
+  view.unmount();
+});
+
+it('shows the existing profile error view for a known initialization failure', async () => {
+  serveFapi({});
+  const clerk = new Clerk(publishableKey());
+  const status = vi.spyOn(clerk, 'status', 'get').mockReturnValue('error');
+  const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+  const view = render(profile(clerk, seed(clerk)));
+  expect(await screen.findByText('Could not load profile.')).toBeVisible();
+  view.unmount();
+  errors.mockRestore();
+  status.mockRestore();
+});
+
+it('waits for native data even when the surrounding SDK has an initial user', async () => {
+  serveFapi({
+    client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', first_name: 'Initial' }) })]),
+  });
+  const initialClerk = new Clerk(publishableKey());
+  await act(() => initialClerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
+  const clerk = new Clerk(publishableKey());
+  function NativeUser() {
+    return <p>{useSuspenseUser().user?.firstName}</p>;
+  }
+  const view = render(
+    <LoomProvider clerk={clerk}>
+      <ClerkContextProvider
+        clerk={clerk}
+        initialState={{ user: initialClerk.user }}
+      >
+        <React.Suspense fallback={<p>Waiting for native user</p>}>
+          <NativeUser />
+        </React.Suspense>
+      </ClerkContextProvider>
+    </LoomProvider>,
+  );
+  expect(screen.getByText('Waiting for native user')).toBeVisible();
+  expect(screen.queryByText('Initial')).toBeNull();
+  await act(() => clerk.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
+  expect(await screen.findByText('Initial')).toBeVisible();
+  view.unmount();
+});
+
+it('never completes a replacement host read from SDK initial state before native readiness', async () => {
+  serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ first_name: 'Native' }) })]) });
+  const first = new Clerk(publishableKey());
+  await act(() => first.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
+  const next = new Clerk(publishableKey());
+  const reads: ReturnType<typeof useSuspenseUser>[] = [];
+  function Reader() {
+    const result = useSuspenseUser();
+    reads.push(result);
+    return <p>{result.user?.firstName}</p>;
+  }
+  function tree(clerk: Clerk, key: string) {
+    return (
+      <LoomProvider clerk={clerk}>
+        <ClerkContextProvider
+          key={key}
+          clerk={clerk}
+          initialState={{ user: first.user }}
+        >
+          <React.Suspense fallback={<p>Waiting for replacement</p>}>
+            <Reader />
+          </React.Suspense>
+        </ClerkContextProvider>
+      </LoomProvider>
+    );
+  }
+  const view = render(tree(first, 'first'));
+  expect(await screen.findByText('Native')).toBeVisible();
+  reads.length = 0;
+  view.rerender(tree(next, 'next'));
+  expect(reads).toHaveLength(0);
+  expect(screen.getByText('Waiting for replacement')).toBeVisible();
+  await act(() => next.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
+  expect(await screen.findByText('Native')).toBeVisible();
+  expect(reads.at(-1)?.user).toBe(next.user);
+  view.unmount();
+});
+
+it.each(['profile', 'password'])('recovers %s after a failed host is replaced', async surface => {
+  serveFapi({
+    client: fapiClient([
+      fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', first_name: 'Healthy', password_enabled: true }) }),
+    ]),
+  });
+  const failed = new Clerk(publishableKey());
+  const status = vi.spyOn(failed, 'status', 'get').mockReturnValue('error');
+  const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+  const hydration = seed(failed);
+  function tree(clerk: Clerk) {
+    return surface === 'profile' ? (
+      profile(clerk, hydration)
+    ) : (
+      <MosaicProvider>
+        <LoomProvider
+          clerk={clerk}
+          hydration={hydration}
+        >
+          <LoomPassword />
+        </LoomProvider>
+      </MosaicProvider>
+    );
+  }
+  const view = render(tree(failed));
+  expect(await screen.findByRole('alert')).toBeVisible();
+  const healthy = new Clerk(publishableKey());
+  await act(() => healthy.load({ routerPush: () => Promise.resolve(), routerReplace: () => Promise.resolve() }));
+  view.rerender(tree(healthy));
+  if (surface === 'profile') {
+    expect(await screen.findByText('Healthy')).toBeVisible();
+    await selectSecurity();
+    await act(() => healthy.user?.update({ firstName: 'Updated' }));
+    expect(screen.getByRole('button', { name: 'Security' })).toBeVisible();
+  }
+  expect(await screen.findByRole('button', { name: 'Change password' })).toBeEnabled();
+  expect(screen.queryByRole('alert')).toBeNull();
+  view.unmount();
+  errors.mockRestore();
+  status.mockRestore();
 });

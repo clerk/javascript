@@ -1,4 +1,4 @@
-import { LoomHandoff } from '@clerk/loom/handoff';
+import { LoomHandoff, useLoomGeneration } from '@clerk/loom/handoff';
 
 import { Button } from '../../components/button';
 import { UserProfileConnectedAccountsSectionView } from '../../features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
@@ -21,12 +21,18 @@ export function LoomConnectedAccounts() {
 }
 
 export function LoomPassword() {
+  const generation = useLoomGeneration();
   return (
-    <LoomHandoff live={<UserProfilePasswordSection />}>
-      <LoomSectionBoundary failure='Could not load password status.'>
-        <PasswordContent />
-      </LoomSectionBoundary>
-    </LoomHandoff>
+    <LoomSectionBoundary
+      key={generation}
+      failure='Could not load password status.'
+    >
+      <LoomHandoff live={<UserProfilePasswordSection />}>
+        <LoomSectionBoundary failure='Could not load password status.'>
+          <PasswordContent />
+        </LoomSectionBoundary>
+      </LoomHandoff>
+    </LoomSectionBoundary>
   );
 }
 
@@ -42,7 +48,12 @@ function PasswordContent() {
       showReadonlyStatus
       action={
         !display.managed ? (
-          <Button color='neutral' size='sm' variant='outline' disabled>
+          <Button
+            color='neutral'
+            size='sm'
+            variant='outline'
+            disabled
+          >
             {display.hasPassword ? m.change : m.set}
           </Button>
         ) : undefined

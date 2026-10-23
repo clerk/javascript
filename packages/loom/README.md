@@ -16,6 +16,7 @@ rtk proxy pnpm --filter @clerk/swingset dev
 Sign in with the test account, then open these routes on Swingset, normally `http://localhost:6006`.
 
 - `/live/loom` shows the prefetched composed profile.
+- `/live/loom?prefetch=off` shows the same profile waiting for native Clerk data without a server seed.
 - `/live/loom/password` shows standalone Password with the same handoff.
 - `/live/user-profile/user-profile` shows the ordinary profile for comparison.
 - `/live/user-profile/user-profile-active-devices-section` shows ordinary Mosaic Active devices.
@@ -72,9 +73,19 @@ The user snapshot supplies the name, avatar URL, contact addresses, connected ac
 
 `LoomProvider` exposes the immutable seed through context. `useUserSnapshot()` reads user data immediately. `useProfileSnapshot()` also reads settings and suspends while they are pending. Section boundaries handle pending and failed settings. Once ClerkJS resolves, ordinary Mosaic panels replace the seed panels while preserving the selected tab. Forms, validation, reverification, and resource actions stay in Mosaic and ClerkJS.
 
-The seed retires when the host resolves. It cannot reappear after sign-out, an account change, or host replacement. Late settings cannot overwrite live data. The provider captures one seed for its lifetime; a new server snapshot needs a new provider mount.
+The seed retires when the native user read resolves, including signed-out `null`. It cannot reappear after sign-out, an account change, or host replacement. Late settings cannot overwrite live data. The provider captures one seed for its lifetime; a new server snapshot needs a new provider mount.
 
 Active-device details and eligible enterprise connection choices still load through ordinary browser paths after handoff. They do not block the prefetched sections. API keys are outside this prototype composition.
+
+## Opt-in native user Suspense
+
+`useSuspenseUser()` from `@clerk/loom/handoff` reads through the existing shared `useUser()`. On the client it waits for native ClerkJS user data, even if an outer SDK context has server initial state. A signed-in result contains the exact native user resource; a signed-out result contains `null`. The return type retains `isLoaded` because a direct server call returns the ordinary loading state instead of waiting on a browser promise.
+
+The hook requires `LoomProvider` and Clerk context for the same instance. Both providers must commit above its Suspense boundary. `LoomHandoff` installs this arrangement automatically and gates the actual native profile panel. Server rendering and initial hydration keep the seed tree; after hydration, the seed becomes the native gate's Suspense fallback. Without a seed the configured provider fallback appears.
+
+The existing handoff store owns one pending wakeable per host generation and subscribes only after commit. It stores readiness and initialization failure, never a second user resource or browser response cache. During host replacement, a provider-owned transition wakeable prevents direct hook consumers from reading the previous host's readiness before the committed store update. Native updates keep flowing through shared `useUser()`. Known initial status errors and later status error events reach the existing section error boundary. Replacing a failed host resets the outer profile and Password error boundaries without resetting the selected tab on ordinary resource updates. No retry or freshness policy is added.
+
+An SDK wrapper can hide an error emitted before Loom subscribes if its current status getter subsequently reports another value. A raw host cannot reconstruct that missed event; this prototype does not change the ClerkJS or SDK contracts to recover it. Stable `useUser()` is unchanged.
 
 ## Server boundary
 

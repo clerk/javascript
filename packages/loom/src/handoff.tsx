@@ -1,10 +1,11 @@
-import { ClerkContextProvider } from '@clerk/shared/react';
+import { ClerkContextProvider, useUser } from '@clerk/shared/react';
 import type { Clerk } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import * as React from 'react';
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import type {} from 'react/canary';
 
-import { createHandoffStore, type HandoffPhase } from './handoff-state';
+import { createHandoffStore, type HandoffPhase, type UserReadiness } from './handoff-state';
 import { parseHydration } from './hydration';
 import { sameScope } from './scope';
 import type { LoomHydration, PrefetchedProfile, ProfileSnapshot, SessionScope, UserSnapshot } from './types';
@@ -17,6 +18,9 @@ type ProviderProps = {
 
 type HandoffContextValue = {
   phase: HandoffPhase;
+  readiness: UserReadiness;
+  generation: number;
+  store: ReturnType<typeof createHandoffStore>;
   clerk: Clerk | null | undefined;
   seed: LoomHydration | null;
   settings: PrefetchedProfile['settings'] | undefined;
@@ -40,25 +44,75 @@ export function LoomProvider({ clerk, children, fallback = null, prefetch, hydra
   }, [initial]);
   const [store] = useState(() => createHandoffStore(clerk, seed?.scope));
   const phase = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
-  useEffect(() => store.setHost(clerk), [clerk, store]);
-  const currentPhase = clerk === store.getHost() ? phase : ({ kind: 'waiting' } as const);
+  const transition = useMemo(() => ({ clerk, ...createDeferredPromise() }), [clerk]);
+  useEffect(() => {
+    store.setHost(transition.clerk);
+    transition.resolve();
+    return () => transition.resolve();
+  }, [transition, store]);
+  const aligned = clerk === store.getHost();
+  const currentPhase = aligned ? phase : ({ kind: 'waiting' } as const);
+  const readiness: UserReadiness = aligned
+    ? store.getReadiness()
+    : { kind: 'pending', promise: transition.promise, resolve: transition.resolve };
+  const generation = store.getGeneration() + (aligned ? 0 : 1);
   return (
     <HandoffContext.Provider
-      value={{ phase: currentPhase, clerk, seed, settings: initial.prefetch?.settings, fallback }}
+      value={{
+        phase: currentPhase,
+        readiness,
+        generation,
+        store,
+        clerk,
+        seed,
+        settings: initial.prefetch?.settings,
+        fallback,
+      }}
     >
       {children}
     </HandoffContext.Provider>
   );
 }
 
+export function useLoomGeneration() {
+  return useContext(HandoffContext)?.generation ?? 0;
+}
+
+export function useSuspenseUser() {
+  const context = useContext(HandoffContext);
+  const result = useUser();
+  if (!context) {
+    throw new Error('useSuspenseUser requires LoomProvider.');
+  }
+  if (typeof window === 'undefined') {
+    return result;
+  }
+  const { readiness } = context;
+  if (readiness.kind === 'error') {
+    throw readiness.error;
+  }
+  if (readiness.kind === 'pending') {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- React Suspense consumes the provider-owned readiness promise.
+    throw readiness.promise;
+  }
+  return result;
+}
+
+function NativeUserGate({ children, fallback }: { children: ReactNode; fallback: ReactNode }) {
+  const { isLoaded, user } = useSuspenseUser();
+  return <>{isLoaded && user ? children : fallback}</>;
+}
+
 export function LoomHandoff({ children, live }: { children: ReactNode; live: ReactNode }) {
   const context = useContext(HandoffContext);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   if (!context) {
     return <>{children}</>;
   }
-  const { phase, clerk, seed, settings, fallback } = context;
-  if (phase.kind === 'seed' && seed) {
-    return (
+  const { phase, store, clerk, seed, settings, fallback } = context;
+  const pending =
+    phase.kind === 'seed' && seed ? (
       <SnapshotContext.Provider value={{ seed, settings }}>
         {seed.user?.data.imageUrl ? (
           <link
@@ -69,20 +123,23 @@ export function LoomHandoff({ children, live }: { children: ReactNode; live: Rea
         ) : null}
         {children}
       </SnapshotContext.Provider>
+    ) : (
+      fallback
     );
+  if (!hydrated || !clerk || clerk !== store.getHost()) {
+    return <>{pending}</>;
   }
-  if (phase.kind === 'live' && clerk && phase.clerk === clerk) {
-    return (
-      <ClerkContextProvider
-        key={JSON.stringify([phase.generation, phase.scope])}
-        clerk={clerk}
-        clerkStatus={phase.clerkStatus}
-      >
-        {live}
-      </ClerkContextProvider>
-    );
-  }
-  return <>{fallback}</>;
+  return (
+    <ClerkContextProvider
+      key={JSON.stringify([store.getGeneration(), phase.kind === 'live' ? phase.scope : null])}
+      clerk={clerk}
+      clerkStatus={clerk.status}
+    >
+      <React.Suspense fallback={pending}>
+        <NativeUserGate fallback={fallback}>{live}</NativeUserGate>
+      </React.Suspense>
+    </ClerkContextProvider>
+  );
 }
 
 export function useUserSnapshot(): Readonly<{ scope: SessionScope; user: UserSnapshot }> {
