@@ -225,7 +225,7 @@ export interface SessionResource extends ClerkResource {
    */
   expireAt: Date;
   /**
-   * The date and time when the session was abandoned by the user.
+   * The date and time when the session will be abandoned due to inactivity.
    */
   abandonAt: Date;
   /**
