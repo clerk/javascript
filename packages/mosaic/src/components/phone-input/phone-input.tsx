@@ -228,10 +228,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               <span {...stylex.props(reset.base, styles.triggerContent)}>
                 <span
                   aria-hidden='true'
-                  {...mergeStyleProps(
-                    themeProps('phone-input-flag'),
-                    stylex.props(reset.base, styles.flag, styles.triggerFlag),
-                  )}
+                  {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
                 >
                   {getFlagEmojiFromCountryIso(country.iso)}
                 </span>
@@ -300,6 +297,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                       value={option.iso}
                       label={option.name}
                       {...themeProps('phone-input-country-option')}
+                      xstyle={styles.option}
                     >
                       <span
                         aria-hidden='true'

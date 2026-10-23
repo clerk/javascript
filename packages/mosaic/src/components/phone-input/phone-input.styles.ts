@@ -29,15 +29,12 @@ export const styles = stylex.create({
     display: 'flex',
   },
   flag: {
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-    lineHeight: 1,
-  },
-  triggerFlag: {
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
     fontSize: typeScaleVars['--cl-text-xs-size'],
     justifyContent: 'center',
+    lineHeight: 1,
     height: space['4'],
     width: space['4'],
   },
@@ -107,6 +104,9 @@ export const styles = stylex.create({
     '::placeholder': {
       color: colorVars['--cl-color-foreground-secondary'],
     },
+  },
+  option: {
+    paddingInlineStart: `calc(${space['1']} + 1px)`,
   },
   optionName: {
     overflow: 'hidden',
