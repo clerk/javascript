@@ -84,7 +84,7 @@ export function UpdateRequiredContent({
             Update required
           </Text>
           <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-            {`This version of ${appName} is no longer supported. To keep your account secure, please update to continue.`}
+            {`This version of ${appName} is no longer supported. Please update to continue.`}
           </Text>
         </View>
         <VersionBox

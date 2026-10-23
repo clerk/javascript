@@ -88,11 +88,7 @@ describe('UpdateRequiredView', () => {
     block(store, { updateUrl: APP_STORE_URL, supportEmail: 'support@example.com' });
 
     expect(screen.getByRole('header').textContent).toBe('Update required');
-    expect(
-      screen.getByText(
-        'This version of Acme is no longer supported. To keep your account secure, please update to continue.',
-      ),
-    ).toBeDefined();
+    expect(screen.getByText('This version of Acme is no longer supported. Please update to continue.')).toBeDefined();
     expect(screen.getByText('Your version')).toBeDefined();
     expect(screen.getByText('1.9.9')).toBeDefined();
     expect(screen.getByText('2.0+')).toBeDefined();
