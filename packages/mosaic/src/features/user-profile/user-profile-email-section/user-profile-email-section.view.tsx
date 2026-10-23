@@ -22,6 +22,7 @@ export function UserProfileEmailSectionView({
   verificationFinalFocus,
   setPrimaryReverification,
   setPrimaryFinalFocus,
+  pendingVerifyId,
   onVerify,
   onSetPrimary,
 }: UserProfileEmailSectionViewProps) {
@@ -32,6 +33,7 @@ export function UserProfileEmailSectionView({
       render={
         <Button
           aria-label={m.email.add}
+          disabled={pendingVerifyId !== undefined}
           color='neutral'
           size='sm'
           variant='outline'

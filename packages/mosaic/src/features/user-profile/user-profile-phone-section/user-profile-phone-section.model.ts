@@ -12,10 +12,14 @@ import type { UserProfilePhoneSectionModel } from './user-profile-phone-section.
 
 const ADD_PHONE_FIELDS: readonly UserProfileAddPhoneField[] = ['phoneNumber', 'code'];
 
-function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
+function toPhoneVerifier(currentPhone: () => PhoneNumberResource): UserProfilePhoneVerifier {
   return {
-    sendCode: () => save(() => phone.prepareVerification()),
-    verifyCode: code => save(() => phone.attemptVerification({ code }), ADD_PHONE_FIELDS),
+    sendCode: () =>
+      save(async () => {
+        await currentPhone().prepareVerification();
+        currentPhone();
+      }),
+    verifyCode: code => save(() => currentPhone().attemptVerification({ code }), ADD_PHONE_FIELDS),
   };
 }
 
@@ -56,10 +60,12 @@ export function useUserProfilePhoneSectionModel(): UserProfilePhoneSectionModel 
       ? async phoneNumber => {
           const request = createPhone(currentUser, phoneNumber);
           await save(() => request, ADD_PHONE_FIELDS);
-          return toPhoneVerifier(await request);
+          currentUser();
+          const phone = await request;
+          return toPhoneVerifier(() => byId(currentUser().phoneNumbers, phone.id, 'phone number'));
         }
       : undefined,
-    getPhoneVerifier: id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')),
+    getPhoneVerifier: id => toPhoneVerifier(() => byId(currentUser().phoneNumbers, id, 'phone number')),
     onSetPrimaryPhone: id => saveAsUser(current => setPrimaryPhone(current, id)),
     onRemovePhone: access.canRemove ? id => saveAsUser(current => removePhone(current, id)) : undefined,
     removeReverification,

@@ -23,6 +23,10 @@ export type AttemptEmailAddressVerificationParams = {
   code: string;
 };
 
+export interface StartEmailAddressLinkFlowParams extends StartEmailLinkFlowParams {
+  onPrepared?: () => void;
+}
+
 export interface EmailAddressResource extends ClerkResource {
   id: string;
   emailAddress: string;
@@ -32,7 +36,7 @@ export interface EmailAddressResource extends ClerkResource {
   toString: () => string;
   prepareVerification: (params: PrepareEmailAddressVerificationParams) => Promise<EmailAddressResource>;
   attemptVerification: (params: AttemptEmailAddressVerificationParams) => Promise<EmailAddressResource>;
-  createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource>;
+  createEmailLinkFlow: () => CreateEmailLinkFlowReturn<StartEmailAddressLinkFlowParams, EmailAddressResource>;
   createEnterpriseSSOLinkFlow: () => CreateEnterpriseSSOLinkFlowReturn<
     StartEnterpriseSSOLinkFlowParams,
     EmailAddressResource

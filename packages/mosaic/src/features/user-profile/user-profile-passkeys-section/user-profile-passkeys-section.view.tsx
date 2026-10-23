@@ -3,7 +3,7 @@ import type { Ref } from 'react';
 import type { ConfirmController } from '../../../blocks/confirm';
 import { Confirmation } from '../../../blocks/confirmation';
 import { ReverificationDialog } from '../../../blocks/reverification';
-import { Button } from '../../../components/button';
+import { SubmitButton } from '../../../components/button';
 import type { DialogFocusTarget } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Icon } from '../../../components/icon';
@@ -69,14 +69,15 @@ export function UserProfilePasskeysSectionView({
             </Section.Content>
             {onAdd ? (
               <Section.Actions>
-                <Button
+                <SubmitButton
                   ref={addButtonRef}
                   aria-label={m.addLabel}
                   color='neutral'
                   size='sm'
                   variant='outline'
-                  disabled={isAdding}
-                  aria-busy={isAdding}
+                  type='button'
+                  isPending={isAdding}
+                  pendingLabel={m.addPending}
                   onClick={onAdd}
                 >
                   <Icon
@@ -85,7 +86,7 @@ export function UserProfilePasskeysSectionView({
                     size='sm'
                   />
                   {m.add}
-                </Button>
+                </SubmitButton>
               </Section.Actions>
             ) : null}
           </Section.Header>

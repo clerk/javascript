@@ -1,5 +1,6 @@
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import type { EmailAddressResource, UserResource } from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 
 import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
@@ -28,12 +29,13 @@ function verifyRedirectUrl(userProfileUrl: string): string {
   return buildURL({ base: userProfileUrl, hashPath: '/verify' }, { stringify: true });
 }
 
-function startEmailVerification(
-  email: EmailAddressResource,
+async function prepareEmailVerification(
+  currentEmail: () => EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
-): UserProfileEmailVerification {
-  if (email.matchesSsoConnection) {
+  setCancel: (cancel: () => void) => void,
+): Promise<UserProfileEmailVerification> {
+  if (currentEmail().matchesSsoConnection) {
     return {
       method: 'sso',
       /*
@@ -48,7 +50,7 @@ function startEmailVerification(
       */
       connect: () =>
         save(async () => {
-          const prepared = await email.prepareVerification({
+          const prepared = await currentEmail().prepareVerification({
             strategy: 'enterprise_sso',
             redirectUrl: window.location.href,
           });
@@ -61,24 +63,45 @@ function startEmailVerification(
     };
   }
   if (linkRedirectUrl === undefined) {
-    return { method: 'code', sent: save(() => email.prepareVerification({ strategy: 'email_code' })) };
+    await save(() => currentEmail().prepareVerification({ strategy: 'email_code' }));
+    currentEmail();
+    return { method: 'code' };
   }
-  const { startEmailLinkFlow, cancelEmailLinkFlow } = email.createEmailLinkFlow();
-  return {
-    method: 'link',
-    verified: save(() => startEmailLinkFlow({ redirectUrl: linkRedirectUrl })),
-    cancel: cancelEmailLinkFlow,
-  };
+  const { startEmailLinkFlow, cancelEmailLinkFlow } = currentEmail().createEmailLinkFlow();
+  const prepared = createDeferredPromise();
+  setCancel(cancelEmailLinkFlow);
+  const verified = save(() =>
+    startEmailLinkFlow({
+      redirectUrl: linkRedirectUrl,
+      onPrepared: () => {
+        currentEmail();
+        prepared.resolve();
+      },
+    }),
+  );
+  void verified.catch((error: unknown) => {
+    cancelEmailLinkFlow();
+    prepared.reject(error);
+  });
+  await prepared.promise;
+  return { method: 'link', verified, cancel: cancelEmailLinkFlow };
 }
 
 function toEmailVerifier(
-  email: EmailAddressResource,
+  currentEmail: () => EmailAddressResource,
   linkRedirectUrl: string | undefined,
   router: MosaicRouter,
 ): UserProfileEmailVerifier {
+  let cancel = () => {};
   return {
-    start: () => startEmailVerification(email, linkRedirectUrl, router),
-    verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
+    prepare: () => {
+      cancel();
+      return prepareEmailVerification(currentEmail, linkRedirectUrl, router, next => {
+        cancel = next;
+      });
+    },
+    cancel: () => cancel(),
+    verifyCode: code => save(() => currentEmail().attemptVerification({ code }), ADD_EMAIL_FIELDS),
   };
 }
 
@@ -113,7 +136,8 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
 
   const verifiesByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
   const linkRedirectUrl = verifiesByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
-  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router);
+  const verifierFor = (email: EmailAddressResource) =>
+    toEmailVerifier(() => byId(currentUser().emailAddresses, email.id, 'email address'), linkRedirectUrl, router);
 
   return {
     status: 'ready',

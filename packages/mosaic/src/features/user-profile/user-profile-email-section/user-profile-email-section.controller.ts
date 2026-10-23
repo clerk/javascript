@@ -24,6 +24,7 @@ export function useUserProfileEmailSectionController({
     reverification: createReverification,
   });
   const setPrimary = usePendingAction();
+  const verify = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: emails.map(email => email.id),
@@ -39,7 +40,8 @@ export function useUserProfileEmailSectionController({
     emails,
     canAdd: Boolean(onCreateEmail),
     verification,
-    error: setPrimary.error,
+    error: verify.error ?? setPrimary.error,
+    pendingVerifyId: verify.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemoveEmail ? remove : undefined,
@@ -50,7 +52,7 @@ export function useUserProfileEmailSectionController({
     onVerify: id => {
       const email = emails.find(email => email.id === id);
       if (email) {
-        verification.onVerifyEmail(email, getEmailVerifier(id));
+        void verify.run(id, () => verification.onVerifyEmail(email, getEmailVerifier(id)));
       }
     },
     onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryEmail(id)),

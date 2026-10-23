@@ -23,6 +23,7 @@ export function UserProfilePhoneSectionView({
   verificationFinalFocus,
   setPrimaryReverification,
   setPrimaryFinalFocus,
+  pendingVerifyId,
   onVerify,
   onSetPrimary,
 }: UserProfilePhoneSectionViewProps) {
@@ -33,6 +34,7 @@ export function UserProfilePhoneSectionView({
       render={
         <Button
           aria-label={m.phone.add}
+          disabled={pendingVerifyId !== undefined}
           color='neutral'
           size='sm'
           variant='outline'

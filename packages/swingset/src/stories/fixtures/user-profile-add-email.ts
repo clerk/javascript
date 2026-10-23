@@ -19,7 +19,7 @@ export function createUserProfileAddEmailFixture({
   onCreated,
   onVerified,
 }: FixtureOptions = {}): Pick<ReadyEmailSectionModel, 'onCreateEmail' | 'getEmailVerifier'> {
-  const startLink = (id: string): UserProfileEmailVerification => {
+  const startLink = (id: string): Extract<UserProfileEmailVerification, { method: 'link' }> => {
     let cancelled = false;
     const verified = delay(fail === 'verify' ? 2000 : 4000).then(() => {
       if (fail === 'verify') {
@@ -43,24 +43,32 @@ export function createUserProfileAddEmailFixture({
     },
   });
 
-  const verifier = (id: string): UserProfileEmailVerifier => ({
-    start: () => {
-      if (method === 'link') {
-        return startLink(id);
-      }
-      if (method === 'sso') {
-        return startSso(id);
-      }
-      return { method: 'code', sent: delay(700).then(() => undefined) };
-    },
-    verifyCode: async code => {
-      await delay(700);
-      if (fail === 'verify' || code === '000000') {
-        throw new Error('That code is incorrect. Try again.');
-      }
-      onVerified?.(id);
-    },
-  });
+  const verifier = (id: string): UserProfileEmailVerifier => {
+    let cancelLink: (() => void) | undefined;
+    return {
+      prepare: async () => {
+        cancelLink?.();
+        if (method === 'link') {
+          const verification = startLink(id);
+          cancelLink = verification.cancel;
+          return verification;
+        }
+        if (method === 'sso') {
+          return startSso(id);
+        }
+        await delay(700);
+        return { method: 'code' };
+      },
+      cancel: () => cancelLink?.(),
+      verifyCode: async code => {
+        await delay(700);
+        if (fail === 'verify' || code === '000000') {
+          throw new Error('That code is incorrect. Try again.');
+        }
+        onVerified?.(id);
+      },
+    };
+  };
 
   return {
     onCreateEmail: async emailAddress => {

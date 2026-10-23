@@ -55,8 +55,7 @@ describe('UserProfileAddPhoneDialog', () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(<VerificationExample onSubmit={onSubmit} />);
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Close', exact: true })).toHaveFocus());
-    await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus());
 
     if (method === 'typing') {
       await user.keyboard('12345');

@@ -24,6 +24,7 @@ export function useUserProfilePhoneSectionController({
     reverification: createReverification,
   });
   const setPrimary = usePendingAction();
+  const verify = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: phones.map(phone => phone.id),
@@ -40,7 +41,8 @@ export function useUserProfilePhoneSectionController({
     defaultPhoneCountry,
     canAdd: Boolean(onCreatePhone),
     verification,
-    error: setPrimary.error,
+    error: verify.error ?? setPrimary.error,
+    pendingVerifyId: verify.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemovePhone ? remove : undefined,
@@ -51,7 +53,7 @@ export function useUserProfilePhoneSectionController({
     onVerify: id => {
       const phone = phones.find(phone => phone.id === id);
       if (phone) {
-        verification.onVerifyPhone(phone, getPhoneVerifier(id));
+        void verify.run(id, () => verification.onVerifyPhone(phone, getPhoneVerifier(id)));
       }
     },
     onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryPhone(id)),

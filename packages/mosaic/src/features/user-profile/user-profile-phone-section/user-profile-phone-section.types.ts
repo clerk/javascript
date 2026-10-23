@@ -20,6 +20,7 @@ export interface UserProfilePhoneSectionViewProps {
   verificationFinalFocus: DialogFocusTarget;
   setPrimaryReverification: ReverificationController;
   setPrimaryFinalFocus: DialogFocusTarget;
+  pendingVerifyId?: string;
   onVerify: (id: string) => void;
   onSetPrimary: (id: string) => void;
 }

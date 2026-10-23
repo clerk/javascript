@@ -498,6 +498,8 @@ describe('phone reverification', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
     await waitFor(() => expect(start.requests).toHaveLength(1));
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(within(row()).getByText(WORK_LABEL)).toBeVisible();
     expect(screen.queryByRole('dialog')).toBeNull();
 
     start.release();
@@ -522,4 +524,68 @@ describe('Removing a number', () => {
     await waitFor(() => expect(listed()).toEqual([HOME_LABEL]));
     expect(screen.queryByRole('alertdialog')).toBeNull();
   });
+});
+
+it('keeps Send code pending until phone verification is ready', async () => {
+  const { actor } = await renderSection();
+  const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+  try {
+    await addPhone(actor, '8015550100');
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    expect(screen.getByRole('button', { name: 'Send code' })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('textbox', { name: 'Phone' })).toBeVisible();
+    expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
+    prepare.release();
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  } finally {
+    prepare.release();
+  }
+});
+
+it('keeps the profile visible until phone verification is ready and focuses the code field', async () => {
+  const pending = fapiPhoneNumber({
+    id: 'idn_pending',
+    phone_number: '+18015550199',
+    verification: fapiVerification('phone_code', { status: 'unverified' }),
+  });
+  const { actor } = await renderSection(signedIn([HOME, pending]));
+  const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+  try {
+    await manage(actor, WORK_LABEL, 'Verify phone number');
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(within(row()).getByText(WORK_LABEL)).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add phone number' })).toBeDisabled();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    prepare.release();
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus());
+  } finally {
+    prepare.release();
+  }
+});
+
+it('retries phone preparation from the entry form without creating another number', async () => {
+  const { actor, fapi } = await renderSection();
+  const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+  try {
+    await addPhone(actor, '8015550100');
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    prepare.fail('action_blocked');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Send code' })).not.toHaveAttribute('aria-busy', 'true'),
+    );
+    const retry = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+    try {
+      await actor.click(screen.getByRole('button', { name: 'Send code' }));
+      await waitFor(() => expect(retry.requests).toHaveLength(1));
+      expect(fapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+      retry.release();
+      expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
+    } finally {
+      retry.release();
+    }
+  } finally {
+    prepare.release();
+  }
 });
