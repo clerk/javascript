@@ -292,7 +292,6 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
     setInternal(
       {
-        createdAt: iat,
         tokenId: data.tokenId,
         tokenResolver: Promise.resolve(token),
       },
@@ -399,17 +398,15 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         clearTimeout(live.timeoutId);
         clearTimeout(live.refreshTimeoutId);
 
-        const expiresAt = winnerClaims.exp;
-        const issuedAt = winnerClaims.iat;
-        const expiresIn: Seconds = expiresAt - issuedAt;
-        // Timers run relative to now, while createdAt/expiresIn describe the token's
-        // real validity window for get(). An aged winner (alive for part of its
-        // lifetime already) must be evicted and refreshed by its real expiry, not a
-        // full lifetime from now.
-        const remainingTtl: Seconds = expiresAt - Math.floor(Date.now() / 1000);
+        // `exp` is server time, so reading it on the device clock is late by the
+        // device's lag. A full lifetime from cache insert is late by the token's age
+        // on arrival. The earlier of the two is late only by the smaller error.
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        const lifetime: Seconds = winnerClaims.exp - winnerClaims.iat;
+        const remainingTtl: Seconds = Math.min(winnerClaims.exp - nowSeconds, lifetime - (nowSeconds - live.createdAt));
 
-        live.createdAt = issuedAt;
-        live.expiresIn = expiresIn;
+        live.createdAt = nowSeconds;
+        live.expiresIn = remainingTtl;
 
         if (remainingTtl <= 0) {
           dropIfCurrent(live);

@@ -235,7 +235,6 @@ describe('SessionTokenCache', () => {
       await broadcastListener(newerEvent);
       const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterNewer).toBeDefined();
-      const newerCreatedAt = resultAfterNewer?.entry.createdAt;
 
       const olderEvent: MessageEvent<SessionTokenEvent> = {
         data: {
@@ -252,7 +251,7 @@ describe('SessionTokenCache', () => {
 
       const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterOlder).toBeDefined();
-      expect(resultAfterOlder?.entry.createdAt).toBe(newerCreatedAt);
+      expect(resultAfterOlder?.entry.resolvedToken?.getRawString()).toBe(newerJwt);
     });
 
     it('enforces monotonicity: replaces older cached token when a fresher-oiat broadcast arrives', async () => {
@@ -277,7 +276,7 @@ describe('SessionTokenCache', () => {
       await broadcastListener(olderEvent);
       const resultAfterOlder = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterOlder).toBeDefined();
-      expect(resultAfterOlder?.entry.createdAt).toBe(1666648190);
+      expect(resultAfterOlder?.entry.resolvedToken?.getRawString()).toBe(olderJwt);
 
       const newerEvent: MessageEvent<SessionTokenEvent> = {
         data: {
@@ -294,7 +293,7 @@ describe('SessionTokenCache', () => {
 
       const resultAfterNewer = SessionTokenCache.get({ tokenId: 'session_123' });
       expect(resultAfterNewer).toBeDefined();
-      expect(resultAfterNewer?.entry.createdAt).toBe(1666648250);
+      expect(resultAfterNewer?.entry.resolvedToken?.getRawString()).toBe(newerJwt);
     });
 
     it('ignores a broadcast staler than the reconciled resolvedToken even when the resolver is staler', async () => {
@@ -320,7 +319,6 @@ describe('SessionTokenCache', () => {
       await tick();
       const beforeEntry = SessionTokenCache.get({ tokenId })?.entry;
       expect(beforeEntry?.resolvedToken?.getRawString()).toBe(highRaw);
-      const beforeCreatedAt = beforeEntry?.createdAt;
 
       // Broadcast a token staler than high (but fresher than low, so the staler resolver would
       // have let it through under the bug).
@@ -340,9 +338,9 @@ describe('SessionTokenCache', () => {
 
       const afterEntry = SessionTokenCache.get({ tokenId })?.entry;
       expect(afterEntry?.resolvedToken?.getRawString()).toBe(highRaw);
-      // createdAt unchanged proves the broadcast was dropped before setInternal ran; the bug
-      // would have replaced the entry, stamping it with the broadcast's iat (1666648220).
-      expect(afterEntry?.createdAt).toBe(beforeCreatedAt);
+      // The same entry proves the broadcast was dropped before setInternal ran; the bug
+      // would have replaced it with the broadcast's entry.
+      expect(afterEntry).toBe(beforeEntry);
     });
 
     it('successfully updates cache with valid token', () => {
@@ -555,9 +553,8 @@ describe('SessionTokenCache', () => {
 
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(highRaw);
 
-      // createdAt reflects high's iat (1666648250), not low's (1666648190): the slot's TTL is stamped
-      // from the published winner. A slot stamped with low's earlier iat would already be evicted at
-      // this point; one stamped with high's iat is still comfortably within its 120s TTL.
+      // The slot's TTL comes from the published winner, high (exp 1666648370), not low
+      // (exp 1666648310). A slot timed from low would already be evicted at this point.
       vi.advanceTimersByTime(50 * 1000);
       expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(highRaw);
     });
@@ -788,7 +785,7 @@ describe('SessionTokenCache', () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
       const tokenResolver = Promise.resolve({
         getRawString: () => mockJwt,
-        jwt: { claims: { exp: futureExp, iat: 1675876730, sid: 'session_123' } },
+        jwt: { claims: { exp: futureExp, iat: futureExp - 3600, sid: 'session_123' } },
       } as any);
 
       SessionTokenCache.set({
@@ -815,7 +812,7 @@ describe('SessionTokenCache', () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
       const tokenResolver = Promise.resolve({
         getRawString: () => mockJwt,
-        jwt: { claims: { exp: futureExp, iat: 1675876730 } },
+        jwt: { claims: { exp: futureExp, iat: futureExp - 3600 } },
       } as any);
 
       SessionTokenCache.set({
@@ -832,7 +829,7 @@ describe('SessionTokenCache', () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
       const tokenResolver = Promise.resolve({
         getRawString: () => mockJwt,
-        jwt: { claims: { exp: futureExp, iat: 1675876730, sid: 'session_123' } },
+        jwt: { claims: { exp: futureExp, iat: futureExp - 3600, sid: 'session_123' } },
       } as any);
 
       SessionTokenCache.set({
@@ -858,7 +855,7 @@ describe('SessionTokenCache', () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
       const tokenResolver = Promise.resolve({
         getRawString: () => mockJwt,
-        jwt: { claims: { exp: futureExp, iat: 1675876730, sid: 'session_123' } },
+        jwt: { claims: { exp: futureExp, iat: futureExp - 3600, sid: 'session_123' } },
       } as any);
 
       expect(() =>
