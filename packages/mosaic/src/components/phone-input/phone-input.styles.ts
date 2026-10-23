@@ -12,7 +12,7 @@ import {
 
 export const styles = stylex.create({
   triggerStart: {
-    paddingInlineStart: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))',
+    paddingInlineStart: 'var(--_cl-input-group-inset)',
   },
   trigger: {
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
@@ -79,7 +79,7 @@ export const styles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     paddingInlineEnd: space['2'],
-    paddingInlineStart: space['1'],
+    paddingInlineStart: space['2'],
     height: space['8'],
   },
   countrySearchIcon: {
