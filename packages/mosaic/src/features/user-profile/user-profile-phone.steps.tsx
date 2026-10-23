@@ -13,7 +13,7 @@ import { Otp } from '../../components/otp';
 import type { CountryIso } from '../../components/phone-input';
 import { PhoneInput } from '../../components/phone-input';
 import { fill, rich, useMessages } from '../../localization';
-import { styles } from './user-profile-profile-panel.styles';
+import { tabularNumbersStyle } from '../../styles/typography.styles';
 
 interface EnterPhoneStepProps {
   inputRef?: Ref<HTMLInputElement>;
@@ -147,26 +147,31 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
           </Field.Message>
-          <Button
-            type='button'
-            size='sm'
-            variant='link'
-            color='neutral'
-            disabled={props.isPending || props.isResending || (props.resendSeconds ?? 0) > 0}
-            onClick={props.onResend}
-          >
-            {props.isResending ? (
-              m.verify.resending
-            ) : (props.resendSeconds ?? 0) > 0 ? (
-              <span>
-                {rich(m.verify.resendCountdown, {
-                  values: { seconds: <span {...stylex.props(styles.countdown)}>{props.resendSeconds}</span> },
-                })}
-              </span>
-            ) : (
-              m.verify.resend
-            )}
-          </Button>
+          <Field.Description>
+            {m.verify.resendText}{' '}
+            <Button
+              type='button'
+              size='sm'
+              variant='link'
+              color='neutral'
+              disabled={props.isPending || props.isResending || (props.resendSeconds ?? 0) > 0}
+              onClick={props.onResend}
+            >
+              {props.isResending ? (
+                m.verify.resending
+              ) : (props.resendSeconds ?? 0) > 0 ? (
+                <span>
+                  {rich(m.verify.resendCountdown, {
+                    values: {
+                      seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{props.resendSeconds}</span>,
+                    },
+                  })}
+                </span>
+              ) : (
+                m.verify.resend
+              )}
+            </Button>
+          </Field.Description>
         </Field.Root>
       </Card.Content>
       <Card.Footer>

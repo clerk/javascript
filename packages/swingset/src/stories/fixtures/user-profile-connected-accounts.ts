@@ -19,7 +19,7 @@ export const connectedAccount: UserProfileConnectedAccount = {
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
   { id: 'google', provider: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
-  { id: 'apple', provider: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg' },
+  { id: 'apple', provider: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg', monochromeIcon: true },
 ];
 
 export function useConnectedAccountsFixture({
@@ -61,6 +61,7 @@ export function useConnectedAccountsFixture({
             id: provider.id,
             provider: provider.provider,
             iconUrl: provider.iconUrl,
+            monochromeIcon: provider.monochromeIcon,
             identifier: 'test@example.com',
             status: 'connected',
           },
