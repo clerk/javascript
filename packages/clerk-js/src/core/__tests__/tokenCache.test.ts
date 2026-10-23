@@ -726,6 +726,63 @@ describe('SessionTokenCache', () => {
     });
   });
 
+  describe('device clock skew', () => {
+    const tokenId = 'session_123';
+    const deviceNow = 1666648260;
+    const deviceLag = 40;
+
+    it('does not serve a fresh token past its server expiry when the device clock is behind', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(50 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not serve a broadcast token past its server expiry when the device clock is behind', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+
+      await broadcastListener({
+        data: { organizationId: null, sessionId: tokenId, tokenId, tokenRaw: freshRaw, traceId: 'skew' },
+      } as MessageEvent<SessionTokenEvent>);
+
+      vi.advanceTimersByTime(50 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('fires the proactive refresh before server expiry when the device clock is behind', async () => {
+      const freshRaw = createJwtWithOiat(deviceNow + deviceLag, deviceNow + deviceLag, 60);
+      const onRefresh = vi.fn();
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)), onRefresh });
+      await tick();
+
+      vi.advanceTimersByTime(44 * 1000);
+      expect(onRefresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not extend an aged token to a full lifetime from cache insert', async () => {
+      const agedRaw = createJwtWithOiat(deviceNow - 40, deviceNow - 40, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(agedRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(10 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(11 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+  });
+
   describe('broadcast sending', () => {
     it('broadcasts automatically when token resolves with valid claims', async () => {
       const futureExp = Math.floor(Date.now() / 1000) + 3600;
