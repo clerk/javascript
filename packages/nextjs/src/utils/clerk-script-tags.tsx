@@ -48,6 +48,7 @@ export function ClerkScriptTags(props: ClerkScriptTagsProps) {
         src={clerkJSScriptUrl(opts)}
         data-clerk-js-script
         async
+        {...(React.version.startsWith('18') ? { fetchpriority: 'high' } : { fetchPriority: 'high' })}
         crossOrigin='anonymous'
         {...buildClerkJSScriptAttributes(opts)}
       />
