@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { ClerkAPIResponseError } from '../errors';
 import { createClerkClient } from '../index';
@@ -16,6 +16,12 @@ const endpoint = 'https://example.clerk.accounts.dev/.well-known/poppy.json';
 afterEach(() => vi.restoreAllMocks());
 
 describe('clerkClient.__experimental_getPoppyMetadata', () => {
+  it('returns an unknown response type', () => {
+    const client = createClerkClient({ publishableKey: publishableKey('example.clerk.accounts.dev') });
+
+    expectTypeOf(client.__experimental_getPoppyMetadata).returns.toEqualTypeOf<Promise<unknown>>();
+  });
+
   it.each([
     { name: 'development', host: 'example.clerk.accounts.dev', mode: 'test' },
     { name: 'production', host: 'clerk.c1.example', mode: 'live' },
@@ -159,15 +165,18 @@ describe('clerkClient.__experimental_getPoppyMetadata', () => {
     null,
     [],
     {},
+    'metadata',
+    42,
+    true,
     { ...metadata, protocol_version: 2 },
     { ...metadata, organization: null },
     { ...metadata, organization: { name: 'C1' } },
     { ...metadata, organization: { name: 1, domain: 'c1.example' } },
-  ])('rejects invalid metadata %j', async body => {
+  ])('returns JSON %j unchanged', async body => {
     server.use(http.get(endpoint, () => HttpResponse.json(body)));
     const client = createClerkClient({ publishableKey: publishableKey('example.clerk.accounts.dev') });
 
-    await expect(client.__experimental_getPoppyMetadata()).rejects.toThrow('Invalid POPPY metadata response.');
+    await expect(client.__experimental_getPoppyMetadata()).resolves.toEqual(body);
   });
 
   it.each([

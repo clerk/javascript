@@ -53,7 +53,6 @@ export function createClerkClient(options: ClerkOptions): ClerkClient {
  */
 export type { OrganizationMembershipRole } from './api/resources';
 export type { VerifyTokenOptions } from './tokens/verify';
-export type { PoppyMetadata } from './poppy';
 /**
  * JSON types
  */

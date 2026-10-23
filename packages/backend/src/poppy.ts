@@ -3,17 +3,6 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 
 import { runtime } from './runtime';
 
-/** POPPY discovery metadata, including fields added by future protocol versions. */
-export type PoppyMetadata = {
-  protocol_version: string;
-  organization: {
-    name: string;
-    domain: string;
-    [key: string]: unknown;
-  };
-  [key: string]: unknown;
-};
-
 export function createPoppyClient(publishableKey: string | undefined) {
   return {
     /**
@@ -26,7 +15,7 @@ export function createPoppyClient(publishableKey: string | undefined) {
      * return Response.json(await clerkClient.__experimental_getPoppyMetadata());
      * ```
      */
-    async __experimental_getPoppyMetadata(): Promise<PoppyMetadata> {
+    async __experimental_getPoppyMetadata(): Promise<unknown> {
       const { frontendApi } = parsePublishableKey(publishableKey, { fatal: true });
       const origin = new URL(`https://${frontendApi}`);
       if (
@@ -61,17 +50,7 @@ export function createPoppyClient(publishableKey: string | undefined) {
         });
       }
 
-      const metadata: unknown = await response.json();
-      if (
-        !isRecord(metadata) ||
-        typeof metadata.protocol_version !== 'string' ||
-        !isRecord(metadata.organization) ||
-        typeof metadata.organization.name !== 'string' ||
-        typeof metadata.organization.domain !== 'string'
-      ) {
-        throw new Error('Invalid POPPY metadata response.');
-      }
-      return metadata as PoppyMetadata;
+      return response.json();
     },
   };
 }
