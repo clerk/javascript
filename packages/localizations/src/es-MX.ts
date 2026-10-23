@@ -1644,6 +1644,16 @@ export const esMX: LocalizationResource = {
       subtitle: 'Ingresa tu contraseña actual para continuar',
       title: 'Verificación requerida',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificación',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -1655,6 +1665,21 @@ export const esMX: LocalizationResource = {
       resendButton: '¿No recibiste un código? Reenviar',
       subtitle: 'Ingresa el código enviado a tu teléfono para continuar',
       title: 'Verificación requerida',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificación',

@@ -1638,6 +1638,16 @@ export const trTR: LocalizationResource = {
       subtitle: 'Şifrenizi girerek devam edebilirsiniz.',
       title: 'Şifre ile Giriş Yapın',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Telefon Kodu ile Doğrulama',
       resendButton: 'Telefon kodunu tekrar gönder',
@@ -1649,6 +1659,21 @@ export const trTR: LocalizationResource = {
       resendButton: 'Telefon kodunu tekrar gönder',
       subtitle: 'Telefonunuza gönderilen doğrulama kodunu girin.',
       title: 'Telefon Koduyla Doğrulama',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'TOTP ile MFA Doğrulaması',

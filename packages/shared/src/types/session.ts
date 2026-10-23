@@ -10,6 +10,8 @@ import type {
   PhoneCodeAttempt,
   PhoneCodeConfig,
   PhoneCodeSecondFactorConfig,
+  ResetPasswordEmailCodeFactorConfig,
+  ResetPasswordPhoneCodeFactorConfig,
   TOTPAttempt,
   TrustedDeviceAttempt,
   TrustedDeviceConfig,
@@ -28,6 +30,7 @@ import type {
   SessionVerificationResource,
 } from './sessionVerification';
 import type { SessionJSONSnapshot } from './snapshots';
+import type { ResetPasswordEmailCodeStrategy, ResetPasswordPhoneCodeStrategy } from './strategies';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 import type { Autocomplete } from './utils';
@@ -537,6 +540,8 @@ export type SessionVerifyPrepareFirstFactorParams =
   | EmailCodeConfig
   | PhoneCodeConfig
   | PassKeyConfig
+  | ResetPasswordEmailCodeFactorConfig
+  | ResetPasswordPhoneCodeFactorConfig
   /**
    * @experimental
    */
@@ -546,11 +551,35 @@ export type SessionVerifyPrepareFirstFactorParams =
    */
   | TrustedDeviceConfig;
 
+/**
+ * Reverifies with a reset password code. Unlike a sign-in's reset attempt, the
+ * new password is required: the code only counts together with it.
+ */
+export type SessionVerifyResetPasswordAttempt = {
+  /**
+   * The strategy type.
+   */
+  strategy: ResetPasswordEmailCodeStrategy | ResetPasswordPhoneCodeStrategy;
+  /**
+   * The one-time code sent to the user's email address or phone number.
+   */
+  code: string;
+  /**
+   * The new password, which replaces the current one.
+   */
+  password: string;
+  /**
+   * Whether to sign the user out of their other sessions once the new password is set.
+   */
+  signOutOfOtherSessions?: boolean;
+};
+
 export type SessionVerifyAttemptFirstFactorParams =
   | EmailCodeAttempt
   | PhoneCodeAttempt
   | PasswordAttempt
   | PasskeyAttempt
+  | SessionVerifyResetPasswordAttempt
   /**
    * @experimental
    */

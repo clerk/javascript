@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 import { useUserVerification } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
+import { isResetPasswordStrategy } from '../SignIn/utils';
 import { useUserVerificationSession } from './useUserVerificationSession';
 
 const useAfterVerification = () => {
@@ -27,7 +28,9 @@ const useAfterVerification = () => {
       switch (sessionVerification.status) {
         case 'complete':
           await setActive({ session: sessionVerification.session.id });
-          return afterVerification?.();
+          return afterVerification?.({
+            passwordReset: isResetPasswordStrategy(sessionVerification.firstFactorVerification?.strategy),
+          });
 
         case 'needs_second_factor':
           return navigate('./factor-two');

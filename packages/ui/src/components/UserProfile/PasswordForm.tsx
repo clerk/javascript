@@ -1,4 +1,4 @@
-import { useReverification, useSession, useUser } from '@clerk/shared/react';
+import { useClerk, useReverification, useSession, useUser } from '@clerk/shared/react';
 import type { UserResource } from '@clerk/shared/types';
 import { useRef } from 'react';
 
@@ -38,8 +38,35 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   const { t, locale } = useLocalizations();
   const { onSuccess, onReset } = props;
   const { user } = useUser();
+  const clerk = useClerk();
+  // The new password the form is about to set. If reverification asks the user
+  // to reset a breached password, the modal uses it instead of asking again.
+  const pendingPasswordRef = useRef<{ password: string; signOutOfOtherSessions: boolean }>();
+  // Set when the modal already changed the password, so the retry doesn't
+  // change it a second time.
+  const passwordResetDuringVerificationRef = useRef(false);
   const updatePasswordWithReverification = useReverification(
-    (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
+    (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => {
+      if (passwordResetDuringVerificationRef.current) {
+        passwordResetDuringVerificationRef.current = false;
+        // The password already changed, so a failed refresh isn't a failed change.
+        return user.reload().catch(() => user);
+      }
+      return user.updatePassword(...opts);
+    },
+    {
+      onNeedsReverification: ({ level, complete, cancel }) => {
+        clerk.__internal_openReverification({
+          level,
+          resetPassword: pendingPasswordRef.current,
+          afterVerification: result => {
+            passwordResetDuringVerificationRef.current = !!result?.passwordReset;
+            complete();
+          },
+          afterVerificationCancelled: cancel,
+        });
+      },
+    },
   );
 
   if (!user) {
@@ -125,6 +152,10 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
         signOutOfOtherSessions: sessionsField.checked,
         currentPassword: currentPasswordRequired ? currentPasswordField.value : undefined,
       } satisfies Parameters<typeof user.updatePassword>[0];
+      pendingPasswordRef.current = {
+        password: opts.newPassword,
+        signOutOfOtherSessions: !!opts.signOutOfOtherSessions,
+      };
 
       await updatePasswordWithReverification(user, [opts]);
       onSuccess();

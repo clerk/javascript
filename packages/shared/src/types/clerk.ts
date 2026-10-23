@@ -1972,7 +1972,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   /**
    * Non-awaitable callback for when verification is completed successfully
    */
-  afterVerification?: () => void;
+  afterVerification?: (result?: __internal_UserVerificationResult) => void;
 
   /**
    * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
@@ -1988,9 +1988,23 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   level?: SessionVerificationLevel;
 
   /**
+   * A new password the caller already collected. When the user resets their
+   * password to verify, it's used instead of asking for one.
+   */
+  resetPassword?: {
+    password: string;
+    signOutOfOtherSessions: boolean;
+  };
+
+  /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
+};
+
+export type __internal_UserVerificationResult = {
+  /** True when the user reset their password to verify. */
+  passwordReset?: boolean;
 };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;

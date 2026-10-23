@@ -1,3 +1,4 @@
+import { isPasswordCompromisedError, isPasswordPwnedError } from '@clerk/shared/error';
 import { useSession } from '@clerk/shared/react';
 import React from 'react';
 
@@ -12,12 +13,19 @@ import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { HavingTrouble } from '../SignIn/HavingTrouble';
 import { useAfterVerification } from './use-after-verification';
 
+export type PasswordErrorReason = 'pwned' | 'compromised';
+
 type UserVerificationFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
+  /**
+   * Called when the password is rejected as breached or compromised. Without
+   * it, the error only shows on the card.
+   */
+  onPasswordError?: (reason: PasswordErrorReason) => void;
 };
 
 export function UserVerificationFactorOnePasswordCard(props: UserVerificationFactorOnePasswordProps): JSX.Element {
-  const { onShowAlternativeMethodsClick } = props;
+  const { onShowAlternativeMethodsClick, onPasswordError } = props;
   const { session } = useSession();
 
   const { handleVerificationResponse } = useAfterVerification();
@@ -40,7 +48,20 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
         password: passwordControl.value,
       })
       .then(handleVerificationResponse)
-      .catch(err => handleError(err, [passwordControl], card.setError));
+      .catch(err => {
+        const reason: PasswordErrorReason | null = isPasswordPwnedError(err)
+          ? 'pwned'
+          : isPasswordCompromisedError(err)
+            ? 'compromised'
+            : null;
+        if (onPasswordError && reason) {
+          card.setError({ ...err.errors[0], code: `form_password_${reason}__sign_in` });
+          onPasswordError(reason);
+          return;
+        }
+
+        handleError(err, [passwordControl], card.setError);
+      });
   };
 
   if (showHavingTrouble) {

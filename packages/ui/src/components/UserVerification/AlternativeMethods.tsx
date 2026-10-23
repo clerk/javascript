@@ -10,7 +10,7 @@ import { formatSafeIdentifier } from '@/ui/utils/formatSafeIdentifier';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
-import { Building, Envelope, Fingerprint, Lock, SpeechBubble } from '../../icons';
+import { Building, Envelope, Fingerprint, Lock, LockArrow, SpeechBubble } from '../../icons';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { useUserVerificationSession } from './useUserVerificationSession';
 import { withHavingTrouble } from './withHavingTrouble';
@@ -118,6 +118,9 @@ export function getButtonLabel(factor: SessionVerificationFirstFactor): Localiza
       return localizationKeys('reverification.alternativeMethods.blockButton__password');
     case 'passkey':
       return localizationKeys('reverification.alternativeMethods.blockButton__passkey');
+    case 'reset_password_email_code':
+    case 'reset_password_phone_code':
+      return localizationKeys('reverification.passwordPwned.blockButton__resetPassword');
     default:
       throw new Error(`Invalid sign in strategy: "${(factor as any).strategy}"`);
   }
@@ -130,6 +133,8 @@ export function getButtonIcon(factor: SessionVerificationFirstFactor) {
     password: Lock,
     passkey: Fingerprint,
     enterprise_sso: Building,
+    reset_password_email_code: LockArrow,
+    reset_password_phone_code: LockArrow,
   } as const;
 
   return icons[factor.strategy];

@@ -1636,6 +1636,16 @@ export const koKR: LocalizationResource = {
       subtitle: '계속하려면 현재 비밀번호를 입력하세요',
       title: '인증이 필요해요',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '인증 코드',
       resendButton: '코드를 받지 못하셨나요? 다시 보내기',
@@ -1647,6 +1657,21 @@ export const koKR: LocalizationResource = {
       resendButton: '코드를 받지 못하셨나요? 다시 보내기',
       subtitle: '휴대폰으로 전송된 코드를 입력해 주세요',
       title: '인증이 필요해요',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: '인증 코드',

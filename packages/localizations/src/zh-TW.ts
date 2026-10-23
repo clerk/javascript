@@ -1631,6 +1631,16 @@ export const zhTW: LocalizationResource = {
       subtitle: '請輸入您的密碼以繼續',
       title: '需要驗證您的身分',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '驗證碼',
       resendButton: '沒收到代碼？重新傳送',
@@ -1642,6 +1652,21 @@ export const zhTW: LocalizationResource = {
       resendButton: '沒收到代碼？重新傳送',
       subtitle: '請輸入已寄至您手機的驗證碼以繼續',
       title: '需要驗證您的身分',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: '驗證碼',

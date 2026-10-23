@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { fireEvent, render, screen, waitFor } from '@/test/utils';
+import { act, fireEvent, render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
 import { PasswordSection } from '../PasswordSection';
@@ -345,6 +346,71 @@ describe('PasswordSection', () => {
       expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
         newPassword: 'testtest',
         signOutOfOtherSessions: true,
+      });
+    });
+
+    describe('Reverification with a breached password', () => {
+      const reverificationRequired = () =>
+        new ClerkAPIResponseError('Reverification required', {
+          status: 403,
+          data: [{ code: 'session_reverification_required', message: 'Reverification required' }],
+        });
+
+      // Submits the form, which needs reverification, and returns the props the modal was opened with.
+      const submitAndOpenReverification = async () => {
+        const config = createFixtures.config(f => {
+          f.withReverification();
+          f.withPassword();
+          f.withUser({ password_enabled: true });
+        });
+        const { wrapper, fixtures } = await createFixtures(config);
+        fixtures.clerk.user?.updatePassword.mockRejectedValueOnce(reverificationRequired()).mockResolvedValue({});
+        const reload = vi.spyOn(fixtures.clerk.user!, 'reload').mockResolvedValue({} as any);
+        const openReverification = vi
+          .spyOn(fixtures.clerk, '__internal_openReverification')
+          .mockImplementation(() => {});
+
+        const { getByRole, userEvent, getByLabelText } = render(<PasswordSection />, { wrapper });
+        await userEvent.click(getByRole('button', { name: /update password/i }));
+        await waitFor(() => getByRole('heading', { name: /update password/i }));
+        await userEvent.type(getByLabelText(/new password/i), 'testtest');
+        await userEvent.type(getByLabelText(/confirm password/i), 'testtest');
+        await userEvent.click(getByRole('button', { name: /save$/i }));
+
+        await waitFor(() => expect(openReverification).toHaveBeenCalledTimes(1));
+        return { fixtures, reload, modalProps: openReverification.mock.calls[0][0]! };
+      };
+
+      it('passes the new password to the modal and skips the retry once the modal reset it', async () => {
+        const { fixtures, reload, modalProps } = await submitAndOpenReverification();
+        expect(modalProps.resetPassword).toEqual({ password: 'testtest', signOutOfOtherSessions: true });
+
+        await act(() => modalProps.afterVerification?.({ passwordReset: true }));
+
+        await waitFor(() => expect(reload).toHaveBeenCalledTimes(1));
+        expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(1);
+      });
+
+      it('shows success when the modal reset the password but refreshing the user fails', async () => {
+        const { fixtures, reload, modalProps } = await submitAndOpenReverification();
+        reload.mockRejectedValueOnce(new Error('network'));
+
+        await act(() => modalProps.afterVerification?.({ passwordReset: true }));
+
+        // Success closes the form instead of showing the refresh error on it
+        await waitFor(() =>
+          expect(screen.queryByRole('heading', { name: /update password/i })).not.toBeInTheDocument(),
+        );
+        expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(1);
+      });
+
+      it('retries the password change when the modal verified another way', async () => {
+        const { fixtures, reload, modalProps } = await submitAndOpenReverification();
+
+        await act(() => modalProps.afterVerification?.());
+
+        await waitFor(() => expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledTimes(2));
+        expect(reload).not.toHaveBeenCalled();
       });
     });
 

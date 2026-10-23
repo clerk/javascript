@@ -1632,6 +1632,16 @@ export const heIL: LocalizationResource = {
       subtitle: 'הכנס את הסיסמה המקושרת עם חשבונך',
       title: 'הכנס סיסמה',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'קוד אימות',
       resendButton: 'לא קיבלת קוד? שלח שוב',
@@ -1643,6 +1653,21 @@ export const heIL: LocalizationResource = {
       resendButton: 'לא קיבלת קוד? שלח שוב',
       subtitle: 'להמשך, אנא הכנס את קוד האימות שנשלח לטלפון שלך',
       title: 'בדוק את הטלפון שלך',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'קוד אימות',

@@ -1,5 +1,13 @@
 import { useSession } from '@clerk/shared/react';
-import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/shared/types';
+import type {
+  EmailCodeAttempt,
+  EmailCodeFactor,
+  PhoneCodeAttempt,
+  PhoneCodeFactor,
+  ResetPasswordEmailCodeFactor,
+  ResetPasswordPhoneCodeFactor,
+  SessionVerificationResource,
+} from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -8,13 +16,14 @@ import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import type { LocalizationKey } from '../../localization';
+import { localizationKeys } from '../../localization';
 import { useAfterVerification } from './use-after-verification';
 
 export type UVFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
   'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
 > & {
-  factor: EmailCodeFactor | PhoneCodeFactor;
+  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordEmailCodeFactor | ResetPasswordPhoneCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
 };
@@ -25,6 +34,14 @@ export type UVFactorOneCodeFormProps = UVFactorOneCodeCard & {
   inputLabel: LocalizationKey;
   resendButton: LocalizationKey;
   identityPreviewEditButtonAriaLabel: LocalizationKey;
+  /**
+   * Replaces the default attempt, which sends only the strategy and code.
+   */
+  attempt?: (code: string) => Promise<SessionVerificationResource>;
+  /**
+   * Handles a failed attempt. Defaults to showing the error on the code card.
+   */
+  onAttemptError?: (err: unknown, reject: (err: unknown) => Promise<void>) => void;
 };
 
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
@@ -48,14 +65,20 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    session!
-      .attemptFirstFactorVerification({ strategy: props.factor.strategy, code })
+    // The reset password strategies pass their own attempt, which carries the new password.
+    const attempt =
+      props.attempt ??
+      ((code: string) =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        session!.attemptFirstFactorVerification({ strategy: props.factor.strategy, code } as
+          | EmailCodeAttempt
+          | PhoneCodeAttempt));
+    attempt(code)
       .then(async res => {
         await resolve();
         return handleVerificationResponse(res);
       })
-      .catch(reject);
+      .catch(err => (props.onAttemptError ? props.onAttemptError(err, reject) : reject(err)));
   };
 
   return (
@@ -72,6 +95,7 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
       showAlternativeMethods={props.showAlternativeMethods}
       onBackLinkClicked={props.onBackLinkClicked}
+      backLinkLabel={localizationKeys('backButton')}
     />
   );
 };
