@@ -141,17 +141,19 @@ function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HT
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
           </Field.Message>
+          <Field.Description>
+            <Button
+              type='button'
+              variant='link'
+              color='neutral'
+              size='sm'
+              disabled={props.isPending}
+              onClick={props.onAddPhone}
+            >
+              {m.addPhone}
+            </Button>
+          </Field.Description>
         </Field.Root>
-        <Button
-          type='button'
-          variant='link'
-          color='neutral'
-          size='sm'
-          disabled={props.isPending}
-          onClick={props.onAddPhone}
-        >
-          {m.addPhone}
-        </Button>
       </Card.Content>
       <Card.Footer>
         <Button
