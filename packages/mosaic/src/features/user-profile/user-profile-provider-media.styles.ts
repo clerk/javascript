@@ -13,6 +13,9 @@ export const styles = stylex.create({
     height: space['5'],
     width: space['5'],
   },
+  appleOffset: {
+    translate: '0 -1px',
+  },
   maskImage: (url: string) => ({ maskImage: `url(${JSON.stringify(url)})` }),
   fallback: {
     borderRadius: radiusVars['--cl-radius-sm'],

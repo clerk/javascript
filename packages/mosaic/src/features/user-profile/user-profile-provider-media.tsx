@@ -2,18 +2,23 @@ import * as stylex from '@stylexjs/stylex';
 
 import { IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
+import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './user-profile-provider-media.styles';
 
 export function UserProfileProviderMedia({
   provider,
+  iconId,
   iconUrl,
   monochromeIcon,
 }: {
   provider: string;
+  iconId?: string;
   iconUrl?: string;
   monochromeIcon?: boolean;
 }) {
   const url = iconUrl?.trim();
+  const slot = themeProps('provider-icon', { provider: iconId?.replaceAll('_', '-') });
+  const offset = iconId === 'apple' && styles.appleOffset;
   return (
     <Section.Media size='lg'>
       <IconFrame
@@ -23,19 +28,19 @@ export function UserProfileProviderMedia({
         {url && monochromeIcon ? (
           <span
             aria-hidden
-            {...stylex.props(styles.maskedIcon, styles.maskImage(url))}
+            {...mergeStyleProps(slot, stylex.props(styles.maskedIcon, styles.maskImage(url), offset))}
           />
         ) : url ? (
           <img
             src={url}
             alt=''
             aria-hidden
-            {...stylex.props(styles.icon)}
+            {...mergeStyleProps(slot, stylex.props(styles.icon, offset))}
           />
         ) : (
           <span
             aria-hidden
-            {...stylex.props(styles.fallback)}
+            {...mergeStyleProps(slot, stylex.props(styles.fallback))}
           >
             {provider.trim().charAt(0).toUpperCase()}
           </span>
