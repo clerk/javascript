@@ -225,10 +225,6 @@ export interface SessionResource extends ClerkResource {
    */
   expireAt: Date;
   /**
-   * Whether the session has a maximum lifetime. `false` when `expireAt` is Unix epoch zero. A session without a maximum lifetime can still end through sign-out or revocation, so use `status` to check whether it is active. `undefined` in ClerkJS versions that predate this property.
-   */
-  readonly hasMaximumLifetime?: boolean;
-  /**
    * The abandonment deadline. For an indefinite native session, this represents Unix epoch zero, meaning no abandonment deadline is configured.
    */
   abandonAt: Date;
@@ -390,10 +386,6 @@ export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;
   status: string;
   expireAt: Date;
-  /**
-   * Whether the session has a maximum lifetime. `false` when `expireAt` is Unix epoch zero. `undefined` in ClerkJS versions that predate this property.
-   */
-  readonly hasMaximumLifetime?: boolean;
   abandonAt: Date;
   lastActiveAt: Date;
   latestActivity: SessionActivity;

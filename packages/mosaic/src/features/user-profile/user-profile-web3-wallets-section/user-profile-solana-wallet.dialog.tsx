@@ -8,12 +8,14 @@ type SolanaWalletContentProps = Omit<ComponentProps<typeof UserProfileSolanaWall
 
 export function UserProfileSolanaWalletDialog({
   open,
+  finalFocus,
   pendingWalletName,
   error,
   onOpenChange,
   onConnect,
 }: SolanaWalletContentProps & {
   open: boolean;
+  finalFocus?: ComponentProps<typeof Dialog.Popup>['finalFocus'];
   onOpenChange: (open: boolean) => void;
 }) {
   const pending = pendingWalletName !== undefined;
@@ -28,7 +30,10 @@ export function UserProfileSolanaWalletDialog({
         onOpenChange(nextOpen);
       }}
     >
-      <Dialog.Popup variant='card'>
+      <Dialog.Popup
+        variant='card'
+        finalFocus={finalFocus}
+      >
         <SolanaWalletContent
           pendingWalletName={pendingWalletName}
           error={error}

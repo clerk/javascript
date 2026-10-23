@@ -20,7 +20,7 @@ const styles = stylex.create({
 });
 
 export const meta: StoryMeta = {
-  group: 'API Keys',
+  group: 'Misc',
   status: 'wip',
   title: 'APIKeysTable',
   label: 'API keys table',

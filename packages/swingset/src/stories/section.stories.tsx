@@ -589,16 +589,22 @@ export function Loading() {
       >
         Reload
       </Button>
-      <VisuallyHidden role='status'>{loading ? 'Loading active devices' : 'Active devices loaded'}</VisuallyHidden>
+      {loading ? <LoadingDevicesSkeleton /> : <LoadingDevices />}
+    </div>
+  );
+}
+
+function LoadingDevicesSkeleton() {
+  return (
+    <>
+      <VisuallyHidden role='status'>Loading active devices</VisuallyHidden>
       <Section.Root>
-        <Section.Group skeleton={loading}>
+        <Section.Group>
           <Section.Header>
-            <Section.Title>
-              <Skeleton>Active devices</Skeleton>
-            </Section.Title>
+            <Section.Title>Active devices</Section.Title>
           </Section.Header>
           <Section.Body>
-            <Section.Items>
+            <Section.Items aria-hidden>
               {loadingItems.map(item => (
                 <Section.Item key={item.label}>
                   <Skeleton>
@@ -624,6 +630,7 @@ export function Loading() {
                       <ActionMenu
                         label={`Manage ${item.label}`}
                         actions={[{ label: 'View details', onClick: () => undefined }]}
+                        disabled
                       />
                     </Skeleton>
                   </Section.Actions>
@@ -633,6 +640,47 @@ export function Loading() {
           </Section.Body>
         </Section.Group>
       </Section.Root>
-    </div>
+    </>
+  );
+}
+
+function LoadingDevices() {
+  return (
+    <>
+      <VisuallyHidden role='status'>Active devices loaded</VisuallyHidden>
+      <Section.Root>
+        <Section.Group>
+          <Section.Header>
+            <Section.Title>Active devices</Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              {loadingItems.map(item => (
+                <Section.Item key={item.label}>
+                  <Section.Media size='lg'>
+                    <IconFrame>
+                      <Icon
+                        glyph={item.icon}
+                        size='lg'
+                      />
+                    </IconFrame>
+                  </Section.Media>
+                  <Section.Content>
+                    <Section.Label>{item.label}</Section.Label>
+                    <Section.Description>{item.description}</Section.Description>
+                  </Section.Content>
+                  <Section.Actions>
+                    <ActionMenu
+                      label={`Manage ${item.label}`}
+                      actions={[{ label: 'View details', onClick: () => undefined }]}
+                    />
+                  </Section.Actions>
+                </Section.Item>
+              ))}
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>
+    </>
   );
 }

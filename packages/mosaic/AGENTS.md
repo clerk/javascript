@@ -53,6 +53,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`use-user-sessions-query.ts`)                          |
 | An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                              |
 | Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                |
+| An input that reformats as the user types without moving the caret       | `useFormattedInput` (`src/primitives/hooks/`)                                                                 |
 | An interaction with an async lifecycle or two values that move together  | A machine in the controller file, via `setup()` (`src/machine/`)                                              |
 | Styles several components share                                          | `src/styles/*.styles.ts`                                                                                      |
 
