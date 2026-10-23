@@ -15,11 +15,6 @@ import { createTokenStore } from './tokenStore';
  */
 interface TokenCacheEntry extends TokenCacheKeyJSON {
   /**
-   * Timestamp in seconds since UNIX epoch when the entry was created.
-   * Used for expiration and cleanup scheduling.
-   */
-  createdAt?: Seconds;
-  /**
    * Callback to refresh this token before it expires.
    * Called by the proactive refresh timer to trigger background refresh.
    * If not provided, no refresh timer will be scheduled (e.g., for broadcast-received tokens).
@@ -52,9 +47,9 @@ interface TokenCacheValue {
    * which is what keeps a staler resolve from overwriting a fresher token.
    */
   baseline?: TokenResource;
-  createdAt: Seconds;
+  cachedAt: Seconds;
   entry: TokenCacheEntry;
-  expiresIn?: Seconds;
+  expiresAt?: Seconds;
   /** Timer for automatic cache cleanup when token expires */
   timeoutId?: ReturnType<typeof setTimeout>;
   /** Timer for proactive refresh before token enters leeway period */
@@ -190,9 +185,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
       return;
     }
 
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    const elapsed = nowSeconds - value.createdAt;
-    const remainingTtl = (value.expiresIn ?? Infinity) - elapsed;
+    const remainingTtl = (value.expiresAt ?? Infinity) - Math.floor(Date.now() / 1000);
 
     // Token expired or dangerously close to expiration - force synchronous refresh
     // Uses poller interval as threshold since the poller might not get to it in time
@@ -325,9 +318,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     clearTimeout(existing?.timeoutId);
     clearTimeout(existing?.refreshTimeoutId);
 
-    const nowSeconds = Math.floor(Date.now() / 1000);
-    const createdAt = entry.createdAt ?? nowSeconds;
-    const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
+    const value: TokenCacheValue = { cachedAt: Math.floor(Date.now() / 1000), entry };
 
     // Chain the freshest known token across replacements. This never touches
     // entry.resolvedToken: a pending entry reads as pending and callers await.
@@ -401,12 +392,10 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         // `exp` is server time, so reading it on the device clock is late by the
         // device's lag. A full lifetime from cache insert is late by the token's age
         // on arrival. The earlier of the two is late only by the smaller error.
-        const nowSeconds = Math.floor(Date.now() / 1000);
-        const lifetime: Seconds = winnerClaims.exp - winnerClaims.iat;
-        const remainingTtl: Seconds = Math.min(winnerClaims.exp - nowSeconds, lifetime - (nowSeconds - live.createdAt));
+        const expiresAt: Seconds = Math.min(winnerClaims.exp, live.cachedAt + winnerClaims.exp - winnerClaims.iat);
+        const remainingTtl: Seconds = expiresAt - Math.floor(Date.now() / 1000);
 
-        live.createdAt = nowSeconds;
-        live.expiresIn = remainingTtl;
+        live.expiresAt = expiresAt;
 
         if (remainingTtl <= 0) {
           dropIfCurrent(live);

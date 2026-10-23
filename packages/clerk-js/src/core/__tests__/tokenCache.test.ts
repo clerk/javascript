@@ -681,7 +681,7 @@ describe('SessionTokenCache', () => {
         jwt: { claims: { exp, iat } },
       } as any);
 
-      SessionTokenCache.set({ createdAt: nowSeconds - 70, tokenId: 'expired_token', tokenResolver });
+      SessionTokenCache.set({ tokenId: 'expired_token', tokenResolver });
 
       await tokenResolver;
 
@@ -691,7 +691,7 @@ describe('SessionTokenCache', () => {
 
     it('returns token when remaining TTL is above poller interval', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
-      const iat = nowSeconds;
+      const iat = nowSeconds - 11;
       const exp = iat + 20;
       const soonJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ iat, exp }))}.signature`;
 
@@ -700,8 +700,8 @@ describe('SessionTokenCache', () => {
         jwt: { claims: { exp, iat } },
       } as any);
 
-      // Token has 20s TTL, created 11s ago = 9s remaining (> 5s poller interval)
-      SessionTokenCache.set({ createdAt: nowSeconds - 11, tokenId: 'soon_expired_token', tokenResolver });
+      // Token has 20s TTL, issued 11s ago = 9s remaining (> 5s poller interval)
+      SessionTokenCache.set({ tokenId: 'soon_expired_token', tokenResolver });
 
       await tokenResolver;
 
@@ -1909,7 +1909,6 @@ describe('SessionTokenCache', () => {
 
       SessionTokenCache.set({
         audience: undefined,
-        createdAt: nowSeconds,
         tokenId: session1Id,
         tokenResolver: session1Resolver,
       });
@@ -1969,7 +1968,6 @@ describe('SessionTokenCache', () => {
 
       SessionTokenCache.set({
         audience: undefined,
-        createdAt: nowSeconds - 10,
         tokenId: sessionId,
         tokenResolver: initialResolver,
       });
