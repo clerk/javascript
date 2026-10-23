@@ -120,7 +120,7 @@ function RoutedHost({ launch, clientTokenKeptAtLaunch }: RoutedHostProps): React
 
   useEffect(() => {
     const signInTicket = launch.signInTicket;
-    if (!signInTicket || !isLoaded || ticketStarted.current) {
+    if (!signInTicket || !isLoaded || !authView.isLoaded || ticketStarted.current) {
       return;
     }
     ticketStarted.current = true;
@@ -147,7 +147,7 @@ function RoutedHost({ launch, clientTokenKeptAtLaunch }: RoutedHostProps): React
         setTicket('failed');
       },
     );
-  }, [isLoaded, isSignedIn, launch.signInTicket, signIn]);
+  }, [authView.isLoaded, isLoaded, isSignedIn, launch.signInTicket, signIn]);
 
   const showsAuthView = opened === 'auth' || opened === 'nativeAuth';
   const finished = showsAuthView
