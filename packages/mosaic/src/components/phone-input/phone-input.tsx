@@ -8,11 +8,13 @@ import React from 'react';
 
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { Button } from '../../primitives/button';
 import { useFormattedInput } from '../../primitives/hooks';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
-import { Button } from '../button';
+import { styles as buttonStyles } from '../button/button.styles';
 import { Combobox } from '../combobox';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
@@ -201,14 +203,20 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           placement='bottom-start'
           sideOffset={8}
         >
-          <InputGroup.Start>
+          <InputGroup.Start xstyle={styles.triggerStart}>
             <Popover.Trigger
               render={
                 <Button
-                  size='xs'
-                  shape='default'
-                  xstyle={styles.trigger}
-                  {...themeProps('phone-input-country-trigger')}
+                  {...mergeStyleProps(
+                    themeProps('phone-input-country-trigger'),
+                    stylex.props(
+                      reset.base,
+                      focusOutline.visible,
+                      buttonStyles.touchTarget,
+                      styles.trigger,
+                      disabled && buttonStyles.disabled,
+                    ),
+                  )}
                 />
               }
               type='button'

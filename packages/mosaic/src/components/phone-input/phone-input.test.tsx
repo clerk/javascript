@@ -73,16 +73,28 @@ describe('Mosaic PhoneInput', () => {
     expect(document.querySelector('.cl-phone-input-popup')).toHaveAttribute('data-size', 'anchor');
   });
 
-  it.each(['sm', 'md', 'lg'] as const)('uses an xs country trigger for a %s input', size => {
-    render(
-      <PhoneInput
-        size={size}
-        aria-label='Phone number'
-      />,
-    );
-    expect(screen.getByRole('button', { name: 'Country, United States' })).toHaveAttribute('data-size', 'xs');
-    expect(screen.getByRole('button', { name: 'Country, United States' })).toHaveAttribute('data-shape', 'default');
-  });
+  it.each(['sm', 'md', 'lg'] as const)(
+    'opens and dismisses the country picker with Space for a %s input',
+    async size => {
+      const user = userEvent.setup();
+      render(
+        <PhoneInput
+          size={size}
+          aria-label='Phone number'
+        />,
+      );
+      const trigger = screen.getByRole('button', { name: 'Country, United States' });
+
+      await user.tab();
+      expect(trigger).toHaveFocus();
+      await user.keyboard(' ');
+      await waitFor(() => expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveFocus());
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => expect(trigger).toHaveFocus());
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    },
+  );
   it('renders one grouped telephone control with the default country', () => {
     render(<PhoneInput aria-label='Phone number' />);
 
@@ -92,10 +104,8 @@ describe('Mosaic PhoneInput', () => {
     expect(input).toHaveClass('cl-input', 'cl-phone-input-control');
     expect(input).toHaveAttribute('data-variant', 'ghost');
     const countryTrigger = screen.getByRole('button', { name: 'Country, United States' });
-    expect(countryTrigger).toHaveClass('cl-button', 'cl-phone-input-country-trigger');
+    expect(countryTrigger).toHaveClass('cl-phone-input-country-trigger');
     expect(countryTrigger.closest('.cl-input-group-start')).not.toBeNull();
-    expect(countryTrigger).toHaveAttribute('data-size', 'xs');
-    expect(countryTrigger).toHaveAttribute('data-variant', 'ghost');
     expect(screen.queryByText('us')).not.toBeInTheDocument();
     expect(document.querySelector('.cl-phone-input-divider')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('+1')).toHaveClass('cl-phone-input-prefix');

@@ -3,12 +3,25 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  triggerStart: {
+    paddingInlineStart: 'max(0px, calc(var(--_cl-input-group-inset) - 1px))',
+  },
   trigger: {
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
+    borderRadius: 'max(0px, calc(var(--_cl-input-group-radius) - var(--_cl-input-group-inset)))',
     borderWidth: 0,
+    alignItems: 'center',
+    appearance: 'none',
     backgroundColor: 'transparent',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    outlineOffset: { default: null, ':focus-visible': 0 },
     paddingInlineEnd: 0,
     paddingInlineStart: space['1.5'],
+    userSelect: 'none',
+    height: 'calc(var(--_cl-input-group-height) - 2 * var(--_cl-input-group-inset))',
   },
   triggerContent: {
     gap: space['0.5'],
