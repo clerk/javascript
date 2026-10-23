@@ -822,7 +822,6 @@ describe('ProtectSession default deadline', () => {
   it('keeps waiting for a leader tab after SafeLock gives up, until its own deadline', async () => {
     Object.defineProperty(navigator, 'locks', {
       value: {
-        // Never granted; rejects on SafeLock's abort the way the Web Locks API does.
         request: vi.fn(
           (_key: string, options: { signal: AbortSignal }) =>
             new Promise((_resolve, reject) => {

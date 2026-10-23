@@ -34,7 +34,6 @@ const TOKEN_REFRESH_MARGIN_MS = 60 * 1_000;
 const DEFAULT_TOKEN_TIMEOUT_MS = 10 * 1_000;
 /** Ceiling on the instance-configured deadline, so no server value can stall a sign-in. */
 const MAX_TOKEN_TIMEOUT_MS = 10 * 1_000;
-/** How often a tab that could not take the lock re-reads the store while another tab mints. */
 const STORE_POLL_INTERVAL_MS = 100;
 /** A stored token claiming more remaining life than this was not minted by us. */
 const MAX_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1_000;
