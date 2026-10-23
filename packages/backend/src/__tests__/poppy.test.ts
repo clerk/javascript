@@ -4,6 +4,7 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { ClerkAPIResponseError } from '../errors';
 import { createClerkClient } from '../index';
 import { server } from '../mock-server';
+import { clerkFrontendApiProxy } from '../proxy';
 import { runtime } from '../runtime';
 
 const metadata = {
@@ -99,6 +100,125 @@ describe('clerkClient.__experimental_getPoppyMetadata', () => {
     await expect(second.__experimental_getPoppyMetadata()).resolves.toMatchObject({
       organization: { domain: 'other.example' },
     });
+  });
+
+  it.each([
+    { proxyUrl: 'https://customer.example/__clerk', target: 'https://customer.example/__clerk/.well-known/poppy.json' },
+    {
+      proxyUrl: 'https://customer.example/__clerk/',
+      target: 'https://customer.example/__clerk/.well-known/poppy.json',
+    },
+    {
+      proxyUrl: 'https://customer.example/nested/__clerk///',
+      target: 'https://customer.example/nested/__clerk/.well-known/poppy.json',
+    },
+    {
+      proxyUrl: new URL('https://customer.example/nested/__clerk/'),
+      target: 'https://customer.example/nested/__clerk/.well-known/poppy.json',
+    },
+    {
+      proxyUrl: new URL('/__clerk', 'https://customer.example/nested/route'),
+      target: 'https://customer.example/__clerk/.well-known/poppy.json',
+    },
+    { proxyUrl: 'http://localhost:3000/__clerk', target: 'http://localhost:3000/__clerk/.well-known/poppy.json' },
+  ])('fetches through explicit proxy $proxyUrl without a publishable key', async ({ proxyUrl, target }) => {
+    const fetchSpy = vi.spyOn(runtime, 'fetch');
+    const originalUrl = proxyUrl.toString();
+    server.use(http.get(target, () => HttpResponse.json(metadata)));
+    const client = createClerkClient({});
+
+    await expect(client.__experimental_getPoppyMetadata({ proxyUrl })).resolves.toEqual(metadata);
+    expect(fetchSpy).toHaveBeenCalledExactlyOnceWith(new URL(target), {
+      headers: { Accept: 'application/json' },
+      credentials: 'omit',
+      redirect: 'error',
+      cache: 'no-store',
+    });
+    expect(proxyUrl.toString()).toBe(originalUrl);
+  });
+
+  it.each([
+    '/__clerk',
+    '//customer.example/__clerk',
+    'file:///__clerk',
+    'ftp://customer.example/__clerk',
+    'https://user:password@customer.example/__clerk',
+    'https://customer.example/__clerk?query=value',
+    'https://customer.example/__clerk#fragment',
+  ])('rejects invalid proxy %s before fetching', async proxyUrl => {
+    const fetchSpy = vi.spyOn(runtime, 'fetch');
+    const client = createClerkClient({ publishableKey: publishableKey('example.clerk.accounts.dev') });
+
+    await expect(client.__experimental_getPoppyMetadata({ proxyUrl })).rejects.toThrow();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { name: 'HTTP 404', response: () => new HttpResponse(null, { status: 404 }) },
+    { name: 'network failure', response: () => HttpResponse.error() },
+    { name: 'redirect', response: () => HttpResponse.redirect(endpoint) },
+  ])('does not fall back to direct FAPI after proxy $name', async ({ response }) => {
+    const fetchSpy = vi.spyOn(runtime, 'fetch');
+    server.use(http.get('https://customer.example/__clerk/.well-known/poppy.json', response));
+    const client = createClerkClient({ publishableKey: publishableKey('example.clerk.accounts.dev') });
+
+    await expect(
+      client.__experimental_getPoppyMetadata({ proxyUrl: 'https://customer.example/__clerk' }),
+    ).rejects.toThrow();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not retain an explicit proxy for later direct calls', async () => {
+    const directMetadata = { source: 'direct' };
+    server.use(
+      http.get('https://customer.example/__clerk/.well-known/poppy.json', () => HttpResponse.json(metadata)),
+      http.get(endpoint, () => HttpResponse.json(directMetadata)),
+    );
+    const client = createClerkClient({ publishableKey: publishableKey('example.clerk.accounts.dev') });
+
+    await expect(
+      client.__experimental_getPoppyMetadata({ proxyUrl: 'https://customer.example/__clerk' }),
+    ).resolves.toEqual(metadata);
+    await expect(client.__experimental_getPoppyMetadata()).resolves.toEqual(directMetadata);
+  });
+
+  it('forwards the well-known path through the existing customer proxy without sending credentials to it', async () => {
+    let proxyRequests = 0;
+    let upstreamRequests = 0;
+    server.use(
+      http.get('https://customer.example/__clerk/.well-known/poppy.json', async ({ request }) => {
+        proxyRequests++;
+        expect(request.headers.get('accept')).toBe('application/json');
+        expect(request.headers.get('authorization')).toBeNull();
+        expect(request.headers.get('cookie')).toBeNull();
+        expect(request.headers.get('clerk-secret-key')).toBeNull();
+        expect(request.headers.get('clerk-proxy-url')).toBeNull();
+        return clerkFrontendApiProxy(request, {
+          publishableKey: publishableKey('example.clerk.accounts.dev'),
+          secretKey: 'sk_test_proxy',
+          fapiUrl: 'https://frontend-api.clerk.example',
+        });
+      }),
+      http.get('https://frontend-api.clerk.example/.well-known/poppy.json', ({ request }) => {
+        upstreamRequests++;
+        expect(request.headers.get('clerk-secret-key')).toBe('sk_test_proxy');
+        expect(request.headers.get('clerk-proxy-url')).toBe('https://customer.example/__clerk');
+        expect(request.headers.get('authorization')).toBeNull();
+        expect(request.headers.get('cookie')).toBeNull();
+        return HttpResponse.json(metadata);
+      }),
+    );
+    const client = createClerkClient({
+      secretKey: 'sk_test_helper',
+      proxyUrl: 'https://unused.example',
+      apiUrl: 'https://backend.example',
+    });
+
+    await expect(
+      client.__experimental_getPoppyMetadata({ proxyUrl: 'https://customer.example/__clerk' }),
+    ).resolves.toEqual(metadata);
+    expect(proxyRequests).toBe(1);
+    expect(upstreamRequests).toBe(1);
   });
 
   it.each([
