@@ -3,6 +3,7 @@ import type { Jwt, JwtPayload, Simplify } from '@clerk/shared/types';
 
 import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
+import { USER_AGENT } from '../constants';
 import {
   MachineTokenVerificationError,
   MachineTokenVerificationErrorCode,
@@ -251,7 +252,7 @@ async function verifyAPIKey(
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<APIKey, MachineTokenVerificationError>> {
   try {
-    const client = createBackendApiClient(options);
+    const client = createBackendApiClient({ ...options, userAgent: USER_AGENT });
     const verifiedToken = await client.apiKeys.verify(secret);
     return { data: verifiedToken, tokenType: TokenType.ApiKey, errors: undefined };
   } catch (err: any) {
