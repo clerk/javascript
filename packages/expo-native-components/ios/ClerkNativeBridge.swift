@@ -672,9 +672,14 @@ final class ClerkNativeBridge {
   private static func makeClerkOptions(proxyUrl: String?) -> Clerk.Options {
     let middleware = Clerk.Options.MiddlewareConfig(request: [ClerkExpoHeaderMiddleware()])
     guard let service = keychainService else {
-      return .init(proxyUrl: proxyUrl, middleware: middleware)
+      return .init(proxyUrl: proxyUrl, middleware: middleware, updateRequiredViewEnabled: false)
     }
-    return .init(keychainConfig: .init(service: service), proxyUrl: proxyUrl, middleware: middleware)
+    return .init(
+      keychainConfig: .init(service: service),
+      proxyUrl: proxyUrl,
+      middleware: middleware,
+      updateRequiredViewEnabled: false
+    )
   }
 
   @MainActor

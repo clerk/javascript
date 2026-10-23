@@ -112,6 +112,7 @@ class ClerkExpoModule : Module() {
         // JS owns client state. The native foreground refresh races SSO completion and mints duplicate clients (#9217).
         return ClerkConfigurationOptions(proxyUrl = proxyUrl)
             .withForegroundRefreshDisabled()
+            .withUpdateRequiredViewDisabled()
             .withCustomHeaders(customHeaders)
     }
 
