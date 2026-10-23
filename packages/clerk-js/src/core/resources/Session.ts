@@ -219,8 +219,8 @@ export class Session extends BaseResource implements SessionResource {
   #hydrateCache = (token: TokenResource | null) => {
     if (token) {
       const tokenId = this.#getCacheId();
-      // Dispatch tokenUpdate for __session tokens with the session's active organization ID
-      const shouldDispatchTokenUpdate = true;
+      // Only the client's active session may write __session. Inactive sessions still cache.
+      const shouldDispatchTokenUpdate = this.#isActiveClientSession();
       SessionTokenCache.set({
         tokenId,
         tokenResolver: Promise.resolve(token),
@@ -239,6 +239,12 @@ export class Session extends BaseResource implements SessionResource {
     const resolvedOrganizationId =
       typeof organizationId === 'undefined' ? this.lastActiveOrganizationId : organizationId;
     return TokenId.build(this.id, template, resolvedOrganizationId);
+  }
+
+  #isActiveClientSession(): boolean {
+    const clerk = BaseResource.clerk;
+    const activeId = clerk?.session?.id ?? clerk?.client?.lastActiveSessionId;
+    return Boolean(activeId && this.id === activeId);
   }
 
   startVerification = async ({ level }: SessionVerifyCreateParams): Promise<SessionVerificationResource> => {
@@ -498,8 +504,9 @@ export class Session extends BaseResource implements SessionResource {
 
     const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId });
 
-    // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
-    const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
+    // Dispatch tokenUpdate only for the client's active session __session token, not JWT templates
+    const shouldDispatchTokenUpdate =
+      !template && organizationId === this.lastActiveOrganizationId && this.#isActiveClientSession();
 
     let result: string | null;
 
