@@ -5,7 +5,7 @@ An app that uses `useSignInWithGoogle` from `@clerk/expo/google` or `useBiometri
 ## Sub-features
 
 - `google-sign-in` starts the Google flow with `startGoogleAuthenticationFlow()`, and on iOS cancels it. The hook configures the native module with the test app's placeholder client IDs and calls its `presentExplicitSignIn`. On iOS the system asks whether the app may use `accounts.google.com` to sign in. On Android Google Play services opens a page of its own. Cancelling resolves the hook with no session, which the test checks on iOS only.
-- `biometric-availability` asks `getAvailability()` whether a biometric credential on this device can sign in. With biometric sign-in on for the instance, the hook calls the native `getAvailability` and shows the reason that follows from its answer.
+- `biometric-availability` asks `getAvailability()` whether a biometric credential on this device can sign in. With biometric sign-in on for the instance, the hook calls the native `getAvailability`. When that says the device has secure key storage, the hook reads the native list of stored credentials and shows the reason that follows.
 
 ## How to get to it (user POV)
 
