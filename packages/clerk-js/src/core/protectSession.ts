@@ -105,13 +105,12 @@ export type ApplyLoader = (loader: ProtectLoader, placeholders: ProtectPlacehold
 
 type StoredToken = {
   token: string;
-  /** Unix seconds, as served by the token endpoint. */
+  /** Expiry in seconds on this browser's clock. */
   exp: number;
   rid: string;
   /**
-   * Local milliseconds at the moment we stored it. `exp` compares server truth against this
-   * browser's clock, so a skewed clock either ships lapsed tokens or discards good ones; this
-   * bounds both by elapsed local time, which is measured entirely on the one clock.
+   * Local milliseconds at the moment we stored it, bounding cache age independently of expiry
+   * and rejecting an entry stamped before the browser's clock moved backwards.
    */
   at: number;
   /**
@@ -128,6 +127,10 @@ type StoredToken = {
  * cannot forget either.
  */
 type MintedToken = Omit<StoredToken, 'at' | 'floor'>;
+
+type TokenClock = { localTimeMs: number; serverTimeMs: number };
+
+const tokenClocks = new WeakMap<object, TokenClock>();
 
 type LoaderOutcome = 'loaded' | 'error' | 'timeout';
 
@@ -288,14 +291,9 @@ function normalizeFloor(value: unknown): number {
 }
 
 /**
- * The clock-skew bound. `exp` is server truth compared against this browser's clock, so a clock
- * running slow keeps an entry alive long past its real expiry and a clock running fast throws
- * good ones away. Elapsed time since we stored it is measured on one clock, so a constant offset
- * cancels: an entry older than any token we would ever be issued is stale whatever `exp` claims,
+ * Elapsed cache age and a translated expiry use the same browser clock, so a constant offset
+ * cancels. An entry older than any token we would ever be issued is stale whatever `exp` claims,
  * and one stamped in the future means the clock moved backwards under us.
- *
- * This bounds the damage rather than removing it — a fully skew-proof check needs the server to
- * send a relative lifetime instead of an absolute `exp`, which is a wire change.
  */
 function freshByLocalClock(at: unknown): boolean {
   if (typeof at !== 'number' || !Number.isFinite(at)) {
@@ -314,18 +312,31 @@ function freshByLocalClock(at: unknown): boolean {
  * directly. What it buys is that a corrupt or truncated entry starts a fresh run immediately
  * instead of suppressing acquisition until it expires.
  */
-function validateToken(token: unknown, exp: unknown, marginMs: number): { token: string; exp: number } | null {
+function validateToken(
+  token: unknown,
+  exp: unknown,
+  marginMs: number,
+  clock?: TokenClock,
+): { token: string; exp: number } | null {
   if (typeof token !== 'string' || token.length > MAX_TOKEN_LENGTH || !TOKEN_SHAPE.test(token)) {
     return null;
   }
   if (typeof exp !== 'number' || !Number.isFinite(exp)) {
     return null;
   }
-  const expMs = exp * 1_000;
-  if (expMs - marginMs <= Date.now() || expMs > Date.now() + MAX_TOKEN_LIFETIME_MS) {
+  const now = Date.now();
+  let expMs = exp * 1_000;
+  if (clock) {
+    const lifetimeMs = expMs - clock.serverTimeMs;
+    if (lifetimeMs <= 0 || lifetimeMs > MAX_TOKEN_LIFETIME_MS || clock.localTimeMs > now) {
+      return null;
+    }
+    expMs = clock.localTimeMs + lifetimeMs;
+  }
+  if (expMs - marginMs <= now || expMs > now + MAX_TOKEN_LIFETIME_MS) {
     return null;
   }
-  return { token, exp };
+  return { token, exp: expMs / 1_000 };
 }
 
 /** `at` and `floor` are the writer's business, not the caller's — both stamped here, at the write. */
@@ -373,6 +384,7 @@ async function readInlineToken(cid: string, rid: string, deadline: number): Prom
   }
 
   const { cid: mintedFor, ready } = inline as Record<string, unknown>;
+  const clock = tokenClocks.get(inline);
   // The global is page-visible and outlives a navigation, so a token minted for anyone else's run
   // is not ours to send. The base shape, which carries no cid at all, lands here too.
   if (mintedFor !== cid || !isThenable(ready)) {
@@ -388,9 +400,34 @@ async function readInlineToken(cid: string, rid: string, deadline: number): Prom
   }
 
   const { token, exp } = resolved as Record<string, unknown>;
-  const validated = validateToken(token, exp, 0);
+  const validated = validateToken(token, exp, 0, clock);
   // `{ status: 'no_token' }` has no token to validate and lands here, as does a malformed one.
   return validated ? { ...validated, rid } : 'no_token';
+}
+
+function readTokenClock(cid: string, localTimeMs?: number): TokenClock | undefined {
+  const inline = (globalThis as unknown as Record<string, unknown>)[INLINE_TOKEN_GLOBAL];
+  if (!inline || typeof inline !== 'object') {
+    return undefined;
+  }
+  const { cid: mintedFor, p } = inline as Record<string, unknown>;
+  if (mintedFor !== cid) {
+    return undefined;
+  }
+  const existing = tokenClocks.get(inline);
+  if (existing || localTimeMs === undefined) {
+    return existing;
+  }
+  if (!p || typeof p !== 'object') {
+    return undefined;
+  }
+  const { t } = p as Record<string, unknown>;
+  if (typeof t !== 'number' || !Number.isFinite(t) || t <= 0) {
+    return undefined;
+  }
+  const clock = { localTimeMs, serverTimeMs: t };
+  tokenClocks.set(inline, clock);
+  return clock;
 }
 
 function httpStatus(status: number): ProtectStatus {
@@ -697,7 +734,7 @@ export class ProtectSession {
     }
 
     if (this.#tokenUrl) {
-      return await this.#poll(deadline);
+      return await this.#poll(deadline, readTokenClock(this.#cid as string));
     }
 
     const inline = await readInlineToken(this.#cid as string, this.#rid as string, deadline);
@@ -719,6 +756,7 @@ export class ProtectSession {
       return Promise.resolve('error');
     }
 
+    const startedAt = Date.now();
     let element: HTMLElement | undefined;
     try {
       element = this.#applyLoader(loader, this.#placeholders);
@@ -735,8 +773,11 @@ export class ProtectSession {
     // we ever looked. An inline module is the exception: it evaluates off a fetched graph, so its
     // `load` does arrive and settling early would read the global before it is written.
     if (!isFetching(element)) {
+      readTokenClock(this.#cid as string, startedAt);
       return Promise.resolve('loaded');
     }
+
+    element.addEventListener('load', () => readTokenClock(this.#cid as string, startedAt), { once: true });
 
     return new Promise<LoaderOutcome>(resolve => {
       const timer = setTimeout(() => resolve('timeout'), Math.max(0, deadline - Date.now()));
@@ -750,7 +791,7 @@ export class ProtectSession {
   }
 
   /** The upgrade mint: polls the token endpoint until the deadline. Never rejects. */
-  async #poll(deadline: number): Promise<ProtectStatus> {
+  async #poll(deadline: number, clock?: TokenClock): Promise<ProtectStatus> {
     const url = this.#tokenUrl as string;
     const controller = new AbortController();
     const deadlineTimer = setTimeout(() => controller.abort(), Math.max(0, deadline - Date.now()));
@@ -770,7 +811,7 @@ export class ProtectSession {
         }
 
         if (response.status === 200) {
-          const token = await readTokenPayload(response, this.#rid as string);
+          const token = await readTokenPayload(response, this.#rid as string, clock);
           if (!token) {
             return 'fetch_error';
           }
@@ -822,7 +863,7 @@ function resolveTokenUrl(loader: ProtectLoader, placeholders: ProtectPlaceholder
   }
 }
 
-async function readTokenPayload(response: Response, rid: string): Promise<MintedToken | null> {
+async function readTokenPayload(response: Response, rid: string, clock?: TokenClock): Promise<MintedToken | null> {
   let json: unknown;
   try {
     json = await response.json();
@@ -835,7 +876,7 @@ async function readTokenPayload(response: Response, rid: string): Promise<Minted
   }
 
   const { token, exp } = json as Record<string, unknown>;
-  const validated = validateToken(token, exp, 0);
+  const validated = validateToken(token, exp, 0, clock);
   return validated ? { ...validated, rid } : null;
 }
 
