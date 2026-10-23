@@ -1289,13 +1289,9 @@ describe('the step that edits the description', () => {
     ['<!-- verify-evidence:ios -->', '', ...lines, '', '<!-- /verify-evidence:ios -->'].join('\n');
   const AFTER_ONLY = [
     '',
-    '| `profile` |',
-    '| :---: |',
-    `| <img src="${asset(2)}" width="280" alt="profile"> |`,
-    '',
-    '| `video` |',
-    '| :---: |',
-    `| ${asset(1)} |`,
+    '| `video` | `profile` |',
+    '| :---: | :---: |',
+    `| ${asset(1)} | <img src="${asset(2)}" width="280" alt="profile"> |`,
   ];
 
   it('adds the block after the description and attaches the files from their own directory, under names the description could not have guessed', async () => {
@@ -1492,24 +1488,6 @@ describe('the step that edits the description', () => {
 
   it('lays out a flow that is new as its video alone, in a table that keeps it from the full width', async () => {
     assert.equal(await published(CLIP), laidOut(SAID, '', '| `video` |', '| :---: |', `| ${asset(1)} |`));
-  });
-
-  it('lays out both kinds when the hand-off holds both: the screenshots first, then the video, each as it is alone', async () => {
-    assert.equal(
-      await published([...CLIP, ...SHOT], [...WAS_CLIP, ...WAS_SHOT]),
-      laidOut(
-        `${SAID}${WAS}`,
-        '',
-        '| Before | After |',
-        '| :---: | :---: |',
-        `| <img src="${asset(4)}" width="280" alt="Before: profile"> | <img src="${asset(2)}" width="280" alt="After: profile"> |`,
-        '',
-        '| Before | After |',
-        '| :---: | :---: |',
-        `| ${asset(3)} | ${asset(1)} |`,
-      ),
-    );
-    assert.equal(await published([...CLIP, ...SHOT]), laidOut(SAID, ...AFTER_ONLY));
   });
 
   const ASCII = Array.from({ length: 128 }, (_, code) => String.fromCharCode(code));
@@ -1732,7 +1710,7 @@ describe('the step that edits the description', () => {
     );
     assert.match(
       fake.state.laidOutBody,
-      /, 3 of 3 passed\. The pull request has newer commits\.\r\n\r\n\| `profile` \|/,
+      /, 3 of 3 passed\. The pull request has newer commits\.\r\n\r\n\| `video` \| `profile` \|/,
     );
   });
 
@@ -1764,7 +1742,7 @@ describe('the step that edits the description', () => {
     );
     assert.match(
       fake.state.laidOutBody,
-      /, 3 of 3 passed\. The pull request has newer commits\.\r\n\r\n\| `profile` \|/,
+      /, 3 of 3 passed\. The pull request has newer commits\.\r\n\r\n\| `video` \| `profile` \|/,
     );
   });
 

@@ -208,7 +208,7 @@ $ integration/expo-native/bin/control-clerk-expo attach <run-id> --pr <n> --vide
 
 `attach` posts what you choose, and with neither `--screenshot` nor `--video` it fails with a usage error. Make two choices.
 
-Choose screenshots or the video by what changed, and post one kind. A change to behavior, to movement or animation, or to a flow shows in a video, so pass `--video`: one before and after video for each change, and no screenshots beside it. A still change, such as wording or a layout, shows in screenshots, so pass `--screenshot <label>` once for each screen the change touches, each with its before. `attach` refuses both flags together unless you add `--both`, which is for the rare change a reviewer cannot see in one kind alone.
+Choose screenshots or the video by what changed, and post one kind. A change to behavior, to movement or animation, or to a flow shows in a video, so pass `--video`: one before and after video for each change, and no screenshots beside it. A still change, such as wording or a layout, shows in screenshots, so pass `--screenshot <label>` once for each screen the change touches, each with its before. Never post both kinds, and `attach` refuses `--video` with `--screenshot`. When a brief, a prompt or a reviewer asks for both, post the one kind the change calls for, and say in your hand-back that you did and why.
 
 A video shows only the part of the run that you mark. Wrap the steps that show the change in `host.evidence`, and leave sign-in, seeding and navigation outside it:
 
