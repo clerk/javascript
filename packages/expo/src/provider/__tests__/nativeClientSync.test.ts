@@ -208,4 +208,86 @@ describe('createNativeClientSync', () => {
     expect(getToken).toHaveBeenCalledTimes(2);
     expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', 'seed-token', null);
   });
+
+  describe('without a stored client token', () => {
+    function loadingNativeModule() {
+      const authFlowListeners = new Set<(state: unknown) => void>();
+      const native: ClerkExpoNativeModule = {
+        ...nativeModule(),
+        getAuthFlowState: vi.fn().mockResolvedValue({ isLoaded: false, isAuthFlowComplete: false }),
+        addListener: vi.fn((eventName: string, listener?: (...args: unknown[]) => void) => {
+          if (eventName !== 'clerkNativeAuthFlowChanged' || !listener) {
+            return { remove: () => undefined };
+          }
+          authFlowListeners.add(listener);
+          return { remove: () => authFlowListeners.delete(listener) };
+        }),
+      };
+      const finishNativeLoad = () =>
+        authFlowListeners.forEach(listener => listener({ isLoaded: true, isAuthFlowComplete: false }));
+      return { native, finishNativeLoad, authFlowListeners };
+    }
+
+    test('reads the native token only after the native client has loaded', async () => {
+      const createNativeClientSync = await loadEngine();
+      const { native, finishNativeLoad, authFlowListeners } = loadingNativeModule();
+      const cache = userTokenCache(vi.fn().mockResolvedValue(null));
+
+      const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+      let token: string | null | undefined;
+      const read = sync.tokenCache
+        .getToken(CLERK_CLIENT_JWT_KEY)
+        .then((value: string | null | undefined) => (token = value));
+
+      await vi.waitFor(() => expect(authFlowListeners.size).toBe(1));
+      expect(token).toBeUndefined();
+      expect(native.getDeviceToken).not.toHaveBeenCalled();
+
+      finishNativeLoad();
+
+      await read;
+      expect(token).toBe('native-token');
+      expect(authFlowListeners.size).toBe(0);
+    });
+
+    test('does not wait when the native client has already loaded', async () => {
+      const createNativeClientSync = await loadEngine();
+      const { native } = loadingNativeModule();
+      vi.mocked(native.getAuthFlowState!).mockResolvedValue({ isLoaded: true, isAuthFlowComplete: false });
+      const cache = userTokenCache(vi.fn().mockResolvedValue(null));
+
+      const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+
+      await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('native-token');
+    });
+
+    test('stops waiting for a native client that does not load', async () => {
+      vi.useFakeTimers();
+      try {
+        const createNativeClientSync = await loadEngine();
+        const { native, authFlowListeners } = loadingNativeModule();
+        const cache = userTokenCache(vi.fn().mockResolvedValue(null));
+
+        const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+        const read = sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
+        await vi.advanceTimersByTimeAsync(2_000);
+
+        await expect(read).resolves.toBe('native-token');
+        expect(authFlowListeners.size).toBe(0);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    test('does not wait for native when a client token is stored', async () => {
+      const createNativeClientSync = await loadEngine();
+      const { native } = loadingNativeModule();
+      const cache = userTokenCache(vi.fn().mockResolvedValue('seed-token'));
+
+      const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+
+      await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('native-token');
+      expect(native.addListener).not.toHaveBeenCalledWith('clerkNativeAuthFlowChanged', expect.anything());
+    });
+  });
 });

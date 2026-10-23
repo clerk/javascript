@@ -7,8 +7,10 @@ import type { ClerkExpoNativeModule } from '../utils/native-module';
 import { waitUntilAppIsActive } from '../utils/runtime';
 
 const CONFIGURE_TIMEOUT_MS = 3_000;
+const NATIVE_LOAD_TIMEOUT_MS = 2_000;
 const IDLE_TIMEOUT_MS = 5_000;
 const INVALIDATED_EVENT = 'clerkNativeClientInvalidated';
+const AUTH_FLOW_CHANGED_EVENT = 'clerkNativeAuthFlowChanged';
 
 type FetchableClient = ClientResource & { fetch?: (options?: { fetchMaxTries?: number }) => Promise<ClientResource> };
 
@@ -104,6 +106,31 @@ function fingerprint(clerk: SyncableClerk): string {
   ]);
 }
 
+function isLoadedState(state: unknown): boolean {
+  return (state as { isLoaded?: unknown } | undefined)?.isLoaded === true;
+}
+
+/**
+ * Resolves once the native SDK has finished its first client load, or after a timeout. Without a
+ * stored device token, a token-less request from each side would mint two different clients.
+ */
+async function waitForNativeLoad(native: ClerkExpoNativeModule): Promise<void> {
+  if (typeof native.getAuthFlowState !== 'function' || typeof native.addListener !== 'function') {
+    return;
+  }
+  let subscription: { remove: () => void } | undefined;
+  const loaded = new Promise<void>(resolve => {
+    subscription = native.addListener?.(AUTH_FLOW_CHANGED_EVENT, state => isLoadedState(state) && resolve());
+    native.getAuthFlowState?.().then(
+      state => isLoadedState(state) && resolve(),
+      () => resolve(),
+    );
+  });
+  await withTimeout(loaded, NATIVE_LOAD_TIMEOUT_MS, () => new Error('Timed out waiting for the native client.'))
+    .catch(noop)
+    .finally(() => subscription?.remove());
+}
+
 async function readSeedDeviceToken(tokenCache: TokenCache): Promise<string | null> {
   try {
     return (await tokenCache.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
@@ -127,6 +154,9 @@ function configureOnce(
       await native
         .configureNative(publishableKey, seed, proxyUrl)
         .catch(() => native.configureNative(publishableKey, seed, proxyUrl));
+      if (!seed) {
+        await waitForNativeLoad(native);
+      }
       const latest = timedOut ? ((await tokenCache.getToken(CLERK_CLIENT_JWT_KEY)) ?? null) : seed;
       const didHandOff = !!latest && latest !== seed && (await native.setDeviceToken(latest, seed));
       configured = true;
