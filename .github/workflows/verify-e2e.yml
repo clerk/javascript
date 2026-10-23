@@ -223,10 +223,12 @@ jobs:
 
       - name: Record the flaky tests
         if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
+        continue-on-error: true
         run: node scripts/verify-flaky.mjs record "$PACKAGE/.verify/runs" "$RUNNER_TEMP/verify-flaky.json"
 
       - name: Keep the flaky tests for the Slack post
         if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
+        continue-on-error: true
         uses: actions/upload-artifact@v4.6.2
         with:
           name: verify-flaky-${{ matrix.platform }}
