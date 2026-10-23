@@ -55,7 +55,7 @@ import { Table } from '@clerk/mosaic/components/table';
 - `Table.ColumnGroup` renders a `<colgroup>`. Put it first inside `Table.Root`, with one column part per column.
 - `Table.Column` renders a `<col>`. Pass `width` (any CSS length) to set the column's width. A column without `width` takes the space the others leave, unless the cell in its first row sets its own width, as `Table.SelectAllCell` does.
 - `Table.Header` and `Table.Body` render `<thead>` and `<tbody>`. Rows inside the body get a top border.
-- `Table.Row` renders a `<tr>`. Pass `selected` to mark it `aria-selected` and tint it.
+- `Table.Row` renders a `<tr>`. Pass `selected` to mark it `aria-selected` and tint it. Pass `onClick` to make the whole row clickable: it gets a pointer cursor and a hover tint, and clicks on links, buttons, and other controls inside the row are left to those controls. The row is not focusable, so put a button or link with the same action in its first cell for keyboard users, and have `onClick` click that control so a dialog it opens returns focus to it on close.
 - `Table.HeaderCell` renders a `<th scope="col">`. Pass `onSort` to make it sortable: the label becomes a button with a direction icon, and `sort` (`'ascending'`, `'descending'`, or `'none'`) reflects the current direction as `aria-sort`. `align` moves the content to `'center'` or `'end'`.
 - `Table.Cell` renders a `<td>` with the same `align` prop. `noWrap` defaults to `false`; enable it to keep dates and other short values on one line.
 - `Table.HeaderCell` and `Table.Cell` take `sticky` (`'start'` or `'end'`) to pin the cell to that edge while the table scrolls horizontally. Set it on every cell in the column. A pinned cell gets an opaque background that matches its row and a fade on its inner edge.
@@ -77,7 +77,7 @@ Each part carries a stable `.cl-*` class, and the parts with state reflect it as
 | `.cl-table-column`       | `Table.Column`                            |                                                                                                                                                            |
 | `.cl-table-header`       | `Table.Header`                            |                                                                                                                                                            |
 | `.cl-table-body`         | `Table.Body`                              |                                                                                                                                                            |
-| `.cl-table-row`          | `Table.Row`                               | `data-selected` when `selected`                                                                                                                            |
+| `.cl-table-row`          | `Table.Row`                               | `data-selected` when `selected`, `data-interactive` when `onClick` is set                                                                                  |
 | `.cl-table-header-cell`  | `Table.HeaderCell`                        | `data-align` (`start` / `center` / `end`), `data-sticky` (`start` / `end`), `data-sortable` when `onSort` is set, `data-sort` (`ascending` / `descending`) |
 | `.cl-table-cell`         | `Table.Cell`                              | `data-align` (`start` / `center` / `end`), `data-sticky` (`start` / `end`), `data-no-wrap` when `noWrap`                                                   |
 | `.cl-table-select-cell`  | `Table.SelectAllCell`, `Table.SelectCell` |                                                                                                                                                            |
@@ -151,5 +151,14 @@ With `layout='fixed'`, the widths in `Table.ColumnGroup` decide the columns, so 
 
 <Story
   name='ColumnWidths'
+  storyModule={TableStories}
+/>
+
+### Clickable rows
+
+Clicking anywhere on a row opens the key's details. The name is a dialog trigger, so keyboard users reach the same dialog, and the row's `onClick` clicks that trigger, so focus returns to it when the dialog closes. The row menu still opens on its own.
+
+<Story
+  name='ClickableRows'
   storyModule={TableStories}
 />
