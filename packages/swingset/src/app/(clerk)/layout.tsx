@@ -69,6 +69,7 @@ export default function ClerkLayout({ children }: { children: ReactNode }) {
       signInFallbackRedirectUrl='/live'
       signUpFallbackRedirectUrl='/live'
       afterSignOutUrl='/live'
+      telemetry={false}
     >
       <LiveChrome userButton={<LiveUserButton />}>{children}</LiveChrome>
     </ClerkProvider>

@@ -2,9 +2,11 @@
 
 import type { ReactElement } from 'react';
 
+import { useComponentMountedTelemetry } from '../../hooks/use-component-mounted-telemetry';
 import type { SwitcherProps } from '../switcher/switcher';
 import { Switcher } from '../switcher/switcher';
 import type { OrganizationSwitcherModelOptions } from '../switcher/switcher.model';
+import { switcherTelemetry } from '../switcher/switcher.telemetry';
 import type { SwitcherMenuProps } from '../switcher/switcher.types';
 import type { SwitcherTriggerProps } from '../switcher/switcher.view';
 
@@ -60,6 +62,8 @@ export type OrganizationSwitcherProps = OrganizationSwitcherModelOptions &
  * ```
  */
 export function OrganizationSwitcher(props: OrganizationSwitcherProps = {}): ReactElement {
+  useComponentMountedTelemetry('OrganizationSwitcher', switcherTelemetry(props));
+
   return (
     <Switcher
       {...props}

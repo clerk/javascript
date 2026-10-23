@@ -19,6 +19,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { openMenu } from '../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { captureTelemetry, debugTelemetry } from '../../../__tests__/feature/telemetry';
 import { PortalProvider } from '../../../primitives/portal';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
@@ -1353,5 +1354,42 @@ describe('UserButton custom trigger badges', () => {
     expect(trigger()).not.toHaveTextContent('Acme');
     expect(trigger()).not.toHaveTextContent('Pro plan');
     expect(renderTriggerBadge).not.toHaveBeenCalled();
+  });
+});
+
+describe('UserButton telemetry', () => {
+  it('records one mount with its configuration once Clerk loads', async () => {
+    const telemetry = captureTelemetry();
+    serveFapi(signedIn());
+    await renderWithClerk(
+      tree({
+        mode: 'user',
+        userProfileUrl: '/account',
+        customMenuItems: [{ id: 'support', label: 'Support', href: '/support' }],
+        userProfileProps: { customPages: [{ url: 'https://example.com', label: 'Docs' }] },
+      }),
+      debugTelemetry,
+    );
+    await open();
+
+    expect(telemetry.mounts('UserButton')).toEqual([
+      {
+        component: 'UserButton',
+        source: 'mosaic',
+        mode: 'user',
+        triggerVariant: 'condensed',
+        userProfileMode: 'navigation',
+        organizationProfileMode: 'modal',
+        createOrganizationMode: 'modal',
+        hidePersonal: false,
+        skipInvitationScreen: false,
+        customMenuItems: 1,
+        userProfileCustomPages: 1,
+        organizationProfileCustomPages: 0,
+        customTriggerLabel: false,
+        customTriggerBadge: false,
+        fallback: false,
+      },
+    ]);
   });
 });
