@@ -10,19 +10,6 @@ import { type UpdateRequiredColors, updateRequiredColors } from './colors';
 const GOOGLE_PLAY_HOST = 'play.google.com';
 const MAX_ACTIONS_WIDTH = 320;
 
-/**
- * A full-screen view telling the user to update the app because its version is older than the minimum set in the Clerk Dashboard.
- *
- * `<ClerkProvider>` shows this view over your app automatically. To place it yourself, set `updateRequiredViewEnabled={false}` on `<ClerkProvider>` and render it while `useAppVersionSupport()` reports the app as unsupported.
- *
- * @example
- * ```tsx
- * const { isSupported } = useAppVersionSupport();
- * if (!isSupported) {
- *   return <UpdateRequiredView />;
- * }
- * ```
- */
 export function UpdateRequiredView(): JSX.Element {
   const status = useAppVersionSupport();
   const display = useSyncExternalStore(

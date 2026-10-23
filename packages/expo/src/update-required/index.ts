@@ -1,1 +1,0 @@
-export { UpdateRequiredView } from './UpdateRequiredView';

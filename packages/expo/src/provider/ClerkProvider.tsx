@@ -54,7 +54,7 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<ReactClerkProviderPro
    */
   __experimental_disableNativeClientSync?: boolean;
   /**
-   * Shows `<UpdateRequiredView />` over your app on iOS and Android when its version is older than the minimum set in the Clerk Dashboard. The view covers the whole app and can't be dismissed until the user updates. Set this to `false` to show your own UI from `useAppVersionSupport()` instead, or to place `<UpdateRequiredView />` yourself.
+   * Shows an update screen over your app on iOS and Android when its version is older than the minimum set in the Clerk Dashboard. The screen covers the whole app and can't be dismissed until the user updates. Set this to `false` to show your own UI from `useAppVersionSupport()` instead.
    *
    * @default true
    */
