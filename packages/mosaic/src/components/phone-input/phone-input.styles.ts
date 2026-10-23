@@ -3,6 +3,12 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  trigger: {
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    paddingInlineEnd: 0,
+    paddingInlineStart: space['1.5'],
+  },
   triggerContent: {
     gap: space['0.5'],
     alignItems: 'center',
@@ -29,14 +35,14 @@ export const styles = stylex.create({
   },
   prefix: {
     gap: space['2'],
-    color: colorVars['--cl-color-brand'],
+    color: colorVars['--cl-color-foreground'],
     fontVariantNumeric: 'tabular-nums',
     paddingInlineEnd: 0,
     paddingInlineStart: space['2'],
   },
   control: {
     fontVariantNumeric: 'tabular-nums',
-    paddingInlineStart: space['2'],
+    paddingInlineStart: space['1.5'],
   },
   popup: {
     borderRadius: radiusVars['--cl-radius-lg'],

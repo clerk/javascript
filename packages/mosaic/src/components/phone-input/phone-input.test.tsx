@@ -7,6 +7,22 @@ import { Field } from '../field';
 import { PhoneInput } from './phone-input';
 
 describe('Mosaic PhoneInput', () => {
+  it('opens the country picker from the keyboard and restores focus when dismissed', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+    const trigger = screen.getByRole('button', { name: 'Country, United States' });
+
+    await user.tab();
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveTextContent('🇺🇸');
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveFocus());
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('focuses the country search when opened with a pointer', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);

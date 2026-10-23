@@ -207,6 +207,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 <Button
                   size='xs'
                   shape='default'
+                  xstyle={styles.trigger}
                   {...themeProps('phone-input-country-trigger')}
                 />
               }
