@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createLoomClient, LoomClient } from '../client';
 import { parseHydration } from '../hydration';
 import { prefetchUser } from '../server';
 import { parseUser, userSnapshot } from '../user';
@@ -130,31 +129,6 @@ describe('user snapshots', () => {
     expect(() => parseHydration({ ...seed, user: { data: user, updatedAt: NaN } })).toThrow();
     expect(() => parseHydration(seed, { ...scope, sessionId: 'other' })).toThrow();
   });
-  it('fetches user without a sessions transport and reuses fresh hydration', async () => {
-    const readUser = vi.fn(() => Promise.resolve(user));
-    const client = createLoomClient({ scope, readUser });
-    expect(await client.fetchUser()).toEqual(user);
-    const hydration = client.dehydrate();
-    client.dispose();
-    const browser = createLoomClient({ scope, readUser, hydration });
-    expect(await browser.fetchUser()).toEqual(user);
-    expect(readUser).toHaveBeenCalledTimes(1);
-    await browser.refreshUser();
-    expect(readUser).toHaveBeenCalledTimes(2);
-    browser.dispose();
-  });
-  it('does not publish a user read after invalidation or disposal', async () => {
-    const pending = Promise.withResolvers<typeof user>();
-    const client = createLoomClient({ scope, readUser: () => pending.promise });
-    const result = client.fetchUser();
-    const rejected = expect(result).rejects.toBeDefined();
-    await client.invalidateUser();
-    pending.resolve(user);
-    await rejected;
-    expect(client.dehydrate()).toBeUndefined();
-    client.dispose();
-    await expect(client.fetchUser()).rejects.toThrow('disposed');
-  });
 });
 
 describe('server user prefetch', () => {
@@ -180,13 +154,9 @@ describe('server user prefetch', () => {
     expect(state?.user?.data).toEqual(user);
     expect(JSON.stringify(state)).not.toContain('secret');
   });
-});
-
-it('isolates overlapping user requests and disposes owners after success or failure', async () => {
-  const pending = Promise.withResolvers<unknown>();
-  const routing = { publishableKey: 'pk', frontendApi: 'host', domain: '' };
-  const dispose = vi.spyOn(LoomClient.prototype, 'dispose');
-  try {
+  it('isolates concurrent identities and rejects a mismatched backend user', async () => {
+    const pending = Promise.withResolvers<unknown>();
+    const routing = { publishableKey: 'pk', frontendApi: 'host', domain: '' };
     const first = prefetchUser({
       identity: { userId: 'user_a', sessionId: 'sess_a' },
       resolveBackend: () => Promise.resolve({ routing, client: { users: { getUser: () => pending.promise } } }),
@@ -200,60 +170,17 @@ it('isolates overlapping user requests and disposes owners after success or fail
         }),
     });
     pending.resolve(user);
-    expect((await first)?.user?.data).toEqual(user);
-    expect(second?.user?.data.id).toBe('user_b');
-    const failure = new Error('backend failed');
+    expect((await first)?.user?.data.firstName).toBe('Ada');
+    expect(second?.user?.data.firstName).toBe('Grace');
     await expect(
       prefetchUser({
         identity: { userId: 'user_a', sessionId: 'sess_a' },
         resolveBackend: () =>
-          Promise.resolve({ routing, client: { users: { getUser: () => Promise.reject(failure) } } }),
-      }),
-    ).rejects.toBe(failure);
-    await expect(
-      prefetchUser({
-        identity: { userId: 'user_a', sessionId: 'sess_a' },
-        resolveBackend: () =>
-          Promise.resolve({ routing, client: { users: { getUser: () => Promise.resolve({ ...user, id: 'other' }) } } }),
+          Promise.resolve({
+            routing,
+            client: { users: { getUser: () => Promise.resolve({ ...user, id: 'other' }) } },
+          }),
       }),
     ).rejects.toThrow('authenticated');
-    expect(dispose).toHaveBeenCalledTimes(4);
-  } finally {
-    dispose.mockRestore();
-  }
-});
-
-it('keeps user reads independent from session mutations and preserves separate timestamps', async () => {
-  const pending = Promise.withResolvers<typeof user>();
-  const sessions = [
-    {
-      id: 'other',
-      status: 'active',
-      expireAt: 1,
-      abandonAt: 2,
-      lastActiveAt: null,
-      hasActor: false,
-      latestActivity: { id: 'activity' },
-    },
-  ];
-  const owner = createLoomClient({
-    scope,
-    readUser: () => pending.promise,
-    transport: { read: () => Promise.resolve(sessions), revoke: () => Promise.resolve() },
-    hydration: { version: 5, scope, sessions: { data: sessions, updatedAt: 10 } },
   });
-  const result = owner.fetchUser();
-  await owner.revoke('other');
-  pending.resolve(user);
-  expect(await result).toEqual(user);
-  expect(owner.dehydrate()?.sessions?.data).toEqual([]);
-  expect(owner.dehydrate()?.user?.updatedAt).toBeGreaterThan(10);
-  owner.dispose();
-  const restored = createLoomClient({
-    scope,
-    hydration: { version: 5, scope, sessions: { data: [], updatedAt: 10 }, user: { data: user, updatedAt: 20 } },
-  });
-  expect(restored.dehydrate()?.sessions?.updatedAt).toBe(10);
-  expect(restored.dehydrate()?.user?.updatedAt).toBe(20);
-  restored.dispose();
 });

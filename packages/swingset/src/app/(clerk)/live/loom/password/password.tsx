@@ -1,7 +1,7 @@
 'use client';
 
 import type { PrefetchedProfile } from '@clerk/loom';
-import { LoomProvider } from '@clerk/loom/react';
+import { LoomProvider } from '@clerk/loom/handoff';
 import { LoomPassword } from '@clerk/mosaic/experimental/loom/loom-account-status';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useClerk, useUser } from '@clerk/nextjs';

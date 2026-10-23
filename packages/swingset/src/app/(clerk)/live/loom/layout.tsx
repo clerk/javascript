@@ -24,8 +24,8 @@ export default function LoomDemoLayout({ children }: { children: ReactNode }) {
   return (
     <main className='mx-auto flex w-full max-w-6xl flex-col gap-6 p-3 sm:p-8'>
       <LivePageHeader title={password ? 'Password with Loom' : 'User profile with Loom'}>
-        Loom streams profile data and supplies the available account actions. Mosaic handles the forms and verification
-        dialogs. ClerkJS runs authentication and account operations.
+        Loom renders the prefetched profile while ClerkJS loads. Once ready, ClerkJS owns the data and actions through
+        the ordinary Mosaic sections.
       </LivePageHeader>
       {children}
       <nav className='flex gap-4 text-sm underline'>
@@ -39,9 +39,9 @@ export default function LoomDemoLayout({ children }: { children: ReactNode }) {
           <p className='text-muted-foreground text-sm'>
             These are the executing app files. Mosaic imports are private prototype paths. The parent app layout uses
             ClerkProvider. Each client passes useClerk() directly to LoomProvider. Prefetch requires React 19 or Next
-            App Router. Loom owns streaming, cache hydration, and action availability. Each section reads data and
-            commands from one Loom hook. Mosaic keeps forms and verification dialogs; ClerkJS executes account
-            operations.
+            App Router. Loom shows a read-only snapshot, then hands each panel to the ordinary Mosaic components.
+            ClerkJS owns live data and actions. Mosaic keeps forms and verification dialogs. The selected tab survives
+            the handoff. Production SSR and rotation remain unverified.
           </p>
           {sources.map(({ name, source }) => (
             <section

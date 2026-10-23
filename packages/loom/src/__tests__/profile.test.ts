@@ -1,7 +1,5 @@
-import { QueryObserver } from '@tanstack/query-core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createLoomClient } from '../client';
 import { parseHydration } from '../hydration';
 import { parseProfileSettings, profileSettingsSnapshot } from '../profile-settings';
 import { prefetchProfile } from '../server';
@@ -297,37 +295,6 @@ it.each(['google', 'facebook', 'github'])('preserves %s errors without optional 
   ).toThrow('canonical');
 });
 
-it('refreshes only the user while preserving settings and failure data', async () => {
-  const scope = { instanceKey: 'instance', userId: 'user_a', sessionId: 'sess_a' };
-  const user = backendUserSnapshot({ raw }, 'user_a');
-  const settings = parseProfileSettings(environment);
-  const pending = Promise.withResolvers<typeof user>();
-  const readUser = vi.fn(() => pending.promise);
-  const readProfileSettings = vi.fn(() => Promise.resolve(settings));
-  const owner = createLoomClient({
-    scope,
-    readUser,
-    readProfileSettings,
-    hydration: {
-      version: 5,
-      scope,
-      user: { data: user, updatedAt: Date.now() },
-      profileSettings: { data: settings, updatedAt: Date.now() },
-    },
-  });
-  const observer = new QueryObserver(owner.queryClient, owner.userQueryOptions());
-  const stop = observer.subscribe(() => {});
-  const first = owner.invalidateUser();
-  await vi.waitFor(() => expect(readUser).toHaveBeenCalledTimes(1));
-  pending.reject(new Error('Refresh failed'));
-  await first;
-  expect(await owner.fetchProfileSettings()).toEqual(settings);
-  expect(readProfileSettings).not.toHaveBeenCalled();
-  expect(owner.queryClient.getQueryData(owner.userQueryOptions().queryKey)).toEqual(user);
-  stop();
-  owner.dispose();
-});
-
 it('validates profile hydration scope and timestamps and drops injected settings fields', () => {
   const scope = { instanceKey: 'instance', userId: 'user_a', sessionId: 'sess_a' };
   const seed = {
@@ -338,31 +305,6 @@ it('validates profile hydration scope and timestamps and drops injected settings
   expect(JSON.stringify(parseHydration(seed))).not.toContain('private');
   expect(() => parseHydration(seed, { ...scope, sessionId: 'other' })).toThrow();
   expect(() => parseHydration({ ...seed, profileSettings: { ...seed.profileSettings, updatedAt: NaN } })).toThrow();
-});
-
-it('cancels an active refresh on a second mutation instead of accepting its stale completion', async () => {
-  const scope = { instanceKey: 'instance', userId: 'user_a', sessionId: 'sess_a' };
-  const user = backendUserSnapshot({ raw }, 'user_a');
-  const stale = Promise.withResolvers<typeof user>();
-  const fresh = Promise.withResolvers<typeof user>();
-  const readUser = vi.fn().mockReturnValueOnce(stale.promise).mockReturnValueOnce(fresh.promise);
-  const owner = createLoomClient({
-    scope,
-    readUser,
-    hydration: { version: 5, scope, user: { data: user, updatedAt: Date.now() } },
-  });
-  const observer = new QueryObserver(owner.queryClient, owner.userQueryOptions());
-  const stop = observer.subscribe(() => {});
-  const first = owner.invalidateUser();
-  await vi.waitFor(() => expect(readUser).toHaveBeenCalledTimes(1));
-  const second = owner.invalidateUser();
-  await vi.waitFor(() => expect(readUser).toHaveBeenCalledTimes(2));
-  stale.resolve({ ...user, firstName: 'Old mutation' });
-  fresh.resolve({ ...user, firstName: 'Latest mutation' });
-  await Promise.all([first, second]);
-  expect(owner.dehydrate()?.user?.data.firstName).toBe('Latest mutation');
-  stop();
-  owner.dispose();
 });
 
 describe('user-ready profile prefetch', () => {

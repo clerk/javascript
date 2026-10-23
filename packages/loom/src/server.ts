@@ -222,19 +222,10 @@ export async function prefetchUser(context: ServerUserContext): Promise<LoomHydr
     return undefined;
   }
   const { client, routing } = await context.resolveBackend();
-  const owner = createLoomClient({
-    scope: createClerkScope(routing, { userId, sessionId }),
-    readUser: async () => {
-      const user = await client.users.getUser(userId);
-      return isRecord(user) && isRecord(user.raw) ? backendUserSnapshot(user, userId) : userSnapshot(user, userId);
-    },
-  });
-  try {
-    await owner.fetchUser();
-    return owner.dehydrate();
-  } finally {
-    owner.dispose();
-  }
+  const scope = createClerkScope(routing, { userId, sessionId });
+  const user = await client.users.getUser(userId);
+  const data = isRecord(user) && isRecord(user.raw) ? backendUserSnapshot(user, userId) : userSnapshot(user, userId);
+  return { version: 5, scope, user: { data, updatedAt: Date.now() } };
 }
 
 export type { PrefetchedProfile } from './types';

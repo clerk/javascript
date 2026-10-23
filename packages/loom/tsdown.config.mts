@@ -4,6 +4,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     react: 'src/react.tsx',
+    handoff: 'src/handoff.tsx',
     clerk: 'src/clerk.ts',
     server: 'src/server.ts',
     nextjs: 'src/nextjs.ts',

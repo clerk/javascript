@@ -1,5 +1,5 @@
 import { Clerk } from '@clerk/clerk-js';
-import { LoomProvider } from '@clerk/loom/react';
+import { LoomProvider } from '@clerk/loom/handoff';
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { ClerkContextProvider } from '@clerk/shared/react';
 import { render, screen, within } from '@testing-library/react';

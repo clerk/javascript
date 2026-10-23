@@ -1,24 +1,12 @@
-import { useEnterpriseConnections, useSuspenseProfile } from '@clerk/loom/react';
+import { useProfileSnapshot } from '@clerk/loom/handoff';
 
-import { useUserProfileOptions } from '../../features/user-profile/user-profile.provider';
 import { projectEnterpriseAccounts } from '../../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.model';
-import type {
-  UserProfileEnterpriseAccount,
-  UserProfileEnterpriseConnection,
-} from '../../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.types';
+import type { UserProfileEnterpriseAccount } from '../../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.types';
 
-export type LoomEnterpriseState = {
-  userId: string;
-  accounts: UserProfileEnterpriseAccount[];
-  connections: UserProfileEnterpriseConnection[];
-  connectionsStatus: 'ready' | 'loading' | 'unavailable';
-  connect?: (id: string) => Promise<'redirecting'>;
-};
+export type LoomEnterpriseState = { accounts: UserProfileEnterpriseAccount[] };
 
 export function useLoomProfileEnterpriseModel(): LoomEnterpriseState | null {
-  const { mode } = useUserProfileOptions();
-  const { user, settings, actions } = useSuspenseProfile({ mode: mode === 'modal' ? 'modal' : 'navigation' });
-  const choices = useEnterpriseConnections(settings.enterpriseSsoEnabled);
+  const { user, settings } = useProfileSnapshot();
   if (!settings.enterpriseSsoEnabled) {
     return null;
   }
@@ -40,20 +28,6 @@ export function useLoomProfileEnterpriseModel(): LoomEnterpriseState | null {
         : null,
     };
   });
-  const projection = projectEnterpriseAccounts({
-    enabled: true,
-    accounts,
-    connections: choices.data ?? [],
-  });
-  const connectionsStatus = choices.isError ? 'unavailable' : choices.data ? 'ready' : 'loading';
-  if (projection.status === 'hidden' && connectionsStatus === 'ready') {
-    return null;
-  }
-  return {
-    userId: user.id,
-    accounts: projection.status === 'ready' ? projection.accounts : [],
-    connections: projection.status === 'ready' ? projection.connections : [],
-    connectionsStatus,
-    connect: connectionsStatus === 'ready' && actions.enterprise.available ? actions.enterprise.connect : undefined,
-  };
+  const projection = projectEnterpriseAccounts({ enabled: true, accounts, connections: [] });
+  return projection.status === 'hidden' ? null : { accounts: projection.accounts };
 }

@@ -11,34 +11,11 @@ export class BootstrapClient extends LoomClient {
       scope: hydration.scope,
       hydration,
       transport: { read: unavailable, revoke: unavailable },
-      readUser: unavailable,
-      readProfileSettings: unavailable,
     });
   }
 
   override queryOptions() {
     return { ...super.queryOptions(), staleTime: Infinity, gcTime: Infinity };
-  }
-
-  override userQueryOptions() {
-    return { ...super.userQueryOptions(), staleTime: Infinity, gcTime: Infinity };
-  }
-
-  override profileSettingsQueryOptions() {
-    return { ...super.profileSettingsQueryOptions(), staleTime: Infinity, gcTime: Infinity };
-  }
-
-  override fetchUser(): Promise<never> {
-    return Promise.reject(new Error('Loom is waiting for Clerk.'));
-  }
-  override prefetchUser(): Promise<never> {
-    return Promise.reject(new Error('Loom is waiting for Clerk.'));
-  }
-  override refreshUser(): Promise<never> {
-    return Promise.reject(new Error('Loom is waiting for Clerk.'));
-  }
-  override invalidateUser(): Promise<never> {
-    return Promise.reject(new Error('Loom is waiting for Clerk.'));
   }
 
   override fetch(): Promise<never> {

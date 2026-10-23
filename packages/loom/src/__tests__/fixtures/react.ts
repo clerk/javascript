@@ -1,10 +1,8 @@
 import { vi } from 'vitest';
 
 import type { ClerkSessionsHost } from '../../clerk';
-import { throwResponseError } from '../../fapi';
 import { createClerkScope } from '../../scope';
 import type { LoomHydration } from '../../types';
-import { parseUser } from '../../user';
 
 export function clerkHost() {
   const resourceListeners = new Set<() => void>();
@@ -34,13 +32,6 @@ export function clerkHost() {
     user: null,
     session: null,
     getFapiClient: () => ({ request }),
-    __internal_readUser: async ({ userId, sessionId, signal }) => {
-      const response = await request({ method: 'GET', path: '/me', sessionId, signal });
-      if (!response.ok) {
-        throwResponseError(response);
-      }
-      return parseUser(response.payload, userId);
-    },
     addListener: listener => {
       resourceListeners.add(listener);
       return () => {

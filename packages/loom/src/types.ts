@@ -23,13 +23,6 @@ export type SessionsTransport = Readonly<{
   revoke: (id: string, signal: AbortSignal) => Promise<void>;
 }>;
 
-export type EnterpriseConnection = Readonly<{
-  id: string;
-  name: string;
-  allowOrganizationAccountLinking: boolean;
-  logoPublicUrl: string | null;
-}>;
-
 export type UserSnapshot = Readonly<{
   id: string;
   firstName: string | null;
@@ -96,8 +89,6 @@ export type UserSnapshot = Readonly<{
     verification: UserVerification | null;
   }>[];
 }>;
-
-export type UserNameInput = Readonly<{ firstName: string; lastName: string }>;
 
 export type LoomHydration = Readonly<{
   version: 5;
