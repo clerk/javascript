@@ -169,10 +169,10 @@ export function createNativeClientSync(
   publishableKey: string,
   proxyUrl: string | null,
   getUserTokenCache: () => TokenCache | undefined,
-  nativeUpdateRequiredViewEnabled = true,
+  getNativeUpdateRequiredViewEnabled: () => boolean = () => true,
 ) {
   const fallback = () => getUserTokenCache() ?? MemoryTokenCache;
-  const ready = () => configureOnce(native, publishableKey, proxyUrl, fallback(), nativeUpdateRequiredViewEnabled);
+  const ready = () => configureOnce(native, publishableKey, proxyUrl, fallback(), getNativeUpdateRequiredViewEnabled());
   let mirroredToken: string | null = null;
   let lastFingerprint: string | undefined;
   let refreshFailure: { error: unknown } | null = null;

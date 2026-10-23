@@ -72,9 +72,13 @@ describe('createNativeClientSync', () => {
     const native = { ...nativeModule(), setUpdateRequiredViewEnabled: vi.fn().mockResolvedValue(undefined) };
     const cache = userTokenCache(vi.fn().mockResolvedValue(null));
 
-    await createNativeClientSync(native, 'pk_test_123', null, () => cache, false).tokenCache.getToken(
-      CLERK_CLIENT_JWT_KEY,
-    );
+    await createNativeClientSync(
+      native,
+      'pk_test_123',
+      null,
+      () => cache,
+      () => false,
+    ).tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
 
     expect(native.setUpdateRequiredViewEnabled).toHaveBeenCalledWith(false);
     expect(vi.mocked(native.setUpdateRequiredViewEnabled).mock.invocationCallOrder[0]).toBeLessThan(
@@ -101,9 +105,13 @@ describe('createNativeClientSync', () => {
     };
     const cache = userTokenCache(vi.fn().mockResolvedValue(null));
 
-    await createNativeClientSync(native, 'pk_test_123', null, () => cache, false).tokenCache.getToken(
-      CLERK_CLIENT_JWT_KEY,
-    );
+    await createNativeClientSync(
+      native,
+      'pk_test_123',
+      null,
+      () => cache,
+      () => false,
+    ).tokenCache.getToken(CLERK_CLIENT_JWT_KEY);
 
     expect(native.configureNative).toHaveBeenCalledWith('pk_test_123', null, null);
   });
