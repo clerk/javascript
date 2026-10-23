@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   triggerStart: {
@@ -105,25 +105,62 @@ export const styles = stylex.create({
       color: colorVars['--cl-color-foreground-secondary'],
     },
   },
+  countryList: {
+    gap: space['0.5'],
+    paddingBlock: space['0.5'],
+    paddingInline: space['1'],
+  },
   option: {
-    paddingInlineStart: `calc(${space['1']} + 1px)`,
+    gap: space['1'],
+    paddingBlock: space['1'],
+    backgroundColor: {
+      default: null,
+      ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
+      '@media (hover: hover)': {
+        ':hover': colorVars['--cl-color-neutral-alpha-100'],
+      },
+    },
+    color: {
+      default: colorVars['--cl-color-foreground-secondary'],
+      ':where([data-active])': colorVars['--cl-color-foreground'],
+    },
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    fontWeight: fontWeightVars['--cl-font-normal'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    paddingInlineEnd: space['1.5'],
+    paddingInlineStart: space['1'],
+    height: space['8'],
+  },
+  optionFlag: {
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    height: space['5'],
+    width: space['5'],
   },
   optionName: {
+    padding: space['0.5'],
     overflow: 'hidden',
     flexGrow: 1,
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    height: space['6'],
     minWidth: 0,
   },
   optionCode: {
+    alignItems: 'center',
     color: colorVars['--cl-color-foreground-secondary'],
-    flexShrink: 0,
-    fontVariantNumeric: 'tabular-nums',
-    whiteSpace: 'nowrap',
-  },
-  indicatorSlot: {
     display: 'flex',
     flexShrink: 0,
-    width: space['3'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontVariantNumeric: 'tabular-nums',
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    justifyContent: 'flex-end',
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    whiteSpace: 'nowrap',
+    height: space['5'],
+    minWidth: space['5'],
+    width: 'max-content',
   },
 });

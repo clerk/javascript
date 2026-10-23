@@ -289,7 +289,10 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                   />
                 </label>
               </Field.Root>
-              <Combobox.List {...themeProps('phone-input-country-list')}>
+              <Combobox.List
+                {...themeProps('phone-input-country-list')}
+                xstyle={styles.countryList}
+              >
                 {filteredCountries.length > 0 ? (
                   filteredCountries.map(option => (
                     <Combobox.Option
@@ -301,15 +304,12 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                     >
                       <span
                         aria-hidden='true'
-                        {...stylex.props(reset.base, styles.flag)}
+                        {...stylex.props(reset.base, styles.optionFlag)}
                       >
-                        {getFlagEmojiFromCountryIso(option.iso)}
+                        <span {...stylex.props(reset.base, styles.flag)}>{getFlagEmojiFromCountryIso(option.iso)}</span>
                       </span>
                       <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
                       <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
-                      <span {...stylex.props(styles.indicatorSlot)}>
-                        <Combobox.OptionIndicator />
-                      </span>
                     </Combobox.Option>
                   ))
                 ) : (
