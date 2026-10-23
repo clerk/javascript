@@ -417,7 +417,8 @@ function OTPPanel({
         resend={
           renderResend
             ? {
-                label: isResending ? 'Sending a new code…' : 'Didn’t receive a code? Resend',
+                text: 'Didn’t receive a code?',
+                label: isResending ? 'Sending a new code…' : 'Resend',
                 disabled: isResending,
                 onClick: () => setValue(''),
               }
