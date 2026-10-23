@@ -44,7 +44,10 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
               }
             >
               <Item.Media>
-                <IconFrame filled>
+                <IconFrame
+                  filled
+                  bordered={false}
+                >
                   <Icon glyph={icons[type]} />
                 </IconFrame>
               </Item.Media>

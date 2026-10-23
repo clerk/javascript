@@ -55,6 +55,7 @@ export function UserProfileWeb3WalletRowView({
         {wallet.provider ? (
           <UserProfileProviderMedia
             provider={wallet.provider}
+            iconId={wallet.iconId}
             iconUrl={wallet.iconUrl}
             monochromeIcon={wallet.monochromeIcon}
           />
