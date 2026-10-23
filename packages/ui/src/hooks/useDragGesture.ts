@@ -4,8 +4,7 @@ import { useEffect, useRef } from 'react';
 
 const DRAG_THRESHOLD = 5;
 let activeDrags = 0;
-let userSelect = '';
-let webkitUserSelect = '';
+let originalSelection: Pick<CSSStyleDeclaration, 'userSelect' | 'webkitUserSelect'>;
 
 export type Point = { x: number; y: number };
 
@@ -52,10 +51,8 @@ export const useDragGesture = ({
         element.setPointerCapture(pointerId);
         dragging = true;
         if (++activeDrags === 1) {
-          userSelect = bodyStyle.userSelect;
-          webkitUserSelect = bodyStyle.webkitUserSelect;
-          bodyStyle.userSelect = 'none';
-          bodyStyle.webkitUserSelect = 'none';
+          originalSelection = { userSelect: bodyStyle.userSelect, webkitUserSelect: bodyStyle.webkitUserSelect };
+          bodyStyle.userSelect = bodyStyle.webkitUserSelect = 'none';
         }
         onDragStart?.();
       }
@@ -78,8 +75,7 @@ export const useDragGesture = ({
         element.releasePointerCapture(pointerId);
       }
       if (--activeDrags === 0) {
-        bodyStyle.userSelect = userSelect;
-        bodyStyle.webkitUserSelect = webkitUserSelect;
+        Object.assign(bodyStyle, originalSelection);
       }
       const onEnd = endEvent && endEvent.type === 'pointerup' ? onDragEnd : onDragCancel || onDragEnd;
       onEnd?.();
