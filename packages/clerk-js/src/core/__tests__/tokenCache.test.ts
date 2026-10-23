@@ -766,6 +766,52 @@ describe('SessionTokenCache', () => {
       expect(onRefresh).toHaveBeenCalledTimes(1);
     });
 
+    it('stops serving a token early, not late, when the device clock is ahead', async () => {
+      const deviceLead = 30;
+      const freshRaw = createJwtWithOiat(deviceNow - deviceLead, deviceNow - deviceLead, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(freshRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeDefined();
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('keeps the fresher token expiry when a later fetch resolves with a staler token', async () => {
+      const fresherRaw = createJwtWithOiat(deviceNow - 10, deviceNow - 10, 60);
+      const stalerRaw = createJwtWithOiat(deviceNow - 50, deviceNow - 50, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(fresherRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(stalerRaw)) });
+      await tick();
+
+      vi.advanceTimersByTime(20 * 1000);
+      expect(SessionTokenCache.get({ tokenId })?.entry.resolvedToken?.getRawString()).toBe(fresherRaw);
+
+      vi.advanceTimersByTime(6 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
+    it('does not extend expiry when the same token is cached again on a synced clock', async () => {
+      const raw = createJwtWithOiat(deviceNow, deviceNow, 60);
+
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(raw)) });
+      await tick();
+
+      vi.advanceTimersByTime(30 * 1000);
+      SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(makeToken(raw)) });
+      await tick();
+
+      vi.advanceTimersByTime(26 * 1000);
+      expect(SessionTokenCache.get({ tokenId })).toBeUndefined();
+    });
+
     it('does not extend an aged token to a full lifetime from cache insert', async () => {
       const agedRaw = createJwtWithOiat(deviceNow - 40, deviceNow - 40, 60);
 
