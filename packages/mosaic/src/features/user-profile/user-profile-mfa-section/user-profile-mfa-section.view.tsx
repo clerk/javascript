@@ -3,7 +3,6 @@ import type { ReactNode, Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { ReverificationDialog } from '../../../blocks/reverification';
-import type { ActionMenuAction } from '../../../components/action-menu';
 import { Section } from '../../../components/section';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
@@ -22,9 +21,8 @@ export interface UserProfileMfaSectionViewProps {
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
-  regenerateProgress?: ActionMenuAction['progress'];
-  regenerateError?: string;
   onRegenerateBackupCodes?: () => void;
+  regenerateError?: string;
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
   removeReverification?: ReverificationController;
@@ -38,7 +36,6 @@ export function UserProfileMfaSectionView({
   addControl,
   onAdd,
   onRegenerateBackupCodes,
-  regenerateProgress,
   regenerateError,
   onRemove,
   onSetDefault,
@@ -85,19 +82,7 @@ export function UserProfileMfaSectionView({
             triggerRef={controller.registerTrigger(method.id)}
             onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}
-            defaultProgress={
-              controller.pendingDefaultId === method.id
-                ? setDefaultReverification?.visible
-                  ? 'handoff'
-                  : 'pending'
-                : 'idle'
-            }
-            disabled={
-              (controller.pendingDefaultId !== undefined && controller.pendingDefaultId !== method.id) ||
-              (regenerateProgress === 'pending' && method.type !== 'backup-codes')
-            }
             onRegenerateBackupCodes={onRegenerateBackupCodes}
-            regenerateProgress={regenerateProgress}
           />
         ))}
       </UserProfileSecurityList>

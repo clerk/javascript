@@ -43,7 +43,6 @@ export function useUserProfilePhoneSectionController({
     verification,
     error: verify.error ?? setPrimary.error,
     pendingVerifyId: verify.pendingKey,
-    pendingPrimaryId: setPrimary.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemovePhone ? remove : undefined,

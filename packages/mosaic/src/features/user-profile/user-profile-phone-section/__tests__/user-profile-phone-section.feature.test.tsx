@@ -498,11 +498,9 @@ describe('phone reverification', () => {
 
     await manage(actor, WORK_LABEL, 'Set as primary');
     await waitFor(() => expect(start.requests).toHaveLength(1));
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(within(row()).getByText(WORK_LABEL)).toBeVisible();
     expect(screen.queryByRole('dialog')).toBeNull();
-    const selected = screen.getByRole('menuitem', { name: 'Set as primary' });
-    expect(selected).toHaveAttribute('aria-busy', 'true');
-    expect(await within(selected).findByRole('progressbar')).toBeVisible();
-    expect(screen.getByRole('menuitem', { name: 'Remove phone number' })).toHaveAttribute('aria-disabled', 'true');
 
     start.release();
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
@@ -545,7 +543,7 @@ it('keeps Send code pending until phone verification is ready', async () => {
   }
 });
 
-it('keeps an existing phone Verify pending and focuses the prepared code field', async () => {
+it('keeps the profile visible until phone verification is ready and focuses the code field', async () => {
   const pending = fapiPhoneNumber({
     id: 'idn_pending',
     phone_number: '+18015550199',
@@ -556,7 +554,8 @@ it('keeps an existing phone Verify pending and focuses the prepared code field',
   try {
     await manage(actor, WORK_LABEL, 'Verify phone number');
     await waitFor(() => expect(prepare.requests).toHaveLength(1));
-    expect(screen.getByRole('menuitem', { name: 'Verify phone number' })).toHaveAttribute('aria-busy', 'true');
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    expect(within(row()).getByText(WORK_LABEL)).toBeVisible();
     expect(screen.getByRole('button', { name: 'Add phone number' })).toBeDisabled();
     expect(screen.queryByRole('dialog')).toBeNull();
     prepare.release();

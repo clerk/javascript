@@ -1,17 +1,14 @@
-import { type Ref, useState } from 'react';
+import type { Ref } from 'react';
 
-import { useSpinDelay } from '../../hooks/use-spin-delay';
 import type { IconComponent } from '../../icons/glyph';
 import { Icon } from '../icon';
 import { Menu } from '../menu';
-import { Spinner } from '../spinner';
 
 export interface ActionMenuAction {
   label: string;
   color?: 'neutral' | 'negative';
   icon?: IconComponent;
   onClick: () => void;
-  progress?: 'idle' | 'pending' | 'handoff';
 }
 
 export interface ActionMenuProps {
@@ -23,31 +20,12 @@ export interface ActionMenuProps {
 }
 
 export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhenDisabled }: ActionMenuProps) {
-  const [open, setOpen] = useState(false);
-  const [activated, setActivated] = useState(false);
-  const pending = actions.some(action => action.progress === 'pending');
-  const handoff = actions.some(action => action.progress === 'handoff');
-  const showSpinner = useSpinDelay(pending ? true : null);
-
-  if (activated && !pending) {
-    setActivated(false);
-    setOpen(false);
-  }
-
   if (actions.length === 0) {
     return null;
   }
 
   return (
-    <Menu.Root
-      placement='bottom-end'
-      open={open && !handoff}
-      onOpenChange={nextOpen => {
-        if (!pending && !handoff) {
-          setOpen(nextOpen);
-        }
-      }}
-    >
+    <Menu.Root placement='bottom-end'>
       <Menu.Trigger
         ref={triggerRef}
         aria-label={label}
@@ -60,15 +38,8 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
             key={action.label}
             color={action.color}
             label={action.label}
-            onClick={() => {
-              if (action.progress !== undefined) {
-                setActivated(true);
-              }
-              action.onClick();
-            }}
-            closeOnClick={action.progress === undefined}
-            aria-busy={action.progress === 'pending' || undefined}
-            disabled={disabled || pending || handoff}
+            onClick={action.onClick}
+            disabled={disabled}
           >
             {action.icon ? (
               <Menu.Media>
@@ -76,14 +47,6 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
               </Menu.Media>
             ) : null}
             <Menu.Label>{action.label}</Menu.Label>
-            {action.progress === 'pending' && showSpinner ? (
-              <Spinner
-                size='sm'
-                role='progressbar'
-                aria-hidden={undefined}
-                aria-label={action.label}
-              />
-            ) : null}
           </Menu.Item>
         ))}
       </Menu.Popup>

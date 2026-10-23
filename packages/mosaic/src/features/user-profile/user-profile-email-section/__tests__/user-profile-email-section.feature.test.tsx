@@ -139,12 +139,11 @@ describe('the user profile email section', () => {
       try {
         await manageEmail(actor, 'pending@example.com', 'Verify');
         await waitFor(() => expect(prepare.requests).toHaveLength(1));
-        const action = screen.getByRole('menuitem', { name: 'Verify' });
         const add = screen.getByRole('button', { name: 'Add email' });
         expect(add).toBeDisabled();
         await actor.click(add);
-        expect(screen.queryByRole('dialog')).toBeNull();
-        expect(action).toHaveAttribute('aria-busy', 'true');
+        expect(screen.queryByRole('menu')).toBeNull();
+        expect(within(emailRow()).getByText('pending@example.com')).toBeVisible();
         expect(screen.queryByRole('dialog')).toBeNull();
         prepare.release();
         await screen.findByRole('dialog');
@@ -477,7 +476,7 @@ describe('email reverification', () => {
   });
 
   it.each(['pointer', 'keyboard'])(
-    'keeps the %s action pending in its menu until verification is ready',
+    'keeps the profile visible after the %s primary action until verification is ready',
     async input => {
       const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
       const { actor } = await renderSection({
@@ -497,23 +496,15 @@ describe('email reverification', () => {
           await actor.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
         }
         await waitFor(() => expect(mutation.requests).toHaveLength(1));
-        const selected = screen.getByRole('menuitem', { name: 'Set as primary' });
-        expect(selected).toHaveAttribute('aria-busy', 'true');
-        expect(selected).toHaveFocus();
-        expect(await within(selected).findByRole('progressbar')).toBeVisible();
-        const remove = screen.getByRole('menuitem', { name: 'Remove email' });
-        expect(remove).toHaveAttribute('aria-disabled', 'true');
-        await actor.keyboard('{Enter}{Escape}');
-        await actor.click(selected);
-        await actor.click(remove);
-        await actor.click(screen.getByRole('heading', { name: 'Email' }));
-        expect(screen.getByRole('menu')).toBeVisible();
+        expect(screen.queryByRole('menu')).toBeNull();
+        expect(within(emailRow()).getByText('bob@example.com')).toBeVisible();
         expect(screen.queryByRole('alertdialog')).toBeNull();
+        expect(screen.queryByRole('dialog')).toBeNull();
         expect(mutation.requests).toHaveLength(1);
 
         mutation.release();
         await waitFor(() => expect(start.requests).toHaveLength(1));
-        expect(screen.getByRole('menu')).toBeVisible();
+        expect(within(emailRow()).getByText('bob@example.com')).toBeVisible();
         expect(screen.queryByRole('dialog')).toBeNull();
         start.release();
 
@@ -529,7 +520,7 @@ describe('email reverification', () => {
     },
   );
 
-  it('closes the pending menu and shows the section error when the primary action fails', async () => {
+  it('shows the section error when the primary action fails after closing the menu', async () => {
     const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
     const { actor } = await renderSection(signedInWithEmails([PRIMARY, second]));
     const mutation = holdRequests('post', '/v1/me');
@@ -538,7 +529,8 @@ describe('email reverification', () => {
     try {
       await manageEmail(actor, 'bob@example.com', 'Set as primary');
       await waitFor(() => expect(mutation.requests).toHaveLength(1));
-      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(within(emailRow()).getByText('bob@example.com')).toBeVisible();
       mutation.fail('action_blocked', 'Unable to set primary address.');
       await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
       await waitFor(() =>

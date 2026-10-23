@@ -23,7 +23,6 @@ export function UserProfilePhoneSectionView({
   verificationFinalFocus,
   setPrimaryReverification,
   setPrimaryFinalFocus,
-  pendingPrimaryId,
   pendingVerifyId,
   onVerify,
   onSetPrimary,
@@ -62,10 +61,6 @@ export function UserProfilePhoneSectionView({
         addAction={addPhoneAction}
         onRemove={remove ? phone => remove.open(phone) : undefined}
         onSetPrimary={onSetPrimary}
-        pendingPrimaryId={pendingPrimaryId}
-        pendingVerifyId={pendingVerifyId}
-        verificationReadyId={verification.open ? verification.verifyingId : undefined}
-        primaryChallengeVisible={setPrimaryReverification.visible}
         onVerify={onVerify}
       >
         <Section.Error>{error}</Section.Error>

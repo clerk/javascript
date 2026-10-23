@@ -59,7 +59,6 @@ export function useUserProfileMfaSectionLeafController({
     finalRemovalFocus: removalFocus.finalFocus,
     setDefaultFinalFocus: () => (defaultAction.lastKey ? removalFocus.trigger(defaultAction.lastKey) : null),
     defaultError: defaultAction.error,
-    pendingDefaultId: defaultAction.pendingKey,
-    setDefault: onSetDefault ? setDefault : undefined,
+    setDefault: onSetDefault && !defaultAction.isPending ? setDefault : undefined,
   };
 }

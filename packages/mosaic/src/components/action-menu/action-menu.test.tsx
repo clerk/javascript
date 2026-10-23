@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -37,18 +37,6 @@ describe('Mosaic ActionMenu', () => {
 
     expect(onClick).toHaveBeenCalledOnce();
   });
-  it('closes a progress action that settles before pending renders', async () => {
-    const onClick = vi.fn();
-    const user = userEvent.setup();
-    renderMenu([{ label: 'Make default', progress: 'idle', onClick }]);
-
-    await user.click(screen.getByRole('button', { name: 'Manage passkey' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Make default' }));
-
-    expect(onClick).toHaveBeenCalledOnce();
-    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
-  });
-
   it('keeps a disabled trigger focusable without allowing pointer or keyboard activation', async () => {
     const onClick = vi.fn();
     render(

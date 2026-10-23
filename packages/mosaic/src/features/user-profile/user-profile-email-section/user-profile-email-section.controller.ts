@@ -42,7 +42,6 @@ export function useUserProfileEmailSectionController({
     verification,
     error: verify.error ?? setPrimary.error,
     pendingVerifyId: verify.pendingKey,
-    pendingPrimaryId: setPrimary.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemoveEmail ? remove : undefined,

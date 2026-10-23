@@ -42,6 +42,8 @@ interface MfaContext {
   dismissed: boolean;
   resendSeconds: number;
   run: () => Promise<MfaFlow>;
+  resolve: () => void;
+  reject: (error: unknown) => void;
 }
 
 type MfaEvent =
@@ -61,7 +63,7 @@ type MfaEvent =
   | { type: 'PHONE_RESOLVED'; id: string; phoneNumber: string }
   | { type: 'PRINT_FAILED' }
   | { type: 'TICK' }
-  | { type: 'RUN'; key: MfaAction; run: () => Promise<MfaFlow> };
+  | { type: 'RUN'; key: MfaAction; run: () => Promise<MfaFlow>; resolve: () => void; reject: (error: unknown) => void };
 
 const { createMachine, assign, fromPromise } = setup<MfaContext, MfaEvent>();
 const RESEND_COOLDOWN_SECONDS = 30;
@@ -76,6 +78,8 @@ const mfaMachine = createMachine({
     dismissed: false,
     resendSeconds: 0,
     run: () => Promise.resolve({ kind: 'closed' }),
+    resolve: () => undefined,
+    reject: () => undefined,
   },
   states: {
     idle: {
@@ -178,6 +182,8 @@ const mfaMachine = createMachine({
             pending: event.key,
             dismissed: false,
             run: event.run,
+            resolve: event.resolve,
+            reject: event.reject,
           })),
         },
       },
@@ -209,6 +215,7 @@ const mfaMachine = createMachine({
         onDone: {
           target: 'idle',
           actions: [
+            context => context.resolve(),
             assign<DoneInvokeEvent<MfaFlow>>((context, event) => {
               if (context.dismissed && event.output.kind !== 'backup') {
                 return { pending: undefined, dismissed: false };
@@ -235,6 +242,7 @@ const mfaMachine = createMachine({
         onError: {
           target: 'idle',
           actions: [
+            (context, event) => context.reject(event.error),
             assign((context, event) => {
               const flow = context.flow;
               if (context.dismissed) {
@@ -257,7 +265,7 @@ const mfaMachine = createMachine({
 });
 
 type MfaSend = (event: MfaEvent) => void;
-type RunMfaAction = (key: MfaAction, action: () => Promise<MfaFlow>) => void;
+type RunMfaAction = (key: MfaAction, action: () => Promise<MfaFlow>) => Promise<void>;
 
 function createAuthenticatorActions(model: ReadyModel, flow: MfaFlow, run: RunMfaAction) {
   const prepareAuthenticator = () => {
@@ -265,10 +273,10 @@ function createAuthenticatorActions(model: ReadyModel, flow: MfaFlow, run: RunMf
     if (!createAuthenticator) {
       return;
     }
-    run('prepareAuthenticator', async () => {
+    void run('prepareAuthenticator', async () => {
       const setup = await createAuthenticator();
       return { kind: 'authenticator', setup, code: '' };
-    });
+    }).catch(() => undefined);
   };
 
   const verifyAuthenticator = (code: string) => {
@@ -276,10 +284,10 @@ function createAuthenticatorActions(model: ReadyModel, flow: MfaFlow, run: RunMf
     if (!verify || flow.kind !== 'authenticator') {
       return;
     }
-    run('verifyAuthenticator', async () => {
+    void run('verifyAuthenticator', async () => {
       const result = await verify(code);
       return result.backupCodes.length ? { kind: 'backup', codes: result.backupCodes } : { kind: 'closed' };
-    });
+    }).catch(() => undefined);
   };
 
   return { prepareAuthenticator, verifyAuthenticator };
@@ -293,7 +301,7 @@ function createSmsActions(model: ReadyModel, flow: MfaFlow, resendSeconds: numbe
       return;
     }
     const current = flow;
-    run('sms', async () => {
+    void run('sms', async () => {
       let phoneId = current.step === 'phone' ? current.phoneId : (current.phoneId ?? current.selectedPhoneId);
       if (!phoneId) {
         if (current.step !== 'phone' || !findOrCreatePhone) {
@@ -310,7 +318,7 @@ function createSmsActions(model: ReadyModel, flow: MfaFlow, resendSeconds: numbe
       return result.status === 'complete' && result.backupCodes.length
         ? { kind: 'backup', codes: result.backupCodes }
         : { kind: 'closed' };
-    });
+    }).catch(() => undefined);
   };
 
   const resendSms = () => {
@@ -319,10 +327,10 @@ function createSmsActions(model: ReadyModel, flow: MfaFlow, resendSeconds: numbe
       return;
     }
     const current = flow;
-    run('resend', async () => {
+    void run('resend', async () => {
       await resend(current.phoneId ?? '');
       return { ...current, error: undefined };
-    });
+    }).catch(() => undefined);
   };
 
   return { submitSms, resendSms };
@@ -341,10 +349,10 @@ function createBackupCodeActions(
     if (!generate) {
       return;
     }
-    run('generate', async () => {
+    void run('generate', async () => {
       const codes = await generate();
       return { kind: 'backup', codes };
-    });
+    }).catch(() => undefined);
   };
 
   const copy = () => {
@@ -352,10 +360,10 @@ function createBackupCodeActions(
       return;
     }
     const codes = flow.codes;
-    run('copy', async () => {
+    void run('copy', async () => {
       await navigator.clipboard.writeText(codes.join('\n'));
       return { kind: 'closed' };
-    });
+    }).catch(() => undefined);
   };
 
   const download = () => {
@@ -499,7 +507,12 @@ export function useUserProfileMfaController(model: ReadyModel) {
   const [{ context, value }, send] = useMachine(mfaMachine);
   const isBusy = value === 'busy';
   const run: RunMfaAction = (key, action) => {
-    send({ type: 'RUN', key, run: action });
+    if (isBusy) {
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve, reject) => {
+      send({ type: 'RUN', key, run: action, resolve, reject });
+    });
   };
   const { resendSeconds } = context;
   const flow = context.flow;
@@ -568,12 +581,6 @@ export function useUserProfileMfaController(model: ReadyModel) {
     methods: [...model.methods],
     addableMethods: model.addableMethods,
     onRegenerateBackupCodes: model.generateBackupCodes ? generateBackupCodes : undefined,
-    regenerateProgress:
-      flow.kind === 'backup' || (context.pending === 'generate' && model.backupCodesReverification.visible)
-        ? 'handoff'
-        : context.pending === 'generate'
-          ? 'pending'
-          : 'idle',
     regenerateError: flow.kind === 'closed' && flow.error ? errorText(flow.error) : undefined,
     onRemove: model.remove,
     onSetDefault: model.setDefault,

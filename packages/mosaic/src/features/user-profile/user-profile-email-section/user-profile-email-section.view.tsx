@@ -22,7 +22,6 @@ export function UserProfileEmailSectionView({
   verificationFinalFocus,
   setPrimaryReverification,
   setPrimaryFinalFocus,
-  pendingPrimaryId,
   pendingVerifyId,
   onVerify,
   onSetPrimary,
@@ -61,10 +60,6 @@ export function UserProfileEmailSectionView({
         addAction={addEmailAction}
         onRemove={remove ? email => remove.open(email) : undefined}
         onSetPrimary={onSetPrimary}
-        pendingPrimaryId={pendingPrimaryId}
-        pendingVerifyId={pendingVerifyId}
-        verificationReadyId={verification.open ? verification.verifyingId : undefined}
-        primaryChallengeVisible={setPrimaryReverification.visible}
         onVerify={onVerify}
       >
         <Section.Error>{error}</Section.Error>
