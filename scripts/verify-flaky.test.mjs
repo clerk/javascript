@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { flakesFromReport, flakyMessage, main, normalizeError } from './verify-flaky.mjs';
+import { flakesFromReport, flakyPayload, main, normalizeError } from './verify-flaky.mjs';
 
 const signedInError = (name, user, launch, session, passes = 2) =>
   `the app did not show "Signed in as ${name}+clerk_test@example.com" with user ID ${user} and a session ID on the home after launch ${launch}; it shows its error screen: Something went wrong No session was found with id ${session}; passes: ${passes}; reads: ${passes * 2}, the slowest ${passes * 70}ms (the heading)`;
@@ -103,43 +103,75 @@ describe('normalizeError', () => {
   });
 });
 
-describe('flakyMessage', () => {
-  it('is empty when no test was flaky', () => {
-    expect(flakyMessage([])).toBe('');
-    expect(flakyMessage([{ runUrl: runUrl(1), commit: null, flakes: [] }])).toBe('');
+const section = text => ({ type: 'section', text: { type: 'mrkdwn', text } });
+
+describe('flakyPayload', () => {
+  it('is null when no test was flaky', () => {
+    expect(flakyPayload([])).toBeNull();
+    expect(flakyPayload([{ runUrl: runUrl(1), commit: null, flakes: [] }])).toBeNull();
   });
 
-  it('lists each flaky test once with its platforms and its first error, and links the run', () => {
+  it('gives each flaky test its own block with its platforms and first error, after a header that links the run', () => {
     const profile = flake({
       file: 'specs/features/user-button-and-profile/profile.e2e.ts',
       title: 'the home sign-out button ends the session',
       error: 'a <b> & c',
     });
-    const message = flakyMessage([
+    const payload = flakyPayload([
       { runUrl: runUrl(1), commit: null, flakes: [profile, flake()] },
       { runUrl: runUrl(1), commit: null, flakes: [flake({ platform: 'ios' })] },
     ]);
 
-    expect(message).toBe(
-      [
-        `:warning: Expo E2E had 2 flaky tests on the Version packages pull request · <${runUrl(1)}|View the run>`,
-        '• `native-js-sync/sign-out-from-native.e2e.ts` signing out in the native profile signs out the JS hooks · android, ios',
-        '  first attempt failed: No session was found with id sess_&lt;id&gt;',
-        '• `user-button-and-profile/profile.e2e.ts` the home sign-out button ends the session · android',
-        '  first attempt failed: a &lt;b&gt; &amp; c',
-      ].join('\n'),
+    expect(payload).toEqual({
+      blocks: [
+        section(
+          [
+            '*:warning: Expo E2E flaky tests*',
+            '*Pull request:* Version packages',
+            '*Flaky:* 2 tests passed only on a retry',
+            `*Run:* <${runUrl(1)}|View logs>`,
+          ].join('\n'),
+        ),
+        section(
+          [
+            '`native-js-sync/sign-out-from-native.e2e.ts` signing out in the native profile signs out the JS hooks',
+            '*Platforms:* android, ios',
+            '*First attempt failed:* No session was found with id sess_&lt;id&gt;',
+          ].join('\n'),
+        ),
+        section(
+          [
+            '`user-button-and-profile/profile.e2e.ts` the home sign-out button ends the session',
+            '*Platforms:* android',
+            '*First attempt failed:* a &lt;b&gt; &amp; c',
+          ].join('\n'),
+        ),
+      ],
+      unfurl_links: false,
+      unfurl_media: false,
+    });
+  });
+
+  it('names one flaky test in the singular and leaves out the run without a link', () => {
+    expect(flakyPayload([{ runUrl: null, commit: null, flakes: [flake()] }]).blocks[0]).toEqual(
+      section(
+        [
+          '*:warning: Expo E2E flaky tests*',
+          '*Pull request:* Version packages',
+          '*Flaky:* 1 test passed only on a retry',
+        ].join('\n'),
+      ),
     );
   });
 
-  it('names one flaky test in the singular and leaves out the link without a run', () => {
-    expect(flakyMessage([{ runUrl: null, commit: null, flakes: [flake()] }]).split('\n')[0]).toBe(
-      ':warning: Expo E2E had 1 flaky test on the Version packages pull request',
-    );
+  it('keeps every block under the Slack limit of 3000 characters', () => {
+    const payload = flakyPayload([{ runUrl: runUrl(1), commit: null, flakes: [flake({ error: 'x'.repeat(5000) })] }]);
+    expect(Math.max(...payload.blocks.map(block => block.text.text.length))).toBeLessThan(3000);
   });
 });
 
 describe('the command line', () => {
-  it('records the flaky tests of every e2e report, then writes the message', () => {
+  it('records the flaky tests of every e2e report, then writes the Slack payload', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'verify-flaky-'));
     const runs = path.join(dir, 'runs');
     const write = (file, value) => {
@@ -176,11 +208,9 @@ describe('the command line', () => {
     expect(main(['record', path.join(dir, 'no-runs'), empty], {}, () => {})).toBe(0);
     expect(JSON.parse(fs.readFileSync(empty, 'utf8'))).toEqual({ runUrl: null, commit: null, flakes: [] });
 
-    const message = [];
-    expect(main(['message', path.join(dir, 'records')], {}, line => message.push(line))).toBe(0);
-    expect(message.join('\n').split('\n')[1]).toBe(
-      '• `native-js-sync/sign-out-from-native.e2e.ts` signing out in the native profile signs out the JS hooks · android, ios',
-    );
-    expect(main(['message'], {}, () => {})).toBe(2);
+    const printed = [];
+    expect(main(['payload', path.join(dir, 'records')], {}, line => printed.push(line))).toBe(0);
+    expect(JSON.parse(printed.join('\n')).blocks[1].text.text.split('\n')[1]).toBe('*Platforms:* android, ios');
+    expect(main(['payload'], {}, () => {})).toBe(2);
   });
 });

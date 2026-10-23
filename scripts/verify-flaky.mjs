@@ -30,7 +30,7 @@ const slackText = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').
 
 const mostCommon = counts => [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
 
-function flakyMessage(records) {
+function flakyPayload(records) {
   const tests = new Map();
   for (const record of records) {
     for (const flake of record.flakes) {
@@ -43,24 +43,32 @@ function flakyMessage(records) {
     }
   }
   if (tests.size === 0) {
-    return '';
+    return null;
   }
 
+  const markdown = text => ({ type: 'section', text: { type: 'mrkdwn', text } });
   const runUrl = records.find(record => record.runUrl)?.runUrl;
-  const count = tests.size === 1 ? '1 flaky test' : `${tests.size} flaky tests`;
-  const lines = [
-    `:warning: Expo E2E had ${count} on the Version packages pull request${runUrl ? ` · <${runUrl}|View the run>` : ''}`,
+  const count = tests.size === 1 ? '1 test' : `${tests.size} tests`;
+  const header = [
+    '*:warning: Expo E2E flaky tests*',
+    '*Pull request:* Version packages',
+    `*Flaky:* ${count} passed only on a retry`,
+    ...(runUrl ? [`*Run:* <${runUrl}|View logs>`] : []),
   ];
   const sorted = [...tests.values()].sort((a, b) => a.file.localeCompare(b.file) || a.title.localeCompare(b.title));
+  const blocks = [markdown(header.join('\n'))];
   for (const test of sorted) {
-    const platforms = [...test.platforms].sort().join(', ');
-    lines.push(`• \`${test.file.replace(/^specs\/features\//, '')}\` ${slackText(test.title)} · ${platforms}`);
+    const lines = [
+      `\`${test.file.replace(/^specs\/features\//, '')}\` ${slackText(test.title)}`,
+      `*Platforms:* ${[...test.platforms].sort().join(', ')}`,
+    ];
     const error = mostCommon(test.errors);
     if (error !== '') {
-      lines.push(`  first attempt failed: ${slackText(error)}`);
+      lines.push(`*First attempt failed:* ${slackText(error)}`);
     }
+    blocks.push(markdown(lines.join('\n')));
   }
-  return lines.join('\n');
+  return { blocks, unfurl_links: false, unfurl_media: false };
 }
 
 const readJson = file => JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -107,18 +115,18 @@ function main(argv, env, log = console.log) {
     log(`Recorded ${record.flakes.length} flaky tests in ${rest[1]}.`);
     return 0;
   }
-  if (step === 'message' && rest.length === 1) {
-    const message = flakyMessage(readRecords(rest[0]));
-    if (message !== '') {
-      log(message);
+  if (step === 'payload' && rest.length === 1) {
+    const payload = flakyPayload(readRecords(rest[0]));
+    if (payload !== null) {
+      log(JSON.stringify(payload));
     }
     return 0;
   }
-  log('usage: verify-flaky.mjs record <runsDir> <outFile> | message <dir>');
+  log('usage: verify-flaky.mjs record <runsDir> <outFile> | payload <dir>');
   return 2;
 }
 
-export { flakesFromReport, flakyMessage, main, normalizeError };
+export { flakesFromReport, flakyPayload, main, normalizeError };
 
 if (process.argv[1] !== undefined && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   process.exit(main(process.argv.slice(2), process.env));

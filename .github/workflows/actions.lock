@@ -103,6 +103,7 @@ workflows:
         - 'actions/setup-node@v4.4.0'
         - 'actions/upload-artifact@v4.6.2'
         - 'pnpm/action-setup@v4.3.0'
+        - 'slackapi/slack-github-action@v1.27.1'
     '.github/workflows/verify-remote.yml':
         - 'actions/checkout@v4.4.0'
         - 'actions/setup-java@v4.9.1'

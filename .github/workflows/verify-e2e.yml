@@ -262,25 +262,30 @@ jobs:
           pattern: verify-flaky-*
           path: ${{ runner.temp }}/flaky
 
-      - name: Post the flaky tests
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MOBILE_TEAM_ALERTS_WEBHOOK_URL }}
+      - name: Generate notification payload
+        id: notification
         run: |
-          set -euo pipefail
           mkdir -p "$RUNNER_TEMP/flaky"
-          MESSAGE="$(node scripts/verify-flaky.mjs message "$RUNNER_TEMP/flaky")"
-          if [ -z "$MESSAGE" ]; then
+          payload="$(node scripts/verify-flaky.mjs payload "$RUNNER_TEMP/flaky")"
+          if [ -z "$payload" ]; then
             echo "No flaky tests in this run."
             exit 0
           fi
-          echo "$MESSAGE"
-          if [ -z "$SLACK_WEBHOOK_URL" ]; then
-            echo "::warning::SLACK_MOBILE_TEAM_ALERTS_WEBHOOK_URL is not configured; skipping Slack notification"
-            exit 0
-          fi
-          PAYLOAD="$(jq -n --arg text "$MESSAGE" '{text: $text, unfurl_links: false, unfurl_media: false}')"
-          curl --fail-with-body --connect-timeout 10 --max-time 30 --retry 3 --retry-delay 5 --retry-max-time 60 --retry-all-errors \
-            --request POST --header "Content-type: application/json" --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
+          echo "$payload"
+          {
+            echo 'payload<<__NOTIFY_EOF__'
+            echo "$payload"
+            echo '__NOTIFY_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Send the flaky tests to Slack
+        if: ${{ steps.notification.outputs.payload != '' }}
+        uses: slackapi/slack-github-action@v1.27.1
+        with:
+          payload: ${{ steps.notification.outputs.payload }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MOBILE_TEAM_ALERTS_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   verify-e2e:
     name: Expo E2E
