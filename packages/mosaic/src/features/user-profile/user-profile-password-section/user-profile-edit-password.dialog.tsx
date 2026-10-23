@@ -15,6 +15,7 @@ import { InputGroup } from '../../../components/input-group';
 import { Eye } from '../../../icons/glyphs/eye';
 import { EyeSlash } from '../../../icons/glyphs/eye-slash';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
 import type {
@@ -64,7 +65,7 @@ export function UserProfileEditPasswordDialog({
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={form.id}
             onSubmit={form.handleSubmit}
           />

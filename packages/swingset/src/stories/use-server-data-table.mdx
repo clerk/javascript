@@ -74,6 +74,7 @@ const { table, sortHeader, pagination } = useServerDataTable({
 | `onPageSizeChange` | `(pageSize: number) => void`                           | —            | Called with the next page size, followed by `onPageChange(1)`. Without it, `Pagination` has no page size control |
 | `searchValue`      | `string`                                               | — (required) | Current search query                                                                                             |
 | `onSearchChange`   | `(value: string) => void`                              | — (required) | Called with the next search query                                                                                |
+| `isFetching`       | `boolean`                                              | `false`      | Whether a page is loading. While `true`, `Pagination` is disabled                                                |
 
 ## Return
 
@@ -97,6 +98,7 @@ type ServerDataTablePagination = {
   page: number;
   pageSize: number;
   totalItems: number;
+  disabled: boolean;
   onChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
 };
