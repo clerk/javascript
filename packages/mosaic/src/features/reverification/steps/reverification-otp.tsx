@@ -18,6 +18,7 @@ export interface ReverificationOtpMessages {
 }
 
 export interface ReverificationOtpResend {
+  text: string;
   label: string;
   disabled?: boolean;
   onClick: () => void;
@@ -93,15 +94,18 @@ export function ReverificationOTP({
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
             {resend ? (
-              <Button
-                type='button'
-                size='sm'
-                variant='link'
-                disabled={resend.disabled || isPending}
-                onClick={resend.onClick}
-              >
-                {resend.label}
-              </Button>
+              <Field.Description>
+                {resend.text}{' '}
+                <Button
+                  type='button'
+                  size='sm'
+                  variant='link'
+                  disabled={resend.disabled || isPending}
+                  onClick={resend.onClick}
+                >
+                  {resend.label}
+                </Button>
+              </Field.Description>
             ) : null}
           </Field.Root>
         </form>

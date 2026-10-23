@@ -150,11 +150,14 @@ export function ReverificationView({
     pendingLabel: m.verifying,
   };
   const hasAlternatives = methods.length > 0;
-  const resendLabel = otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton;
+  const resendCopy = otpChannel === 'phone' ? m.phoneCode : m.emailCode;
   const resend =
     otpChannel === 'email' || otpChannel === 'phone'
       ? {
-          label: resendRemainingSeconds ? `${resendLabel} (${resendRemainingSeconds})` : resendLabel,
+          text: resendCopy.resendText,
+          label: resendRemainingSeconds
+            ? `${resendCopy.resendButton} (${resendRemainingSeconds})`
+            : resendCopy.resendButton,
           disabled: !canResend || isPending,
           onClick: onResend,
         }
