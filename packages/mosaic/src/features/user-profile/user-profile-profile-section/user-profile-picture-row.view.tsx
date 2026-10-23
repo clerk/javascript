@@ -94,7 +94,7 @@ function ProfilePictureActions({
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, onClick: onRemove });
+    actions.push({ label: m.picture.remove, color: 'negative', onClick: onRemove });
   }
 
   if (actions.length > 0) {

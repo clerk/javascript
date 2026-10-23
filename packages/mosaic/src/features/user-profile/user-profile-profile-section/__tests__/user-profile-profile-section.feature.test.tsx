@@ -103,6 +103,7 @@ describe('the user profile profile section', () => {
     expect(screen.getByRole('menuitem', { name: 'Remove avatar' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Change avatar' }).querySelector('svg')).toBeNull();
     expect(screen.getByRole('menuitem', { name: 'Remove avatar' }).querySelector('svg')).toBeNull();
+    expect(screen.getByRole('menuitem', { name: 'Remove avatar' })).toHaveAttribute('data-color', 'negative');
   });
 
   it('says why an upload was refused', async () => {
