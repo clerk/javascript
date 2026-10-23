@@ -1490,6 +1490,20 @@ describe('the step that edits the description', () => {
     assert.equal(await published(CLIP), laidOut(SAID, '', '| `video` |', '| :---: |', `| ${asset(1)} |`));
   });
 
+  it('lays out a hand-off that holds both kinds with a before as one Before and After table, in the order of the manifest', async () => {
+    assert.equal(
+      await published([...CLIP, ...SHOT], [...WAS_CLIP, ...WAS_SHOT]),
+      laidOut(
+        `${SAID}${WAS}`,
+        '',
+        '| Before | After |',
+        '| :---: | :---: |',
+        `| ${asset(3)} | ${asset(1)} |`,
+        `| <img src="${asset(4)}" width="280" alt="Before: profile"> | <img src="${asset(2)}" width="280" alt="After: profile"> |`,
+      ),
+    );
+  });
+
   const ASCII = Array.from({ length: 128 }, (_, code) => String.fromCharCode(code));
   const ADDRESS = 'https://github\\.com/user-attachments/assets/[0-9a-f-]{36}';
   const LABEL = '[A-Za-z0-9._-]+';
