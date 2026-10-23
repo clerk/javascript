@@ -847,6 +847,45 @@ describe('ProtectSession default deadline', () => {
     });
     expect(elements).toHaveLength(0);
   });
+
+  it.each([
+    [2_000, -3_600_000],
+    [6_000, -3_600_000],
+    [2_000, 3_600_000],
+    [6_000, 3_600_000],
+  ])('settles follower polling after a clock change at %s ms by %s ms', async (changeAt, correction) => {
+    let available = false;
+    const request = vi.fn((_key: string, options: { signal: AbortSignal }, callback: () => Promise<unknown>) => {
+      if (available) {
+        return callback();
+      }
+      return new Promise((_resolve, reject) => {
+        options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+      });
+    });
+    Object.defineProperty(navigator, 'locks', { configurable: true, value: { request } });
+    const { session: created, elements } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(changeAt);
+    vi.setSystemTime(Date.now() + correction);
+    await vi.advanceTimersByTimeAsync(9_999 - changeAt);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+    expect(vi.getTimerCount()).toBe(0);
+
+    available = true;
+    await vi.advanceTimersByTimeAsync(30_000);
+    const retry = created?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(elements).toHaveLength(1);
+    serveInline(elements[0], { cid: created?.placeholders().cid });
+    await expect(retry).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+  });
 });
 
 describe('ProtectSession cross-tab single flight', () => {
