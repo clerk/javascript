@@ -1,4 +1,4 @@
-name: Verify end-to-end tests
+name: Expo E2E
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   e2e-tests:
-    name: Verify E2E (${{ matrix.platform }})
+    name: Device tests (${{ matrix.platform }})
     if: ${{ github.event_name == 'workflow_dispatch' || github.head_ref == 'changeset-release/main' }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 75
@@ -222,7 +222,7 @@ jobs:
           if-no-files-found: warn
 
   verify-e2e:
-    name: Verify E2E
+    name: Expo E2E
     needs: e2e-tests
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
