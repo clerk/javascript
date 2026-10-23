@@ -26,6 +26,12 @@ describe('ErrorThrower', () => {
     );
   });
 
+  it('says init needs no signup, so agents do not read it as requiring an account', () => {
+    expect(() => errorThrower.throwMissingPublishableKeyError()).toThrow(
+      "'npx clerk@latest init' does not need a Clerk account and writes temporary dev keys.",
+    );
+  });
+
   it('names the missing key so the secret key error is distinguishable from the publishable key error', () => {
     expect(() => errorThrower.throwMissingSecretKeyError()).toThrow(
       '@clerk/test-package: Missing secretKey.\n\nTo use an existing Clerk app, run:\nnpx clerk@latest link\nnpx clerk@latest env pull',

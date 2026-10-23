@@ -4,6 +4,8 @@ import React from 'react';
 /** `label` for natively labelable controls; `span` for a control a `<label>` would activate on click. */
 export type FieldLabelElementType = 'label' | 'span';
 
+export type FieldOrientation = 'vertical' | 'horizontal';
+
 interface RegisteredControl {
   id: string | null;
   labelElementType: FieldLabelElementType;
@@ -12,7 +14,9 @@ interface RegisteredControl {
 interface FieldContextValue {
   controlId: string;
   labelElementType: FieldLabelElementType;
+  orientation: FieldOrientation;
   disabled: boolean;
+  focusableWhenDisabled: boolean;
   required: boolean;
   invalid: boolean;
   labelIds: string[];
@@ -30,12 +34,21 @@ export function mergeIds(...values: Array<string | undefined>): string | undefin
 }
 
 interface FieldProviderProps extends React.PropsWithChildren {
+  orientation: FieldOrientation;
   disabled: boolean;
+  focusableWhenDisabled: boolean;
   required: boolean;
   invalid: boolean;
 }
 
-export function FieldProvider({ children, disabled, required, invalid }: FieldProviderProps) {
+export function FieldProvider({
+  children,
+  orientation,
+  disabled,
+  focusableWhenDisabled,
+  required,
+  invalid,
+}: FieldProviderProps) {
   const generatedId = React.useId();
   const defaultControlId = `cl-field-${generatedId}`;
   const [controlId, setControlId] = React.useState(defaultControlId);
@@ -59,7 +72,7 @@ export function FieldProvider({ children, disabled, required, invalid }: FieldPr
       ) {
         warnedAboutMultipleControls.current = true;
         console.warn(
-          '[clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
+          '[Clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
         );
       }
 
@@ -73,7 +86,9 @@ export function FieldProvider({ children, disabled, required, invalid }: FieldPr
     () => ({
       controlId,
       labelElementType,
+      orientation,
       disabled,
+      focusableWhenDisabled,
       required,
       invalid,
       labelIds,
@@ -82,7 +97,18 @@ export function FieldProvider({ children, disabled, required, invalid }: FieldPr
       setLabelIds,
       setMessageIds,
     }),
-    [controlId, labelElementType, disabled, required, invalid, labelIds, messageIds, registerControlId],
+    [
+      controlId,
+      labelElementType,
+      orientation,
+      disabled,
+      focusableWhenDisabled,
+      required,
+      invalid,
+      labelIds,
+      messageIds,
+      registerControlId,
+    ],
   );
 
   return <FieldContext.Provider value={context}>{children}</FieldContext.Provider>;
@@ -168,6 +194,7 @@ export function useOptionalFieldControlProps({
   return {
     id: context.controlId,
     disabled: disabled ?? context.disabled,
+    focusableWhenDisabled: context.focusableWhenDisabled,
     required: required ?? context.required,
     'aria-invalid': ariaInvalid ?? (context.invalid ? true : undefined),
     'aria-labelledby': mergeIds(ariaLabelledBy, ...context.labelIds),

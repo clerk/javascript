@@ -1,4 +1,4 @@
-import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
+import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -8,10 +8,12 @@ export { default as __source } from './user-profile-connected-accounts-section.s
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
+  substatus: 'needs reverification',
   title: 'UserProfileConnectedAccountsSection',
   label: 'Connected accounts',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-connected-accounts-section.view.tsx',
+  source:
+    'packages/mosaic/src/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view.tsx',
 };
 export function Default() {
   const fixture = useConnectedAccountsFixture();
@@ -45,6 +47,7 @@ export function ConnectionError() {
         id: 'apple',
         provider: 'Apple',
         iconUrl: 'https://img.clerk.com/static/apple.svg',
+        monochromeIcon: true,
         connectError: 'Unable to connect. Please try again.',
       },
     ],

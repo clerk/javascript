@@ -17,6 +17,7 @@ export interface ProtectCheckRunnerParams<TResource> extends ProtectCheckRunnerR
    * `isCancelled` lets the continuation bail if the component unmounted mid-await.
    */
   onResolved: (resource: TResource, isCancelled: () => boolean) => Promise<unknown>;
+  onError?: (error: unknown) => void;
 }
 
 export interface ProtectCheckRunnerState {
@@ -54,9 +55,18 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const instanceTimeoutMs = useEnvironment().protectConfig?.challenge_load_timeout_ms;
   const loadTimeoutMs = loaderTimeoutMs ?? instanceTimeoutMs;
 
+  // Keep the latest callbacks without re-running the effect when the caller re-renders.
+  const paramsRef = React.useRef(params);
+  paramsRef.current = params;
+
   // `handleError` re-throws what it does not recognise, and this runner awaits caller code that
   // raises plain errors (a transient fetch failure, an OAuth continuation that did not complete).
   const reportError = (err: any) => {
+    const { onError } = paramsRef.current;
+    if (onError) {
+      onError(err);
+      return;
+    }
     try {
       handleError(err, [], card.setError);
     } catch {
@@ -83,10 +93,6 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       mountedRef.current = false;
     };
   }, []);
-
-  // Keep the latest callbacks without re-running the effect when the caller re-renders.
-  const paramsRef = React.useRef(params);
-  paramsRef.current = params;
 
   const reloadCountRef = React.useRef(0);
 

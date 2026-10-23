@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { EllipsisHorizontal } from '../../icons/glyphs/ellipsis-horizontal';
 import type {
   MenuItemProps as PrimitiveMenuItemProps,
   MenuPopupProps as PrimitiveMenuPopupProps,
@@ -12,9 +13,9 @@ import { Menu as Primitive } from '../../primitives/menu';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
-import { truncationStyles } from '../../utils/typography.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
@@ -58,7 +59,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
       render={trigger}
       {...mergeStyleProps(themeProps('menu-trigger'), stylex.props(xstyle), rest)}
     >
-      {children ?? <Icon name='ellipsis-horizontal' />}
+      {children ?? <Icon glyph={EllipsisHorizontal} />}
     </Primitive.Trigger>
   );
 });

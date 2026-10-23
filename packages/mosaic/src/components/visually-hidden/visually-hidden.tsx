@@ -4,8 +4,8 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { visuallyHidden } from '../../utils/visually-hidden.styles';
+import { reset } from '../../styles/reset.styles';
+import { visuallyHidden } from '../../styles/visually-hidden.styles';
 
 export type VisuallyHiddenProps = MosaicComponentProps<'span'>;
 
@@ -14,7 +14,7 @@ export type VisuallyHiddenProps = MosaicComponentProps<'span'>;
  * forwards its ref; `render` swaps the element where a `span` is not valid in context.
  *
  * @example
- * <Button><Icon name='trash' /><VisuallyHidden>Delete</VisuallyHidden></Button>
+ * <Button><Icon glyph={Trash} /><VisuallyHidden>Delete</VisuallyHidden></Button>
  *
  * @example
  * <VisuallyHidden render={<div role='status' aria-live='polite' />}>{feedback}</VisuallyHidden>

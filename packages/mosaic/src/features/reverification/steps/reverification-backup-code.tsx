@@ -1,4 +1,5 @@
-import type { FormEvent } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import type { FormEvent, Ref } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -24,6 +25,7 @@ export interface ReverificationBackupCodeProps {
   onValueChange: (value: string) => void;
   onSubmit: () => void;
   onCancel?: () => void;
+  focusRef?: Ref<HTMLElement>;
 }
 
 export function ReverificationBackupCode({
@@ -34,6 +36,7 @@ export function ReverificationBackupCode({
   onValueChange,
   onSubmit,
   onCancel,
+  focusRef,
 }: ReverificationBackupCodeProps) {
   const formId = useId();
 
@@ -59,10 +62,11 @@ export function ReverificationBackupCode({
             required
             invalid={Boolean(errorMessage)}
             disabled={isPending}
+            focusableWhenDisabled
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Input
-              ref={useFlowAutoFocus<HTMLInputElement>()}
+              ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
               name='backupCode'
               type='text'
               autoComplete='off'

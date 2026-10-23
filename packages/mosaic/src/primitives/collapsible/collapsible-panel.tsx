@@ -1,6 +1,6 @@
 'use client';
 
-import React, { type RefObject, useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import { useAnimationsFinished } from '../hooks/use-animations-finished';
 import { useTransition } from '../hooks/use-transition';
@@ -26,7 +26,7 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
 
     const { mounted, transitionStatus, transitionProps } = useTransition({
       open,
-      ref: panelRef as RefObject<HTMLElement>,
+      ref: panelRef,
     });
 
     const runOnAnimationsFinished = useAnimationsFinished(panelRef, open);

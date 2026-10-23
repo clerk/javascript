@@ -3,7 +3,7 @@
 import { CompositeItem } from '@floating-ui/react';
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import { useAccordionContext, useAccordionItemContext } from './accordion-context';
 
 export type AccordionTriggerProps = ComponentProps<'button'>;
@@ -32,10 +32,7 @@ export function AccordionTrigger(props: AccordionTriggerProps) {
           },
         };
 
-        const merged = mergeProps<'button'>(
-          mergeProps<'button'>(defaultProps, otherProps),
-          compositeProps as Record<string, unknown>,
-        );
+        const merged = mergeProps<'button'>(mergeProps<'button'>(defaultProps, otherProps), compositeProps);
 
         // The wired id is owned by the primitive: a consumer-supplied id must
         // not override it, or the trigger/panel aria pairing would silently break.
@@ -46,16 +43,11 @@ export function AccordionTrigger(props: AccordionTriggerProps) {
         // where useRender's merged ref would overwrite it and break focus navigation.
         const { ref: compositeRef, ...mergedProps } = merged;
 
-        // floating-ui's CompositeItem invokes this render callback synchronously and
-        // unconditionally during its own render (see renderJsx), so useRender runs in a
-        // stable hook position on the CompositeItem fiber. The rule can't see that.
-        // eslint-disable-next-line react-hooks/rules-of-hooks
+        // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's CompositeItem calls this render callback synchronously during its own render, so the hook keeps a stable position.
         return useRender({
           defaultTagName: 'button',
           render,
-          // SAFETY: mergeProps returns Record<string, unknown>; the ref CompositeItem
-          // injected is a valid React ref at runtime.
-          ref: compositeRef as React.Ref<unknown>,
+          ref: isRef(compositeRef) ? compositeRef : undefined,
           state,
           stateAttributesMapping: {
             open: (v: boolean): Record<string, string> | null => (v ? { 'data-open': '' } : { 'data-closed': '' }),

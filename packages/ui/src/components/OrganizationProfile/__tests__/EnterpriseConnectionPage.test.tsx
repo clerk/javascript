@@ -10,6 +10,17 @@ import { EnterpriseConnectionPage } from '../EnterpriseConnectionPage';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
+// jsdom's File has no text(); the certificate upload reads the file with it.
+if (typeof File.prototype.text !== 'function') {
+  File.prototype.text = function (this: File) {
+    return new Promise<string>(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsText(this);
+    });
+  };
+}
+
 const withPageFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
   f.withEnterpriseSso({ selfServeSSO: true });
   f.withEmailAddress();
@@ -204,6 +215,138 @@ describe('EnterpriseConnectionPage', () => {
       );
 
       expect(await screen.findByText('Certificate expires')).toBeInTheDocument();
+    });
+
+    it('lists every trusted certificate in the Edit form, marking the primary', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { userEvent, container } = renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({
+          idpCertificates: [
+            { certificate: 'CERTONE', issuedAt: null, expiresAt: Date.parse('2036-05-01T00:00:00Z') },
+            { certificate: 'CERTTWO', issuedAt: null, expiresAt: Date.parse('2020-05-01T00:00:00Z') },
+          ],
+        }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      expect(within(form).getByText('CERTONE')).toBeInTheDocument();
+      expect(within(form).getByText('CERTTWO')).toBeInTheDocument();
+      expect(within(form).getByText('Primary').closest('[tabindex="0"]')).not.toBeNull();
+      expect(within(form).getByText(/^Expired /)).toBeInTheDocument();
+      expect(within(form).getAllByRole('button', { name: 'Remove certificate' })).toHaveLength(2);
+      expect(within(form).getByRole('button', { name: 'Add certificate' })).toBeInTheDocument();
+    });
+
+    it('adds the certificates of an uploaded bundle and saves the whole list', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue(samlConnection());
+
+      const { userEvent, container } = renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({
+          idpCertificates: [{ certificate: 'CERTONE', issuedAt: null, expiresAt: Date.parse('2036-05-01T00:00:00Z') }],
+        }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      const bundle = new File(
+        [
+          '-----BEGIN CERTIFICATE-----\nCERTONE\n-----END CERTIFICATE-----\n' +
+            '-----BEGIN CERTIFICATE-----\nCERT\nTWO\n-----END CERTIFICATE-----\n',
+        ],
+        'bundle.pem',
+      );
+      await userEvent.upload(form.querySelector('input[type="file"]') as HTMLInputElement, bundle);
+
+      expect(await within(form).findByText('CERTTWO')).toBeInTheDocument();
+      expect(within(form).getByText('Expiry shows after you save.')).toBeInTheDocument();
+
+      await userEvent.click(within(form).getByRole('button', { name: 'Save' }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith('ent_1', {
+          saml: {
+            idpSsoUrl: 'https://idp.example.com/sso',
+            idpEntityId: 'https://idp.example.com/entity',
+            idpCertificates: ['CERTONE', 'CERTTWO'],
+          },
+        });
+      });
+    });
+
+    it('removes a certificate but never the last one', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { userEvent, container } = renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({
+          idpCertificates: [
+            { certificate: 'CERTONE', issuedAt: null, expiresAt: null },
+            { certificate: 'CERTTWO', issuedAt: null, expiresAt: null },
+          ],
+        }),
+      );
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      await userEvent.click(within(form).getAllByRole('button', { name: 'Remove certificate' })[1]);
+
+      expect(within(form).queryByText('CERTTWO')).not.toBeInTheDocument();
+      expect(within(form).getByRole('button', { name: 'Remove certificate' })).toBeDisabled();
+    });
+
+    it('rejects a file that is not a certificate', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      const { userEvent, container } = renderPage(wrapper, fixtures, samlConnection());
+
+      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2));
+      await userEvent.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
+
+      const form = container.querySelector('.cl-actionCard') as HTMLElement;
+      const key = new File(['-----BEGIN PRIVATE KEY-----\nAAAA\n-----END PRIVATE KEY-----\n'], 'key.pem');
+      await userEvent.upload(form.querySelector('input[type="file"]') as HTMLInputElement, key);
+
+      expect(await within(form).findAllByText('One of the uploaded files is not a certificate.')).not.toHaveLength(0);
+      expect(within(form).getAllByRole('button', { name: 'Remove certificate' })).toHaveLength(1);
+    });
+
+    it('summarizes several certificates in the closed view', async () => {
+      const { wrapper, fixtures } = await createFixtures(withPageFixtures);
+      withNoTestRuns(fixtures);
+
+      renderPage(
+        wrapper,
+        fixtures,
+        samlConnectionWith({
+          idpCertificates: [
+            { certificate: 'CERTONE', issuedAt: null, expiresAt: Date.parse('2036-05-01T00:00:00Z') },
+            { certificate: 'CERTTWO', issuedAt: null, expiresAt: Date.parse('2030-05-01T00:00:00Z') },
+            { certificate: 'CERTTHREE', issuedAt: null, expiresAt: null },
+          ],
+        }),
+      );
+
+      expect(await screen.findByText('Certificates')).toBeInTheDocument();
+      expect(screen.getByText('3 certificates, earliest expires May 1, 2030')).toBeInTheDocument();
+      expect(screen.queryByText('Certificate expires')).not.toBeInTheDocument();
     });
 
     it('renders the OIDC variant of the service provider section and only the shared settings', async () => {

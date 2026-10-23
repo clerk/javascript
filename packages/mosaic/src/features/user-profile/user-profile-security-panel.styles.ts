@@ -3,12 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  deviceLabel: {
-    alignItems: 'center',
-    columnGap: space['2'],
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
   icon: {
     color: colorVars['--cl-color-foreground-secondary'],
     display: 'block',
@@ -26,8 +20,5 @@ export const styles = stylex.create({
     gap: space['3'],
     display: 'flex',
     flexDirection: 'column',
-  },
-  emptySectionCards: {
-    display: 'none',
   },
 });

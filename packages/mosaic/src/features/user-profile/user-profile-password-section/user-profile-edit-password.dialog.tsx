@@ -1,52 +1,150 @@
 import { useMergeRefs } from '@floating-ui/react';
-import * as stylex from '@stylexjs/stylex';
 import type { RefObject } from 'react';
-import { useId, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
+import { Checkbox } from '../../../components/checkbox';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import type { UseFormResult } from '../../../components/form';
+import { Flow, useFlowAutoFocus } from '../../../components/flow';
+import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
-import { Text } from '../../../components/text';
+import { Eye } from '../../../icons/glyphs/eye';
+import { EyeSlash } from '../../../icons/glyphs/eye-slash';
 import { useMessages } from '../../../localization';
-import { styles } from './user-profile-password-section.styles';
+import type { ReverificationController } from '../../reverification';
+import { Reverification } from '../../reverification';
 import type {
   UserProfileEditPasswordField,
   UserProfileEditPasswordValues,
 } from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordDialogProps {
+  passwordFeedback?: FieldFeedback;
+  identifier?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
   form: UseFormResult<UserProfileEditPasswordValues>;
+  reverification?: ReverificationController;
+  step: 'edit' | 'verify';
 }
 
 export function UserProfileEditPasswordDialog({
+  passwordFeedback,
+  identifier = '',
   open,
   onOpenChange,
   trigger,
   hasPassword = false,
   requiresCurrentPassword = false,
   form,
+  reverification,
+  step,
 }: UserProfileEditPasswordDialogProps) {
   const m = useMessages('userProfilePasswordSection');
-  const signOutId = useId();
-  const signOutDescriptionId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
+
+  const edit = (
+    <>
+      <Card.Header>
+        <Card.Title>{hasPassword ? m.dialogTitle.change : m.dialogTitle.set}</Card.Title>
+      </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {form.error}
+      </Card.Banner>
+      <Card.Content
+        render={
+          <form
+            id={form.id}
+            onSubmit={form.handleSubmit}
+          />
+        }
+      >
+        <input
+          readOnly
+          hidden
+          name='identifier'
+          autoComplete='username'
+          value={identifier}
+        />
+        {showCurrentPassword ? (
+          <PasswordField
+            autoComplete='current-password'
+            form={form}
+            inputRef={initialFocusRef}
+            label={m.currentPasswordLabel}
+            name='currentPassword'
+          />
+        ) : null}
+        <PasswordField
+          autoComplete='new-password'
+          form={form}
+          inputRef={showCurrentPassword ? undefined : initialFocusRef}
+          label={m.newPasswordLabel}
+          name='newPassword'
+          advisoryFeedback={passwordFeedback}
+        />
+        <PasswordField
+          autoComplete='new-password'
+          form={form}
+          label={m.confirmPasswordLabel}
+          name='confirmPassword'
+        />
+        <Field.Root
+          orientation='horizontal'
+          disabled={form.isSubmitting}
+        >
+          <Checkbox
+            checked={form.values.signOutOfOtherSessions}
+            onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
+          />
+          <Field.Content>
+            <Field.Label>{m.signOutOfOtherSessionsLabel}</Field.Label>
+            <Field.Description>{m.signOutOfOtherSessionsDescription}</Field.Description>
+          </Field.Content>
+        </Field.Root>
+      </Card.Content>
+      <Card.Footer>
+        <Dialog.Close
+          render={
+            <Button
+              variant='outline'
+              color='neutral'
+              fullWidth
+            >
+              {m.cancel}
+            </Button>
+          }
+        />
+        <SubmitButton
+          form={form.id}
+          fullWidth
+          isPending={form.isSubmitting}
+          disabled={!form.canSubmit}
+          focusableWhenDisabled
+        >
+          {m.save}
+        </SubmitButton>
+      </Card.Footer>
+    </>
+  );
 
   return (
     <Dialog.Root
       open={open}
       onOpenChange={onOpenChange}
+      shouldCloseOnInteractOutside={step !== 'verify'}
+      showCloseButton={step !== 'verify' || Boolean(reverification?.onCancel)}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
@@ -57,97 +155,27 @@ export function UserProfileEditPasswordDialog({
           elevation='overlay'
           renderBranding={false}
         >
-          <Card.Header>
-            <Card.Title>{hasPassword ? m.dialogTitle.change : m.dialogTitle.set}</Card.Title>
-          </Card.Header>
-          <Card.Content
-            render={
-              <form
-                id={form.id}
-                onSubmit={form.handleSubmit}
-              />
-            }
-          >
-            {form.error ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{form.error}</Banner.Label>
-              </Banner.Root>
-            ) : null}
-            {showCurrentPassword ? (
-              <PasswordField
-                autoComplete='current-password'
-                form={form}
-                inputRef={initialFocusRef}
-                label={m.currentPasswordLabel}
-                name='currentPassword'
-              />
-            ) : null}
-            <PasswordField
-              autoComplete='new-password'
-              form={form}
-              inputRef={showCurrentPassword ? undefined : initialFocusRef}
-              label={m.newPasswordLabel}
-              name='newPassword'
-            />
-            <PasswordField
-              autoComplete='new-password'
-              form={form}
-              label={m.confirmPasswordLabel}
-              name='confirmPassword'
-            />
-            <div {...stylex.props(styles.checkboxField)}>
-              <input
-                aria-describedby={signOutDescriptionId}
-                checked={form.values.signOutOfOtherSessions}
-                disabled={form.isSubmitting}
-                id={signOutId}
-                type='checkbox'
-                {...stylex.props(styles.checkbox)}
-                onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
-              />
-              <div {...stylex.props(styles.checkboxCopy)}>
-                <Text
-                  render={<label htmlFor={signOutId} />}
-                  size='sm'
-                  xstyle={styles.checkboxLabel}
-                >
-                  {m.signOutOfOtherSessionsLabel}
-                </Text>
-                <Text
-                  id={signOutDescriptionId}
-                  size='xs'
-                  xstyle={styles.checkboxDescription}
-                >
-                  {m.signOutOfOtherSessionsDescription}
-                </Text>
-              </div>
-            </div>
-          </Card.Content>
-          <Card.Footer>
-            <Dialog.Close
-              render={
-                <Button
-                  variant='outline'
-                  color='neutral'
-                  fullWidth
-                >
-                  {m.cancel}
-                </Button>
-              }
-            />
-            <SubmitButton
-              form={form.id}
-              fullWidth
-              isPending={form.isSubmitting}
-              disabled={!form.canSubmit}
-              focusableWhenDisabled
+          {reverification ? (
+            <Flow.Root
+              value={step}
+              direction={step === 'verify' ? 1 : -1}
+              state={step}
             >
-              {m.save}
-            </SubmitButton>
-          </Card.Footer>
+              {() => (
+                <>
+                  <Flow.Step ids={['edit']}>{edit}</Flow.Step>
+                  <Flow.Step ids={['verify']}>
+                    <Reverification
+                      controller={reverification}
+                      onClose={() => onOpenChange(false)}
+                    />
+                  </Flow.Step>
+                </>
+              )}
+            </Flow.Root>
+          ) : (
+            edit
+          )}
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
@@ -160,24 +188,30 @@ function PasswordField({
   form,
   inputRef,
   name,
+  advisoryFeedback,
 }: {
   label: string;
   autoComplete: 'current-password' | 'new-password';
   form: UseFormResult<UserProfileEditPasswordValues>;
   inputRef?: RefObject<HTMLInputElement>;
   name: UserProfileEditPasswordField;
+  advisoryFeedback?: FieldFeedback;
 }) {
   const m = useMessages('userProfilePasswordSection');
   const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
   const { feedback } = form.fields[name];
-  const error = feedback?.type === 'error' ? feedback.message : undefined;
+  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
+  const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
   const { ref, ...control } = form.register(name);
-  const mergedRef = useMergeRefs([ref, inputRef]);
+  const mergedRef = useMergeRefs([ref, inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
+  // TODO: Discuss enforcing the configured minimum length on the new password input or keeping the hint advisory and letting the server validate. https://github.com/clerk/javascript/pull/9930#discussion_r4151734254
   return (
     <Field.Root
       disabled={form.isSubmitting}
-      invalid={error !== undefined}
+      focusableWhenDisabled
+      invalid={feedbackType === 'error'}
       required
     >
       <Field.Label>{label}</Field.Label>
@@ -187,6 +221,11 @@ function PasswordField({
           autoComplete={autoComplete}
           type={visible ? 'text' : 'password'}
           {...control}
+          onFocus={() => setFocused(true)}
+          onBlur={() => {
+            setFocused(false);
+            control.onBlur();
+          }}
         />
         <InputGroup.End>
           <Button
@@ -194,11 +233,11 @@ function PasswordField({
             aria-label={visible ? m.hidePassword : m.showPassword}
             onClick={() => setVisible(current => !current)}
           >
-            <Icon name={visible ? 'eye-slash' : 'eye'} />
+            <Icon glyph={visible ? EyeSlash : Eye} />
           </Button>
         </InputGroup.End>
       </InputGroup.Root>
-      {error ? <Field.Error>{error}</Field.Error> : null}
+      <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>
   );
 }

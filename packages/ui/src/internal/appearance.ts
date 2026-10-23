@@ -769,6 +769,12 @@ export type ElementsConfig = {
   configureSSOCertificateFileBadge: WithOptions;
   configureSSOCertificateFileName: WithOptions;
   configureSSOCertificateRemoveButton: WithOptions;
+  configureSSOCertificateList: WithOptions;
+  configureSSOCertificateListItem: WithOptions;
+  configureSSOCertificateListItemBody: WithOptions;
+  configureSSOCertificateListItemExpiry: WithOptions;
+  configureSSOCertificateListItemRemoveButton: WithOptions;
+  configureSSOCertificatePrimaryBadge: WithOptions;
 
   configureSSOTestUrlOpenButton: WithOptions;
   configureSSOTestRefreshButton: WithOptions;
@@ -837,6 +843,17 @@ export type ElementsConfig = {
   configureDirectorySyncSyncNowButton: WithOptions;
   configureDirectorySyncStatusBadge: WithOptions<string>;
   configureDirectorySyncLastSyncedAt: WithOptions;
+  configureDirectorySyncRoleMappingToggle: WithOptions;
+  configureDirectorySyncRoleMappingTable: WithOptions;
+  configureDirectorySyncRoleMappingHeader: WithOptions;
+  configureDirectorySyncRoleMappingRow: WithOptions;
+  configureDirectorySyncRoleMappingReorderButton: WithOptions;
+  configureDirectorySyncRoleMappingPriority: WithOptions;
+  configureDirectorySyncRoleMappingGroupName: WithOptions;
+  configureDirectorySyncRoleMappingEmpty: WithOptions;
+  configureDirectorySyncRoleSyncDialog: WithOptions;
+  configureDirectorySyncRoleSyncDialogCancelButton: WithOptions;
+  configureDirectorySyncRoleSyncDialogSubmitButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;

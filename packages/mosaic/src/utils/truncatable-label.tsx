@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { reset } from './reset.styles';
-import { truncationStyles } from './typography.styles';
+import { reset } from '../styles/reset.styles';
+import { truncationStyles } from '../styles/typography.styles';
 
 // The ellipsis comes from `truncationStyles.singleLine`; this releases the flex-item min-width
 // floor, without which the box never shrinks enough to clip.

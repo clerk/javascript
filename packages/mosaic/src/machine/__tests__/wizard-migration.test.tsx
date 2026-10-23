@@ -3,10 +3,10 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { assign } from '../assign';
-import { createActor, mockActor } from '../createActor';
-import { createMachine } from '../createMachine';
+import { createActor, mockActor } from '../create-actor';
+import { createMachine } from '../create-machine';
 import type { StateConfig, StateMachine } from '../types';
-import { useActor, useMachine, useSelector } from '../useMachine';
+import { useActor, useMachine, useSelector } from '../use-machine';
 
 /**
  * Wizard migration: before → after.
@@ -437,7 +437,7 @@ describe('Wizard AFTER — scope-boundary signal (the seam parent-link would hoo
   });
 });
 
-// ── Driven through the React hooks (mirrors useMachine.test.tsx patterns) ──────
+// ── Driven through the React hooks (mirrors use-machine.test.tsx patterns) ──────
 
 const STEP_LABEL: Record<string, string> = { intro: 'Welcome', details: 'Your details', review: 'Review & submit' };
 

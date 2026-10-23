@@ -11,6 +11,7 @@ import type {
   SignUpVerificationsJSON,
   SignUpVerificationsJSONSnapshot,
   SignUpVerificationsResource,
+  TrustedDeviceChallengeResource,
   VerificationJSON,
   VerificationJSONSnapshot,
   VerificationResource,
@@ -19,6 +20,7 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
+import { trustedDeviceChallengeFromJSON, trustedDeviceChallengeToJSON } from './TrustedDeviceChallenge';
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';
@@ -33,6 +35,7 @@ export class Verification extends BaseResource implements VerificationResource {
   error: ClerkAPIError | null = null;
   verifiedAtClient: string | null = null;
   channel?: PhoneCodeChannel;
+  trustedDeviceChallenge: TrustedDeviceChallengeResource | null = null;
 
   constructor(data: VerificationJSON | VerificationJSONSnapshot | null) {
     super();
@@ -59,6 +62,7 @@ export class Verification extends BaseResource implements VerificationResource {
       this.expireAt = unixEpochToDate(data.expire_at || undefined);
       this.error = data.error ? new ClerkAPIError(data.error) : null;
       this.channel = data.channel || undefined;
+      this.trustedDeviceChallenge = trustedDeviceChallengeFromJSON(data.trusted_device_challenge);
     }
     return this;
   }
@@ -76,6 +80,9 @@ export class Verification extends BaseResource implements VerificationResource {
       expire_at: this.expireAt?.getTime() || null,
       error: errorToJSON(this.error),
       verified_at_client: this.verifiedAtClient,
+      ...(this.trustedDeviceChallenge && {
+        trusted_device_challenge: trustedDeviceChallengeToJSON(this.trustedDeviceChallenge),
+      }),
     };
   }
 }

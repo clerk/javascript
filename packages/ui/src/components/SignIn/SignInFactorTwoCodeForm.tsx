@@ -15,7 +15,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
 import { useRouter } from '../../router';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
-import { isResetPasswordStrategy } from './utils';
+import { isResettingPassword } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
   showClientTrustNotice?: boolean;
@@ -31,10 +31,6 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
   inputLabel: LocalizationKey;
   resendButton?: LocalizationKey;
 };
-
-const isResettingPassword = (resource: SignInResource) =>
-  isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
-  resource.firstFactorVerification?.status === 'verified';
 
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const env = useEnvironment();

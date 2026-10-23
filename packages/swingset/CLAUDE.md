@@ -31,6 +31,8 @@ These require reading several files together; the `README.md` covers the step-by
 
 - **Routing.** Route groups split the app: `(explorer)` is the component playground, `(clerk)` is the Live Sandbox (`/live`, `/sign-in`, `/sign-up`) and needs keys from `packages/swingset/.env.local`. Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives *inside* the overview. `app/(explorer)/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (client components / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
 
+- **Live Sandbox pages.** Every `app/(clerk)/live/*/page.tsx` opens with `LivePageHeader` (`app/(clerk)/live-page-header.tsx`), which renders the page's `h1` and, beside it, the entry's status badge (`StatusBadge`) looked up from the live route map in `lib/live-navigation.ts`. The badge belongs in the title row, where the reader is looking, mirroring the docs pages' `DocTitle` — never in the sticky header chrome. Don't hand-write an `h1` on a live page; pass the title and description to `LivePageHeader` so the badge stays attached. The live sidebar is also the inventory for the User Profile and Organization Profile groups: every Panels/Sections entry from the registry appears there, and one without a route in `liveRoutes` renders as a gray `todo` placeholder (`live/todo/[group]/[component]`, a dashed gray box labelled TODO). When you add a live harness for one, add its route to `liveRoutes` and the placeholder disappears.
+
 - **Shared playground state.** `DocsViewer` wraps each overview in a `PlaygroundProvider` (`PlaygroundContext.tsx`), keyed by slug and seeded from the component's `meta` via `getModuleBySlug`. It owns the knob values (props). The `<Preview>` and the interactive `<PropTable>` both read/write this single context, so editing a prop in the table updates the preview above it.
 
 - **Every story renders inside `MosaicProvider`.** `StoryPreview` (the MDX `<Preview>`) renders a named story with the playground's knob values as props and exposes a Reset button. `StoryEmbed` (the MDX `<Story>`) renders a single static variation with default knob values and no controls.
@@ -59,11 +61,12 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 ### Layers
 
-`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, `Reverification`, and `Localization` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
+`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `Organization Switcher`, `User Profile`, `Reverification`, and `Localization` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
 
 | Group        | What lives here                                                | Archetype |
 | ------------ | -------------------------------------------------------------- | --------- |
 | `User Button` | Composed flow UI (e.g. `UserButton`)                          | C         |
+| `Organization Switcher` | Composed flow UI (e.g. `OrganizationSwitcher`)      | C         |
 | `User Profile` | Composed flow UI (e.g. `UserProfileProfilePanel`)             | C         |
 | `Components` | Styled Mosaic components — simple, with a flat variant surface (`Button`, `Input`), or compound (`Card`, `Field`, `Menu`, `Popover`) | A         |
 | `Primitives` | Headless primitives from `@clerk/mosaic`'s `src/primitives/` (`Accordion`) | B         |
@@ -101,7 +104,7 @@ export const meta: StoryMeta = {
 
 - `title` is the component's export name; it produces the slug and is what readers match against code. Set `label` only when the sidebar should read differently (the slug and page heading still come from `title`).
 - `status` marks the entry's maturity — `'stable'`, `'wip'`, or `'todo'` (planned, not yet implemented; e.g. `Table`) — rendered as a colored dot (green / amber / gray) to the left of the entry in the sidebar, and as a dot-plus-label badge to the right of the page's `# Title` h1. It is explicit: omitting it displays no status anywhere (not every entry carries one, e.g. `Scroll Area`). A todo entry is `meta` alone plus a one-paragraph MDX page; it skips its archetype's required sections (and `source`) until the component exists.
-- `substatus` optionally says *why* a wip entry is wip — one of `'needs wire-up'` (view runs on mock data, not yet connected to its model/controller), `'needs design'`, `'needs a11y'`, `'needs docs'`, `'needs polish'`. It renders in the page badge (`wip: needs wire-up`) and the sidebar dot's tooltip. Most wip entries won't need one; it is ignored on stable entries.
+- `substatus` optionally says *why* a wip entry is wip — one of `'needs wire-up'` (view runs on mock data, not yet connected to its model/controller), `'needs reverification'` (wired to FAPI, but a sensitive action still runs without session reverification), `'needs design'`, `'needs a11y'`, `'needs docs'`, `'needs polish'`. It renders in the page badge (`wip: needs wire-up`) and the sidebar dot's tooltip. Most wip entries won't need one; it is ignored on stable entries.
 - `source` is always a path **relative to the monorepo root**, pointing at the file that exports the documented component. Always set it — it powers the "View source" link.
 - `styles` declares the component's variant props and is **required for archetype A's simple (knob-driven) form** (it generates the knobs and the `<PropTable>`). Keep it in sync with the component's real prop union by hand — StyleX compiles its styles away, so nothing derives it for you. Omit it for compound A components, and for B and C.
 
@@ -253,7 +256,7 @@ The story is `meta` (no `styles`) plus a single `Default` export that renders th
 These compose lower layers, so the docs lead with the composition rather than knobs. Required MDX:
 
 ```mdx
-import * as UserButtonStories from './user-button.stories';
+import * as SwitcherStories from './user-button.stories';
 
 # UserButton
 
@@ -261,7 +264,7 @@ import * as UserButtonStories from './user-button.stories';
 
 <Story
   name='Default'
-  storyModule={UserButtonStories}
+  storyModule={SwitcherStories}
   composition={[
     { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
     { name: 'Item', href: '/components/item', layer: 'Components' },

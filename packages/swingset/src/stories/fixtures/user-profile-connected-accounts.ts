@@ -1,21 +1,25 @@
+import { useUserProfileConnectedAccountsController } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.controller';
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
-} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosText } from '@/lib/chaos';
 
-export const connectedAccount = {
+import { idleReverification } from './reverification';
+
+export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
   identifier: 'test@example.com',
   iconUrl: 'https://img.clerk.com/static/google.svg',
+  status: 'connected',
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
   { id: 'google', provider: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
-  { id: 'apple', provider: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg' },
+  { id: 'apple', provider: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg', monochromeIcon: true },
 ];
 
 export function useConnectedAccountsFixture({
@@ -41,19 +45,31 @@ export function useConnectedAccountsFixture({
   );
   const availableProviders = providers.filter(provider => !accounts.some(account => account.id === provider.id));
 
-  return {
+  return useUserProfileConnectedAccountsController({
     accounts,
+    removeReverification: idleReverification,
+    reconnectReverification: idleReverification,
+    connectReverification: idleReverification,
     availableProviders,
-    onConnect: (id: string) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    onConnect: async (id: string) => {
       const provider = providers.find(item => item.id === id);
       if (provider) {
         setAccounts(current => [
           ...current,
-          { id: provider.id, provider: provider.provider, iconUrl: provider.iconUrl, identifier: 'test@example.com' },
+          {
+            id: provider.id,
+            provider: provider.provider,
+            iconUrl: provider.iconUrl,
+            monochromeIcon: provider.monochromeIcon,
+            identifier: 'test@example.com',
+            status: 'connected',
+          },
         ]);
       }
     },
-    onReconnect: (id: string) =>
+    // eslint-disable-next-line @typescript-eslint/require-await
+    onReconnect: async (id: string) =>
       setAccounts(current =>
         current.map(account =>
           account.id === id
@@ -71,5 +87,5 @@ export function useConnectedAccountsFixture({
       }
       setAccounts(current => current.filter(item => item.id !== id));
     },
-  };
+  });
 }

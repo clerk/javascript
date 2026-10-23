@@ -86,6 +86,28 @@ describe('tokens.verify(token, options)', () => {
     expect(result.errors).toBeUndefined();
   });
 
+  it('rejects the token when the provided issuer option does not match the iss claim', async () => {
+    server.use(
+      http.get(
+        'https://api.clerk.test/v1/jwks',
+        validateHeaders(() => {
+          return HttpResponse.json(mockJwks);
+        }),
+      ),
+    );
+
+    const { data, errors } = await verifyToken(mockJwt, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
+      issuer: 'https://clerk.another-app.com',
+      skipJwksCache: true,
+    });
+
+    expect(data).toBeUndefined();
+    expect(errors?.[0].reason).toBe('token-invalid-issuer');
+  });
+
   it('verifies the token by fetching the JWKs from Backend API when secretKey is provided', async () => {
     server.use(
       http.get(
@@ -278,6 +300,69 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:foo', 'write:bar']);
     expect(data.aud).toEqual(aud);
+  });
+
+  describe.each(['opaque', 'at+jwt', 'application/at+jwt'] as const)('%s OAuth token actor', format => {
+    const chainedAct = {
+      iss: 'https://clerk.oauth.example.test',
+      sub: 'client_exchanging',
+      act: { iss: 'https://clerk.oauth.example.test', sub: 'client_subject' },
+    };
+
+    beforeEach(() => {
+      vi.setSystemTime(new Date(mockOAuthAccessTokenJwtPayload.iat * 1000));
+    });
+
+    async function verifyWithAct(act: unknown) {
+      let token: string;
+      if (format === 'opaque') {
+        token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
+        server.use(
+          http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () =>
+            HttpResponse.json({
+              object: 'clerk_idp_oauth_access_token',
+              ...mockVerificationResults.oauth_token,
+              ...(act === undefined ? {} : { act }),
+            }),
+          ),
+        );
+      } else {
+        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+        token = await createSignedOAuthJwt({ ...mockOAuthAccessTokenJwtPayload, act }, format);
+      }
+
+      const result = await verifyMachineAuthToken(token, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeUndefined();
+      return (result.data as IdPOAuthAccessToken).act;
+    }
+
+    it.each([{ act: undefined }, { act: { sub: 'client_exchanging' } }, { act: chainedAct }])(
+      'returns act=$act',
+      async ({ act }) => {
+        expect(await verifyWithAct(act)).toEqual(act);
+      },
+    );
+
+    it('keeps only iss, sub, and one nested actor', async () => {
+      const act = await verifyWithAct({
+        ...chainedAct,
+        extra: 'dropped',
+        act: { ...chainedAct.act, extra: 'dropped', act: { sub: 'client_deeper' } },
+      });
+
+      expect(act).toStrictEqual(chainedAct);
+    });
+
+    it.each([{ act: 'client_exchanging' }, { act: { iss: 'https://clerk.oauth.example.test' } }, { act: { sub: 42 } }])(
+      'drops malformed act=$act',
+      async ({ act }) => {
+        expect(await verifyWithAct(act)).toBeUndefined();
+      },
+    );
   });
 
   describe.each(['opaque', 'at+jwt', 'application/at+jwt'] as const)('%s OAuth token audience verification', format => {
@@ -801,6 +886,45 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.tokenType).toBe('m2m_token');
       expect(result.data).toBeDefined();
       expect(result.errors).toBeUndefined();
+    });
+
+    it('rejects an M2M JWT whose aud does not include the configured audience', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+      const token = await createSignedM2MJwt();
+
+      const result = await verifyMachineAuthToken(token, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience: 'mch_3xxxxx',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors?.[0].code).toBe('token-verification-failed');
+      expect(result.errors?.[0].message).toContain('Invalid JWT audience claim array (aud)');
+    });
+
+    it('ignores a session-token issuer option when verifying an M2M JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const m2mJwt = await createSignedM2MJwt();
+
+      const result = await verifyMachineAuthToken(m2mJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        issuer: 'https://clerk.inspired.puma-74.lcl.dev',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.errors).toBeUndefined();
+      expect(result.data).toBeDefined();
     });
 
     it('rejects M2M JWT with alg: none', async () => {

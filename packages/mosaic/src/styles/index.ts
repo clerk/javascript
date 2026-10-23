@@ -91,6 +91,8 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaAxis, ScrollAreaGutter } from '../components/scroll-area';
+export { Radio } from '../components/radio';
+export type { RadioGroupProps, RadioItemProps } from '../components/radio';
 export { Select } from '../components/select';
 export type {
   SelectItem,
@@ -114,9 +116,10 @@ export type {
   TableSelectCellProps,
   TableSort,
 } from '../components/table';
+export { SegmentedControl } from '../components/segmented-control';
+export type { SegmentedControlItemProps, SegmentedControlRootProps } from '../components/segmented-control';
 export { Tabs } from '../components/tabs';
 export type {
-  TabsIndicatorProps,
   TabsListProps,
   TabsPanelProps,
   TabsPanelsProps,
@@ -161,6 +164,8 @@ export type {
 } from '../components/popover';
 export { Panel } from '../components/panel';
 export type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from '../components/panel';
+export { Reveal } from '../components/reveal';
+export type { RevealProps } from '../components/reveal';
 export { Profile } from '../components/profile';
 export type {
   ProfileContentProps,
@@ -171,6 +176,7 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { OrganizationSwitcher } from '../features/organization-switcher/organization-switcher';
 export { UserButton } from '../features/user-button/user-button';
 
 import {
@@ -224,14 +230,12 @@ export type SpacingVarName = keyof typeof spacingVars;
 export type TargetVarName = keyof typeof targetVars;
 export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';
-export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
-export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-setup.view';
+export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
+export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
 
-export { UserProfileApiKeysPanelView } from '../features/user-profile/user-profile-api-keys-panel.view';
+export { APIKeysTableView } from '../features/api-keys/api-keys-table.view';
+export { UserProfileEnterpriseAccountsSectionView } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';
 
-export { OrganizationProfileApiKeysPanelView } from '../features/organization-profile/organization-profile-api-keys-panel.view';
-export { OrganizationProfileCreateAPIKeyDialog } from '../features/organization-profile/organization-profile-create-api-key.dialog';
-
-export { MembersTableTabView } from '../features/organization-profile/members-table-tab.view';
-export { InvitationsTableTabView } from '../features/organization-profile/invitations-table-tab.view';
-export { RequestsTableTabView } from '../features/organization-profile/requests-table-tab.view';
+export { MembersTableTabView } from '../features/organization-profile/organization-profile-members-panel/members-table-tab.view';
+export { InvitationsTableTabView } from '../features/organization-profile/organization-profile-members-panel/invitations-table-tab.view';
+export { RequestsTableTabView } from '../features/organization-profile/organization-profile-members-panel/requests-table-tab.view';

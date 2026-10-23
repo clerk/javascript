@@ -308,9 +308,45 @@ export const hiIN: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -904,6 +940,17 @@ export const hiIN: LocalizationResource = {
       title: 'प्रदाता चुनें',
       warning: 'एक बार प्रदाता का चयन करने के बाद आप कॉन्फ़िगरेशन समाप्त होने तक इसे बदल नहीं सकते',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1345,6 +1392,10 @@ export const hiIN: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },
@@ -1586,6 +1637,11 @@ export const hiIN: LocalizationResource = {
         'अपनी पासकी का उपयोग करके आपकी पहचान की पुष्टि होती है। आपका डिवाइस आपके फिंगरप्रिंट, चेहरे या स्क्रीन लॉक के लिए पूछ सकता है।',
       title: 'अपनी पासकी का उपयोग करें',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'दूसरी विधि का उपयोग करें',
       subtitle: 'जारी रखने के लिए अपना वर्तमान पासवर्ड दर्ज करें',
@@ -1736,6 +1792,10 @@ export const hiIN: LocalizationResource = {
       subtitle:
         'अपनी पासकी का उपयोग करके पुष्टि होती है कि यह आप ही हैं। आपका डिवाइस आपके फिंगरप्रिंट, चेहरे या स्क्रीन लॉक के लिए पूछ सकता है।',
       title: 'अपनी पासकी का उपयोग करें',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'दूसरी विधि का उपयोग करें',

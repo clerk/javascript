@@ -15,6 +15,11 @@ import { handleError } from '@/utils/errorHandler';
 
 import type { LocalizationKey } from '../../../customizables';
 import { Col, localizationKeys, Text } from '../../../customizables';
+import {
+  getIdpCertificateStatus,
+  type IdpCertificateEntry,
+  toIdpCertificateEntries,
+} from '../../ConfigureSSO/domain/idpCertificates';
 import { isOidcProvider } from '../../ConfigureSSO/domain/organizationEnterpriseConnection';
 import type { EnterpriseConnectionMutations } from '../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import {
@@ -40,7 +45,13 @@ type IdentityProviderSectionProps = {
 
 type FormScreenProps = IdentityProviderSectionProps & { onSuccess: () => void; onReset: () => void };
 
-type Detail = { id: string; label: LocalizationKey; value: string };
+type Detail = {
+  id: string;
+  label: LocalizationKey;
+  value?: string;
+  valueKey?: LocalizationKey;
+  tone?: 'danger' | 'warning';
+};
 
 const SAML_MODES = ['metadataUrl', 'manual'] as const satisfies readonly SamlIdpConfigurationMode[];
 const OIDC_MODES = ['discoveryUrl', 'manual'] as const satisfies readonly OidcIdpConfigurationMode[];
@@ -75,15 +86,56 @@ const samlDetails = (connection: EnterpriseConnectionResource): Detail[] => {
         },
       ];
 
-  if (saml && saml.idpCertificateExpiresAt > 0) {
-    details.push({
-      id: 'idpCertificateExpiresAt',
-      label: localizationKeys('organizationProfile.securityPage.connectionPage.identityProvider.certificateExpires'),
-      value: formatDate(new Date(saml.idpCertificateExpiresAt)),
-    });
+  const certificates = toIdpCertificateEntries(saml);
+  if (certificates.length > 0) {
+    details.push(certificatesDetail(certificates));
   }
 
   return details;
+};
+
+const toneFor = (entry: IdpCertificateEntry): Detail['tone'] => {
+  const status = getIdpCertificateStatus(entry);
+  return status === 'expired' ? 'danger' : status === 'expiring' ? 'warning' : undefined;
+};
+
+const certificatesDetail = (certificates: IdpCertificateEntry[]): Detail => {
+  const dated = certificates.filter(entry => entry.expiresAt !== null);
+  const earliest = dated.length > 0 ? dated.reduce((a, b) => ((b.expiresAt ?? 0) < (a.expiresAt ?? 0) ? b : a)) : null;
+
+  if (certificates.length === 1) {
+    const [only] = certificates;
+    return {
+      id: 'idpCertificateExpiresAt',
+      label: localizationKeys('organizationProfile.securityPage.connectionPage.identityProvider.certificateExpires'),
+      value: only.expiresAt === null ? undefined : formatDate(new Date(only.expiresAt)),
+      tone: toneFor(only),
+    };
+  }
+
+  const count = certificates.length;
+  if (!earliest || earliest.expiresAt === null) {
+    return {
+      id: 'idpCertificates',
+      label: localizationKeys('organizationProfile.securityPage.connectionPage.identityProvider.certificates'),
+      valueKey: localizationKeys('organizationProfile.securityPage.connectionPage.identityProvider.certificatesCount', {
+        count,
+      }),
+    };
+  }
+
+  const expired = getIdpCertificateStatus(earliest) === 'expired';
+  return {
+    id: 'idpCertificates',
+    label: localizationKeys('organizationProfile.securityPage.connectionPage.identityProvider.certificates'),
+    valueKey: localizationKeys(
+      expired
+        ? 'organizationProfile.securityPage.connectionPage.identityProvider.certificatesSummaryExpired'
+        : 'organizationProfile.securityPage.connectionPage.identityProvider.certificatesSummary',
+      { count, date: formatDate(new Date(earliest.expiresAt)) },
+    ),
+    tone: toneFor(earliest),
+  };
 };
 
 const oidcDetails = (connection: EnterpriseConnectionResource): Detail[] => {
@@ -138,7 +190,7 @@ export const IdentityProviderSection = (props: IdentityProviderSectionProps): JS
           <ProfileSection.Item id='ssoConnectionIdentityProvider'>
             <Col sx={t => ({ gap: t.space.$3, minWidth: 0 })}>
               {details
-                .filter(detail => detail.value)
+                .filter(detail => detail.value || detail.valueKey)
                 .map(detail => (
                   <Col
                     key={detail.id}
@@ -149,7 +201,13 @@ export const IdentityProviderSection = (props: IdentityProviderSectionProps): JS
                       variant='caption'
                       localizationKey={detail.label}
                     />
-                    <Text sx={{ overflowWrap: 'anywhere' }}>{detail.value}</Text>
+                    <Text
+                      sx={{ overflowWrap: 'anywhere' }}
+                      colorScheme={detail.tone}
+                      localizationKey={detail.valueKey}
+                    >
+                      {detail.value}
+                    </Text>
                   </Col>
                 ))}
             </Col>
@@ -203,10 +261,10 @@ const SamlForm = withCardStateProvider(
   ({ connection, updateConnection, onSuccess, onReset }: FormScreenProps): JSX.Element => {
     const card = useCardState();
     const saml = connection.samlConnection;
-    const existingCertPresent = Boolean(saml?.idpCertificate);
+    const initialCertificates = toIdpCertificateEntries(saml);
 
     const [mode, setMode] = useState<SamlIdpConfigurationMode>(saml?.idpMetadataUrl ? 'metadataUrl' : 'manual');
-    const [certFile, setCertFile] = useState<File | null>(null);
+    const [certificates, setCertificates] = useState<IdpCertificateEntry[]>(initialCertificates);
 
     const metadataUrlField = useFormControl('idpMetadataUrl', saml?.idpMetadataUrl ?? '', {
       type: 'text',
@@ -248,9 +306,7 @@ const SamlForm = withCardStateProvider(
     const isValid =
       mode === 'metadataUrl'
         ? metadataUrlField.value.trim().length > 0
-        : signOnUrlField.value.trim().length > 0 &&
-          issuerField.value.trim().length > 0 &&
-          (certFile !== null || existingCertPresent);
+        : signOnUrlField.value.trim().length > 0 && issuerField.value.trim().length > 0 && certificates.length > 0;
 
     const formProps: IdentityProviderConfigurationFormProps =
       mode === 'metadataUrl'
@@ -269,9 +325,9 @@ const SamlForm = withCardStateProvider(
               signOnUrlField,
               issuerField,
               certificateField,
-              certFile,
-              onCertFileChange: setCertFile,
-              existingCertPresent,
+              certificates,
+              onCertificatesChange: setCertificates,
+              initialCertificates,
             },
             labels: {
               description: localizationKeys(
@@ -305,7 +361,7 @@ const SamlForm = withCardStateProvider(
         const payload = await buildSamlConfigurationPayload({
           mode,
           metadataUrl: { value: metadataUrlField.value },
-          manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
+          manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certificates, initialCertificates },
         });
 
         await updateConnection(connection.id, { saml: payload });

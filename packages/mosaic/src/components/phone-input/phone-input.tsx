@@ -1,20 +1,17 @@
 'use client';
 
 import type { CountryEntry, CountryIso } from '@clerk/shared/phone';
-import {
-  extractDigits,
-  formatPhoneNumber,
-  getFlagEmojiFromCountryIso,
-  IsoToCountryMap,
-  parsePhoneString,
-} from '@clerk/shared/phone';
+import { extractDigits, getFlagEmojiFromCountryIso, IsoToCountryMap, parsePhoneString } from '@clerk/shared/phone';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { useFormattedInput } from '../../primitives/hooks';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
 import { Combobox } from '../combobox';
 import { Field } from '../field';
@@ -22,6 +19,7 @@ import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
 import { InputGroup } from '../input-group';
 import { Popover } from '../popover';
+import { formatNationalNumber, getNationalNumber, toE164 } from './phone-input.format';
 import { styles } from './phone-input.styles';
 
 const countryOptions = [...IsoToCountryMap.values()];
@@ -35,18 +33,13 @@ function getCountry(iso: CountryIso | undefined): CountryEntry {
   return country ?? fallback;
 }
 
+export function toCountryIso(value: string | null | undefined): CountryIso | undefined {
+  const iso = value?.toLowerCase();
+  return iso ? countryOptions.find(country => country.iso === iso)?.iso : undefined;
+}
+
 function getInitialCountry(value: string | undefined, defaultCountry: CountryIso | undefined): CountryIso {
   return value ? parsePhoneString(value).iso : getCountry(defaultCountry).iso;
-}
-
-function getNationalNumber(value: string, country: CountryEntry): string {
-  const digits = extractDigits(value);
-  return digits.startsWith(country.code) ? digits.slice(country.code.length) : digits;
-}
-
-function toE164(country: CountryEntry, nationalNumber: string): string {
-  const number = extractDigits(nationalNumber);
-  return number ? `+${country.code}${number}` : '';
 }
 
 export interface PhoneInputProps extends Omit<
@@ -110,9 +103,10 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   const [uncontrolledCountry, setUncontrolledCountry] = React.useState<CountryIso>(() =>
     getInitialCountry(valueProp ?? defaultValue, defaultCountry),
   );
+  const emittedValueRef = React.useRef<string | null>(null);
   const country = getCountry(countryProp ?? uncontrolledCountry);
   const nationalNumber = getNationalNumber(value, country);
-  const formattedNumber = formatPhoneNumber(nationalNumber, country.pattern, country.code);
+  const formattedNumber = formatNationalNumber(nationalNumber, country.pattern);
   const [open, setOpen] = React.useState(false);
   const [anchor, setAnchor] = React.useState<HTMLDivElement | null>(null);
   const [query, setQuery] = React.useState('');
@@ -120,16 +114,15 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
   const mergedInputRef = useMergeRefs([inputRef, forwardedRef]);
 
   React.useEffect(() => {
+    const emittedValue = emittedValueRef.current;
+    emittedValueRef.current = null;
+    if (valueProp === undefined || valueProp === emittedValue) {
+      return;
+    }
     if (countryProp === undefined && valueProp) {
       setUncontrolledCountry(parsePhoneString(valueProp).iso);
     }
   }, [countryProp, valueProp]);
-
-  React.useEffect(() => {
-    if (!open) {
-      setQuery('');
-    }
-  }, [open]);
 
   const filteredCountries = React.useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -143,6 +136,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
 
   const setValue = React.useCallback(
     (nextValue: string) => {
+      emittedValueRef.current = nextValue;
       if (valueProp === undefined) {
         setUncontrolledValue(nextValue);
       }
@@ -159,25 +153,31 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       onCountryChange?.(nextCountry.iso);
       setValue(toE164(nextCountry, nationalNumber));
       setOpen(false);
+      setQuery('');
       inputRef.current?.focus();
     },
     [countryProp, nationalNumber, onCountryChange, setValue],
   );
 
-  const handleNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const nextValue = event.target.value;
-    if (nextValue.includes('+')) {
-      const parsed = parsePhoneString(nextValue);
-      const parsedCountry = getCountry(parsed.iso);
-      if (countryProp === undefined) {
-        setUncontrolledCountry(parsedCountry.iso);
+  const numberInput = useFormattedInput({
+    value: formattedNumber,
+    accept: /[\d+]/,
+    format: nextValue =>
+      nextValue.includes('+') ? nextValue : formatNationalNumber(extractDigits(nextValue), country.pattern),
+    onChange: nextValue => {
+      if (nextValue.includes('+')) {
+        const parsed = parsePhoneString(nextValue);
+        const parsedCountry = getCountry(parsed.iso);
+        if (countryProp === undefined) {
+          setUncontrolledCountry(parsedCountry.iso);
+        }
+        onCountryChange?.(parsedCountry.iso);
+        setValue(toE164(parsedCountry, parsed.number));
+        return;
       }
-      onCountryChange?.(parsedCountry.iso);
-      setValue(toE164(parsedCountry, parsed.number));
-      return;
-    }
-    setValue(toE164(country, nextValue));
-  };
+      setValue(toE164(country, nextValue));
+    },
+  });
 
   return (
     <>
@@ -191,7 +191,12 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
       >
         <Popover.Root
           open={open}
-          onOpenChange={setOpen}
+          onOpenChange={nextOpen => {
+            setOpen(nextOpen);
+            if (!nextOpen) {
+              setQuery('');
+            }
+          }}
           initialFocus='first'
           placement='bottom-start'
           sideOffset={8}
@@ -220,7 +225,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                   {getFlagEmojiFromCountryIso(country.iso)}
                 </span>
                 <Icon
-                  name='chevron-down'
+                  glyph={ChevronDown}
                   size='md'
                 />
               </span>
@@ -252,7 +257,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 >
                   <InputGroup.Start>
                     <Icon
-                      name='magnifying-glass'
+                      glyph={MagnifyingGlass}
                       size='sm'
                     />
                   </InputGroup.Start>
@@ -311,7 +316,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           {...inputProps}
           id={id}
           type='tel'
-          value={formattedNumber}
+          {...numberInput}
           disabled={disabledProp}
           required={requiredProp}
           form={form}
@@ -322,7 +327,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
           aria-invalid={ariaInvalidProp}
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
-          onChange={handleNumberChange}
         />
       </InputGroup.Root>
       {name ? (

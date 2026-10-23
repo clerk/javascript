@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 
 import { Dialog } from '@clerk/mosaic/components/dialog';
 import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';

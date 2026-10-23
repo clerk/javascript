@@ -1,4 +1,5 @@
-import type { FormEvent } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -17,7 +18,8 @@ export interface ReverificationOtpMessages {
 }
 
 export interface ReverificationOtpResend {
-  label: string;
+  text: string;
+  label: ReactNode;
   disabled?: boolean;
   onClick: () => void;
 }
@@ -33,6 +35,7 @@ export interface ReverificationOTPProps {
   onComplete?: (value: string) => void;
   onSubmit: () => void;
   onCancel?: () => void;
+  focusRef?: Ref<HTMLElement>;
 }
 
 export function ReverificationOTP({
@@ -46,6 +49,7 @@ export function ReverificationOTP({
   onComplete,
   onSubmit,
   onCancel,
+  focusRef,
 }: ReverificationOTPProps) {
   const formId = useId();
 
@@ -71,10 +75,11 @@ export function ReverificationOTP({
             required
             invalid={Boolean(errorMessage)}
             disabled={isPending}
+            focusableWhenDisabled
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Otp
-              ref={useFlowAutoFocus<HTMLInputElement>()}
+              ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
               name='code'
               length={length}
               value={value}
@@ -89,15 +94,18 @@ export function ReverificationOTP({
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
             {resend ? (
-              <Button
-                type='button'
-                size='sm'
-                variant='link'
-                disabled={resend.disabled || isPending}
-                onClick={resend.onClick}
-              >
-                {resend.label}
-              </Button>
+              <Field.Description>
+                {resend.text}{' '}
+                <Button
+                  type='button'
+                  size='sm'
+                  variant='link'
+                  disabled={resend.disabled || isPending}
+                  onClick={resend.onClick}
+                >
+                  {resend.label}
+                </Button>
+              </Field.Description>
             ) : null}
           </Field.Root>
         </form>

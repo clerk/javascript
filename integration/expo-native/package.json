@@ -1,0 +1,20 @@
+{
+  "name": "verify-clerk-expo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@clerk/internal-mobile-e2e": "github:clerk/internal-mobile-e2e#ad396e6014ad86cd3d29e58933c75ab59905b7ab",
+    "@types/node": "24.19.1",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=24.8.0 <25"
+  },
+  "allowScripts": {
+    "github:clerk/internal-mobile-e2e": true
+  }
+}

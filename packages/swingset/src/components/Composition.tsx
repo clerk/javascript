@@ -17,6 +17,7 @@ const LAYER_ORDER = [
   'User Button',
   'User Profile',
   'Organization Profile',
+  'Misc',
   'Blocks',
   'Components',
   'Styles',

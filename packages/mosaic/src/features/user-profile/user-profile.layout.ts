@@ -1,15 +1,19 @@
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Code } from '../../icons/glyphs/code';
+import { CreditCard } from '../../icons/glyphs/credit-card';
+import { ShieldCheck } from '../../icons/glyphs/shield-check';
+import { UserCircle } from '../../icons/glyphs/user-circle';
 import { applyOrder } from '../../utils/apply-order';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 
 /** The built-in pages in the order the profile lists them before a consumer reorders anything. */
 export const USER_PROFILE_PAGE_IDS: readonly UserProfilePageId[] = ['account', 'security', 'billing', 'apiKeys'];
 
-export const USER_PROFILE_PAGE_ICONS: Record<UserProfilePageId, IconName> = {
-  account: 'user-circle',
-  security: 'shield-check',
-  billing: 'credit-card',
-  apiKeys: 'code',
+export const USER_PROFILE_PAGE_ICONS: Record<UserProfilePageId, IconComponent> = {
+  account: UserCircle,
+  security: ShieldCheck,
+  billing: CreditCard,
+  apiKeys: Code,
 };
 
 /** One row of the navigation: a built-in page by id, or a page of the consumer's own. */
@@ -19,7 +23,10 @@ export type UserProfileNavEntry =
 
 /** The built-in pages this instance was given content for. `account` is always among them. */
 export function getAvailableUserProfilePages(pages: UserProfilePages): UserProfilePageId[] {
-  return USER_PROFILE_PAGE_IDS.filter(id => pages[id] !== undefined);
+  return USER_PROFILE_PAGE_IDS.filter(id => {
+    const content = pages[id];
+    return content !== undefined && content !== null && content !== false;
+  });
 }
 
 /**

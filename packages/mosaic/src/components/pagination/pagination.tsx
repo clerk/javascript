@@ -1,11 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ChevronDoubleLeft } from '../../icons/glyphs/chevron-double-left';
+import { ChevronDoubleRight } from '../../icons/glyphs/chevron-double-right';
+import { ChevronLeft } from '../../icons/glyphs/chevron-left';
+import { ChevronRight } from '../../icons/glyphs/chevron-right';
 import { fill } from '../../localization/messages';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { rtl } from '../../utils/rtl.styles';
+import { reset } from '../../styles/reset.styles';
+import { rtl } from '../../styles/rtl.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { Select } from '../select';
@@ -106,46 +110,50 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           <span {...mergeStyleProps(themeProps('pagination-range'), stylex.props(reset.base, styles.text))}>
             {fill(rangeLabel, { start, end, total: itemCount })}
           </span>
-          <span
-            aria-hidden
-            {...mergeStyleProps(themeProps('pagination-divider'), stylex.props(reset.base, styles.divider))}
-          />
-          <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
-            <span {...stylex.props(reset.base, styles.text, styles.pageSizeLabel)}>{pageSizeLabel}</span>
-            <span
-              aria-hidden
-              {...stylex.props(reset.base, styles.text, styles.pageSizeLabelCompact)}
-            >
-              {pageSizeLabelCompact}
-            </span>
-            <Select.Root
-              items={pageSizeItems}
-              value={String(itemsPerPage)}
-              onValueChange={value => onPageSizeChange?.(Number(value))}
-            >
-              <Select.Trigger
-                aria-label={pageSizeLabel}
-                disabled={disabled}
-                render={props => (
-                  <Button
-                    color='neutral'
-                    variant='outline'
-                    size='sm'
-                    {...props}
-                  />
-                )}
+          {onPageSizeChange ? (
+            <>
+              <span
+                aria-hidden
+                {...mergeStyleProps(themeProps('pagination-divider'), stylex.props(reset.base, styles.divider))}
               />
-              <Select.Popup>
-                {pageSizeItems.map(item => (
-                  <Select.Option
-                    key={item.value}
-                    xstyle={styles.pageSizeOption}
-                    {...item}
+              <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
+                <span {...stylex.props(reset.base, styles.text, styles.pageSizeLabel)}>{pageSizeLabel}</span>
+                <span
+                  aria-hidden
+                  {...stylex.props(reset.base, styles.text, styles.pageSizeLabelCompact)}
+                >
+                  {pageSizeLabelCompact}
+                </span>
+                <Select.Root
+                  items={pageSizeItems}
+                  value={String(itemsPerPage)}
+                  onValueChange={value => onPageSizeChange(Number(value))}
+                >
+                  <Select.Trigger
+                    aria-label={pageSizeLabel}
+                    disabled={disabled}
+                    render={props => (
+                      <Button
+                        color='neutral'
+                        variant='outline'
+                        size='sm'
+                        {...props}
+                      />
+                    )}
                   />
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </div>
+                  <Select.Popup>
+                    {pageSizeItems.map(item => (
+                      <Select.Option
+                        key={item.value}
+                        xstyle={styles.pageSizeOption}
+                        {...item}
+                      />
+                    ))}
+                  </Select.Popup>
+                </Select.Root>
+              </div>
+            </>
+          ) : null}
         </div>
 
         <div {...mergeStyleProps(themeProps('pagination-controls'), stylex.props(reset.base, styles.controls))}>
@@ -162,7 +170,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 onClick={() => goTo(1)}
               >
                 <Icon
-                  name='chevron-double-left'
+                  glyph={ChevronDoubleLeft}
                   size='sm'
                   xstyle={rtl.mirror}
                 />
@@ -179,7 +187,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               onClick={() => goTo(current - pageStep)}
             >
               <Icon
-                name='chevron-left'
+                glyph={ChevronLeft}
                 size='sm'
                 xstyle={rtl.mirror}
               />
@@ -205,7 +213,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               onClick={() => goTo(current + pageStep)}
             >
               <Icon
-                name='chevron-right'
+                glyph={ChevronRight}
                 size='sm'
                 xstyle={rtl.mirror}
               />
@@ -222,7 +230,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 onClick={() => goTo(pageCount)}
               >
                 <Icon
-                  name='chevron-double-right'
+                  glyph={ChevronDoubleRight}
                   size='sm'
                   xstyle={rtl.mirror}
                 />

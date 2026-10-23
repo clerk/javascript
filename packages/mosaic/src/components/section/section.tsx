@@ -2,31 +2,36 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ExclamationCircle } from '../../icons/glyphs/exclamation-circle';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { feedbackHeight, feedbackStyles } from '../../styles/feedback.styles';
+import { reset } from '../../styles/reset.styles';
+import { sizes as typographySizes, styles as typographyStyles, truncationStyles } from '../../styles/typography.styles';
 import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
-import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
-import { reset } from '../../utils/reset.styles';
-import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
+import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
-import { sectionItemsMarker } from './section.markers.stylex';
+import { sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
-export type SectionTitleProps = Omit<HeadingProps, 'size'>;
 export type SectionGroupProps = MosaicComponentProps<'div'>;
+export type SectionHeaderProps = MosaicComponentProps<'div'>;
+export type SectionTitleProps = Omit<HeadingProps, 'size'>;
+export type SectionBodyProps = MosaicComponentProps<'div'>;
 export type SectionRowProps = MosaicComponentProps<'div'>;
-export type SectionItemsProps = MosaicComponentProps<'div'>;
-export type SectionItemProps = MosaicComponentProps<'div'>;
+export type SectionItemsProps = MosaicComponentProps<'ul'>;
+export type SectionItemProps = MosaicComponentProps<'div'> & { wrap?: boolean };
 export type SectionMediaSize = 'sm' | 'md' | 'lg' | 'xl';
 export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize };
 export type SectionContentProps = MosaicComponentProps<'div'>;
 export type SectionLabelProps = MosaicComponentProps<'div'>;
 export type SectionDescriptionProps = MosaicComponentProps<'div'>;
 export type SectionActionsProps = MosaicComponentProps<'div'>;
+export type SectionNoteProps = MosaicComponentProps<'div'> & { icon?: React.ReactNode };
 export type SectionErrorProps = MosaicComponentProps<'p'>;
 
 const mediaSizes = {
@@ -36,91 +41,92 @@ const mediaSizes = {
   xl: styles.mediaXl,
 };
 
-const SectionTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
+const SectionGroupContext = React.createContext<React.Dispatch<React.SetStateAction<string | undefined>> | null>(null);
+const SectionHeaderContext = React.createContext(false);
 const SectionItemsContext = React.createContext(false);
+const SectionItemWrapContext = React.createContext(false);
 
-const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot(
-  { render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
-  ref,
-) {
-  const [titleIds, setTitleIds] = React.useState<string[]>([]);
-
-  const element = useRender({
+const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot({ render, xstyle, ...rest }, ref) {
+  return useRender({
     defaultTagName: 'section',
     render,
     ref,
+    props: mergeStyleProps(themeProps('section'), stylex.props(reset.base, styles.root, xstyle), rest),
+  });
+});
+
+const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function SectionGroup(
+  { render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
+  ref,
+) {
+  const [titleId, setTitleId] = React.useState<string>();
+
+  const element = useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
     props: {
-      ...mergeStyleProps(themeProps('section'), stylex.props(reset.base, styles.root, xstyle), rest),
+      role: 'group',
+      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
       'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleIds.join(' ') || undefined),
+      'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleId),
     },
   });
 
-  return <SectionTitleContext.Provider value={setTitleIds}>{element}</SectionTitleContext.Provider>;
+  return <SectionGroupContext.Provider value={setTitleId}>{element}</SectionGroupContext.Provider>;
+});
+
+const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function SectionHeader(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  const element = useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('section-header'), stylex.props(reset.base, styles.header, xstyle), rest),
+  });
+
+  return <SectionHeaderContext.Provider value>{element}</SectionHeaderContext.Provider>;
 });
 
 const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function SectionTitle(
-  { id: idProp, render, xstyle, ...rest },
+  { id: idProp, xstyle, ...rest },
   ref,
 ) {
-  const setTitleIds = React.useContext(SectionTitleContext);
+  const setTitleId = React.useContext(SectionGroupContext);
   const generatedId = React.useId();
   const level = useHeadingLevel();
-  const id = idProp ?? (setTitleIds ? `cl-section-${generatedId}-title` : undefined);
+  const id = idProp ?? (setTitleId ? `cl-section-${generatedId}-title` : undefined);
 
   useSafeLayoutEffect(() => {
-    if (!id || !setTitleIds) {
+    if (!id || !setTitleId) {
       return undefined;
     }
 
-    setTitleIds(ids => (ids.includes(id) ? ids : [...ids, id]));
-    return () => setTitleIds(ids => ids.filter(value => value !== id));
-  }, [id, setTitleIds]);
+    setTitleId(id);
+    return () => setTitleId(current => (current === id ? undefined : current));
+  }, [id, setTitleId]);
 
   return (
     <Heading
       ref={ref}
       id={id}
       level={level}
-      render={render}
       size='base'
-      {...mergeStyleProps(themeProps('section-title'), stylex.props(styles.title, xstyle), rest)}
+      xstyle={[styles.title, truncationStyles.singleLine, xstyle]}
+      {...mergeStyleProps(themeProps('section-title'), rest)}
     />
   );
 });
 
-const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function SectionGroup(
-  { render, xstyle, ...rest },
-  ref,
-) {
+const Body = React.forwardRef<HTMLDivElement, SectionBodyProps>(function SectionBody({ render, xstyle, ...rest }, ref) {
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
-    },
+    props: mergeStyleProps(themeProps('section-body'), stylex.props(reset.base, styles.body, xstyle), rest),
   });
-});
-
-const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function SectionItems(
-  { render, xstyle, ...rest },
-  ref,
-) {
-  const element = useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('section-items', { nested: true }),
-        stylex.props(reset.base, styles.items, sectionItemsMarker, xstyle),
-        rest,
-      ),
-    },
-  });
-
-  return <SectionItemsContext.Provider value>{element}</SectionItemsContext.Provider>;
 });
 
 const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRow({ render, xstyle, ...rest }, ref) {
@@ -128,23 +134,49 @@ const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRo
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(themeProps('section-row'), stylex.props(reset.base, styles.row, xstyle), rest),
-    },
+    props: mergeStyleProps(themeProps('section-row'), stylex.props(reset.base, styles.row, xstyle), rest),
   });
 });
 
-const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem({ render, xstyle, ...rest }, ref) {
-  const nested = React.useContext(SectionItemsContext);
-
-  return useRender({
-    defaultTagName: 'div',
+const Items = React.forwardRef<HTMLUListElement, SectionItemsProps>(function SectionItems(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  const element = useRender({
+    defaultTagName: 'ul',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(themeProps('section-item', { nested }), stylex.props(reset.base, styles.item, xstyle), rest),
-    },
+    props: mergeStyleProps(themeProps('section-items'), stylex.props(reset.base, styles.items, xstyle), rest),
   });
+
+  return <SectionItemsContext.Provider value>{element}</SectionItemsContext.Provider>;
+});
+
+const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem(
+  { wrap = false, render, xstyle, ...rest },
+  ref,
+) {
+  const nested = React.useContext(SectionItemsContext);
+
+  const element = useRender({
+    defaultTagName: nested ? 'li' : 'div',
+    render,
+    ref,
+    props: mergeStyleProps(
+      themeProps('section-item', { nested, wrap }),
+      stylex.props(
+        reset.base,
+        styles.item,
+        nested && styles.nestedItem,
+        nested && sectionNestedItemMarker,
+        wrap && styles.itemWrap,
+        xstyle,
+      ),
+      rest,
+    ),
+  });
+
+  return <SectionItemWrapContext.Provider value={wrap}>{element}</SectionItemWrapContext.Provider>;
 });
 
 const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
@@ -155,13 +187,11 @@ const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function Secti
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('section-media', { size }),
-        stylex.props(reset.base, styles.mediaBase, mediaSizes[size], xstyle),
-        rest,
-      ),
-    },
+    props: mergeStyleProps(
+      themeProps('section-media', { size }),
+      stylex.props(reset.base, styles.mediaBase, mediaSizes[size], xstyle),
+      rest,
+    ),
   });
 });
 
@@ -170,23 +200,22 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
   ref,
 ) {
   const nested = React.useContext(SectionItemsContext);
+  const inHeader = React.useContext(SectionHeaderContext);
 
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(
-        themeProps('section-content', { nested }),
-        stylex.props(reset.base, styles.content, xstyle),
-        rest,
-      ),
-    },
+    props: mergeStyleProps(
+      themeProps('section-content', { nested }),
+      stylex.props(reset.base, styles.content, inHeader && styles.headerContent, xstyle),
+      rest,
+    ),
   });
 });
 
 const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function SectionLabel(
-  { render, xstyle, ...rest },
+  { render, xstyle, children, ...rest },
   ref,
 ) {
   return useRender({
@@ -195,6 +224,7 @@ const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function Secti
     ref,
     props: {
       ...mergeStyleProps(themeProps('section-label'), stylex.props(reset.base, styles.label, xstyle), rest),
+      children: withTruncatableLabel(children),
     },
   });
 });
@@ -207,9 +237,11 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      ...mergeStyleProps(themeProps('section-description'), stylex.props(reset.base, styles.description, xstyle), rest),
-    },
+    props: mergeStyleProps(
+      themeProps('section-description'),
+      stylex.props(reset.base, styles.description, xstyle),
+      rest,
+    ),
   });
 });
 
@@ -217,12 +249,44 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
   { render, xstyle, ...rest },
   ref,
 ) {
+  const wrap = React.useContext(SectionItemWrapContext);
+  const inHeader = React.useContext(SectionHeaderContext);
+
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(
+      themeProps('section-actions'),
+      stylex.props(reset.base, styles.actions, wrap && styles.actionsWrap, inHeader && styles.headerActions, xstyle),
+      rest,
+    ),
+  });
+});
+
+/**
+ * Static text that takes an action's place in a row, stating why it offers none. Sits directly in
+ * `Section.Item` where a `Section.Actions` would; it holds its own trailing position, so it does not
+ * need one. `icon` renders into a fixed leading slot, sized to the text, for a logo or a lock.
+ */
+const Note = React.forwardRef<HTMLDivElement, SectionNoteProps>(function SectionNote(
+  { icon, children, render, xstyle, ...rest },
+  ref,
+) {
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-actions'), stylex.props(reset.base, styles.actions, xstyle), rest),
+      ...mergeStyleProps(themeProps('section-note'), stylex.props(reset.base, styles.note, xstyle), rest),
+      children: (
+        <>
+          {icon ? (
+            <span {...mergeStyleProps(themeProps('section-note-icon'), stylex.props(styles.noteIcon))}>{icon}</span>
+          ) : null}
+          <span {...stylex.props(truncationStyles.singleLine, styles.truncate)}>{children}</span>
+        </>
+      ),
     },
   });
 });
@@ -276,7 +340,7 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
           {...transitionProps}
           style={{ ...messageProps.style, ...transitionProps.style }}
         >
-          <FeedbackBody icon='exclamation-circle'>{message}</FeedbackBody>
+          <FeedbackBody icon={ExclamationCircle}>{message}</FeedbackBody>
         </span>
       ),
     },
@@ -284,13 +348,16 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
 });
 
 /**
- * A compound component that fixes section semantics, surface treatment, row grouping,
- * and item layout while leaving each item's content composable.
+ * A compound component for a topic of settings. `Section.Root` stacks groups; each `Section.Group`
+ * is named by the `Section.Title` in its `Section.Header`, above a `Section.Body` card holding
+ * either `Section.Row`s (one setting each) or a `Section.Items` list of values.
  */
 export const Section = {
   Root,
-  Title,
   Group,
+  Header,
+  Title,
+  Body,
   Row,
   Items,
   Item,
@@ -299,5 +366,6 @@ export const Section = {
   Label,
   Description,
   Actions,
+  Note,
   Error: SectionError,
 };

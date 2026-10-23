@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
+import { focusOutline } from '../../styles/focus-outline.styles';
 import { durationVars, radiusVars, scrollbarVars, scrollFadeVars } from '../../tokens.stylex';
-import { focusOutline } from '../../utils/focus-outline.styles';
 import { scrollAreaVars, scrollbarThumbVars } from './scroll-area.vars.stylex';
 
 // Same-file locals so the `var()` references read as names rather than as a wall of
@@ -49,7 +49,9 @@ const revealEnd = stylex.keyframes({
 // own, since the two can never legitimately differ. Where we do NOT paint the scrollbar the
 // layer is zero-wide and contributes nothing. Layers composite with `add` by default, so no
 // `mask-composite` declaration is needed.
-const fadeStops = `transparent 0, #000 calc(${progressStart} * ${fadeSize}), #000 calc(100% - ${progressEnd} * ${fadeSize}), transparent 100%`;
+const fadeStart = `var(--_cl-scroll-area-fade-start, ${fadeSize})`;
+const fadeEnd = `var(--_cl-scroll-area-fade-end, ${fadeSize})`;
+const fadeStops = `transparent 0, #000 calc(${progressStart} * ${fadeStart}), #000 calc(100% - ${progressEnd} * ${fadeEnd}), transparent 100%`;
 const blockMaskImage = `linear-gradient(to bottom, ${fadeStops}), linear-gradient(#000, #000)`;
 const inlineMaskImage = `linear-gradient(to right, ${fadeStops}), linear-gradient(#000, #000)`;
 const inlineMaskImageRtl = `linear-gradient(to left, ${fadeStops}), linear-gradient(#000, #000)`;

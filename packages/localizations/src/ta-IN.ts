@@ -310,9 +310,45 @@ export const taIN: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -906,6 +942,17 @@ export const taIN: LocalizationResource = {
       title: 'வழங்குநரைத் தேர்ந்தெடுக்கவும்',
       warning: 'வழங்குநரைத் தேர்ந்தெடுத்த பிறகு, கட்டமைப்பு முடியும் வரை மீண்டும் மாற்ற முடியாது',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1350,6 +1397,10 @@ export const taIN: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },
@@ -1592,6 +1643,11 @@ export const taIN: LocalizationResource = {
         'உங்கள் பாஸ்கீயைப் பயன்படுத்துவது உங்கள் அடையாளத்தை உறுதிப்படுத்துகிறது. உங்கள் சாதனம் உங்கள் கைரேகை, முகம் அல்லது திரை பூட்டைக் கேட்கலாம்.',
       title: 'உங்கள் பாஸ்கீயைப் பயன்படுத்தவும்',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'வேறு முறையைப் பயன்படுத்துங்கள்',
       subtitle: 'தொடர உங்கள் தற்போதைய கடவுச்சொல்லை உள்ளிடவும்',
@@ -1742,6 +1798,10 @@ export const taIN: LocalizationResource = {
       subtitle:
         'உங்கள் பாஸ்கீயைப் பயன்படுத்துவது நீங்கள் தான் என்பதை உறுதிப்படுத்துகிறது. உங்கள் சாதனம் உங்கள் கைரேகை, முகம் அல்லது திரை பூட்டைக் கேட்கலாம்.',
       title: 'உங்கள் பாஸ்கீயைப் பயன்படுத்தவும்',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'வேறு முறையைப் பயன்படுத்துங்கள்',

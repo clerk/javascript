@@ -1,9 +1,12 @@
 import stylex from '@stylexjs/unplugin/vite';
+import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 const mosaicPath = resolve(import.meta.dirname, 'src');
+const featureTests = 'src/**/*.feature.test.tsx';
+const webkitTests = 'src/**/*.webkit.test.tsx';
 
 export default defineConfig({
   plugins: [
@@ -22,9 +25,9 @@ export default defineConfig({
     exclude: ['node_modules/**', 'dist/**'],
     testTimeout: 5000,
     // Primitives ran as their own package on happy-dom with no setup beyond matchers, so they
-    // never picked up clerk-js's shared jsdom mocks (including a requestAnimationFrame mock that
-    // changes floating-ui's focus-on-open timing). Keeping them on their own project here, instead
-    // of folding them into the root jsdom project, preserves that behavior post-move.
+    // never picked up the requestAnimationFrame mock in the Mosaic setup (it changes floating-ui's
+    // focus-on-open timing). Keeping them on their own project here, instead of folding them into
+    // the jsdom project, preserves that behavior post-move.
     projects: [
       {
         extends: true,
@@ -32,6 +35,7 @@ export default defineConfig({
           name: 'primitives',
           environment: 'happy-dom',
           include: ['src/primitives/**/*.test.?(c|m)[jt]s?(x)', 'src/primitives/**/*.spec.?(c|m)[jt]s?(x)'],
+          exclude: [webkitTests],
           setupFiles: ['./src/primitives/test-utils/vitest.setup.ts'],
         },
       },
@@ -40,8 +44,47 @@ export default defineConfig({
         test: {
           name: 'mosaic',
           include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
-          exclude: ['src/primitives/**'],
-          setupFiles: ['../clerk-js/vitest.setup.mts'],
+          exclude: ['src/primitives/**', featureTests, webkitTests],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
+        },
+      },
+      {
+        extends: true,
+        publicDir: 'test/public',
+        optimizeDeps: {
+          include: [
+            '@clerk/clerk-js',
+            '@wallet-standard/core',
+            '@testing-library/jest-dom/matchers',
+            '@testing-library/react',
+            '@testing-library/user-event',
+            'msw',
+            'msw/browser',
+          ],
+        },
+        test: {
+          name: 'feature',
+          include: [featureTests],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.browser.mts')],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'webkit',
+          include: [webkitTests],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'webkit' }],
+          },
         },
       },
     ],

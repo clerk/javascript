@@ -116,6 +116,11 @@ added.
 `{ files, addFiles, removeFile, clearFiles, openFilePicker, disabled }` for reading the selection
 and driving custom UI. It must be called inside `FileUpload.Root`.
 
+`FileUpload.useObjectUrl(file)` returns a URL for a locally picked file, revoked when the file is
+replaced or the caller unmounts, and `undefined` when there is no file. `ItemPreview` uses it, and so
+does any surface that shows the pick in its own element rather than a thumbnail — an avatar showing
+the new image while the upload is still running. It does not need `FileUpload.Root`.
+
 ## Props
 
 ### `FileUpload.Root`

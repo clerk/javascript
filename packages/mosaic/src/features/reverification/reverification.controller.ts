@@ -1,31 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
+import { useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, StateConfig } from '../../machine/types';
-import { useMachine } from '../../machine/useMachine';
-import type { ReverificationModel, ReverificationReadyModel } from './reverification.model';
-import type { ReverificationMethod, ReverificationResult, ReverificationViewProps } from './reverification.types';
-import { needsPrepare, otpChannelFor } from './reverification.utils';
+import { useMachine } from '../../machine/use-machine';
+import type { ReverificationActiveModel, ReverificationModel } from './reverification.model';
+import type {
+  ReverificationErrorReason,
+  ReverificationMethod,
+  ReverificationResult,
+  ReverificationStep,
+  ReverificationViewProps,
+} from './reverification.types';
+import { errorDetail, needsPrepare, otpChannelFor } from './reverification.utils';
 
-export type ReverificationController =
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'unavailable' }
-  | ({ status: 'ready' } & ReverificationViewProps);
+type ReverificationControllerState =
+  | { status: 'idle'; onCancel?: undefined }
+  | { status: 'loading'; onCancel?: () => void }
+  | { status: 'error'; reason: ReverificationErrorReason; onCancel?: () => void }
+  | ({ status: 'ready'; onCancel?: () => void } & ReverificationViewProps)
+  | ({ status: 'retrying'; onCancel?: undefined } & ReverificationViewProps);
+
+export type ReverificationController = ReverificationControllerState & {
+  /**
+   * Whether reverification has a card of its own to show: a factor or an error. The pending card
+   * shown before a factor exists is not counted, so a host can keep its own pending state on
+   * screen until this turns true. False again as soon as the run ends or the user cancels.
+   */
+  visible: boolean;
+};
 
 type OverlayFrom = 'factor' | 'method-picker';
 
-export type ReverificationDeps = Pick<ReverificationReadyModel, 'start' | 'prepare' | 'attempt' | 'finish' | 'cancel'>;
+export type ReverificationDeps = Pick<ReverificationActiveModel, 'start' | 'prepare' | 'attempt' | 'finish'>;
+
+interface FactorError {
+  detail: string | undefined;
+}
 
 interface ReverificationContext {
   inputValue: string;
-  errorMessage: string | undefined;
+  error: FactorError | undefined;
   direction: FlowDirection;
   activeMethod: ReverificationMethod | null;
   methods: readonly ReverificationMethod[];
   resendAvailableAt: number | undefined;
-  abortRequested: boolean;
   submitRequested: boolean;
   frozenActiveMethodId: string | undefined;
   overlayFrom: OverlayFrom;
@@ -55,7 +75,6 @@ const unseatedDeps: ReverificationDeps = {
   prepare: notSeated,
   attempt: notSeated,
   finish: notSeated,
-  cancel: () => {},
 };
 
 export const RESEND_COOLDOWN_MS = 30_000;
@@ -68,15 +87,15 @@ function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
   return { resendAvailableAt: undefined };
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+function factorError(error: unknown): FactorError {
+  return { detail: errorDetail(error) };
 }
 
 function selectMethod(ctx: ReverificationContext, id: string): Partial<ReverificationContext> {
   return {
     activeMethod: ctx.methods.find(method => method.id === id) ?? ctx.activeMethod,
     inputValue: '',
-    errorMessage: undefined,
+    error: undefined,
     direction: 1,
     submitRequested: false,
   };
@@ -99,7 +118,7 @@ const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => 
   methods: event.output.methods,
   activeMethod: event.output.startingMethod,
   inputValue: '',
-  errorMessage: undefined,
+  error: undefined,
   ...unlockResend(),
   direction: 1,
 }));
@@ -107,8 +126,8 @@ const afterResult = [
   {
     guard: (_: ReverificationContext, event: DoneInvokeEvent<ReverificationResult>) =>
       event.output.status === 'complete',
-    target: 'completing' as const,
-    // We don't apply the result here as we want to keep the old one visible as we are completing
+    target: 'finishing' as const,
+    // We don't apply the result here as we want to keep the old one visible as we are finishing
   },
   {
     guard: (_: ReverificationContext, event: DoneInvokeEvent<ReverificationResult>) =>
@@ -127,20 +146,9 @@ const afterResult = [
   { target: 'verifying' as const, actions: applyResult },
 ];
 
-const abortAfterInvoke = {
-  target: 'done' as const,
-  guard: (ctx: ReverificationContext) => ctx.abortRequested,
-  actions: [
-    (ctx: ReverificationContext) => {
-      ctx.deps.cancel();
-    },
-    assign(() => ({ abortRequested: false })),
-  ],
-};
-
 const factorEvents = {
   TYPE: {
-    actions: assign((_, event) => ({ inputValue: event.value, errorMessage: undefined })),
+    actions: assign((_, event) => ({ inputValue: event.value, error: undefined })),
   },
   SHOW_METHODS: {
     target: 'methodPicker',
@@ -168,12 +176,11 @@ export const reverificationMachine = createMachine({
   initial: 'inactive',
   context: {
     inputValue: '',
-    errorMessage: undefined,
+    error: undefined,
     direction: 1,
     activeMethod: null,
     methods: [],
     resendAvailableAt: undefined,
-    abortRequested: false,
     submitRequested: false,
     frozenActiveMethodId: undefined,
     overlayFrom: 'factor',
@@ -184,8 +191,7 @@ export const reverificationMachine = createMachine({
     inactive: {
       entry: assign(() => ({
         inputValue: '',
-        errorMessage: undefined,
-        abortRequested: false,
+        error: undefined,
         submitRequested: false,
         ...unlockResend(),
       })),
@@ -196,7 +202,7 @@ export const reverificationMachine = createMachine({
       on: { RESET: 'inactive' },
       invoke: fromPromise(ctx => ctx.deps.start(), {
         onDone: afterResult,
-        onError: 'unavailable',
+        onError: 'failed',
       }),
     },
 
@@ -225,7 +231,7 @@ export const reverificationMachine = createMachine({
         onError: {
           target: 'verifying',
           actions: assign((_, event) => ({
-            errorMessage: errorMessage(event.error),
+            error: factorError(event.error),
             submitRequested: false,
             ...unlockResend(),
           })),
@@ -246,7 +252,7 @@ export const reverificationMachine = createMachine({
         onDone: 'verifying',
         onError: {
           target: 'verifying',
-          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error), ...unlockResend() })),
+          actions: assign((_, event) => ({ error: factorError(event.error), ...unlockResend() })),
         },
       }),
     },
@@ -264,7 +270,7 @@ export const reverificationMachine = createMachine({
           actions: assign(() => ({
             ...lockResend(),
             inputValue: '',
-            errorMessage: undefined,
+            error: undefined,
             submitRequested: false,
           })),
         },
@@ -272,21 +278,13 @@ export const reverificationMachine = createMachine({
     },
 
     submitting: {
-      on: {
-        RESET: {
-          guard: ctx => !ctx.abortRequested,
-          actions: assign(() => ({ abortRequested: true })),
-        },
-      },
+      on: { RESET: 'inactive' },
       invoke: fromPromise(submit, {
-        onDone: [abortAfterInvoke, ...afterResult],
-        onError: [
-          abortAfterInvoke,
-          {
-            target: 'verifying',
-            actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
-          },
-        ],
+        onDone: afterResult,
+        onError: {
+          target: 'verifying',
+          actions: assign((_, event) => ({ error: factorError(event.error) })),
+        },
       }),
     },
 
@@ -327,52 +325,62 @@ export const reverificationMachine = createMachine({
     },
 
     unavailable: {
-      entry: (ctx: ReverificationContext) => {
-        ctx.deps.cancel();
-      },
       on: { RESET: 'inactive' },
     },
 
-    completing: {
+    failed: {
+      on: { RESET: 'inactive' },
+    },
+
+    finishing: {
       on: { RESET: 'inactive' },
       invoke: fromPromise(ctx => ctx.deps.finish(), {
-        onDone: 'done',
-        onError: {
-          target: 'verifying',
-          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
-        },
+        onDone: 'retrying',
+        onError: 'failed',
       }),
     },
 
-    done: {
+    // This means we are retrying the action after successful reverification
+    // This state is left by the model returning to inactive once the retry has completed
+    retrying: {
       on: { RESET: 'inactive' },
     },
   },
 });
 
-const pendingStates = new Set(['submitting', 'completing']);
+const pendingStates = new Set(['submitting', 'finishing', 'retrying']);
 
-function viewStep(value: string, method: ReverificationMethod | null): ReverificationViewProps['step'] | undefined {
+function factorStep(method: ReverificationMethod): ReverificationStep {
+  if (method.strategy === 'password') {
+    return 'password';
+  }
+  if (method.strategy === 'passkey') {
+    return 'passkey';
+  }
+  if (method.strategy === 'backup_code') {
+    return 'backup-code';
+  }
+  return 'otp';
+}
+
+function viewStep(value: string, method: ReverificationMethod | null): ReverificationStep | undefined {
   if (value === 'methodPicker' || value === 'methodPickerPreparing') {
     return 'method-picker';
   }
   if (value === 'help') {
     return 'help';
   }
-  if (value === 'verifying' || value === 'submitting' || value === 'preparing' || value === 'completing') {
+  if (
+    value === 'verifying' ||
+    value === 'submitting' ||
+    value === 'preparing' ||
+    value === 'finishing' ||
+    value === 'retrying'
+  ) {
     if (!method) {
       return undefined;
     }
-    if (method.strategy === 'password') {
-      return 'password';
-    }
-    if (method.strategy === 'passkey') {
-      return 'passkey';
-    }
-    if (method.strategy === 'backup_code') {
-      return 'backup-code';
-    }
-    return 'otp';
+    return factorStep(method);
   }
   return undefined;
 }
@@ -380,24 +388,42 @@ function viewStep(value: string, method: ReverificationMethod | null): Reverific
 /**
  * Machine - State internal to the controller, not all steps are exposed to the UI
  * Return 'ReverificationController' - The view state
- *   - status: idle | loading | unavailable | ready
- *   - When ready
- *     - step: The visible reverification step
+ *   - status: 'idle' renders nothing
+ *   - status: 'loading' | 'error' carry no factor props
+ *   - status: 'ready' | 'retrying' carry the factor view, including step
  *
- * Note that there are two loading states.
- *   - status: 'loading' - Full card spinner
- *   - status: 'ready' && isPending: true - Current action is pending, inline loading state
+ * There are two pending presentations.
+ *   - status: 'loading' is the pending card rendered in place, before a factor exists
+ *   - status: 'ready' && isPending is the inline pending state of the current factor
+ *
+ * 'retrying' is the point of no return: verification succeeded and the original action is being
+ * retried, so it keeps the last factor pending and has no `onCancel`. The factor machine runs
+ * while the model is active and resets when the model returns to inactive.
+ *
+ * When the run ends or the user cancels, the model returns to inactive and the controller to
+ * 'idle' in the same render. Continuity of the card on screen is the `Reverification` component's
+ * job: it keeps rendering the last card it showed, pending and without `onCancel`, for as long as
+ * it stays mounted, so a host can animate the card away without it going blank.
  */
 export function useReverificationController(model: ReverificationModel): ReverificationController {
-  const ready = model.status === 'ready' ? model : null;
+  const state = useReverificationState(model);
+  return useMemo(
+    () => ({ ...state, visible: state.status === 'ready' || state.status === 'retrying' || state.status === 'error' }),
+    [state],
+  );
+}
+
+function useReverificationState(model: ReverificationModel): ReverificationControllerState {
+  const m = useMessages('reverification');
+  const active = model.status === 'active' ? model : null;
 
   const [snapshot, send] = useMachine(
     reverificationMachine,
-    ready
+    active
       ? {
           context: {
-            supportEmail: ready.supportEmail,
-            deps: ready,
+            supportEmail: active.supportEmail,
+            deps: active,
           },
         }
       : undefined,
@@ -416,8 +442,13 @@ export function useReverificationController(model: ReverificationModel): Reverif
     return () => window.clearInterval(id);
   }, [countingDown, resendAvailableAt]);
 
-  const needsStart = model.isActive && Boolean(ready) && snapshot.value === 'inactive';
-  const needsReset = !model.isActive && snapshot.value !== 'inactive';
+  const cancelModel =
+    (model.status === 'loading' || model.status === 'active') && snapshot.value !== 'retrying'
+      ? model.cancel
+      : undefined;
+  const onCancel = cancelModel;
+  const needsStart = active !== null && snapshot.value === 'inactive';
+  const needsReset = model.status === 'inactive' && snapshot.value !== 'inactive';
   useEffect(() => {
     if (needsStart) {
       send({ type: 'START' });
@@ -426,63 +457,71 @@ export function useReverificationController(model: ReverificationModel): Reverif
     }
   }, [needsStart, needsReset, send]);
 
-  if (!model.isActive) {
-    return { status: 'idle' };
-  }
+  const inactive = model.status === 'inactive';
 
-  if (snapshot.value === 'inactive' || snapshot.value === 'starting' || snapshot.value === 'done') {
-    return { status: 'loading' };
-  }
+  return useMemo((): ReverificationControllerState => {
+    if (inactive) {
+      return { status: 'idle' };
+    }
 
-  if (snapshot.value === 'unavailable') {
-    return { status: 'unavailable' };
-  }
+    const { context } = snapshot;
+    const activeMethod = context.activeMethod;
+    const state = snapshot.value;
 
-  const { context } = snapshot;
-  const step = viewStep(snapshot.value, context.activeMethod);
-  if (!step) {
-    return { status: 'unavailable' };
-  }
+    if (state === 'unavailable') {
+      return { status: 'error', reason: 'noFactors', onCancel };
+    }
 
-  const activeMethod = context.activeMethod;
-  // If we are currently on the alternative methods screen and preparing a factor, activeMethod will
-  // have transitioned to the factor we are now preparing, so the one we want to hide is the old one
-  const excludeId = snapshot.value === 'methodPickerPreparing' ? context.frozenActiveMethodId : activeMethod?.id;
-  const methods = context.methods.filter(method => method.id !== excludeId);
-  const pendingMethodId = snapshot.value === 'methodPickerPreparing' ? activeMethod?.id : undefined;
+    if (state === 'failed') {
+      return { status: 'error', reason: 'generic', onCancel };
+    }
 
-  return {
-    status: 'ready',
-    step,
-    direction: context.direction,
-    value: context.inputValue,
-    onValueChange: value => send({ type: 'TYPE', value }),
-    errorMessage: context.errorMessage,
-    isPending: pendingStates.has(snapshot.value),
-    onSubmit: () => send({ type: 'SUBMIT' }),
-    onShowMethods: () => send({ type: 'SHOW_METHODS' }),
-    onShowHelp: () => send({ type: 'SHOW_HELP' }),
-    onBack: () => send({ type: 'BACK' }),
-    onEmailSupport: () => {
-      if (context.supportEmail) {
-        window.location.assign(`mailto:${context.supportEmail}`);
-      }
-    },
-    methods,
-    pendingMethodId,
-    onSelectMethod: id => send({ type: 'SELECT_METHOD', id }),
-    otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
-    onResend: () => send({ type: 'RESEND' }),
-    canResend,
-    // We clamp this to 30s because the first render after locking resend
-    // will have the old `now` state set, which would result in a value above
-    // 30s. There are other solutions like reading Date.now() in render and
-    // letting the interval only retrigger render, but that makes the render
-    // impure which is something the React compiler would warn about.
-    // useSyncExternalStore feels unnecessarily complex here
-    resendRemainingSeconds:
-      countingDown && resendAvailableAt
-        ? Math.min(RESEND_COOLDOWN_MS / 1000, Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)))
-        : undefined,
-  };
+    const step = viewStep(state, activeMethod);
+
+    if (!step) {
+      return { status: 'loading', onCancel };
+    }
+
+    // If we are currently on the alternative methods screen and preparing a factor, activeMethod will
+    // have transitioned to the factor we are now preparing, so the one we want to hide is the old one
+    const excludeId = state === 'methodPickerPreparing' ? context.frozenActiveMethodId : activeMethod?.id;
+    const methods = context.methods.filter(method => method.id !== excludeId);
+    const pendingMethodId = state === 'methodPickerPreparing' ? activeMethod?.id : undefined;
+
+    const view: ReverificationViewProps = {
+      step,
+      direction: context.direction,
+      value: context.inputValue,
+      onValueChange: (value: string) => send({ type: 'TYPE', value }),
+      errorMessage: context.error ? (context.error.detail ?? m.unstable__errors__generic) : undefined,
+      isPending: pendingStates.has(state),
+      onSubmit: () => send({ type: 'SUBMIT' }),
+      onShowMethods: () => send({ type: 'SHOW_METHODS' }),
+      onShowHelp: () => send({ type: 'SHOW_HELP' }),
+      onBack: () => send({ type: 'BACK' }),
+      onEmailSupport: () => {
+        if (context.supportEmail) {
+          window.location.assign(`mailto:${context.supportEmail}`);
+        }
+      },
+      methods,
+      pendingMethodId,
+      onSelectMethod: (id: string) => send({ type: 'SELECT_METHOD', id }),
+      otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
+      onResend: () => send({ type: 'RESEND' }),
+      canResend,
+      // We clamp this to 30s because the first render after locking resend
+      // will have the old `now` state set, which would result in a value above
+      // 30s. There are other solutions like reading Date.now() in render and
+      // letting the interval only retrigger render, but that makes the render
+      // impure which is something the React compiler would warn about.
+      // useSyncExternalStore feels unnecessarily complex here
+      resendRemainingSeconds:
+        countingDown && resendAvailableAt
+          ? Math.min(RESEND_COOLDOWN_MS / 1000, Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)))
+          : undefined,
+    };
+
+    return state === 'retrying' ? { status: 'retrying', ...view } : { status: 'ready', onCancel, ...view };
+  }, [inactive, snapshot, onCancel, send, m, canResend, countingDown, resendAvailableAt, now]);
 }
