@@ -16,6 +16,7 @@ import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, rich, useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import { tabularNumbersStyle } from '../../../styles/typography.styles';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
@@ -38,6 +39,7 @@ export interface UserProfileAddEmailDialogProps {
   canSubmitEmail?: boolean;
   code: string;
   onCodeChange: (value: string) => void;
+  canSubmitCode?: boolean;
   onSubmit: (code?: string) => void;
   onResend: () => void;
   onConnect: () => void;
@@ -113,6 +115,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                     emailAddress={current.emailAddress}
                     code={current.code}
                     onCodeChange={current.onCodeChange}
+                    canSubmit={current.canSubmitCode !== false}
                     onSubmit={current.onSubmit}
                     onResend={current.onResend}
                     isPending={current.isPending}
@@ -158,7 +161,7 @@ function EnterEmailStep(props: EnterEmailStepProps) {
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             id={emailFormId}
             onSubmit={handleSubmit}
           />
@@ -204,6 +207,7 @@ interface VerifyEmailStepProps {
   emailAddress: string;
   code: string;
   onCodeChange: (value: string) => void;
+  canSubmit: boolean;
   onSubmit: (code?: string) => void;
   onResend: () => void;
   isPending?: boolean;
@@ -230,7 +234,7 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             id={verifyFormId}
             onSubmit={handleSubmit}
           />
@@ -281,7 +285,7 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
           form={verifyFormId}
           fullWidth
           isPending={props.isPending}
-          disabled={props.isResending}
+          disabled={!props.canSubmit || props.isResending}
           pendingLabel={m.verify.pending}
         >
           {m.verify.submit}

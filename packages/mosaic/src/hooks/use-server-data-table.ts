@@ -8,7 +8,7 @@ export interface ServerDataTableSort<TColumn extends string> {
 }
 
 export type ServerDataTablePagination = Required<
-  Pick<PaginationProps, 'page' | 'pageSize' | 'totalItems' | 'onChange'>
+  Pick<PaginationProps, 'page' | 'pageSize' | 'totalItems' | 'onChange' | 'disabled'>
 > &
   Pick<PaginationProps, 'onPageSizeChange'>;
 
@@ -26,6 +26,7 @@ export function useServerDataTable<TData, TColumn extends string>({
   onPageSizeChange,
   searchValue,
   onSearchChange,
+  isFetching = false,
 }: {
   data: TData[];
   totalCount: number;
@@ -40,6 +41,7 @@ export function useServerDataTable<TData, TColumn extends string>({
   onPageSizeChange?: (pageSize: number) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
+  isFetching?: boolean;
 }) {
   const sorting: SortingState = sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [];
   const pagination: PaginationState = { pageIndex: page - 1, pageSize };
@@ -97,6 +99,7 @@ export function useServerDataTable<TData, TColumn extends string>({
         page: table.pagination.pageIndex + 1,
         pageSize: table.pagination.pageSize,
         totalItems: totalCount,
+        disabled: isFetching,
         onChange: next => table.setPagination(current => ({ ...current, pageIndex: next - 1 })),
         onPageSizeChange: onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined,
       }

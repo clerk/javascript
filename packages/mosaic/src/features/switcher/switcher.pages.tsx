@@ -1,6 +1,7 @@
 import {
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationBillingFeature,
+  disabledSelfServeDirectorySyncFeature,
   disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   disabledUserBillingFeature,
@@ -51,7 +52,7 @@ export function useOrganizationProfilePages(): OrganizationProfilePageId[] {
   if (!disabledOrganizationAPIKeysFeature(clerk, environment)) {
     pages.push('apiKeys');
   }
-  if (!disabledSelfServeSSOFeature(clerk, environment)) {
+  if (!disabledSelfServeSSOFeature(clerk, environment) || !disabledSelfServeDirectorySyncFeature(clerk, environment)) {
     pages.push('security');
   }
   return pages;
