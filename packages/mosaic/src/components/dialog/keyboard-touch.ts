@@ -30,7 +30,7 @@ export function guardKeyboardTouch(element: HTMLElement): () => void {
   const onTouchStart = (event: TouchEvent) => {
     startX = event.touches[0]?.clientX ?? 0;
     startY = event.touches[0]?.clientY ?? 0;
-    moved = false;
+    moved = event.touches.length > 1;
   };
   const onTouchMove = (event: TouchEvent) => {
     const touch = event.touches[0];

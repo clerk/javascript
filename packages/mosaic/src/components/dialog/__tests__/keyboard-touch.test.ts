@@ -16,11 +16,11 @@ function scroller(scrollTop: number) {
   return element;
 }
 
-function touch(target: Element, type: string, y: number) {
+function touch(target: Element, type: string, y: number, fingers = 1) {
   const point = { clientX: 10, clientY: y };
   const event = new Event(type, { bubbles: true, cancelable: true });
   Object.defineProperties(event, {
-    touches: { value: type === 'touchend' ? [] : [point] },
+    touches: { value: type === 'touchend' ? [] : Array.from({ length: fingers }, () => point) },
     changedTouches: { value: [point] },
   });
   target.dispatchEvent(event);
@@ -67,6 +67,17 @@ describe('guardKeyboardTouch', () => {
     touch(input, 'touchstart', 100);
     touch(input, 'touchmove', 150);
     touch(input, 'touchend', 102);
+
+    expect(input).not.toHaveFocus();
+  });
+
+  it('leaves a text field alone when a second finger joins the touch', () => {
+    const input = document.createElement('input');
+    container.append(input);
+
+    touch(input, 'touchstart', 100);
+    touch(input, 'touchstart', 100, 2);
+    touch(input, 'touchend', 101);
 
     expect(input).not.toHaveFocus();
   });
