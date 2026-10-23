@@ -21,7 +21,10 @@ const icons = {
 export function UserProfileSecurityIcon({ name }: { name: UserProfileSecurityIconName }) {
   return (
     <Section.Media size='lg'>
-      <IconFrame filled>
+      <IconFrame
+        filled
+        bordered={false}
+      >
         <Icon
           glyph={icons[name]}
           size='lg'

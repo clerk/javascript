@@ -16,7 +16,10 @@ export function UserProfileProviderMedia({
   const url = iconUrl?.trim();
   return (
     <Section.Media size='lg'>
-      <IconFrame filled>
+      <IconFrame
+        filled
+        bordered={false}
+      >
         {url && monochromeIcon ? (
           <span
             aria-hidden

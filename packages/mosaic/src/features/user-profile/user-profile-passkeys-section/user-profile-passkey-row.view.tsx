@@ -52,7 +52,10 @@ export function UserProfilePasskeyRowView({
     <>
       <Section.Item>
         <Section.Media size='lg'>
-          <IconFrame filled>
+          <IconFrame
+            filled
+            bordered={false}
+          >
             <Icon
               glyph={SecurityPasskey}
               size='md'
