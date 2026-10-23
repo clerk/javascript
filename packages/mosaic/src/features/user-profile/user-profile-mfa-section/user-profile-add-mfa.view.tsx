@@ -2,10 +2,13 @@ import { Card } from '../../../components/card';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
+import { Spinner } from '../../../components/spinner';
 import { useMessages } from '../../../localization';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
 export interface UserProfileAddMfaViewProps {
+  pendingMethod?: 'authenticator' | 'backup-codes';
+  errorMessage?: string;
   methods: readonly UserProfileMfaAddableMethod[];
   onSelect: (type: UserProfileMfaAddableMethod) => void;
 }
@@ -16,7 +19,7 @@ const icons = {
   'backup-codes': 'numbers',
 } as const;
 
-export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaViewProps) {
+export function UserProfileAddMfaView({ methods, onSelect, pendingMethod, errorMessage }: UserProfileAddMfaViewProps) {
   const m = useMessages('userProfileMfa');
   const firstMethodRef = useFlowAutoFocus<HTMLDivElement>();
   return (
@@ -26,6 +29,12 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
         <Card.Description>{m.addDialog.description}</Card.Description>
       </Card.Header>
       <Card.Content>
+        <Card.Banner
+          role='alert'
+          color='negative'
+        >
+          {errorMessage}
+        </Card.Banner>
         <Item.Group variant='outline'>
           {methods.map((type, index) => (
             <Item.Root
@@ -35,6 +44,8 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
               render={
                 <button
                   type='button'
+                  disabled={pendingMethod !== undefined}
+                  aria-busy={pendingMethod === type}
                   onClick={() => onSelect(type)}
                 />
               }
@@ -48,9 +59,7 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
                 <Item.Label>{m.methods[type]}</Item.Label>
                 <Item.Description>{m.addDialog.methods[type]}</Item.Description>
               </Item.Content>
-              <Item.Actions>
-                <Icon name='chevron-right' />
-              </Item.Actions>
+              <Item.Actions>{pendingMethod === type ? <Spinner /> : <Icon name='chevron-right' />}</Item.Actions>
             </Item.Root>
           ))}
         </Item.Group>

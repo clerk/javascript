@@ -32,6 +32,28 @@ describe('User profile MFA', () => {
     expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
   });
 
+  it('keeps the authenticator choice pending until its setup is ready', async () => {
+    await renderMfa();
+    const held = holdRequests('post', '/v1/me/totp');
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    const authenticator = await screen.findByRole('button', { name: /Authenticator app/ });
+    await user.click(authenticator);
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      expect(screen.getByRole('button', { name: /Authenticator app/ })).toBeVisible();
+      expect(authenticator).toHaveAttribute('aria-busy', 'true');
+      await user.click(authenticator);
+      await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+      expect(held.requests).toHaveLength(1);
+      expect(screen.queryByText('Preparing authenticator…')).toBeNull();
+      expect(screen.queryByRole('img', { name: /QR code/i })).toBeNull();
+    } finally {
+      held.release();
+    }
+    expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
+  });
+
   it('shows enrolled methods with the default SMS phone first', async () => {
     const second = fapiPhoneNumber({
       ...phone,
@@ -221,7 +243,16 @@ describe('User profile MFA', () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    const held = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      expect(screen.getByRole('combobox', { name: /Phone number/ })).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Verification code' })).toBeNull();
+    } finally {
+      held.release();
+    }
     expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
     expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
     expect(fapi.mfa.phoneUpdates).toEqual([]);

@@ -13,37 +13,44 @@ function menuActions({
   method,
   onRemove,
   onSetDefault,
+  defaultProgress,
   onRegenerateBackupCodes,
+  regenerateProgress,
   showDisabledMenu,
   m,
 }: {
   method: UserProfileMfaMethod;
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
+  defaultProgress?: ActionMenuAction['progress'];
   onRegenerateBackupCodes?: () => void;
+  regenerateProgress?: ActionMenuAction['progress'];
   showDisabledMenu?: boolean;
   m: MosaicMessages['userProfileMfa'];
 }): ActionMenuAction[] {
   const actions: ActionMenuAction[] = [];
-  if (method.type === 'sms' && method.canSetDefault && !method.isDefault && onSetDefault) {
-    actions.push({ label: m.setDefault, onClick: () => onSetDefault(method.id) });
+  const hasDefaultAction =
+    (method.canSetDefault && !method.isDefault) || defaultProgress === 'pending' || defaultProgress === 'handoff';
+  if (method.type === 'sms' && hasDefaultAction && onSetDefault) {
+    actions.push({ label: m.setDefault, onClick: () => onSetDefault(method.id), progress: defaultProgress ?? 'idle' });
   }
   if (method.type === 'backup-codes') {
     if (onRegenerateBackupCodes) {
-      actions.push({ label: m.regenerate, onClick: onRegenerateBackupCodes });
+      actions.push({ label: m.regenerate, onClick: onRegenerateBackupCodes, progress: regenerateProgress });
     }
   } else if (onRemove && method.canRemove !== false) {
     actions.push({ label: m.remove, color: 'negative', onClick: onRemove });
   }
-  if (showDisabledMenu && actions.length === 0) {
-    if (method.type === 'sms' && method.canSetDefault && !method.isDefault) {
-      actions.push({ label: m.setDefault, disabled: true });
-    }
-    if (method.type === 'backup-codes') {
-      actions.push({ label: m.regenerate, disabled: true });
-    } else if (method.canRemove !== false) {
-      actions.push({ label: m.remove, color: 'negative', disabled: true });
-    }
+  if (!showDisabledMenu || actions.length > 0) {
+    return actions;
+  }
+  if (method.type === 'sms' && hasDefaultAction) {
+    actions.push({ label: m.setDefault, disabled: true });
+  }
+  if (method.type === 'backup-codes') {
+    actions.push({ label: m.regenerate, disabled: true });
+  } else if (method.canRemove !== false) {
+    actions.push({ label: m.remove, color: 'negative', disabled: true });
   }
   return actions;
 }
@@ -53,13 +60,18 @@ export function UserProfileMfaRowView({
   triggerRef,
   onRemove,
   onSetDefault,
+  defaultProgress,
   onRegenerateBackupCodes,
+  regenerateProgress,
   showDisabledMenu,
-}: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes'> & {
+  disabled,
+}: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes' | 'regenerateProgress'> & {
   method: UserProfileMfaMethod;
   triggerRef?: Ref<HTMLButtonElement>;
+  disabled?: boolean;
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
+  defaultProgress?: ActionMenuAction['progress'];
   showDisabledMenu?: boolean;
 }) {
   const m = useMessages('userProfileMfa');
@@ -70,7 +82,16 @@ export function UserProfileMfaRowView({
     method.type === 'sms' && description
       ? fill(m.manageSms, { label, phoneNumber: description })
       : fill(m.manage, { label });
-  const actions = menuActions({ method, onRemove, onSetDefault, onRegenerateBackupCodes, showDisabledMenu, m });
+  const actions = menuActions({
+    method,
+    onRemove,
+    onSetDefault,
+    defaultProgress,
+    onRegenerateBackupCodes,
+    regenerateProgress,
+    showDisabledMenu,
+    m,
+  });
 
   return (
     <Section.Item>
@@ -87,6 +108,7 @@ export function UserProfileMfaRowView({
           <ActionMenu
             triggerRef={triggerRef}
             actions={actions}
+            disabled={disabled}
             label={manageLabel}
           />
         </Section.Actions>
