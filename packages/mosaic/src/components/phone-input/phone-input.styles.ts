@@ -4,6 +4,7 @@ import { colorVars, radiusVars, shadowVars, space, typeScaleVars } from '../../t
 
 export const styles = stylex.create({
   trigger: {
+    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
     borderWidth: 0,
     backgroundColor: 'transparent',
     paddingInlineEnd: 0,
