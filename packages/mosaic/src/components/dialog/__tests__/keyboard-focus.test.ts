@@ -99,6 +99,37 @@ describe('guardKeyboardFocus', () => {
     expect(scroll.scrollTo).toHaveBeenCalledWith({ top: 520, behavior: 'smooth' });
   });
 
+  it('moves focus between fields without the browser panning while the keyboard is up', () => {
+    const scroll = scroller();
+    const first = field(100);
+    const second = field(200);
+    scroll.append(first, second);
+    container.append(scroll);
+    first.focus();
+    openKeyboard();
+    const focus = vi.spyOn(second, 'focus');
+
+    second.focus();
+
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(document.activeElement).toBe(second);
+  });
+
+  it('leaves focus to the browser while the keyboard is down', () => {
+    const scroll = scroller();
+    const first = field(100);
+    const second = field(200);
+    scroll.append(first, second);
+    container.append(scroll);
+    first.focus();
+    const focus = vi.spyOn(second, 'focus');
+
+    second.focus();
+
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(focus).toHaveBeenCalledWith();
+  });
+
   it('puts the page back when the browser scrolls it to reveal a field with the keyboard up', () => {
     const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
     openKeyboard();
