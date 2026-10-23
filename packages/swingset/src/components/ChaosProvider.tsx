@@ -3,8 +3,6 @@
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import * as React from 'react';
 
-import { chaosLocalization } from '@/lib/chaos';
-
 interface ChaosContextValue {
   chaos: boolean;
   setChaos: (chaos: boolean) => void;
@@ -29,12 +27,5 @@ export function useChaosFixture<T>(data: T, toChaos: (data: T) => T): T {
 
 export function StoryMosaicProvider({ children }: { children: React.ReactNode }) {
   const { chaos } = useChaos();
-  return (
-    <MosaicProvider
-      key={String(chaos)}
-      localization={chaos ? chaosLocalization : undefined}
-    >
-      {children}
-    </MosaicProvider>
-  );
+  return <MosaicProvider key={String(chaos)}>{children}</MosaicProvider>;
 }
