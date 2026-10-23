@@ -282,4 +282,16 @@ describe('createNativeClientSync', () => {
     await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('other-native-token');
     expect(native.setDeviceToken).toHaveBeenCalledTimes(1);
   });
+
+  test('keeps a native token that is not a client JWT', async () => {
+    const createNativeClientSync = await loadEngine();
+    const native = nativeWithStoredToken('other-native-token');
+    const cache = storedTokenCache(clientToken('client_signed_in', 1));
+
+    const sync = createNativeClientSync(native, 'pk_test_123', null, () => cache);
+    await sync.tokenCache.saveClientToken(clientToken('client_signed_in', 2), clientToken('client_signed_in', 1));
+
+    await expect(sync.tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('other-native-token');
+    expect(native.setDeviceToken).toHaveBeenCalledTimes(1);
+  });
 });

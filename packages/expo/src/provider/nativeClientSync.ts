@@ -208,7 +208,8 @@ export function createNativeClientSync(
       return false;
     }
     const current = await native.getDeviceToken().catch(() => null);
-    return !!current && clientIdOf(current) !== clientId && setDeviceToken(token, current);
+    const currentClientId = clientIdOf(current);
+    return !!current && !!currentClientId && currentClientId !== clientId && setDeviceToken(token, current);
   };
 
   const tokenCache: ClientTokenCache = {
