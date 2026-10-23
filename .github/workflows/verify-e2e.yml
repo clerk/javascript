@@ -16,7 +16,7 @@ concurrency:
 jobs:
   e2e-tests:
     name: Device tests (${{ matrix.platform }})
-    if: ${{ github.event_name == 'workflow_dispatch' || github.head_ref == 'changeset-release/main' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.head_ref == 'changeset-release/main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 75
     permissions:
