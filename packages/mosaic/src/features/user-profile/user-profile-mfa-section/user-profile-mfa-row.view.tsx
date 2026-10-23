@@ -14,12 +14,17 @@ export function UserProfileMfaRowView({
   triggerRef,
   onRemove,
   onSetDefault,
+  defaultProgress,
   onRegenerateBackupCodes,
-}: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes'> & {
+  regenerateProgress,
+  disabled,
+}: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes' | 'regenerateProgress'> & {
   method: UserProfileMfaMethod;
   triggerRef?: Ref<HTMLButtonElement>;
+  disabled?: boolean;
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
+  defaultProgress?: ActionMenuAction['progress'];
 }) {
   const m = useMessages('userProfileMfa');
   const label = method.label ?? m.methods[method.type];
@@ -30,14 +35,14 @@ export function UserProfileMfaRowView({
       ? fill(m.manageSms, { label, phoneNumber: description })
       : fill(m.manage, { label });
   const actions: ActionMenuAction[] = [];
-
-  if (method.type === 'sms' && method.canSetDefault && !method.isDefault && onSetDefault) {
-    actions.push({ label: m.setDefault, onClick: () => onSetDefault(method.id) });
+  const hasDefaultAction =
+    (method.canSetDefault && !method.isDefault) || defaultProgress === 'pending' || defaultProgress === 'handoff';
+  if (method.type === 'sms' && hasDefaultAction && onSetDefault) {
+    actions.push({ label: m.setDefault, onClick: () => onSetDefault(method.id), progress: defaultProgress ?? 'idle' });
   }
-
   if (method.type === 'backup-codes') {
     if (onRegenerateBackupCodes) {
-      actions.push({ label: m.regenerate, onClick: onRegenerateBackupCodes });
+      actions.push({ label: m.regenerate, onClick: onRegenerateBackupCodes, progress: regenerateProgress });
     }
   } else if (onRemove && method.canRemove !== false) {
     actions.push({ label: m.remove, color: 'negative', onClick: onRemove });
@@ -58,6 +63,7 @@ export function UserProfileMfaRowView({
           <ActionMenu
             triggerRef={triggerRef}
             actions={actions}
+            disabled={disabled}
             label={manageLabel}
           />
         </Section.Actions>

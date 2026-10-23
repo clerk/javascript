@@ -22,6 +22,8 @@ export function UserProfileEmailSectionView({
   verificationFinalFocus,
   setPrimaryReverification,
   setPrimaryFinalFocus,
+  pendingPrimaryId,
+  pendingVerifyId,
   onVerify,
   onSetPrimary,
 }: UserProfileEmailSectionViewProps) {
@@ -32,6 +34,7 @@ export function UserProfileEmailSectionView({
       render={
         <Button
           aria-label={m.email.add}
+          disabled={pendingVerifyId !== undefined}
           color='neutral'
           size='sm'
           variant='outline'
@@ -58,6 +61,10 @@ export function UserProfileEmailSectionView({
         addAction={addEmailAction}
         onRemove={remove ? email => remove.open(email) : undefined}
         onSetPrimary={onSetPrimary}
+        pendingPrimaryId={pendingPrimaryId}
+        pendingVerifyId={pendingVerifyId}
+        verificationReadyId={verification.open ? verification.verifyingId : undefined}
+        primaryChallengeVisible={setPrimaryReverification.visible}
         onVerify={onVerify}
       >
         <Section.Error>{error}</Section.Error>

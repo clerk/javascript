@@ -104,6 +104,18 @@ section. The dialog opens once `visible` is true, so it skips the loading card, 
 dismissal only while the controller has a cancel callback. Return focus with the hook's
 `lastKey`, which outlives the run, unlike `pendingKey`.
 
+For a direct action in `ActionMenu`, derive its `progress` from the existing
+pending key and the matching reverification controller. Pass `idle` before
+activation, `pending` while the request or verification preparation is running,
+and `handoff` when the dialog becomes visible. The menu keeps its selected item
+and trailing spinner visible while pending, disables its actions, and blocks
+dismissal until handoff or settlement. Ordinary failures close the menu and use
+the section's existing error. Actions without `progress` still close immediately.
+Keep the selected action and its callback present through data refreshes that
+change eligibility. Disable other row triggers while the section is pending,
+but keep the selected row's trigger available as the dialog's final-focus target.
+The menu owns popup presentation only; `usePendingAction` still owns the operation.
+
 A single open boolean earns nothing. A two-state machine with one event is a
 boolean spelled long. `useUserProfileEditUsernameController` holds `isOpen` in
 `useState` and hands the async part to `useForm`:

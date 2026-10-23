@@ -171,6 +171,10 @@ describe('User profile MFA management', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     await waitFor(() => expect(start.requests).toHaveLength(1));
     expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('menuitem', { name: 'Set as default' })).toHaveAttribute('aria-busy', 'true');
+    await waitFor(() =>
+      expect(within(screen.getByRole('menuitem', { name: 'Set as default' })).getByRole('progressbar')).toBeVisible(),
+    );
 
     start.release();
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
@@ -355,7 +359,7 @@ describe('User profile MFA management', () => {
     expect(clerk.user?.id).toBe('user_2');
   });
 
-  it('opens the backup-code surface while regeneration is pending', async () => {
+  it('keeps regeneration pending in its menu until backup codes are ready', async () => {
     await renderMfa(
       fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
     );
@@ -364,20 +368,46 @@ describe('User profile MFA management', () => {
     await openMenu(user, screen.getByRole('button', { name: 'Manage Backup codes' }));
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
     await waitFor(() => expect(held.requests).toHaveLength(1));
-    await waitFor(() => expect(screen.getByRole('status', { name: 'Generating backup codes' })).toBeVisible());
-    for (const name of ['Print', 'Download']) {
-      expect(screen.getByRole('button', { name })).toBeVisible();
-      expect(screen.getByRole('button', { name })).toBeDisabled();
+    try {
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('button', { name: 'Add verification method' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Manage Authenticator app' })).toBeDisabled();
+      expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('status', { name: 'Generating backup codes' })).toBeNull();
+    } finally {
+      held.release();
     }
-    expect(screen.getByRole('button', { name: 'Copy and close' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
-    held.release();
     await waitFor(() => expect(screen.getByText('CODE0100')).toBeVisible());
     expect(screen.getByRole('button', { name: 'Close' })).toBeVisible();
     for (const name of ['Print', 'Download', 'Copy and close']) {
       expect(screen.getByRole('button', { name })).toBeEnabled();
     }
+  });
+
+  it('returns failed regeneration to the section and retries from the menu', async () => {
+    const fapi = await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
+    );
+    const handlers = worker.listHandlers();
+    const held = holdRequests('post', '/v1/me/backup_codes/');
+    const user = userEvent.setup();
+    const trigger = screen.getByRole('button', { name: 'Manage Backup codes' });
+    await openMenu(user, trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    held.fail('action_blocked', 'Unable to create backup codes.');
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        "This action couldn't be completed. Please try again later or contact support if this persists.",
+      ),
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+    worker.resetHandlers(...handlers);
+    await openMenu(user, trigger);
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    expect(await screen.findByText('CODE0100')).toBeVisible();
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
   it('uses fresh server codes for explicit regeneration', async () => {
@@ -445,6 +475,7 @@ describe('User profile MFA management', () => {
     await regenerate(user);
     await screen.findByText('Enter your current password to continue');
     const dialog = screen.getByRole('dialog');
+    const handlers = worker.listHandlers();
     const replay = holdRequests('post', '/v1/me/backup_codes/');
     await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
     await waitFor(() => expect(replay.requests).toHaveLength(1));
@@ -454,44 +485,56 @@ describe('User profile MFA management', () => {
     expect(dialog).toBeVisible();
 
     replay.fail('action_blocked', 'Unable to create backup codes.');
-    await waitFor(() => expect(within(screen.getByRole('dialog')).getByRole('alert')).toBeVisible());
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      "This action couldn't be completed. Please try again later or contact support if this persists.",
+    );
     expect(screen.queryByRole('list', { name: 'Backup codes' })).toBeNull();
     expect(fapi.mfa.backupCodeCreations).toBe(0);
+    worker.resetHandlers(...handlers);
+    await regenerate(user);
+    await screen.findByRole('list', { name: 'Backup codes' });
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
-  it('cancels a loading verification when the backup-code dialog closes so regeneration can start again', async () => {
+  it('keeps the menu pending until verification preparation is ready', async () => {
     const fapi = await renderBackupCodesNeedingReverification();
     const start = holdRequests('post', '/v1/client/sessions/:id/verify');
     const user = userEvent.setup();
 
     await regenerate(user);
     await waitFor(() => expect(start.requests).toHaveLength(1));
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    start.release();
-
-    await regenerate(user);
+    try {
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toHaveAttribute('aria-busy', 'true');
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toBeVisible();
+    } finally {
+      start.release();
+    }
+    await screen.findByText('Enter your current password to continue');
+    await waitFor(() => expect(screen.getByRole('dialog')).toContainElement(document.activeElement));
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
     await screen.findByRole('list', { name: 'Backup codes' });
     expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
-  it('keeps the backup-code dialog open until the first response so a verification can appear', async () => {
+  it('keeps the menu pending until the first response can request verification', async () => {
     const fapi = await renderBackupCodesNeedingReverification();
     const first = holdRequests('post', '/v1/me/backup_codes/');
     const user = userEvent.setup();
 
     await regenerate(user);
     await waitFor(() => expect(first.requests).toHaveLength(1));
-    const dialog = screen.getByRole('dialog');
     try {
-      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+      expect(screen.queryByRole('dialog')).toBeNull();
       await user.keyboard('{Escape}');
-      expect(dialog).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toHaveAttribute('aria-busy', 'true');
     } finally {
       first.release();
     }
 
-    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
     await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
     await screen.findByRole('list', { name: 'Backup codes' });
     expect(fapi.mfa.backupCodeCreations).toBe(1);
@@ -788,41 +831,38 @@ describe('User profile MFA management', () => {
   });
 
   it.each([
-    { phase: 'mutation', method: 'post', path: '/v1/me/phone_numbers/phone_2', pendingPhone: '+1 (555) 555-0202' },
-    { phase: 'refresh', method: 'get', path: '/v1/me', pendingPhone: '+1 (555) 555-0101' },
-  ] as const)(
-    'keeps method menus available but hides default changes during $phase',
-    async ({ method, path, pendingPhone }) => {
-      const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
-      const second = fapiPhoneNumber({
-        ...phone,
-        id: 'phone_2',
-        phone_number: '+15555550202',
-        reserved_for_second_factor: true,
-      });
-      await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
-      const held = holdRequests(method, path);
-      const user = userEvent.setup();
-      const selected = screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' });
-      await openMenu(user, selected);
-      await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
-      await waitFor(() => expect(held.requests).toHaveLength(1));
-      try {
-        const pendingAction = screen.getByRole('button', { name: `Manage SMS verification ${pendingPhone}` });
-        await openMenu(user, pendingAction);
-        await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
-        expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
-        await user.click(await screen.findByRole('menuitem', { name: 'Remove method' }));
-        expect(screen.queryByRole('alertdialog')).toBeNull();
-      } finally {
-        held.release();
-      }
-      await waitFor(() => expect(screen.getByText('+1 (555) 555-0202').closest('li')).toHaveTextContent('Default'));
-      await user.keyboard('{Escape}');
-      await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
-      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
-    },
-  );
+    { phase: 'mutation', method: 'post', path: '/v1/me/phone_numbers/phone_2' },
+    { phase: 'refresh', method: 'get', path: '/v1/me' },
+  ] as const)('keeps the selected default action pending during $phase', async ({ method, path }) => {
+    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const second = fapiPhoneNumber({
+      ...phone,
+      id: 'phone_2',
+      phone_number: '+15555550202',
+      reserved_for_second_factor: true,
+    });
+    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
+    const held = holdRequests(method, path);
+    const user = userEvent.setup();
+    const selected = screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' });
+    await openMenu(user, selected);
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(held.requests).toHaveLength(1));
+    try {
+      const action = screen.getByRole('menuitem', { name: 'Set as default' });
+      expect(action).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('menuitem', { name: 'Remove method' })).toHaveAttribute('aria-disabled', 'true');
+      expect(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' })).toBeDisabled();
+      await user.click(await screen.findByRole('menuitem', { name: 'Remove method' }));
+      expect(screen.queryByRole('alertdialog')).toBeNull();
+    } finally {
+      held.release();
+    }
+    await waitFor(() => expect(screen.getByText('+1 (555) 555-0202').closest('li')).toHaveTextContent('Default'));
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
+  });
 
   it('clears backup-code eligibility when the final optional factor is removed', async () => {
     const fapi = await renderMfa(

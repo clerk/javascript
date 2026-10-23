@@ -213,6 +213,17 @@ describe('UserProfileAddEmailDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Didn’t receive a link? Resend' }));
     expect(props.onResend).toHaveBeenCalledOnce();
 
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddEmailDialog
+          {...props}
+          resendSeconds={0}
+          isResending
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('button', { name: 'Sending link…' })).toBeDisabled();
+
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
   });

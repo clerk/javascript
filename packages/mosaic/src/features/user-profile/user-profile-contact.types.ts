@@ -10,12 +10,13 @@ export type UserProfileEmail = UserProfileContact;
 export type UserProfilePhone = UserProfileContact;
 
 export type UserProfileEmailVerification =
-  | { method: 'code'; sent: Promise<void> }
+  | { method: 'code' }
   | { method: 'link'; verified: Promise<void>; cancel: () => void }
   | { method: 'sso'; connect: () => Promise<void> };
 
 export interface UserProfileEmailVerifier {
-  start: () => UserProfileEmailVerification;
+  prepare: () => Promise<UserProfileEmailVerification>;
+  cancel: () => void;
   verifyCode: (code: string) => Promise<void>;
 }
 

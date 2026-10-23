@@ -35,6 +35,8 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
           <Flow.Step ids={['select']}>
             <UserProfileAddMfaView
               methods={current.methods}
+              pendingMethod={current.pendingMethod}
+              errorMessage={current.errorMessage}
               onSelect={current.onSelect}
             />
           </Flow.Step>

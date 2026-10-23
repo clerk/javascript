@@ -3,6 +3,7 @@ import type { ReactNode, Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { ReverificationDialog } from '../../../blocks/reverification';
+import type { ActionMenuAction } from '../../../components/action-menu';
 import { Section } from '../../../components/section';
 import { fill, type MosaicMessages, useMessages } from '../../../localization';
 import type { ReverificationController } from '../../reverification';
@@ -21,6 +22,8 @@ export interface UserProfileMfaSectionViewProps {
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
+  regenerateProgress?: ActionMenuAction['progress'];
+  regenerateError?: string;
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void | Promise<void>;
@@ -35,6 +38,8 @@ export function UserProfileMfaSectionView({
   addControl,
   onAdd,
   onRegenerateBackupCodes,
+  regenerateProgress,
+  regenerateError,
   onRemove,
   onSetDefault,
   removeReverification,
@@ -80,11 +85,23 @@ export function UserProfileMfaSectionView({
             triggerRef={controller.registerTrigger(method.id)}
             onRemove={controller.remove ? () => controller.openRemoval(method) : undefined}
             onSetDefault={controller.setDefault}
+            defaultProgress={
+              controller.pendingDefaultId === method.id
+                ? setDefaultReverification?.visible
+                  ? 'handoff'
+                  : 'pending'
+                : 'idle'
+            }
+            disabled={
+              (controller.pendingDefaultId !== undefined && controller.pendingDefaultId !== method.id) ||
+              (regenerateProgress === 'pending' && method.type !== 'backup-codes')
+            }
             onRegenerateBackupCodes={onRegenerateBackupCodes}
+            regenerateProgress={regenerateProgress}
           />
         ))}
       </UserProfileSecurityList>
-      <Section.Error>{controller.defaultError}</Section.Error>
+      <Section.Error>{regenerateError ?? controller.defaultError}</Section.Error>
       {controller.remove ? (
         <Confirmation
           controller={controller.remove}

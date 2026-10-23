@@ -23,6 +23,10 @@ export interface UserProfileContactListRowViewProps {
   onAdd?: () => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
+  pendingPrimaryId?: string;
+  pendingVerifyId?: string;
+  verificationReadyId?: string;
+  primaryChallengeVisible?: boolean;
   onRemove?: (item: UserProfileContact) => void;
   children?: ReactNode;
 }
@@ -34,6 +38,10 @@ export function UserProfileContactListRowView({
   onAdd,
   onVerify,
   onSetPrimary,
+  pendingPrimaryId,
+  pendingVerifyId,
+  verificationReadyId,
+  primaryChallengeVisible,
   onRemove,
   addAction,
   rowRef,
@@ -42,6 +50,8 @@ export function UserProfileContactListRowView({
 }: UserProfileContactListRowViewProps) {
   const m = useMessages('userProfileContact');
   const emptyDescription = m[kind].empty;
+  const pendingId = pendingPrimaryId ?? pendingVerifyId;
+  const readyId = primaryChallengeVisible ? pendingPrimaryId : verificationReadyId;
 
   return (
     <Section.Group
@@ -84,14 +94,22 @@ export function UserProfileContactListRowView({
           ) : (
             items.map(item => {
               const actions: ActionMenuAction[] = [];
+              const progress = readyId === item.id ? 'handoff' : pendingId === item.id ? 'pending' : 'idle';
 
-              if (!item.isVerified && onVerify) {
+              if (pendingPrimaryId === item.id && onSetPrimary) {
+                actions.push({
+                  label: m.setPrimary,
+                  onClick: () => onSetPrimary(item.id),
+                  progress,
+                });
+              } else if (!item.isVerified && onVerify) {
                 actions.push({
                   label: item.isDefault ? m.completeVerification : m[kind].verify,
                   onClick: () => onVerify(item.id),
+                  progress,
                 });
               } else if (item.isVerified && !item.isDefault && onSetPrimary) {
-                actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
+                actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id), progress });
               }
 
               if (onRemove) {
@@ -116,6 +134,7 @@ export function UserProfileContactListRowView({
                       <ActionMenu
                         triggerRef={triggerRef?.(item.id)}
                         actions={actions}
+                        disabled={pendingId !== undefined && pendingId !== item.id}
                         label={fill(m.manageValue, { value: item.value })}
                       />
                     </Section.Actions>

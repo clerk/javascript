@@ -97,6 +97,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                   <VerifyLinkStep
                     emailAddress={current.emailAddress}
                     onResend={current.onResend}
+                    isResending={current.isResending}
                     errorMessage={current.errorMessage}
                     resendSeconds={current.resendSeconds}
                   />
@@ -296,6 +297,7 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
 }
 
 interface VerifyLinkStepProps {
+  isResending?: boolean;
   emailAddress: string;
   onResend: () => void;
   errorMessage?: string;
@@ -322,6 +324,7 @@ function VerifyLinkStep(props: VerifyLinkStepProps) {
         ) : null}
         <ResendButton
           labels={m.link}
+          isResending={props.isResending}
           onResend={props.onResend}
           resendSeconds={props.resendSeconds}
         />

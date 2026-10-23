@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import type { DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { useForm } from '../../../components/form';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
-import type { ErrorInvokeEvent } from '../../../machine/types';
+import type { DoneInvokeEvent, ErrorInvokeEvent } from '../../../machine/types';
 import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/errors';
 import { toFormError } from '../../../utils/errors';
@@ -29,7 +29,7 @@ export interface UserProfileAddEmailControllerOptions {
 export interface UserProfileAddEmailController extends UserProfileAddEmailDialogProps {
   handle: DialogHandle<unknown>;
   verifyingId: string | undefined;
-  onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => void;
+  onVerifyEmail: (email: Pick<UserProfileEmail, 'id' | 'value'>, verifier: UserProfileEmailVerifier) => Promise<void>;
 }
 
 interface Context {
@@ -43,7 +43,13 @@ interface Context {
 
 type Event =
   | { type: 'ADD' }
-  | { type: 'START'; id?: string; emailAddress: string; verifier: UserProfileEmailVerifier }
+  | {
+      type: 'READY';
+      id?: string;
+      emailAddress: string;
+      verifier: UserProfileEmailVerifier;
+      verification: UserProfileEmailVerification;
+    }
   | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
   | { type: 'CONNECT' }
@@ -62,19 +68,24 @@ const LINK_RESEND_SECONDS = 60;
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 const fail = assign<ErrorInvokeEvent>((_, event) => ({ error: toFormError(event.error) }));
 const resend = {
-  target: 'starting',
+  target: 'resending',
   guard: (context: Context) => context.resendSeconds === 0,
   actions: assign(() => ({ error: undefined })),
 };
-const start = {
-  target: 'starting',
-  actions: assign<Extract<Event, { type: 'START' }>>((_, event) => ({
+const ready = {
+  target: 'ready',
+  actions: assign<Extract<Event, { type: 'READY' }>>((_, event) => ({
     verifyingId: event.id,
     emailAddress: event.emailAddress,
     verifier: event.verifier,
-    verification: undefined,
+    verification: event.verification,
     error: undefined,
-    resendSeconds: 0,
+    resendSeconds:
+      event.verification.method === 'link'
+        ? LINK_RESEND_SECONDS
+        : event.verification.method === 'code'
+          ? CODE_RESEND_SECONDS
+          : 0,
   })),
 };
 
@@ -102,36 +113,37 @@ const machine = createMachine({
             resendSeconds: 0,
           })),
         },
-        START: start,
+        READY: ready,
       },
     },
     email: {
-      on: { CANCEL: 'idle', START: start },
+      on: { CANCEL: 'idle', READY: ready },
     },
-    starting: {
-      entry: assign(context => ({
-        verification: context.verifier ? context.verifier.start() : undefined,
-        error: undefined,
-      })),
-      always: ({ context }) => {
-        const method = context.verification?.method;
-        if (method === 'code') {
-          return { target: 'sending' };
-        }
-        if (method === 'sso') {
-          return { target: 'connecting' };
-        }
-        return { target: 'waiting', context: { resendSeconds: method === 'link' ? LINK_RESEND_SECONDS : 0 } };
-      },
+    ready: {
+      always: ({ context }) => ({
+        target:
+          context.verification?.method === 'code'
+            ? 'verify'
+            : context.verification?.method === 'sso'
+              ? 'connecting'
+              : 'waiting',
+      }),
     },
-    sending: {
-      invoke: fromPromise(
-        context => (context.verification?.method === 'code' ? context.verification.sent : missingDependency()),
-        {
-          onDone: { target: 'verify', actions: assign(() => ({ resendSeconds: CODE_RESEND_SECONDS })) },
-          onError: { target: 'verify', actions: fail },
+    resending: {
+      on: { CANCEL: { target: 'idle', guard: context => context.verification?.method === 'link' } },
+      invoke: fromPromise(context => (context.verifier ? context.verifier.prepare() : missingDependency()), {
+        onDone: {
+          target: 'ready',
+          actions: assign<DoneInvokeEvent<UserProfileEmailVerification>>((_, event) => ({
+            verification: event.output,
+            resendSeconds: event.output.method === 'link' ? LINK_RESEND_SECONDS : CODE_RESEND_SECONDS,
+          })),
         },
-      ),
+        onError: [
+          { target: 'linkFailed', guard: context => context.verification?.method === 'link', actions: fail },
+          { target: 'verify', actions: fail },
+        ],
+      }),
     },
     waiting: {
       on: { CANCEL: 'idle', TICK: tick, RESEND: resend },
@@ -139,9 +151,12 @@ const machine = createMachine({
         context => (context.verification?.method === 'link' ? context.verification.verified : missingDependency()),
         {
           onDone: 'idle',
-          onError: { actions: fail },
+          onError: { target: 'linkFailed', actions: fail },
         },
       ),
+    },
+    linkFailed: {
+      on: { CANCEL: 'idle', TICK: tick, RESEND: resend },
     },
     connecting: {
       on: { CANCEL: 'idle', CONNECT: 'redirecting' },
@@ -172,13 +187,36 @@ export function useUserProfileAddEmailController({
   const errorText = useErrorText();
   const handle = useMemo(() => Dialog.createHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
+  const activeVerifier = useRef<UserProfileEmailVerifier>(undefined);
+  const created = useRef<{ value: string; verifier: UserProfileEmailVerifier }>(undefined);
+  const mounted = useRef(true);
+  const generation = useRef(0);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      activeVerifier.current?.cancel();
+    };
+  }, []);
   const { resendSeconds, error, verification } = snapshot.context;
   const emailForm = useForm({
     initialValues: { emailAddress: initialEmailAddress },
     canSubmit: values => values.emailAddress !== '' && values.emailAddress !== username,
     onSubmit: async ({ emailAddress }) => {
       if (onCreate) {
-        send({ type: 'START', emailAddress, verifier: await onCreate(emailAddress) });
+        if (created.current?.value !== emailAddress) {
+          const verifier = await onCreate(emailAddress);
+          if (!mounted.current) {
+            return;
+          }
+          created.current = { value: emailAddress, verifier };
+        }
+        const { verifier } = created.current;
+        activeVerifier.current = verifier;
+        const verification = await verifier.prepare();
+        if (mounted.current) {
+          send({ type: 'READY', emailAddress, verifier, verification });
+        }
       }
     },
   });
@@ -214,7 +252,7 @@ export function useUserProfileAddEmailController({
   return {
     handle,
     resendSeconds,
-    isResending: state === 'sending',
+    isResending: state === 'resending',
     open,
     step,
     reverification,
@@ -231,11 +269,17 @@ export function useUserProfileAddEmailController({
         }
         reverification.onCancel();
       }
+      if (actor.getSnapshot().value === 'resending' && verification?.method !== 'link') {
+        return;
+      }
+      generation.current++;
       if (open) {
+        created.current = undefined;
         emailForm.reset();
         codeForm.reset();
         send({ type: 'ADD' });
       } else {
+        activeVerifier.current?.cancel();
         send({ type: 'CANCEL' });
       }
     },
@@ -260,9 +304,19 @@ export function useUserProfileAddEmailController({
     },
     onConnect: () => send({ type: 'CONNECT' }),
     verifyingId: snapshot.context.verifyingId,
-    onVerifyEmail: (email, verifier) => {
-      codeForm.reset();
-      send({ type: 'START', id: email.id, emailAddress: email.value, verifier });
+    onVerifyEmail: async (email, verifier) => {
+      if (actor.getSnapshot().value !== 'idle') {
+        return;
+      }
+      const started = generation.current;
+      activeVerifier.current = verifier;
+      const verification = await verifier.prepare();
+      if (mounted.current && generation.current === started && actor.getSnapshot().value === 'idle') {
+        codeForm.reset();
+        send({ type: 'READY', id: email.id, emailAddress: email.value, verifier, verification });
+      } else {
+        verifier.cancel();
+      }
     },
   };
 }

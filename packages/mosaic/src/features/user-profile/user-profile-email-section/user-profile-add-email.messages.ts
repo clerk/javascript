@@ -23,6 +23,7 @@ export const userProfileAddEmailMessages = {
     description: 'Open the link we sent to {emailAddress}',
     cancel: 'Cancel',
     resend: 'Didn’t receive a link? Resend',
+    resending: 'Sending link…',
     resendCountdown: 'Didn’t receive a link? Resend ({seconds})',
   },
   sso: {

@@ -23,6 +23,8 @@ export function UserProfilePhoneSectionView({
   verificationFinalFocus,
   setPrimaryReverification,
   setPrimaryFinalFocus,
+  pendingPrimaryId,
+  pendingVerifyId,
   onVerify,
   onSetPrimary,
 }: UserProfilePhoneSectionViewProps) {
@@ -33,6 +35,7 @@ export function UserProfilePhoneSectionView({
       render={
         <Button
           aria-label={m.phone.add}
+          disabled={pendingVerifyId !== undefined}
           color='neutral'
           size='sm'
           variant='outline'
@@ -59,6 +62,10 @@ export function UserProfilePhoneSectionView({
         addAction={addPhoneAction}
         onRemove={remove ? phone => remove.open(phone) : undefined}
         onSetPrimary={onSetPrimary}
+        pendingPrimaryId={pendingPrimaryId}
+        pendingVerifyId={pendingVerifyId}
+        verificationReadyId={verification.open ? verification.verifyingId : undefined}
+        primaryChallengeVisible={setPrimaryReverification.visible}
         onVerify={onVerify}
       >
         <Section.Error>{error}</Section.Error>
