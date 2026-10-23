@@ -7,6 +7,7 @@ import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
+import { Form } from '../../../primitives/form';
 
 export interface ReverificationOtpMessages {
   title: string;
@@ -53,9 +54,11 @@ export function ReverificationOTP({
 }: ReverificationOTPProps) {
   const formId = useId();
 
+  const canSubmit = value.length === length;
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isPending) {
+    if (canSubmit && !isPending) {
       onSubmit();
     }
   };
@@ -67,7 +70,7 @@ export function ReverificationOTP({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <form
+        <Form
           id={formId}
           onSubmit={handleSubmit}
         >
@@ -108,7 +111,7 @@ export function ReverificationOTP({
               </Field.Description>
             ) : null}
           </Field.Root>
-        </form>
+        </Form>
       </Card.Content>
       <Card.Footer>
         {onCancel ? (
@@ -126,6 +129,7 @@ export function ReverificationOTP({
         <SubmitButton
           form={formId}
           fullWidth
+          disabled={!canSubmit}
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

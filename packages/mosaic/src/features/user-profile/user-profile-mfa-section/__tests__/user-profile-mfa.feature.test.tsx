@@ -322,7 +322,7 @@ describe('User profile MFA', () => {
       held.release();
       vi.useRealTimers();
     }
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Verify' })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Back' })).toBeEnabled());
     expect(code).not.toHaveAttribute('aria-disabled');
     expect(code).not.toHaveAttribute('readonly');
   });

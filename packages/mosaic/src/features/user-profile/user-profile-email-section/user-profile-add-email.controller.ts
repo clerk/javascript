@@ -161,6 +161,8 @@ const machine = createMachine({
   },
 });
 
+const CODE_LENGTH = 6;
+
 export function useUserProfileAddEmailController({
   initialEmailAddress = '',
   username,
@@ -173,7 +175,7 @@ export function useUserProfileAddEmailController({
   const { resendSeconds, error, verification } = snapshot.context;
   const emailForm = useForm({
     initialValues: { emailAddress: initialEmailAddress },
-    canSubmit: values => !username || values.emailAddress !== username,
+    canSubmit: values => values.emailAddress !== '' && values.emailAddress !== username,
     onSubmit: async ({ emailAddress }) => {
       if (onCreate) {
         send({ type: 'START', emailAddress, verifier: await onCreate(emailAddress) });
@@ -182,6 +184,7 @@ export function useUserProfileAddEmailController({
   });
   const codeForm = useForm({
     initialValues: { code: '' },
+    canSubmit: values => values.code.length === CODE_LENGTH,
     onSubmit: async ({ code }) => {
       const { verifier } = actor.getSnapshot().context;
       if (verifier) {
@@ -218,6 +221,7 @@ export function useUserProfileAddEmailController({
     emailAddress: state === 'email' ? emailForm.values.emailAddress : snapshot.context.emailAddress,
     canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
     code: codeForm.values.code,
+    canSubmitCode: codeForm.canSubmit || codeForm.isSubmitting,
     errorMessage: formError?.message ?? form.error ?? machineError,
     isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {

@@ -14,6 +14,7 @@ import { Input } from '../../components/input';
 import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { fill } from '../../localization';
+import { Form } from '../../primitives/form';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { APIKeysTableMessages } from './api-keys-table.types';
 
@@ -102,7 +103,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={form.id}
             onSubmit={form.handleSubmit}
           />
@@ -192,7 +193,7 @@ function CopyKeyStep(props: CreateAPIKeyDialogProps) {
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={formId}
             onSubmit={event => {
               event.preventDefault();
