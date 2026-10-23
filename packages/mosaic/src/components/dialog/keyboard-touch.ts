@@ -1,5 +1,7 @@
 import { canScrollToward, opensKeyboard } from '../../primitives/utils';
 
+const TAP_SLOP = 10;
+
 /** A native slider, or anything that opts out of the browser's panning to take the drag itself. */
 function handlesOwnDrag(element: Element): boolean {
   if (element instanceof HTMLInputElement && element.type === 'range') {
@@ -24,17 +26,23 @@ function handlesOwnDrag(element: Element): boolean {
 export function guardKeyboardTouch(element: HTMLElement): () => void {
   let startX = 0;
   let startY = 0;
+  let moved = false;
   const onTouchStart = (event: TouchEvent) => {
     startX = event.touches[0]?.clientX ?? 0;
     startY = event.touches[0]?.clientY ?? 0;
+    moved = false;
   };
   const onTouchMove = (event: TouchEvent) => {
     const touch = event.touches[0];
-    if (event.touches.length > 1 || !touch || !event.cancelable) {
+    if (!touch) {
       return;
     }
     const deltaX = touch.clientX - startX;
     const deltaY = touch.clientY - startY;
+    moved ||= event.touches.length > 1 || Math.hypot(deltaX, deltaY) >= TAP_SLOP;
+    if (event.touches.length > 1 || !event.cancelable) {
+      return;
+    }
     for (let node = event.target instanceof Element ? event.target : null; node; node = node.parentElement) {
       if (handlesOwnDrag(node) || canScrollToward(node, deltaX, deltaY)) {
         return;
@@ -45,7 +53,8 @@ export function guardKeyboardTouch(element: HTMLElement): () => void {
   const onTouchEnd = (event: TouchEvent) => {
     const target = event.target;
     const touch = event.changedTouches[0];
-    const isTap = touch !== undefined && Math.hypot(touch.clientX - startX, touch.clientY - startY) < 10;
+    const isTap =
+      touch !== undefined && !moved && Math.hypot(touch.clientX - startX, touch.clientY - startY) < TAP_SLOP;
     const submit = target instanceof Element ? target.closest('button[type="submit"]') : null;
     if (isTap && submit instanceof HTMLButtonElement && opensKeyboard(document.activeElement)) {
       event.preventDefault();

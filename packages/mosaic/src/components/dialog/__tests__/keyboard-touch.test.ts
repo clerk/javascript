@@ -60,6 +60,17 @@ describe('guardKeyboardTouch', () => {
     expect(input).not.toHaveFocus();
   });
 
+  it('leaves a text field alone when a drag returns to where it started', () => {
+    const input = document.createElement('input');
+    container.append(input);
+
+    touch(input, 'touchstart', 100);
+    touch(input, 'touchmove', 150);
+    touch(input, 'touchend', 102);
+
+    expect(input).not.toHaveFocus();
+  });
+
   it('submits on a tap of a submit button and keeps focus on the field', () => {
     const input = document.createElement('input');
     const submit = document.createElement('button');

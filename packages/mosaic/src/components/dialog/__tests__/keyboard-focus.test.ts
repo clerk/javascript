@@ -85,6 +85,20 @@ describe('guardKeyboardFocus', () => {
     expect(scroll.scrollTo).not.toHaveBeenCalled();
   });
 
+  it('reveals a field that sits above the visible band when the page is panned', () => {
+    const scroll = scroller();
+    scroll.scrollTop = 500;
+    const input = field(100);
+    scroll.append(input);
+    container.append(scroll);
+    input.focus();
+    viewport.offsetTop = 200;
+
+    openKeyboard();
+
+    expect(scroll.scrollTo).toHaveBeenCalledWith({ top: 220, behavior: 'smooth' });
+  });
+
   it('centers the next field when focus moves with the keyboard up', () => {
     const scroll = scroller();
     const first = field(100);

@@ -55,11 +55,12 @@ function revealAboveKeyboard(field: HTMLElement, boundary: HTMLElement, viewport
   }
   const bounds = scroller.getBoundingClientRect();
   const target = field.getBoundingClientRect();
+  const top = Math.max(bounds.top, viewport.offsetTop);
   const bottom = Math.min(bounds.bottom, viewport.offsetTop + viewport.height);
-  if (target.top >= bounds.top && target.bottom <= bottom) {
+  if (target.top >= top && target.bottom <= bottom) {
     return;
   }
-  const centered = scroller.scrollTop + target.top - bounds.top - ((bottom - bounds.top) / 2 - target.height / 2);
+  const centered = scroller.scrollTop + target.top - top - ((bottom - top) / 2 - target.height / 2);
   scroller.scrollTo({
     top: Math.max(0, Math.min(scroller.scrollHeight - scroller.clientHeight, centered)),
     behavior: 'smooth',
