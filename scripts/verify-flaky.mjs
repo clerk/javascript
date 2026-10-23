@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const MOST_TESTS = 10;
 const ERROR_CHARS = 300;
 
 function flakesFromReport(report) {
@@ -31,26 +30,15 @@ const slackText = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').
 
 const mostCommon = counts => [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
 
-function digestMessage(records, { runs, hours }) {
+function flakyMessage(records) {
   const tests = new Map();
   for (const record of records) {
     for (const flake of record.flakes) {
       const key = `${flake.file}\n${flake.title}`;
-      const test = tests.get(key) ?? {
-        file: flake.file,
-        title: flake.title,
-        total: 0,
-        platforms: new Map(),
-        runs: new Set(),
-        errors: new Map(),
-        latestRunUrl: null,
-      };
+      const test = tests.get(key) ?? { file: flake.file, title: flake.title, platforms: new Set(), errors: new Map() };
       const error = normalizeError(flake.error);
-      test.total += 1;
-      test.platforms.set(flake.platform, (test.platforms.get(flake.platform) ?? 0) + 1);
-      test.runs.add(record.runUrl ?? record);
+      test.platforms.add(flake.platform);
       test.errors.set(error, (test.errors.get(error) ?? 0) + 1);
-      test.latestRunUrl = record.runUrl ?? test.latestRunUrl;
       tests.set(key, test);
     }
   }
@@ -58,31 +46,19 @@ function digestMessage(records, { runs, hours }) {
     return '';
   }
 
-  const sorted = [...tests.values()].sort(
-    (a, b) => b.total - a.total || a.file.localeCompare(b.file) || a.title.localeCompare(b.title),
-  );
-  const lines = [`:warning: Expo E2E had flaky tests in ${runs} Version packages runs over the last ${hours} hours`];
-  for (const test of sorted.slice(0, MOST_TESTS)) {
-    const platforms = [...test.platforms.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([platform, count]) => `${platform} ×${count}`)
-      .join(', ');
-    const parts = [
-      `• \`${test.file.replace(/^specs\/features\//, '')}\` ${slackText(test.title)}`,
-      `${test.runs.size} of ${runs} runs`,
-      platforms,
-    ];
-    if (test.latestRunUrl !== null) {
-      parts.push(`<${test.latestRunUrl}|latest run>`);
-    }
-    lines.push(parts.join(' · '));
+  const runUrl = records.find(record => record.runUrl)?.runUrl;
+  const count = tests.size === 1 ? '1 flaky test' : `${tests.size} flaky tests`;
+  const lines = [
+    `:warning: Expo E2E had ${count} on the Version packages pull request${runUrl ? ` · <${runUrl}|View the run>` : ''}`,
+  ];
+  const sorted = [...tests.values()].sort((a, b) => a.file.localeCompare(b.file) || a.title.localeCompare(b.title));
+  for (const test of sorted) {
+    const platforms = [...test.platforms].sort().join(', ');
+    lines.push(`• \`${test.file.replace(/^specs\/features\//, '')}\` ${slackText(test.title)} · ${platforms}`);
     const error = mostCommon(test.errors);
     if (error !== '') {
       lines.push(`  first attempt failed: ${slackText(error)}`);
     }
-  }
-  if (sorted.length > MOST_TESTS) {
-    lines.push(`…and ${sorted.length - MOST_TESTS} more`);
   }
   return lines.join('\n');
 }
@@ -126,26 +102,23 @@ function readRecords(dir) {
 
 function main(argv, env, log = console.log) {
   const [step, ...rest] = argv;
-  const flag = name => (rest.includes(name) ? rest[rest.indexOf(name) + 1] : undefined);
   if (step === 'record' && rest.length === 2) {
     const record = recordStep(rest[0], rest[1], env);
     log(`Recorded ${record.flakes.length} flaky tests in ${rest[1]}.`);
     return 0;
   }
-  const runs = Number(flag('--runs'));
-  const hours = Number(flag('--hours'));
-  if (step === 'digest' && rest[0] !== undefined && Number.isInteger(runs) && Number.isInteger(hours)) {
-    const message = digestMessage(readRecords(rest[0]), { runs, hours });
+  if (step === 'message' && rest.length === 1) {
+    const message = flakyMessage(readRecords(rest[0]));
     if (message !== '') {
       log(message);
     }
     return 0;
   }
-  log('usage: verify-flaky.mjs record <runsDir> <outFile> | digest <dir> --runs <n> --hours <h>');
+  log('usage: verify-flaky.mjs record <runsDir> <outFile> | message <dir>');
   return 2;
 }
 
-export { digestMessage, flakesFromReport, main, normalizeError };
+export { flakesFromReport, flakyMessage, main, normalizeError };
 
 if (process.argv[1] !== undefined && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   process.exit(main(process.argv.slice(2), process.env));

@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { digestMessage, flakesFromReport, main, normalizeError } from './verify-flaky.mjs';
+import { flakesFromReport, flakyMessage, main, normalizeError } from './verify-flaky.mjs';
 
 const signedInError = (name, user, launch, session, passes = 2) =>
   `the app did not show "Signed in as ${name}+clerk_test@example.com" with user ID ${user} and a session ID on the home after launch ${launch}; it shows its error screen: Something went wrong No session was found with id ${session}; passes: ${passes}; reads: ${passes * 2}, the slowest ${passes * 70}ms (the heading)`;
@@ -103,60 +103,43 @@ describe('normalizeError', () => {
   });
 });
 
-describe('digestMessage', () => {
+describe('flakyMessage', () => {
   it('is empty when no test was flaky', () => {
-    expect(digestMessage([], { runs: 4, hours: 24 })).toBe('');
-    expect(digestMessage([{ runUrl: runUrl(1), commit: null, flakes: [] }], { runs: 4, hours: 24 })).toBe('');
+    expect(flakyMessage([])).toBe('');
+    expect(flakyMessage([{ runUrl: runUrl(1), commit: null, flakes: [] }])).toBe('');
   });
 
-  it('groups a test across runs and platforms, and links its latest run', () => {
-    const signOut = flake();
+  it('lists each flaky test once with its platforms and its first error, and links the run', () => {
     const profile = flake({
       file: 'specs/features/user-button-and-profile/profile.e2e.ts',
       title: 'the home sign-out button ends the session',
       error: 'a <b> & c',
     });
-    const message = digestMessage(
-      [
-        { runUrl: runUrl(1), commit: null, flakes: [signOut, profile] },
-        { runUrl: runUrl(1), commit: null, flakes: [flake({ platform: 'ios' })] },
-        {
-          runUrl: runUrl(2),
-          commit: null,
-          flakes: [flake({ error: 'No session was found with id sess_3L6FCP4vbLeA13m6zfP70AEVLx7' })],
-        },
-        { runUrl: runUrl(3), commit: null, flakes: [flake({ error: 'something else' })] },
-      ],
-      { runs: 5, hours: 24 },
-    );
+    const message = flakyMessage([
+      { runUrl: runUrl(1), commit: null, flakes: [profile, flake()] },
+      { runUrl: runUrl(1), commit: null, flakes: [flake({ platform: 'ios' })] },
+    ]);
 
     expect(message).toBe(
       [
-        ':warning: Expo E2E had flaky tests in 5 Version packages runs over the last 24 hours',
-        `• \`native-js-sync/sign-out-from-native.e2e.ts\` signing out in the native profile signs out the JS hooks · 3 of 5 runs · android ×3, ios ×1 · <${runUrl(3)}|latest run>`,
+        `:warning: Expo E2E had 2 flaky tests on the Version packages pull request · <${runUrl(1)}|View the run>`,
+        '• `native-js-sync/sign-out-from-native.e2e.ts` signing out in the native profile signs out the JS hooks · android, ios',
         '  first attempt failed: No session was found with id sess_&lt;id&gt;',
-        `• \`user-button-and-profile/profile.e2e.ts\` the home sign-out button ends the session · 1 of 5 runs · android ×1 · <${runUrl(1)}|latest run>`,
+        '• `user-button-and-profile/profile.e2e.ts` the home sign-out button ends the session · android',
         '  first attempt failed: a &lt;b&gt; &amp; c',
       ].join('\n'),
     );
   });
 
-  it('lists the ten most flaky tests', () => {
-    const flakes = Array.from({ length: 12 }, (_, i) =>
-      Array.from({ length: i + 1 }, () => flake({ title: `test ${i}` })),
-    ).flat();
-    const lines = digestMessage([{ runUrl: null, commit: null, flakes }], { runs: 1, hours: 24 }).split('\n');
-
-    expect(lines.filter(line => line.startsWith('•')).map(line => line.split(' · ')[0])).toEqual(
-      Array.from({ length: 10 }, (_, i) => `• \`native-js-sync/sign-out-from-native.e2e.ts\` test ${11 - i}`),
+  it('names one flaky test in the singular and leaves out the link without a run', () => {
+    expect(flakyMessage([{ runUrl: null, commit: null, flakes: [flake()] }]).split('\n')[0]).toBe(
+      ':warning: Expo E2E had 1 flaky test on the Version packages pull request',
     );
-    expect(lines[1]).toBe('• `native-js-sync/sign-out-from-native.e2e.ts` test 11 · 1 of 1 runs · android ×12');
-    expect(lines.at(-1)).toBe('…and 2 more');
   });
 });
 
 describe('the command line', () => {
-  it('records the flaky tests of every e2e report, then digests them', () => {
+  it('records the flaky tests of every e2e report, then writes the message', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'verify-flaky-'));
     const runs = path.join(dir, 'runs');
     const write = (file, value) => {
@@ -193,13 +176,11 @@ describe('the command line', () => {
     expect(main(['record', path.join(dir, 'no-runs'), empty], {}, () => {})).toBe(0);
     expect(JSON.parse(fs.readFileSync(empty, 'utf8'))).toEqual({ runUrl: null, commit: null, flakes: [] });
 
-    const digest = [];
-    expect(main(['digest', path.join(dir, 'records'), '--runs', '2', '--hours', '24'], {}, l => digest.push(l))).toBe(
-      0,
+    const message = [];
+    expect(main(['message', path.join(dir, 'records')], {}, line => message.push(line))).toBe(0);
+    expect(message.join('\n').split('\n')[1]).toBe(
+      '• `native-js-sync/sign-out-from-native.e2e.ts` signing out in the native profile signs out the JS hooks · android, ios',
     );
-    expect(digest.join('\n').split('\n')[1]).toBe(
-      `• \`native-js-sync/sign-out-from-native.e2e.ts\` signing out in the native profile signs out the JS hooks · 1 of 2 runs · android ×1, ios ×1 · <${runUrl(42)}|latest run>`,
-    );
-    expect(main(['digest', path.join(dir, 'records')], {}, () => {})).toBe(2);
+    expect(main(['message'], {}, () => {})).toBe(2);
   });
 });

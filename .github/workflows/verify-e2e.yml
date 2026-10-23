@@ -225,15 +225,62 @@ jobs:
         if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
         run: node scripts/verify-flaky.mjs record "$PACKAGE/.verify/runs" "$RUNNER_TEMP/verify-flaky.json"
 
-      - name: Keep the flaky tests for the daily digest
+      - name: Keep the flaky tests for the Slack post
         if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
         uses: actions/upload-artifact@v4.6.2
         with:
           name: verify-flaky-${{ matrix.platform }}
           path: ${{ runner.temp }}/verify-flaky.json
-          retention-days: 3
+          retention-days: 1
           overwrite: true
           if-no-files-found: ignore
+
+  report-flaky:
+    name: Post the flaky tests to Slack
+    needs: e2e-tests
+    if: ${{ !cancelled() && needs.e2e-tests.result != 'skipped' && github.head_ref == 'changeset-release/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/verify-flaky.mjs
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 24.15.0
+
+      - name: Download the flaky tests of both platforms
+        continue-on-error: true
+        uses: actions/download-artifact@v4.3.0
+        with:
+          pattern: verify-flaky-*
+          path: ${{ runner.temp }}/flaky
+
+      - name: Post the flaky tests
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MOBILE_TEAM_ALERTS_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/flaky"
+          MESSAGE="$(node scripts/verify-flaky.mjs message "$RUNNER_TEMP/flaky")"
+          if [ -z "$MESSAGE" ]; then
+            echo "No flaky tests in this run."
+            exit 0
+          fi
+          echo "$MESSAGE"
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "::warning::SLACK_MOBILE_TEAM_ALERTS_WEBHOOK_URL is not configured; skipping Slack notification"
+            exit 0
+          fi
+          PAYLOAD="$(jq -n --arg text "$MESSAGE" '{text: $text, unfurl_links: false, unfurl_media: false}')"
+          curl --fail-with-body --connect-timeout 10 --max-time 30 --retry 3 --retry-delay 5 --retry-max-time 60 --retry-all-errors \
+            --request POST --header "Content-type: application/json" --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
 
   verify-e2e:
     name: Expo E2E
