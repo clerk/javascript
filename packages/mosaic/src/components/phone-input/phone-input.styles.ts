@@ -65,11 +65,48 @@ export const styles = stylex.create({
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
   },
-  countrySearchContainer: {
-    paddingInline: space['2'],
+  countrySearchRow: {
+    gap: space['1'],
+    alignItems: 'center',
+    borderBlockEndColor: colorVars['--cl-color-border'],
+    borderBlockEndStyle: 'solid',
+    borderBlockEndWidth: '1px',
+    display: 'flex',
     flexShrink: 0,
-    paddingBlockEnd: space['1'],
-    paddingBlockStart: space['2'],
+    paddingInlineEnd: space['2'],
+    paddingInlineStart: space['1'],
+    height: space['8'],
+  },
+  countrySearchIcon: {
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    height: space['5'],
+    width: space['5'],
+  },
+  countrySearchInput: {
+    borderRadius: 0,
+    outline: {
+      default: 'none',
+      '@media (forced-colors: active)': {
+        default: null,
+        ':focus-visible': '2px solid CanvasText',
+      },
+    },
+    outlineOffset: {
+      default: null,
+      '@media (forced-colors: active)': {
+        default: null,
+        ':focus-visible': '2px',
+      },
+    },
+    paddingInlineEnd: space['1'],
+    paddingInlineStart: space['0.5'],
+    height: space['6'],
+    '::placeholder': {
+      color: colorVars['--cl-color-foreground-secondary'],
+    },
   },
   optionName: {
     overflow: 'hidden',

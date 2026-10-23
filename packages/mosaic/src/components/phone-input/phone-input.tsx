@@ -9,6 +9,7 @@ import React from 'react';
 import { ChevronDown } from '../../icons/glyphs/chevron-down';
 import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
 import { Button } from '../../primitives/button';
+import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
 import { useFormattedInput } from '../../primitives/hooks';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -19,6 +20,7 @@ import { Combobox } from '../combobox';
 import { Field } from '../field';
 import { useOptionalFieldContext } from '../field/field.context';
 import { Icon } from '../icon';
+import { sizes as inputSizes, styles as inputStyles } from '../input/input.styles';
 import { InputGroup } from '../input-group';
 import { Popover } from '../popover';
 import { formatNationalNumber, getNationalNumber, toE164 } from './phone-input.format';
@@ -77,7 +79,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
     defaultCountry,
     onCountryChange,
     size = 'md',
-    countrySearchPlaceholder = 'Search country or code',
+    countrySearchPlaceholder = 'Search',
     noResultsMessage = 'No countries found',
     disabled: disabledProp,
     required: requiredProp,
@@ -259,23 +261,36 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 }
               }}
             >
-              <Field.Root xstyle={styles.countrySearchContainer}>
-                <InputGroup.Root
-                  size='md'
-                  {...themeProps('phone-input-country-search')}
+              <Field.Root>
+                <label
+                  {...mergeStyleProps(
+                    themeProps('phone-input-country-search'),
+                    stylex.props(reset.base, styles.countrySearchRow),
+                  )}
                 >
-                  <InputGroup.Start>
+                  <span {...stylex.props(reset.base, styles.countrySearchIcon)}>
                     <Icon
                       glyph={MagnifyingGlass}
-                      size='sm'
+                      size='md'
                     />
-                  </InputGroup.Start>
-                  <Combobox.Input
+                  </span>
+                  <HeadlessCombobox.Input
                     aria-label='Search countries'
                     placeholder={countrySearchPlaceholder}
                     spellCheck={false}
+                    {...mergeStyleProps(
+                      themeProps('combobox-input', { size: 'md', variant: 'ghost' }),
+                      themeProps('input', { size: 'md', variant: 'ghost', disabled: false }),
+                      stylex.props(
+                        reset.base,
+                        inputStyles.base,
+                        inputSizes.md,
+                        inputStyles.ghost,
+                        styles.countrySearchInput,
+                      ),
+                    )}
                   />
-                </InputGroup.Root>
+                </label>
               </Field.Root>
               <Combobox.List {...themeProps('phone-input-country-list')}>
                 {filteredCountries.length > 0 ? (

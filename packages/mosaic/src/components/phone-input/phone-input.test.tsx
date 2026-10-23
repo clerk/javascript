@@ -32,6 +32,29 @@ describe('Mosaic PhoneInput', () => {
     await waitFor(() => expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveFocus());
   });
 
+  it('shows Search as the default country search placeholder', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+
+    expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveAttribute('placeholder', 'Search');
+  });
+
+  it('uses a custom country search placeholder', async () => {
+    const user = userEvent.setup();
+    render(
+      <PhoneInput
+        aria-label='Phone number'
+        countrySearchPlaceholder='Find a country'
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+
+    expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveAttribute('placeholder', 'Find a country');
+  });
+
   it('forwards object refs and clears them on unmount', () => {
     const ref = React.createRef<HTMLInputElement>();
     const { unmount } = render(
@@ -177,7 +200,7 @@ describe('Mosaic PhoneInput', () => {
     const searchInput = screen.getByRole('combobox', { name: 'Search countries' });
     expect(searchInput).toHaveClass('cl-combobox-input', 'cl-input');
     expect(searchInput).toHaveAttribute('data-variant', 'ghost');
-    expect(searchInput.closest('.cl-input-group')).toHaveClass('cl-phone-input-country-search');
+    expect(searchInput.closest('.cl-phone-input-country-search')).toBeInTheDocument();
     await user.type(searchInput, 'Greece');
     expect(screen.getByRole('listbox')).toHaveClass('cl-combobox-list');
     expect(screen.getByRole('option', { name: /Greece/ })).toHaveClass('cl-combobox-option');
@@ -201,6 +224,43 @@ describe('Mosaic PhoneInput', () => {
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
 
     expect(screen.getByRole('combobox', { name: 'Search countries' })).toHaveValue('');
+  });
+
+  it('focuses the search when clicking its row after dismissing and reopening', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('combobox', { name: 'Search countries' })).not.toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+
+    const searchInput = screen.getByRole('combobox', { name: 'Search countries' });
+    const searchRow = searchInput.closest('.cl-phone-input-country-search');
+    if (!searchRow) {
+      throw new Error('Country search row missing');
+    }
+    searchInput.blur();
+    await user.click(searchRow);
+
+    expect(searchInput).toHaveFocus();
+  });
+
+  it('focuses the phone input when clicking its group after the search is dismissed', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+    const phoneInput = screen.getByRole('textbox', { name: 'Phone number' });
+    const phoneGroup = phoneInput.closest('.cl-phone-input');
+    if (!phoneGroup) {
+      throw new Error('Phone input group missing');
+    }
+
+    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('combobox', { name: 'Search countries' })).not.toBeInTheDocument());
+    await user.click(phoneGroup);
+
+    expect(phoneInput).toHaveFocus();
   });
 
   it('clears the country search after a country is chosen', async () => {
