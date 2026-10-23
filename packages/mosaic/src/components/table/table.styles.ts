@@ -24,7 +24,7 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     width: '100%',
   },
   viewport: {
@@ -34,7 +34,7 @@ export const styles = stylex.create({
   },
   table: {
     '--_cl-table-row-tint': 'transparent',
-    '--_cl-table-surface': colorVars['--cl-color-background'],
+    '--_cl-table-surface': colorVars['--cl-color-surface'],
     borderCollapse: 'collapse',
     borderSpacing: 0,
     isolation: 'isolate',

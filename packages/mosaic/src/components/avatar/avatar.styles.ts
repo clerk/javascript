@@ -73,7 +73,7 @@ export const styles = stylex.create({
     borderWidth: '1px',
     overflow: 'hidden',
     alignItems: 'center',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxSizing: 'border-box',
     display: 'flex',
     insetBlockEnd: `calc(${space['2']} * -1)`,

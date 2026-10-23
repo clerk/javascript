@@ -23,12 +23,12 @@ import * as stylex from '@stylexjs/stylex';
 // Color Tokens
 // =============================================================================
 
-// Every achromatic token is `--cl-color-neutral` mixed into `--cl-color-background`, so
+// Every achromatic token is `--cl-color-neutral` mixed into `--cl-color-surface`, so
 // retinting neutral (a warm gray, say) retints the whole ramp. The percentages reproduce
 // the Figma gray scale: grays have zero chroma, so an oklab mix is linear in lightness.
-// Dark mode needs its own percentage because its background is a 900, not black.
+// Dark mode needs its own percentage because its surface is a 900, not black.
 const neutralMix = (light: number, dark: number) =>
-  `light-dark(color-mix(in oklab, var(--cl-color-neutral) ${light}%, var(--cl-color-background)), color-mix(in oklab, var(--cl-color-neutral) ${dark}%, var(--cl-color-background)))`;
+  `light-dark(color-mix(in oklab, var(--cl-color-neutral) ${light}%, var(--cl-color-surface)), color-mix(in oklab, var(--cl-color-neutral) ${dark}%, var(--cl-color-surface)))`;
 
 const colorDefaults = {
   '--cl-color-neutral': 'light-dark(oklch(0 0 0), oklch(1 0 0))',
@@ -36,20 +36,23 @@ const colorDefaults = {
   '--cl-color-neutral-alpha-200': 'color-mix(in oklab, var(--cl-color-neutral) 8%, transparent)',
   '--cl-color-neutral-alpha-300': 'color-mix(in oklab, var(--cl-color-neutral) 12%, transparent)',
 
-  '--cl-color-background': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
+  '--cl-color-background': 'light-dark(oklch(1 0 0), oklch(0.133 0 0))',
   '--cl-color-background-subtle': neutralMix(3, 4.25),
+  '--cl-color-surface':
+    'light-dark(var(--cl-color-background), color-mix(in oklab, var(--cl-color-neutral) 6.5%, var(--cl-color-background)))',
 
   '--cl-color-foreground': neutralMix(79.5, 98),
   '--cl-color-foreground-secondary': neutralMix(44.45, 64.25),
   '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
-  '--cl-color-border': neutralMix(5.5, 8),
+  '--cl-color-border':
+    'light-dark(color-mix(in oklab, var(--cl-color-neutral) 5.5%, var(--cl-color-surface)), color-mix(in oklab, var(--cl-color-neutral) 10.5%, var(--cl-color-surface)))',
   '--cl-color-border-subtle': neutralMix(3, 4.25),
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
   '--cl-color-brand-secondary': 'light-dark(oklch(0.4017 0 0), oklch(0.7025 0 0))',
   '--cl-color-brand-border': 'light-dark(oklch(0.8078 0 0), oklch(0.3904 0 0))',
-  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
 
   '--cl-color-negative': 'oklch(0.6252 0.2161 26.11)',
   '--cl-color-negative-foreground': 'oklch(1 0 0)',
@@ -75,7 +78,7 @@ const colorDefaults = {
   '--cl-color-warning-alpha-200': 'color-mix(in oklab, var(--cl-color-warning) 8%, transparent)',
   '--cl-color-warning-alpha-300': 'color-mix(in oklab, var(--cl-color-warning) 12%, transparent)',
 
-  '--cl-color-input': 'var(--cl-color-background)',
+  '--cl-color-input': 'var(--cl-color-surface)',
   '--cl-color-input-placeholder': neutralMix(28, 64),
 
   '--cl-color-ring': neutralMix(80, 90),
@@ -146,7 +149,7 @@ export const targetVars = stylex.defineVars(targetDefaults);
 // pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
 // thumb's own two. Each derives from `--cl-scrollbar-thumb` rather than baking its value in, so
 // they resolve at use time — overriding the base re-derives all three, while any one stays
-// individually overridable. The base is itself mixed most of the way toward `--cl-color-background`,
+// individually overridable. The base is itself mixed most of the way toward `--cl-color-surface`,
 // which keeps a 4px bar reading as a hairline rather than a hard rule; `idle` carries on in that
 // direction, and the other two step back toward `--cl-color-foreground`, deepening in light
 // mode and lightening in dark, since that token already carries both.
@@ -169,8 +172,8 @@ const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
 const scrollbarDefaults = {
   '--cl-scrollbar-width': '8px',
   '--cl-scrollbar-thumb-inset': '2px',
-  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-foreground-secondary']}, ${colorVars['--cl-color-background']} 55%)`,
-  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-background']} 45%)`,
+  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-foreground-secondary']}, ${colorVars['--cl-color-surface']} 55%)`,
+  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-surface']} 45%)`,
   '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 15%)`,
   '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 30%)`,
 } as const;

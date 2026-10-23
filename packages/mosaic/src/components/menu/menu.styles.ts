@@ -25,7 +25,7 @@ export const popup = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-lg'],
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
@@ -80,6 +80,8 @@ export const viewport = stylex.create({
   },
 });
 
+const negativeActive = `light-dark(${colorVars['--cl-color-negative-alpha-200']}, ${colorVars['--cl-color-negative-subtle']})`;
+
 export const item = stylex.create({
   base: {
     borderRadius: '0.375rem',
@@ -128,9 +130,9 @@ export const item = stylex.create({
   negative: {
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': colorVars['--cl-color-negative-alpha-200'],
+      ':is([data-active])': negativeActive,
       '@media (hover: hover)': {
-        ':hover': colorVars['--cl-color-negative-alpha-200'],
+        ':hover': negativeActive,
       },
     },
     color: colorVars['--cl-color-negative'],
