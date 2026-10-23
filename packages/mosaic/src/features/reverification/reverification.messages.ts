@@ -27,7 +27,9 @@ export const reverificationMessages = {
   emailCode: {
     description: 'Enter the code sent to your email to continue',
     formTitle: 'Verification code',
-    resendButton: 'Didn’t receive a code? Resend',
+    resendButton: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+    resendText: 'Didn’t receive a code?',
     title: 'Verification required',
   },
   passkey: {
@@ -44,13 +46,17 @@ export const reverificationMessages = {
   phoneCode: {
     description: 'Enter the code sent to your phone to continue',
     formTitle: 'Verification code',
-    resendButton: 'Didn’t receive a code? Resend',
+    resendButton: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+    resendText: 'Didn’t receive a code?',
     title: 'Verification required',
   },
   phoneCodeMfa: {
     description: 'Enter the code sent to your phone to continue',
     formTitle: 'Verification code',
-    resendButton: 'Didn’t receive a code? Resend',
+    resendButton: 'Resend',
+    resendCountdown: 'Resend ({seconds})',
+    resendText: 'Didn’t receive a code?',
     title: 'Verification required',
   },
   error: {

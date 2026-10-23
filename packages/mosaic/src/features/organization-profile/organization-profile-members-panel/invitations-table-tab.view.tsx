@@ -50,6 +50,7 @@ export function InvitationsTableTabView({
     onPageChange,
     searchValue: '',
     onSearchChange: () => {},
+    isFetching,
   });
   const columnCount = 3 + Number(Boolean(revoke)) + Number(Boolean(onBulkAction));
   return (

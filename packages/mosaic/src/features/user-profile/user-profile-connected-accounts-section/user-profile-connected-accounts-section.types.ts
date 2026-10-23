@@ -8,6 +8,7 @@ export type ConnectedAccountActionResult = 'redirecting' | void;
 
 export interface ConnectedAccountProviderDisplay {
   provider: string;
+  iconId?: string;
   iconUrl?: string;
   monochromeIcon?: boolean;
 }

@@ -9,6 +9,7 @@ import { Field } from '../../../components/field';
 import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import type { UserProfileRenamePasskeyValues } from './user-profile-passkeys-section.types';
 
 export interface UserProfileRenamePasskeyDialogProps {
@@ -52,7 +53,7 @@ export function UserProfileRenamePasskeyDialog({
           </Card.Banner>
           <Card.Content
             render={
-              <form
+              <Form
                 id={form.id}
                 onSubmit={form.handleSubmit}
               />

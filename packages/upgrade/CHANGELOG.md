@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 2.0.9
+
+### Patch Changes
+
+- Correct the Core 3 `<Suspense>` guidance for Next.js Cache Components. A plain `ClerkProvider` doesn't need a `<Suspense>` boundary. The code under it that reads the request does: `<Show>`, `auth()`, `currentUser()`, and `<SignIn />`, `<SignUp />`, `<UserProfile />`, and `<OrganizationProfile />` on catch-all routes. With the `dynamic` prop, `ClerkProvider` needs a boundary too. ([#10340](https://github.com/clerk/javascript/pull/10340)) by [@manovotny](https://github.com/manovotny)
+
 ## 2.0.8
 
 ### Patch Changes

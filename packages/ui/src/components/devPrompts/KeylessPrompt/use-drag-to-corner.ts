@@ -1,12 +1,13 @@
-import type { PointerEventHandler } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+
+import { useDragGesture } from '../../../hooks/useDragGesture';
 
 export type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 export const STORAGE_KEY = 'clerk-keyless-prompt-corner';
 const CORNER_OFFSET = '1.25rem';
 const CORNER_OFFSET_PX = 20; // 1.25rem ≈ 20px
-const DRAG_THRESHOLD = 5;
 const VELOCITY_SAMPLE_INTERVAL_MS = 10;
 const VELOCITY_HISTORY_SIZE = 5;
 const INERTIA_DECELERATION_RATE = 0.999;
@@ -36,7 +37,7 @@ interface UseDragToCornerResult {
   isDragging: boolean;
   cornerStyle: React.CSSProperties;
   containerRef: React.RefObject<HTMLDivElement>;
-  onPointerDown: PointerEventHandler;
+  onPointerDown: (e: ReactPointerEvent<HTMLElement>) => void;
   preventClick: boolean;
   isInitialized: boolean;
 }
@@ -138,13 +139,8 @@ export function useDragToCorner(): UseDragToCornerResult {
   }, []);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const machine = useRef<{ state: 'idle' | 'press' | 'animating' } | { state: 'drag'; pointerId: number }>({
-    state: 'idle',
-  });
-
-  const cleanup = useRef<(() => void) | null>(null);
-  const origin = useRef<Point>({ x: 0, y: 0 });
   const translation = useRef<Point>({ x: 0, y: 0 });
+  const dragStartTranslation = useRef<Point>(ZERO_POINT);
   const lastTimestamp = useRef<number>(0);
   const velocities = useRef<Velocity[]>([]);
   const dragStartDimensions = useRef<{ width: number; height: number } | null>(null);
@@ -212,7 +208,6 @@ export function useDragToCorner(): UseDragToCornerResult {
         translation.current = ZERO_POINT;
         el.style.transition = '';
         el.style.transform = ZERO_TRANSFORM;
-        machine.current = { state: 'idle' };
         setPreventClick(false);
         return;
       }
@@ -231,11 +226,9 @@ export function useDragToCorner(): UseDragToCornerResult {
           translation.current = ZERO_POINT;
           el.style.transition = '';
           el.style.transform = ZERO_TRANSFORM;
-          machine.current = { state: 'idle' };
           setPreventClick(false);
         } else {
           // Different corner — React state + layoutEffect for flash-free repositioning
-          machine.current = { state: 'animating' };
           pendingCornerUpdate.current = cornerTranslation.corner;
           setCorner(cornerTranslation.corner);
         }
@@ -248,62 +241,21 @@ export function useDragToCorner(): UseDragToCornerResult {
     [setTranslation, corner],
   );
 
-  const cancel = useCallback(() => {
-    if (machine.current.state === 'drag') {
-      containerRef.current?.releasePointerCapture(machine.current.pointerId);
-      machine.current = { state: 'animating' };
-    } else {
-      machine.current = { state: 'idle' };
-    }
-
-    if (cleanup.current) {
-      cleanup.current();
-      cleanup.current = null;
-    }
-
-    velocities.current = [];
-    setIsDragging(false);
-    dragStartDimensions.current = null; // Clear stored dimensions
-    containerRef.current?.classList.remove('dev-tools-grabbing');
-    document.body.style.removeProperty('user-select');
-    document.body.style.removeProperty('-webkit-user-select');
-
-    // Don't reset translation on simple clicks - it should already be correct
-    // Only reset if we were actually dragging and need to clean up
-    // Translation is reset to zero when snapping to corners, so simple clicks don't need reset
-  }, []);
-
   useLayoutEffect(() => {
     if (pendingCornerUpdate.current === corner) {
       const el = containerRef.current;
-      if (el && machine.current.state === 'animating') {
+      if (el) {
         translation.current = ZERO_POINT;
         el.style.transition = '';
         el.style.transform = ZERO_TRANSFORM;
-        machine.current = { state: 'idle' };
         setPreventClick(false);
         pendingCornerUpdate.current = null;
       }
     }
   }, [corner]);
 
-  useLayoutEffect(() => {
-    return () => {
-      cancel();
-    };
-  }, [cancel]);
-
-  const handlePointerDown: PointerEventHandler = useCallback(
-    e => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'A' || target.closest('a')) {
-        return;
-      }
-
-      if (e.button !== 0) {
-        return;
-      }
-
+  const onPointerDown = useDragGesture({
+    onDragStart: () => {
       const container = containerRef.current;
       if (!container) {
         return;
@@ -314,156 +266,59 @@ export function useDragToCorner(): UseDragToCornerResult {
         width: container.offsetWidth,
         height: container.offsetHeight,
       };
-
-      origin.current = { x: e.clientX, y: e.clientY };
-
-      // Read the current transform from the element's style to sync translation.current
-      // This ensures we start from the actual current position, not a stale value
-      const currentTransform = container.style.transform;
-      if (currentTransform && currentTransform !== 'none' && currentTransform !== ZERO_TRANSFORM) {
-        // Parse translate3d(x, y, 0) to extract x and y values
-        const match = currentTransform.match(/translate3d\(([^,]+)px,\s*([^,]+)px/);
-        if (match) {
-          translation.current = {
-            x: parseFloat(match[1]) || 0,
-            y: parseFloat(match[2]) || 0,
-          };
-        }
-      } else {
-        translation.current = ZERO_POINT;
-      }
-
-      machine.current = { state: 'press' };
+      dragStartTranslation.current = translation.current;
       velocities.current = [];
       lastTimestamp.current = Date.now();
 
-      const handlePointerMove = (moveEvent: PointerEvent) => {
-        if (machine.current.state === 'press') {
-          const dx = moveEvent.clientX - origin.current.x;
-          const dy = moveEvent.clientY - origin.current.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < DRAG_THRESHOLD) {
-            return;
-          }
-
-          machine.current = { state: 'drag', pointerId: moveEvent.pointerId };
-          try {
-            container.setPointerCapture(moveEvent.pointerId);
-          } catch {
-            // Pointer capture may fail - drag still works without it
-          }
-
-          // Disable all transitions during drag
-          container.style.transition = 'none';
-
-          container.classList.add('dev-tools-grabbing');
-          document.body.style.userSelect = 'none';
-          document.body.style.webkitUserSelect = 'none';
-          setIsDragging(true);
-
-          // Apply the initial movement that got us past the threshold
-          setTranslation({
-            x: translation.current.x + dx,
-            y: translation.current.y + dy,
-          });
-
-          // Update origin for next calculation
-          origin.current = { x: moveEvent.clientX, y: moveEvent.clientY };
-          return;
-        }
-
-        if (machine.current.state !== 'drag') {
-          return;
-        }
-
-        const currentPosition = { x: moveEvent.clientX, y: moveEvent.clientY };
-        const dx = currentPosition.x - origin.current.x;
-        const dy = currentPosition.y - origin.current.y;
-
-        // Update origin for next calculation
-        origin.current = currentPosition;
-
-        // Apply translation relative to current position
-        setTranslation({
-          x: translation.current.x + dx,
-          y: translation.current.y + dy,
-        });
-
-        const now = Date.now();
-        if (now - lastTimestamp.current >= VELOCITY_SAMPLE_INTERVAL_MS) {
-          velocities.current = [
-            ...velocities.current.slice(-VELOCITY_HISTORY_SIZE + 1),
-            { position: currentPosition, timestamp: now },
-          ];
-          lastTimestamp.current = now;
-        }
-      };
-
-      const handlePointerUp = () => {
-        const wasDragging = machine.current.state === 'drag';
-
-        if (wasDragging) {
-          const velocity = calculateVelocity(velocities.current);
-          const allCorners = getCorners();
-          cancel();
-
-          const container = containerRef.current;
-          if (!container) {
-            return;
-          }
-
-          const projectedTranslation = {
-            x: translation.current.x + project(velocity.x),
-            y: translation.current.y + project(velocity.y),
-          };
-
-          const newCorner = getNearestCorner(projectedTranslation, allCorners);
-          const targetTranslation = allCorners[newCorner];
-
-          setPreventClick(true);
-          animate({ corner: newCorner, translation: targetTranslation });
-        } else {
-          cancel();
-        }
-      };
-
-      const handleClick = (clickEvent: MouseEvent) => {
-        const target = clickEvent.target as HTMLElement;
-        const isButton = target.tagName === 'BUTTON' || target.closest('button');
-        const isLink = target.tagName === 'A' || target.closest('a');
-
-        if (machine.current.state === 'animating' && !isButton && !isLink) {
-          clickEvent.preventDefault();
-          clickEvent.stopPropagation();
-        }
-      };
-
-      window.addEventListener('pointermove', handlePointerMove);
-      window.addEventListener('pointerup', handlePointerUp, { once: true });
-      window.addEventListener('pointercancel', cancel, { once: true });
-      container.addEventListener('click', handleClick);
-
-      if (cleanup.current) {
-        cleanup.current();
-      }
-
-      cleanup.current = () => {
-        window.removeEventListener('pointermove', handlePointerMove);
-        window.removeEventListener('pointerup', handlePointerUp);
-        window.removeEventListener('pointercancel', cancel);
-        container.removeEventListener('click', handleClick);
-      };
+      // Disable all transitions during drag
+      container.style.transition = 'none';
+      setIsDragging(true);
     },
-    [cancel, setTranslation, animate, getCorners],
-  );
+    onDrag: offset => {
+      const position = {
+        x: dragStartTranslation.current.x + offset.x,
+        y: dragStartTranslation.current.y + offset.y,
+      };
+      setTranslation(position);
+
+      const now = Date.now();
+      if (now - lastTimestamp.current >= VELOCITY_SAMPLE_INTERVAL_MS) {
+        velocities.current = [...velocities.current.slice(-VELOCITY_HISTORY_SIZE + 1), { position, timestamp: now }];
+        lastTimestamp.current = now;
+      }
+    },
+    onDragCancel: () => {
+      velocities.current = [];
+      dragStartDimensions.current = null;
+      setIsDragging(false);
+      if (containerRef.current) {
+        containerRef.current.style.transition = '';
+      }
+    },
+    onDragEnd: () => {
+      const velocity = calculateVelocity(velocities.current);
+      const allCorners = getCorners();
+      velocities.current = [];
+      dragStartDimensions.current = null;
+      setIsDragging(false);
+
+      const projectedTranslation = {
+        x: translation.current.x + project(velocity.x),
+        y: translation.current.y + project(velocity.y),
+      };
+      const newCorner = getNearestCorner(projectedTranslation, allCorners);
+
+      setPreventClick(true);
+      animate({ corner: newCorner, translation: allCorners[newCorner] });
+    },
+  });
 
   return {
     corner,
     isDragging,
     cornerStyle: getCornerStyles(corner),
     containerRef,
-    onPointerDown: handlePointerDown,
+    onPointerDown,
     preventClick,
     isInitialized,
   };

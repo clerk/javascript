@@ -79,7 +79,11 @@ function EditName({
   lastNameAttribute: UserProfileNameAttribute;
 }) {
   const m = useMessages('userProfileProfileSection');
-  const controller = useUserProfileEditNameController(options);
+  const controller = useUserProfileEditNameController({
+    ...options,
+    firstNameRequired: firstNameAttribute.required,
+    lastNameRequired: lastNameAttribute.required,
+  });
 
   return (
     <UserProfileEditNameDialog

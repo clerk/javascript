@@ -1,5 +1,22 @@
 # @clerk/mosaic
 
+## 0.1.12
+
+### Patch Changes
+
+- Prevent actions in `UserButton` and `OrganizationSwitcher` menus from activating during the closing animation. ([#10366](https://github.com/clerk/javascript/pull/10366)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Reduce the size of the published bundle by only including the icons that Mosaic components render. Icon overrides passed to `MosaicProvider` through `icons` work as before. ([#10309](https://github.com/clerk/javascript/pull/10309)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the OKX Wallet logo in the user profile Web3 wallets section so it follows the text color and stays visible in dark mode. ([#10370](https://github.com/clerk/javascript/pull/10370)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the password visibility toggle in the reverification dialog. ([#10345](https://github.com/clerk/javascript/pull/10345)) by [@mwickett](https://github.com/mwickett)
+
+- Fix the keyboard focus ring on `UserButton` and `OrganizationSwitcher` rows being covered by the row below it. ([#10381](https://github.com/clerk/javascript/pull/10381)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+
 ## 0.1.11
 
 ### Patch Changes

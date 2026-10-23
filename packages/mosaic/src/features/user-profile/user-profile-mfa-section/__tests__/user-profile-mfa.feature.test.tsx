@@ -141,7 +141,7 @@ describe('User profile MFA', () => {
       expect(screen.getByText('You cannot set your last identification as second factor.')).toBeVisible(),
     );
     expect(screen.getByRole('combobox', { name: /Phone number/ })).toHaveAccessibleDescription(
-      'You cannot set your last identification as second factor.',
+      'Add a new phone number You cannot set your last identification as second factor.',
     );
     expect(fapi.mfa.phoneUpdates).toHaveLength(0);
     expect(screen.getByRole('button', { name: 'Back' })).toBeVisible();
@@ -322,7 +322,7 @@ describe('User profile MFA', () => {
       held.release();
       vi.useRealTimers();
     }
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Verify' })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Back' })).toBeEnabled());
     expect(code).not.toHaveAttribute('aria-disabled');
     expect(code).not.toHaveAttribute('readonly');
   });

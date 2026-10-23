@@ -37,46 +37,45 @@ const colorDefaults = {
   '--cl-color-neutral-alpha-300': 'color-mix(in oklab, var(--cl-color-neutral) 12%, transparent)',
 
   '--cl-color-background': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
-  '--cl-color-background-subtle': neutralMix(3, 4),
+  '--cl-color-background-subtle': neutralMix(3, 4.25),
 
   '--cl-color-foreground': neutralMix(79.5, 98),
-  '--cl-color-foreground-secondary': neutralMix(56, 64.25),
+  '--cl-color-foreground-secondary': neutralMix(44.45, 64.25),
   '--cl-color-foreground-disabled': neutralMix(28.5, 44),
 
   '--cl-color-border': neutralMix(5.5, 8),
   '--cl-color-border-subtle': neutralMix(3, 4.25),
 
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
-  '--cl-color-brand-secondary': 'light-dark(oklch(0.5555 0 0), oklch(0.7155 0 0))',
-  '--cl-color-brand-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
+  '--cl-color-brand-secondary': 'light-dark(oklch(0.4017 0 0), oklch(0.7025 0 0))',
+  '--cl-color-brand-border': 'light-dark(oklch(0.8078 0 0), oklch(0.3904 0 0))',
   '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
 
-  '--cl-color-negative': 'light-dark(oklch(0.5903 0.213 26.78), oklch(0.7106 0.1661 22.22))',
+  '--cl-color-negative': 'oklch(0.6252 0.2161 26.11)',
   '--cl-color-negative-foreground': 'oklch(1 0 0)',
-  '--cl-color-negative-subtle': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
-  '--cl-color-negative-border': 'light-dark(oklch(0.8155 0.0983 19.41), oklch(0.3958 0.1331 25.72))',
+  '--cl-color-negative-subtle': 'light-dark(oklch(0.9686 0.0154 27.28), oklch(0.2545 0.0256 26.99))',
+  '--cl-color-negative-border': 'light-dark(oklch(0.9071 0.0481 27.58), oklch(0.305 0.0524 25.9))',
   '--cl-color-negative-alpha-100': 'color-mix(in oklab, var(--cl-color-negative) 6%, transparent)',
   '--cl-color-negative-alpha-200': 'color-mix(in oklab, var(--cl-color-negative) 8%, transparent)',
   '--cl-color-negative-alpha-300': 'color-mix(in oklab, var(--cl-color-negative) 12%, transparent)',
 
   '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
   '--cl-color-positive-foreground': 'oklch(1 0 0)',
-  '--cl-color-positive-subtle': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
-  '--cl-color-positive-border': 'light-dark(oklch(0.7922 0.1959 148.18), oklch(0.4479 0.1083 151.33))',
+  '--cl-color-positive-subtle': 'light-dark(oklch(0.9679 0.0135 145.47), oklch(0.2673 0.0226 150.07))',
+  '--cl-color-positive-border': 'light-dark(oklch(0.9058 0.0428 145.21), oklch(0.3293 0.047 149.58))',
   '--cl-color-positive-alpha-100': 'color-mix(in oklab, var(--cl-color-positive) 6%, transparent)',
   '--cl-color-positive-alpha-200': 'color-mix(in oklab, var(--cl-color-positive) 8%, transparent)',
   '--cl-color-positive-alpha-300': 'color-mix(in oklab, var(--cl-color-positive) 12%, transparent)',
 
   '--cl-color-warning': 'light-dark(oklch(0.7099 0.1888 44.94), oklch(0.7576 0.159 55.93))',
   '--cl-color-warning-foreground': 'oklch(1 0 0)',
-  '--cl-color-warning-subtle': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
-  '--cl-color-warning-border': 'light-dark(oklch(0.8672 0.0902 63.47), oklch(0.4084 0.1165 38.17))',
+  '--cl-color-warning-subtle': 'light-dark(oklch(0.9744 0.0136 46.23), oklch(0.2699 0.0187 52.63))',
+  '--cl-color-warning-border': 'light-dark(oklch(0.9261 0.0409 46.68), oklch(0.3374 0.0384 54.7))',
   '--cl-color-warning-alpha-100': 'color-mix(in oklab, var(--cl-color-warning) 6%, transparent)',
   '--cl-color-warning-alpha-200': 'color-mix(in oklab, var(--cl-color-warning) 8%, transparent)',
   '--cl-color-warning-alpha-300': 'color-mix(in oklab, var(--cl-color-warning) 12%, transparent)',
 
-  '--cl-color-input':
-    'light-dark(var(--cl-color-background), color-mix(in oklab, var(--cl-color-neutral) 4%, var(--cl-color-background)))',
+  '--cl-color-input': 'var(--cl-color-background)',
   '--cl-color-input-placeholder': neutralMix(28, 64),
 
   '--cl-color-ring': neutralMix(80, 90),

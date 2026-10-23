@@ -100,18 +100,17 @@ export function ReverificationMethodPicker({
               </Item.Root>
             );
           })}
+          {onBack ? (
+            <Button
+              type='button'
+              variant='ghost'
+              disabled={Boolean(pendingMethodId)}
+              onClick={onBack}
+            >
+              {messages.backButton}
+            </Button>
+          ) : null}
         </Item.Group>
-        {onBack ? (
-          <Button
-            type='button'
-            variant='ghost'
-            fullWidth
-            disabled={Boolean(pendingMethodId)}
-            onClick={onBack}
-          >
-            {messages.backButton}
-          </Button>
-        ) : null}
         <Text
           size='xs'
           xstyle={styles.helpText}

@@ -1,5 +1,17 @@
 # @clerk/ui
 
+## 1.41.2
+
+### Patch Changes
+
+- Fix the impersonation button moving faster than the pointer when dragged. It now starts dragging only after the pointer moves a few pixels, prevents page text selection during dragging, and springs back inside the window when released off-screen instead of jumping to its default position. Its background now follows the theme, so its text is readable in dark mode. ([#10241](https://github.com/clerk/javascript/pull/10241)) by [@joshrowley](https://github.com/joshrowley)
+
+- Sign-in and sign-up identifier fields now set standard `autocomplete` tokens so browsers and password managers can offer email, name, and phone. ([#10365](https://github.com/clerk/javascript/pull/10365)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+  - @clerk/localizations@4.24.1
+
 ## 1.41.1
 
 ### Patch Changes
