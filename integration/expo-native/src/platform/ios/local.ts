@@ -2,8 +2,8 @@ import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { defaultClaimsDir, freeSlot, isOrphaned, readClaim, readClaims, takeSlot, type Claim } from '../../core/claims.ts';
-import { run, sleep } from '../../core/exec.ts';
+import { defaultClaimsDir, freeSlot, isOrphaned, readClaim, readClaims, takeSlot, type Claim } from '@clerk/internal-mobile-e2e/core/claims';
+import { run, sleep } from '@clerk/internal-mobile-e2e/core/exec';
 import {
   LOCAL_POOL,
   VerifyFailure,
@@ -13,7 +13,7 @@ import {
   type EvidencePath,
   type LocalLease,
   type Recording,
-} from '../../core/types.ts';
+} from '@clerk/internal-mobile-e2e/core/types';
 
 import { recordVideo, showLogs } from './simulator.ts';
 

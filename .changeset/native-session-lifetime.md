@@ -1,6 +1,6 @@
 ---
-'@clerk/clerk-js': minor
-'@clerk/shared': minor
+'@clerk/clerk-js': patch
+'@clerk/shared': patch
 ---
 
-Add `hasMaximumLifetime` to `SessionResource` and `SessionWithActivitiesResource`. It is `false` for sessions without a maximum lifetime, whose `expireAt` and `abandonAt` now stay at Unix epoch zero instead of being replaced with the current time.
+Keep a session's `expireAt` and `abandonAt` at Unix epoch zero when the session has no maximum lifetime, instead of falling back to the current time.
