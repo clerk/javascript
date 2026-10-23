@@ -9,6 +9,7 @@ import { Field } from '../../../components/field';
 import { Flow, type FlowDirection, useFlowAutoFocus } from '../../../components/flow';
 import { Select } from '../../../components/select';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import { EnterPhoneStep, VerifyPhoneStep } from '../user-profile-phone.steps';
 
 export interface UserProfileAddSmsViewProps {
@@ -106,7 +107,7 @@ function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HT
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             id={formId}
             onSubmit={event => {
               event.preventDefault();

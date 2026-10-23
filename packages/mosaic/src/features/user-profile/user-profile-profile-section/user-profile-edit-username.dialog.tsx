@@ -11,6 +11,7 @@ import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import type { ReverificationController } from '../../reverification';
 import { Reverification } from '../../reverification';
 
@@ -56,7 +57,7 @@ export function UserProfileEditUsernameDialog({
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={form.id}
             onSubmit={form.handleSubmit}
           />

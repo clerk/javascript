@@ -10,6 +10,7 @@ import type { SelectItem } from '../../../components/select';
 import { Select } from '../../../components/select';
 import { TagInput } from '../../../components/tag-input';
 import { fill, useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import { styles } from './organization-profile-invite-members.styles';
 
 const isEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value);
@@ -81,7 +82,7 @@ export function OrganizationProfileInviteMembersDialog({
           </Card.Banner>
           <Card.Content
             render={
-              <form
+              <Form
                 id={formId}
                 onSubmit={event => {
                   event.preventDefault();
