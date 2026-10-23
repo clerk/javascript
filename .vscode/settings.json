@@ -9,6 +9,7 @@
   },
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.preferGoToSourceDefinition": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
   },

@@ -26,6 +26,7 @@ export default defineConfig(({ watch, env }) => {
       './src/*.{ts,tsx}',
       './src/react/index.ts',
       './src/utils/index.ts',
+      './src/phone/index.ts',
       './src/workerTimers/index.ts',
       './src/types/index.ts',
       './src/dom/*.ts',
@@ -79,10 +80,8 @@ export default defineConfig(({ watch, env }) => {
     // matching how this package has always published its declarations.
     {
       ...common,
-      dts: { emitDtsOnly: true, sourcemap: false },
-      // Declaration sourcemaps are skipped: rolldown-plugin-dts can't produce them
-      // in this mode (SOURCEMAP_BROKEN warning), and they'd reference src files
-      // that aren't shipped in the tarball anyway.
+      // Local editor go-to-source; maps are correct despite SOURCEMAP_BROKEN and are pack-excluded.
+      dts: { emitDtsOnly: true, sourcemap: true },
       sourcemap: false,
       clean: false,
       unbundle: true,

@@ -3,9 +3,10 @@ import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import { instanceKeys } from '../../presets/envs';
+import { resolveInstanceKeys } from '../../presets/envs';
 import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
+import { withRetry } from '../../testUtils/retryableClerkClient';
 import { createUserService } from '../../testUtils/usersService';
 
 test.describe('Custom Flows OAuth @custom', () => {
@@ -22,23 +23,23 @@ test.describe('Custom Flows OAuth @custom', () => {
     await app.dev();
 
     const client = createClerkClient({
-      secretKey: instanceKeys.get('oauth-provider').sk,
-      publishableKey: instanceKeys.get('oauth-provider').pk,
+      secretKey: (await resolveInstanceKeys('oauth-provider')).sk,
+      publishableKey: (await resolveInstanceKeys('oauth-provider')).pk,
     });
-    const users = createUserService(client);
+    const users = createUserService(withRetry(client));
     fakeUser = users.createFakeUser(test, { withUsername: true });
     await users.createBapiUser(fakeUser);
   });
 
   test.afterAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     await fakeUser.deleteIfExists();
     await u.services.users.deleteIfExists({ email: fakeUser.email });
     await app.teardown();
   });
 
   test('SDK-75: retrying OAuth after an abandoned redirect creates a fresh sign-in', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     // Block the OAuth provider redirect on the first attempt only. clerk-js sets
     // `firstFactorVerification.status='unverified'` and `externalVerificationRedirectURL`
@@ -85,7 +86,7 @@ test.describe('Custom Flows OAuth @custom', () => {
     expect(secondPost.method()).toBe('POST');
 
     // Complete the OAuth flow end-to-end and assert we're signed in on the app instance.
-    await u.page.getByText('Sign in to oauth-provider').waitFor();
+    await u.page.getByText(/Sign in to .*oauth-provider/).waitFor();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
     await u.po.signIn.enterTestOtpCode();

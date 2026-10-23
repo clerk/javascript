@@ -8,7 +8,9 @@ import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import type { AvailableComponentProps } from '@/ui/types';
 
-import { hasMultipleEnterpriseConnections } from './shared';
+import { useRouter } from '../../router';
+import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
+import { getEnterpriseConnectionFactors, hasMultipleEnterpriseConnections } from './shared';
 
 /**
  * @experimental
@@ -16,30 +18,43 @@ import { hasMultipleEnterpriseConnections } from './shared';
 const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const ctx = useSignInContext();
   const clerk = useClerk();
+  const { navigate } = useRouter();
   const signIn = clerk.client.signIn;
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
-    // This should not happen due to the HOC guard, but provides type safety
+    // This should not happen due to the HOC guard
     return null;
   }
 
-  const enterpriseConnections = signIn.supportedFirstFactors.map(ff => ({
+  const enterpriseConnections = getEnterpriseConnectionFactors(signIn.supportedFirstFactors).map(ff => ({
     id: ff.enterpriseConnectionId,
     name: ff.enterpriseConnectionName,
+    logoPublicUrl: ff.enterpriseConnectionLogoPublicUrl,
+    provider: ff.enterpriseConnectionProvider,
   }));
 
-  const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
+  const handleEnterpriseSSO = async (enterpriseConnectionId: string) => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    return signIn.authenticateWithRedirect({
-      strategy: 'enterprise_sso',
-      redirectUrl,
-      redirectUrlComplete,
-      oidcPrompt: ctx.oidcPrompt,
-      continueSignIn: true,
-      enterpriseConnectionId,
-    });
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+        redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
+        continueSignIn: true,
+        enterpriseConnectionId,
+      });
+    } catch (err) {
+      // Preparing the hand-off can itself raise a challenge. No redirect was issued and the sign-in
+      // is sitting on the gate instead. Handled here because the card's click handler drops errors,
+      // so without this the user clicks their connection and nothing happens.
+      if (isProtectCheckRequiredError(err) && navigateOnSignInProtectGate(signIn, navigate, '../protect-check')) {
+        return;
+      }
+      throw err;
+    }
   };
 
   return (

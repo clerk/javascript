@@ -16,6 +16,7 @@ import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
 import { BaseResource, Client, Organization, Session } from '../internal';
+import { SessionWithActivities } from '../SessionWithActivities';
 
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
@@ -38,6 +39,44 @@ describe('Session', () => {
     SessionTokenCache.clear();
     restoreDocument();
     vi.useRealTimers();
+  });
+
+  it.each([0, 2000000000000])('preserves a session deadline of %s through snapshots', deadline => {
+    const session = new Session({
+      id: 'session_lifetime',
+      status: 'active',
+      expire_at: deadline,
+      abandon_at: deadline,
+      public_user_data: { user_id: 'user_1' },
+    } as SessionJSON);
+    expect(session.expireAt.getTime()).toBe(deadline);
+    expect(session.abandonAt.getTime()).toBe(deadline);
+    const restored = new Session(session.__internal_toSnapshot());
+    expect(restored.expireAt.getTime()).toBe(deadline);
+    expect(restored.abandonAt.getTime()).toBe(deadline);
+    const withActivities = new SessionWithActivities(
+      { id: session.id, expire_at: deadline, abandon_at: deadline } as any,
+      '/me/sessions',
+    );
+    expect(withActivities.expireAt.getTime()).toBe(deadline);
+    expect(withActivities.abandonAt.getTime()).toBe(deadline);
+  });
+
+  it('keeps zero only for session deadlines', () => {
+    const session = new Session({
+      id: 'session_lifetime',
+      status: 'active',
+      expire_at: 0,
+      abandon_at: 0,
+      created_at: 0,
+      updated_at: 0,
+      public_user_data: { user_id: 'user_1' },
+    } as SessionJSON);
+
+    expect(session.expireAt.getTime()).toBe(0);
+    expect(session.abandonAt.getTime()).toBe(0);
+    expect(session.createdAt.getTime()).toBe(Date.now());
+    expect(session.updatedAt.getTime()).toBe(Date.now());
   });
 
   describe('getToken()', () => {
@@ -383,7 +422,7 @@ describe('Session', () => {
         expect(ClerkOfflineError.is(error)).toBe(true);
       });
 
-      it('retries 3 times before throwing when offline without making network requests', async () => {
+      it('still attempts the network request on each retry when offline', async () => {
         const session = new Session({
           status: 'active',
           id: 'session_1',
@@ -407,7 +446,80 @@ describe('Session', () => {
         await errorPromise;
 
         expect(getTokenSpy).toHaveBeenCalledTimes(4);
-        expect(global.fetch).toHaveBeenCalledTimes(0);
+        expect(global.fetch).toHaveBeenCalledTimes(4);
+      });
+
+      it('returns the token when navigator.onLine is false but the network works', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockFetch(true, 200, { object: 'token', jwt: mockJwt });
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        expect(await session.getToken({ skipCache: true })).toEqual(mockJwt);
+      });
+
+      it('throws the API error instead of ClerkOfflineError when FAPI responds', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        mockFetch(false, 503, { errors: [{ code: 'service_unavailable', message: 'Service unavailable' }] });
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        const error = await errorPromise;
+        expect(ClerkOfflineError.is(error)).toBe(false);
+        expect(error).toBeInstanceOf(ClerkAPIResponseError);
+      });
+
+      it('throws the API error instead of ClerkOfflineError when FAPI responds with a non-JSON body', async () => {
+        const session = new Session({
+          status: 'active',
+          id: 'session_1',
+          object: 'session',
+          user: createUser({}),
+          last_active_organization_id: null,
+          actor: null,
+          created_at: new Date().getTime(),
+          updated_at: new Date().getTime(),
+        } as SessionJSON);
+
+        // @ts-ignore
+        global.fetch = vi.fn(() =>
+          Promise.resolve({
+            status: 502,
+            statusText: 'Bad Gateway',
+            ok: false,
+            json: () => Promise.reject(new SyntaxError('Unexpected token < in JSON')),
+          }),
+        );
+        BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+        const errorPromise = session.getToken({ skipCache: true }).catch(e => e);
+        await vi.advanceTimersByTimeAsync(60_000);
+
+        const error = await errorPromise;
+        expect(ClerkOfflineError.is(error)).toBe(false);
+        expect(error).toBeInstanceOf(ClerkAPIResponseError);
+        expect(error.status).toBe(502);
       });
 
       it('does not emit token:update with an empty token when offline', async () => {
@@ -896,6 +1008,137 @@ describe('Session', () => {
     });
   });
 
+  describe('verifyWithPasskey()', () => {
+    const mockPublicKeyCredential = {
+      id: 'credential_123',
+      rawId: new ArrayBuffer(32),
+      response: {
+        authenticatorData: new ArrayBuffer(37),
+        clientDataJSON: new ArrayBuffer(121),
+        signature: new ArrayBuffer(64),
+        userHandle: null,
+      },
+      type: 'public-key',
+    };
+
+    const sessionJSON = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+
+    let originalFetch: typeof BaseResource._fetch;
+
+    beforeEach(() => {
+      originalFetch = BaseResource._fetch;
+      BaseResource.clerk = clerkMock({
+        __internal_isWebAuthnSupported: vi.fn().mockReturnValue(true),
+        __internal_getPublicCredentials: vi.fn().mockResolvedValue({
+          publicKeyCredential: mockPublicKeyCredential,
+          error: null,
+        }),
+      } as any);
+    });
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      BaseResource.clerk = null as any;
+    });
+
+    it('runs the first-factor verification flow by default', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: {
+            id: 'sv_123',
+            first_factor_verification: { nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }) },
+          },
+        })
+        .mockResolvedValueOnce({
+          response: { id: 'sv_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await session.verifyWithPasskey();
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_first_factor',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/attempt_first_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it('runs the second-factor verification flow when level is second_factor', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: {
+            id: 'sv_123',
+            second_factor_verification: { nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }) },
+          },
+        })
+        .mockResolvedValueOnce({
+          response: { id: 'sv_123', status: 'complete' },
+        });
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await session.verifyWithPasskey({ level: 'second_factor' });
+
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_second_factor',
+          body: expect.objectContaining({ strategy: 'passkey' }),
+        }),
+      );
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/attempt_second_factor',
+          body: expect.objectContaining({
+            strategy: 'passkey',
+            publicKeyCredential: expect.any(String),
+          }),
+        }),
+      );
+    });
+
+    it('rejects invalid verification levels without calling the API', async () => {
+      const mockFetch = vi.fn();
+      BaseResource._fetch = mockFetch;
+
+      const session = new Session(sessionJSON);
+      await expect(session.verifyWithPasskey({ level: 'third_factor' as any })).rejects.toThrow(
+        'not a valid verification level',
+      );
+
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+  });
+
   describe('touch()', () => {
     let dispatchSpy: ReturnType<typeof vi.spyOn>;
 
@@ -961,6 +1204,150 @@ describe('Session', () => {
           body: { active_organization_id: 'org_123', intent: 'focus' },
           method: 'POST',
           path: '/client/sessions/session_1/touch',
+        }),
+        expect.anything(),
+      );
+    });
+  });
+
+  describe('trusted device reverification', () => {
+    const sessionJSON = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+
+    const verificationResponse = (factor: 'first_factor_verification' | 'second_factor_verification') => ({
+      object: 'session_verification',
+      id: 'sessver_1',
+      status: factor === 'first_factor_verification' ? 'needs_first_factor' : 'needs_second_factor',
+      level: 'multi_factor',
+      session: sessionJSON,
+      first_factor_verification: null,
+      second_factor_verification: null,
+      supported_first_factors: null,
+      supported_second_factors: null,
+      [factor]: {
+        object: 'verification',
+        status: 'unverified',
+        strategy: 'trusted_device',
+        attempts: 0,
+        expire_at: 1666648310000,
+        trusted_device_challenge: {
+          object: 'trusted_device_challenge',
+          challenge: 'challenge',
+          challenge_id: 'tdch_1',
+          trusted_device_id: 'td_1',
+          client_data: 'client-data',
+          expires_at: 1666648310,
+          algorithm: 'ES256',
+        },
+      },
+    });
+
+    let requestSpy: Mock;
+
+    beforeEach(() => {
+      BaseResource.clerk = clerkMock();
+      requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it('prepares a first factor with the trusted device and parses its challenge', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('first_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+
+      const verification = await session.prepareFirstFactorVerification({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+      });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { strategy: 'trusted_device', trustedDeviceId: 'td_1' },
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_first_factor',
+        }),
+        expect.anything(),
+      );
+      expect(verification.firstFactorVerification.trustedDeviceChallenge).toEqual({
+        challenge: 'challenge',
+        challengeId: 'tdch_1',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        expiresAt: new Date(1666648310 * 1000),
+        algorithm: 'ES256',
+      });
+    });
+
+    it('attempts a first factor with the signed challenge', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('first_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+      const attempt = {
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        signature: 'signature',
+        algorithm: 'ES256',
+      } as const;
+
+      await session.attemptFirstFactorVerification(attempt);
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: attempt,
+          path: '/client/sessions/session_1/verify/attempt_first_factor',
+        }),
+        expect.anything(),
+      );
+    });
+
+    it('prepares and attempts a second factor with the trusted device', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('second_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+      const attempt = {
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        signature: 'signature',
+        algorithm: 'ES256',
+      } as const;
+
+      const prepared = await session.prepareSecondFactorVerification({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+      });
+      await session.attemptSecondFactorVerification(attempt);
+
+      expect(prepared.secondFactorVerification.trustedDeviceChallenge?.clientData).toBe('client-data');
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { strategy: 'trusted_device', trustedDeviceId: 'td_1' },
+          path: '/client/sessions/session_1/verify/prepare_second_factor',
+        }),
+        expect.anything(),
+      );
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: attempt,
+          path: '/client/sessions/session_1/verify/attempt_second_factor',
         }),
         expect.anything(),
       );

@@ -136,10 +136,14 @@ export type SignUpCreateParams = Partial<
     oidcLoginHint: string;
     channel: PhoneCodeChannel;
     locale?: string;
+    /**
+     * An IANA timezone for this sign-up. Defaults to the browser's timezone when omitted, if available.
+     */
+    timezone?: string;
   } & Omit<SnakeToCamel<Record<SignUpAttributeField | SignUpVerifiableField, string>>, 'legalAccepted'>
 >;
 
-export type SignUpUpdateParams = SignUpCreateParams;
+export type SignUpUpdateParams = Omit<SignUpCreateParams, 'timezone'>;
 
 /**
  * @deprecated Use `SignUpAuthenticateWithWeb3Params` instead.

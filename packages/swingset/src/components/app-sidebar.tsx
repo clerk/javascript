@@ -1,17 +1,17 @@
 'use client';
 
-import { ChevronRightIcon } from 'lucide-react';
+import { FlaskConicalIcon, SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { type NavigationGroup, SidebarNavigation } from '@/components/sidebar-navigation';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -19,116 +19,49 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getSidebarGroups } from '@/lib/registry';
+import { getSidebarCategories } from '@/lib/sidebar-navigation';
 
 const groups = getSidebarGroups();
 
-const COLLAPSED_BY_DEFAULT = new Set(['Primitives', 'Components', 'Styles', 'Hooks']);
-
-type SidebarEntry = ReturnType<typeof getSidebarGroups>[number]['components'][number];
-
-// Partitions a group's entries by `meta.navigation.category` into subheaded runs. Category and
-// entry order both follow first appearance in the registry; uncategorized entries get no subheading.
-function byCategory(components: SidebarEntry[]) {
-  const categories: { category: string; components: SidebarEntry[] }[] = [];
-  for (const component of components) {
-    const category = component.mod.meta.navigation?.category ?? '';
-    const bucket = categories.find(c => c.category === category);
-    if (bucket) {
-      bucket.components.push(component);
-    } else {
-      categories.push({ category, components: [component] });
-    }
-  }
-  return categories;
-}
-
-function SidebarUsageItem({ usage, href, isActive }: { usage: string; href: string; isActive: boolean }) {
-  const labelRef = React.useRef<HTMLSpanElement>(null);
-  const [isTruncated, setIsTruncated] = React.useState(false);
+export function AppSidebar({
+  onSearchOpen,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { onSearchOpen: () => void }) {
+  const pathname = usePathname();
+  const [isMac, setIsMac] = React.useState(false);
 
   React.useEffect(() => {
-    const label = labelRef.current;
-    if (!label) {
-      return;
-    }
-    const check = () => setIsTruncated(label.scrollWidth > label.clientWidth);
-    check();
-    const observer = new ResizeObserver(check);
-    observer.observe(label);
-    return () => observer.disconnect();
+    setIsMac(navigator.platform.toLowerCase().includes('mac'));
   }, []);
 
-  return (
-    <SidebarMenuItem>
-      <Tooltip disabled={!isTruncated}>
-        <TooltipTrigger
-          delay={300}
-          render={
-            <SidebarMenuButton
-              className='h-auto py-1 text-xs'
-              isActive={isActive}
-              render={<Link href={href} />}
-            >
-              <span
-                ref={labelRef}
-                className='truncate font-mono text-[10px] leading-relaxed'
-              >
-                {usage}
-              </span>
-            </SidebarMenuButton>
-          }
-        />
-        <TooltipContent
-          side='right'
-          className='font-mono text-[10px]'
-        >
-          {usage}
-        </TooltipContent>
-      </Tooltip>
-    </SidebarMenuItem>
-  );
-}
-
-function SidebarEntryMenu({
-  components,
-  groupSlug,
-  pathname,
-}: {
-  components: SidebarEntry[];
-  groupSlug: string;
-  pathname: string;
-}) {
-  return (
-    <SidebarMenu>
-      {components.map(({ mod, componentSlug }) => {
+  const navigationGroups: NavigationGroup[] = groups.map(({ group, groupSlug, components }) => ({
+    label: group,
+    separatorBefore: group === 'Blocks',
+    categories: getSidebarCategories(components).map(({ category, components }) => ({
+      label: category,
+      items: components.map(({ mod, componentSlug }) => {
         const href = `/${groupSlug}/${componentSlug}`;
         // How an entry is USED differs by layer, so the label follows the layer rather
         // than a guess at the title: hooks are called, atomic styles are a set of
-        // exports with no single call form worth privileging, and everything else is a
-        // component rendered as JSX.
+        // exports with no single call form worth privileging, localization is a prop rather
+        // than a component, and everything else is a component rendered as JSX.
         const usage =
           mod.meta.group === 'Hooks'
             ? `${mod.meta.title}()`
-            : mod.meta.group === 'Styles'
+            : mod.meta.group === 'Styles' || mod.meta.group === 'Localization'
               ? mod.meta.title
               : `<${mod.meta.title} />`;
-        return (
-          <SidebarUsageItem
-            key={mod.meta.title}
-            usage={usage}
-            href={href}
-            isActive={pathname === href}
-          />
-        );
-      })}
-    </SidebarMenu>
-  );
-}
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname();
+        return {
+          href,
+          usage,
+          isActive: pathname === href,
+          status: mod.meta.status,
+          substatus: mod.meta.substatus,
+        };
+      }),
+    })),
+  }));
 
   return (
     <Sidebar {...props}>
@@ -164,73 +97,48 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </svg>
         <span className='text-sidebar-foreground/70 text-[10px] font-medium'>Mosaic - Swingset</span>
       </SidebarHeader>
+      <div className='border-b px-2 py-2'>
+        <button
+          type='button'
+          onClick={onSearchOpen}
+          aria-label='Search components'
+          className='border-input bg-background text-sidebar-foreground/50 hover:bg-accent/50 flex h-8 w-full items-center gap-2 rounded-md border px-2 text-xs shadow-none'
+        >
+          <SearchIcon className='size-3.5 shrink-0' />
+          <span>Search…</span>
+          <kbd className='bg-muted ml-auto flex shrink-0 items-center gap-0.5 rounded border px-1 py-0.5 font-mono text-[10px]'>
+            {isMac ? (
+              <>
+                <span className='text-[11px]'>⌘</span>K
+              </>
+            ) : (
+              'Ctrl K'
+            )}
+          </kbd>
+        </button>
+      </div>
       <SidebarContent className='gap-0'>
-        {groups.map(({ group, groupSlug, components }) => (
-          <React.Fragment key={group}>
-            {group === 'Components' && <SidebarSeparator className='data-horizontal:w-auto my-1' />}
-            <Collapsible
-              defaultOpen={!COLLAPSED_BY_DEFAULT.has(group)}
-              className='group/collapsible'
-            >
-              <SidebarGroup
-                className='py-1'
-                data-section={group}
-              >
-                <SidebarGroupLabel
-                  className='text-sidebar-foreground/50 hover:text-sidebar-foreground/80 h-auto w-full px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'
-                  render={<CollapsibleTrigger />}
-                >
-                  {group}
-                  <ChevronRightIcon className='size-3! ml-auto transition-transform group-data-[open]/collapsible:rotate-90' />
-                </SidebarGroupLabel>
-                <CollapsibleContent>
-                  <SidebarGroupContent>
-                    {byCategory(components).map(({ category, components }) =>
-                      category ? (
-                        <Collapsible
-                          key={category}
-                          // Collapsed by default, unless it holds the page being viewed.
-                          defaultOpen={components.some(
-                            ({ componentSlug }) => pathname === `/${groupSlug}/${componentSlug}`,
-                          )}
-                          className='group/category'
-                        >
-                          <CollapsibleTrigger className='text-sidebar-foreground/40 hover:text-sidebar-foreground/70 flex w-full items-center gap-1 px-2 pb-0.5 pt-2 text-[9px] font-semibold uppercase tracking-wider'>
-                            <span
-                              aria-hidden='true'
-                              className='font-mono text-[10px] leading-none'
-                            >
-                              └
-                            </span>
-                            {category}
-                            <ChevronRightIcon className='size-2.5! ml-auto transition-transform group-data-[open]/category:rotate-90' />
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <div className='border-sidebar-border ml-3 border-l pl-1'>
-                              <SidebarEntryMenu
-                                components={components}
-                                groupSlug={groupSlug}
-                                pathname={pathname}
-                              />
-                            </div>
-                          </CollapsibleContent>
-                        </Collapsible>
-                      ) : (
-                        <SidebarEntryMenu
-                          key={group}
-                          components={components}
-                          groupSlug={groupSlug}
-                          pathname={pathname}
-                        />
-                      ),
-                    )}
-                  </SidebarGroupContent>
-                </CollapsibleContent>
-              </SidebarGroup>
-            </Collapsible>
-          </React.Fragment>
-        ))}
+        <SidebarNavigation groups={navigationGroups} />
       </SidebarContent>
+      <SidebarFooter className='gap-0 p-0'>
+        <SidebarSeparator className='data-horizontal:w-auto my-1' />
+        <SidebarGroup className='py-1'>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className='h-auto py-1 text-xs'
+                  isActive={pathname.startsWith('/live')}
+                  render={<Link href='/live' />}
+                >
+                  <FlaskConicalIcon className='size-3.5!' />
+                  Live Sandbox
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

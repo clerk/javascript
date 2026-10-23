@@ -1,5 +1,211 @@
 # Change Log
 
+## 7.9.19
+
+### Patch Changes
+
+- Updated dependencies [[`49c8afd`](https://github.com/clerk/javascript/commit/49c8afd12724d83418a0c1b85d009c389330dcb6)]:
+  - @clerk/backend@3.26.1
+
+## 7.9.18
+
+### Patch Changes
+
+- Fix the return type of `auth.protect()` when a predicate is passed together with the `token` option. The result is now typed from the accepted token types, so `auth.protect(() => true, { token: 'api_key' })` resolves to the API key auth object instead of a session auth object. ([#10211](https://github.com/clerk/javascript/pull/10211)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`85dec02`](https://github.com/clerk/javascript/commit/85dec028a0320c32023fa58139e269db0202b1eb), [`b799bad`](https://github.com/clerk/javascript/commit/b799bad6057c469f777506b4bc40b1c44b0d4cb4), [`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/backend@3.26.0
+  - @clerk/shared@4.41.0
+  - @clerk/react@6.18.0
+
+## 7.9.17
+
+### Patch Changes
+
+- Updated dependencies [[`57aeba8`](https://github.com/clerk/javascript/commit/57aeba8420be67296a8dda5b049586bf42c2767f)]:
+  - @clerk/backend@3.25.0
+
+## 7.9.16
+
+### Patch Changes
+
+- Updated dependencies [[`9159465`](https://github.com/clerk/javascript/commit/9159465ac02cafec69a3e4e2235cddd1ed3639b7)]:
+  - @clerk/backend@3.24.0
+
+## 7.9.15
+
+### Patch Changes
+
+- Fix `auth.protect()` skipping authorization checks for machine tokens. The `role`, `permission`, `feature`, `plan`, and `reverification` params and the predicate callback are now evaluated for API key, OAuth token, and M2M token requests. Param-based checks respond with a 401 for those requests. ([#10198](https://github.com/clerk/javascript/pull/10198)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix `getAuth()` and `auth()` returning OAuth and M2M tokens as signed-in user sessions. They now return a signed-out state for machine tokens. To authenticate OAuth or M2M tokens on a route, use `auth({ acceptsToken })`. ([#10213](https://github.com/clerk/javascript/pull/10213)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 7.9.14
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+  - @clerk/backend@3.23.2
+
+## 7.9.13
+
+### Patch Changes
+
+- Export `<HandleSSOCallback />` from `@clerk/nextjs`. Previously, importing it from `@clerk/nextjs` failed, so it could not be used on the SSO callback route of a custom flow. ([#10140](https://github.com/clerk/javascript/pull/10140)) by [@manovotny](https://github.com/manovotny)
+
+## 7.9.12
+
+### Patch Changes
+
+- Updated dependencies [[`fc7d050`](https://github.com/clerk/javascript/commit/fc7d0506c59ca01f7d86bea1a9999a1fe4dd81ff), [`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/react@6.17.7
+  - @clerk/shared@4.39.1
+  - @clerk/backend@3.23.1
+
+## 7.9.11
+
+### Patch Changes
+
+- Remove `https://images.clerkstage.dev` from the default `connect-src` Content Security Policy directive. It is a Clerk-internal storage host that no application connects to. Organization logos are served from `https://img.clerk.com`, which stays in the default. ([#9898](https://github.com/clerk/javascript/pull/9898)) by [@Grundlefleck](https://github.com/Grundlefleck)
+
+- Updated dependencies [[`2302140`](https://github.com/clerk/javascript/commit/23021401d3ab66bf920ba07be1d7500c4d98a5a9), [`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260), [`dee649c`](https://github.com/clerk/javascript/commit/dee649c2d6cad6ba543a2433e65707a0d93686df)]:
+  - @clerk/backend@3.23.0
+  - @clerk/shared@4.39.0
+  - @clerk/react@6.17.6
+
+## 7.9.10
+
+### Patch Changes
+
+- Updated dependencies [[`4eac21f`](https://github.com/clerk/javascript/commit/4eac21f68b6608d5e59dfb9d7660582d7bf0a148), [`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/backend@3.22.0
+  - @clerk/shared@4.38.0
+  - @clerk/react@6.17.5
+
+## 7.9.9
+
+### Patch Changes
+
+- Removed the period from the end of the displayed error. Agents were trying to use the URL with period at the end and getting 404s ([#9985](https://github.com/clerk/javascript/pull/9985)) by [@royanger](https://github.com/royanger)
+
+- Updated dependencies [[`0fe89c2`](https://github.com/clerk/javascript/commit/0fe89c20379bea9484b65276905cfd90397ea890), [`e34a5cc`](https://github.com/clerk/javascript/commit/e34a5cc2622e05eea9a683651e0784ad23705bb2), [`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/backend@3.21.1
+  - @clerk/shared@4.37.1
+  - @clerk/react@6.17.4
+
+## 7.9.8
+
+### Patch Changes
+
+- Updated dependencies [[`397fd72`](https://github.com/clerk/javascript/commit/397fd72fe8657540ad9cb4c1f20b1efc4f4fe26e), [`6a14691`](https://github.com/clerk/javascript/commit/6a14691f8d98dcafd3956e1ea97cb35d56a34864), [`0ee4ee2`](https://github.com/clerk/javascript/commit/0ee4ee2b49286a8cae5f251ec997f30c8a863205), [`7a3fcf5`](https://github.com/clerk/javascript/commit/7a3fcf5b2d536b4e444920a3e87c4f70da3487ba), [`69c1b9c`](https://github.com/clerk/javascript/commit/69c1b9c886ab0860a9af12872235b6e492b2b2d0), [`d9cf0f2`](https://github.com/clerk/javascript/commit/d9cf0f29ea2ef8388bbd5736007ca71f9411bf42), [`f8266be`](https://github.com/clerk/javascript/commit/f8266bebb6eab6d7358c03abca2860880319f460)]:
+  - @clerk/backend@3.21.0
+  - @clerk/shared@4.37.0
+  - @clerk/react@6.17.3
+
+## 7.9.7
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+  - @clerk/react@6.17.2
+  - @clerk/backend@3.20.1
+
+## 7.9.6
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`9d78a1f`](https://github.com/clerk/javascript/commit/9d78a1f42e83874ebac54b67d81d444b376350e5), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+  - @clerk/backend@3.20.0
+  - @clerk/react@6.17.1
+
+## 7.9.5
+
+### Patch Changes
+
+- Fix a development-only React key warning when using `ClerkProvider` in the App Router. ([#9816](https://github.com/clerk/javascript/pull/9816)) by [@joshrowley](https://github.com/joshrowley)
+
+- Fix a cross-request credential leak in `clerkMiddleware()`. When using dynamic keys (an options callback that resolves a different `secretKey` per request), a `clerkClient()` call made inside the middleware handler could be built with another concurrent request's secret key. Each request now gets its own isolated store, so the keys resolved for a request are only ever visible to that request. ([#9723](https://github.com/clerk/javascript/pull/9723)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`f56a14b`](https://github.com/clerk/javascript/commit/f56a14b3281578c76c4ebd8f50ac41156c437feb), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`917453a`](https://github.com/clerk/javascript/commit/917453a23ec594e644834815d6f84af77146256d), [`3d6ed25`](https://github.com/clerk/javascript/commit/3d6ed25dd62603647e39447454cd8b964fe3558d), [`40f40f2`](https://github.com/clerk/javascript/commit/40f40f213507285ae1dfe1714fde2e88adb7ccc2), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+  - @clerk/react@6.17.0
+  - @clerk/backend@3.19.0
+
+## 7.9.4
+
+### Patch Changes
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+  - @clerk/backend@3.18.1
+  - @clerk/react@6.16.1
+
+## 7.9.3
+
+### Patch Changes
+
+- Update docs deep links in JSDoc comments to match clerk.com's new heading anchors (`#get-token` is now `#gettoken`, `#o-auth-strategy` is now `#oauthstrategy`, and so on). ([#9520](https://github.com/clerk/javascript/pull/9520)) by [@manovotny](https://github.com/manovotny)
+
+- Add a note to the `ClerkProvider`, `clerkMiddleware()` and `auth()` doc comments explaining that `npx clerk@latest init` can provision temporary development keys without a Clerk account. Update the README prerequisites and installation section to say the same, replacing the statement that an existing Clerk application and account are required. ([#9665](https://github.com/clerk/javascript/pull/9665)) by [@shane-kercheval](https://github.com/shane-kercheval)
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`4e1e432`](https://github.com/clerk/javascript/commit/4e1e43201fbb6cf041b4d4a95851b058a1aef807), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42), [`9801ed5`](https://github.com/clerk/javascript/commit/9801ed5645dc62d58f36cef064feb314448b2502)]:
+  - @clerk/react@6.16.0
+  - @clerk/shared@4.32.0
+  - @clerk/backend@3.18.0
+
+## 7.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+  - @clerk/backend@3.17.2
+  - @clerk/react@6.15.2
+
+## 7.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`2b3341f`](https://github.com/clerk/javascript/commit/2b3341fd5f666ab86ac13c2dabbab06345cd39b4)]:
+  - @clerk/react@6.15.1
+
+## 7.9.0
+
+### Minor Changes
+
+- Add an authenticated OAuth device verification component and workflow hook for approving or denying OAuth Device Authorization Grant requests. ([#9518](https://github.com/clerk/javascript/pull/9518)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/react@6.15.0
+  - @clerk/shared@4.31.0
+  - @clerk/backend@3.17.1
+
+## 7.8.4
+
+### Patch Changes
+
+- Add `@deprecated` tags to the removed `<SignedIn>`, `<SignedOut>`, and `<Protect>` control-component stubs so editors and lint rules flag them at authoring time (with the `<Show>` migration guidance) instead of only failing when rendered. ([#9627](https://github.com/clerk/javascript/pull/9627)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c4f9883`](https://github.com/clerk/javascript/commit/c4f98834434edd7821f5c6f344583c07e30013cd), [`eef0ceb`](https://github.com/clerk/javascript/commit/eef0ceb97926688384ec480afe44199b16f13993)]:
+  - @clerk/backend@3.17.0
+
+## 7.8.3
+
+### Patch Changes
+
+- Align JSDoc link targets with the docs link rules: internal docs links don't open in a new tab (removed `{{ target: '_blank' }}` from the `Invitation` Metadata link), while API reference links do (added it to the `ExternalAccount` Backend API link and the `currentUser()` endpoint link). ([#9556](https://github.com/clerk/javascript/pull/9556)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`9c5e93c`](https://github.com/clerk/javascript/commit/9c5e93c9ea93561242ab26ff0e2b100940ac6308), [`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/backend@3.16.13
+  - @clerk/shared@4.30.2
+  - @clerk/react@6.14.8
+
 ## 7.8.2
 
 ### Patch Changes

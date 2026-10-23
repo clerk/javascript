@@ -15,6 +15,7 @@ export type EmailLinkVerifyProps = {
   redirectUrlComplete?: string;
   redirectUrl?: string;
   ssoCallbackUrl?: string;
+  oidcPrompt?: string;
   verifyEmailPath?: string;
   verifyPhonePath?: string;
   continuePath?: string;
@@ -22,7 +23,15 @@ export type EmailLinkVerifyProps = {
 };
 
 export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
-  const { redirectUrl, redirectUrlComplete, ssoCallbackUrl, verifyEmailPath, verifyPhonePath, continuePath } = props;
+  const {
+    redirectUrl,
+    redirectUrlComplete,
+    ssoCallbackUrl,
+    oidcPrompt,
+    verifyEmailPath,
+    verifyPhonePath,
+    continuePath,
+  } = props;
   const { handleEmailLinkVerification } = useClerk();
   const { navigate } = useRouter();
   const signUp = useCoreSignUp();
@@ -53,6 +62,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
         navigate,
         redirectUrl: ssoCallbackUrl,
         redirectUrlComplete: redirectUrlComplete || '/',
+        oidcPrompt,
       });
     } catch (err: any) {
       if (

@@ -24,11 +24,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
   let userBId: string;
 
   test.beforeAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
 
-    const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
-    const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
-    const apiUrl = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_API_URL');
+    const env = app.env;
+    const publishableKey = env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+    const secretKey = env.privateVariables.get('CLERK_SECRET_KEY');
+    const apiUrl = env.privateVariables.get('CLERK_API_URL');
     const { frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
 
     await clerkSetup({
@@ -65,7 +66,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
   });
 
   test('should emit correct transitive auth state when switching orgs with navigation', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
@@ -107,7 +108,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
   });
 
   test('should emit correct transitive auth state when switching users with navigation', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     const pathInitial = '/transitive-state/user-button';
     const pathSwitched = '/transitive-state/user-button/switched';
@@ -165,7 +166,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
   });
 
   test('should emit correct transitive auth state when signing out with navigation', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await context.clearCookies();
 
@@ -211,7 +212,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
     page,
     context,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
 
     await context.clearCookies();
 

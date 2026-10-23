@@ -2,7 +2,6 @@
 
 # compiled output
 dist
-dist-mosaic
 tmp
 out-tsc
 out
@@ -93,6 +92,7 @@ yalc.lock
 # Workflow Outputs
 /packages/*/*.tgz
 /packages/*/tsconfig*.vitest-temp.json
+/packages/*/.vitest/
 /packages/*/tsup.config.bundled_*
 
 # Scripts

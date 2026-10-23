@@ -342,6 +342,17 @@ export interface Clerk {
    */
   __internal_protectChallengeLoadTimeoutMs?: number;
 
+  /**
+   * Resolves a pending `protect_check` on the client's current sign-in or sign-up through Clerk's
+   * Protect modal. Callback pages need it because the gate arrives with the client, not on a request.
+   * Does nothing once either attempt is `complete`. Pass `flow` to resolve only that attempt's gate,
+   * so a callback for one flow does not open the challenge of a stale attempt on the other. Without
+   * `flow`, the sign-in gate is resolved before the sign-up gate.
+   *
+   * @internal
+   */
+  __internal_resolvePendingProtectCheck?: (flow?: ProtectCheckFlow) => Promise<void>;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -817,6 +828,24 @@ export interface Clerk {
   __internal_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a configure Directory Sync component at the target element.
+   *
+   * @param targetNode - Target to mount the ConfigureDirectorySync component.
+   * @param props - Configuration parameters.
+   * @hidden
+   */
+  __internal_mountConfigureDirectorySync: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+
+  /**
+   * Unmount a configure Directory Sync component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the ConfigureDirectorySync component from.
+   * @hidden
+   */
+  __internal_unmountConfigureDirectorySync: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -847,6 +876,23 @@ export interface Clerk {
    * @param targetNode - Target node to unmount the OAuth consent component from.
    */
   unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts an OAuth device verification component at the target element.
+   *
+   * @param targetNode - Target node to mount the OAuth device verification component.
+   * @param props - OAuth device verification configuration parameters.
+   * @internal
+   */
+  __internal_mountOAuthDeviceVerification: (targetNode: HTMLDivElement, props?: OAuthDeviceVerificationProps) => void;
+
+  /**
+   * Unmounts an OAuth device verification component from the target element.
+   * If there is no component mounted at the target node, this is a noop.
+   *
+   * @internal
+   */
+  __internal_unmountOAuthDeviceVerification: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a TaskChooseOrganization component at the target element.
@@ -1116,7 +1162,7 @@ export interface Clerk {
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
-   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticatewithgoogleonetap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
    *
    * @param signInOrUp - The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).
    * @param params - Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.
@@ -1346,6 +1392,11 @@ export type HandleOAuthCallbackParams = TransferableOption &
      * (`protect_check`). Defaults to the `protect-check` route on the mounted sign-up component.
      */
     signUpProtectCheckUrl?: string | null;
+    /**
+     * The full URL or path to navigate to if the sign-up must choose between several enterprise connections
+     * (`enterprise_sso` is missing). Defaults to the `enterprise-connections` route on the sign-up URL.
+     */
+    enterpriseConnectionsUrl?: string | null;
     /**
      * The underlying resource to optionally reload before processing an OAuth callback.
      */
@@ -1944,6 +1995,14 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
+export type ProtectCheckFlow = 'signIn' | 'signUp';
+
+export type __internal_ProtectCheckModalProps = {
+  resource: SignInResource | SignUpResource;
+  onResolved: () => void;
+  onFailed: (error: unknown) => void;
+};
+
 export type __internal_EnableOrganizationsPromptProps = {
   onSuccess?: () => void;
   onClose?: () => void;
@@ -1967,6 +2026,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
     | 'ConfigureSSO'
+    | 'ConfigureDirectorySync'
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;
@@ -2770,6 +2830,13 @@ export type OAuthConsentProps = {
   onDeny?: () => void;
 };
 
+export type OAuthDeviceVerificationProps = {
+  /**
+   * Customization options to fully match the Clerk component to your own brand.
+   */
+  appearance?: ClerkAppearanceTheme;
+};
+
 /** @deprecated Use OAuthConsentProps instead. */
 export type __internal_OAuthConsentProps = OAuthConsentProps;
 
@@ -3160,7 +3227,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   __internal_clerkUIVersion?: string;
   /**
-   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard.
    */
   publishableKey: string;
   /**

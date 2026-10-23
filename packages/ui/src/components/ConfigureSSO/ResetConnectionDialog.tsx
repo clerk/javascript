@@ -15,9 +15,9 @@ type ResetConnectionDialogProps = {
   confirmationValue: string;
   onDelete: () => Promise<unknown>;
   contentRef: React.RefObject<HTMLDivElement>;
+  subtitle: LocalizationKey;
   /** Defaults to the Reset copy; overridden when the dialog is reused for the Remove action. */
   title?: LocalizationKey;
-  subtitle?: LocalizationKey;
   confirmButtonLabel?: LocalizationKey;
 };
 
@@ -47,9 +47,8 @@ export const ResetConnectionDialog = (props: ResetConnectionDialogProps): JSX.El
 };
 
 const ResetConnectionDialogContent = withCardStateProvider((props: ResetConnectionDialogProps) => {
-  const { onClose, onDelete, confirmationValue } = props;
+  const { onClose, onDelete, confirmationValue, subtitle } = props;
   const title = props.title ?? localizationKeys('configureSSO.resetConnectionDialog.title');
-  const subtitle = props.subtitle ?? localizationKeys('configureSSO.resetConnectionDialog.subtitle');
   const confirmButtonLabel =
     props.confirmButtonLabel ?? localizationKeys('configureSSO.resetConnectionDialog.resetButton');
   const card = useCardState();

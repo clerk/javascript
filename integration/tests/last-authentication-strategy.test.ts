@@ -43,7 +43,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockLastAuthenticationStrategyResponse(page, undefined);
 
       await u.po.signIn.goTo();
@@ -59,7 +59,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test('should not show "Last used" badge when lastAuthenticationStrategy is null', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockLastAuthenticationStrategyResponse(page, null);
 
       await u.po.signIn.goTo();
@@ -75,7 +75,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test('should show "Last used" badge when lastAuthenticationStrategy is saml_google', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockLastAuthenticationStrategyResponse(page, 'saml_google');
 
       await u.po.signIn.goTo();
@@ -86,7 +86,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await expect(lastUsedBadge).toBeVisible();
       await expect(lastUsedBadge).toHaveCount(1);
 
-      const btn = page.getByRole('button', { name: 'Last used Sign in with Google' });
+      const btn = page.getByRole('button', { name: 'Last used Continue with Google' });
       await expect(btn).toBeVisible();
 
       // Ensure the last used social button has been pulled to the first row.
@@ -97,7 +97,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
     });
 
     test('should show "Last used" badge when lastAuthenticationStrategy is oauth_google', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockLastAuthenticationStrategyResponse(page, 'oauth_google');
 
       await u.po.signIn.goTo();
@@ -108,7 +108,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await expect(lastUsedBadge).toBeVisible();
       await expect(lastUsedBadge).toHaveCount(1);
 
-      const btn = page.getByRole('button', { name: 'Last used Sign in with Google' });
+      const btn = page.getByRole('button', { name: 'Last used Continue with Google' });
       await expect(btn).toBeVisible();
 
       // Ensure the last used social button has been pulled to the first row.
@@ -122,7 +122,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockLastAuthenticationStrategyResponse(page, 'email_address');
 
       await u.po.signIn.goTo();
@@ -142,7 +142,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockLastAuthenticationStrategyResponse(page, 'oauth_google');
 
       await u.po.signUp.goTo();

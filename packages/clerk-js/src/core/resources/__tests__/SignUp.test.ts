@@ -2,6 +2,7 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
+import { ProtectCheckGate } from '../../protectCheckGate';
 import { signUpErrorSignal, signUpResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignUp } from '../SignUp';
@@ -32,10 +33,59 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
 }));
 
 describe('SignUp', () => {
+  beforeEach(() => {
+    vi.stubGlobal('Intl', undefined);
+  });
+
   it('can be serialized with JSON.stringify', () => {
     const signUp = new SignUp();
     const snapshot = JSON.stringify(signUp);
     expect(snapshot).toBeDefined();
+  });
+
+  it('keeps a null timezone across JSON, resource, and snapshot representations', () => {
+    const signUp = new SignUp({ timezone: null } as any);
+
+    expect(signUp.timezone).toBeNull();
+    expect(signUp.__internal_toSnapshot().timezone).toBeNull();
+  });
+
+  it('defaults a missing timezone from an older snapshot to null', () => {
+    const signUp = new SignUp({ id: 'signup_123' } as any);
+
+    expect(signUp.timezone).toBeNull();
+    expect(signUp.__internal_toSnapshot().timezone).toBeNull();
+  });
+
+  describe('__experimental_getEnterpriseConnections', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('maps the enterprise connection provider and logo', async () => {
+      BaseResource._fetch = vi.fn().mockResolvedValue({
+        response: [
+          {
+            object: 'enterprise_connection',
+            id: 'ent_1',
+            name: 'Acme',
+            provider: 'saml_okta',
+            logo_public_url: 'https://img.clerk.com/acme.png',
+          },
+          { object: 'enterprise_connection', id: 'ent_2', name: 'Globex', provider: 'oauth_microsoft' },
+        ],
+      });
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+      const connections = await signUp.__experimental_getEnterpriseConnections();
+
+      expect(
+        connections.map(({ id, name, provider, logoPublicUrl }) => ({ id, name, provider, logoPublicUrl })),
+      ).toEqual([
+        { id: 'ent_1', name: 'Acme', provider: 'saml_okta', logoPublicUrl: 'https://img.clerk.com/acme.png' },
+        { id: 'ent_2', name: 'Globex', provider: 'oauth_microsoft', logoPublicUrl: null },
+      ]);
+    });
   });
 
   describe('prepareVerification', () => {
@@ -236,6 +286,53 @@ describe('SignUp', () => {
       SignUp.clerk = {} as any;
     });
 
+    it('includes the detected timezone when creating a sign-up', async () => {
+      vi.stubGlobal('Intl', {
+        DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+      });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      await new SignUp().create({ emailAddress: 'user@example.com' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({ body: expect.objectContaining({ timezone: 'America/New_York' }) }),
+      );
+    });
+
+    it('omits timezone when browser detection is unavailable', async () => {
+      vi.stubGlobal('Intl', undefined);
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      await new SignUp().create({ emailAddress: 'user@example.com' });
+
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
+    });
+
+    it('preserves an explicitly supplied timezone when creating a sign-up', async () => {
+      vi.stubGlobal('Intl', {
+        DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+      });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signup_123', status: 'missing_requirements' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      await new SignUp().create({ emailAddress: 'user@example.com', timezone: 'Europe/Paris' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({ body: expect.objectContaining({ timezone: 'Europe/Paris' }) }),
+      );
+    });
+
     it.each([
       { strategy: 'email_code', label: 'email_code' },
       { strategy: 'email_link', label: 'email_link' },
@@ -396,6 +493,39 @@ describe('SignUp', () => {
             }),
           }),
         );
+      });
+
+      it('includes the detected timezone when creating a sign-up', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        await new SignUp().__internal_future.create({ emailAddress: 'user@example.com' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
+      });
+
+      it('preserves an explicitly supplied timezone when creating a sign-up', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signup_123', status: 'missing_requirements' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        await new SignUp().__internal_future.create({
+          emailAddress: 'user@example.com',
+          timezone: 'Europe/Paris',
+        });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'Europe/Paris');
       });
 
       it('returns error property on success', async () => {
@@ -980,7 +1110,7 @@ describe('SignUp', () => {
         );
       });
 
-      it('does not inject browser locale when continuing an existing signup', async () => {
+      it('does not forward locale defaults or an explicit timezone when continuing an existing signup', async () => {
         vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
         vi.stubGlobal('navigator', { language: 'fr-FR' });
 
@@ -1013,7 +1143,8 @@ describe('SignUp', () => {
           strategy: 'oauth_google',
           redirectUrl: '/complete',
           redirectCallbackUrl: '/sso-callback',
-        });
+          timezone: 'Europe/Paris',
+        } as any);
 
         expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -1024,6 +1155,7 @@ describe('SignUp', () => {
             }),
           }),
         );
+        expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
       });
 
       it('continues an existing sign up via the resource URL', async () => {
@@ -1583,7 +1715,10 @@ describe('SignUp', () => {
         vi.unstubAllGlobals();
       });
 
-      it('creates signup with password when no existing signup', async () => {
+      it('ignores an explicit timezone and detects the browser timezone when creating with a password', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,
           response: { id: 'signup_123', status: 'missing_requirements' },
@@ -1591,7 +1726,10 @@ describe('SignUp', () => {
         BaseResource._fetch = mockFetch;
 
         const signUp = new SignUp();
-        await signUp.__internal_future.password({ password: 'test-password-123' });
+        await signUp.__internal_future.password({
+          password: 'test-password-123',
+          timezone: 'Europe/Paris',
+        } as any);
 
         expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -1603,29 +1741,7 @@ describe('SignUp', () => {
             }),
           }),
         );
-      });
-
-      it('updates existing signup when already created', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signup_123', status: 'missing_requirements' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signUp = new SignUp({ id: 'signup_123' } as any);
-        await signUp.__internal_future.password({ password: 'test-password-123' });
-
-        // Should use PATCH to update existing signup, not POST to create a new one
-        expect(mockFetch).toHaveBeenCalledWith(
-          expect.objectContaining({
-            method: 'PATCH',
-            path: '/client/sign_ups/signup_123',
-            body: expect.objectContaining({
-              strategy: 'password',
-              password: 'test-password-123',
-            }),
-          }),
-        );
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
       it('returns error property on success', async () => {
@@ -2216,6 +2332,149 @@ describe('SignUp', () => {
       );
       expect(result.status).toBe('complete');
       expect(result.protectCheck).toBeNull();
+    });
+  });
+});
+
+describe('SignUp protect_check gate', () => {
+  let previousClerk: any;
+
+  beforeEach(() => {
+    previousClerk = SignUp.clerk;
+    SignUp.clerk = { __internal_environment: { displayConfig: { captchaOauthBypass: [] } } } as any;
+    vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+    BaseResource._fetch = vi.fn().mockResolvedValue({
+      client: null,
+      response: {
+        id: 'signup_123',
+        status: 'needs_protect_check',
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    SignUp.clerk = previousClerk;
+  });
+
+  it('hands the resource to the gate after a Future call', async () => {
+    const signUp = new SignUp();
+
+    await signUp.__internal_future.create({ emailAddress: 'user@example.com' });
+
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(SignUp.clerk, signUp, undefined);
+  });
+
+  it('returns a classic call with the gate still pending', async () => {
+    const signUp = new SignUp();
+
+    await signUp.create({ emailAddress: 'user@example.com' });
+
+    expect(signUp.protectCheck?.token).toBe('challenge-token');
+    expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+  });
+
+  describe('Future sso', () => {
+    let windowNavigate: ReturnType<typeof vi.fn>;
+
+    const handOff = (url: string) => ({ status: 'unverified', external_verification_redirect_url: url });
+    const challenged = (externalAccount: ReturnType<typeof handOff> | null = null) => ({
+      client: null,
+      response: {
+        id: 'signup_123',
+        status: 'missing_requirements',
+        verifications: { external_account: externalAccount },
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
+    const cleared = (externalAccount: ReturnType<typeof handOff>) => ({
+      client: null,
+      response: {
+        id: 'signup_123',
+        status: 'missing_requirements',
+        verifications: { external_account: externalAccount },
+      },
+    });
+
+    beforeEach(() => {
+      vi.stubGlobal('window', { location: { origin: 'https://example.com', href: 'https://example.com/sign-up' } });
+      windowNavigate = vi.fn();
+      SignUp.clerk = {
+        buildUrlWithAuth: vi.fn(url => url),
+        buildUrl: vi.fn(path => 'https://example.com' + path),
+        frontendApi: 'clerk.example.com',
+        __internal_windowNavigate: windowNavigate,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    it('goes to the provider when a challenged create carries a hand-off, leaving the challenge for the way back', async () => {
+      BaseResource._fetch = vi.fn().mockResolvedValue(challenged(handOff('https://accounts.google.example/auth')));
+
+      const signUp = new SignUp();
+      const { error } = await signUp.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+      expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+    });
+
+    it('runs the challenge before going to the provider when a challenged create has no hand-off', async () => {
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce(challenged())
+        .mockResolvedValueOnce(cleared(handOff('https://accounts.google.example/auth')));
+      const resolve = vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async (_clerk, resource) => {
+        await resource.submitProtectCheck({ proofToken: 'proof' });
+      });
+
+      const signUp = new SignUp();
+      const { error } = await signUp.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(resolve).toHaveBeenCalledTimes(1);
+      expect(resolve.mock.calls[0][1]).toBe(signUp);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+      expect(resolve.mock.invocationCallOrder[0]).toBeLessThan(windowNavigate.mock.invocationCallOrder[0]);
+    });
+
+    it('runs a challenge that is waiting when the popup returns', async () => {
+      const popup = { location: { href: '' } } as Window;
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce(cleared(handOff('https://accounts.google.example/auth')))
+        .mockResolvedValueOnce(challenged());
+      vi.mocked(_futureAuthenticateWithPopup).mockResolvedValue(undefined);
+
+      const signUp = new SignUp();
+      const { error } = await signUp.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+        popup,
+      });
+
+      expect(error).toBeNull();
+      expect(_futureAuthenticateWithPopup).toHaveBeenCalledTimes(1);
+      expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(ProtectCheckGate.prototype.resolve).mock.calls[0][1]).toBe(signUp);
+      expect(vi.mocked(_futureAuthenticateWithPopup).mock.invocationCallOrder[0]).toBeLessThan(
+        vi.mocked(ProtectCheckGate.prototype.resolve).mock.invocationCallOrder[0],
+      );
     });
   });
 });

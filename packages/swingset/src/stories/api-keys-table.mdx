@@ -1,0 +1,63 @@
+import * as Stories from './api-keys-table.stories';
+
+# APIKeysTable
+
+A table of the API keys that belong to a user or an organization, with search, page navigation, creation, and revocation confirmed by typing the key name. `APIKeysTable` takes the `subject` whose keys it lists, reads them from Clerk, and offers creation and revocation only when the signed-in user may manage them. The user and organization profile API keys panels render it under their own title. `perPage` sets how many keys a page lists, 10 by default. Pass `messages` to replace any of its strings.
+
+After a key is created, its secret is shown once. The secret dialog stays open on Escape and outside clicks until the secret has been copied, or a copy has failed.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Table', href: '/components/table', layer: 'Components' },
+    { name: 'EmptyState', href: '/components/empty-state', layer: 'Components' },
+    { name: 'useDataTable', href: '/hooks/use-data-table', layer: 'Hooks' },
+    { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Text', href: '/components/text', layer: 'Components' },
+    { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
+  ]}
+/>
+
+## Examples
+
+### Organization
+
+An organization subject explains organization keys in its empty state.
+
+<Story name='Organization' storyModule={Stories} />
+
+### Description
+
+`showDescription` adds an optional Description field to the create dialog. The description is saved with the key.
+
+<Story name='Description' storyModule={Stories} />
+
+### Empty
+
+<Story name='Empty' storyModule={Stories} />
+
+### Loading
+
+`APIKeysTableSkeleton` stands in for the table until its first page arrives. The search, the Create button and the column headers stay real, with the controls disabled, and only the rows are bones. Reload fakes a 2 second load.
+
+<Story name='Loading' storyModule={Stories} />
+
+### Proposed table
+
+This example enables sorting and row selection through `onSortChange` and `onBulkAction`. Click Name, Date created, or Last used to cycle through ascending, descending, and unsorted order. The caller sorts all results before pagination and resets to page 1. Keys that have never been used sort last.
+
+The bulk callback is a placeholder that enables selection checkboxes. Sorting clears the current selection.
+
+<Story name='ProposedTable' storyModule={Stories} />

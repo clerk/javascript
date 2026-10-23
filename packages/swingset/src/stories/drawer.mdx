@@ -3,7 +3,7 @@ import * as DrawerStories from './drawer.stories';
 # Drawer
 
 A modal bottom sheet that slides up from the bottom edge and is dismissed by dragging it
-down, from `@clerk/headless`. It is a **headless** primitive: it supplies open state,
+down. It is a **headless** primitive: it supplies open state,
 portalling, an overlay surface, a scroll-locked viewport, focus management, dismissal
 (drag / outside press / Escape), optional snap points, virtual-keyboard awareness, nesting,
 and ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the
@@ -25,7 +25,7 @@ the popup to dismiss.
 ## Usage
 
 ```tsx
-import { Drawer } from '@clerk/headless/drawer';
+import { Drawer } from '@clerk/mosaic/primitives/drawer';
 
 <Drawer.Root>
   <Drawer.Trigger>Open</Drawer.Trigger>
@@ -64,7 +64,7 @@ A trigger rendered **outside** `Drawer.Root` can drive it through a shared handl
 `handle.isOpen` / `handle.subscribe(cb)` make it `useSyncExternalStore`-compatible.
 
 ```tsx
-import { createDrawerHandle } from '@clerk/headless/drawer';
+import { createDrawerHandle } from '@clerk/mosaic/primitives/drawer';
 
 const handle = createDrawerHandle();
 

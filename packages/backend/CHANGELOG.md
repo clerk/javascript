@@ -1,5 +1,194 @@
 # Change Log
 
+## 3.26.1
+
+### Patch Changes
+
+- Stop accepting the legacy `cl_I7d4PD111III` JWT category as a session or handshake token. Clerk no longer issues it, so `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for a token carrying it, the same as for other non-session categories. ([#10286](https://github.com/clerk/javascript/pull/10286)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.26.0
+
+### Minor Changes
+
+- Add webhook types for transactional email delivery, delays, bounces, complaints, failures, and suppressions. Bounce events distinguish `Permanent`, `Transient`, and `Undetermined` classifications. `verifyWebhook()` preserves the original event timestamp and instance ID for outcome handlers. These types prepare for the transactional email pilot; receiving the events requires the corresponding backend rollout. ([#9776](https://github.com/clerk/javascript/pull/9776)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Clarify issuer validation for session tokens and document that machine token verification ignores the issuer option. ([#10282](https://github.com/clerk/javascript/pull/10282)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+
+## 3.25.0
+
+### Minor Changes
+
+- Added an optional `issuer` option to `verifyJwt()`, `verifyToken()`, and `authenticateRequest()` to validate the JWT `iss` claim against a string or list of allowed strings. For `verifyToken()` and `authenticateRequest()`, this applies only to session tokens. Omitting `issuer` preserves existing behavior. ([#8772](https://github.com/clerk/javascript/pull/8772)) by [@jacekradko](https://github.com/jacekradko)
+
+## 3.24.0
+
+### Minor Changes
+
+- Add `deprovisioned` to the Backend `User` object and `UserJSON`, so you can tell when Directory Sync has deactivated a user, including in `user.updated` webhook payloads, without casting. It's separate from `banned`: Directory Sync sets and clears `deprovisioned`, while you set `banned` through the Dashboard or Backend API. ([#10245](https://github.com/clerk/javascript/pull/10245)) by [@manovotny](https://github.com/manovotny)
+
+## 3.23.2
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/shared@4.40.0
+
+## 3.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/shared@4.39.1
+
+## 3.23.0
+
+### Minor Changes
+
+- Add `clerkClient.invitations.deleteInvitation(invitationId)`, which permanently deletes an instance invitation and the stored copies of its invitation email. Unlike `revokeInvitation`, this removes the invitation record itself, so it can be used to honor a data erasure request from someone who was invited but never signed up. ([#10034](https://github.com/clerk/javascript/pull/10034)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Verified OAuth access tokens now expose `act`, the RFC 8693 actor chain, when the token was issued by an OAuth 2.0 Token Exchange. It is available on the `IdPOAuthAccessToken` returned for both opaque and JWT access tokens. ([#9929](https://github.com/clerk/javascript/pull/9929)) by [@wyattjoh](https://github.com/wyattjoh)
+
+### Patch Changes
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260)]:
+  - @clerk/shared@4.39.0
+
+## 3.22.0
+
+### Minor Changes
+
+- SAML connections can trust several Identity Provider signing certificates at once. `SamlConnection` and `EnterpriseConnection.samlConnection` now include `idpCertificates`, every trusted certificate with its validity window, and `createSamlConnection()`, `updateSamlConnection()`, `createEnterpriseConnection()` and `updateEnterpriseConnection()` accept an `idpCertificates` array that replaces the connection's whole set. The single `idpCertificate` parameter is deprecated in favor of the array; it keeps working and still replaces the whole set. ([#9995](https://github.com/clerk/javascript/pull/9995)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/shared@4.38.0
+
+## 3.21.1
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc on `clerkClient.instances.update()` and the `Instance` resource to note that Electron apps using `@clerk/electron` also need the renderer's dev server origin, for example `http://localhost:5173`, during development. ([#9982](https://github.com/clerk/javascript/pull/9982)) by [@manovotny](https://github.com/manovotny)
+
+- Update the `lockUser()` JSDoc to link the Dashboard's current Protect rules page. ([#9976](https://github.com/clerk/javascript/pull/9976)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/shared@4.37.1
+
+## 3.21.0
+
+### Minor Changes
+
+- `verifyWebhook()` now returns the event's top-level `timestamp` (milliseconds since epoch when the event occurred) and `instance_id`, so webhook handlers can order events and identify the instance that sent them. ([#9906](https://github.com/clerk/javascript/pull/9906)) by [@manovotny](https://github.com/manovotny)
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc for Electron apps to describe the custom renderer scheme used by `@clerk/electron`. ([#9784](https://github.com/clerk/javascript/pull/9784)) by [@manovotny](https://github.com/manovotny)
+
+- Capture authentication timezones so Clerk emails can display timestamps in a stored user timezone. ([#9540](https://github.com/clerk/javascript/pull/9540)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`6a14691`](https://github.com/clerk/javascript/commit/6a14691f8d98dcafd3956e1ea97cb35d56a34864), [`0ee4ee2`](https://github.com/clerk/javascript/commit/0ee4ee2b49286a8cae5f251ec997f30c8a863205), [`7a3fcf5`](https://github.com/clerk/javascript/commit/7a3fcf5b2d536b4e444920a3e87c4f70da3487ba), [`69c1b9c`](https://github.com/clerk/javascript/commit/69c1b9c886ab0860a9af12872235b6e492b2b2d0), [`d9cf0f2`](https://github.com/clerk/javascript/commit/d9cf0f29ea2ef8388bbd5736007ca71f9411bf42)]:
+  - @clerk/shared@4.37.0
+
+## 3.20.1
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+
+## 3.20.0
+
+### Minor Changes
+
+- Add an optional `nameQuery` filter to `oauthApplications.list()` to search OAuth applications by name or exact client ID. ([#9904](https://github.com/clerk/javascript/pull/9904)) by [@austincalvelage](https://github.com/austincalvelage)
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+
+## 3.19.0
+
+### Minor Changes
+
+- - Fixes an issue where OAuth token validation did not correctly validate audience (`aud`) claims. Previous usages that specified `audience` were falsely passing. This upgrade will cause those to start rejecting if the `audience` indeed does not match the OAuth token's `aud` claim, including cases where the `aud` claim is omitted. ([#9724](https://github.com/clerk/javascript/pull/9724)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - Adds an optional `audience` parameter to `idPOAuthAccessToken.verify()`
+
+- Expose the optional `aud` audience on verified OAuth access tokens. ([#9585](https://github.com/clerk/javascript/pull/9585)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Clarify domain API documentation and deletion parameter names. The active domain cannot be deleted. ([#9741](https://github.com/clerk/javascript/pull/9741)) by [@rafaelrcamargo](https://github.com/rafaelrcamargo)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+
+## 3.18.1
+
+### Patch Changes
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+
+## 3.18.0
+
+### Minor Changes
+
+- Add experimental `emails.createBatch()` for submitting up to 100 transactional emails. Each message supports its own idempotency key and returns an independent success or error result. ([#9711](https://github.com/clerk/javascript/pull/9711)) by [@jescalan](https://github.com/jescalan)
+
+  Transactional messages now support sender and reply-to display names, cross-domain Reply-To addresses, CC/BCC recipients, attachments, and custom headers. These options require a backend deployment that supports them.
+
+### Patch Changes
+
+- Update docs deep links in JSDoc comments to match clerk.com's new heading anchors (`#get-token` is now `#gettoken`, `#o-auth-strategy` is now `#oauthstrategy`, and so on). ([#9520](https://github.com/clerk/javascript/pull/9520)) by [@manovotny](https://github.com/manovotny)
+
+- Update the `lockUser()` JSDoc to point at the **System** page under **Protect** > **Rules** (`/~/protect/rules/system`), matching the Clerk Dashboard's Protect navigation. ([#9691](https://github.com/clerk/javascript/pull/9691)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42)]:
+  - @clerk/shared@4.32.0
+
+## 3.17.2
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+
+## 3.17.1
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/shared@4.31.0
+
+## 3.17.0
+
+### Minor Changes
+
+- Add experimental methods for sending and retrieving internal transactional emails, including Clerk suppression state and reasons. ([#9553](https://github.com/clerk/javascript/pull/9553)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Reject JWT-template tokens presented as session tokens in the `Authorization` header when `acceptsToken` is `'any'` or an array that includes `'session_token'`. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token, matching the existing `acceptsToken: 'session_token'` behavior. ([#9511](https://github.com/clerk/javascript/pull/9511)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.16.13
+
+### Patch Changes
+
+- Align JSDoc link targets with the docs link rules: internal docs links don't open in a new tab (removed `{{ target: '_blank' }}` from the `Invitation` Metadata link), while API reference links do (added it to the `ExternalAccount` Backend API link and the `currentUser()` endpoint link). ([#9556](https://github.com/clerk/javascript/pull/9556)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/shared@4.30.2
+
 ## 3.16.12
 
 ### Patch Changes

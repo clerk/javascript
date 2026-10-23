@@ -1,6 +1,8 @@
 // eslint-disable-next-line no-restricted-imports
 import createCache, { type EmotionCache } from '@emotion/cache';
 
+import { sanitizeCssLayerName } from '../utils/cssLayerName';
+
 type CreateEmotionCacheOptions = {
   /** The nonce value for CSP (Content Security Policy). */
   nonce?: string;
@@ -14,7 +16,8 @@ type CreateEmotionCacheOptions = {
  * `cssLayerName` is set, every insertion is wrapped in `@layer <name> { ... }`
  * so consumers can control cascade precedence relative to their own styles.
  */
-export function createEmotionCache({ nonce, cssLayerName }: CreateEmotionCacheOptions): EmotionCache {
+export function createEmotionCache({ nonce, cssLayerName: rawCssLayerName }: CreateEmotionCacheOptions): EmotionCache {
+  const cssLayerName = sanitizeCssLayerName(rawCssLayerName);
   const el = typeof document !== 'undefined' ? document.querySelector('style#cl-style-insertion-point') : null;
   const cache = createCache({
     key: 'cl-internal',

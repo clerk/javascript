@@ -1,6 +1,9 @@
-import type { ButtonProps } from '@clerk/ui/mosaic/components/button';
-import { Button, SubmitButton } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import type { ButtonProps } from '@clerk/mosaic/components/button';
+import { Button, SubmitButton } from '@clerk/mosaic/components/button';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
+import { ChevronDown } from '@clerk/mosaic/icons/glyphs/chevron-down';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -11,13 +14,14 @@ export { default as __source } from './button.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Button',
-  source: 'packages/ui/src/mosaic/components/button/button.tsx',
+  source: 'packages/mosaic/src/components/button/button.tsx',
   styles: {
     _variants: {
       color: { primary: {}, neutral: {}, negative: {} },
       variant: { filled: {}, outline: {}, ghost: {}, link: {} },
-      size: { sm: {}, md: {}, lg: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {} },
       shape: { default: {}, square: {}, circle: {} },
       fullWidth: { true: {}, false: {} },
       touchTarget: { true: {}, false: {} },
@@ -46,6 +50,12 @@ export function Primary(props: Record<string, unknown>) {
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <Button
+        {...knobsAsProps(props)}
+        size='xs'
+      >
+        Extra small
+      </Button>
       <Button
         {...knobsAsProps(props)}
         size='sm'
@@ -144,7 +154,7 @@ export function Shapes(props: Record<string, unknown>) {
         aria-label='Add'
       >
         <Icon
-          name='plus'
+          glyph={Plus}
           size='sm'
         />
       </Button>
@@ -154,7 +164,7 @@ export function Shapes(props: Record<string, unknown>) {
         size='md'
         aria-label='Add'
       >
-        <Icon name='plus' />
+        <Icon glyph={Plus} />
       </Button>
       <Button
         {...knobsAsProps(props)}
@@ -163,7 +173,7 @@ export function Shapes(props: Record<string, unknown>) {
         aria-label='Add'
       >
         <Icon
-          name='plus'
+          glyph={Plus}
           size='sm'
         />
       </Button>
@@ -173,7 +183,7 @@ export function Shapes(props: Record<string, unknown>) {
         size='md'
         aria-label='Add'
       >
-        <Icon name='plus' />
+        <Icon glyph={Plus} />
       </Button>
     </div>
   );
@@ -186,7 +196,7 @@ export function Icons(props: Record<string, unknown>) {
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       <Button {...knobsAsProps(props)}>
         <Icon
-          name='check'
+          glyph={Checkmark}
           placement='inline-start'
         />
         Approve
@@ -194,18 +204,18 @@ export function Icons(props: Record<string, unknown>) {
       <Button {...knobsAsProps(props)}>
         Options
         <Icon
-          name='chevron-down'
+          glyph={ChevronDown}
           placement='inline-end'
         />
       </Button>
       <Button {...knobsAsProps(props)}>
         <Icon
-          name='check'
+          glyph={Checkmark}
           placement='inline-start'
         />
         Both sides
         <Icon
-          name='chevron-down'
+          glyph={ChevronDown}
           placement='inline-end'
         />
       </Button>
@@ -218,7 +228,7 @@ export function Icons(props: Record<string, unknown>) {
 export function IconSizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'grid', gap: 12, justifyItems: 'start' }}>
-      {(['sm', 'md', 'lg'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
         <div
           key={size}
           style={{ display: 'flex', gap: 8, alignItems: 'center' }}
@@ -228,9 +238,9 @@ export function IconSizes(props: Record<string, unknown>) {
             size={size}
           >
             <Icon
-              name='check'
+              glyph={Checkmark}
               placement='inline-start'
-              size={size}
+              size={size === 'xs' ? 'sm' : size}
             />
             Approve
           </Button>
@@ -246,9 +256,9 @@ export function IconSizes(props: Record<string, unknown>) {
           >
             Options
             <Icon
-              name='chevron-down'
+              glyph={ChevronDown}
               placement='inline-end'
-              size={size}
+              size={size === 'xs' ? 'sm' : size}
             />
           </Button>
         </div>
@@ -280,7 +290,7 @@ export function Truncation(props: Record<string, unknown>) {
         fullWidth
       >
         <Icon
-          name='check'
+          glyph={Checkmark}
           placement='inline-start'
         />
         Save this organization&rsquo;s billing details
@@ -388,7 +398,7 @@ export function SubmitDelay(props: Record<string, unknown>) {
 export function SubmitSizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      {(['sm', 'md', 'lg'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
         <SubmitButton
           key={size}
           {...knobsAsProps(props)}

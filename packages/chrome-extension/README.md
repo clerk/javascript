@@ -55,7 +55,7 @@ Please see the latest extension [authentication support matrix](https://clerk.co
          -d '{"allowed_origins": ["chrome-extension://<YOUR_EXTENSION_KEY>"]}'
    ```
 
-4. **Set Environment Variables:** Retrieve the **Publishable key** from your [Clerk dashboard](https://dashboard.clerk.com/last-active?path=api-keys&utm_source=github&utm_medium=clerk_chrome_extension) and set it as an environment variable.
+4. **Set Environment Variables:** Retrieve the **Publishable key** from your [Clerk dashboard](https://dashboard.clerk.com/~/api-keys?utm_source=github&utm_medium=clerk_chrome_extension) and set it as an environment variable.
 
    ```sh
    # Vite

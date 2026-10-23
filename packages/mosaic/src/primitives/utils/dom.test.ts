@@ -1,0 +1,208 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import {
+  autoUpdate,
+  canScrollToward,
+  getDimensions,
+  getScale,
+  getScrollDimensions,
+  isElement,
+  isHTMLElement,
+} from './dom';
+
+function stub(element: HTMLElement, values: Record<string, number>) {
+  for (const [key, value] of Object.entries(values)) {
+    Object.defineProperty(element, key, { configurable: true, get: () => value });
+  }
+}
+
+function stubRect(
+  element: HTMLElement,
+  { x, y, width, height }: { x: number; y: number; width: number; height: number },
+) {
+  element.getBoundingClientRect = () => DOMRect.fromRect({ x, y, width, height });
+}
+
+function create() {
+  const element = document.createElement('div');
+  document.body.append(element);
+  return element;
+}
+
+afterEach(() => {
+  document.body.replaceChildren();
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+
+describe('isElement', () => {
+  it.each([
+    ['an element', () => document.createElement('div'), true],
+    ['an svg element', () => document.createElementNS('http://www.w3.org/2000/svg', 'svg'), true],
+    ['a text node', () => document.createTextNode('text'), false],
+    ['the document', () => document, false],
+    ['the window', () => window, false],
+    ['null', () => null, false],
+  ])('is %s: %s', (_, target, expected) => {
+    expect(isElement(target())).toBe(expected);
+  });
+});
+
+describe('isHTMLElement', () => {
+  it.each([
+    ['an element', () => document.createElement('div'), true],
+    ['an svg element', () => document.createElementNS('http://www.w3.org/2000/svg', 'svg'), false],
+    ['a text node', () => document.createTextNode('text'), false],
+    ['null', () => null, false],
+  ])('is %s: %s', (_, target, expected) => {
+    expect(isHTMLElement(target())).toBe(expected);
+  });
+});
+
+describe('getDimensions', () => {
+  it('reads the fractional CSS size when it agrees with the rendered box', () => {
+    const element = create();
+    element.style.width = '100.4px';
+    element.style.height = '20.6px';
+    stub(element, { offsetWidth: 100, offsetHeight: 21 });
+
+    expect(getDimensions(element)).toEqual({ width: 100.4, height: 20.6 });
+  });
+
+  it('falls back to the rendered box when the CSS size disagrees', () => {
+    const element = create();
+    element.style.width = '100px';
+    stub(element, { offsetWidth: 120, offsetHeight: 40 });
+
+    expect(getDimensions(element)).toEqual({ width: 120, height: 40 });
+  });
+
+  it('falls back per axis', () => {
+    const element = create();
+    element.style.width = '100px';
+    element.style.height = '20.6px';
+    stub(element, { offsetWidth: 120, offsetHeight: 21 });
+
+    expect(getDimensions(element)).toEqual({ width: 120, height: 20.6 });
+  });
+});
+
+describe('getScrollDimensions', () => {
+  it('reads the scroll size with content alignment reset', () => {
+    const element = create();
+    element.style.justifyContent = 'center';
+    let alignment = '';
+    Object.defineProperty(element, 'scrollHeight', {
+      configurable: true,
+      get: () => {
+        alignment = element.style.justifyContent;
+        return 80;
+      },
+    });
+    stub(element, { scrollWidth: 200 });
+
+    expect(getScrollDimensions(element)).toEqual({ width: 200, height: 80 });
+    expect(alignment).toBe('initial');
+    expect(element.style.justifyContent).toBe('center');
+  });
+
+  it('restores an inline priority after reading', () => {
+    const element = create();
+    element.style.setProperty('align-items', 'end', 'important');
+
+    getScrollDimensions(element);
+
+    expect(element.style.getPropertyValue('align-items')).toBe('end');
+    expect(element.style.getPropertyPriority('align-items')).toBe('important');
+  });
+});
+
+describe('getScale', () => {
+  it('compares the rendered size to the layout size', () => {
+    const element = create();
+    stub(element, { offsetWidth: 100, offsetHeight: 50 });
+    stubRect(element, { x: 0, y: 0, width: 50, height: 25 });
+
+    expect(getScale(element)).toEqual({ x: 0.5, y: 0.5 });
+  });
+
+  it('is 1 when the element has no layout size', () => {
+    const element = create();
+    stubRect(element, { x: 0, y: 0, width: 50, height: 25 });
+
+    expect(getScale(element)).toEqual({ x: 1, y: 1 });
+  });
+});
+
+describe('autoUpdate', () => {
+  it('updates right away and whenever an element resizes', () => {
+    let notify = () => {};
+    const observed: Element[] = [];
+    const disconnect = vi.fn();
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(callback: () => void) {
+          notify = callback;
+        }
+        observe(element: Element) {
+          observed.push(element);
+        }
+        disconnect = disconnect;
+      },
+    );
+    const a = create();
+    const b = create();
+    const update = vi.fn();
+
+    const cleanup = autoUpdate([a, b], update);
+
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(observed).toEqual([a, b]);
+
+    notify();
+
+    expect(update).toHaveBeenCalledTimes(2);
+
+    cleanup();
+
+    expect(disconnect).toHaveBeenCalled();
+  });
+
+  it('still updates once without ResizeObserver', () => {
+    vi.stubGlobal('ResizeObserver', undefined);
+    const update = vi.fn();
+
+    autoUpdate(create(), update)();
+
+    expect(update).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('canScrollToward', () => {
+  function scroller(overflowY: string, scrollTop: number) {
+    const element = document.createElement('div');
+    element.style.overflowY = overflowY;
+    document.body.appendChild(element);
+    stub(element, { scrollHeight: 400, clientHeight: 200, scrollTop, scrollWidth: 100, clientWidth: 100 });
+    return element;
+  }
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('follows a drag with room on the axis it moved', () => {
+    expect(canScrollToward(scroller('auto', 0), 0, -1)).toBe(true);
+    expect(canScrollToward(scroller('auto', 0), 0, 1)).toBe(false);
+    expect(canScrollToward(scroller('auto', 200), 0, -1)).toBe(false);
+  });
+
+  it('keeps a vertical scroller when the first move jitters mostly sideways', () => {
+    expect(canScrollToward(scroller('auto', 0), 2, -1)).toBe(true);
+  });
+
+  it('ignores a box that overflows without scrolling', () => {
+    expect(canScrollToward(scroller('hidden', 0), 0, -1)).toBe(false);
+  });
+});

@@ -61,6 +61,12 @@ export type UseOrganizationParams = {
    * </ul>
    */
   invitations?: true | PaginatedHookConfig<GetInvitationsParams>;
+  /**
+   * Skip the development prompt that offers to enable Organizations.
+   *
+   * @internal
+   */
+  __internal_skipAttemptToEnableOrganizations?: boolean;
 };
 
 /**
@@ -69,7 +75,7 @@ export type UseOrganizationParams = {
 export type UseOrganizationReturn<T extends UseOrganizationParams> =
   | {
       /**
-       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (e.g., when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#set-active)).
+       * Indicates whether Clerk has loaded the current authentication state. Initially `false`, becomes `true` once Clerk loads, and can revert to `false` while auth state is updating (e.g., when switching organizations via [`setActive()`](https://clerk.com/docs/reference/objects/clerk#setactive)).
        */
       isLoaded: false;
       /**
@@ -275,10 +281,13 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     membershipRequests: membershipRequestsListParams,
     memberships: membersListParams,
     invitations: invitationsListParams,
+    __internal_skipAttemptToEnableOrganizations,
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
-  useAttemptToEnableOrganizations('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization', {
+    enabled: !__internal_skipAttemptToEnableOrganizations,
+  });
 
   const organization = useOrganizationBase();
   const session = useSessionBase();

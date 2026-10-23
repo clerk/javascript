@@ -22,7 +22,7 @@ function withLastActiveFallback(callback: () => string): string {
   try {
     return callback();
   } catch {
-    return 'https://dashboard.clerk.com/last-active';
+    return 'https://dashboard.clerk.com/~';
   }
 }
 

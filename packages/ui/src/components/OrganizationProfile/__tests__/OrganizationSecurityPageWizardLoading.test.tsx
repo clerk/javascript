@@ -65,6 +65,12 @@ vi.mock('../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection', () => ({
       session: {},
       organization: { name: 'Org1' },
       enterpriseConnection: activeConnection,
+      enterpriseConnections: [activeConnection],
+      connectionScope: { kind: 'existing', id: activeConnection.id },
+      selectConnection: () => {},
+      connectionDomains: activeConnection.domains,
+      setConnectionDomains: noop,
+      claimedDomains: new Map(),
       organizationEnterpriseConnection: buildOrganizationEnterpriseConnection({
         connection: activeConnection,
         hasSuccessfulTestRun: true,
@@ -108,7 +114,9 @@ const withSecurityPageFixtures = (f: Parameters<Parameters<typeof createFixtures
   f.withOrganizations();
   f.withUser({
     email_addresses: ['test@clerk.com'],
-    organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+    organization_memberships: [
+      { name: 'Org1', self_serve_sso_enabled: true, permissions: ['org:sys_entconns:manage'] },
+    ],
   });
 };
 
@@ -119,9 +127,10 @@ describe('OrganizationSecurityPage — wizard survives a mid-flow loading toggle
 
     const { userEvent } = render(<OrganizationSecurityPage contentRef={{ current: null }} />, { wrapper });
 
-    // Enter the wizard from the overview via Edit, which forces the first step.
-    await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Edit' }));
+    // Enter the wizard from the overview via Add connection, which forces the
+    // first step. The mocked hook pins the scope to `activeConnection`, so the
+    // wizard opens on it regardless of the requested scope.
+    await userEvent.click(await screen.findByRole('button', { name: /Add connection/i }));
     expect(await screen.findByRole('heading', { name: /add SSO domains/i })).toBeInTheDocument();
 
     // Navigate forward to the Activate step via the breadcrumb (reachable because

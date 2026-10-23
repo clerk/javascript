@@ -15,7 +15,8 @@ type MfaTOTPFormProps = FormProps;
 export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => {
   const { onReset } = props;
   const wizard = useWizard();
-  const ref = React.useRef<TOTPResource>();
+  const pendingTotpRef = React.useRef<TOTPResource>();
+  const verifiedTotpRef = React.useRef<TOTPResource>();
 
   return (
     <Wizard {...wizard.props}>
@@ -23,12 +24,14 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
         title={localizationKeys('userProfile.mfaTOTPPage.title')}
         onSuccess={wizard.nextStep}
         onReset={onReset}
+        pendingTotpRef={pendingTotpRef}
       />
 
       <VerifyTOTP
         onSuccess={wizard.nextStep}
         onReset={onReset}
-        resourceRef={ref}
+        onBack={wizard.prevStep}
+        verifiedTotpRef={verifiedTotpRef}
       />
 
       <SuccessPage
@@ -38,7 +41,7 @@ export const MfaTOTPScreen = withCardStateProvider((props: MfaTOTPFormProps) => 
         contents={
           <MfaBackupCodeList
             subtitle={localizationKeys('userProfile.backupCodePage.successSubtitle')}
-            backupCodes={ref.current?.backupCodes}
+            backupCodes={verifiedTotpRef.current?.backupCodes}
           />
         }
       />

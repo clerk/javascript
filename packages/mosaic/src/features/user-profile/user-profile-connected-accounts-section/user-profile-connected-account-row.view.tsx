@@ -1,0 +1,143 @@
+import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
+
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
+import { Badge } from '../../../components/badge';
+import { SubmitButton } from '../../../components/button';
+import { Icon } from '../../../components/icon';
+import { Section } from '../../../components/section';
+import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
+import { fill, useMessages } from '../../../localization';
+import { truncationStyles } from '../../../styles/typography.styles';
+import { UserProfileProviderMedia } from '../user-profile-provider-media';
+import { styles } from './user-profile-connected-accounts-section.styles';
+import type {
+  UserProfileConnectedAccount,
+  UserProfileConnectionProvider,
+} from './user-profile-connected-accounts-section.types';
+
+export function UserProfileConnectProviderRowView({
+  provider,
+  isPending,
+  isDisabled,
+  onConnect,
+  triggerRef,
+}: {
+  provider: UserProfileConnectionProvider;
+  isPending: boolean;
+  isDisabled: boolean;
+  onConnect: (id: string) => void;
+  triggerRef?: Ref<HTMLButtonElement>;
+}) {
+  const m = useMessages('userProfileConnectedAccounts');
+  return (
+    <Section.Row xstyle={styles.connectRow}>
+      <Section.Item>
+        <UserProfileProviderMedia
+          provider={provider.provider}
+          iconUrl={provider.iconUrl}
+          monochromeIcon={provider.monochromeIcon}
+        />
+        <Section.Content>
+          <Section.Label>
+            <span
+              title={provider.provider}
+              {...stylex.props(truncationStyles.singleLine, styles.text)}
+            >
+              {provider.provider}
+            </span>
+          </Section.Label>
+        </Section.Content>
+        <Section.Actions>
+          <SubmitButton
+            ref={triggerRef}
+            type='button'
+            size='sm'
+            variant='outline'
+            color='neutral'
+            aria-label={fill(m.connectLabel, { provider: provider.provider })}
+            isPending={isPending}
+            disabled={isDisabled && !isPending}
+            onClick={() => onConnect(provider.id)}
+          >
+            {m.connect}
+            <Icon
+              glyph={ArrowUpRight}
+              placement='inline-end'
+              size='sm'
+            />
+          </SubmitButton>
+        </Section.Actions>
+      </Section.Item>
+      <Section.Error>{provider.connectError}</Section.Error>
+    </Section.Row>
+  );
+}
+
+export function UserProfileConnectedAccountRowView({
+  account,
+  triggerRef,
+  isDisabled = false,
+  onReconnect,
+  onRemove,
+}: {
+  account: UserProfileConnectedAccount;
+  triggerRef?: Ref<HTMLButtonElement>;
+  isDisabled?: boolean;
+  onReconnect?: (id: string) => void;
+  onRemove?: (account: UserProfileConnectedAccount) => void;
+}) {
+  const m = useMessages('userProfileConnectedAccounts');
+  const actions: ActionMenuAction[] = [];
+  if ((account.status === 'reconnect' || account.status === 'error') && onReconnect && !isDisabled) {
+    actions.push({
+      label: account.status === 'reconnect' ? m.reconnect : m.tryAgain,
+      onClick: () => onReconnect(account.id),
+    });
+  }
+  if (onRemove) {
+    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(account) });
+  }
+  return (
+    <Section.Row>
+      <Section.Item>
+        <UserProfileProviderMedia
+          provider={account.provider}
+          iconUrl={account.iconUrl}
+          monochromeIcon={account.monochromeIcon}
+        />
+        <Section.Content>
+          <Section.Label>
+            <span
+              title={account.provider}
+              {...stylex.props(truncationStyles.singleLine, styles.text)}
+            >
+              {account.provider}
+            </span>
+            {account.status === 'reconnect' ? <Badge color='warning'>{m.disconnected}</Badge> : null}
+          </Section.Label>
+          {account.identifier ? (
+            <Section.Description
+              xstyle={truncationStyles.singleLine}
+              title={account.identifier}
+            >
+              {account.identifier}
+            </Section.Description>
+          ) : null}
+        </Section.Content>
+        {actions.length > 0 ? (
+          <Section.Actions>
+            <ActionMenu
+              triggerRef={triggerRef}
+              label={fill(m.manageLabel, { provider: account.provider })}
+              actions={actions}
+            />
+          </Section.Actions>
+        ) : null}
+      </Section.Item>
+      <Section.Error>{account.reconnectError}</Section.Error>
+      <Section.Error>{account.status === 'error' ? account.verificationError : undefined}</Section.Error>
+    </Section.Row>
+  );
+}

@@ -28,6 +28,10 @@ expo:
   - changed-files:
       - any-glob-to-any-file: packages/expo/**
 
+expo-native-components:
+  - changed-files:
+      - any-glob-to-any-file: packages/expo-native-components/**
+
 express:
   - changed-files:
       - any-glob-to-any-file: packages/express/**
@@ -75,6 +79,10 @@ themes:
 types:
   - changed-files:
       - any-glob-to-any-file: packages/types/**
+
+mosaic:
+  - changed-files:
+      - any-glob-to-any-file: packages/mosaic/**
 
 ui:
   - changed-files:

@@ -13,12 +13,6 @@ const commonSetup = appConfigs.next.appRouterQuickstart.clone();
 test.describe('Keyless mode @quickstart', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test.use({
-    extraHTTPHeaders: {
-      'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET || '',
-    },
-  });
-
   let app: Application;
 
   test.beforeAll(async () => {
@@ -39,7 +33,7 @@ test.describe('Keyless mode @quickstart', () => {
     const response = await page.goto(`${app.serverUrl}/`);
     expect(response?.status()).toBe(500);
     const content = await page.content();
-    expect(content).toContain('Missing publishableKey');
+    expect(content).toContain('Clerk keys are missing from your environment');
     expect(content).toContain('npx clerk@latest init');
   });
 
@@ -51,6 +45,7 @@ test.describe('Keyless mode @quickstart', () => {
      * Seed claimed keyless state directly: the SDK no longer mints keys, so write the
      * keys fixture to `.clerk/.tmp/keyless.json` and copy the matching keys into `.env`.
      */
+    await appConfigs.envs.withEmailCodes.resolve();
     const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
     const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
     await fs.ensureDir(path.join(app.appDir, '.clerk', '.tmp'));
@@ -58,7 +53,7 @@ test.describe('Keyless mode @quickstart', () => {
       publishableKey,
       secretKey,
       claimUrl: 'https://dashboard.clerk.com/apps/claim',
-      apiKeysUrl: 'https://dashboard.clerk.com/last-active?path=api-keys',
+      apiKeysUrl: 'https://dashboard.clerk.com/~/api-keys',
     });
     await app.keylessToEnv();
     /**
@@ -67,7 +62,7 @@ test.describe('Keyless mode @quickstart', () => {
     await page.waitForTimeout(5_000);
 
     await mockClaimedInstanceEnvironmentCall(page);
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context, useTestingToken: false });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
 

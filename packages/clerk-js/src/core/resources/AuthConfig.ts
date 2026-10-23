@@ -1,4 +1,11 @@
-import type { AuthConfigJSON, AuthConfigJSONSnapshot, AuthConfigResource, PhoneCodeChannel } from '@clerk/shared/types';
+import type {
+  AuthConfigJSON,
+  AuthConfigJSONSnapshot,
+  AuthConfigResource,
+  NativeSettingsJSON,
+  NativeSettingsResource,
+  PhoneCodeChannel,
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';
@@ -9,6 +16,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
   singleSessionMode: boolean = false;
   preferredChannels: Record<string, PhoneCodeChannel> | null = null;
   sessionMinter: boolean = false;
+  nativeSettings: NativeSettingsResource | null = null;
 
   public constructor(data: Partial<AuthConfigJSON> | null = null) {
     super();
@@ -25,6 +33,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     this.singleSessionMode = this.withDefault(data.single_session_mode, this.singleSessionMode);
     this.preferredChannels = this.withDefault(data.preferred_channels, this.preferredChannels);
     this.sessionMinter = this.withDefault(data.session_minter, this.sessionMinter);
+    this.nativeSettings = this.withDefault(nativeSettingsFromJSON(data.native_settings), this.nativeSettings);
     return this;
   }
 
@@ -36,6 +45,32 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
       reverification: this.reverification,
       single_session_mode: this.singleSessionMode,
       session_minter: this.sessionMinter,
+      native_settings: nativeSettingsToJSON(this.nativeSettings),
     };
   }
+}
+
+function nativeSettingsFromJSON(data: NativeSettingsJSON | null | undefined): NativeSettingsResource | null {
+  if (!data) {
+    return null;
+  }
+  return {
+    apiEnabled: data.api_enabled,
+    trustedDeviceSignInEnabled: data.trusted_device_sign_in_enabled,
+    trustedDeviceEnrollmentPromptAfterSignInEnabled: data.trusted_device_enrollment_prompt_after_sign_in_enabled,
+    trustedDeviceEnrollmentPromptAfterSignUpEnabled: data.trusted_device_enrollment_prompt_after_sign_up_enabled,
+  };
+}
+
+function nativeSettingsToJSON(settings: NativeSettingsResource | null): NativeSettingsJSON | null {
+  if (!settings) {
+    return null;
+  }
+  return {
+    object: 'native_settings',
+    api_enabled: settings.apiEnabled,
+    trusted_device_sign_in_enabled: settings.trustedDeviceSignInEnabled,
+    trusted_device_enrollment_prompt_after_sign_in_enabled: settings.trustedDeviceEnrollmentPromptAfterSignInEnabled,
+    trusted_device_enrollment_prompt_after_sign_up_enabled: settings.trustedDeviceEnrollmentPromptAfterSignUpEnabled,
+  };
 }

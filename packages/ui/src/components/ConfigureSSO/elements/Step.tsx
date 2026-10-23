@@ -229,6 +229,7 @@ const FooterReset = (): JSX.Element | null => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         confirmationValue={organization?.name ?? ''}
+        subtitle={localizationKeys('configureSSO.resetConnectionDialog.subtitle', { name: enterpriseConnection.name })}
         onDelete={() => enterpriseConnectionMutations.deleteConnection(enterpriseConnection.id)}
         contentRef={contentRef}
       />
