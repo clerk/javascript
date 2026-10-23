@@ -71,7 +71,7 @@ export function resetAppVersionSupport(): void {
   environmentStatus = null;
   serverAnswer = null;
   display = EMPTY_DISPLAY;
-  publish({ displayChanged: true });
+  publish({ displayChanged: true, notifyLater: true });
 }
 
 export function applyFetchedEnvironment(environment: unknown, requestGeneration: number): void {
@@ -203,7 +203,10 @@ function supportedStatus(): AppVersionSupportStatus {
   };
 }
 
-function publish({ displayChanged = false }: { displayChanged?: boolean } = {}): void {
+function publish({
+  displayChanged = false,
+  notifyLater = false,
+}: { displayChanged?: boolean; notifyLater?: boolean } = {}): void {
   const next = !serverAnswer
     ? (environmentStatus ?? supportedStatus())
     : !serverAnswer.isSupported
@@ -216,8 +219,16 @@ function publish({ displayChanged = false }: { displayChanged?: boolean } = {}):
     status = next;
   }
   if (statusChanged || displayChanged) {
-    listeners.forEach(listener => listener());
+    if (notifyLater) {
+      queueMicrotask(notifyListeners);
+    } else {
+      notifyListeners();
+    }
   }
+}
+
+function notifyListeners(): void {
+  listeners.forEach(listener => listener());
 }
 
 function resolveDisplay(environment: unknown): UpdateRequiredDisplay {

@@ -1,3 +1,5 @@
+import { act, render } from '@testing-library/react';
+import { createElement, useRef } from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { NativeAppIdentity } from '../nativeAppIdentity';
@@ -237,6 +239,38 @@ describe('appVersionSupport', () => {
     store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, staleGeneration);
 
     expect(store.getAppVersionSupportStatus().isSupported).toBe(true);
+  });
+
+  test('a reset during render updates subscribers after the render, not during it', async () => {
+    const store = await loadStore();
+    const { useAppVersionSupport } = await import('../../hooks/useAppVersionSupport');
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const seen: (string | null)[] = [];
+    const Subscriber = () => {
+      seen.push(useAppVersionSupport().minimumVersion);
+      return null;
+    };
+    const Provider = ({ instance }: { instance: number }) => {
+      const resetFor = useRef(0);
+      if (resetFor.current !== instance) {
+        resetFor.current = instance;
+        store.resetAppVersionSupport();
+      }
+      return createElement(Subscriber);
+    };
+    const view = render(createElement(Provider, { instance: 0 }));
+    act(() => fetchEnvironment(store, environment({ ios: [iosPolicy('1.0')] })));
+
+    await act(async () => {
+      view.rerender(createElement(Provider, { instance: 1 }));
+      await Promise.resolve();
+    });
+
+    expect(consoleError.mock.calls.some(([message]) => String(message).includes('Cannot update a component'))).toBe(
+      false,
+    );
+    expect(store.getAppVersionSupportStatus().minimumVersion).toBeNull();
+    expect(seen.at(-1)).toBeNull();
   });
 
   test('notifies subscribers only when the status changes', async () => {
