@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -35,7 +35,20 @@ describe('Mosaic ActionMenu', () => {
     await user.click(await screen.findByRole('menuitem', { name: 'Rename' }));
 
     expect(onClick).toHaveBeenCalledOnce();
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   });
+  it('closes a progress action that settles before pending renders', async () => {
+    const onClick = vi.fn();
+    const user = userEvent.setup();
+    renderMenu([{ label: 'Make default', progress: 'idle', onClick }]);
+
+    await user.click(screen.getByRole('button', { name: 'Manage passkey' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Make default' }));
+
+    expect(onClick).toHaveBeenCalledOnce();
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+  });
+
   it('keeps an eligible action visible but inert until its handler exists', async () => {
     const onClick = vi.fn();
     const user = userEvent.setup();
