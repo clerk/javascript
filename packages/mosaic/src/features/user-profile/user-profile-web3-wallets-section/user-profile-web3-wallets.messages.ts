@@ -2,6 +2,8 @@ export const userProfileWeb3WalletsMessages = {
   title: 'Web3 wallets',
   connect: 'Connect',
   connectLabel: 'Connect {provider}',
+  verify: 'Verify',
+  verifying: 'Verifying',
   manageLabel: 'Manage {wallet}',
   remove: 'Remove wallet',
   setPrimary: 'Set as primary',

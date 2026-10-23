@@ -16,9 +16,10 @@ export interface ActionMenuProps {
   actions: ActionMenuAction[];
   triggerRef?: Ref<HTMLButtonElement>;
   disabled?: boolean;
+  focusableWhenDisabled?: boolean;
 }
 
-export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuProps) {
+export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhenDisabled }: ActionMenuProps) {
   if (actions.length === 0) {
     return null;
   }
@@ -29,6 +30,7 @@ export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuP
         ref={triggerRef}
         aria-label={label}
         disabled={disabled}
+        focusableWhenDisabled={focusableWhenDisabled}
       />
       <Menu.Popup>
         {actions.map(action => (
