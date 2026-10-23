@@ -35,6 +35,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
 | An async action from a button or row: pending, an error, one lock        | `usePendingAction` (`src/hooks/`)                                                                             |
 | A form: values, validation, submit, field errors                         | `useForm` (`src/components/form/`), with `validateAsync` for a server-side check                              |
+| A `<form>` element, without the browser's validation popup               | `Form` (`src/primitives/form/`)                                                                               |
 | A model save whose Clerk errors should land on form fields               | `save` in the model (`src/utils/errors.ts`), or reject with `FormSubmitError`                                 |
 | A confirm step before an action                                          | `useConfirmController` (`src/blocks/confirm/`) with `Confirmation` (`src/blocks/confirmation/`)               |
 | A delete that needs the user to type a phrase                            | `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)                 |
@@ -53,6 +54,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`use-user-sessions-query.ts`)                          |
 | An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                              |
 | Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                |
+| An input that reformats as the user types without moving the caret       | `useFormattedInput` (`src/primitives/hooks/`)                                                                 |
 | An interaction with an async lifecycle or two values that move together  | A machine in the controller file, via `setup()` (`src/machine/`)                                              |
 | Styles several components share                                          | `src/styles/*.styles.ts`                                                                                      |
 

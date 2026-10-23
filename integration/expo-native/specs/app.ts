@@ -1,5 +1,5 @@
-import type { TestApp } from './support/inputs.ts';
-import type { AppEntry, Platform } from './support/types.ts';
+import type { TestApp } from '@clerk/internal-mobile-e2e/specs/support/inputs';
+import type { AppEntry, Platform } from '@clerk/internal-mobile-e2e/specs/support/types';
 
 export const APP_ID = 'com.clerk.exponativebuildfixture';
 

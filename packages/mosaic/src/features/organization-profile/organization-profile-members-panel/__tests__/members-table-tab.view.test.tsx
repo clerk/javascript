@@ -154,6 +154,12 @@ describe('MembersTableTabView', () => {
     expect(screen.queryByRole('combobox', { name: /^Results per page/ })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Joined' })).toBeNull();
   });
+  it('locks paging while a page loads', () => {
+    renderView({ totalCount: 25, page: 2, isFetching: true });
+    expect(screen.getByRole('button', { name: 'Previous members page' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next members page' })).toBeDisabled();
+  });
+
   it('does not retain hidden selection for protected members within a Shift-click range', async () => {
     const user = userEvent.setup();
     const member = propsFor().members[1];

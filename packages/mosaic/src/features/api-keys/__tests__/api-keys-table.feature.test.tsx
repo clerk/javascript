@@ -359,6 +359,8 @@ describe('APIKeysTable', () => {
       await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
       await waitFor(() => expect(table()).toHaveAttribute('aria-busy', 'true'));
       expect(within(table()).getByText('Key 1')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Previous API keys page' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeDisabled();
       next.release();
       expect(await within(await loadedTable()).findByText('Key 11')).toBeVisible();
       expect(within(table()).queryByText('Key 1')).toBeNull();

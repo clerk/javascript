@@ -140,7 +140,7 @@ describe('the user profile phone section', () => {
 
     await addPhone(actor, '8015550100');
 
-    expect(await screen.findByRole('button', { name: /Didn’t receive a code\? Resend \(\d+\)/ })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
   });
 
   it('verifies a number that was left unverified', async () => {

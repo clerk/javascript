@@ -2,7 +2,6 @@ import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 
 import { ActionMenu } from '../../../components/action-menu';
-import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Entity } from '../../../components/entity';
 import { Icon } from '../../../components/icon';
@@ -108,19 +107,6 @@ export function InvitationsTableTabSkeleton({
               ) : null}
               <Table.Cell>
                 <Entity.Root>
-                  <Skeleton
-                    show
-                    shape='pill'
-                  >
-                    <Entity.Media>
-                      <Avatar.Root
-                        size='fit'
-                        aria-hidden
-                      >
-                        <Avatar.Fallback />
-                      </Avatar.Root>
-                    </Entity.Media>
-                  </Skeleton>
                   <Entity.Content>
                     <Entity.Label>
                       <Skeleton show>{invitation.email}</Skeleton>

@@ -101,6 +101,12 @@ describe('InvitationsTableTabView', () => {
     expect(screen.getAllByRole('button', { name: 'Try again' })).toHaveLength(1);
   });
 
+  it('locks paging while a page loads', () => {
+    renderView({ totalCount: 25, page: 2, isFetching: true });
+    expect(screen.getByRole('button', { name: 'Previous invitations page' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next invitations page' })).toBeDisabled();
+  });
+
   it('forwards paging without search, sorting, or page-size controls', async () => {
     const user = userEvent.setup();
     const { props } = renderView({ totalCount: 21, onBulkAction: vi.fn() });

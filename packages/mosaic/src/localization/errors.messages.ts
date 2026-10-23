@@ -94,6 +94,7 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
   web3_provider_unavailable: 'This wallet provider is unavailable.',
   web3_wallet_creation_failed: 'The wallet could not be created.',
+  web3_wallet_account_mismatch: 'Select the wallet account that matches this address.',
   web3_verification_message_unavailable: 'The wallet verification message is unavailable.',
   web3_signature_unavailable: 'The wallet signature is unavailable.',
   web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',

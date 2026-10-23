@@ -10,18 +10,24 @@ export interface UserProfileWeb3Provider {
   walletPicker?: 'solana';
   provider: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   connectError?: string;
 }
 
 export interface UserProfileWeb3Wallet {
   id: string;
   address: string;
+  providerId?: Web3Strategy;
+  walletPicker?: 'solana';
+  canVerify?: boolean;
   provider?: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   isPrimary?: boolean;
   isVerified: boolean;
   canRemove?: boolean;
   primaryError?: string;
+  verifyError?: string;
 }
 
 export interface UserProfileWeb3WalletsSectionViewProps {
@@ -29,7 +35,9 @@ export interface UserProfileWeb3WalletsSectionViewProps {
   sectionRef?: Ref<HTMLDivElement>;
   availableProviders?: UserProfileWeb3Provider[];
   pendingId?: string;
+  error?: string;
   onConnect?: (id: string) => void;
+  onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   remove?: ConfirmController<UserProfileWeb3Wallet>;
@@ -48,7 +56,12 @@ export type UserProfileWeb3WalletsModel =
       userId: string;
       wallets: UserProfileWeb3Wallet[];
       availableProviders: UserProfileWeb3Provider[];
-      connect: (strategy: Web3Strategy, walletName?: string) => Promise<void>;
+      connect: (
+        strategy: Web3Strategy,
+        walletName?: string,
+        onTarget?: (target: Web3ConnectionTarget) => void,
+      ) => Promise<void>;
+      verify: (walletId: string, walletName?: string) => Promise<void>;
       setPrimary: (walletId: string) => Promise<void>;
       remove?: (walletId: string) => Promise<void>;
       removeReverification: ReverificationController;
@@ -57,3 +70,5 @@ export type UserProfileWeb3WalletsModel =
     };
 
 export type ReadyWeb3WalletsModel = Extract<UserProfileWeb3WalletsModel, { status: 'ready' }>;
+
+export type Web3ConnectionTarget = { kind: 'address'; address: string } | { kind: 'wallet'; id: string };

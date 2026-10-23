@@ -84,6 +84,12 @@ describe('RequestsTableTabView', () => {
     },
   );
 
+  it('locks paging while a page loads', () => {
+    renderView({ totalCount: 25, page: 2, isFetching: true });
+    expect(screen.getByRole('button', { name: 'Previous requests page' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next requests page' })).toBeDisabled();
+  });
+
   it('does not report requests as loaded when they fail to load', () => {
     renderView({ isError: true, onRetry: vi.fn() });
     expect(screen.getByRole('alert')).toHaveTextContent('Unable to load requests');

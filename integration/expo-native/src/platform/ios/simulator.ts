@@ -1,4 +1,4 @@
-import type { CommandLine } from '../../core/exec.ts';
+import type { CommandLine } from '@clerk/internal-mobile-e2e/core/exec';
 
 const LOG_PREDICATE = 'subsystem == "com.clerk.verify" OR subsystem == "com.clerk.sdk"';
 

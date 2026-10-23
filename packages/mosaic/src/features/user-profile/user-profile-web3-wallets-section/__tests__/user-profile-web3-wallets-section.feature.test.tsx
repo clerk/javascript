@@ -25,34 +25,15 @@ import { Dialog } from '../../../../components/dialog';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfileSolanaWalletView } from '../user-profile-solana-wallet.view';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section';
+import { registerWallets, signedInWallets, web3Environment } from './user-profile-web3-wallets.fixtures';
 
 describe('Web3 wallets', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  function web3Environment() {
-    const base = fapiEnvironment();
-    return fapiEnvironment({
-      user_settings: {
-        attributes: {
-          ...base.user_settings.attributes,
-          web3_wallet: {
-            ...base.user_settings.attributes.web3_wallet,
-            enabled: true,
-            used_for_first_factor: true,
-            first_factors: ['web3_metamask_signature', 'web3_solana_signature'],
-          },
-        },
-      },
-    });
-  }
+  const walletFactors = ['web3_metamask_signature', 'web3_solana_signature'] as const;
 
   async function renderWeb3(overrides: Partial<UserJSON> = {}, seed: FakeFapiSeed = {}) {
-    const user = fapiUser({ id: 'user_1', ...overrides });
-    const fapi = serveFapi({
-      environment: web3Environment(),
-      client: fapiClient([fapiSession({ id: 'sess_1', user })]),
-      ...seed,
-    });
+    const fapi = serveFapi(signedInWallets(walletFactors, overrides, seed));
     await renderWithClerk(<UserProfileWeb3WalletsSection />);
     return fapi;
   }
@@ -90,8 +71,9 @@ describe('Web3 wallets', () => {
     },
   );
 
-  it('keeps an unverified wallet available to connect without offering to make it primary', async () => {
-    await renderWeb3({
+  it('shows Verify in the saved wallet menu after a fresh mount', async () => {
+    const user = fapiUser({
+      id: 'user_1',
       web3_wallets: [
         fapiWeb3Wallet({
           id: 'wallet_1',
@@ -100,9 +82,20 @@ describe('Web3 wallets', () => {
         }),
       ],
     });
+    serveFapi({
+      environment: web3Environment(walletFactors),
+      client: fapiClient([fapiSession({ id: 'sess_1', user })]),
+    });
+    const view = await renderWithClerk(<UserProfileWeb3WalletsSection />);
     expect(screen.getByText('Unverified')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Verify MetaMask' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).toBeNull();
+    view.rerender(null);
+    view.rerender(<UserProfileWeb3WalletsSection />);
+    expect(screen.queryByRole('button', { name: 'Verify MetaMask' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).toBeNull();
     await openMenu(userEvent.setup(), screen.getByRole('button', { name: 'Manage MetaMask' }));
+    expect(screen.getByRole('menuitem', { name: 'Verify' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Remove wallet' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).toBeNull();
   });
@@ -144,7 +137,7 @@ describe('Web3 wallets', () => {
     );
   });
 
-  it('reuses the created Ethereum wallet when Connect is retried after signature rejection', async () => {
+  it('verifies the saved Ethereum wallet after signature rejection without creating another', async () => {
     const address = '0xabcdef1234567890';
     let accountRequests = 0;
     let signatureRequests = 0;
@@ -175,7 +168,8 @@ describe('Web3 wallets', () => {
     expect(pendingId).toBeDefined();
     expect(fapi.client.sessions[0]?.user.web3_wallets).toHaveLength(1);
 
-    await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Verify' }));
 
     await waitFor(() => expect(fapi.client.sessions[0]?.user.web3_wallets[0]?.verification?.status).toBe('verified'));
     expect(creation.requests).toHaveLength(1);
@@ -184,7 +178,7 @@ describe('Web3 wallets', () => {
   });
 
   it('hides immutable wallet mutations but still permits setting a verified wallet as primary', async () => {
-    const environment = web3Environment();
+    const environment = web3Environment(walletFactors);
     serveFapi({
       environment: fapiEnvironment({
         user_settings: {
@@ -217,7 +211,7 @@ describe('Web3 wallets', () => {
   });
 
   it('hides an immutable Web3 section without saved wallets', async () => {
-    const environment = web3Environment();
+    const environment = web3Environment(walletFactors);
     serveFapi({
       environment: fapiEnvironment({
         user_settings: {
@@ -237,7 +231,7 @@ describe('Web3 wallets', () => {
   it('shows a localized fallback when the wallet provider rejects without a message', async () => {
     vi.stubGlobal('ethereum', { request: vi.fn(() => Promise.reject(new Error(''))) });
     serveFapi({
-      environment: web3Environment(),
+      environment: web3Environment(walletFactors),
       client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
     });
     await renderWithClerk(
@@ -257,7 +251,7 @@ describe('Web3 wallets', () => {
     const request = vi.fn(() => Promise.resolve([]));
     vi.stubGlobal('ethereum', { request });
     serveFapi({
-      environment: web3Environment(),
+      environment: web3Environment(walletFactors),
       client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
     });
     const section = <UserProfileWeb3WalletsSection />;
@@ -288,7 +282,7 @@ describe('Web3 wallets', () => {
   it('uses the canonical API-code translation for a wallet connection failure', async () => {
     vi.stubGlobal('ethereum', { request: vi.fn(() => Promise.resolve(['0x1234567890abcdef'])) });
     serveFapi({
-      environment: web3Environment(),
+      environment: web3Environment(walletFactors),
       client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
     });
     await renderWithClerk(
@@ -314,7 +308,7 @@ describe('Web3 wallets', () => {
       const request = vi.fn(() => accountRequest.promise);
       vi.stubGlobal('ethereum', { request });
       serveFapi({
-        environment: web3Environment(),
+        environment: web3Environment(walletFactors),
         client: fapiClient([
           fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) }),
           fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2' }) }),
@@ -350,7 +344,7 @@ describe('Web3 wallets', () => {
   it('rechecks creation policy after the wallet provider prompt', async () => {
     const accountRequest = Promise.withResolvers<string[]>();
     vi.stubGlobal('ethereum', { request: vi.fn(() => accountRequest.promise) });
-    const environment = web3Environment();
+    const environment = web3Environment(walletFactors);
     const fapi = serveFapi({
       environment: fapiEnvironment({
         user_settings: {
@@ -387,7 +381,7 @@ describe('Web3 wallets', () => {
   it('clears the previous user’s provider error and open wallet picker on session change', async () => {
     vi.stubGlobal('ethereum', { request: vi.fn(() => Promise.reject(new Error('First user wallet failure'))) });
     serveFapi({
-      environment: web3Environment(),
+      environment: web3Environment(walletFactors),
       client: fapiClient([
         fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) }),
         fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2' }) }),
@@ -934,15 +928,7 @@ describe('Web3 wallets', () => {
         'solana:signMessage': { version: '1.0.0' as const, signMessage: secondSignMessage },
       },
     };
-    const unregister: Array<() => void> = [];
-    const register = (api: WindowAppReadyEventAPI) => unregister.push(api.register(wallet), api.register(secondWallet));
-    const onAppReady = (event: Event & { detail?: WindowAppReadyEventAPI }) => {
-      if (event.detail) {
-        register(event.detail);
-      }
-    };
-    window.addEventListener('wallet-standard:app-ready', onAppReady);
-    window.dispatchEvent(new CustomEvent('wallet-standard:register-wallet', { detail: register }));
+    const unregister = registerWallets(wallet, secondWallet);
     try {
       const fapi = await renderWeb3();
       const user = userEvent.setup();
@@ -983,8 +969,7 @@ describe('Web3 wallets', () => {
       expect(secondSignMessage).toHaveBeenCalledOnce();
       expect(await screen.findByRole('button', { name: 'Manage Solana' })).toBeInTheDocument();
     } finally {
-      window.removeEventListener('wallet-standard:app-ready', onAppReady);
-      unregister.forEach(remove => remove());
+      unregister();
     }
   });
 
@@ -1006,15 +991,7 @@ describe('Web3 wallets', () => {
           },
         },
       };
-      const unregister: Array<() => void> = [];
-      const register = (api: WindowAppReadyEventAPI) => unregister.push(api.register(wallet));
-      const onAppReady = (event: Event & { detail?: WindowAppReadyEventAPI }) => {
-        if (event.detail) {
-          register(event.detail);
-        }
-      };
-      window.addEventListener('wallet-standard:app-ready', onAppReady);
-      window.dispatchEvent(new CustomEvent('wallet-standard:register-wallet', { detail: register }));
+      const unregister = registerWallets(wallet);
       try {
         await renderWeb3();
         const user = userEvent.setup();
@@ -1045,8 +1022,7 @@ describe('Web3 wallets', () => {
         );
         expect(connect).toHaveBeenCalledTimes(2);
       } finally {
-        window.removeEventListener('wallet-standard:app-ready', onAppReady);
-        unregister.forEach(remove => remove());
+        unregister();
       }
     },
   );

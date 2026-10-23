@@ -3,7 +3,6 @@ import type { Ref } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { ActionMenu } from '../../../components/action-menu';
-import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { EmptyState } from '../../../components/empty-state';
 import { Entity } from '../../../components/entity';
@@ -51,6 +50,7 @@ export function InvitationsTableTabView({
     onPageChange,
     searchValue: '',
     onSearchChange: () => {},
+    isFetching,
   });
   const columnCount = 3 + Number(Boolean(revoke)) + Number(Boolean(onBulkAction));
   return (
@@ -212,20 +212,6 @@ function InvitationsTableBody({
           ) : null}
           <Table.Cell>
             <Entity.Root>
-              <Entity.Media>
-                <Avatar.Root
-                  size='fit'
-                  aria-hidden
-                >
-                  {row.original.imageUrl ? (
-                    <Avatar.Image
-                      src={row.original.imageUrl}
-                      alt=''
-                    />
-                  ) : null}
-                  <Avatar.Fallback />
-                </Avatar.Root>
-              </Entity.Media>
               <Entity.Content>
                 <Entity.Label>{row.original.email}</Entity.Label>
               </Entity.Content>

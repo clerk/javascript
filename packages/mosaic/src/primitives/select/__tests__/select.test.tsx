@@ -92,6 +92,12 @@ describe('Select', () => {
       expect(value?.textContent).toBe('Pick a fruit...');
     });
 
+    it('shows placeholder when the controlled value is an empty string', () => {
+      renderSelect({ value: '' });
+      const value = document.querySelector('[data-testid="select-value"]');
+      expect(value?.textContent).toBe('Pick a fruit...');
+    });
+
     it('shows placeholder over a function child when no value is selected', () => {
       render(
         <Select.Root
@@ -763,15 +769,27 @@ describe('Select', () => {
   describe('alignItemWithTrigger', () => {
     it('marks the positioner with data-side="none" and blocks page scrolling while open', async () => {
       const user = userEvent.setup();
-      renderSelect({ alignItemWithTrigger: true });
+      renderSelect({ alignItemWithTrigger: true, defaultValue: 'banana' });
+      const trigger = screen.getByRole('combobox');
+      trigger.getBoundingClientRect = () => new DOMRect(0, 300, 120, 32);
 
-      await user.click(screen.getByRole('combobox'));
+      await user.click(trigger);
 
       expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'none');
       expect(document.body).toHaveStyle({ overflowY: 'hidden' });
 
       await user.keyboard('{Escape}');
       await waitFor(() => expect(screen.queryByTestId('select-positioner')).not.toBeInTheDocument());
+      expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
+    });
+
+    it('positions like a menu when nothing is selected', async () => {
+      const user = userEvent.setup();
+      renderSelect({ alignItemWithTrigger: true, value: '' });
+
+      await user.click(screen.getByRole('combobox'));
+
+      await waitFor(() => expect(screen.getByTestId('select-positioner')).toHaveAttribute('data-side', 'bottom'));
       expect(document.body).not.toHaveStyle({ overflowY: 'hidden' });
     });
 

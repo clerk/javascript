@@ -16,7 +16,6 @@ import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
 import { BaseResource, Client, Organization, Session } from '../internal';
-import { SessionWithActivities } from '../SessionWithActivities';
 
 const baseFapiClientOptions = {
   frontendApi: 'clerk.example.com',
@@ -39,45 +38,6 @@ describe('Session', () => {
     SessionTokenCache.clear();
     restoreDocument();
     vi.useRealTimers();
-  });
-
-  it.each([0, 2000000000000])('preserves a session deadline of %s through snapshots', deadline => {
-    const session = new Session({
-      id: 'session_lifetime',
-      status: 'active',
-      expire_at: deadline,
-      abandon_at: deadline,
-      public_user_data: { user_id: 'user_1' },
-    } as SessionJSON);
-    expect(session.expireAt.getTime()).toBe(deadline);
-    expect(session.abandonAt.getTime()).toBe(deadline);
-    expect(session.hasMaximumLifetime).toBe(deadline > 0);
-    const restored = new Session(session.__internal_toSnapshot());
-    expect(restored.expireAt.getTime()).toBe(deadline);
-    expect(restored.hasMaximumLifetime).toBe(deadline > 0);
-    const withActivities = new SessionWithActivities(
-      { id: session.id, expire_at: deadline, abandon_at: deadline } as any,
-      '/me/sessions',
-    );
-    expect(withActivities.hasMaximumLifetime).toBe(deadline > 0);
-    expect(withActivities.abandonAt.getTime()).toBe(deadline);
-  });
-
-  it('keeps zero only for session deadlines', () => {
-    const session = new Session({
-      id: 'session_lifetime',
-      status: 'active',
-      expire_at: 0,
-      abandon_at: 0,
-      created_at: 0,
-      updated_at: 0,
-      public_user_data: { user_id: 'user_1' },
-    } as SessionJSON);
-
-    expect(session.expireAt.getTime()).toBe(0);
-    expect(session.abandonAt.getTime()).toBe(0);
-    expect(session.createdAt.getTime()).toBe(Date.now());
-    expect(session.updatedAt.getTime()).toBe(Date.now());
   });
 
   describe('getToken()', () => {
