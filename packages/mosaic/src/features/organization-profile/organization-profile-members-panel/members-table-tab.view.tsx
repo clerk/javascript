@@ -64,6 +64,7 @@ export function MembersTableTabView({
     onPageChange,
     searchValue,
     onSearchChange,
+    isFetching,
   });
   const columnCount = 3 + Number(Boolean(remove)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();

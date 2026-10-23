@@ -9,6 +9,7 @@ import { Field } from '../../../components/field';
 import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 
 export interface OrganizationProfileEditSlugValue {
   slug: string;
@@ -59,7 +60,7 @@ export function OrganizationProfileEditSlugDialog({
           </Card.Banner>
           <Card.Content
             render={
-              <form
+              <Form
                 id={form.id}
                 onSubmit={form.handleSubmit}
               />

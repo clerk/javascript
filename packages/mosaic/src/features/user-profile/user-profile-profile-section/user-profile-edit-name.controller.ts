@@ -7,6 +7,8 @@ import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 export interface UserProfileEditNameControllerOptions {
   firstName?: string;
   lastName?: string;
+  firstNameRequired?: boolean;
+  lastNameRequired?: boolean;
   /** Resolve to close the dialog, or reject with a `SaveError` to keep it open showing why. */
   onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
 }
@@ -20,12 +22,17 @@ export interface UserProfileEditNameController {
 export function useUserProfileEditNameController({
   firstName = '',
   lastName = '',
+  firstNameRequired = false,
+  lastNameRequired = false,
   onSubmit,
 }: UserProfileEditNameControllerOptions): UserProfileEditNameController {
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm({
     initialValues: { firstName, lastName },
-    canSubmit: values => values.firstName !== firstName || values.lastName !== lastName,
+    canSubmit: values =>
+      (values.firstName !== firstName || values.lastName !== lastName) &&
+      (!firstNameRequired || values.firstName !== '') &&
+      (!lastNameRequired || values.lastName !== ''),
     onSubmit: async values => {
       await onSubmit(values);
       setIsOpen(false);
