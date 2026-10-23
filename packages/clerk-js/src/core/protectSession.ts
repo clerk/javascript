@@ -8,8 +8,8 @@ import { SafeLock } from './auth/safeLock';
  * The browser mints an opaque correlation id (`cid`) and hands it to the loader through the
  * element's attributes, which are per-instance server config. The server mints a signed session
  * token while serving that loader and returns it inline on the script's own global, so the gate
- * costs no extra round trip. We acquire it exactly once per browser session across all tabs and
- * attach it to sign-in and sign-up requests.
+ * costs no extra round trip. Translated tokens keep a per-page monotonic lifetime; other pages
+ * refresh them rather than trusting a clock reference they cannot verify.
  *
  * An instance that configures `tokenUrl` gets the upgrade mint instead: a `GET` for a token that
  * attests to work happening after the script runs. Only that path can report `fetch_error` or
@@ -105,13 +105,10 @@ export type ApplyLoader = (loader: ProtectLoader, placeholders: ProtectPlacehold
 
 type StoredToken = {
   token: string;
-  /** Expiry in seconds on this browser's clock. */
+  /** Local expiry for older readers; `lifetime` bounds translated tokens independently. */
   exp: number;
   rid: string;
-  /**
-   * Local milliseconds at the moment we stored it, bounding cache age independently of expiry
-   * and rejecting an entry stamped before the browser's clock moved backwards.
-   */
+  /** Local write time, bounding cache age for entries without a monotonic lifetime. */
   at: number;
   /**
    * The `tokens_invalid_before` in force when this was acquired. Raising the configured value
@@ -119,6 +116,7 @@ type StoredToken = {
    * in minutes rather than over the token's full lifetime.
    */
   floor: number;
+  lifetime?: TokenLifetime;
 };
 
 /**
@@ -128,9 +126,12 @@ type StoredToken = {
  */
 type MintedToken = Omit<StoredToken, 'at' | 'floor'>;
 
-type TokenClock = { localTimeMs: number; serverTimeMs: number };
+type TokenClock = { localTimeMs: number; serverTimeMs: number; monotonicTimeMs: number; timeOrigin: number };
+
+type TokenLifetime = { exp: number; expiresAt: number; timeOrigin: number };
 
 const tokenClocks = new WeakMap<object, TokenClock>();
+const tokenLifetimes = new Map<string, TokenLifetime>();
 
 type LoaderOutcome = 'loaded' | 'error' | 'timeout';
 
@@ -185,14 +186,15 @@ export function buildCid(pid: string, rid: string): string {
 }
 
 /**
- * `localStorage` with an in-memory fallback. A sandboxed iframe, blocked storage or a full quota
- * costs us cross-tab sharing, never a sign-in, so nothing in here throws.
+ * `localStorage` with an in-memory fallback. Translated tokens also retain a page-local copy so
+ * another page's clock reference cannot strand this page's valid token. Nothing in here throws.
  */
 const memoryStore = new Map<string, string>();
 
 /** Test-only: the fallback outlives any single session, so a suite has to be able to clear it. */
 export function __internal_resetProtectStorage(): void {
   memoryStore.clear();
+  tokenLifetimes.clear();
 }
 
 function localStorageOrNull(): Storage | null {
@@ -252,37 +254,34 @@ function readOrMintPid(): string | null {
  * `tokens_invalid_before`; an entry acquired under an older one is stranded.
  */
 function readStoredToken(key: string, marginMs: number, floor: number): StoredToken | null {
-  const raw = readStored(key);
-  if (!raw) {
-    return null;
-  }
+  for (const raw of new Set([readStored(key), memoryStore.get(key)])) {
+    if (!raw) {
+      continue;
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      continue;
+    }
+    if (!parsed || typeof parsed !== 'object') {
+      continue;
+    }
 
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return null;
+    const { token, exp, rid, at, lifetime, floor: storedFloor } = parsed as Record<string, unknown>;
+    if (typeof rid !== 'string' || !BASE32_128_REGEX.test(rid) || typeof at !== 'number' || !Number.isFinite(at)) {
+      continue;
+    }
+    floor = Math.max(floor, normalizeFloor(storedFloor));
+    if (normalizeFloor(storedFloor) < floor || (lifetime === undefined && !freshByLocalClock(at))) {
+      continue;
+    }
+    const validated = validateToken(token, exp, marginMs, undefined, lifetime);
+    if (validated) {
+      return { ...validated, rid, at, floor: normalizeFloor(storedFloor) };
+    }
   }
-
-  if (!parsed || typeof parsed !== 'object') {
-    return null;
-  }
-
-  const { token, exp, rid, at, floor: storedFloor } = parsed as Record<string, unknown>;
-  if (typeof rid !== 'string' || !BASE32_128_REGEX.test(rid)) {
-    return null;
-  }
-  if (!freshByLocalClock(at)) {
-    return null;
-  }
-  // An entry with no floor predates the mechanism and counts as zero, so an instance that has
-  // never set one keeps its cached tokens rather than re-acquiring on every browser at once.
-  if (normalizeFloor(storedFloor) < floor) {
-    return null;
-  }
-
-  const validated = validateToken(token, exp, marginMs);
-  return validated ? { ...validated, rid, at: at as number, floor: normalizeFloor(storedFloor) } : null;
+  return null;
 }
 
 /** A floor is unix seconds; anything else configured or stored is treated as no floor at all. */
@@ -291,9 +290,8 @@ function normalizeFloor(value: unknown): number {
 }
 
 /**
- * Elapsed cache age and a translated expiry use the same browser clock, so a constant offset
- * cancels. An entry older than any token we would ever be issued is stale whatever `exp` claims,
- * and one stamped in the future means the clock moved backwards under us.
+ * Legacy entries use wall-clock age as an additional bound, rejecting future writes and entries
+ * older than the maximum token lifetime. Translated entries use their monotonic lifetime instead.
  */
 function freshByLocalClock(at: unknown): boolean {
   if (typeof at !== 'number' || !Number.isFinite(at)) {
@@ -317,7 +315,8 @@ function validateToken(
   exp: unknown,
   marginMs: number,
   clock?: TokenClock,
-): { token: string; exp: number } | null {
+  storedLifetime?: unknown,
+): { token: string; exp: number; lifetime?: TokenLifetime } | null {
   if (typeof token !== 'string' || token.length > MAX_TOKEN_LENGTH || !TOKEN_SHAPE.test(token)) {
     return null;
   }
@@ -326,12 +325,48 @@ function validateToken(
   }
   const now = Date.now();
   let expMs = exp * 1_000;
+  let lifetime: unknown = storedLifetime === undefined ? tokenLifetimes.get(token) : storedLifetime;
   if (clock) {
     const lifetimeMs = expMs - clock.serverTimeMs;
-    if (lifetimeMs <= 0 || lifetimeMs > MAX_TOKEN_LIFETIME_MS || clock.localTimeMs > now) {
+    if (lifetimeMs <= 0 || lifetimeMs > MAX_TOKEN_LIFETIME_MS) {
       return null;
     }
     expMs = clock.localTimeMs + lifetimeMs;
+    lifetime = {
+      exp: expMs / 1_000,
+      expiresAt: clock.monotonicTimeMs + lifetimeMs,
+      timeOrigin: clock.timeOrigin,
+    };
+  }
+  if (lifetime !== undefined) {
+    if (!lifetime || typeof lifetime !== 'object') {
+      return null;
+    }
+    const { exp: translatedExp, expiresAt, timeOrigin } = lifetime as Record<string, unknown>;
+    if (translatedExp !== expMs / 1_000) {
+      if (storedLifetime !== undefined) {
+        return null;
+      }
+      lifetime = undefined;
+    } else {
+      if (
+        typeof performance === 'undefined' ||
+        typeof expiresAt !== 'number' ||
+        !Number.isFinite(expiresAt) ||
+        typeof timeOrigin !== 'number' ||
+        !Number.isFinite(timeOrigin) ||
+        timeOrigin !== performance.timeOrigin
+      ) {
+        return null;
+      }
+      const remaining = Math.min(expiresAt - performance.now(), expMs - now);
+      if (!Number.isFinite(remaining) || remaining <= marginMs || remaining > MAX_TOKEN_LIFETIME_MS) {
+        return null;
+      }
+      const validatedLifetime = lifetime as TokenLifetime;
+      tokenLifetimes.set(token, validatedLifetime);
+      return { token, exp: expMs / 1_000, lifetime: validatedLifetime };
+    }
   }
   if (expMs - marginMs <= now || expMs > now + MAX_TOKEN_LIFETIME_MS) {
     return null;
@@ -341,7 +376,23 @@ function validateToken(
 
 /** `at` and `floor` are the writer's business, not the caller's — both stamped here, at the write. */
 function writeStoredToken(key: string, value: MintedToken, floor: number): void {
-  writeStored(key, JSON.stringify({ ...value, at: Date.now(), floor }));
+  const validated = validateToken(value.token, value.exp, 0, undefined, value.lifetime);
+  if (!validated) {
+    return;
+  }
+  const raw = JSON.stringify({ ...value, ...validated, at: Date.now(), floor });
+  let existingFloor = 0;
+  try {
+    const existing = JSON.parse(readStored(key) ?? 'null') as StoredToken | null;
+    existingFloor = normalizeFloor(existing?.floor);
+  } catch {
+    existingFloor = 0;
+  }
+  if (existingFloor > floor) {
+    return;
+  }
+  writeStored(key, raw);
+  memoryStore.set(key, raw);
 }
 
 /** Sentinel for "the deadline won", distinguishable from anything `ready` could resolve to. */
@@ -405,7 +456,7 @@ async function readInlineToken(cid: string, rid: string, deadline: number): Prom
   return validated ? { ...validated, rid } : 'no_token';
 }
 
-function readTokenClock(cid: string, localTimeMs?: number): TokenClock | undefined {
+function readTokenClock(cid: string, localTimeMs?: number, monotonicTimeMs?: number): TokenClock | undefined {
   const inline = (globalThis as unknown as Record<string, unknown>)[INLINE_TOKEN_GLOBAL];
   if (!inline || typeof inline !== 'object') {
     return undefined;
@@ -415,17 +466,24 @@ function readTokenClock(cid: string, localTimeMs?: number): TokenClock | undefin
     return undefined;
   }
   const existing = tokenClocks.get(inline);
-  if (existing || localTimeMs === undefined) {
+  if (existing || localTimeMs === undefined || monotonicTimeMs === undefined) {
     return existing;
   }
   if (!p || typeof p !== 'object') {
     return undefined;
   }
   const { t } = p as Record<string, unknown>;
-  if (typeof t !== 'number' || !Number.isFinite(t) || t <= 0) {
+  if (
+    typeof t !== 'number' ||
+    !Number.isFinite(t) ||
+    t <= 0 ||
+    !Number.isFinite(monotonicTimeMs) ||
+    typeof performance === 'undefined' ||
+    !Number.isFinite(performance.timeOrigin)
+  ) {
     return undefined;
   }
-  const clock = { localTimeMs, serverTimeMs: t };
+  const clock = { localTimeMs, serverTimeMs: t, monotonicTimeMs, timeOrigin: performance.timeOrigin };
   tokenClocks.set(inline, clock);
   return clock;
 }
@@ -758,6 +816,7 @@ export class ProtectSession {
     }
 
     const startedAt = Date.now();
+    const monotonicStartedAt = typeof performance === 'undefined' ? undefined : performance.now();
     let element: HTMLElement | undefined;
     try {
       element = this.#applyLoader(loader, this.#placeholders);
@@ -774,11 +833,13 @@ export class ProtectSession {
     // we ever looked. An inline module is the exception: it evaluates off a fetched graph, so its
     // `load` does arrive and settling early would read the global before it is written.
     if (!isFetching(element)) {
-      readTokenClock(this.#cid as string, startedAt);
+      readTokenClock(this.#cid as string, startedAt, monotonicStartedAt);
       return Promise.resolve('loaded');
     }
 
-    element.addEventListener('load', () => readTokenClock(this.#cid as string, startedAt), { once: true });
+    element.addEventListener('load', () => readTokenClock(this.#cid as string, startedAt, monotonicStartedAt), {
+      once: true,
+    });
 
     return new Promise<LoaderOutcome>(resolve => {
       const timer = setTimeout(() => resolve('timeout'), Math.max(0, deadline - Date.now()));
