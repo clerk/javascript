@@ -28,9 +28,9 @@ jobs:
       matrix:
         include:
           - platform: ios
-            runner: ${{ vars.VERIFY_CI_RUNNER_IOS || 'blacksmith-6vcpu-macos-26' }}
+            runner: ${{ vars.VERIFY_CI_RUNNER_IOS || 'macos-26' }}
           - platform: android
-            runner: ${{ vars.VERIFY_CI_RUNNER_ANDROID || 'blacksmith-8vcpu-ubuntu-2204' }}
+            runner: ${{ vars.VERIFY_CI_RUNNER_ANDROID || 'ubuntu-24.04' }}
     env:
       PACKAGE: integration/expo-native
       CLI: integration/expo-native/bin/control-clerk-expo
