@@ -36,7 +36,7 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'flex',
     flexShrink: 0,
-    fontSize: space['3'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
     justifyContent: 'center',
     height: space['4'],
     width: space['4'],
