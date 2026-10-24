@@ -139,6 +139,7 @@
     "@types/base-64": "^1.0.2",
     "esbuild": "^0.28.1",
     "expo-apple-authentication": "^8.0.8",
+    "expo-application": "^7.0.8",
     "expo-auth-session": "^7.0.11",
     "expo-constants": "^18.0.13",
     "expo-crypto": "^15.0.9",
@@ -154,6 +155,7 @@
     "@clerk/expo-passkeys": ">=0.0.6",
     "expo": "catalog:peer-expo",
     "expo-apple-authentication": ">=7.0.0",
+    "expo-application": ">=5.0.0",
     "expo-auth-session": ">=5",
     "expo-constants": ">=12",
     "expo-crypto": ">=12",
@@ -178,6 +180,9 @@
       "optional": true
     },
     "expo-apple-authentication": {
+      "optional": true
+    },
+    "expo-application": {
       "optional": true
     },
     "expo-auth-session": {

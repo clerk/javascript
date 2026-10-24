@@ -39,6 +39,17 @@ vi.mock('react-native', () => {
   };
 });
 
+vi.mock('../../../app-version/appVersionRequestHooks', () => ({
+  createAppVersionRequestHooks: () => ({
+    refreshOnForegroundWhileUnsupported: () => {},
+    beforeRequest: ({ headers }: { headers: Headers }) => {
+      headers.set('x-bundle-id', 'com.example.app');
+      headers.set('x-app-version', '4.8.4');
+    },
+    afterResponse: () => {},
+  }),
+}));
+
 class MockClerk {
   public publishableKey: string;
   public proxyUrl: unknown;
@@ -384,6 +395,32 @@ describe('createClerkInstance', () => {
     });
 
     await expect(tokenCache.getToken(CLERK_CLIENT_JWT_KEY)).resolves.toBe('fresh-token');
+  });
+
+  test('creates a new Clerk instance after the current one is discarded', async () => {
+    const mod = await import('../createClerkInstance');
+    const getClerkInstance = mod.createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const first = getClerkInstance({ publishableKey: 'pk_test_123' });
+
+    mod.discardClerkInstance();
+    const second = getClerkInstance({ publishableKey: 'pk_test_123' });
+
+    expect(second).not.toBe(first);
+    expect(getClerkInstance({ publishableKey: 'pk_test_123' })).toBe(second);
+  });
+
+  test('identifies the app without changing the API version', async () => {
+    const { beforeRequest, requestInit } = await setUpBeforeRequest({
+      getToken: vi.fn().mockResolvedValue(null),
+      saveToken: vi.fn(),
+    });
+    requestInit.url.searchParams.set('__clerk_api_version', '2026-08-20');
+
+    await beforeRequest(requestInit);
+
+    expect(requestInit.url.searchParams.getAll('__clerk_api_version')).toEqual(['2026-08-20']);
+    expect(requestInit.headers.get('x-bundle-id')).toBe('com.example.app');
+    expect(requestInit.headers.get('x-app-version')).toBe('4.8.4');
   });
 
   test('waits until the app is active and retries when the token cache read fails in the background', async () => {

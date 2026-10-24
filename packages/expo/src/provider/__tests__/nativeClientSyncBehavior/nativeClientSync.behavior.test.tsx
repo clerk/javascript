@@ -11,6 +11,18 @@ vi.mock('react-native', () => ({
   Platform: { OS: 'ios', constants: { reactNativeVersion: { major: 0, minor: 81, patch: 0 } } },
 }));
 
+vi.mock('../../../app-version/appVersionRequestHooks', () => ({
+  createAppVersionRequestHooks: () => ({
+    refreshOnForegroundWhileUnsupported: () => {},
+    beforeRequest: () => {},
+    afterResponse: () => {},
+  }),
+}));
+
+vi.mock('../../../update-required/UpdateRequiredModal', () => ({
+  UpdateRequiredModal: () => null,
+}));
+
 vi.mock('expo-secure-store', () => ({
   AFTER_FIRST_UNLOCK: 0,
   deleteItemAsync: vi.fn(),
@@ -19,6 +31,7 @@ vi.mock('expo-secure-store', () => ({
 }));
 
 vi.mock('../../../utils/runtime', () => ({
+  isExpoGo: () => false,
   isNative: () => true,
   isWeb: () => false,
 }));
@@ -30,7 +43,7 @@ vi.mock('@clerk/react/internal', async () => {
 
 vi.mock('../../singleton', async () => {
   const { getClerkInstanceForActiveEnvironment } = await import('./environment');
-  return { getClerkInstance: getClerkInstanceForActiveEnvironment };
+  return { discardClerkInstance: () => {}, getClerkInstance: getClerkInstanceForActiveEnvironment };
 });
 
 vi.mock('../../../specs/NativeClerkModule', async () => {

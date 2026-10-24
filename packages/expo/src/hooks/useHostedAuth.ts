@@ -8,6 +8,7 @@ import { getClerkInstance } from '../provider/singleton';
 import { errorThrower } from '../utils/errors';
 import type { HostedAuthClerkInstance, HostedAuthMode } from '../utils/hostedAuth';
 import { applyHostedAuthClientJSON, createHostedAuth, redeemHostedAuth } from '../utils/hostedAuth';
+import { isExpoGo } from '../utils/runtime';
 
 export type { HostedAuthMode };
 
@@ -243,20 +244,17 @@ function getExpoAppIdentifier(): string | undefined {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const constantsModule = require('expo-constants') as {
       default?: {
-        appOwnership?: string | null;
-        executionEnvironment?: string;
         expoConfig?: {
           ios?: { bundleIdentifier?: string };
           android?: { package?: string };
         };
       };
     };
-    const constants = constantsModule.default;
-    if (constants?.executionEnvironment === 'storeClient' || constants?.appOwnership === 'expo') {
+    if (isExpoGo()) {
       return undefined;
     }
 
-    const expoConfig = constants?.expoConfig;
+    const expoConfig = constantsModule.default?.expoConfig;
     return Platform.OS === 'ios' ? expoConfig?.ios?.bundleIdentifier : expoConfig?.android?.package;
   } catch {
     return undefined;
