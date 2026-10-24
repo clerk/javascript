@@ -14,6 +14,7 @@ import com.clerk.api.FrameworkIntegrationApi
 import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.session.Session
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
@@ -41,6 +42,17 @@ private fun debugLog(tag: String, message: String) {
         Log.d(tag, message)
     }
 }
+
+internal fun signedInSessionEnded(previous: Client?, current: Client?): Boolean {
+    if (current == null) return false
+    val remaining = current.signedInSessionIds()
+    return previous?.signedInSessionIds().orEmpty().any { it !in remaining }
+}
+
+private fun Client.signedInSessionIds(): Set<String> =
+    sessions
+        .filter { it.status == Session.SessionStatus.ACTIVE || it.status == Session.SessionStatus.PENDING }
+        .mapTo(mutableSetOf()) { it.id }
 
 class ClerkExpoModule : Module() {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -211,8 +223,13 @@ class ClerkExpoModule : Module() {
         }
 
         clientInvalidationObserverJob = coroutineScope.launch {
+            var previousClient: Client? = null
             Clerk.clientFlow.collect { client ->
                 clientInvalidationTracker.observe(clientFingerprint(client))
+                if (signedInSessionEnded(previousClient, client)) {
+                    launch { clearRestoreCredential() }
+                }
+                previousClient = client
             }
         }
     }
@@ -287,6 +304,12 @@ class ClerkExpoModule : Module() {
             } catch (e: Exception) {
                 promise.reject("E_REFRESH_CLIENT_FAILED", e.message ?: "Client refresh failed", e)
             }
+        }
+    }
+
+    private suspend fun clearRestoreCredential() {
+        if (Clerk.restoreCredentials.clear() is ClerkResult.Failure) {
+            debugLog(TAG, "Restore credential cleanup after a session ended did not complete")
         }
     }
 

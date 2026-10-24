@@ -8,6 +8,7 @@ interface NativeProps extends ViewProps {
   mode?: string;
   isDismissible?: boolean;
   logoMaxHeight?: number;
+  enableRestoreCredentials?: boolean;
   hostBackButton?: boolean;
   onAuthEvent?: (event: NativeSyntheticEvent<AuthEvent>) => void;
   onHostBack?: (event: NativeSyntheticEvent<object>) => void;
