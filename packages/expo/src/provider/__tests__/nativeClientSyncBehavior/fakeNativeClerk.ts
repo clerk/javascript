@@ -119,6 +119,10 @@ export class FakeNativeClerk {
     await this.#observe(() => this.server.removeAllSessions('native', this.token));
   }
 
+  async refresh(): Promise<void> {
+    await this.#observe(() => this.server.getClient('native', this.token));
+  }
+
   async rotateDeviceToken(): Promise<void> {
     if (this.token) {
       this.server.rotateTokenOnNextResponse(this.token);

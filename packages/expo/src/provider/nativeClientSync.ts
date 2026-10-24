@@ -1,3 +1,4 @@
+import { isomorphicAtob } from '@clerk/shared/isomorphicAtob';
 import type { ClientResource, SignedInSessionResource } from '@clerk/shared/types';
 
 import { MemoryTokenCache } from '../cache/MemoryTokenCache';
@@ -104,6 +105,22 @@ function fingerprint(clerk: SyncableClerk): string {
   ]);
 }
 
+function clientIdOf(token: string | null): string | null {
+  const payload = token?.split('.')[1];
+  if (!payload) {
+    return null;
+  }
+  try {
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const { id } = JSON.parse(isomorphicAtob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='))) as {
+      id?: unknown;
+    };
+    return typeof id === 'string' ? id : null;
+  } catch {
+    return null;
+  }
+}
+
 async function readSeedDeviceToken(tokenCache: TokenCache): Promise<string | null> {
   try {
     return (await tokenCache.getToken(CLERK_CLIENT_JWT_KEY)) ?? null;
@@ -185,6 +202,15 @@ export function createNativeClientSync(
       return false;
     });
 
+  const reclaimRotatedToken = async (token: string, requestToken: string | null, current: string | null) => {
+    const clientId = clientIdOf(requestToken);
+    if (!clientId || clientIdOf(token) !== clientId) {
+      return false;
+    }
+    const currentClientId = clientIdOf(current);
+    return !!currentClientId && currentClientId !== clientId && setDeviceToken(token, current);
+  };
+
   const tokenCache: ClientTokenCache = {
     getToken: async key => {
       if (key !== CLERK_CLIENT_JWT_KEY || !(await ready())) {
@@ -206,8 +232,16 @@ export function createNativeClientSync(
       if (!(await ready())) {
         return fallback().saveToken(CLERK_CLIENT_JWT_KEY, token);
       }
-      const didSet = token === requestToken || (await setDeviceToken(token, requestToken));
-      mirror(didSet ? token : await native.getDeviceToken().catch(() => null));
+      if (token === requestToken || (await setDeviceToken(token, requestToken))) {
+        mirror(token);
+        return;
+      }
+      const current = await native.getDeviceToken().catch(() => null);
+      const didReclaim = await reclaimRotatedToken(token, requestToken, current);
+      mirror(didReclaim ? token : current);
+      if (didReclaim) {
+        void native.refreshClient().catch(error => warn('Failed to refresh the native client.', error));
+      }
     },
   };
 
@@ -218,7 +252,12 @@ export function createNativeClientSync(
     const pull = async () => {
       const client = clerk.client as FetchableClient | null | undefined;
       if (typeof client?.fetch === 'function') {
-        clerk.updateClient(await client.fetch({ fetchMaxTries: 1 }));
+        let fetched = await client.fetch({ fetchMaxTries: 1 });
+        const sharedClientId = clientIdOf(await native.getDeviceToken().catch(() => null));
+        if (sharedClientId && fetched.id && fetched.id !== sharedClientId) {
+          fetched = await client.fetch({ fetchMaxTries: 1 });
+        }
+        clerk.updateClient(fetched);
       } else {
         await clerk.__internal_reloadInitialResources?.();
       }
