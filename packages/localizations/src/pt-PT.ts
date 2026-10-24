@@ -1606,6 +1606,7 @@ export const ptPT: LocalizationResource = {
       actionText: 'Não tem nenhum destes métodos?',
       blockButton__backupCode: 'Utilizar um código de recuperação',
       blockButton__emailCode: 'Código por e-mail para {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: 'Utilizar a sua chave de acesso',
       blockButton__password: 'Continuar com a sua palavra-passe',
       blockButton__phoneCode: 'Enviar código SMS para {{identifier}}',
@@ -1628,6 +1629,10 @@ export const ptPT: LocalizationResource = {
       resendButton: 'Não recebeu um código? Reenviar',
       subtitle: 'Introduza o código enviado para o seu e-mail para continuar',
       title: 'Verificação necessária',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Não é possível prosseguir com a verificação. Não existe um fator de autenticação adequado configurado.',

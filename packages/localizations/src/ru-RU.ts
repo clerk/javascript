@@ -1603,6 +1603,7 @@ export const ruRU: LocalizationResource = {
       actionText: 'У вас нет ничего из этого?',
       blockButton__backupCode: 'Использовать резервный код',
       blockButton__emailCode: 'Отправить код на {{identifier}}',
+      blockButton__enterpriseSSO: undefined,
       blockButton__passkey: undefined,
       blockButton__password: 'Продолжить с вашим паролем',
       blockButton__phoneCode: 'Отправить SMS код на {{identifier}}',
@@ -1625,6 +1626,10 @@ export const ruRU: LocalizationResource = {
       resendButton: 'Не получили код? Отправить повторно',
       subtitle: 'для продолжения {{applicationName}}',
       title: 'Проверьте вашу почту',
+    },
+    enterpriseSSO: {
+      subtitle: undefined,
+      title: undefined,
     },
     noAvailableMethods: {
       message: 'Невозможно продолжить верификацию. Нет доступного фактора аутентификации.',

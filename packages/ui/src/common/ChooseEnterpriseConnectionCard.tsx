@@ -15,6 +15,7 @@ type ChooseEnterpriseConnectionCardProps = {
   subtitle: LocalizationKey;
   onClick: (id: string) => Promise<void>;
   enterpriseConnections: Array<{ id: string; name: string; logoPublicUrl?: string | null; provider?: string }>;
+  showLogo?: boolean;
 };
 
 /**
@@ -25,6 +26,7 @@ export const ChooseEnterpriseConnectionCard = ({
   subtitle,
   onClick,
   enterpriseConnections,
+  showLogo = true,
   children,
 }: PropsWithChildren<ChooseEnterpriseConnectionCardProps>) => {
   const card = useCardState();
@@ -32,7 +34,7 @@ export const ChooseEnterpriseConnectionCard = ({
   return (
     <Card.Root>
       <Card.Content>
-        <Header.Root showLogo>
+        <Header.Root showLogo={showLogo}>
           <Header.Title localizationKey={title} />
           <Header.Subtitle localizationKey={subtitle} />
         </Header.Root>
