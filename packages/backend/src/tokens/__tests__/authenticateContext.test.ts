@@ -27,6 +27,23 @@ describe('AuthenticateContext', () => {
 
   describe('suffixedCookies', () => {
     describe('use un-suffixed cookies', () => {
+      it('still reads a suffixed __clerk_db_jwt when session cookies are un-suffixed', async () => {
+        const headers = new Headers({
+          cookie: createCookieHeader({
+            __client_uat: clientUat,
+            __session: session,
+            __clerk_db_jwt_MqCvchyS: '__clerk_db_jwt-suffixed',
+          }),
+        });
+        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
+        const context = await createAuthenticateContext(clerkRequest, {
+          publishableKey: pkLive,
+        });
+
+        expect(context.usesSuffixedCookies()).toBe(false);
+        expect(context.devBrowserToken).toBe('__clerk_db_jwt-suffixed');
+      });
+
       it('request with un-suffixed cookies', async () => {
         const headers = new Headers({
           cookie: createCookieHeader({

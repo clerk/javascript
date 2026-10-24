@@ -59,13 +59,16 @@ export const createDevBrowserCookie = (
   };
 
   const removeStaleAttributeVariants = (wrotePartitioned: boolean) => {
+    // Only strip the variants we did not just write. Removing Partitioned
+    // after an unpartitioned write can expire the live cookie on Safari
+    // builds that ignore the Partitioned attribute.
+    if (!wrotePartitioned) {
+      return;
+    }
+
     for (const cookie of cookies) {
-      if (wrotePartitioned) {
-        cookie.remove({ sameSite: 'Lax', secure: getSecureAttribute('Lax'), partitioned: false });
-        cookie.remove({ sameSite: 'None', secure: getSecureAttribute('None'), partitioned: false });
-      } else {
-        cookie.remove(partitionedCookieAttributes);
-      }
+      cookie.remove({ sameSite: 'Lax', secure: getSecureAttribute('Lax'), partitioned: false });
+      cookie.remove({ sameSite: 'None', secure: getSecureAttribute('None'), partitioned: false });
     }
   };
 

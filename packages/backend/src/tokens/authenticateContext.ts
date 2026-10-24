@@ -320,7 +320,8 @@ class AuthenticateContext implements AuthenticateContext {
       (this.usesSuffixedCookies()
         ? this.getSuffixedCookie(constants.Cookies.DevBrowser) ||
           this.getCookie(constants.Cookies.DevBrowser)
-        : this.getCookie(constants.Cookies.DevBrowser));
+        : this.getCookie(constants.Cookies.DevBrowser) ||
+          this.getSuffixedCookie(constants.Cookies.DevBrowser));
     // Using getCookie since we don't suffix the handshake token cookie
     this.handshakeToken =
       this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);
