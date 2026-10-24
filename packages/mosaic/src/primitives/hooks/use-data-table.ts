@@ -11,6 +11,8 @@ export type SortingState = Array<{ id: string; desc: boolean }>;
 export type ColumnFiltersState = Array<{ id: string; value: unknown }>;
 export type PaginationState = { pageIndex: number; pageSize: number };
 export type RowSelectionState = Record<string, boolean>;
+export type ExpandedState = Record<string, boolean>;
+export type SelectionMode = 'none' | 'single' | 'multiple';
 
 export function functionalUpdate<T>(updater: Updater<T>, old: T): T {
   return typeof updater === 'function' ? (updater as (old: T) => T)(old) : updater;
@@ -19,7 +21,10 @@ export function functionalUpdate<T>(updater: Updater<T>, old: T): T {
 export interface UseDataTableOptions<TData> {
   data: TData[];
   getRowId?: (row: TData, index: number) => string;
+  getSubRows?: (row: TData) => TData[] | undefined;
+  getRowCanExpand?: (row: TData) => boolean;
   isRowSelectable?: (row: TData) => boolean;
+  selectionMode?: SelectionMode;
   totalCount?: number;
 
   sorting?: SortingState;
@@ -41,13 +46,25 @@ export interface UseDataTableOptions<TData> {
   rowSelection?: RowSelectionState;
   defaultRowSelection?: RowSelectionState;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+
+  expanded?: ExpandedState;
+  defaultExpanded?: ExpandedState;
+  onExpandedChange?: OnChangeFn<ExpandedState>;
 }
 
 export interface DataTableRow<TData> {
   id: string;
   original: TData;
+  depth: number;
+  parentId: string | null;
+  index: number;
+  setSize: number;
+  getCanSelect: () => boolean;
   getIsSelected: () => boolean;
   toggleSelected: (options?: { range?: boolean }) => void;
+  getCanExpand: () => boolean;
+  getIsExpanded: () => boolean;
+  toggleExpanded: () => void;
 }
 
 export interface UseDataTableReturn<TData> {
@@ -71,11 +88,15 @@ export interface UseDataTableReturn<TData> {
   getCanPreviousPage: () => boolean;
   getPageCount: () => number;
 
+  selectionMode: SelectionMode;
   rowSelection: RowSelectionState;
   setRowSelection: OnChangeFn<RowSelectionState>;
   getIsAllRowsSelected: () => boolean;
   getIsSomeRowsSelected: () => boolean;
   toggleAllRowsSelected: () => void;
+
+  expanded: ExpandedState;
+  setExpanded: OnChangeFn<ExpandedState>;
 }
 
 export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTableReturn<TData> {
@@ -107,6 +128,12 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
     opts.onRowSelectionChange,
   );
 
+  const [expanded, setExpandedRaw] = useControllableState(
+    opts.expanded,
+    opts.defaultExpanded ?? {},
+    opts.onExpandedChange,
+  );
+
   // ── Updater-aware public setters ────────────────────────────────────────────
 
   const setSorting: OnChangeFn<SortingState> = useCallback(
@@ -134,26 +161,38 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
     [rowSelection, setRowSelectionRaw],
   );
 
+  const setExpanded: OnChangeFn<ExpandedState> = useCallback(
+    u => setExpandedRaw(functionalUpdate(u, expanded)),
+    [expanded, setExpandedRaw],
+  );
+
   // ── Rows ────────────────────────────────────────────────────────────────────
 
-  const { getRowId, isRowSelectable } = opts;
+  const { getRowId, getSubRows, getRowCanExpand, isRowSelectable } = opts;
+  const selectionMode = opts.selectionMode ?? 'multiple';
   const selectionAnchor = useRef<string | null>(null);
   const rows = useMemo<DataTableRow<TData>[]>(() => {
-    const entries = opts.data.map((original, i) => ({ original, id: getRowId ? getRowId(original, i) : String(i) }));
+    const entries = flattenVisibleRows(opts.data, { getRowId, getSubRows, getRowCanExpand, expanded });
     const selectableIds = entries
       .filter(entry => !isRowSelectable || isRowSelectable(entry.original))
       .map(entry => entry.id);
-    return entries.map(({ original, id }) => {
+    return entries.map(({ canExpand, ...entry }) => {
+      const { id } = entry;
+      const canSelect = selectionMode !== 'none' && selectableIds.includes(id);
       return {
-        id,
-        original,
+        ...entry,
+        getCanSelect: () => canSelect,
         getIsSelected: () => !!rowSelection[id],
         toggleSelected: options => {
-          const index = selectableIds.indexOf(id);
-          if (index === -1) {
+          if (!canSelect) {
+            return;
+          }
+          if (selectionMode === 'single') {
+            setRowSelection(old => (old[id] ? {} : { [id]: true }));
             return;
           }
           const anchor = selectionAnchor.current;
+          const index = selectableIds.indexOf(id);
           const anchorIndex = options?.range && anchor !== null ? selectableIds.indexOf(anchor) : -1;
           selectionAnchor.current = id;
           setRowSelection(old => {
@@ -165,9 +204,27 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
             return { ...old, ...Object.fromEntries(rangeIds.map(rangeId => [rangeId, selected])) };
           });
         },
+        getCanExpand: () => canExpand,
+        getIsExpanded: () => canExpand && !!expanded[id],
+        toggleExpanded: () => {
+          if (canExpand) {
+            setExpanded(old => ({ ...old, [id]: !old[id] }));
+          }
+        },
       };
     });
-  }, [opts.data, getRowId, isRowSelectable, rowSelection, setRowSelection]);
+  }, [
+    opts.data,
+    getRowId,
+    getSubRows,
+    getRowCanExpand,
+    isRowSelectable,
+    selectionMode,
+    rowSelection,
+    setRowSelection,
+    expanded,
+    setExpanded,
+  ]);
 
   // ── Pagination helpers ──────────────────────────────────────────────────────
 
@@ -221,8 +278,11 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
   );
 
   const toggleAllRowsSelected = useCallback(() => {
+    if (selectionMode !== 'multiple') {
+      return;
+    }
     setRowSelection(getIsAllRowsSelected() ? {} : Object.fromEntries(selectableRows.map(r => [r.id, true])));
-  }, [selectableRows, getIsAllRowsSelected, setRowSelection]);
+  }, [selectionMode, selectableRows, getIsAllRowsSelected, setRowSelection]);
 
   return {
     rows,
@@ -245,10 +305,46 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
     getCanPreviousPage,
     getPageCount,
 
+    selectionMode,
     rowSelection,
     setRowSelection,
     getIsAllRowsSelected,
     getIsSomeRowsSelected,
     toggleAllRowsSelected,
+
+    expanded,
+    setExpanded,
   };
+}
+
+interface VisibleRowEntry<TData> {
+  id: string;
+  original: TData;
+  depth: number;
+  parentId: string | null;
+  index: number;
+  setSize: number;
+  canExpand: boolean;
+}
+
+function flattenVisibleRows<TData>(
+  data: TData[],
+  options: Pick<UseDataTableOptions<TData>, 'getRowId' | 'getSubRows' | 'getRowCanExpand'> & {
+    expanded: ExpandedState;
+  },
+  parentId: string | null = null,
+  depth = 0,
+): VisibleRowEntry<TData>[] {
+  const { getRowId, getSubRows, getRowCanExpand, expanded } = options;
+  return data.flatMap((original, index) => {
+    const fallbackId = parentId === null ? String(index) : `${parentId}.${index}`;
+    const id = getRowId ? getRowId(original, index) : fallbackId;
+    const subRows = getSubRows?.(original) ?? [];
+    const canExpand = getRowCanExpand ? getRowCanExpand(original) : subRows.length > 0;
+    const entry = { id, original, depth, parentId, index, setSize: data.length, canExpand };
+    if (!canExpand || !expanded[id]) {
+      return [entry];
+    }
+    return [entry, ...flattenVisibleRows(subRows, options, id, depth + 1)];
+  });
 }

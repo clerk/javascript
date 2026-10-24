@@ -506,4 +506,148 @@ describe('useDataTable', () => {
       expect(result.current.rowSelection).toEqual({ '0': true, '1': false, '2': false });
     });
   });
+
+  describe('selection mode', () => {
+    it('ignores toggles when selectionMode is none', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA, selectionMode: 'none' }));
+
+      act(() => result.current.rows[0].toggleSelected());
+      act(() => result.current.toggleAllRowsSelected());
+
+      expect(result.current.rowSelection).toEqual({});
+    });
+
+    it('replaces the selection when selectionMode is single', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA, selectionMode: 'single' }));
+
+      act(() => result.current.rows[0].toggleSelected());
+      act(() => result.current.rows[2].toggleSelected({ range: true }));
+
+      expect(result.current.rowSelection).toEqual({ '2': true });
+
+      act(() => result.current.rows[2].toggleSelected());
+
+      expect(result.current.rowSelection).toEqual({});
+    });
+
+    it('does not select all when selectionMode is single', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA, selectionMode: 'single' }));
+
+      act(() => result.current.toggleAllRowsSelected());
+
+      expect(result.current.rowSelection).toEqual({});
+    });
+
+    it('getCanSelect() is false for non-selectable rows and when selectionMode is none', () => {
+      const { result, rerender } = renderHook(props => useDataTable({ data: DATA, ...props }), {
+        initialProps: { isRowSelectable: (row: Person) => row.role === 'Admin' },
+      });
+
+      expect(result.current.rows.map(row => row.getCanSelect())).toEqual([true, false, true]);
+
+      rerender({ isRowSelectable: () => true, selectionMode: 'none' as const });
+
+      expect(result.current.rows.map(row => row.getCanSelect())).toEqual([false, false, false]);
+    });
+
+    it('defaults to multiple selection', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA }));
+
+      expect(result.current.selectionMode).toBe('multiple');
+    });
+  });
+
+  describe('tree rows', () => {
+    type Node = { id: string; children?: Node[] };
+
+    const TREE: Node[] = [{ id: 'a', children: [{ id: 'a1' }, { id: 'a2', children: [{ id: 'a2x' }] }] }, { id: 'b' }];
+
+    const treeOptions = { data: TREE, getRowId: (row: Node) => row.id, getSubRows: (row: Node) => row.children };
+
+    const visibleIds = (rows: Array<{ id: string }>) => rows.map(row => row.id);
+
+    it('shows only top-level rows until a row is expanded', () => {
+      const { result } = renderHook(() => useDataTable(treeOptions));
+
+      expect(visibleIds(result.current.rows)).toEqual(['a', 'b']);
+    });
+
+    it('describes where each row sits in the tree', () => {
+      const { result } = renderHook(() => useDataTable({ ...treeOptions, defaultExpanded: { a: true, a2: true } }));
+
+      expect(
+        result.current.rows.map(({ id, depth, parentId, index, setSize }) => ({ id, depth, parentId, index, setSize })),
+      ).toEqual([
+        { id: 'a', depth: 0, parentId: null, index: 0, setSize: 2 },
+        { id: 'a1', depth: 1, parentId: 'a', index: 0, setSize: 2 },
+        { id: 'a2', depth: 1, parentId: 'a', index: 1, setSize: 2 },
+        { id: 'a2x', depth: 2, parentId: 'a2', index: 0, setSize: 1 },
+        { id: 'b', depth: 0, parentId: null, index: 1, setSize: 2 },
+      ]);
+    });
+
+    it('hides descendants of a collapsed row even when they are marked expanded', () => {
+      const { result } = renderHook(() => useDataTable({ ...treeOptions, defaultExpanded: { a2: true } }));
+
+      expect(visibleIds(result.current.rows)).toEqual(['a', 'b']);
+    });
+
+    it('toggleExpanded() shows and hides child rows', () => {
+      const { result } = renderHook(() => useDataTable(treeOptions));
+
+      act(() => result.current.rows[0].toggleExpanded());
+
+      expect(result.current.rows[0].getIsExpanded()).toBe(true);
+      expect(visibleIds(result.current.rows)).toEqual(['a', 'a1', 'a2', 'b']);
+
+      act(() => result.current.rows[0].toggleExpanded());
+
+      expect(result.current.rows[0].getIsExpanded()).toBe(false);
+      expect(visibleIds(result.current.rows)).toEqual(['a', 'b']);
+    });
+
+    it('can expand only rows with children unless getRowCanExpand says otherwise', () => {
+      const { result, rerender } = renderHook(props => useDataTable({ ...treeOptions, ...props }), {
+        initialProps: {},
+      });
+
+      expect(result.current.rows.map(row => row.getCanExpand())).toEqual([true, false]);
+
+      act(() => result.current.rows[1].toggleExpanded());
+
+      expect(result.current.expanded).toEqual({});
+
+      rerender({ getRowCanExpand: (row: Node) => row.id === 'b' });
+
+      expect(result.current.rows.map(row => row.getCanExpand())).toEqual([false, true]);
+    });
+
+    it('fires onExpandedChange and respects controlled expanded', () => {
+      const onExpandedChange = vi.fn();
+      const { result } = renderHook(() => useDataTable({ ...treeOptions, expanded: {}, onExpandedChange }));
+
+      act(() => result.current.rows[0].toggleExpanded());
+
+      expect(onExpandedChange).toHaveBeenCalledWith({ a: true });
+      expect(visibleIds(result.current.rows)).toEqual(['a', 'b']);
+    });
+
+    it('gives nested rows default ids under their parent', () => {
+      const { result } = renderHook(() =>
+        useDataTable({ data: TREE, getSubRows: row => row.children, defaultExpanded: { '0': true } }),
+      );
+
+      expect(visibleIds(result.current.rows)).toEqual(['0', '0.0', '0.1', '1']);
+    });
+
+    it('selects ranges and all rows across visible rows only', () => {
+      const { result } = renderHook(() => useDataTable({ ...treeOptions, defaultExpanded: { a: true } }));
+
+      act(() => result.current.rows[0].toggleSelected());
+      act(() => result.current.rows[3].toggleSelected({ range: true }));
+
+      expect(result.current.rowSelection).toEqual({ a: true, a1: true, a2: true, b: true });
+      expect(result.current.getIsAllRowsSelected()).toBe(true);
+    });
+  });
 });
