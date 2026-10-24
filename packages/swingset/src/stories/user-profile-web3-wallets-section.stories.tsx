@@ -35,7 +35,9 @@ export function ConnectOnly() {
 export function UnverifiedWallet() {
   const fixture = useWeb3WalletsFixture({
     initialWallets: [{ ...primaryWallet, isPrimary: false, isVerified: false }],
-    availableProviders: [{ id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: primaryWallet.iconUrl }],
+    availableProviders: [
+      { id: 'web3_metamask_signature', provider: 'MetaMask', iconId: 'metamask', iconUrl: primaryWallet.iconUrl },
+    ],
   });
   return (
     <UserProfileWeb3WalletsSectionView
@@ -52,6 +54,7 @@ export function ConnectionError() {
       {
         id: 'web3_metamask_signature',
         provider: 'MetaMask',
+        iconId: 'metamask',
         iconUrl: primaryWallet.iconUrl,
         connectError: 'Wallet extension not found. Check your wallet and try again.',
       },

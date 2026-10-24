@@ -47,6 +47,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | A spinner that should not flash or flicker                               | `useSpinDelay` (`src/hooks/`)                                                                                 |
 | A placeholder for content that is still loading                          | `Skeleton` (`src/components/skeleton/`), see [Skeletons](docs/skeletons.md)                                   |
 | A date shown to the user                                                 | `formatDate` (`src/utils/format-date.ts`)                                                                     |
+| A value turned into kebab case, e.g. for a `data-*` attribute            | `kebabCase` (`src/utils/kebab-case.ts`)                                                                       |
 | Current time for display labels                                          | `useNow` + `MosaicProvider` ([#10098](https://github.com/clerk/javascript/pull/10098), once available)        |
 | Whether enterprise SSO permits adding another identification             | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                |
 | An inline message row that animates open and closed                      | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `styles/feedback.styles.ts` |

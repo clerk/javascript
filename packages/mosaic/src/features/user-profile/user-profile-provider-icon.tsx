@@ -10,7 +10,10 @@ type UserProfileProviderIconProps = { iconUrl: string; glyph?: never } | { iconU
 export function UserProfileProviderIcon(props: UserProfileProviderIconProps) {
   return (
     <Section.Media size='lg'>
-      <IconFrame>
+      <IconFrame
+        filled
+        bordered={false}
+      >
         {'iconUrl' in props ? (
           <img
             alt=''

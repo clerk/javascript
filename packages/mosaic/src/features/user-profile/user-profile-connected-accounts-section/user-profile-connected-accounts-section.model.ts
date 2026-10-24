@@ -88,6 +88,7 @@ export function createProviderCatalog(
     enabled: enabled.has(strategy),
     display: {
       provider: name,
+      iconId: provider,
       iconUrl: iconImageUrl(provider),
       monochromeIcon: isMonochromeProvider(provider),
     },
@@ -109,7 +110,7 @@ export function createProviderCatalog(
       strategy,
       provider,
       enabled: enabled.has(strategy),
-      display: { provider: settings?.name || provider, iconUrl: settings?.logo_url || undefined },
+      display: { provider: settings?.name || provider, iconId: provider, iconUrl: settings?.logo_url || undefined },
     });
   }
   return [
