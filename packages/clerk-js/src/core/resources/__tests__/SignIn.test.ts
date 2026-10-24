@@ -3,11 +3,15 @@ import { camelToSnake } from '@clerk/shared/underscore';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { Clerk } from '../../clerk';
 import { eventBus } from '../../events';
+import { createFapiClient } from '../../fapiClient';
 import { ProtectCheckGate } from '../../protectCheckGate';
 import { signInErrorSignal, signInResourceSignal } from '../../signals';
-import { BaseResource } from '../internal';
+import { BaseResource, Client, Environment } from '../internal';
 import { SignIn } from '../SignIn';
+
+const resourceFetch = BaseResource._fetch;
 
 // Mock the authenticateWithPopup module
 vi.mock('../../../utils/authenticateWithPopup', async () => {
@@ -4331,5 +4335,457 @@ describe('SignIn protect_check gate', () => {
         vi.mocked(ProtectCheckGate.prototype.resolve).mock.invocationCallOrder[0],
       );
     });
+  });
+});
+
+describe('SignIn Slack workspace hint requests', () => {
+  const fetchMock = vi.fn();
+  const response = {
+    ...new SignIn().__internal_toSnapshot(),
+    id: 'signin_slack',
+    status: 'needs_first_factor' as const,
+    first_factor_verification: {
+      ...new SignIn().__internal_toSnapshot().first_factor_verification,
+      status: 'unverified' as const,
+      external_verification_redirect_url: 'https://slack.com/openid/connect/authorize',
+    },
+  };
+  const jsonResponse = (payload: unknown, status = 200) => ({
+    ok: status === 200,
+    status,
+    headers: new Headers(),
+    json: () => Promise.resolve(payload),
+  });
+  const workspaceResponse = (team: string) => ({
+    ...response,
+    first_factor_verification: {
+      ...response.first_factor_verification,
+      status: 'unverified' as const,
+      external_verification_redirect_url: `https://slack.com/openid/connect/authorize?team=${team}`,
+    },
+  });
+  const challengedResponse = {
+    ...workspaceResponse('TOLD'),
+    status: 'needs_protect_check',
+    protect_check: { status: 'pending', token: 'challenge', sdk_url: 'https://protect.example/sdk.js' },
+  };
+  let previousFetch: typeof BaseResource._fetch;
+  let previousBaseClerk: typeof BaseResource.clerk;
+  let previousClerk: typeof SignIn.clerk;
+  const fields = (index = 0) => new URLSearchParams(fetchMock.mock.calls[index][1].body);
+
+  beforeEach(() => {
+    previousFetch = BaseResource._fetch;
+    previousBaseClerk = BaseResource.clerk;
+    previousClerk = SignIn.clerk;
+    BaseResource._fetch = resourceFetch;
+    fetchMock.mockReset().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () => Promise.resolve({ client: null, response }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    const fapiClient = createFapiClient({
+      frontendApi: 'clerk.example.com',
+      instanceType: 'production',
+      getSessionId: () => undefined,
+    });
+    const clerk = new Clerk('pk_live_Y2xlcmsuZXhhbXBsZS5jb20k');
+    clerk.getFapiClient = () => fapiClient;
+    clerk.__internal_setCountry = vi.fn();
+    clerk.buildUrlWithAuth = url => url;
+    clerk.__internal_windowNavigate = vi.fn();
+    clerk.client = Client.getOrCreateInstance();
+    const environment = new Environment();
+    vi.spyOn(clerk, '__internal_environment', 'get').mockReturnValue(environment);
+    BaseResource.clerk = SignIn.clerk = clerk;
+    vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    BaseResource._fetch = previousFetch;
+    BaseResource.clerk = previousBaseClerk;
+    SignIn.clerk = previousClerk;
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it.each(['T123ABC', '', undefined])('serializes a low-level create hint of %s', async slackTeamId => {
+    await new SignIn().create({ strategy: 'oauth_slack', redirectUrl: 'https://example.com/callback', slackTeamId });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fields().get('slack_team_id')).toBe(slackTeamId ?? null);
+    expect(fields().has('slackTeamId')).toBe(false);
+  });
+
+  it('serializes a unified low-level create hint', async () => {
+    const { error } = await new SignIn().__internal_future.create({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/callback',
+      slackTeamId: 'T123ABC',
+    });
+    expect(error).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fields().get('slack_team_id')).toBe('T123ABC');
+  });
+
+  it.each(['redirect', 'popup'] as const)('forwards a hint through legacy %s authentication', async mode => {
+    const signIn = new SignIn();
+    const params = {
+      strategy: 'oauth_slack' as const,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+      slackTeamId: 'T123ABC',
+    };
+    if (mode === 'popup') {
+      await signIn.authenticateWithPopup({ ...params, popup: { location: { href: '' } } as Window });
+    } else {
+      await signIn.authenticateWithRedirect(params);
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fields().get('slack_team_id')).toBe('T123ABC');
+  });
+
+  it.each(['redirect', 'popup'] as const)('refreshes the workspace on legacy %s continuation', async mode => {
+    const signIn = new SignIn();
+    const popup = { location: { href: '' } } as Window;
+    const params = {
+      strategy: 'oauth_slack' as const,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+    };
+    const authenticate = (slackTeamId: string, continueSignIn = false) =>
+      mode === 'popup'
+        ? signIn.authenticateWithPopup({ ...params, slackTeamId, continueSignIn, popup })
+        : signIn.authenticateWithRedirect({ ...params, slackTeamId, continueSignIn });
+
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T123ABC') }))
+      .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T456DEF') }));
+    await authenticate('T123ABC');
+    await authenticate('T456DEF', true);
+
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+      '/v1/client/sign_ins',
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+    ]);
+    expect([fields(0).get('slack_team_id'), fields(1).get('slack_team_id')]).toEqual(['T123ABC', 'T456DEF']);
+    if (mode === 'popup') {
+      expect(popup.location.href).toBe('https://slack.com/openid/connect/authorize?team=T456DEF');
+    } else {
+      expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenLastCalledWith(
+        new URL('https://slack.com/openid/connect/authorize?team=T456DEF'),
+      );
+    }
+  });
+
+  it.each([
+    { strategy: 'oauth_slack' as const, slackTeamId: '' },
+    { strategy: 'oauth_google' as const, slackTeamId: 'T123ABC' },
+  ])('forwards a rejected legacy continuation hint for $strategy with "$slackTeamId"', async params => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ errors: [{ code: 'form_param_value_invalid' }] }, 422));
+    const signIn = new SignIn(workspaceResponse('TOLD'));
+
+    await expect(
+      signIn.authenticateWithRedirect({
+        ...params,
+        continueSignIn: true,
+        redirectUrl: 'https://example.com/callback',
+        redirectUrlComplete: 'https://example.com/dashboard',
+      }),
+    ).rejects.toMatchObject({ errors: [{ code: 'form_param_value_invalid' }] });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0].pathname).toBe('/v1/client/sign_ins/signin_slack/prepare_first_factor');
+    expect(fields().get('strategy')).toBe(params.strategy);
+    expect(fields().get('slack_team_id')).toBe(params.slackTeamId);
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  it('reuses the legacy redirect without a request when continuation omits the hint', async () => {
+    const signIn = new SignIn(workspaceResponse('T123ABC'));
+    await signIn.authenticateWithRedirect({
+      strategy: 'oauth_slack',
+      continueSignIn: true,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+    });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledWith(
+      new URL('https://slack.com/openid/connect/authorize?team=T123ABC'),
+    );
+  });
+
+  it('continues the same legacy attempt after Protect without following its stale redirect', async () => {
+    const signIn = new SignIn(workspaceResponse('TOLD'));
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse({ response: challengedResponse }))
+      .mockResolvedValueOnce(jsonResponse({ response: { id: 'signin_slack', status: 'needs_first_factor' } }))
+      .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T456DEF') }));
+    const params = {
+      strategy: 'oauth_slack' as const,
+      continueSignIn: true,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+      slackTeamId: 'T456DEF',
+    };
+
+    await expect(signIn.authenticateWithRedirect(params)).rejects.toMatchObject({ code: 'protect_check_required' });
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+    await signIn.submitProtectCheck({ proofToken: 'proof' });
+    await signIn.authenticateWithRedirect(params);
+
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+      '/v1/client/sign_ins/signin_slack/protect_check',
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+    ]);
+    expect(fields(0).get('slack_team_id')).toBe('T456DEF');
+    expect(fields(2).get('slack_team_id')).toBe('T456DEF');
+    expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledExactlyOnceWith(
+      new URL('https://slack.com/openid/connect/authorize?team=T456DEF'),
+    );
+  });
+
+  it.each(['redirect', 'popup'] as const)('prepares a workspace on an existing unified %s attempt', async mode => {
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    const popup = mode === 'popup' ? ({ location: { href: '' } } as Window) : undefined;
+    vi.mocked(_futureAuthenticateWithPopup).mockImplementation((_clerk, params) => {
+      params.popup.location.href = params.externalVerificationRedirectURL.toString();
+      return Promise.resolve();
+    });
+    fetchMock.mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T456DEF') }));
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamId: 'T456DEF',
+      popup,
+    });
+
+    expect(error).toBeNull();
+    expect(fetchMock.mock.calls[0][0].pathname).toBe('/v1/client/sign_ins/signin_slack/prepare_first_factor');
+    expect(fields().get('slack_team_id')).toBe('T456DEF');
+    if (popup) {
+      expect(popup.location.href).toBe('https://slack.com/openid/connect/authorize?team=T456DEF');
+    } else {
+      expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledWith(
+        new URL('https://slack.com/openid/connect/authorize?team=T456DEF'),
+      );
+    }
+  });
+
+  it.each([
+    { strategy: 'oauth_slack' as const, slackTeamId: '' },
+    { strategy: 'oauth_google' as const, slackTeamId: 'T123ABC' },
+  ])('forwards a rejected existing unified hint for $strategy with "$slackTeamId"', async params => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ errors: [{ code: 'form_param_value_invalid' }] }, 422));
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    const { error } = await signIn.__internal_future.sso({
+      ...params,
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+    });
+
+    expect(error).toMatchObject({ errors: [{ code: 'form_param_value_invalid' }] });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0].pathname).toBe('/v1/client/sign_ins/signin_slack/prepare_first_factor');
+    expect(fields().get('strategy')).toBe(params.strategy);
+    expect(fields().get('slack_team_id')).toBe(params.slackTeamId);
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  it('keeps existing unified reuse without a request when the hint is omitted', async () => {
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+    });
+
+    expect(error).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  it('retries unified workspace preparation on the same attempt after Protect', async () => {
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse({ response: challengedResponse }))
+      .mockResolvedValueOnce(jsonResponse({ response: { id: 'signin_slack', status: 'needs_first_factor' } }))
+      .mockResolvedValueOnce(jsonResponse({ response: workspaceResponse('T456DEF') }));
+    vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async () => {
+      expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+      if (signIn.protectCheck) {
+        await signIn.submitProtectCheck({ proofToken: 'proof' });
+      }
+    });
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamId: 'T456DEF',
+      oidcPrompt: 'consent',
+    });
+
+    expect(error).toBeNull();
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual([
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+      '/v1/client/sign_ins/signin_slack/protect_check',
+      '/v1/client/sign_ins/signin_slack/prepare_first_factor',
+    ]);
+    expect(fields(0).get('slack_team_id')).toBe('T456DEF');
+    expect(fields(2)).toEqual(fields(0));
+    expect(SignIn.clerk.__internal_windowNavigate).toHaveBeenCalledExactlyOnceWith(
+      new URL('https://slack.com/openid/connect/authorize?team=T456DEF'),
+    );
+  });
+
+  it('does not follow a stale unified redirect when Protect resolution fails', async () => {
+    const signIn = new SignIn({
+      ...new SignIn().__internal_toSnapshot(),
+      id: 'signin_slack',
+      status: 'needs_first_factor',
+    });
+    fetchMock.mockResolvedValueOnce(jsonResponse({ response: challengedResponse }));
+    vi.mocked(ProtectCheckGate.prototype.resolve).mockRejectedValueOnce(new Error('challenge failed'));
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamId: 'T456DEF',
+    });
+
+    expect(error).toMatchObject({ message: 'challenge failed' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(SignIn.clerk.__internal_windowNavigate).not.toHaveBeenCalled();
+  });
+
+  it('forwards incompatible legacy enterprise hints to first-factor preparation', async () => {
+    const signIn = new SignIn();
+    signIn.id = 'signin_existing';
+    await signIn.authenticateWithRedirect({
+      strategy: 'enterprise_sso',
+      continueSignIn: true,
+      redirectUrl: 'https://example.com/callback',
+      redirectUrlComplete: 'https://example.com/dashboard',
+      slackTeamId: 'T123ABC',
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0].pathname).toBe('/v1/client/sign_ins/signin_existing/prepare_first_factor');
+    expect(fields().get('strategy')).toBe('enterprise_sso');
+    expect(fields().get('slack_team_id')).toBe('T123ABC');
+  });
+
+  it('preserves unsupported legacy social first-factor preparation', () => {
+    const signIn = new SignIn();
+    signIn.id = 'signin_existing';
+    expect(() =>
+      signIn.prepareFirstFactor({
+        strategy: 'oauth_slack',
+        redirectUrl: 'https://example.com/callback',
+        actionCompleteRedirectUrl: 'https://example.com/dashboard',
+        slackTeamId: 'T123ABC',
+      }),
+    ).toThrow();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('creates fresh unified attempts for changed workspaces and then omits an absent hint', async () => {
+    const signIn = new SignIn();
+    for (const slackTeamId of ['T123ABC', 'T456DEF', undefined]) {
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_slack',
+        redirectUrl: 'https://example.com/dashboard',
+        redirectCallbackUrl: 'https://example.com/callback',
+        slackTeamId,
+      });
+      expect(error).toBeNull();
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual(Array(3).fill('/v1/client/sign_ins'));
+    expect([0, 1, 2].map(index => fields(index).get('slack_team_id'))).toEqual(['T123ABC', 'T456DEF', null]);
+  });
+
+  it('forwards a unified popup hint to the create request', async () => {
+    const popup = { location: { href: '' } } as Window;
+    vi.mocked(_futureAuthenticateWithPopup).mockResolvedValue(undefined);
+    const { error } = await new SignIn().__internal_future.sso({
+      strategy: 'oauth_slack',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamId: 'T123ABC',
+      popup,
+    });
+    expect(error).toBeNull();
+    expect(fields().get('slack_team_id')).toBe('T123ABC');
+    expect(_futureAuthenticateWithPopup).toHaveBeenCalledWith(SignIn.clerk, expect.objectContaining({ popup }));
+  });
+
+  it.each(['oauth_google', 'enterprise_sso'] as const)('forwards incompatible unified %s hints', async strategy => {
+    const { error } = await new SignIn().__internal_future.sso({
+      strategy,
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamId: 'T123ABC',
+    });
+    expect(error).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(strategy === 'enterprise_sso' ? 2 : 1);
+    for (let index = 0; index < fetchMock.mock.calls.length; index++) {
+      expect(fields(index).get('strategy')).toBe(strategy);
+      expect(fields(index).get('slack_team_id')).toBe('T123ABC');
+    }
+  });
+
+  it('preserves the hint when unified enterprise preparation retries after a challenge', async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: () =>
+        Promise.resolve({
+          response: {
+            id: 'signin_existing',
+            status: 'needs_protect_check',
+            protect_check: { status: 'pending', token: 'challenge', sdk_url: 'https://protect.example/sdk.js' },
+          },
+        }),
+    });
+    const signIn = new SignIn();
+    signIn.id = 'signin_existing';
+    vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(() => {
+      signIn.protectCheck = null;
+      return Promise.resolve();
+    });
+    const { error } = await signIn.__internal_future.sso({
+      strategy: 'enterprise_sso',
+      redirectUrl: 'https://example.com/dashboard',
+      redirectCallbackUrl: 'https://example.com/callback',
+      slackTeamId: 'T123ABC',
+    });
+    expect(error).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fields(0).get('slack_team_id')).toBe('T123ABC');
+    expect(fields(1).get('slack_team_id')).toBe('T123ABC');
+    expect(fetchMock.mock.calls.map(([url]) => url.pathname)).toEqual(
+      Array(2).fill('/v1/client/sign_ins/signin_existing/prepare_first_factor'),
+    );
   });
 });

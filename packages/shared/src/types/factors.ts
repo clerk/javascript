@@ -239,6 +239,10 @@ export type OAuthConfig = OauthFactor & {
    * The OIDC login hint parameter to use for the OAuth flow.
    */
   oidcLoginHint?: string;
+  /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamId?: string;
 };
 
 /** @generateWithEmptyComment */

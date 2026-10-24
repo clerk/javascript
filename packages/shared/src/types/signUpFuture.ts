@@ -249,6 +249,10 @@ export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
    */
   oidcPrompt?: string;
   /**
+   * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+   */
+  slackTeamId?: string;
+  /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
    * @experimental
    */

@@ -452,6 +452,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       emailAddress,
       legalAccepted,
       oidcPrompt,
+      slackTeamId,
       enterpriseConnectionId,
     } = params;
 
@@ -466,6 +467,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         emailAddress,
         legalAccepted,
         oidcPrompt,
+        slackTeamId,
         enterpriseConnectionId,
       };
       return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
@@ -1099,6 +1101,7 @@ class SignUpFuture implements SignUpFutureResource {
       unsafeMetadata,
       legalAccepted,
       oidcPrompt,
+      slackTeamId,
       enterpriseConnectionId,
       emailAddress,
       popup,
@@ -1134,6 +1137,7 @@ class SignUpFuture implements SignUpFutureResource {
           unsafeMetadata,
           legalAccepted,
           oidcPrompt,
+          slackTeamId,
           enterpriseConnectionId,
           emailAddress,
           captchaToken,

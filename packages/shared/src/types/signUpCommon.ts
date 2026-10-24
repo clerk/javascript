@@ -79,6 +79,10 @@ export type PrepareVerificationParams =
       actionCompleteRedirectUrl?: string;
       oidcPrompt?: string;
       oidcLoginHint?: string;
+      /**
+       * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+       */
+      slackTeamId?: string;
     }
   | {
       strategy: EnterpriseSSOStrategy;
@@ -134,6 +138,10 @@ export type SignUpCreateParams = Partial<
     legalAccepted: boolean;
     oidcPrompt: string;
     oidcLoginHint: string;
+    /**
+     * Optional per-attempt Slack workspace hint. Only supported with the `oauth_slack` strategy.
+     */
+    slackTeamId?: string;
     channel: PhoneCodeChannel;
     locale?: string;
     /**
