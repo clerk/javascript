@@ -202,14 +202,13 @@ export function createNativeClientSync(
       return false;
     });
 
-  const reclaimRotatedToken = async (token: string, requestToken: string | null) => {
+  const reclaimRotatedToken = async (token: string, requestToken: string | null, current: string | null) => {
     const clientId = clientIdOf(requestToken);
     if (!clientId || clientIdOf(token) !== clientId) {
       return false;
     }
-    const current = await native.getDeviceToken().catch(() => null);
     const currentClientId = clientIdOf(current);
-    return !!current && !!currentClientId && currentClientId !== clientId && setDeviceToken(token, current);
+    return !!currentClientId && currentClientId !== clientId && setDeviceToken(token, current);
   };
 
   const tokenCache: ClientTokenCache = {
@@ -233,11 +232,12 @@ export function createNativeClientSync(
       if (!(await ready())) {
         return fallback().saveToken(CLERK_CLIENT_JWT_KEY, token);
       }
-      const didSet =
-        token === requestToken ||
-        (await setDeviceToken(token, requestToken)) ||
-        (await reclaimRotatedToken(token, requestToken));
-      mirror(didSet ? token : await native.getDeviceToken().catch(() => null));
+      if (token === requestToken || (await setDeviceToken(token, requestToken))) {
+        mirror(token);
+        return;
+      }
+      const current = await native.getDeviceToken().catch(() => null);
+      mirror((await reclaimRotatedToken(token, requestToken, current)) ? token : current);
     },
   };
 
@@ -248,7 +248,12 @@ export function createNativeClientSync(
     const pull = async () => {
       const client = clerk.client as FetchableClient | null | undefined;
       if (typeof client?.fetch === 'function') {
-        clerk.updateClient(await client.fetch({ fetchMaxTries: 1 }));
+        let fetched = await client.fetch({ fetchMaxTries: 1 });
+        const sharedClientId = clientIdOf(await native.getDeviceToken().catch(() => null));
+        if (sharedClientId && fetched.id && fetched.id !== sharedClientId) {
+          fetched = await client.fetch({ fetchMaxTries: 1 });
+        }
+        clerk.updateClient(fetched);
       } else {
         await clerk.__internal_reloadInitialResources?.();
       }
