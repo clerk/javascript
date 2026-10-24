@@ -27,6 +27,23 @@ describe('AuthenticateContext', () => {
 
   describe('suffixedCookies', () => {
     describe('use un-suffixed cookies', () => {
+      it('still reads a suffixed __clerk_db_jwt when session cookies are un-suffixed', async () => {
+        const headers = new Headers({
+          cookie: createCookieHeader({
+            __client_uat: clientUat,
+            __session: session,
+            __clerk_db_jwt_MqCvchyS: '__clerk_db_jwt-suffixed',
+          }),
+        });
+        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
+        const context = await createAuthenticateContext(clerkRequest, {
+          publishableKey: pkLive,
+        });
+
+        expect(context.usesSuffixedCookies()).toBe(false);
+        expect(context.devBrowserToken).toBe('__clerk_db_jwt-suffixed');
+      });
+
       it('request with un-suffixed cookies', async () => {
         const headers = new Headers({
           cookie: createCookieHeader({
@@ -170,6 +187,29 @@ describe('AuthenticateContext', () => {
         expect(context.sessionTokenInCookie).toBe(suffixedSession);
         expect(context.clientUat.toString()).toBe('0');
         expect(context.devBrowserToken).toBe('__clerk_db_jwt-suffixed');
+      });
+
+      /**
+       * @see https://github.com/clerk/javascript/issues/10411
+       */
+      it('dev: falls back to unsuffixed __clerk_db_jwt when the suffixed cookie is missing', async () => {
+        const headers = new Headers({
+          cookie: createCookieHeader({
+            __client_uat: clientUat,
+            __client_uat_vWCgMp3A: suffixedClientUat,
+            __session: session,
+            __session_vWCgMp3A: suffixedSession,
+            __clerk_db_jwt: '__clerk_db_jwt',
+          }),
+        });
+        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
+        const context = await createAuthenticateContext(clerkRequest, {
+          publishableKey: pkTest,
+        });
+
+        expect(context.usesSuffixedCookies()).toBe(true);
+        expect(context.sessionTokenInCookie).toBe(suffixedSession);
+        expect(context.devBrowserToken).toBe('__clerk_db_jwt');
       });
 
       it('dev: request with suffixed session and signed-out suffixed client_uat', async () => {

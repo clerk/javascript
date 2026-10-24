@@ -46,13 +46,29 @@ export const createDevBrowserCookie = (
 
   const get = () => suffixedDevBrowserCookie.get() || devBrowserCookie.get();
 
+  const cookies = [suffixedDevBrowserCookie, devBrowserCookie];
+
   const removeAll = () => {
     const attributes = getCookieAttributes(options);
 
-    for (const cookie of [suffixedDevBrowserCookie, devBrowserCookie]) {
+    for (const cookie of cookies) {
       cookie.remove(attributes);
       cookie.remove();
       cookie.remove(partitionedCookieAttributes);
+    }
+  };
+
+  const removeStaleAttributeVariants = (wrotePartitioned: boolean) => {
+    // Only strip the variants we did not just write. Removing Partitioned
+    // after an unpartitioned write can expire the live cookie on Safari
+    // builds that ignore the Partitioned attribute.
+    if (!wrotePartitioned) {
+      return;
+    }
+
+    for (const cookie of cookies) {
+      cookie.remove({ sameSite: 'Lax', secure: getSecureAttribute('Lax'), partitioned: false });
+      cookie.remove({ sameSite: 'None', secure: getSecureAttribute('None'), partitioned: false });
     }
   };
 
@@ -60,12 +76,12 @@ export const createDevBrowserCookie = (
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure, partitioned } = getCookieAttributes(options);
 
-    // Remove stale variants before writing. The environment may not be loaded
-    // yet, so the current partitioned-cookies setting cannot be trusted.
-    removeAll();
-
+    // Write both cookies first so a concurrent request never sees a hole
+    // between remove() and set(). Then drop only the attribute variants
+    // that are not the ones we just wrote.
     suffixedDevBrowserCookie.set(devBrowser, { expires, sameSite, secure, partitioned });
     devBrowserCookie.set(devBrowser, { expires, sameSite, secure, partitioned });
+    removeStaleAttributeVariants(partitioned);
   };
 
   const remove = () => removeAll();

@@ -317,7 +317,11 @@ class AuthenticateContext implements AuthenticateContext {
   private initHandshakeValues() {
     this.devBrowserToken =
       this.getQueryParam(constants.QueryParameters.DevBrowser) ||
-      this.getSuffixedOrUnSuffixedCookie(constants.Cookies.DevBrowser);
+      (this.usesSuffixedCookies()
+        ? this.getSuffixedCookie(constants.Cookies.DevBrowser) ||
+          this.getCookie(constants.Cookies.DevBrowser)
+        : this.getCookie(constants.Cookies.DevBrowser) ||
+          this.getSuffixedCookie(constants.Cookies.DevBrowser));
     // Using getCookie since we don't suffix the handshake token cookie
     this.handshakeToken =
       this.getQueryParam(constants.QueryParameters.Handshake) || this.getCookie(constants.Cookies.Handshake);

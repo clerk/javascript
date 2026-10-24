@@ -2,10 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createDevBrowserCookie } from '../devBrowser';
 
-const { cookieStore, removeCalls, setCalls } = vi.hoisted(() => ({
+const { cookieStore, removeCalls, setCalls, ops } = vi.hoisted(() => ({
   cookieStore: new Map<string, string>(),
   removeCalls: [] as Array<{ name: string; attributes?: object }>,
   setCalls: [] as Array<{ name: string; value: string; attributes?: object }>,
+  ops: [] as Array<{ op: 'set' | 'remove'; name: string }>,
 }));
 
 vi.mock('@clerk/shared/cookie', () => ({
@@ -13,10 +14,12 @@ vi.mock('@clerk/shared/cookie', () => ({
     get: () => cookieStore.get(name),
     remove: (attributes?: object) => {
       removeCalls.push({ name, attributes });
+      ops.push({ op: 'remove', name });
       cookieStore.delete(name);
     },
     set: (value: string, attributes?: object) => {
       setCalls.push({ name, value, attributes });
+      ops.push({ op: 'set', name });
       cookieStore.set(name, value);
     },
   }),
@@ -37,6 +40,7 @@ describe('createDevBrowserCookie', () => {
     cookieStore.clear();
     removeCalls.length = 0;
     setCalls.length = 0;
+    ops.length = 0;
   });
 
   afterEach(() => {
@@ -87,27 +91,11 @@ describe('createDevBrowserCookie', () => {
     ]);
   });
 
-  it('clears stale partitioned cookie variants before writing a new dev browser', () => {
+  it('writes both cookies and does not remove partitioned variants after an unpartitioned write', () => {
     const cookieHandler = createDevBrowserCookie(cookieSuffix, defaultOptions);
 
     cookieHandler.set(devBrowser);
 
-    expect(removeCalls).toContainEqual({
-      name: suffixedCookieName,
-      attributes: {
-        sameSite: 'None',
-        secure: true,
-        partitioned: true,
-      },
-    });
-    expect(removeCalls).toContainEqual({
-      name: unsuffixedCookieName,
-      attributes: {
-        sameSite: 'None',
-        secure: true,
-        partitioned: true,
-      },
-    });
     expect(setCalls).toEqual([
       {
         name: suffixedCookieName,
@@ -130,6 +118,24 @@ describe('createDevBrowserCookie', () => {
         },
       },
     ]);
+    expect(removeCalls).toEqual([]);
+    expect(ops.filter(op => op.op === 'remove')).toEqual([]);
+    expect(cookieStore.get(suffixedCookieName)).toBe(devBrowser);
+    expect(cookieStore.get(unsuffixedCookieName)).toBe(devBrowser);
+  });
+
+  it('writes both partitioned cookies before stripping unpartitioned variants', () => {
+    vi.stubGlobal('location', { protocol: 'https:', hostname: 'example.com' });
+    const cookieHandler = createDevBrowserCookie(cookieSuffix, {
+      usePartitionedCookies: () => true,
+    });
+
+    cookieHandler.set(devBrowser);
+
+    expect(ops.map(op => op.op)).toEqual(['set', 'set', 'remove', 'remove', 'remove', 'remove']);
+    expect(ops[0]).toEqual({ op: 'set', name: suffixedCookieName });
+    expect(ops[1]).toEqual({ op: 'set', name: unsuffixedCookieName });
+    expect(ops.slice(2).every(op => op.op === 'remove')).toBe(true);
   });
 
   it('reads the suffixed cookie before falling back to the unsuffixed cookie', () => {
