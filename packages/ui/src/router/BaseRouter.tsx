@@ -232,7 +232,7 @@ export const BaseRouter = ({
   useHistoryChangeObserver(refreshEvents, observerRefresh);
 
   // TODO: Look into the real possible types of globalNavigate
-  const baseNavigate = async (toURL: URL | undefined): Promise<unknown> => {
+  const baseNavigate = async (toURL: URL | undefined, { replace }: { replace?: boolean } = {}): Promise<unknown> => {
     if (!toURL) {
       return;
     }
@@ -243,7 +243,7 @@ export const BaseRouter = ({
     if (isOutsideOfUIComponent || isCrossOrigin) {
       isNavigatingRef.current = true;
       try {
-        return await clerkNavigate(toURL.href);
+        return await clerkNavigate(toURL.href, { replace });
       } finally {
         isNavigatingRef.current = false;
       }
@@ -263,7 +263,7 @@ export const BaseRouter = ({
     }
     isNavigatingRef.current = true;
     try {
-      const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
+      const internalNavRes = await internalNavigate(toURL, { replace, metadata: { navigationType: 'internal' } });
       // We need to flushSync to guarantee the re-render happens before handing things back to the caller,
       // otherwise setActive might emit, and children re-render with the old navigation state.
       // An alternative solution here could be to return a deferred promise, set that to state together

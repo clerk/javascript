@@ -25,12 +25,12 @@ vi.mock('@clerk/shared/react', () => {
   };
 });
 
-const Button = ({ to, children }: React.PropsWithChildren<{ to: string }>) => {
+const Button = ({ to, replace, children }: React.PropsWithChildren<{ to: string; replace?: boolean }>) => {
   const router = useRouter();
   return (
     <button
       onClick={() => {
-        void router.navigate(to);
+        void router.navigate(to, { replace });
       }}
     >
       {children}
@@ -44,6 +44,12 @@ const Tester = () => (
       <div id='index'>Index</div>
       <Button to='foo'>Internal</Button>
       <Button to='/external'>External</Button>
+      <Button
+        to='foo'
+        replace
+      >
+        Replace
+      </Button>
     </Route>
     <Route path='foo'>
       <div id='bar'>Bar</div>
@@ -104,6 +110,22 @@ describe('HashRouter', () => {
       await userEvent.click(button);
 
       expect(mockNavigate).toHaveBeenNthCalledWith(1, 'https://www.example.com/external');
+    });
+
+    it('replaces the hash instead of pushing it for internal navigation with replace', async () => {
+      const replace = vi.fn((to: string) => {
+        // @ts-ignore
+        window.location = new URL(to, window.location.href);
+      });
+      // @ts-ignore
+      window.location.replace = replace;
+      render(<Tester />);
+
+      const button = screen.getByRole('button', { name: /Replace/i });
+      await userEvent.click(button);
+
+      expect(replace).toHaveBeenCalledWith('#/foo?preserved=1');
+      expect(screen.queryByText('Bar')).toBeInTheDocument();
     });
   });
 });
