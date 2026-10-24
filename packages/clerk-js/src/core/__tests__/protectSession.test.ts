@@ -686,7 +686,7 @@ describe('ProtectSession deadlines', () => {
 
     const startedAt = Date.now();
     await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
-    // Misread, this would fall back to the 5s default and be two orders of magnitude out.
+    // Misread, this would fall back to the 10s default and be two orders of magnitude out.
     expect(Date.now() - startedAt).toBeLessThan(1_000);
   });
 
@@ -733,11 +733,157 @@ describe('ProtectSession deadlines', () => {
     // `tokenTimeoutMs` is server config with no upper bound of its own, so the ceiling is ours.
     expect(clampTimeout(120_000)).toBe(10_000);
     expect(clampTimeout(1_500)).toBe(1_500);
-    expect(clampTimeout(undefined)).toBe(5_000);
-    expect(clampTimeout(0)).toBe(5_000);
-    expect(clampTimeout(-1)).toBe(5_000);
-    expect(clampTimeout('soon')).toBe(5_000);
-    expect(clampTimeout(Number.POSITIVE_INFINITY)).toBe(5_000);
+    expect(clampTimeout(undefined)).toBe(10_000);
+    expect(clampTimeout(0)).toBe(10_000);
+    expect(clampTimeout(-1)).toBe(10_000);
+    expect(clampTimeout('soon')).toBe(10_000);
+    expect(clampTimeout(Number.POSITIVE_INFINITY)).toBe(10_000);
+  });
+});
+
+describe('ProtectSession default deadline', () => {
+  const defaultLoader = () => loader({ token_timeout_ms: undefined });
+
+  const track = (params: Promise<unknown> | undefined) => {
+    const state = { settled: false };
+    void params?.then(() => {
+      state.settled = true;
+    });
+    return state;
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (navigator as unknown as Record<string, unknown>).locks;
+  });
+
+  it('accepts a token that arrives after 7s', async () => {
+    const { session: created, elements } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+
+    await vi.advanceTimersByTimeAsync(7_000);
+    serveInline(elements[0], { cid: created?.placeholders().cid });
+
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
+  });
+
+  it('gives up at 10s when the loader never loads', async () => {
+    const { session: created } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(9_999);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it('holds a sign-in made mid-acquisition only for what is left of it', async () => {
+    const { session: created } = session([defaultLoader()]);
+    created?.start();
+    await vi.advanceTimersByTimeAsync(6_000);
+
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(3_999);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it('never holds one sign-in past the deadline when the lock is granted late', async () => {
+    Object.defineProperty(navigator, 'locks', {
+      value: {
+        request: vi.fn((_key: string, _options: unknown, callback: () => Promise<unknown>) =>
+          new Promise(resolve => setTimeout(resolve, 4_900)).then(() => callback()),
+        ),
+      },
+      configurable: true,
+    });
+
+    const { session: created } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(9_999);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+  });
+
+  it('keeps waiting for a leader tab after SafeLock gives up, until its own deadline', async () => {
+    Object.defineProperty(navigator, 'locks', {
+      value: {
+        request: vi.fn(
+          (_key: string, options: { signal: AbortSignal }) =>
+            new Promise((_resolve, reject) => {
+              options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+            }),
+        ),
+      },
+      configurable: true,
+    });
+
+    const { session: created, elements } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+
+    await vi.advanceTimersByTimeAsync(7_000);
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
+    await vi.advanceTimersByTimeAsync(100);
+
+    await expect(params).resolves.toMatchObject({
+      __clerk_protect_token: 'v1.leader.mac',
+      __clerk_protect_status: 'ok',
+    });
+    expect(elements).toHaveLength(0);
+  });
+
+  it.each([
+    [2_000, -3_600_000],
+    [6_000, -3_600_000],
+    [2_000, 3_600_000],
+    [6_000, 3_600_000],
+  ])('settles follower polling after a clock change at %s ms by %s ms', async (changeAt, correction) => {
+    let available = false;
+    const request = vi.fn((_key: string, options: { signal: AbortSignal }, callback: () => Promise<unknown>) => {
+      if (available) {
+        return callback();
+      }
+      return new Promise((_resolve, reject) => {
+        options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+      });
+    });
+    Object.defineProperty(navigator, 'locks', { configurable: true, value: { request } });
+    const { session: created, elements } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(changeAt);
+    vi.setSystemTime(Date.now() + correction);
+    await vi.advanceTimersByTimeAsync(9_999 - changeAt);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+    expect(vi.getTimerCount()).toBe(0);
+
+    available = true;
+    await vi.advanceTimersByTimeAsync(30_000);
+    const retry = created?.getRequestParams();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(elements).toHaveLength(1);
+    serveInline(elements[0], { cid: created?.placeholders().cid });
+    await expect(retry).resolves.toMatchObject({ __clerk_protect_status: 'ok' });
   });
 });
 
