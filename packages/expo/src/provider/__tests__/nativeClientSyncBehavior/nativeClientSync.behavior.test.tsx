@@ -484,6 +484,7 @@ describe('native client sync behavior', () => {
       const sharedToken = await h.jsDeviceToken();
       expect(h.native.token).toBe(sharedToken);
       expect(server.clientIdForToken(sharedToken)).toBe(clientId);
+      await expectConverged(h);
     });
 
     it('keeps the session when native signs out with the pre-rotation token while a JS response rotates it', async () => {
@@ -508,6 +509,7 @@ describe('native client sync behavior', () => {
       expect(server.inspectClient(sharedToken)?.sessions.map(session => session.id)).toEqual([sessionIds.user_1]);
       expect(h.js.client?.id).toBe(clientId);
       expect(h.js.session?.id).toBe(sessionIds.user_1);
+      await expectConverged(h);
     });
   });
 });
