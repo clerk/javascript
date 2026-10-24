@@ -160,12 +160,16 @@ import {
   Empty as OrganizationProfileApiKeysPanelEmpty,
   meta as organizationProfileApiKeysPanelMeta,
 } from '../stories/organization-profile-api-keys-panel.stories';
+import { meta as organizationProfileBillingHistorySectionMeta } from '../stories/organization-profile-billing-history-section.stories';
+import { meta as organizationProfileBillingPanelMeta } from '../stories/organization-profile-billing-panel.stories';
 import {
   Default as OrganizationProfileDangerSectionDefault,
   LeaveOnly as OrganizationProfileDangerSectionLeaveOnly,
   meta as organizationProfileDangerSectionMeta,
   WithError as OrganizationProfileDangerSectionWithError,
 } from '../stories/organization-profile-danger-section.stories';
+import { meta as organizationProfileDirectorySyncSectionMeta } from '../stories/organization-profile-directory-sync-section.stories';
+import { meta as organizationProfileDomainsSectionMeta } from '../stories/organization-profile-domains-section.stories';
 import {
   Default as OrganizationProfileGeneralPanelDefault,
   meta as organizationProfileGeneralPanelMeta,
@@ -177,11 +181,16 @@ import {
   meta as organizationProfileMembersPanelMeta,
   Proposed as OrganizationProfileMembersPanelProposed,
 } from '../stories/organization-profile-members-panel.stories';
+import { meta as organizationProfilePaymentMethodsSectionMeta } from '../stories/organization-profile-payment-methods-section.stories';
 import {
   Default as OrganizationProfileProfileSectionDefault,
   meta as organizationProfileProfileSectionMeta,
   SaveFails as OrganizationProfileProfileSectionSaveFails,
 } from '../stories/organization-profile-profile-section.stories';
+import { meta as organizationProfileSecurityPanelMeta } from '../stories/organization-profile-security-panel.stories';
+import { meta as organizationProfileSsoBypassSectionMeta } from '../stories/organization-profile-sso-bypass-section.stories';
+import { meta as organizationProfileSsoSectionMeta } from '../stories/organization-profile-sso-section.stories';
+import { meta as organizationProfileSubscriptionSectionMeta } from '../stories/organization-profile-subscription-section.stories';
 import {
   Default as OrganizationSwitcherDefault,
   meta as organizationSwitcherMeta,
@@ -1017,6 +1026,22 @@ const organizationProfileMembersPanelModule: StoryModule = {
   Empty: OrganizationProfileMembersPanelEmpty,
 };
 
+const organizationProfileSecurityPanelModule: StoryModule = { meta: organizationProfileSecurityPanelMeta };
+const organizationProfileBillingPanelModule: StoryModule = { meta: organizationProfileBillingPanelMeta };
+const organizationProfileDomainsSectionModule: StoryModule = { meta: organizationProfileDomainsSectionMeta };
+const organizationProfileSsoSectionModule: StoryModule = { meta: organizationProfileSsoSectionMeta };
+const organizationProfileSsoBypassSectionModule: StoryModule = { meta: organizationProfileSsoBypassSectionMeta };
+const organizationProfileDirectorySyncSectionModule: StoryModule = {
+  meta: organizationProfileDirectorySyncSectionMeta,
+};
+const organizationProfileSubscriptionSectionModule: StoryModule = { meta: organizationProfileSubscriptionSectionMeta };
+const organizationProfilePaymentMethodsSectionModule: StoryModule = {
+  meta: organizationProfilePaymentMethodsSectionMeta,
+};
+const organizationProfileBillingHistorySectionModule: StoryModule = {
+  meta: organizationProfileBillingHistorySectionMeta,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -1046,10 +1071,19 @@ export const registry: StoryModule[] = [
   organizationProfileModule,
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
-  organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
+  organizationProfileSecurityPanelModule,
+  organizationProfileBillingPanelModule,
+  organizationProfileApiKeysPanelModule,
   // Organization Profile · Sections
   organizationProfileProfileSectionModule,
+  organizationProfileDomainsSectionModule,
+  organizationProfileSsoSectionModule,
+  organizationProfileSsoBypassSectionModule,
+  organizationProfileDirectorySyncSectionModule,
+  organizationProfileSubscriptionSectionModule,
+  organizationProfilePaymentMethodsSectionModule,
+  organizationProfileBillingHistorySectionModule,
   organizationProfileDangerSectionModule,
   // Misc
   organizationSwitcherModule,
