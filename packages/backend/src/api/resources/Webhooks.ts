@@ -2,7 +2,10 @@ import type {
   BillingPaymentAttemptWebhookEventJSON,
   BillingSubscriptionItemWebhookEventJSON,
   BillingSubscriptionWebhookEventJSON,
+  DeletedDirectoryGroupMembershipWebhookEventJSON,
   DeletedObjectJSON,
+  DirectoryGroupMembershipWebhookEventJSON,
+  DirectoryGroupWebhookEventJSON,
   EmailJSON,
   OrganizationDomainJSON,
   OrganizationInvitationAcceptedJSON,
@@ -73,6 +76,15 @@ export type EmailDeliveryWebhookEvent =
 
 export type SMSWebhookEvent = Webhook<'sms.created', SMSMessageJSON>;
 
+export type DirectoryGroupWebhookEvent = Webhook<
+  'directoryGroup.created' | 'directoryGroup.updated' | 'directoryGroup.deleted',
+  DirectoryGroupWebhookEventJSON
+>;
+
+export type DirectoryGroupMembershipWebhookEvent =
+  | Webhook<'directoryGroupMembership.created', DirectoryGroupMembershipWebhookEventJSON>
+  | Webhook<'directoryGroupMembership.deleted', DeletedDirectoryGroupMembershipWebhookEventJSON>;
+
 export type SessionWebhookEvent = Webhook<
   'session.created' | 'session.ended' | 'session.removed' | 'session.revoked',
   SessionWebhookEventJSON
@@ -140,6 +152,8 @@ export type WebhookEvent =
   | EmailWebhookEvent
   | EmailDeliveryWebhookEvent
   | SMSWebhookEvent
+  | DirectoryGroupWebhookEvent
+  | DirectoryGroupMembershipWebhookEvent
   | OrganizationWebhookEvent
   | OrganizationDomainWebhookEvent
   | OrganizationMembershipWebhookEvent
