@@ -237,7 +237,11 @@ export function createNativeClientSync(
         return;
       }
       const current = await native.getDeviceToken().catch(() => null);
-      mirror((await reclaimRotatedToken(token, requestToken, current)) ? token : current);
+      const didReclaim = await reclaimRotatedToken(token, requestToken, current);
+      mirror(didReclaim ? token : current);
+      if (didReclaim) {
+        void native.refreshClient().catch(error => warn('Failed to refresh the native client.', error));
+      }
     },
   };
 
