@@ -4,6 +4,7 @@ import { envField } from 'astro/config';
 
 import { name as packageName, version as packageVersion } from '../../package.json';
 import type { AstroClerkIntegrationParams } from '../types';
+import { writeAgentRulesOnce } from './agent-rules';
 import { buildBeforeHydrationSnippet, buildPageLoadSnippet } from './snippets';
 import { vitePluginAstroConfig } from './vite-plugin-astro-config';
 
@@ -31,6 +32,10 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
       name: '@clerk/astro/integration',
       hooks: {
         'astro:config:setup': ({ config, injectScript, updateConfig, logger, command }) => {
+          if (command === 'dev') {
+            writeAgentRulesOnce(config.root);
+          }
+
           if (['server', 'hybrid'].includes(config.output) && !config.adapter) {
             logger.error('Missing adapter, please update your Astro config to use one.');
           }

@@ -52,6 +52,7 @@
   "module": "dist/clerk.mjs",
   "types": "dist/types/index.d.ts",
   "files": [
+    "AGENTS.md",
     "dist",
     "!dist/**/*.d.ts.map",
     "!dist/**/*.d.mts.map",

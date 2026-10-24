@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { automatedEnvironmentVariables, isAutomatedEnvironment } from '../utils/runtimeEnvironment';
+import {
+  automatedEnvironmentVariables,
+  isAutomatedEnvironment,
+  isClerkAgentRulesWriteAllowed,
+} from '../utils/runtimeEnvironment';
 
 describe('isAutomatedEnvironment', () => {
   beforeEach(() => {
@@ -58,5 +62,59 @@ describe('isAutomatedEnvironment', () => {
     vi.stubGlobal('CI', true);
 
     expect(isAutomatedEnvironment()).toBe(false);
+  });
+});
+
+describe('isClerkAgentRulesWriteAllowed', () => {
+  beforeEach(() => {
+    for (const name of automatedEnvironmentVariables) {
+      vi.stubEnv(name, '');
+    }
+    vi.stubEnv('CLERK_AGENTS_MD', '');
+    vi.stubEnv('NODE_ENV', 'development');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('allows writes in development without an AI agent', () => {
+    expect(isClerkAgentRulesWriteAllowed()).toBe(true);
+  });
+
+  it('blocks writes in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+
+    expect(isClerkAgentRulesWriteAllowed()).toBe(false);
+  });
+
+  it('blocks writes in CI', () => {
+    vi.stubEnv('CI', 'true');
+
+    expect(isClerkAgentRulesWriteAllowed()).toBe(false);
+  });
+
+  it('blocks writes in tests', () => {
+    vi.stubEnv('NODE_ENV', 'test');
+
+    expect(isClerkAgentRulesWriteAllowed()).toBe(false);
+  });
+
+  it.each(['false', 'FALSE', '0', 'off', 'no'])('blocks writes when CLERK_AGENTS_MD is %s', value => {
+    vi.stubEnv('CLERK_AGENTS_MD', value);
+
+    expect(isClerkAgentRulesWriteAllowed()).toBe(false);
+  });
+
+  it('allows writes when CLERK_AGENTS_MD is unset', () => {
+    vi.stubEnv('CLERK_AGENTS_MD', undefined);
+
+    expect(isClerkAgentRulesWriteAllowed()).toBe(true);
+  });
+
+  it('allows writes when CLERK_AGENTS_MD is true', () => {
+    vi.stubEnv('CLERK_AGENTS_MD', 'true');
+
+    expect(isClerkAgentRulesWriteAllowed()).toBe(true);
   });
 });

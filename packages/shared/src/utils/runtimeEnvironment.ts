@@ -61,3 +61,13 @@ export const isProductionEnvironment = (): boolean => {
 export const isAutomatedEnvironment = (): boolean => {
   return automatedEnvironmentVariables.some(name => isTruthyEnvValue(getEnvVariable(name)));
 };
+
+export const isClerkAgentRulesWriteAllowed = (): boolean => {
+  const optOut = (getEnvVariable('CLERK_AGENTS_MD') || '').toLowerCase();
+  return (
+    !['0', 'false', 'off', 'no'].includes(optOut) &&
+    !isProductionEnvironment() &&
+    !isTestEnvironment() &&
+    !isAutomatedEnvironment()
+  );
+};

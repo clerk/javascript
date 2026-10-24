@@ -17,6 +17,7 @@ import {
   renderWarning,
 } from './render.js';
 import { runCodemods, runScans } from './runner.js';
+import { detectClerkAgentRuleSdks, writeClerkAgentRules } from './util/agent-rules.js';
 import {
   detectSdk,
   findWorkspaceRoot,
@@ -50,6 +51,7 @@ const cli = meow(
       --release          Name of the release you're upgrading to (e.g. core-3)
       --canary           Upgrade to the latest canary version instead of the stable release
       --dry-run          Show what would be done without making changes
+      --agents-md        Write Clerk AGENTS.md sections and exit
 
     Examples
       $ npx @clerk/upgrade
@@ -70,6 +72,7 @@ const cli = meow(
     flags: {
       dir: { type: 'string', default: process.cwd() },
       dryRun: { type: 'boolean', default: false },
+      agentsMd: { type: 'boolean', default: false },
       glob: { type: 'string', default: '**/*.(js|jsx|ts|tsx|mjs|cjs)' },
       ignore: { type: 'string', isMultiple: true },
       release: { type: 'string' },
@@ -93,11 +96,17 @@ async function main() {
     release: cli.flags.release,
     skipCodemods: cli.flags.skipCodemods,
     skipUpgrade: cli.flags.skipUpgrade,
+    agentsMd: cli.flags.agentsMd,
   };
 
   if (options.dryRun) {
     renderWarning(' Upgrade running in dry run mode - no changes will be made');
     renderNewline();
+  }
+
+  if (options.agentsMd) {
+    writeAgentsMd(options);
+    return;
   }
 
   // Step 1: Detect or prompt for SDK
@@ -252,6 +261,13 @@ async function main() {
     await performPackageReplacements(packageManager, config, options);
   }
 
+  if (isInteractive) {
+    const sdks = detectClerkAgentRuleSdks(options.dir);
+    if (sdks.length > 0 && (await promptConfirm('Write Clerk AGENTS.md sections?', true))) {
+      writeAgentsMd(options, sdks);
+    }
+  }
+
   // Step 7: Run codemods
   if (config.codemods?.length > 0) {
     renderText(`Running ${config.codemods.length} codemod(s)...`, 'blue');
@@ -269,6 +285,24 @@ async function main() {
 
   // Step 9: Done
   renderComplete(sdk, config.docsUrl);
+}
+
+function writeAgentsMd(options, detectedSdks) {
+  const sdks = detectedSdks || detectClerkAgentRuleSdks(options.dir);
+
+  if (sdks.length === 0) {
+    renderWarning('No Clerk SDK packages found for AGENTS.md');
+    process.exitCode = 1;
+    return;
+  }
+
+  const result = writeClerkAgentRules({ dir: options.dir, dryRun: options.dryRun, sdks });
+  const prefix = options.dryRun ? '[dry run] Would write' : 'Wrote';
+
+  renderText(`${prefix} Clerk AGENTS.md sections for ${sdks.map(s => `@clerk/${s}`).join(', ')}`, 'blue');
+  renderText(`Target: ${result.targetDir}`);
+  renderText(`AGENTS.md: ${result.agentsMd}; CLAUDE.md: ${result.claudeMd}`);
+  renderNewline();
 }
 
 async function performUpgrade(sdk, packageManager, config, options) {

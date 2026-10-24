@@ -7,9 +7,30 @@
  * 3. If @clerk/expo-native-components is installed, its config plugin is applied for the Clerk native SDKs
  */
 const { AndroidConfig, withAndroidManifest, withEntitlementsPlist, withInfoPlist } = require('@expo/config-plugins');
+const { logClerkAgentRulesResult, writeClerkAgentRules } = require('@clerk/shared/agentRules');
+const { isClerkAgentRulesWriteAllowed } = require('@clerk/shared/utils');
+
+const fs = require('fs');
+const path = require('path');
 
 const CLERK_EXPO_NATIVE = '@clerk/expo-native-components';
 const CLERK_EXPO_NATIVE_OPTIONS = ['keychainService', 'theme'];
+let didWriteAgentRules = false;
+
+const maybeWriteAgentRules = config => {
+  if (didWriteAgentRules || !isClerkAgentRulesWriteAllowed()) {
+    return;
+  }
+
+  didWriteAgentRules = true;
+
+  try {
+    const projectRoot = config?._internal?.projectRoot || process.cwd();
+    logClerkAgentRulesResult(writeClerkAgentRules({ cwd: projectRoot, fs, path, sdks: ['expo'] }));
+  } catch {
+    // Writing agent hints must never break Expo config evaluation.
+  }
+};
 
 const addHostedAuthIntentFilter = (mainActivity, packageName) => {
   const callbackHost = `${packageName}.hosted-callback`;
@@ -138,6 +159,8 @@ const withClerkExpoNativeComponents = (config, props = {}, resolvePlugin = resol
 };
 
 const withClerkExpo = (config, props = {}) => {
+  maybeWriteAgentRules(config);
+
   const { appleSignIn = true } = props;
   if (appleSignIn !== false) {
     config = withClerkAppleSignIn(config);
@@ -151,6 +174,7 @@ const withClerkExpo = (config, props = {}) => {
 module.exports = withClerkExpo;
 module.exports._testing = {
   addHostedAuthIntentFilter,
+  maybeWriteAgentRules,
   withClerkExpoNativeComponents,
   withClerkFaceIDPermission,
 };
