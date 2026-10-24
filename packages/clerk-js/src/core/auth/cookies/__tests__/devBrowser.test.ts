@@ -87,27 +87,11 @@ describe('createDevBrowserCookie', () => {
     ]);
   });
 
-  it('clears stale partitioned cookie variants before writing a new dev browser', () => {
+  it('writes both cookies before stripping stale partitioned variants', () => {
     const cookieHandler = createDevBrowserCookie(cookieSuffix, defaultOptions);
 
     cookieHandler.set(devBrowser);
 
-    expect(removeCalls).toContainEqual({
-      name: suffixedCookieName,
-      attributes: {
-        sameSite: 'None',
-        secure: true,
-        partitioned: true,
-      },
-    });
-    expect(removeCalls).toContainEqual({
-      name: unsuffixedCookieName,
-      attributes: {
-        sameSite: 'None',
-        secure: true,
-        partitioned: true,
-      },
-    });
     expect(setCalls).toEqual([
       {
         name: suffixedCookieName,
@@ -127,6 +111,24 @@ describe('createDevBrowserCookie', () => {
           sameSite: 'Lax',
           secure: false,
           partitioned: false,
+        },
+      },
+    ]);
+    expect(removeCalls).toEqual([
+      {
+        name: suffixedCookieName,
+        attributes: {
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
+        },
+      },
+      {
+        name: unsuffixedCookieName,
+        attributes: {
+          sameSite: 'None',
+          secure: true,
+          partitioned: true,
         },
       },
     ]);

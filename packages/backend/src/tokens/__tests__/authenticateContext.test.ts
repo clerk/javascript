@@ -172,6 +172,29 @@ describe('AuthenticateContext', () => {
         expect(context.devBrowserToken).toBe('__clerk_db_jwt-suffixed');
       });
 
+      /**
+       * @see https://github.com/clerk/javascript/issues/10411
+       */
+      it('dev: falls back to unsuffixed __clerk_db_jwt when the suffixed cookie is missing', async () => {
+        const headers = new Headers({
+          cookie: createCookieHeader({
+            __client_uat: clientUat,
+            __client_uat_vWCgMp3A: suffixedClientUat,
+            __session: session,
+            __session_vWCgMp3A: suffixedSession,
+            __clerk_db_jwt: '__clerk_db_jwt',
+          }),
+        });
+        const clerkRequest = createClerkRequest(new Request('http://example.com', { headers }));
+        const context = await createAuthenticateContext(clerkRequest, {
+          publishableKey: pkTest,
+        });
+
+        expect(context.usesSuffixedCookies()).toBe(true);
+        expect(context.sessionTokenInCookie).toBe(suffixedSession);
+        expect(context.devBrowserToken).toBe('__clerk_db_jwt');
+      });
+
       it('dev: request with suffixed session and signed-out suffixed client_uat', async () => {
         const headers = new Headers({
           cookie: createCookieHeader({
