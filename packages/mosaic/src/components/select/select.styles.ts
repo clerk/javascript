@@ -40,7 +40,7 @@ export const popup = stylex.create({
     borderStyle: 'solid',
     borderWidth: '1px',
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {

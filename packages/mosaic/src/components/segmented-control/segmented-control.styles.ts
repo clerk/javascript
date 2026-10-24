@@ -32,7 +32,7 @@ const scaleIn = stylex.keyframes({
 
 const surface = {
   borderRadius: radiusVars['--cl-radius-md'],
-  backgroundColor: { default: colorVars['--cl-color-background'], [forcedColors]: 'Highlight' },
+  backgroundColor: { default: colorVars['--cl-color-surface'], [forcedColors]: 'Highlight' },
   boxShadow: shadowVars['--cl-shadow-sm'],
   forcedColorAdjust: 'none',
 } as const;

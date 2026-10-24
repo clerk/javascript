@@ -6,7 +6,7 @@ import { switchInputMarker } from './switch.markers.stylex';
 const thumbInset = '2px';
 const trackOffHover = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 24%, transparent)`;
 const trackOnHover = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 12%)`;
-const thumbOff = `light-dark(${colorVars['--cl-color-background']}, ${colorVars['--cl-color-foreground']})`;
+const thumbOff = `light-dark(${colorVars['--cl-color-surface']}, ${colorVars['--cl-color-foreground']})`;
 
 export const styles = stylex.create({
   root: {

@@ -22,6 +22,7 @@ import { iconScope } from '../icon/icon.markers.stylex';
 const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 12%)`;
 const primaryActive = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 18%)`;
 const negativeHover = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 12%)`;
+const negativePressed = `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`;
 const negativeActive = `color-mix(in oklab, ${colorVars['--cl-color-negative']}, ${colorVars['--cl-color-negative-foreground']} 18%)`;
 
 // Interactive states are gated on `:not([data-disabled])`: the button stays hit-testable while
@@ -209,11 +210,11 @@ export const variants = stylex.create({
     borderColor: colorVars['--cl-color-border'],
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):active': colorVars['--cl-color-neutral-alpha-200'],
-      ':not([data-disabled])[data-open]': colorVars['--cl-color-neutral-alpha-200'],
+      ':not([data-disabled]):active': negativePressed,
+      ':not([data-disabled])[data-open]': negativePressed,
       '@media (hover: hover)': {
         default: null,
-        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
+        ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-subtle'],
       },
     },
     color: colorVars['--cl-color-negative'],
@@ -248,8 +249,8 @@ export const variants = stylex.create({
   'ghost-negative': {
     backgroundColor: {
       default: 'transparent',
-      ':not([data-disabled]):active': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
-      ':not([data-disabled])[data-open]': `color-mix(in oklab, ${colorVars['--cl-color-negative-subtle']}, ${colorVars['--cl-color-negative']} 8%)`,
+      ':not([data-disabled]):active': negativePressed,
+      ':not([data-disabled])[data-open]': negativePressed,
       '@media (hover: hover)': {
         default: null,
         ':not([data-disabled]):hover:not(:active):not([data-open])': colorVars['--cl-color-negative-subtle'],

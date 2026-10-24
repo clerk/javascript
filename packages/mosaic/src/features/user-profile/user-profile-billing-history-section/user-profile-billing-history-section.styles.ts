@@ -72,7 +72,7 @@ export const styles = stylex.create({
     borderWidth: '1px',
     paddingBlock: space['1'],
     paddingInline: space['2'],
-    backgroundColor: colorVars['--cl-color-background'],
+    backgroundColor: colorVars['--cl-color-surface'],
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],

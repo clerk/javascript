@@ -18,14 +18,16 @@ Tokens are CSS custom properties declared through `stylex.defineVars` in `tokens
 // packages/mosaic/src/tokens.stylex.ts
 export const colorVars = stylex.defineVars({
   '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
-  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), var(--cl-color-surface))',
   // …
 });
 ```
 
 Each exported `*Vars` const in that file is one group (`colorVars`, `radiusVars`, …); the file is the list. `space` is also declared with `defineVars`, but its keys are not `--cl-*` names, so its steps compile to hashed custom properties that are internal, not part of the contract.
 
-There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-background-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-background` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp; in dark mode override `--cl-color-background` too, since the ramp mixes toward it. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
+There is no gray scale. Every achromatic token (`--cl-color-foreground`, `-border`, `-background-subtle`, …) is `--cl-color-neutral` (black on light, white on dark) mixed into `--cl-color-surface` at a fixed percentage per mode, so overriding neutral to a warm gray retints the whole ramp. The `--cl-<color>-alpha-100|200|300` tokens in `colorVars` are washes (6, 8, and 12 percent of `--cl-color-neutral`, `-negative`, `-positive`, and `-warning` over `transparent`); overriding the solid color retints its washes.
+
+Two tiers carry the dark look. `--cl-color-background` is the base: the shell of a settings surface such as the profile, and the darkest layer (`oklch(0.133 0 0)` in dark mode, white in light mode). `--cl-color-surface` is everything raised on it (cards, sections, menus, popovers, dialogs, controls) and the base the gray ramp mixes into. It is derived, not set: in dark mode it is `--cl-color-neutral` mixed 6.5 percent into `--cl-color-background`, and in light mode it equals `--cl-color-background`. So retinting `--cl-color-background` retints the shell, the surface and the whole ramp together; override `--cl-color-surface` directly only to change how far cards sit above the shell. Both are solid, never alpha, so they look the same over any backdrop.
 
 Light and dark come from CSS `light-dark()` on the default values, so there is no theme object and no re-render on theme change — the browser resolves it.
 
@@ -51,7 +53,7 @@ A theme styles a part from CSS, against that class and its attributes:
   border-radius: 4px;
 }
 .cl-item[data-interactive] {
-  background-color: var(--cl-color-background);
+  background-color: var(--cl-color-surface);
 }
 ```
 
