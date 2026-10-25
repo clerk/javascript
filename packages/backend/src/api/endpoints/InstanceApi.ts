@@ -12,8 +12,6 @@ export type UpdateParams = {
   testMode?: boolean | null | undefined;
   /** Whether the instance should be using the Have I Been Pwned (HIBP) service to check passwords for breaches. */
   hibp?: boolean | null | undefined;
-  /** Whether the instance should send emails from "verifications@clerk.dev" instead of your domain. This can be helpful if you do not have a high domain reputation. */
-  enhancedEmailDeliverability?: boolean | null | undefined;
   /** The support email for the instance. */
   supportEmail?: string | null | undefined;
   /** The npm version for `@clerk/clerk-js`. */

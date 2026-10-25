@@ -6,7 +6,6 @@ export class InstanceSettings {
     readonly restrictedToAllowlist?: boolean | undefined,
     readonly fromEmailAddress?: string | undefined,
     readonly progressiveSignUp?: boolean | undefined,
-    readonly enhancedEmailDeliverability?: boolean | undefined,
   ) {}
 
   static fromJSON(data: InstanceSettingsJSON): InstanceSettings {
@@ -15,7 +14,6 @@ export class InstanceSettings {
       data.restricted_to_allowlist,
       data.from_email_address,
       data.progressive_sign_up,
-      data.enhanced_email_deliverability,
     );
   }
 }
