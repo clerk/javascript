@@ -62,6 +62,7 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
   const [disabledValues, registerDisabled] = useRegistry<string>();
   const [interactiveCount, registerInteractive] = useCounter();
   const [columnCount, registerColumn] = useCounter();
+  const [rowHeaderColumns, registerRowHeaderColumn] = useRegistry<number>();
   const anchorRef = React.useRef<string | null>(null);
   const excluded = React.useMemo(() => new WeakSet<Element>(), []);
 
@@ -133,6 +134,8 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
     registerDisabled,
     registerInteractive,
     registerColumn,
+    rowHeaderColumns,
+    registerRowHeaderColumn,
     columnCount,
     excludeFromNavigation,
   };

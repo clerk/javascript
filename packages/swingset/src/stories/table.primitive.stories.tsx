@@ -73,6 +73,7 @@ export function Default() {
           <Table.Column
             value='message'
             sortable
+            rowHeader
             className={`${CELL} hover:text-foreground cursor-pointer font-medium after:ms-1 data-[sort-direction=ascending]:after:content-['↑'] data-[sort-direction=descending]:after:content-['↓']`}
           >
             Message
@@ -94,10 +95,7 @@ export function Default() {
               <Table.Cell className={CELL}>
                 <Table.SelectionCheckbox />
               </Table.Cell>
-              <Table.Cell
-                rowHeader
-                className={`${CELL} ps-[calc(2.25rem+var(--table-row-depth)*1.25rem)]`}
-              >
+              <Table.Cell className={`${CELL} ps-[calc(2.25rem+var(--table-row-depth)*1.25rem)]`}>
                 <Table.ExpandButton className='hover:bg-muted-foreground/15 data-expanded:rotate-90 rtl:data-collapsed:-scale-x-100 -ms-6 me-1 size-5 cursor-pointer rounded'>
                   ›
                 </Table.ExpandButton>

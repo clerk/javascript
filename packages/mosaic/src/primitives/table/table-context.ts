@@ -1,4 +1,4 @@
-import { createContext, useContext, useId } from 'react';
+import { createContext, useContext, useId, useLayoutEffect, useRef, useState } from 'react';
 
 export type TableSelectionMode = 'none' | 'single' | 'multiple';
 
@@ -29,6 +29,8 @@ export interface TableContextValue {
   registerDisabled: (value: string) => () => void;
   registerInteractive: () => () => void;
   registerColumn: () => () => void;
+  rowHeaderColumns: number[];
+  registerRowHeaderColumn: (index: number) => () => void;
   columnCount: number;
   excludeFromNavigation: (element: Element) => void;
 }
@@ -86,4 +88,14 @@ export function useRowHeaderLabel(label: string, id: string | undefined) {
     'aria-label': label,
     'aria-labelledby': rowHeaderIds ? `${ownId} ${rowHeaderIds}` : undefined,
   };
+}
+
+export function useCellIndex() {
+  const ref = useRef<HTMLTableCellElement | null>(null);
+  const [index, setIndex] = useState(-1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Re-reads cellIndex after every render so the index follows column changes; setIndex bails out when it is unchanged, so it cannot loop.
+  useLayoutEffect(() => {
+    setIndex(ref.current?.cellIndex ?? -1);
+  });
+  return [ref, index] as const;
 }

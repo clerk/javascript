@@ -69,6 +69,7 @@ function LogsTable({
           <Table.Column
             value='message'
             sortable={sortable}
+            rowHeader
           >
             Message
           </Table.Column>
@@ -87,7 +88,7 @@ function LogsTable({
                   <Table.SelectionCheckbox />
                 </Table.Cell>
               ) : null}
-              <Table.Cell rowHeader>
+              <Table.Cell>
                 <Table.ExpandButton />
                 {log.message}
               </Table.Cell>

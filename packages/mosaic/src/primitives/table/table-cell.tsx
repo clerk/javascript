@@ -3,16 +3,15 @@
 import React from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
-import { TableRowContext, useTableContext } from './table-context';
+import { TableRowContext, useCellIndex, useTableContext } from './table-context';
 
-export interface TableCellProps extends ComponentProps<'td'> {
-  /** Renders the cell as a row header. The row and its selection checkbox and expand button take their names from it. @default false */
-  rowHeader?: boolean;
-}
+export type TableCellProps = ComponentProps<'td'>;
 
 export const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function TableCell(props, ref) {
-  const { render, rowHeader = false, ...otherProps } = props;
-  useTableContext();
+  const { render, ...otherProps } = props;
+  const { rowHeaderColumns } = useTableContext();
+  const [elementRef, index] = useCellIndex();
+  const rowHeader = rowHeaderColumns.includes(index);
   const registerRowHeader = React.useContext(TableRowContext)?.registerRowHeader;
   const generatedId = React.useId();
   const id = otherProps.id ?? generatedId;
@@ -27,7 +26,7 @@ export const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
   return useRender({
     defaultTagName: rowHeader ? 'th' : 'td',
     render,
-    ref,
+    ref: [elementRef, ref],
     props: mergeProps<'td'>(defaultProps, otherProps),
   });
 });

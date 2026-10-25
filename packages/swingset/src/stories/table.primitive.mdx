@@ -26,7 +26,7 @@ import { Table } from '@clerk/mosaic/primitives/table';
     <Table.Column>
       <Table.SelectionCheckbox />
     </Table.Column>
-    <Table.Column>Message</Table.Column>
+    <Table.Column rowHeader>Message</Table.Column>
   </Table.Header>
   <Table.Body
     items={logs}
@@ -38,7 +38,7 @@ import { Table } from '@clerk/mosaic/primitives/table';
         <Table.Cell>
           <Table.SelectionCheckbox />
         </Table.Cell>
-        <Table.Cell rowHeader>{log.message}</Table.Cell>
+        <Table.Cell>{log.message}</Table.Cell>
       </Table.Row>
     )}
   </Table.Body>
@@ -64,7 +64,7 @@ const [selection, setSelection] = useState<string[]>([]);
 
 ### Row headers
 
-Mark the cell that names the row with `rowHeader`. The row is labelled by it, and the selection checkbox and expand button get their names from it ("Select Alpha", "Expand Alpha" / "Collapse Alpha"). Every interactive table needs one.
+Mark the column that names each row with `rowHeader`. Its cells render as row headers. Each row is labelled by its row header, and the selection checkbox and expand button get their names from it ("Select Alpha", "Expand Alpha" / "Collapse Alpha"). Every interactive table needs one.
 
 ### Expandable rows
 
@@ -75,6 +75,9 @@ Pass `itemToChildren` to `Table.Body` and the table becomes a tree grid. The chi
   aria-label='Logs'
   defaultExpanded={['req-1']}
 >
+  <Table.Header>
+    <Table.Column rowHeader>Message</Table.Column>
+  </Table.Header>
   <Table.Body
     items={logs}
     itemToStringValue={log => log.id}
@@ -82,7 +85,7 @@ Pass `itemToChildren` to `Table.Body` and the table becomes a tree grid. The chi
   >
     {log => (
       <Table.Row>
-        <Table.Cell rowHeader>
+        <Table.Cell>
           <Table.ExpandButton>▸</Table.ExpandButton>
           {log.message}
         </Table.Cell>
@@ -148,16 +151,16 @@ Left and right swap in right-to-left layouts. A cell with a single button or lin
 
 ## Parts
 
-| Part                      | Default element                            | Description                                                       |
-| ------------------------- | ------------------------------------------ | ----------------------------------------------------------------- |
-| `Table.Root`              | `table`                                    | Owns selection, expanded and sort state, and keyboard navigation  |
-| `Table.Header`            | `thead`                                    | Wraps its columns in a `tr`                                       |
-| `Table.Column`            | `th scope="col"`                           | Column header, optionally sortable                                |
-| `Table.Body`              | `tbody`                                    | Renders a row per visible item, or the empty state                |
-| `Table.Row`               | `tr`                                       | Row with optional action, selection and tree state                |
-| `Table.Cell`              | `td`, or `th scope="row"` with `rowHeader` | Cell                                                              |
-| `Table.SelectionCheckbox` | `input type="checkbox"`                    | Selects its row, or all rows inside `Table.Header`                |
-| `Table.ExpandButton`      | `button`                                   | Toggles its row's children. Renders only when the row can expand. |
+| Part                      | Default element                                   | Description                                                       |
+| ------------------------- | ------------------------------------------------- | ----------------------------------------------------------------- |
+| `Table.Root`              | `table`                                           | Owns selection, expanded and sort state, and keyboard navigation  |
+| `Table.Header`            | `thead`                                           | Wraps its columns in a `tr`                                       |
+| `Table.Column`            | `th scope="col"`                                  | Column header, optionally sortable                                |
+| `Table.Body`              | `tbody`                                           | Renders a row per visible item, or the empty state                |
+| `Table.Row`               | `tr`                                              | Row with optional action, selection and tree state                |
+| `Table.Cell`              | `td`, or `th scope="row"` in a `rowHeader` column | Cell                                                              |
+| `Table.SelectionCheckbox` | `input type="checkbox"`                           | Selects its row, or all rows inside `Table.Header`                |
+| `Table.ExpandButton`      | `button`                                          | Toggles its row's children. Renders only when the row can expand. |
 
 Every part accepts `render` for polymorphic rendering and throws outside `Table.Root`.
 
@@ -182,10 +185,11 @@ Every part accepts `render` for polymorphic rendering and throws outside `Table.
 
 ### `Table.Column`
 
-| Prop       | Type      | Default | Description                                        |
-| ---------- | --------- | ------- | -------------------------------------------------- |
-| `value`    | `string`  | —       | Identifies the column in the sort state            |
-| `sortable` | `boolean` | `false` | Sorts by this column on activation. Needs `value`. |
+| Prop        | Type      | Default | Description                                                    |
+| ----------- | --------- | ------- | -------------------------------------------------------------- |
+| `value`     | `string`  | —       | Identifies the column in the sort state                        |
+| `sortable`  | `boolean` | `false` | Sorts by this column on activation. Needs `value`.             |
+| `rowHeader` | `boolean` | `false` | Renders the column's cells as row headers that name their rows |
 
 ### `Table.Body`
 
@@ -209,13 +213,7 @@ Every part accepts `render` for polymorphic rendering and throws outside `Table.
 | `rel`        | `string`                      | —       | Rel for `href`                                         |
 | `download`   | `boolean \| string`           | —       | Downloads `href` instead of opening it                 |
 
-### `Table.Cell`
-
-| Prop        | Type      | Default | Description                                                      |
-| ----------- | --------- | ------- | ---------------------------------------------------------------- |
-| `rowHeader` | `boolean` | `false` | Renders a row header that names the row, its checkbox and button |
-
-`Table.Header`, `Table.SelectionCheckbox` and `Table.ExpandButton` take no additional props beyond standard HTML attributes for their default element. Passing `aria-label` to the checkbox or expand button replaces the default "Select" or "Expand" word; the row header is still added.
+`Table.Header`, `Table.Cell`, `Table.SelectionCheckbox` and `Table.ExpandButton` take no additional props beyond standard HTML attributes for their default element. Passing `aria-label` to the checkbox or expand button replaces the default "Select" or "Expand" word; the row header is still added.
 
 ## Styling
 

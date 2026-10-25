@@ -25,6 +25,7 @@ import { Table } from '@/primitives/table';
     <Table.Column
       value='message'
       sortable
+      rowHeader
     >
       Message
     </Table.Column>
@@ -40,7 +41,7 @@ import { Table } from '@/primitives/table';
         <Table.Cell>
           <Table.SelectionCheckbox />
         </Table.Cell>
-        <Table.Cell rowHeader>
+        <Table.Cell>
           <Table.ExpandButton>▸</Table.ExpandButton>
           {log.message}
         </Table.Cell>
@@ -50,7 +51,7 @@ import { Table } from '@/primitives/table';
 </Table.Root>;
 ```
 
-Mark the cell that names the row with `rowHeader`. The row, its selection checkbox ("Select …") and its expand button ("Expand …" / "Collapse …") take their accessible names from it.
+Mark the column that names each row with `rowHeader`. Its cells render as `<th scope="row">`, and each row, its selection checkbox ("Select …") and its expand button ("Expand …" / "Collapse …") take their accessible names from them.
 
 ### Tree rows
 
@@ -77,7 +78,7 @@ Give a column a `value` and `sortable`. Activating its header sorts by it ascend
 | `Table.Column`            | `<th scope="col">`      | Column header, optionally sortable                         |
 | `Table.Body`              | `<tbody>`               | Renders a row per visible item, or the empty state         |
 | `Table.Row`               | `<tr>`                  | Body row, with optional action, selection and tree state   |
-| `Table.Cell`              | `<td>`                  | Cell. `<th scope="row">` with `rowHeader`.                 |
+| `Table.Cell`              | `<td>`                  | Cell. `<th scope="row">` in a `rowHeader` column.          |
 | `Table.SelectionCheckbox` | `<input type=checkbox>` | Selects its row, or all rows when inside `Table.Header`    |
 | `Table.ExpandButton`      | `<button>`              | Toggles its row's children. Renders only if it can expand. |
 
@@ -102,10 +103,11 @@ Give a column a `value` and `sortable`. Activating its header sorts by it ascend
 
 ### `Table.Column`
 
-| Prop       | Type      | Default | Description                                        |
-| ---------- | --------- | ------- | -------------------------------------------------- |
-| `value`    | `string`  | —       | Identifies the column in the sort state            |
-| `sortable` | `boolean` | `false` | Sorts by this column on activation. Needs `value`. |
+| Prop        | Type      | Default | Description                                                    |
+| ----------- | --------- | ------- | -------------------------------------------------------------- |
+| `value`     | `string`  | —       | Identifies the column in the sort state                        |
+| `sortable`  | `boolean` | `false` | Sorts by this column on activation. Needs `value`.             |
+| `rowHeader` | `boolean` | `false` | Renders the column's cells as row headers that name their rows |
 
 ### `Table.Body`
 
@@ -128,12 +130,6 @@ Give a column a `value` and `sortable`. Activating its header sorts by it ascend
 | `target`     | `string`            | —       | Link target                                                |
 | `rel`        | `string`            | —       | Link rel                                                   |
 | `download`   | `boolean \| string` | —       | Link download                                              |
-
-### `Table.Cell`
-
-| Prop        | Type      | Default | Description                                                          |
-| ----------- | --------- | ------- | -------------------------------------------------------------------- |
-| `rowHeader` | `boolean` | `false` | Renders a row header that names the row, its checkbox and its button |
 
 All parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their default element.
 
