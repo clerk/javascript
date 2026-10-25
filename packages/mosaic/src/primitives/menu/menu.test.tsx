@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { DirectionProvider } from '../direction-provider';
 import { Popover } from '../popover';
 import { axe } from '../test-utils/axe';
 import { Menu } from './index';
@@ -733,6 +734,43 @@ describe('Menu', () => {
 
       await user.keyboard('{Escape}');
 
+      expect(screen.getByText('Share')).toHaveAttribute('data-closed', '');
+      expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
+    });
+
+    it('opens and closes a submenu with the reading-direction arrow keys in RTL', async () => {
+      const user = userEvent.setup();
+      render(
+        <DirectionProvider direction='rtl'>
+          <Menu.Root>
+            <Menu.Trigger>Actions</Menu.Trigger>
+            <Menu.Positioner>
+              <Menu.Popup>
+                <Menu.Root>
+                  <Menu.Trigger>Share</Menu.Trigger>
+                  <Menu.Positioner>
+                    <Menu.Popup>
+                      <Menu.Item label='Email'>Email</Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Root>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Root>
+        </DirectionProvider>,
+      );
+
+      await user.click(screen.getByText('Actions'));
+      await new Promise(r => requestAnimationFrame(r));
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{ArrowRight}');
+      expect(screen.getByText('Share')).not.toHaveAttribute('data-open');
+
+      await user.keyboard('{ArrowLeft}');
+      expect(screen.getByText('Share')).toHaveAttribute('data-open', '');
+
+      await new Promise(r => requestAnimationFrame(r));
+      await user.keyboard('{ArrowRight}');
       expect(screen.getByText('Share')).toHaveAttribute('data-closed', '');
       expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
     });
