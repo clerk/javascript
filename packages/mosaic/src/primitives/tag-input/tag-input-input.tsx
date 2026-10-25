@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, mergeProps, readingDirectionKeys, useRender } from '../utils';
 import { useTagInputContext } from './tag-input-context';
-import { readingDirectionKeys, splitTags } from './tag-input-utils';
+import { splitTags } from './tag-input-utils';
 
 export type TagInputInputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue'>;
 

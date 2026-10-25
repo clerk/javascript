@@ -2,9 +2,9 @@
 
 import React from 'react';
 
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, mergeProps, readingDirectionKeys, useRender } from '../utils';
 import { TableRowContext, type TableRowContextValue, useTableContext, useTableItem } from './table-context';
-import { focusIsInChildRows, isRowOwnClick, isRtl, openLink, type TableLink } from './table-dom';
+import { focusIsInChildRows, isRowOwnClick, openLink, type TableLink } from './table-dom';
 
 export interface TableRowProps extends ComponentProps<'tr'>, Partial<TableLink> {
   /** Removes the row from keyboard navigation, selection and its action. @default false */
@@ -86,7 +86,6 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
         runAction(event);
       }
     },
-    // eslint-disable-next-line sonarjs/cognitive-complexity -- One pass over the row's keydown; each branch handles a separate key.
     onKeyDown: (event: React.KeyboardEvent<HTMLTableRowElement>) => {
       const element = event.currentTarget;
       const onRow = event.target === element;
@@ -105,7 +104,7 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
         event.preventDefault();
         toggleSelected({ range: event.shiftKey });
       } else if (onRow && canExpand) {
-        const [expandKey, collapseKey] = isRtl(element) ? ['ArrowLeft', 'ArrowRight'] : ['ArrowRight', 'ArrowLeft'];
+        const { nextKey: expandKey, previousKey: collapseKey } = readingDirectionKeys(element);
         if ((event.key === expandKey && !expanded) || (event.key === collapseKey && expanded)) {
           event.preventDefault();
           toggleExpanded();

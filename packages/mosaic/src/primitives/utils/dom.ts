@@ -130,6 +130,14 @@ export function opensKeyboard(element: EventTarget | null): element is HTMLEleme
   );
 }
 
+export function readingDirectionKeys(element: Element) {
+  const isRtl = (element.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl';
+  return {
+    previousKey: isRtl ? 'ArrowRight' : 'ArrowLeft',
+    nextKey: isRtl ? 'ArrowLeft' : 'ArrowRight',
+  };
+}
+
 /**
  * Whether `element` scrolls and has room to follow a drag of `deltaX` / `deltaY` (finger movement)
  * on either axis that moved: dragging down or toward the inline start needs content scrolled away

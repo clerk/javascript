@@ -652,7 +652,6 @@ describe('Table', () => {
           />
         </div>,
       );
-      screen.getByRole('treegrid').style.direction = 'rtl';
 
       await tabIntoTable(user);
       await user.keyboard('{ArrowLeft}');

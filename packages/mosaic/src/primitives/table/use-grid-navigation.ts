@@ -1,7 +1,8 @@
 import { contains } from '@floating-ui/react/utils';
 import React from 'react';
 
-import { isRtl, isTextEntry } from './table-dom';
+import { readingDirectionKeys } from '../utils';
+import { isTextEntry } from './table-dom';
 
 const WIDGET_SELECTOR = 'button, a[href], input, select, textarea, [tabindex]';
 
@@ -149,7 +150,7 @@ function rowMove(
   event: KeyboardEvent,
   excluded: WeakSet<Element>,
 ): Position | null {
-  const { forward, backward } = arrowKeys(table);
+  const { nextKey: forward, previousKey: backward } = readingDirectionKeys(table);
   const expanded = row.getAttribute('aria-expanded');
   switch (event.key) {
     case forward:
@@ -180,7 +181,7 @@ function cellMove(
   event: KeyboardEvent,
   excluded: WeakSet<Element>,
 ): Position | null {
-  const { forward, backward } = arrowKeys(table);
+  const { nextKey: forward, previousKey: backward } = readingDirectionKeys(table);
   const row = rowOf(cell);
   const column = cell.cellIndex;
   const last = row.cells.length - 1;
@@ -296,12 +297,6 @@ function isRowItem(row: HTMLTableRowElement, excluded: WeakSet<Element>) {
 
 function isDisabledRow(row: HTMLTableRowElement) {
   return row.getAttribute('aria-disabled') === 'true';
-}
-
-function arrowKeys(table: HTMLTableElement) {
-  return isRtl(table)
-    ? { forward: 'ArrowLeft', backward: 'ArrowRight' }
-    : { forward: 'ArrowRight', backward: 'ArrowLeft' };
 }
 
 function setTabIndex(element: HTMLElement, active: boolean | null) {

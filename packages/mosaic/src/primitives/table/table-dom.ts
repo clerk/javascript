@@ -1,10 +1,7 @@
-import { getComputedStyle } from '../utils/dom';
+import { opensKeyboard } from '../utils/dom';
 
 const NESTED_CONTROL_SELECTOR =
   'a[href], button, input, select, textarea, label, [role="button"], [role="link"], [role="checkbox"], [role="menuitem"]';
-
-const TEXT_ENTRY_SELECTOR =
-  'textarea, select, [contenteditable]:not([contenteditable="false"]), input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="range"], [type="color"], [type="file"], [type="image"])';
 
 export interface TableLink {
   href: string;
@@ -25,11 +22,7 @@ export function isRowOwnClick(event: React.MouseEvent<HTMLElement>) {
 }
 
 export function isTextEntry(element: Element) {
-  return element.matches(TEXT_ENTRY_SELECTOR);
-}
-
-export function isRtl(element: Element) {
-  return getComputedStyle(element).direction === 'rtl';
+  return opensKeyboard(element) || element instanceof HTMLSelectElement;
 }
 
 export function focusIsInChildRows(row: HTMLTableRowElement) {

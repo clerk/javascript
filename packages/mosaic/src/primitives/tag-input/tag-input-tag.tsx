@@ -4,9 +4,8 @@ import { inertProps } from '@clerk/shared/inert';
 import React, { useCallback, useEffect, useRef } from 'react';
 
 import { useTransition } from '../hooks/use-transition';
-import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, mergeProps, readingDirectionKeys, useRender } from '../utils';
 import { TagContext, useTagInputContext } from './tag-input-context';
-import { readingDirectionKeys } from './tag-input-utils';
 
 export interface TagInputTagProps extends ComponentProps<'div'> {
   value: string;

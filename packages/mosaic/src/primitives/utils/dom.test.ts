@@ -8,6 +8,7 @@ import {
   getScrollDimensions,
   isElement,
   isHTMLElement,
+  readingDirectionKeys,
 } from './dom';
 
 function stub(element: HTMLElement, values: Record<string, number>) {
@@ -206,3 +207,23 @@ describe('canScrollToward', () => {
     expect(canScrollToward(scroller('hidden', 0), 0, -1)).toBe(false);
   });
 });
+
+describe('readingDirectionKeys', () => {
+  it('maps previous to ArrowLeft and next to ArrowRight in left-to-right text', () => {
+    expect(readingDirectionKeys(create())).toEqual({ previousKey: 'ArrowLeft', nextKey: 'ArrowRight' });
+  });
+
+  it('swaps the keys under a dir="rtl" ancestor', () => {
+    const element = nested(container => container.setAttribute('dir', 'rtl'));
+
+    expect(readingDirectionKeys(element)).toEqual({ previousKey: 'ArrowRight', nextKey: 'ArrowLeft' });
+  });
+});
+
+function nested(setup: (container: HTMLElement) => void) {
+  const container = create();
+  setup(container);
+  const element = document.createElement('div');
+  container.append(element);
+  return element;
+}
