@@ -303,6 +303,7 @@ import {
   States as SwitchStates,
   WithField as SwitchWithField,
 } from '../stories/switch.stories';
+import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
 import {
   Default as TableDefault,
   Empty as TableEmpty,
@@ -313,7 +314,6 @@ import {
   Sorting as TableSorting,
 } from '../stories/table.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
-import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
   Default as TagInputComponentDefault,
