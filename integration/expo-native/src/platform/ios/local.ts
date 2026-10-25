@@ -41,6 +41,20 @@ async function simctl(args: readonly string[], what: string): Promise<string> {
   return result.stdout;
 }
 
+// A clone does not inherit simslim's overrides, so each lane is slimmed before its first boot, when
+// the background services it turns off would otherwise keep a CI runner's cores busy for minutes.
+async function boot(udid: string, name: string): Promise<void> {
+  if (process.env.VERIFY_SIMSLIM !== '1') {
+    await simctl(['boot', udid], `simctl boot ${name}`);
+    await simctl(['bootstatus', udid, '-b'], `simctl bootstatus ${name}`);
+    return;
+  }
+  const slim = await run('simslim', ['on', udid]);
+  if (slim.code !== 0) {
+    throw new VerifyFailure('NOT_READY', `simslim on ${name} failed: ${slim.stderr.trim() || slim.stdout.trim()}`, 'install simslim, or unset VERIFY_SIMSLIM');
+  }
+}
+
 function simulatorDataDir(udid: string): string {
   return join(homedir(), 'Library', 'Developer', 'CoreSimulator', 'Devices', udid, 'data');
 }
@@ -116,8 +130,7 @@ export function localIosBackend(options: { readonly os?: NodeJS.Platform } = {})
         await deleteSimulators((d) => d.name === claim.deviceName);
         request.progress(`device  ${claim.deviceName}  cloning ${TEMPLATE_NAME}`);
         udid = (await simctl(['clone', template.udid, claim.deviceName], `simctl clone ${claim.deviceName}`)).trim();
-        await simctl(['boot', udid], `simctl boot ${claim.deviceName}`);
-        await simctl(['bootstatus', udid, '-b'], `simctl bootstatus ${claim.deviceName}`);
+        await boot(udid, claim.deviceName);
       } catch (error) {
         await clearSlot(claim, request.worktree).catch(() => undefined);
         throw error;
