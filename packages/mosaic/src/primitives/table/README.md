@@ -33,7 +33,7 @@ import { Table } from '@/primitives/table';
     items={logs}
     itemToStringValue={log => log.id}
     itemToChildren={log => log.children}
-    empty='No logs'
+    renderEmptyState={() => 'No logs'}
   >
     {log => (
       <Table.Row href={`/logs/${log.id}`}>
@@ -115,7 +115,7 @@ Give a column a `value` and `sortable`. Activating its header sorts by it ascend
 | `itemToStringValue` | `(item: Item) => string`              | — (required) | The row's value in the selection and expanded state   |
 | `itemToChildren`    | `(item: Item) => Item[] \| undefined` | —            | An item's child items. Makes the table a tree grid.   |
 | `children`          | `(item: Item) => ReactNode`           | — (required) | Renders the row for an item                           |
-| `empty`             | `ReactNode`                           | —            | Rendered in one cell spanning every column when empty |
+| `renderEmptyState`  | `() => ReactNode`                     | —            | Rendered in one cell spanning every column when empty |
 
 ### `Table.Row`
 

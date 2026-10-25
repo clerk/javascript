@@ -42,14 +42,14 @@ function LogsTable({
   items = FLAT_LOGS,
   tree = false,
   rowProps,
-  empty,
+  renderEmptyState,
   sortable = false,
   ...rootProps
 }: TableRootProps & {
   items?: Log[];
   tree?: boolean;
   rowProps?: (log: Log) => TableRowProps;
-  empty?: ReactNode;
+  renderEmptyState?: () => ReactNode;
   sortable?: boolean;
 }) {
   const selectable = (rootProps.selectionMode ?? 'none') !== 'none';
@@ -78,7 +78,7 @@ function LogsTable({
           items={items}
           itemToStringValue={toValue}
           itemToChildren={tree ? toChildren : undefined}
-          empty={empty}
+          renderEmptyState={renderEmptyState}
         >
           {log => (
             <Table.Row {...rowProps?.(log)}>
@@ -815,7 +815,7 @@ describe('Table', () => {
         <LogsTable
           items={[]}
           selectionMode='multiple'
-          empty='No logs'
+          renderEmptyState={() => 'No logs'}
         />,
       );
 
@@ -831,7 +831,7 @@ describe('Table', () => {
         <LogsTable
           items={[]}
           selectionMode='multiple'
-          empty='No logs'
+          renderEmptyState={() => 'No logs'}
         />,
       );
 
@@ -1027,7 +1027,7 @@ describe('Table', () => {
       ['grid', { selectionMode: 'multiple' as const }],
       ['treegrid', { items: LOGS, tree: true, defaultExpanded: ['a'] }],
       ['sortable table', { sortable: true, defaultSort: { column: 'message', direction: 'ascending' as const } }],
-      ['empty table', { items: [], empty: 'No logs', selectionMode: 'multiple' as const }],
+      ['empty table', { items: [], renderEmptyState: () => 'No logs', selectionMode: 'multiple' as const }],
       ['grid with actions', { rowProps: () => ({ href: '/logs' }) }],
     ])('has no axe violations as a %s', async (_, props) => {
       const { container } = render(<LogsTable {...props} />);

@@ -14,8 +14,8 @@ export interface TableBodyProps<Item> extends Omit<ComponentProps<'tbody'>, 'chi
   itemToChildren?: (item: Item) => readonly Item[] | undefined;
   /** Renders the row for an item. */
   children: (item: Item) => React.ReactNode;
-  /** Rendered in a single cell that spans every column when there are no items. */
-  empty?: React.ReactNode;
+  /** Renders the content of a single cell that spans every column when there are no items. */
+  renderEmptyState?: () => React.ReactNode;
 }
 
 interface VisibleRow<Item> extends TableItem {
@@ -30,7 +30,7 @@ type TableBodyComponent = <Item>(
 export const TableBody = React.forwardRef(TableBodyImpl) as TableBodyComponent;
 
 function TableBodyImpl<Item>(props: TableBodyProps<Item>, ref: React.ForwardedRef<HTMLTableSectionElement>) {
-  const { render, items, itemToStringValue, itemToChildren, children, empty, ...otherProps } = props;
+  const { render, items, itemToStringValue, itemToChildren, children, renderEmptyState, ...otherProps } = props;
   const { expanded, syncBodyRows, columnCount, excludeFromNavigation } = useTableContext();
   const tree = itemToChildren !== undefined;
 
@@ -53,9 +53,9 @@ function TableBodyImpl<Item>(props: TableBodyProps<Item>, ref: React.ForwardedRe
   );
 
   const content =
-    rows.length === 0 && empty !== undefined ? (
+    rows.length === 0 && renderEmptyState ? (
       <tr ref={excludeEmptyRow}>
-        <td colSpan={columnCount || undefined}>{empty}</td>
+        <td colSpan={columnCount || undefined}>{renderEmptyState()}</td>
       </tr>
     ) : (
       rows.map(({ item, ...tableItem }) => (
