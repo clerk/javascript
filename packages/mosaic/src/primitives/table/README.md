@@ -26,7 +26,7 @@ const table = useDataTable({
 >
   <Table.Header>
     <Table.Column>
-      <Table.SelectionCheckbox aria-label='Select all' />
+      <Table.SelectionCheckbox />
     </Table.Column>
     <Table.Column>Message</Table.Column>
   </Table.Header>
@@ -38,10 +38,10 @@ const table = useDataTable({
         href={`/logs/${row.id}`}
       >
         <Table.Cell>
-          <Table.SelectionCheckbox aria-label={`Select ${row.original.message}`} />
+          <Table.SelectionCheckbox />
         </Table.Cell>
-        <Table.Cell>
-          <Table.ExpandButton aria-label='Toggle children' />
+        <Table.Cell rowHeader>
+          <Table.ExpandButton>▸</Table.ExpandButton>
           {row.original.message}
         </Table.Cell>
       </Table.Row>
@@ -49,6 +49,8 @@ const table = useDataTable({
   </Table.Body>
 </Table.Root>;
 ```
+
+Mark the cell that names the row with `rowHeader`. The row, its selection checkbox ("Select …") and its expand button ("Expand …" / "Collapse …") take their accessible names from it.
 
 `table.rows` holds only the visible rows: a child row is in the list while its parent is expanded. Use `--table-row-depth` to indent child rows.
 
@@ -69,7 +71,7 @@ Set `selectionMode` on `useDataTable` to `'single'`, `'multiple'` or `'none'`. W
 | `Table.Column`            | `<th scope="col">`      | Column header                                              |
 | `Table.Body`              | `<tbody>`               | Body                                                       |
 | `Table.Row`               | `<tr>`                  | Body row, with optional action, selection and tree state   |
-| `Table.Cell`              | `<td>`                  | Cell                                                       |
+| `Table.Cell`              | `<td>`                  | Cell. `<th scope="row">` with `rowHeader`.                 |
 | `Table.SelectionCheckbox` | `<input type=checkbox>` | Selects its row, or all rows when inside `Table.Header`    |
 | `Table.ExpandButton`      | `<button>`              | Toggles its row's children. Renders only if it can expand. |
 
@@ -92,6 +94,12 @@ Set `selectionMode` on `useDataTable` to `'single'`, `'multiple'` or `'none'`. W
 | `target`   | `string`            | —       | Link target                                                |
 | `rel`      | `string`            | —       | Link rel                                                   |
 | `download` | `boolean \| string` | —       | Link download                                              |
+
+### `Table.Cell`
+
+| Prop        | Type      | Default | Description                                                          |
+| ----------- | --------- | ------- | -------------------------------------------------------------------- |
+| `rowHeader` | `boolean` | `false` | Renders a row header that names the row, its checkbox and its button |
 
 All parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their default element.
 
@@ -135,5 +143,6 @@ Left and right swap in right-to-left layouts. A cell with a single button or lin
 ## ARIA
 
 - Root: `role="treegrid"` with tree rows, `role="grid"` with actions or selection, none otherwise. `aria-multiselectable` in multiple mode.
-- Row: `aria-selected` when selectable, `aria-disabled`. In a tree grid also `aria-level`, `aria-posinset`, `aria-setsize` and `aria-expanded`.
-- ExpandButton: `aria-expanded`, and `tabIndex={-1}` because the row's arrow keys expand and collapse it.
+- Row: `aria-labelledby` its row header cells, `aria-selected` when selectable, `aria-disabled`. In a tree grid also `aria-level`, `aria-posinset`, `aria-setsize` and `aria-expanded`.
+- SelectionCheckbox: labelled "Select" plus the row header, or "Select all" in the header.
+- ExpandButton: labelled "Expand" or "Collapse" plus the row header, `aria-expanded`, and `tabIndex={-1}` because the row's arrow keys expand and collapse it.

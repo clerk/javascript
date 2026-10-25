@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useId } from 'react';
 
 import type { DataTableRow, UseDataTableReturn } from '../hooks/use-data-table';
 
@@ -24,6 +24,8 @@ export interface TableContextValue {
 export interface TableRowContextValue {
   row: DataTableRow<unknown> | null;
   disabled: boolean;
+  rowHeaderIds: string | undefined;
+  registerRowHeader: (id: string) => () => void;
 }
 
 export const TableContext = createContext<TableContextValue | null>(null);
@@ -38,4 +40,15 @@ export function useTableContext() {
     throw new Error('Table compound components must be used within <Table.Root>');
   }
   return ctx;
+}
+
+export function useRowHeaderLabel(label: string, id: string | undefined) {
+  const generatedId = useId();
+  const ownId = id ?? generatedId;
+  const rowHeaderIds = useContext(TableRowContext)?.rowHeaderIds;
+  return {
+    id: ownId,
+    'aria-label': label,
+    'aria-labelledby': rowHeaderIds ? `${ownId} ${rowHeaderIds}` : undefined,
+  };
 }

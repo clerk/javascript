@@ -23,6 +23,13 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
   const canExpand = row?.getCanExpand() ?? false;
   const expanded = row?.getIsExpanded() ?? false;
   const selected = row?.getIsSelected() ?? false;
+  const [rowHeaders, setRowHeaders] = React.useState<string[]>([]);
+  const rowHeaderIds = rowHeaders.length > 0 ? rowHeaders.join(' ') : undefined;
+
+  const registerRowHeader = React.useCallback((id: string) => {
+    setRowHeaders(ids => [...ids, id]);
+    return () => setRowHeaders(ids => ids.filter(other => other !== id));
+  }, []);
 
   React.useLayoutEffect(() => (actionable ? registerAction() : undefined), [actionable, registerAction]);
 
@@ -34,6 +41,7 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
   };
 
   const defaultProps: Record<string, unknown> = {
+    'aria-labelledby': rowHeaderIds,
     'aria-selected': row?.getCanSelect() ? selected : undefined,
     'aria-disabled': disabled || undefined,
     ...(tree && row
@@ -84,7 +92,10 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
     },
   };
 
-  const rowContext = React.useMemo<TableRowContextValue>(() => ({ row, disabled }), [row, disabled]);
+  const rowContext = React.useMemo<TableRowContextValue>(
+    () => ({ row, disabled, rowHeaderIds, registerRowHeader }),
+    [row, disabled, rowHeaderIds, registerRowHeader],
+  );
 
   const state = { selected, disabled, expanded, actionable };
 

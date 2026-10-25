@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { TableRowContext, useTableContext } from './table-context';
+import { TableRowContext, useRowHeaderLabel, useTableContext } from './table-context';
 
 export type TableExpandButtonProps = ComponentProps<'button'>;
 
@@ -14,6 +14,7 @@ export const TableExpandButton = React.forwardRef<HTMLButtonElement, TableExpand
     const row = React.useContext(TableRowContext)?.row;
     const canExpand = row?.getCanExpand() ?? false;
     const expanded = row?.getIsExpanded() ?? false;
+    const labelProps = useRowHeaderLabel(expanded ? 'Collapse' : 'Expand', otherProps.id);
 
     const register = React.useCallback(
       (node: HTMLButtonElement | null) => {
@@ -25,6 +26,7 @@ export const TableExpandButton = React.forwardRef<HTMLButtonElement, TableExpand
     );
 
     const ownProps = {
+      ...labelProps,
       type: 'button',
       tabIndex: -1,
       'aria-expanded': expanded,

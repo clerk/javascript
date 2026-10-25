@@ -3,14 +3,15 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
-import { TableHeaderContext, TableRowContext, useTableContext } from './table-context';
+import { TableHeaderContext, TableRowContext, useRowHeaderLabel, useTableContext } from './table-context';
 
 export type TableSelectionCheckboxProps = ComponentProps<'input'>;
 
 export const TableSelectionCheckbox = React.forwardRef<HTMLInputElement, TableSelectionCheckboxProps>(
   function TableSelectionCheckbox(props, ref) {
     const { render, ...otherProps } = props;
-    const { enabled, checked, indeterminate, disabled, toggle } = useSelectionCheckboxState();
+    const { enabled, checked, indeterminate, disabled, label, toggle } = useSelectionCheckboxState();
+    const labelProps = useRowHeaderLabel(label, otherProps.id);
 
     const setIndeterminate = React.useCallback(
       (node: HTMLInputElement | null) => {
@@ -22,6 +23,7 @@ export const TableSelectionCheckbox = React.forwardRef<HTMLInputElement, TableSe
     );
 
     const ownProps = {
+      ...labelProps,
       type: 'checkbox',
       checked,
       disabled,
@@ -60,6 +62,7 @@ function useSelectionCheckboxState() {
       checked: row.getIsSelected(),
       indeterminate: false,
       disabled: rowContext.disabled || !row.getCanSelect(),
+      label: 'Select',
       toggle: row.toggleSelected,
     };
   }
@@ -69,6 +72,7 @@ function useSelectionCheckboxState() {
     checked: table?.getIsAllRowsSelected() ?? false,
     indeterminate: table?.getIsSomeRowsSelected() ?? false,
     disabled: table ? !table.rows.some(tableRow => tableRow.getCanSelect()) : true,
+    label: 'Select all',
     toggle: () => table?.toggleAllRowsSelected(),
   };
 }
