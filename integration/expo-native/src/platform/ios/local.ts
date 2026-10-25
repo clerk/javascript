@@ -73,7 +73,11 @@ async function simslimCheck(): Promise<DoctorCheck> {
   // The shared DoctorCheckId union has no simslim entry yet.
   const id = 'simslim' as DoctorCheckId;
   const version = await simslimVersion();
-  if (version === null) return { id, ok: true, state: 'warning', detail: 'not installed; lanes boot stock (brew install mobai-app/tap/simslim)' };
+  if (version === null) {
+    return process.env.VERIFY_SIMSLIM === '1'
+      ? { id, ok: false, detail: 'VERIFY_SIMSLIM=1 needs simslim, and it is not installed', fix: 'brew install mobai-app/tap/simslim, or unset VERIFY_SIMSLIM' }
+      : { id, ok: true, state: 'warning', detail: 'not installed; lanes boot stock (brew install mobai-app/tap/simslim)' };
+  }
   return laneBoot(process.env.VERIFY_SIMSLIM, true) === 'slim'
     ? { id, ok: true, detail: `slim on (simslim ${version})` }
     : { id, ok: true, state: 'warning', detail: `simslim ${version} is installed; VERIFY_SIMSLIM=0 keeps lanes stock` };
