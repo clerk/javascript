@@ -1,0 +1,175 @@
+import * as TablePrimitiveStories from './table.primitive.stories';
+
+# Table
+
+A headless primitive for a native `<table>` whose rows can run an action, be selected, or expand to show child rows. It ships no styles; target its `data-*` attributes for appearance. Rows, selection and expanded state come from `useDataTable`.
+
+## Example
+
+The example styles the parts with Tailwind, using their `data-*` attributes for state. Tab into the table to focus the first row, then use the arrow keys to move between rows and cells. Right Arrow expands a row and Left Arrow collapses it. Space selects a row and Enter opens it. The last row is disabled.
+
+<Story
+  name='Default'
+  storyModule={TablePrimitiveStories}
+/>
+
+## Usage
+
+```tsx
+import { useDataTable } from '@clerk/mosaic/primitives/hooks';
+import { Table } from '@clerk/mosaic/primitives/table';
+
+const table = useDataTable({
+  data: logs,
+  getRowId: log => log.id,
+  getSubRows: log => log.children,
+  selectionMode: 'multiple',
+});
+
+<Table.Root table={table} aria-label='Logs'>
+  <Table.Header>
+    <Table.Column>
+      <Table.SelectionCheckbox />
+    </Table.Column>
+    <Table.Column>Message</Table.Column>
+  </Table.Header>
+  <Table.Body>
+    {table.rows.map(row => (
+      <Table.Row key={row.id} row={row} href={`/logs/${row.id}`}>
+        <Table.Cell>
+          <Table.SelectionCheckbox />
+        </Table.Cell>
+        <Table.Cell rowHeader>
+          <Table.ExpandButton>▸</Table.ExpandButton>
+          {row.original.message}
+        </Table.Cell>
+      </Table.Row>
+    ))}
+  </Table.Body>
+</Table.Root>;
+```
+
+### Row headers
+
+Mark the cell that names the row with `rowHeader`. The row is labelled by it, and the selection checkbox and expand button get their names from it ("Select Alpha", "Expand Alpha" / "Collapse Alpha"). Every interactive table needs one.
+
+### Expandable rows
+
+Nest child records inside each record and tell `useDataTable` where they are with `getSubRows`. A row with children can expand. `table.rows` is a flat list of the rows to render: top-level rows, plus the children of every expanded row, right after their parent. Map over it as usual; there is no recursion in your JSX.
+
+```tsx
+const logs = [
+  {
+    id: 'req-1',
+    message: 'POST /v1/client/sign_ins',
+    children: [
+      { id: 'req-1-db', message: 'SELECT users' },
+      { id: 'req-1-hook', message: 'webhook user.signed_in' },
+    ],
+  },
+  { id: 'req-2', message: 'GET /v1/me' },
+];
+
+const table = useDataTable({
+  data: logs,
+  getRowId: log => log.id,
+  getSubRows: log => log.children,
+  defaultExpanded: { 'req-1': true },
+});
+
+// table.rows → req-1 (depth 0), req-1-db (depth 1), req-1-hook (depth 1), req-2 (depth 0)
+```
+
+`Table.ExpandButton` toggles its row and renders nothing on rows without children. Expanded state is keyed by row id; pass `expanded` and `onExpandedChange` to control it, or `getRowCanExpand` to make a row expandable before its children are loaded. Each row reports its `depth`, which `Table.Row` exposes as `--table-row-depth` for indenting.
+
+### Row actions
+
+Pass `onClick` or `href` (with `target`, `rel` and `download`) to `Table.Row`. The row runs the action on click and on Enter, with no link or button in a cell. Clicks on controls inside the row and on portaled content do not run it. `href` keeps modifier keys, so Cmd/Ctrl-click opens a new tab. For client-side routing, call `event.preventDefault()` in `onClick` and navigate.
+
+### Selection
+
+Set `selectionMode` on `useDataTable` to `'none'`, `'single'` or `'multiple'`. While nothing is selected, clicking an actionable row runs its action. Once a row is selected, clicking a row toggles its selection. Shift-click selects a range. The header checkbox selects all rows in `'multiple'` mode and does not render otherwise.
+
+### Keyboard
+
+The table becomes a grid, with one tab stop, when it has row actions, selection or tree rows. Otherwise it stays a plain table.
+
+| Key                      | Action                                                                                                     |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `ArrowDown` / `ArrowUp`  | Next or previous row, or the cell in the same column. Skips disabled rows.                                 |
+| `ArrowRight`             | On a collapsed row, expand it. Otherwise move into the first cell, then along the cells.                   |
+| `ArrowLeft`              | On an expanded row, collapse it. On a child row, move to its parent. From the first cell, back to the row. |
+| `Home` / `End`           | First or last row, or first or last cell in the row                                                        |
+| `Ctrl+Home` / `Ctrl+End` | First or last cell in the table                                                                            |
+| `Enter`                  | Run the row action, or toggle selection if the row has none. On a cell with controls, focus them.          |
+| `F2`                     | Focus the controls in the focused cell                                                                     |
+| `Escape`                 | Leave a cell's controls, or clear the selection                                                            |
+| `Space`                  | Toggle the row's selection. `Shift+Space` selects a range.                                                 |
+| `Ctrl+A` / `Cmd+A`       | Select all rows in `'multiple'` mode                                                                       |
+
+Left and right swap in right-to-left layouts. A cell with a single button or link focuses that control directly.
+
+## Parts
+
+| Part                      | Default element                            | Description                                                        |
+| ------------------------- | ------------------------------------------ | ------------------------------------------------------------------ |
+| `Table.Root`              | `table`                                    | Owns keyboard navigation. A `grid` or `treegrid` when interactive. |
+| `Table.Header`            | `thead`                                    | Wraps its columns in a `tr`                                        |
+| `Table.Column`            | `th scope="col"`                           | Column header                                                      |
+| `Table.Body`              | `tbody`                                    | Body                                                               |
+| `Table.Row`               | `tr`                                       | Row with optional action, selection and tree state                 |
+| `Table.Cell`              | `td`, or `th scope="row"` with `rowHeader` | Cell                                                               |
+| `Table.SelectionCheckbox` | `input type="checkbox"`                    | Selects its row, or all rows inside `Table.Header`                 |
+| `Table.ExpandButton`      | `button`                                   | Toggles its row's children. Renders only when the row can expand.  |
+
+Every part accepts `render` for polymorphic rendering and throws outside `Table.Root`.
+
+## Props
+
+### `Table.Root`
+
+| Prop    | Type              | Default | Description                                                         |
+| ------- | ----------------- | ------- | ------------------------------------------------------------------- |
+| `table` | `TableCollection` | —       | The return value of `useDataTable`: rows, selection, expanded state |
+
+### `Table.Row`
+
+| Prop       | Type                          | Default | Description                                            |
+| ---------- | ----------------------------- | ------- | ------------------------------------------------------ |
+| `row`      | `DataTableRow`                | —       | The row from `useDataTable`                            |
+| `disabled` | `boolean`                     | `false` | Removes the row from navigation, selection and actions |
+| `onClick`  | `(event: MouseEvent) => void` | —       | Row action. Runs before `href`.                        |
+| `href`     | `string`                      | —       | Opens this URL as the row action                       |
+| `target`   | `string`                      | —       | Target for `href`                                      |
+| `rel`      | `string`                      | —       | Rel for `href`                                         |
+| `download` | `boolean \| string`           | —       | Downloads `href` instead of opening it                 |
+
+### `Table.Cell`
+
+| Prop        | Type      | Default | Description                                                      |
+| ----------- | --------- | ------- | ---------------------------------------------------------------- |
+| `rowHeader` | `boolean` | `false` | Renders a row header that names the row, its checkbox and button |
+
+`Table.Header`, `Table.Column`, `Table.Body`, `Table.SelectionCheckbox` and `Table.ExpandButton` take no additional props beyond standard HTML attributes for their default element. Passing `aria-label` to the checkbox or expand button replaces the default "Select" or "Expand" word; the row header is still added.
+
+## Styling
+
+Each part emits `data-*` attributes you can target with any CSS solution:
+
+| Attribute            | Applies To             | Description                         |
+| -------------------- | ---------------------- | ----------------------------------- |
+| `data-selected`      | Row                    | Present when the row is selected    |
+| `data-disabled`      | Row, SelectionCheckbox | Present when disabled               |
+| `data-expanded`      | Row, ExpandButton      | Present when the row is expanded    |
+| `data-collapsed`     | ExpandButton           | Present when the row is collapsed   |
+| `data-actionable`    | Row                    | Present when the row has an action  |
+| `data-checked`       | SelectionCheckbox      | Present when checked                |
+| `data-indeterminate` | SelectionCheckbox      | Present when some rows are selected |
+
+`Table.Row` exposes `--table-row-depth` (`0` for top-level rows) for indenting child rows:
+
+```css
+th[scope='row'] {
+  padding-inline-start: calc(var(--table-row-depth) * 1.5rem);
+}
+```
