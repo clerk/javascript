@@ -10,4 +10,4 @@ export type {
   TableSelectionCheckboxProps,
   TableExpandButtonProps,
 } from './parts';
-export type { TableCollection } from './table-context';
+export type { TableSelectionMode, TableSort } from './table-context';

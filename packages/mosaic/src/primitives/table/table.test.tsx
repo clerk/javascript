@@ -1,12 +1,11 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
-import { type ExpandedState, type SelectionMode, useDataTable, type UseDataTableOptions } from '../hooks';
 import { Menu } from '../menu';
 import { axe } from '../test-utils/axe';
-import { Table, type TableRowProps } from './index';
+import { Table, type TableRootProps, type TableRowProps, type TableSort } from './index';
 
 afterEach(() => cleanup());
 
@@ -27,61 +26,76 @@ const LOGS: Log[] = [
 
 const FLAT_LOGS = LOGS.map(({ id, message }) => ({ id, message }));
 
+const LOGS_WITH_GRANDCHILDREN: Log[] = [
+  {
+    id: 'a',
+    message: 'Alpha',
+    children: [{ id: 'a1', message: 'Alpha one', children: [{ id: 'a1x', message: 'Alpha one retry' }] }],
+  },
+  { id: 'b', message: 'Bravo' },
+];
+
+const toValue = (log: Log) => log.id;
+const toChildren = (log: Log) => log.children;
+
 function LogsTable({
-  data = FLAT_LOGS,
-  selectionMode = 'none',
+  items = FLAT_LOGS,
+  tree = false,
   rowProps,
-  options,
-}: {
-  data?: Log[];
-  selectionMode?: SelectionMode;
-  rowProps?: (log: Log) => Omit<TableRowProps, 'row'>;
-  options?: Partial<UseDataTableOptions<Log>>;
+  empty,
+  sortable = false,
+  ...rootProps
+}: TableRootProps & {
+  items?: Log[];
+  tree?: boolean;
+  rowProps?: (log: Log) => TableRowProps;
+  empty?: ReactNode;
+  sortable?: boolean;
 }) {
-  const table = useDataTable({
-    data,
-    getRowId: log => log.id,
-    getSubRows: log => log.children,
-    selectionMode,
-    ...options,
-  });
+  const selectable = (rootProps.selectionMode ?? 'none') !== 'none';
   return (
     <>
       <button type='button'>Before</button>
       <Table.Root
-        table={table}
         aria-label='Logs'
+        {...rootProps}
       >
         <Table.Header>
-          {selectionMode === 'none' ? null : (
+          {selectable ? (
             <Table.Column>
               <Table.SelectionCheckbox />
             </Table.Column>
-          )}
-          <Table.Column>Message</Table.Column>
+          ) : null}
+          <Table.Column
+            value='message'
+            sortable={sortable}
+          >
+            Message
+          </Table.Column>
           <Table.Column>Actions</Table.Column>
         </Table.Header>
-        <Table.Body>
-          {table.rows.map(row => (
-            <Table.Row
-              key={row.id}
-              row={row}
-              {...rowProps?.(row.original)}
-            >
-              {selectionMode === 'none' ? null : (
+        <Table.Body
+          items={items}
+          itemToStringValue={toValue}
+          itemToChildren={tree ? toChildren : undefined}
+          empty={empty}
+        >
+          {log => (
+            <Table.Row {...rowProps?.(log)}>
+              {selectable ? (
                 <Table.Cell>
                   <Table.SelectionCheckbox />
                 </Table.Cell>
-              )}
+              ) : null}
               <Table.Cell rowHeader>
                 <Table.ExpandButton />
-                {row.original.message}
+                {log.message}
               </Table.Cell>
               <Table.Cell>
-                <button type='button'>{`Copy ${row.original.message}`}</button>
+                <button type='button'>{`Copy ${log.message}`}</button>
               </Table.Cell>
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
       <button type='button'>After</button>
@@ -129,7 +143,12 @@ describe('Table', () => {
     });
 
     it('is a treegrid when rows can expand', () => {
-      render(<LogsTable data={LOGS} />);
+      render(
+        <LogsTable
+          items={LOGS}
+          tree
+        />,
+      );
 
       expect(screen.getByRole('treegrid', { name: 'Logs' })).toBeInTheDocument();
     });
@@ -152,7 +171,12 @@ describe('Table', () => {
 
     it('names the expand button from its state and the row header', async () => {
       const user = userEvent.setup();
-      render(<LogsTable data={LOGS} />);
+      render(
+        <LogsTable
+          items={LOGS}
+          tree
+        />,
+      );
 
       await user.click(screen.getByRole('button', { name: 'Expand Alpha' }));
 
@@ -176,18 +200,14 @@ describe('Table', () => {
     it('ignores clicks from portaled content rendered inside the row', async () => {
       const user = userEvent.setup();
       const onClick = vi.fn();
-      function PortalRow() {
-        const table = useDataTable({ data: FLAT_LOGS, getRowId: log => log.id, selectionMode: 'none' });
-        return (
-          <Table.Root
-            table={table}
-            aria-label='Logs'
+      render(
+        <Table.Root aria-label='Logs'>
+          <Table.Body
+            items={FLAT_LOGS.slice(0, 1)}
+            itemToStringValue={toValue}
           >
-            <Table.Body>
-              <Table.Row
-                row={table.rows[0]}
-                onClick={onClick}
-              >
+            {() => (
+              <Table.Row onClick={onClick}>
                 <Table.Cell>
                   <Menu.Root>
                     <Menu.Trigger>Actions</Menu.Trigger>
@@ -201,11 +221,10 @@ describe('Table', () => {
                   </Menu.Root>
                 </Table.Cell>
               </Table.Row>
-            </Table.Body>
-          </Table.Root>
-        );
-      }
-      render(<PortalRow />);
+            )}
+          </Table.Body>
+        </Table.Root>,
+      );
 
       await user.click(screen.getByRole('button', { name: 'Actions' }));
       await user.click(await screen.findByRole('menuitem', { name: 'Archive' }));
@@ -367,30 +386,34 @@ describe('Table', () => {
       expect(onClick).toHaveBeenCalledTimes(2);
     });
 
-    it('does not select rows the table marks as not selectable', async () => {
+    it('does not select a disabled row, including in a range', async () => {
       const user = userEvent.setup();
       render(
         <LogsTable
           selectionMode='multiple'
-          options={{ isRowSelectable: log => log.id !== 'b' }}
+          rowProps={log => ({ disabled: log.id === 'b' })}
         />,
       );
 
       expect(checkbox('Bravo')).toBeDisabled();
       expect(row('Bravo')).not.toHaveAttribute('aria-selected');
-      await tabIntoTable(user);
-      await user.keyboard('{ArrowDown} ');
       await user.click(screen.getByText('Bravo'));
+      expect(checkbox('Bravo')).not.toBeChecked();
 
+      await user.click(checkbox('Alpha'));
+      await user.keyboard('{Shift>}');
+      await user.click(checkbox('Charlie'));
+      await user.keyboard('{/Shift}');
+      expect(checkbox('Charlie')).toBeChecked();
       expect(checkbox('Bravo')).not.toBeChecked();
     });
 
-    it('drives the select-all checkbox from the row selection', async () => {
+    it('drives the select-all checkbox from the selectable rows', async () => {
       const user = userEvent.setup();
       render(
         <LogsTable
           selectionMode='multiple'
-          options={{ isRowSelectable: log => log.id !== 'b' }}
+          rowProps={log => ({ disabled: log.id === 'b' })}
         />,
       );
       const selectAll = screen.getByRole('checkbox', { name: 'Select all' });
@@ -441,31 +464,83 @@ describe('Table', () => {
       expect(onKeyDown).toHaveBeenCalledWith('Escape');
     });
 
-    it('works with controlled row selection', async () => {
+    it('starts from defaultSelection and reports changes', async () => {
+      const user = userEvent.setup();
+      const onSelectionChange = vi.fn();
+      render(
+        <LogsTable
+          selectionMode='multiple'
+          defaultSelection={['c']}
+          onSelectionChange={onSelectionChange}
+        />,
+      );
+
+      expect(checkbox('Charlie')).toBeChecked();
+      await user.click(checkbox('Alpha'));
+
+      expect(onSelectionChange).toHaveBeenLastCalledWith(['c', 'a']);
+      expect(checkbox('Alpha')).toBeChecked();
+    });
+
+    it('works with a controlled selection', async () => {
       const user = userEvent.setup();
       function Controlled() {
-        const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({ c: true });
+        const [selection, setSelection] = useState(['c']);
         return (
-          <LogsTable
-            selectionMode='multiple'
-            options={{ rowSelection, onRowSelectionChange: setRowSelection }}
-          />
+          <>
+            <LogsTable
+              selectionMode='multiple'
+              selection={selection}
+              onSelectionChange={setSelection}
+            />
+            <button
+              type='button'
+              onClick={() => setSelection([])}
+            >
+              Clear
+            </button>
+          </>
         );
       }
       render(<Controlled />);
 
       expect(checkbox('Charlie')).toBeChecked();
       await user.click(checkbox('Alpha'));
-
       expect(checkbox('Alpha')).toBeChecked();
       expect(checkbox('Charlie')).toBeChecked();
+
+      await user.click(screen.getByRole('button', { name: 'Clear' }));
+      expect(checkbox('Alpha')).not.toBeChecked();
+      expect(checkbox('Charlie')).not.toBeChecked();
+    });
+
+    it('does not change a controlled selection on its own', async () => {
+      const user = userEvent.setup();
+      const onSelectionChange = vi.fn();
+      render(
+        <LogsTable
+          selectionMode='multiple'
+          selection={[]}
+          onSelectionChange={onSelectionChange}
+        />,
+      );
+
+      await user.click(checkbox('Alpha'));
+
+      expect(onSelectionChange).toHaveBeenCalledWith(['a']);
+      expect(checkbox('Alpha')).not.toBeChecked();
     });
   });
 
   describe('tree rows', () => {
     it('describes each row in the tree and renders children only when expanded', async () => {
       const user = userEvent.setup();
-      render(<LogsTable data={LOGS} />);
+      render(
+        <LogsTable
+          items={LOGS}
+          tree
+        />,
+      );
 
       expect(row('Alpha')).toHaveAttribute('aria-expanded', 'false');
       expect(row('Alpha')).toHaveAttribute('aria-level', '1');
@@ -490,7 +565,8 @@ describe('Table', () => {
       const onClick = vi.fn();
       render(
         <LogsTable
-          data={LOGS}
+          items={LOGS}
+          tree
           rowProps={() => ({ onClick })}
         />,
       );
@@ -503,7 +579,12 @@ describe('Table', () => {
 
     it('expands with the forward arrow, collapses with the back arrow and moves to the parent', async () => {
       const user = userEvent.setup();
-      render(<LogsTable data={LOGS} />);
+      render(
+        <LogsTable
+          items={LOGS}
+          tree
+        />,
+      );
 
       await tabIntoTable(user);
       await user.keyboard('{ArrowRight}');
@@ -526,7 +607,10 @@ describe('Table', () => {
       const user = userEvent.setup();
       render(
         <div dir='rtl'>
-          <LogsTable data={LOGS} />
+          <LogsTable
+            items={LOGS}
+            tree
+          />
         </div>,
       );
       screen.getByRole('treegrid').style.direction = 'rtl';
@@ -541,31 +625,220 @@ describe('Table', () => {
       expect(screen.getByRole('button', { name: 'Copy Alpha' })).toHaveFocus();
     });
 
+    it('starts from defaultExpanded and reports changes', async () => {
+      const user = userEvent.setup();
+      const onExpandedChange = vi.fn();
+      render(
+        <LogsTable
+          items={LOGS}
+          tree
+          defaultExpanded={['a']}
+          onExpandedChange={onExpandedChange}
+        />,
+      );
+
+      expect(screen.getByText('Alpha one')).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Collapse Alpha' }));
+
+      expect(onExpandedChange).toHaveBeenCalledWith([]);
+      expect(screen.queryByText('Alpha one')).not.toBeInTheDocument();
+    });
+
     it('works with controlled expanded state', async () => {
       const user = userEvent.setup();
       const onExpandedChange = vi.fn();
+      const { rerender } = render(
+        <LogsTable
+          items={LOGS}
+          tree
+          expanded={[]}
+          onExpandedChange={onExpandedChange}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Expand Alpha' }));
+      expect(onExpandedChange).toHaveBeenCalledWith(['a']);
+      expect(screen.queryByText('Alpha one')).not.toBeInTheDocument();
+
+      rerender(
+        <LogsTable
+          items={LOGS}
+          tree
+          expanded={['a']}
+          onExpandedChange={onExpandedChange}
+        />,
+      );
+      expect(screen.getByText('Alpha one')).toBeInTheDocument();
+    });
+
+    it('hides grandchildren with their parent and keeps their expanded state', async () => {
+      const user = userEvent.setup();
+      render(
+        <LogsTable
+          items={LOGS_WITH_GRANDCHILDREN}
+          tree
+          defaultExpanded={['a', 'a1']}
+        />,
+      );
+
+      expect(row('Alpha one retry')).toHaveAttribute('aria-level', '3');
+      await user.click(screen.getByRole('button', { name: 'Collapse Alpha' }));
+      expect(screen.queryByText('Alpha one')).not.toBeInTheDocument();
+      expect(screen.queryByText('Alpha one retry')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Expand Alpha' }));
+      expect(screen.getByText('Alpha one retry')).toBeInTheDocument();
+    });
+
+    it('lets a row without loaded children expand when it is expandable', async () => {
+      const user = userEvent.setup();
+      const onExpandedChange = vi.fn();
+      render(
+        <LogsTable
+          items={LOGS}
+          tree
+          rowProps={log => ({ expandable: log.id === 'b' })}
+          onExpandedChange={onExpandedChange}
+        />,
+      );
+
+      expect(row('Bravo')).toHaveAttribute('aria-expanded', 'false');
+      expect(row('Charlie')).not.toHaveAttribute('aria-expanded');
+      await user.click(screen.getByRole('button', { name: 'Expand Bravo' }));
+
+      expect(onExpandedChange).toHaveBeenCalledWith(['b']);
+      expect(row('Bravo')).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('moves focus from a child row to its parent when the parent collapses', async () => {
+      const user = userEvent.setup();
+      render(
+        <LogsTable
+          items={LOGS}
+          tree
+          defaultExpanded={['a']}
+        />,
+      );
+
+      await tabIntoTable(user);
+      await user.keyboard('{ArrowDown}{ArrowDown}');
+      expect(row('Alpha two')).toHaveFocus();
+      await user.click(screen.getByRole('button', { name: 'Collapse Alpha' }));
+
+      expect(row('Alpha')).toHaveFocus();
+    });
+  });
+
+  describe('sorting', () => {
+    const header = (name: string) => screen.getByRole('columnheader', { name });
+
+    it('sorts ascending, then flips the direction on each click', async () => {
+      const user = userEvent.setup();
+      const onSortChange = vi.fn();
+      render(
+        <LogsTable
+          sortable
+          onSortChange={onSortChange}
+        />,
+      );
+
+      expect(screen.getByRole('grid', { name: 'Logs' })).toBeInTheDocument();
+      expect(header('Message')).toHaveAttribute('aria-sort', 'none');
+      expect(header('Actions')).not.toHaveAttribute('aria-sort');
+
+      await user.click(header('Message'));
+      expect(onSortChange).toHaveBeenLastCalledWith({ column: 'message', direction: 'ascending' });
+      expect(header('Message')).toHaveAttribute('aria-sort', 'ascending');
+      expect(header('Message')).toHaveAttribute('data-sort-direction', 'ascending');
+
+      await user.click(header('Message'));
+      expect(onSortChange).toHaveBeenLastCalledWith({ column: 'message', direction: 'descending' });
+      expect(header('Message')).toHaveAttribute('aria-sort', 'descending');
+
+      await user.click(header('Actions'));
+      expect(onSortChange).toHaveBeenCalledTimes(2);
+    });
+
+    it('starts ascending when another column was sorted', async () => {
+      const user = userEvent.setup();
+      const onSortChange = vi.fn();
+      render(
+        <LogsTable
+          sortable
+          defaultSort={{ column: 'status', direction: 'descending' }}
+          onSortChange={onSortChange}
+        />,
+      );
+
+      await user.click(header('Message'));
+
+      expect(onSortChange).toHaveBeenCalledWith({ column: 'message', direction: 'ascending' });
+    });
+
+    it('sorts with Enter and Space on the focused column header', async () => {
+      const user = userEvent.setup();
+      render(<LogsTable sortable />);
+
+      await tabIntoTable(user);
+      await user.keyboard('{ArrowUp}');
+      expect(header('Message')).toHaveFocus();
+      await user.keyboard('{Enter}');
+      expect(header('Message')).toHaveAttribute('aria-sort', 'ascending');
+      await user.keyboard(' ');
+      expect(header('Message')).toHaveAttribute('aria-sort', 'descending');
+    });
+
+    it('works with a controlled sort', async () => {
+      const user = userEvent.setup();
       function Controlled() {
-        const [expanded, setExpanded] = useState<ExpandedState>({ a: true });
+        const [sort, setSort] = useState<TableSort | null>({ column: 'message', direction: 'descending' });
         return (
           <LogsTable
-            data={LOGS}
-            options={{
-              expanded,
-              onExpandedChange: next => {
-                onExpandedChange(next);
-                setExpanded(next);
-              },
-            }}
+            sortable
+            sort={sort}
+            onSortChange={setSort}
           />
         );
       }
       render(<Controlled />);
 
-      expect(screen.getByText('Alpha one')).toBeInTheDocument();
-      await user.click(screen.getByRole('button', { name: 'Collapse Alpha' }));
+      expect(header('Message')).toHaveAttribute('aria-sort', 'descending');
+      await user.click(header('Message'));
 
-      expect(onExpandedChange).toHaveBeenCalledWith({ a: false });
-      expect(screen.queryByText('Alpha one')).not.toBeInTheDocument();
+      expect(header('Message')).toHaveAttribute('aria-sort', 'ascending');
+    });
+  });
+
+  describe('empty state', () => {
+    it('renders the empty content in one cell that spans every column', () => {
+      render(
+        <LogsTable
+          items={[]}
+          selectionMode='multiple'
+          empty='No logs'
+        />,
+      );
+
+      const cell = screen.getByText('No logs');
+      expect(cell.tagName).toBe('TD');
+      expect(cell).toHaveAttribute('colspan', '3');
+      expect(screen.getByRole('checkbox', { name: 'Select all' })).toBeDisabled();
+    });
+
+    it('moves focus to the column headers when tabbing into an empty grid', async () => {
+      const user = userEvent.setup();
+      render(
+        <LogsTable
+          items={[]}
+          selectionMode='multiple'
+          empty='No logs'
+        />,
+      );
+
+      await tabIntoTable(user);
+
+      expect(screen.getByRole('checkbox', { name: 'Select all' })).not.toHaveFocus();
+      expect(focused()).toBe(screen.getAllByRole('columnheader')[0]);
     });
   });
 
@@ -645,33 +918,29 @@ describe('Table', () => {
 
     it('enters a cell of several controls with Enter and leaves it with Escape', async () => {
       const user = userEvent.setup();
-      function Controls() {
-        const table = useDataTable({ data: FLAT_LOGS, getRowId: log => log.id });
-        return (
-          <Table.Root
-            table={table}
-            aria-label='Logs'
+      render(
+        <Table.Root
+          aria-label='Logs'
+          selectionMode='single'
+        >
+          <Table.Body
+            items={FLAT_LOGS}
+            itemToStringValue={toValue}
           >
-            <Table.Body>
-              {table.rows.map(tableRow => (
-                <Table.Row
-                  key={tableRow.id}
-                  row={tableRow}
-                >
-                  <Table.Cell>
-                    <button type='button'>{`Edit ${tableRow.original.message}`}</button>
-                    <button type='button'>{`Remove ${tableRow.original.message}`}</button>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <input aria-label={`${tableRow.original.message} note`} />
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table.Root>
-        );
-      }
-      render(<Controls />);
+            {log => (
+              <Table.Row>
+                <Table.Cell>
+                  <button type='button'>{`Edit ${log.message}`}</button>
+                  <button type='button'>{`Remove ${log.message}`}</button>
+                </Table.Cell>
+                <Table.Cell>
+                  <input aria-label={`${log.message} note`} />
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table.Root>,
+      );
 
       await user.tab();
       await user.keyboard('{ArrowRight}');
@@ -696,36 +965,32 @@ describe('Table', () => {
 
     it('opens a cell menu with Enter and leaves its arrow keys alone', async () => {
       const user = userEvent.setup();
-      function MenuTable() {
-        const table = useDataTable({ data: FLAT_LOGS, getRowId: log => log.id });
-        return (
-          <Table.Root
-            table={table}
-            aria-label='Logs'
+      render(
+        <Table.Root
+          aria-label='Logs'
+          selectionMode='single'
+        >
+          <Table.Body
+            items={FLAT_LOGS}
+            itemToStringValue={toValue}
           >
-            <Table.Body>
-              {table.rows.map(tableRow => (
-                <Table.Row
-                  key={tableRow.id}
-                  row={tableRow}
-                >
-                  <Table.Cell>
-                    <Menu.Root>
-                      <Menu.Trigger>{`${tableRow.original.message} actions`}</Menu.Trigger>
-                      <Menu.Positioner>
-                        <Menu.Popup>
-                          <Menu.Item label='Archive'>Archive</Menu.Item>
-                        </Menu.Popup>
-                      </Menu.Positioner>
-                    </Menu.Root>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table.Root>
-        );
-      }
-      render(<MenuTable />);
+            {log => (
+              <Table.Row>
+                <Table.Cell>
+                  <Menu.Root>
+                    <Menu.Trigger>{`${log.message} actions`}</Menu.Trigger>
+                    <Menu.Positioner>
+                      <Menu.Popup>
+                        <Menu.Item label='Archive'>Archive</Menu.Item>
+                      </Menu.Popup>
+                    </Menu.Positioner>
+                  </Menu.Root>
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table.Root>,
+      );
 
       await user.tab();
       await user.keyboard('{ArrowRight}');
@@ -747,7 +1012,7 @@ describe('Table', () => {
       rerender(
         <LogsTable
           selectionMode='multiple'
-          data={FLAT_LOGS.slice(0, 2)}
+          items={FLAT_LOGS.slice(0, 2)}
         />,
       );
       await tabIntoTable(user);
@@ -760,7 +1025,9 @@ describe('Table', () => {
     it.each([
       ['plain', {}],
       ['grid', { selectionMode: 'multiple' as const }],
-      ['treegrid', { data: LOGS, options: { defaultExpanded: { a: true } } }],
+      ['treegrid', { items: LOGS, tree: true, defaultExpanded: ['a'] }],
+      ['sortable table', { sortable: true, defaultSort: { column: 'message', direction: 'ascending' as const } }],
+      ['empty table', { items: [], empty: 'No logs', selectionMode: 'multiple' as const }],
       ['grid with actions', { rowProps: () => ({ href: '/logs' }) }],
     ])('has no axe violations as a %s', async (_, props) => {
       const { container } = render(<LogsTable {...props} />);
@@ -776,9 +1043,9 @@ describe('Table', () => {
       render(
         <table>
           <tbody>
-            <Table.Row>
+            <tr>
               <Table.Cell />
-            </Table.Row>
+            </tr>
           </tbody>
         </table>,
       ),

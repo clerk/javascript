@@ -2,27 +2,31 @@
 
 import React from 'react';
 
-import type { DataTableRow } from '../hooks/use-data-table';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
-import { TableRowContext, type TableRowContextValue, useTableContext } from './table-context';
-import { isRowOwnClick, isRtl, openLink, type TableLink } from './table-dom';
+import { TableRowContext, type TableRowContextValue, useTableContext, useTableItem } from './table-context';
+import { focusIsInChildRows, isRowOwnClick, isRtl, openLink, type TableLink } from './table-dom';
 
 export interface TableRowProps extends ComponentProps<'tr'>, Partial<TableLink> {
-  /** The row from `useDataTable`. It drives the row's selection and tree state. */
-  row?: DataTableRow<unknown>;
   /** Removes the row from keyboard navigation, selection and its action. @default false */
   disabled?: boolean;
+  /** Lets the row expand before its children are loaded. @default false */
+  expandable?: boolean;
 }
 
 export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(function TableRow(props, ref) {
-  const { render, row = null, disabled = false, href, target, rel, download, onClick, ...otherProps } = props;
-  const { tree, hasSelection, registerAction } = useTableContext();
+  const { render, disabled = false, expandable = false, href, target, rel, download, onClick, ...otherProps } = props;
+  const table = useTableContext();
+  const item = useTableItem();
+  const { value } = item;
+  const { registerDisabled, registerInteractive } = table;
+  const elementRef = React.useRef<HTMLTableRowElement | null>(null);
 
   const actionable = !disabled && (onClick !== undefined || href !== undefined);
-  const canSelect = !disabled && (row?.getCanSelect() ?? false);
-  const canExpand = row?.getCanExpand() ?? false;
-  const expanded = row?.getIsExpanded() ?? false;
-  const selected = row?.getIsSelected() ?? false;
+  const canSelect = !disabled && table.selectionMode !== 'none';
+  const selected = table.selection.includes(value);
+  const canExpand = table.tree && (item.hasChildren || expandable);
+  const expanded = canExpand && table.expanded.includes(value);
+  const hasSelection = table.selection.length > 0;
   const [rowHeaders, setRowHeaders] = React.useState<string[]>([]);
   const rowHeaderIds = rowHeaders.length > 0 ? rowHeaders.join(' ') : undefined;
 
@@ -31,7 +35,25 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
     return () => setRowHeaders(ids => ids.filter(other => other !== id));
   }, []);
 
-  React.useLayoutEffect(() => (actionable ? registerAction() : undefined), [actionable, registerAction]);
+  React.useLayoutEffect(() => (actionable ? registerInteractive() : undefined), [actionable, registerInteractive]);
+  React.useLayoutEffect(() => (disabled ? registerDisabled(value) : undefined), [disabled, value, registerDisabled]);
+
+  const toggleSelected = (options?: { range?: boolean }) => {
+    if (canSelect) {
+      table.toggleSelected(value, options);
+    }
+  };
+
+  const toggleExpanded = () => {
+    if (!canExpand) {
+      return;
+    }
+    const element = elementRef.current;
+    if (expanded && element && focusIsInChildRows(element)) {
+      element.focus();
+    }
+    table.toggleExpanded(value);
+  };
 
   const runAction = (event: React.MouseEvent<HTMLTableRowElement>) => {
     onClick?.(event);
@@ -42,24 +64,24 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
 
   const defaultProps: Record<string, unknown> = {
     'aria-labelledby': rowHeaderIds,
-    'aria-selected': row?.getCanSelect() ? selected : undefined,
+    'aria-selected': canSelect ? selected : undefined,
     'aria-disabled': disabled || undefined,
-    ...(tree && row
+    ...(table.tree
       ? {
-          'aria-level': row.depth + 1,
-          'aria-posinset': row.index + 1,
-          'aria-setsize': row.setSize,
+          'aria-level': item.depth + 1,
+          'aria-posinset': item.index + 1,
+          'aria-setsize': item.setSize,
           'aria-expanded': canExpand ? expanded : undefined,
         }
       : {}),
-    style: row ? { '--table-row-depth': row.depth } : undefined,
+    style: { '--table-row-depth': item.depth },
     onClick: (event: React.MouseEvent<HTMLTableRowElement>) => {
       if (disabled || !isRowOwnClick(event)) {
         return;
       }
       const pointer = event.detail !== 0;
       if (canSelect && pointer && (hasSelection || !actionable)) {
-        row?.toggleSelected({ range: event.shiftKey });
+        toggleSelected({ range: event.shiftKey });
       } else if (actionable) {
         runAction(event);
       }
@@ -76,26 +98,33 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
         event.preventDefault();
         if (actionable) {
           element.click();
-        } else if (canSelect) {
-          row?.toggleSelected();
+        } else {
+          toggleSelected();
         }
       } else if (event.key === ' ' && canSelect) {
         event.preventDefault();
-        row?.toggleSelected({ range: event.shiftKey });
+        toggleSelected({ range: event.shiftKey });
       } else if (onRow && canExpand) {
         const [expandKey, collapseKey] = isRtl(element) ? ['ArrowLeft', 'ArrowRight'] : ['ArrowRight', 'ArrowLeft'];
         if ((event.key === expandKey && !expanded) || (event.key === collapseKey && expanded)) {
           event.preventDefault();
-          row?.toggleExpanded();
+          toggleExpanded();
         }
       }
     },
   };
 
-  const rowContext = React.useMemo<TableRowContextValue>(
-    () => ({ row, disabled, rowHeaderIds, registerRowHeader }),
-    [row, disabled, rowHeaderIds, registerRowHeader],
-  );
+  const rowContext: TableRowContextValue = {
+    disabled,
+    canSelect,
+    selected,
+    canExpand,
+    expanded,
+    toggleSelected,
+    toggleExpanded,
+    rowHeaderIds,
+    registerRowHeader,
+  };
 
   const state = { selected, disabled, expanded, actionable };
 
@@ -104,7 +133,7 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
       {useRender({
         defaultTagName: 'tr',
         render,
-        ref,
+        ref: [elementRef, ref],
         state,
         stateAttributesMapping: {
           selected: (v: boolean) => (v ? { 'data-selected': '' } : null),

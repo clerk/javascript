@@ -1,7 +1,6 @@
 'use client';
 
-import { useDataTable } from '@clerk/mosaic/primitives/hooks';
-import { Table } from '@clerk/mosaic/primitives/table';
+import { Table, type TableSort } from '@clerk/mosaic/primitives/table';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -54,36 +53,42 @@ const CELL =
 
 export function Default() {
   const [opened, setOpened] = useState<string | null>(null);
-  const table = useDataTable({
-    data: LOGS,
-    getRowId: log => log.id,
-    getSubRows: log => log.children,
-    defaultExpanded: { 'req-1': true },
-    selectionMode: 'multiple',
-  });
+  const [sort, setSort] = useState<TableSort | null>(null);
+  const logs = sort ? sortLogs(LOGS, sort) : LOGS;
 
   return (
     <div className='not-prose w-full'>
       <Table.Root
-        table={table}
         aria-label='Request logs'
+        selectionMode='multiple'
+        defaultExpanded={['req-1']}
+        sort={sort}
+        onSortChange={setSort}
         className='w-full border-collapse text-sm'
       >
         <Table.Header className='text-muted-foreground'>
           <Table.Column className={`${CELL} w-10 font-medium`}>
             <Table.SelectionCheckbox />
           </Table.Column>
-          <Table.Column className={`${CELL} font-medium`}>Message</Table.Column>
+          <Table.Column
+            value='message'
+            sortable
+            className={`${CELL} hover:text-foreground cursor-pointer font-medium after:ms-1 data-[sort-direction=ascending]:after:content-['↑'] data-[sort-direction=descending]:after:content-['↓']`}
+          >
+            Message
+          </Table.Column>
           <Table.Column className={`${CELL} font-medium`}>Status</Table.Column>
           <Table.Column className={`${CELL} font-medium`}>Duration</Table.Column>
         </Table.Header>
-        <Table.Body>
-          {table.rows.map(row => (
+        <Table.Body
+          items={logs}
+          itemToStringValue={log => log.id}
+          itemToChildren={log => log.children}
+        >
+          {log => (
             <Table.Row
-              key={row.id}
-              row={row}
-              disabled={row.id === 'req-4'}
-              onClick={() => setOpened(row.original.message)}
+              disabled={log.id === 'req-4'}
+              onClick={() => setOpened(log.message)}
               className='hover:bg-muted data-selected:bg-accent focus-visible:outline-ring data-actionable:cursor-pointer data-disabled:cursor-default data-disabled:opacity-50 focus-visible:outline-2 focus-visible:-outline-offset-2'
             >
               <Table.Cell className={CELL}>
@@ -96,12 +101,12 @@ export function Default() {
                 <Table.ExpandButton className='hover:bg-muted-foreground/15 data-expanded:rotate-90 rtl:data-collapsed:-scale-x-100 -ms-6 me-1 size-5 cursor-pointer rounded'>
                   ›
                 </Table.ExpandButton>
-                {row.original.message}
+                {log.message}
               </Table.Cell>
-              <Table.Cell className={`${CELL} tabular-nums`}>{row.original.status}</Table.Cell>
-              <Table.Cell className={`${CELL} text-muted-foreground tabular-nums`}>{row.original.duration}</Table.Cell>
+              <Table.Cell className={`${CELL} tabular-nums`}>{log.status}</Table.Cell>
+              <Table.Cell className={`${CELL} text-muted-foreground tabular-nums`}>{log.duration}</Table.Cell>
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
       <p
@@ -112,4 +117,11 @@ export function Default() {
       </p>
     </div>
   );
+}
+
+function sortLogs(logs: Log[], sort: TableSort): Log[] {
+  const sign = sort.direction === 'ascending' ? 1 : -1;
+  return [...logs]
+    .sort((a, b) => sign * a.message.localeCompare(b.message))
+    .map(log => (log.children ? { ...log, children: sortLogs(log.children, sort) } : log));
 }

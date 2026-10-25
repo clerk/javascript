@@ -11,9 +11,8 @@ export const TableExpandButton = React.forwardRef<HTMLButtonElement, TableExpand
   function TableExpandButton(props, ref) {
     const { render, ...otherProps } = props;
     const { excludeFromNavigation } = useTableContext();
-    const row = React.useContext(TableRowContext)?.row;
-    const canExpand = row?.getCanExpand() ?? false;
-    const expanded = row?.getIsExpanded() ?? false;
+    const row = React.useContext(TableRowContext);
+    const expanded = row?.expanded ?? false;
     const labelProps = useRowHeaderLabel(expanded ? 'Collapse' : 'Expand', otherProps.id);
 
     const register = React.useCallback(
@@ -39,7 +38,7 @@ export const TableExpandButton = React.forwardRef<HTMLButtonElement, TableExpand
     return useRender({
       defaultTagName: 'button',
       render,
-      enabled: canExpand,
+      enabled: row?.canExpand ?? false,
       ref: [register, ref],
       state,
       stateAttributesMapping: {

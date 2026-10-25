@@ -3,11 +3,9 @@ export { functionalUpdate, useDataTable } from './use-data-table';
 export type {
   ColumnFiltersState,
   DataTableRow,
-  ExpandedState,
   OnChangeFn,
   PaginationState,
   RowSelectionState,
-  SelectionMode,
   SortingState,
   Updater,
   UseDataTableOptions,

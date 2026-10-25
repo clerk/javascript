@@ -2,11 +2,11 @@ import * as TablePrimitiveStories from './table.primitive.stories';
 
 # Table
 
-A headless primitive for a native `<table>` whose rows can run an action, be selected, or expand to show child rows. It ships no styles; target its `data-*` attributes for appearance. Rows, selection and expanded state come from `useDataTable`.
+A headless primitive for a native `<table>` whose rows can run an action, be selected, sorted, or expand to show child rows. It ships no styles; target its `data-*` attributes for appearance. `Table.Root` owns the selection, expanded and sort state, and `Table.Body` renders a row per item.
 
 ## Example
 
-The example styles the parts with Tailwind, using their `data-*` attributes for state. Tab into the table to focus the first row, then use the arrow keys to move between rows and cells. Right Arrow expands a row and Left Arrow collapses it. Space selects a row and Enter opens it. The last row is disabled.
+The example styles the parts with Tailwind, using their `data-*` attributes for state. Tab into the table to focus the first row, then use the arrow keys to move between rows and cells. Right Arrow expands a row and Left Arrow collapses it. Space selects a row and Enter opens it. Activate the Message header to sort. The last row is disabled.
 
 <Story
   name='Default'
@@ -16,36 +16,49 @@ The example styles the parts with Tailwind, using their `data-*` attributes for 
 ## Usage
 
 ```tsx
-import { useDataTable } from '@clerk/mosaic/primitives/hooks';
 import { Table } from '@clerk/mosaic/primitives/table';
 
-const table = useDataTable({
-  data: logs,
-  getRowId: log => log.id,
-  getSubRows: log => log.children,
-  selectionMode: 'multiple',
-});
-
-<Table.Root table={table} aria-label='Logs'>
+<Table.Root
+  aria-label='Logs'
+  selectionMode='multiple'
+>
   <Table.Header>
     <Table.Column>
       <Table.SelectionCheckbox />
     </Table.Column>
     <Table.Column>Message</Table.Column>
   </Table.Header>
-  <Table.Body>
-    {table.rows.map(row => (
-      <Table.Row key={row.id} row={row} href={`/logs/${row.id}`}>
+  <Table.Body
+    items={logs}
+    itemToStringValue={log => log.id}
+    empty='No logs'
+  >
+    {log => (
+      <Table.Row href={`/logs/${log.id}`}>
         <Table.Cell>
           <Table.SelectionCheckbox />
         </Table.Cell>
-        <Table.Cell rowHeader>
-          <Table.ExpandButton>▸</Table.ExpandButton>
-          {row.original.message}
-        </Table.Cell>
+        <Table.Cell rowHeader>{log.message}</Table.Cell>
       </Table.Row>
-    ))}
+    )}
   </Table.Body>
+</Table.Root>;
+```
+
+### Controlled
+
+Selection, expanded rows and sort each take a value, a default value and a change callback.
+
+```tsx
+const [selection, setSelection] = useState<string[]>([]);
+
+<Table.Root
+  aria-label='Logs'
+  selectionMode='multiple'
+  selection={selection}
+  onSelectionChange={setSelection}
+>
+  …
 </Table.Root>;
 ```
 
@@ -55,32 +68,55 @@ Mark the cell that names the row with `rowHeader`. The row is labelled by it, an
 
 ### Expandable rows
 
-Nest child records inside each record and tell `useDataTable` where they are with `getSubRows`. A row with children can expand. `table.rows` is a flat list of the rows to render: top-level rows, plus the children of every expanded row, right after their parent. Map over it as usual; there is no recursion in your JSX.
+Pass `itemToChildren` to `Table.Body` and the table becomes a tree grid. The children of an expanded row render right after it, so the render function stays flat.
 
 ```tsx
-const logs = [
-  {
-    id: 'req-1',
-    message: 'POST /v1/client/sign_ins',
-    children: [
-      { id: 'req-1-db', message: 'SELECT users' },
-      { id: 'req-1-hook', message: 'webhook user.signed_in' },
-    ],
-  },
-  { id: 'req-2', message: 'GET /v1/me' },
-];
-
-const table = useDataTable({
-  data: logs,
-  getRowId: log => log.id,
-  getSubRows: log => log.children,
-  defaultExpanded: { 'req-1': true },
-});
-
-// table.rows → req-1 (depth 0), req-1-db (depth 1), req-1-hook (depth 1), req-2 (depth 0)
+<Table.Root
+  aria-label='Logs'
+  defaultExpanded={['req-1']}
+>
+  <Table.Body
+    items={logs}
+    itemToStringValue={log => log.id}
+    itemToChildren={log => log.children}
+  >
+    {log => (
+      <Table.Row>
+        <Table.Cell rowHeader>
+          <Table.ExpandButton>▸</Table.ExpandButton>
+          {log.message}
+        </Table.Cell>
+      </Table.Row>
+    )}
+  </Table.Body>
+</Table.Root>
 ```
 
-`Table.ExpandButton` toggles its row and renders nothing on rows without children. Expanded state is keyed by row id; pass `expanded` and `onExpandedChange` to control it, or `getRowCanExpand` to make a row expandable before its children are loaded. Each row reports its `depth`, which `Table.Row` exposes as `--table-row-depth` for indenting.
+`Table.ExpandButton` toggles its row and renders nothing on rows that cannot expand. Set `expandable` on a `Table.Row` whose children are not loaded yet. `Table.Row` exposes the row's depth as `--table-row-depth` for indenting.
+
+### Sorting
+
+Give a column a `value` and `sortable`. Activating its header calls `onSortChange` with that column, ascending first and then flipping the direction. The table does not reorder the items; sort them yourself or on the server.
+
+```tsx
+const [sort, setSort] = useState<TableSort | null>(null);
+
+<Table.Root
+  aria-label='Logs'
+  sort={sort}
+  onSortChange={setSort}
+>
+  <Table.Header>
+    <Table.Column
+      value='message'
+      sortable
+    >
+      Message
+    </Table.Column>
+  </Table.Header>
+  …
+</Table.Root>;
+```
 
 ### Row actions
 
@@ -88,11 +124,11 @@ Pass `onClick` or `href` (with `target`, `rel` and `download`) to `Table.Row`. T
 
 ### Selection
 
-Set `selectionMode` on `useDataTable` to `'none'`, `'single'` or `'multiple'`. While nothing is selected, clicking an actionable row runs its action. Once a row is selected, clicking a row toggles its selection. Shift-click selects a range. The header checkbox selects all rows in `'multiple'` mode and does not render otherwise.
+Set `selectionMode` to `'none'`, `'single'` or `'multiple'`. While nothing is selected, clicking an actionable row runs its action. Once a row is selected, clicking a row toggles its selection. Shift-click selects a range. The header checkbox selects every visible row that is not disabled in `'multiple'` mode and does not render otherwise.
 
 ### Keyboard
 
-The table becomes a grid, with one tab stop, when it has row actions, selection or tree rows. Otherwise it stays a plain table.
+The table becomes a grid, with one tab stop, when it has row actions, selection, sortable columns or tree rows. Otherwise it stays a plain table.
 
 | Key                      | Action                                                                                                     |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------- |
@@ -102,6 +138,7 @@ The table becomes a grid, with one tab stop, when it has row actions, selection 
 | `Home` / `End`           | First or last row, or first or last cell in the row                                                        |
 | `Ctrl+Home` / `Ctrl+End` | First or last cell in the table                                                                            |
 | `Enter`                  | Run the row action, or toggle selection if the row has none. On a cell with controls, focus them.          |
+| `Enter` / `Space`        | On a sortable column header, sort by it                                                                    |
 | `F2`                     | Focus the controls in the focused cell                                                                     |
 | `Escape`                 | Leave a cell's controls, or clear the selection                                                            |
 | `Space`                  | Toggle the row's selection. `Shift+Space` selects a range.                                                 |
@@ -111,16 +148,16 @@ Left and right swap in right-to-left layouts. A cell with a single button or lin
 
 ## Parts
 
-| Part                      | Default element                            | Description                                                        |
-| ------------------------- | ------------------------------------------ | ------------------------------------------------------------------ |
-| `Table.Root`              | `table`                                    | Owns keyboard navigation. A `grid` or `treegrid` when interactive. |
-| `Table.Header`            | `thead`                                    | Wraps its columns in a `tr`                                        |
-| `Table.Column`            | `th scope="col"`                           | Column header                                                      |
-| `Table.Body`              | `tbody`                                    | Body                                                               |
-| `Table.Row`               | `tr`                                       | Row with optional action, selection and tree state                 |
-| `Table.Cell`              | `td`, or `th scope="row"` with `rowHeader` | Cell                                                               |
-| `Table.SelectionCheckbox` | `input type="checkbox"`                    | Selects its row, or all rows inside `Table.Header`                 |
-| `Table.ExpandButton`      | `button`                                   | Toggles its row's children. Renders only when the row can expand.  |
+| Part                      | Default element                            | Description                                                       |
+| ------------------------- | ------------------------------------------ | ----------------------------------------------------------------- |
+| `Table.Root`              | `table`                                    | Owns selection, expanded and sort state, and keyboard navigation  |
+| `Table.Header`            | `thead`                                    | Wraps its columns in a `tr`                                       |
+| `Table.Column`            | `th scope="col"`                           | Column header, optionally sortable                                |
+| `Table.Body`              | `tbody`                                    | Renders a row per visible item, or the empty state                |
+| `Table.Row`               | `tr`                                       | Row with optional action, selection and tree state                |
+| `Table.Cell`              | `td`, or `th scope="row"` with `rowHeader` | Cell                                                              |
+| `Table.SelectionCheckbox` | `input type="checkbox"`                    | Selects its row, or all rows inside `Table.Header`                |
+| `Table.ExpandButton`      | `button`                                   | Toggles its row's children. Renders only when the row can expand. |
 
 Every part accepts `render` for polymorphic rendering and throws outside `Table.Root`.
 
@@ -128,21 +165,49 @@ Every part accepts `render` for polymorphic rendering and throws outside `Table.
 
 ### `Table.Root`
 
-| Prop    | Type              | Default | Description                                                         |
-| ------- | ----------------- | ------- | ------------------------------------------------------------------- |
-| `table` | `TableCollection` | —       | The return value of `useDataTable`: rows, selection, expanded state |
+| Prop                | Type                               | Default  | Description                                |
+| ------------------- | ---------------------------------- | -------- | ------------------------------------------ |
+| `selectionMode`     | `'none' \| 'single' \| 'multiple'` | `'none'` | How many rows can be selected              |
+| `selection`         | `string[]`                         | —        | Selected row values (controlled)           |
+| `defaultSelection`  | `string[]`                         | `[]`     | Selected row values on mount               |
+| `onSelectionChange` | `(selection: string[]) => void`    | —        | Called when the selection changes          |
+| `expanded`          | `string[]`                         | —        | Expanded row values (controlled)           |
+| `defaultExpanded`   | `string[]`                         | `[]`     | Expanded row values on mount               |
+| `onExpandedChange`  | `(expanded: string[]) => void`     | —        | Called when a row expands or collapses     |
+| `sort`              | `TableSort \| null`                | —        | Sorted column and direction (controlled)   |
+| `defaultSort`       | `TableSort \| null`                | `null`   | Sorted column and direction on mount       |
+| `onSortChange`      | `(sort: TableSort) => void`        | —        | Called when a sortable column is activated |
+
+`TableSort` is `{ column: string; direction: 'ascending' | 'descending' }`.
+
+### `Table.Column`
+
+| Prop       | Type      | Default | Description                                        |
+| ---------- | --------- | ------- | -------------------------------------------------- |
+| `value`    | `string`  | —       | Identifies the column in the sort state            |
+| `sortable` | `boolean` | `false` | Sorts by this column on activation. Needs `value`. |
+
+### `Table.Body`
+
+| Prop                | Type                                  | Default      | Description                                           |
+| ------------------- | ------------------------------------- | ------------ | ----------------------------------------------------- |
+| `items`             | `Item[]`                              | — (required) | The records to render                                 |
+| `itemToStringValue` | `(item: Item) => string`              | — (required) | The row's value in the selection and expanded state   |
+| `itemToChildren`    | `(item: Item) => Item[] \| undefined` | —            | An item's child items. Makes the table a tree grid.   |
+| `children`          | `(item: Item) => ReactNode`           | — (required) | Renders the row for an item                           |
+| `empty`             | `ReactNode`                           | —            | Rendered in one cell spanning every column when empty |
 
 ### `Table.Row`
 
-| Prop       | Type                          | Default | Description                                            |
-| ---------- | ----------------------------- | ------- | ------------------------------------------------------ |
-| `row`      | `DataTableRow`                | —       | The row from `useDataTable`                            |
-| `disabled` | `boolean`                     | `false` | Removes the row from navigation, selection and actions |
-| `onClick`  | `(event: MouseEvent) => void` | —       | Row action. Runs before `href`.                        |
-| `href`     | `string`                      | —       | Opens this URL as the row action                       |
-| `target`   | `string`                      | —       | Target for `href`                                      |
-| `rel`      | `string`                      | —       | Rel for `href`                                         |
-| `download` | `boolean \| string`           | —       | Downloads `href` instead of opening it                 |
+| Prop         | Type                          | Default | Description                                            |
+| ------------ | ----------------------------- | ------- | ------------------------------------------------------ |
+| `disabled`   | `boolean`                     | `false` | Removes the row from navigation, selection and actions |
+| `expandable` | `boolean`                     | `false` | Lets the row expand before its children are loaded     |
+| `onClick`    | `(event: MouseEvent) => void` | —       | Row action. Runs before `href`.                        |
+| `href`       | `string`                      | —       | Opens this URL as the row action                       |
+| `target`     | `string`                      | —       | Target for `href`                                      |
+| `rel`        | `string`                      | —       | Rel for `href`                                         |
+| `download`   | `boolean \| string`           | —       | Downloads `href` instead of opening it                 |
 
 ### `Table.Cell`
 
@@ -150,21 +215,23 @@ Every part accepts `render` for polymorphic rendering and throws outside `Table.
 | ----------- | --------- | ------- | ---------------------------------------------------------------- |
 | `rowHeader` | `boolean` | `false` | Renders a row header that names the row, its checkbox and button |
 
-`Table.Header`, `Table.Column`, `Table.Body`, `Table.SelectionCheckbox` and `Table.ExpandButton` take no additional props beyond standard HTML attributes for their default element. Passing `aria-label` to the checkbox or expand button replaces the default "Select" or "Expand" word; the row header is still added.
+`Table.Header`, `Table.SelectionCheckbox` and `Table.ExpandButton` take no additional props beyond standard HTML attributes for their default element. Passing `aria-label` to the checkbox or expand button replaces the default "Select" or "Expand" word; the row header is still added.
 
 ## Styling
 
 Each part emits `data-*` attributes you can target with any CSS solution:
 
-| Attribute            | Applies To             | Description                         |
-| -------------------- | ---------------------- | ----------------------------------- |
-| `data-selected`      | Row                    | Present when the row is selected    |
-| `data-disabled`      | Row, SelectionCheckbox | Present when disabled               |
-| `data-expanded`      | Row, ExpandButton      | Present when the row is expanded    |
-| `data-collapsed`     | ExpandButton           | Present when the row is collapsed   |
-| `data-actionable`    | Row                    | Present when the row has an action  |
-| `data-checked`       | SelectionCheckbox      | Present when checked                |
-| `data-indeterminate` | SelectionCheckbox      | Present when some rows are selected |
+| Attribute             | Applies To             | Description                                                         |
+| --------------------- | ---------------------- | ------------------------------------------------------------------- |
+| `data-selected`       | Row                    | Present when the row is selected                                    |
+| `data-disabled`       | Row, SelectionCheckbox | Present when disabled                                               |
+| `data-expanded`       | Row, ExpandButton      | Present when the row is expanded                                    |
+| `data-collapsed`      | ExpandButton           | Present when the row is collapsed                                   |
+| `data-actionable`     | Row                    | Present when the row has an action                                  |
+| `data-checked`        | SelectionCheckbox      | Present when checked                                                |
+| `data-indeterminate`  | SelectionCheckbox      | Present when some rows are selected                                 |
+| `data-sortable`       | Column                 | Present when the column is sortable                                 |
+| `data-sort-direction` | Column                 | `ascending` or `descending` while the table is sorted by the column |
 
 `Table.Row` exposes `--table-row-depth` (`0` for top-level rows) for indenting child rows:
 

@@ -32,6 +32,21 @@ export function isRtl(element: Element) {
   return getComputedStyle(element).direction === 'rtl';
 }
 
+export function focusIsInChildRows(row: HTMLTableRowElement) {
+  const level = Number(row.getAttribute('aria-level'));
+  const active = row.ownerDocument.activeElement;
+  for (
+    let next = row.nextElementSibling;
+    next instanceof HTMLTableRowElement && Number(next.getAttribute('aria-level')) > level;
+    next = next.nextElementSibling
+  ) {
+    if (next.contains(active)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function openLink(from: Element, link: TableLink, modifiers: LinkModifiers) {
   const doc = from.ownerDocument;
   const anchor = doc.createElement('a');

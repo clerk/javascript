@@ -51,28 +51,26 @@ export const TableSelectionCheckbox = React.forwardRef<HTMLInputElement, TableSe
 );
 
 function useSelectionCheckboxState() {
-  const { table } = useTableContext();
-  const rowContext = React.useContext(TableRowContext);
+  const table = useTableContext();
+  const row = React.useContext(TableRowContext);
   const inHeader = React.useContext(TableHeaderContext);
-  const row = rowContext?.row;
 
-  if (row && rowContext) {
+  if (row) {
     return {
-      enabled: row.getCanSelect() || table?.selectionMode !== 'none',
-      checked: row.getIsSelected(),
+      enabled: table.selectionMode !== 'none',
+      checked: row.selected,
       indeterminate: false,
-      disabled: rowContext.disabled || !row.getCanSelect(),
+      disabled: !row.canSelect,
       label: 'Select',
       toggle: row.toggleSelected,
     };
   }
-  const selectAll = inHeader && table?.selectionMode === 'multiple';
   return {
-    enabled: Boolean(selectAll),
-    checked: table?.getIsAllRowsSelected() ?? false,
-    indeterminate: table?.getIsSomeRowsSelected() ?? false,
-    disabled: table ? !table.rows.some(tableRow => tableRow.getCanSelect()) : true,
+    enabled: inHeader && table.selectionMode === 'multiple',
+    checked: table.allSelected,
+    indeterminate: table.someSelected,
+    disabled: !table.canSelectAll,
     label: 'Select all',
-    toggle: () => table?.toggleAllRowsSelected(),
+    toggle: table.toggleAllSelected,
   };
 }

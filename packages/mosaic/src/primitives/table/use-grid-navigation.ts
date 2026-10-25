@@ -22,7 +22,7 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
       return;
     }
     if (!activeRef.current?.isConnected || !contains(table, activeRef.current)) {
-      activeRef.current = itemAt(table, positionRef.current ?? initialPosition(table), excluded) ?? null;
+      activeRef.current = itemAt(table, positionRef.current ?? initialPosition(table, excluded), excluded) ?? null;
     }
     for (const row of Array.from(table.rows)) {
       syncRow(row, activeRef.current, editingRef.current, excluded);
@@ -62,7 +62,7 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
       if (!(target instanceof HTMLElement)) {
         return;
       }
-      if (target instanceof HTMLTableRowElement && isRowItem(target) && target.closest('table') === table) {
+      if (target instanceof HTMLTableRowElement && isRowItem(target, excluded) && target.closest('table') === table) {
         activate(target, positionOf(target), null);
         return;
       }
@@ -106,7 +106,7 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
         return;
       }
 
-      const next = row ? rowMove(table, row, event) : cell ? cellMove(table, cell, event) : null;
+      const next = row ? rowMove(table, row, event, excluded) : cell ? cellMove(table, cell, event, excluded) : null;
       if (!next) {
         return;
       }
@@ -132,7 +132,7 @@ function syncRow(
   excluded: WeakSet<Element>,
 ) {
   const disabled = isDisabledRow(row);
-  if (isRowItem(row)) {
+  if (isRowItem(row, excluded)) {
     setTabIndex(row, disabled ? null : row === active);
   }
   for (const cell of Array.from(row.cells)) {
@@ -143,7 +143,12 @@ function syncRow(
   }
 }
 
-function rowMove(table: HTMLTableElement, row: HTMLTableRowElement, event: KeyboardEvent): Position | null {
+function rowMove(
+  table: HTMLTableElement,
+  row: HTMLTableRowElement,
+  event: KeyboardEvent,
+  excluded: WeakSet<Element>,
+): Position | null {
   const { forward, backward } = arrowKeys(table);
   const expanded = row.getAttribute('aria-expanded');
   switch (event.key) {
@@ -161,15 +166,20 @@ function rowMove(table: HTMLTableElement, row: HTMLTableRowElement, event: Keybo
     case 'ArrowUp':
       return { row: nextRowIndex(table, row.rowIndex, -1), column: ROW_COLUMN };
     case 'Home':
-      return { row: edgeRowIndex(table, 1) ?? row.rowIndex, column: ROW_COLUMN };
+      return { row: edgeRowIndex(table, 1, excluded) ?? row.rowIndex, column: ROW_COLUMN };
     case 'End':
-      return { row: edgeRowIndex(table, -1) ?? row.rowIndex, column: ROW_COLUMN };
+      return { row: edgeRowIndex(table, -1, excluded) ?? row.rowIndex, column: ROW_COLUMN };
     default:
       return null;
   }
 }
 
-function cellMove(table: HTMLTableElement, cell: HTMLTableCellElement, event: KeyboardEvent): Position | null {
+function cellMove(
+  table: HTMLTableElement,
+  cell: HTMLTableCellElement,
+  event: KeyboardEvent,
+  excluded: WeakSet<Element>,
+): Position | null {
   const { forward, backward } = arrowKeys(table);
   const row = rowOf(cell);
   const column = cell.cellIndex;
@@ -177,9 +187,9 @@ function cellMove(table: HTMLTableElement, cell: HTMLTableCellElement, event: Ke
   const corner = event.ctrlKey || event.metaKey;
   switch (event.key) {
     case forward:
-      return { row: row.rowIndex, column: column === last && isRowItem(row) ? ROW_COLUMN : column + 1 };
+      return { row: row.rowIndex, column: column === last && isRowItem(row, excluded) ? ROW_COLUMN : column + 1 };
     case backward:
-      return { row: row.rowIndex, column: column === 0 && isRowItem(row) ? ROW_COLUMN : column - 1 };
+      return { row: row.rowIndex, column: column === 0 && isRowItem(row, excluded) ? ROW_COLUMN : column - 1 };
     case 'ArrowDown':
       return { row: nextRowIndex(table, row.rowIndex, 1), column };
     case 'ArrowUp':
@@ -200,18 +210,18 @@ function itemAt(table: HTMLTableElement, position: Position, excluded: WeakSet<E
     return undefined;
   }
   if (isDisabledRow(row)) {
-    const fallback = initialPosition(table);
+    const fallback = initialPosition(table, excluded);
     return fallback.row === row.rowIndex ? undefined : itemAt(table, fallback, excluded);
   }
-  if (position.column === ROW_COLUMN && isRowItem(row)) {
+  if (position.column === ROW_COLUMN && isRowItem(row, excluded)) {
     return row;
   }
   const cell = row.cells[clamp(position.column, 0, row.cells.length - 1)];
   return cell ? focusTarget(cell, excluded) : undefined;
 }
 
-function initialPosition(table: HTMLTableElement): Position {
-  const row = edgeRowIndex(table, 1);
+function initialPosition(table: HTMLTableElement, excluded: WeakSet<Element>): Position {
+  const row = edgeRowIndex(table, 1, excluded);
   return row === undefined ? { row: 0, column: 0 } : { row, column: ROW_COLUMN };
 }
 
@@ -235,8 +245,8 @@ function nextRowIndex(table: HTMLTableElement, from: number, step: 1 | -1) {
   return from;
 }
 
-function edgeRowIndex(table: HTMLTableElement, step: 1 | -1) {
-  const rows = Array.from(table.rows).filter(row => isRowItem(row) && !isDisabledRow(row));
+function edgeRowIndex(table: HTMLTableElement, step: 1 | -1, excluded: WeakSet<Element>) {
+  const rows = Array.from(table.rows).filter(row => isRowItem(row, excluded) && !isDisabledRow(row));
   return (step === 1 ? rows[0] : rows[rows.length - 1])?.rowIndex;
 }
 
@@ -278,8 +288,10 @@ function rowOf(cell: HTMLTableCellElement) {
   return row;
 }
 
-function isRowItem(row: HTMLTableRowElement) {
-  return row.parentElement instanceof HTMLTableSectionElement && row.parentElement.tagName === 'TBODY';
+function isRowItem(row: HTMLTableRowElement, excluded: WeakSet<Element>) {
+  return (
+    row.parentElement instanceof HTMLTableSectionElement && row.parentElement.tagName === 'TBODY' && !excluded.has(row)
+  );
 }
 
 function isDisabledRow(row: HTMLTableRowElement) {
