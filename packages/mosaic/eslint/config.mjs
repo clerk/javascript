@@ -67,6 +67,12 @@ export default [
               message: 'Read the support email in the model and pass plain data to the controller or view.',
               allowTypeImports: true,
             },
+            {
+              regex: '(^|/)use-component-mounted-telemetry(?:[.]ts)?$',
+              importNames: ['useComponentMountedTelemetry'],
+              message: 'Record component telemetry from the public component wrapper, not from a controller or view.',
+              allowTypeImports: true,
+            },
           ],
         },
       ],
