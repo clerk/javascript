@@ -67,7 +67,7 @@ Set `selectionMode` to `'single'`, `'multiple'` or `'none'`. With nothing select
 
 ### Sorting
 
-Give a column a `value` and `sortable`. Activating its header sorts by it ascending, and activating it again flips the direction. The table does not sort the items; sort them in `onSortChange` or on the server.
+Give a column a `value` and `sortable`. Activating its header sorts by it ascending, and activating it again flips the direction. The table does not reorder the items; sort them yourself or on the server.
 
 ## Parts
 
@@ -131,7 +131,7 @@ Give a column a `value` and `sortable`. Activating its header sorts by it ascend
 | `rel`        | `string`            | —       | Link rel                                                   |
 | `download`   | `boolean \| string` | —       | Link download                                              |
 
-All parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their default element.
+All parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their default element. Every part throws outside `Table.Root`, and `Table.Row` also throws when it is not rendered by the children function of `Table.Body`.
 
 ## Keyboard Navigation
 

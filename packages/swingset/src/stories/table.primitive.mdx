@@ -6,7 +6,7 @@ A headless primitive for a native `<table>` whose rows can run an action, be sel
 
 ## Example
 
-The example styles the parts with Tailwind, using their `data-*` attributes for state. Tab into the table to focus the first row, then use the arrow keys to move between rows and cells. Right Arrow expands a row and Left Arrow collapses it. Space selects a row and Enter opens it. Activate the Message header to sort. The last row is disabled.
+The example styles the parts with Tailwind, using their `data-*` attributes for state. Tab into the table to focus the first row, then use the arrow keys to move between rows and cells. Right Arrow expands a row and Left Arrow collapses it. Space selects a row and Enter opens it. Activate the Message header to sort. The `DELETE /v1/sessions` row is disabled.
 
 <Story
   name='Default'
@@ -102,6 +102,8 @@ Pass `itemToChildren` to `Table.Body` and the table becomes a tree grid. The chi
 Give a column a `value` and `sortable`. Activating its header calls `onSortChange` with that column, ascending first and then flipping the direction. The table does not reorder the items; sort them yourself or on the server.
 
 ```tsx
+import { Table, type TableSort } from '@clerk/mosaic/primitives/table';
+
 const [sort, setSort] = useState<TableSort | null>(null);
 
 <Table.Root
@@ -162,7 +164,7 @@ Left and right swap in right-to-left layouts. A cell with a single button or lin
 | `Table.SelectionCheckbox` | `input type="checkbox"`                           | Selects its row, or all rows inside `Table.Header`                |
 | `Table.ExpandButton`      | `button`                                          | Toggles its row's children. Renders only when the row can expand. |
 
-Every part accepts `render` for polymorphic rendering and throws outside `Table.Root`.
+Every part accepts `render` for polymorphic rendering and throws outside `Table.Root`. `Table.Row` also throws when it is not rendered by the children function of `Table.Body`.
 
 ## Props
 
