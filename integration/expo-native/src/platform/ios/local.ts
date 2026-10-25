@@ -10,6 +10,7 @@ import {
   type AcquireRequest,
   type DeviceBackend,
   type DoctorCheck,
+  type DoctorCheckId,
   type EvidencePath,
   type LocalLease,
   type Recording,
@@ -41,18 +42,41 @@ async function simctl(args: readonly string[], what: string): Promise<string> {
   return result.stdout;
 }
 
+// VERIFY_SIMSLIM=1 requires simslim and VERIFY_SIMSLIM=0 turns it off; otherwise a lane is slimmed
+// whenever simslim is installed.
+export function laneBoot(flag: string | undefined, simslimInstalled: boolean): 'slim' | 'stock' {
+  if (flag === '1') return 'slim';
+  if (flag === '0') return 'stock';
+  return simslimInstalled ? 'slim' : 'stock';
+}
+
+async function simslimVersion(): Promise<string | null> {
+  const probe = await run('simslim', ['--version']);
+  return probe.code === 0 ? probe.stdout.trim().replace(/^simslim\s+/, '') : null;
+}
+
 // A clone does not inherit simslim's overrides, so each lane is slimmed before its first boot, when
-// the background services it turns off would otherwise keep a CI runner's cores busy for minutes.
+// the background services it turns off would otherwise keep the host's cores busy for minutes.
 async function boot(udid: string, name: string): Promise<void> {
-  if (process.env.VERIFY_SIMSLIM !== '1') {
+  if (laneBoot(process.env.VERIFY_SIMSLIM, (await simslimVersion()) !== null) === 'stock') {
     await simctl(['boot', udid], `simctl boot ${name}`);
     await simctl(['bootstatus', udid, '-b'], `simctl bootstatus ${name}`);
     return;
   }
   const slim = await run('simslim', ['on', udid]);
   if (slim.code !== 0) {
-    throw new VerifyFailure('NOT_READY', `simslim on ${name} failed: ${slim.stderr.trim() || slim.stdout.trim()}`, 'install simslim, or unset VERIFY_SIMSLIM');
+    throw new VerifyFailure('NOT_READY', `simslim on ${name} failed: ${slim.stderr.trim() || slim.stdout.trim()}`, 'install simslim, or set VERIFY_SIMSLIM=0');
   }
+}
+
+async function simslimCheck(): Promise<DoctorCheck> {
+  // The shared DoctorCheckId union has no simslim entry yet.
+  const id = 'simslim' as DoctorCheckId;
+  const version = await simslimVersion();
+  if (version === null) return { id, ok: true, state: 'warning', detail: 'not installed; lanes boot stock (brew install mobai-app/tap/simslim)' };
+  return laneBoot(process.env.VERIFY_SIMSLIM, true) === 'slim'
+    ? { id, ok: true, detail: `slim on (simslim ${version})` }
+    : { id, ok: true, state: 'warning', detail: `simslim ${version} is installed; VERIFY_SIMSLIM=0 keeps lanes stock` };
 }
 
 function simulatorDataDir(udid: string): string {
@@ -241,6 +265,7 @@ export function localIosBackend(options: { readonly os?: NodeJS.Platform } = {})
         xcode.code === 0
           ? { id: 'xcode', ok: true, detail: xcode.stdout.split('\n')[0]?.replace('Xcode ', '') ?? '' }
           : { id: 'xcode', ok: false, detail: 'xcodebuild is not available', fix: 'install Xcode and run `sudo xcode-select -s /Applications/Xcode.app`' },
+        await simslimCheck(),
       ];
       const template = xcode.code === 0 ? (await listSimulators()).find((d) => d.name === TEMPLATE_NAME) : undefined;
       const device: DoctorCheck[] = [
