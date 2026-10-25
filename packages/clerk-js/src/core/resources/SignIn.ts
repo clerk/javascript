@@ -1405,6 +1405,14 @@ class SignInFuture implements SignInFutureResource {
         routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
       }
 
+      // Reuse the existing sign-in by default so any state already attached to it carries
+      // into the SSO attempt (e.g. a ticket from `signIn.create({ strategy: 'ticket' })`,
+      // or a discovered identifier). For OAuth, a pending redirect may belong to an
+      // abandoned attempt, including a retry of the same provider (SDK-75), so start
+      // fresh rather than replay it. `enterprise_sso` can reuse the sign-in because
+      // `prepare_first_factor` below refreshes its redirect. When reusing a sign-in
+      // without a pending redirect, an explicit `slackTeamId` also triggers preparation
+      // so the hint is applied to the existing attempt.
       const hasPendingRedirect = !!this.#resource.firstFactorVerification.externalVerificationRedirectURL;
       const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
       const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
