@@ -4702,7 +4702,6 @@ describe('SignIn Slack workspace hint requests', () => {
         strategy: 'oauth_slack',
         redirectUrl: 'https://example.com/callback',
         actionCompleteRedirectUrl: 'https://example.com/dashboard',
-        slackTeamId: 'T123ABC',
       }),
     ).toThrow();
     expect(fetchMock).not.toHaveBeenCalled();

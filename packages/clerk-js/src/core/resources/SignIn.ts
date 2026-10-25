@@ -303,11 +303,7 @@ export class SignIn extends BaseResource implements SignInResource {
         clerkInvalidStrategy('SignIn.prepareFirstFactor', params.strategy);
     }
     return this._basePost({
-      body: {
-        ...config,
-        strategy: params.strategy,
-        slackTeamId: 'slackTeamId' in params ? params.slackTeamId : undefined,
-      },
+      body: { ...config, strategy: params.strategy },
       action: 'prepare_first_factor',
       coalesce: true,
     });
