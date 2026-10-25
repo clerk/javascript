@@ -13,7 +13,7 @@ export const TableExpandButton = React.forwardRef<HTMLButtonElement, TableExpand
     const { excludeFromNavigation } = useTableContext();
     const row = React.useContext(TableRowContext);
     const expanded = row?.expanded ?? false;
-    const labelProps = useRowHeaderLabel(expanded ? 'Collapse' : 'Expand', otherProps.id);
+    const labelProps = useRowHeaderLabel(otherProps.id, otherProps['aria-label']);
 
     const register = React.useCallback(
       (node: HTMLButtonElement | null) => {

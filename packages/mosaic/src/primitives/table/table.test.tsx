@@ -63,7 +63,7 @@ function LogsTable({
         <Table.Header>
           {selectable ? (
             <Table.Column>
-              <Table.SelectionCheckbox />
+              <Table.SelectionCheckbox aria-label='Select all' />
             </Table.Column>
           ) : null}
           <Table.Column
@@ -85,11 +85,11 @@ function LogsTable({
             <Table.Row {...rowProps?.(log)}>
               {selectable ? (
                 <Table.Cell>
-                  <Table.SelectionCheckbox />
+                  <Table.SelectionCheckbox aria-label='Select' />
                 </Table.Cell>
               ) : null}
               <Table.Cell>
-                <Table.ExpandButton />
+                <Table.ExpandButton aria-label='Expand' />
                 {log.message}
               </Table.Cell>
               <Table.Cell>
@@ -163,14 +163,14 @@ describe('Table', () => {
       expect(row('Bravo')).toHaveAccessibleName('Bravo');
     });
 
-    it('names the selection checkboxes from the row header', () => {
+    it('names the selection checkboxes from their aria-label and the row header', () => {
       render(<LogsTable selectionMode='multiple' />);
 
       expect(screen.getByRole('checkbox', { name: 'Select all' })).toBeInTheDocument();
       expect(screen.getByRole('checkbox', { name: 'Select Bravo' })).toBeInTheDocument();
     });
 
-    it('names the expand button from its state and the row header', async () => {
+    it('names the expand button from its aria-label and the row header, and reports its state', async () => {
       const user = userEvent.setup();
       render(
         <LogsTable
@@ -181,7 +181,45 @@ describe('Table', () => {
 
       await user.click(screen.getByRole('button', { name: 'Expand Alpha' }));
 
-      expect(screen.getByRole('button', { name: 'Collapse Alpha' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Expand Alpha' })).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('adds no text of its own to the checkbox and expand button names', () => {
+      render(
+        <Table.Root
+          aria-label='Logs'
+          selectionMode='multiple'
+        >
+          <Table.Header>
+            <Table.Column>
+              <Table.SelectionCheckbox />
+            </Table.Column>
+            <Table.Column rowHeader>Message</Table.Column>
+          </Table.Header>
+          <Table.Body
+            items={LOGS}
+            itemToStringValue={toValue}
+            itemToChildren={toChildren}
+          >
+            {log => (
+              <Table.Row>
+                <Table.Cell>
+                  <Table.SelectionCheckbox />
+                </Table.Cell>
+                <Table.Cell>
+                  <Table.ExpandButton />
+                  {log.message}
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table.Root>,
+      );
+
+      const [selectAll, selectAlpha] = screen.getAllByRole('checkbox');
+      expect(selectAll).toHaveAccessibleName('');
+      expect(selectAlpha).toHaveAccessibleName('Alpha');
+      expect(screen.getByRole('button')).toHaveAccessibleName('Alpha');
     });
   });
 
@@ -554,7 +592,7 @@ describe('Table', () => {
       await user.click(screen.getByRole('button', { name: 'Expand Alpha' }));
 
       expect(row('Alpha')).toHaveAttribute('aria-expanded', 'true');
-      expect(screen.getByRole('button', { name: 'Collapse Alpha' })).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('button', { name: 'Expand Alpha' })).toHaveAttribute('aria-expanded', 'true');
       expect(row('Alpha two')).toHaveAttribute('aria-level', '2');
       expect(row('Alpha two')).toHaveAttribute('aria-posinset', '2');
       expect(row('Alpha two')).toHaveAttribute('aria-setsize', '2');
@@ -639,7 +677,7 @@ describe('Table', () => {
       );
 
       expect(screen.getByText('Alpha one')).toBeInTheDocument();
-      await user.click(screen.getByRole('button', { name: 'Collapse Alpha' }));
+      await user.click(screen.getByRole('button', { name: 'Expand Alpha' }));
 
       expect(onExpandedChange).toHaveBeenCalledWith([]);
       expect(screen.queryByText('Alpha one')).not.toBeInTheDocument();
@@ -683,7 +721,7 @@ describe('Table', () => {
       );
 
       expect(row('Alpha one retry')).toHaveAttribute('aria-level', '3');
-      await user.click(screen.getByRole('button', { name: 'Collapse Alpha' }));
+      await user.click(screen.getByRole('button', { name: 'Expand Alpha' }));
       expect(screen.queryByText('Alpha one')).not.toBeInTheDocument();
       expect(screen.queryByText('Alpha one retry')).not.toBeInTheDocument();
 
@@ -724,7 +762,7 @@ describe('Table', () => {
       await tabIntoTable(user);
       await user.keyboard('{ArrowDown}{ArrowDown}');
       expect(row('Alpha two')).toHaveFocus();
-      await user.click(screen.getByRole('button', { name: 'Collapse Alpha' }));
+      await user.click(screen.getByRole('button', { name: 'Expand Alpha' }));
 
       expect(row('Alpha')).toHaveFocus();
     });

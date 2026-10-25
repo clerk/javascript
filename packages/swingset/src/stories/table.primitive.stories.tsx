@@ -68,7 +68,7 @@ export function Default() {
       >
         <Table.Header className='text-muted-foreground'>
           <Table.Column className={`${CELL} w-10 font-medium`}>
-            <Table.SelectionCheckbox />
+            <Table.SelectionCheckbox aria-label='Select all' />
           </Table.Column>
           <Table.Column
             value='message'
@@ -93,10 +93,13 @@ export function Default() {
               className='hover:bg-muted data-selected:bg-accent focus-visible:outline-ring data-actionable:cursor-pointer data-disabled:cursor-default data-disabled:opacity-50 focus-visible:outline-2 focus-visible:-outline-offset-2'
             >
               <Table.Cell className={CELL}>
-                <Table.SelectionCheckbox />
+                <Table.SelectionCheckbox aria-label='Select' />
               </Table.Cell>
               <Table.Cell className={`${CELL} ps-[calc(2.25rem+var(--table-row-depth)*1.25rem)]`}>
-                <Table.ExpandButton className='hover:bg-muted-foreground/15 data-expanded:rotate-90 rtl:data-collapsed:-scale-x-100 -ms-6 me-1 size-5 cursor-pointer rounded'>
+                <Table.ExpandButton
+                  aria-label='Expand'
+                  className='hover:bg-muted-foreground/15 data-expanded:rotate-90 rtl:data-collapsed:-scale-x-100 -ms-6 me-1 size-5 cursor-pointer rounded'
+                >
                   ›
                 </Table.ExpandButton>
                 {log.message}

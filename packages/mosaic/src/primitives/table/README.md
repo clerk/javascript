@@ -20,7 +20,7 @@ import { Table } from '@/primitives/table';
 >
   <Table.Header>
     <Table.Column>
-      <Table.SelectionCheckbox />
+      <Table.SelectionCheckbox aria-label='Select all' />
     </Table.Column>
     <Table.Column
       value='message'
@@ -39,10 +39,10 @@ import { Table } from '@/primitives/table';
     {log => (
       <Table.Row href={`/logs/${log.id}`}>
         <Table.Cell>
-          <Table.SelectionCheckbox />
+          <Table.SelectionCheckbox aria-label='Select' />
         </Table.Cell>
         <Table.Cell>
-          <Table.ExpandButton>▸</Table.ExpandButton>
+          <Table.ExpandButton aria-label='Expand'>▸</Table.ExpandButton>
           {log.message}
         </Table.Cell>
       </Table.Row>
@@ -51,7 +51,7 @@ import { Table } from '@/primitives/table';
 </Table.Root>;
 ```
 
-Mark the column that names each row with `rowHeader`. Its cells render as `<th scope="row">`, and each row, its selection checkbox ("Select …") and its expand button ("Expand …" / "Collapse …") take their accessible names from them.
+Mark the column that names each row with `rowHeader`. Its cells render as `<th scope="row">`, and each row takes its accessible name from them. The selection checkbox and expand button add the row header after their own `aria-label`, so `aria-label='Select'` reads "Select GET /v1/me". Without an `aria-label` they are named by the row header alone. The header checkbox has no row header, so give it an `aria-label`.
 
 ### Tree rows
 
@@ -178,5 +178,5 @@ Left and right swap in right-to-left layouts. A cell with a single button or lin
 - Root: `role="treegrid"` with `itemToChildren`, `role="grid"` with actions, selection or sortable columns, none otherwise. `aria-multiselectable` in multiple mode.
 - Row: `aria-labelledby` its row header cells, `aria-selected` when selectable, `aria-disabled`. In a tree grid also `aria-level`, `aria-posinset`, `aria-setsize` and `aria-expanded`.
 - Column: `aria-sort` when sortable: the direction on the sorted column, `none` on the others.
-- SelectionCheckbox: labelled "Select" plus the row header, or "Select all" in the header.
-- ExpandButton: labelled "Expand" or "Collapse" plus the row header, `aria-expanded`, and `tabIndex={-1}` because the row's arrow keys expand and collapse it.
+- SelectionCheckbox: labelled by its `aria-label` plus the row header.
+- ExpandButton: labelled by its `aria-label` plus the row header, `aria-expanded`, and `tabIndex={-1}` because the row's arrow keys expand and collapse it.

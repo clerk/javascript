@@ -79,15 +79,12 @@ export function useTableItem() {
   return item;
 }
 
-export function useRowHeaderLabel(label: string, id: string | undefined) {
+export function useRowHeaderLabel(id: string | undefined, ariaLabel: string | undefined) {
   const generatedId = useId();
   const ownId = id ?? generatedId;
   const rowHeaderIds = useContext(TableRowContext)?.rowHeaderIds;
-  return {
-    id: ownId,
-    'aria-label': label,
-    'aria-labelledby': rowHeaderIds ? `${ownId} ${rowHeaderIds}` : undefined,
-  };
+  const labelledBy = rowHeaderIds && ariaLabel ? `${ownId} ${rowHeaderIds}` : rowHeaderIds;
+  return { id: ownId, 'aria-labelledby': labelledBy };
 }
 
 export function useCellIndex() {

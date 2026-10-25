@@ -10,8 +10,8 @@ export type TableSelectionCheckboxProps = ComponentProps<'input'>;
 export const TableSelectionCheckbox = React.forwardRef<HTMLInputElement, TableSelectionCheckboxProps>(
   function TableSelectionCheckbox(props, ref) {
     const { render, ...otherProps } = props;
-    const { enabled, checked, indeterminate, disabled, label, toggle } = useSelectionCheckboxState();
-    const labelProps = useRowHeaderLabel(label, otherProps.id);
+    const { enabled, checked, indeterminate, disabled, toggle } = useSelectionCheckboxState();
+    const labelProps = useRowHeaderLabel(otherProps.id, otherProps['aria-label']);
 
     const setIndeterminate = React.useCallback(
       (node: HTMLInputElement | null) => {
@@ -61,7 +61,6 @@ function useSelectionCheckboxState() {
       checked: row.selected,
       indeterminate: false,
       disabled: !row.canSelect,
-      label: 'Select',
       toggle: row.toggleSelected,
     };
   }
@@ -70,7 +69,6 @@ function useSelectionCheckboxState() {
     checked: table.allSelected,
     indeterminate: table.someSelected,
     disabled: !table.canSelectAll,
-    label: 'Select all',
     toggle: table.toggleAllSelected,
   };
 }
