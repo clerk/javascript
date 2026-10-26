@@ -101,7 +101,8 @@ test.describe('OAuth testing tokens @nextjs', () => {
     expect((await context.cookies(providerOrigin)).map(cookie => cookie.name).sort()).toEqual(['consent', 'provider']);
   });
 
-  test('delivers the token on the callback when the provider skips the consent screen', async ({ page }) => {
+  test('delivers the token on the callback when the provider skips the consent screen', async ({ page, context }) => {
+    await setupTestingTokens({ context, frontendApiOrigin: providerOrigin, token: 'provider-testing-token' });
     const callback = new URL('/v1/oauth_callback?code=auth-code&state=a%2Bb%2F%3D', appOrigin);
     const authorize = new URL('/oauth/authorize/continue', providerOrigin);
     authorize.searchParams.set('callback', callback.toString());
