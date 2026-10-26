@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.26.3
+
+### Patch Changes
+
+- Update the `lockUser()` JSDoc to link to the **Protections** page under **Protect** (`/~/protect/protections`) in the Clerk Dashboard. Point the user lock links in the `lockUser()`, `unlockUser()`, `CreateUserParams.locked`, and `User.locked` JSDoc to the current guide on user locks. ([#10395](https://github.com/clerk/javascript/pull/10395)) by [@mwickett](https://github.com/mwickett)
+
+- Session `expireAt` and `abandonAt` no longer special-case a `0` deadline; the backend now always sends a real deadline. ([#10389](https://github.com/clerk/javascript/pull/10389)) by [@swolfand](https://github.com/swolfand)
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/shared@4.42.0
+
 ## 3.26.2
 
 ### Patch Changes
