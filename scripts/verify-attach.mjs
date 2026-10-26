@@ -432,35 +432,28 @@ function mediaTables(files, hasBefore, uploaded) {
     const label = stem(name);
     const cell = (url, alt) => (isVideo(name) ? url : `<img src="${url}" width="${IMAGE_WIDTH}" alt="${alt}">`);
     return {
-      video: isVideo(name),
       label,
       after: cell(uploaded[at], hasBefore ? `After: ${label}` : label),
       before: hasBefore ? cell(uploaded[files.length + at], `Before: ${label}`) : '',
     };
   });
-  return [false, true].flatMap(video => {
-    const some = shown.filter(item => item.video === video);
-    if (some.length === 0) {
-      return [];
-    }
-    if (hasBefore) {
-      return [
-        table(
-          ['Before', 'After'],
-          some.map(item => [item.before, item.after]),
-        ),
-      ];
-    }
-    const rows = Array.from({ length: Math.ceil(some.length / ACROSS) }, (_, row) =>
-      some.slice(row * ACROSS, (row + 1) * ACROSS),
-    );
-    return rows.map(row =>
+  if (hasBefore) {
+    return [
       table(
-        row.map(item => `\`${item.label}\``),
-        [row.map(item => item.after)],
+        ['Before', 'After'],
+        shown.map(item => [item.before, item.after]),
       ),
-    );
-  });
+    ];
+  }
+  const rows = Array.from({ length: Math.ceil(shown.length / ACROSS) }, (_, row) =>
+    shown.slice(row * ACROSS, (row + 1) * ACROSS),
+  );
+  return rows.map(row =>
+    table(
+      row.map(item => `\`${item.label}\``),
+      [row.map(item => item.after)],
+    ),
+  );
 }
 
 // `gh pr edit --attach` rewrites only a markdown reference to a file, so the files go up as a list first, and the tables are written from the addresses GitHub gave them.
