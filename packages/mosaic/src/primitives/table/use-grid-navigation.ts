@@ -33,7 +33,7 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     if (!table) {
       return;
     }
-    if (!activeRef.current?.isConnected || !contains(table, activeRef.current)) {
+    if (!isActivatable(table, activeRef.current)) {
       activeRef.current = itemAt(table, positionRef.current ?? initialPosition(table, excluded), excluded) ?? null;
     }
     for (const element of originalTabIndexes.current.keys()) {
@@ -346,6 +346,11 @@ function arrowKeys(table: HTMLTableElement) {
   return isRtl(table)
     ? { forward: 'ArrowLeft', backward: 'ArrowRight' }
     : { forward: 'ArrowRight', backward: 'ArrowLeft' };
+}
+
+function isActivatable(table: HTMLTableElement, element: HTMLElement | null) {
+  const row = element?.closest('tr');
+  return !!element?.isConnected && contains(table, element) && !!row && !isDisabledRow(row);
 }
 
 function rovingTabIndex(active: boolean) {

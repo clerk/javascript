@@ -1140,6 +1140,23 @@ describe('Table', () => {
       expect(focused()).toBe(screen.getByRole('button', { name: 'Alpha actions' }).closest('td'));
     });
 
+    it('keeps a tab stop when the focused row becomes disabled', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(<LogsTable selectionMode='multiple' />);
+
+      await tabIntoTable(user);
+      expect(row('Alpha')).toHaveFocus();
+      rerender(
+        <LogsTable
+          selectionMode='multiple'
+          rowProps={log => ({ disabled: log.message === 'Alpha' })}
+        />,
+      );
+      await tabIntoTable(user);
+
+      expect(row('Bravo')).toHaveFocus();
+    });
+
     it('restores the tab order when navigation turns off', async () => {
       const user = userEvent.setup();
       const { rerender } = render(<LogsTable selectionMode='multiple' />);
