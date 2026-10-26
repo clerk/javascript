@@ -43,7 +43,7 @@ const ANDROID_VERSION_CODE = /^[1-9]\d*$/;
 
 const listeners = new Set<() => void>();
 let environmentStatus: AppVersionSupportStatus | null = null;
-let serverAnswer: { isSupported: true } | { isSupported: false; status: AppVersionSupportStatus } | null = null;
+let serverAnswer: { isSupported: true } | { isSupported: false; meta: Record<string, unknown> } | null = null;
 let requestSequence = 0;
 let lastResetRequest = 0;
 let lastAnsweredRequest = 0;
@@ -95,16 +95,7 @@ export function applyUnsupportedAppVersion(meta: unknown, request: number): void
   if (!acceptAnswer(request)) {
     return;
   }
-  const fields = isRecord(meta) ? meta : {};
-  serverAnswer = {
-    isSupported: false,
-    status: {
-      isSupported: false,
-      currentVersion: stringOrNull(fields.current_version) ?? getNativeAppIdentity()?.version ?? null,
-      minimumVersion: stringOrNull(fields.minimum_version) ?? environmentStatus?.minimumVersion ?? null,
-      updateUrl: httpUrlOrNull(fields.update_url) ?? environmentStatus?.updateUrl ?? null,
-    },
-  };
+  serverAnswer = { isSupported: false, meta: isRecord(meta) ? meta : {} };
   publish();
 }
 
@@ -215,6 +206,15 @@ function supportedStatus(): AppVersionSupportStatus {
   };
 }
 
+function rejectionStatus(meta: Record<string, unknown>): AppVersionSupportStatus {
+  return {
+    isSupported: false,
+    currentVersion: stringOrNull(meta.current_version) ?? getNativeAppIdentity()?.version ?? null,
+    minimumVersion: stringOrNull(meta.minimum_version) ?? environmentStatus?.minimumVersion ?? null,
+    updateUrl: httpUrlOrNull(meta.update_url) ?? environmentStatus?.updateUrl ?? null,
+  };
+}
+
 function publish({
   displayChanged = false,
   notifyLater = false,
@@ -222,7 +222,7 @@ function publish({
   const next = !serverAnswer
     ? (environmentStatus ?? supportedStatus())
     : !serverAnswer.isSupported
-      ? serverAnswer.status
+      ? rejectionStatus(serverAnswer.meta)
       : environmentStatus?.isSupported
         ? environmentStatus
         : supportedStatus();

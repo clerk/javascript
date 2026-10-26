@@ -156,6 +156,22 @@ describe('appVersionSupport', () => {
     expect(store.getAppVersionSupportStatus().isSupported).toBe(true);
   });
 
+  test('a rejection uses the latest environment for what its meta leaves out', async () => {
+    const store = await loadStore();
+    const newerAppStoreUrl = 'https://apps.apple.com/app/id456';
+    fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
+    store.applyUnsupportedAppVersion({}, store.nextAppVersionRequest());
+
+    fetchEnvironment(store, environment({ ios: [iosPolicy('3.0', newerAppStoreUrl)] }));
+
+    expect(store.getAppVersionSupportStatus()).toEqual({
+      isSupported: false,
+      currentVersion: '1.9.9',
+      minimumVersion: '3.0',
+      updateUrl: newerAppStoreUrl,
+    });
+  });
+
   test('a rejection falls back to the environment for what its meta leaves out', async () => {
     const store = await loadStore();
     fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
