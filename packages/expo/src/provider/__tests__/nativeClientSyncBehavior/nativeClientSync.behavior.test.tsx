@@ -307,6 +307,29 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
+    it('refreshes native after a JS sign-in that lands while JS refetches a native change', async () => {
+      const { server, token } = seedDevice();
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      const client = h.js.client;
+      if (!client) {
+        throw new Error('JS has no client');
+      }
+      const fetchClient = client.fetch;
+      let jsSessionId: string | undefined;
+      client.fetch = async options => {
+        client.fetch = fetchClient;
+        jsSessionId = await h.js.signIn('user_2');
+        return fetchClient(options);
+      };
+
+      await h.run(() => h.native.signIn('user_1'));
+      await h.settle();
+
+      expect(h.js.session?.id).toBe(jsSessionId);
+      expect(h.native.activeSessionId).toBe(jsSessionId);
+      await expectConverged(h);
+    });
+
     it('settles a JS change without an echo loop', async () => {
       const { server, token, sessionIds } = seedDevice(['user_1', 'user_2'], 'user_1');
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
