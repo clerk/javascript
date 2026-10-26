@@ -108,7 +108,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
 
       // Resolves task
-      await u.po.signUp.waitForMounted();
+      await page.waitForURL(/tasks/);
       const fakeOrganization = Object.assign(u.services.organizations.createFakeOrganization(), {
         slug: u.services.organizations.createFakeOrganization().slug + '-with-sign-in-sso',
       });
