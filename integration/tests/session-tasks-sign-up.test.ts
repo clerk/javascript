@@ -101,7 +101,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signUp.waitForMounted();
       await u.po.signUp.setEmailAddress(fakeUserForOAuth.email);
       await u.po.signUp.continue();
-      await u.po.signUp.enterTestOtpCode();
+      const [callback] = await Promise.all([
+        page.waitForRequest(request => new URL(request.url()).pathname === '/v1/oauth_callback'),
+        u.po.signUp.enterTestOtpCode(),
+      ]);
+      expect(new URL(callback.url()).searchParams.has('__clerk_testing_token')).toBe(true);
 
       // Resolves task
       await u.po.signUp.waitForMounted();
