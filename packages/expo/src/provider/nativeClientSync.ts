@@ -271,12 +271,11 @@ export function createNativeClientSync(
       if (await ready()) {
         await pull();
         await reconciling;
-        lastFingerprint = fingerprint(clerk);
       }
     });
 
     const toNative = singleFlight(async () => {
-      // Let an in-flight native pull settle first so its own emissions are not echoed back.
+      // Let an in-flight native pull settle first so one refresh covers what it applied.
       await fromNative.current()?.catch(noop);
       const next = fingerprint(clerk);
       if (next === lastFingerprint || !(await ready())) {
