@@ -76,13 +76,17 @@ export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhen
               </Menu.Media>
             ) : null}
             <Menu.Label>{action.label}</Menu.Label>
-            {action.progress === 'pending' && showSpinner ? (
-              <Spinner
-                size='sm'
-                role='progressbar'
-                aria-hidden={undefined}
-                aria-label={action.label}
-              />
+            {action.progress !== undefined ? (
+              <Menu.Indicator>
+                {action.progress === 'pending' && showSpinner ? (
+                  <Spinner
+                    size='sm'
+                    role='progressbar'
+                    aria-hidden={undefined}
+                    aria-label={action.label}
+                  />
+                ) : null}
+              </Menu.Indicator>
             ) : null}
           </Menu.Item>
         ))}
