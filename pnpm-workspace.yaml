@@ -71,8 +71,6 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # Renovate security update: axios@0.34.0
-  - axios@0.34.0
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
