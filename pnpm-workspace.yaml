@@ -71,8 +71,6 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # Renovate security update: svgo@4.1.0
-  - svgo@4.1.0
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
