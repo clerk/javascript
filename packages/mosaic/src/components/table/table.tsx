@@ -208,7 +208,7 @@ const Column = React.forwardRef<HTMLTableCellElement, TableColumnProps>(function
           styles.column,
           aligns[align],
           width !== undefined && columnWidth.fixed(width),
-          sortable && [styles.sortableColumn, focusOutline.visible, tableStateMarker],
+          sortable && [styles.sortableColumn, focusOutline.visible, styles.focusRing, tableStateMarker],
           sticky && [styles.sticky, stickySides[sticky]],
           xstyle,
         ),
@@ -264,7 +264,7 @@ const Row = React.forwardRef<HTMLTableRowElement, TableRowProps>(function Mosaic
       ref={ref}
       {...mergeStyleProps(
         themeProps('table-row'),
-        stylex.props(reset.base, styles.row, focusOutline.visible, xstyle),
+        stylex.props(reset.base, styles.row, focusOutline.visible, styles.focusRing, xstyle),
         rest,
       )}
     />
@@ -285,8 +285,9 @@ const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function Mos
           styles.cell,
           aligns[align],
           noWrap && styles.noWrap,
-          sticky && [styles.sticky, stickySides[sticky]],
           focusOutline.visible,
+          styles.focusRing,
+          sticky && [styles.sticky, stickySides[sticky]],
           xstyle,
         ),
         rest,

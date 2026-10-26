@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import {
   colorVars,
   durationVars,
+  focusVars,
   fontWeightVars,
   radiusVars,
   scrollFadeVars,
@@ -75,6 +76,7 @@ export const styles = stylex.create({
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
     cursor: { default: null, ':where([data-actionable])': 'pointer' },
+    position: 'relative',
   },
   column: {
     paddingBlock: space['2.5'],
@@ -83,6 +85,7 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    position: 'relative',
     verticalAlign: 'middle',
     whiteSpace: 'nowrap',
   },
@@ -105,6 +108,7 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    position: 'relative',
     verticalAlign: 'middle',
   },
   selectCell: {
@@ -119,7 +123,7 @@ export const styles = stylex.create({
     backgroundColor: surface,
     backgroundImage: `linear-gradient(${tint}, ${tint})`,
     position: 'sticky',
-    zIndex: 1,
+    zIndex: { default: 1, ':focus-visible': 2 },
     '::before': {
       insetBlock: 0,
       content: '""',
@@ -127,6 +131,10 @@ export const styles = stylex.create({
       position: 'absolute',
       width: scrollFadeVars['--cl-scroll-fade-size'],
     },
+  },
+  focusRing: {
+    outlineOffset: { default: null, ':focus-visible': `calc(-1 * ${focusVars['--cl-focus-outline-width']})` },
+    zIndex: { default: null, ':focus-visible': 2 },
   },
   empty: {
     textAlign: 'center',
