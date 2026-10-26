@@ -71,8 +71,6 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # Renovate security update: smol-toml@1.7.1
-  - smol-toml@1.7.1
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
