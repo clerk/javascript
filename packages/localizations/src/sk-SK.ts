@@ -1640,6 +1640,14 @@ export const skSK: LocalizationResource = {
       subtitle: 'Pre pokračovanie vložte svoje aktuálne heslo',
       title: 'Vyžaduje sa overenie',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Overovací kód',
       resendButton: 'Nedostali ste kód? Znova odoslať',
@@ -1651,6 +1659,25 @@ export const skSK: LocalizationResource = {
       resendButton: 'Nedostali ste kód? Znova odoslať',
       subtitle: 'Pre pokračovanie vložte overovací kód odoslaný na vaše telefónne číslo',
       title: 'Vyžaduje sa overenie',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Overovací kód',

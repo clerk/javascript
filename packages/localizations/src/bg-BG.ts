@@ -1639,6 +1639,14 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Enter your current password to continue using "{{applicationName}}"',
       title: 'Enter your password',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Enter the verification code sent to your phone number.',
       resendButton: "Didn't receive the code? Resend it.",
@@ -1650,6 +1658,25 @@ export const bgBG: LocalizationResource = {
       resendButton: "Didn't receive the code? Resend it.",
       subtitle: 'Verify using the code sent to your phone.',
       title: 'Phone number MFA',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Enter the verification code from your authenticator app.',

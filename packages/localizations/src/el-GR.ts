@@ -1645,6 +1645,14 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε',
       title: 'Εισάγετε τον κωδικό πρόσβασής σας',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Κωδικός επαλήθευσης',
       resendButton: 'Δεν λάβατε κωδικό; Επαναποστολή',
@@ -1656,6 +1664,25 @@ export const elGR: LocalizationResource = {
       resendButton: 'Δεν λάβατε κωδικό; Επαναποστολή',
       subtitle: 'για να συνεχίσετε',
       title: 'Ελέγξτε το τηλέφωνό σας',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Κωδικός επαλήθευσης',

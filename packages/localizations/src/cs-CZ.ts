@@ -1645,6 +1645,14 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Zadejte své aktuální heslo pro pokračování',
       title: 'Vyžadováno ověření',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Ověřovací kód',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -1656,6 +1664,25 @@ export const csCZ: LocalizationResource = {
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
       subtitle: 'Zadejte kód odeslaný na váš telefon pro pokračování',
       title: 'Vyžadováno ověření',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Ověřovací kód',

@@ -1686,6 +1686,16 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter your current password to continue',
       title: 'Verification required',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword:
+        "Your current password can't be used anymore. Confirm it's you to save your new password.",
+      title: 'Password compromised',
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword:
+        "Your current password was found in a data breach. Confirm it's you to save your new password.",
+      title: 'Password compromised',
+    },
     phoneCode: {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",
@@ -1697,6 +1707,25 @@ export const enUS: LocalizationResource = {
       resendButton: "Didn't receive a code? Resend",
       subtitle: 'Enter the code sent to your phone to continue',
       title: 'Verification required',
+    },
+    resetPassword: {
+      formButtonPrimary: 'Continue',
+      title: 'Set new password',
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: 'Reset your password',
+      label__alternativeMethods: 'Or, verify with another method',
+    },
+    resetPasswordCode: {
+      formTitle: 'Reset password code',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle__saveNewPassword_email: 'Enter the code sent to your email address to save your new password',
+      subtitle__saveNewPassword_phone: 'Enter the code sent to your phone to save your new password',
+      subtitle_email: 'Enter the code sent to your email address to set your new password',
+      subtitle_phone: 'Enter the code sent to your phone to set your new password',
+      title: 'Reset password',
+      title__saveNewPassword_email: 'Check your email',
+      title__saveNewPassword_phone: 'Check your phone',
     },
     totpMfa: {
       formTitle: 'Verification code',

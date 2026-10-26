@@ -1650,6 +1650,14 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Introduza a sua palavra-passe atual para continuar',
       title: 'Verificação necessária',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificação',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -1661,6 +1669,25 @@ export const ptPT: LocalizationResource = {
       resendButton: 'Não recebeu um código? Reenviar',
       subtitle: 'Introduza o código enviado para o seu telemóvel para continuar',
       title: 'Verificação necessária',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Código de verificação',
