@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/shared/react';
+import { useReverification, useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource, VerificationStrategy } from '@clerk/shared/types';
 import React, { Fragment, useState } from 'react';
 
@@ -106,7 +106,7 @@ export const MfaSection = () => {
 
                     <MfaPhoneCodeMenu
                       phone={phone}
-                      isDefault={isDefault}
+                      showSetDefaultAction={!showTOTP && !phone.defaultSecondFactor}
                       hidePhoneCodeDeleteAction={hidePhoneCodeDeleteAction}
                     />
                   </ProfileSection.Item>
@@ -158,21 +158,22 @@ export const MfaSection = () => {
 
 type MfaPhoneCodeMenuProps = {
   phone: PhoneNumberResource;
-  isDefault: boolean;
+  showSetDefaultAction: boolean;
   hidePhoneCodeDeleteAction: boolean;
 };
 
-const MfaPhoneCodeMenu = ({ phone, isDefault, hidePhoneCodeDeleteAction }: MfaPhoneCodeMenuProps) => {
+const MfaPhoneCodeMenu = ({ phone, showSetDefaultAction, hidePhoneCodeDeleteAction }: MfaPhoneCodeMenuProps) => {
   const { open } = useActionContext();
   const card = useCardState();
   const phoneId = phone.id;
+  const makeDefaultSecondFactor = useReverification(() => phone.makeDefaultSecondFactor());
 
   const actions = (
     [
-      !isDefault
+      showSetDefaultAction
         ? {
             label: localizationKeys('userProfile.start.mfaSection.phoneCode.actionLabel__setDefault'),
-            onClick: () => phone.makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError)),
+            onClick: () => makeDefaultSecondFactor().catch(err => handleError(err, [], card.setError)),
           }
         : null,
       !hidePhoneCodeDeleteAction

@@ -76,13 +76,44 @@ describe('SignInStart', () => {
       screen.getByText(/email address/i);
     });
 
+    it('sets autocomplete=email on an email-only identifier field', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /email address/i })).toHaveAttribute('autocomplete', 'email');
+    });
+
+    it('sets autocomplete=username when email and username are both enabled', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withUsername();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /email address or username/i })).toHaveAttribute(
+        'autocomplete',
+        'username',
+      );
+    });
+
+    it('sets autocomplete=tel on a phone identifier field', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber();
+      });
+
+      render(<SignInStart />, { wrapper });
+      expect(screen.getByRole('textbox', { name: /phone number/i })).toHaveAttribute('autocomplete', 'tel');
+    });
+
     it('enables login with username', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withUsername();
       });
 
       render(<SignInStart />, { wrapper });
-      screen.getByText(/username/i);
+      expect(screen.getByRole('textbox', { name: /username/i })).toHaveAttribute('autocomplete', 'username');
     });
 
     it('enables login with phone number', async () => {
@@ -152,6 +183,10 @@ describe('SignInStart', () => {
             flow: 'autofill',
           });
         });
+        expect(screen.getByRole('textbox', { name: /email address/i })).toHaveAttribute(
+          'autocomplete',
+          'email webauthn',
+        );
       });
 
       it('does not display related-origin errors from passkey autofill', async () => {

@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { useProtect } from '../../common';
-import { useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/ConfigureDirectorySyncWizard';
 import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
@@ -17,6 +15,7 @@ import { SecurityBackControl } from './SecurityBackControl';
 import { SecuritySSOBypassSection } from './SecuritySSOBypassSection';
 import { SecuritySsoSection } from './SecuritySsoSection';
 import { SSOBypassAllowlistPage } from './SSOBypassAllowlistPage';
+import { useSecurityCapabilities } from './useSecurityCapabilities';
 
 type OrganizationSecurityPageProps = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -41,8 +40,7 @@ export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPag
 };
 
 const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
-  const canManageConnections = useProtect({ permission: 'org:sys_entconns:manage' });
-  const canManageSSOBypass = useProtect({ permission: 'org:sys_entconns_sso_bypass:manage' });
+  const { canConfigureSso, canConfigureDirectorySync, canManageSSOBypass } = useSecurityCapabilities();
 
   const {
     organization,
@@ -58,10 +56,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     enterpriseConnectionMutations,
     organizationDomains,
     organizationDomainMutations,
-  } = useOrganizationEnterpriseConnection({ manage: canManageConnections });
+  } = useOrganizationEnterpriseConnection({ manage: canConfigureSso });
 
-  const { userSettings } = useEnvironment();
-  const showDirectorySync = canManageConnections && userSettings.enterpriseSSO.self_serve_directory_sync;
   const showSSOBypass = canManageSSOBypass && enterpriseConnections.length > 0;
 
   const [requestedView, setRequestedView] = useState<SecurityPageView>({ kind: 'overview' });
@@ -113,6 +109,7 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     return (
       <ConfigureDirectorySyncWizard
         title={<SecurityBackControl onClick={exitToOverview} />}
+        contentRef={contentRef}
         onExit={exitToOverview}
       />
     );
@@ -159,11 +156,11 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         enterpriseConnectionMutations={enterpriseConnectionMutations}
         organizationName={organization?.name ?? ''}
         contentRef={contentRef}
-        onConfigure={canManageConnections ? openWizard : undefined}
-        onOpenConnection={canManageConnections ? openConnection : undefined}
+        onConfigure={canConfigureSso ? openWizard : undefined}
+        onOpenConnection={canConfigureSso ? openConnection : undefined}
       />
       {showSSOBypass && <SecuritySSOBypassSection onManage={() => setRequestedView({ kind: 'ssoBypass' })} />}
-      {showDirectorySync && (
+      {canConfigureDirectorySync && (
         <SecurityDirectorySyncSection
           organizationName={organization?.name ?? ''}
           contentRef={contentRef}

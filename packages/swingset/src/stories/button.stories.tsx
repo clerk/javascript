@@ -1,6 +1,9 @@
 import type { ButtonProps } from '@clerk/mosaic/components/button';
 import { Button, SubmitButton } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
+import { ChevronDown } from '@clerk/mosaic/icons/glyphs/chevron-down';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -151,7 +154,7 @@ export function Shapes(props: Record<string, unknown>) {
         aria-label='Add'
       >
         <Icon
-          name='plus'
+          glyph={Plus}
           size='sm'
         />
       </Button>
@@ -161,7 +164,7 @@ export function Shapes(props: Record<string, unknown>) {
         size='md'
         aria-label='Add'
       >
-        <Icon name='plus' />
+        <Icon glyph={Plus} />
       </Button>
       <Button
         {...knobsAsProps(props)}
@@ -170,7 +173,7 @@ export function Shapes(props: Record<string, unknown>) {
         aria-label='Add'
       >
         <Icon
-          name='plus'
+          glyph={Plus}
           size='sm'
         />
       </Button>
@@ -180,7 +183,7 @@ export function Shapes(props: Record<string, unknown>) {
         size='md'
         aria-label='Add'
       >
-        <Icon name='plus' />
+        <Icon glyph={Plus} />
       </Button>
     </div>
   );
@@ -193,7 +196,7 @@ export function Icons(props: Record<string, unknown>) {
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       <Button {...knobsAsProps(props)}>
         <Icon
-          name='checkmark'
+          glyph={Checkmark}
           placement='inline-start'
         />
         Approve
@@ -201,18 +204,18 @@ export function Icons(props: Record<string, unknown>) {
       <Button {...knobsAsProps(props)}>
         Options
         <Icon
-          name='chevron-down'
+          glyph={ChevronDown}
           placement='inline-end'
         />
       </Button>
       <Button {...knobsAsProps(props)}>
         <Icon
-          name='checkmark'
+          glyph={Checkmark}
           placement='inline-start'
         />
         Both sides
         <Icon
-          name='chevron-down'
+          glyph={ChevronDown}
           placement='inline-end'
         />
       </Button>
@@ -235,7 +238,7 @@ export function IconSizes(props: Record<string, unknown>) {
             size={size}
           >
             <Icon
-              name='checkmark'
+              glyph={Checkmark}
               placement='inline-start'
               size={size === 'xs' ? 'sm' : size}
             />
@@ -253,7 +256,7 @@ export function IconSizes(props: Record<string, unknown>) {
           >
             Options
             <Icon
-              name='chevron-down'
+              glyph={ChevronDown}
               placement='inline-end'
               size={size === 'xs' ? 'sm' : size}
             />
@@ -287,7 +290,7 @@ export function Truncation(props: Record<string, unknown>) {
         fullWidth
       >
         <Icon
-          name='checkmark'
+          glyph={Checkmark}
           placement='inline-start'
         />
         Save this organization&rsquo;s billing details

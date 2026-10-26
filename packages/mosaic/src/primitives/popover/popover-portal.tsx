@@ -1,8 +1,8 @@
 'use client';
 
-import { FloatingPortal } from '@floating-ui/react';
 import type { ReactNode } from 'react';
 
+import { Portal } from '../portal';
 import { usePopoverContext } from './popover-context';
 
 export interface PopoverPortalProps {
@@ -15,5 +15,5 @@ export function PopoverPortal(props: PopoverPortalProps) {
   if (!mounted) {
     return null;
   }
-  return <FloatingPortal root={props.root}>{props.children}</FloatingPortal>;
+  return <Portal root={props.root}>{props.children}</Portal>;
 }

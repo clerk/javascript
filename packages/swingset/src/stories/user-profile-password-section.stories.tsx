@@ -1,4 +1,4 @@
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile.types';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 
 import type { StoryMeta } from '@/lib/types';
@@ -10,6 +10,7 @@ export { default as __source } from './user-profile-password-section.stories?raw
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
+  substatus: 'needs reverification',
   title: 'UserProfilePasswordSection',
   label: 'Password',
   navigation: { category: 'Sections' },
