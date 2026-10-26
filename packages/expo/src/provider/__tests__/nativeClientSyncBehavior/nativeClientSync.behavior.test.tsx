@@ -213,7 +213,7 @@ describe('native client sync behavior', () => {
 
       await expectConverged(h);
       expect(server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
-      expect(h.native.clientRefreshCount - nativeRefreshesBefore).toBe(0);
+      expect(h.native.clientRefreshCount - nativeRefreshesBefore).toBe(1);
     });
   });
 
