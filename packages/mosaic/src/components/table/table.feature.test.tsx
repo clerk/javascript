@@ -87,3 +87,37 @@ describe('Mosaic Table expand button', () => {
     expect(icon && getComputedStyle(icon).transform).toBe(transform);
   });
 });
+
+describe('Mosaic Table sticky fade', () => {
+  it.each([
+    ['ltr', 'start', 'to right'],
+    ['ltr', 'end', 'to left'],
+    ['rtl', 'start', 'to left'],
+    ['rtl', 'end', 'to right'],
+  ] as const)('fades %s %s-pinned cells away from the pinned edge', (dir, side, gradient) => {
+    render(
+      <MosaicProvider>
+        <div dir={dir}>
+          <Table.Root aria-label='Keys'>
+            <Table.Header>
+              <Table.Column>Name</Table.Column>
+            </Table.Header>
+            <Table.Body
+              items={['alpha']}
+              itemToStringValue={item => item}
+            >
+              {() => (
+                <Table.Row>
+                  <Table.Cell sticky={side}>Alpha</Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table.Root>
+        </div>
+      </MosaicProvider>,
+    );
+    expect(getComputedStyle(screen.getByRole('cell', { name: 'Alpha' }), '::before').backgroundImage).toContain(
+      `linear-gradient(${gradient}`,
+    );
+  });
+});

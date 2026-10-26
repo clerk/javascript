@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
+import { mosaicLightningCssTargets } from './stylex-lightningcss.config.mjs';
+
 const mosaicPath = resolve(import.meta.dirname, 'src');
 const featureTests = 'src/**/*.feature.test.tsx';
 const webkitTests = 'src/**/*.webkit.test.tsx';
@@ -11,7 +13,11 @@ const browserTests = 'src/**/*.browser.test.tsx';
 
 export default defineConfig({
   plugins: [
-    stylex({ dev: true, unstable_moduleResolution: { type: 'commonJS', rootDir: mosaicPath } }),
+    stylex({
+      dev: true,
+      unstable_moduleResolution: { type: 'commonJS', rootDir: mosaicPath },
+      lightningcssOptions: { targets: mosaicLightningCssTargets },
+    }),
     react({ jsxRuntime: 'automatic' }),
   ],
   test: {
