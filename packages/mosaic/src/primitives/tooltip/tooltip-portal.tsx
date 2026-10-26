@@ -1,8 +1,8 @@
 'use client';
 
-import { FloatingPortal } from '@floating-ui/react';
 import type { ReactNode, RefObject } from 'react';
 
+import { Portal } from '../portal';
 import { useTooltipContext } from './tooltip-context';
 
 export interface TooltipPortalProps {
@@ -15,5 +15,5 @@ export function TooltipPortal(props: TooltipPortalProps) {
   if (!mounted) {
     return null;
   }
-  return <FloatingPortal root={props.root}>{props.children}</FloatingPortal>;
+  return <Portal root={props.root}>{props.children}</Portal>;
 }

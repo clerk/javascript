@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const EllipsisHorizontalCircle = glyph(
+  'ellipsis-horizontal-circle',
   <>
     <path
       d='M5.33333 8V7.99333M5.5 8C5.5 8.09207 5.42538 8.16667 5.33333 8.16667C5.24129 8.16667 5.16667 8.09207 5.16667 8C5.16667 7.90793 5.24129 7.83333 5.33333 7.83333C5.42538 7.83333 5.5 7.90793 5.5 8Z'

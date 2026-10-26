@@ -304,9 +304,48 @@ export const enUS: LocalizationResource = {
       google: 'Google Workspace',
       okta: 'Okta Workforce',
     },
+    roleMappingStep: {
+      actionHint__reorder: 'Drag to reorder, or use the arrow keys',
+      actionLabel__reorder: 'Reorder {{group}} mapping',
+      alert__missingManageMembersPermission: {
+        subtitle: 'Ask someone who can manage members to change role sync or the group role mappings.',
+        title: 'Role mapping is read-only',
+      },
+      columns: {
+        directoryGroup: 'Directory group',
+        priority: 'Priority',
+        role: 'Role',
+      },
+      disableDialog: {
+        cancelButton: 'Cancel',
+        confirmButton: 'Disable role sync',
+        subtitle:
+          "Members keep their current roles, but new members won't get a role from their directory group. Your mappings are saved, and turning role sync back on reapplies them to every member, overwriting any manual role changes.",
+        title: 'Disabling role sync',
+      },
+      empty__noGroups: {
+        subtitle: 'Push groups from {{provider}} and they will appear here, ready to map.',
+        title: 'No groups provisioned yet',
+      },
+      enableDialog: {
+        cancelButton: 'Cancel',
+        confirmButton: 'Enable role sync',
+        subtitle:
+          "Members' organization roles will be overwritten by the role mapped to their directory group, including roles that were assigned manually.",
+        title: 'Enabling role sync',
+      },
+      error__loadMappings: 'Could not load role mappings',
+      everyoneElse: 'Everyone else',
+      formFieldLabel__syncRoles: 'Sync roles',
+      roleOption__unassigned: 'Unassigned',
+      subtitle:
+        'Members get a role from the directory group they belong to. Members belonging to multiple groups are assigned the highest priority role.',
+      title: 'Role mapping',
+    },
     stepper: {
       attributes: 'Attributes',
       configure: 'Configure',
+      roles: 'Roles',
       test: 'Test',
     },
     testStep: {
@@ -1636,6 +1675,12 @@ export const enUS: LocalizationResource = {
         'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
       title: 'Use your passkey',
     },
+    passkeyMfa: {
+      blockButton__passkey: 'Use your passkey',
+      subtitle:
+        'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
+      title: 'Verification required',
+    },
     password: {
       actionLink: 'Use another method',
       subtitle: 'Enter your current password to continue',
@@ -1784,6 +1829,10 @@ export const enUS: LocalizationResource = {
       title: 'Cannot sign in',
     },
     passkey: {
+      subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
+      title: 'Use your passkey',
+    },
+    passkeyMfa: {
       subtitle: "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
       title: 'Use your passkey',
     },

@@ -49,7 +49,7 @@ import { Avatar } from '@clerk/mosaic/components/avatar';
 
 ### Pending
 
-While an image is still resolving, the fallback carries `data-pending` and pulses. This source holds its response for a minute, so the state is the component's own rather than a pinned attribute — inspect the `.cl-avatar-fallback` element to watch the attribute come and go.
+While an image is still resolving, the fallback carries `data-pending` and shimmers. This source holds its response for a minute, so the state is the component's own rather than a pinned attribute — inspect the `.cl-avatar-fallback` element to watch the attribute come and go.
 
 <Story
   name='Pending'
@@ -67,7 +67,7 @@ Use `render` to compose the avatar onto a button or another trigger without intr
 
 ### Fallback
 
-Once the image fails, the pulse stops and the fallback settles into a plain fill. Nothing is on its way for an entity that has no picture, so its mark holds still rather than claiming to be loading one.
+Once the image fails, the shimmer stops and the fallback settles into a plain fill. Nothing is on its way for an entity that has no picture, so its mark holds still rather than claiming to be loading one.
 
 <Story
   name='Fallback'

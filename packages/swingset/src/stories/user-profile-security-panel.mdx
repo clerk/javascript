@@ -2,11 +2,6 @@ import * as Stories from './user-profile-security-panel.stories';
 
 # UserProfileSecurityPanel
 
-The security panel groups the available authentication methods and active devices. For a live
-password section, pass `useUserProfilePasswordSlot()` as `passwordSlot`. The hook returns `null`
-when passwords are hidden or loading without a fallback, so the panel omits an empty Authentication
-section. Fixtures pass `{ content: <UserProfilePasswordSectionView {...props} /> }`.
-
 ## Example
 
 <Story
@@ -14,3 +9,26 @@ section. Fixtures pass `{ content: <UserProfilePasswordSectionView {...props} />
   storyModule={Stories}
   composition={[{ name: 'Section', href: '/components/section', layer: 'Components' }]}
 />
+
+## Usage
+
+`UserProfileSecurityPanel` renders the Security title with the password, passkeys, 2-step verification, and active devices sections. Each section shows itself only when the signed-in user and the instance settings call for it.
+
+```tsx
+import { UserProfileSecurityPanel } from '@clerk/mosaic/features/user-profile/user-profile-security-panel';
+
+<UserProfileSecurityPanel />;
+```
+
+Pass sections as children to choose which ones render and in what order.
+
+```tsx
+import { UserProfileMfaSection } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section';
+import { UserProfilePasswordSection } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section';
+import { UserProfileSecurityPanel } from '@clerk/mosaic/features/user-profile/user-profile-security-panel';
+
+<UserProfileSecurityPanel>
+  <UserProfilePasswordSection />
+  <UserProfileMfaSection />
+</UserProfileSecurityPanel>;
+```

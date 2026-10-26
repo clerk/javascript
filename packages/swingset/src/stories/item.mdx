@@ -113,7 +113,7 @@ Media sizes itself from the row, so give it a child that fills its column — an
 ```tsx
 <Item.Root size='xs' render={({ children, ...props }) => <button type='button' {...props}>{children}</button>}>
   <Item.Media>
-    <Icon name='log-out' size='sm' />
+    <Icon glyph={LogOut} size='sm' />
   </Item.Media>
   <Item.Content>
     <Item.Label variant='interactive'>Sign out of all accounts</Item.Label>

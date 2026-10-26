@@ -1,8 +1,8 @@
 'use client';
 
-import { FloatingPortal } from '@floating-ui/react';
 import type { ReactNode } from 'react';
 
+import { Portal } from '../portal';
 import { useDrawerContext } from './drawer-context';
 
 export interface DrawerPortalProps {
@@ -17,5 +17,5 @@ export function DrawerPortal(props: DrawerPortalProps) {
     return null;
   }
 
-  return <FloatingPortal root={props.root}>{props.children}</FloatingPortal>;
+  return <Portal root={props.root}>{props.children}</Portal>;
 }
