@@ -5,12 +5,7 @@ import { mockJwks, mockRsaJwkKid, signingJwks } from '../../fixtures';
 import { signJwt } from '../../jwt/signJwt';
 import { server, validateHeaders } from '../../mock-server';
 import { verifyHandshakeToken } from '../handshake';
-import {
-  JWT_CATEGORY_IGNORE,
-  JWT_CATEGORY_JWT_TEMPLATE,
-  JWT_CATEGORY_M2M_TOKEN,
-  JWT_CATEGORY_SESSION_TOKEN,
-} from '../jwtCategories';
+import { JWT_CATEGORY_JWT_TEMPLATE, JWT_CATEGORY_M2M_TOKEN, JWT_CATEGORY_SESSION_TOKEN } from '../jwtCategories';
 
 const directives = ['__session=foo; Path=/'];
 
@@ -42,7 +37,6 @@ describe('tokens.verifyHandshakeToken(token, options)', () => {
 
   it.each([
     ['the session-token category, which is what the handshake minter stamps', JWT_CATEGORY_SESSION_TOKEN],
-    ['the ignore category, used by instances that opt out of category tagging', JWT_CATEGORY_IGNORE],
     ['no category, for tokens minted before the category rollout', undefined],
   ])('verifies a handshake token with %s', async (_label, cat) => {
     await expect(verify(await createHandshakeJwt(cat))).resolves.toMatchObject({ handshake: directives });

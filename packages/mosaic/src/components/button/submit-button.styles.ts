@@ -6,16 +6,8 @@ export const styles = stylex.create({
   root: {
     position: 'relative',
   },
-  // Button gates its hover and pressed fills on `:enabled`, which a pending button still is —
-  // `aria-disabled` keeps it focusable, so the native attribute is out. Dropping pointer events
-  // stops `:hover` and `:active` matching for the pointer in one line, across every variant cell.
-  // Unlike `disabled` there's nothing lost by it: pending is self-explanatory and brief, so the
-  // button isn't carrying a tooltip that has to stay hoverable to explain itself.
-  //
-  // It doesn't cover the keyboard, though — a focused button still takes `:active` from space and
-  // enter with no pointer involved. That half is handled where the fills are declared, by the
-  // `:not([data-pending])` on each cell's active selector in `button.styles.ts`.
   rootPending: {
+    opacity: 1,
     pointerEvents: 'none',
   },
 

@@ -308,9 +308,45 @@ export const bnIN: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1601,6 +1637,11 @@ export const bnIN: LocalizationResource = {
         'আপনার পাসকি ব্যবহার করে আপনার পরিচয় নিশ্চিত করা হয়। আপনার ডিভাইস আপনার আঙ্গুলের ছাপ, মুখ বা স্ক্রিন লক চাইতে পারে।',
       title: 'আপনার পাসকি ব্যবহার করুন',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'অন্য পদ্ধতি ব্যবহার করুন',
       subtitle: 'চালিয়ে যেতে আপনার বর্তমান পাসওয়ার্ড লিখুন',
@@ -1751,6 +1792,10 @@ export const bnIN: LocalizationResource = {
       subtitle:
         'আপনার পাসকি ব্যবহার করলে নিশ্চিত হয় যে এটি আপনি। আপনার ডিভাইস আপনার আঙ্গুলের ছাপ, মুখ বা স্ক্রিন লক চাইতে পারে।',
       title: 'আপনার পাসকি ব্যবহার করুন',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'অন্য পদ্ধতি ব্যবহার করুন',

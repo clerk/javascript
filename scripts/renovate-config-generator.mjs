@@ -86,6 +86,8 @@ const defaultRules = [
       'should{/,}**',
       'sinon{/,}**',
       '@playwright{/,}**',
+      'e2e',
+      '@e2e-dev{/,}**',
     ],
   },
   {

@@ -5,18 +5,9 @@ import {
 import type { DirectorySyncUserResource } from '@clerk/shared/types';
 import { useEffect, useState } from 'react';
 
-import {
-  Badge,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  localizationKeys,
-  Spinner,
-  Text,
-  useLocalizations,
-} from '@/customizables';
+import { Badge, Col, descriptors, Flex, localizationKeys, Spinner, Text, useLocalizations } from '@/customizables';
 import { Alert } from '@/ui/elements/Alert';
+import { getAPIErrorMessage } from '@/utils/errorHandler';
 
 import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
@@ -89,8 +80,8 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
 };
 
 export const TestSyncStep = (): JSX.Element => {
-  const { goPrev } = useWizard();
-  const { providerMeta, directory, onExit, syncDirectory } = useConfigureDirectorySync();
+  const { goNext, goPrev } = useWizard();
+  const { providerMeta, directory, syncDirectory } = useConfigureDirectorySync();
   const { t } = useLocalizations();
   const isPull = providerMeta?.mode === 'pull';
   // The list doubles as a live feed while the admin pushes test users from the
@@ -181,7 +172,7 @@ export const TestSyncStep = (): JSX.Element => {
             <Alert
               variant='danger'
               title={localizationKeys('configureDirectorySync.testStep.error__loadUsers')}
-              subtitle={users.error.message}
+              subtitle={getAPIErrorMessage(users.error)}
             />
           ) : rows.length === 0 ? (
             <Flex
@@ -240,13 +231,7 @@ export const TestSyncStep = (): JSX.Element => {
 
       <Step.Footer>
         <Step.Footer.Previous onClick={() => goPrev()} />
-        <Button
-          elementDescriptor={descriptors.configureDirectorySyncCompleteButton}
-          variant='solid'
-          size='sm'
-          onClick={() => onExit?.()}
-          localizationKey={localizationKeys('configureDirectorySync.testStep.actionLabel__complete')}
-        />
+        <Step.Footer.Continue onClick={() => goNext()} />
       </Step.Footer>
     </>
   );

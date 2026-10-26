@@ -4,13 +4,15 @@ import type { ReactNode } from 'react';
 import { Panel } from '../../components/panel';
 import { useMessages } from '../../localization';
 import { themeProps } from '../../props';
-import { APIKeysTable, useAPIKeysAccess } from '../api-keys/api-keys-table';
+import type { APIKeysPageProps } from '../api-keys/api-keys-table';
+import { APIKeysTable } from '../api-keys/api-keys-table';
+import { useAPIKeysAccess } from '../api-keys/api-keys-table.model';
 
-export interface UserProfileApiKeysPanelProps {
+export interface UserProfileApiKeysPanelProps extends Omit<APIKeysPageProps, 'hide'> {
   fallback?: ReactNode;
 }
 
-export function UserProfileApiKeysPanel({ fallback }: UserProfileApiKeysPanelProps) {
+export function UserProfileApiKeysPanel({ perPage, showDescription, fallback }: UserProfileApiKeysPanelProps) {
   const { user } = useUser();
   const { isAvailable } = useAPIKeysAccess(user?.id);
   const m = useMessages('userProfile');
@@ -24,6 +26,8 @@ export function UserProfileApiKeysPanel({ fallback }: UserProfileApiKeysPanelPro
       <Panel.Title>{m.pages.apiKeys}</Panel.Title>
       <APIKeysTable
         subject={user.id}
+        perPage={perPage}
+        showDescription={showDescription}
         fallback={fallback}
       />
     </Panel.Root>

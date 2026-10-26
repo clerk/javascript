@@ -3,6 +3,7 @@ import type { APIKeysTableMessages, APIKeysTableSubjectKind } from './api-keys-t
 
 export const apiKeysTableMessages = {
   loading: 'Loading API keys',
+  loaded: 'API keys loaded',
   loadError: 'Could not load API keys',
   loadErrorDescription: 'Something went wrong. Please try again.',
   retry: 'Try again',
@@ -29,11 +30,11 @@ export const apiKeysTableMessages = {
   search: 'Search API keys',
   create: 'Create API key',
   createError: 'Could not create the API key. Try again.',
-  nameTakenError: 'API Key name already exists.',
-  quotaExceededError: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
   createTitle: 'Add new API key',
   createDescription: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
   nameLabel: 'Secret key name',
+  descriptionLabel: 'Description',
+  descriptionPlaceholder: 'Explain why you’re generating this key',
   expirationLabel: 'Expiration',
   noExpiration: 'This key will never expire',
   expirationPlaceholder: 'Select expiration',

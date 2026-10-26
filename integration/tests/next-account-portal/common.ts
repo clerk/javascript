@@ -16,7 +16,7 @@ type TestParams = {
 };
 
 export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) => {
-  const u = createTestUtils({ app, page, context, useTestingToken: false });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
   // Begin in localhost
   await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
@@ -79,7 +79,7 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
 };
 
 export const testSignUp = async ({ app, page, context }: TestParams, test: PlaywrightTest) => {
-  const u = createTestUtils({ app, page, context, useTestingToken: false });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
   const tempUser = u.services.users.createFakeUser(test, { fictionalEmail: true });
 
   // Begin in localhost
@@ -149,7 +149,7 @@ export const testSignUp = async ({ app, page, context }: TestParams, test: Playw
 };
 
 export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
-  const u = createTestUtils({ app, page, context, useTestingToken: false });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
 
   // Begin in localhost
   await u.page.goToAppHome();
@@ -184,7 +184,7 @@ export const testSSR = async ({ app, page, context, fakeUser }: TestParams) => {
 };
 
 export const testSignOut = async ({ app, page, context, fakeUser }: TestParams) => {
-  const u = createTestUtils({ app, page, context, useTestingToken: false });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
 
   // Sign in via Account Portal first
   await u.page.goToAppHome();
@@ -227,7 +227,7 @@ export const testSignOut = async ({ app, page, context, fakeUser }: TestParams) 
 };
 
 export const testAPClerkJsVersion = async ({ app, page, context }: TestParams, expectedMajorVersion: string) => {
-  const u = createTestUtils({ app, page, context, useTestingToken: false });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
 
   await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
@@ -247,7 +247,7 @@ export const testAPClerkJsVersion = async ({ app, page, context }: TestParams, e
 };
 
 export const testHandshakeRecovery = async ({ app, page, context, fakeUser }: TestParams) => {
-  const u = createTestUtils({ app, page, context, useTestingToken: false });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
 
   // Sign in via Account Portal
   await u.page.goToAppHome();

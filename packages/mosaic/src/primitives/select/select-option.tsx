@@ -14,13 +14,21 @@ export interface SelectOptionProps extends ComponentProps<'button'> {
 
 export function SelectOption(props: SelectOptionProps) {
   const { render, value, label, disabled, ...otherProps } = props;
-  const { activeIndex, selectedValue, setSelectedIndex, getItemProps, handleSelect, valueToLabelRef, selectedItemRef } =
-    useSelectContext();
+  const {
+    activeIndex,
+    selectedValues,
+    setSelectedIndex,
+    getItemProps,
+    handleSelect,
+    valueToLabelRef,
+    selectedItemRef,
+  } = useSelectContext();
 
   const displayLabel = label ?? value;
   const { ref: itemRef, index } = useListItem({ label: displayLabel });
 
-  const isSelected = selectedValue === value;
+  const isSelected = selectedValues.includes(value);
+  const isAnchor = selectedValues[selectedValues.length - 1] === value;
   const isActive = activeIndex === index;
 
   useEffect(() => {
@@ -32,10 +40,10 @@ export function SelectOption(props: SelectOptionProps) {
   }, [value, displayLabel, valueToLabelRef]);
 
   useEffect(() => {
-    if (isSelected) {
+    if (isAnchor) {
       setSelectedIndex(index);
     }
-  }, [index, isSelected, setSelectedIndex]);
+  }, [index, isAnchor, setSelectedIndex]);
 
   const state = {
     selected: isSelected,
@@ -71,7 +79,7 @@ export function SelectOption(props: SelectOptionProps) {
       active: (v: boolean) => (v ? { 'data-active': '' } : null),
       disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
     },
-    ref: [itemRef, isSelected ? selectedItemRef : null],
+    ref: [itemRef, isAnchor ? selectedItemRef : null],
     props: mergeProps<'button'>(defaultProps, otherProps),
   });
 }
