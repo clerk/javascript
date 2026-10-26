@@ -303,6 +303,7 @@ import {
   States as SwitchStates,
   WithField as SwitchWithField,
 } from '../stories/switch.stories';
+import { meta as tablePrimitiveMeta } from '../stories/table.primitive.stories';
 import {
   Default as TableDefault,
   Empty as TableEmpty,
@@ -774,6 +775,7 @@ const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const portalModule: StoryModule = { meta: portalMeta };
 const selectModule: StoryModule = { meta: selectMeta };
+const tablePrimitiveModule: StoryModule = { meta: tablePrimitiveMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tagInputModule: StoryModule = { meta: tagInputMeta };
 const toastPrimitiveModule: StoryModule = { meta: toastPrimitiveMeta };
@@ -1116,6 +1118,7 @@ export const registry: StoryModule[] = [
   popoverModule,
   portalModule,
   selectModule,
+  tablePrimitiveModule,
   tabsModule,
   tagInputModule,
   toastPrimitiveModule,

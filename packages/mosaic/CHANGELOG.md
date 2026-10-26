@@ -1,5 +1,16 @@
 # @clerk/mosaic
 
+## 0.1.13
+
+### Patch Changes
+
+- Add `selfServeDirectorySyncEnabled` to `OrganizationResource`. Self-serve Directory Sync is now enabled per organization by this setting instead of following `selfServeSSOEnabled`. In `<OrganizationProfile />`, the Security page now appears for organizations that have only Directory Sync enabled, and their admins can manage the connection's directory. Organizations that have self-serve SSO without Directory Sync no longer see the Directory Sync section. ([#10374](https://github.com/clerk/javascript/pull/10374)) by [@kalafut](https://github.com/kalafut)
+
+- Correct secondary text, brand colors, and status backgrounds and borders in light and dark modes to match the Mosaic design palette. Align dark input backgrounds with the surrounding surface and keep translucent error highlights red in both modes. ([#10375](https://github.com/clerk/javascript/pull/10375)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/shared@4.42.0
+
 ## 0.1.12
 
 ### Patch Changes

@@ -213,7 +213,7 @@ describe('native client sync behavior', () => {
 
       await expectConverged(h);
       expect(server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
-      expect(h.native.clientRefreshCount - nativeRefreshesBefore).toBe(0);
+      expect(h.native.clientRefreshCount - nativeRefreshesBefore).toBe(1);
     });
   });
 
@@ -304,6 +304,29 @@ describe('native client sync behavior', () => {
 
       expect(h.native.clientRefreshCount - refreshesBefore).toBe(1);
       expect(h.native.client?.sessions.find(session => session.id === sessionIds.user_1)?.profileVersion).toBe(1);
+      await expectConverged(h);
+    });
+
+    it('refreshes native after a JS sign-in that lands while JS refetches a native change', async () => {
+      const { server, token } = seedDevice();
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      const client = h.js.client;
+      if (!client) {
+        throw new Error('JS has no client');
+      }
+      const fetchClient = client.fetch;
+      let jsSessionId: string | undefined;
+      client.fetch = async options => {
+        client.fetch = fetchClient;
+        jsSessionId = await h.js.signIn('user_2');
+        return fetchClient(options);
+      };
+
+      await h.run(() => h.native.signIn('user_1'));
+      await h.settle();
+
+      expect(h.js.session?.id).toBe(jsSessionId);
+      expect(h.native.activeSessionId).toBe(jsSessionId);
       await expectConverged(h);
     });
 
