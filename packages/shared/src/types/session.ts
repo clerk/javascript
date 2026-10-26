@@ -12,6 +12,7 @@ import type {
   PhoneCodeSecondFactorConfig,
   ResetPasswordEmailCodeFactorConfig,
   ResetPasswordPhoneCodeFactorConfig,
+  SessionVerifyResetPasswordAttempt,
   TOTPAttempt,
   TrustedDeviceAttempt,
   TrustedDeviceConfig,
@@ -30,7 +31,6 @@ import type {
   SessionVerificationResource,
 } from './sessionVerification';
 import type { SessionJSONSnapshot } from './snapshots';
-import type { ResetPasswordEmailCodeStrategy, ResetPasswordPhoneCodeStrategy } from './strategies';
 import type { TokenResource } from './token';
 import type { UserResource } from './user';
 import type { Autocomplete } from './utils';
@@ -294,6 +294,7 @@ export interface SessionResource extends ClerkResource {
   getToken: GetToken;
   /**
    * Checks if the user is [authorized for the specified Role, Permission, Feature, or Plan](https://clerk.com/docs/guides/secure/authorization-checks) or requires the user to [reverify their credentials](https://clerk.com/docs/guides/secure/reverification) if their last verification is older than allowed.
+   *
    * @skipParametersSection
    */
   checkAuthorization: CheckAuthorization;
@@ -311,12 +312,15 @@ export interface SessionResource extends ClerkResource {
   updatedAt: Date;
   /**
    * Initiates the reverification flow.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    */
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
   /**
    * Initiates the [first factor verification](!first-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   prepareFirstFactorVerification: (
@@ -324,7 +328,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Attempts to complete the [first factor verification](!first-factor-verification) process.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   attemptFirstFactorVerification: (
@@ -332,7 +338,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Initiates the [second factor verification](!second-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   prepareSecondFactorVerification: (
@@ -340,7 +348,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Attempts to complete the [second factor verification](!second-factor-verification) process.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   attemptSecondFactorVerification: (
@@ -354,6 +364,7 @@ export interface SessionResource extends ClerkResource {
    * in-progress multi-factor reverification instead. Any other `level`
    * value is rejected. Throws a `ClerkWebAuthnError` when WebAuthn is
    * unsupported or the passkey ceremony fails.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    */
   verifyWithPasskey: (params?: SessionVerifyWithPasskeyParams) => Promise<SessionVerificationResource>;
@@ -550,29 +561,6 @@ export type SessionVerifyPrepareFirstFactorParams =
    * @experimental
    */
   | TrustedDeviceConfig;
-
-/**
- * Reverifies with a reset password code. Unlike a sign-in's reset attempt, the
- * new password is required: the code only counts together with it.
- */
-export type SessionVerifyResetPasswordAttempt = {
-  /**
-   * The strategy type.
-   */
-  strategy: ResetPasswordEmailCodeStrategy | ResetPasswordPhoneCodeStrategy;
-  /**
-   * The one-time code sent to the user's email address or phone number.
-   */
-  code: string;
-  /**
-   * The new password, which replaces the current one.
-   */
-  password: string;
-  /**
-   * Whether to sign the user out of their other sessions once the new password is set.
-   */
-  signOutOfOtherSessions?: boolean;
-};
 
 export type SessionVerifyAttemptFirstFactorParams =
   | EmailCodeAttempt

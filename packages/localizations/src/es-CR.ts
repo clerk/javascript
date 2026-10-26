@@ -1648,8 +1648,6 @@ export const esCR: LocalizationResource = {
       title: undefined,
     },
     passwordPwned: {
-      blockButton__resetPassword: undefined,
-      label__alternativeMethods: undefined,
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
@@ -1668,6 +1666,10 @@ export const esCR: LocalizationResource = {
     resetPassword: {
       formButtonPrimary: undefined,
       title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
     },
     resetPasswordCode: {
       formTitle: undefined,

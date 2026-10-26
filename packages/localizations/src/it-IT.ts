@@ -1652,8 +1652,6 @@ export const itIT: LocalizationResource = {
       title: undefined,
     },
     passwordPwned: {
-      blockButton__resetPassword: undefined,
-      label__alternativeMethods: undefined,
       subtitle__saveNewPassword: undefined,
       title: undefined,
     },
@@ -1672,6 +1670,10 @@ export const itIT: LocalizationResource = {
     resetPassword: {
       formButtonPrimary: undefined,
       title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
     },
     resetPasswordCode: {
       formTitle: undefined,

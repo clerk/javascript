@@ -1,13 +1,13 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useSession } from '@clerk/shared/react';
-import type { ResetPasswordEmailCodeFactor, ResetPasswordPhoneCodeFactor } from '@clerk/shared/types';
+import type { ResetPasswordCodeFactor } from '@clerk/shared/types';
 
 import { Flow, localizationKeys } from '../../customizables';
 import type { UVFactorOneCodeCard } from './UVFactorOneCodeForm';
 import { UVFactorOneCodeForm } from './UVFactorOneCodeForm';
 
 type UVFactorOneResetPasswordCodeCardProps = UVFactorOneCodeCard & {
-  factor: ResetPasswordEmailCodeFactor | ResetPasswordPhoneCodeFactor;
+  factor: ResetPasswordCodeFactor;
   newPassword: string;
   signOutOfOtherSessions: boolean;
   /** The caller collected the new password, so the copy says it's being saved, not reset. */
@@ -24,22 +24,27 @@ export const UVFactorOneResetPasswordCodeCard = (props: UVFactorOneResetPassword
   const { newPassword, signOutOfOtherSessions, hasNewPassword, onNewPasswordRejected, ...codeCardProps } = props;
   const { session } = useSession();
   const isEmail = props.factor.strategy === 'reset_password_email_code';
-  const channel = isEmail ? 'email' : 'phone';
 
   return (
     <Flow.Part part='resetPassword'>
       <UVFactorOneCodeForm
         {...codeCardProps}
-        cardTitle={localizationKeys(
+        cardTitle={
+          !hasNewPassword
+            ? localizationKeys('reverification.resetPasswordCode.title')
+            : isEmail
+              ? localizationKeys('reverification.resetPasswordCode.title__saveNewPassword_email')
+              : localizationKeys('reverification.resetPasswordCode.title__saveNewPassword_phone')
+        }
+        cardSubtitle={
           hasNewPassword
-            ? `reverification.resetPasswordCode.title__saveNewPassword_${channel}`
-            : 'reverification.resetPasswordCode.title',
-        )}
-        cardSubtitle={localizationKeys(
-          hasNewPassword
-            ? `reverification.resetPasswordCode.subtitle__saveNewPassword_${channel}`
-            : `reverification.resetPasswordCode.subtitle_${channel}`,
-        )}
+            ? isEmail
+              ? localizationKeys('reverification.resetPasswordCode.subtitle__saveNewPassword_email')
+              : localizationKeys('reverification.resetPasswordCode.subtitle__saveNewPassword_phone')
+            : isEmail
+              ? localizationKeys('reverification.resetPasswordCode.subtitle_email')
+              : localizationKeys('reverification.resetPasswordCode.subtitle_phone')
+        }
         inputLabel={localizationKeys('reverification.resetPasswordCode.formTitle')}
         resendButton={localizationKeys('reverification.resetPasswordCode.resendButton')}
         identityPreviewEditButtonAriaLabel={localizationKeys(

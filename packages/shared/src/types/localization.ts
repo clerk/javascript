@@ -716,8 +716,6 @@ export type __internal_LocalizationResource = {
     passwordPwned: {
       title: LocalizationValue;
       subtitle__saveNewPassword: LocalizationValue;
-      blockButton__resetPassword: LocalizationValue;
-      label__alternativeMethods: LocalizationValue;
     };
     passwordCompromised: {
       title: LocalizationValue;
@@ -726,6 +724,10 @@ export type __internal_LocalizationResource = {
     resetPassword: {
       title: LocalizationValue;
       formButtonPrimary: LocalizationValue;
+    };
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: LocalizationValue;
+      label__alternativeMethods: LocalizationValue;
     };
     resetPasswordCode: {
       title: LocalizationValue;

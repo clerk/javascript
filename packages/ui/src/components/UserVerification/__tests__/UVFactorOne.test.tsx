@@ -7,6 +7,9 @@ import { render, screen } from '@/test/utils';
 
 import { clearFetchCache } from '../../../hooks';
 import { UserVerificationFactorOne } from '../UserVerificationFactorOne';
+import type { UserVerificationResetPassword } from '../utils';
+
+type RenderedUserEvent = ReturnType<typeof render>['userEvent'];
 
 const { createFixtures } = bindCreateFixtures('UserVerification');
 
@@ -280,7 +283,7 @@ describe('UserVerificationFactorOne', () => {
     // Starts the modal with password + email code + a reset factor, and submits a breached password.
     const submitPwnedPassword = async (
       opts: {
-        resetPassword?: { password: string; signOutOfOtherSessions: boolean };
+        resetPassword?: UserVerificationResetPassword;
         // The button on the breached screen, which depends on whether the caller has a new password.
         resetButtonText?: string;
       } = {},
@@ -309,14 +312,14 @@ describe('UserVerificationFactorOne', () => {
       return { ...utils, fixtures, afterVerification };
     };
 
-    const setNewPassword = async (userEvent: any, password: string) => {
+    const setNewPassword = async (userEvent: RenderedUserEvent, password: string) => {
       await userEvent.type(screen.getByLabelText(/^new password/i), password);
       await userEvent.type(screen.getByLabelText(/^confirm password/i), password);
       await userEvent.click(screen.getByRole('button', { name: /continue/i }));
     };
 
     // From the breached screen: reset, set a new password, and land on the code step.
-    const reachResetCodeStep = async (userEvent: any) => {
+    const reachResetCodeStep = async (userEvent: RenderedUserEvent) => {
       await userEvent.click(screen.getByText('Reset your password'));
       await setNewPassword(userEvent, 'a-much-better-password-123');
       await screen.findByText('Enter the code sent to your email address to set your new password');

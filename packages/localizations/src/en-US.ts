@@ -1692,8 +1692,6 @@ export const enUS: LocalizationResource = {
       title: 'Password compromised',
     },
     passwordPwned: {
-      blockButton__resetPassword: 'Reset your password',
-      label__alternativeMethods: 'Or, verify with another method',
       subtitle__saveNewPassword:
         "Your current password was found in a data breach. Confirm it's you to save your new password.",
       title: 'Password compromised',
@@ -1713,6 +1711,10 @@ export const enUS: LocalizationResource = {
     resetPassword: {
       formButtonPrimary: 'Continue',
       title: 'Set new password',
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: 'Reset your password',
+      label__alternativeMethods: 'Or, verify with another method',
     },
     resetPasswordCode: {
       formTitle: 'Reset password code',

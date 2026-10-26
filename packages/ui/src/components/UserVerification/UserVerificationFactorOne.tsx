@@ -1,9 +1,4 @@
-import type {
-  ResetPasswordEmailCodeFactor,
-  ResetPasswordPhoneCodeFactor,
-  SessionVerificationFirstFactor,
-  SignInFactor,
-} from '@clerk/shared/types';
+import type { ResetPasswordCodeFactor, SessionVerificationFirstFactor, SignInFactor } from '@clerk/shared/types';
 import React, { useEffect, useMemo } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -14,10 +9,10 @@ import { useEnvironment, useUserVerification } from '../../contexts';
 import { useIsWebAuthnSupported } from '../../hooks';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
+import type { PasswordErrorCode } from '../SignIn/SignInFactorOnePasswordCard';
 import { determineStartingSignInFactor, factorHasLocalStrategy, isResetPasswordStrategy } from '../SignIn/utils';
 import { AlternativeMethods } from './AlternativeMethods';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
-import type { PasswordErrorReason } from './UserVerificationFactorOnePassword';
 import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorOnePassword';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { sortByPrimaryFactor } from './utils';
@@ -25,7 +20,6 @@ import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
 import { UVFactorOnePasskeysCard } from './UVFactorOnePasskeysCard';
 import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
 import { UVFactorOneResetPasswordCodeCard } from './UVFactorOneResetPasswordCodeCard';
-import { UVPasswordPwnedMethods } from './UVPasswordPwnedMethods';
 import { UVResetPasswordCard } from './UVResetPasswordCard';
 
 const factorKey = (factor: SignInFactor | null | undefined) => {
@@ -53,9 +47,9 @@ const SUPPORTED_STRATEGIES: SessionVerificationFirstFactor['strategy'][] = [
 // password, then enter the code, which is sent together with the new password.
 type ResetPasswordStep =
   | { step: 'none' }
-  | { step: 'methods'; reason: PasswordErrorReason }
-  | { step: 'newPassword'; reason: PasswordErrorReason; error?: Error }
-  | { step: 'code'; reason: PasswordErrorReason };
+  | { step: 'methods'; reason: PasswordErrorCode }
+  | { step: 'newPassword'; reason: PasswordErrorCode; error?: Error }
+  | { step: 'code'; reason: PasswordErrorCode };
 
 export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const { data } = useUserVerificationSession();
@@ -72,8 +66,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
   const resetPasswordFactor = useMemo(
     () =>
       sessionVerification.supportedFirstFactors?.find(f => isResetPasswordStrategy(f.strategy)) as
-        | ResetPasswordEmailCodeFactor
-        | ResetPasswordPhoneCodeFactor
+        | ResetPasswordCodeFactor
         | undefined,
     [sessionVerification.supportedFirstFactors],
   );
@@ -146,21 +139,19 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
 
   if (resetPasswordFactor && resetStep.step === 'methods') {
     const { reason } = resetStep;
+    // As in sign-in, no way back: re-entering the rejected password can't succeed.
     return (
-      <UVPasswordPwnedMethods
-        reason={reason}
-        resetPasswordFactor={resetPasswordFactor}
-        hasNewPassword={!!resetPassword}
-        supportedFirstFactors={availableFactors}
-        onResetPasswordClick={() =>
-          setResetStep(resetPassword ? { step: 'code', reason } : { step: 'newPassword', reason })
-        }
+      <AlternativeMethods
+        mode={reason === 'pwned' ? 'pwned' : 'passwordCompromised'}
+        resetPassword={{
+          factor: resetPasswordFactor,
+          hasNewPassword: !!resetPassword,
+          onClick: () => setResetStep(resetPassword ? { step: 'code', reason } : { step: 'newPassword', reason }),
+        }}
+        currentFactor={currentFactor}
+        onBackLinkClick={undefined}
         onFactorSelected={f => {
           selectFactor(f);
-          setResetStep({ step: 'none' });
-        }}
-        onBackLinkClick={() => {
-          card.setError(undefined);
           setResetStep({ step: 'none' });
         }}
       />

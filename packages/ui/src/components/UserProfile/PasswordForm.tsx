@@ -16,6 +16,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys, useLocalizations } from '../../customizables';
 import { useConfirmPassword } from '../../hooks';
+import type { UserVerificationResetPassword } from '../UserVerification/utils';
 
 const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boolean) => {
   const localizedTexts = [];
@@ -41,7 +42,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   const clerk = useClerk();
   // The new password the form is about to set. If reverification asks the user
   // to reset a breached password, the modal uses it instead of asking again.
-  const pendingPasswordRef = useRef<{ password: string; signOutOfOtherSessions: boolean }>();
+  const pendingPasswordRef = useRef<UserVerificationResetPassword>();
   // Set when the modal already changed the password, so the retry doesn't
   // change it a second time.
   const passwordResetDuringVerificationRef = useRef(false);

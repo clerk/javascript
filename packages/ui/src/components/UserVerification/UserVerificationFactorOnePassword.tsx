@@ -11,9 +11,8 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { HavingTrouble } from '../SignIn/HavingTrouble';
+import type { PasswordErrorCode } from '../SignIn/SignInFactorOnePasswordCard';
 import { useAfterVerification } from './use-after-verification';
-
-export type PasswordErrorReason = 'pwned' | 'compromised';
 
 type UserVerificationFactorOnePasswordProps = {
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
@@ -21,7 +20,7 @@ type UserVerificationFactorOnePasswordProps = {
    * Called when the password is rejected as breached or compromised. Without
    * it, the error only shows on the card.
    */
-  onPasswordError?: (reason: PasswordErrorReason) => void;
+  onPasswordError?: (errorCode: PasswordErrorCode) => void;
 };
 
 export function UserVerificationFactorOnePasswordCard(props: UserVerificationFactorOnePasswordProps): JSX.Element {
@@ -49,15 +48,18 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
       })
       .then(handleVerificationResponse)
       .catch(err => {
-        const reason: PasswordErrorReason | null = isPasswordPwnedError(err)
-          ? 'pwned'
-          : isPasswordCompromisedError(err)
-            ? 'compromised'
-            : null;
-        if (onPasswordError && reason) {
-          card.setError({ ...err.errors[0], code: `form_password_${reason}__sign_in` });
-          onPasswordError(reason);
-          return;
+        if (onPasswordError) {
+          if (isPasswordPwnedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
+            onPasswordError('pwned');
+            return;
+          }
+
+          if (isPasswordCompromisedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_compromised__sign_in' });
+            onPasswordError('compromised');
+            return;
+          }
         }
 
         handleError(err, [passwordControl], card.setError);

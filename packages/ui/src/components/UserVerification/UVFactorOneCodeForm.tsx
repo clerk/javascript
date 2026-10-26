@@ -1,11 +1,8 @@
 import { useSession } from '@clerk/shared/react';
 import type {
-  EmailCodeAttempt,
   EmailCodeFactor,
-  PhoneCodeAttempt,
   PhoneCodeFactor,
-  ResetPasswordEmailCodeFactor,
-  ResetPasswordPhoneCodeFactor,
+  ResetPasswordCodeFactor,
   SessionVerificationResource,
 } from '@clerk/shared/types';
 import React from 'react';
@@ -23,26 +20,38 @@ export type UVFactorOneCodeCard = Pick<
   VerificationCodeCardProps,
   'onShowAlternativeMethodsClicked' | 'showAlternativeMethods' | 'onBackLinkClicked'
 > & {
-  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordEmailCodeFactor | ResetPasswordPhoneCodeFactor;
+  factor: EmailCodeFactor | PhoneCodeFactor | ResetPasswordCodeFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
 };
 
-export type UVFactorOneCodeFormProps = UVFactorOneCodeCard & {
-  cardTitle: LocalizationKey;
-  cardSubtitle: LocalizationKey;
-  inputLabel: LocalizationKey;
-  resendButton: LocalizationKey;
-  identityPreviewEditButtonAriaLabel: LocalizationKey;
-  /**
-   * Replaces the default attempt, which sends only the strategy and code.
-   */
-  attempt?: (code: string) => Promise<SessionVerificationResource>;
-  /**
-   * Handles a failed attempt. Defaults to showing the error on the code card.
-   */
-  onAttemptError?: (err: unknown, reject: (err: unknown) => Promise<void>) => void;
-};
+/**
+ * An email or phone code is attempted with just the strategy and code. A reset
+ * password code must carry the new password, so its caller passes the attempt.
+ */
+type UVFactorOneCodeAttempt =
+  | {
+      factor: EmailCodeFactor | PhoneCodeFactor;
+      attempt?: undefined;
+      onAttemptError?: undefined;
+    }
+  | {
+      factor: ResetPasswordCodeFactor;
+      attempt: (code: string) => Promise<SessionVerificationResource>;
+      /**
+       * Handles a failed attempt. Defaults to showing the error on the code card.
+       */
+      onAttemptError?: (err: unknown, reject: (err: unknown) => Promise<void>) => void;
+    };
+
+export type UVFactorOneCodeFormProps = UVFactorOneCodeCard &
+  UVFactorOneCodeAttempt & {
+    cardTitle: LocalizationKey;
+    cardSubtitle: LocalizationKey;
+    inputLabel: LocalizationKey;
+    resendButton: LocalizationKey;
+    identityPreviewEditButtonAriaLabel: LocalizationKey;
+  };
 
 export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   const { session } = useSession();
@@ -65,15 +74,11 @@ export const UVFactorOneCodeForm = (props: UVFactorOneCodeFormProps) => {
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
-    // The reset password strategies pass their own attempt, which carries the new password.
-    const attempt =
-      props.attempt ??
-      ((code: string) =>
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        session!.attemptFirstFactorVerification({ strategy: props.factor.strategy, code } as
-          | EmailCodeAttempt
-          | PhoneCodeAttempt));
-    attempt(code)
+    const attempt = props.attempt
+      ? props.attempt(code)
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        session!.attemptFirstFactorVerification({ strategy: props.factor.strategy, code });
+    attempt
       .then(async res => {
         await resolve();
         return handleVerificationResponse(res);

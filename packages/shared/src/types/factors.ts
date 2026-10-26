@@ -128,21 +128,25 @@ export type EnterpriseSSOFactor = {
   strategy: EnterpriseSSOStrategy;
   /**
    * The ID of the enterprise connection.
+   *
    * @experimental
    */
   enterpriseConnectionId?: string;
   /**
    * The name of the enterprise connection.
+   *
    * @experimental
    */
   enterpriseConnectionName?: string;
   /**
    * The public URL of the enterprise connection logo.
+   *
    * @experimental
    */
   enterpriseConnectionLogoPublicUrl?: string | null;
   /**
    * The provider of the enterprise connection.
+   *
    * @experimental
    */
   enterpriseConnectionProvider?: string;
@@ -255,11 +259,13 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   oidcPrompt?: string;
   /**
    * The ID of the email address used for the enterprise SSO factor.
+   *
    * @experimental
    */
   emailAddressId?: string;
   /**
    * The ID of the enterprise connection used for the enterprise SSO factor.
+   *
    * @experimental
    */
   enterpriseConnectionId?: string;
@@ -441,4 +447,25 @@ export type ResetPasswordEmailCodeAttempt = {
    * The password provided by the user.
    */
   password?: string;
+};
+
+/** @generateWithEmptyComment */
+export type SessionVerifyResetPasswordAttempt = {
+  /**
+   * The strategy type.
+   */
+  strategy: ResetPasswordEmailCodeStrategy | ResetPasswordPhoneCodeStrategy;
+  /**
+   * The one-time code sent to the user's email address or phone number.
+   */
+  code: string;
+  /**
+   * The new password, which replaces the current one. Unlike a sign-in's reset
+   * attempt, it's required: the code only counts together with it.
+   */
+  password: string;
+  /**
+   * Whether to sign the user out of their other sessions once the new password is set.
+   */
+  signOutOfOtherSessions?: boolean;
 };
