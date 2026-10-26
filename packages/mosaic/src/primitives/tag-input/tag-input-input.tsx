@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 
+import { readingDirectionKeys, useDirection } from '../direction-provider';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { useTagInputContext } from './tag-input-context';
-import { readingDirectionKeys, splitTags } from './tag-input-utils';
+import { splitTags } from './tag-input-utils';
 
 export type TagInputInputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue'>;
 
@@ -13,6 +14,7 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
     const { render, ...otherProps } = props;
     const { value, delimiters, disabled, add, focusTag, registerInput } = useTagInputContext();
     const [text, setText] = useState('');
+    const { previousKey } = readingDirectionKeys(useDirection());
 
     const commit = () => {
       add([text]);
@@ -54,7 +56,6 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
 
         const { selectionStart, selectionEnd } = event.currentTarget;
         const caretAtStart = selectionStart === 0 && selectionEnd === 0;
-        const { previousKey } = readingDirectionKeys(event.currentTarget);
         if ((event.key === 'Backspace' || event.key === previousKey) && caretAtStart && value.length > 0) {
           event.preventDefault();
           focusTag(value[value.length - 1]);

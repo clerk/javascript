@@ -3,6 +3,7 @@
 import { Composite } from '@floating-ui/react';
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { useDirection } from '../direction-provider';
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, isRef, mergeProps, useRender } from '../utils';
 import {
@@ -25,7 +26,7 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
     const [value, setValue] = useControllableState(valueProp, defaultValue ?? '', onValueChange);
     const [direction, setDirection] = useState<SegmentedControlDirection>('forward');
     const [activeIndex, setActiveIndex] = useState(0);
-    const [rtl, setRtl] = useState(false);
+    const readingDirection = useDirection();
     const rootRef = useRef<HTMLDivElement>(null);
     const selectedIndexRef = useRef(-1);
     const navigatedIndexRef = useRef<number | null>(null);
@@ -73,16 +74,13 @@ export const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedCo
         <Composite
           orientation='horizontal'
           loop={false}
-          rtl={rtl}
+          rtl={readingDirection === 'rtl'}
           activeIndex={activeIndex}
           onNavigate={onNavigate}
           render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
             const { onKeyDown: compositeKeyDown, ...otherCompositeProps } = compositeProps;
             const defaultProps: Record<string, unknown> = {
               role: 'radiogroup' as const,
-              onFocus: (event: React.FocusEvent<HTMLElement>) => {
-                setRtl((event.currentTarget.closest('[dir]')?.getAttribute('dir') ?? '').toLowerCase() === 'rtl');
-              },
               onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
                 navigatedIndexRef.current = -1;
                 if (event.key === 'Home' || event.key === 'End') {

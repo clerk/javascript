@@ -7,7 +7,7 @@ export { default as __source } from './radio.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Radio',
   source: 'packages/mosaic/src/components/radio/radio.tsx',
 };
