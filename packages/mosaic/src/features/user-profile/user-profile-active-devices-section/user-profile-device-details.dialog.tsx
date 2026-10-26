@@ -1,0 +1,161 @@
+import type { ConfirmController } from '../../../blocks/confirm';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { DataList } from '../../../components/data-list';
+import type { DialogFocusTarget } from '../../../components/dialog';
+import { Dialog } from '../../../components/dialog';
+import { Flow } from '../../../components/flow';
+import { Reverification } from '../../../features/reverification';
+import { fill, useMessages } from '../../../localization';
+import type { UserProfileDevice } from './user-profile-active-devices.types';
+
+export interface UserProfileDeviceDetailsDialogProps {
+  controller: ConfirmController<UserProfileDevice>;
+  devices: UserProfileDevice[];
+  finalFocus?: DialogFocusTarget;
+  onSignOut?: (device: UserProfileDevice) => void;
+}
+
+export function UserProfileDeviceDetailsDialog({
+  controller,
+  devices,
+  finalFocus,
+  onSignOut,
+}: UserProfileDeviceDetailsDialogProps) {
+  const { reverification, step } = controller;
+  return (
+    <Dialog.Root
+      handle={controller.handle}
+      open={controller.isOpen}
+      onOpenChange={controller.onOpenChange}
+      shouldCloseOnInteractOutside={step !== 'verify'}
+      showCloseButton={step !== 'verify' || controller.canClose}
+    >
+      {({ payload }) => {
+        if (payload === undefined) {
+          return null;
+        }
+
+        const device = devices.find(candidate => candidate.id === payload.id) ?? payload;
+        const details = (
+          <DeviceDetails
+            device={device}
+            onSignOut={onSignOut ? () => onSignOut(device) : undefined}
+            isSigningOut={controller.isPending}
+            errorMessage={controller.errorMessage}
+          />
+        );
+
+        return (
+          <Dialog.Popup
+            variant='card'
+            compactPlacement='center'
+            finalFocus={finalFocus}
+          >
+            <Card.Root
+              elevation='overlay'
+              renderBranding={false}
+            >
+              {reverification ? (
+                <Flow.Root
+                  value={step}
+                  direction={step === 'verify' ? 1 : -1}
+                  state={step}
+                >
+                  {() => (
+                    <>
+                      <Flow.Step ids={['confirm']}>{details}</Flow.Step>
+                      <Flow.Step ids={['verify']}>
+                        <Reverification
+                          controller={reverification}
+                          onClose={() => controller.onOpenChange(false)}
+                        />
+                      </Flow.Step>
+                    </>
+                  )}
+                </Flow.Root>
+              ) : (
+                details
+              )}
+            </Card.Root>
+          </Dialog.Popup>
+        );
+      }}
+    </Dialog.Root>
+  );
+}
+
+function DeviceDetails({
+  device,
+  onSignOut,
+  isSigningOut,
+  errorMessage,
+}: {
+  device: UserProfileDevice;
+  onSignOut?: () => void;
+  isSigningOut: boolean;
+  errorMessage: string | undefined;
+}) {
+  const m = useMessages('userProfileActiveDevices');
+  const fields: { label: string; value: string | undefined }[] = [
+    { label: m.detailsDialog.model, value: device.model },
+    { label: m.detailsDialog.browser, value: device.browser },
+    { label: m.detailsDialog.ipAddress, value: device.ipAddress },
+    { label: m.detailsDialog.location, value: device.location },
+    { label: m.detailsDialog.signedInAt, value: device.signedInAt },
+  ];
+  const details = fields.filter((field): field is { label: string; value: string } => Boolean(field.value));
+
+  return (
+    <>
+      <Card.Header>
+        <Card.Title>{device.name}</Card.Title>
+        {device.lastActive ? (
+          <Card.Description>{fill(m.detailsDialog.lastActive, { lastActive: device.lastActive })}</Card.Description>
+        ) : null}
+      </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {errorMessage}
+      </Card.Banner>
+      {details.length > 0 ? (
+        <Card.Content>
+          <DataList.Root>
+            {details.map(detail => (
+              <DataList.Item key={detail.label}>
+                <DataList.Label>{detail.label}</DataList.Label>
+                <DataList.Value title={detail.value}>{detail.value}</DataList.Value>
+              </DataList.Item>
+            ))}
+          </DataList.Root>
+        </Card.Content>
+      ) : null}
+      <Card.Footer>
+        {onSignOut && !device.isCurrent ? (
+          <SubmitButton
+            type='button'
+            fullWidth
+            isPending={isSigningOut}
+            onClick={onSignOut}
+          >
+            {m.detailsDialog.signOut}
+          </SubmitButton>
+        ) : (
+          <Dialog.Close
+            render={
+              <Button
+                color='neutral'
+                fullWidth
+                variant='outline'
+              />
+            }
+          >
+            {m.detailsDialog.close}
+          </Dialog.Close>
+        )}
+      </Card.Footer>
+    </>
+  );
+}

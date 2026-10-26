@@ -309,9 +309,45 @@ export const nbNO: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1604,6 +1640,11 @@ export const nbNO: LocalizationResource = {
         'Bruk av passnøkkelen bekrefter identiteten din. Enheten din kan be om fingeravtrykk, ansiktsgjenkjenning eller skjermlås.',
       title: 'Bruk passnøkkelen din',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Bruk en annen metode',
       subtitle: 'Skriv inn ditt nåværende passord for å fortsette',
@@ -1754,6 +1795,10 @@ export const nbNO: LocalizationResource = {
       subtitle:
         'Bruk av passnøkkelen bekrefter at det er deg. Enheten din kan be om fingeravtrykk, ansiktsgjenkjenning eller skjermlås.',
       title: 'Bruk passnøkkelen din',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Bruk en annen metode',

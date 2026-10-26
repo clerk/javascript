@@ -1,5 +1,79 @@
 # @clerk/electron
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`0a6e367`](https://github.com/clerk/javascript/commit/0a6e3678ccc032ce9f00908bc125510e98b5a835), [`cf9c897`](https://github.com/clerk/javascript/commit/cf9c897afb10c0a8a8155ddc8b3bc2534032bcff)]:
+  - @clerk/clerk-js@6.41.0
+  - @clerk/shared@4.42.0
+  - @clerk/react@6.18.2
+
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+  - @clerk/clerk-js@6.40.1
+  - @clerk/react@6.18.1
+
+## 0.1.3
+
+### Patch Changes
+
+- Fix OAuth sign-in staying blocked after a user abandons the browser tab. Starting a new OAuth sign-in now replaces the pending one instead of failing with `Clerk: an OAuth flow is already pending.` until the 3-minute callback timeout. If the user later finishes the abandoned browser tab, its callback is ignored and no longer completes the newer sign-in. ([#10337](https://github.com/clerk/javascript/pull/10337)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+  - @clerk/clerk-js@6.40.0
+  - @clerk/react@6.18.0
+
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`c0ba3bc`](https://github.com/clerk/javascript/commit/c0ba3bc728d76bd40f80c2c4c506cbfeb5d0807a), [`560ff50`](https://github.com/clerk/javascript/commit/560ff507af494b43210fd2d9a7bd109c4eb6902c)]:
+  - @clerk/clerk-js@6.39.1
+
+## 0.1.0
+
+### Minor Changes
+
+- - OAuth sign-in without the `renderer` option in `createClerkBridge()` now throws a Clerk error that asks for it. Previously it failed with Electron's "No handler registered" error. ([#10000](https://github.com/clerk/javascript/pull/10000)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  - Telemetry now reports `@clerk/electron` instead of `@clerk/react`.
+  - Add a `@clerk/electron/react/experimental` entry point that re-exports `@clerk/react/experimental`.
+
+### Patch Changes
+
+- Updated dependencies [[`dcb03d3`](https://github.com/clerk/javascript/commit/dcb03d3c6d4597b029e39ef3eebc2ec681bb48b1), [`31c1930`](https://github.com/clerk/javascript/commit/31c1930f0d4933cf952133c784692cb5159a7659)]:
+  - @clerk/clerk-js@6.39.0
+  - @clerk/shared@4.40.0
+  - @clerk/react@6.17.8
+
+## 0.0.52
+
+### Patch Changes
+
+- Updated dependencies [[`fc7d050`](https://github.com/clerk/javascript/commit/fc7d0506c59ca01f7d86bea1a9999a1fe4dd81ff), [`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/clerk-js@6.38.1
+  - @clerk/react@6.17.7
+  - @clerk/shared@4.39.1
+
+## 0.0.51
+
+### Patch Changes
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260)]:
+  - @clerk/shared@4.39.0
+  - @clerk/clerk-js@6.38.0
+  - @clerk/react@6.17.6
+
 ## 0.0.50
 
 ### Patch Changes

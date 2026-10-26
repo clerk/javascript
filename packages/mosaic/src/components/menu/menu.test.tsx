@@ -24,11 +24,11 @@ function renderMenu(props?: { onSignOut?: () => void }) {
     <Menu.Root>
       <Menu.Trigger />
       <Menu.Popup>
-        <Menu.Item label='Add workspace'>
+        <Menu.Item label='Add organization'>
           <Menu.Media>
             <svg data-testid='add-icon' />
           </Menu.Media>
-          <Menu.Label>Add workspace</Menu.Label>
+          <Menu.Label>Add organization</Menu.Label>
         </Menu.Item>
         <Menu.Separator />
         <Menu.Item
@@ -62,8 +62,8 @@ describe('Mosaic Menu', () => {
           focusableWhenDisabled
         />
         <Menu.Popup>
-          <Menu.Item label='Add workspace'>
-            <Menu.Label>Add workspace</Menu.Label>
+          <Menu.Item label='Add organization'>
+            <Menu.Label>Add organization</Menu.Label>
           </Menu.Item>
         </Menu.Popup>
       </Menu.Root>,
@@ -96,8 +96,8 @@ describe('Mosaic Menu', () => {
           Actions
         </Menu.Trigger>
         <Menu.Popup>
-          <Menu.Item label='Add workspace'>
-            <Menu.Label>Add workspace</Menu.Label>
+          <Menu.Item label='Add organization'>
+            <Menu.Label>Add organization</Menu.Label>
           </Menu.Item>
         </Menu.Popup>
       </Menu.Root>,
@@ -117,7 +117,7 @@ describe('Mosaic Menu', () => {
     // `role="menu"` sits on the positioner (floating-ui owns it); the popup is the surface inside.
     expect(screen.getByRole('menu')).toHaveClass('cl-menu-positioner');
     expect(screen.getByRole('menu').querySelector('.cl-menu-popup')).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Add workspace' })).toHaveAttribute('data-color', 'neutral');
+    expect(screen.getByRole('menuitem', { name: 'Add organization' })).toHaveAttribute('data-color', 'neutral');
     expect(screen.getByRole('separator')).toHaveClass('cl-menu-separator');
     expect(screen.getByTestId('add-icon')).toBeInTheDocument();
   });
@@ -262,11 +262,11 @@ describe('Mosaic Menu', () => {
       <Menu.Root defaultOpen>
         <Menu.Trigger />
         <Menu.Popup>
-          <Menu.Item label='Add workspace'>
+          <Menu.Item label='Add organization'>
             <Menu.Media>
               <svg data-testid='add-icon' />
             </Menu.Media>
-            <Menu.Label>Add workspace</Menu.Label>
+            <Menu.Label>Add organization</Menu.Label>
           </Menu.Item>
         </Menu.Popup>
       </Menu.Root>,

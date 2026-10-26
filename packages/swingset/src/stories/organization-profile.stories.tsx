@@ -44,8 +44,19 @@ function OverlayProfile() {
 export function Overlay() {
   return (
     <Dialog.Root>
-      <Dialog.Trigger render={<Button />}>Manage workspace</Dialog.Trigger>
+      <Dialog.Trigger render={<Button />}>Manage organization</Dialog.Trigger>
       <Dialog.Popup variant='profile'>
+        <OverlayProfile />
+      </Dialog.Popup>
+    </Dialog.Root>
+  );
+}
+
+export function Fullscreen() {
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger render={<Button />}>Manage organization</Dialog.Trigger>
+      <Dialog.Popup variant='fullscreen'>
         <OverlayProfile />
       </Dialog.Popup>
     </Dialog.Root>

@@ -1,42 +1,38 @@
 import { iconImageUrl } from '@clerk/shared/constants';
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type {
   ClerkAPIError,
   CustomOauthProvider,
-  EnterpriseAccountConnectionResource,
-  EnterpriseAccountResource,
-  EnterpriseSSOSettings,
   ExternalAccountResource,
   OAuthProvider,
   OAuthProviders,
   OAuthScope,
   OAuthStrategy,
+  UserResource,
   VerificationResource,
 } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
-import { useErrorText, useMessages } from '../../../localization';
-import { connectedAccountFeedback } from './user-profile-connected-accounts-feedback';
+import { allowsIdentificationCreation } from '../../../utils/allows-identification-creation';
+import type { ReverificationController } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
+import { useUserProfileOptions } from '../user-profile.provider';
+import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
   ConnectedAccountActionResult,
   ConnectedAccountProviderDisplay,
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';
-import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.types';
 
 type AccountData = Pick<ExternalAccountResource, 'id' | 'provider' | 'approvedScopes' | 'username' | 'emailAddress'> & {
   verification:
     | (Pick<VerificationResource, 'strategy'> & { error: Pick<ClerkAPIError, 'code' | 'longMessage'> | null })
     | null;
-};
-type EnterpriseUser = {
-  enterpriseAccounts: (Pick<EnterpriseAccountResource, 'active'> & {
-    enterpriseConnection?: Pick<EnterpriseAccountConnectionResource, 'disableAdditionalIdentifications'> | null;
-  })[];
 };
 type ProjectedUser = {
   verifiedExternalAccounts: AccountData[];
@@ -76,8 +72,6 @@ const RECONNECT_ERROR_CODES = [
   'external_account_email_address_verification_required',
 ];
 
-const MONOCHROME_PROVIDERS = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'];
-
 type SocialSettings = Partial<
   Record<string, Pick<OAuthProviders[OAuthStrategy], 'name' | 'logo_url'> & { strategy: string }>
 >;
@@ -94,8 +88,9 @@ export function createProviderCatalog(
     enabled: enabled.has(strategy),
     display: {
       provider: name,
+      iconId: provider,
       iconUrl: iconImageUrl(provider),
-      monochromeIcon: MONOCHROME_PROVIDERS.includes(provider),
+      monochromeIcon: isMonochromeProvider(provider),
     },
   }));
   const candidates = new Set([
@@ -115,7 +110,7 @@ export function createProviderCatalog(
       strategy,
       provider,
       enabled: enabled.has(strategy),
-      display: { provider: settings?.name || provider, iconUrl: settings?.logo_url || undefined },
+      display: { provider: settings?.name || provider, iconId: provider, iconUrl: settings?.logo_url || undefined },
     });
   }
   return [
@@ -125,18 +120,6 @@ export function createProviderCatalog(
     }),
     ...providers.filter(provider => !provider.enabled),
   ];
-}
-
-export function allowsIdentificationCreation(
-  user: EnterpriseUser,
-  enterpriseSSO: Pick<EnterpriseSSOSettings, 'enabled'>,
-): boolean {
-  if (!enterpriseSSO.enabled) {
-    return true;
-  }
-  return !user.enterpriseAccounts.some(
-    account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
-  );
 }
 
 function findAdditionalScopes(account: AccountData, scopes: AdditionalOAuthScopes | undefined): string[] {
@@ -232,21 +215,38 @@ export type UserProfileConnectedAccountsModel =
       connect: (strategy: string) => Promise<ConnectedAccountActionResult>;
       reconnect: (accountId: string) => Promise<ConnectedAccountActionResult>;
       remove: (accountId: string) => Promise<void>;
+      removeReverification: ReverificationController;
+      reconnectReverification: ReverificationController;
+      connectReverification: ReverificationController;
     };
 
-export function useUserProfileConnectedAccountsModel({
-  additionalOAuthScopes,
-  mode,
-}: {
-  additionalOAuthScopes?: AdditionalOAuthScopes;
-  mode?: 'modal' | 'mounted';
-}): UserProfileConnectedAccountsModel {
+function unavailable() {
+  return new ClerkRuntimeError('This connected account is no longer available.', {
+    code: 'connected_account_unavailable',
+  });
+}
+
+export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAccountsModel {
+  const { additionalOAuthScopes, mode } = useUserProfileOptions();
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
-  const messages = useMessages('userProfileConnectedAccounts');
-  const errorText = useErrorText();
+  const [removeAccount, removeReverification] = useReverificationFlow((current: UserResource, accountId: string) => {
+    const account = current.externalAccounts.find(candidate => candidate.id === accountId);
+    if (!account) {
+      throw unavailable();
+    }
+    return account.destroy();
+  });
+  const [recreateAccount, reconnectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
+  const [createAccount, connectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -277,7 +277,7 @@ export function useUserProfileConnectedAccountsModel({
   const requireCurrentUser = () => {
     const current = clerk.user;
     if (!current || current.id !== userId) {
-      throw new ConnectedAccountActionError('unavailable');
+      throw unavailable();
     }
     return current;
   };
@@ -289,7 +289,9 @@ export function useUserProfileConnectedAccountsModel({
   const completeVerification = async (response: ExternalAccountResource): Promise<ConnectedAccountActionResult> => {
     const url = response.verification?.externalVerificationRedirectURL;
     if (!url) {
-      throw new ConnectedAccountActionError('missing_verification_url');
+      throw new ClerkRuntimeError('OAuth flow did not receive a verification URL.', {
+        code: 'oauth_missing_verification_url',
+      });
     }
 
     requireCurrentUser();
@@ -305,65 +307,53 @@ export function useUserProfileConnectedAccountsModel({
     return 'redirecting';
   };
 
-  async function runAction<T>(action: () => Promise<T>): Promise<T> {
-    try {
-      return await action();
-    } catch (error) {
-      throw connectedAccountFeedback(error, messages, errorText);
-    }
-  }
-
   return {
     ...projection,
     userId,
-    connect: strategyId =>
-      runAction(async () => {
-        const provider = providers.find(candidate => candidate.enabled && candidate.strategy === strategyId);
-        if (!provider) {
-          throw new ConnectedAccountActionError('unavailable');
-        }
-        const redirectUrl = await getRedirectUrl();
-        const current = requireCurrentUser();
-        const response = await current.createExternalAccount({
-          strategy: provider.strategy,
-          redirectUrl: withModalState(redirectUrl, provider.provider),
-          additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
-        });
-        return completeVerification(response);
-      }),
-    reconnect: accountId =>
-      runAction(async () => {
-        const redirectUrl = await getRedirectUrl();
-        const current = requireCurrentUser();
-        const account = current.externalAccounts.find(candidate => candidate.id === accountId);
-        if (!account) {
-          throw new ConnectedAccountActionError('unavailable');
-        }
-        const { plan: recovery } = recoveryFor(account, additionalOAuthScopes, providers);
-        if (!recovery) {
-          throw new ConnectedAccountActionError('unavailable');
-        }
+    connect: async strategyId => {
+      const provider = providers.find(candidate => candidate.enabled && candidate.strategy === strategyId);
+      if (!provider) {
+        throw unavailable();
+      }
+      const redirectUrl = await getRedirectUrl();
+      const current = requireCurrentUser();
+      const response = await createAccount(current, {
+        strategy: provider.strategy,
+        redirectUrl: withModalState(redirectUrl, provider.provider),
+        additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
+      });
+      return completeVerification(response);
+    },
+    reconnect: async accountId => {
+      const redirectUrl = await getRedirectUrl();
+      const current = requireCurrentUser();
+      const account = current.externalAccounts.find(candidate => candidate.id === accountId);
+      if (!account) {
+        throw unavailable();
+      }
+      const { plan: recovery } = recoveryFor(account, additionalOAuthScopes, providers);
+      if (!recovery) {
+        throw unavailable();
+      }
 
-        const response =
-          recovery.kind === 'reauthorize'
-            ? await account.reauthorize({
-                additionalScopes: recovery.additionalScopes,
-                redirectUrl: withModalState(redirectUrl),
-              })
-            : await current.createExternalAccount({
-                strategy: recovery.strategy,
-                redirectUrl: withModalState(redirectUrl),
-                additionalScopes: recovery.additionalScopes,
-              });
-        return completeVerification(response);
-      }),
-    remove: accountId =>
-      runAction(async () => {
-        const account = requireCurrentUser().externalAccounts.find(candidate => candidate.id === accountId);
-        if (!account) {
-          throw new ConnectedAccountActionError('unavailable');
-        }
-        await account.destroy();
-      }),
+      const response =
+        recovery.kind === 'reauthorize'
+          ? await account.reauthorize({
+              additionalScopes: recovery.additionalScopes,
+              redirectUrl: withModalState(redirectUrl),
+            })
+          : await recreateAccount(current, {
+              strategy: recovery.strategy,
+              redirectUrl: withModalState(redirectUrl),
+              additionalScopes: recovery.additionalScopes,
+            });
+      return completeVerification(response);
+    },
+    remove: async accountId => {
+      await removeAccount(requireCurrentUser(), accountId);
+    },
+    removeReverification,
+    reconnectReverification,
+    connectReverification,
   };
 }

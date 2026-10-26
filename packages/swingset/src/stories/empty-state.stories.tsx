@@ -1,6 +1,8 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { EmptyState } from '@clerk/mosaic/components/empty-state';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { MagnifyingGlass } from '@clerk/mosaic/icons/glyphs/magnifying-glass';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -18,13 +20,13 @@ export const meta: StoryMeta = {
 export function Default() {
   return (
     <EmptyState.Root>
-      <EmptyState.Icon name='magnifying-glass' />
+      <EmptyState.Icon glyph={MagnifyingGlass} />
       <EmptyState.Label>No API keys</EmptyState.Label>
       <EmptyState.Description>Create a key to start making requests from your application.</EmptyState.Description>
       <EmptyState.Actions>
         <Button size='sm'>
           <Icon
-            name='plus'
+            glyph={Plus}
             placement='inline-start'
           />
           Create key
@@ -37,7 +39,7 @@ export function Default() {
 export function NoResults() {
   return (
     <EmptyState.Root>
-      <EmptyState.Icon name='magnifying-glass' />
+      <EmptyState.Icon glyph={MagnifyingGlass} />
       <EmptyState.Label>No results</EmptyState.Label>
       <EmptyState.Description>No keys match your search. Try a different name.</EmptyState.Description>
     </EmptyState.Root>

@@ -1,5 +1,67 @@
 # Change Log
 
+## 4.42.0
+
+### Minor Changes
+
+- Add `selfServeDirectorySyncEnabled` to `OrganizationResource`. Self-serve Directory Sync is now enabled per organization by this setting instead of following `selfServeSSOEnabled`. In `<OrganizationProfile />`, the Security page now appears for organizations that have only Directory Sync enabled, and their admins can manage the connection's directory. Organizations that have self-serve SSO without Directory Sync no longer see the Directory Sync section. ([#10374](https://github.com/clerk/javascript/pull/10374)) by [@kalafut](https://github.com/kalafut)
+
+### Patch Changes
+
+- Session `expireAt` and `abandonAt` no longer special-case a `0` deadline; the backend now always sends a real deadline. ([#10389](https://github.com/clerk/javascript/pull/10389)) by [@swolfand](https://github.com/swolfand)
+
+## 4.41.1
+
+### Patch Changes
+
+- Add internal query helpers used by `@clerk/mosaic`. ([#10342](https://github.com/clerk/javascript/pull/10342)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Keep a session's `expireAt` and `abandonAt` at Unix epoch zero when the session has no maximum lifetime, instead of falling back to the current time. ([#9871](https://github.com/clerk/javascript/pull/9871)) by [@swolfand](https://github.com/swolfand)
+
+## 4.41.0
+
+### Minor Changes
+
+- Support passkeys as a second factor during sign-in and session reverification. ([#9127](https://github.com/clerk/javascript/pull/9127)) by [@dmoerner](https://github.com/dmoerner)
+
+  When a user has a passkey, the prebuilt `<SignIn/>` and `<UserVerification/>`
+  components preselect it as the second factor, as they already do for the first
+  factor. Other methods stay available under "Use another method".
+
+  To use it, your instance must allow passkeys to satisfy the second factor. This
+  is on by default for instances created after 2026-07-08, and can be turned on
+  in the Dashboard for older ones. Web apps also need to opt in to the passkey
+  second factor update in the Dashboard.
+
+  If you build a custom flow, `supportedSecondFactors` can now include `passkey`.
+  Call `signIn.authenticateWithPasskey()` to complete it.
+
+  Passkeys are no longer preselected, for either factor, where the SDK reports
+  that WebAuthn is unavailable (for example, Electron apps without passkey
+  support enabled).
+
+## 4.40.0
+
+### Minor Changes
+
+- Add a role mapping step to the self-serve Directory Sync setup in `<OrganizationProfile />`. Organization admins can now assign an organization role to each directory group their identity provider pushes, set which group wins when a member belongs to several, and turn role syncing on or off. Members in no mapped group keep the organization's default role. The step is read-only for members without the `org:sys_memberships:manage` permission and while the organization's role set is being migrated. ([#10081](https://github.com/clerk/javascript/pull/10081)) by [@kalafut](https://github.com/kalafut)
+
+### Patch Changes
+
+- Add an `enterpriseConnectionsUrl` option to `handleRedirectCallback()` and `<AuthenticateWithRedirectCallback />`. When the Clerk API asks an OAuth sign-up to choose between several enterprise connections for the same email domain, the callback navigates to this URL, which defaults to the `enterprise-connections` route of your sign-up page. ([#9947](https://github.com/clerk/javascript/pull/9947)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.39.1
+
+### Patch Changes
+
+- The missing and invalid key errors now say that `npx clerk@latest init` does not need a Clerk account and writes temporary dev keys. Readers previously saw `init` listed beside `link`, `env pull` and the Dashboard link, and assumed signing up was required before any of the steps would work. ([#10099](https://github.com/clerk/javascript/pull/10099)) by [@eatmorespinach](https://github.com/eatmorespinach)
+
+## 4.39.0
+
+### Minor Changes
+
+- SAML enterprise connections can trust several Identity Provider signing certificates at once. `EnterpriseConnection.samlConnection` now includes `idpCertificates`, every trusted certificate with its validity window, and `organization.createEnterpriseConnection()` and `organization.updateEnterpriseConnection()` accept `saml.idpCertificates`, an array that replaces the connection's whole set. The single `saml.idpCertificate` input is deprecated in favor of the array; it keeps working and still replaces the whole set. ([#9996](https://github.com/clerk/javascript/pull/9996)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
 ## 4.38.0
 
 ### Minor Changes

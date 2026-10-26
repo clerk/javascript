@@ -1,5 +1,5 @@
 // packages/clerk-js/src/ui/elements/__tests__/SocialButtons.test.tsx
-import { render, renderHook, screen } from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/utils';
@@ -355,6 +355,33 @@ describe('SocialButtons', () => {
       expect(googleButton).toHaveTextContent('Continue with Google');
       expect(googleButton).not.toHaveTextContent('Last used');
       expect(screen.queryByText('Last used')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('With an OAuth transport', () => {
+    it('re-enables the buttons when the window regains focus while the browser flow is pending', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+        f.withSocialProvider({ provider: 'github' });
+      });
+      Object.defineProperty(fixtures.clerk, '__internal_hasOAuthTransport', { value: true });
+      mockOAuthCallback.mockReturnValue(new Promise(() => {}));
+
+      render(
+        <CardStateProvider>
+          <SocialButtons {...defaultProps} />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /google/i }));
+      expect(await screen.findByRole('button', { name: /github/i })).toBeDisabled();
+
+      act(() => {
+        window.dispatchEvent(new Event('focus'));
+      });
+
+      expect(screen.getByRole('button', { name: /github/i })).toBeEnabled();
     });
   });
 });

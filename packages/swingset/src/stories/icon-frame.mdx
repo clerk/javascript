@@ -22,13 +22,14 @@ IconFrame centers an icon or other visual in a square Mosaic surface. `bordered`
 
 ```tsx
 import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
+import { Checkmark } from '@clerk/mosaic/icons/glyphs/checkmark';
 
 <IconFrame
   bordered={false}
   filled
   size='lg'
 >
-  <Icon name='checkmark' />
+  <Icon glyph={Checkmark} />
 </IconFrame>
 ```
 

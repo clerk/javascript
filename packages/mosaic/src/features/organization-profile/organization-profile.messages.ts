@@ -1,5 +1,5 @@
 export const organizationProfileMessages = {
-  label: 'Workspace',
+  label: 'Organization',
   pages: {
     general: 'General',
     members: 'Members',

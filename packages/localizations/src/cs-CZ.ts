@@ -306,9 +306,45 @@ export const csCZ: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1599,6 +1635,11 @@ export const csCZ: LocalizationResource = {
         'Použití vašeho přístupového klíče potvrzuje vaši identitu. Vaše zařízení může požádat o otisk prstu, obličej nebo zámek obrazovky.',
       title: 'Použít váš přístupový klíč',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Použít jinou metodu',
       subtitle: 'Zadejte své aktuální heslo pro pokračování',
@@ -1750,6 +1791,10 @@ export const csCZ: LocalizationResource = {
       subtitle:
         'Použití vašeho přístupového klíče potvrzuje, že jste to vy. Vaše zařízení může požádat o otisk prstu, obličej nebo zámek obrazovky.',
       title: 'Použít váš přístupový klíč',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Použít jinou metodu',
