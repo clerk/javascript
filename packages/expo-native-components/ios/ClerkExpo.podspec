@@ -18,7 +18,7 @@ else
 end
 
 clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
-clerk_ios_revision = '38ed765bbdbcf6342b39d2e4ad853b0bdf7898c3'
+clerk_ios_revision = '0fb932a50b87ea7b9ff90f2ea415a65b3004db5b'
 
 Pod::Spec.new do |s|
   s.name           = 'ClerkExpo'
