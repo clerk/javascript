@@ -16,6 +16,18 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
   const activeRef = React.useRef<HTMLElement | null>(null);
   const positionRef = React.useRef<Position | null>(null);
   const editingRef = React.useRef<HTMLTableCellElement | null>(null);
+  const originalTabIndexes = React.useRef(new Map<HTMLElement, string | null>());
+
+  const setTabIndex = React.useCallback((element: HTMLElement, tabIndex: number | null) => {
+    if (!originalTabIndexes.current.has(element)) {
+      originalTabIndexes.current.set(element, element.getAttribute('tabindex'));
+    }
+    if (tabIndex === null) {
+      element.removeAttribute('tabindex');
+    } else {
+      element.tabIndex = tabIndex;
+    }
+  }, []);
 
   const sync = React.useCallback(() => {
     if (!table) {
@@ -24,10 +36,15 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     if (!activeRef.current?.isConnected || !contains(table, activeRef.current)) {
       activeRef.current = itemAt(table, positionRef.current ?? initialPosition(table, excluded), excluded) ?? null;
     }
-    for (const row of Array.from(table.rows)) {
-      syncRow(row, activeRef.current, editingRef.current, excluded);
+    for (const element of originalTabIndexes.current.keys()) {
+      if (!element.isConnected) {
+        originalTabIndexes.current.delete(element);
+      }
     }
-  }, [table, excluded]);
+    for (const row of Array.from(table.rows)) {
+      syncRow(row, activeRef.current, editingRef.current, excluded, setTabIndex);
+    }
+  }, [table, excluded, setTabIndex]);
 
   const activate = React.useCallback(
     (element: HTMLElement, position: Position, editing: HTMLTableCellElement | null) => {
@@ -62,6 +79,7 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     if (!enabled || !table) {
       return;
     }
+    const originals = originalTabIndexes.current;
     const observer = new MutationObserver(sync);
     observer.observe(table, { childList: true, subtree: true });
 
@@ -130,6 +148,7 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
       observer.disconnect();
       table.removeEventListener('focusin', onFocusIn);
       table.removeEventListener('keydown', onKeyDown, true);
+      restoreTabIndexes(originals);
     };
   }, [enabled, table, excluded, sync, activate]);
 
@@ -141,17 +160,29 @@ function syncRow(
   active: HTMLElement | null,
   editing: HTMLTableCellElement | null,
   excluded: WeakSet<Element>,
+  setTabIndex: (element: HTMLElement, tabIndex: number | null) => void,
 ) {
   const disabled = isDisabledRow(row);
   if (isRowItem(row, excluded)) {
-    setTabIndex(row, disabled ? null : row === active);
+    setTabIndex(row, disabled ? null : rovingTabIndex(row === active));
   }
   for (const cell of Array.from(row.cells)) {
-    setTabIndex(cell, disabled ? null : cell === active);
+    setTabIndex(cell, disabled ? null : rovingTabIndex(cell === active));
     for (const widget of cellWidgets(cell, excluded)) {
-      widget.tabIndex = widget === active || cell === editing ? 0 : -1;
+      setTabIndex(widget, rovingTabIndex(widget === active || cell === editing));
     }
   }
+}
+
+function restoreTabIndexes(originals: Map<HTMLElement, string | null>) {
+  for (const [element, tabIndex] of originals) {
+    if (tabIndex === null) {
+      element.removeAttribute('tabindex');
+    } else {
+      element.setAttribute('tabindex', tabIndex);
+    }
+  }
+  originals.clear();
 }
 
 function rowMove(
@@ -317,12 +348,8 @@ function arrowKeys(table: HTMLTableElement) {
     : { forward: 'ArrowRight', backward: 'ArrowLeft' };
 }
 
-function setTabIndex(element: HTMLElement, active: boolean | null) {
-  if (active === null) {
-    element.removeAttribute('tabindex');
-  } else {
-    element.tabIndex = active ? 0 : -1;
-  }
+function rovingTabIndex(active: boolean) {
+  return active ? 0 : -1;
 }
 
 function clamp(value: number, min: number, max: number) {

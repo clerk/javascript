@@ -145,10 +145,10 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
     'aria-multiselectable': selectionMode === 'multiple' || undefined,
     onKeyDown: (event: React.KeyboardEvent<HTMLTableElement>) => {
       const { target, currentTarget } = event;
-      if (!(target instanceof Element) || !currentTarget.contains(target)) {
+      if (event.isDefaultPrevented() || !(target instanceof Element) || !currentTarget.contains(target)) {
         return;
       }
-      if (event.key === 'Escape' && !event.isDefaultPrevented() && leaveCell(target)) {
+      if (event.key === 'Escape' && leaveCell(target)) {
         event.preventDefault();
         event.stopPropagation();
       } else if (event.key === 'Escape' && selection.length > 0) {

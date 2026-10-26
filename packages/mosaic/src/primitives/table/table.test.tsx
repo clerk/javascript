@@ -503,6 +503,46 @@ describe('Table', () => {
       expect(onKeyDown).toHaveBeenCalledWith('Escape');
     });
 
+    it('keeps the selection when a widget handles Escape', async () => {
+      const user = userEvent.setup();
+      render(
+        <Table.Root
+          aria-label='Logs'
+          selectionMode='multiple'
+          defaultSelection={['a']}
+        >
+          <Table.Body
+            items={FLAT_LOGS}
+            itemToStringValue={toValue}
+          >
+            {log => (
+              <Table.Row>
+                <Table.Cell>{log.message}</Table.Cell>
+                <Table.Cell>
+                  <input
+                    aria-label={`${log.message} note`}
+                    onKeyDown={event => {
+                      if (event.key === 'Escape') {
+                        event.preventDefault();
+                      }
+                    }}
+                  />
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table.Root>,
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowRight}{ArrowRight}{F2}');
+      expect(screen.getByRole('textbox', { name: 'Alpha note' })).toHaveFocus();
+      await user.keyboard('{Escape}');
+
+      expect(row('Alpha')).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('textbox', { name: 'Alpha note' })).toHaveFocus();
+    });
+
     it('starts from defaultSelection and reports changes', async () => {
       const user = userEvent.setup();
       const onSelectionChange = vi.fn();
@@ -1098,6 +1138,19 @@ describe('Table', () => {
       expect(screen.getByRole('button', { name: 'Alpha actions' })).toHaveFocus();
       await user.keyboard('{Escape}');
       expect(focused()).toBe(screen.getByRole('button', { name: 'Alpha actions' }).closest('td'));
+    });
+
+    it('restores the tab order when navigation turns off', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(<LogsTable selectionMode='multiple' />);
+
+      await tabIntoTable(user);
+      rerender(<LogsTable selectionMode='none' />);
+
+      expect(row('Alpha')).not.toHaveAttribute('tabindex');
+      expect(row('Alpha').cells[0]).not.toHaveAttribute('tabindex');
+      expect(screen.getByRole('button', { name: 'Copy Alpha' })).not.toHaveAttribute('tabindex');
+      expect(screen.getByRole('button', { name: 'Copy Bravo' })).not.toHaveAttribute('tabindex');
     });
 
     it('keeps a tab stop when the focused row is removed', async () => {
