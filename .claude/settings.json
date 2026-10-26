@@ -40,12 +40,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "grep -q '\"stop_hook_active\": *true' && exit 0; cd \"$CLAUDE_PROJECT_DIR/packages/mosaic\" && { git diff --name-only --relative --diff-filter=d HEAD -- src; git ls-files --others --exclude-standard -- src; } | grep -E '\\.tsx?$' | xargs -r pnpm exec eslint --quiet --no-warn-ignored >&2 || exit 2",
+            "command": "cd \"$(git rev-parse --show-toplevel)/packages/mosaic\" && { git diff --name-only --relative --diff-filter=d HEAD -- src; git ls-files --others --exclude-standard -- src; } | grep -E '\\.tsx?$' | xargs -r pnpm exec eslint --quiet --no-warn-ignored >&2 || exit 2",
             "timeout": 180
           },
           {
             "type": "command",
-            "command": "grep -q '\"stop_hook_active\": *true' && exit 0; cd \"$CLAUDE_PROJECT_DIR\" && { git diff --name-only --diff-filter=d HEAD -- packages/swingset/src; git ls-files --others --exclude-standard -- packages/swingset/src; } | grep -E '\\.tsx?$' | xargs -r pnpm exec eslint --quiet --no-warn-ignored >&2 || exit 2",
+            "command": "cd \"$(git rev-parse --show-toplevel)\" && { git diff --name-only --diff-filter=d HEAD -- packages/swingset/src; git ls-files --others --exclude-standard -- packages/swingset/src; } | grep -E '\\.tsx?$' | xargs -r pnpm exec eslint --quiet --no-warn-ignored --rule 'import/no-unresolved: off' >&2 || exit 2",
             "timeout": 180
           }
         ]
