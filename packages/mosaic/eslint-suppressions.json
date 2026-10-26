@@ -30,7 +30,7 @@
     }
   },
   "src/features/user-profile/user-profile-web3-wallets-section/user-profile-solana-wallet.model.ts": {
-    "@typescript-eslint/no-restricted-imports": {
+    "boundaries/dependencies": {
       "count": 1
     }
   },
