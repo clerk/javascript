@@ -81,7 +81,8 @@ const appendAgentsImport = (content: string) => {
   return content.trim() ? `${content.trimEnd()}${eol}${eol}@AGENTS.md${eol}` : `@AGENTS.md${eol}`;
 };
 
-export const isClerkAgentRulesSdk = (value: string): value is ClerkAgentRulesSdk => value in SDK_LABELS;
+export const isClerkAgentRulesSdk = (value: string): value is ClerkAgentRulesSdk =>
+  Object.prototype.hasOwnProperty.call(SDK_LABELS, value);
 
 export const clerkAgentRulesSdks = Object.keys(SDK_LABELS) as ClerkAgentRulesSdk[];
 

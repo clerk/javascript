@@ -4,6 +4,7 @@ import {
   CLERK_SDK_PLUGIN_END,
   CLERK_SDK_PLUGIN_START,
   type FileSystemAdapter,
+  isClerkAgentRulesSdk,
   logClerkAgentRulesResult,
   renderClerkAgentRulesBlock,
   renderClerkSdkPluginBlock,
@@ -277,6 +278,17 @@ describe('writeClerkAgentRules with an existing CLAUDE.md', () => {
 
     expect(result.claudeMd).toBe('updated');
     expect(memory.read('/repo/CLAUDE.md')).toBe('Claude rules\n');
+  });
+});
+
+describe('isClerkAgentRulesSdk', () => {
+  it('accepts supported SDKs', () => {
+    expect(isClerkAgentRulesSdk('nextjs')).toBe(true);
+  });
+
+  it('rejects inherited object keys', () => {
+    expect(isClerkAgentRulesSdk('constructor')).toBe(false);
+    expect(isClerkAgentRulesSdk('toString')).toBe(false);
   });
 });
 
