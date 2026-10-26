@@ -39,7 +39,7 @@ export async function testToggleCollapsePopoverAndClaim({
   dashboardUrl: string;
   framework: string;
 }): Promise<void> {
-  const u = createTestUtils({ app, page, context });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
   await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
   await u.po.expect.toBeSignedOut();
@@ -75,7 +75,7 @@ export async function testClaimedAppWithMissingKeys({
   dashboardUrl: string;
 }): Promise<void> {
   await mockClaimedInstanceEnvironmentCall(page);
-  const u = createTestUtils({ app, page, context });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
   await u.page.goToAppHome();
   await u.page.waitForClerkJsLoaded();
 
@@ -100,7 +100,7 @@ export async function testKeylessRemovedAfterEnvAndRestart({
   context: BrowserContext;
   app: Application;
 }): Promise<void> {
-  const u = createTestUtils({ app, page, context });
+  const u = await createTestUtils({ app, page, context, useTestingToken: false });
   await u.page.goToAppHome();
 
   await u.po.keylessPopover.waitForMounted();

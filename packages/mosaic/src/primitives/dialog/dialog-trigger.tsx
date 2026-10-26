@@ -6,8 +6,14 @@ import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '.
 import { useOptionalDialogContext } from './dialog-context';
 import type { DialogHandle } from './dialog-handle';
 
+export type TriggerPayloadRequirement<Payload> = [Payload] extends [void]
+  ? { payload?: NoInfer<Payload> }
+  : unknown extends Payload
+    ? { payload?: NoInfer<Payload> }
+    : { payload: NoInfer<Payload> };
+
 /** Props for {@link DialogTrigger}. */
-export interface DialogTriggerProps<Payload = unknown> extends ComponentProps<'button'> {
+export type DialogTriggerProps<Payload = unknown> = ComponentProps<'button'> & {
   /**
    * Connects this trigger to a root rendered elsewhere in the tree. Create with
    * `Dialog.createHandle()` and pass the same handle to the `Dialog.Root`. A trigger nested
@@ -20,7 +26,7 @@ export interface DialogTriggerProps<Payload = unknown> extends ComponentProps<'b
    * while the dialog is open are not reflected.
    */
   payload?: Payload;
-}
+} & TriggerPayloadRequirement<Payload>;
 
 /**
  * Button that opens the dialog. Registers itself with the root — directly when nested inside

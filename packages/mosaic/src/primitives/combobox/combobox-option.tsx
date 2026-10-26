@@ -3,7 +3,7 @@
 import { useListItem } from '@floating-ui/react';
 import React, { useEffect, useId } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isHTMLElement, mergeProps, useRender } from '../utils';
 import { useComboboxContext } from './combobox-context';
 import { ComboboxOptionContext } from './combobox-option-context';
 
@@ -16,8 +16,16 @@ export interface ComboboxOptionProps extends ComponentProps<'div'> {
 export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionProps>(
   function ComboboxOption(props, ref) {
     const { render, value, label, disabled, ...otherProps } = props;
-    const { activeIndex, selectedValue, getItemProps, handleSelect, valuesByIndexRef, registerSelectedIndex, refs } =
-      useComboboxContext();
+    const {
+      activeIndex,
+      selectedValue,
+      getItemProps,
+      handleSelect,
+      valuesByIndexRef,
+      registerSelectedIndex,
+      registerOption,
+      refs,
+    } = useComboboxContext();
 
     const id = useId();
     const displayLabel = label ?? value;
@@ -32,11 +40,12 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
         map.set(index, value);
       }
       const unregisterSelectedIndex = registerSelectedIndex(index, value, displayLabel);
+      registerOption(index);
       return () => {
         map.delete(index);
         unregisterSelectedIndex?.();
       };
-    }, [index, value, displayLabel, disabled, valuesByIndexRef, registerSelectedIndex]);
+    }, [index, value, displayLabel, disabled, valuesByIndexRef, registerSelectedIndex, registerOption]);
 
     const state = {
       selected: isSelected,
@@ -57,7 +66,10 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
         onClick() {
           if (!disabled) {
             handleSelect(value, index, displayLabel);
-            (refs.domReference.current as HTMLElement | null)?.focus();
+            const reference = refs.domReference.current;
+            if (isHTMLElement(reference)) {
+              reference.focus();
+            }
           }
         },
       }),

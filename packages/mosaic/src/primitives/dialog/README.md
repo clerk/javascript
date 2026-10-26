@@ -64,8 +64,9 @@ const feedbackDialog = Dialog.createHandle();
 
 Each trigger can carry an `id` and a `payload`. The root's children can be a function receiving
 the active payload, so one dialog renders per-trigger content. Type the payload through
-the handle: `Dialog.createHandle<Payload>()`. The payload is captured when the trigger opens the
-dialog; for data that can change while it is open, carry an id and read live state inside.
+the handle: `Dialog.createHandle<Payload>()`, and every trigger on that handle must pass one. The
+payload is captured when the trigger opens the dialog; for data that can change while it is open,
+carry an id and read live state inside.
 
 ```tsx
 const detail = Dialog.createHandle<{ name: string }>();
@@ -132,17 +133,17 @@ the close was pointer-driven, where focus is left where the pointer put it (see 
 
 ## Parts
 
-| Part                 | Default Element | Description                                     |
-| -------------------- | --------------- | ----------------------------------------------- |
-| `Dialog.Root`        | —               | Root context provider                           |
-| `Dialog.Trigger`     | `<button>`      | Opens/closes the dialog on click                |
-| `Dialog.Portal`      | —               | Portals children (defaults to `document.body`)  |
-| `Dialog.Backdrop`    | `<div>`         | Semi-transparent overlay surface                |
-| `Dialog.Viewport`    | `<div>`         | Fixed centering container; owns scroll lock     |
-| `Dialog.Popup`       | `<div>`         | The dialog content container                    |
-| `Dialog.Title`       | `<h2>`          | Dialog heading, wired to `aria-labelledby`      |
-| `Dialog.Description` | `<p>`           | Dialog description, wired to `aria-describedby` |
-| `Dialog.Close`       | `<button>`      | Closes the dialog on click                      |
+| Part                 | Default Element | Description                                                                         |
+| -------------------- | --------------- | ----------------------------------------------------------------------------------- |
+| `Dialog.Root`        | —               | Root context provider                                                               |
+| `Dialog.Trigger`     | `<button>`      | Opens/closes the dialog on click                                                    |
+| `Dialog.Portal`      | —               | Portals children (defaults to the `PortalProvider` container, else `document.body`) |
+| `Dialog.Backdrop`    | `<div>`         | Semi-transparent overlay surface                                                    |
+| `Dialog.Viewport`    | `<div>`         | Fixed centering container; owns scroll lock                                         |
+| `Dialog.Popup`       | `<div>`         | The dialog content container                                                        |
+| `Dialog.Title`       | `<h2>`          | Dialog heading, wired to `aria-labelledby`                                          |
+| `Dialog.Description` | `<p>`           | Dialog description, wired to `aria-describedby`                                     |
+| `Dialog.Close`       | `<button>`      | Closes the dialog on click                                                          |
 
 ## Props
 
@@ -184,11 +185,11 @@ dismisses but Escape does not — unrepresentable.
 
 ### `Dialog.Portal`
 
-| Prop   | Type                                                          | Default         | Description                      |
-| ------ | ------------------------------------------------------------- | --------------- | -------------------------------- |
-| `root` | `HTMLElement \| null \| React.RefObject<HTMLElement \| null>` | `document.body` | Container element to portal into |
+| Prop   | Type                                                          | Default                                              | Description                      |
+| ------ | ------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------- |
+| `root` | `HTMLElement \| null \| React.RefObject<HTMLElement \| null>` | the `PortalProvider` container, else `document.body` | Container element to portal into |
 
-When `root` is provided, the dialog is portaled into that container instead of `document.body`. Consumers handle layout via CSS on the container (or by omitting `Dialog.Viewport` and styling their own).
+When `root` is provided, the dialog is portaled into that container instead of the default. Consumers handle layout via CSS on the container (or by omitting `Dialog.Viewport` and styling their own).
 
 ### `Dialog.Viewport`
 
@@ -203,11 +204,11 @@ root, and `initialFocus={false}` on the popup so mounting does not steal focus.
 
 ### `Dialog.Trigger`
 
-| Prop      | Type           | Default | Description                                              |
-| --------- | -------------- | ------- | -------------------------------------------------------- |
-| `handle`  | `DialogHandle` | —       | Drives a root elsewhere in the tree (detached trigger)   |
-| `id`      | `string`       | auto    | Names this trigger for the root's `triggerId`            |
-| `payload` | `Payload`      | —       | Delivered to the root's children render function on open |
+| Prop      | Type           | Default | Description                                                                                                |
+| --------- | -------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| `handle`  | `DialogHandle` | —       | Drives a root elsewhere in the tree (detached trigger)                                                     |
+| `id`      | `string`       | auto    | Names this trigger for the root's `triggerId`                                                              |
+| `payload` | `Payload`      | —       | Delivered to the root's children render function on open; required when the handle is typed with a payload |
 
 ### `Dialog.Popup`
 

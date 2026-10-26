@@ -1,0 +1,62 @@
+import * as SwitchStories from './switch.stories';
+
+# Switch
+
+Switch is a styled native `<input type="checkbox" role="switch">` for a setting that is on or off. It forwards its ref and every input prop to the input, so it works controlled (`checked` + `onChange`) or uncontrolled (`defaultChecked`) exactly like the native element, and submits with a form like a checkbox.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={SwitchStories}
+/>
+
+## Props
+
+<PropTable
+  meta={SwitchStories.meta}
+  extra={[
+    { name: 'checked', type: 'boolean' },
+    { name: 'defaultChecked', type: 'boolean' },
+    { name: 'onChange', type: '(event) => void' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { Switch } from '@clerk/mosaic/components/switch';
+
+<Switch
+  aria-label='Email notifications'
+  checked={enabled}
+  onChange={event => setEnabled(event.target.checked)}
+/>;
+```
+
+For a switch with a visible label or description, place it in a [Field](/components/field) with `orientation='horizontal'`.
+
+---
+
+## Examples
+
+### States
+
+<Story
+  name='States'
+  storyModule={SwitchStories}
+/>
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={SwitchStories}
+/>
+
+### With Field
+
+<Story
+  name='WithField'
+  storyModule={SwitchStories}
+/>

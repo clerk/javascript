@@ -3,6 +3,8 @@ import { Field } from '@clerk/mosaic/components/field';
 import { Icon } from '@clerk/mosaic/components/icon';
 import type { InputGroupRootProps } from '@clerk/mosaic/components/input-group';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
+import { Eye } from '@clerk/mosaic/icons/glyphs/eye';
+import { EyeSlash } from '@clerk/mosaic/icons/glyphs/eye-slash';
 import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
@@ -63,7 +65,7 @@ export function Default(props: Record<string, unknown>) {
             aria-label={visible ? 'Hide password' : 'Show password'}
             onClick={() => setVisible(value => !value)}
           >
-            <Icon name={visible ? 'eye-slash' : 'eye'} />
+            <Icon glyph={visible ? EyeSlash : Eye} />
           </Button>
         </InputGroup.End>
       </InputGroup.Root>
@@ -141,7 +143,7 @@ export function Invalid(props: Record<string, unknown>) {
             aria-label={visible ? 'Hide password' : 'Show password'}
             onClick={() => setVisible(value => !value)}
           >
-            <Icon name={visible ? 'eye-slash' : 'eye'} />
+            <Icon glyph={visible ? EyeSlash : Eye} />
           </Button>
         </InputGroup.End>
       </InputGroup.Root>

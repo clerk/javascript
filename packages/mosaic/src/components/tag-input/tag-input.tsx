@@ -3,6 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { X } from '../../icons/glyphs/x';
 import { useLayoutAnimation } from '../../primitives/hooks';
 import type {
   TagInputInputProps as PrimitiveTagInputInputProps,
@@ -55,7 +56,7 @@ function Tags({ removeLabel, itemProps }: { removeLabel: (value: string) => stri
         {...mergeStyleProps(themeProps('tag-input-tag-remove'), stylex.props(reset.base, styles.tagRemove))}
       >
         <Icon
-          name='x'
+          glyph={X}
           size='sm'
         />
       </Primitive.TagRemove>

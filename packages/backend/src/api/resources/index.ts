@@ -70,6 +70,8 @@ export * from './Web3Wallet';
 
 export type {
   EmailWebhookEvent,
+  EmailBounceType,
+  EmailDeliveryWebhookEvent,
   OrganizationDomainWebhookEvent,
   OrganizationInvitationAcceptedWebhookEvent,
   OrganizationInvitationWebhookEvent,

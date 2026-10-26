@@ -3,7 +3,6 @@ import {
   Composite,
   CompositeItem,
   FloatingFocusManager,
-  FloatingPortal,
   getOverflowAncestors,
   hide,
   limitShift,
@@ -16,8 +15,10 @@ import { activeElement, contains, getDocument, getTarget, useLatestRef } from '@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { X } from '../../icons/glyphs/x';
 import { useAnimationsFinished, useTransitionStatus } from '../../primitives/hooks';
-import { mergeProps, useRender } from '../../primitives/utils';
+import { Portal } from '../../primitives/portal';
+import { isElement, isRef, mergeProps, useRender } from '../../primitives/utils';
 import { getComputedStyle } from '../../primitives/utils/dom';
 import type { MosaicComponentProps, XStyle } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -113,7 +114,9 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
           shift({
             mainAxis: false,
             crossAxis: true,
-            boundary: scrollingAncestors(state.elements.reference as Element),
+            boundary: isElement(state.elements.reference)
+              ? scrollingAncestors(state.elements.reference)
+              : 'clippingAncestors',
             padding: EDGE_GAP,
             limiter: limitShift({ mainAxis: false, crossAxis: true }),
           }).fn(state),
@@ -154,7 +157,8 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
 
   const guardPortalledKeys = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const bar = barRef.current;
-    if (!bar || !contains(bar, getTarget(event.nativeEvent) as Element)) {
+    const target = getTarget(event.nativeEvent);
+    if (!bar || !isElement(target) || !contains(bar, target)) {
       event.stopPropagation();
     }
   };
@@ -171,7 +175,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
         {status}
       </VisuallyHidden>
       {mounted ? (
-        <FloatingPortal root={portalRoot}>
+        <Portal root={portalRoot}>
           <FloatingFocusManager
             context={floatingContext}
             modal={false}
@@ -203,13 +207,13 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
                         rest,
                       ),
                     },
-                    compositeProps as Record<string, unknown>,
+                    compositeProps,
                   );
-                  // eslint-disable-next-line react-hooks/rules-of-hooks
+                  // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
                   return useRender({
                     defaultTagName: 'div',
                     render,
-                    ref: [barRef, compositeRef as React.Ref<unknown>],
+                    ref: [barRef, isRef(compositeRef) ? compositeRef : undefined],
                     props: {
                       ...merged,
                       ...(transitionStatus === 'starting'
@@ -239,7 +243,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
               />
             </div>
           </FloatingFocusManager>
-        </FloatingPortal>
+        </Portal>
       ) : null}
     </ActionBarContext.Provider>
   );
@@ -254,18 +258,15 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
   return (
     <CompositeItem
       render={(itemProps: React.HTMLAttributes<HTMLElement>) => {
-        const { ref: itemRef, ...merged } = mergeProps<'button'>(
-          rest as Record<string, unknown>,
-          itemProps as Record<string, unknown>,
-        );
+        const { ref: itemRef, ...merged } = mergeProps<'button'>(rest, itemProps);
         return (
           <Button
             variant='ghost'
             size='md'
             color={color}
             {...merged}
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            ref={useMergeRefs([ref, itemRef as React.Ref<HTMLButtonElement>])}
+            // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's CompositeItem calls this render callback synchronously during its own render, so the hook keeps a stable position.
+            ref={useMergeRefs<unknown>([ref, isRef(itemRef) ? itemRef : undefined])}
             xstyle={[color === 'negative' && styles.destructive, xstyle]}
           />
         );
@@ -327,7 +328,7 @@ const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(funct
       aria-label={ariaLabel ?? 'Clear selection'}
       {...mergeStyleProps(themeProps('action-bar-dismiss'), rest)}
     >
-      <Icon name='x' />
+      <Icon glyph={X} />
     </Action>
   );
 });
