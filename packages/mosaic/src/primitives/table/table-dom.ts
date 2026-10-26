@@ -15,7 +15,7 @@ export interface TableLink {
 
 type LinkModifiers = Pick<MouseEvent, 'metaKey' | 'ctrlKey' | 'altKey' | 'shiftKey'>;
 
-export function isRowOwnClick(event: React.MouseEvent<HTMLElement>) {
+export function isOwnClick(event: React.MouseEvent<HTMLElement>) {
   const { target, currentTarget } = event;
   if (!(target instanceof Element) || !currentTarget.contains(target)) {
     return false;

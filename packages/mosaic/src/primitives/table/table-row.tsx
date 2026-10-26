@@ -4,7 +4,7 @@ import React from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { TableRowContext, type TableRowContextValue, useTableContext, useTableItem } from './table-context';
-import { focusIsInChildRows, isRowOwnClick, isRtl, openLink, type TableLink } from './table-dom';
+import { focusIsInChildRows, isOwnClick, isRtl, openLink, type TableLink } from './table-dom';
 
 export interface TableRowProps extends ComponentProps<'tr'>, Partial<TableLink> {
   /** Removes the row from keyboard navigation, selection and its action. @default false */
@@ -76,7 +76,7 @@ export const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(fun
       : {}),
     style: { '--table-row-depth': item.depth },
     onClick: (event: React.MouseEvent<HTMLTableRowElement>) => {
-      if (disabled || !isRowOwnClick(event)) {
+      if (disabled || !isOwnClick(event)) {
         return;
       }
       const pointer = event.detail !== 0;

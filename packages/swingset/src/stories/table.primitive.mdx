@@ -101,7 +101,7 @@ Pass `itemToChildren` to `Table.Body` and the table becomes a tree grid. The chi
 
 ### Sorting
 
-Give a column a `value` and `sortable`. Activating its header calls `onSortChange` with that column, ascending first and then flipping the direction. The table does not reorder the items; sort them yourself or on the server.
+Give a column a `value` and `sortable`. Activating its header calls `onSortChange` with that column, ascending first and then flipping the direction. Clicks on controls inside the header do not sort. The table does not reorder the items; sort them yourself or on the server.
 
 ```tsx
 import { Table, type TableSort } from '@clerk/mosaic/primitives/table';
@@ -151,7 +151,7 @@ The table becomes a grid, with one tab stop, when it has row actions, selection,
 | `Space`                  | Toggle the row's selection. `Shift+Space` selects a range.                                                 |
 | `Ctrl+A` / `Cmd+A`       | Select all rows in `'multiple'` mode                                                                       |
 
-Left and right swap in right-to-left layouts. A cell with a single button or link focuses that control directly.
+Left and right swap in right-to-left layouts. A cell with a single button or link focuses that control directly. When the focused row is removed, focus moves to the nearest row.
 
 ## Parts
 

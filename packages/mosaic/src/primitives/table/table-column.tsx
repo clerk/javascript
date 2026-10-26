@@ -4,6 +4,7 @@ import React from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { useCellIndex, useTableContext } from './table-context';
+import { isOwnClick } from './table-dom';
 
 export interface TableColumnProps extends ComponentProps<'th'> {
   /** Identifies the column in the sort state. */
@@ -33,7 +34,11 @@ export const TableColumn = React.forwardRef<HTMLTableCellElement, TableColumnPro
     ...(canSort
       ? {
           'aria-sort': sortDirection ?? 'none',
-          onClick: () => sortBy(value),
+          onClick: (event: React.MouseEvent<HTMLTableCellElement>) => {
+            if (isOwnClick(event)) {
+              sortBy(value);
+            }
+          },
           onKeyDown: (event: React.KeyboardEvent<HTMLTableCellElement>) => {
             if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
               event.preventDefault();

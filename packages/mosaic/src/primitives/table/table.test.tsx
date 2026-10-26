@@ -838,6 +838,41 @@ describe('Table', () => {
       expect(onSortChange).toHaveBeenCalledTimes(2);
     });
 
+    it('does not sort when a control inside the header is clicked', async () => {
+      const user = userEvent.setup();
+      const onSortChange = vi.fn();
+      render(
+        <Table.Root
+          aria-label='Logs'
+          onSortChange={onSortChange}
+        >
+          <Table.Header>
+            <Table.Column
+              value='message'
+              sortable
+            >
+              Message
+              <button type='button'>Filter</button>
+            </Table.Column>
+          </Table.Header>
+          <Table.Body
+            items={FLAT_LOGS}
+            itemToStringValue={toValue}
+          >
+            {log => (
+              <Table.Row>
+                <Table.Cell>{log.message}</Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table.Root>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Filter' }));
+
+      expect(onSortChange).not.toHaveBeenCalled();
+    });
+
     it('starts ascending when another column was sorted', async () => {
       const user = userEvent.setup();
       const onSortChange = vi.fn();
@@ -1138,6 +1173,43 @@ describe('Table', () => {
       expect(screen.getByRole('button', { name: 'Alpha actions' })).toHaveFocus();
       await user.keyboard('{Escape}');
       expect(focused()).toBe(screen.getByRole('button', { name: 'Alpha actions' }).closest('td'));
+    });
+
+    it('moves focus to the nearest row when the focused row is removed', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(<LogsTable selectionMode='multiple' />);
+
+      await tabIntoTable(user);
+      await user.keyboard('{End}');
+      expect(row('Charlie')).toHaveFocus();
+      rerender(
+        <LogsTable
+          selectionMode='multiple'
+          items={FLAT_LOGS.slice(0, 2)}
+        />,
+      );
+
+      await waitFor(() => expect(row('Bravo')).toHaveFocus());
+      await user.keyboard('{ArrowUp}');
+      expect(row('Alpha')).toHaveFocus();
+    });
+
+    it('leaves focus outside the table when a row is removed', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(<LogsTable selectionMode='multiple' />);
+
+      await tabIntoTable(user);
+      await user.keyboard('{End}');
+      await user.click(screen.getByRole('button', { name: 'After' }));
+      rerender(
+        <LogsTable
+          selectionMode='multiple'
+          items={FLAT_LOGS.slice(0, 2)}
+        />,
+      );
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
     });
 
     it('keeps a tab stop when the focused row becomes disabled', async () => {

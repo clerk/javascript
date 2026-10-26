@@ -16,6 +16,7 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
   const activeRef = React.useRef<HTMLElement | null>(null);
   const positionRef = React.useRef<Position | null>(null);
   const editingRef = React.useRef<HTMLTableCellElement | null>(null);
+  const focusedRef = React.useRef(false);
   const originalTabIndexes = React.useRef(new Map<HTMLElement, string | null>());
 
   const setTabIndex = React.useCallback((element: HTMLElement, tabIndex: number | null) => {
@@ -35,6 +36,9 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     }
     if (!isActivatable(table, activeRef.current)) {
       activeRef.current = itemAt(table, positionRef.current ?? initialPosition(table, excluded), excluded) ?? null;
+      if (focusedRef.current && !contains(table, table.ownerDocument.activeElement)) {
+        activeRef.current?.focus();
+      }
     }
     for (const element of originalTabIndexes.current.keys()) {
       if (!element.isConnected) {
@@ -96,6 +100,7 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
       if (!(target instanceof HTMLElement)) {
         return;
       }
+      focusedRef.current = true;
       if (target instanceof HTMLTableRowElement && isRowItem(target, excluded) && target.closest('table') === table) {
         activate(target, positionOf(target), null);
         return;
@@ -108,6 +113,17 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
         activate(target, positionOf(cell), null);
       } else {
         activate(cell, positionOf(cell), cell);
+      }
+    };
+
+    const onFocusOut = (event: FocusEvent) => {
+      const { target, relatedTarget } = event;
+      if (
+        target instanceof Element &&
+        target.isConnected &&
+        !(relatedTarget instanceof Element && contains(table, relatedTarget))
+      ) {
+        focusedRef.current = false;
       }
     };
 
@@ -143,10 +159,12 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     };
 
     table.addEventListener('focusin', onFocusIn);
+    table.addEventListener('focusout', onFocusOut);
     table.addEventListener('keydown', onKeyDown, true);
     return () => {
       observer.disconnect();
       table.removeEventListener('focusin', onFocusIn);
+      table.removeEventListener('focusout', onFocusOut);
       table.removeEventListener('keydown', onKeyDown, true);
       restoreTabIndexes(originals);
     };
