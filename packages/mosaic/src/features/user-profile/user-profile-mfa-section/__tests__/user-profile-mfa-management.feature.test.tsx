@@ -417,6 +417,49 @@ describe('User profile MFA management', () => {
     expect(fapi.mfa.backupCodeCreations).toBe(1);
   });
 
+  it('holds the menu open with a spinner on Regenerate until the backup codes are ready', async () => {
+    await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
+      mfaEnvironment(),
+    );
+    const generate = holdRequests('post', '/v1/me/backup_codes/');
+    const user = userEvent.setup();
+
+    try {
+      await regenerate(user);
+      await waitFor(() => expect(generate.requests).toHaveLength(1));
+      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toHaveAttribute('aria-busy', 'true');
+      expect(await screen.findByRole('progressbar', { name: 'Regenerate' })).toBeVisible();
+      expect(screen.queryByRole('dialog')).toBeNull();
+    } finally {
+      generate.release();
+    }
+
+    const list = await screen.findByRole('list', { name: 'Backup codes' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(10);
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+  });
+
+  it('holds the Regenerate menu item until session verification opens', async () => {
+    await renderBackupCodesNeedingReverification();
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+    const user = userEvent.setup();
+
+    try {
+      await regenerate(user);
+      await waitFor(() => expect(start.requests).toHaveLength(1));
+      expect(screen.getByRole('menu')).toBeVisible();
+      expect(screen.getByRole('menuitem', { name: 'Regenerate' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByText('Enter your current password to continue')).toBeNull();
+    } finally {
+      start.release();
+    }
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+  });
+
   async function renderBackupCodesNeedingReverification() {
     const fapi = await renderMfa(
       fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
