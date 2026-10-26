@@ -34,22 +34,27 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
 
 type Seconds = number;
 
+interface CachedToken {
+  expiresAt: Seconds;
+  token: TokenResource;
+}
+
 /**
  * Internal cache value containing the entry, expiration metadata, and timers.
  */
 interface TokenCacheValue {
   /**
-   * Freshest claims-valid token observed for this key, chained across set() calls
-   * and updated by every resolver settle, including resolvers replaced by a newer
-   * set() while still pending. Internal bookkeeping only: readers only ever see
-   * entry.resolvedToken, so a pending entry still reads as pending and callers
+   * Freshest claims-valid token observed for this key, with its expiry fixed when
+   * the cache first saw it for as long as the cache holds it, chained across set()
+   * calls and updated by every resolver settle, including resolvers replaced by a
+   * newer set() while still pending. Internal bookkeeping only: readers only ever
+   * see entry.resolvedToken, so a pending entry still reads as pending and callers
    * await its resolver. Folded into resolvedToken when the live entry resolves,
    * which is what keeps a staler resolve from overwriting a fresher token.
    */
-  baseline?: TokenResource;
+  freshest?: CachedToken;
   cachedAt: Seconds;
   entry: TokenCacheEntry;
-  expiresAt?: Seconds;
   /** Timer for automatic cache cleanup when token expires */
   timeoutId?: ReturnType<typeof setTimeout>;
   /** Timer for proactive refresh before token enters leeway period */
@@ -132,6 +137,16 @@ const generateTabId = (): string => {
   return Math.random().toString(36).slice(2);
 };
 
+const pickFreshestCachedToken = (existing: CachedToken | undefined, incoming: CachedToken): CachedToken => {
+  if (!existing) {
+    return incoming;
+  }
+  if (existing.token.getRawString() === incoming.token.getRawString()) {
+    return existing.expiresAt <= incoming.expiresAt ? existing : incoming;
+  }
+  return pickFreshestJwt(existing.token, incoming.token) === existing.token ? existing : incoming;
+};
+
 /**
  * Creates an in-memory token cache with optional BroadcastChannel synchronization across tabs.
  * Automatically manages token expiration and cleanup via scheduled timeouts.
@@ -185,7 +200,9 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
       return;
     }
 
-    const remainingTtl = (value.expiresAt ?? Infinity) - Math.floor(Date.now() / 1000);
+    const hasResolvedToken = value.entry.resolvedToken !== undefined;
+    const expiresAt = hasResolvedToken && value.freshest ? value.freshest.expiresAt : Infinity;
+    const remainingTtl = expiresAt - Math.floor(Date.now() / 1000);
 
     // Token expired or dangerously close to expiration - force synchronous refresh
     // Uses poller interval as threshold since the poller might not get to it in time
@@ -322,8 +339,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
     // Chain the freshest known token across replacements. This never touches
     // entry.resolvedToken: a pending entry reads as pending and callers await.
-    const prior = existing?.entry.resolvedToken;
-    value.baseline = prior ? pickFreshestJwt(existing?.baseline, prior) : existing?.baseline;
+    value.freshest = existing?.freshest;
 
     // Clears both timers and drops the slot, but only if it still holds `target`
     // (a newer set() may have replaced it while a promise/timer was pending).
@@ -352,7 +368,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
         if (isOwn && !isValid) {
           // The live slot's own fetch resolved unusable: drop the slot so the next
-          // read refetches. Keeping the baseline alive here would hide a broken
+          // read refetches. Keeping the freshest token alive here would hide a broken
           // token endpoint behind cache hits.
           dropIfCurrent(live);
           return;
@@ -361,41 +377,38 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
           return;
         }
 
+        // `exp` is server time, so reading it on the device clock is late by the
+        // device's lag. A full lifetime from cache insert is late by the token's age
+        // on arrival. The earlier of the two is late only by the smaller error.
+        const candidate: CachedToken = {
+          expiresAt: Math.min(claims.exp, value.cachedAt + claims.exp - claims.iat),
+          token: newToken,
+        };
+
         // Track the freshest token seen for this key, even when this resolver was
         // replaced by a newer set() while it was pending.
-        const baseline = pickFreshestJwt(live.baseline, newToken);
-        live.baseline = baseline;
+        const previous = live.freshest;
+        const winner = pickFreshestCachedToken(previous, candidate);
+        live.freshest = winner;
 
         // resolvedToken is only written once the live slot itself resolves. While
         // the live slot is pending, readers must keep awaiting its resolver, so a
-        // replaced resolver may only advance the baseline above.
-        if (!isOwn && live.entry.resolvedToken === undefined) {
+        // replaced resolver may only advance the freshest token above.
+        const hasResolvedToken = live.entry.resolvedToken !== undefined;
+        if (!isOwn && !hasResolvedToken) {
           return;
         }
 
-        const winner = pickFreshestJwt(live.entry.resolvedToken, baseline);
-        if (winner === live.entry.resolvedToken) {
+        if (hasResolvedToken && winner === previous) {
           // Nothing advanced; the installed timers already match the winner.
           return;
         }
-        live.entry.resolvedToken = winner;
-
-        const winnerClaims = winner.jwt?.claims;
-        if (!winnerClaims || typeof winnerClaims.exp !== 'number' || typeof winnerClaims.iat !== 'number') {
-          dropIfCurrent(live);
-          return;
-        }
+        live.entry.resolvedToken = winner.token;
 
         clearTimeout(live.timeoutId);
         clearTimeout(live.refreshTimeoutId);
 
-        // `exp` is server time, so reading it on the device clock is late by the
-        // device's lag. A full lifetime from cache insert is late by the token's age
-        // on arrival. The earlier of the two is late only by the smaller error.
-        const expiresAt: Seconds = Math.min(winnerClaims.exp, live.cachedAt + winnerClaims.exp - winnerClaims.iat);
-        const remainingTtl: Seconds = expiresAt - Math.floor(Date.now() / 1000);
-
-        live.expiresAt = expiresAt;
+        const remainingTtl: Seconds = winner.expiresAt - Math.floor(Date.now() / 1000);
 
         if (remainingTtl <= 0) {
           dropIfCurrent(live);
@@ -437,8 +450,9 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
           // Best-effort side effect: a broadcast failure (e.g. postMessage racing a
           // channel close) must not reach the outer catch and evict the cached token (SDK-119).
           try {
-            const tokenRaw = winner.getRawString();
-            if (tokenRaw && winnerClaims.sid) {
+            const tokenRaw = winner.token.getRawString();
+            const winnerClaims = winner.token.jwt?.claims;
+            if (tokenRaw && winnerClaims?.sid) {
               const sessionId = winnerClaims.sid;
               const organizationId = winnerClaims.org_id || (winnerClaims.o as any)?.id;
               const template = TokenId.extractTemplate(entry.tokenId, sessionId, organizationId);
