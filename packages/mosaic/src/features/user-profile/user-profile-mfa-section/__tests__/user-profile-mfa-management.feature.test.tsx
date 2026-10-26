@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
@@ -438,7 +438,21 @@ describe('User profile MFA management', () => {
 
     await regenerate(user);
     expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
-    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    const refresh = holdRequests('get', '/v1/me');
+    try {
+      await user.keyboard('hunter2{Enter}');
+      await act(async () => {
+        await waitFor(() => expect(refresh.requests).toHaveLength(1));
+      });
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('dialog')).toHaveAttribute('data-open');
+      expect(screen.getByText('Enter your current password to continue')).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+    } finally {
+      refresh.release();
+    }
 
     const list = await screen.findByRole('list', { name: 'Backup codes' });
     expect(within(list).getAllByRole('listitem')).toHaveLength(10);
