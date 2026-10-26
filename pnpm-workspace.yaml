@@ -71,8 +71,6 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # Renovate security update: ip-address@10.7.1
-  - ip-address@10.7.1
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
