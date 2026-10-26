@@ -10,19 +10,23 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
   platform,
 }) => {
   const googleResult = screen.getByTestId('google-result');
+  const googlePage = screen.getByTestId(/^com\.google\.android\.gms:id\//);
   await host.launch();
   await host.tap(homeLinks(screen).nativeModules);
   await host.tap(screen.getByTestId('google-sign-in-button'));
   if (platform === 'android') {
     // Google Play services keeps its add-account flow running after the app is force-stopped, and its next page later covers whatever app is in front.
-    const googlePage = screen.getByTestId(/^com\.google\.android\.gms:id\//);
     await expect
       .poll(() => googlePage.count().catch(() => 0), {
         timeout: GOOGLE_UI_TIMEOUT_MS,
         message: 'a page of Google Play services is on screen',
       })
       .toBeGreaterThan(0);
-    await host.screenshot('google-system-prompt');
+  } else {
+    await expect(screen.getByText(/accounts\.google\.com/)).toBeVisible({ timeout: GOOGLE_UI_TIMEOUT_MS });
+  }
+  await host.screenshot('google-system-prompt');
+  if (platform === 'android') {
     await expect
       .poll(
         async () => {
@@ -33,8 +37,6 @@ test('useSignInWithGoogle opens the native Google sign-in, and cancelling it end
       )
       .toBeGreaterThan(0);
   } else {
-    await expect(screen.getByText(/accounts\.google\.com/)).toBeVisible({ timeout: GOOGLE_UI_TIMEOUT_MS });
-    await host.screenshot('google-system-prompt');
     await device.alert('dismiss');
   }
   await expect(googleResult).toHaveText('Google sign-in was cancelled', { timeout: 15_000 });
