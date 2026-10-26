@@ -38,7 +38,7 @@ export type UserProfileMfaModel =
       methods: readonly UserProfileMfaMethod[];
       addableMethods: readonly UserProfileMfaAddableMethod[];
       phones: readonly MfaPhone[];
-      findOrCreatePhone?: (phoneNumber: string) => Promise<{ phone: MfaPhone; codeSent: boolean }>;
+      enrollPhoneNumber?: (phoneNumber: string) => Promise<SmsEnrollmentResult>;
       enrollSms?: (phoneId: string, code?: string) => Promise<SmsEnrollmentResult>;
       resendSms?: (phoneId: string) => Promise<void>;
       createAuthenticator?: () => Promise<{ secret: string; uri: string }>;

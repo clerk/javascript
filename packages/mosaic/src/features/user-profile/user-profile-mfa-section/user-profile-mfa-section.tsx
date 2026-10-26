@@ -34,8 +34,6 @@ export function mfaSectionNode(model: UserProfileMfaModel, fallback: ReactNode =
 function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'ready' }> }) {
   const controller = useUserProfileMfaController(model);
   const initialFocusRef = useRef<HTMLElement>(null);
-  const reverifying = controller.setupProps.step === 'verify';
-
   return (
     <UserProfileMfaSectionView
       {...controller.sectionProps}
@@ -46,10 +44,12 @@ function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'r
             disabled={controller.isPending}
             onOpenChange={controller.onDialogOpenChange}
             hideTrigger={!controller.showAddTrigger}
-            reverifying={reverifying}
+            reverifying={controller.reverifying}
             showCloseButton={controller.showCloseButton}
             initialFocus={
-              reverifying && controller.setupProps.reverification.status !== 'error' ? initialFocusRef : undefined
+              controller.reverifying && controller.setupProps.reverification.status !== 'error'
+                ? initialFocusRef
+                : undefined
             }
           >
             <UserProfileMfaSetupView
