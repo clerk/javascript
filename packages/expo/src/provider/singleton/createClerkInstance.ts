@@ -25,6 +25,7 @@ import { CLERK_CLIENT_JWT_KEY } from '../../constants';
 import { errorThrower } from '../../errorThrower';
 import { assertValidProxyUrl } from '../../utils/errors';
 import { isNative, waitUntilAppIsActive } from '../../utils/runtime';
+import type { ClientTokenCache } from '../nativeClientSync';
 import type { BuildClerkOptions } from './types';
 
 /**
@@ -132,7 +133,13 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         void __internal_tokenCache.clearToken?.(CLERK_CLIENT_JWT_KEY);
       }
 
-      const saveToken = (key: string, token: string) => __internal_tokenCache.saveToken(key, token);
+      const saveClientToken = (token: string, requestToken: string | null) => {
+        const tokenCache = __internal_tokenCache as TokenCache & Partial<ClientTokenCache>;
+        return tokenCache.saveClientToken
+          ? tokenCache.saveClientToken(token, requestToken)
+          : tokenCache.saveToken(CLERK_CLIENT_JWT_KEY, token);
+      };
+      const requestTokens = new WeakMap<FapiRequestInit, string | null>();
 
       __internal_clerkOptions = { publishableKey, proxyUrl, domain };
       const clerk = new ClerkClass(publishableKey, { proxyUrl, domain }) as unknown as BrowserClerk;
@@ -299,6 +306,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         requestInit.url?.searchParams.append('_is_native', '1');
 
         const jwt = await readClientJwt();
+        requestTokens.set(requestInit, jwt ?? null);
         (requestInit.headers as Headers).set('authorization', jwt || '');
 
         // Instructs the backend that the request is from a mobile device.
@@ -311,15 +319,15 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse) => {
+      __internal_clerk.__internal_onAfterResponse(async (requestInit: FapiRequestInit, response: FapiResponse) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
-          await saveToken(CLERK_CLIENT_JWT_KEY, authHeader);
+          await saveClientToken(authHeader, requestTokens.get(requestInit) ?? null);
         }
 
         if (__DEV__ && !nativeApiErrorShown && response.payload?.errors?.[0]?.code === 'native_api_disabled') {
           console.error(
-            'The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/~/native-applications',
+            'Clerk: The Native API is disabled for this instance.\nGo to Clerk Dashboard > Configure > Native applications to enable it.\nOr, navigate here: https://dashboard.clerk.com/~/native-applications',
           );
           nativeApiErrorShown = true;
         }

@@ -4,13 +4,14 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { demandReverificationOnce, holdRequests, serveFapi } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnterpriseAccount, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileProfilePanel } from '../../user-profile-profile-panel';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section';
 import { github, google, renderSection, signedIn } from './user-profile-connected-accounts.fixtures';
 
 async function openRemoval(user: ReturnType<typeof userEvent.setup>, provider: string) {
-  await user.click(screen.getByRole('button', { name: `Manage ${provider}` }));
+  await openMenu(user, screen.getByRole('button', { name: `Manage ${provider}` }));
   await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
   return screen.getByRole('alertdialog');
 }

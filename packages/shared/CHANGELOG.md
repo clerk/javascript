@@ -1,5 +1,35 @@
 # Change Log
 
+## 4.41.1
+
+### Patch Changes
+
+- Add internal query helpers used by `@clerk/mosaic`. ([#10342](https://github.com/clerk/javascript/pull/10342)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Keep a session's `expireAt` and `abandonAt` at Unix epoch zero when the session has no maximum lifetime, instead of falling back to the current time. ([#9871](https://github.com/clerk/javascript/pull/9871)) by [@swolfand](https://github.com/swolfand)
+
+## 4.41.0
+
+### Minor Changes
+
+- Support passkeys as a second factor during sign-in and session reverification. ([#9127](https://github.com/clerk/javascript/pull/9127)) by [@dmoerner](https://github.com/dmoerner)
+
+  When a user has a passkey, the prebuilt `<SignIn/>` and `<UserVerification/>`
+  components preselect it as the second factor, as they already do for the first
+  factor. Other methods stay available under "Use another method".
+
+  To use it, your instance must allow passkeys to satisfy the second factor. This
+  is on by default for instances created after 2026-07-08, and can be turned on
+  in the Dashboard for older ones. Web apps also need to opt in to the passkey
+  second factor update in the Dashboard.
+
+  If you build a custom flow, `supportedSecondFactors` can now include `passkey`.
+  Call `signIn.authenticateWithPasskey()` to complete it.
+
+  Passkeys are no longer preselected, for either factor, where the SDK reports
+  that WebAuthn is unavailable (for example, Electron apps without passkey
+  support enabled).
+
 ## 4.40.0
 
 ### Minor Changes

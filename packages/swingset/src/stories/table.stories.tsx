@@ -1,11 +1,16 @@
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { DataList } from '@clerk/mosaic/components/data-list';
+import { Dialog } from '@clerk/mosaic/components/dialog';
 import { EmptyState } from '@clerk/mosaic/components/empty-state';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Menu } from '@clerk/mosaic/components/menu';
 import type { TableSort } from '@clerk/mosaic/components/table';
 import { Table } from '@clerk/mosaic/components/table';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
+import { MagnifyingGlass } from '@clerk/mosaic/icons/glyphs/magnifying-glass';
+import { Plus } from '@clerk/mosaic/icons/glyphs/plus';
 import type { OnChangeFn, SortingState } from '@clerk/mosaic/primitives/hooks';
 import { useDataTable } from '@clerk/mosaic/primitives/hooks';
 import * as stylex from '@stylexjs/stylex';
@@ -333,7 +338,7 @@ export function Empty() {
       <Table.Body>
         <Table.Empty>
           <EmptyState.Root>
-            <EmptyState.Icon name='magnifying-glass' />
+            <EmptyState.Icon glyph={MagnifyingGlass} />
             <EmptyState.Label>No API keys</EmptyState.Label>
             <EmptyState.Description>
               Create a key to start making requests from your application.
@@ -341,7 +346,7 @@ export function Empty() {
             <EmptyState.Actions>
               <Button size='sm'>
                 <Icon
-                  name='plus'
+                  glyph={Plus}
                   placement='inline-start'
                 />
                 Create key
@@ -496,5 +501,115 @@ export function ColumnWidths() {
         ))}
       </Table.Body>
     </Table.Root>
+  );
+}
+
+const keyDetails = Dialog.createHandle<ApiKey>();
+
+export function ClickableRows() {
+  return (
+    <>
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Environment</Table.HeaderCell>
+            <Table.HeaderCell>Last used</Table.HeaderCell>
+            <Table.HeaderCell align='end'>
+              <VisuallyHidden>Actions</VisuallyHidden>
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {apiKeys.map(key => (
+            <ClickableKeyRow
+              key={key.id}
+              apiKey={key}
+            />
+          ))}
+        </Table.Body>
+      </Table.Root>
+      <Dialog.Root handle={keyDetails}>
+        {({ payload }) =>
+          payload === undefined ? null : (
+            <Dialog.Popup
+              variant='card'
+              compactPlacement='center'
+            >
+              <Card.Root
+                elevation='overlay'
+                renderBranding={false}
+              >
+                <Card.Header>
+                  <Card.Title>{payload.name}</Card.Title>
+                  <Card.Description>API key</Card.Description>
+                </Card.Header>
+                <Card.Content>
+                  <DataList.Root>
+                    <DataList.Item>
+                      <DataList.Label>Environment</DataList.Label>
+                      <DataList.Value>{payload.environment}</DataList.Value>
+                    </DataList.Item>
+                    <DataList.Item>
+                      <DataList.Label>Last used</DataList.Label>
+                      <DataList.Value>{payload.lastUsed}</DataList.Value>
+                    </DataList.Item>
+                    <DataList.Item>
+                      <DataList.Label>Created</DataList.Label>
+                      <DataList.Value>{payload.created}</DataList.Value>
+                    </DataList.Item>
+                  </DataList.Root>
+                </Card.Content>
+                <Card.Footer>
+                  <Dialog.Close
+                    render={
+                      <Button
+                        color='neutral'
+                        fullWidth
+                        variant='outline'
+                      />
+                    }
+                  >
+                    Close
+                  </Dialog.Close>
+                </Card.Footer>
+              </Card.Root>
+            </Dialog.Popup>
+          )
+        }
+      </Dialog.Root>
+    </>
+  );
+}
+
+function ClickableKeyRow({ apiKey }: { apiKey: ApiKey }) {
+  const trigger = React.useRef<HTMLButtonElement>(null);
+  return (
+    <Table.Row onClick={() => trigger.current?.click()}>
+      <Table.Cell>
+        <Dialog.Trigger
+          ref={trigger}
+          handle={keyDetails}
+          payload={apiKey}
+          render={<Button variant='link' />}
+        >
+          {apiKey.name}
+        </Dialog.Trigger>
+      </Table.Cell>
+      <Table.Cell>
+        <Badge color={apiKey.environment === 'Production' ? 'positive' : 'neutral'}>{apiKey.environment}</Badge>
+      </Table.Cell>
+      <Table.Cell>{apiKey.lastUsed}</Table.Cell>
+      <Table.Cell align='end'>
+        <Menu.Root placement='bottom-end'>
+          <Menu.Trigger aria-label={`Manage ${apiKey.name}`} />
+          <Menu.Popup>
+            <Menu.Item label='Revoke'>
+              <Menu.Label>Revoke</Menu.Label>
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Root>
+      </Table.Cell>
+    </Table.Row>
   );
 }

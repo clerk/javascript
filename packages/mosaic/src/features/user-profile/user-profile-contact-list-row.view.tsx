@@ -7,6 +7,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { Plus } from '../../icons/glyphs/plus';
 import { fill, useMessages } from '../../localization';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { UserProfileContact } from './user-profile-contact.types';
@@ -63,7 +64,7 @@ export function UserProfileContactListRowView({
               onClick={onAdd}
             >
               <Icon
-                name='plus'
+                glyph={Plus}
                 placement='inline-start'
                 size='sm'
               />

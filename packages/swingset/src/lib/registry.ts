@@ -219,6 +219,7 @@ import {
   Placement as PopoverComponentPlacement,
 } from '../stories/popover.component.stories';
 import { meta as popoverMeta } from '../stories/popover.stories';
+import { meta as portalMeta } from '../stories/portal.stories';
 import {
   Customized as ProfileCustomized,
   Default as ProfileDefault,
@@ -232,6 +233,7 @@ import {
   Sizes as RadioSizes,
   States as RadioStates,
 } from '../stories/radio.stories';
+import { Default as RevealDefault, meta as revealMeta } from '../stories/reveal.component.stories';
 import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
@@ -642,6 +644,8 @@ const radioModule: StoryModule = {
   Sizes: RadioSizes,
 };
 
+const revealModule: StoryModule = { meta: revealMeta, Default: RevealDefault };
+
 const dataListModule: StoryModule = {
   meta: dataListMeta,
   Default: DataListDefault,
@@ -768,6 +772,7 @@ const flowModule: StoryModule = { meta: flowMeta };
 const menuModule: StoryModule = { meta: menuMeta };
 const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
+const portalModule: StoryModule = { meta: portalMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
 const tagInputModule: StoryModule = { meta: tagInputMeta };
@@ -1015,8 +1020,6 @@ const organizationProfileMembersPanelModule: StoryModule = {
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
-  // Organization Switcher
-  organizationSwitcherModule,
   // User Profile
   userProfileModule,
   // User Profile · Panels
@@ -1048,9 +1051,9 @@ export const registry: StoryModule[] = [
   // Organization Profile · Sections
   organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
-  // API Keys
+  // Misc
+  organizationSwitcherModule,
   apiKeysTableModule,
-  // Reverification
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
@@ -1086,6 +1089,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   radioModule,
+  revealModule,
   sectionModule,
   segmentedControlModule,
   selectComponentModule,
@@ -1110,6 +1114,7 @@ export const registry: StoryModule[] = [
   menuModule,
   otpModule,
   popoverModule,
+  portalModule,
   selectModule,
   tabsModule,
   tagInputModule,

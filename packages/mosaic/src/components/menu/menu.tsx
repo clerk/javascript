@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { EllipsisHorizontal } from '../../icons/glyphs/ellipsis-horizontal';
 import type {
   MenuItemProps as PrimitiveMenuItemProps,
   MenuPopupProps as PrimitiveMenuPopupProps,
@@ -58,7 +59,7 @@ export const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>
       render={trigger}
       {...mergeStyleProps(themeProps('menu-trigger'), stylex.props(xstyle), rest)}
     >
-      {children ?? <Icon name='ellipsis-horizontal' />}
+      {children ?? <Icon glyph={EllipsisHorizontal} />}
     </Primitive.Trigger>
   );
 });

@@ -1,5 +1,23 @@
 # @clerk/expo-native-components
 
+## 0.4.1
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.2.1` to `1.3.0`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.3.0. by [@clerk-cookie](https://github.com/clerk-cookie)
+
+## 0.4.0
+
+### Minor Changes
+
+- Remove the legacy client sync functions. Older `@clerk/expo` versions need them to configure the native components, which render blank without them. Update `@clerk/expo` to the latest version when you update this package. ([#9956](https://github.com/clerk/javascript/pull/9956)) by [@mikepitre](https://github.com/mikepitre)
+
+## 0.3.0
+
+### Minor Changes
+
+- Add native module support for the upcoming single-token client sync between `@clerk/expo` and the Clerk iOS and Android SDKs. The native SDK's stored device token becomes the one token both runtimes use, and each side is notified to reload its own client when the other changes it. Existing sync behavior is unchanged until `@clerk/expo` adopts it. ([#9957](https://github.com/clerk/javascript/pull/9957)) by [@mikepitre](https://github.com/mikepitre)
+
 ## 0.2.0
 
 ### Minor Changes

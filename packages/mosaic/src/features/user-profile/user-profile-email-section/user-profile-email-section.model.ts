@@ -85,8 +85,15 @@ function toEmailVerifier(
 export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel {
   const model = useUserProfileUserModel();
   const router = useMosaicRouter();
-  const [removeEmail, reverification] = useReverificationFlow((user: UserResource, id: string) =>
+  const [removeEmail, removeReverification] = useReverificationFlow((user: UserResource, id: string) =>
     byId(user.emailAddresses, id, 'email address').destroy(),
+  );
+  const [setPrimaryEmail, setPrimaryReverification] = useReverificationFlow((user: UserResource, id: string) =>
+    user.update({ primaryEmailAddressId: id }),
+  );
+  const [createEmail, createReverification] = useReverificationFlow(
+    (currentUser: () => UserResource, emailAddress: string) =>
+      currentUser().createEmailAddress({ email: emailAddress }),
   );
   if (model.status !== 'ready') {
     return model;
@@ -115,14 +122,16 @@ export function useUserProfileEmailSectionModel(): UserProfileEmailSectionModel 
     username: user.username ?? undefined,
     onCreateEmail: access.canCreate
       ? async emailAddress => {
-          const request = currentUser().createEmailAddress({ email: emailAddress });
+          const request = createEmail(currentUser, emailAddress);
           await save(() => request, ADD_EMAIL_FIELDS);
           return verifierFor(await request);
         }
       : undefined,
     getEmailVerifier: id => verifierFor(byId(user.emailAddresses, id, 'email address')),
-    onSetPrimaryEmail: id => saveAsUser(current => current.update({ primaryEmailAddressId: id })),
+    onSetPrimaryEmail: id => saveAsUser(current => setPrimaryEmail(current, id)),
     onRemoveEmail: access.canRemove ? id => saveAsUser(current => removeEmail(current, id)) : undefined,
-    reverification,
+    removeReverification,
+    setPrimaryReverification,
+    createReverification,
   };
 }

@@ -42,13 +42,24 @@ export const styles = stylex.create({
     width: '100%',
   },
   header: {
-    '--_cl-table-surface': colorVars['--cl-color-border-subtle'],
-    backgroundColor: colorVars['--cl-color-border-subtle'],
+    '--_cl-table-surface': colorVars['--cl-color-background-subtle'],
+    backgroundColor: colorVars['--cl-color-background-subtle'],
   },
   bodyRow: {
     borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
+  },
+  interactiveRow: {
+    '--_cl-table-row-tint': {
+      default: null,
+      '@media (hover: hover)': { ':hover': colorVars['--cl-color-background-subtle'] },
+    },
+    backgroundColor: {
+      default: null,
+      '@media (hover: hover)': { ':hover': colorVars['--cl-color-background-subtle'] },
+    },
+    cursor: 'pointer',
   },
   selectedRow: {
     '--_cl-table-row-tint': colorVars['--cl-color-neutral-alpha-100'],
@@ -113,6 +124,10 @@ export const layouts = stylex.create({
 
 export const columnWidth = stylex.create({
   fixed: (width: string) => ({ width }),
+});
+
+export const tableMinWidth = stylex.create({
+  fixed: (minWidth: string) => ({ minWidth }),
 });
 
 export const aligns = stylex.create({

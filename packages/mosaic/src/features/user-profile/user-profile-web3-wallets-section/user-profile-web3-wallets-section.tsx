@@ -35,8 +35,12 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
         sectionRef={controller.sectionRef}
         availableProviders={controller.availableProviders}
         pendingId={controller.pendingId}
+        error={controller.error}
         onConnect={id => {
           void controller.onConnect(id);
+        }}
+        onVerify={id => {
+          void controller.onVerify(id);
         }}
         onSetPrimary={id => {
           void controller.onSetPrimary(id);
@@ -44,9 +48,14 @@ function Web3Wallets({ model }: { model: ReadyWeb3WalletsModel }) {
         registerTrigger={controller.registerTrigger}
         remove={controller.remove}
         finalFocus={controller.finalFocus}
+        setPrimaryReverification={controller.setPrimaryReverification}
+        setPrimaryFinalFocus={controller.setPrimaryFinalFocus}
+        createReverification={controller.createReverification}
+        createFinalFocus={controller.createFinalFocus}
       />
       <UserProfileSolanaWalletDialog
         open={controller.solanaPickerOpen}
+        finalFocus={controller.solanaFinalFocus}
         pendingWalletName={controller.pendingWalletName}
         error={controller.solanaPickerError}
         onOpenChange={open => {

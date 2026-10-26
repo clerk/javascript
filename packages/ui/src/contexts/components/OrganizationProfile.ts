@@ -28,6 +28,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isSecurityPageRoot: boolean;
   shouldShowBilling: boolean;
   shouldShowSelfServeSSO: boolean;
+  shouldShowSelfServeDirectorySync: boolean;
   shouldShowSecurityPage: boolean;
 };
 
@@ -64,8 +65,13 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const shouldShowSelfServeSSO =
     environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
 
+  const shouldShowSelfServeDirectorySync =
+    environment.userSettings.enterpriseSSO.self_serve_sso &&
+    environment.userSettings.enterpriseSSO.self_serve_directory_sync &&
+    !!organization?.selfServeDirectorySyncEnabled;
+
   const canManageSSOBypass = Boolean(session?.checkAuthorization({ permission: 'org:sys_entconns_sso_bypass:manage' }));
-  const shouldShowSecurityPage = shouldShowSelfServeSSO || canManageSSOBypass;
+  const shouldShowSecurityPage = shouldShowSelfServeSSO || shouldShowSelfServeDirectorySync || canManageSSOBypass;
 
   const pages = useMemo(
     () =>
@@ -103,6 +109,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isSecurityPageRoot,
     shouldShowBilling,
     shouldShowSelfServeSSO,
+    shouldShowSelfServeDirectorySync,
     shouldShowSecurityPage,
   };
 };

@@ -1,5 +1,34 @@
 # Change Log
 
+## 3.1.99
+
+### Patch Changes
+
+- Updated dependencies [[`91780f8`](https://github.com/clerk/javascript/commit/91780f8852dc112dc462db3013faad7cd76eb4b5), [`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c), [`17eecac`](https://github.com/clerk/javascript/commit/17eecac0e70c084f58603217d29ba3586a1aa3f5)]:
+  - @clerk/ui@1.41.2
+  - @clerk/shared@4.41.1
+  - @clerk/clerk-js@6.40.1
+  - @clerk/react@6.18.1
+
+## 3.1.98
+
+### Patch Changes
+
+- Fix production builds that drop the setup code `@clerk/chrome-extension` runs when it loads. The package no longer declares `sideEffects: false`, which let bundlers such as Parcel skip that setup. With `plasmo build`, this left the extension popup blank. Measured Plasmo and esbuild bundle sizes are unchanged. ([#10313](https://github.com/clerk/javascript/pull/10313)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`8e8746d`](https://github.com/clerk/javascript/commit/8e8746d177c363b8e8d98887f04cc07c277f34df), [`1c450df`](https://github.com/clerk/javascript/commit/1c450dfcf5d0161c97ff5686545a31b24d8dcbd7)]:
+  - @clerk/ui@1.41.1
+
+## 3.1.97
+
+### Patch Changes
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18), [`7f4b9a8`](https://github.com/clerk/javascript/commit/7f4b9a8dbf4aaabe3efeedc2d7e2c227d655a247)]:
+  - @clerk/shared@4.41.0
+  - @clerk/clerk-js@6.40.0
+  - @clerk/ui@1.41.0
+  - @clerk/react@6.18.0
+
 ## 3.1.96
 
 ### Patch Changes

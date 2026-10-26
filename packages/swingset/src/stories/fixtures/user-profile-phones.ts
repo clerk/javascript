@@ -33,7 +33,9 @@ export function useUserProfilePhonesFixture({
 
   return useUserProfilePhoneSectionController({
     phones,
-    reverification: idleReverification,
+    removeReverification: idleReverification,
+    setPrimaryReverification: idleReverification,
+    createReverification: idleReverification,
     ...flow,
     onSetPrimaryPhone: id => {
       setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })));

@@ -1,4 +1,6 @@
-import { Flow } from '../../../components/flow';
+import { Flow, useFlowAutoFocus } from '../../../components/flow';
+import type { ReverificationController } from '../../reverification';
+import { Reverification } from '../../reverification';
 import type { UserProfileAddAuthenticatorViewProps } from './user-profile-add-authenticator.view';
 import { UserProfileAddAuthenticatorView } from './user-profile-add-authenticator.view';
 import type { UserProfileAddMfaViewProps } from './user-profile-add-mfa.view';
@@ -10,7 +12,8 @@ import { UserProfileBackupCodesView } from './user-profile-backup-codes.view';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.types';
 
 export interface UserProfileMfaSetupViewProps extends UserProfileAddMfaViewProps {
-  step: UserProfileMfaAddableMethod | 'select';
+  step: UserProfileMfaAddableMethod | 'select' | 'verify';
+  reverification: ReverificationController;
   sms: UserProfileAddSmsViewProps;
   authenticator: Omit<UserProfileAddAuthenticatorViewProps, 'onBack'>;
   backupCodes: Omit<UserProfileBackupCodesViewProps, 'onCancel'>;
@@ -56,8 +59,22 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
               onCancel={current.onCancel}
             />
           </Flow.Step>
+          <Flow.Step ids={['verify']}>
+            <ReverifyStep controller={current.reverification} />
+          </Flow.Step>
         </>
       )}
     </Flow.Root>
+  );
+}
+
+function ReverifyStep(props: { controller: ReverificationController }) {
+  const initialFocusRef = useFlowAutoFocus<HTMLElement>();
+
+  return (
+    <Reverification
+      {...props}
+      initialFocusRef={initialFocusRef}
+    />
   );
 }

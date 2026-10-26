@@ -1,5 +1,31 @@
 # Change Log
 
+## 3.26.2
+
+### Patch Changes
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+
+## 3.26.1
+
+### Patch Changes
+
+- Stop accepting the legacy `cl_I7d4PD111III` JWT category as a session or handshake token. Clerk no longer issues it, so `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for a token carrying it, the same as for other non-session categories. ([#10286](https://github.com/clerk/javascript/pull/10286)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.26.0
+
+### Minor Changes
+
+- Add webhook types for transactional email delivery, delays, bounces, complaints, failures, and suppressions. Bounce events distinguish `Permanent`, `Transient`, and `Undetermined` classifications. `verifyWebhook()` preserves the original event timestamp and instance ID for outcome handlers. These types prepare for the transactional email pilot; receiving the events requires the corresponding backend rollout. ([#9776](https://github.com/clerk/javascript/pull/9776)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Clarify issuer validation for session tokens and document that machine token verification ignores the issuer option. ([#10282](https://github.com/clerk/javascript/pull/10282)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+
 ## 3.25.0
 
 ### Minor Changes

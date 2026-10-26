@@ -15,9 +15,14 @@ export function useUserProfilePhoneSectionController({
   getPhoneVerifier,
   onSetPrimaryPhone,
   onRemovePhone,
-  reverification,
+  removeReverification,
+  setPrimaryReverification,
+  createReverification,
 }: Omit<ReadyPhoneSectionModel, 'status' | 'userId'>): UserProfilePhoneSectionViewProps {
-  const verification = useUserProfileAddPhoneController({ onCreate: onCreatePhone });
+  const verification = useUserProfileAddPhoneController({
+    onCreate: onCreatePhone,
+    reverification: createReverification,
+  });
   const setPrimary = usePendingAction();
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
@@ -27,7 +32,7 @@ export function useUserProfilePhoneSectionController({
   });
   const remove = useConfirmController<UserProfilePhone>({
     onConfirm: phone => removalFocus.remove(phone.id),
-    reverification,
+    reverification: removeReverification,
   });
 
   return {
@@ -41,6 +46,8 @@ export function useUserProfilePhoneSectionController({
     remove: onRemovePhone ? remove : undefined,
     finalFocus: removalFocus.finalFocus,
     verificationFinalFocus: () => (verification.verifyingId ? removalFocus.trigger(verification.verifyingId) : null),
+    setPrimaryReverification,
+    setPrimaryFinalFocus: () => (setPrimary.lastKey ? removalFocus.trigger(setPrimary.lastKey) : null),
     onVerify: id => {
       const phone = phones.find(phone => phone.id === id);
       if (phone) {

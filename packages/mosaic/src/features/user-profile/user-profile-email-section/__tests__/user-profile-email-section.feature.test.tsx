@@ -1,5 +1,5 @@
 import type { EmailAddressJSON, EnterpriseAccountConnectionJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -20,6 +20,7 @@ import {
   fapiUser,
   fapiVerification,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { UserProfileEmailSection } from '../user-profile-email-section';
 
@@ -55,8 +56,8 @@ const emailsListed = () =>
     .map(node => node.textContent);
 
 async function manageEmail(actor: Actor, label: string, action: string) {
-  await actor.click(within(emailRow()).getByRole('button', { name: `Manage ${label}` }));
-  await actor.click(await screen.findByRole('menuitem', { name: action }));
+  await openMenu(actor, within(emailRow()).getByRole('button', { name: `Manage ${label}` }));
+  await actor.click(screen.getByRole('menuitem', { name: action }));
 }
 
 async function enterCode(actor: Actor, code: string) {
@@ -246,9 +247,306 @@ describe('the email section for a user signed in through an enterprise connectio
 });
 
 describe('email reverification', () => {
-  it.todo('confirms it is the user before an email address is added, then adds it');
-  it.todo('confirms it is the user before an email address becomes the primary one');
-  it.todo('leaves the add dialog open and untouched when the confirmation is dismissed');
+  it('sets a verified address as primary without a challenge when none is required', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor, fapi } = await renderSection(signedInWithEmails([PRIMARY, second]));
+
+    await manageEmail(actor, 'bob@example.com', 'Set as primary');
+
+    await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_second'));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('verifies the session before setting an address as primary and returns focus to its menu', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor, fapi } = await renderSection({
+      ...signedInWithEmails([PRIMARY, second]),
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me');
+
+    await manageEmail(actor, 'bob@example.com', 'Set as primary');
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
+
+    await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_second'));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(within(emailRow()).getByRole('button', { name: 'Manage bob@example.com' })).toHaveFocus();
+  });
+
+  it('lets the user cancel verification quietly and retry the primary action', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor, fapi } = await renderSection({
+      ...signedInWithEmails([PRIMARY, second]),
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me');
+
+    await manageEmail(actor, 'bob@example.com', 'Set as primary');
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    await actor.click(within(dialog).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_primary');
+    expect(within(emailRow()).queryByRole('alert')).toBeNull();
+    expect(within(emailRow()).getByRole('button', { name: 'Manage bob@example.com' })).toHaveFocus();
+
+    await manageEmail(actor, 'bob@example.com', 'Set as primary');
+    await waitFor(() => expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_second'));
+  });
+
+  it('keeps the verification dialog open while retrying and reports an ordinary retry error', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor, fapi } = await renderSection({
+      ...signedInWithEmails([PRIMARY, second]),
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me');
+
+    await manageEmail(actor, 'bob@example.com', 'Set as primary');
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    const replay = holdRequests('post', '/v1/me');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
+    await waitFor(() => expect(replay.requests).toHaveLength(1));
+
+    expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+    await actor.keyboard('{Escape}');
+    expect(dialog).toBeVisible();
+    expect(fapi.client.sessions[0]?.user?.primary_email_address_id).toBe('idn_primary');
+
+    replay.fail('action_blocked', 'Unable to set primary address.');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() =>
+      expect(within(emailRow()).getByRole('alert')).toHaveTextContent("This action couldn't be completed."),
+    );
+  });
+
+  it('waits for a verification factor before opening the dialog', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection({
+      ...signedInWithEmails([PRIMARY, second]),
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me');
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+
+    await manageEmail(actor, 'bob@example.com', 'Set as primary');
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    start.release();
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+  });
+
+  it('focuses Close when the dialog opens on a verification that could not start', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection({
+      ...signedInWithEmails([PRIMARY, second]),
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me');
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+
+    await manageEmail(actor, 'bob@example.com', 'Set as primary');
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    start.fail('verification_failed', 'Unable to start verification.');
+
+    const dialog = await screen.findByRole('dialog');
+    await waitFor(() => expect(within(dialog).getAllByRole('button', { name: 'Close' })[0]).toHaveFocus());
+  });
+
+  const challengedSeed = (environment = fapiEnvironment()): FakeFapiSeed => ({
+    ...signedInWithEmails([], environment),
+    verification: { secrets: { password: 'hunter2' }, firstFactors: [{ strategy: 'password' }] },
+  });
+
+  async function beginAdd(actor: Actor, address = 'new@example.com') {
+    await actor.click(screen.getByRole('button', { name: 'Add email' }));
+    await actor.type(screen.getByRole('textbox', { name: 'Email' }), address);
+    await actor.click(screen.getByRole('button', { name: 'Continue' }));
+  }
+
+  it('confirms it is the user before an email address is added, then verifies its code', async () => {
+    const { actor, fapi } = await renderSection(challengedSeed());
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(0);
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await actor.keyboard('hunter2{Enter}');
+    await enterCode(actor, VERIFICATION_CODE);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(emailsListed()).toEqual(['new@example.com']);
+  });
+  it('focuses the session verification code before adding an email address', async () => {
+    const { actor, fapi } = await renderSection({
+      ...signedInWithEmails([PRIMARY]),
+      verification: {
+        firstFactors: [
+          { strategy: 'email_code', email_address_id: PRIMARY.id, safe_identifier: PRIMARY.email_address },
+        ],
+        secrets: { email_code: VERIFICATION_CODE },
+      },
+    });
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    const code = await screen.findByRole('textbox', { name: 'Verification code' });
+    await waitFor(() => expect(code).toHaveFocus());
+    await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+    await actor.keyboard(VERIFICATION_CODE);
+
+    await screen.findByRole('dialog', { name: 'Verify your email' });
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(emailsListed()).toEqual(['alice@example.com', 'new@example.com']);
+  });
+
+  it('closes quietly when confirmation is dismissed and starts clean on reopen', async () => {
+    const { actor, fapi } = await renderSection(challengedSeed());
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await screen.findByPlaceholderText('Enter your password');
+    await actor.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(0);
+    await actor.click(screen.getByRole('button', { name: 'Add email' }));
+    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveValue('');
+    await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'retry@example.com');
+    await actor.click(screen.getByRole('button', { name: 'Continue' }));
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(emailsListed()).toEqual(['retry@example.com']);
+  });
+
+  it('continues to the emailed link after confirming the session', async () => {
+    const { actor, fapi } = await renderSection(challengedSeed(verifiesByLink));
+    const poll = holdRequests('get', '/v1/me/email_addresses/:id');
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
+    await waitFor(() => expect(dialog).toHaveTextContent('Open the link we sent to new@example.com'));
+    expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
+    await waitFor(() => expect(poll.requests).toHaveLength(1));
+    const added = fapi.client.sessions[0]?.user.email_addresses[0];
+    if (!added) {
+      throw new Error('Expected the new email address');
+    }
+    verifyEmailOutOfBand(fapi, added.id);
+    poll.release();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(emailsListed()).toEqual(['new@example.com']);
+  });
+
+  it('keeps an initial create pending through duplicate submit and dismissal attempts', async () => {
+    const { actor } = await renderSection(signedInWithEmails([]));
+    const create = holdRequests('post', '/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await waitFor(() => expect(create.requests).toHaveLength(1));
+    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveAttribute('aria-disabled', 'true');
+    await actor.keyboard('{Escape}{Enter}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(create.requests).toHaveLength(1);
+
+    create.release();
+    await enterCode(actor, VERIFICATION_CODE);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(emailsListed()).toEqual(['new@example.com']);
+  });
+
+  it('allows cancellation while the session challenge loads', async () => {
+    const { actor, fapi } = await renderSection(challengedSeed());
+    const start = holdRequests('post', '/v1/client/sessions/sess_1/verify');
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    await actor.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(0);
+    start.release();
+  });
+
+  it('keeps the retried create locked and returns the email field error without a duplicate', async () => {
+    const { actor, fapi } = await renderSection(challengedSeed());
+    const retry = holdRequests('post', '/v1/me/email_addresses');
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(retry.requests).toHaveLength(1));
+    await actor.keyboard('{Escape}{Enter}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(retry.requests).toHaveLength(1);
+    retry.fail('form_param_invalid', 'That email is taken.', 'email_address');
+
+    const email = await screen.findByRole('textbox', { name: 'Email' });
+    expect(email).toHaveValue('new@example.com');
+    await waitFor(() => expect(email).toHaveAccessibleDescription('That email is taken.'));
+    expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(0);
+  });
+
+  it('focuses the email field when returning to the form after verifying', async () => {
+    const { actor } = await renderSection(challengedSeed());
+    const retry = holdRequests('post', '/v1/me/email_addresses');
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+    await waitFor(() => expect(retry.requests).toHaveLength(1));
+    retry.fail('form_param_invalid', 'That email is taken.', 'email_address');
+
+    const email = await screen.findByRole('textbox', { name: 'Email' });
+    await waitFor(() => expect(email).toHaveFocus());
+  });
+
+  it('cancels an in-progress verification when the active session changes', async () => {
+    const seed = challengedSeed();
+    const { actor, fapi, clerk } = await renderSection({
+      ...seed,
+      client: fapiClient([
+        ...seed.client.sessions,
+        fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2', username: 'bob' }) }),
+      ]),
+    });
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    await screen.findByPlaceholderText('Enter your password');
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(fapi.client.sessions.map(session => session.user.email_addresses)).toEqual([[], []]);
+  });
+
+  it('closes the host from the challenge error card', async () => {
+    const { actor, fapi } = await renderSection(challengedSeed());
+    holdRequests('post', '/v1/client/sessions/sess_1/verify').fail('some_new_error', 'Nope');
+    demandReverificationOnce('/v1/me/email_addresses');
+
+    await beginAdd(actor);
+    expect(await screen.findByText('Something went wrong')).toBeVisible();
+    const buttons = screen.getAllByRole('button', { name: 'Close' });
+    const close = buttons.at(-1);
+    if (!close) {
+      throw new Error('Expected a close button');
+    }
+    await actor.click(close);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(0);
+  });
 });
 
 describe('Removing an address', () => {

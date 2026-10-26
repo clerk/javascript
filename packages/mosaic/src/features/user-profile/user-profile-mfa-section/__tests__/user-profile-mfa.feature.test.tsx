@@ -141,7 +141,7 @@ describe('User profile MFA', () => {
       expect(screen.getByText('You cannot set your last identification as second factor.')).toBeVisible(),
     );
     expect(screen.getByRole('combobox', { name: /Phone number/ })).toHaveAccessibleDescription(
-      'You cannot set your last identification as second factor.',
+      'Add a new phone number You cannot set your last identification as second factor.',
     );
     expect(fapi.mfa.phoneUpdates).toHaveLength(0);
     expect(screen.getByRole('button', { name: 'Back' })).toBeVisible();
@@ -322,7 +322,7 @@ describe('User profile MFA', () => {
       held.release();
       vi.useRealTimers();
     }
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Verify' })).toBeEnabled());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Back' })).toBeEnabled());
     expect(code).not.toHaveAttribute('aria-disabled');
     expect(code).not.toHaveAttribute('readonly');
   });
@@ -363,6 +363,49 @@ describe('User profile MFA', () => {
     await user.click(screen.getAllByRole('option')[1]);
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     await waitFor(() => expect(fapi.mfa.phonePreparations).toEqual(['phone_1', 'phone_2']));
+  });
+
+  it('creates the entered phone instead of using the selected one', async () => {
+    const fapi = await renderMfa();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await user.type(await screen.findByRole('textbox', { name: 'Phone' }), '5555550303');
+    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    await screen.findByRole('textbox', { name: 'Verification code' });
+    expect(fapi.mfa.phoneCreations).toHaveLength(1);
+    expect(fapi.mfa.phonePreparations).not.toContain('phone_1');
+  });
+
+  it('enrolls the selected phone after backing out of new phone entry', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await user.type(await screen.findByRole('textbox', { name: 'Phone' }), '5555550303');
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(fapi.mfa.phonePreparations).toEqual(['phone_1']));
+    expect(fapi.mfa.phoneCreations).toHaveLength(0);
+  });
+
+  it('clears a failed selected phone error when adding a new phone', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    prepare.fail('phone_number_invalid', 'Unable to send a code.');
+    await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await screen.findByRole('textbox', { name: 'Phone' });
+    expect(screen.queryByText('Unable to send a code.')).toBeNull();
   });
 
   it('returns to the entered number after backing out of a new phone verification', async () => {

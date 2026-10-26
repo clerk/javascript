@@ -43,6 +43,8 @@ function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'r
             open={controller.dialogOpen}
             onOpenChange={controller.onDialogOpenChange}
             hideTrigger={!controller.showAddTrigger}
+            reverifying={controller.reverifying}
+            showCloseButton={controller.showCloseButton}
           >
             <UserProfileMfaSetupView {...controller.setupProps} />
           </UserProfileAddMfaDialog>

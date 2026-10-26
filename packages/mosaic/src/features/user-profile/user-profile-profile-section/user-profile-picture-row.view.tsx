@@ -90,11 +90,11 @@ function ProfilePictureActions({
   const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
+    actions.push({ label: m.picture.change, onClick: openFilePicker });
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
+    actions.push({ label: m.picture.remove, color: 'negative', onClick: onRemove });
   }
 
   if (actions.length > 0) {

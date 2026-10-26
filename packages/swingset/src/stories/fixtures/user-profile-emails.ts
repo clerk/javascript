@@ -41,7 +41,9 @@ export function useUserProfileEmailsFixture({
 
   return useUserProfileEmailSectionController({
     emails,
-    reverification: idleReverification,
+    removeReverification: idleReverification,
+    setPrimaryReverification: idleReverification,
+    createReverification: idleReverification,
     username,
     ...flow,
     onSetPrimaryEmail: id => {

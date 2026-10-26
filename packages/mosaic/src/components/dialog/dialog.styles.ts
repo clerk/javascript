@@ -146,6 +146,7 @@ export const styles = stylex.create({
     // regardless of order, so this wins without depending on argument order. Falls back to `0px`,
     // so it is inert until `acquireKeyboardInset` has something to report.
     paddingBlockEnd: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
+    paddingBlockStart: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-offset, 0px))',
     // A grid item's automatic minimum would otherwise hold this to its content and defeat the
     // definite row `viewportVariants.profile` pins.
     minHeight: 0,

@@ -99,7 +99,7 @@ describe('UserProfileView', () => {
     const terms = screen.getByRole('tab', { name: 'Terms' });
     expect(screen.getAllByRole('tab').at(-1)).toBe(terms);
     expect(terms).toContainElement(screen.getByTestId('terms-icon'));
-    expect(screen.getByText('Terms of service')).not.toBeVisible();
+    expect(screen.queryByText('Terms of service')).not.toBeInTheDocument();
 
     await user.click(terms);
     expect(onPageChange).toHaveBeenCalledWith('terms');

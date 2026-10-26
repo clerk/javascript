@@ -1,4 +1,5 @@
-import type { FormEvent } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import type { FormEvent, Ref } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -6,6 +7,7 @@ import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Input } from '../../../components/input';
+import { Form } from '../../../primitives/form';
 
 export interface ReverificationBackupCodeMessages {
   title: string;
@@ -24,6 +26,7 @@ export interface ReverificationBackupCodeProps {
   onValueChange: (value: string) => void;
   onSubmit: () => void;
   onCancel?: () => void;
+  focusRef?: Ref<HTMLElement>;
 }
 
 export function ReverificationBackupCode({
@@ -34,12 +37,15 @@ export function ReverificationBackupCode({
   onValueChange,
   onSubmit,
   onCancel,
+  focusRef,
 }: ReverificationBackupCodeProps) {
   const formId = useId();
 
+  const canSubmit = value !== '';
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isPending) {
+    if (canSubmit && !isPending) {
       onSubmit();
     }
   };
@@ -51,7 +57,7 @@ export function ReverificationBackupCode({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <form
+        <Form
           id={formId}
           onSubmit={handleSubmit}
         >
@@ -63,7 +69,7 @@ export function ReverificationBackupCode({
           >
             <Field.Label>{messages.fieldLabel}</Field.Label>
             <Input
-              ref={useFlowAutoFocus<HTMLInputElement>()}
+              ref={useMergeRefs<HTMLElement>([focusRef, useFlowAutoFocus<HTMLInputElement>()])}
               name='backupCode'
               type='text'
               autoComplete='off'
@@ -76,7 +82,7 @@ export function ReverificationBackupCode({
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
           </Field.Root>
-        </form>
+        </Form>
       </Card.Content>
       <Card.Footer>
         {onCancel ? (
@@ -94,6 +100,7 @@ export function ReverificationBackupCode({
         <SubmitButton
           form={formId}
           fullWidth
+          disabled={!canSubmit}
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

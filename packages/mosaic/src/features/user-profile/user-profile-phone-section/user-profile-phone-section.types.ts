@@ -18,6 +18,8 @@ export interface UserProfilePhoneSectionViewProps {
   remove?: ConfirmController<UserProfilePhone>;
   finalFocus: DialogFocusTarget;
   verificationFinalFocus: DialogFocusTarget;
+  setPrimaryReverification: ReverificationController;
+  setPrimaryFinalFocus: DialogFocusTarget;
   onVerify: (id: string) => void;
   onSetPrimary: (id: string) => void;
 }
@@ -34,7 +36,9 @@ export type UserProfilePhoneSectionModel =
       getPhoneVerifier: (id: string) => UserProfilePhoneVerifier;
       onSetPrimaryPhone: (id: string) => Promise<void>;
       onRemovePhone?: (id: string) => Promise<void>;
-      reverification: ReverificationController;
+      removeReverification: ReverificationController;
+      setPrimaryReverification: ReverificationController;
+      createReverification: ReverificationController;
     };
 
 export type ReadyPhoneSectionModel = Extract<UserProfilePhoneSectionModel, { status: 'ready' }>;

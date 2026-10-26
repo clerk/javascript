@@ -112,6 +112,11 @@ function createSmsActions(
   userId: string,
   sessionId: string,
   refresh: () => Promise<void>,
+  calls: {
+    makeDefault: (phone: PhoneNumberResource) => Promise<unknown>;
+    createPhone: (current: UserResource, phoneNumber: string) => Promise<PhoneNumberResource>;
+    reservePhone: (phone: PhoneNumberResource) => Promise<PhoneNumberResource>;
+  },
 ): Pick<ReadyModel, 'findOrCreatePhone' | 'enrollSms' | 'resendSms' | 'setDefault'> {
   const currentPhone = (phoneId: string) => {
     const current = requireIdentity(clerk, userId, sessionId);
@@ -128,7 +133,7 @@ function createSmsActions(
       const existing = current.phoneNumbers.find(
         phone => !phone.reservedForSecondFactor && phone.phoneNumber === phoneNumber,
       );
-      return summarizePhone(existing ?? (await current.createPhoneNumber({ phoneNumber })));
+      return summarizePhone(existing ?? (await calls.createPhone(current, phoneNumber)));
     },
     enrollSms: async (phoneId, code): Promise<SmsEnrollmentResult> => {
       let phone = currentPhone(phoneId);
@@ -143,7 +148,7 @@ function createSmsActions(
       if (phone.reservedForSecondFactor || !configuredFactors(environment).includes('phone_code')) {
         throw phoneUnavailable();
       }
-      const result = await phone.setReservedForSecondFactor({ reserved: true });
+      const result = await calls.reservePhone(phone);
       await refresh().catch(() => undefined);
       return { status: 'complete', backupCodes: result.backupCodes ?? [] };
     },
@@ -155,7 +160,7 @@ function createSmsActions(
       if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
         throw phoneUnavailable();
       }
-      await phone.makeDefaultSecondFactor();
+      await calls.makeDefault(phone);
       await refresh().catch(() => undefined);
     },
   };
@@ -188,7 +193,22 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   const { isLoaded: userLoaded, user } = useUser();
   const { isLoaded: sessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
-  const [removeMethod, reverification] = useReverificationFlow(removeMfaMethod);
+  const [removeMethod, removeReverification] = useReverificationFlow(removeMfaMethod);
+  const [makeDefault, setDefaultReverification] = useReverificationFlow((phone: PhoneNumberResource) =>
+    phone.makeDefaultSecondFactor(),
+  );
+  const [createBackupCode, backupCodesReverification] = useReverificationFlow((current: UserResource) =>
+    current.createBackupCode(),
+  );
+  const [createPhone, createPhoneReverification] = useReverificationFlow((current: UserResource, phoneNumber: string) =>
+    current.createPhoneNumber({ phoneNumber }),
+  );
+  const [reservePhone, enrollSmsReverification] = useReverificationFlow((phone: PhoneNumberResource) =>
+    phone.setReservedForSecondFactor({ reserved: true }),
+  );
+  const [createTotp, authenticatorReverification] = useReverificationFlow((current: UserResource) =>
+    current.createTOTP(),
+  );
 
   if (!userLoaded || !sessionLoaded || !environment) {
     return { status: 'loading' };
@@ -214,7 +234,9 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     await current.reload();
   };
 
-  const smsActions = smsEnabled ? createSmsActions(clerk, environment, userId, sessionId, refresh) : {};
+  const smsActions = smsEnabled
+    ? createSmsActions(clerk, environment, userId, sessionId, refresh, { makeDefault, createPhone, reservePhone })
+    : {};
 
   return {
     status: 'ready',
@@ -232,7 +254,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
           if (current.totpEnabled || !configuredFactors(environment).includes('totp')) {
             throw new ClerkRuntimeError('Authenticator is unavailable.', { code: 'mfa_authenticator_unavailable' });
           }
-          const result = await current.createTOTP();
+          const result = await createTotp(current);
           return { secret: result.secret ?? '', uri: result.uri ?? '' };
         }
       : undefined,
@@ -252,12 +274,17 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
             if (!currentFactors.includes('backup_code') || usableFactorCount(current, currentFactors) === 0) {
               throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
             }
-            const result = await current.createBackupCode();
+            const result = await createBackupCode(current);
             await refresh().catch(() => undefined);
             return result.codes;
           }
         : undefined,
     remove: methodId => removeMethod(requireIdentity(clerk, userId, sessionId), environment, methodId),
-    reverification,
+    removeReverification,
+    setDefaultReverification,
+    backupCodesReverification,
+    createPhoneReverification,
+    enrollSmsReverification,
+    authenticatorReverification,
   };
 }

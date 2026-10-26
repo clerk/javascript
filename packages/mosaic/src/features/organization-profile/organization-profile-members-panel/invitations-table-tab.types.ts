@@ -6,7 +6,6 @@ import type { DialogFocusTarget } from '../../../components/dialog';
 export interface OrganizationProfileInvitation {
   id: string;
   email: string;
-  imageUrl?: string;
   invitedAtLabel: string;
   roleLabel: string;
 }
@@ -24,6 +23,7 @@ export interface InvitationsTableTabViewProps {
   inviteButtonRef?: Ref<HTMLButtonElement>;
   tableContainerRef?: Ref<HTMLDivElement>;
   onInvite?: MouseEventHandler<HTMLButtonElement>;
+  isInviteDisabled?: boolean;
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
   revoke?: ConfirmController<OrganizationProfileInvitation>;
   finalFocus?: DialogFocusTarget;

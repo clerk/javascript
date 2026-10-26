@@ -92,22 +92,23 @@ describe('User profile MFA interaction boundaries', () => {
     expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
   });
 
-  it('keeps the dialog closed when dismissed while authenticator preparation is pending', async () => {
+  it('keeps the dialog open until authenticator preparation responds', async () => {
     const fapi = await renderMfa();
     const held = holdRequests('post', '/v1/me/totp');
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
     await waitFor(() => expect(held.requests).toHaveLength(1));
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    held.release();
-    await waitFor(() => expect(fapi.mfa.totpCreations).toBe(1));
-    expect(screen.queryByRole('dialog')).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(await screen.findByRole('dialog', { name: 'Add 2-step verification' })).toHaveAccessibleDescription(
-      'Choose a verification method',
-    );
+    const dialog = screen.getByRole('dialog');
+    try {
+      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+      await user.keyboard('{Escape}');
+      expect(dialog).toBeVisible();
+    } finally {
+      held.release();
+    }
+    expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
+    expect(fapi.mfa.totpCreations).toBe(1);
   });
 
   it('shows backup codes when dismissed while authenticator verification is pending', async () => {
@@ -135,6 +136,19 @@ describe('User profile MFA interaction boundaries', () => {
     await waitFor(() => expect(selection).toHaveFocus());
     await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Phone' })).toHaveFocus());
+  });
+
+  it('keeps the chosen phone after backing out of new phone entry', async () => {
+    await renderMfa();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    expect(screen.getByRole('combobox', { name: /Phone number/ })).toHaveTextContent('+1 (555) 555-0101');
+    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
+    await user.click(await screen.findByRole('button', { name: 'Back' }));
+    await waitFor(() =>
+      expect(screen.getByRole('combobox', { name: /Phone number/ })).toHaveTextContent('+1 (555) 555-0101'),
+    );
   });
 
   it('blocks duplicate authenticator verification through the native form while pending', async () => {

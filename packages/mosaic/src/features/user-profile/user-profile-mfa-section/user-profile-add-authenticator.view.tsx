@@ -7,6 +7,7 @@ import { useFlowAutoFocus } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import { styles } from './user-profile-add-authenticator.styles';
 import { UserProfileAuthenticatorSetupView } from './user-profile-authenticator-setup.view';
 
@@ -75,7 +76,7 @@ export function UserProfileAddAuthenticatorView({
         <Card.Content
           xstyle={styles.verification}
           render={
-            <form
+            <Form
               id={formId}
               onSubmit={event => {
                 event.preventDefault();

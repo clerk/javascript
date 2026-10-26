@@ -13,13 +13,20 @@ import { idleReverification } from './reverification';
 export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
+  iconId: 'google',
   identifier: 'test@example.com',
   iconUrl: 'https://img.clerk.com/static/google.svg',
   status: 'connected',
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
-  { id: 'google', provider: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
-  { id: 'apple', provider: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg' },
+  { id: 'google', provider: 'Google', iconId: 'google', iconUrl: 'https://img.clerk.com/static/google.svg' },
+  {
+    id: 'apple',
+    provider: 'Apple',
+    iconId: 'apple',
+    iconUrl: 'https://img.clerk.com/static/apple.svg',
+    monochromeIcon: true,
+  },
 ];
 
 export function useConnectedAccountsFixture({
@@ -47,7 +54,9 @@ export function useConnectedAccountsFixture({
 
   return useUserProfileConnectedAccountsController({
     accounts,
-    reverification: idleReverification,
+    removeReverification: idleReverification,
+    reconnectReverification: idleReverification,
+    connectReverification: idleReverification,
     availableProviders,
     // eslint-disable-next-line @typescript-eslint/require-await
     onConnect: async (id: string) => {
@@ -58,7 +67,9 @@ export function useConnectedAccountsFixture({
           {
             id: provider.id,
             provider: provider.provider,
+            iconId: provider.iconId,
             iconUrl: provider.iconUrl,
+            monochromeIcon: provider.monochromeIcon,
             identifier: 'test@example.com',
             status: 'connected',
           },

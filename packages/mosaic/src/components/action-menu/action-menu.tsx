@@ -1,13 +1,13 @@
 import type { Ref } from 'react';
 
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
 import { Icon } from '../icon';
 import { Menu } from '../menu';
 
 export interface ActionMenuAction {
   label: string;
   color?: 'neutral' | 'negative';
-  icon?: IconName;
+  icon?: IconComponent;
   onClick: () => void;
 }
 
@@ -16,9 +16,10 @@ export interface ActionMenuProps {
   actions: ActionMenuAction[];
   triggerRef?: Ref<HTMLButtonElement>;
   disabled?: boolean;
+  focusableWhenDisabled?: boolean;
 }
 
-export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuProps) {
+export function ActionMenu({ label, actions, triggerRef, disabled, focusableWhenDisabled }: ActionMenuProps) {
   if (actions.length === 0) {
     return null;
   }
@@ -29,6 +30,7 @@ export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuP
         ref={triggerRef}
         aria-label={label}
         disabled={disabled}
+        focusableWhenDisabled={focusableWhenDisabled}
       />
       <Menu.Popup>
         {actions.map(action => (
@@ -41,7 +43,7 @@ export function ActionMenu({ label, actions, triggerRef, disabled }: ActionMenuP
           >
             {action.icon ? (
               <Menu.Media>
-                <Icon name={action.icon} />
+                <Icon glyph={action.icon} />
               </Menu.Media>
             ) : null}
             <Menu.Label>{action.label}</Menu.Label>

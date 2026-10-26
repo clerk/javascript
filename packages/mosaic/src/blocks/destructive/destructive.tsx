@@ -6,6 +6,7 @@ import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
+import { Form } from '../../primitives/form';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import type { ConfirmBlockProps, ConfirmStepProps } from '../confirm/confirm-shell';
 import { ConfirmShell } from '../confirm/confirm-shell';
@@ -59,7 +60,7 @@ function DestructiveStep<Payload>({
         <Card.Description>{description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <form
+        <Form
           id={formId}
           onSubmit={handleSubmit}
         >
@@ -79,7 +80,7 @@ function DestructiveStep<Payload>({
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
           </Field.Root>
-        </form>
+        </Form>
       </Card.Content>
       <Card.Footer>
         <Dialog.Close

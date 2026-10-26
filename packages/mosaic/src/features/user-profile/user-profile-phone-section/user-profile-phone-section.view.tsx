@@ -1,8 +1,10 @@
 import { Confirmation } from '../../../blocks/confirmation';
+import { ReverificationDialog } from '../../../blocks/reverification';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { Plus } from '../../../icons/glyphs/plus';
 import { fill, useMessages } from '../../../localization';
 import { UserProfileContactListRowView } from '../user-profile-contact-list-row.view';
 import { UserProfileAddPhoneDialog } from './user-profile-add-phone.dialog';
@@ -19,6 +21,8 @@ export function UserProfilePhoneSectionView({
   remove,
   finalFocus,
   verificationFinalFocus,
+  setPrimaryReverification,
+  setPrimaryFinalFocus,
   onVerify,
   onSetPrimary,
 }: UserProfilePhoneSectionViewProps) {
@@ -36,7 +40,7 @@ export function UserProfilePhoneSectionView({
       }
     >
       <Icon
-        name='plus'
+        glyph={Plus}
         placement='inline-start'
         size='sm'
       />
@@ -63,6 +67,10 @@ export function UserProfilePhoneSectionView({
         {...verification}
         defaultCountry={defaultPhoneCountry}
         finalFocus={verificationFinalFocus}
+      />
+      <ReverificationDialog
+        controller={setPrimaryReverification}
+        finalFocus={setPrimaryFinalFocus}
       />
       {remove ? (
         <Confirmation

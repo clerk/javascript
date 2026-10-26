@@ -33,6 +33,7 @@ const aliceSession = fapiSession({ id: 'sess_1', user: alice });
 const VERIFY = '/v1/client/sessions/sess_1/verify';
 const PREPARE_FIRST = `${VERIFY}/prepare_first_factor`;
 const ATTEMPT_FIRST = `${VERIFY}/attempt_first_factor`;
+const ATTEMPT_SECOND = `${VERIFY}/attempt_second_factor`;
 const TOUCH = '/v1/client/sessions/sess_1/touch';
 
 const PASSWORD = 'hunter2';
@@ -528,6 +529,34 @@ describe('Reverification', () => {
       // The card closes once the retried action has settled
       await untilClosed();
     });
+
+    it('reveals and hides the password on request', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      expect(passwordField()).toHaveAttribute('type', 'password');
+
+      await user.click(screen.getByRole('button', { name: 'Show password' }));
+      expect(passwordField()).toHaveAttribute('type', 'text');
+      await user.click(screen.getByRole('button', { name: 'Hide password' }));
+      expect(passwordField()).toHaveAttribute('type', 'password');
+    });
+
+    it('keeps Continue disabled until a password is typed', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+      await user.type(passwordField(), '{Enter}');
+      await settle();
+      expect(attempt.requests).toHaveLength(0);
+
+      await user.type(passwordField(), PASSWORD);
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+      attempt.release();
+    });
   });
 
   describe('email code', () => {
@@ -584,6 +613,20 @@ describe('Reverification', () => {
       expect(verifying()).toBeInTheDocument();
       attempt.release();
       expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
+    });
+
+    it('keeps Continue disabled until the code is complete', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+
+      await pasteCode(user, CODE.slice(0, 3));
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+      await user.keyboard('{Enter}');
+      await settle();
+      expect(attempt.requests).toHaveLength(0);
+      attempt.release();
     });
 
     it('holds a submit made while a code is being sent', async () => {
@@ -746,6 +789,25 @@ describe('Reverification', () => {
       await user.clear(screen.getByLabelText('Backup code'));
       await user.type(screen.getByLabelText('Backup code'), `${BACKUP_CODE}{Enter}`);
       await untilResolved();
+    });
+
+    it('keeps Continue disabled until a backup code is typed', async () => {
+      await renderReverification(
+        guardedAction({ level: 'second_factor', afterMinutes: 10 }),
+        verificationSeed({ secondFactors: [backupCodeFactor] }),
+      );
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.backupCode)).toBeVisible();
+      const attempt = holdRequests('post', ATTEMPT_SECOND);
+
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+      await user.type(screen.getByLabelText('Backup code'), '{Enter}');
+      await settle();
+      expect(attempt.requests).toHaveLength(0);
+
+      await user.type(screen.getByLabelText('Backup code'), BACKUP_CODE);
+      expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+      attempt.release();
     });
   });
 

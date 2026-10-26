@@ -46,5 +46,10 @@ export type UserProfileMfaModel =
       generateBackupCodes?: () => Promise<readonly string[]>;
       remove: (methodId: string) => Promise<void>;
       setDefault?: (phoneId: string) => Promise<void>;
-      reverification: ReverificationController;
+      removeReverification: ReverificationController;
+      setDefaultReverification: ReverificationController;
+      backupCodesReverification: ReverificationController;
+      createPhoneReverification: ReverificationController;
+      enrollSmsReverification: ReverificationController;
+      authenticatorReverification: ReverificationController;
     };

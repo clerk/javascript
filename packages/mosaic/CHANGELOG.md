@@ -1,5 +1,41 @@
 # @clerk/mosaic
 
+## 0.1.12
+
+### Patch Changes
+
+- Prevent actions in `UserButton` and `OrganizationSwitcher` menus from activating during the closing animation. ([#10366](https://github.com/clerk/javascript/pull/10366)) by [@austincalvelage](https://github.com/austincalvelage)
+
+- Reduce the size of the published bundle by only including the icons that Mosaic components render. Icon overrides passed to `MosaicProvider` through `icons` work as before. ([#10309](https://github.com/clerk/javascript/pull/10309)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the OKX Wallet logo in the user profile Web3 wallets section so it follows the text color and stays visible in dark mode. ([#10370](https://github.com/clerk/javascript/pull/10370)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the password visibility toggle in the reverification dialog. ([#10345](https://github.com/clerk/javascript/pull/10345)) by [@mwickett](https://github.com/mwickett)
+
+- Fix the keyboard focus ring on `UserButton` and `OrganizationSwitcher` rows being covered by the row below it. ([#10381](https://github.com/clerk/javascript/pull/10381)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`8c3739d`](https://github.com/clerk/javascript/commit/8c3739dd7027335dc0a625e856daf5b3e482b8df), [`0334b05`](https://github.com/clerk/javascript/commit/0334b0539bd7058a5e02520d519a20eefe84659c)]:
+  - @clerk/shared@4.41.1
+
+## 0.1.11
+
+### Patch Changes
+
+- Add support for supplying an async function to `renderTriggerBadge` for `UserButton` and `OrganizationSwitcher` which allows supplying custom label text for the badge rendered alongside the trigger's label. ([#10287](https://github.com/clerk/javascript/pull/10287)) by [@dstaley](https://github.com/dstaley)
+
+- An organization joined by accepting an invitation in `UserButton` or `OrganizationSwitcher` now stays listed right away, even before it appears in the loaded memberships, and selecting it follows `afterSelectOrganizationUrl`. ([#10280](https://github.com/clerk/javascript/pull/10280)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Menu items now use the secondary foreground color at rest and the primary foreground color on hover, matching the `UserButton` menu rows. ([#10281](https://github.com/clerk/javascript/pull/10281)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix menus in Safari not opening on the first click when their trigger already had focus, such as right after a dialog closes and returns focus to it. ([#10306](https://github.com/clerk/javascript/pull/10306)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `PortalProvider` to render Mosaic overlays into a custom container, and stop the page from shifting when a Mosaic overlay opens while another library has already locked scrolling. ([#10299](https://github.com/clerk/javascript/pull/10299)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Stop the page from shifting when a Mosaic overlay opens on a page that does not scroll. ([#10312](https://github.com/clerk/javascript/pull/10312)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`e5cfdff`](https://github.com/clerk/javascript/commit/e5cfdffc768f99a3be50a10ef247f5dbe8b3ed18)]:
+  - @clerk/shared@4.41.0
+
 ## 0.1.10
 
 ### Patch Changes

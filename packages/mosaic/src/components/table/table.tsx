@@ -2,6 +2,11 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { ChevronDown } from '../../icons/glyphs/chevron-down';
+import { ChevronUp } from '../../icons/glyphs/chevron-up';
+import { ChevronUpDown } from '../../icons/glyphs/chevron-up-down';
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
+import { X } from '../../icons/glyphs/x';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -13,7 +18,7 @@ import { Icon } from '../icon';
 import type { InputProps } from '../input';
 import { InputGroup } from '../input-group';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { aligns, columnWidth, layouts, stickySides, styles } from './table.styles';
+import { aligns, columnWidth, layouts, stickySides, styles, tableMinWidth } from './table.styles';
 
 type TableSection = 'header' | 'body';
 
@@ -29,6 +34,7 @@ export type TableLayout = keyof typeof layouts;
 
 export interface TableProps extends MosaicElementProps<'table'> {
   layout?: TableLayout;
+  minWidth?: string;
 }
 
 export type TableToolbarProps = MosaicComponentProps<'div'>;
@@ -68,7 +74,7 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
       {...themeProps('table-search')}
     >
       <InputGroup.Start>
-        <Icon name='magnifying-glass' />
+        <Icon glyph={MagnifyingGlass} />
       </InputGroup.Start>
       <InputGroup.Input
         ref={mergedRef}
@@ -92,7 +98,7 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
               inputRef.current?.focus();
             }}
           >
-            <Icon name='x' />
+            <Icon glyph={X} />
           </Button>
         </InputGroup.End>
       ) : null}
@@ -101,7 +107,7 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
 });
 
 const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable(
-  { layout = 'auto', xstyle, ...rest },
+  { layout = 'auto', minWidth, xstyle, ...rest },
   ref,
 ) {
   return (
@@ -118,7 +124,13 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
           ref={ref}
           {...mergeStyleProps(
             themeProps('table', { layout }),
-            stylex.props(reset.base, styles.table, layouts[layout], xstyle),
+            stylex.props(
+              reset.base,
+              styles.table,
+              layouts[layout],
+              minWidth !== undefined && tableMinWidth.fixed(minWidth),
+              xstyle,
+            ),
             rest,
           )}
         />
@@ -196,22 +208,50 @@ export interface TableRowProps extends MosaicComponentProps<'tr'> {
 }
 
 const Row = React.forwardRef<HTMLTableRowElement, TableRowProps>(function MosaicTableRow(
-  { selected, render, xstyle, ...rest },
+  { selected, onClick, render, xstyle, ...rest },
   ref,
 ) {
   const section = React.useContext(TableSectionContext);
+  const interactive = onClick !== undefined;
   return useRender({
     defaultTagName: 'tr',
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('table-row', { selected }),
-      stylex.props(reset.base, section === 'body' && styles.bodyRow, selected && styles.selectedRow, xstyle),
-      { 'aria-selected': selected ? true : undefined },
+      themeProps('table-row', { selected, interactive }),
+      stylex.props(
+        reset.base,
+        section === 'body' && styles.bodyRow,
+        interactive && styles.interactiveRow,
+        selected && styles.selectedRow,
+        xstyle,
+      ),
+      {
+        'aria-selected': selected ? true : undefined,
+        onClick: interactive
+          ? (event: React.MouseEvent<HTMLTableRowElement>) => {
+              if (isRowOwnClick(event)) {
+                onClick(event);
+              }
+            }
+          : undefined,
+      },
       rest,
     ),
   });
 });
+
+const nestedControlSelector =
+  'a[href], button, input, select, textarea, label, [role="button"], [role="link"], [role="checkbox"], [role="menuitem"]';
+
+const isRowOwnClick = (event: React.MouseEvent<HTMLElement>) => {
+  const { target, currentTarget } = event;
+  if (!(target instanceof Element) || !currentTarget.contains(target)) {
+    return false;
+  }
+  const control = target.closest(nestedControlSelector);
+  return control === null || !currentTarget.contains(control);
+};
 
 export interface TableHeaderCellProps extends Omit<MosaicComponentProps<'th'>, 'align'> {
   align?: TableAlign;
@@ -221,9 +261,9 @@ export interface TableHeaderCellProps extends Omit<MosaicComponentProps<'th'>, '
 }
 
 const sortIcons = {
-  ascending: 'chevron-up',
-  descending: 'chevron-down',
-  none: 'chevron-up-down',
+  ascending: ChevronUp,
+  descending: ChevronDown,
+  none: ChevronUpDown,
 } as const;
 
 const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(function MosaicTableHeaderCell(
@@ -265,7 +305,7 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
         >
           {children}
           <Icon
-            name={sortIcons[sort]}
+            glyph={sortIcons[sort]}
             size='sm'
             placement='inline-end'
           />

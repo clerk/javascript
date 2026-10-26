@@ -9,9 +9,11 @@ import {
   fapiUrl,
   holdRequests,
   serveFapi,
+  VERIFICATION_CODE,
   worker,
 } from '../../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../../mosaic-provider';
 import { UserProfileMfaSection } from '../user-profile-mfa-section';
@@ -75,13 +77,103 @@ describe('User profile MFA management', () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     try {
       const user = userEvent.setup();
-      await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+      await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
       await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
       await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
     } finally {
       changeDefault.mockRestore();
       log.mockRestore();
     }
+  });
+
+  async function renderTwoSmsMethodsNeedingReverification() {
+    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const second = fapiPhoneNumber({
+      ...phone,
+      id: 'phone_2',
+      phone_number: '+15555550202',
+      reserved_for_second_factor: true,
+    });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second] }), mfaEnvironment(), {
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me/phone_numbers/phone_2');
+    return fapi;
+  }
+
+  const secondManage = () => screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' });
+  const defaultUpdates = (fapi: Awaited<ReturnType<typeof renderMfa>>) =>
+    fapi.mfa.phoneUpdates.filter(update => update.default === true);
+
+  it('verifies the session before changing the default method and returns focus to its menu', async () => {
+    const fapi = await renderTwoSmsMethodsNeedingReverification();
+    const user = userEvent.setup();
+
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    await waitFor(() => expect(defaultUpdates(fapi)).toEqual([{ id: 'phone_2', reserved: undefined, default: true }]));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(secondManage()).toHaveFocus());
+  });
+
+  it('lets the user cancel verification quietly and retry the default change', async () => {
+    const fapi = await renderTwoSmsMethodsNeedingReverification();
+    const user = userEvent.setup();
+
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(defaultUpdates(fapi)).toEqual([]);
+    expect(screen.queryByRole('alert')).toBeNull();
+    await waitFor(() => expect(secondManage()).toHaveFocus());
+
+    await openMenu(user, secondManage());
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(defaultUpdates(fapi)).toEqual([{ id: 'phone_2', reserved: undefined, default: true }]));
+  });
+
+  it('keeps the verification dialog open while retrying and reports an ordinary retry error', async () => {
+    const fapi = await renderTwoSmsMethodsNeedingReverification();
+    const user = userEvent.setup();
+
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    const replay = holdRequests('post', '/v1/me/phone_numbers/:id');
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+    await waitFor(() => expect(replay.requests).toHaveLength(1));
+
+    expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+    await user.keyboard('{Escape}');
+    expect(dialog).toBeVisible();
+
+    replay.fail('action_blocked', 'Unable to update the default method.');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
+    expect(defaultUpdates(fapi)).toEqual([]);
+  });
+
+  it('waits for a verification factor before opening the default-change dialog', async () => {
+    await renderTwoSmsMethodsNeedingReverification();
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+    const user = userEvent.setup();
+
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    start.release();
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
   });
 
   it('shows a safe message when authenticator setup throws an unexpected error', async () => {
@@ -125,7 +217,7 @@ describe('User profile MFA management', () => {
       ),
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Authenticator app' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('This authenticator must remain enabled.'));
@@ -140,7 +232,7 @@ describe('User profile MFA management', () => {
     );
     demandReverificationOnce('/v1/me/totp');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Authenticator app' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
 
@@ -156,7 +248,7 @@ describe('User profile MFA management', () => {
     const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
     const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved], two_factor_enabled: true }));
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     expect(screen.getByRole('alertdialog', { name: 'Remove SMS verification' })).toHaveAccessibleDescription(
       'You will no longer receive sign-in verification codes at +1 (555) 555-0101. The phone number will remain on your account.',
@@ -173,7 +265,7 @@ describe('User profile MFA management', () => {
     const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved], two_factor_enabled: true }));
     const held = holdRequests('post', '/v1/me/phone_numbers/phone_1');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     const dialog = screen.getByRole('alertdialog');
     const remove = within(dialog).getByRole('button', { name: 'Remove' });
@@ -199,7 +291,7 @@ describe('User profile MFA management', () => {
     await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved], two_factor_enabled: true }));
     const user = userEvent.setup();
     const action = screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0101' });
-    await user.click(action);
+    await openMenu(user, action);
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
@@ -269,7 +361,7 @@ describe('User profile MFA management', () => {
     );
     const held = holdRequests('post', '/v1/me/backup_codes/');
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Backup codes' }));
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
     await waitFor(() => expect(held.requests).toHaveLength(1));
     await waitFor(() => expect(screen.getByRole('status', { name: 'Generating backup codes' })).toBeVisible());
@@ -279,9 +371,10 @@ describe('User profile MFA management', () => {
     }
     expect(screen.getByRole('button', { name: 'Copy and close' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
     held.release();
     await waitFor(() => expect(screen.getByText('CODE0100')).toBeVisible());
+    expect(screen.getByRole('button', { name: 'Close' })).toBeVisible();
     for (const name of ['Print', 'Download', 'Copy and close']) {
       expect(screen.getByRole('button', { name })).toBeEnabled();
     }
@@ -292,12 +385,240 @@ describe('User profile MFA management', () => {
       fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Backup codes' }));
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
     const list = await screen.findByRole('list', { name: 'Backup codes' });
     expect(within(list).getAllByRole('listitem')).toHaveLength(10);
     expect(within(list).queryByText('CODE0001')).toBeNull();
     expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
+  async function renderBackupCodesNeedingReverification() {
+    const fapi = await renderMfa(
+      fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
+      mfaEnvironment(),
+      { verification: { secrets: { password: 'hunter2' } } },
+    );
+    demandReverificationOnce('/v1/me/backup_codes');
+    return fapi;
+  }
+
+  const regenerate = async (user: ReturnType<typeof userEvent.setup>) => {
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage Backup codes' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+  };
+
+  it('verifies the session before regenerating backup codes and then shows them', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+
+    const list = await screen.findByRole('list', { name: 'Backup codes' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(10);
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
+  it('lets the user cancel verification quietly and retry regenerating backup codes', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.mfa.backupCodeCreations).toBe(0);
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    await regenerate(user);
+    await screen.findByRole('list', { name: 'Backup codes' });
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
+  it('keeps the verification open while regenerating and reports an ordinary retry error', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    await screen.findByText('Enter your current password to continue');
+    const dialog = screen.getByRole('dialog');
+    const replay = holdRequests('post', '/v1/me/backup_codes/');
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(replay.requests).toHaveLength(1));
+
+    expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+    await user.keyboard('{Escape}');
+    expect(dialog).toBeVisible();
+
+    replay.fail('action_blocked', 'Unable to create backup codes.');
+    await waitFor(() => expect(within(screen.getByRole('dialog')).getByRole('alert')).toBeVisible());
+    expect(screen.queryByRole('list', { name: 'Backup codes' })).toBeNull();
+    expect(fapi.mfa.backupCodeCreations).toBe(0);
+  });
+
+  it('cancels a loading verification when the backup-code dialog closes so regeneration can start again', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    await waitFor(() => expect(start.requests).toHaveLength(1));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    start.release();
+
+    await regenerate(user);
+    await screen.findByRole('list', { name: 'Backup codes' });
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
+  it('keeps the backup-code dialog open until the first response so a verification can appear', async () => {
+    const fapi = await renderBackupCodesNeedingReverification();
+    const first = holdRequests('post', '/v1/me/backup_codes/');
+    const user = userEvent.setup();
+
+    await regenerate(user);
+    await waitFor(() => expect(first.requests).toHaveLength(1));
+    const dialog = screen.getByRole('dialog');
+    try {
+      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+      await user.keyboard('{Escape}');
+      expect(dialog).toBeVisible();
+    } finally {
+      first.release();
+    }
+
+    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
+    await user.type(screen.getByLabelText('Password'), 'hunter2{Enter}');
+    await screen.findByRole('list', { name: 'Backup codes' });
+    expect(fapi.mfa.backupCodeCreations).toBe(1);
+  });
+
+  const startSms = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+  };
+
+  it('verifies the session before reserving an existing phone for SMS MFA', async () => {
+    const fapi = await renderMfa(undefined, mfaEnvironment(), { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/phone_numbers/phone_1');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    expect(await screen.findByText('CODE0001')).toBeVisible();
+    expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: true, default: undefined });
+  });
+
+  it('keeps SMS code verification open until its reservation challenge can be cancelled', async () => {
+    const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }), mfaEnvironment(), {
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me/phone_numbers/phone_1');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    const code = await screen.findByRole('textbox', { name: 'Verification code' });
+    const attempt = holdRequests('post', '/v1/me/phone_numbers/phone_1/attempt_verification');
+    await user.type(code, VERIFICATION_CODE);
+    await waitFor(() => expect(attempt.requests).toHaveLength(1));
+    const dialog = screen.getByRole('dialog');
+    try {
+      expect(within(dialog).queryByRole('button', { name: 'Close' })).toBeNull();
+      await user.keyboard('{Escape}');
+      expect(dialog).toBeVisible();
+    } finally {
+      attempt.release();
+    }
+
+    expect(await within(dialog).findByText('Enter your current password to continue')).toBeVisible();
+    await user.click(within(dialog).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.mfa.phoneAttempts).toEqual([{ id: 'phone_1', code: VERIFICATION_CODE }]);
+    expect(fapi.mfa.phoneUpdates).toEqual([]);
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('verifies the session before creating a phone for SMS MFA, then sends its code', async () => {
+    const fapi = await renderMfa(fapiUser({ id: 'user_1' }), mfaEnvironment(), {
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me/phone_numbers');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.type(screen.getByRole('textbox', { name: 'Phone' }), '5555550303');
+    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    await waitFor(() => expect(fapi.mfa.phonePreparations).toHaveLength(1));
+    expect(fapi.mfa.phoneCreations).toHaveLength(1);
+    expect(await screen.findByRole('button', { name: 'Verify' })).toBeVisible();
+  });
+
+  it('lets the user cancel SMS MFA verification quietly and add the method again', async () => {
+    const fapi = await renderMfa(undefined, mfaEnvironment(), { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/phone_numbers/phone_1');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.mfa.phoneUpdates).toEqual([]);
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    await startSms(user);
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('CODE0001')).toBeVisible();
+  });
+
+  it('verifies the session before starting authenticator setup', async () => {
+    const fapi = await renderMfa(undefined, mfaEnvironment(), { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/totp');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    await user.keyboard('hunter2{Enter}');
+
+    expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
+    expect(fapi.mfa.totpCreations).toBe(1);
+  });
+
+  it('lets the user cancel authenticator verification quietly and start setup again', async () => {
+    const fapi = await renderMfa(undefined, mfaEnvironment(), { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/totp');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    await screen.findByText('Enter your current password to continue');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Close' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(fapi.mfa.totpCreations).toBe(0);
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+    expect(await screen.findByRole('img', { name: /QR code/i })).toBeVisible();
+    expect(fapi.mfa.totpCreations).toBe(1);
   });
 
   it('copies server-issued backup codes and closes their one-time surface', async () => {
@@ -379,7 +700,7 @@ describe('User profile MFA management', () => {
       ),
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Backup codes' }));
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
     await waitFor(() => expect(screen.getByText('CODE0100')).toBeVisible());
     expect(fapi.mfa.backupCodeCreations).toBe(1);
@@ -410,7 +731,7 @@ describe('User profile MFA management', () => {
     });
     const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     await waitFor(() =>
       expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_2', default: true, reserved: undefined }),
@@ -450,12 +771,12 @@ describe('User profile MFA management', () => {
     const user = userEvent.setup();
     const selected = screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' });
 
-    await user.click(selected);
+    await openMenu(user, selected);
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Unable to update default method.'));
     expect(screen.getAllByText('Default')).toHaveLength(1);
 
-    await user.click(selected);
+    await openMenu(user, selected);
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
     await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
     await waitFor(() =>
@@ -483,18 +804,15 @@ describe('User profile MFA management', () => {
       const held = holdRequests(method, path);
       const user = userEvent.setup();
       const selected = screen.getByRole('button', { name: 'Manage SMS verification +1 (555) 555-0202' });
-      await user.click(selected);
+      await openMenu(user, selected);
       await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
       await waitFor(() => expect(held.requests).toHaveLength(1));
       try {
         const pendingAction = screen.getByRole('button', { name: `Manage SMS verification ${pendingPhone}` });
-        await user.click(pendingAction);
-        if (pendingAction.getAttribute('aria-expanded') !== 'true') {
-          await user.click(pendingAction);
-        }
-        expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
+        await openMenu(user, pendingAction);
         await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
-        await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+        expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
+        await user.click(await screen.findByRole('menuitem', { name: 'Remove method' }));
         expect(screen.queryByRole('alertdialog')).toBeNull();
       } finally {
         held.release();
@@ -511,7 +829,7 @@ describe('User profile MFA management', () => {
       fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Authenticator app' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(fapi.mfa.totpRemovals).toBe(1));
@@ -524,7 +842,7 @@ describe('User profile MFA management', () => {
       fapiUser({ id: 'user_1', totp_enabled: true, backup_code_enabled: true, two_factor_enabled: true }),
     );
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage Authenticator app' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     worker.use(
       http.get(fapiUrl('/v1/me'), () =>

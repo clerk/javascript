@@ -21,6 +21,7 @@ import { allowsIdentificationCreation } from '../../../utils/allows-identificati
 import type { ReverificationController } from '../../reverification';
 import { useReverificationFlow } from '../../reverification';
 import { useUserProfileOptions } from '../user-profile.provider';
+import { isMonochromeProvider } from '../user-profile-provider.utils';
 import type {
   ConnectedAccountActionResult,
   ConnectedAccountProviderDisplay,
@@ -71,8 +72,6 @@ const RECONNECT_ERROR_CODES = [
   'external_account_email_address_verification_required',
 ];
 
-const MONOCHROME_PROVIDERS = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'];
-
 type SocialSettings = Partial<
   Record<string, Pick<OAuthProviders[OAuthStrategy], 'name' | 'logo_url'> & { strategy: string }>
 >;
@@ -89,8 +88,9 @@ export function createProviderCatalog(
     enabled: enabled.has(strategy),
     display: {
       provider: name,
+      iconId: provider,
       iconUrl: iconImageUrl(provider),
-      monochromeIcon: MONOCHROME_PROVIDERS.includes(provider),
+      monochromeIcon: isMonochromeProvider(provider),
     },
   }));
   const candidates = new Set([
@@ -110,7 +110,7 @@ export function createProviderCatalog(
       strategy,
       provider,
       enabled: enabled.has(strategy),
-      display: { provider: settings?.name || provider, iconUrl: settings?.logo_url || undefined },
+      display: { provider: settings?.name || provider, iconId: provider, iconUrl: settings?.logo_url || undefined },
     });
   }
   return [
@@ -215,7 +215,9 @@ export type UserProfileConnectedAccountsModel =
       connect: (strategy: string) => Promise<ConnectedAccountActionResult>;
       reconnect: (accountId: string) => Promise<ConnectedAccountActionResult>;
       remove: (accountId: string) => Promise<void>;
-      reverification: ReverificationController;
+      removeReverification: ReverificationController;
+      reconnectReverification: ReverificationController;
+      connectReverification: ReverificationController;
     };
 
 function unavailable() {
@@ -230,13 +232,21 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
-  const [removeAccount, reverification] = useReverificationFlow((current: UserResource, accountId: string) => {
+  const [removeAccount, removeReverification] = useReverificationFlow((current: UserResource, accountId: string) => {
     const account = current.externalAccounts.find(candidate => candidate.id === accountId);
     if (!account) {
       throw unavailable();
     }
     return account.destroy();
   });
+  const [recreateAccount, reconnectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
+  const [createAccount, connectReverification] = useReverificationFlow(
+    (current: UserResource, params: Parameters<UserResource['createExternalAccount']>[0]) =>
+      current.createExternalAccount(params),
+  );
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -307,7 +317,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
       }
       const redirectUrl = await getRedirectUrl();
       const current = requireCurrentUser();
-      const response = await current.createExternalAccount({
+      const response = await createAccount(current, {
         strategy: provider.strategy,
         redirectUrl: withModalState(redirectUrl, provider.provider),
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
@@ -332,7 +342,7 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
               additionalScopes: recovery.additionalScopes,
               redirectUrl: withModalState(redirectUrl),
             })
-          : await current.createExternalAccount({
+          : await recreateAccount(current, {
               strategy: recovery.strategy,
               redirectUrl: withModalState(redirectUrl),
               additionalScopes: recovery.additionalScopes,
@@ -342,6 +352,8 @@ export function useUserProfileConnectedAccountsModel(): UserProfileConnectedAcco
     remove: async accountId => {
       await removeAccount(requireCurrentUser(), accountId);
     },
-    reverification,
+    removeReverification,
+    reconnectReverification,
+    connectReverification,
   };
 }

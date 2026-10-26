@@ -14,6 +14,7 @@ import {
   fapiSession,
   fapiUser,
 } from '../../../../__tests__/feature/fapi';
+import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../../localization';
 import { OrganizationProfileMembersPanel } from '../organization-profile-members-panel';
@@ -89,6 +90,29 @@ describe('connected organization invitations', () => {
     members.release();
   });
 
+  it('shows loading until the first page of invitations arrives', async () => {
+    serve(['org:sys_memberships:manage']);
+    const list = holdRequests('get', '/v1/organizations/:organizationId/invitations');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const table = () => screen.getByRole('table', { name: 'Invitations' });
+    const columnWidths = () =>
+      within(table())
+        .getAllByRole('columnheader')
+        .map(cell => cell.getBoundingClientRect().width);
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Loading invitations');
+    expect(within(table()).getAllByRole('row')).toHaveLength(1);
+    expect(within(table()).queryByRole('button')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Invite' })).toBeDisabled();
+    const loadingWidths = columnWidths();
+    list.release();
+    expect(await screen.findByText('ada@example.com')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('Invitations loaded');
+    expect(screen.getByRole('button', { name: 'Invite' })).toBeVisible();
+    expect(within(table()).getAllByRole('row')).toHaveLength(2);
+    expect(columnWidths()).toEqual(loadingWidths);
+  });
+
   it('shows a failed initial load and retries the invitation list', async () => {
     serve(['org:sys_memberships:manage']);
     const initial = holdRequests('get', '/v1/organizations/:organizationId/invitations');
@@ -107,7 +131,7 @@ describe('connected organization invitations', () => {
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
     expect(await screen.findByText('ada@example.com')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(user, screen.getByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     expect(fapi.organizationInvitations[0]?.status).toBe('pending');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
@@ -123,7 +147,7 @@ describe('connected organization invitations', () => {
     const fapi = serve(['org:sys_memberships:manage']);
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
@@ -144,7 +168,7 @@ describe('connected organization invitations', () => {
     const fapi = serve(['org:sys_memberships:manage']);
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     fapi.organizationInvitations = [{ ...invitation, status: 'accepted' }];
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
@@ -160,7 +184,7 @@ describe('connected organization invitations', () => {
     const fapi = serve(['org:sys_memberships:manage']);
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     worker.use(
       http.post(fapiUrl('/v1/organizations/:organizationId/invitations/:invitationId/revoke'), () =>
@@ -182,7 +206,7 @@ describe('connected organization invitations', () => {
     serve(['org:sys_memberships:manage']);
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
     const confirm = within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' });
@@ -201,7 +225,7 @@ describe('connected organization invitations', () => {
     fapi.organizationInvitations.push(other);
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     const refresh = holdRequests('get', '/v1/organizations/:organizationId/invitations');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
@@ -237,8 +261,8 @@ describe('connected organization invitations', () => {
         <OrganizationProfileMembersPanel />
       </MosaicLocalizationProvider>,
     );
-    const table = within(await screen.findByRole('table', { name: 'Invitations' }));
-    expect(await table.findByRole('cell', { name: 'Administrateur' })).toBeVisible();
+    expect(await screen.findByRole('cell', { name: 'Administrateur' })).toBeVisible();
+    const table = within(screen.getByRole('table', { name: 'Invitations' }));
     expect(table.getByRole('cell', { name: 'Membre' })).toBeVisible();
     expect(table.queryByRole('cell', { name: 'Admin' })).toBeNull();
   });
@@ -268,7 +292,7 @@ describe('connected organization invitations', () => {
     await waitFor(() => expect(nextPage.requests).toHaveLength(1));
     expect(screen.getByText('user0@example.com')).toBeVisible();
     nextPage.release();
-    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     expect(await screen.findByText('user0@example.com')).toBeVisible();
@@ -287,7 +311,7 @@ describe('connected organization invitations', () => {
     ]);
     const { clerk } = await renderWithClerk(<OrganizationProfileMembersPanel />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(user, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument();
     await act(() => clerk.setActive({ session: 'sess_second' }));
@@ -318,7 +342,7 @@ describe('connected organization invitations', () => {
     });
     const { clerk } = await renderWithClerk(<OrganizationProfileMembersPanel />);
     const actor = userEvent.setup();
-    await actor.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(actor, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await actor.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument();
     await act(() => clerk.setActive({ organization: otherOrganization.id }));
@@ -347,7 +371,7 @@ describe('connected organization invitations', () => {
     });
     const { clerk } = await renderWithClerk(<OrganizationProfileMembersPanel />);
     const actor = userEvent.setup();
-    await actor.click(await screen.findByRole('button', { name: 'Manage ada@example.com' }));
+    await openMenu(actor, await screen.findByRole('button', { name: 'Manage ada@example.com' }));
     await actor.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     const revoke = holdRequests('post', '/v1/organizations/:organizationId/invitations/:invitationId/revoke');
     await actor.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
@@ -536,21 +560,37 @@ describe('inviting members', () => {
     const user = userEvent.setup();
     for (const tab of ['Members', 'Invitations', 'Requests']) {
       await user.click(await screen.findByRole('tab', { name: tab }));
-      expect(await within(screen.getByRole('tabpanel')).findByRole('button', { name: 'Invite' })).toBeVisible();
+      await waitFor(() =>
+        expect(within(screen.getByRole('tabpanel')).getByRole('button', { name: 'Invite' })).toBeEnabled(),
+      );
     }
   });
 
   it('does not offer Invite without the manage permission', async () => {
     serveInvite({ permissions: ['org:sys_memberships:read'] });
-    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
     expect(await screen.findByText('Bob Smith')).toBeVisible();
-    expect(roles.requests).toHaveLength(0);
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
-    roles.release();
   });
 
-  it('does not offer Invite when roles fail to load', async () => {
+  it('offers Invite as unavailable until roles load', async () => {
+    serveInvite({ permissions: ['org:sys_memberships:manage'] });
+    const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
+    await renderWithClerk(<OrganizationProfileMembersPanel />);
+    const user = userEvent.setup();
+    expect(await screen.findByText('ada@example.com')).toBeVisible();
+    await waitFor(() => expect(roles.requests).toHaveLength(1));
+    const invite = screen.getByRole('button', { name: 'Invite' });
+    expect(invite).toHaveAttribute('aria-disabled', 'true');
+    await user.click(invite);
+    expect(screen.queryByRole('dialog', { name: 'Invite members' })).toBeNull();
+    roles.release();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Invite' })).not.toHaveAttribute('aria-disabled'));
+    await user.click(screen.getByRole('button', { name: 'Invite' }));
+    expect(await screen.findByRole('dialog', { name: 'Invite members' })).toBeVisible();
+  });
+
+  it('keeps Invite unavailable when roles fail to load', async () => {
     serveInvite();
     const roles = holdRequests('get', '/v1/organizations/:organizationId/roles');
     await renderWithClerk(<OrganizationProfileMembersPanel />);
@@ -559,7 +599,7 @@ describe('inviting members', () => {
     await userEvent.setup().click(await screen.findByRole('tab', { name: 'Invitations' }));
     expect(await screen.findByText('ada@example.com')).toBeVisible();
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage ada@example.com' })).toBeVisible());
-    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Invite' })).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('replaces a pending invitation for the same address', async () => {
@@ -568,7 +608,7 @@ describe('inviting members', () => {
     const { user, dialog } = await openInviteDialog();
     await addEmails(dialog, 'ada@example.com');
     await user.click(dialog.getByRole('button', { name: 'Send invites' }));
-    await waitFor(() => expect(screen.getByRole('heading', { name: 'Invitations sent' })).toBeVisible());
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Invitation sent' })).toBeVisible());
     expect(fapi.organizationInvitations.map(item => [item.email_address, item.status, item.role])).toEqual([
       ['ada@example.com', 'pending', 'org:admin'],
       ['ada@example.com', 'revoked', 'org:member'],
