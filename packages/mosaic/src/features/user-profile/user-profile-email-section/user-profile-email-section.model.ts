@@ -71,11 +71,11 @@ function toEmailVerifier(
 ): UserProfileEmailVerifier {
   const linkFlow = linkRedirectUrl === undefined ? undefined : currentEmail().createEmailLinkFlow();
   return {
-    prepare: () => {
+    prepare: async () => {
       if (linkFlow && linkRedirectUrl && !currentEmail().matchesSsoConnection) {
         linkFlow.cancelEmailLinkFlow();
         const verified = save(() => linkFlow.startEmailLinkFlow({ redirectUrl: linkRedirectUrl }));
-        return Promise.resolve({ method: 'link' as const, verified, cancel: linkFlow.cancelEmailLinkFlow });
+        return { method: 'link' as const, verified, cancel: linkFlow.cancelEmailLinkFlow };
       }
       return prepareEmailVerification(currentEmail, router);
     },

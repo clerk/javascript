@@ -53,9 +53,13 @@ export function useUserProfilePhoneSectionController({
     onVerify: id => {
       const phone = phones.find(phone => phone.id === id);
       if (phone) {
+        setPrimary.reset();
         void verify.run(id, () => verification.onVerifyPhone(phone, getPhoneVerifier(id)));
       }
     },
-    onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryPhone(id)),
+    onSetPrimary: id => {
+      verify.reset();
+      void setPrimary.run(id, () => onSetPrimaryPhone(id));
+    },
   };
 }

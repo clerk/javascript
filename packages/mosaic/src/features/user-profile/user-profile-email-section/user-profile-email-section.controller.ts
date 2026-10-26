@@ -52,9 +52,13 @@ export function useUserProfileEmailSectionController({
     onVerify: id => {
       const email = emails.find(email => email.id === id);
       if (email) {
+        setPrimary.reset();
         void verify.run(id, () => verification.onVerifyEmail(email, getEmailVerifier(id)));
       }
     },
-    onSetPrimary: id => void setPrimary.run(id, () => onSetPrimaryEmail(id)),
+    onSetPrimary: id => {
+      verify.reset();
+      void setPrimary.run(id, () => onSetPrimaryEmail(id));
+    },
   };
 }

@@ -417,6 +417,31 @@ describe('email reverification', () => {
     }
   });
 
+  it('replaces a failed verify error with a later primary action error', async () => {
+    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, pending, second]));
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+    const mutation = holdRequests('post', '/v1/me');
+
+    try {
+      await manageEmail(actor, 'pending@example.com', 'Verify');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      prepare.fail('too_many_requests', 'Too many requests.');
+      await waitFor(() => expect(within(emailRow()).getByRole('alert')).toHaveTextContent('Too many requests.'));
+
+      await manageEmail(actor, 'bob@example.com', 'Set as primary');
+      await waitFor(() => expect(mutation.requests).toHaveLength(1));
+      mutation.fail('action_blocked', 'Unable to set primary address.');
+      await waitFor(() =>
+        expect(within(emailRow()).getByRole('alert')).toHaveTextContent("This action couldn't be completed."),
+      );
+    } finally {
+      prepare.release();
+      mutation.release();
+    }
+  });
+
   it('focuses Close when the dialog opens on a verification that could not start', async () => {
     const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
     const { actor } = await renderSection({

@@ -289,7 +289,7 @@ describe('useUserProfileAddEmailController', () => {
     expect(result.current.step).toBe('link');
     expect(result.current.errorMessage).toBe('Too many requests');
     expect(result.current.resendSeconds).toBe(0);
-    email.prepare.mockImplementationOnce(sentLink(new Promise(() => {})));
+    email.prepare.mockResolvedValueOnce(sentLink(new Promise(() => {}))());
     await act(() => result.current.onResend());
     expect(result.current.step).toBe('link');
     expect(result.current.resendSeconds).toBe(60);
