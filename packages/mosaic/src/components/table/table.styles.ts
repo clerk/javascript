@@ -152,8 +152,8 @@ export const styles = stylex.create({
   expandIcon: {
     transform: {
       default: null,
+      ':is([dir="rtl"] *):not([data-expanded] *)': 'scaleX(-1)',
       [stylex.when.ancestor('[data-expanded]', tableStateMarker)]: 'rotate(90deg)',
-      ':dir(rtl)': 'scaleX(-1)',
     },
     transitionDuration: durationVars['--cl-duration-fast'],
     transitionProperty: 'transform',
