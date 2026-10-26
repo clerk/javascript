@@ -22,6 +22,7 @@ describe('State', () => {
   });
 
   afterEach(() => {
+    _state.dispose();
     vi.clearAllMocks();
     // Reset signals after each test
     signUpResourceSignal({ resource: null });
@@ -29,6 +30,21 @@ describe('State', () => {
     // Restore original clerk references to prevent global state leakage
     SignUp.clerk = originalSignUpClerk;
     SignIn.clerk = originalSignInClerk;
+  });
+
+  it('disposes only its own resource subscriptions', () => {
+    const other = new State();
+    const disposedResource = vi.spyOn(_state, 'signInResourceSignal');
+    const liveResource = vi.spyOn(other, 'signInResourceSignal');
+    _state.dispose();
+    _state.dispose();
+
+    const resource = new SignIn(null);
+    eventBus.emit('resource:update', { resource });
+
+    expect(disposedResource).not.toHaveBeenCalled();
+    expect(liveResource).toHaveBeenCalled();
+    other.dispose();
   });
 
   describe('shouldIgnoreNullUpdate behavior', () => {

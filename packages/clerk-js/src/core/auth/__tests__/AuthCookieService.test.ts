@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus, events } from '../../events';
@@ -64,12 +65,57 @@ describe('AuthCookieService session cookie refresh', () => {
   });
 
   afterEach(() => {
-    service?.stopPollingForToken();
+    service?.dispose();
     service = undefined;
-    // The service registers listeners on the shared event bus on construction.
-    eventBus.off(events.TokenUpdate);
-    eventBus.off(events.UserSignOut);
-    eventBus.off(events.EnvironmentUpdate);
+  });
+
+  it('disposes only its own listeners and leaves another service active', async () => {
+    service = await createService();
+    const other = await createService();
+    service.dispose();
+    service.dispose();
+    mocks.sessionCookie.set.mockClear();
+    getToken.mockClear();
+
+    emitTokenUpdate('remaining-service');
+    expect(mocks.sessionCookie.set).toHaveBeenCalledTimes(1);
+    window.dispatchEvent(new Event('focus'));
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(getToken).toHaveBeenCalledTimes(2);
+    mocks.sessionCookie.remove.mockClear();
+    mocks.devBrowser.refreshCookies.mockClear();
+    eventBus.emit(events.UserSignOut, null);
+    eventBus.emit(events.EnvironmentUpdate, null);
+    expect(mocks.sessionCookie.remove).toHaveBeenCalledOnce();
+    expect(mocks.devBrowser.refreshCookies).toHaveBeenCalledOnce();
+    other.dispose();
+  });
+
+  it('does not write a cookie when an in-flight refresh completes after disposal', async () => {
+    service = await createService();
+    const pending = createDeferredPromise();
+    getToken.mockReturnValue(pending.promise.then(() => 'after-disposal'));
+    window.dispatchEvent(new Event('focus'));
+    service.dispose();
+    mocks.sessionCookie.set.mockClear();
+
+    pending.resolve('after-disposal');
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(mocks.sessionCookie.set).not.toHaveBeenCalled();
+  });
+
+  it('releases listeners when cookie setup fails', async () => {
+    const eventNames = [events.TokenUpdate, events.UserSignOut, events.EnvironmentUpdate] as const;
+    const before = eventNames.map(event => eventBus.internal.retrieveListeners(event).length);
+    mocks.devBrowser.clear.mockImplementationOnce(() => {
+      throw new Error('cookie setup failed');
+    });
+
+    await expect(createService()).rejects.toThrow('cookie setup failed');
+
+    expect(eventNames.map(event => eventBus.internal.retrieveListeners(event).length)).toEqual(before);
   });
 
   it('registers both focus and visibilitychange listeners', async () => {

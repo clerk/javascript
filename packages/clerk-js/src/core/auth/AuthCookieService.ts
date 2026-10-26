@@ -10,7 +10,7 @@ import {
   isUnauthenticatedError,
 } from '@clerk/shared/error';
 import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
-import type { Clerk, InstanceType } from '@clerk/shared/types';
+import type { Clerk, InstanceType, TokenResource } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
 import { debugLogger } from '@/utils/debug';
@@ -55,6 +55,8 @@ export class AuthCookieService {
   private sessionCookie: SessionCookieHandler;
   private activeCookie: ReturnType<typeof createCookieHandler>;
   private devBrowser: DevBrowser;
+  private disposed = false;
+  private readonly removeListeners: () => void;
 
   public static async create(
     clerk: Clerk,
@@ -64,8 +66,13 @@ export class AuthCookieService {
   ) {
     const cookieSuffix = await getCookieSuffix(clerk.publishableKey);
     const service = new AuthCookieService(clerk, fapiClient, cookieSuffix, instanceType, clerkEventBus);
-    await service.setup();
-    return service;
+    try {
+      await service.setup();
+      return service;
+    } catch (error) {
+      service.dispose();
+      throw error;
+    }
   }
 
   private constructor(
@@ -76,21 +83,30 @@ export class AuthCookieService {
     private clerkEventBus: ReturnType<typeof createClerkEventBus>,
   ) {
     // set cookie on token update
-    eventBus.on(events.TokenUpdate, ({ token }) => {
+    const onTokenUpdate = ({ token }: { token: TokenResource | null }) => {
       this.updateSessionCookie(token && token.getRawString());
       this.setClientUatCookieForDevelopmentInstances();
-    });
+    };
+    eventBus.on(events.TokenUpdate, onTokenUpdate);
 
-    eventBus.on(events.UserSignOut, () => this.handleSignOut());
+    const onUserSignOut = () => this.handleSignOut();
+    eventBus.on(events.UserSignOut, onUserSignOut);
 
     // Environment can resolve after auth cookies are first written.
-    eventBus.on(events.EnvironmentUpdate, () => {
+    const onEnvironmentUpdate = () => {
       this.devBrowser.refreshCookies();
       void this.refreshSessionToken({ updateCookieImmediately: true });
       this.setClientUatCookieForDevelopmentInstances();
-    });
+    };
+    eventBus.on(events.EnvironmentUpdate, onEnvironmentUpdate);
 
-    this.refreshTokenOnFocus();
+    const removeFocusListeners = this.refreshTokenOnFocus();
+    this.removeListeners = () => {
+      eventBus.off(events.TokenUpdate, onTokenUpdate);
+      eventBus.off(events.UserSignOut, onUserSignOut);
+      eventBus.off(events.EnvironmentUpdate, onEnvironmentUpdate);
+      removeFocusListeners();
+    };
     this.startPollingForToken();
 
     const cookieOptions = {
@@ -105,6 +121,16 @@ export class AuthCookieService {
       cookieSuffix,
       cookieOptions,
     });
+  }
+
+  public dispose() {
+    if (this.disposed) {
+      return;
+    }
+    this.disposed = true;
+    this.removeListeners();
+    this.poller?.dispose();
+    this.poller = null;
   }
 
   public async setup() {
@@ -145,7 +171,7 @@ export class AuthCookieService {
   }
 
   public startPollingForToken() {
-    if (!this.poller) {
+    if (!this.disposed && !this.poller) {
       this.poller = new SessionCookiePoller();
       this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
     }
@@ -153,7 +179,7 @@ export class AuthCookieService {
 
   public stopPollingForToken() {
     if (this.poller) {
-      this.poller.stopPollingForSessionToken();
+      this.poller.dispose();
       this.poller = null;
     }
   }
@@ -178,6 +204,12 @@ export class AuthCookieService {
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', refreshIfVisible);
     }
+    return () => {
+      window.removeEventListener('focus', refreshIfVisible);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', refreshIfVisible);
+      }
+    };
   }
 
   private async refreshSessionToken({
@@ -185,7 +217,7 @@ export class AuthCookieService {
   }: {
     updateCookieImmediately?: boolean;
   } = {}): Promise<void> {
-    if (!this.clerk.session) {
+    if (this.disposed || !this.clerk.session) {
       return;
     }
 
@@ -195,11 +227,16 @@ export class AuthCookieService {
         this.updateSessionCookie(token);
       }
     } catch (e) {
-      return this.handleGetTokenError(e);
+      if (!this.disposed) {
+        return this.handleGetTokenError(e);
+      }
     }
   }
 
   private updateSessionCookie(token: string | null) {
+    if (this.disposed) {
+      return;
+    }
     // Only allow background tabs to update if both session and organization match.
     // A cross-origin iframe never reports focus even while visible, so treat a visible embedded
     // frame as eligible to write; top-level multi-tab ownership still keys on `document.hasFocus()`.
@@ -266,7 +303,7 @@ export class AuthCookieService {
   }
 
   public setClientUatCookieForDevelopmentInstances() {
-    if (!this.clerk.client) {
+    if (this.disposed || !this.clerk.client) {
       return;
     }
     if (this.instanceType !== 'production' && this.inCustomDevelopmentDomain()) {

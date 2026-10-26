@@ -13,22 +13,28 @@ import { noop } from '@clerk/shared/utils';
  */
 export const createPageLifecycle = () => {
   if (!inBrowser()) {
-    return { onPageFocus: noop };
+    return { onPageFocus: noop, dispose: noop };
   }
 
   const callbackQueue: Record<string, Array<() => void>> = {
     focus: [],
   };
 
-  window.addEventListener('focus', () => {
+  const onFocus = () => {
     if (document.visibilityState === 'visible') {
       callbackQueue['focus'].forEach(cb => cb());
     }
-  });
+  };
+  window.addEventListener('focus', onFocus);
 
   const onPageFocus = (cb: () => void) => {
     callbackQueue['focus'].push(cb);
   };
 
-  return { onPageFocus };
+  const dispose = () => {
+    window.removeEventListener('focus', onFocus);
+    callbackQueue['focus'].length = 0;
+  };
+
+  return { onPageFocus, dispose };
 };

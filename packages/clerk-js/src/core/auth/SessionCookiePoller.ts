@@ -15,20 +15,33 @@ export class SessionCookiePoller {
   private timerId: ReturnType<typeof this.workerTimers.setInterval> | null = null;
   // Disallows for multiple `startPollingForSessionToken()` calls before `callback` is executed.
   private initiated = false;
+  private disposed = false;
 
   public startPollingForSessionToken(cb: () => Promise<unknown>): void {
-    if (this.timerId || this.initiated) {
+    if (this.disposed || this.timerId != null || this.initiated) {
       return;
     }
 
     const run = async () => {
       this.initiated = true;
-      await this.lock.acquireLockAndRun(cb);
+      await this.lock.acquireLockAndRun(() => (this.disposed ? Promise.resolve() : cb()));
+      if (this.disposed) {
+        return;
+      }
       const interval = isTabFocused() === true ? FOCUSED_POLLER_INTERVAL_IN_MS : POLLER_INTERVAL_IN_MS;
       this.timerId = this.workerTimers.setTimeout(run, interval);
     };
 
     void run();
+  }
+
+  public dispose(): void {
+    if (this.disposed) {
+      return;
+    }
+    this.disposed = true;
+    this.stopPollingForSessionToken();
+    this.workerTimers.cleanup();
   }
 
   public stopPollingForSessionToken(): void {

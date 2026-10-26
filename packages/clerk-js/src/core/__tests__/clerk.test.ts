@@ -21,7 +21,7 @@ import { mockJwt } from '@/test/core-fixtures';
 import { restoreDocument, setDocumentVisibilityState } from '@/test/document-helpers';
 
 import { mockNativeRuntime } from '../../test/utils';
-import { Clerk } from '../clerk';
+import { __internal_cleanupForTest, Clerk } from '../clerk';
 import { eventBus, events } from '../events';
 import { ProtectCheckGate } from '../protectCheckGate';
 import type { DisplayConfig, Organization } from '../resources/internal';
@@ -155,6 +155,51 @@ describe('Clerk singleton', () => {
   });
 
   afterEach(() => mockNavigate.mockReset());
+
+  it('cleans up its owned subscriptions without removing another instance', async () => {
+    const sut = new Clerk(productionPublishableKey);
+    const other = new Clerk(productionPublishableKey);
+    await sut.load();
+    await other.load();
+    const eventNames = [events.SessionTokenResolved, events.UserSignOut, events.EnvironmentUpdate] as const;
+    const counts = eventNames.map(event => eventBus.internal.retrieveListeners(event).length);
+
+    __internal_cleanupForTest(sut);
+    __internal_cleanupForTest(sut);
+
+    expect(eventNames.map(event => eventBus.internal.retrieveListeners(event).length)).toEqual([
+      counts[0] - 1,
+      counts[1] - 2,
+      counts[2] - 2,
+    ]);
+    const listener = vi.fn();
+    other.addListener(listener);
+    listener.mockClear();
+    eventBus.emit(events.SessionTokenResolved, null);
+    expect(listener).toHaveBeenCalledOnce();
+    __internal_cleanupForTest(other);
+  });
+
+  it.each([true, false])('does not adopt load results after cleanup (standardBrowser: %s)', async standardBrowser => {
+    const pending = createDeferredPromise();
+    const sut = new Clerk(productionPublishableKey);
+    const initialEnvironment = sut.__internal_environment;
+    mockClientFetch.mockClear();
+    mockClientFetch.mockImplementationOnce(() => pending.promise.then(() => ({ signedInSessions: [] })));
+    mockEnvironmentFetch.mockImplementationOnce(() =>
+      pending.promise.then(() => ({ displayConfig: mockDisplayConfig })),
+    );
+    const loading = sut.load({ standardBrowser });
+    await waitFor(() => expect(mockClientFetch).toHaveBeenCalledOnce());
+
+    __internal_cleanupForTest(sut);
+    pending.resolve();
+    await loading;
+
+    expect(sut.client).toBeUndefined();
+    expect(sut.__internal_environment).toBe(initialEnvironment);
+    expect(sut.status).toBe('loading');
+  });
 
   describe('initialize', () => {
     it('should consider publishableKey readonly', () => {

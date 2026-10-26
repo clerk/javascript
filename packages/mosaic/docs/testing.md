@@ -171,9 +171,9 @@ in [Test placement](#test-placement).
 The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the
 window. Before each test it moves FAPI to a new host, so a request a previous
 test's Clerk sends late fails with a network error instead of reaching this
-test's handlers. After each test it cleans up, resets the handlers and the
-shared query cache, and **fails the test on any FAPI request without a
-handler**, or on a `holdRequests` hold never released or failed. When a
+test's handlers. After each test it unmounts React, disposes the Clerk instances
+created by `renderWithClerk`, resets the handlers and the shared query cache,
+and **fails the test on any FAPI request without a handler**, or on a `holdRequests` hold never released or failed. When a
 feature needs a new endpoint, add a handler to `serveFapi` that mirrors what
 FAPI returns.
 

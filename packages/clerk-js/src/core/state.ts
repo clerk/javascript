@@ -52,6 +52,12 @@ export class State implements StateInterface {
     this.waitlistResourceSignal({ resource: this._waitlistInstance });
   }
 
+  dispose() {
+    eventBus.off('resource:update', this.onResourceUpdated);
+    eventBus.off('resource:error', this.onResourceError);
+    eventBus.off('resource:fetch', this.onResourceFetch);
+  }
+
   get __internal_waitlist() {
     return this._waitlistInstance;
   }

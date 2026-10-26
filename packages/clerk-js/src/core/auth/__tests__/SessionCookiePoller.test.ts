@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { restoreDocument, setDocument, setDocumentHasFocus, setDocumentHasFocusValue } from '@/test/document-helpers';
@@ -18,11 +19,39 @@ describe('SessionCookiePoller', () => {
   });
 
   afterEach(() => {
-    poller?.stopPollingForSessionToken();
+    poller?.dispose();
     poller = undefined;
     restoreDocument();
     vi.useRealTimers();
     vi.restoreAllMocks();
+  });
+
+  it('does not schedule another tick after disposal during a refresh', async () => {
+    const pending = createDeferredPromise();
+    const callback = vi.fn(() => pending.promise);
+    poller = new SessionCookiePoller();
+    poller.startPollingForSessionToken(callback);
+
+    poller.dispose();
+    pending.resolve();
+    await Promise.resolve();
+    await vi.advanceTimersByTimeAsync(POLLER_INTERVAL_IN_MS * 2);
+    poller.startPollingForSessionToken(callback);
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('allows polling to start again after stopping', async () => {
+    const callback = vi.fn(() => Promise.resolve());
+    poller = new SessionCookiePoller();
+    poller.startPollingForSessionToken(callback);
+    await Promise.resolve();
+    poller.stopPollingForSessionToken();
+    poller.startPollingForSessionToken(callback);
+    await Promise.resolve();
+
+    expect(callback).toHaveBeenCalledTimes(2);
   });
 
   it.each([

@@ -242,6 +242,13 @@ const defaultOptions: ClerkOptions = {
   newSubscriptionRedirectUrl: undefined,
 };
 
+const testCleanup = new WeakMap<Clerk, () => void>();
+
+export const __internal_cleanupForTest = (clerk: Clerk): void => {
+  testCleanup.get(clerk)?.();
+  testCleanup.delete(clerk);
+};
+
 export class Clerk implements ClerkInterface {
   public static version: string = __PKG_VERSION__;
   public static sdkMetadata: SDKMetadata = {
@@ -271,6 +278,8 @@ export class Clerk implements ClerkInterface {
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
+  #disposed = false;
+  #eventListenerCleanup: Array<() => void> = [];
   #protect?: Protect;
   #captchaHeartbeat?: CaptchaHeartbeat;
   #broadcastChannel: BroadcastChannel | null = null;
@@ -552,6 +561,20 @@ export class Clerk implements ClerkInterface {
       return errorThrower.throwInvalidPublishableKeyError({ key });
     }
 
+    testCleanup.set(this, () => {
+      this.#disposed = true;
+      this.#eventListenerCleanup.forEach(cleanup => cleanup());
+      this.#eventListenerCleanup = [];
+      this.#authService?.dispose();
+      this.__internal_state.dispose();
+      this.#captchaHeartbeat?.dispose();
+      this.#pageLifecycle?.dispose();
+      this.#broadcastChannel?.close();
+      this.#broadcastChannel = null;
+      this.#listeners = [];
+      this.#navigationListeners = [];
+      this.#queryClient?.clear();
+    });
     this.#domain = options?.domain;
     this.#proxyUrl = options?.proxyUrl;
     this.environment = Environment.getInstance();
@@ -605,7 +628,7 @@ export class Clerk implements ClerkInterface {
 
   public load = async (options?: ClerkOptions): Promise<void> => {
     debugLogger.info('load() start', {}, 'clerk');
-    if (this.loaded) {
+    if (this.#disposed || this.loaded) {
       return;
     }
 
@@ -651,9 +674,9 @@ export class Clerk implements ClerkInterface {
      * Listen to `Session.getToken` resolving to emit the updated session
      * with the new token to the state listeners.
      */
-    eventBus.on(events.SessionTokenResolved, () => {
-      this.#updateAccessors(this.session);
-    });
+    const onSessionTokenResolved = () => this.#updateAccessors(this.session);
+    eventBus.on(events.SessionTokenResolved, onSessionTokenResolved);
+    this.#eventListenerCleanup.push(() => eventBus.off(events.SessionTokenResolved, onSessionTokenResolved));
 
     if (this.#options.sdkMetadata) {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
@@ -679,6 +702,9 @@ export class Clerk implements ClerkInterface {
         await this.#loadInStandardBrowser();
       } else {
         await this.#loadInNonStandardBrowser();
+      }
+      if (this.#disposed) {
+        return;
       }
       const telemetry = this.#options.telemetry;
       const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
@@ -3259,6 +3285,9 @@ export class Clerk implements ClerkInterface {
     Waitlist.join({ emailAddress });
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
+    if (this.#disposed) {
+      return;
+    }
     this.environment = environment;
   }
 
@@ -3282,6 +3311,9 @@ export class Clerk implements ClerkInterface {
   // and emitting, library consumers that both read state directly and set up listeners
   // could end up in a inconsistent state.
   updateClient = (newClient: ClientResource, options?: { __internal_dangerouslySkipEmit?: boolean }): void => {
+    if (this.#disposed) {
+      return;
+    }
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
@@ -3489,6 +3521,10 @@ export class Clerk implements ClerkInterface {
       this.#instanceType!,
       this.#publicEventBus,
     );
+    if (this.#disposed) {
+      this.#authService.dispose();
+      return;
+    }
 
     /**
      * 1. Multi-domain SSO handling
@@ -3531,7 +3567,7 @@ export class Clerk implements ClerkInterface {
     let initializationDegradedCounter = 0;
 
     let retries = 0;
-    while (retries < 2) {
+    while (!this.#disposed && retries < 2) {
       retries++;
 
       try {
@@ -3564,6 +3600,9 @@ export class Clerk implements ClerkInterface {
           )
             .then(res => this.updateClient(res))
             .catch(async e => {
+              if (this.#disposed) {
+                return null;
+              }
               /**
                * Only handle non 4xx errors, like 5xx errors and network errors.
                */
@@ -3590,6 +3629,9 @@ export class Clerk implements ClerkInterface {
                       return this.#authService?.getSessionCookie();
                     })
                   : this.#authService?.getSessionCookie();
+                if (this.#disposed) {
+                  return null;
+                }
                 this.updateClient(createClientFromJwt(jwt));
               } finally {
                 this.#authService?.startPollingForToken();
@@ -3605,6 +3647,9 @@ export class Clerk implements ClerkInterface {
         };
 
         const [environmentResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        if (this.#disposed) {
+          return;
+        }
         if (environmentResult.status === 'rejected') {
           throw environmentResult.reason;
         }
@@ -3626,6 +3671,9 @@ export class Clerk implements ClerkInterface {
         }
         break;
       } catch (err) {
+        if (this.#disposed) {
+          return;
+        }
         if (isError(err, 'dev_browser_unauthenticated')) {
           await this.#authService.handleUnauthenticatedDevBrowser();
         } else if (!isValidBrowserOnline()) {
@@ -3641,6 +3689,9 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    if (this.#disposed) {
+      return;
+    }
     this.#captchaHeartbeat = new CaptchaHeartbeat(this);
     void this.#captchaHeartbeat.start();
     this.#clearClerkQueryParams();
@@ -3664,11 +3715,17 @@ export class Clerk implements ClerkInterface {
         Client.getOrCreateInstance().fetch({ fetchMaxTries }),
       ]);
     } catch (err) {
+      if (this.#disposed) {
+        return;
+      }
       const isUnavailable =
         (isClerkRuntimeError(err) && err.code === 'network_error') ||
         (isClerkAPIResponseError(err) && err.status >= 500);
       if (isUnavailable && this.shouldFallbackToCachedResources()) {
         const cachedResources = await this.__internal_getCachedResources?.();
+        if (this.#disposed) {
+          return;
+        }
         environment = new Environment(cachedResources?.environment);
         Client.clearInstance();
         client = Client.getOrCreateInstance(cachedResources?.client);
@@ -3678,6 +3735,9 @@ export class Clerk implements ClerkInterface {
       }
     }
 
+    if (this.#disposed) {
+      return;
+    }
     this.updateClient(client);
     this.updateEnvironment(environment);
     // TODO: Add an auth service also for non standard browsers that will poll for the __session JWT but won't use cookies
@@ -3752,18 +3812,20 @@ export class Clerk implements ClerkInterface {
     /**
      * Allow resources within the singleton to notify other tabs about a signout event (scoped to a single tab)
      */
-    eventBus.on(events.UserSignOut, () => {
-      this.#broadcastChannel?.postMessage({ type: 'signout' });
-    });
+    const onUserSignOut = () => this.#broadcastChannel?.postMessage({ type: 'signout' });
+    eventBus.on(events.UserSignOut, onUserSignOut);
+    this.#eventListenerCleanup.push(() => eventBus.off(events.UserSignOut, onUserSignOut));
 
-    eventBus.on(events.EnvironmentUpdate, () => {
+    const onEnvironmentUpdate = () => {
       // Cache the environment snapshot for 24 hours
       SafeLocalStorage.setItem(
         CLERK_ENVIRONMENT_STORAGE_ENTRY,
         this.environment?.__internal_toSnapshot(),
         24 * 60 * 60 * 1_000,
       );
-    });
+    };
+    eventBus.on(events.EnvironmentUpdate, onEnvironmentUpdate);
+    this.#eventListenerCleanup.push(() => eventBus.off(events.EnvironmentUpdate, onEnvironmentUpdate));
   };
 
   // TODO: Be more conservative about touches. Throttle, don't touch when only one user, etc

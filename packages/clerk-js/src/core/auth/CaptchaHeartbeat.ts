@@ -4,6 +4,9 @@ import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import type { Clerk } from '../resources/internal';
 
 export class CaptchaHeartbeat {
+  private disposed = false;
+  private intervalId: ReturnType<typeof this.timers.setInterval> | null = null;
+
   constructor(
     private clerk: Clerk,
     private captchaChallenge = new CaptchaChallenge(clerk),
@@ -11,24 +14,41 @@ export class CaptchaHeartbeat {
   ) {}
 
   public async start() {
-    if (!this.isEnabled()) {
+    if (this.disposed || !this.isEnabled()) {
       return;
     }
 
     await this.challengeAndSend();
-    this.timers.setInterval(() => {
+    if (this.disposed) {
+      return;
+    }
+    this.intervalId = this.timers.setInterval(() => {
       void this.challengeAndSend();
     }, this.intervalInMs());
   }
 
+  public dispose() {
+    if (this.disposed) {
+      return;
+    }
+    this.disposed = true;
+    if (this.intervalId !== null) {
+      this.timers.clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+    this.timers.cleanup();
+  }
+
   private async challengeAndSend() {
-    if (!this.clerk.client || this.clientBypass()) {
+    if (this.disposed || !this.clerk.client || this.clientBypass()) {
       return;
     }
 
     try {
       const params = await this.captchaChallenge.invisible({ action: 'heartbeat' });
-      await this.clerk.client.__internal_sendCaptchaToken(params);
+      if (!this.disposed) {
+        await this.clerk.client.__internal_sendCaptchaToken(params);
+      }
     } catch {
       // Ignore unhandled errors
     }

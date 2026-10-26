@@ -5,11 +5,12 @@ import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 
 import {
   startWorker,
+  switchFapiHost,
   takeUnhandledRequests,
   takeUnsettledHolds,
-  switchFapiHost,
   worker,
 } from './src/__tests__/feature/fake-fapi';
+import { cleanupClerkInstances } from './src/__tests__/feature/render';
 
 expect.extend(matchers);
 
@@ -66,6 +67,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  cleanupClerkInstances();
   __resetClerkQueryClientForTest();
   for (const channel of [...openChannels]) {
     channel.close();

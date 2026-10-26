@@ -1,4 +1,4 @@
-import { Clerk } from './core/clerk';
+import { __internal_cleanupForTest, Clerk } from './core/clerk';
 
 export {
   ClerkAPIResponseError,
@@ -14,7 +14,7 @@ export {
   isUserLockedError,
   type MetamaskError,
 } from '@clerk/shared/error';
-export { Clerk };
+export { __internal_cleanupForTest, Clerk };
 
 if (module.hot) {
   module.hot.accept();
