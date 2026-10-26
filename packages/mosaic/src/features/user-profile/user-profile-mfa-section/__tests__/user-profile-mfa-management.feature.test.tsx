@@ -562,6 +562,34 @@ describe('User profile MFA management', () => {
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: true, default: undefined });
   });
 
+  it('keeps session verification on screen until the SMS reservation refresh completes', async () => {
+    await renderMfa(undefined, mfaEnvironment(), { verification: { secrets: { password: 'hunter2' } } });
+    demandReverificationOnce('/v1/me/phone_numbers/phone_1');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    const refresh = holdRequests('get', '/v1/me');
+    try {
+      await user.keyboard('hunter2{Enter}');
+      await act(async () => {
+        await waitFor(() => expect(refresh.requests).toHaveLength(1));
+      });
+      await user.keyboard('{Escape}');
+      expect(screen.getByRole('dialog')).toHaveAttribute('data-open');
+      expect(screen.getByText('Enter your current password to continue')).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByText('CODE0001')).toBeNull();
+    } finally {
+      refresh.release();
+    }
+
+    expect(await screen.findByText('CODE0001')).toBeVisible();
+  });
+
   it('keeps SMS code verification open until its reservation challenge can be cancelled', async () => {
     const unverified = fapiPhoneNumber({ ...phone, verification: { ...phone.verification, status: 'unverified' } });
     const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [unverified] }), mfaEnvironment(), {
