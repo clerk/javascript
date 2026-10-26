@@ -1,6 +1,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -104,7 +105,7 @@ describe('Tabs', () => {
     it('shows selected panel content', () => {
       renderTabs();
       expect(screen.getByText('Account content')).toBeVisible();
-      expect(screen.getByText('Settings content')).not.toBeVisible();
+      expect(screen.queryByText('Settings content')).not.toBeInTheDocument();
     });
 
     it('selects tab on click', async () => {
@@ -131,6 +132,16 @@ describe('Tabs', () => {
       await user.click(screen.getByText('Settings'));
 
       expect(onValueChange).toHaveBeenCalledWith('tab2');
+    });
+
+    it('does not call onValueChange when the selected tab is chosen again', async () => {
+      const onValueChange = vi.fn();
+      const user = userEvent.setup();
+      renderTabs({ onValueChange });
+
+      await user.click(screen.getByText('Account'));
+
+      expect(onValueChange).not.toHaveBeenCalled();
     });
   });
 
@@ -193,6 +204,31 @@ describe('Tabs', () => {
       await user.keyboard('{ArrowLeft}');
 
       expect(document.activeElement).toBe(screen.getByText('Billing'));
+    });
+
+    it('follows the visual order of arrow keys in RTL', async () => {
+      const user = userEvent.setup();
+      render(
+        <div dir='rtl'>
+          <Tabs.Root defaultValue='tab2'>
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+              <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+            <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
+          </Tabs.Root>
+        </div>,
+      );
+
+      await user.click(screen.getByText('Settings'));
+      await user.keyboard('{ArrowLeft}');
+      expect(document.activeElement).toBe(screen.getByText('Billing'));
+
+      await user.keyboard('{ArrowRight}');
+      expect(document.activeElement).toBe(screen.getByText('Settings'));
     });
 
     it('uses ArrowDown/ArrowUp for vertical orientation', async () => {
@@ -351,198 +387,84 @@ describe('Tabs', () => {
   });
 
   describe('Tabs.Indicator', () => {
-    function renderWithIndicator() {
-      return render(
-        <Tabs.Root defaultValue='tab1'>
-          <Tabs.List style={{ position: 'relative' }}>
+    function Indicated(props: Partial<React.ComponentProps<typeof Tabs.Root>>) {
+      return (
+        <Tabs.Root
+          defaultValue='tab1'
+          {...props}
+        >
+          <Tabs.List>
             <Tabs.Tab value='tab1'>Account</Tabs.Tab>
             <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            <Tabs.Tab value='tab3'>Billing</Tabs.Tab>
             <Tabs.Indicator data-testid='indicator' />
           </Tabs.List>
           <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
           <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
-        </Tabs.Root>,
+          <Tabs.Panel value='tab3'>Billing content</Tabs.Panel>
+        </Tabs.Root>
       );
     }
-
-    it('has position absolute', () => {
-      renderWithIndicator();
-      const indicator = screen.getByTestId('indicator');
-      expect(indicator.style.position).toBe('absolute');
-    });
 
     it('has aria-hidden', () => {
-      renderWithIndicator();
-      const indicator = screen.getByTestId('indicator');
-      expect(indicator).toHaveAttribute('aria-hidden', 'true');
+      render(<Indicated />);
+      expect(screen.getByTestId('indicator')).toHaveAttribute('aria-hidden', 'true');
     });
 
-    it('sets --cl-tab-width and --cl-tab-left CSS vars', () => {
-      renderWithIndicator();
-      const indicator = screen.getByTestId('indicator');
-      // In a real browser, getBoundingClientRect returns actual measurements
-      expect(indicator.style.getPropertyValue('--cl-tab-width')).toBeTruthy();
-      expect(indicator.style.getPropertyValue('--cl-tab-left')).toBeTruthy();
-    });
-
-    it('updates position when tab changes', async () => {
+    it('marks the direction the selection traveled', async () => {
       const user = userEvent.setup();
-      renderWithIndicator();
-
+      render(<Indicated />);
       const indicator = screen.getByTestId('indicator');
+
+      expect(indicator).toHaveAttribute('data-direction', 'forward');
+
+      await user.click(screen.getByText('Billing'));
+      expect(indicator).toHaveAttribute('data-direction', 'forward');
 
       await user.click(screen.getByText('Settings'));
-
-      // Verify the effect ran and style properties are set
-      expect(indicator.style.position).toBe('absolute');
-      expect(indicator.style.getPropertyValue('--cl-tab-width')).toBeDefined();
+      expect(indicator).toHaveAttribute('data-direction', 'backward');
     });
 
-    it('skips transition on initial render', () => {
-      renderWithIndicator();
-      const indicator = screen.getByTestId('indicator');
-      expect(indicator.style.transition).toBe('none');
+    it('marks the direction when a controlled value changes', () => {
+      const { rerender } = render(<Indicated value='tab3' />);
+      rerender(<Indicated value='tab1' />);
+
+      expect(screen.getByTestId('indicator')).toHaveAttribute('data-direction', 'backward');
     });
-  });
 
-  describe('Tabs.Indicator resize tracking (B1)', () => {
-    it('re-measures the active tab when it resizes without a tab change', () => {
-      // Capture every ResizeObserver the tree creates so the test can drive it.
-      const observers: Array<{ cb: ResizeObserverCallback; targets: Element[] }> = [];
-      class MockResizeObserver {
-        cb: ResizeObserverCallback;
-        targets: Element[] = [];
-        constructor(cb: ResizeObserverCallback) {
-          this.cb = cb;
-          observers.push(this);
-        }
-        observe(el: Element) {
-          this.targets.push(el);
-        }
-        unobserve() {}
-        disconnect() {}
-      }
-      vi.stubGlobal('ResizeObserver', MockResizeObserver);
-
-      try {
-        render(
-          <Tabs.Root defaultValue='tab1'>
-            <Tabs.List style={{ position: 'relative' }}>
-              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
-              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
-              <Tabs.Indicator data-testid='indicator' />
-            </Tabs.List>
-            <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
-            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
-          </Tabs.Root>,
+    it('marks the direction when a controlled parent follows onValueChange', async () => {
+      const user = userEvent.setup();
+      function Controlled() {
+        const [value, setValue] = useState('tab3');
+        return (
+          <Indicated
+            value={value}
+            onValueChange={setValue}
+          />
         );
-
-        const indicator = screen.getByTestId('indicator');
-        const list = screen.getByRole('tablist');
-
-        // The indicator should have registered an observer for its active tab.
-        expect(observers.length).toBeGreaterThan(0);
-
-        // Simulate the active tab growing (e.g. font load / container resize)
-        // with no tab-selection change.
-        const rect = (left: number, width: number) =>
-          ({ left, top: 0, right: left + width, bottom: 20, width, height: 20, x: left, y: 0, toJSON() {} }) as DOMRect;
-        list.getBoundingClientRect = () => rect(0, 400);
-        for (const tab of screen.getAllByRole('tab')) {
-          tab.getBoundingClientRect = () => rect(0, 250);
-        }
-
-        // Fire every observer the tree created.
-        act(() => {
-          for (const o of observers) {
-            o.cb([], o as unknown as ResizeObserver);
-          }
-        });
-
-        expect(indicator.style.getPropertyValue('--cl-tab-width')).toBe('250px');
-      } finally {
-        vi.unstubAllGlobals();
       }
+      render(<Controlled />);
+
+      await user.click(screen.getByText('Account'));
+
+      expect(screen.getByText('Account')).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByTestId('indicator')).toHaveAttribute('data-direction', 'backward');
     });
 
-    function setupObservedIndicator() {
-      const observers: Array<{ cb: ResizeObserverCallback }> = [];
-      class MockResizeObserver {
-        cb: ResizeObserverCallback;
-        constructor(cb: ResizeObserverCallback) {
-          this.cb = cb;
-          observers.push(this);
-        }
-        observe() {}
-        unobserve() {}
-        disconnect() {}
-      }
-      vi.stubGlobal('ResizeObserver', MockResizeObserver);
-
+    it('follows vertical tabs the same way', async () => {
+      const user = userEvent.setup();
       render(
-        <Tabs.Root defaultValue='tab1'>
-          <Tabs.List style={{ position: 'relative' }}>
-            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
-            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
-            <Tabs.Indicator data-testid='indicator' />
-          </Tabs.List>
-          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
-          <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
-        </Tabs.Root>,
+        <Indicated
+          orientation='vertical'
+          defaultValue='tab3'
+        />,
       );
 
-      const rect = (left: number, width: number) =>
-        ({ left, top: 0, right: left + width, bottom: 20, width, height: 20, x: left, y: 0, toJSON() {} }) as DOMRect;
-      const setTabRects = (widths: number[]) => {
-        screen.getByRole('tablist').getBoundingClientRect = () => rect(0, 400);
-        let left = 0;
-        screen.getAllByRole('tab').forEach((tab, i) => {
-          const tabLeft = left;
-          tab.getBoundingClientRect = () => rect(tabLeft, widths[i]);
-          left += widths[i];
-        });
-      };
-      const fireResize = () =>
-        act(() => {
-          for (const o of observers) {
-            o.cb([], o as unknown as ResizeObserver);
-          }
-        });
+      await user.click(screen.getByText('Billing'));
+      await user.keyboard('{ArrowUp}');
 
-      return { indicator: screen.getByTestId('indicator'), setTabRects, fireResize };
-    }
-
-    it('does not animate when the active tab resizes after mount', () => {
-      try {
-        const { indicator, setTabRects, fireResize } = setupObservedIndicator();
-
-        setTabRects([100, 120]);
-        fireResize();
-
-        expect(indicator.style.getPropertyValue('--cl-tab-width')).toBe('100px');
-        expect(indicator.style.transition).toBe('none');
-      } finally {
-        vi.unstubAllGlobals();
-      }
-    });
-
-    it('keeps animating a tab change when the observer reports the same size', async () => {
-      try {
-        const user = userEvent.setup();
-        const { indicator, setTabRects, fireResize } = setupObservedIndicator();
-
-        setTabRects([100, 120]);
-        await user.click(screen.getByText('Settings'));
-
-        expect(indicator.style.getPropertyValue('--cl-tab-left')).toBe('100px');
-        expect(indicator.style.transition).toBe('');
-
-        fireResize();
-
-        expect(indicator.style.transition).toBe('');
-      } finally {
-        vi.unstubAllGlobals();
-      }
+      expect(screen.getByText('Settings')).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByTestId('indicator')).toHaveAttribute('data-direction', 'backward');
     });
   });
 
@@ -657,16 +579,173 @@ describe('Tabs', () => {
     it('marks deselected panels inert and leaves the selected panel interactive', () => {
       renderTabs({ defaultValue: 'tab1' });
 
-      const selected = screen.getByText('Account content');
-      const deselected = screen.getByText('Settings content');
+      const [selected, deselected] = screen.getAllByRole('tabpanel', { hidden: true });
 
       expect(selected).not.toHaveAttribute('inert');
       expect(deselected).toHaveAttribute('inert');
     });
   });
 
+  describe('panel children', () => {
+    function mockAnimations() {
+      let finish = () => {};
+      const finished = new Promise<void>(resolve => {
+        finish = resolve;
+      });
+      const original = (Element.prototype as { getAnimations?: unknown }).getAnimations;
+      (Element.prototype as { getAnimations?: unknown }).getAnimations = () => [{ finished }];
+      return {
+        finish: () =>
+          act(async () => {
+            finish();
+            await finished;
+          }),
+        restore: () => {
+          if (original) {
+            (Element.prototype as { getAnimations?: unknown }).getAnimations = original;
+          } else {
+            delete (Element.prototype as { getAnimations?: unknown }).getAnimations;
+          }
+        },
+      };
+    }
+
+    it('renders every panel element but only the selected panel children', () => {
+      renderTabs();
+
+      expect(screen.getAllByRole('tabpanel', { hidden: true })).toHaveLength(3);
+      expect(screen.getByText('Account content')).toBeVisible();
+      expect(screen.queryByText('Settings content')).not.toBeInTheDocument();
+      expect(screen.queryByText('Billing content')).not.toBeInTheDocument();
+    });
+
+    it('swaps children when the selection changes', async () => {
+      const user = userEvent.setup();
+      renderTabs();
+
+      await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+      expect(screen.getByText('Settings content')).toBeVisible();
+      expect(screen.queryByText('Account content')).not.toBeInTheDocument();
+      expect(screen.getAllByRole('tabpanel', { hidden: true })[0]).toHaveAttribute('hidden');
+    });
+
+    it('keeps the leaving panel visible with its children until its exit animation finishes', async () => {
+      const user = userEvent.setup();
+      renderTabs();
+      const [leaving] = screen.getAllByRole('tabpanel', { hidden: true });
+      const animations = mockAnimations();
+      try {
+        await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+        expect(leaving).toHaveAttribute('data-ending-style');
+        expect(leaving).toHaveAttribute('inert');
+        expect(leaving).not.toHaveAttribute('hidden');
+        expect(screen.getByText('Account content')).toBeInTheDocument();
+
+        await animations.finish();
+
+        expect(leaving).toHaveAttribute('hidden');
+        expect(screen.queryByText('Account content')).not.toBeInTheDocument();
+      } finally {
+        animations.restore();
+      }
+    });
+
+    it('marks a newly selected panel with data-starting-style, but not the initial one', () => {
+      function Controlled({ value }: { value: string }) {
+        return (
+          <Tabs.Root value={value}>
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+          </Tabs.Root>
+        );
+      }
+      const view = render(<Controlled value='tab1' />);
+      const [first, second] = screen.getAllByRole('tabpanel', { hidden: true });
+      expect(first).not.toHaveAttribute('data-starting-style');
+
+      view.rerender(<Controlled value='tab2' />);
+
+      expect(second).toHaveAttribute('data-starting-style');
+      expect(second.style.getPropertyValue('--cl-tab-transition-direction')).toBe('1');
+    });
+
+    it('renders children before selection with keepMounted', () => {
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+          <Tabs.Panel
+            value='tab2'
+            keepMounted
+          >
+            Settings content
+          </Tabs.Panel>
+        </Tabs.Root>,
+      );
+
+      expect(screen.getByText('Settings content')).not.toBeVisible();
+    });
+
+    it('holds the leaving panel content while its exit animation runs', async () => {
+      function Controlled() {
+        const [value, setValue] = useState('tab1');
+        return (
+          <Tabs.Root
+            value={value}
+            onValueChange={setValue}
+          >
+            <Tabs.List>
+              <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+              <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value='tab1'>Account for {value}</Tabs.Panel>
+            <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+          </Tabs.Root>
+        );
+      }
+      const user = userEvent.setup();
+      render(<Controlled />);
+      const animations = mockAnimations();
+      try {
+        await user.click(screen.getByRole('tab', { name: 'Settings' }));
+
+        expect(screen.getByText('Account for tab1')).toBeInTheDocument();
+        expect(screen.queryByText('Account for tab2')).not.toBeInTheDocument();
+
+        await animations.finish();
+      } finally {
+        animations.restore();
+      }
+    });
+
+    it('server-renders only the selected panel children', () => {
+      const html = renderToString(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+          <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+        </Tabs.Root>,
+      );
+
+      expect(html).toContain('Account content');
+      expect(html).not.toContain('Settings content');
+    });
+  });
+
   describe('transition direction', () => {
-    function renderForceMounted() {
+    function renderTwoTabs() {
       return render(
         <Tabs.Root
           defaultValue='tab1'
@@ -676,27 +755,17 @@ describe('Tabs', () => {
             <Tabs.Tab value='tab1'>One</Tabs.Tab>
             <Tabs.Tab value='tab2'>Two</Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel
-            value='tab1'
-            shouldForceMount
-          >
-            One content
-          </Tabs.Panel>
-          <Tabs.Panel
-            value='tab2'
-            shouldForceMount
-          >
-            Two content
-          </Tabs.Panel>
+          <Tabs.Panel value='tab1'>One content</Tabs.Panel>
+          <Tabs.Panel value='tab2'>Two content</Tabs.Panel>
         </Tabs.Root>,
       );
     }
 
     it('does not flip direction backward when re-selecting the active tab', async () => {
       const user = userEvent.setup();
-      renderForceMounted();
+      renderTwoTabs();
 
-      const panel = screen.getByText('Two content');
+      const panel = screen.getAllByRole('tabpanel', { hidden: true })[1];
 
       // Moving forward to tab2 sets direction = 1.
       await user.click(screen.getByRole('tab', { name: 'Two' }));

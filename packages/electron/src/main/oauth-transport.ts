@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 
 import { OAUTH_TRANSPORT_CHANNELS } from '../shared/ipc';
@@ -5,11 +7,13 @@ import type { RendererSchemeOptions } from '../shared/types';
 import { isMainFrameEvent } from './validate-sender';
 
 const CALLBACK_TIMEOUT_MS = 3 * 60 * 1000;
+const ATTEMPT_PARAM = '__clerk_oauth_attempt';
 
 type PendingOAuthFlow = {
   resolve: (value: { callbackUrl: string }) => void;
   reject: (reason: Error) => void;
   timeout: NodeJS.Timeout;
+  attemptId: string | undefined;
   window: Electron.BrowserWindow | null;
 };
 
@@ -34,6 +38,11 @@ function isMatchingCallbackUrl(url: string, redirectUrl: string): boolean {
   } catch {
     return false;
   }
+}
+
+function isCallbackForAttempt(url: string, attemptId: string | undefined): boolean {
+  const callbackAttemptId = new URL(url).searchParams.get(ATTEMPT_PARAM);
+  return callbackAttemptId === null || callbackAttemptId === attemptId;
 }
 
 function findMatchingCallbackUrl(argv: string[], redirectUrl: string): string | undefined {
@@ -64,6 +73,7 @@ function assertExternalOAuthUrl(url: string): void {
 export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): () => void {
   const redirectUrl = buildRedirectUrl(options);
   let pendingOAuthFlow: PendingOAuthFlow | null = null;
+  const attemptIds = new WeakMap<Electron.WebContents, string>();
 
   const disposePendingOAuthFlow = (reason?: Error): void => {
     if (!pendingOAuthFlow) {
@@ -80,7 +90,11 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
   };
 
   const handleCallbackUrl = (url: string): void => {
-    if (!pendingOAuthFlow || !isMatchingCallbackUrl(url, redirectUrl)) {
+    if (
+      !pendingOAuthFlow ||
+      !isMatchingCallbackUrl(url, redirectUrl) ||
+      !isCallbackForAttempt(url, pendingOAuthFlow.attemptId)
+    ) {
       return;
     }
 
@@ -115,7 +129,12 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
     if (!isMainFrameEvent(event)) {
       throw new Error("Clerk: OAuth request did not originate from a window's main frame.");
     }
-    return redirectUrl;
+
+    const attemptId = randomUUID();
+    attemptIds.set(event.sender, attemptId);
+    const attemptRedirectUrl = new URL(redirectUrl);
+    attemptRedirectUrl.searchParams.set(ATTEMPT_PARAM, attemptId);
+    return attemptRedirectUrl.href;
   });
 
   ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.open, async (event, url: string) => {
@@ -123,27 +142,29 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
       throw new Error("Clerk: OAuth request did not originate from a window's main frame.");
     }
 
-    if (pendingOAuthFlow) {
-      throw new Error('Clerk: an OAuth flow is already pending.');
-    }
-
     assertExternalOAuthUrl(url);
+    disposePendingOAuthFlow();
 
     const window = BrowserWindow.fromWebContents(event.sender);
+    const attemptId = attemptIds.get(event.sender);
 
+    let flow: PendingOAuthFlow | null = null;
     const callbackPromise = new Promise<{ callbackUrl: string }>((resolve, reject) => {
       const timeout = setTimeout(() => {
         disposePendingOAuthFlow();
         reject(new Error('Clerk: OAuth callback timed out.'));
       }, CALLBACK_TIMEOUT_MS);
 
-      pendingOAuthFlow = { resolve, reject, timeout, window };
+      flow = { resolve, reject, timeout, attemptId, window };
+      pendingOAuthFlow = flow;
     });
 
     try {
       await shell.openExternal(url);
     } catch (err) {
-      disposePendingOAuthFlow(err instanceof Error ? err : new Error(String(err)));
+      if (pendingOAuthFlow === flow) {
+        disposePendingOAuthFlow(err instanceof Error ? err : new Error(String(err)));
+      }
     }
 
     return callbackPromise;
@@ -153,6 +174,22 @@ export function setupOAuthTransportIpcHandlers(options: OAuthTransportOptions): 
     disposePendingOAuthFlow(new Error('Clerk: OAuth flow was cancelled.'));
     app.removeListener('open-url', openUrlListener);
     app.removeListener('second-instance', secondInstanceListener);
+    ipcMain.removeHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);
+    ipcMain.removeHandler(OAUTH_TRANSPORT_CHANNELS.open);
+  };
+}
+
+export function setupMissingRendererOAuthTransportIpcHandlers(): () => void {
+  const rejectMissingRenderer = (): never => {
+    throw new Error(
+      'Clerk: OAuth sign-in requires the renderer option. Pass createClerkBridge({ renderer: { scheme, host } }) so the OAuth callback can reach the app.',
+    );
+  };
+
+  ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl, rejectMissingRenderer);
+  ipcMain.handle(OAUTH_TRANSPORT_CHANNELS.open, rejectMissingRenderer);
+
+  return () => {
     ipcMain.removeHandler(OAUTH_TRANSPORT_CHANNELS.getRedirectUrl);
     ipcMain.removeHandler(OAUTH_TRANSPORT_CHANNELS.open);
   };

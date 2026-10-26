@@ -1,0 +1,4 @@
+{
+  "config": { "auth_biometric": { "used_for_sign_in": true } },
+  "environment": { "auth_config.native_settings.trusted_device_sign_in_enabled": true }
+}

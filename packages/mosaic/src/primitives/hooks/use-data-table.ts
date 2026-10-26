@@ -12,7 +12,7 @@ export type ColumnFiltersState = Array<{ id: string; value: unknown }>;
 export type PaginationState = { pageIndex: number; pageSize: number };
 export type RowSelectionState = Record<string, boolean>;
 
-function functionalUpdate<T>(updater: Updater<T>, old: T): T {
+export function functionalUpdate<T>(updater: Updater<T>, old: T): T {
   return typeof updater === 'function' ? (updater as (old: T) => T)(old) : updater;
 }
 
@@ -139,10 +139,11 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
   const { getRowId, isRowSelectable } = opts;
   const selectionAnchor = useRef<string | null>(null);
   const rows = useMemo<DataTableRow<TData>[]>(() => {
-    const ids = opts.data.map((original, i) => (getRowId ? getRowId(original, i) : String(i)));
-    const selectableIds = ids.filter((_, i) => !isRowSelectable || isRowSelectable(opts.data[i]));
-    return opts.data.map((original, i) => {
-      const id = ids[i];
+    const entries = opts.data.map((original, i) => ({ original, id: getRowId ? getRowId(original, i) : String(i) }));
+    const selectableIds = entries
+      .filter(entry => !isRowSelectable || isRowSelectable(entry.original))
+      .map(entry => entry.id);
+    return entries.map(({ original, id }) => {
       return {
         id,
         original,

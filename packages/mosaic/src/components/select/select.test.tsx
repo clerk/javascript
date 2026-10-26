@@ -13,7 +13,7 @@ const roles = [
   { value: 'member', label: 'Member' },
 ];
 
-function renderSelect(props?: Partial<React.ComponentProps<typeof Select.Root>>) {
+function renderSelect(props?: Partial<Extract<React.ComponentProps<typeof Select.Root>, { multiple?: false }>>) {
   return render(
     <Select.Root
       items={roles}
@@ -136,6 +136,48 @@ describe('Mosaic Select', () => {
     expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Admin');
   });
 
+  it('toggles options without closing and lists every selected label when multiple', async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <Select.Root
+        items={roles}
+        multiple
+        defaultValue={['admin']}
+        onValueChange={onValueChange}
+      >
+        <Select.Trigger placeholder='Choose roles' />
+        <Select.Popup />
+      </Select.Root>,
+    );
+
+    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: 'Member' }));
+
+    expect(onValueChange).toHaveBeenCalledWith(['admin', 'member']);
+    expect(screen.getByRole('listbox')).toHaveAttribute('aria-multiselectable', 'true');
+    expect(screen.getByRole('option', { name: 'Admin' })).toHaveAttribute('data-selected', '');
+    expect(screen.getByRole('option', { name: 'Member' })).toHaveAttribute('data-selected', '');
+    expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Admin, Member');
+  });
+
+  it('renders the value through a function passed as trigger children', () => {
+    render(
+      <Select.Root
+        items={roles}
+        multiple
+        defaultValue={['admin', 'member']}
+      >
+        <Select.Trigger>{value => `${value.length} roles`}</Select.Trigger>
+        <Select.Popup />
+      </Select.Root>,
+    );
+
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.querySelector('.cl-select-value')).toHaveTextContent('2 roles');
+    expect(trigger.querySelector('.cl-select-trigger-icon')).toBeInTheDocument();
+  });
+
   it('renders one option per item when the popup is given no children', () => {
     render(
       <Select.Root
@@ -177,6 +219,131 @@ describe('Mosaic Select', () => {
     expect(option).toHaveAttribute('data-described', '');
     expect(option.querySelector('.cl-select-option-label')).toHaveTextContent('Admin');
     expect(option.querySelector('.cl-select-option-description')).toHaveTextContent('Can manage members and settings');
+  });
+
+  it('composes media beside a content column of label and description', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media>
+              <svg data-testid='acme-logo' />
+            </Select.Media>
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+              <Select.Description>Owner</Select.Description>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const option = screen.getByRole('option', { name: 'Acme' });
+    expect(option).toHaveAttribute('data-described', '');
+    expect(option).toHaveAccessibleDescription('Owner');
+
+    const media = screen.getByTestId('acme-logo').parentElement;
+    expect(media?.tagName).toBe('SPAN');
+    expect(media).toHaveClass('cl-select-option-media');
+    expect(media?.parentElement).toBe(option);
+
+    const content = option.querySelector('.cl-select-option-content');
+    expect(content?.previousElementSibling).toBe(media);
+    expect(content?.querySelector('.cl-select-option-label')).toHaveTextContent('Acme');
+    expect(content?.querySelector('.cl-select-option-description')).toHaveTextContent('Owner');
+  });
+
+  it('leaves a composed option without a description undescribed', () => {
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media />
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    const option = screen.getByRole('option', { name: 'Acme' });
+    expect(option).not.toHaveAttribute('data-described');
+    expect(option).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('keeps the remaining description when another one in the option unmounts', () => {
+    function Options({ showSecond }: { showSecond: boolean }) {
+      return (
+        <Select.Root
+          items={[{ value: 'acme', label: 'Acme' }]}
+          defaultOpen
+        >
+          <Select.Trigger />
+          <Select.Popup>
+            <Select.Option
+              value='acme'
+              label='Acme'
+            >
+              <Select.Content>
+                <Select.Label>Acme</Select.Label>
+                <Select.Description>Owner</Select.Description>
+                {showSecond ? <Select.Description>Billing</Select.Description> : null}
+              </Select.Content>
+            </Select.Option>
+          </Select.Popup>
+        </Select.Root>
+      );
+    }
+
+    const { rerender } = render(<Options showSecond />);
+    expect(screen.getByRole('option', { name: 'Acme' })).toHaveAccessibleDescription('Owner Billing');
+
+    rerender(<Options showSecond={false} />);
+    expect(screen.getByRole('option', { name: 'Acme' })).toHaveAccessibleDescription('Owner');
+  });
+
+  it('forwards the media ref and swaps its element via render', () => {
+    const ref = React.createRef<HTMLSpanElement>();
+    render(
+      <Select.Root
+        items={[{ value: 'acme', label: 'Acme' }]}
+        defaultOpen
+      >
+        <Select.Trigger />
+        <Select.Popup>
+          <Select.Option
+            value='acme'
+            label='Acme'
+          >
+            <Select.Media
+              ref={ref}
+              render={<span data-testid='custom-media' />}
+            />
+            <Select.Content>
+              <Select.Label>Acme</Select.Label>
+            </Select.Content>
+          </Select.Option>
+        </Select.Popup>
+      </Select.Root>,
+    );
+
+    expect(ref.current).toBe(screen.getByTestId('custom-media'));
+    expect(ref.current).toHaveClass('cl-select-option-media');
   });
 
   it('marks a disabled option as aria-disabled and does not select it', async () => {
@@ -353,6 +520,21 @@ describe('Mosaic Select', () => {
 
     it('hangs below the trigger by default when any item has a description', () => {
       renderSelect({ items: describedRoles, defaultValue: 'member', defaultOpen: true });
+      expect(positioner()).not.toHaveAttribute('data-side', 'none');
+    });
+
+    it('hangs below the trigger by default when multiple', () => {
+      render(
+        <Select.Root
+          items={roles}
+          multiple
+          defaultValue={['admin']}
+          defaultOpen
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>,
+      );
       expect(positioner()).not.toHaveAttribute('data-side', 'none');
     });
 

@@ -1,4 +1,5 @@
 import { OrganizationProfileGeneralPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel.view';
+import { OrganizationProfileProfileSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-profile-section/organization-profile-profile-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -8,28 +9,28 @@ export { default as __source } from './organization-profile-general-panel.storie
 
 export const meta: StoryMeta = {
   group: 'Organization Profile',
-  status: 'wip',
-  substatus: 'needs wire-up',
+  status: 'stable',
   title: 'OrganizationProfileGeneralPanel',
   label: 'General panel',
   navigation: { category: 'Panels' },
-  source: 'packages/mosaic/src/features/organization-profile/organization-profile-general-panel.view.tsx',
+  source: 'packages/mosaic/src/features/organization-profile/organization-profile-general-panel.tsx',
 };
 
 export function Default() {
-  const { general } = useOrganizationProfileFixture();
-  return <OrganizationProfileGeneralPanelView {...general} />;
+  const { pages } = useOrganizationProfileFixture();
+  return pages.general;
 }
 
 export function ReadOnly() {
-  const { general } = useOrganizationProfileFixture();
+  const { profile } = useOrganizationProfileFixture();
   return (
-    <OrganizationProfileGeneralPanelView
-      name={general.name}
-      slug={general.slug}
-      memberCount={general.memberCount}
-      imageUrl={general.imageUrl}
-      hasImage={general.hasImage}
-    />
+    <OrganizationProfileGeneralPanelView>
+      <OrganizationProfileProfileSectionView
+        name={profile.name}
+        slug={profile.slug}
+        imageUrl={profile.imageUrl}
+        hasImage={profile.hasImage}
+      />
+    </OrganizationProfileGeneralPanelView>
   );
 }

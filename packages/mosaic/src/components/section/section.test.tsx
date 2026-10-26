@@ -23,8 +23,12 @@ describe('Section', () => {
       <Section.Root data-testid='root'>
         <Section.Group data-testid='group'>
           <Section.Header data-testid='header'>
-            <Section.Title>Account</Section.Title>
-            <Section.Description data-testid='header-description'>Who you are to the application.</Section.Description>
+            <Section.Content>
+              <Section.Title>Account</Section.Title>
+              <Section.Description data-testid='header-description'>
+                Who you are to the application.
+              </Section.Description>
+            </Section.Content>
             <Section.Actions data-testid='header-actions'>Add</Section.Actions>
           </Section.Header>
           <Section.Body data-testid='body'>
@@ -77,13 +81,17 @@ describe('Section', () => {
       <Section.Root>
         <Section.Group>
           <Section.Header>
-            <Section.Title>Email</Section.Title>
+            <Section.Content>
+              <Section.Title>Email</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body />
         </Section.Group>
         <Section.Group>
           <Section.Header>
-            <Section.Title>Phone</Section.Title>
+            <Section.Content>
+              <Section.Title>Phone</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body />
         </Section.Group>
@@ -103,7 +111,9 @@ describe('Section', () => {
         <Section.Root>
           <Section.Group>
             <Section.Header>
-              <Section.Title>Account</Section.Title>
+              <Section.Content>
+                <Section.Title>Account</Section.Title>
+              </Section.Content>
             </Section.Header>
           </Section.Group>
         </Section.Root>
@@ -117,7 +127,9 @@ describe('Section', () => {
     render(
       <Section.Group>
         <Section.Header>
-          <Section.Title render={<h5 />}>Account</Section.Title>
+          <Section.Content>
+            <Section.Title render={<h5 />}>Account</Section.Title>
+          </Section.Content>
         </Section.Header>
       </Section.Group>,
     );
@@ -134,7 +146,9 @@ describe('Section', () => {
         </Section.Group>
         <Section.Group aria-label='Contact'>
           <Section.Header>
-            <Section.Title>Email</Section.Title>
+            <Section.Content>
+              <Section.Title>Email</Section.Title>
+            </Section.Content>
           </Section.Header>
         </Section.Group>
       </Section.Root>,
@@ -150,7 +164,9 @@ describe('Section', () => {
     render(
       <Section.Group>
         <Section.Header data-testid='header'>
-          <Section.Title>Email</Section.Title>
+          <Section.Content>
+            <Section.Title>Email</Section.Title>
+          </Section.Content>
           <Section.Actions>Add</Section.Actions>
         </Section.Header>
         <Section.Body>
@@ -224,7 +240,9 @@ describe('Section', () => {
           xstyle={overrides.group}
         >
           <Section.Header>
-            <Section.Title>Account</Section.Title>
+            <Section.Content>
+              <Section.Title>Account</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body
             ref={bodyRef}

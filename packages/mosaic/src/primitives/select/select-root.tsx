@@ -31,25 +31,47 @@ import { SelectContext, type SelectContextValue, type SelectItem } from './selec
 
 export type { SelectItem } from './select-context';
 
-export interface SelectProps {
+interface SelectBaseProps {
   /** Array of `{ label, value }` items for label resolution before options mount. */
   items?: SelectItem[];
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   /**
    * When true, the popup is positioned so the selected item overlays the
    * trigger — like a native `<select>`. Defaults to `true`. Falls back to
-   * menu-like placement below the trigger when opened by touch, or when the
-   * trigger sits too close to a viewport edge for the overlay to be usable.
+   * menu-like placement below the trigger when opened by touch, when nothing
+   * is selected, or when the trigger sits too close to a viewport edge for the
+   * overlay to be usable.
    */
   alignItemWithTrigger?: boolean;
   placement?: Placement;
   sideOffset?: number;
   children: ReactNode;
+}
+
+export interface SelectSingleProps extends SelectBaseProps {
+  multiple?: false;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+}
+
+export interface SelectMultipleProps extends SelectBaseProps {
+  /** Lets several options be selected. Picking an option toggles it and keeps the popup open. */
+  multiple: true;
+  value?: string[];
+  defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
+}
+
+export type SelectProps = SelectSingleProps | SelectMultipleProps;
+
+function toValues(value: string | undefined): string[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  return value === '' ? [] : [value];
 }
 
 function SelectInner(props: SelectProps) {
@@ -60,19 +82,22 @@ function SelectInner(props: SelectProps) {
     sideOffset = 4,
     children,
   } = props;
+  const multiple = props.multiple === true;
+  const onSingleValueChange = props.multiple ? undefined : props.onValueChange;
+  const onMultipleValueChange = props.multiple ? props.onValueChange : undefined;
 
   const nodeId = useFloatingNodeId();
 
   const [open, setOpen] = useControllableState(props.open, props.defaultOpen ?? false, props.onOpenChange);
 
-  const [selectedValue, setSelectedValue] = useControllableState<string | undefined>(
-    props.value,
-    props.defaultValue,
-    props.onValueChange as ((value: string | undefined) => void) | undefined,
+  const controlledValues = props.multiple ? props.value : toValues(props.value);
+  const [selectedValues, setSelectedValues] = useControllableState<string[]>(
+    controlledValues,
+    (props.multiple ? props.defaultValue : toValues(props.defaultValue)) ?? [],
   );
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+  const [cachedLabels, setCachedLabels] = useState<ReadonlyMap<string, string>>(new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const elementsRef = useRef<Array<HTMLElement | null>>([]);
@@ -156,22 +181,45 @@ function SelectInner(props: SelectProps) {
     }
   }, [mounted]);
 
-  const isControlled = props.value !== undefined;
+  const isControlled = controlledValues !== undefined;
 
   const handleSelect = useCallback(
     (value: string, index: number) => {
-      setSelectedValue(value);
-      setSelectedIndex(index);
+      if (multiple) {
+        const next = selectedValues.includes(value)
+          ? selectedValues.filter(selected => selected !== value)
+          : [...selectedValues, value];
+        setSelectedValues(next);
+        onMultipleValueChange?.(next);
+        if (next.length === 0) {
+          setSelectedIndex(null);
+        }
+      } else {
+        setSelectedValues([value]);
+        onSingleValueChange?.(value);
+        setSelectedIndex(index);
+      }
       // In controlled mode the parent decides whether to accept the new value.
-      // If they reject it, selectedValue rolls back but selectedLabel would not,
-      // showing a stale label. Only cache the label in uncontrolled mode where
+      // If they reject it, the selection rolls back but a cached label would not,
+      // showing a stale label. Only cache labels in uncontrolled mode where
       // the value always persists after selection.
       if (!isControlled) {
-        setSelectedLabel(valueToLabelRef.current.get(value) ?? value);
+        const label = valueToLabelRef.current.get(value) ?? value;
+        setCachedLabels(prev => new Map(prev).set(value, label));
       }
-      handleOpenChange(false);
+      if (!multiple) {
+        handleOpenChange(false);
+      }
     },
-    [isControlled, setSelectedValue, handleOpenChange],
+    [
+      multiple,
+      selectedValues,
+      isControlled,
+      setSelectedValues,
+      handleOpenChange,
+      onSingleValueChange,
+      onMultipleValueChange,
+    ],
   );
 
   const handleTypeaheadMatch = useCallback(
@@ -225,8 +273,9 @@ function SelectInner(props: SelectProps) {
       setActiveIndex,
       selectedIndex,
       setSelectedIndex,
-      selectedValue,
-      selectedLabel: isControlled ? null : selectedLabel,
+      multiple,
+      selectedValues,
+      cachedLabels: isControlled ? null : cachedLabels,
       elementsRef,
       labelsRef,
       popupRef,
@@ -254,8 +303,9 @@ function SelectInner(props: SelectProps) {
       setActiveIndex,
       selectedIndex,
       setSelectedIndex,
-      selectedValue,
-      selectedLabel,
+      multiple,
+      selectedValues,
+      cachedLabels,
       isControlled,
       returnFocusRef,
       alignActive,

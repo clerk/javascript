@@ -8,8 +8,8 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
 
   let fakeUser: FakeUser;
 
-  test.beforeAll(() => {
-    const u = createTestUtils({ app });
+  test.beforeAll(async () => {
+    const u = await createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser(test);
   });
 
@@ -18,7 +18,7 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
   });
 
   test('sign up with email link', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -34,7 +34,6 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
     await u.tabs.runInNewTab(async u => {
       const verificationLink = await u.services.email.getVerificationLinkForEmailAddress(fakeUser.email);
 
-      await u.po.testingToken.setup();
       await u.page.goto(verificationLink);
       await u.po.expect.toBeSignedIn();
       await u.page.close();
@@ -43,7 +42,7 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
   });
 
   test('sign in with email link', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -54,7 +53,6 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
     await page.getByRole('heading', { name: /Check your email/i }).waitFor();
     await u.tabs.runInNewTab(async u => {
       const verificationLink = await u.services.email.getVerificationLinkForEmailAddress(fakeUser.email);
-      await u.po.testingToken.setup();
       await u.page.goto(verificationLink);
       await u.po.expect.toBeSignedIn();
       await u.page.close();

@@ -27,7 +27,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withProtectService] })(
     });
 
     test('should add loader script when protect_config.loader is set', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockProtectSettings(page, {
         object: 'protect_config',
         id: 'n',
@@ -50,7 +50,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withProtectService] })(
       page,
       context,
     }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockProtectSettings(page, {
         object: 'protect_config',
         id: 'n',
@@ -70,7 +70,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withProtectService] })(
     });
 
     test('should not create loader element when protect_config.loader is not set', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
+      const u = await createTestUtils({ app, page, context });
       await mockProtectSettings(page);
       await u.page.goToAppHome();
       await u.page.waitForClerkJsLoaded();
