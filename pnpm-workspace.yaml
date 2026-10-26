@@ -71,8 +71,6 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # Renovate security update: fastify@5.12.5
-  - fastify@5.12.5
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
