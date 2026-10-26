@@ -116,7 +116,7 @@
   },
   "src/primitives/utils/use-render.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
-      "count": 8
+      "count": 6
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
