@@ -942,6 +942,21 @@ describe('Table', () => {
       expect(screen.getByRole('checkbox', { name: 'Select all' })).toHaveFocus();
     });
 
+    it('jumps to the last enabled row with Ctrl+End', async () => {
+      const user = userEvent.setup();
+      render(
+        <LogsTable
+          selectionMode='multiple'
+          rowProps={log => ({ disabled: log.message === 'Charlie' })}
+        />,
+      );
+
+      await tabIntoTable(user);
+      await user.keyboard('{ArrowRight}{Control>}{End}{/Control}');
+
+      expect(screen.getByRole('button', { name: 'Copy Bravo' })).toHaveFocus();
+    });
+
     it('returns to the last focused item when tabbed back into', async () => {
       const user = userEvent.setup();
       render(<LogsTable selectionMode='multiple' />);
@@ -1040,6 +1055,49 @@ describe('Table', () => {
       await user.keyboard('{ArrowDown}');
 
       expect(screen.getByRole('menuitem', { name: 'Archive' })).toBeInTheDocument();
+    });
+
+    it('lets a menu in a cell close on Escape before leaving the cell', async () => {
+      const user = userEvent.setup();
+      render(
+        <Table.Root
+          aria-label='Logs'
+          selectionMode='single'
+        >
+          <Table.Body
+            items={FLAT_LOGS}
+            itemToStringValue={toValue}
+          >
+            {log => (
+              <Table.Row>
+                <Table.Cell>
+                  <Menu.Root>
+                    <Menu.Trigger>{`${log.message} actions`}</Menu.Trigger>
+                    <Menu.Positioner>
+                      <Menu.Popup>
+                        <Menu.Item label='Archive'>Archive</Menu.Item>
+                      </Menu.Popup>
+                    </Menu.Positioner>
+                  </Menu.Root>
+                  <button type='button'>{`Copy ${log.message}`}</button>
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table.Root>,
+      );
+
+      await user.tab();
+      await user.keyboard('{ArrowRight}{Enter}');
+      expect(screen.getByRole('button', { name: 'Alpha actions' })).toHaveFocus();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Archive' })).toHaveFocus());
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => expect(screen.queryByRole('menuitem', { name: 'Archive' })).not.toBeInTheDocument());
+      expect(screen.getByRole('button', { name: 'Alpha actions' })).toHaveFocus();
+      await user.keyboard('{Escape}');
+      expect(focused()).toBe(screen.getByRole('button', { name: 'Alpha actions' }).closest('td'));
     });
 
     it('keeps a tab stop when the focused row is removed', async () => {

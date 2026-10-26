@@ -76,7 +76,7 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
   const someSelected = selectedCount > 0 && !allSelected;
   const interactive = tree || selectionMode !== 'none' || interactiveCount > 0;
 
-  useGridNavigation(element, interactive, excluded);
+  const leaveCell = useGridNavigation(element, interactive, excluded);
 
   const toggleSelected = (value: string, options?: { range?: boolean }) => {
     if (!selectable.includes(value)) {
@@ -148,7 +148,10 @@ export const TableRoot = React.forwardRef<HTMLTableElement, TableRootProps>(func
       if (!(target instanceof Element) || !currentTarget.contains(target)) {
         return;
       }
-      if (event.key === 'Escape' && selection.length > 0) {
+      if (event.key === 'Escape' && !event.isDefaultPrevented() && leaveCell(target)) {
+        event.preventDefault();
+        event.stopPropagation();
+      } else if (event.key === 'Escape' && selection.length > 0) {
         event.preventDefault();
         event.stopPropagation();
         setSelection([]);

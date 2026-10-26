@@ -29,6 +29,29 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     }
   }, [table, excluded]);
 
+  const activate = React.useCallback(
+    (element: HTMLElement, position: Position, editing: HTMLTableCellElement | null) => {
+      activeRef.current = element;
+      positionRef.current = position;
+      editingRef.current = editing;
+      sync();
+    },
+    [sync],
+  );
+
+  const leaveCell = React.useCallback(
+    (target: Element) => {
+      const cell = table ? owningCell(table, target) : null;
+      if (!cell || editingRef.current !== cell) {
+        return false;
+      }
+      activate(cell, positionOf(cell), null);
+      cell.focus();
+      return true;
+    },
+    [table, activate],
+  );
+
   React.useLayoutEffect(() => {
     if (enabled) {
       sync();
@@ -41,13 +64,6 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     }
     const observer = new MutationObserver(sync);
     observer.observe(table, { childList: true, subtree: true });
-
-    const activate = (element: HTMLElement, position: Position, editing: HTMLTableCellElement | null) => {
-      activeRef.current = element;
-      positionRef.current = position;
-      editingRef.current = editing;
-      sync();
-    };
 
     const moveTo = (position: Position) => {
       const element = itemAt(table, position, excluded);
@@ -77,7 +93,6 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
       }
     };
 
-    // eslint-disable-next-line sonarjs/cognitive-complexity -- One pass over the grid's keydown: editing mode, entering a cell, then movement.
     const onKeyDown = (event: KeyboardEvent) => {
       const { target } = event;
       if (event.defaultPrevented || event.altKey || !(target instanceof HTMLElement)) {
@@ -87,12 +102,6 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
       const cell = row ? null : owningCell(table, target);
 
       if (cell && editingRef.current === cell) {
-        if (event.key === 'Escape') {
-          event.preventDefault();
-          event.stopPropagation();
-          activate(cell, positionOf(cell), null);
-          cell.focus();
-        }
         return;
       }
 
@@ -122,7 +131,9 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
       table.removeEventListener('focusin', onFocusIn);
       table.removeEventListener('keydown', onKeyDown, true);
     };
-  }, [enabled, table, excluded, sync]);
+  }, [enabled, table, excluded, sync, activate]);
+
+  return leaveCell;
 }
 
 function syncRow(
@@ -197,7 +208,9 @@ function cellMove(
     case 'Home':
       return corner ? { row: 0, column: 0 } : { row: row.rowIndex, column: 0 };
     case 'End':
-      return corner ? { row: table.rows.length - 1, column: Infinity } : { row: row.rowIndex, column: Infinity };
+      return corner
+        ? { row: nextRowIndex(table, table.rows.length, -1), column: Infinity }
+        : { row: row.rowIndex, column: Infinity };
     default:
       return null;
   }
