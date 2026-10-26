@@ -8,7 +8,7 @@ import type {
   EmailAddressResource,
   IdentificationLinkResource,
   PrepareEmailAddressVerificationParams,
-  StartEmailAddressLinkFlowParams,
+  StartEmailLinkFlowParams,
   StartEnterpriseSSOLinkFlowParams,
   VerificationResource,
 } from '@clerk/shared/types';
@@ -51,28 +51,15 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
     });
   };
 
-  createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailAddressLinkFlowParams, EmailAddressResource> => {
+  createEmailLinkFlow = (): CreateEmailLinkFlowReturn<StartEmailLinkFlowParams, EmailAddressResource> => {
     const { run, stop } = Poller();
 
-    let operation = 0;
-
-    const startEmailLinkFlow = async ({
-      redirectUrl,
-      onPrepared,
-    }: StartEmailAddressLinkFlowParams): Promise<EmailAddressResource> => {
-      const currentOperation = ++operation;
+    const startEmailLinkFlow = async ({ redirectUrl }: StartEmailLinkFlowParams): Promise<EmailAddressResource> => {
       await this.prepareVerification({
         strategy: 'email_link',
         redirectUrl: redirectUrl,
       });
       return new Promise((resolve, reject) => {
-        if (currentOperation !== operation) {
-          return;
-        }
-        onPrepared?.();
-        if (currentOperation !== operation) {
-          return;
-        }
         void run(() => {
           return this.reload()
             .then(res => {
@@ -88,13 +75,7 @@ export class EmailAddress extends BaseResource implements EmailAddressResource {
         });
       });
     };
-    return {
-      startEmailLinkFlow,
-      cancelEmailLinkFlow: () => {
-        operation++;
-        stop();
-      },
-    };
+    return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
   };
 
   createEnterpriseSSOLinkFlow = (): CreateEnterpriseSSOLinkFlowReturn<

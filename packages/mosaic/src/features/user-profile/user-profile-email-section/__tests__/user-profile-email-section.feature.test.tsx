@@ -105,91 +105,47 @@ describe('the user profile email section', () => {
     }
   });
 
-  it.each(['code', 'link'] as const)(
-    'keeps existing email Verify pending until %s preparation succeeds',
-    async method => {
-      const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
-      const { actor } = await renderSection(
-        signedInWithEmails([PRIMARY, pending], method === 'link' ? verifiesByLink : fapiEnvironment()),
-      );
-      const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
-      try {
-        await manageEmail(actor, 'pending@example.com', 'Verify');
-        await waitFor(() => expect(prepare.requests).toHaveLength(1));
-        expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
-        expect(within(emailRow()).getByText('pending@example.com')).toBeVisible();
-        expect(screen.queryByRole('dialog')).toBeNull();
-        prepare.release();
-        await screen.findByRole('dialog');
-        if (method === 'code') {
-          await waitFor(() => expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus());
-        } else {
-          await waitFor(() =>
-            expect(screen.getByRole('dialog')).toHaveTextContent('Open the link we sent to pending@example.com'),
-          );
-        }
-      } finally {
-        prepare.release();
-      }
-    },
-  );
-
-  it.each(['code', 'link'] as const)(
-    'retries failed %s preparation from the entry form without another email',
-    async method => {
-      const { actor, fapi } = await renderSection(
-        signedInWithEmails([], method === 'link' ? verifiesByLink : fapiEnvironment()),
-      );
-      const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
-      try {
-        await actor.click(screen.getByRole('button', { name: 'Add email' }));
-        await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
-        await actor.click(screen.getByRole('button', { name: 'Continue' }));
-        await waitFor(() => expect(prepare.requests).toHaveLength(1));
-        prepare.fail('action_blocked');
-        await waitFor(() =>
-          expect(screen.getByRole('button', { name: 'Continue' })).not.toHaveAttribute('aria-busy', 'true'),
-        );
-        expect(screen.getByRole('textbox', { name: 'Email' })).toHaveValue('new@example.com');
-        const retry = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
-        try {
-          await actor.click(screen.getByRole('button', { name: 'Continue' }));
-          await waitFor(() => expect(retry.requests).toHaveLength(1));
-          expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(1);
-          retry.release();
-          if (method === 'code') {
-            expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
-          } else {
-            await waitFor(() =>
-              expect(screen.getByRole('dialog')).toHaveTextContent('Open the link we sent to new@example.com'),
-            );
-          }
-        } finally {
-          retry.release();
-        }
-      } finally {
-        prepare.release();
-      }
-    },
-  );
-
-  it('does not begin link polling after unmount during preparation', async () => {
+  it('keeps existing email Verify pending until code preparation succeeds', async () => {
     const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
-    const { actor, clerk, unmount } = await renderSection(signedInWithEmails([PRIMARY, pending], verifiesByLink));
-    const email = clerk.user?.emailAddresses.find(value => value.id === pending.id);
-    if (!email) {
-      throw new Error('Missing email');
-    }
-    const reload = vi.spyOn(email, 'reload');
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, pending]));
     const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
     try {
       await manageEmail(actor, 'pending@example.com', 'Verify');
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
-      unmount();
-      prepare.release();
-      await waitFor(() => expect(email.verification.strategy).toBe('email_link'));
-      expect(reload).not.toHaveBeenCalled();
+      expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
+      expect(within(emailRow()).getByText('pending@example.com')).toBeVisible();
       expect(screen.queryByRole('dialog')).toBeNull();
+      prepare.release();
+      await screen.findByRole('dialog');
+      await waitFor(() => expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus());
+    } finally {
+      prepare.release();
+    }
+  });
+
+  it('retries failed code preparation from the entry form without another email', async () => {
+    const { actor, fapi } = await renderSection(signedInWithEmails([]));
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+    try {
+      await actor.click(screen.getByRole('button', { name: 'Add email' }));
+      await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
+      await actor.click(screen.getByRole('button', { name: 'Continue' }));
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      prepare.fail('action_blocked');
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Continue' })).not.toHaveAttribute('aria-busy', 'true'),
+      );
+      expect(screen.getByRole('textbox', { name: 'Email' })).toHaveValue('new@example.com');
+      const retry = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+      try {
+        await actor.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() => expect(retry.requests).toHaveLength(1));
+        expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(1);
+        retry.release();
+        expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
+      } finally {
+        retry.release();
+      }
     } finally {
       prepare.release();
     }
@@ -489,39 +445,32 @@ describe('email reverification', () => {
     await actor.click(screen.getByRole('button', { name: 'Continue' }));
   }
 
-  it.each(['code', 'link'] as const)(
-    'holds password confirmation until email %s preparation finishes',
-    async method => {
-      const { actor } = await renderSection(challengedSeed(method === 'link' ? verifiesByLink : fapiEnvironment()));
-      demandReverificationOnce('/v1/me/email_addresses');
-      const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+  it('holds password confirmation until email code preparation finishes', async () => {
+    const { actor } = await renderSection(challengedSeed());
+    demandReverificationOnce('/v1/me/email_addresses');
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
 
-      try {
-        await beginAdd(actor);
-        await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
-        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    try {
+      await beginAdd(actor);
+      await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
 
-        expect(screen.getByLabelText('Password')).toBeVisible();
-        expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
-        expect(screen.queryByRole('textbox', { name: 'Email' })).toBeNull();
-        expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
-        await actor.keyboard('{Escape}{Enter}');
-        expect(screen.getByRole('dialog')).toBeVisible();
-        expect(prepare.requests).toHaveLength(1);
+      expect(screen.getByLabelText('Password')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Email' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+      await actor.keyboard('{Escape}{Enter}');
+      expect(screen.getByRole('dialog')).toBeVisible();
+      expect(prepare.requests).toHaveLength(1);
 
-        prepare.release();
-        if (method === 'link') {
-          expect(await screen.findByText('Open the link we sent to new@example.com')).toBeVisible();
-        } else {
-          const input = await screen.findByRole('textbox', { name: 'Verification code' });
-          await waitFor(() => expect(input).not.toHaveAttribute('aria-disabled'));
-          expect(input).toBeVisible();
-        }
-      } finally {
-        prepare.release();
-      }
-    },
-  );
+      prepare.release();
+      const input = await screen.findByRole('textbox', { name: 'Verification code' });
+      await waitFor(() => expect(input).not.toHaveAttribute('aria-disabled'));
+      expect(input).toBeVisible();
+    } finally {
+      prepare.release();
+    }
+  });
 
   it('returns to the email form after preparation fails', async () => {
     const { actor } = await renderSection(challengedSeed());

@@ -296,30 +296,6 @@ describe('useUserProfileAddEmailController', () => {
     expect(result.current.errorMessage).toBeUndefined();
   });
 
-  it('cancels a held link resend without reopening the dialog when it settles', async () => {
-    vi.useFakeTimers();
-    const email = verifier(sentLink(new Promise(() => {})));
-    const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
-    await act(() => result.current.onVerifyEmail(other, email));
-    for (let second = 0; second < 60; second++) {
-      await act(async () => vi.advanceTimersByTimeAsync(1000));
-    }
-    const held = createDeferredPromise();
-    email.prepare.mockImplementationOnce(async () => {
-      await held.promise;
-      return sentLink(new Promise(() => {}))();
-    });
-    act(() => result.current.onResend());
-    act(() => result.current.onOpenChange(false));
-    expect(email.cancel).toHaveBeenCalled();
-    expect(result.current.open).toBe(false);
-    await act(async () => {
-      held.resolve();
-      await held.promise;
-    });
-    expect(result.current.open).toBe(false);
-  });
-
   it('shows the error for the field that failed', async () => {
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({
