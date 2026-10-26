@@ -23,8 +23,7 @@ export { default as __source } from './organization-profile-members-panel.storie
 
 export const meta: StoryMeta = {
   group: 'Organization Profile',
-  status: 'wip',
-  substatus: 'needs reverification',
+  status: 'stable',
   title: 'OrganizationProfileMembersPanel',
   label: 'Members panel',
   navigation: { category: 'Panels' },
