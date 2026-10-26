@@ -71,8 +71,6 @@ minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # Renovate security update: fast-uri@3.1.7
-  - fast-uri@3.1.7
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
