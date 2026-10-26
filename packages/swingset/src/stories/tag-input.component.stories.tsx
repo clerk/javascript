@@ -13,7 +13,7 @@ export { default as __source } from './tag-input.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'TagInput',
   label: 'Tag Input',
   source: 'packages/mosaic/src/components/tag-input/tag-input.tsx',
