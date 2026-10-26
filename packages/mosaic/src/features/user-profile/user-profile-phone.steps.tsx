@@ -10,15 +10,20 @@ import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { useFlowAutoFocus } from '../../components/flow';
 import { Otp } from '../../components/otp';
+import type { CountryIso } from '../../components/phone-input';
 import { PhoneInput } from '../../components/phone-input';
 import { fill, rich, useMessages } from '../../localization';
-import { styles } from './user-profile-profile-panel.styles';
+import { Form } from '../../primitives/form';
+import { tabularNumbersStyle } from '../../styles/typography.styles';
+
+const CODE_LENGTH = 6;
 
 interface EnterPhoneStepProps {
   inputRef?: Ref<HTMLInputElement>;
   secondaryAction?: ReactNode;
   phoneNumber: string;
   onPhoneNumberChange: (value: string) => void;
+  defaultCountry?: CountryIso;
   onSubmit: () => void;
   isPending?: boolean;
   errorMessage?: string;
@@ -28,10 +33,11 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
   const m = useMessages('userProfileAddPhone');
   const phoneFormId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
+  const canSubmit = props.phoneNumber !== '';
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!props.isPending) {
+    if (canSubmit && !props.isPending) {
       props.onSubmit();
     }
   };
@@ -44,7 +50,7 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             id={phoneFormId}
             onSubmit={handleSubmit}
           />
@@ -53,6 +59,7 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
         <Field.Root
           required
           disabled={props.isPending}
+          focusableWhenDisabled
           invalid={Boolean(props.errorMessage)}
         >
           <Field.Label>{m.phone.label}</Field.Label>
@@ -61,6 +68,7 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
             name='phoneNumber'
             value={props.phoneNumber}
             onValueChange={props.onPhoneNumberChange}
+            defaultCountry={props.defaultCountry}
           />
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
@@ -72,6 +80,7 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
         <SubmitButton
           form={phoneFormId}
           fullWidth
+          disabled={!canSubmit}
           isPending={props.isPending}
           pendingLabel={m.phone.pending}
         >
@@ -98,6 +107,7 @@ interface VerifyPhoneStepProps {
 export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
   const m = useMessages('userProfileAddPhone');
   const verifyFormId = useId();
+  const canSubmit = props.code.length === CODE_LENGTH;
 
   const submitCode = (code?: string) => {
     if (!props.isPending && !props.isResending) {
@@ -107,7 +117,9 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    submitCode();
+    if (canSubmit) {
+      submitCode();
+    }
   };
 
   return (
@@ -120,7 +132,7 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
       </Card.Header>
       <Card.Content
         render={
-          <form
+          <Form
             id={verifyFormId}
             onSubmit={handleSubmit}
           />
@@ -129,6 +141,7 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
         <Field.Root
           required
           disabled={props.isPending || props.isResending}
+          focusableWhenDisabled
           invalid={Boolean(props.errorMessage)}
         >
           <Field.Label visuallyHidden>{m.verify.label}</Field.Label>
@@ -142,26 +155,31 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>
           </Field.Message>
-          <Button
-            type='button'
-            size='sm'
-            variant='link'
-            color='neutral'
-            disabled={props.isPending || props.isResending || (props.resendSeconds ?? 0) > 0}
-            onClick={props.onResend}
-          >
-            {props.isResending ? (
-              m.verify.resending
-            ) : (props.resendSeconds ?? 0) > 0 ? (
-              <span>
-                {rich(m.verify.resendCountdown, {
-                  values: { seconds: <span {...stylex.props(styles.countdown)}>{props.resendSeconds}</span> },
-                })}
-              </span>
-            ) : (
-              m.verify.resend
-            )}
-          </Button>
+          <Field.Description>
+            {m.verify.resendText}{' '}
+            <Button
+              type='button'
+              size='sm'
+              variant='link'
+              color='neutral'
+              disabled={props.isPending || props.isResending || (props.resendSeconds ?? 0) > 0}
+              onClick={props.onResend}
+            >
+              {props.isResending ? (
+                m.verify.resending
+              ) : (props.resendSeconds ?? 0) > 0 ? (
+                <span>
+                  {rich(m.verify.resendCountdown, {
+                    values: {
+                      seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{props.resendSeconds}</span>,
+                    },
+                  })}
+                </span>
+              ) : (
+                m.verify.resend
+              )}
+            </Button>
+          </Field.Description>
         </Field.Root>
       </Card.Content>
       <Card.Footer>
@@ -182,7 +200,7 @@ export function VerifyPhoneStep(props: VerifyPhoneStepProps) {
           form={verifyFormId}
           fullWidth
           isPending={props.isPending}
-          disabled={props.isResending}
+          disabled={!canSubmit || props.isResending}
           pendingLabel={m.verify.pending}
         >
           {m.verify.submit}

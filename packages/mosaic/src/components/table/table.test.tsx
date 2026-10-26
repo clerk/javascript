@@ -2,11 +2,13 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { describe, expect, it, vi } from 'vitest';
 
+import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
 import { EmptyState } from '../empty-state';
 import { Table } from './table';
-import { styles } from './table.styles';
+import { stickySides, styles } from './table.styles';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -91,6 +93,40 @@ describe('Mosaic Table', () => {
     expect(date).toHaveClass(stylex.props(styles.noWrap).className ?? '');
     expect(description).not.toHaveAttribute('data-no-wrap');
     expect(description).not.toHaveClass(stylex.props(styles.noWrap).className ?? '');
+  });
+
+  it.each(['start', 'end'] as const)('pins header and body cells to the %s edge', side => {
+    render(
+      <Table.Root>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell sticky={side}>Actions</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>Alpha</Table.Cell>
+            <Table.Cell sticky={side}>Edit</Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table.Root>,
+    );
+    const stickyClass = stylex.props(styles.sticky, stickySides[side]).className ?? '';
+    for (const cell of [
+      screen.getByRole('columnheader', { name: 'Actions' }),
+      screen.getByRole('cell', { name: 'Edit' }),
+    ]) {
+      expect(cell).toHaveAttribute('data-sticky', side);
+      expect(cell).toHaveClass(...stickyClass.split(' '));
+    }
+    for (const cell of [
+      screen.getByRole('columnheader', { name: 'Name' }),
+      screen.getByRole('cell', { name: 'Alpha' }),
+    ]) {
+      expect(cell).not.toHaveAttribute('data-sticky');
+      expect(cell).not.toHaveClass(stylex.props(styles.sticky).className ?? '');
+    }
   });
 
   it('lets the keyboard reach the scrolling viewport', () => {
@@ -278,6 +314,71 @@ describe('Mosaic Table', () => {
     });
   });
 
+  describe('interactive rows', () => {
+    it('marks rows with a click handler as interactive', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      render(
+        <Table.Root>
+          <Table.Body>
+            <Table.Row onClick={onClick}>
+              <Table.Cell>Alpha</Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell>Beta</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>,
+      );
+      const [interactive, plain] = screen.getAllByRole('row');
+      expect(interactive).toHaveAttribute('data-interactive', '');
+      expect(plain).not.toHaveAttribute('data-interactive');
+      await user.click(screen.getByText('Alpha'));
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not run the row action when a control inside the row is clicked', async () => {
+      const user = userEvent.setup();
+      const onRowClick = vi.fn();
+      const onButtonClick = vi.fn();
+      render(
+        <Table.Root>
+          <Table.Body>
+            <Table.Row onClick={onRowClick}>
+              <Table.Cell>
+                <button
+                  type='button'
+                  onClick={onButtonClick}
+                >
+                  View
+                </button>
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>,
+      );
+      await user.click(screen.getByRole('button', { name: 'View' }));
+      expect(onButtonClick).toHaveBeenCalledTimes(1);
+      expect(onRowClick).not.toHaveBeenCalled();
+    });
+
+    it('does not run the row action for clicks inside content portaled out of the row', async () => {
+      const user = userEvent.setup();
+      const onRowClick = vi.fn();
+      render(
+        <Table.Root>
+          <Table.Body>
+            <Table.Row onClick={onRowClick}>
+              <Table.Cell>{createPortal(<p>Menu content</p>, document.body)}</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>,
+      );
+      await user.click(screen.getByText('Menu content'));
+      expect(onRowClick).not.toHaveBeenCalled();
+    });
+  });
+
   describe('empty state', () => {
     it('renders the empty state across every column', () => {
       render(
@@ -291,7 +392,7 @@ describe('Mosaic Table', () => {
           <Table.Body>
             <Table.Empty colSpan={2}>
               <EmptyState.Root>
-                <EmptyState.Icon name='magnifying-glass' />
+                <EmptyState.Icon glyph={MagnifyingGlass} />
                 <EmptyState.Label>No results</EmptyState.Label>
                 <EmptyState.Description>Try a different search.</EmptyState.Description>
               </EmptyState.Root>

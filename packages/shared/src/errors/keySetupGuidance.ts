@@ -10,6 +10,8 @@ const dashboardFallback = `Or copy keys from https://dashboard.clerk.com/~/api-k
 export const keySetupGuidance = `To create a new Clerk app, run:
 npx clerk@latest init
 
+'npx clerk@latest init' does not need a Clerk account and writes temporary dev keys.
+
 ${existingAppSteps}
 
 ${dashboardFallback}`;

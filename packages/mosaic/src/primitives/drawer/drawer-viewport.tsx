@@ -3,6 +3,7 @@
 import { FloatingOverlay } from '@floating-ui/react';
 import React from 'react';
 
+import { useScrollLock } from '../hooks/use-scroll-lock';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useDrawerContext } from './drawer-context';
 
@@ -13,8 +14,8 @@ export interface DrawerViewportProps extends ComponentProps<'div'> {
 }
 
 /**
- * Fixed full-viewport container for the drawer. Wraps `FloatingOverlay` for
- * scroll-locking; the sheet (`Drawer.Popup`) is positioned against the bottom
+ * Fixed full-viewport container for the drawer. Locks page scroll and wraps
+ * `FloatingOverlay`; the sheet (`Drawer.Popup`) is positioned against the bottom
  * edge by the styled layer. Scroll-lock lives here, not on `Drawer.Backdrop`,
  * so the backdrop surface can be styled independently.
  */
@@ -22,6 +23,7 @@ export const DrawerViewport = React.forwardRef<HTMLDivElement, DrawerViewportPro
   function DrawerViewport(props, ref) {
     const { render, lockScroll = true, ...otherProps } = props;
     const { open, mounted, transitionProps, modal } = useDrawerContext();
+    useScrollLock(mounted && lockScroll);
 
     const state = { open };
 
@@ -46,13 +48,6 @@ export const DrawerViewport = React.forwardRef<HTMLDivElement, DrawerViewportPro
       return null;
     }
 
-    return (
-      <FloatingOverlay
-        lockScroll={lockScroll}
-        style={modal ? undefined : { pointerEvents: 'none' }}
-      >
-        {element}
-      </FloatingOverlay>
-    );
+    return <FloatingOverlay style={modal ? undefined : { pointerEvents: 'none' }}>{element}</FloatingOverlay>;
   },
 );

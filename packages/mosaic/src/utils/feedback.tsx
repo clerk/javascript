@@ -2,7 +2,7 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import React from 'react';
 
 import { Icon } from '../components/icon';
-import type { IconName } from '../icons/registry';
+import type { IconComponent } from '../icons/glyph';
 import { autoUpdate, getDimensions } from '../primitives/utils/dom';
 import { feedbackStyles } from '../styles/feedback.styles';
 
@@ -32,11 +32,11 @@ export function useHeldMessage(children: React.ReactNode, open: boolean) {
   return held.current;
 }
 
-export function FeedbackBody({ icon, children }: { icon: IconName; children: React.ReactNode }) {
+export function FeedbackBody({ icon, children }: { icon: IconComponent; children: React.ReactNode }) {
   return (
     <>
       <Icon
-        name={icon}
+        glyph={icon}
         size='sm'
         xstyle={feedbackStyles.icon}
       />

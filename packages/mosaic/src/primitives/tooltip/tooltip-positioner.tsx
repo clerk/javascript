@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useTooltipContext } from './tooltip-context';
 
 export type TooltipPositionerProps = ComponentProps<'div'>;
@@ -12,7 +13,7 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
     const { render, ...otherProps } = props;
     const { mounted, refs, floatingStyles, placement, getFloatingProps } = useTooltipContext();
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
     const floatingProps = getFloatingProps();
     const wiredId = floatingProps.id;
 
@@ -32,10 +33,7 @@ export const TooltipPositioner = React.forwardRef<HTMLDivElement, TooltipPositio
       defaultTagName: 'div',
       render,
       enabled: mounted,
-      // floating-ui types `setFloating` as a method signature, but at runtime it's
-      // a stable callback that doesn't use `this`, so the unbound-method check is a
-      // false positive here.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setFloating` as a method, but it is a stable callback that does not use `this`.
       ref: [refs.setFloating, ref],
       props: merged,
     });

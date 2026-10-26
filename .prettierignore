@@ -26,3 +26,16 @@ renovate.json5
 # Frozen snapshots of TypeDoc-generated MDX; must match raw `extract-methods.mjs` output.
 .typedoc/__tests__/__snapshots__/
 CLAUDE.md
+
+# Written by `eslint --suppress-rule` / `--prune-suppressions`; ESLint owns the formatting.
+/**/eslint-suppressions.json
+
+# Copied byte for byte from another repo; do not reformat.
+integration/expo-native/src/platform/android/
+integration/expo-native/src/platform/ios/
+integration/expo-native/test/*.ts
+!integration/expo-native/test/freshness.test.ts
+!integration/expo-native/test/host.test.ts
+!integration/expo-native/test/remote-host.test.ts
+integration/expo-native/.verify/
+integration/expo-native/specs/explored/

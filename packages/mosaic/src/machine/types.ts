@@ -159,6 +159,7 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
    * `setup().fromPromise`) to carry the resolved type to `onDone.actions`.
    * A raw `src` function is also accepted — `e.output` is `any` in that case.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Each state invokes its own output type, and TypeScript cannot express that per-state type here; `unknown` would reject typed `onDone` handlers.
   invoke?: InvokeConfig<TContext, TEvent, any, TStates>;
   /** Actions run when the state is entered. */
   entry?: Actions<TContext, TEvent>;

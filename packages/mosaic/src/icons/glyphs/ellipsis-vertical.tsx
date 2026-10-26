@@ -1,6 +1,7 @@
 import { glyph } from '../glyph';
 
 export const EllipsisVertical = glyph(
+  'ellipsis-vertical',
   <g transform='translate(0 -0.01)'>
     <path
       d='M8 9.33333C8.73638 9.33333 9.33333 8.73638 9.33333 8C9.33333 7.26362 8.73638 6.66667 8 6.66667C7.26362 6.66667 6.66667 7.26362 6.66667 8C6.66667 8.73638 7.26362 9.33333 8 9.33333Z'

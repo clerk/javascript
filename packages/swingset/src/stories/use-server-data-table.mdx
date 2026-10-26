@@ -1,0 +1,105 @@
+import * as UseServerDataTableStories from './use-server-data-table.stories';
+
+# useServerDataTable
+
+Adapter from server query state to the [Table](/components/table) and [Pagination](/components/pagination) components. You own the query (search, sort, 1-based page, page size) and pass in the page of rows it returned; the hook wraps [useDataTable](/hooks/use-data-table) and hands back the table state, the sort props for each header cell, and the props for `Pagination`. Any change to the search, sort, page, or page size clears the row selection.
+
+## Example
+
+Search, sort by a column, select rows, and change pages. The story filters, sorts, and slices the rows itself to stand in for the server.
+
+<Story
+  name='Default'
+  storyModule={UseServerDataTableStories}
+/>
+
+## Usage
+
+```tsx
+import { Pagination } from '@clerk/mosaic/components/pagination';
+import { Table } from '@clerk/mosaic/components/table';
+import { useServerDataTable } from '@clerk/mosaic/hooks/use-server-data-table';
+
+const { table, sortHeader, pagination } = useServerDataTable({
+  data: response.data,
+  totalCount: response.totalCount,
+  getRowId: row => row.id,
+  sortableColumns: ['name', 'createdAt'],
+  sort,
+  onSortChange: setSort,
+  page,
+  pageSize,
+  onPageChange: setPage,
+  onPageSizeChange: setPageSize,
+  searchValue: query,
+  onSearchChange: setQuery,
+});
+
+<Table.Search
+  label='Search'
+  clearLabel='Clear search'
+  value={table.globalFilter}
+  onValueChange={table.setGlobalFilter}
+/>
+<Table.Root>
+  <Table.Header>
+    <Table.Row>
+      <Table.HeaderCell {...sortHeader('name')}>Name</Table.HeaderCell>
+      <Table.HeaderCell {...sortHeader('createdAt')}>Created</Table.HeaderCell>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    {table.rows.map(row => (
+      <Table.Row key={row.id}>…</Table.Row>
+    ))}
+  </Table.Body>
+</Table.Root>
+{pagination ? <Pagination {...pagination} /> : null}
+```
+
+## Options
+
+| Prop               | Type                                                   | Default      | Description                                                                                                      |
+| ------------------ | ------------------------------------------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `data`             | `TData[]`                                              | — (required) | Current page of rows                                                                                             |
+| `totalCount`       | `number`                                               | — (required) | Total matching rows across all pages                                                                             |
+| `getRowId`         | `(row: TData) => string`                               | — (required) | Stable row identifier                                                                                            |
+| `isRowSelectable`  | `(row: TData) => boolean`                              | every row    | Rows that return `false` are skipped by selection                                                                |
+| `sortableColumns`  | `readonly TColumn[]`                                   | — (required) | Columns the server can sort by                                                                                   |
+| `sort`             | `ServerDataTableSort<TColumn> \| null`                 | unsorted     | Active sort                                                                                                      |
+| `onSortChange`     | `(sort: ServerDataTableSort<TColumn> \| null) => void` | —            | Called with the next sort. Without it, header cells are not sortable                                             |
+| `page`             | `number`                                               | — (required) | Current page, 1-based                                                                                            |
+| `pageSize`         | `number`                                               | — (required) | Rows per page                                                                                                    |
+| `onPageChange`     | `(page: number) => void`                               | — (required) | Called with the next 1-based page                                                                                |
+| `onPageSizeChange` | `(pageSize: number) => void`                           | —            | Called with the next page size, followed by `onPageChange(1)`. Without it, `Pagination` has no page size control |
+| `searchValue`      | `string`                                               | — (required) | Current search query                                                                                             |
+| `onSearchChange`   | `(value: string) => void`                              | — (required) | Called with the next search query                                                                                |
+| `isFetching`       | `boolean`                                              | `false`      | Whether a page is loading. While `true`, `Pagination` is disabled                                                |
+
+## Return
+
+| Value        | Type                                                                  | Description                                                                                                       |
+| ------------ | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `table`      | `UseDataTableReturn<TData>`                                           | The [useDataTable](/hooks/use-data-table) return: rows, selection, and the search value to bind to `Table.Search` |
+| `sortHeader` | `(column: TColumn) => Pick<TableHeaderCellProps, 'sort' \| 'onSort'>` | Props to spread on a `Table.HeaderCell`. Clicking cycles ascending, descending, unsorted                          |
+| `pagination` | `ServerDataTablePagination \| null`                                   | Props to spread on `Pagination`, or `null` when there is nothing to paginate                                      |
+
+`pagination` is non-null when there is more than one page, or when there is at least one row and `onPageSizeChange` is set.
+
+## Types
+
+```ts
+interface ServerDataTableSort<TColumn extends string> {
+  column: TColumn;
+  direction: 'ascending' | 'descending';
+}
+
+type ServerDataTablePagination = {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  disabled: boolean;
+  onChange: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+};
+```

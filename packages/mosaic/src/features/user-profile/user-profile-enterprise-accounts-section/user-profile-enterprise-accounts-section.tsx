@@ -8,11 +8,10 @@ import { UserProfileEnterpriseAccountsSectionView } from './user-profile-enterpr
 
 export type UserProfileEnterpriseAccountsSectionProps = {
   fallback?: ReactNode;
-  mode?: 'modal' | 'mounted';
 };
 
-export function UserProfileEnterpriseAccountsSection({ fallback, mode }: UserProfileEnterpriseAccountsSectionProps) {
-  const model = useUserProfileEnterpriseAccountsModel({ mode });
+export function UserProfileEnterpriseAccountsSection({ fallback }: UserProfileEnterpriseAccountsSectionProps) {
+  const model = useUserProfileEnterpriseAccountsModel();
   if (model.status === 'loading') {
     return fallback ?? null;
   }
@@ -33,7 +32,8 @@ function EnterpriseAccounts({ model }: { model: Extract<UserProfileEnterpriseAcc
     accounts: model.accounts,
     connections: model.connections,
     onConnect: model.connect,
-    errorMessage: m.errors.generic,
+    connectReverification: model.connectReverification,
+    errorFallback: m.errors.generic,
   });
 
   return <UserProfileEnterpriseAccountsSectionView {...controller} />;
