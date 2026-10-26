@@ -75,46 +75,31 @@ export function MembersTableTabSkeleton({
         minWidth='37rem'
         aria-label={m.title}
         aria-busy
+        selectionMode={hasBulkAction ? 'multiple' : 'none'}
       >
-        <Table.ColumnGroup>
-          {hasBulkAction ? <Table.Column /> : null}
-          <Table.Column />
-          <Table.Column width='9rem' />
-          <Table.Column width='10rem' />
-          {hasRemove ? <Table.Column width='4rem' /> : null}
-        </Table.ColumnGroup>
         <Table.Header>
-          <Table.Row>
-            {hasBulkAction ? (
-              <Table.SelectAllCell
-                aria-label={m.selectAll}
-                checked={false}
-                disabled
-              />
-            ) : null}
-            <Table.HeaderCell>{m.name}</Table.HeaderCell>
-            <Table.HeaderCell>{m.joinedAt}</Table.HeaderCell>
-            <Table.HeaderCell>{m.role}</Table.HeaderCell>
-            {hasRemove ? (
-              <Table.HeaderCell align='end'>
-                <VisuallyHidden>{m.actions}</VisuallyHidden>
-              </Table.HeaderCell>
-            ) : null}
-          </Table.Row>
+          {hasBulkAction ? <Table.SelectionColumn aria-label={m.selectAll} /> : null}
+          <Table.Column>{m.name}</Table.Column>
+          <Table.Column width='9rem'>{m.joinedAt}</Table.Column>
+          <Table.Column width='10rem'>{m.role}</Table.Column>
+          {hasRemove ? (
+            <Table.Column
+              align='end'
+              width='4rem'
+            >
+              <VisuallyHidden>{m.actions}</VisuallyHidden>
+            </Table.Column>
+          ) : null}
         </Table.Header>
         <Table.Body
           aria-hidden
           {...inertProps(true)}
+          items={PLACEHOLDER_MEMBERS}
+          itemToStringValue={member => member.id}
         >
-          {PLACEHOLDER_MEMBERS.map(member => (
-            <Table.Row key={member.id}>
-              {hasBulkAction ? (
-                <Table.SelectCell
-                  aria-label={member.name}
-                  checked={false}
-                  disabled
-                />
-              ) : null}
+          {member => (
+            <Table.Row disabled>
+              {hasBulkAction ? <Table.SelectionCell aria-label={member.name} /> : null}
               <Table.Cell>
                 <Entity.Root>
                   <Skeleton
@@ -161,7 +146,7 @@ export function MembersTableTabSkeleton({
                 </Table.Cell>
               ) : null}
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
     </div>
