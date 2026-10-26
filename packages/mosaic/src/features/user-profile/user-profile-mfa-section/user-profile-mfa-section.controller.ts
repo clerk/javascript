@@ -307,9 +307,12 @@ function createSmsActions(model: ReadyModel, flow: MfaFlow, resendSeconds: numbe
         if (current.step !== 'phone' || !findOrCreatePhone) {
           return current;
         }
-        const phone = await findOrCreatePhone(current.phoneNumber);
+        const { phone, codeSent } = await findOrCreatePhone(current.phoneNumber);
         phoneId = phone.id;
         send({ type: 'PHONE_RESOLVED', id: phone.id, phoneNumber: phone.phoneNumber });
+        if (codeSent) {
+          return { ...current, step: 'verify', phoneId, phoneNumber: phone.phoneNumber, error: undefined };
+        }
       }
       const result = await enrollSms(phoneId, code ?? (current.step === 'verify' ? current.code : undefined));
       if (result.status === 'needsVerification') {

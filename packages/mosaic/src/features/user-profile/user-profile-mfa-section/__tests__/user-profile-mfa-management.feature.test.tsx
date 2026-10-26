@@ -640,6 +640,36 @@ describe('User profile MFA management', () => {
     expect(await screen.findByRole('button', { name: 'Verify' })).toBeVisible();
   });
 
+  it('keeps session verification on screen until the new phone code is sent', async () => {
+    const fapi = await renderMfa(fapiUser({ id: 'user_1' }), mfaEnvironment(), {
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me/phone_numbers');
+    const user = userEvent.setup();
+
+    await startSms(user);
+    await user.type(screen.getByRole('textbox', { name: 'Phone' }), '5555550303');
+    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    expect(await screen.findByText('Enter your current password to continue')).toBeVisible();
+    await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+    try {
+      await user.keyboard('hunter2{Enter}');
+      await act(async () => {
+        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      });
+      expect(screen.getByText('Enter your current password to continue')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Phone' })).toBeNull();
+    } finally {
+      prepare.release();
+    }
+
+    expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
+    expect(screen.queryByRole('textbox', { name: 'Phone' })).toBeNull();
+    expect(fapi.mfa.phonePreparations).toHaveLength(1);
+  });
+
   it('lets the user cancel SMS MFA verification quietly and add the method again', async () => {
     const fapi = await renderMfa(undefined, mfaEnvironment(), { verification: { secrets: { password: 'hunter2' } } });
     demandReverificationOnce('/v1/me/phone_numbers/phone_1');

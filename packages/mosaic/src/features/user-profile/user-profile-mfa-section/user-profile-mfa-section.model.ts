@@ -132,7 +132,10 @@ function createSmsActions(
       const existing = current.phoneNumbers.find(
         phone => !phone.reservedForSecondFactor && phone.phoneNumber === phoneNumber,
       );
-      return summarizePhone(existing ?? (await calls.createPhone(current, phoneNumber)));
+      if (existing) {
+        return { phone: summarizePhone(existing), codeSent: false };
+      }
+      return { phone: summarizePhone(await calls.createPhone(current, phoneNumber)), codeSent: true };
     },
     enrollSms: async (phoneId, code): Promise<SmsEnrollmentResult> => {
       let phone = currentPhone(phoneId);
@@ -200,8 +203,12 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     await current.reload().catch(() => undefined);
     return result;
   });
-  const [createPhone, createPhoneReverification] = useReverificationFlow((current: UserResource, phoneNumber: string) =>
-    current.createPhoneNumber({ phoneNumber }),
+  const [createPhone, createPhoneReverification] = useReverificationFlow(
+    async (current: UserResource, phoneNumber: string) => {
+      const phone = await current.createPhoneNumber({ phoneNumber });
+      await phone.prepareVerification();
+      return phone;
+    },
   );
   const [reservePhone, enrollSmsReverification] = useReverificationFlow(async (phone: PhoneNumberResource) => {
     const result = await phone.setReservedForSecondFactor({ reserved: true });
