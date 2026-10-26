@@ -1,10 +1,18 @@
+import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
+
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import { Spinner } from '../../components/spinner';
-import type { IconName } from '../../icons/registry';
+import type { IconComponent } from '../../icons/glyph';
+import { Code } from '../../icons/glyphs/code';
+import { SecurityLockSquare } from '../../icons/glyphs/security-lock-square';
+import { SecurityPasskey } from '../../icons/glyphs/security-passkey';
+import { SecurityPhone } from '../../icons/glyphs/security-phone';
 import type { MosaicMessages } from '../../localization';
-import { fill, useMessages } from '../../localization';
+import { fill, rich, useMessages } from '../../localization';
+import { tabularNumbersStyle } from '../../styles/typography.styles';
 import { styles } from './reverification.styles';
 import type {
   ReverificationErrorReason,
@@ -22,13 +30,13 @@ import { ReverificationPassword } from './steps/reverification-password';
 type Messages = MosaicMessages['reverification'];
 
 const methodIcon = {
-  password: 'security-lock-square',
-  passkey: 'security-passkey',
-  email_code: 'code',
-  phone_code: 'security-phone',
-  totp: 'security-lock-square',
-  backup_code: 'security-phone',
-} as const satisfies Record<ReverificationMethod['strategy'], IconName>;
+  password: SecurityLockSquare,
+  passkey: SecurityPasskey,
+  email_code: Code,
+  phone_code: SecurityPhone,
+  totp: SecurityLockSquare,
+  backup_code: SecurityPhone,
+} as const satisfies Record<ReverificationMethod['strategy'], IconComponent>;
 
 function methodLabel(method: ReverificationMethod, m: Messages): string {
   const identifier = 'identifier' in method ? method.identifier : '';
@@ -133,7 +141,8 @@ export function ReverificationView({
   onResend,
   canResend,
   resendRemainingSeconds,
-}: ReverificationViewProps): JSX.Element {
+  focusRef,
+}: ReverificationViewProps & { focusRef?: Ref<HTMLElement> }): JSX.Element {
   const m = useMessages('reverification');
 
   const otp = otpCopy(otpChannel, m);
@@ -143,11 +152,22 @@ export function ReverificationView({
     pendingLabel: m.verifying,
   };
   const hasAlternatives = methods.length > 0;
-  const resendLabel = otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton;
+  const resendCopy = otpChannel === 'phone' ? m.phoneCode : m.emailCode;
   const resend =
     otpChannel === 'email' || otpChannel === 'phone'
       ? {
-          label: resendRemainingSeconds ? `${resendLabel} (${resendRemainingSeconds})` : resendLabel,
+          text: resendCopy.resendText,
+          label: resendRemainingSeconds ? (
+            <span>
+              {rich(resendCopy.resendCountdown, {
+                values: {
+                  seconds: <span {...stylex.props(tabularNumbersStyle.enabled)}>{resendRemainingSeconds}</span>,
+                },
+              })}
+            </span>
+          ) : (
+            resendCopy.resendButton
+          ),
           disabled: !canResend || isPending,
           onClick: onResend,
         }
@@ -163,11 +183,14 @@ export function ReverificationView({
         <>
           <Flow.Step ids={['password']}>
             <ReverificationPassword
+              focusRef={focusRef}
               messages={{
                 title: m.password.title,
                 description: m.password.description,
                 fieldLabel: m.formFieldLabel__password,
                 fieldPlaceholder: m.formFieldInputPlaceholder__password,
+                showPasswordLabel: m.formFieldAction__showPassword,
+                hidePasswordLabel: m.formFieldAction__hidePassword,
                 ...actions,
               }}
               value={value}
@@ -181,6 +204,7 @@ export function ReverificationView({
 
           <Flow.Step ids={['passkey']}>
             <ReverificationPasskey
+              focusRef={focusRef}
               messages={{
                 title: m.passkey.title,
                 description: m.passkey.description,
@@ -195,6 +219,7 @@ export function ReverificationView({
 
           <Flow.Step ids={['otp']}>
             <ReverificationOTP
+              focusRef={focusRef}
               messages={{
                 title: otp.title,
                 description: otp.description,
@@ -217,6 +242,7 @@ export function ReverificationView({
 
           <Flow.Step ids={['backup-code']}>
             <ReverificationBackupCode
+              focusRef={focusRef}
               messages={{
                 title: m.backupCodeMfa.title,
                 description: m.backupCodeMfa.description,
@@ -234,6 +260,7 @@ export function ReverificationView({
 
           <Flow.Step ids={['method-picker']}>
             <ReverificationMethodPicker
+              focusRef={focusRef}
               messages={{
                 title: m.alternativeMethods.title,
                 description: m.alternativeMethods.description,

@@ -302,9 +302,45 @@ export const kkKZ: LocalizationResource = {
       google: undefined,
       okta: undefined,
     },
+    roleMappingStep: {
+      actionHint__reorder: undefined,
+      actionLabel__reorder: undefined,
+      alert__missingManageMembersPermission: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      columns: {
+        directoryGroup: undefined,
+        priority: undefined,
+        role: undefined,
+      },
+      disableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      empty__noGroups: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      enableDialog: {
+        cancelButton: undefined,
+        confirmButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      error__loadMappings: undefined,
+      everyoneElse: undefined,
+      formFieldLabel__syncRoles: undefined,
+      roleOption__unassigned: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     stepper: {
       attributes: undefined,
       configure: undefined,
+      roles: undefined,
       test: undefined,
     },
     testStep: {
@@ -1585,6 +1621,11 @@ export const kkKZ: LocalizationResource = {
         'Құпия кілт арқылы сіздің тұлғаңыз расталады. Құрылғыңыз саусақ ізі, бет бейнесі немесе экран құлыптамасын сұрауы мүмкін.',
       title: 'Құпия кілт қолдану',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Басқа әдісті қолдану',
       subtitle: 'Жалғастыру үшін құпия сөзді енгізіңіз',
@@ -1734,6 +1775,10 @@ export const kkKZ: LocalizationResource = {
       subtitle:
         'Құпия кілт арқылы тұлғаңыз расталады. Құрылғыңыз саусақ ізі, бет бейнесі немесе экран құлыптамасын сұрауы мүмкін.',
       title: 'Құпия кілт қолдану',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Басқа әдісті қолдану',

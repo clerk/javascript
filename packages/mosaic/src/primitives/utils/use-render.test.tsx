@@ -2,10 +2,28 @@ import { cleanup, render, renderHook, screen } from '@testing-library/react';
 import * as React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { mergeProps, useRender } from './use-render';
+import { isRef, mergeProps, useRender } from './use-render';
 
 afterEach(() => {
   cleanup();
+});
+
+describe('isRef', () => {
+  it.each([
+    ['null', null],
+    ['a callback ref', () => {}],
+    ['a ref object', React.createRef()],
+  ])('accepts %s', (_, value) => {
+    expect(isRef(value)).toBe(true);
+  });
+
+  it.each([
+    ['undefined', undefined],
+    ['a string', 'ref'],
+    ['an object without current', {}],
+  ])('rejects %s', (_, value) => {
+    expect(isRef(value)).toBe(false);
+  });
 });
 
 describe('mergeProps', () => {
@@ -45,6 +63,23 @@ describe('mergeProps', () => {
   it('concatenates className', () => {
     const result = mergeProps<'div'>({ className: 'base' }, { className: 'extra' });
     expect(result.className).toBe('base extra');
+  });
+
+  it.each([
+    { key: 'onClick', value: () => {}, empty: undefined },
+    { key: 'className', value: 'base', empty: undefined },
+    { key: 'className', value: 'base', empty: null },
+    { key: 'className', value: 'base', empty: '' },
+    { key: 'style', value: { color: 'red' }, empty: undefined },
+    { key: 'style', value: { color: 'red' }, empty: null },
+  ])('keeps the first argument $key when the second passes $empty', ({ key, value, empty }) => {
+    const result = mergeProps<'button'>({ [key]: value }, { [key]: empty });
+    expect(result[key]).toBe(value);
+  });
+
+  it('lets the second argument clear an event handler with null', () => {
+    const result = mergeProps<'button'>({ onClick: () => {} }, { onClick: null });
+    expect(result.onClick).toBeNull();
   });
 
   it('does not chain non-event-handler functions', () => {

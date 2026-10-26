@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { PortalProvider } from '../../primitives/portal';
 import { Dialog } from '../dialog';
 import { Menu } from '../menu';
 import { ActionBar } from './action-bar';
@@ -78,6 +79,27 @@ describe('Mosaic ActionBar', () => {
     expect(bar).toHaveAttribute('aria-orientation', 'horizontal');
     expect(bar).toHaveAccessibleDescription('3 selected');
     expect(screen.getAllByRole('separator')).toHaveLength(2);
+  });
+
+  it('portals into the PortalProvider container', async () => {
+    function App() {
+      const ref = React.useRef<HTMLDivElement>(null);
+      return (
+        <div
+          ref={ref}
+          data-testid='container'
+        >
+          <PortalProvider container={ref}>
+            <BulkActions />
+          </PortalProvider>
+        </div>
+      );
+    }
+    render(<App />);
+
+    expect(screen.getByTestId('container')).toContainElement(
+      await screen.findByRole('toolbar', { name: 'Bulk actions' }),
+    );
   });
 
   it('renders nothing while closed', () => {

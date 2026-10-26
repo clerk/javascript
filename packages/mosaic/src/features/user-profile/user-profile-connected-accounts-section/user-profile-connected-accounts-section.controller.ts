@@ -1,6 +1,14 @@
-import { useRef, useState } from 'react';
+import type { Ref } from 'react';
+import { useRef } from 'react';
 
+import type { ConfirmController } from '../../../blocks/confirm';
+import { useConfirmController } from '../../../blocks/confirm';
+import type { DialogFocusTarget } from '../../../components/dialog';
+import { usePanelTitle } from '../../../components/panel';
+import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
+import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
 import type {
   ConnectedAccountActionResult,
   UserProfileConnectedAccount,
@@ -12,6 +20,10 @@ export interface UserProfileConnectedAccountsControllerOptions {
   availableProviders: UserProfileConnectionProvider[];
   onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
+  onRemove?: (id: string) => void | Promise<void>;
+  removeReverification: ReverificationController;
+  reconnectReverification: ReverificationController;
+  connectReverification: ReverificationController;
 }
 
 export interface UserProfileConnectedAccountsController {
@@ -20,6 +32,14 @@ export interface UserProfileConnectedAccountsController {
   pendingId: string | undefined;
   onConnect: (id: string) => void;
   onReconnect: (id: string) => void;
+  sectionRef: Ref<HTMLDivElement>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+  remove: ConfirmController<UserProfileConnectedAccount> | undefined;
+  finalFocus: DialogFocusTarget;
+  reconnectReverification: ReverificationController;
+  reconnectFinalFocus: DialogFocusTarget;
+  connectReverification: ReverificationController;
+  connectFinalFocus: DialogFocusTarget;
 }
 
 const OAUTH_REDIRECT_HOLD_MS = 2000;
@@ -29,41 +49,52 @@ export function useUserProfileConnectedAccountsController({
   availableProviders,
   onConnect,
   onReconnect,
+  onRemove,
+  removeReverification,
+  reconnectReverification,
+  connectReverification,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const messages = useMessages('userProfileConnectedAccounts');
-  const [pendingId, setPendingId] = useState<string>();
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const connecting = useRef(false);
+  const actions = usePendingAction({ errorFallback: messages.errors.generic });
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const panelTitle = usePanelTitle();
+  const removalFocus = useListRemovalFocus({
+    ids: accounts.map(account => account.id),
+    onRemove,
+    fallback: () =>
+      sectionRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
+      sectionRef.current ??
+      panelTitle(),
+  });
+  const remove = useConfirmController<UserProfileConnectedAccount>({
+    onConfirm: account => removalFocus.remove(account.id),
+    reverification: removeReverification,
+  });
 
-  const run = async (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) => {
-    if (connecting.current) {
-      return;
-    }
-    connecting.current = true;
-    setPendingId(id);
-    setErrors(({ [id]: _cleared, ...rest }) => rest);
-
-    try {
+  const run = (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) =>
+    void actions.run(id, async () => {
       if ((await action(id)) === 'redirecting') {
         await new Promise(resolve => setTimeout(resolve, OAUTH_REDIRECT_HOLD_MS));
       }
-    } catch (error) {
-      setErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : messages.errors.generic }));
-    } finally {
-      connecting.current = false;
-      setPendingId(undefined);
-    }
-  };
+    });
 
   return {
     accounts: accounts.map(account =>
-      errors[account.id] ? { ...account, reconnectError: errors[account.id] } : account,
+      actions.errorKey === account.id ? { ...account, reconnectError: actions.error } : account,
     ),
     availableProviders: availableProviders.map(provider =>
-      errors[provider.id] ? { ...provider, connectError: errors[provider.id] } : provider,
+      actions.errorKey === provider.id ? { ...provider, connectError: actions.error } : provider,
     ),
-    pendingId,
-    onConnect: id => void run(id, onConnect),
-    onReconnect: id => void run(id, onReconnect),
+    pendingId: actions.pendingKey,
+    onConnect: id => run(id, onConnect),
+    onReconnect: id => run(id, onReconnect),
+    sectionRef,
+    registerTrigger: removalFocus.registerTrigger,
+    remove: onRemove ? remove : undefined,
+    finalFocus: removalFocus.finalFocus,
+    reconnectReverification,
+    reconnectFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
+    connectReverification,
+    connectFinalFocus: () => (actions.lastKey ? removalFocus.trigger(actions.lastKey) : null),
   };
 }

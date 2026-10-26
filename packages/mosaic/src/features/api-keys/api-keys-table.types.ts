@@ -1,7 +1,12 @@
-import type { MouseEventHandler } from 'react';
+import type { APIKeyResource } from '@clerk/shared/types';
+import type { MouseEventHandler, Ref } from 'react';
 
+import type { ConfirmController } from '../../blocks/confirm';
+import type { DialogFocusTarget } from '../../components/dialog';
 import type { MosaicMessages } from '../../localization';
 import type { CreateAPIKeyDialogProps } from './create-api-key.dialog';
+
+export type APIKeyRecord = Pick<APIKeyResource, 'id' | 'name' | 'createdAt' | 'expiration' | 'lastUsedAt'>;
 
 export interface APIKey {
   id: string;
@@ -31,16 +36,19 @@ export interface APIKeysTableViewProps {
   page: number;
   pageSize?: number;
   searchValue: string;
-  isLoading: boolean;
   isFetching?: boolean;
   isError?: boolean;
   onRetry?: () => void;
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;
+  searchInputRef?: Ref<HTMLInputElement>;
+  createButtonRef?: Ref<HTMLButtonElement>;
   onCreate?: MouseEventHandler<HTMLButtonElement>;
   createDialog?: CreateAPIKeyDialogProps;
-  onRevoke?: (id: string) => Promise<void>;
+  registerTrigger: (id: string) => Ref<HTMLButtonElement>;
+  revoke?: ConfirmController<APIKey>;
+  finalFocus?: DialogFocusTarget;
   onBulkAction?: (ids: string[]) => void;
   sort?: APIKeysTableSort | null;
   onSortChange?: (sort: APIKeysTableSort | null) => void;

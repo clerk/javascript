@@ -1,4 +1,9 @@
-import { ClerkOfflineError, ClerkRuntimeError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import {
+  ClerkAPIResponseError,
+  ClerkOfflineError,
+  ClerkRuntimeError,
+  EmailLinkErrorCodeStatus,
+} from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ActiveSessionResource,
@@ -1067,6 +1072,39 @@ describe('Clerk singleton', () => {
 
         expect(sut.client).toBe(realClient);
         expect(sut.session).toBe(realSession);
+      });
+    });
+
+    mockNativeRuntime(() => {
+      describe('with cached resources in a non-standard browser', () => {
+        it.each([
+          ['a network error', new ClerkRuntimeError('Network request failed.', { code: 'network_error' })],
+          ['a 5xx API response', new ClerkAPIResponseError('Bad Gateway', { data: [], status: 502 })],
+        ])('falls back to the cached resources on %s', async (_, error) => {
+          const clientInstance = { fetch: mockClientFetch, signedInSessions: [] };
+          vi.mocked(Client.getOrCreateInstance)
+            .mockReturnValueOnce(clientInstance as any)
+            .mockReturnValueOnce(clientInstance as any);
+          mockClientFetch.mockRejectedValue(error);
+
+          const sut = new Clerk(productionPublishableKey);
+          sut.__internal_getCachedResources = vi.fn(() => Promise.resolve({ client: null, environment: null }));
+          await sut.load({ standardBrowser: false });
+
+          expect(sut.__internal_getCachedResources).toHaveBeenCalled();
+          expect(sut.status).toBe('degraded');
+        });
+
+        it('does not fall back to the cached resources on a 4xx API response', async () => {
+          const error = new ClerkAPIResponseError('Bad Request', { data: [], status: 400 });
+          mockClientFetch.mockRejectedValue(error);
+
+          const sut = new Clerk(productionPublishableKey);
+          sut.__internal_getCachedResources = vi.fn(() => Promise.resolve({ client: null, environment: null }));
+          await expect(sut.load({ standardBrowser: false })).rejects.toBe(error);
+
+          expect(sut.__internal_getCachedResources).not.toHaveBeenCalled();
+        });
       });
     });
   });
@@ -2176,6 +2214,129 @@ describe('Clerk singleton', () => {
 
         await waitFor(() => expect(mockSignUpCreate).not.toHaveBeenCalled());
       });
+
+      describe('a sign-up whose external account already belongs to a user', () => {
+        const existingAccountSignUp = (extra: Record<string, unknown> = {}) =>
+          new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['email_address', 'password'],
+            verifications: {
+              external_account: {
+                status: 'transferable',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: null,
+                error: {
+                  code: ERROR_CODES.EXTERNAL_ACCOUNT_EXISTS,
+                  long_message: 'This external account already exists.',
+                  message: 'already exists',
+                },
+              },
+            },
+            external_account: null,
+            ...extra,
+          } as any as SignUpJSON);
+
+        it('is sent to its challenge by the callback before the transfer runs', async () => {
+          loadEnvironment();
+          mockClientFetch.mockReturnValue(
+            Promise.resolve({
+              signedInSessions: [],
+              signIn: new SignIn(null),
+              signUp: existingAccountSignUp({
+                missing_fields: ['email_address', 'password', 'protect_check'],
+                protect_check: { status: 'pending', token: 'token', sdk_url: 'https://example.com/sdk.js' },
+              }),
+            }),
+          );
+
+          const mockSignInCreate = vi.fn();
+
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load(mockedLoadOptions);
+          if (!sut.client) {
+            fail('we should always have a client');
+          }
+          sut.client.signIn.create = mockSignInCreate;
+          sut.setActive = vi.fn();
+
+          await sut.handleRedirectCallback();
+
+          await waitFor(() => expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/protect-check'));
+          expect(mockSignInCreate).not.toHaveBeenCalled();
+        });
+
+        it('completes the transfer as a SIGN-IN and activates the created session', async () => {
+          loadEnvironment();
+          mockClientFetch.mockReturnValue(
+            Promise.resolve({
+              signedInSessions: [],
+              signIn: new SignIn(null),
+              signUp: existingAccountSignUp(),
+            }),
+          );
+
+          const mockSetActive = vi.fn();
+          const mockSignInCreate = vi
+            .fn()
+            .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load(mockedLoadOptions);
+          if (!sut.client) {
+            fail('we should always have a client');
+          }
+          sut.client.signIn.create = mockSignInCreate;
+          sut.setActive = mockSetActive;
+
+          await sut.__internal_resumeAfterProtectCheck();
+
+          await waitFor(() => {
+            expect(mockSignInCreate).toHaveBeenCalledTimes(1);
+            expect(mockSignInCreate).toHaveBeenCalledWith({ transfer: true });
+            expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: '123' }));
+          });
+          expect(mockNavigate.mock.calls.some(([to]) => typeof to === 'string' && to.includes('protect-check'))).toBe(
+            false,
+          );
+        });
+
+        it('activates the transferred sign-in when resumed again after the transfer has committed', async () => {
+          loadEnvironment();
+          mockClientFetch.mockReturnValue(
+            Promise.resolve({
+              signedInSessions: [],
+              signIn: new SignIn({
+                status: 'complete',
+                first_factor_verification: null,
+                second_factor_verification: null,
+                identifier: '',
+                user_data: null,
+                created_session_id: '123',
+                created_user_id: 'user_1',
+              } as any as SignInJSON),
+              signUp: new SignUp(null),
+            }),
+          );
+
+          const mockSetActive = vi.fn();
+          const mockSignInCreate = vi.fn();
+
+          const sut = new Clerk(productionPublishableKey);
+          await sut.load(mockedLoadOptions);
+          if (!sut.client) {
+            fail('we should always have a client');
+          }
+          sut.client.signIn.create = mockSignInCreate;
+          sut.setActive = mockSetActive;
+
+          await sut.__internal_resumeAfterProtectCheck();
+
+          await waitFor(() => {
+            expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: '123' }));
+          });
+          expect(mockSignInCreate).not.toHaveBeenCalled();
+        });
+      });
     });
 
     it('does not initiate the transfer flow when transferable: false is passed', async () => {
@@ -2819,6 +2980,421 @@ describe('Clerk singleton', () => {
 
       await waitFor(() => {
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/continue');
+      });
+    });
+
+    it('redirects user to factor-one to choose between multiple enterprise connections', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/factor-one');
+      });
+    });
+
+    it('redirects user to sign-in when a single bare enterprise_sso factor needs the first factor', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [{ strategy: 'enterprise_sso' }],
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in');
+      });
+    });
+
+    it('redirects user to the enterprise connections url if the sign-up is missing enterprise_sso', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['enterprise_sso'],
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/enterprise-connections');
+      });
+    });
+
+    it('builds the enterprise connections url from the signUpUrl param when provided', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['enterprise_sso'],
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ signUpUrl: '/custom-sign-up' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-sign-up#/enterprise-connections');
+      });
+    });
+
+    it('completes a sign-up callback instead of resuming a pending enterprise connection sign-in', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp({
+            status: 'complete',
+            missing_fields: [],
+            created_session_id: 'sess_123',
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const mockSetActive = vi.fn();
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      sut.setActive = mockSetActive;
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: 'sess_123' }));
+      });
+      expect(mockNavigate).not.toHaveBeenCalledWith('/sign-in#/factor-one');
+    });
+
+    it('continues a sign-up callback instead of resuming a pending enterprise connection sign-in', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['first_name'],
+            created_session_id: null,
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/continue');
+      });
+    });
+
+    it('does not resume a pending enterprise connection sign-in on a sign-up callback', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_first_factor',
+            supported_first_factors: [
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_1', enterprise_connection_name: 'A' },
+              { strategy: 'enterprise_sso', enterprise_connection_id: 'ec_2', enterprise_connection_name: 'B' },
+            ],
+          } as unknown as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ reloadResource: 'signUp' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in');
+      });
+    });
+
+    it('redirects user to the enterpriseConnectionsUrl param if the sign-up is missing enterprise_sso', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['enterprise_sso'],
+            created_session_id: null,
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ enterpriseConnectionsUrl: '/custom-chooser' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-chooser');
+      });
+    });
+
+    it('redirects a transferred sign-up missing enterprise_sso to the enterprise connections url', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn({
+            status: 'needs_identifier',
+            first_factor_verification: {
+              status: 'transferable',
+              strategy: 'oauth_google',
+              external_verification_redirect_url: '',
+              error: null,
+            },
+          } as any as SignInJSON),
+          signUp: new SignUp(null),
+        }),
+      );
+
+      const mockSignUpCreate = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ status: 'missing_requirements', missingFields: ['enterprise_sso'] }));
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      if (!sut.client) {
+        fail('we should always have a client');
+      }
+      sut.client.signUp.create = mockSignUpCreate;
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/enterprise-connections');
+      });
+    });
+
+    it('redirects user to the protect-check url before the enterprise connections url if the sign-up is protect-gated', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['protect_check', 'enterprise_sso'],
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback();
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/sign-up#/protect-check');
       });
     });
 
@@ -4103,6 +4679,23 @@ describe('Clerk singleton', () => {
 
       expect(resolve).toHaveBeenCalledTimes(1);
       expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      resolve.mockRestore();
+    });
+
+    it('reports a failed gate on the resource that carries it and rejects', async () => {
+      const blocked = new Error('blocked');
+      const resolve = vi
+        .spyOn(ProtectCheckGate.prototype, 'resolve')
+        .mockResolvedValueOnce(undefined)
+        .mockRejectedValueOnce(blocked);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+      const emit = vi.spyOn(eventBus, 'emit');
+
+      await expect(sut.__internal_resolvePendingProtectCheck()).rejects.toBe(blocked);
+
+      expect(emit).toHaveBeenCalledTimes(1);
+      expect(emit).toHaveBeenCalledWith(events.ResourceError, { resource: sut.client?.signUp, error: blocked });
+      emit.mockRestore();
       resolve.mockRestore();
     });
   });

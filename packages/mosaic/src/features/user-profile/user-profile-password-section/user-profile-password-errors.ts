@@ -3,8 +3,9 @@ import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
 import { FormSubmitError } from '../../../components/form';
-import type { LocalizableError, MosaicMessages } from '../../../localization';
+import type { ErrorDescription, MosaicMessages } from '../../../localization';
 import { toLocalizableApiError } from '../../../localization';
+import { toLocalizableError } from '../../../utils/errors';
 import { passwordComplexityMessage, passwordStrengthMessage } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValues } from './user-profile-password-section.types';
 
@@ -32,14 +33,15 @@ function passwordError(
   settings: Settings,
   messages: Messages,
   locale: string,
-  errorText: (error: LocalizableError) => string,
+  errorText: (error: ErrorDescription) => string,
 ) {
   const first = errors[0];
   if (!first) {
     return undefined;
   }
   if (first.code === 'form_password_not_strong_enough') {
-    return passwordStrengthMessage(first.meta?.zxcvbn?.suggestions?.map(suggestion => suggestion.code) ?? [], messages);
+    const suggestions: { code: string }[] | undefined = first.meta?.zxcvbn?.suggestions;
+    return passwordStrengthMessage(suggestions?.map(suggestion => suggestion.code) ?? [], messages);
   }
   const failures = errors.flatMap(error => {
     const code = passwordComplexityCodes.get(error.code);
@@ -52,21 +54,23 @@ function passwordError(
   );
 }
 
+// TODO: Move onto save() and drop toLocalizableApiError.
 export function passwordFormError(
   error: unknown,
   requiresCurrentPassword: boolean,
   settings: Settings,
   messages: Messages,
   locale: string,
-  errorText: (error: LocalizableError) => string,
+  errorText: (error: ErrorDescription) => string,
 ): FormSubmitError<UserProfileEditPasswordValues> {
   if (typeof error !== 'object' || error === null || !isClerkAPIResponseError(error)) {
-    return new FormSubmitError({ message: errorText({ message: error instanceof Error ? error.message : undefined }) });
+    return new FormSubmitError({ message: errorText(toLocalizableError(error)) });
   }
   const fields: { currentPassword?: string; newPassword?: string } = {};
   const passwordErrors: ClerkAPIError[] = [];
   let message: string | undefined;
-  for (const item of error.errors) {
+  const items: ClerkAPIError[] = error.errors;
+  for (const item of items) {
     const text = errorText(toLocalizableApiError(item));
     const name = snakeToCamel(item.meta?.paramName);
     if (name === 'currentPassword' && requiresCurrentPassword) {

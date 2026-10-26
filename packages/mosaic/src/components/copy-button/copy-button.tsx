@@ -1,6 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Checkmark } from '../../icons/glyphs/checkmark';
+import { Clipboard } from '../../icons/glyphs/clipboard';
 import type { ToastSide } from '../../primitives/toast';
 import { Toast } from '../../primitives/toast';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -93,7 +95,7 @@ const CopyButtonTrigger = React.forwardRef<HTMLButtonElement, Omit<CopyButtonPro
           {...rest}
         >
           <Icon
-            name='clipboard'
+            glyph={Clipboard}
             size='sm'
           />
         </Button>
@@ -112,7 +114,7 @@ const CopyButtonTrigger = React.forwardRef<HTMLButtonElement, Omit<CopyButtonPro
                     {...mergeStyleProps(themeProps('copy-button-toast-title'), stylex.props(styles.title))}
                   />
                   <Icon
-                    name='checkmark'
+                    glyph={Checkmark}
                     size='sm'
                   />
                 </Toast.Root>

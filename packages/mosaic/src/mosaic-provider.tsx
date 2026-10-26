@@ -1,10 +1,13 @@
 import React from 'react';
 
 import { ToastProvider } from './components/toast/toast';
+import { MosaicNowProvider } from './hooks/use-now';
 import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
 import type { MosaicLocalization } from './localization';
 import { MosaicLocalizationProvider, resolveLocalization } from './localization';
+import type { ModalSurfaces } from './modals/modal.types';
+import { ModalHost } from './modals/modal-host';
 
 export interface MosaicProviderProps {
   children: React.ReactNode;
@@ -20,12 +23,19 @@ export interface MosaicProviderProps {
 export function MosaicProvider({ children, icons, localization }: MosaicProviderProps): React.ReactElement {
   const iconsValue = React.useMemo(() => icons ?? {}, [icons]);
   const localizationValue = React.useMemo(() => resolveLocalization(localization), [localization]);
+  const [now] = React.useState(() => new Date());
 
   return (
     <MosaicIconsProvider value={iconsValue}>
       <MosaicLocalizationProvider value={localizationValue}>
-        <ToastProvider>{children}</ToastProvider>
+        <MosaicNowProvider value={now}>
+          <ToastProvider>
+            <ModalHost surfaces={modalSurfaces}>{children}</ModalHost>
+          </ToastProvider>
+        </MosaicNowProvider>
       </MosaicLocalizationProvider>
     </MosaicIconsProvider>
   );
 }
+
+const modalSurfaces: ModalSurfaces = [];
