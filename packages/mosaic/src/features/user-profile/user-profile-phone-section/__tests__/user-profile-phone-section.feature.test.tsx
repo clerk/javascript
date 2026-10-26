@@ -262,6 +262,62 @@ describe('phone reverification', () => {
     });
   const savedPhones = (fapi: ReturnType<typeof serveFapi>) => fapi.client.sessions[0]?.user.phone_numbers;
 
+  it('holds password confirmation until phone code preparation finishes', async () => {
+    const { actor } = await renderSection(challenged());
+    demandReverificationOnce('/v1/me/phone_numbers');
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await addPhone(actor, '8015550100');
+      await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+
+      expect(screen.getByLabelText('Password')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('textbox', { name: 'Phone' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+      await actor.keyboard('{Escape}{Enter}');
+      expect(screen.getByRole('dialog')).toBeVisible();
+      expect(prepare.requests).toHaveLength(1);
+
+      prepare.release();
+      await enterCode(actor, VERIFICATION_CODE);
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    } finally {
+      prepare.release();
+    }
+  });
+
+  it('returns to the phone form after preparation fails and retries without another create', async () => {
+    const { actor, fapi } = await renderSection(challenged());
+    demandReverificationOnce('/v1/me/phone_numbers');
+    const prepare = holdRequests('post', '/v1/me/phone_numbers/:id/prepare_verification');
+
+    try {
+      await addPhone(actor, '8015550100');
+      await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByLabelText('Password')).toBeVisible();
+      prepare.fail('form_param_invalid', 'Could not send code.', 'phone_number');
+
+      const input = await screen.findByRole('textbox', { name: 'Phone' });
+      await waitFor(() => expect(input).toHaveFocus());
+      await waitFor(() => expect(input).toHaveAccessibleDescription('Could not send code.'));
+      await actor.click(screen.getByRole('button', { name: 'Send code' }));
+      await enterCode(actor, VERIFICATION_CODE);
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(savedPhones(fapi)).toHaveLength(1);
+
+      await actor.click(screen.getByRole('button', { name: 'Add phone number' }));
+      expect(screen.getByRole('textbox', { name: 'Phone' })).toHaveValue('');
+      expect(screen.queryByLabelText('Password')).toBeNull();
+      await actor.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    } finally {
+      prepare.release();
+    }
+  });
+
   it('confirms it is the user before a phone number is added, then verifies its code', async () => {
     const { actor, fapi } = await renderSection(challenged());
     demandReverificationOnce('/v1/me/phone_numbers');

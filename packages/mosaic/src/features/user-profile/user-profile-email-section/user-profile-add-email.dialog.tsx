@@ -1,7 +1,7 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { FormEvent, Ref } from 'react';
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
@@ -52,18 +52,24 @@ export interface UserProfileAddEmailDialogProps {
 export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps) {
   const emailRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
+  const [lastShownStep, setLastShownStep] = useState(props.step);
+  const step =
+    props.open && props.isPending && props.step === 'email' && lastShownStep === 'reverify' ? 'reverify' : props.step;
+  if (step !== lastShownStep) {
+    setLastShownStep(step);
+  }
 
   return (
     <Dialog.Root
       handle={props.handle}
       open={props.open}
       onOpenChange={props.onOpenChange}
-      shouldCloseOnInteractOutside={props.step !== 'reverify'}
-      showCloseButton={props.step !== 'reverify' || Boolean(props.reverification.onCancel)}
+      shouldCloseOnInteractOutside={step !== 'reverify'}
+      showCloseButton={step !== 'reverify' || Boolean(props.reverification.onCancel)}
     >
       <Dialog.Popup
         variant='card'
-        initialFocus={props.step === 'email' ? emailRef : props.step === 'verify' ? codeRef : undefined}
+        initialFocus={step === 'email' ? emailRef : step === 'verify' ? codeRef : undefined}
         finalFocus={props.finalFocus}
       >
         <Card.Root
@@ -71,7 +77,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
           renderBranding={false}
         >
           <Flow.Root
-            value={props.step}
+            value={step}
             state={props}
           >
             {current => (

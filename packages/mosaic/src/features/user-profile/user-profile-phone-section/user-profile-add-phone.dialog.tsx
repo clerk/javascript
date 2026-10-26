@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { Card } from '../../../components/card';
 import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
@@ -32,18 +32,24 @@ export interface UserProfileAddPhoneDialogProps {
 export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps) {
   const phoneRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
+  const [lastShownStep, setLastShownStep] = useState(props.step);
+  const step =
+    props.open && props.isPending && props.step === 'phone' && lastShownStep === 'reverify' ? 'reverify' : props.step;
+  if (step !== lastShownStep) {
+    setLastShownStep(step);
+  }
 
   return (
     <Dialog.Root
       handle={props.handle}
       open={props.open}
       onOpenChange={props.onOpenChange}
-      shouldCloseOnInteractOutside={props.step !== 'reverify'}
-      showCloseButton={props.step !== 'reverify' || Boolean(props.reverification?.onCancel)}
+      shouldCloseOnInteractOutside={step !== 'reverify'}
+      showCloseButton={step !== 'reverify' || Boolean(props.reverification?.onCancel)}
     >
       <Dialog.Popup
         variant='card'
-        initialFocus={props.step === 'phone' ? phoneRef : codeRef}
+        initialFocus={step === 'phone' ? phoneRef : codeRef}
         finalFocus={props.finalFocus}
       >
         <Card.Root
@@ -51,7 +57,7 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
           renderBranding={false}
         >
           <Flow.Root
-            value={props.step}
+            value={step}
             state={props}
           >
             {current => (

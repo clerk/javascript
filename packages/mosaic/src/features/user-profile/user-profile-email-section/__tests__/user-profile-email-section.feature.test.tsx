@@ -573,6 +573,70 @@ describe('email reverification', () => {
     await actor.click(screen.getByRole('button', { name: 'Continue' }));
   }
 
+  it.each(['code', 'link'] as const)(
+    'holds password confirmation until email %s preparation finishes',
+    async method => {
+      const { actor } = await renderSection(challengedSeed(method === 'link' ? verifiesByLink : fapiEnvironment()));
+      demandReverificationOnce('/v1/me/email_addresses');
+      const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+
+      try {
+        await beginAdd(actor);
+        await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+
+        expect(screen.getByLabelText('Password')).toBeVisible();
+        expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
+        expect(screen.queryByRole('textbox', { name: 'Email' })).toBeNull();
+        expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+        await actor.keyboard('{Escape}{Enter}');
+        expect(screen.getByRole('dialog')).toBeVisible();
+        expect(prepare.requests).toHaveLength(1);
+
+        prepare.release();
+        if (method === 'link') {
+          await screen.findByText('Open the link we sent to new@example.com');
+          await actor.click(screen.getByRole('button', { name: 'Cancel' }));
+        } else {
+          await enterCode(actor, VERIFICATION_CODE);
+        }
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      } finally {
+        prepare.release();
+      }
+    },
+  );
+
+  it('returns to the email form after preparation fails and retries without another create', async () => {
+    const { actor, fapi } = await renderSection(challengedSeed());
+    demandReverificationOnce('/v1/me/email_addresses');
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+
+    try {
+      await beginAdd(actor);
+      await actor.type(await screen.findByPlaceholderText('Enter your password'), 'hunter2{Enter}');
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      expect(screen.getByLabelText('Password')).toBeVisible();
+      prepare.fail('form_param_invalid', 'Could not send code.', 'email_address');
+
+      const input = await screen.findByRole('textbox', { name: 'Email' });
+      await waitFor(() => expect(input).toHaveFocus());
+      await waitFor(() => expect(input).toHaveAccessibleDescription('Could not send code.'));
+      await actor.click(screen.getByRole('button', { name: 'Continue' }));
+      await enterCode(actor, VERIFICATION_CODE);
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(fapi.client.sessions[0]?.user.email_addresses).toHaveLength(1);
+
+      await actor.click(screen.getByRole('button', { name: 'Add email' }));
+      expect(screen.getByRole('textbox', { name: 'Email' })).toHaveValue('');
+      expect(screen.queryByLabelText('Password')).toBeNull();
+      await actor.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    } finally {
+      prepare.release();
+    }
+  });
+
   it('confirms it is the user before an email address is added, then verifies its code', async () => {
     const { actor, fapi } = await renderSection(challengedSeed());
     demandReverificationOnce('/v1/me/email_addresses');
