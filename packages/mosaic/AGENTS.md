@@ -31,33 +31,33 @@ A flow lives in `src/features/<feature>/`. The **model** (`*.model.ts(x)`) is th
 
 Most problems a feature hits already have a shared answer. Find the row for your problem and use it. Do not write a local version, even a small one.
 
-| Problem                                                                  | Use                                                                                                           |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| An async action from a button or row: pending, an error, one lock        | `usePendingAction` (`src/hooks/`)                                                                             |
-| A form: values, validation, submit, field errors                         | `useForm` (`src/components/form/`), with `validateAsync` for a server-side check                              |
-| A `<form>` element, without the browser's validation popup               | `Form` (`src/primitives/form/`)                                                                               |
-| A model save whose Clerk errors should land on form fields               | `save` in the model (`src/utils/errors.ts`), or reject with `FormSubmitError`                                 |
-| A confirm step before an action                                          | `useConfirmController` (`src/blocks/confirm/`) with `Confirmation` (`src/blocks/confirmation/`)               |
-| A delete that needs the user to type a phrase                            | `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)                 |
-| An action that may need step-up verification                             | `useReverificationFlow` (`src/features/reverification/`) in the model, passed to `useConfirmController`       |
-| A direct action that needs step-up verification                          | `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view  |
-| Showing any error to the user                                            | One of the owners above. They call `toLocalizableError` and resolve copy with `useErrorText`                  |
-| Moving focus after a list row is removed                                 | `useListRemovalFocus` (`src/hooks/`)                                                                          |
-| A debounced, abortable async check as the user types                     | `useDebouncedAsync` (`src/hooks/`)                                                                            |
-| A spinner that should not flash or flicker                               | `useSpinDelay` (`src/hooks/`)                                                                                 |
-| A placeholder for content that is still loading                          | `Skeleton` (`src/components/skeleton/`), see [Skeletons](docs/skeletons.md)                                   |
-| A date shown to the user                                                 | `formatDate` (`src/utils/format-date.ts`)                                                                     |
-| A value turned into kebab case, e.g. for a `data-*` attribute            | `kebabCase` (`src/utils/kebab-case.ts`)                                                                       |
-| Current time for display labels                                          | `useNow` + `MosaicProvider` ([#10098](https://github.com/clerk/javascript/pull/10098), once available)        |
-| Whether enterprise SSO permits adding another identification             | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                |
-| An inline message row that animates open and closed                      | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `styles/feedback.styles.ts` |
-| A table whose sorting, paging and search are done by the server          | `useServerDataTable` (`src/hooks/`)                                                                           |
-| Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`use-user-sessions-query.ts`)                          |
-| An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                              |
-| Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                |
-| An input that reformats as the user types without moving the caret       | `useFormattedInput` (`src/primitives/hooks/`)                                                                 |
-| An interaction with an async lifecycle or two values that move together  | A machine in the controller file, via `setup()` (`src/machine/`)                                              |
-| Styles several components share                                          | `src/styles/*.styles.ts`                                                                                      |
+| Problem                                                                  | Use                                                                                                               |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| An async action from a button or row: pending, an error, one lock        | `usePendingAction` (`src/hooks/`)                                                                                 |
+| A form: values, validation, submit, field errors                         | `useForm` (`src/components/form/`), with `validateAsync` for a server-side check                                  |
+| A `<form>` element, without the browser's validation popup               | `Form` (`src/primitives/form/`)                                                                                   |
+| A model save whose Clerk errors should land on form fields               | `save` (`src/utils/errors.ts`) in the model, or reject with `FormSubmitError`                                     |
+| A confirm step before an action                                          | `useConfirmController` (`src/blocks/confirm/`) with `Confirmation` (`src/blocks/confirmation/`)                   |
+| A delete that needs the user to type a phrase                            | `useConfirmController` (`src/blocks/confirm/`) with `Destructive` (`src/blocks/destructive/`)                     |
+| An action that may need step-up verification                             | `useReverificationFlow` (`src/features/reverification/`) in the model, passed to `useConfirmController`           |
+| A direct action that needs step-up verification                          | `useReverificationFlow` in the model, with `ReverificationDialog` (`src/blocks/reverification/`) in the view      |
+| Showing any error to the user                                            | One of the owners above. They call `toLocalizableError` and resolve copy with `useErrorText`                      |
+| Moving focus after a list row is removed                                 | `useListRemovalFocus` (`src/hooks/`)                                                                              |
+| A debounced, abortable async check as the user types                     | `useDebouncedAsync` (`src/hooks/`)                                                                                |
+| A spinner that should not flash or flicker                               | `useSpinDelay` (`src/hooks/`)                                                                                     |
+| A placeholder for content that is still loading                          | `Skeleton` (`src/components/skeleton/`), see [Skeletons](docs/skeletons.md)                                       |
+| A date shown to the user                                                 | `formatDate` (`src/utils/format-date.ts`)                                                                         |
+| A value turned into kebab case, e.g. for a `data-*` attribute            | `kebabCase` (`src/utils/kebab-case.ts`)                                                                           |
+| Current time for display labels                                          | `useNow` (`src/hooks/`)                                                                                           |
+| Whether enterprise SSO permits adding another identification             | `allowsIdentificationCreation` (`src/utils/allows-identification-creation.ts`)                                    |
+| An inline message row that animates open and closed                      | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `src/styles/feedback.styles.ts` |
+| A table whose sorting, paging and search are done by the server          | `useServerDataTable` (`src/hooks/`)                                                                               |
+| Data read from a Clerk resource that should be cached across mounts      | A query hook in `src/queries/`, called from the model (`src/queries/use-user-sessions-query.ts`)                  |
+| An item changed in place in an infinite list, kept until the next reload | `replaceInPages` (`src/utils/infinite-pages.ts`), passed to the list's `setData`                                  |
+| Siblings that slide when an item is added or removed                     | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                    |
+| An input that reformats as the user types without moving the caret       | `useFormattedInput` (`src/primitives/hooks/`)                                                                     |
+| An interaction with an async lifecycle or two values that move together  | A machine in the controller file, via `setup()` (`src/machine/`)                                                  |
+| Styles several components share                                          | `src/styles/*.styles.ts`                                                                                          |
 
 ## Signs you are about to invent a pattern
 
