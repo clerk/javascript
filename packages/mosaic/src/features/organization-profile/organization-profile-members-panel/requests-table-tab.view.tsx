@@ -54,6 +54,7 @@ export function RequestsTableTabView({
     onPageChange,
     searchValue: '',
     onSearchChange: () => {},
+    isFetching,
   });
   const hasActions = Boolean(onAccept || onDecline);
   const columnCount = 2 + Number(hasActions) + Number(Boolean(onBulkAction));

@@ -5,15 +5,42 @@ import { projectEnterpriseAccounts } from '../user-profile-enterprise-accounts-s
 describe('projectEnterpriseAccounts', () => {
   const connection = (id: string, allowOrganizationAccountLinking = true) => ({
     id,
+    provider: 'saml_okta' as const,
     name: id,
     allowOrganizationAccountLinking,
   });
   const account = (id: string, enterpriseConnectionId: string, active = true, error?: string) => ({
     id,
+    provider: 'saml_okta' as const,
     emailAddress: `${id}@example.com`,
     enterpriseConnectionId,
     verification: error ? { error: { longMessage: error } } : null,
     enterpriseConnection: { active, name: enterpriseConnectionId, logoPublicUrl: null },
+  });
+
+  it.each([
+    ['saml_okta', true],
+    ['oauth_github', true],
+    ['saml_google', false],
+    ['saml_custom', false],
+  ] as const)('projects %s icon treatment for linked and available accounts', (provider, monochromeIcon) => {
+    const linked = account('ent_linked', 'linked');
+    const projection = projectEnterpriseAccounts({
+      enabled: true,
+      accounts: [
+        {
+          ...linked,
+          provider,
+        },
+      ],
+      connections: [{ ...connection('available'), provider }],
+    });
+
+    expect(projection).toMatchObject({
+      status: 'ready',
+      accounts: [{ monochromeIcon }],
+      connections: [{ monochromeIcon }],
+    });
   });
 
   it('hides the section when enterprise SSO is disabled', () => {

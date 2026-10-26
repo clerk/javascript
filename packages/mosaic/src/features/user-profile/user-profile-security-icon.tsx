@@ -1,4 +1,4 @@
-import { Icon } from '../../components/icon';
+import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
 import { DeviceLaptop } from '../../icons/glyphs/device-laptop';
 import { DevicePhone } from '../../icons/glyphs/device-phone';
@@ -20,15 +20,17 @@ const icons = {
 
 export function UserProfileSecurityIcon({ name }: { name: UserProfileSecurityIconName }) {
   return (
-    <Section.Media
-      size='lg'
-      xstyle={styles.media}
-    >
-      <Icon
-        glyph={icons[name]}
-        size='lg'
-        xstyle={styles.icon}
-      />
+    <Section.Media size='lg'>
+      <IconFrame
+        filled
+        bordered={false}
+      >
+        <Icon
+          glyph={icons[name]}
+          size='lg'
+          xstyle={styles.icon}
+        />
+      </IconFrame>
     </Section.Media>
   );
 }

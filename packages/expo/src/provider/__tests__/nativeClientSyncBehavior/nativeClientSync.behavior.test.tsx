@@ -436,5 +436,80 @@ describe('native client sync behavior', () => {
       expect(h.js.session?.id).toBe(sessionIds.user_1);
       await expectConverged(h);
     });
+
+    it('keeps a JS sign-in on its client when a stale-token native refresh lands a new client first', async () => {
+      const { server, token, clientId } = seedDevice([]);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      server.rotateTokenOnNextResponse(token);
+      const signInResponse = server.holdNextResponse('js', 'POST /client/sign_ins');
+      const signingIn = h.js.signIn('user_1');
+      await signInResponse.handled;
+      await h.run(() => h.native.refresh());
+      await h.settle();
+      expect(server.clientIdForToken(h.native.token)).not.toBe(clientId);
+
+      signInResponse.release();
+      const sessionId = await h.run(() => signingIn);
+      await h.settle();
+
+      expect(h.js.client?.id).toBe(clientId);
+      expect(h.js.session?.id).toBe(sessionId);
+      expect(h.native.activeSessionId).toBe(sessionId);
+      await expectConverged(h);
+    });
+
+    it("keeps JS signed in when a pull answers for a client that is no longer the shared token's client", async () => {
+      const { server, token, clientId } = seedDevice([]);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      server.rotateTokenOnNextResponse(token);
+      const signInResponse = server.holdNextResponse('js', 'POST /client/sign_ins');
+      const signingIn = h.js.signIn('user_1');
+      await signInResponse.handled;
+      const pullResponse = server.holdNextResponse('js', 'GET /client');
+      await h.run(() => h.native.refresh());
+      await pullResponse.handled;
+      signInResponse.release();
+      const sessionId = await h.run(() => signingIn);
+      expect(h.js.session?.id).toBe(sessionId);
+      const emissionIndex = h.js.emissions.length;
+
+      pullResponse.release();
+      await h.settle();
+
+      expect(signedOutEmissionsSince(h, emissionIndex)).toEqual([]);
+      expect(h.js.client?.id).toBe(clientId);
+      expect(h.js.session?.id).toBe(sessionId);
+      const sharedToken = await h.jsDeviceToken();
+      expect(h.native.token).toBe(sharedToken);
+      expect(server.clientIdForToken(sharedToken)).toBe(clientId);
+      await expectConverged(h);
+    });
+
+    it('keeps the session when native signs out with the pre-rotation token while a JS response rotates it', async () => {
+      const { server, token, clientId, sessionIds } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      server.rotateTokenOnNextResponse(token);
+      const profileResponse = server.holdNextResponse('js', 'PATCH /me');
+      const updating = h.js.updateProfile();
+      await profileResponse.handled;
+      await h.run(() => h.native.signOut());
+      await h.settle();
+      expect(server.clientIdForToken(h.native.token)).not.toBe(clientId);
+
+      profileResponse.release();
+      await h.run(() => updating);
+      await h.settle();
+
+      const sharedToken = await h.jsDeviceToken();
+      expect(h.native.token).toBe(sharedToken);
+      expect(server.clientIdForToken(sharedToken)).toBe(clientId);
+      expect(server.inspectClient(sharedToken)?.sessions.map(session => session.id)).toEqual([sessionIds.user_1]);
+      expect(h.js.client?.id).toBe(clientId);
+      expect(h.js.session?.id).toBe(sessionIds.user_1);
+      await expectConverged(h);
+    });
   });
 });

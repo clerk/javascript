@@ -122,6 +122,20 @@ describe('UserProfileAddPhoneDialog', () => {
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
 
+  it('holds Send code while the phone number is empty', () => {
+    const { props } = renderView({ phoneNumber: '' });
+    expect(screen.getByRole('button', { name: 'Send code' })).toBeDisabled();
+    screen.getByRole('textbox', { name: 'Phone' }).closest('form')?.requestSubmit();
+    expect(props.onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('holds Verify until the code is complete', () => {
+    const { props } = renderView({ step: 'verify', code: '123' });
+    expect(screen.getByRole('button', { name: 'Verify', exact: true })).toBeDisabled();
+    screen.getByRole('textbox', { name: 'Verification code' }).closest('form')?.requestSubmit();
+    expect(props.onSubmit).not.toHaveBeenCalled();
+  });
+
   it('blocks submission and resend while verification is pending', async () => {
     const user = userEvent.setup();
     const { props } = renderView({ step: 'verify', code: '123456', isPending: true });

@@ -224,11 +224,11 @@ export interface SessionResource extends ClerkResource {
    */
   status: SessionStatus;
   /**
-   * The date and time when the session will expire. For an indefinite native session, this represents Unix epoch zero, meaning no expiration deadline is configured.
+   * The date and time when the session will expire.
    */
   expireAt: Date;
   /**
-   * The abandonment deadline. For an indefinite native session, this represents Unix epoch zero, meaning no abandonment deadline is configured.
+   * The date and time when the session will be abandoned due to inactivity.
    */
   abandonAt: Date;
   /**

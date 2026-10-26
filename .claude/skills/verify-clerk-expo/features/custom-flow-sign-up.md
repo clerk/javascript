@@ -17,7 +17,7 @@ Preconditions:
 - The standard settings require a password at sign-up. The spec fills it with `runPassword(host.runId)`.
 - The spec gets a new `+clerk_test` address from `host.newEmail`. The address is a first name and the run tag, as `maya.7c1e+clerk_test@example.com`, and the run tag is how the run finds the user the form creates. `integration/expo-native/bin/control-clerk-expo down` deletes the application and with it the user the form creates.
 
-- **Request the code.** Run `integration/expo-native/bin/control-clerk-expo run custom-flow-sign-up/complete`. The spec fills `verify.customSignUp.emailAddress` and `verify.customSignUp.password`, taps `verify.customSignUp.sendCode`, and expects `verify.customSignUp.code` with no `verify.customSignUp.error`. The form shows the code field only when `signUp.create` and `sendEmailCode` returned no error. Screenshot `custom-signup-code`.
+- **Request the code.** Run `integration/expo-native/bin/control-clerk-expo run custom-flow-sign-up/complete`. The spec fills `verify.customSignUp.emailAddress` and `verify.customSignUp.password`, taps `verify.customSignUp.sendCode`, and expects `verify.customSignUp.code` with no `verify.customSignUp.error`. The form shows the code field only when `signUp.create` and `signUp.verifications.sendEmailCode` returned no error. Screenshot `custom-signup-code`.
 - **Enter the code.** The spec then types `CLERK_TEST_CODE` and taps `verify.customSignUp.verifyCode`, and `host.expectSignedInAs(email)` waits for the home to show the new email, a user ID, and a session ID. Screenshot `custom-signed-up`.
 - **Proof.** The spec shows the home with the new email, a user ID, and a session ID.
 

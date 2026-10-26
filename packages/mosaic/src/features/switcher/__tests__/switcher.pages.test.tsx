@@ -8,17 +8,18 @@ import type { CustomPagesOptions } from '../switcher.pages';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from '../switcher.pages';
 
 let selfServeSSOEnabled: boolean;
+let selfServeDirectorySyncEnabled: boolean;
 let environment: {
   commerceSettings: { billing: { user: { enabled: boolean }; organization: { enabled: boolean } } };
   apiKeysSettings: { user_api_keys_enabled: boolean; orgs_api_keys_enabled: boolean };
-  userSettings: { enterpriseSSO: { self_serve_sso: boolean } };
+  userSettings: { enterpriseSSO: { self_serve_sso: boolean; self_serve_directory_sync: boolean } };
 };
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
   return {
     ...actual,
-    useClerk: () => ({ organization: { selfServeSSOEnabled } }),
+    useClerk: () => ({ organization: { selfServeSSOEnabled, selfServeDirectorySyncEnabled } }),
   };
 });
 
@@ -66,10 +67,11 @@ const docs: CustomProfileItem = {
 beforeEach(() => {
   emitted = undefined;
   selfServeSSOEnabled = false;
+  selfServeDirectorySyncEnabled = false;
   environment = {
     commerceSettings: { billing: { user: { enabled: false }, organization: { enabled: false } } },
     apiKeysSettings: { user_api_keys_enabled: false, orgs_api_keys_enabled: false },
-    userSettings: { enterpriseSSO: { self_serve_sso: false } },
+    userSettings: { enterpriseSSO: { self_serve_sso: false, self_serve_directory_sync: false } },
   };
 });
 
@@ -111,6 +113,15 @@ describe('useOrganizationProfilePages', () => {
     expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members']);
 
     selfServeSSOEnabled = true;
+    expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members', 'security']);
+  });
+
+  it('adds security when the active organization allows self-serve Directory Sync without SSO', () => {
+    environment.userSettings.enterpriseSSO.self_serve_sso = true;
+    environment.userSettings.enterpriseSSO.self_serve_directory_sync = true;
+    expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members']);
+
+    selfServeDirectorySyncEnabled = true;
     expect(renderHook(() => useOrganizationProfilePages()).result.current).toEqual(['general', 'members', 'security']);
   });
 });

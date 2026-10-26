@@ -59,6 +59,7 @@ export function APIKeysTableView({
     onPageSizeChange,
     searchValue,
     onSearchChange,
+    isFetching,
   });
   const columnCount = 3 + Number(Boolean(revoke)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
