@@ -78,7 +78,7 @@
     "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
-    "hono": "^4.12.34"
+    "hono": "^4.13.7"
   },
   "peerDependencies": {
     "hono": ">=4"
