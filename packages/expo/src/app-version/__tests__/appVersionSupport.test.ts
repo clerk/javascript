@@ -47,7 +47,7 @@ describe('appVersionSupport', () => {
   });
 
   const fetchEnvironment = (store: Awaited<ReturnType<typeof loadStore>>, json: unknown) => {
-    store.applyFetchedEnvironment(json, store.getAppVersionSupportGeneration());
+    store.applyFetchedEnvironment(json, store.nextAppVersionRequest());
   };
 
   test('reports a supported app before anything is known', async () => {
@@ -141,9 +141,10 @@ describe('appVersionSupport', () => {
 
   test('a rejection blocks the app until a later response marks it supported', async () => {
     const store = await loadStore();
-    const generation = store.getAppVersionSupportGeneration();
-
-    store.applyUnsupportedAppVersion({ minimum_version: '2.0', update_url: APP_STORE_URL }, generation);
+    store.applyUnsupportedAppVersion(
+      { minimum_version: '2.0', update_url: APP_STORE_URL },
+      store.nextAppVersionRequest(),
+    );
     expect(store.getAppVersionSupportStatus()).toEqual({
       isSupported: false,
       currentVersion: '1.9.9',
@@ -151,7 +152,7 @@ describe('appVersionSupport', () => {
       updateUrl: APP_STORE_URL,
     });
 
-    store.applySupportedAppVersion(generation);
+    store.applySupportedAppVersion(store.nextAppVersionRequest());
     expect(store.getAppVersionSupportStatus().isSupported).toBe(true);
   });
 
@@ -159,7 +160,7 @@ describe('appVersionSupport', () => {
     const store = await loadStore();
     fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
 
-    store.applyUnsupportedAppVersion({ update_url: '' }, store.getAppVersionSupportGeneration());
+    store.applyUnsupportedAppVersion({ update_url: '' }, store.nextAppVersionRequest());
 
     expect(store.getAppVersionSupportStatus()).toEqual({
       isSupported: false,
@@ -171,7 +172,7 @@ describe('appVersionSupport', () => {
 
   test('an environment does not lift a rejection', async () => {
     const store = await loadStore();
-    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.getAppVersionSupportGeneration());
+    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.nextAppVersionRequest());
 
     fetchEnvironment(store, environment());
 
@@ -180,7 +181,7 @@ describe('appVersionSupport', () => {
 
   test('an environment does not block an app a response marked supported', async () => {
     const store = await loadStore();
-    store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+    store.applySupportedAppVersion(store.nextAppVersionRequest());
 
     fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
 
@@ -195,7 +196,7 @@ describe('appVersionSupport', () => {
   test('a supported answer shows the minimum a later environment sets', async () => {
     mocks.identity = { platform: 'ios', appIdentifier: 'com.example.app', version: '2.1', displayVersion: '2.1' };
     const store = await loadStore();
-    store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+    store.applySupportedAppVersion(store.nextAppVersionRequest());
 
     fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
 
@@ -207,7 +208,7 @@ describe('appVersionSupport', () => {
     const store = await loadStore();
     fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
 
-    store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+    store.applySupportedAppVersion(store.nextAppVersionRequest());
 
     expect(store.getAppVersionSupportStatus()).toEqual({
       isSupported: true,
@@ -221,7 +222,7 @@ describe('appVersionSupport', () => {
     const store = await loadStore();
     fetchEnvironment(store, environment({ ios: [iosPolicy('2.0')] }));
 
-    store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+    store.applySupportedAppVersion(store.nextAppVersionRequest());
 
     expect(store.getAppVersionSupportStatus()).toEqual({
       isSupported: true,
@@ -231,12 +232,32 @@ describe('appVersionSupport', () => {
     });
   });
 
+  test('a late rejection does not block again after a newer supported answer', async () => {
+    const store = await loadStore();
+    const olderRequest = store.nextAppVersionRequest();
+    store.applySupportedAppVersion(store.nextAppVersionRequest());
+
+    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, olderRequest);
+
+    expect(store.getAppVersionSupportStatus().isSupported).toBe(true);
+  });
+
+  test('a late supported answer does not lift a newer block', async () => {
+    const store = await loadStore();
+    const olderRequest = store.nextAppVersionRequest();
+    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.nextAppVersionRequest());
+
+    store.applySupportedAppVersion(olderRequest);
+
+    expect(store.getAppVersionSupportStatus().isSupported).toBe(false);
+  });
+
   test('ignores answers for a Clerk instance that was replaced', async () => {
     const store = await loadStore();
-    const staleGeneration = store.getAppVersionSupportGeneration();
+    const staleRequest = store.nextAppVersionRequest();
     store.resetAppVersionSupport();
 
-    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, staleGeneration);
+    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, staleRequest);
 
     expect(store.getAppVersionSupportStatus().isSupported).toBe(true);
   });
@@ -277,10 +298,9 @@ describe('appVersionSupport', () => {
     const store = await loadStore();
     const listener = vi.fn();
     store.subscribeToAppVersionSupport(listener);
-    const generation = store.getAppVersionSupportGeneration();
 
-    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, generation);
-    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, generation);
+    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.nextAppVersionRequest());
+    store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.nextAppVersionRequest());
 
     expect(listener).toHaveBeenCalledTimes(1);
   });

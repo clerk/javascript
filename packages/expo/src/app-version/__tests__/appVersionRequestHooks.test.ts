@@ -86,6 +86,7 @@ describe('createAppVersionRequestHooks', () => {
     const { createAppVersionRequestHooks, status } = await loadModules();
     const hooks = createAppVersionRequestHooks();
     const requestInit = { path: '/client', headers: new Headers() };
+    hooks.beforeRequest(requestInit);
 
     hooks.afterResponse(requestInit, response({ status: 403, payload: { errors: [{ code: 'user_banned' }] } }));
 
@@ -95,10 +96,27 @@ describe('createAppVersionRequestHooks', () => {
   test('the supported header lifts a block', async () => {
     const { createAppVersionRequestHooks, status } = await loadModules();
     const hooks = createAppVersionRequestHooks();
-    const requestInit = { path: '/client', headers: new Headers() };
-    hooks.afterResponse(requestInit, unsupportedAppVersion);
+    const rejectedRequest = { path: '/client', headers: new Headers() };
+    hooks.beforeRequest(rejectedRequest);
+    hooks.afterResponse(rejectedRequest, unsupportedAppVersion);
 
-    hooks.afterResponse(requestInit, response({ headers: { 'X-Clerk-App-Version-Status': 'supported' } }));
+    const laterRequest = { path: '/client', headers: new Headers() };
+    hooks.beforeRequest(laterRequest);
+    hooks.afterResponse(laterRequest, response({ headers: { 'X-Clerk-App-Version-Status': 'supported' } }));
+
+    expect(status().isSupported).toBe(true);
+  });
+
+  test('a rejection that arrives after a newer request was marked supported is ignored', async () => {
+    const { createAppVersionRequestHooks, status } = await loadModules();
+    const hooks = createAppVersionRequestHooks();
+    const olderRequest = { path: '/client', headers: new Headers() };
+    const newerRequest = { path: '/client', headers: new Headers() };
+    hooks.beforeRequest(olderRequest);
+    hooks.beforeRequest(newerRequest);
+
+    hooks.afterResponse(newerRequest, response({ headers: { 'X-Clerk-App-Version-Status': 'supported' } }));
+    hooks.afterResponse(olderRequest, unsupportedAppVersion);
 
     expect(status().isSupported).toBe(true);
   });
@@ -131,9 +149,11 @@ describe('createAppVersionRequestHooks', () => {
   test('ignores responses to a Clerk instance that was replaced', async () => {
     const { createAppVersionRequestHooks, status } = await loadModules();
     const staleHooks = createAppVersionRequestHooks();
+    const staleRequest = { path: '/client', headers: new Headers() };
+    staleHooks.beforeRequest(staleRequest);
     createAppVersionRequestHooks();
 
-    staleHooks.afterResponse({ path: '/client', headers: new Headers() }, unsupportedAppVersion);
+    staleHooks.afterResponse(staleRequest, unsupportedAppVersion);
 
     expect(status().isSupported).toBe(true);
   });
@@ -147,7 +167,9 @@ describe('createAppVersionRequestHooks', () => {
     appState.emit('active');
     expect(refresh).not.toHaveBeenCalled();
 
-    hooks.afterResponse({ path: '/client', headers: new Headers() }, unsupportedAppVersion);
+    const rejectedRequest = { path: '/client', headers: new Headers() };
+    hooks.beforeRequest(rejectedRequest);
+    hooks.afterResponse(rejectedRequest, unsupportedAppVersion);
     appState.emit('background');
     appState.emit('active');
     expect(refresh).toHaveBeenCalledTimes(1);
@@ -158,7 +180,9 @@ describe('createAppVersionRequestHooks', () => {
     const staleRefresh = vi.fn().mockResolvedValue(undefined);
     createAppVersionRequestHooks().refreshOnForegroundWhileUnsupported(staleRefresh);
     const hooks = createAppVersionRequestHooks();
-    hooks.afterResponse({ path: '/client', headers: new Headers() }, unsupportedAppVersion);
+    const rejectedRequest = { path: '/client', headers: new Headers() };
+    hooks.beforeRequest(rejectedRequest);
+    hooks.afterResponse(rejectedRequest, unsupportedAppVersion);
 
     appState.emit('active');
 

@@ -20,12 +20,12 @@ describe('useAppVersionSupport', () => {
     expect(result.current.isSupported).toBe(true);
 
     act(() => {
-      store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.getAppVersionSupportGeneration());
+      store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.nextAppVersionRequest());
     });
     expect(result.current).toMatchObject({ isSupported: false, currentVersion: '1.0', minimumVersion: '2.0' });
 
     act(() => {
-      store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+      store.applySupportedAppVersion(store.nextAppVersionRequest());
     });
     expect(result.current.isSupported).toBe(true);
   });

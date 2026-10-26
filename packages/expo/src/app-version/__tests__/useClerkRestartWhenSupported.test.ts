@@ -25,12 +25,12 @@ describe('useClerkRestartWhenSupported', () => {
 
   const block = (store: Awaited<ReturnType<typeof loadModules>>['store']) =>
     act(() => {
-      store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.getAppVersionSupportGeneration());
+      store.applyUnsupportedAppVersion({ minimum_version: '2.0' }, store.nextAppVersionRequest());
     });
 
   const unblock = (store: Awaited<ReturnType<typeof loadModules>>['store']) =>
     act(() => {
-      store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+      store.applySupportedAppVersion(store.nextAppVersionRequest());
     });
 
   test('restarts Clerk when the app becomes supported after Clerk failed to load', async () => {

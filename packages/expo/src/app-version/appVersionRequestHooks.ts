@@ -4,9 +4,9 @@ import {
   applyFetchedEnvironment,
   applySupportedAppVersion,
   applyUnsupportedAppVersion,
-  getAppVersionSupportGeneration,
   getAppVersionSupportStatus,
   isRecord,
+  nextAppVersionRequest,
   resetAppVersionSupport,
 } from './appVersionSupport';
 import { setNativeAppIdentityHeaders } from './nativeAppIdentity';
@@ -39,7 +39,7 @@ export function createAppVersionRequestHooks(): AppVersionRequestHooks {
   resetAppVersionSupport();
   foregroundSubscription?.remove();
   foregroundSubscription = null;
-  const generation = getAppVersionSupportGeneration();
+  const requests = new WeakMap<AppVersionRequest, number>();
 
   return {
     refreshOnForegroundWhileUnsupported(refresh: () => Promise<unknown>) {
@@ -50,20 +50,25 @@ export function createAppVersionRequestHooks(): AppVersionRequestHooks {
       });
     },
     beforeRequest(requestInit: AppVersionRequest) {
+      requests.set(requestInit, nextAppVersionRequest());
       setNativeAppIdentityHeaders(requestInit.headers as Headers);
     },
     afterResponse(requestInit: AppVersionRequest, response: AppVersionResponse) {
+      const request = requests.get(requestInit);
+      if (request === undefined) {
+        return;
+      }
       const unsupportedAppVersionError =
         response.status === 403 ? findUnsupportedAppVersionError(response.payload) : null;
       if (unsupportedAppVersionError) {
-        applyUnsupportedAppVersion(unsupportedAppVersionError.meta, generation);
+        applyUnsupportedAppVersion(unsupportedAppVersionError.meta, request);
         return;
       }
       if (response.headers.get(APP_VERSION_STATUS_HEADER)?.toLowerCase() === 'supported') {
-        applySupportedAppVersion(generation);
+        applySupportedAppVersion(request);
       }
       if (response.ok && requestInit.path === ENVIRONMENT_PATH) {
-        applyFetchedEnvironment(environmentJSON(response.payload), generation);
+        applyFetchedEnvironment(environmentJSON(response.payload), request);
       }
     },
   };

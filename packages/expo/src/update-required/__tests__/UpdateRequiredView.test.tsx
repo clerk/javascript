@@ -78,7 +78,7 @@ describe('UpdateRequiredView', () => {
     options: { updateUrl: string; supportEmail?: string },
   ) => {
     act(() => {
-      store.applyFetchedEnvironment(environment(options), store.getAppVersionSupportGeneration());
+      store.applyFetchedEnvironment(environment(options), store.nextAppVersionRequest());
     });
   };
 
@@ -148,7 +148,7 @@ describe('UpdateRequiredView', () => {
     expect(screen.getByTestId('modal')).toBeDefined();
 
     act(() => {
-      store.applySupportedAppVersion(store.getAppVersionSupportGeneration());
+      store.applySupportedAppVersion(store.nextAppVersionRequest());
     });
     expect(screen.queryByTestId('modal')).toBeNull();
   });

@@ -44,7 +44,9 @@ const ANDROID_VERSION_CODE = /^[1-9]\d*$/;
 const listeners = new Set<() => void>();
 let environmentStatus: AppVersionSupportStatus | null = null;
 let serverAnswer: { isSupported: true } | { isSupported: false; status: AppVersionSupportStatus } | null = null;
-let generation = 0;
+let requestSequence = 0;
+let lastResetRequest = 0;
+let lastAnsweredRequest = 0;
 let status = supportedStatus();
 let display = EMPTY_DISPLAY;
 let missingExpoApplicationWarned = false;
@@ -62,20 +64,22 @@ export function getUpdateRequiredDisplay(): UpdateRequiredDisplay {
   return display;
 }
 
-export function getAppVersionSupportGeneration(): number {
-  return generation;
+export function nextAppVersionRequest(): number {
+  requestSequence += 1;
+  return requestSequence;
 }
 
 export function resetAppVersionSupport(): void {
-  generation += 1;
+  lastResetRequest = requestSequence;
+  lastAnsweredRequest = requestSequence;
   environmentStatus = null;
   serverAnswer = null;
   display = EMPTY_DISPLAY;
   publish({ displayChanged: true, notifyLater: true });
 }
 
-export function applyFetchedEnvironment(environment: unknown, requestGeneration: number): void {
-  if (requestGeneration !== generation) {
+export function applyFetchedEnvironment(environment: unknown, request: number): void {
+  if (request <= lastResetRequest) {
     return;
   }
   environmentStatus = resolveEnvironmentStatus(environment);
@@ -87,8 +91,8 @@ export function applyFetchedEnvironment(environment: unknown, requestGeneration:
   publish({ displayChanged });
 }
 
-export function applyUnsupportedAppVersion(meta: unknown, requestGeneration: number): void {
-  if (requestGeneration !== generation) {
+export function applyUnsupportedAppVersion(meta: unknown, request: number): void {
+  if (!acceptAnswer(request)) {
     return;
   }
   const fields = isRecord(meta) ? meta : {};
@@ -104,12 +108,20 @@ export function applyUnsupportedAppVersion(meta: unknown, requestGeneration: num
   publish();
 }
 
-export function applySupportedAppVersion(requestGeneration: number): void {
-  if (requestGeneration !== generation) {
+export function applySupportedAppVersion(request: number): void {
+  if (!acceptAnswer(request)) {
     return;
   }
   serverAnswer = { isSupported: true };
   publish();
+}
+
+function acceptAnswer(request: number): boolean {
+  if (request <= lastAnsweredRequest) {
+    return false;
+  }
+  lastAnsweredRequest = request;
+  return true;
 }
 
 function resolveEnvironmentStatus(environment: unknown): AppVersionSupportStatus {
