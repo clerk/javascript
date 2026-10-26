@@ -13,21 +13,20 @@ function renderNarrowTable(minWidth: string) {
           layout='fixed'
           minWidth={minWidth}
         >
-          <Table.ColumnGroup>
-            <Table.Column />
-            <Table.Column width='9rem' />
-          </Table.ColumnGroup>
           <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Created</Table.HeaderCell>
-            </Table.Row>
+            <Table.Column>Name</Table.Column>
+            <Table.Column width='9rem'>Created</Table.Column>
           </Table.Header>
-          <Table.Body>
-            <Table.Row>
-              <Table.Cell>Alpha</Table.Cell>
-              <Table.Cell>Today</Table.Cell>
-            </Table.Row>
+          <Table.Body
+            items={['alpha']}
+            itemToStringValue={item => item}
+          >
+            {() => (
+              <Table.Row>
+                <Table.Cell>Alpha</Table.Cell>
+                <Table.Cell>Today</Table.Cell>
+              </Table.Row>
+            )}
           </Table.Body>
         </Table.Root>
       </div>

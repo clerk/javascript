@@ -2,11 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { createPortal } from 'react-dom';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
-import { EmptyState } from '../empty-state';
 import { Table } from './table';
 import { stickySides, styles } from './table.styles';
 
@@ -14,20 +11,63 @@ const atoms = stylex.create({
   spaced: { marginTop: '8px' },
 });
 
+interface Key {
+  id: string;
+  name: string;
+  created: string;
+  children?: Key[];
+}
+
+const keys: Key[] = [
+  { id: 'alpha', name: 'Alpha', created: 'Today' },
+  { id: 'beta', name: 'Beta', created: 'Yesterday' },
+];
+
 function renderTable(props: Partial<React.ComponentProps<typeof Table.Root>> = {}) {
   return render(
-    <Table.Root {...props}>
+    <Table.Root
+      aria-label='Keys'
+      {...props}
+    >
       <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Name</Table.HeaderCell>
-          <Table.HeaderCell>Created</Table.HeaderCell>
-        </Table.Row>
+        <Table.Column>Name</Table.Column>
+        <Table.Column>Created</Table.Column>
       </Table.Header>
-      <Table.Body>
-        <Table.Row>
-          <Table.Cell>Alpha</Table.Cell>
-          <Table.Cell>Today</Table.Cell>
-        </Table.Row>
+      <Table.Body
+        items={keys}
+        itemToStringValue={key => key.id}
+      >
+        {key => (
+          <Table.Row>
+            <Table.Cell>{key.name}</Table.Cell>
+            <Table.Cell>{key.created}</Table.Cell>
+          </Table.Row>
+        )}
+      </Table.Body>
+    </Table.Root>,
+  );
+}
+
+function renderSelectableTable() {
+  return render(
+    <Table.Root
+      aria-label='Keys'
+      selectionMode='multiple'
+    >
+      <Table.Header>
+        <Table.SelectionColumn aria-label='Select all keys' />
+        <Table.Column rowHeader>Name</Table.Column>
+      </Table.Header>
+      <Table.Body
+        items={keys}
+        itemToStringValue={key => key.id}
+      >
+        {key => (
+          <Table.Row>
+            <Table.SelectionCell aria-label='Select' />
+            <Table.Cell>{key.name}</Table.Cell>
+          </Table.Row>
+        )}
       </Table.Body>
     </Table.Root>,
   );
@@ -79,11 +119,16 @@ describe('Mosaic Table', () => {
   it('opts cells into no-wrap styling without changing neighboring cells', () => {
     render(
       <Table.Root>
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell noWrap>September 23, 2026</Table.Cell>
-            <Table.Cell>A longer description can wrap</Table.Cell>
-          </Table.Row>
+        <Table.Body
+          items={keys.slice(0, 1)}
+          itemToStringValue={key => key.id}
+        >
+          {() => (
+            <Table.Row>
+              <Table.Cell noWrap>September 23, 2026</Table.Cell>
+              <Table.Cell>A longer description can wrap</Table.Cell>
+            </Table.Row>
+          )}
         </Table.Body>
       </Table.Root>,
     );
@@ -95,20 +140,23 @@ describe('Mosaic Table', () => {
     expect(description).not.toHaveClass(stylex.props(styles.noWrap).className ?? '');
   });
 
-  it.each(['start', 'end'] as const)('pins header and body cells to the %s edge', side => {
+  it.each(['start', 'end'] as const)('pins columns and cells to the %s edge', side => {
     render(
       <Table.Root>
         <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell sticky={side}>Actions</Table.HeaderCell>
-          </Table.Row>
+          <Table.Column>Name</Table.Column>
+          <Table.Column sticky={side}>Actions</Table.Column>
         </Table.Header>
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell>Alpha</Table.Cell>
-            <Table.Cell sticky={side}>Edit</Table.Cell>
-          </Table.Row>
+        <Table.Body
+          items={keys.slice(0, 1)}
+          itemToStringValue={key => key.id}
+        >
+          {() => (
+            <Table.Row>
+              <Table.Cell>Alpha</Table.Cell>
+              <Table.Cell sticky={side}>Edit</Table.Cell>
+            </Table.Row>
+          )}
         </Table.Body>
       </Table.Root>,
     );
@@ -144,8 +192,8 @@ describe('Mosaic Table', () => {
     const [header, body] = screen.getAllByRole('rowgroup');
     expect(header).toHaveClass('cl-table-header');
     expect(body).toHaveClass('cl-table-body');
-    expect(screen.getAllByRole('row')[0]).toHaveClass('cl-table-row');
-    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveClass('cl-table-header-cell');
+    expect(screen.getByRole('row', { name: /Alpha/ })).toHaveClass('cl-table-row');
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveClass('cl-table-column');
     expect(screen.getByRole('cell', { name: 'Alpha' })).toHaveClass('cl-table-cell');
   });
 
@@ -156,270 +204,188 @@ describe('Mosaic Table', () => {
     expect(ref.current).toHaveClass('cl-table', stylex.props(atoms.spaced).className ?? '');
   });
 
+  it('renders row header cells with cell styling', () => {
+    render(
+      <Table.Root>
+        <Table.Header>
+          <Table.Column rowHeader>Name</Table.Column>
+        </Table.Header>
+        <Table.Body
+          items={keys.slice(0, 1)}
+          itemToStringValue={key => key.id}
+        >
+          {key => (
+            <Table.Row>
+              <Table.Cell>{key.name}</Table.Cell>
+            </Table.Row>
+          )}
+        </Table.Body>
+      </Table.Root>,
+    );
+    const cell = screen.getByRole('rowheader', { name: 'Alpha' });
+    expect(cell).toHaveClass('cl-table-cell', ...(stylex.props(styles.cell).className ?? '').split(' '));
+  });
+
   describe('sorting', () => {
-    it('renders a plain header cell without a sort handler', () => {
+    it('leaves a column without sortable as plain text', () => {
       renderTable();
-      const cell = screen.getByRole('columnheader', { name: 'Name' });
-      expect(within(cell).queryByRole('button')).toBeNull();
-      expect(cell).not.toHaveAttribute('aria-sort');
+      const column = screen.getByRole('columnheader', { name: 'Name' });
+      expect(column).not.toHaveAttribute('aria-sort');
+      expect(column).not.toHaveAttribute('data-sortable');
     });
 
-    it('renders a sort button and reflects the direction when sortable', async () => {
-      const onSort = vi.fn();
-      const { rerender } = render(
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell
-                sort='none'
-                onSort={onSort}
+    it('reports the sort and reflects its direction', async () => {
+      const user = userEvent.setup();
+      const onSortChange = vi.fn();
+      function Example({ direction }: { direction: 'ascending' | 'descending' | null }) {
+        return (
+          <Table.Root
+            sort={direction ? { column: 'name', direction } : null}
+            onSortChange={onSortChange}
+          >
+            <Table.Header>
+              <Table.Column
+                value='name'
+                sortable
               >
                 Name
-              </Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-        </Table.Root>,
-      );
-      const cell = screen.getByRole('columnheader', { name: 'Name' });
-      expect(cell).not.toHaveAttribute('aria-sort');
-      expect(cell).toHaveAttribute('data-sortable', '');
-
-      await userEvent.click(within(cell).getByRole('button', { name: 'Name' }));
-      expect(onSort).toHaveBeenCalledTimes(1);
-
-      rerender(
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell
-                sort='ascending'
-                onSort={onSort}
+              </Table.Column>
+              <Table.Column
+                value='created'
+                sortable
               >
-                Name
-              </Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-        </Table.Root>,
-      );
-      expect(cell).toHaveAttribute('aria-sort', 'ascending');
-      expect(cell).toHaveAttribute('data-sort', 'ascending');
+                Created
+              </Table.Column>
+            </Table.Header>
+          </Table.Root>
+        );
+      }
+      const { rerender } = render(<Example direction={null} />);
+      const name = screen.getByRole('columnheader', { name: 'Name' });
+      expect(name).toHaveAttribute('aria-sort', 'none');
+      expect(name).toHaveAttribute('data-sortable', '');
 
-      rerender(
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell
-                sort='descending'
-                onSort={onSort}
-              >
-                Name
-              </Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-        </Table.Root>,
-      );
-      expect(cell).toHaveAttribute('aria-sort', 'descending');
+      await user.click(name);
+      expect(onSortChange).toHaveBeenLastCalledWith({ column: 'name', direction: 'ascending' });
+
+      rerender(<Example direction='ascending' />);
+      expect(name).toHaveAttribute('aria-sort', 'ascending');
+      expect(name).toHaveAttribute('data-sort-direction', 'ascending');
+      expect(screen.getByRole('columnheader', { name: 'Created' })).toHaveAttribute('aria-sort', 'none');
+
+      await user.click(name);
+      expect(onSortChange).toHaveBeenLastCalledWith({ column: 'name', direction: 'descending' });
     });
   });
 
   describe('selection', () => {
-    it('renders selection cells with checkboxes', async () => {
-      const onSelectAll = vi.fn();
-      const onSelectRow = vi.fn();
-      render(
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.SelectAllCell
-                aria-label='Select all rows'
-                checked={false}
-                indeterminate
-                onChange={onSelectAll}
-              />
-              <Table.HeaderCell>Name</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            <Table.Row selected>
-              <Table.SelectCell
-                aria-label='Select Alpha'
-                checked
-                onChange={onSelectRow}
-              />
-              <Table.Cell>Alpha</Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table.Root>,
-      );
-
-      const selectAll = screen.getByRole<HTMLInputElement>('checkbox', { name: 'Select all rows' });
-      expect(selectAll.indeterminate).toBe(true);
+    it('renders Mosaic checkboxes named by their labels and the row header', () => {
+      renderSelectableTable();
+      const selectAll = screen.getByRole('checkbox', { name: 'Select all keys' });
+      expect(selectAll).toHaveClass('cl-checkbox-input');
       expect(selectAll.closest('th')).toHaveClass('cl-table-select-cell');
-      await userEvent.click(selectAll);
-      expect(onSelectAll).toHaveBeenCalledTimes(1);
-
       const selectRow = screen.getByRole('checkbox', { name: 'Select Alpha' });
-      expect(selectRow).toBeChecked();
+      expect(selectRow).toHaveClass('cl-checkbox-input');
       expect(selectRow.closest('td')).toHaveClass('cl-table-select-cell');
-      await userEvent.click(selectRow);
-      expect(onSelectRow).toHaveBeenCalledTimes(1);
     });
 
-    it('reports whether a row toggle extends a range', async () => {
-      const onToggleSelected = vi.fn();
-      render(
-        <Table.Root>
-          <Table.Body>
-            <Table.Row>
-              <Table.SelectCell
-                aria-label='Select Alpha'
-                checked={false}
-                onToggleSelected={onToggleSelected}
-              />
-              <Table.Cell>Alpha</Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table.Root>,
-      );
-
+    it('selects rows and reflects partial and full selection on the header checkbox', async () => {
       const user = userEvent.setup();
-      const selectRow = screen.getByRole('checkbox', { name: 'Select Alpha' });
-      await user.click(selectRow);
-      expect(onToggleSelected).toHaveBeenLastCalledWith({ range: false });
+      renderSelectableTable();
+      const selectAll = screen.getByRole<HTMLInputElement>('checkbox', { name: 'Select all keys' });
 
-      await user.keyboard('{Shift>}');
-      await user.click(selectRow);
-      await user.keyboard('{/Shift}');
-      expect(onToggleSelected).toHaveBeenLastCalledWith({ range: true });
-    });
+      await user.click(screen.getByRole('checkbox', { name: 'Select Alpha' }));
+      expect(screen.getByRole('row', { name: 'Alpha' })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('row', { name: 'Alpha' })).toHaveAttribute('data-selected', '');
+      expect(selectAll.indeterminate).toBe(true);
 
-    it('reflects the selected row state', () => {
-      render(
-        <Table.Root>
-          <Table.Body>
-            <Table.Row selected>
-              <Table.Cell>Alpha</Table.Cell>
-            </Table.Row>
-            <Table.Row>
-              <Table.Cell>Beta</Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table.Root>,
-      );
-      const [selected, unselected] = screen.getAllByRole('row');
-      expect(selected).toHaveAttribute('aria-selected', 'true');
-      expect(selected).toHaveAttribute('data-selected', '');
-      expect(unselected).not.toHaveAttribute('aria-selected');
-      expect(unselected).not.toHaveAttribute('data-selected');
+      await user.click(selectAll);
+      expect(screen.getByRole('checkbox', { name: 'Select Beta' })).toBeChecked();
+      expect(selectAll).toBeChecked();
+      expect(selectAll.indeterminate).toBe(false);
     });
   });
 
-  describe('interactive rows', () => {
-    it('marks rows with a click handler as interactive', async () => {
-      const user = userEvent.setup();
-      const onClick = vi.fn();
-      render(
-        <Table.Root>
-          <Table.Body>
-            <Table.Row onClick={onClick}>
-              <Table.Cell>Alpha</Table.Cell>
+  it('marks rows with an action as actionable', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <Table.Root>
+        <Table.Header>
+          <Table.Column rowHeader>Name</Table.Column>
+        </Table.Header>
+        <Table.Body
+          items={keys}
+          itemToStringValue={key => key.id}
+        >
+          {key => (
+            <Table.Row onClick={key.id === 'alpha' ? onClick : undefined}>
+              <Table.Cell>{key.name}</Table.Cell>
             </Table.Row>
-            <Table.Row>
-              <Table.Cell>Beta</Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table.Root>,
-      );
-      const [interactive, plain] = screen.getAllByRole('row');
-      expect(interactive).toHaveAttribute('data-interactive', '');
-      expect(plain).not.toHaveAttribute('data-interactive');
-      await user.click(screen.getByText('Alpha'));
-      expect(onClick).toHaveBeenCalledTimes(1);
-    });
+          )}
+        </Table.Body>
+      </Table.Root>,
+    );
+    expect(screen.getByRole('row', { name: 'Alpha' })).toHaveAttribute('data-actionable', '');
+    expect(screen.getByRole('row', { name: 'Beta' })).not.toHaveAttribute('data-actionable');
+    await user.click(screen.getByText('Alpha'));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
 
-    it('does not run the row action when a control inside the row is clicked', async () => {
-      const user = userEvent.setup();
-      const onRowClick = vi.fn();
-      const onButtonClick = vi.fn();
-      render(
-        <Table.Root>
-          <Table.Body>
-            <Table.Row onClick={onRowClick}>
+  it('renders the empty state across every column', () => {
+    render(
+      <Table.Root>
+        <Table.Header>
+          <Table.Column>Name</Table.Column>
+          <Table.Column>Created</Table.Column>
+        </Table.Header>
+        <Table.Body
+          items={[]}
+          itemToStringValue={(key: Key) => key.id}
+          renderEmptyState={() => 'No results'}
+        >
+          {key => (
+            <Table.Row>
+              <Table.Cell>{key.name}</Table.Cell>
+              <Table.Cell>{key.created}</Table.Cell>
+            </Table.Row>
+          )}
+        </Table.Body>
+      </Table.Root>,
+    );
+    const cell = screen.getByRole('cell');
+    expect(cell).toHaveAttribute('colspan', '2');
+    expect(within(cell).getByText('No results')).toHaveClass('cl-table-empty');
+  });
+
+  it('expands tree rows from a button named by its label and the row header', async () => {
+    const user = userEvent.setup();
+    render(
+      <Table.Root aria-label='Keys'>
+        <Table.Header>
+          <Table.Column rowHeader>Name</Table.Column>
+        </Table.Header>
+        <Table.Body
+          items={[{ ...keys[0], children: [keys[1]] }]}
+          itemToStringValue={key => key.id}
+          itemToChildren={key => key.children}
+        >
+          {key => (
+            <Table.Row>
               <Table.Cell>
-                <button
-                  type='button'
-                  onClick={onButtonClick}
-                >
-                  View
-                </button>
+                <Table.ExpandButton aria-label='Expand' />
+                {key.name}
               </Table.Cell>
             </Table.Row>
-          </Table.Body>
-        </Table.Root>,
-      );
-      await user.click(screen.getByRole('button', { name: 'View' }));
-      expect(onButtonClick).toHaveBeenCalledTimes(1);
-      expect(onRowClick).not.toHaveBeenCalled();
-    });
-
-    it('does not run the row action for clicks inside content portaled out of the row', async () => {
-      const user = userEvent.setup();
-      const onRowClick = vi.fn();
-      render(
-        <Table.Root>
-          <Table.Body>
-            <Table.Row onClick={onRowClick}>
-              <Table.Cell>{createPortal(<p>Menu content</p>, document.body)}</Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table.Root>,
-      );
-      await user.click(screen.getByText('Menu content'));
-      expect(onRowClick).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('empty state', () => {
-    it('renders the empty state across every column', () => {
-      render(
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Created</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            <Table.Empty colSpan={2}>
-              <EmptyState.Root>
-                <EmptyState.Icon glyph={MagnifyingGlass} />
-                <EmptyState.Label>No results</EmptyState.Label>
-                <EmptyState.Description>Try a different search.</EmptyState.Description>
-              </EmptyState.Root>
-            </Table.Empty>
-          </Table.Body>
-        </Table.Root>,
-      );
-      const cell = screen.getByRole('cell');
-      expect(cell).toHaveClass('cl-table-empty');
-      expect(cell).toHaveAttribute('colspan', '2');
-      expect(within(cell).getByText('No results')).toHaveClass('cl-empty-state-label');
-      expect(within(cell).getByText('Try a different search.')).toBeInTheDocument();
-    });
-
-    it('spans every column when colSpan is omitted', () => {
-      render(
-        <Table.Root>
-          <Table.Body>
-            <Table.Empty>
-              <EmptyState.Root>
-                <EmptyState.Label>No results</EmptyState.Label>
-              </EmptyState.Root>
-            </Table.Empty>
-          </Table.Body>
-        </Table.Root>,
-      );
-      expect(screen.getByRole('cell')).toHaveAttribute('colspan', '1000');
-    });
+          )}
+        </Table.Body>
+      </Table.Root>,
+    );
+    const expand = screen.getByRole('button', { name: 'Expand Alpha' });
+    expect(expand).toHaveClass('cl-table-expand-button');
+    expect(screen.queryByRole('row', { name: 'Beta' })).toBeNull();
+    await user.click(expand);
+    expect(expand).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('row', { name: 'Beta' })).toBeInTheDocument();
   });
 });
