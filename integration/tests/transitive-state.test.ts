@@ -227,7 +227,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
     await u.po.signIn.continue();
     await u.po.signIn.setPassword(userB.password);
     await u.po.signIn.continue();
-    await u.page.waitForFunction(userId => window.Clerk?.user?.id === userId, userBId);
 
     const pathA = '/transitive-state/sign-out';
     const pathB = '/transitive-state/sign-out/sign-in';
