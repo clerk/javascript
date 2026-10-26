@@ -415,7 +415,6 @@ interface MfaSetupActions {
   close: () => void;
   submitSms: (code?: string) => void;
   resendSms: () => void;
-  prepareAuthenticator: () => void;
   verifyAuthenticator: (code: string) => void;
   generateBackupCodes: () => void;
   copy: () => void;
@@ -453,7 +452,7 @@ function createSetupProps(
     pendingMethod:
       context.pending === 'prepareAuthenticator'
         ? 'authenticator'
-        : context.pending === 'generate' && flow.kind === 'select'
+        : context.pending === 'generate'
           ? 'backup-codes'
           : undefined,
     errorMessage,
@@ -480,15 +479,16 @@ function createSetupProps(
       resendSeconds: context.resendSeconds,
       errorMessage,
     },
-    authenticator: {
-      setup: authenticator?.setup,
-      onRetry: actions.prepareAuthenticator,
-      code: authenticator?.code ?? '',
-      onCodeChange: value => send({ type: 'EDIT_CODE', value }),
-      onSubmit: actions.verifyAuthenticator,
-      isPending: context.pending === 'prepareAuthenticator' || context.pending === 'verifyAuthenticator',
-      errorMessage,
-    },
+    authenticator: authenticator
+      ? {
+          setup: authenticator.setup,
+          code: authenticator.code,
+          onCodeChange: value => send({ type: 'EDIT_CODE', value }),
+          onSubmit: actions.verifyAuthenticator,
+          isPending: context.pending === 'verifyAuthenticator',
+          errorMessage,
+        }
+      : undefined,
     backupCodes: {
       codes: backup?.codes ?? [],
       onRetry: actions.generateBackupCodes,
@@ -566,7 +566,6 @@ export function useUserProfileMfaController(model: ReadyModel) {
       close,
       submitSms,
       resendSms,
-      prepareAuthenticator,
       verifyAuthenticator,
       generateBackupCodes,
       copy,
@@ -589,16 +588,14 @@ export function useUserProfileMfaController(model: ReadyModel) {
   };
 
   const showAddTrigger = model.addableMethods.length > 0;
-  const reverifying = setupProps.step === 'verify';
   const hasPendingReverification = context.pending !== undefined && REVERIFIABLE_ACTIONS.includes(context.pending);
   const canClose = !hasPendingReverification || Boolean(reverification.onCancel);
 
   return {
     dialogOpen,
     showAddTrigger,
-    addDisabled: isBusy,
     showAddControl: showAddTrigger || dialogOpen,
-    reverifying,
+    isPending: isBusy,
     onDialogOpenChange: (open: boolean) => {
       if (!open && !canClose) {
         return;
