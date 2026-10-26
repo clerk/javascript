@@ -236,6 +236,43 @@ describe('Table', () => {
       expect(onClick).toHaveBeenCalledTimes(1);
     });
 
+    it('ignores clicks from custom controls and editable content inside the row', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      render(
+        <Table.Root aria-label='Logs'>
+          <Table.Body
+            items={FLAT_LOGS}
+            itemToStringValue={toValue}
+          >
+            {log => (
+              <Table.Row onClick={onClick}>
+                <Table.Cell>
+                  <span
+                    role='switch'
+                    aria-checked='false'
+                    tabIndex={0}
+                  >{`Mute ${log.message}`}</span>
+                  <span
+                    contentEditable
+                    suppressContentEditableWarning
+                    data-testid={`${log.id}-note`}
+                  >
+                    note
+                  </span>
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        </Table.Root>,
+      );
+
+      await user.click(screen.getByRole('switch', { name: 'Mute Alpha' }));
+      await user.click(screen.getByTestId('a-note'));
+
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
     it('ignores clicks from portaled content rendered inside the row', async () => {
       const user = userEvent.setup();
       const onClick = vi.fn();

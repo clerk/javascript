@@ -1,7 +1,7 @@
 import { getComputedStyle } from '../utils/dom';
 
 const NESTED_CONTROL_SELECTOR =
-  'a[href], button, input, select, textarea, label, [role="button"], [role="link"], [role="checkbox"], [role="menuitem"]';
+  'a[href], button, input, select, textarea, label, [role="button"], [role="link"], [role="checkbox"], [role="menuitem"], [tabindex]:not(tr, td, th), [contenteditable]:not([contenteditable="false"])';
 
 const TEXT_ENTRY_SELECTOR =
   'textarea, select, [contenteditable]:not([contenteditable="false"]), input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="range"], [type="color"], [type="file"], [type="image"])';

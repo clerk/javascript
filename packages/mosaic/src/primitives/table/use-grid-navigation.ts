@@ -34,11 +34,9 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     if (!table) {
       return;
     }
-    if (!isActivatable(table, activeRef.current)) {
+    const lostActive = !isActivatable(table, activeRef.current);
+    if (lostActive) {
       activeRef.current = itemAt(table, positionRef.current ?? initialPosition(table, excluded), excluded) ?? null;
-      if (focusedRef.current && !contains(table, table.ownerDocument.activeElement)) {
-        activeRef.current?.focus();
-      }
     }
     for (const element of originalTabIndexes.current.keys()) {
       if (!element.isConnected) {
@@ -47,6 +45,9 @@ export function useGridNavigation(table: HTMLTableElement | null, enabled: boole
     }
     for (const row of Array.from(table.rows)) {
       syncRow(row, activeRef.current, editingRef.current, excluded, setTabIndex);
+    }
+    if (lostActive && focusedRef.current && !contains(table, table.ownerDocument.activeElement)) {
+      activeRef.current?.focus();
     }
   }, [table, excluded, setTabIndex]);
 
