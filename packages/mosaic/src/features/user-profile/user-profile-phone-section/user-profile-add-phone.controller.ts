@@ -115,14 +115,7 @@ export function useUserProfileAddPhoneController({
   const handle = useMemo(() => Dialog.createHandle(), []);
   const [snapshot, send, actor] = useMachine(machine);
   const created = useRef<{ value: string; verifier: UserProfilePhoneVerifier }>(undefined);
-  const mounted = useRef(true);
   const generation = useRef(0);
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
   const { resendSeconds, error } = snapshot.context;
   const phoneForm = useForm({
     initialValues: { phoneNumber: '' },
@@ -130,14 +123,14 @@ export function useUserProfileAddPhoneController({
       if (onCreate) {
         if (created.current?.value !== phoneNumber) {
           const verifier = await onCreate(phoneNumber);
-          if (!mounted.current) {
+          if (actor.getSnapshot().status !== 'active') {
             return;
           }
           created.current = { value: phoneNumber, verifier };
         }
         const { verifier } = created.current;
         await verifier.sendCode();
-        if (mounted.current) {
+        if (actor.getSnapshot().status === 'active') {
           send({ type: 'READY', phoneNumber, verifier });
         }
       }
@@ -223,7 +216,11 @@ export function useUserProfileAddPhoneController({
       }
       const started = generation.current;
       await verifier.sendCode();
-      if (mounted.current && generation.current === started && actor.getSnapshot().value === 'idle') {
+      if (
+        actor.getSnapshot().status === 'active' &&
+        generation.current === started &&
+        actor.getSnapshot().value === 'idle'
+      ) {
         codeForm.reset();
         send({ type: 'READY', id: phone.id, phoneNumber: phone.value, verifier });
       }

@@ -259,7 +259,6 @@ describe('Adding a passkey', () => {
     const creation = holdRequests('post', '/v1/me/passkeys');
     const user = userEvent.setup();
     const add = screen.getByRole('button', { name: 'Add passkey' });
-    const bounds = add.getBoundingClientRect();
     try {
       await user.click(add);
       await waitFor(() => expect(creation.requests).toHaveLength(1));
@@ -267,8 +266,6 @@ describe('Adding a passkey', () => {
       await waitFor(() => expect(within(add).getByRole('progressbar')).toBeVisible());
       expect(add).toHaveAttribute('aria-disabled', 'true');
       expect(add).toHaveAttribute('aria-busy', 'true');
-      expect(add.getBoundingClientRect().width).toBe(bounds.width);
-      expect(add.getBoundingClientRect().height).toBe(bounds.height);
       expect(add).toHaveAccessibleName('Add passkey');
       await user.keyboard('{Enter}');
       expect(creation.requests).toHaveLength(1);

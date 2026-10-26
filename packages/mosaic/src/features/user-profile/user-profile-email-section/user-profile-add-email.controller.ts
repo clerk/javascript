@@ -189,12 +189,9 @@ export function useUserProfileAddEmailController({
   const [snapshot, send, actor] = useMachine(machine);
   const activeVerifier = useRef<UserProfileEmailVerifier>(undefined);
   const created = useRef<{ value: string; verifier: UserProfileEmailVerifier }>(undefined);
-  const mounted = useRef(true);
   const generation = useRef(0);
   useEffect(() => {
-    mounted.current = true;
     return () => {
-      mounted.current = false;
       activeVerifier.current?.cancel();
     };
   }, []);
@@ -206,7 +203,7 @@ export function useUserProfileAddEmailController({
       if (onCreate) {
         if (created.current?.value !== emailAddress) {
           const verifier = await onCreate(emailAddress);
-          if (!mounted.current) {
+          if (actor.getSnapshot().status !== 'active') {
             return;
           }
           created.current = { value: emailAddress, verifier };
@@ -214,7 +211,7 @@ export function useUserProfileAddEmailController({
         const { verifier } = created.current;
         activeVerifier.current = verifier;
         const verification = await verifier.prepare();
-        if (mounted.current) {
+        if (actor.getSnapshot().status === 'active') {
           send({ type: 'READY', emailAddress, verifier, verification });
         }
       }
@@ -311,7 +308,11 @@ export function useUserProfileAddEmailController({
       const started = generation.current;
       activeVerifier.current = verifier;
       const verification = await verifier.prepare();
-      if (mounted.current && generation.current === started && actor.getSnapshot().value === 'idle') {
+      if (
+        actor.getSnapshot().status === 'active' &&
+        generation.current === started &&
+        actor.getSnapshot().value === 'idle'
+      ) {
         codeForm.reset();
         send({ type: 'READY', id: email.id, emailAddress: email.value, verifier, verification });
       } else {

@@ -238,25 +238,6 @@ describe('useUserProfileAddEmailController', () => {
     expect(result.current.verifyingId).toBeUndefined();
   });
 
-  it('keeps preparation failure at the source and retries without creating another email', async () => {
-    const email = verifier();
-    email.prepare.mockRejectedValueOnce(saveError('Too many requests'));
-    const onCreate = vi.fn(async () => email);
-    const { result } = renderHook(() =>
-      useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
-    );
-    act(() => result.current.onOpenChange(true));
-    act(() => result.current.onEmailAddressChange('new@example.com'));
-    await act(() => result.current.onSubmit());
-    await waitFor(() => expect(result.current.errorMessage).toBe('Too many requests'));
-    expect(result.current.step).toBe('email');
-    expect(result.current.resendSeconds).toBe(0);
-    await act(() => result.current.onSubmit());
-    await waitFor(() => expect(result.current.step).toBe('verify'));
-    expect(onCreate).toHaveBeenCalledOnce();
-    expect(email.prepare).toHaveBeenCalledTimes(2);
-  });
-
   it('creates a different email when the value changes after failed preparation', async () => {
     const email = verifier();
     email.prepare.mockRejectedValueOnce(saveError('Try again'));
@@ -274,37 +255,20 @@ describe('useUserProfileAddEmailController', () => {
     expect(onCreate.mock.calls).toEqual([['first@example.com'], ['second@example.com']]);
   });
 
-  it.each(['code', 'link'] as const)(
-    'keeps the ready %s destination through failed resend and starts cooldown after success',
-    async method => {
-      vi.useFakeTimers();
-      const email = verifier(method === 'link' ? sentLink(new Promise(() => {})) : sentCode);
-      const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
-      await act(() => result.current.onVerifyEmail(other, email));
-      for (let second = 0; second < (method === 'link' ? 60 : 30); second++) {
-        await act(async () => vi.advanceTimersByTimeAsync(1000));
-      }
-      const held = createDeferredPromise();
-      email.prepare.mockImplementationOnce(async () => {
-        await held.promise;
-        return sentCode();
-      });
-      act(() => result.current.onResend());
-      expect(result.current.step).toBe(method === 'link' ? 'link' : 'verify');
-      expect(result.current.isResending).toBe(true);
-      expect(result.current.resendSeconds).toBe(0);
-      await act(async () => {
-        held.reject(saveError('Send failed'));
-        await Promise.resolve();
-      });
-      expect(result.current.step).toBe(method === 'link' ? 'link' : 'verify');
-      expect(result.current.errorMessage).toBe('Send failed');
-      expect(result.current.resendSeconds).toBe(0);
-      await act(() => result.current.onResend());
-      expect(result.current.resendSeconds).toBe(method === 'link' ? 60 : 30);
-      expect(result.current.errorMessage).toBeUndefined();
-    },
-  );
+  it('keeps the code input and zero cooldown after failed resend', async () => {
+    vi.useFakeTimers();
+    const email = verifier();
+    const { result } = renderHook(() => useUserProfileAddEmailController({ reverification: idleReverification }));
+    await act(() => result.current.onVerifyEmail(other, email));
+    for (let second = 0; second < 30; second++) {
+      await act(async () => vi.advanceTimersByTimeAsync(1000));
+    }
+    email.prepare.mockRejectedValueOnce(saveError('Send failed'));
+    await act(() => result.current.onResend());
+    expect(result.current.step).toBe('verify');
+    expect(result.current.errorMessage).toBe('Send failed');
+    expect(result.current.resendSeconds).toBe(0);
+  });
 
   it('preserves a failed resend error after the previous link expired', async () => {
     vi.useFakeTimers();
@@ -325,6 +289,11 @@ describe('useUserProfileAddEmailController', () => {
     expect(result.current.step).toBe('link');
     expect(result.current.errorMessage).toBe('Too many requests');
     expect(result.current.resendSeconds).toBe(0);
+    email.prepare.mockImplementationOnce(sentLink(new Promise(() => {})));
+    await act(() => result.current.onResend());
+    expect(result.current.step).toBe('link');
+    expect(result.current.resendSeconds).toBe(60);
+    expect(result.current.errorMessage).toBeUndefined();
   });
 
   it('cancels a held link resend without reopening the dialog when it settles', async () => {

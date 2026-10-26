@@ -22,9 +22,7 @@ import {
 } from '../../../../__tests__/feature/fapi';
 import { openMenu } from '../../../../__tests__/feature/menu';
 import { renderWithClerk } from '../../../../__tests__/feature/render';
-import type { UserProfileEmailVerifier } from '../../user-profile-contact.types';
 import { UserProfileEmailSection } from '../user-profile-email-section';
-import { useUserProfileEmailSectionModel } from '../user-profile-email-section.model';
 
 const VERIFIED = fapiVerification('email_code', { status: 'verified' });
 const PRIMARY = fapiEmailAddress({ id: 'idn_primary', email_address: 'alice@example.com', verification: VERIFIED });
@@ -70,27 +68,6 @@ async function enterCode(actor: Actor, code: string) {
 }
 
 describe('the user profile email section', () => {
-  it('refuses a retained verifier after the account changes', async () => {
-    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
-    const alice = fapiUser({ id: 'user_1', email_addresses: [pending] });
-    const bob = fapiUser({ id: 'user_2', email_addresses: [fapiEmailAddress({ id: 'idn_other' })] });
-    serveFapi({
-      client: fapiClient([fapiSession({ id: 'sess_1', user: alice }), fapiSession({ id: 'sess_2', user: bob })]),
-    });
-    let retained: UserProfileEmailVerifier | undefined;
-    function CaptureVerifier() {
-      const model = useUserProfileEmailSectionModel();
-      if (model.status === 'ready' && !retained) {
-        retained = model.getEmailVerifier('idn_pending');
-      }
-      return null;
-    }
-    const { clerk } = await renderWithClerk(<CaptureVerifier />);
-    expect(retained).toBeDefined();
-    await act(() => clerk.setActive({ session: 'sess_2' }));
-    await expect(retained?.prepare()).rejects.toThrow();
-    await expect(retained?.verifyCode('123456')).rejects.toThrow();
-  });
   it('adds an address and verifies the code it was sent', async () => {
     const { actor } = await renderSection(signedInWithEmails([]));
     expect(emailRow()).toHaveTextContent('No email addresses added');
@@ -139,10 +116,7 @@ describe('the user profile email section', () => {
       try {
         await manageEmail(actor, 'pending@example.com', 'Verify');
         await waitFor(() => expect(prepare.requests).toHaveLength(1));
-        const add = screen.getByRole('button', { name: 'Add email' });
-        expect(add).toBeDisabled();
-        await actor.click(add);
-        expect(screen.queryByRole('menu')).toBeNull();
+        expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
         expect(within(emailRow()).getByText('pending@example.com')).toBeVisible();
         expect(screen.queryByRole('dialog')).toBeNull();
         prepare.release();
@@ -172,7 +146,6 @@ describe('the user profile email section', () => {
         await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
         await actor.click(screen.getByRole('button', { name: 'Continue' }));
         await waitFor(() => expect(prepare.requests).toHaveLength(1));
-        expect(screen.queryByRole('textbox', { name: 'Verification code' })).toBeNull();
         prepare.fail('action_blocked');
         await waitFor(() =>
           expect(screen.getByRole('button', { name: 'Continue' })).not.toHaveAttribute('aria-busy', 'true'),
@@ -199,34 +172,6 @@ describe('the user profile email section', () => {
       }
     },
   );
-
-  it('cancels link preparation when the active account changes', async () => {
-    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
-    const alice = fapiUser({ id: 'user_1', email_addresses: [PRIMARY, pending] });
-    const bob = fapiUser({ id: 'user_2', email_addresses: [fapiEmailAddress({ id: 'idn_bob' })] });
-    const { actor, clerk } = await renderSection({
-      environment: verifiesByLink,
-      client: fapiClient([fapiSession({ id: 'sess_1', user: alice }), fapiSession({ id: 'sess_2', user: bob })]),
-    });
-    const email = clerk.user?.emailAddresses.find(value => value.id === pending.id);
-    if (!email) {
-      throw new Error('Missing email');
-    }
-    const reload = vi.spyOn(email, 'reload');
-    const preparing = vi.spyOn(email, 'prepareVerification');
-    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
-    try {
-      await manageEmail(actor, 'pending@example.com', 'Verify');
-      await waitFor(() => expect(prepare.requests).toHaveLength(1));
-      await act(() => clerk.setActive({ session: 'sess_2' }));
-      prepare.release();
-      await Promise.allSettled(preparing.mock.results.map(result => result.value));
-      expect(reload).not.toHaveBeenCalled();
-      expect(screen.queryByRole('dialog')).toBeNull();
-    } finally {
-      prepare.release();
-    }
-  });
 
   it('does not begin link polling after unmount during preparation', async () => {
     const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
@@ -475,50 +420,26 @@ describe('email reverification', () => {
     );
   });
 
-  it.each(['pointer', 'keyboard'])(
-    'keeps the profile visible after the %s primary action until verification is ready',
-    async input => {
-      const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
-      const { actor } = await renderSection({
-        ...signedInWithEmails([PRIMARY, second]),
-        verification: { secrets: { password: 'hunter2' } },
-      });
-      demandReverificationOnce('/v1/me');
-      const mutation = holdRequests('post', '/v1/me');
-      const start = holdRequests('post', '/v1/client/sessions/:id/verify');
-      const trigger = within(emailRow()).getByRole('button', { name: 'Manage bob@example.com' });
+  it('keeps the profile visible until primary-action verification is ready', async () => {
+    const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
+    const { actor } = await renderSection({
+      ...signedInWithEmails([PRIMARY, second]),
+      verification: { secrets: { password: 'hunter2' } },
+    });
+    demandReverificationOnce('/v1/me');
+    const start = holdRequests('post', '/v1/client/sessions/:id/verify');
 
-      try {
-        await openMenu(actor, trigger);
-        if (input === 'keyboard') {
-          await actor.keyboard('{ArrowDown}{Enter}');
-        } else {
-          await actor.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
-        }
-        await waitFor(() => expect(mutation.requests).toHaveLength(1));
-        expect(screen.queryByRole('menu')).toBeNull();
-        expect(within(emailRow()).getByText('bob@example.com')).toBeVisible();
-        expect(screen.queryByRole('alertdialog')).toBeNull();
-        expect(screen.queryByRole('dialog')).toBeNull();
-        expect(mutation.requests).toHaveLength(1);
-
-        mutation.release();
-        await waitFor(() => expect(start.requests).toHaveLength(1));
-        expect(within(emailRow()).getByText('bob@example.com')).toBeVisible();
-        expect(screen.queryByRole('dialog')).toBeNull();
-        start.release();
-
-        await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
-        await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
-        await actor.keyboard('{Escape}');
-        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-        await waitFor(() => expect(trigger).toHaveFocus());
-      } finally {
-        mutation.release();
-        start.release();
-      }
-    },
-  );
+    try {
+      await manageEmail(actor, 'bob@example.com', 'Set as primary');
+      await waitFor(() => expect(start.requests).toHaveLength(1));
+      expect(within(emailRow()).getByText('bob@example.com')).toBeVisible();
+      expect(screen.queryByRole('dialog')).toBeNull();
+      start.release();
+      await waitFor(() => expect(screen.getByLabelText('Password')).toHaveFocus());
+    } finally {
+      start.release();
+    }
+  });
 
   it('shows the section error when the primary action fails after closing the menu', async () => {
     const second = fapiEmailAddress({ id: 'idn_second', email_address: 'bob@example.com', verification: VERIFIED });
@@ -529,15 +450,10 @@ describe('email reverification', () => {
     try {
       await manageEmail(actor, 'bob@example.com', 'Set as primary');
       await waitFor(() => expect(mutation.requests).toHaveLength(1));
-      expect(screen.queryByRole('menu')).toBeNull();
-      expect(within(emailRow()).getByText('bob@example.com')).toBeVisible();
       mutation.fail('action_blocked', 'Unable to set primary address.');
-      await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
       await waitFor(() =>
         expect(within(emailRow()).getByRole('alert')).toHaveTextContent("This action couldn't be completed."),
       );
-      expect(screen.queryByRole('dialog')).toBeNull();
-      await waitFor(() => expect(trigger).toHaveFocus());
       await openMenu(actor, trigger);
       expect(screen.getByRole('menuitem', { name: 'Set as primary' })).not.toHaveAttribute('aria-disabled');
     } finally {

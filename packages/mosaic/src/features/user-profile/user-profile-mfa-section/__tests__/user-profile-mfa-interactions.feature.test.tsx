@@ -83,9 +83,12 @@ describe('User profile MFA interaction boundaries', () => {
     await waitFor(() => expect(held.requests).toHaveLength(1));
     try {
       await waitFor(() => {
+        expect(screen.getByRole('button', { name: /Authenticator app/ })).toHaveAttribute('aria-busy', 'true');
         expect(screen.getByRole('button', { name: /Authenticator app/ })).toBeDisabled();
         expect(screen.getByRole('button', { name: /SMS verification/ })).toBeDisabled();
       });
+      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+      expect(held.requests).toHaveLength(1);
     } finally {
       held.release();
     }

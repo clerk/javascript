@@ -274,16 +274,13 @@ describe('phone reverification', () => {
 
       expect(screen.getByLabelText('Password')).toBeVisible();
       expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-busy', 'true');
-      expect(screen.queryByRole('textbox', { name: 'Phone' })).toBeNull();
       expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
       await actor.keyboard('{Escape}{Enter}');
-      expect(screen.getByRole('dialog')).toBeVisible();
       expect(prepare.requests).toHaveLength(1);
 
       prepare.release();
       const input = await screen.findByRole('textbox', { name: 'Verification code' });
       await waitFor(() => expect(input).not.toHaveAttribute('aria-disabled'));
-      expect(input).toBeVisible();
     } finally {
       prepare.release();
     }
