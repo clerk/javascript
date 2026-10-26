@@ -79,7 +79,10 @@ export function ReverificationMethodPicker({
                 }
               >
                 <Item.Media>
-                  <IconFrame filled>
+                  <IconFrame
+                    filled
+                    bordered={false}
+                  >
                     <Icon glyph={method.icon} />
                   </IconFrame>
                 </Item.Media>
