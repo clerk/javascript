@@ -86,6 +86,9 @@ export function SignUp({ className, ...props }: React.ComponentProps<'div'>) {
                   />
                   {errors.fields.code && <div className='text-red-500'>{errors.fields.code.message}</div>}
                 </div>
+                {errors.global && (
+                  <p className='text-sm text-red-600'>{errors.global[0].longMessage ?? errors.global[0].message}</p>
+                )}
                 <Button
                   type='submit'
                   className='w-full'

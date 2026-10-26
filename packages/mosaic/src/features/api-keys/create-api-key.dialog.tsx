@@ -14,6 +14,7 @@ import { Input } from '../../components/input';
 import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { fill } from '../../localization';
+import { Form } from '../../primitives/form';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { APIKeysTableMessages } from './api-keys-table.types';
 
@@ -23,6 +24,7 @@ export type APIKeyExpiration = (typeof expirationValues)[number];
 
 export interface CreateAPIKeyValues {
   name: string;
+  description: string;
   expiration: APIKeyExpiration | null;
 }
 
@@ -32,6 +34,7 @@ export interface CreateAPIKeyDialogProps {
   onOpenChange: (open: boolean) => void;
   finalFocus?: DialogFocusTarget;
   form: UseFormResult<CreateAPIKeyValues>;
+  showDescription: boolean;
   expirationDateLabel: string | null;
   secret: string | null;
   copyError: string | null;
@@ -100,7 +103,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={form.id}
             onSubmit={form.handleSubmit}
           />
@@ -109,6 +112,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
         <Field.Root
           required
           disabled={form.isSubmitting}
+          focusableWhenDisabled
         >
           <Field.Label>{m.nameLabel}</Field.Label>
           <Input
@@ -142,6 +146,19 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
             </Field.Hint>
           </Field.Message>
         </Field.Root>
+        {props.showDescription ? (
+          <Field.Root
+            disabled={form.isSubmitting}
+            focusableWhenDisabled
+          >
+            <Field.Label>{m.descriptionLabel}</Field.Label>
+            <Input
+              autoComplete='off'
+              placeholder={m.descriptionPlaceholder}
+              {...form.register('description')}
+            />
+          </Field.Root>
+        ) : null}
       </Card.Content>
       <Card.Footer>
         <SubmitButton
@@ -149,6 +166,7 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
           fullWidth
           isPending={form.isSubmitting}
           disabled={!form.canSubmit}
+          focusableWhenDisabled
         >
           {m.add}
         </SubmitButton>
@@ -175,7 +193,7 @@ function CopyKeyStep(props: CreateAPIKeyDialogProps) {
       </Card.Banner>
       <Card.Content
         render={
-          <form
+          <Form
             id={formId}
             onSubmit={event => {
               event.preventDefault();

@@ -114,6 +114,19 @@ export const styles = stylex.create({
     minHeight: 0,
   },
 
+  rootFullscreen: {
+    inlineSize: '100cqi',
+  },
+
+  layoutFullscreen: {
+    borderRadius: 0,
+    boxShadow: 'none',
+  },
+
+  backItem: {
+    marginBlockEnd: space['4'],
+  },
+
   nav: {
     padding: space['4'],
     borderInlineEndColor: colorVars['--cl-color-border'],
@@ -182,17 +195,16 @@ export const styles = stylex.create({
     borderStyle: 'solid',
     borderWidth: '0px',
     gap: space['2'],
-    paddingBlock: space['2'],
     paddingInline: space['2.5'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':focus-visible': colorVars['--cl-color-border-subtle'],
-      ':where([data-selected])': colorVars['--cl-color-border-subtle'],
-      ':active': colorVars['--cl-color-border-subtle'],
+      ':focus-visible': colorVars['--cl-color-neutral-alpha-100'],
+      ':where([data-selected])': colorVars['--cl-color-neutral-alpha-200'],
+      ':active': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-border-subtle'],
+        ':hover:not(:active):not([data-selected])': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     color: {
@@ -210,6 +222,7 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
     // Above the neighbors, so the selected item's fill cannot cover the ring.
     zIndex: { default: null, ':focus-visible': 1 },
+    height: space['8'],
     minHeight: {
       default: null,
       '@media (pointer: coarse)': targetVars['--cl-target-coarse'],

@@ -1,6 +1,8 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as React from 'react';
 
+import { keysOf } from './object';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -18,11 +20,7 @@ import * as React from 'react';
  *   collides with the `color` variant a styled component spreads these props into.
  */
 export type RenderProps = Omit<React.HTMLAttributes<HTMLElement>, 'color'> & {
-  // SAFETY: the rendered element is chosen by the callback, after this type is fixed, so
-  // no concrete element type is correct here. `Ref<Element>` does not work: `RefObject<Element>`
-  // is not a `RefObject<HTMLAnchorElement>`. `any` is what makes the ref spreadable onto
-  // whatever the callback returns, which is the whole point of `render`. Base UI's
-  // `HTMLProps` resolves this the same way.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- The callback picks the rendered element after this type is fixed, and `Ref<Element>` is not assignable to a narrower element ref, so only `any` spreads onto any element (as in Base UI's `HTMLProps`).
   ref?: React.Ref<any>;
 };
 
@@ -81,7 +79,9 @@ type PropsInput<Tag extends keyof React.JSX.IntrinsicElements> =
 /**
  * Merges two props objects. Event handlers are chained (both fire),
  * `style` is shallow-merged, `className` is concatenated, and
- * everything else is overwritten by the second argument.
+ * everything else is overwritten by the second argument. An `undefined`
+ * handler or an empty `style`/`className` in the second argument keeps the
+ * first argument's value.
  */
 export function mergeProps<Tag extends keyof React.JSX.IntrinsicElements>(
   a: PropsInput<Tag>,
@@ -91,38 +91,79 @@ export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown
   const merged: Record<string, unknown> = { ...a };
 
   for (const key of Object.keys(b)) {
-    const bVal = b[key];
-
-    if (
-      key.charCodeAt(0) === 111 /* o */ &&
-      key.charCodeAt(1) === 110 /* n */ &&
-      key.charCodeAt(2) >= 65 /* A */ &&
-      key.charCodeAt(2) <= 90 /* Z */ &&
-      typeof a[key] === 'function' &&
-      typeof bVal === 'function'
-    ) {
-      // Chain event handlers — internal fires first, consumer fires second
-      const aHandler = a[key] as (...args: unknown[]) => void;
-      const bHandler = bVal as (...args: unknown[]) => void;
-      merged[key] = (...args: unknown[]) => {
-        aHandler(...args);
-        bHandler(...args);
-      };
-    } else if (key === 'style' && a.style && bVal) {
-      merged.style = { ...(a.style as object), ...(bVal as object) };
-    } else if (key === 'className' && typeof a.className === 'string' && typeof bVal === 'string') {
-      merged.className = `${a.className} ${bVal}`;
-    } else {
-      merged[key] = bVal;
-    }
+    merged[key] = mergeValue(key, a[key], b[key]);
   }
 
   return merged;
 }
 
+function mergeValue(key: string, aVal: unknown, bVal: unknown): unknown {
+  if (isEventHandlerKey(key)) {
+    return mergeEventHandlers(aVal, bVal);
+  }
+  if (key === 'style') {
+    return mergeStyles(aVal, bVal);
+  }
+  if (key === 'className') {
+    return mergeClassNames(aVal, bVal);
+  }
+  return bVal;
+}
+
+function mergeEventHandlers(aVal: unknown, bVal: unknown): unknown {
+  if (bVal === undefined) {
+    return aVal;
+  }
+  if (!isHandler(aVal) || !isHandler(bVal)) {
+    return bVal;
+  }
+  // Chain event handlers — internal fires first, consumer fires second
+  return (...args: unknown[]) => {
+    aVal(...args);
+    bVal(...args);
+  };
+}
+
+function mergeStyles(aVal: unknown, bVal: unknown): unknown {
+  if (!bVal) {
+    return aVal;
+  }
+  if (!aVal) {
+    return bVal;
+  }
+  return { ...(aVal as object), ...(bVal as object) };
+}
+
+function mergeClassNames(aVal: unknown, bVal: unknown): unknown {
+  if (!bVal) {
+    return aVal;
+  }
+  if (typeof aVal === 'string' && typeof bVal === 'string') {
+    return `${aVal} ${bVal}`;
+  }
+  return bVal;
+}
+
+function isEventHandlerKey(key: string): boolean {
+  return (
+    key.charCodeAt(0) === 111 /* o */ &&
+    key.charCodeAt(1) === 110 /* n */ &&
+    key.charCodeAt(2) >= 65 /* A */ &&
+    key.charCodeAt(2) <= 90 /* Z */
+  );
+}
+
+function isHandler(value: unknown): value is (...args: unknown[]) => void {
+  return typeof value === 'function';
+}
+
 // ---------------------------------------------------------------------------
 // useRender
 // ---------------------------------------------------------------------------
+
+export function isRef(value: unknown): value is React.Ref<unknown> {
+  return value === null || typeof value === 'function' || (typeof value === 'object' && 'current' in value);
+}
 
 /**
  * Reads the ref off a React element passed to `render`. React 19 exposes it on
@@ -204,7 +245,7 @@ export function useRender<
 
   let dataAttrs: Record<string, string> = {};
   if (state && stateAttributesMapping) {
-    for (const key of Object.keys(stateAttributesMapping) as Array<keyof State>) {
+    for (const key of keysOf(stateAttributesMapping)) {
       const mapper = stateAttributesMapping[key];
       if (mapper) {
         const attrs = mapper(state[key]);

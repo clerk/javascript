@@ -24,6 +24,8 @@ import { Button } from '@clerk/mosaic/components/button';
 import { InputGroup } from '@clerk/mosaic/components/input-group';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { useState } from 'react';
+import { Eye } from '@clerk/mosaic/icons/glyphs/eye';
+import { EyeSlash } from '@clerk/mosaic/icons/glyphs/eye-slash';
 
 function PasswordField() {
   const [visible, setVisible] = useState(false);
@@ -37,7 +39,7 @@ function PasswordField() {
           aria-label={visible ? 'Hide password' : 'Show password'}
           onClick={() => setVisible(value => !value)}
         >
-          <Icon name={visible ? 'eye-slash' : 'eye'} />
+          <Icon glyph={visible ? EyeSlash : Eye} />
         </Button>
       </InputGroup.End>
     </InputGroup.Root>

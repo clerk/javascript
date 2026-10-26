@@ -116,6 +116,10 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
 
   const startOauth = async (strategy: OAuthStrategy | Web3Strategy) => {
     card.setLoading(strategy);
+    const setIdleOnReturn = () => card.setIdle();
+    if (clerk.__internal_hasOAuthTransport && !isWeb3Strategy(strategy)) {
+      window.addEventListener('focus', setIdleOnReturn, { once: true });
+    }
     try {
       if (isWeb3Strategy(strategy)) {
         await web3Callback(strategy);
@@ -125,6 +129,8 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     } catch {
       await sleep(1000);
       card.setIdle();
+    } finally {
+      window.removeEventListener('focus', setIdleOnReturn);
     }
     if (idleAfterDelay) {
       await sleep(5000);

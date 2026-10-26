@@ -3,6 +3,7 @@ import { Icon } from '@clerk/mosaic/components/icon';
 import { Text } from '@clerk/mosaic/components/text';
 import type { VisuallyHiddenProps } from '@clerk/mosaic/components/visually-hidden';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
+import { LogOut } from '@clerk/mosaic/icons/glyphs/log-out';
 import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -25,7 +26,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 export function Default(props: Record<string, unknown>) {
   return (
     <Button shape='square'>
-      <Icon name='log-out' />
+      <Icon glyph={LogOut} />
       <VisuallyHidden {...knobsAsProps(props)}>Sign out</VisuallyHidden>
     </Button>
   );

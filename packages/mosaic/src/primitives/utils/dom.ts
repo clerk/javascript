@@ -8,8 +8,6 @@ export interface Dimensions {
   height: number;
 }
 
-export type Rect = Coords & Dimensions;
-
 const ALIGNMENT_PROPERTIES = ['justify-content', 'align-items', 'align-content', 'justify-items'];
 
 /**
@@ -18,6 +16,14 @@ const ALIGNMENT_PROPERTIES = ['justify-content', 'align-items', 'align-content',
  */
 export function getWindow(node: Node) {
   return node.ownerDocument?.defaultView ?? window;
+}
+
+export function isElement(target: unknown): target is Element {
+  return typeof target === 'object' && target !== null && 'nodeType' in target && target.nodeType === Node.ELEMENT_NODE;
+}
+
+export function isHTMLElement(target: unknown): target is HTMLElement {
+  return isElement(target) && target instanceof getWindow(target).HTMLElement;
 }
 
 /**
@@ -83,23 +89,6 @@ export function getScale(element: HTMLElement): Coords {
 }
 
 /**
- * The element's position and size in `parent`'s coordinate space: relative to its padding box,
- * following its scroll, and with its scale removed. When `parent` is the containing block, these are
- * the `left` / `top` / `width` / `height` an absolutely positioned child needs to cover the element.
- */
-export function getRectRelativeTo(element: Element, parent: HTMLElement): Rect {
-  const rect = element.getBoundingClientRect();
-  const parentRect = parent.getBoundingClientRect();
-  const scale = getScale(parent);
-  return {
-    x: (rect.left - parentRect.left) / scale.x - parent.clientLeft + parent.scrollLeft,
-    y: (rect.top - parentRect.top) / scale.y - parent.clientTop + parent.scrollTop,
-    width: rect.width / scale.x,
-    height: rect.height / scale.y,
-  };
-}
-
-/**
  * Calls `update` now and again whenever any of `elements` resizes. Returns a cleanup that stops
  * observing. Without `ResizeObserver`, `update` runs once.
  *
@@ -117,4 +106,50 @@ export function autoUpdate(elements: Element | Element[], update: () => void): (
     observer.observe(element);
   }
   return () => observer.disconnect();
+}
+
+const NON_TEXT_INPUT_TYPES = new Set([
+  'button',
+  'checkbox',
+  'color',
+  'file',
+  'hidden',
+  'image',
+  'radio',
+  'range',
+  'reset',
+  'submit',
+]);
+
+/** Whether focusing `element` summons the on-screen keyboard: a text field or contenteditable. */
+export function opensKeyboard(element: EventTarget | null): element is HTMLElement {
+  return (
+    (element instanceof HTMLInputElement && !NON_TEXT_INPUT_TYPES.has(element.type)) ||
+    element instanceof HTMLTextAreaElement ||
+    (element instanceof HTMLElement && element.isContentEditable)
+  );
+}
+
+/**
+ * Whether `element` scrolls and has room to follow a drag of `deltaX` / `deltaY` (finger movement)
+ * on either axis that moved: dragging down or toward the inline start needs content scrolled away
+ * behind it, the other way needs content left ahead. Both axes, not just the dominant one, because
+ * the first move of a touch is a pixel or two and its jitter can point anywhere.
+ */
+export function canScrollToward(element: Element, deltaX: number, deltaY: number): boolean {
+  const style = getComputedStyle(element);
+  if (
+    deltaY !== 0 &&
+    /(auto|scroll)/.test(style.overflowY) &&
+    element.scrollHeight > element.clientHeight &&
+    (deltaY > 0 ? element.scrollTop > 0 : element.scrollTop + element.clientHeight < element.scrollHeight - 1)
+  ) {
+    return true;
+  }
+  if (deltaX === 0 || !/(auto|scroll)/.test(style.overflowX) || element.scrollWidth <= element.clientWidth) {
+    return false;
+  }
+  const scrollLeft = Math.abs(element.scrollLeft);
+  const towardStart = style.direction === 'rtl' ? deltaX < 0 : deltaX > 0;
+  return towardStart ? scrollLeft > 0 : scrollLeft + element.clientWidth < element.scrollWidth - 1;
 }

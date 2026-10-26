@@ -48,6 +48,8 @@ const directory = (overrides: Record<string, unknown> = {}) =>
     delete: vi.fn(),
     rotateToken: vi.fn(),
     getUsers: vi.fn().mockResolvedValue({ data: [], total_count: 0 }),
+    getGroups: vi.fn().mockResolvedValue({ data: [], startingAfter: null, hasNextPage: false }),
+    getGroupRoleMappings: vi.fn().mockResolvedValue({ data: [], defaultRole: null }),
     ...overrides,
   }) as any;
 
@@ -278,7 +280,7 @@ describe('ConfigureDirectorySyncWizard test step', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
     expect(await screen.findByText('Could not load provisioned users')).toBeInTheDocument();
-    expect(screen.getByText('users unavailable')).toBeInTheDocument();
+    expect(screen.queryByText('users unavailable')).not.toBeInTheDocument();
     expect(screen.queryByText('Waiting for the first provisioned user…')).not.toBeInTheDocument();
   });
 

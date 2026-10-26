@@ -1,5 +1,10 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useRef, useState } from 'react';
 
+import type { ErrorDescription } from '../../../localization';
+import { useErrorText } from '../../../localization';
+import { toLocalizableError } from '../../../utils/errors';
+import type { ReverificationController } from '../../reverification';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
@@ -10,7 +15,8 @@ export interface UserProfileEnterpriseAccountsControllerOptions {
   accounts: UserProfileEnterpriseAccount[];
   connections: UserProfileEnterpriseConnection[];
   onConnect: (connectionId: string) => Promise<EnterpriseAccountActionResult>;
-  errorMessage: string;
+  connectReverification: ReverificationController;
+  errorFallback: string;
 }
 
 export interface UserProfileEnterpriseAccountsController {
@@ -18,16 +24,19 @@ export interface UserProfileEnterpriseAccountsController {
   connections: UserProfileEnterpriseConnection[];
   pendingId: string | undefined;
   onConnect: (connectionId: string) => void;
+  connectReverification: ReverificationController;
 }
 
 export function useUserProfileEnterpriseAccountsController({
   accounts,
   connections,
   onConnect,
-  errorMessage,
+  connectReverification,
+  errorFallback,
 }: UserProfileEnterpriseAccountsControllerOptions): UserProfileEnterpriseAccountsController {
   const [pendingId, setPendingId] = useState<string>();
-  const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
+  const errorText = useErrorText();
+  const [connectErrors, setConnectErrors] = useState<Record<string, ErrorDescription>>({});
   const connecting = useRef(false);
 
   const run = async (id: string) => {
@@ -43,7 +52,10 @@ export function useUserProfileEnterpriseAccountsController({
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
     } catch (error) {
-      setConnectErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : errorMessage }));
+      if (isReverificationCancelledError(error)) {
+        return;
+      }
+      setConnectErrors(current => ({ ...current, [id]: toLocalizableError(error) }));
     } finally {
       connecting.current = false;
       setPendingId(undefined);
@@ -52,10 +64,12 @@ export function useUserProfileEnterpriseAccountsController({
 
   return {
     accounts,
-    connections: connections.map(connection =>
-      connectErrors[connection.id] ? { ...connection, connectError: connectErrors[connection.id] } : connection,
-    ),
+    connections: connections.map(connection => {
+      const error = connectErrors[connection.id];
+      return error ? { ...connection, connectError: errorText(error, errorFallback) } : connection;
+    }),
     pendingId,
     onConnect: id => void run(id),
+    connectReverification,
   };
 }

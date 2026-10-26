@@ -1,6 +1,6 @@
 {
   "name": "@clerk/hono",
-  "version": "0.1.85",
+  "version": "0.1.94",
   "description": "Clerk SDK for Hono",
   "keywords": [
     "auth",
@@ -78,7 +78,7 @@
     "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
-    "hono": "^4.12.34"
+    "hono": "^4.13.7"
   },
   "peerDependencies": {
     "hono": ">=4"

@@ -8,10 +8,10 @@ on:
     paths:
       - '.github/workflows/expo-native-build.yml'
       - 'integration/templates/expo-native/**'
-      - 'integration/tests/expo-native/**'
       - 'packages/expo/**'
       - 'packages/expo-biometrics/**'
       - 'packages/expo-google-signin/**'
+      - 'packages/expo-native-components/**'
   workflow_dispatch:
 
 permissions:
@@ -23,50 +23,35 @@ concurrency:
 
 env:
   FIXTURE_DIR: integration/templates/expo-native
-  E2E_DIR: integration/tests/expo-native
   FIXTURE_PUBLISHABLE_KEY: pk_test_ZHVtbXkuY2xlcmsuYWNjb3VudHMuZGV2JA
   SDK_PACK_DIR: /tmp/clerk-expo-pack
-  E2E_INSTANCE_NAME: clerkstage-with-native-components
-  BAPI_URL: https://api.clerkstage.dev
-  MAESTRO_VERSION: '2.10.0'
-  MAESTRO_CLI_NO_ANALYTICS: '1'
-  MAESTRO_SHARDS: '2'
-  MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
 
 jobs:
   native-build:
-    if: ${{ github.head_ref != 'changeset-release/main' }}
-    name: Native ${{ matrix.run-e2e == true && 'E2E' || 'Build' }} (${{ matrix.platform }}, sdk ${{ matrix.expo-sdk }})
+    if: ${{ github.head_ref != 'changeset-release/main' && (github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false) }}
+    name: Native Build (${{ matrix.platform }}, sdk ${{ matrix.expo-sdk }})
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: ${{ matrix.run-e2e == true && 60 || 45 }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
         include:
-          - expo-sdk: 54
-            platform: android
-            runner: blacksmith-8vcpu-ubuntu-2204
-          - expo-sdk: 54
-            platform: ios
-            runner: blacksmith-6vcpu-macos-26
           - expo-sdk: 55
             platform: android
             runner: blacksmith-8vcpu-ubuntu-2204
           - expo-sdk: 55
             platform: ios
             runner: blacksmith-6vcpu-macos-26
-          - expo-sdk: 57
+          - expo-sdk: 58
             platform: android
             runner: blacksmith-8vcpu-ubuntu-2204
-            run-e2e: true
-          - expo-sdk: 57
+          - expo-sdk: 58
             platform: ios
             runner: blacksmith-6vcpu-macos-26
-            run-e2e: true
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@v4.4.0
         with:
           persist-credentials: false
 
@@ -87,6 +72,7 @@ jobs:
               packages/expo \
               packages/expo-biometrics \
               packages/expo-google-signin \
+              packages/expo-native-components \
               packages/react \
               packages/shared \
               "$FIXTURE_DIR" |
@@ -102,16 +88,16 @@ jobs:
 
       - name: Restore native build
         id: native-build-cache
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/restore@v4.3.0
         with:
           path: ${{ steps.native-build-key.outputs.artifact }}
           # Bump the version when native build commands change.
-          key: expo-native-build-v1-${{ runner.os }}-${{ matrix.expo-sdk }}-${{ matrix.platform }}-${{ matrix.run-e2e == true && 'e2e' || 'build' }}-${{ env.E2E_INSTANCE_NAME }}-${{ steps.native-build-key.outputs.hash }}
+          key: expo-native-build-v1-${{ runner.os }}-${{ matrix.expo-sdk }}-${{ matrix.platform }}-${{ steps.native-build-key.outputs.hash }}
 
       - if: steps.native-build-cache.outputs.cache-hit != 'true'
-        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        uses: pnpm/action-setup@v4.3.0
       - if: steps.native-build-cache.outputs.cache-hit != 'true'
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: 24.15.0
           cache: pnpm
@@ -127,6 +113,7 @@ jobs:
           mkdir -p "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"
+          pnpm --filter @clerk/expo-native-components pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-biometrics pack --pack-destination "$SDK_PACK_DIR"
 
       - name: Install fixture dependencies
@@ -134,69 +121,33 @@ jobs:
         working-directory: ${{ env.FIXTURE_DIR }}
         env:
           EXPO_SDK: ${{ matrix.expo-sdk }}
-          RUN_E2E: ${{ matrix.run-e2e == true && 'true' || 'false' }}
         run: |
           cp "package.sdk-$EXPO_SDK.json" package.json
           pnpm install --no-frozen-lockfile
-          # [0-9] keeps this glob off the clerk-expo-google-signin tarball.
+          # [0-9] keeps this glob off the other clerk-expo-* tarballs.
           SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"
           GOOGLE_SIGNIN_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
+          NATIVE_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-native-components-*.tgz)"
           BIOMETRICS_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-biometrics-*.tgz)"
-          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" "$BIOMETRICS_TARBALL" -w
-          # expo-dev-client makes even release builds boot into the dev
-          # launcher (unreachable Metro in CI), which stalls every Maestro
-          # flow on a blank screen. Skip it on e2e jobs only.
-          DEV_CLIENT="expo-dev-client"
-          if [ "$RUN_E2E" = "true" ]; then DEV_CLIENT=""; fi
-          pnpm expo install expo-auth-session expo-constants expo-crypto $DEV_CLIENT expo-secure-store expo-web-browser
-          if [ "$RUN_E2E" = "true" ]; then
-            REACT_VERSION=$(node -p 'require("react/package.json").version')
-            REACT_DOM_VERSION=$(node -p 'require("react-dom/package.json").version')
-            if [ "$REACT_VERSION" != "$REACT_DOM_VERSION" ]; then
-              echo "::error::React version mismatch: react@$REACT_VERSION, react-dom@$REACT_DOM_VERSION"
-              exit 1
-            fi
-          fi
-
-      - name: Check e2e secret availability
-        id: gate
-        if: matrix.run-e2e == true
-        env:
-          KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
-        run: |
-          if [ -n "$KEYS" ]; then
-            echo "ok=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ok=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::INTEGRATION_STAGING_INSTANCE_KEYS unavailable (fork PR?); running build-only."
-          fi
-
-      - name: Resolve Clerk instance keys
-        id: keys
-        if: steps.gate.outputs.ok == 'true'
-        continue-on-error: true
-        env:
-          INTEGRATION_STAGING_INSTANCE_KEYS: ${{ secrets.INTEGRATION_STAGING_INSTANCE_KEYS }}
-        run: node scripts/resolve-instance-keys.mjs INTEGRATION_STAGING_INSTANCE_KEYS "$E2E_INSTANCE_NAME"
+          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" "$NATIVE_TARBALL" "$BIOMETRICS_TARBALL" -w
+          pnpm expo install expo-auth-session expo-constants expo-crypto expo-dev-client expo-secure-store expo-web-browser
 
       - name: Write fixture .env
         if: steps.native-build-cache.outputs.cache-hit != 'true'
         working-directory: ${{ env.FIXTURE_DIR }}
-        env:
-          E2E_PK: ${{ steps.keys.outputs.pk }}
         run: |
-          echo "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=${E2E_PK:-$FIXTURE_PUBLISHABLE_KEY}" > .env
+          echo "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=$FIXTURE_PUBLISHABLE_KEY" > .env
 
       - name: Set up JDK 17
         if: matrix.platform == 'android'
-        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        uses: actions/setup-java@v4.9.1
         with:
           distribution: temurin
           java-version: 17
 
       - name: Set up Gradle cache
         if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
-        uses: gradle/actions/setup-gradle@4733eaac7c1b0da527e4206b7671e0061de1ce37 # v6.3.0
+        uses: gradle/actions/setup-gradle@v6.3.0
         with:
           # This workflow never runs on main, so the default (write from main
           # only) would never seed the cache.
@@ -234,184 +185,7 @@ jobs:
 
       - name: Save native build
         if: steps.native-build-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache/save@v4.3.0
         with:
           path: ${{ steps.native-build-key.outputs.artifact }}
           key: ${{ steps.native-build-cache.outputs.cache-primary-key }}
-
-      - name: Boot iOS simulators
-        if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
-        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$MAESTRO_SHARDS"
-
-      - name: Cache maestro CLI
-        if: steps.keys.outputs.pk != ''
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: ~/.maestro
-          key: maestro-${{ runner.os }}-${{ env.MAESTRO_VERSION }}
-
-      - name: Install maestro CLI
-        if: steps.keys.outputs.pk != ''
-        run: |
-          if [ -x "$HOME/.maestro/bin/maestro" ]; then
-            echo "Using cached Maestro"
-          else
-            archive="$RUNNER_TEMP/maestro.zip"
-            curl -fLs --retry 3 --retry-delay 5 -o "$archive" \
-              "https://github.com/mobile-dev-inc/Maestro/releases/download/cli-$MAESTRO_VERSION/maestro.zip"
-            unzip -q "$archive" -d "$RUNNER_TEMP/maestro-dist"
-            mv "$RUNNER_TEMP/maestro-dist/maestro" "$HOME/.maestro"
-          fi
-          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-          test "$("$HOME/.maestro/bin/maestro" --version)" = "$MAESTRO_VERSION"
-
-      # Provisioned as late as possible so live credentials exist for the
-      # shortest window.
-      - name: Provision test user via BAPI
-        id: user
-        if: steps.keys.outputs.pk != ''
-        continue-on-error: true
-        env:
-          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
-        run: |
-          email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
-          username="ci_${GITHUB_RUN_ID}_${RANDOM}"
-          password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST "$BAPI_URL/v1/users" \
-            -H "Authorization: Bearer $CLERK_SECRET_KEY" \
-            -H "Content-Type: application/json" \
-            -d "{\"email_address\":[\"$email\"],\"username\":\"$username\",\"password\":\"$password\"}")
-          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
-            echo "::error::BAPI user creation failed (HTTP $http_code)"
-            cat /tmp/bapi_response.json
-            exit 1
-          fi
-          user_id=$(jq -er '.id' /tmp/bapi_response.json)
-          echo "::add-mask::$password"
-          {
-            echo "email=$email"
-            echo "password=$password"
-            echo "user_id=$user_id"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Run iOS e2e (Maestro)
-        id: run_e2e_ios
-        if: matrix.platform == 'ios' && steps.user.outputs.user_id != ''
-        working-directory: ${{ env.FIXTURE_DIR }}
-        env:
-          CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
-          CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-        run: |
-          "$GITHUB_WORKSPACE/$E2E_DIR/boot-ios-simulators.sh" wait
-          mkdir -p "$RUNNER_TEMP/maestro-debug"
-          log_pids=()
-          trap 'kill "${log_pids[@]}" 2>/dev/null || true; wait "${log_pids[@]}" 2>/dev/null || true' EXIT
-          for udid in ${MAESTRO_UDID//,/ }; do
-            xcrun simctl install "$udid" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
-            xcrun simctl spawn "$udid" log stream --style compact \
-              --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
-              > "$RUNNER_TEMP/maestro-debug/$udid-console.log" 2>&1 &
-            log_pids+=($!)
-          done
-          PLATFORM=ios MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" \
-            "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh"
-
-      - name: Enable KVM
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      - name: AVD cache
-        id: avd-cache
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-34-google_apis-x86_64-v1
-
-      - name: Create AVD snapshot
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != '' && steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-
-      - name: Run Android e2e (Maestro)
-        id: run_e2e_android
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
-        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
-        env:
-          CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
-          CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          # read-only: a writable instance holds a lock the shard emulators wait on forever
-          emulator-options: -read-only -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          disable-animations: true
-          # The action runs each script line in a separate sh -c; the folded
-          # scalar (>-) plus && keeps everything in one shell invocation.
-          script: >-
-            cd integration/tests/expo-native &&
-            MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-android-flows.sh
-            "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
-
-      # Runs before the artifact upload so the credentials are already dead
-      # by the time the debug files become downloadable.
-      - name: Cleanup test user
-        if: always() && steps.user.outputs.user_id != ''
-        env:
-          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
-          USER_ID: ${{ steps.user.outputs.user_id }}
-        run: |
-          curl -fsS -X DELETE "$BAPI_URL/v1/users/$USER_ID" \
-            -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
-
-      # Test reports record flow env (and typed input) in plaintext;
-      # add-mask only covers step logs, not artifact contents. Must run whenever
-      # the upload does, or a passing run uploads the password.
-      - name: Scrub test credentials from Maestro debug output
-        id: scrub
-        if: always() && steps.user.outputs.user_id != ''
-        env:
-          CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-        run: |
-          [ -d "$RUNNER_TEMP/maestro-debug" ] || exit 0
-          [ -n "$CLERK_TEST_PASSWORD" ] || exit 0
-          # shellcheck disable=SC2016
-          find "$RUNNER_TEMP/maestro-debug" -type f \
-            \( -name '*.html' -o -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' \) \
-            -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
-
-      - name: Upload Maestro artifacts
-        if: always() && steps.scrub.outcome == 'success'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: maestro-${{ matrix.platform }}
-          path: ${{ runner.temp }}/maestro-debug
-          if-no-files-found: warn
-          retention-days: 7
-
-      - name: Report e2e outcome
-        if: always() && steps.user.outputs.user_id != ''
-        env:
-          IOS_OUTCOME: ${{ steps.run_e2e_ios.outcome }}
-          ANDROID_OUTCOME: ${{ steps.run_e2e_android.outcome }}
-        run: |
-          outcome="$IOS_OUTCOME"
-          [ "$outcome" = "skipped" ] && outcome="$ANDROID_OUTCOME"
-          echo "## Maestro e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
-          if [ "$outcome" = "failure" ]; then
-            echo "::error::Maestro e2e failed. See the maestro-${{ matrix.platform }} artifact."
-          fi

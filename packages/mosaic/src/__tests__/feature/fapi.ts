@@ -7,6 +7,7 @@ import type {
   ClientJSON,
   DisplayConfigJSON,
   EmailAddressJSON,
+  EnterpriseAccountConnectionJSON,
   EnterpriseAccountJSON,
   EnterpriseConnectionJSON,
   EnvironmentJSON,
@@ -16,6 +17,8 @@ import type {
   OrganizationMembershipJSON,
   OrganizationSettingsJSON,
   OrganizationSuggestionJSON,
+  PasskeyJSON,
+  PhoneNumberJSON,
   PublicKeyCredentialRequestOptionsJSON,
   PublicOrganizationDataJSON,
   SessionJSON,
@@ -25,19 +28,31 @@ import type {
   UserOrganizationInvitationJSON,
   UserSettingsJSON,
   VerificationJSON,
+  Web3Strategy,
+  Web3WalletJSON,
 } from '@clerk/shared/types';
 
 type Settings<T> = Omit<T, 'id' | 'object'>;
 
-export type FapiUserSettings = Omit<Settings<UserSettingsJSON>, 'social'> & { social: Partial<OAuthProviders> };
+type FapiWeb3Attribute = Omit<AttributeDataJSON, 'first_factors'> & {
+  first_factors: Array<AttributeDataJSON['first_factors'][number] | Web3Strategy>;
+};
+
+export type FapiUserSettings = Omit<Settings<UserSettingsJSON>, 'social' | 'attributes'> & {
+  social: Partial<OAuthProviders>;
+  attributes: Omit<AttributesJSON, 'web3_wallet'> & { web3_wallet: FapiWeb3Attribute };
+};
 
 export type FapiEnvironment = Omit<EnvironmentJSON, 'user_settings' | 'organization_settings'> & {
   user_settings: FapiUserSettings;
   organization_settings: Settings<OrganizationSettingsJSON>;
 };
 
+export type FapiAttributeOverrides = Partial<Record<keyof AttributesJSON, Partial<AttributeDataJSON>>>;
+
 export interface FapiEnvironmentOverrides {
   api_keys_settings?: Partial<Settings<APIKeysSettingsJSON>>;
+  attributes?: FapiAttributeOverrides;
   auth_config?: Partial<AuthConfigJSON>;
   display_config?: Partial<DisplayConfigJSON>;
   organization_settings?: Partial<Settings<OrganizationSettingsJSON>>;
@@ -83,23 +98,24 @@ function attribute(overrides: Partial<AttributeDataJSON> = {}): AttributeDataJSO
   };
 }
 
-function attributes(): AttributesJSON {
+function attributes(overrides: FapiAttributeOverrides = {}): AttributesJSON {
   return {
     email_address: attribute({
       verifications: ['email_code'],
       used_for_first_factor: true,
       first_factors: ['email_code'],
       verify_at_sign_up: true,
+      ...overrides.email_address,
     }),
-    phone_number: attribute({ enabled: false }),
-    username: attribute(),
-    first_name: attribute(),
-    last_name: attribute(),
-    password: attribute(),
-    web3_wallet: attribute({ enabled: false }),
-    authenticator_app: attribute({ enabled: false }),
-    backup_code: attribute({ enabled: false }),
-    passkey: attribute({ enabled: false }),
+    phone_number: attribute({ enabled: false, verifications: ['phone_code'], ...overrides.phone_number }),
+    username: attribute(overrides.username),
+    first_name: attribute(overrides.first_name),
+    last_name: attribute(overrides.last_name),
+    password: attribute(overrides.password),
+    web3_wallet: attribute({ enabled: false, ...overrides.web3_wallet }),
+    authenticator_app: attribute({ enabled: false, ...overrides.authenticator_app }),
+    backup_code: attribute({ enabled: false, ...overrides.backup_code }),
+    passkey: attribute({ enabled: false, ...overrides.passkey }),
   };
 }
 
@@ -192,7 +208,7 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       ...overrides.organization_settings,
     },
     user_settings: {
-      attributes: attributes(),
+      attributes: attributes(overrides.attributes),
       actions: { delete_self: true, create_organization: true },
       social: {},
       enterprise_sso: { enabled: false, self_serve_sso: false, self_serve_directory_sync: false },
@@ -258,6 +274,19 @@ export function fapiExternalAccount(
   };
 }
 
+export function fapiPhoneNumber(
+  overrides: Partial<PhoneNumberJSON> & Pick<PhoneNumberJSON, 'id' | 'phone_number'>,
+): PhoneNumberJSON {
+  return {
+    object: 'phone_number',
+    reserved_for_second_factor: false,
+    default_second_factor: false,
+    linked_to: [],
+    verification: null,
+    ...overrides,
+  };
+}
+
 export function fapiEnterpriseConnection(
   overrides: Partial<EnterpriseConnectionJSON> & Pick<EnterpriseConnectionJSON, 'id'>,
 ): EnterpriseConnectionJSON {
@@ -317,6 +346,7 @@ export function fapiUser(overrides: Partial<UserJSON> & Pick<UserJSON, 'id'>): U
 
 export function fapiEnterpriseAccount(
   overrides: Partial<EnterpriseAccountJSON> & Pick<EnterpriseAccountJSON, 'id'>,
+  connection: Partial<EnterpriseAccountConnectionJSON> = {},
 ): EnterpriseAccountJSON {
   return {
     object: 'enterprise_account',
@@ -339,6 +369,7 @@ export function fapiEnterpriseAccount(
       created_at: createdAt,
       updated_at: createdAt,
       enterprise_connection_id: 'sso_1',
+      ...connection,
     },
     first_name: null,
     last_name: null,
@@ -349,6 +380,21 @@ export function fapiEnterpriseAccount(
     verification: null,
     last_authenticated_at: null,
     enterprise_connection_id: 'sso_1',
+    ...overrides,
+  };
+}
+
+export function fapiWeb3Wallet(
+  overrides: Partial<Web3WalletJSON> & Pick<Web3WalletJSON, 'id' | 'web3_wallet'>,
+): Web3WalletJSON {
+  return {
+    object: 'web3_wallet',
+    verification: fapiVerification('web3_metamask_signature', {
+      status: 'verified',
+      verified_at_client: '',
+      attempts: 1,
+      expire_at: 0,
+    }),
     ...overrides,
   };
 }
@@ -548,4 +594,16 @@ export function fapiApiKey(overrides: Partial<ApiKeyJSON> & Pick<ApiKeyJSON, 'id
 
 export function fapiPage<T>(data: T[], totalCount = data.length): FapiPage<T> {
   return { data, total_count: totalCount };
+}
+
+export function fapiPasskey(overrides: Partial<PasskeyJSON> & Pick<PasskeyJSON, 'id'>): PasskeyJSON {
+  return {
+    object: 'passkey',
+    name: 'Laptop',
+    verification: null,
+    created_at: createdAt,
+    updated_at: createdAt,
+    last_used_at: null,
+    ...overrides,
+  };
 }
