@@ -15,6 +15,7 @@ import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';
 import type { BiometricCredentialError, BiometricCredentialErrorCode } from './errors';
+import { isBiometricCredentialError } from './errors';
 import type { ExpoBiometricsModule, ExpoBiometricsRecord } from './loadExpoBiometrics';
 import { loadExpoBiometrics } from './loadExpoBiometrics';
 import type {
@@ -233,6 +234,14 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     return user;
   }
 
+  function requireSessionWithUser(code: BiometricCredentialErrorCode, message: string) {
+    const session = clerk.session;
+    if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
+      throw biometricCredentialError(code, message);
+    }
+    return { session, user: session.user };
+  }
+
   async function deleteLocalCredential(biometrics: Biometrics, record: ExpoBiometricsRecord): Promise<void> {
     await callModule(biometrics, module => module.deleteRecord(record.localKeyId));
   }
@@ -448,6 +457,22 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     }
   }
 
+  async function revokeCredential(
+    biometrics: Biometrics,
+    user: UserResource,
+    id: string,
+  ): Promise<BiometricCredential> {
+    const credential = await callApi(biometrics.fallbackCode, () => user.__experimental_revokeBiometricCredential(id));
+    await ignoreErrors(async () => {
+      const records = await biometrics.module.listRecords();
+      const localKeyIds = new Set(records.filter(record => record.id === id).map(record => record.localKeyId));
+      for (const localKeyId of localKeyIds) {
+        await biometrics.module.deleteRecord(localKeyId);
+      }
+    });
+    return toBiometricCredential(credential);
+  }
+
   return {
     getAvailability: async params => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_AVAILABILITY_FAILED');
@@ -466,14 +491,10 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
     enroll: async params => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_ENROLLMENT_FAILED');
-      const session = clerk.session;
-      if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
-        throw biometricCredentialError(
-          biometrics.fallbackCode,
-          'Unable to enroll a biometric credential without an active or pending Clerk session.',
-        );
-      }
-      const user = session.user;
+      const { user } = requireSessionWithUser(
+        biometrics.fallbackCode,
+        'Unable to enroll a biometric credential without an active or pending Clerk session.',
+      );
       const unavailableReason = featureUnavailableReason();
       if (unavailableReason) {
         throw biometricCredentialError(
@@ -545,18 +566,30 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
     revoke: async id => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_REVOCATION_FAILED');
-      const user = requireUser(biometrics.fallbackCode);
-      const credential = await callApi(biometrics.fallbackCode, () =>
-        user.__experimental_revokeBiometricCredential(id),
+      return revokeCredential(biometrics, requireUser(biometrics.fallbackCode), id);
+    },
+
+    revokeCurrentDeviceCredential: async () => {
+      const biometrics = requireBiometrics('E_TRUSTED_DEVICE_REVOCATION_FAILED');
+      const { user } = requireSessionWithUser(
+        biometrics.fallbackCode,
+        'Unable to revoke a biometric credential without an active or pending Clerk session.',
       );
-      await ignoreErrors(async () => {
-        const records = await biometrics.module.listRecords();
-        const localKeyIds = new Set(records.filter(record => record.id === id).map(record => record.localKeyId));
-        for (const localKeyId of localKeyIds) {
-          await biometrics.module.deleteRecord(localKeyId);
+      const record = (await callModule(biometrics, module => module.listRecords()))
+        .filter(record => record.appIdentifier === biometrics.appIdentifier && record.userId === user.id)
+        .sort(newestFirst)[0];
+      if (!record) {
+        return null;
+      }
+      try {
+        return await revokeCredential(biometrics, user, record.id);
+      } catch (error) {
+        if (!isBiometricCredentialError(error) || error.code !== 'resource_not_found') {
+          throw error;
         }
-      });
-      return toBiometricCredential(credential);
+        await ignoreErrors(() => deleteLocalCredential(biometrics, record));
+        return null;
+      }
     },
 
     signIn: async params => {
@@ -631,14 +664,11 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
           'Biometric reverification level must be first_factor, second_factor, or multi_factor.',
         );
       }
-      const session = clerk.session;
-      if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
-        throw biometricCredentialError(
-          'biometric_reverification_session_unavailable',
-          'Biometric reverification requires an active or pending session with a user.',
-        );
-      }
-      const record = await reverificationCredential(biometrics, session.user.id);
+      const { session, user } = requireSessionWithUser(
+        'biometric_reverification_session_unavailable',
+        'Biometric reverification requires an active or pending session with a user.',
+      );
+      const record = await reverificationCredential(biometrics, user.id);
       const reason = params?.reason ?? DEFAULT_REVERIFICATION_REASON;
 
       let verification = await callApi(biometrics.fallbackCode, () => session.startVerification({ level }));

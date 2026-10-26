@@ -6,6 +6,9 @@ import { Menu } from '@clerk/mosaic/components/menu';
 import { Panel } from '@clerk/mosaic/components/panel';
 import { Profile } from '@clerk/mosaic/components/profile';
 import { Table } from '@clerk/mosaic/components/table';
+import { ChevronDown } from '@clerk/mosaic/icons/glyphs/chevron-down';
+import { Trash } from '@clerk/mosaic/icons/glyphs/trash';
+import { Users } from '@clerk/mosaic/icons/glyphs/users';
 import { useDataTable } from '@clerk/mosaic/primitives/hooks';
 import type { ComponentProps } from 'react';
 import { useId, useRef, useState } from 'react';
@@ -103,7 +106,7 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
           <Menu.Trigger render={<ActionBar.Action />}>
             Change role
             <Icon
-              name='chevron-down'
+              glyph={ChevronDown}
               placement='inline-end'
             />
           </Menu.Trigger>
@@ -129,7 +132,7 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
           aria-label='Remove selected'
           onClick={clearSelection}
         >
-          <Icon name='trash' />
+          <Icon glyph={Trash} />
         </ActionBar.Action>
         <ActionBar.Separator />
         <ActionBar.Dismiss onClick={clearSelection} />
@@ -156,13 +159,13 @@ function MembersProfile({
       value='members'
       {...props}
     >
-      <Profile.Title>Workspace</Profile.Title>
+      <Profile.Title>Organization</Profile.Title>
       <Profile.Nav>
         <Profile.NavItem
           value='members'
           icon={
             <Icon
-              name='users'
+              glyph={Users}
               size='sm'
             />
           }
@@ -170,7 +173,7 @@ function MembersProfile({
           Members
         </Profile.NavItem>
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle='Members'>
         <Profile.ContentPanel value='members'>
           <Panel.Root>
             <Panel.Title>Members</Panel.Title>
@@ -190,7 +193,7 @@ export function InDialog() {
   const [popup, setPopup] = useState<HTMLDivElement | null>(null);
   return (
     <Dialog.Root>
-      <Dialog.Trigger render={<Button />}>Manage workspace</Dialog.Trigger>
+      <Dialog.Trigger render={<Button />}>Manage organization</Dialog.Trigger>
       <Dialog.Popup
         ref={setPopup}
         variant='profile'

@@ -34,7 +34,7 @@ test.describe('Custom Flows Waitlist @custom', () => {
   });
 
   test.afterAll(async () => {
-    const u = createTestUtils({ app });
+    const u = await createTestUtils({ app });
     await Promise.all(fakeEmails.map(email => u.services.waitlist.clearWaitlistByEmail(email)));
     await app.teardown();
   });
@@ -43,7 +43,7 @@ test.describe('Custom Flows Waitlist @custom', () => {
     const fakeEmail = `${hash()}+clerk_test@clerkcookie.com`;
     fakeEmails.push(fakeEmail);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/waitlist');
     await u.page.waitForClerkJsLoaded();
     await expect(u.page.getByText('Join the Waitlist', { exact: true })).toBeVisible();
@@ -59,7 +59,7 @@ test.describe('Custom Flows Waitlist @custom', () => {
   });
 
   test('renders error with invalid email', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/waitlist');
     await u.page.waitForClerkJsLoaded();
     await expect(u.page.getByText('Join the Waitlist', { exact: true })).toBeVisible();
@@ -77,7 +77,7 @@ test.describe('Custom Flows Waitlist @custom', () => {
     const fakeEmail = `${hash()}+clerk_test@clerkcookie.com`;
     fakeEmails.push(fakeEmail);
 
-    const u = createTestUtils({ app, page, context });
+    const u = await createTestUtils({ app, page, context });
     await u.page.goToRelative('/waitlist');
     await u.page.waitForClerkJsLoaded();
     await expect(u.page.getByText('Join the Waitlist', { exact: true })).toBeVisible();

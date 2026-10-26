@@ -94,6 +94,7 @@ const RemoveDomainDialogContent = withCardStateProvider((props: RemoveDomainDial
                 <Form.ResetButton
                   elementDescriptor={descriptors.configureSSORemoveDomainDialogCancelButton}
                   block={false}
+                  colorScheme='neutral'
                   localizationKey={localizationKeys(
                     'configureSSO.organizationDomainsStep.removeDomainDialog.cancelButton',
                   )}

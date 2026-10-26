@@ -262,6 +262,70 @@ describe('Combobox', () => {
     expect(screen.getByRole('option', { name: 'Banana' })).toBeInTheDocument();
     expect(popup).not.toHaveTextContent('Apple');
   });
+
+  it('moves the highlight with the arrow keys right after typing opens a popup', async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox.Root>
+        <Combobox.Input aria-label='Fruit' />
+        <Combobox.Positioner>
+          <Combobox.Popup>
+            {fruits.map(fruit => (
+              <Combobox.Option
+                key={fruit.value}
+                value={fruit.value}
+                label={fruit.label}
+              >
+                {fruit.label}
+              </Combobox.Option>
+            ))}
+          </Combobox.Popup>
+        </Combobox.Positioner>
+      </Combobox.Root>,
+    );
+
+    await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+    await user.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active');
+  });
+
+  it('moves the highlight with the arrow keys right after typing shows an inline list', async () => {
+    const user = userEvent.setup();
+    function Fixture() {
+      const [query, setQuery] = useState('');
+      return (
+        <Combobox.Root
+          inline
+          open={query !== ''}
+          inputValue={query}
+          onInputValueChange={setQuery}
+        >
+          <Combobox.Input aria-label='Fruit' />
+          {query ? (
+            <Combobox.List>
+              {fruits.map(fruit => (
+                <Combobox.Option
+                  key={fruit.value}
+                  value={fruit.value}
+                  label={fruit.label}
+                >
+                  {fruit.label}
+                </Combobox.Option>
+              ))}
+            </Combobox.List>
+          ) : null}
+        </Combobox.Root>
+      );
+    }
+    render(<Fixture />);
+
+    await user.type(screen.getByRole('combobox', { name: 'Fruit' }), 'a');
+    await user.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('option', { name: 'Banana' })).toHaveAttribute('data-active');
+  });
+
   describe('selection-only input', () => {
     it('keeps the selected option when hover and keyboard highlight move', async () => {
       const user = userEvent.setup();
