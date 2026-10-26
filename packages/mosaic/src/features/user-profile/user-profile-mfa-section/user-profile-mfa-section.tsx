@@ -1,4 +1,4 @@
-import { type ReactNode, useRef, useState } from 'react';
+import { type ReactNode, useRef } from 'react';
 
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { useUserProfileMfaController } from './user-profile-mfa-section.controller';
@@ -34,28 +34,17 @@ export function mfaSectionNode(model: UserProfileMfaModel, fallback: ReactNode =
 function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'ready' }> }) {
   const controller = useUserProfileMfaController(model);
   const initialFocusRef = useRef<HTMLElement>(null);
-  const [lastShownStep, setLastShownStep] = useState(controller.setupProps.step);
-  const step = controller.isPending && lastShownStep === 'verify' ? 'verify' : controller.setupProps.step;
-  if (step !== lastShownStep) {
-    setLastShownStep(step);
-  }
-  const reverifying = step === 'verify';
-  const onOpenChange = (open: boolean) => {
-    if (!open && controller.showCloseButton) {
-      setLastShownStep('select');
-    }
-    controller.onDialogOpenChange(open);
-  };
+  const reverifying = controller.setupProps.step === 'verify';
 
   return (
     <UserProfileMfaSectionView
       {...controller.sectionProps}
       addControl={
-        controller.showAddControl || reverifying ? (
+        controller.showAddControl ? (
           <UserProfileAddMfaDialog
-            open={controller.dialogOpen || reverifying}
+            open={controller.dialogOpen}
             disabled={controller.isPending}
-            onOpenChange={onOpenChange}
+            onOpenChange={controller.onDialogOpenChange}
             hideTrigger={!controller.showAddTrigger}
             reverifying={reverifying}
             showCloseButton={controller.showCloseButton}
@@ -65,9 +54,8 @@ function MfaEditor({ model }: { model: Extract<UserProfileMfaModel, { status: 'r
           >
             <UserProfileMfaSetupView
               {...controller.setupProps}
-              step={step}
               initialFocusRef={initialFocusRef}
-              onReverificationClose={() => onOpenChange(false)}
+              onReverificationClose={() => controller.onDialogOpenChange(false)}
             />
           </UserProfileAddMfaDialog>
         ) : undefined

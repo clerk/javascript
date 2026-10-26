@@ -111,7 +111,6 @@ function createSmsActions(
   environment: EnvironmentResource,
   userId: string,
   sessionId: string,
-  refresh: () => Promise<void>,
   calls: {
     makeDefault: (phone: PhoneNumberResource) => Promise<unknown>;
     createPhone: (current: UserResource, phoneNumber: string) => Promise<PhoneNumberResource>;
@@ -149,7 +148,6 @@ function createSmsActions(
         throw phoneUnavailable();
       }
       const result = await calls.reservePhone(phone);
-      await refresh().catch(() => undefined);
       return { status: 'complete', backupCodes: result.backupCodes ?? [] };
     },
     resendSms: async phoneId => {
@@ -161,7 +159,6 @@ function createSmsActions(
         throw phoneUnavailable();
       }
       await calls.makeDefault(phone);
-      await refresh().catch(() => undefined);
     },
   };
 }
@@ -194,18 +191,23 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   const { isLoaded: sessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
   const [removeMethod, removeReverification] = useReverificationFlow(removeMfaMethod);
-  const [makeDefault, setDefaultReverification] = useReverificationFlow((phone: PhoneNumberResource) =>
-    phone.makeDefaultSecondFactor(),
-  );
-  const [createBackupCode, backupCodesReverification] = useReverificationFlow((current: UserResource) =>
-    current.createBackupCode(),
-  );
+  const [makeDefault, setDefaultReverification] = useReverificationFlow(async (phone: PhoneNumberResource) => {
+    await phone.makeDefaultSecondFactor();
+    await clerk.user?.reload().catch(() => undefined);
+  });
+  const [createBackupCode, backupCodesReverification] = useReverificationFlow(async (current: UserResource) => {
+    const result = await current.createBackupCode();
+    await current.reload().catch(() => undefined);
+    return result;
+  });
   const [createPhone, createPhoneReverification] = useReverificationFlow((current: UserResource, phoneNumber: string) =>
     current.createPhoneNumber({ phoneNumber }),
   );
-  const [reservePhone, enrollSmsReverification] = useReverificationFlow((phone: PhoneNumberResource) =>
-    phone.setReservedForSecondFactor({ reserved: true }),
-  );
+  const [reservePhone, enrollSmsReverification] = useReverificationFlow(async (phone: PhoneNumberResource) => {
+    const result = await phone.setReservedForSecondFactor({ reserved: true });
+    await clerk.user?.reload().catch(() => undefined);
+    return result;
+  });
   const [createTotp, authenticatorReverification] = useReverificationFlow((current: UserResource) =>
     current.createTOTP(),
   );
@@ -235,7 +237,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   };
 
   const smsActions = smsEnabled
-    ? createSmsActions(clerk, environment, userId, sessionId, refresh, { makeDefault, createPhone, reservePhone })
+    ? createSmsActions(clerk, environment, userId, sessionId, { makeDefault, createPhone, reservePhone })
     : {};
 
   return {
@@ -275,7 +277,6 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
               throw new ClerkRuntimeError('Set up a verification method first.', { code: 'mfa_setup_factor_first' });
             }
             const result = await createBackupCode(current);
-            await refresh().catch(() => undefined);
             return result.codes;
           }
         : undefined,
