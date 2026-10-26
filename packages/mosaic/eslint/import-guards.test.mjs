@@ -25,6 +25,7 @@ const flowFixtures = [
   'sample.model.tsx',
   'sample.messages.ts',
 ].map(file => `${featureDir}/${file}`);
+const testFixture = 'src/hooks/__tests__/sample.test.ts';
 const rootEslint = new ESLint({ cwd: root });
 const eslint = new ESLint({
   cwd: mosaicRoot,
@@ -32,7 +33,7 @@ const eslint = new ESLint({
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: [...flowFixtures, ...layerFixtures].map(file => `packages/mosaic/${file}`),
+          allowDefaultProject: [...flowFixtures, ...layerFixtures, testFixture].map(file => `packages/mosaic/${file}`),
           maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 32,
         },
       },
@@ -340,6 +341,32 @@ describe('Mosaic layers', { timeout: 30_000 }, () => {
     ['src/styles/index.ts', "export { UserButton } from '../features/user-button/user-button';"],
   ])('%s may import down or across: %s', async (file, source) => {
     expect(await boundaryMessagesAt(file, source)).toEqual([]);
+  });
+});
+
+describe('Mosaic tests', { timeout: 30_000 }, () => {
+  async function vitestRules(source) {
+    const messages = await lintAt(testFixture, ["import { describe, expect, test } from 'vitest';", source].join('\n'));
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    return messages.map(message => message.ruleId).filter(rule => rule?.startsWith('vitest/'));
+  }
+
+  test.each([
+    "test('adds', () => { expect(1 + 1).toBe(2); });",
+    "function expectSum(sum) { expect(sum).toBe(2); }\ntest('adds', () => { expectSum(1 + 1); });",
+  ])('accept a test that asserts: %s', async source => {
+    expect(await vitestRules(source)).toEqual([]);
+  });
+
+  test.each([
+    ['vitest/no-focused-tests', "test.only('adds', () => { expect(1 + 1).toBe(2); });"],
+    ['vitest/expect-expect', "test('adds', () => { void (1 + 1); });"],
+    [
+      'vitest/no-identical-title',
+      "describe('math', () => { test('adds', () => { expect(1).toBe(1); }); test('adds', () => { expect(2).toBe(2); }); });",
+    ],
+  ])('report %s', async (rule, source) => {
+    expect(await vitestRules(source)).toContain(rule);
   });
 });
 

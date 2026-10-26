@@ -146,7 +146,7 @@ describe('phone actions', () => {
     expect(onRemovePhone).not.toHaveBeenCalled();
   });
 
-  it('keeps the phone when removal is canceled with Escape', async () => {
+  it('keeps the phone when removal opened from the keyboard is canceled with Escape', async () => {
     const user = userEvent.setup();
     const onRemovePhone = vi.fn();
     renderPhone({

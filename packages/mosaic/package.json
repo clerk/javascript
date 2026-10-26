@@ -80,6 +80,7 @@
     "@testing-library/user-event": "^14.6.5",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
+    "@vitest/eslint-plugin": "1.6.28",
     "axe-core": "^4.11.3",
     "bundlewatch": "^0.4.2",
     "eslint-plugin-boundaries": "7.3.0",

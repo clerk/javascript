@@ -1,5 +1,6 @@
 import path from 'node:path';
 
+import vitest from '@vitest/eslint-plugin';
 import boundaries from 'eslint-plugin-boundaries';
 
 import { noDynamicMessageCatalogs, noModelReactState } from './rules.mjs';
@@ -50,6 +51,17 @@ export default [
     files: ['src/**/*.model.{ts,tsx}'],
     rules: {
       'mosaic/no-model-react-state': 'error',
+    },
+  },
+  {
+    name: 'packages/mosaic - tests',
+    files: ['src/**/__tests__/**/*.{ts,tsx}', 'src/**/*.test.{ts,tsx}'],
+    ignores: ['src/**/*.test-d.{ts,tsx}'],
+    plugins: { vitest },
+    rules: {
+      'vitest/expect-expect': ['error', { assertFunctionNames: ['expect', 'expect*', 'assert*'] }],
+      'vitest/no-focused-tests': 'error',
+      'vitest/no-identical-title': 'error',
     },
   },
   {

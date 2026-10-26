@@ -517,7 +517,7 @@ describe('Otp', () => {
     });
   });
 
-  describe('form integration', () => {
+  describe('form validation', () => {
     it('marks every slot required so a partial code fails validation', () => {
       render(
         <Harness

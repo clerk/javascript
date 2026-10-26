@@ -538,7 +538,7 @@ describe('Select', () => {
     });
   });
 
-  describe('ARIA attributes', () => {
+  describe('ARIA roles and states', () => {
     it('options have role=option', () => {
       renderSelect({ defaultOpen: true });
 
@@ -766,7 +766,7 @@ describe('Select', () => {
     });
   });
 
-  describe('alignItemWithTrigger', () => {
+  describe('alignItemWithTrigger positioning', () => {
     it('marks the positioner with data-side="none" and blocks page scrolling while open', async () => {
       const user = userEvent.setup();
       renderSelect({ alignItemWithTrigger: true, defaultValue: 'banana' });
