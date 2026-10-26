@@ -847,6 +847,53 @@ describe('ProtectSession default deadline', () => {
     expect(elements).toHaveLength(0);
   });
 
+  it('answers at once when the browser refuses the cross-tab lock', async () => {
+    Object.defineProperty(navigator, 'locks', {
+      value: { request: vi.fn(() => Promise.reject(new DOMException('denied', 'SecurityError'))) },
+      configurable: true,
+    });
+
+    const { session: created, elements } = session([defaultLoader()]);
+    created?.start();
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(50);
+    expect(state.settled).toBe(true);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+    expect(elements).toHaveLength(0);
+  });
+
+  it('stops at its own deadline when that comes before SafeLock gives up', async () => {
+    Object.defineProperty(navigator, 'locks', {
+      value: {
+        request: vi.fn(
+          (_key: string, options: { signal: AbortSignal }) =>
+            new Promise((_resolve, reject) => {
+              options.signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+            }),
+        ),
+      },
+      configurable: true,
+    });
+
+    const { session: created, elements } = session([loader({ token_timeout_ms: 3_000 })]);
+    created?.start();
+    const params = created?.getRequestParams();
+    const state = track(params);
+
+    await vi.advanceTimersByTimeAsync(2_999);
+    expect(state.settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await expect(params).resolves.toMatchObject({ __clerk_protect_status: 'timeout' });
+
+    localStorage.setItem('__clerk_protect_st', storedEntry({ token: 'v1.leader.mac', rid: 'c'.repeat(26) }));
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(vi.getTimerCount()).toBe(0);
+    await expect(created?.getRequestParams()).resolves.toMatchObject({ __clerk_protect_token: 'v1.leader.mac' });
+    expect(elements).toHaveLength(0);
+  });
+
   it.each([
     [2_000, -3_600_000],
     [6_000, -3_600_000],

@@ -35,6 +35,7 @@ const DEFAULT_TOKEN_TIMEOUT_MS = 10 * 1_000;
 /** Ceiling on the instance-configured deadline, so no server value can stall a sign-in. */
 const MAX_TOKEN_TIMEOUT_MS = 10 * 1_000;
 const STORE_POLL_INTERVAL_MS = 100;
+const LOCK_REFUSAL_WINDOW_MS = 4_000;
 /** A stored token claiming more remaining life than this was not minted by us. */
 const MAX_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1_000;
 /** Longest token we will hand back, so a planted store entry cannot bloat a sign-in body. */
@@ -671,6 +672,10 @@ export class ProtectSession {
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.#timeoutMs);
+    let lockWaitedOut = false;
+    const lockTimer = setTimeout(() => {
+      lockWaitedOut = true;
+    }, LOCK_REFUSAL_WINDOW_MS);
     try {
       const result = await this.#lock.acquireLockAndRun(async () => {
         // Double-checked inside the lock. Without this re-read every tab runs the loader in turn,
@@ -685,22 +690,29 @@ export class ProtectSession {
         return result as ProtectStatus;
       }
 
-      // The lock was never held — `SafeLock` gives up waiting after ~5s so a wedged leader delays
-      // nobody. The timer also bounds follower polling when the system clock changes.
+      // The lock was never held. Refused outright, nobody is minting for us and only what is stored
+      // counts; waited out after ~5s, a leader may still be minting, so watch the store until our
+      // deadline, which the timer bounds even when the system clock changes.
+      if (!lockWaitedOut) {
+        return this.#freshStoredToken() ? 'ok' : 'timeout';
+      }
       return (await this.#awaitStoredToken(controller.signal)) ? 'ok' : 'timeout';
     } finally {
       clearTimeout(timer);
+      clearTimeout(lockTimer);
     }
   }
 
   async #awaitStoredToken(signal: AbortSignal): Promise<boolean> {
-    while (!signal.aborted) {
+    for (;;) {
       if (this.#freshStoredToken()) {
         return true;
       }
+      if (signal.aborted) {
+        return false;
+      }
       await sleep(STORE_POLL_INTERVAL_MS, signal);
     }
-    return false;
   }
 
   /** Runs the loader and takes the token it was served with. Never rejects. */
