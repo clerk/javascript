@@ -2,6 +2,7 @@ import path from 'node:path';
 
 import vitest from '@vitest/eslint-plugin';
 import boundaries from 'eslint-plugin-boundaries';
+import noUnneededEffects from 'eslint-plugin-react-you-might-not-need-an-effect';
 
 import { noDynamicMessageCatalogs, noModelReactState } from './rules.mjs';
 
@@ -52,6 +53,13 @@ export default [
     rules: {
       'mosaic/no-model-react-state': 'error',
     },
+  },
+  {
+    name: 'packages/mosaic - effects',
+    files: ['src/features/**/*.{ts,tsx}'],
+    ignores: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}', 'src/**/*.test-d.{ts,tsx}'],
+    plugins: noUnneededEffects.configs.strict.plugins,
+    rules: noUnneededEffects.configs.strict.rules,
   },
   {
     name: 'packages/mosaic - tests',

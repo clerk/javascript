@@ -881,6 +881,9 @@ importers:
       eslint-plugin-boundaries:
         specifier: 7.3.0
         version: 7.3.0(@typescript-eslint/parser@8.58.0(eslint@9.31.0(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.31.0(jiti@2.7.0))
+      eslint-plugin-react-you-might-not-need-an-effect:
+        specifier: 1.0.2
+        version: 1.0.2(eslint@9.31.0(jiti@2.7.0))
       happy-dom:
         specifier: ^20.8.9
         version: 20.10.2(bufferutil@4.1.0)(utf-8-validate@5.0.10)
@@ -8998,6 +9001,12 @@ packages:
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
 
+  eslint-plugin-react-you-might-not-need-an-effect@1.0.2:
+    resolution: {integrity: sha512-HgYol2zhH3KbnW9Q4FY/FcIINbsYVL6rwQESChqBC2s9SLWtw1wg05+J7SCrr3BfQpNY2ReYhf8xjpd2JhKJOQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      eslint: '>=8.40.0'
+
   eslint-plugin-react@7.37.5:
     resolution: {integrity: sha512-Qteup0SqU15kdocexFNAJMvCJEfa2xUKNV4CC1xsVMrIIqEy3SQ/rqyxCWNzfrd3/ldy6HMlD2e0JDVpDg2qIA==}
     engines: {node: '>=4'}
@@ -9802,6 +9811,10 @@ packages:
 
   globals@15.15.0:
     resolution: {integrity: sha512-7ACyT3wmyp3I61S4fG682L0VA2RGD9otkqGJIwNUMF1SWUombIIk+af1unuDYgMm082aHYwD+mzJvv9Iu8dsgg==}
+    engines: {node: '>=18'}
+
+  globals@16.5.0:
+    resolution: {integrity: sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==}
     engines: {node: '>=18'}
 
   globals@17.13.0:
@@ -24942,6 +24955,11 @@ snapshots:
     dependencies:
       eslint: 9.31.0(jiti@2.7.0)
 
+  eslint-plugin-react-you-might-not-need-an-effect@1.0.2(eslint@9.31.0(jiti@2.7.0)):
+    dependencies:
+      eslint: 9.31.0(jiti@2.7.0)
+      globals: 16.5.0
+
   eslint-plugin-react@7.37.5(eslint@9.31.0(jiti@2.7.0)):
     dependencies:
       array-includes: 3.1.9
@@ -26036,6 +26054,8 @@ snapshots:
   globals@14.0.0: {}
 
   globals@15.15.0: {}
+
+  globals@16.5.0: {}
 
   globals@17.13.0: {}
 

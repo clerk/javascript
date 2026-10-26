@@ -1,6 +1,7 @@
 import path from 'node:path';
 
 import { ESLint } from 'eslint';
+import noUnneededEffects from 'eslint-plugin-react-you-might-not-need-an-effect';
 import { describe, expect, test } from 'vitest';
 
 const root = path.resolve(import.meta.dirname, '../../..');
@@ -370,6 +371,68 @@ describe('Mosaic tests', { timeout: 30_000 }, () => {
   });
 });
 
+describe('Mosaic effects', { timeout: 30_000 }, () => {
+  async function effectRules(body) {
+    const messages = await lintAt(
+      'src/features/reverification/sample.view.tsx',
+      [
+        "import { useEffect, useState } from 'react';",
+        'export function FullName({ first, last }: { first: string; last: string }) {',
+        body,
+        '  return <span>{fullName}</span>;',
+        '}',
+      ].join('\n'),
+    );
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    return messages
+      .map(message => message.ruleId)
+      .filter(rule => rule?.startsWith('react-you-might-not-need-an-effect/'));
+  }
+
+  test('reject state derived in an effect', async () => {
+    expect(
+      await effectRules(
+        [
+          "  const [fullName, setFullName] = useState('');",
+          '  useEffect(() => {',
+          '    setFullName(`${first} ${last}`);',
+          '  }, [first, last]);',
+        ].join('\n'),
+      ),
+    ).toContain('react-you-might-not-need-an-effect/no-derived-state');
+  });
+
+  test.each([
+    ['src/features/reverification/sample.controller.ts', ['react-you-might-not-need-an-effect/no-event-handler']],
+    ['src/hooks/sample.ts', []],
+    ['src/primitives/sample.ts', []],
+  ])('%s reports an effect used as an event handler: %j', async (file, expected) => {
+    const messages = await lintAt(
+      file,
+      [
+        "import { useEffect } from 'react';",
+        'export function useOnOpen(open: boolean, onOpen: () => void) {',
+        '  useEffect(() => {',
+        '    if (open) {',
+        '      onOpen();',
+        '    }',
+        '  }, [open, onOpen]);',
+        '}',
+      ].join('\n'),
+    );
+    expect(messages.find(message => message.fatal)).toBeUndefined();
+    expect(
+      messages
+        .map(message => message.ruleId)
+        .filter(rule => rule === 'react-you-might-not-need-an-effect/no-event-handler'),
+    ).toEqual(expected);
+  });
+
+  test('accept state derived during render', async () => {
+    expect(await effectRules('  const fullName = `${first} ${last}`;\n  void useState; void useEffect;')).toEqual([]);
+  });
+});
+
 describe('Mosaic package configuration', { timeout: 30_000 }, () => {
   test.each([
     'src/features/sample.view.tsx',
@@ -388,6 +451,7 @@ describe('Mosaic package configuration', { timeout: 30_000 }, () => {
       'mosaic/no-model-react-state',
       'mosaic/no-dynamic-message-catalogs',
       '@typescript-eslint/no-import-type-side-effects',
+      ...Object.keys(noUnneededEffects.configs.strict.rules),
     ]) {
       expect(rootConfig.rules[rule]).toBeUndefined();
       delete inheritedRules[rule];
