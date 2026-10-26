@@ -132,9 +132,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   },
   hooks: {
     // Headless hooks — alphabetical.
-    'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
     'use-form': dynamic(() => import('../stories/use-form.mdx')),
-    'use-server-data-table': dynamic(() => import('../stories/use-server-data-table.mdx')),
   },
   localization: {
     localization: dynamic(() => import('../stories/localization.mdx')),
