@@ -5,6 +5,8 @@ import type {
   PasskeyFactor,
   PasswordFactor,
   PhoneCodeFactor,
+  ResetPasswordEmailCodeFactor,
+  ResetPasswordPhoneCodeFactor,
   TOTPFactor,
 } from './factors';
 import type { ClerkResource } from './resource';
@@ -55,6 +57,8 @@ export type SessionVerificationFirstFactor =
   | PhoneCodeFactor
   | PasswordFactor
   | PasskeyFactor
+  | ResetPasswordEmailCodeFactor
+  | ResetPasswordPhoneCodeFactor
   /**
    * @experimental
    */

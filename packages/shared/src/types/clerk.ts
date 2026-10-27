@@ -1988,6 +1988,21 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   level?: SessionVerificationLevel;
 
   /**
+   * A new password the caller already collected. When the user resets their
+   * password to verify, it's used instead of asking for one.
+   */
+  resetPassword?: {
+    password: string;
+    signOutOfOtherSessions: boolean;
+    /**
+     * Called when the user enters a different password in the modal because
+     * this one was rejected. A caller that retries its own request after
+     * verification must send this password instead.
+     */
+    onPasswordChange?: (password: string) => void;
+  };
+
+  /**
    * Customization options to fully match the Clerk components to your own brand. These options serve as overrides and will be merged with the global `appearance` configuration (if one is provided). See the [`Appearance`](https://clerk.com/docs/guides/customizing-clerk/appearance-prop/overview) docs for more information.
    */
   appearance?: ClerkAppearanceTheme;
