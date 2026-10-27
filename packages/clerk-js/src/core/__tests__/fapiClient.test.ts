@@ -281,6 +281,20 @@ describe('request', () => {
     expect(resp.payload).toEqual({ response: { foo: 42 } });
   });
 
+  it('rejects a malformed non-empty body when it allows an empty one', async () => {
+    const client = createFapiClient(baseFapiClientOptions);
+    (global.fetch as Mock).mockResolvedValueOnce(
+      Promise.resolve<RecursivePartial<Response>>({
+        status: 200,
+        ok: true,
+        headers: { get: () => null },
+        text: () => Promise.resolve('<html>'),
+      }),
+    );
+
+    await expect(client.request({ path: '/' }, { allowEmptyBody: true })).rejects.toBeInstanceOf(SyntaxError);
+  });
+
   it('rejects an empty successful body unless the request allows it', async () => {
     const client = createFapiClient(baseFapiClientOptions);
     (global.fetch as Mock).mockResolvedValueOnce(
