@@ -53,7 +53,7 @@ export function useUserProfileConnectedAccountsController({
   reconnectReverification,
   connectReverification,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
-  const messages = useMessages('userProfileConnectedAccounts');
+  const messages = useMessages('userProfile').connectedAccounts;
   const actions = usePendingAction({ errorFallback: messages.errors.generic });
   const sectionRef = useRef<HTMLDivElement>(null);
   const panelTitle = usePanelTitle();

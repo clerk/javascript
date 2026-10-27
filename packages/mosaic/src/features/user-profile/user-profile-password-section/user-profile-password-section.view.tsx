@@ -16,7 +16,7 @@ export function UserProfilePasswordSectionView({
   hasPassword = false,
   managedBy,
 }: UserProfilePasswordSectionViewProps) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   if (!hasPassword && !managedBy && !action) {
     return null;
   }

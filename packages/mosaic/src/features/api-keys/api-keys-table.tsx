@@ -38,7 +38,7 @@ function SubjectAPIKeysTable({
   fallback,
 }: APIKeysTableProps) {
   const messages = resolveAPIKeysTableMessages(
-    useMessages('apiKeysTable'),
+    useMessages('apiKeys'),
     isOrganizationId(subject) ? 'organization' : 'user',
     overrides,
   );

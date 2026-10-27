@@ -580,7 +580,7 @@ describe('connected accounts', () => {
     serveFapi(signedIn([]));
     await renderWithClerk(
       <MosaicProvider
-        localization={{ overrides: { 'userProfileConnectedAccounts.errors.generic': 'Try the connection again.' } }}
+        localization={{ overrides: { 'userProfile.connectedAccounts.errors.generic': 'Try the connection again.' } }}
       >
         <UserProfileConnectedAccountsSection />
       </MosaicProvider>,

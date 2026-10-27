@@ -51,7 +51,7 @@ export function MembersTableTabSkeleton({
   hasRemove: boolean;
   hasBulkAction: boolean;
 }) {
-  const m = useMessages('membersTableTab');
+  const m = useMessages('organizationProfile').members.list;
   return (
     <div {...mergeStyleProps(themeProps('members-table-tab'), stylex.props(tableTabStyles.root))}>
       <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>

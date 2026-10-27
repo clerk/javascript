@@ -208,8 +208,10 @@ user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring 
 model nor the view owns it, and the two cannot drift.
 
 `*.messages.ts` holds strings only, exported as one `<feature>Messages` object
-declared `as const` and registered under a namespace in `src/localization/registry.ts`.
-Views read their namespace inside the component with `useMessages('userButton')`, so
+declared `as const` and mounted in `src/localization/registry.ts` under the public
+component it belongs to, such as `userProfile.mfa.backupCodes`. A root is a public
+component or a shared block, never a file name. Views read their root inside the
+component with `useMessages('userProfile').mfa`, so
 the `localization` prop on `MosaicProvider` can replace any string; a module-level
 helper takes the messages as a parameter rather than importing them.
 

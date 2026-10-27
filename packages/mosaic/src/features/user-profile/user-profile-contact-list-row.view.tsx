@@ -42,8 +42,9 @@ export function UserProfileContactListRowView({
   triggerRef,
   children,
 }: UserProfileContactListRowViewProps) {
-  const m = useMessages('userProfileContact');
-  const emptyDescription = m[kind].empty;
+  const messages = useMessages('userProfile');
+  const m = messages.contact;
+  const nouns = messages[kind];
 
   return (
     <Section.Group
@@ -59,7 +60,7 @@ export function UserProfileContactListRowView({
         ) : onAdd ? (
           <Section.Actions>
             <Button
-              aria-label={m[kind].add}
+              aria-label={nouns.add}
               color='neutral'
               size='sm'
               variant='outline'
@@ -80,7 +81,7 @@ export function UserProfileContactListRowView({
           {items.length === 0 ? (
             <Section.Item>
               <Section.Content>
-                <Section.Description>{emptyDescription}</Section.Description>
+                <Section.Description>{nouns.empty}</Section.Description>
               </Section.Content>
             </Section.Item>
           ) : (
@@ -89,7 +90,7 @@ export function UserProfileContactListRowView({
 
               if (!item.isVerified && onVerify) {
                 actions.push({
-                  label: item.isDefault ? m.completeVerification : m[kind].verify,
+                  label: item.isDefault ? m.completeVerification : nouns.verify,
                   onClick: () => onVerify(item.id),
                   status: pendingVerifyId === item.id ? 'pending' : 'idle',
                 });
@@ -99,7 +100,7 @@ export function UserProfileContactListRowView({
 
               if (onRemove) {
                 actions.push({
-                  label: m[kind].remove,
+                  label: nouns.remove,
                   color: 'negative',
                   onClick: () => onRemove(item),
                 });

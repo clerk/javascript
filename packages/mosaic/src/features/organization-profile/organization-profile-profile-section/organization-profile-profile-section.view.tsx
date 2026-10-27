@@ -28,7 +28,7 @@ export function OrganizationProfileProfileSectionView({
   onSubmitName,
   onSubmitSlug,
 }: OrganizationProfileProfileSectionViewProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
 
   return (
     <Section.Root>

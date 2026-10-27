@@ -17,12 +17,14 @@ const localization = resolveLocalization({
       form_password_size_in_bytes_exceeded: 'Custom byte error.',
       form_password_incorrect__current_password: 'Le mot de passe actuel est incorrect.',
     },
-    userProfilePasswordSection: {
-      suggestions: { anotherWord: 'Custom suggestion.' },
+    userProfile: {
+      password: {
+        suggestions: { anotherWord: 'Custom suggestion.' },
+      },
     },
   },
 });
-const messages = localization.messages.userProfilePasswordSection;
+const messages = localization.messages.userProfile.password;
 function resolver(value = localization) {
   const wrapper = ({ children }: { children: ReactNode }) =>
     createElement(MosaicLocalizationProvider, { value }, children);
@@ -171,7 +173,7 @@ describe('password error feedback', () => {
       }),
       current,
       settings,
-      defaults.messages.userProfilePasswordSection,
+      defaults.messages.userProfile.password,
       defaults.locale,
       resolver(defaults),
     );

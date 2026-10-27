@@ -28,7 +28,7 @@ export function UserProfilePictureRowView({
   onReject,
   onRemove,
 }: UserProfilePictureRowViewProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -85,7 +85,7 @@ function ProfilePictureActions({
   canChange: boolean;
   onRemove?: () => void;
 }) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const { openFilePicker } = FileUpload.useFileUpload();
   const actions: ActionMenuAction[] = [];
 

@@ -9,7 +9,7 @@ export interface UserProfileUsernameRowViewProps {
 }
 
 export function UserProfileUsernameRowView({ username, action }: UserProfileUsernameRowViewProps) {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
 
   return (
     <Section.Row>

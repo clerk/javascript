@@ -37,7 +37,7 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
 }
 
 function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
-  const m = useMessages('userProfilePasswordSection');
+  const m = useMessages('userProfile').password;
   const hasPassword = model.mode === 'change';
   const controller = useUserProfileEditPasswordController({
     policy: model,

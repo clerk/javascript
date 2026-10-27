@@ -16,7 +16,7 @@ export interface UserProfileAuthenticatorSetupViewProps {
 }
 
 export function UserProfileAuthenticatorSetupView({ secret, uri }: UserProfileAuthenticatorSetupViewProps) {
-  const m = useMessages('userProfileAuthenticatorSetup');
+  const m = useMessages('userProfile').mfa.authenticatorSetup;
   const [showSetupKey, setShowSetupKey] = useState(false);
 
   return (

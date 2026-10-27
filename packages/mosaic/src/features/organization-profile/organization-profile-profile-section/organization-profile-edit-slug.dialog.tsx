@@ -28,7 +28,7 @@ export function OrganizationProfileEditSlugDialog({
   trigger,
   form,
 }: OrganizationProfileEditSlugDialogProps) {
-  const m = useMessages('organizationProfileProfileSection');
+  const m = useMessages('organizationProfile').profile;
   const inputRef = useRef<HTMLInputElement>(null);
   const { feedback } = form.fields.slug;
   const { ref, ...control } = form.register('slug');

@@ -44,7 +44,7 @@ export function useUserProfileWeb3WalletsController({
   | 'setPrimaryReverification'
   | 'createReverification'
 >) {
-  const messages = useMessages('userProfileWeb3Wallets');
+  const messages = useMessages('userProfile').web3Wallets;
   const action = usePendingAction({ errorFallback: messages.errors.generic });
   const [picker, setPicker] = useState<SolanaPicker>({ open: false });
   const [owner, setOwner] = useState<WalletAction>();

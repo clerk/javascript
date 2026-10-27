@@ -234,7 +234,7 @@ describe('Web3 wallets', () => {
     });
     await renderWithClerk(
       <MosaicProvider
-        localization={{ messages: { userProfileWeb3Wallets: { errors: { generic: 'Connexion impossible.' } } } }}
+        localization={{ messages: { userProfile: { web3Wallets: { errors: { generic: 'Connexion impossible.' } } } } }}
       >
         <UserProfileWeb3WalletsSection />
       </MosaicProvider>,
@@ -756,10 +756,12 @@ describe('Web3 wallets', () => {
     const props = { onConnect: vi.fn() };
     const localization = {
       messages: {
-        userProfileWeb3Wallets: {
-          solanaDialog: {
-            loading: 'Recherche des portefeuilles…',
-            loadError: 'Chargement impossible.',
+        userProfile: {
+          web3Wallets: {
+            solanaDialog: {
+              loading: 'Recherche des portefeuilles…',
+              loadError: 'Chargement impossible.',
+            },
           },
         },
       },

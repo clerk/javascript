@@ -20,7 +20,7 @@ export interface InviteMembersControllerOptions {
 }
 
 export function useInviteMembersController({ roles, defaultRole, invite }: InviteMembersControllerOptions) {
-  const m = useMessages('organizationProfileInviteMembers');
+  const m = useMessages('organizationProfile').members.invite;
   const roleNames = useMessages('roles');
   const locale = useLocale();
   const toast = useToastManager();
