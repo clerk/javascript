@@ -105,7 +105,8 @@ dismissal only while the controller has a cancel callback. Return focus with the
 `lastKey`, which outlives the run, unlike `pendingKey`.
 
 For a direct action in `ActionMenu`, set `pending` while its request runs and
-no dialog is open yet. Set it in the same event as the click, since the menu
+no dialog is open yet, and `false` otherwise so its row keeps room for the
+spinner. Set it in the same event as the click, since the menu
 closes on the next render unless an action is pending. The menu keeps its
 trailing spinner visible while pending, disables its actions, and blocks
 dismissal. It closes once `pending` turns false, whether a dialog opened or the
