@@ -21,6 +21,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 import { CUSTOM_BLOCK_TAGS, CUSTOM_MODIFIER_TAGS } from './.typedoc/custom-tags.mjs';
+import mosaicQualityConfig from './packages/mosaic/eslint/quality-config.mjs';
 
 const REPO_ROOT = import.meta.dirname;
 const ECMA_VERSION = 2021,
@@ -589,6 +590,7 @@ export default tseslint.config([
     },
   },
   ...PACKAGE_IMPORT_RESOLVER_CONFIGS,
+  ...mosaicQualityConfig,
   {
     name: 'packages/clerk-js',
     files: ['packages/clerk-js/src/ui/**/*'],
