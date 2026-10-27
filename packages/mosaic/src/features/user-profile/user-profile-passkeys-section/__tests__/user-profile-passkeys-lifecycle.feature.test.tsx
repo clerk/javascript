@@ -82,6 +82,26 @@ describe('Passkey action errors', () => {
   });
 });
 
+describe('Adding a passkey', () => {
+  it('shows the Add button pending while the passkey request runs', async () => {
+    serveAccounts();
+    await renderWithClerk(<UserProfilePasskeysSection />);
+    const creation = holdRequests('post', '/v1/me/passkeys');
+    const user = userEvent.setup();
+
+    try {
+      await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+      await waitFor(() => expect(creation.requests).toHaveLength(1));
+      expect(screen.getByRole('button', { name: 'Add passkey' })).toHaveAttribute('aria-busy', 'true');
+      await waitFor(() => expect(screen.getByRole('progressbar')).toBeVisible());
+    } finally {
+      creation.fail('form_param_invalid', 'Credential failed');
+    }
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add passkey' })).toBeEnabled());
+    await waitFor(() => expect(screen.queryByRole('progressbar')).toBeNull());
+  });
+});
+
 describe('Changing the active passkey account', () => {
   it('clears the previous account Add error after a user switch', async () => {
     serveAccounts();
