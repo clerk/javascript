@@ -1,5 +1,21 @@
 # @clerk/mosaic
 
+## 0.1.14
+
+### Patch Changes
+
+- Fix primitive parts dropping their own event handler, `className` or `style` when a consumer passes `undefined` for that prop. For example, `<Dialog.Trigger onClick={undefined}>` now still opens the dialog. ([#10433](https://github.com/clerk/javascript/pull/10433)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the gap around the badge on the UserButton avatar breaking when the avatar or its badge is resized. `.cl-user-button-avatar` now reads `--cl-avatar-badge-size`, `--cl-avatar-badge-gap` and `--cl-avatar-badge-offset`, and the cutout behind the badge follows them. ([#10455](https://github.com/clerk/javascript/pull/10455)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add a `direction` prop to `MosaicProvider` (`'ltr' | 'rtl'`, default `'ltr'`). Arrow-key navigation in tabs, segmented controls, one-time code inputs, tag inputs, and nested menus now follows this prop instead of the nearest `dir` attribute. Pages that render right-to-left should pass `direction="rtl"`. ([#10420](https://github.com/clerk/javascript/pull/10420)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Filled icon frames now use a translucent background, so they darken with the row on hover instead of showing as a lighter patch. The reverification method picker's icon frames no longer have a border. ([#10423](https://github.com/clerk/javascript/pull/10423)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Darken `--cl-color-foreground-secondary` in light mode so secondary text meets WCAG AA contrast on both the default and subtle backgrounds. ([#10459](https://github.com/clerk/javascript/pull/10459)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fix the `UserButton` and `OrganizationSwitcher` trigger badge flickering when the popup opens with an inline `renderTriggerBadge` function. The badge is now only requested again when the displayed user, organization or session changes, and each request uses the latest `renderTriggerBadge` you pass. ([#10456](https://github.com/clerk/javascript/pull/10456)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.1.13
 
 ### Patch Changes

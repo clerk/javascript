@@ -1,5 +1,12 @@
 # @clerk/electron
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [[`eec2699`](https://github.com/clerk/javascript/commit/eec2699f2050084f0bd1059efee95b5e94fe9607)]:
+  - @clerk/clerk-js@6.41.1
+
 ## 0.1.5
 
 ### Patch Changes

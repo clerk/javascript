@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.41.1
+
+### Patch Changes
+
+- Fix `getToken()` returning a session token after it expired on the server when the device clock runs behind. ([#10401](https://github.com/clerk/javascript/pull/10401)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 6.41.0
 
 ### Minor Changes
