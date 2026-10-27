@@ -13,7 +13,7 @@ import { useRouter } from '../../router';
 type UseMultisessionActionsParams = {
   user: UserResource | null | undefined;
   actionCompleteCallback?: () => void;
-  navigateAfterSignOut?: () => any;
+  afterSignOutUrl?: string;
   navigateAfterMultiSessionSingleSignOut?: () => any;
   afterSwitchSessionUrl?: string;
   userProfileUrl?: string;
@@ -32,7 +32,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
-      return signOut(opts.navigateAfterSignOut);
+      return signOut({ redirectUrl: opts.afterSignOutUrl });
     }
     return signOut(opts.navigateAfterMultiSessionSingleSignOut, { sessionId: session.id }).finally(() =>
       card.setIdle(),
@@ -71,7 +71,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleSignOutAllClicked = () => {
-    return signOut(opts.navigateAfterSignOut);
+    return signOut({ redirectUrl: opts.afterSignOutUrl });
   };
 
   const handleSessionClicked = (session: SignedInSessionResource) => async () => {

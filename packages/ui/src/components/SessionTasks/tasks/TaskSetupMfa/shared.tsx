@@ -20,11 +20,11 @@ export function SharedFooterActionForSignOut() {
   const clerk = useClerk();
   const { session } = useSession();
   const { otherSessions } = useMultipleSessions({ user });
-  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
-      return clerk.signOut(navigateAfterSignOut);
+      return clerk.signOut({ redirectUrl: afterSignOutUrl });
     }
     return clerk.signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
   };

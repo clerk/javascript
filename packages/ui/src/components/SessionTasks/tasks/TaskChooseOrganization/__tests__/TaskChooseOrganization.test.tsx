@@ -245,7 +245,7 @@ describe('TaskChooseOrganization', () => {
 
     await userEvent.click(signOutButton);
 
-    expect(fixtures.clerk.signOut).toHaveBeenCalled();
+    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl: '/' });
   });
 
   it('renders with username when email is not available', async () => {

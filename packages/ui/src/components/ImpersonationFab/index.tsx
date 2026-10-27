@@ -65,11 +65,11 @@ const FabContent = ({ title, signOutText }: FabContentProps) => {
   const { user } = useUser();
   const { signOut } = useClerk();
   const { otherSessions } = useMultipleSessions({ user });
-  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
-      return signOut(navigateAfterSignOut);
+      return signOut({ redirectUrl: afterSignOutUrl });
     }
     return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session.id });
   };

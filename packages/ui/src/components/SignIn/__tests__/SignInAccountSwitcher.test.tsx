@@ -51,6 +51,6 @@ describe('SignInAccountSwitcher', () => {
     expect(getByText('Mike Lamar')).toBeDefined();
     expect(getByText('Graciela Brennan')).toBeDefined();
     await userEvent.click(getByText('Sign out of all accounts'));
-    expect(fixtures.clerk.signOut).toHaveBeenCalled();
+    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl: '/' });
   });
 });

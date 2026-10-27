@@ -760,7 +760,7 @@ export class Clerk implements ClerkInterface {
     );
     const signOutCallback = typeof callbackOrOptions === 'function' ? callbackOrOptions : undefined;
 
-    const executeSignOut = async () => {
+    const executeSignOut = async (signOutUrl?: string) => {
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
 
       // Notify other tabs that user is signing out and clean up cookies.
@@ -772,7 +772,7 @@ export class Clerk implements ClerkInterface {
         } else {
           // The client outlives sign-out and is what Client Trust uses to recognize a
           // returning device, so the re-issued cookie has to keep its full lifetime.
-          await this.navigate(this.#decorateUrlWithTouch(redirectUrl));
+          await this.navigate(signOutUrl || this.#decorateUrlWithTouch(redirectUrl));
         }
       });
 
@@ -795,8 +795,21 @@ export class Clerk implements ClerkInterface {
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       this.#setTransitiveState();
 
+      let signOutUrl: string | undefined;
       try {
-        if (this.#options.experimental?.persistClient ?? true) {
+        if (
+          !signOutCallback &&
+          this.#instanceType === 'production' &&
+          this.#options.standardBrowser &&
+          inBrowser() &&
+          typeof window.location !== 'undefined' &&
+          this.isSatellite
+        ) {
+          ({ signOutUrl } = await this.client.__internal_signOut({
+            persistClient: this.#options.experimental?.persistClient ?? true,
+            redirectUrl: new URL(redirectUrl, window.location.href).toString(),
+          }));
+        } else if (this.#options.experimental?.persistClient ?? true) {
           await this.client.removeSessions();
         } else {
           await this.client.destroy();
@@ -807,7 +820,7 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      await executeSignOut();
+      await executeSignOut(signOutUrl);
 
       debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
       return;

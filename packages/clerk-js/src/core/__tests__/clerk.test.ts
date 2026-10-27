@@ -1273,6 +1273,7 @@ describe('Clerk singleton', () => {
   describe('.signOut()', () => {
     const mockClientDestroy = vi.fn();
     const mockClientRemoveSessions = vi.fn();
+    const mockClientSignOut = vi.fn();
     const mockSession1 = { id: '1', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
     const mockSession2 = { id: '2', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
     const mockSession3 = { id: '3', remove: vi.fn(), status: 'pending', user: {}, getToken: vi.fn() };
@@ -1287,9 +1288,160 @@ describe('Clerk singleton', () => {
     beforeEach(() => {
       mockClientDestroy.mockReset();
       mockClientRemoveSessions.mockReset();
+      mockClientSignOut.mockReset();
       mockSession1.remove.mockReset();
       mockSession2.remove.mockReset();
       mockSession3.remove.mockReset();
+    });
+
+    describe('satellite sign-out', () => {
+      beforeEach(() => {
+        mockClientSignOut.mockResolvedValue({ signOutUrl: 'https://primary.test/v1/client/sign_out' });
+        mockClientFetch.mockResolvedValue({
+          ...clientTouchDefaults,
+          cookieExpiresAt: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000),
+          signedInSessions: [mockSession1, mockSession2],
+          sessions: [mockSession1, mockSession2],
+          destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
+          __internal_signOut: mockClientSignOut,
+        });
+      });
+
+      it.each([true, false])(
+        'uses the backend URL even with a long-lived cookie and persistClient=%s',
+        async persistClient => {
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true, experimental: { persistClient } });
+          await sut.signOut({ redirectUrl: '/after-sign-out?tab=security#settings' });
+
+          expect(mockClientSignOut).toHaveBeenCalledWith({
+            persistClient,
+            redirectUrl: 'http://test.host/after-sign-out?tab=security#settings',
+          });
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
+          expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+          expect(mockClientDestroy).not.toHaveBeenCalled();
+        },
+      );
+
+      it('prefers the backend URL over a cookie refresh', async () => {
+        const client = await mockClientFetch();
+        client.isEligibleForTouch = () => true;
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut();
+
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
+      });
+
+      it('keeps the existing redirect when an older backend omits the URL', async () => {
+        mockClientSignOut.mockResolvedValue({});
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut({ redirectUrl: '/after?tab=security#settings' });
+
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/after?tab=security#settings');
+      });
+
+      it('keeps the cookie refresh fallback when an older backend omits the URL', async () => {
+        mockClientSignOut.mockResolvedValue({});
+        const client = await mockClientFetch();
+        client.isEligibleForTouch = () => true;
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut();
+
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://clerk.example.com/v1/client/touch');
+      });
+
+      it.each([true, false])(
+        'completes local sign-out after a network error with persistClient=%s',
+        async persistClient => {
+          mockClientSignOut.mockRejectedValue(new ClerkRuntimeError('Offline', { code: 'network_error' }));
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true, experimental: { persistClient } });
+          await expect(sut.signOut()).resolves.toBeUndefined();
+
+          expect(sut.session).toBeNull();
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+        },
+      );
+
+      it('preserves arbitrary callbacks without opting in', async () => {
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback);
+
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+
+      it('does not opt in on a primary domain', async () => {
+        const sut = new Clerk(productionPublishableKey);
+        sut.navigate = vi.fn();
+        await sut.load();
+        await sut.signOut();
+
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+      });
+
+      it('does not opt in for a nonstandard browser', async () => {
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true, standardBrowser: false });
+        await sut.signOut();
+
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+      });
+
+      it('does not opt in for development satellites', async () => {
+        const sut = new Clerk(developmentPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true, signInUrl: 'https://primary.test/sign-in' });
+        await sut.signOut();
+
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+      });
+
+      it('keeps targeted multisession removal on a satellite', async () => {
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut({ sessionId: '1' });
+
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockSession1.remove).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+      });
+
+      mockNativeRuntime(() => {
+        it('does not opt in for native runtimes', async () => {
+          const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+          sut.navigate = vi.fn();
+          await sut.load({ isSatellite: true, standardBrowser: false });
+          await sut.signOut();
+
+          expect(mockClientSignOut).not.toHaveBeenCalled();
+          expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+          expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
+        });
+      });
     });
 
     it('has no effect if called when no sessions exist', async () => {
