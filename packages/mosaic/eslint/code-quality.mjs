@@ -98,4 +98,24 @@ export const noAccumulatorCopy = {
   },
 };
 
-export default { rules: { 'no-accumulator-copy': noAccumulatorCopy } };
+export const noChainedTypeAssertions = {
+  meta: { type: 'suggestion', schema: [], messages: { chain: 'Avoid chaining type assertions.' } },
+  create(context) {
+    function check(node) {
+      if (
+        node.parent?.expression === node &&
+        (node.parent.type === 'TSAsExpression' || node.parent.type === 'TSTypeAssertion')
+      ) {
+        return;
+      }
+      if (node.expression.type === 'TSAsExpression' || node.expression.type === 'TSTypeAssertion') {
+        context.report({ node, messageId: 'chain' });
+      }
+    }
+    return { TSAsExpression: check, TSTypeAssertion: check };
+  },
+};
+
+export default {
+  rules: { 'no-accumulator-copy': noAccumulatorCopy, 'no-chained-type-assertions': noChainedTypeAssertions },
+};
