@@ -31,7 +31,10 @@ export function StoryMosaicProvider({ children }: { children: React.ReactNode })
   const { chaos } = useChaos();
   const { direction } = useDirection();
   return (
-    <MosaicProvider key={String(chaos)} direction={direction}>
+    <MosaicProvider
+      key={String(chaos)}
+      direction={direction}
+    >
       {children}
     </MosaicProvider>
   );
