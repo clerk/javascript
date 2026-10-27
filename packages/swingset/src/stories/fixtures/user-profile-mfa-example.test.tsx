@@ -43,7 +43,9 @@ describe('Profile MFA flows', () => {
     'returns from %s to the method picker without closing the dialog',
     async method => {
       const user = userEvent.setup();
-      render(<ProfileExample localization={{ messages: { userProfileMfa: { addLabel: 'Add a second factor' } } }} />);
+      render(
+        <ProfileExample localization={{ messages: { userProfile: { mfa: { addLabel: 'Add a second factor' } } } }} />,
+      );
       const add = screen.getByRole('button', { name: 'Add a second factor' });
       await user.click(add);
       const dialog = screen.getByRole('dialog', { name: 'Add 2-step verification' });

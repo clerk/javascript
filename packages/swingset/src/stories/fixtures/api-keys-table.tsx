@@ -74,7 +74,7 @@ export function useAPIKeysTableFixture({
   showDescription?: boolean;
 } = {}): APIKeysTableViewProps {
   const locale = useLocale();
-  const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), subjectKind);
+  const messages = resolveAPIKeysTableMessages(useMessages('apiKeys'), subjectKind);
   const seed = useChaosFixture(initialKeys, items =>
     chaosRows(items).map((key, index) => ({ ...key, name: chaosPick(chaosAPIKeyNames, index) })),
   );

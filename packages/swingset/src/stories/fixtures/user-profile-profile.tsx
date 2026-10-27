@@ -39,7 +39,7 @@ export function useUserProfileProfileFixture({
   nameFailWith,
   usernameFailWith,
 }: UserProfileProfileFixtureOptions = {}): UserProfileProfileSectionViewProps {
-  const m = useMessages('userProfileProfileSection');
+  const m = useMessages('userProfile').profile;
   const seed = useChaosFixture({ firstName: initialFirstName, lastName: initialLastName }, () => chaosPerson(0));
   const [value, setValue] = useState<UserProfileEditNameValue>(seed);
   const usernameSeed = useChaosFixture(initialUsername, () => chaosUsername(0));
