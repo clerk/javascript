@@ -502,7 +502,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       direction: context.direction,
       value: context.inputValue,
       onValueChange: (value: string) => send({ type: 'TYPE', value }),
-      errorMessage: context.error ? errorText(context.error, m.unstable__errors__generic) : undefined,
+      errorMessage: context.error ? errorText(context.error, m.attemptFailed) : undefined,
       isPending: pendingStates.has(state),
       onSubmit: () => send({ type: 'SUBMIT' }),
       onShowMethods: () => send({ type: 'SHOW_METHODS' }),
