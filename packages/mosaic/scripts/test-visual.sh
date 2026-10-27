@@ -13,7 +13,7 @@ case "${1:-}" in
     rm -rf "$root/packages/mosaic/.vitest/attachments"
     docker run --rm --init --ipc=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
       --volume "$root:/repo" --workdir /repo/packages/mosaic \
-      "$image" ./node_modules/.bin/vitest run --project visual --update none
+      "$image" node /repo/node_modules/vitest/vitest.mjs run --project visual --update none
     ;;
   *)
     printf 'Usage: %s compare\n' "$0" >&2
