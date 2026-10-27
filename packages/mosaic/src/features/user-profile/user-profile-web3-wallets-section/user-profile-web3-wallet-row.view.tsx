@@ -7,6 +7,7 @@ import { Badge } from '../../../components/badge';
 import { SubmitButton } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
+import { Spinner } from '../../../components/spinner';
 import { ArrowUpRight } from '../../../icons/glyphs/arrow-up-right';
 import { fill, useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
@@ -19,6 +20,7 @@ export function UserProfileWeb3WalletRowView({
   wallet,
   triggerRef,
   isPending = false,
+  isPrimaryPending = false,
   isDisabled = false,
   onConnect,
   onVerify,
@@ -28,6 +30,7 @@ export function UserProfileWeb3WalletRowView({
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
   triggerRef?: Ref<HTMLButtonElement>;
   isPending?: boolean;
+  isPrimaryPending?: boolean;
   isDisabled?: boolean;
   onConnect?: (id: string) => void;
   onVerify?: (id: string) => void;
@@ -69,7 +72,14 @@ export function UserProfileWeb3WalletRowView({
             >
               {wallet.provider || shortAddress}
             </span>
-            {linkedWallet?.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
+            {linkedWallet?.isPrimary ? (
+              <Badge color='neutral'>{m.primary}</Badge>
+            ) : isPrimaryPending ? (
+              <Spinner
+                size='sm'
+                label={m.setPrimary}
+              />
+            ) : null}
             {linkedWallet && !linkedWallet.isVerified ? (
               <Badge color='warning'>{isPending ? m.verifying : m.unverified}</Badge>
             ) : null}

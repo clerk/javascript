@@ -14,6 +14,8 @@ export function UserProfilePhoneSectionView({
   phones,
   defaultPhoneCountry,
   canAdd,
+  isDisabled,
+  pendingPrimaryId,
   verification,
   error,
   rowRef,
@@ -37,6 +39,7 @@ export function UserProfilePhoneSectionView({
           color='neutral'
           size='sm'
           variant='outline'
+          disabled={isDisabled}
         />
       }
     >
@@ -61,6 +64,8 @@ export function UserProfilePhoneSectionView({
         onRemove={remove ? phone => remove.open(phone) : undefined}
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
+        isDisabled={isDisabled}
+        pendingPrimaryId={pendingPrimaryId}
         pendingVerifyId={verification.pendingVerifyId}
       >
         <Section.Error>{error}</Section.Error>

@@ -34,6 +34,7 @@ export interface ConfirmStepProps<Payload> {
   actionLabel: string;
   cancelLabel: string;
   isPending: boolean;
+  canConfirm: boolean;
   errorMessage: string | undefined;
   confirm: () => void;
 }
@@ -68,6 +69,7 @@ function ConfirmCard<Payload>({
     actionLabel: resolve(actionLabel, payload),
     cancelLabel,
     isPending: controller.isPending,
+    canConfirm: controller.canConfirm,
     errorMessage: controller.errorMessage,
     confirm: () => controller.confirm(payload),
   });

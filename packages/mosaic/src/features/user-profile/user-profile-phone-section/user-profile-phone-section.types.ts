@@ -11,6 +11,8 @@ export interface UserProfilePhoneSectionViewProps {
   phones: UserProfilePhone[];
   defaultPhoneCountry?: CountryIso;
   canAdd: boolean;
+  isDisabled: boolean;
+  pendingPrimaryId: string | undefined;
   verification: UserProfileAddPhoneController;
   error: string | undefined;
   rowRef: Ref<HTMLDivElement>;

@@ -82,6 +82,7 @@ describe('Confirmation', () => {
     await user.click(confirmButton());
     expect(onConfirm).toHaveBeenCalledOnce();
     expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
+    expect(confirmButton()).toHaveFocus();
 
     run.resolve();
     await closed();

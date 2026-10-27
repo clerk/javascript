@@ -39,7 +39,7 @@ export interface ConfirmationProps<Payload = void> extends ConfirmBlockProps<Pay
 export function Confirmation<Payload = void>({ color = 'negative', ...props }: ConfirmationProps<Payload>) {
   return (
     <ConfirmShell {...props}>
-      {({ title, description, actionLabel, cancelLabel, isPending, errorMessage, confirm }) => (
+      {({ title, description, actionLabel, cancelLabel, isPending, canConfirm, errorMessage, confirm }) => (
         <>
           <Card.Header>
             <Card.Title>{title}</Card.Title>
@@ -66,6 +66,7 @@ export function Confirmation<Payload = void>({ color = 'negative', ...props }: C
               type='button'
               color={color}
               isPending={isPending}
+              disabled={!canConfirm && !isPending}
               onClick={confirm}
             >
               {actionLabel}

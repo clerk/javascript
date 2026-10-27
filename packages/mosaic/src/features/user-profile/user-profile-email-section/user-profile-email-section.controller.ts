@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
+import { useActionLock } from '../../../hooks/use-action-lock';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import type { UserProfileEmail } from '../user-profile-contact.types';
@@ -23,7 +24,8 @@ export function useUserProfileEmailSectionController({
     onCreate: onCreateEmail,
     reverification: createReverification,
   });
-  const setPrimary = usePendingAction();
+  const actionLock = useActionLock();
+  const setPrimary = usePendingAction({ actionLock });
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: emails.map(email => email.id),
@@ -31,6 +33,7 @@ export function useUserProfileEmailSectionController({
     fallback: () => rowRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? rowRef.current,
   });
   const remove = useConfirmController<UserProfileEmail>({
+    actionLock,
     onConfirm: email => removalFocus.remove(email.id),
     reverification: removeReverification,
   });
@@ -40,6 +43,8 @@ export function useUserProfileEmailSectionController({
     canAdd: Boolean(onCreateEmail),
     verification,
     error: setPrimary.error,
+    isDisabled: actionLock.isPending,
+    pendingPrimaryId: setPrimary.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemoveEmail ? remove : undefined,

@@ -9,6 +9,8 @@ import type { UserProfileAddEmailController } from './user-profile-add-email.con
 export interface UserProfileEmailSectionViewProps {
   emails: UserProfileEmail[];
   canAdd: boolean;
+  isDisabled: boolean;
+  pendingPrimaryId: string | undefined;
   verification: UserProfileAddEmailController;
   error: string | undefined;
   rowRef: Ref<HTMLDivElement>;

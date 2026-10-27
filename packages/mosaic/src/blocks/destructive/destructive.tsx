@@ -32,6 +32,7 @@ function DestructiveStep<Payload>({
   actionLabel,
   cancelLabel,
   isPending,
+  canConfirm,
   errorMessage,
   confirm,
   fieldLabel,
@@ -97,7 +98,7 @@ function DestructiveStep<Payload>({
           form={formId}
           color='negative'
           isPending={isPending}
-          disabled={!isConfirmed}
+          disabled={!isConfirmed || !canConfirm}
           focusableWhenDisabled
         >
           {actionLabel}

@@ -2,6 +2,7 @@ import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useRef } from 'react';
 
 import { useConfirmController } from '../../../blocks/confirm';
+import { useActionLock } from '../../../hooks/use-action-lock';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { usePendingAction } from '../../../hooks/use-pending-action';
 import type { UserProfilePhone } from '../user-profile-contact.types';
@@ -23,7 +24,8 @@ export function useUserProfilePhoneSectionController({
     onCreate: onCreatePhone,
     reverification: createReverification,
   });
-  const setPrimary = usePendingAction();
+  const actionLock = useActionLock();
+  const setPrimary = usePendingAction({ actionLock });
   const rowRef = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: phones.map(phone => phone.id),
@@ -31,6 +33,7 @@ export function useUserProfilePhoneSectionController({
     fallback: () => rowRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? rowRef.current,
   });
   const remove = useConfirmController<UserProfilePhone>({
+    actionLock,
     onConfirm: phone => removalFocus.remove(phone.id),
     reverification: removeReverification,
   });
@@ -41,6 +44,8 @@ export function useUserProfilePhoneSectionController({
     canAdd: Boolean(onCreatePhone),
     verification,
     error: setPrimary.error,
+    isDisabled: actionLock.isPending,
+    pendingPrimaryId: setPrimary.pendingKey,
     rowRef,
     registerTrigger: removalFocus.registerTrigger,
     remove: onRemovePhone ? remove : undefined,
