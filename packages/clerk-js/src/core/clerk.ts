@@ -3691,7 +3691,6 @@ export class Clerk implements ClerkInterface {
   // This is used by @clerk/expo. When `load()` failed, such as while the app version was unsupported, a successful
   // reload finishes loading this instance instead of the app having to create a new one.
   __internal_reloadInitialResources = async (): Promise<void> => {
-    const finishesFailedLoad = this.#status === 'error';
     const [environment, client] = await Promise.all([
       Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),
       Client.getOrCreateInstance().fetch({ fetchMaxTries: 1 }),
@@ -3700,8 +3699,9 @@ export class Clerk implements ClerkInterface {
     this.updateClient(client);
     this.updateEnvironment(environment);
 
-    // An overlapping reload may have finished loading first.
-    if (finishesFailedLoad && this.#status === 'error') {
+    // Only a load that has already failed is finished here. A load that is still running reports its own result, and
+    // an overlapping reload may have finished loading first.
+    if (this.#status === 'error') {
       this.#finishLoad();
       this.#publicEventBus.emit(clerkEvents.Status, 'ready');
     }
