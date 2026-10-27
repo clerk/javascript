@@ -101,8 +101,8 @@ pnpm --filter @clerk/mosaic test:browser              # layout tests (Chromium)
 pnpm --filter @clerk/mosaic exec vitest run           # every project
 ```
 
-CI runs feature tests in their own `Mosaic Feature Tests` job, so the repo-wide
-unit test job never needs a browser.
+CI runs feature and screenshot tests in separate `Mosaic Feature Tests` and
+`Mosaic Visual Tests` jobs, so the repo-wide unit test job never needs a browser.
 
 jsdom and happy-dom have no layout engine, so every rect is 0 and a test that
 asserts on position, size or scrolling always passes there. Name such a test
@@ -145,10 +145,18 @@ zone, and device scale. The browser setup disables motion. Use deterministic
 fixture data and avatar fallbacks, and wait for content before capturing the
 page so portaled menus and overlays are included.
 
-Baselines include the browser and operating system in their filenames. Generate
-and compare them on the same operating system with the repository's pinned
-Playwright version. macOS baselines do not establish a Linux CI baseline; review
-Linux images separately before adding this command to the Linux CI job.
+Baselines include the browser and operating system in their filenames. The
+`Mosaic Visual Tests` job compares screenshots on Linux with the repository's
+pinned Playwright version. On a failed run, download
+`mosaic-visual-failure-artifacts-<run-id>-<run-attempt>` from the GitHub Actions
+run and review the images in `.vitest/attachments/`.
+
+The first Linux run fails until Linux baselines exist. Review each captured
+`*-reference-chromium-linux.png` image, then copy it into the matching test's
+`__screenshots__/` directory without `-reference` in the filename. For later
+changes, review the actual, expected, and diff images from the Linux job, then
+copy each approved actual image over its Linux baseline. Commit the reviewed
+baselines and rerun the job. A macOS update does not update Linux baselines.
 
 ## Feature tests
 
