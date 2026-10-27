@@ -10,6 +10,7 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { useConfirmPassword } from '@/ui/hooks';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
+import { useSignOutWithRedirect } from '@/ui/hooks/useSignOutWithRedirect';
 import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -26,7 +27,8 @@ const TaskResetPasswordInternal = () => {
   const { t, locale } = useLocalizations();
   const { redirectUrlComplete } = useTaskResetPasswordContext();
   const { otherSessions } = useMultipleSessions({ user: clerk.user });
-  const { afterSignOutUrl, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const signOutWithRedirect = useSignOutWithRedirect();
   const updatePasswordWithReverification = useReverification(
     (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
   );
@@ -34,7 +36,7 @@ const TaskResetPasswordInternal = () => {
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
-      return clerk?.signOut({ redirectUrl: afterSignOutUrl });
+      return signOutWithRedirect(navigateAfterSignOut, afterSignOutUrl);
     }
 
     return clerk?.signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: clerk.session?.id });

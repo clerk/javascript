@@ -55,7 +55,7 @@ describe('TaskSetupMFA', () => {
     });
     const { getByRole, userEvent } = render(<TaskSetupMFA />, { wrapper });
     await userEvent.click(getByRole('link', { name: /sign out/i }));
-    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl: '/' });
+    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
   });
 
   describe('main flow', () => {

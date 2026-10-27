@@ -1289,6 +1289,7 @@ describe('Clerk singleton', () => {
       mockClientDestroy.mockReset();
       mockClientRemoveSessions.mockReset();
       mockClientSignOut.mockReset();
+      vi.mocked(Client.isClientResource).mockReturnValue(false);
       mockSession1.remove.mockReset();
       mockSession2.remove.mockReset();
       mockSession3.remove.mockReset();
@@ -1296,6 +1297,7 @@ describe('Clerk singleton', () => {
 
     describe('satellite sign-out', () => {
       beforeEach(() => {
+        vi.mocked(Client.isClientResource).mockReturnValue(true);
         mockClientSignOut.mockResolvedValue({ signOutUrl: 'https://primary.test/v1/client/sign_out' });
         mockClientFetch.mockResolvedValue({
           ...clientTouchDefaults,
@@ -1372,6 +1374,110 @@ describe('Clerk singleton', () => {
           expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/');
         },
       );
+
+      it.each([true, false])('repairs a built-in callback sign-out with persistClient=%s', async persistClient => {
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true, experimental: { persistClient } });
+        await sut.signOut(callback, {
+          __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out?tab=security#settings',
+        });
+
+        expect(mockClientSignOut).toHaveBeenCalledExactlyOnceWith({
+          persistClient,
+          redirectUrl: 'https://satellite.test/signed-out?tab=security#settings',
+        });
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('https://primary.test/v1/client/sign_out');
+        expect(callback).not.toHaveBeenCalled();
+      });
+
+      it.each([
+        undefined,
+        '',
+        '/relative',
+        'not a URL',
+        'https://',
+        'javascript:alert(1)',
+        'http://primary.test/repair',
+      ])('preserves the original callback when the repair URL is %s', async signOutUrl => {
+        mockClientSignOut.mockResolvedValue({ signOutUrl });
+        const client = await mockClientFetch();
+        client.isEligibleForTouch = () => true;
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback, {
+          __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out',
+        });
+
+        expect(mockClientSignOut).toHaveBeenCalledOnce();
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(sut.navigate).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+      });
+
+      it('propagates the original callback rejection without retrying sign-out', async () => {
+        mockClientSignOut.mockResolvedValue({});
+        const error = new Error('Callback failed');
+        const callback = vi.fn().mockRejectedValue(error);
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await expect(
+          sut.signOut(callback, {
+            __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out',
+          }),
+        ).rejects.toBe(error);
+
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(mockClientSignOut).toHaveBeenCalledOnce();
+        expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+
+      it('preserves the callback after a repair request network error', async () => {
+        mockClientSignOut.mockRejectedValue(new ClerkRuntimeError('Offline', { code: 'network_error' }));
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback, { __internal_satelliteSignOutRedirectUrl: 'https://satellite.test/signed-out' });
+
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(mockClientSignOut).toHaveBeenCalledOnce();
+        expect(mockClientRemoveSessions).not.toHaveBeenCalled();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+
+      it('preserves a custom callback with redirect options and an expiring cookie', async () => {
+        const client = await mockClientFetch();
+        client.isEligibleForTouch = () => true;
+        const callback = vi.fn();
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut(callback, { redirectUrl: '/signed-out' });
+
+        expect(callback).toHaveBeenCalledExactlyOnceWith();
+        expect(mockClientSignOut).not.toHaveBeenCalled();
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).not.toHaveBeenCalled();
+      });
+
+      it('keeps sign-out working when an older client resource has no repair method', async () => {
+        const client = await mockClientFetch();
+        delete client.__internal_signOut;
+        vi.mocked(Client.isClientResource).mockReturnValue(false);
+        const sut = new Clerk(productionPublishableKey, { domain: 'satellite.test' });
+        sut.navigate = vi.fn();
+        await sut.load({ isSatellite: true });
+        await sut.signOut({ redirectUrl: '/signed-out' });
+
+        expect(mockClientRemoveSessions).toHaveBeenCalledOnce();
+        expect(sut.navigate).toHaveBeenCalledExactlyOnceWith('/signed-out');
+      });
 
       it('preserves arbitrary callbacks without opting in', async () => {
         const callback = vi.fn();

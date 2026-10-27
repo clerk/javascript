@@ -6,6 +6,7 @@ import { useSignOutContext } from '@/contexts';
 import { Card } from '@/elements/Card';
 import { useMultipleSessions } from '@/hooks/useMultipleSessions';
 import { localizationKeys } from '@/localization';
+import { useSignOutWithRedirect } from '@/ui/hooks/useSignOutWithRedirect';
 import { stringToFormattedPhoneString } from '@/utils/phoneUtils';
 
 export const commonIdentifier = (user: UserResource) => {
@@ -20,11 +21,12 @@ export function SharedFooterActionForSignOut() {
   const clerk = useClerk();
   const { session } = useSession();
   const { otherSessions } = useMultipleSessions({ user });
-  const { afterSignOutUrl, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const { afterSignOutUrl, navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const signOutWithRedirect = useSignOutWithRedirect();
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
-      return clerk.signOut({ redirectUrl: afterSignOutUrl });
+      return signOutWithRedirect(navigateAfterSignOut, afterSignOutUrl);
     }
     return clerk.signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
   };

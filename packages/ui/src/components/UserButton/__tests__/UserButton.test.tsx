@@ -81,11 +81,18 @@ describe('UserButton', () => {
       });
 
       vi.spyOn(fixtures.clerk, 'buildAfterSignOutUrl').mockReturnValue(redirectUrl);
+      fixtures.clerk.signOut.mockImplementation(async callback => {
+        if (typeof callback !== 'function') {
+          throw new Error('Expected the legacy navigation callback');
+        }
+        await callback();
+      });
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open user menu' }));
       await userEvent.click(getByText('Sign out'));
 
-      expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl });
+      expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
+      expect(fixtures.router.navigate).toHaveBeenCalledExactlyOnceWith(redirectUrl);
     },
   );
 
@@ -189,10 +196,17 @@ describe('UserButton', () => {
       async redirectUrl => {
         const { wrapper, fixtures } = await createFixtures(initConfig);
         vi.spyOn(fixtures.clerk, 'buildAfterSignOutUrl').mockReturnValue(redirectUrl);
+        fixtures.clerk.signOut.mockImplementation(async callback => {
+          if (typeof callback !== 'function') {
+            throw new Error('Expected the legacy navigation callback');
+          }
+          await callback();
+        });
         const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
         await userEvent.click(getByRole('button', { name: 'Open user menu' }));
         await userEvent.click(getByText('Sign out of all accounts'));
-        expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl });
+        expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
+        expect(fixtures.router.navigate).toHaveBeenCalledExactlyOnceWith(redirectUrl);
       },
     );
   });

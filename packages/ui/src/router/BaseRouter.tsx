@@ -148,6 +148,9 @@ interface BaseRouterProps {
   children: React.ReactNode;
 }
 
+export const isInternalRoute = (toURL: URL, basePath: string): boolean =>
+  toURL.origin === window.location.origin && toURL.pathname.startsWith(withLeadingSlash(basePath));
+
 export const BaseRouter = ({
   basePath,
   startPath,
@@ -237,10 +240,7 @@ export const BaseRouter = ({
       return;
     }
 
-    const isCrossOrigin = toURL.origin !== window.location.origin;
-    const isOutsideOfUIComponent = !toURL.pathname.startsWith(normalizedBasePath);
-
-    if (isOutsideOfUIComponent || isCrossOrigin) {
+    if (!isInternalRoute(toURL, basePath)) {
       isNavigatingRef.current = true;
       try {
         return await clerkNavigate(toURL.href);

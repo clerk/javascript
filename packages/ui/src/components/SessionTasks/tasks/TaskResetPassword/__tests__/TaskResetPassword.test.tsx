@@ -108,7 +108,7 @@ describe('TaskResetPassword', () => {
 
     await userEvent.click(signOutButton);
 
-    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith({ redirectUrl: '/' });
+    expect(fixtures.clerk.signOut).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
   });
 
   it('renders with username when email is not available', async () => {

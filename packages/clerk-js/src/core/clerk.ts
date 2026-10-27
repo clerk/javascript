@@ -37,6 +37,7 @@ import {
   navigateIfTaskExists,
   warnMissingPendingTaskHandlers,
 } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { isValidUrl } from '@clerk/shared/internal/clerk-js/url';
 import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
@@ -767,12 +768,14 @@ export class Clerk implements ClerkInterface {
       eventBus.emit(events.UserSignOut, null);
 
       await tracker.track(async () => {
-        if (signOutCallback) {
+        if (signOutUrl) {
+          await this.navigate(signOutUrl);
+        } else if (signOutCallback) {
           await signOutCallback();
         } else {
           // The client outlives sign-out and is what Client Trust uses to recognize a
           // returning device, so the re-issued cookie has to keep its full lifetime.
-          await this.navigate(signOutUrl || this.#decorateUrlWithTouch(redirectUrl));
+          await this.navigate(this.#decorateUrlWithTouch(redirectUrl));
         }
       });
 
@@ -798,7 +801,8 @@ export class Clerk implements ClerkInterface {
       let signOutUrl: string | undefined;
       try {
         if (
-          !signOutCallback &&
+          (!signOutCallback || !!opts.__internal_satelliteSignOutRedirectUrl) &&
+          Client.isClientResource(this.client) &&
           this.#instanceType === 'production' &&
           this.#options.standardBrowser &&
           inBrowser() &&
@@ -807,7 +811,10 @@ export class Clerk implements ClerkInterface {
         ) {
           ({ signOutUrl } = await this.client.__internal_signOut({
             persistClient: this.#options.experimental?.persistClient ?? true,
-            redirectUrl: new URL(redirectUrl, window.location.href).toString(),
+            redirectUrl: new URL(
+              opts.__internal_satelliteSignOutRedirectUrl || redirectUrl,
+              window.location.href,
+            ).toString(),
           }));
         } else if (this.#options.experimental?.persistClient ?? true) {
           await this.client.removeSessions();
@@ -820,7 +827,8 @@ export class Clerk implements ClerkInterface {
         }
       }
 
-      await executeSignOut(signOutUrl);
+      const repairUrl = isValidUrl(signOutUrl) && signOutUrl?.startsWith('https://') ? signOutUrl : undefined;
+      await executeSignOut(repairUrl);
 
       debugLogger.info('signOut() complete', { redirectUrl: stripOrigin(redirectUrl) }, 'clerk');
       return;
