@@ -441,7 +441,7 @@ jobs:
           if-no-files-found: ignore
 
   mosaic-visual-tests:
-    needs: [check-permissions]
+    needs: [check-permissions, build-packages]
     name: Mosaic Visual Tests
     permissions:
       contents: read
@@ -449,7 +449,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - name: Checkout Repo
@@ -460,6 +460,17 @@ jobs:
           fetch-tags: false
           filter: 'blob:none'
           show-progress: false
+
+      - name: Setup
+        uses: $/.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Build Mosaic and its dependencies
+        run: pnpm turbo build $TURBO_ARGS --filter=@clerk/mosaic...
 
       - name: Run visual tests
         id: visual
