@@ -225,7 +225,7 @@ describe('enterprise accounts', () => {
       expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
     );
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('progressbar')).not.toBeInTheDocument());
     serveFapi(signedIn());
     await user.click(screen.getByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() =>
