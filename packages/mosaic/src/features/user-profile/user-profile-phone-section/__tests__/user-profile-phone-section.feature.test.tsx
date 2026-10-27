@@ -105,13 +105,13 @@ describe('the user profile phone section', () => {
       expect(screen.queryByRole('menu')).toBeNull();
       expect(screen.queryByRole('alertdialog')).toBeNull();
       expect(screen.getByRole('button', { name: 'Add phone number' })).toBeDisabled();
-      expect(await screen.findByRole('status', { name: 'Set as primary' })).toBeVisible();
+      expect(await screen.findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
     } finally {
       primary.release();
       await waitFor(() => expect(within(row()).getByText(WORK_LABEL).parentElement).toHaveTextContent('Primary'));
     }
     expect(screen.getByRole('button', { name: `Manage ${WORK_LABEL}` })).not.toHaveAttribute('aria-disabled', 'true');
-    expect(screen.queryByRole('status', { name: 'Set as primary' })).toBeNull();
+    expect(screen.queryByRole('progressbar', { name: 'Set as primary' })).toBeNull();
   });
 
   it('lists the primary number first and marks it', async () => {

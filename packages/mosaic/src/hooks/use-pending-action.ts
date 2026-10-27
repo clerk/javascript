@@ -1,13 +1,19 @@
 import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import type { ErrorDescription } from '../localization';
 import { useErrorText } from '../localization';
 import { toLocalizableError } from '../utils/errors';
+import type { ActionLock } from './use-action-lock';
+import { useActionLock } from './use-action-lock';
 
 export interface PendingActionOptions {
   /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
   errorFallback?: string;
+}
+
+export interface PendingActionHookOptions extends PendingActionOptions {
+  actionLock?: ActionLock;
 }
 
 export interface PendingAction<TKey extends string> {
@@ -32,33 +38,34 @@ interface PendingActionFailure<TKey extends string> {
  */
 export function usePendingAction<TKey extends string = string>({
   errorFallback,
-}: PendingActionOptions = {}): PendingAction<TKey> {
+  actionLock,
+}: PendingActionHookOptions = {}): PendingAction<TKey> {
   const errorText = useErrorText();
   const [pendingKey, setPendingKey] = useState<TKey>();
   const [lastKey, setLastKey] = useState<TKey>();
   const [failure, setFailure] = useState<PendingActionFailure<TKey>>();
-  const running = useRef(false);
+  const localLock = useActionLock();
+  const lock = actionLock ?? localLock;
 
   const run = async (key: TKey, action: () => Promise<unknown> | void, options: PendingActionOptions = {}) => {
-    if (running.current) {
-      return false;
-    }
-    running.current = true;
-    setPendingKey(key);
-    setLastKey(key);
-    setFailure(undefined);
-    try {
-      await action();
-      return true;
-    } catch (cause) {
-      if (!isReverificationCancelledError(cause)) {
-        setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
-      }
-      return false;
-    } finally {
-      running.current = false;
-      setPendingKey(undefined);
-    }
+    return (
+      lock.tryRun(async () => {
+        setPendingKey(key);
+        setLastKey(key);
+        setFailure(undefined);
+        try {
+          await action();
+          return true;
+        } catch (cause) {
+          if (!isReverificationCancelledError(cause)) {
+            setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback });
+          }
+          return false;
+        } finally {
+          setPendingKey(undefined);
+        }
+      }) ?? false
+    );
   };
 
   return {

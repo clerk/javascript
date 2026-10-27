@@ -1,3 +1,4 @@
+import type { RefCallback } from 'react';
 import { useRef } from 'react';
 
 export function useListRemovalFocus({
@@ -10,14 +11,23 @@ export function useListRemovalFocus({
   fallback: () => HTMLElement | null;
 }) {
   const triggers = useRef(new Map<string, HTMLButtonElement>());
+  const triggerRefs = useRef(new Map<string, RefCallback<HTMLButtonElement>>());
   const removed = useRef<{ id: string; index: number } | undefined>(undefined);
 
-  const registerTrigger = (id: string) => (element: HTMLButtonElement | null) => {
-    if (element) {
-      triggers.current.set(id, element);
-    } else {
-      triggers.current.delete(id);
+  const registerTrigger = (id: string) => {
+    const existing = triggerRefs.current.get(id);
+    if (existing) {
+      return existing;
     }
+    const ref = (element: HTMLButtonElement | null) => {
+      if (element) {
+        triggers.current.set(id, element);
+      } else {
+        triggers.current.delete(id);
+      }
+    };
+    triggerRefs.current.set(id, ref);
+    return ref;
   };
 
   const remove = async (id: string) => {

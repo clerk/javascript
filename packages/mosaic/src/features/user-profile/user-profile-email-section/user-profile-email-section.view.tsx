@@ -13,6 +13,8 @@ import type { UserProfileEmailSectionViewProps } from './user-profile-email-sect
 export function UserProfileEmailSectionView({
   emails,
   canAdd,
+  isDisabled,
+  pendingPrimaryId,
   verification,
   error,
   rowRef,
@@ -35,6 +37,7 @@ export function UserProfileEmailSectionView({
           color='neutral'
           size='sm'
           variant='outline'
+          disabled={isDisabled}
         />
       }
     >
@@ -59,6 +62,8 @@ export function UserProfileEmailSectionView({
         onRemove={remove ? email => remove.open(email) : undefined}
         onSetPrimary={onSetPrimary}
         onVerify={onVerify}
+        isDisabled={isDisabled}
+        pendingPrimaryId={pendingPrimaryId}
         pendingVerifyId={verification.pendingVerifyId}
       >
         <Section.Error>{error}</Section.Error>

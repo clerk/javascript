@@ -51,6 +51,37 @@ return {
 };
 ```
 
+When a direct action and a confirmation must share admission, create one
+`useActionLock` (`src/hooks/use-action-lock.ts`) and inject it into both owners:
+
+```ts
+const actionLock = useActionLock();
+const primary = usePendingAction({ actionLock });
+const remove = useConfirmController({
+  actionLock,
+  onConfirm: contact => removalFocus.remove(contact.id),
+});
+```
+
+The lock admits synchronously, so two calls in one event cannot both start.
+Its `tryRun` returns `undefined` without invoking busy work, or a promise that
+preserves the accepted action's result or rejection. It stays held until the
+actual action settles, even if a dialog closes and stops observing the action.
+Opening a dialog does not acquire the lock. The lock owns no errors or row IDs.
+`usePendingAction` keeps its inline errors and boolean result; refused runs
+return `false` without changing metadata. `useConfirmController` keeps removal
+errors in its dialog; refusal leaves the dialog and its error unchanged.
+Its `canConfirm` projection disables only the confirmation submit control.
+Admission still runs through the lock, not the rendered projection. Without an
+injected lock, each owner retains its existing independent behavior.
+
+`actionLock` is a hook option, not a per-run option. Project its `isPending` to
+the controls in the shared section. For contact primary changes, close the menu
+on selection by leaving `ActionMenu.status` undefined, disable Add and keep
+Manage disabled but focusable, and show a delayed row spinner beside the value.
+Use one `useSpinDelay` outside the row map with `minDuration: 0`, so feedback ends
+with the request. The Primary badge replaces the spinner after success.
+
 `run` resolves `true` on success, so the caller can close a dialog or move
 focus. To hold pending through an OAuth redirect, await a delay inside the
 action (`user-profile-connected-accounts-section.controller.ts`). When the user

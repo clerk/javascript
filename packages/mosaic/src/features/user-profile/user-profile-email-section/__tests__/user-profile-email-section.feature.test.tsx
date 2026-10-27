@@ -82,7 +82,7 @@ describe('the user profile email section', () => {
       expect(screen.queryByRole('menu')).toBeNull();
       expect(screen.queryByRole('alertdialog')).toBeNull();
       expect(screen.getByRole('button', { name: 'Add email' })).toBeDisabled();
-      expect(await screen.findByRole('status', { name: 'Set as primary' })).toBeVisible();
+      expect(await screen.findByRole('progressbar', { name: 'Set as primary' })).toBeVisible();
     } finally {
       primary.release();
       await waitFor(() =>
@@ -90,7 +90,7 @@ describe('the user profile email section', () => {
       );
     }
     expect(screen.getByRole('button', { name: 'Manage bob@example.com' })).not.toHaveAttribute('aria-disabled', 'true');
-    expect(screen.queryByRole('status', { name: 'Set as primary' })).toBeNull();
+    expect(screen.queryByRole('progressbar', { name: 'Set as primary' })).toBeNull();
   });
 
   it('adds an address and verifies the code it was sent', async () => {

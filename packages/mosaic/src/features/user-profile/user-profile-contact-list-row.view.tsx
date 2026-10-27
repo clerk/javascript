@@ -7,6 +7,8 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { Spinner } from '../../components/spinner';
+import { useSpinDelay } from '../../hooks/use-spin-delay';
 import { Plus } from '../../icons/glyphs/plus';
 import { fill, useMessages } from '../../localization';
 import { truncationStyles } from '../../styles/typography.styles';
@@ -23,6 +25,8 @@ export interface UserProfileContactListRowViewProps {
   onAdd?: () => void;
   onVerify?: (id: string) => void;
   pendingVerifyId?: string;
+  pendingPrimaryId?: string;
+  isDisabled?: boolean;
   onSetPrimary?: (id: string) => void;
   onRemove?: (item: UserProfileContact) => void;
   children?: ReactNode;
@@ -35,6 +39,8 @@ export function UserProfileContactListRowView({
   onAdd,
   onVerify,
   pendingVerifyId,
+  pendingPrimaryId,
+  isDisabled = false,
   onSetPrimary,
   onRemove,
   addAction,
@@ -43,6 +49,7 @@ export function UserProfileContactListRowView({
   children,
 }: UserProfileContactListRowViewProps) {
   const m = useMessages('userProfileContact');
+  const shownPrimaryId = useSpinDelay(pendingPrimaryId ?? null, { minDuration: 0 });
   const emptyDescription = m[kind].empty;
 
   return (
@@ -64,6 +71,7 @@ export function UserProfileContactListRowView({
               size='sm'
               variant='outline'
               onClick={onAdd}
+              disabled={isDisabled}
             >
               <Icon
                 glyph={Plus}
@@ -110,7 +118,14 @@ export function UserProfileContactListRowView({
                   <Section.Content>
                     <Section.Description xstyle={styles.contactValue}>
                       <span {...stylex.props(truncationStyles.singleLine, styles.contactText)}>{item.value}</span>
-                      {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
+                      {item.isDefault ? (
+                        <Badge color='neutral'>{m.primary}</Badge>
+                      ) : shownPrimaryId === item.id ? (
+                        <Spinner
+                          size='sm'
+                          label={m.setPrimary}
+                        />
+                      ) : null}
                       {item.isVerified ? null : <Badge color='warning'>{m.unverified}</Badge>}
                     </Section.Description>
                   </Section.Content>
@@ -119,6 +134,8 @@ export function UserProfileContactListRowView({
                       <ActionMenu
                         triggerRef={triggerRef?.(item.id)}
                         actions={actions}
+                        disabled={isDisabled}
+                        focusableWhenDisabled
                         label={fill(m.manageValue, { value: item.value })}
                       />
                     </Section.Actions>

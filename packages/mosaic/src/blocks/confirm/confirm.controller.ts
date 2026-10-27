@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import type { DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import type { ReverificationController } from '../../features/reverification';
+import type { ActionLock } from '../../hooks/use-action-lock';
 import type { ErrorDescription } from '../../localization';
 import { useErrorText } from '../../localization';
 import { setup } from '../../machine/setup';
@@ -73,6 +74,7 @@ export interface ConfirmController<Payload = void> {
   isPending: boolean;
   /** Whether the dialog can close right now. False while the action is past the point of cancelling */
   canClose: boolean;
+  canConfirm: boolean;
   errorMessage: string | undefined;
   /** Which card the dialog shows: the confirm step, or the reverification the action was interrupted by. */
   step: ConfirmStep;
@@ -85,6 +87,7 @@ export interface ConfirmController<Payload = void> {
 }
 
 export interface ConfirmControllerOptions<Payload = void> {
+  actionLock?: ActionLock;
   /** The action the dialog confirms. Resolve to close; reject to keep the dialog open showing why. */
   onConfirm: (payload: Payload) => Promise<unknown> | void;
   /** The flow `onConfirm` runs under, when the action may need step-up verification. */
@@ -107,6 +110,7 @@ export function useConfirmController<Payload = void>({
   onConfirm,
   reverification,
   errorFallback,
+  actionLock,
 }: ConfirmControllerOptions<Payload>): ConfirmController<Payload> {
   const handle = useMemo(() => Dialog.createHandle<Payload>(), []);
   const [snapshot, send] = useMachine(confirmMachine);
@@ -120,6 +124,7 @@ export function useConfirmController<Payload = void>({
     isOpen: snapshot.value !== 'idle',
     isPending,
     canClose,
+    canConfirm: snapshot.value === 'confirming' && !actionLock?.isPending,
     errorMessage: error ? errorText(error, errorFallback) : undefined,
     step: isPending && reverification?.visible ? 'verify' : 'confirm',
     reverification,
@@ -139,12 +144,17 @@ export function useConfirmController<Payload = void>({
       if (snapshot.value !== 'confirming') {
         return;
       }
-      send({
-        type: 'CONFIRM',
-        run: async () => {
-          await onConfirm(payload);
-        },
-      });
+      const run = async () => {
+        await onConfirm(payload);
+      };
+      if (actionLock) {
+        const accepted = actionLock.tryRun(run);
+        if (accepted) {
+          send({ type: 'CONFIRM', run: () => accepted });
+        }
+        return;
+      }
+      send({ type: 'CONFIRM', run });
     },
   };
 }
