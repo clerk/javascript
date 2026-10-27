@@ -288,16 +288,20 @@ jobs:
         if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' }}
         env:
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          payload="$(jq -c --arg repo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" '
+          release_pr="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+            --jq '[.[] | select(.head.ref == "changeset-release/main")][0].html_url // ""')" || release_pr=""
+          payload="$(jq -c --arg repo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" --arg release_pr "$release_pr" '
             first(.[] | select(.name == "@clerk/expo"))
             | "Clerk Expo SDK \(.version) has been released" as $title
             | "\(.name)@\(.version)" as $tag
+            | "<\($repo)/releases/tag/\($tag | @uri | gsub("%2F"; "/"))|View the GitHub release>" as $release_link
             | {
                 text: $title,
                 blocks: [
                   { type: "section", text: { type: "mrkdwn", text: "*\($title)*" } },
-                  { type: "context", elements: [ { type: "mrkdwn", text: "<\($repo)/releases/tag/\($tag | @uri | gsub("%2F"; "/"))|View the GitHub release>" } ] }
+                  { type: "context", elements: [ { type: "mrkdwn", text: (if $release_pr == "" then $release_link else "\($release_link) · <\($release_pr)|View the changeset release PR>" end) } ] }
                 ]
               }
           ' <<<"$PUBLISHED_PACKAGES")"
