@@ -11,15 +11,22 @@ import {
   writeClerkAgentRules,
 } from '../agentRules';
 
-const createMemoryFs = (files: Record<string, string> = {}, { withRepoPackageJson = true } = {}) => {
+const createMemoryFs = (
+  files: Record<string, string> = {},
+  {
+    withRepoPackageJson = true,
+    symlinks = {},
+  }: { withRepoPackageJson?: boolean; symlinks?: Record<string, string> } = {},
+) => {
   const store = new Map(Object.entries(withRepoPackageJson ? { '/repo/package.json': '{}', ...files } : files));
   const dirs = new Set<string>();
+  const follow = (path: string) => symlinks[path] ?? path;
 
   const fs: FileSystemAdapter = {
-    existsSync: path => store.has(path) || dirs.has(path),
-    readFileSync: path => store.get(path) ?? '',
+    existsSync: path => store.has(follow(path)) || dirs.has(path),
+    readFileSync: path => store.get(follow(path)) ?? '',
     writeFileSync: (path, data) => {
-      store.set(path, data);
+      store.set(follow(path), data);
     },
     mkdirSync: path => {
       dirs.add(path);
@@ -106,6 +113,28 @@ describe('writeClerkAgentRules', () => {
 
     expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:react -->');
     expect(memory.read('/repo/apps/web/AGENTS.md')).toBeUndefined();
+  });
+
+  it('points to an SDK AGENTS.md that exists when the SDK is installed in a pnpm workspace app', () => {
+    const memory = createMemoryFs({
+      '/repo/pnpm-workspace.yaml': 'packages:\n  - apps/*\n',
+      '/repo/package.json': '{"name":"root","private":true}',
+      '/repo/apps/web/package.json': '{"name":"web","dependencies":{"@clerk/nextjs":"*"}}',
+      '/repo/apps/web/node_modules/@clerk/nextjs/AGENTS.md': '# Clerk Next.js',
+    });
+
+    const { files } = writeClerkAgentRules({
+      cwd: '/repo/apps/web',
+      fs: memory.fs,
+      path: pathAdapter,
+      sdks: ['nextjs'],
+    });
+
+    const agentsMdPath = files.find(file => file.endsWith('/AGENTS.md')) ?? '';
+    const pointer = memory.read(agentsMdPath)?.match(/`(node_modules\/@clerk\/nextjs\/AGENTS\.md)`/)?.[1] ?? '';
+
+    expect(pointer).toBe('node_modules/@clerk/nextjs/AGENTS.md');
+    expect(memory.fs.existsSync(pathAdapter.join(pathAdapter.dirname(agentsMdPath), pointer))).toBe(true);
   });
 
   it('replaces only Clerk blocks and preserves surrounding content', () => {
@@ -238,6 +267,15 @@ describe('writeClerkAgentRules with an existing CLAUDE.md', () => {
 
     expect(result.claudeMd).toBe('unchanged');
     expect(memory.read('/repo/CLAUDE.md')).toBe('Shared rules\n');
+  });
+
+  it('keeps the Clerk block when CLAUDE.md is a symlink to an AGENTS.md that does not exist yet', () => {
+    const memory = createMemoryFs({}, { symlinks: { '/repo/CLAUDE.md': '/repo/AGENTS.md' } });
+
+    writeClerkAgentRules({ cwd: '/repo', fs: memory.fs, path: pathAdapter, sdks: ['nextjs'] });
+
+    expect(memory.read('/repo/AGENTS.md')).toContain('<!-- BEGIN:clerk-agent-rules:nextjs -->');
+    expect(memory.read('/repo/AGENTS.md')).not.toContain('@AGENTS.md');
   });
 
   it('writes the Clerk block into CLAUDE.md and skips the import when only CLAUDE.md exists', () => {
