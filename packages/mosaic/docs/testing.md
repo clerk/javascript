@@ -8,6 +8,11 @@ We follow [Write tests. Not too many. Mostly integration.](https://kentcdodds.co
   a user. Past that point, tests cost more than they return.
 - **Don't test implementation details.** A test that breaks on a refactor that
   keeps the behavior is testing the wrong thing.
+- **A test fails if, and only if, the feature stops doing what it is for.**
+  Before writing or reviewing a test, ask "when will this fail?". If the answer
+  includes a refactor, a renamed helper, or a network hiccup, the test is
+  wrong. See
+  [The Golden Rule of Assertions](https://www.epicweb.dev/the-golden-rule-of-assertions).
 - **Static checks come first.** TypeScript and ESLint catch typos and shape
   errors, so tests don't need to.
 
