@@ -358,8 +358,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     };
 
     if (!clerk.loaded) {
+      let loadFailed = false;
       clerk
         .load(this.options)
+        .catch(err => {
+          loadFailed = true;
+          throw err;
+        })
         .then(() => onLoaded())
         .catch(err => {
           if (__DEV__) {
@@ -367,7 +372,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
           }
           this.#eventBus.emit(clerkEvents.Status, 'error');
           this.emitLoaded();
-          this.replayWhenLoadIsFinished(clerk);
+          if (loadFailed) {
+            this.replayWhenLoadIsFinished(clerk);
+          }
         });
     } else {
       onLoaded();
@@ -379,7 +386,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
    * once Clerk stops rejecting the app's version.
    */
   private replayWhenLoadIsFinished(clerk: HeadlessBrowserClerk | BrowserClerk): void {
-    if (clerk.loaded || typeof clerk.on !== 'function') {
+    // A reload can finish the load before this runs.
+    if (clerk.loaded) {
+      this.replayInterceptedInvocations(clerk);
+      return;
+    }
+    if (typeof clerk.on !== 'function') {
       return;
     }
     let finished = false;
