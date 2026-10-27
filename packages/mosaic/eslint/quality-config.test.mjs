@@ -12,7 +12,9 @@ describe('ported lint policy', () => {
     const implementation = await eslint.calculateConfigForFile('packages/mosaic/src/utils/apply-order.ts');
     const tests = await eslint.calculateConfigForFile('packages/mosaic/src/__tests__/object.test.ts');
 
-    for (const rule of ['no-accumulator-copy', 'no-chained-type-assertions', 'no-widen-then-assert']) {
+    expect(implementation.rules['e18e/no-spread-in-reduce']?.[0]).toBe(1);
+    expect(tests.rules['e18e/no-spread-in-reduce']).toBeUndefined();
+    for (const rule of ['no-chained-type-assertions', 'no-widen-then-assert']) {
       expect(implementation.rules[`code-quality/${rule}`]?.[0]).toBe(1);
       expect(tests.rules[`code-quality/${rule}`]).toBeUndefined();
     }
