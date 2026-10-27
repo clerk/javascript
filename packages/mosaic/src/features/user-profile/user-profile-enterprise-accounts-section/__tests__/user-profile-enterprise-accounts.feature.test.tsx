@@ -361,7 +361,7 @@ describe('enterprise accounts', () => {
     await userEvent.setup().click(connect);
     await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
     expect(connect).toHaveAttribute('aria-busy', 'true');
-    await waitFor(() => expect(connect).not.toHaveAttribute('aria-busy', 'true'), { timeout: 2500 });
+    await waitFor(() => expect(connect).not.toHaveAttribute('aria-busy', 'true'));
     expect(connect).toBeEnabled();
   });
 

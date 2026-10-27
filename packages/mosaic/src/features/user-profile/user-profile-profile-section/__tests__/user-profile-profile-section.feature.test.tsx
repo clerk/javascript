@@ -308,7 +308,7 @@ describe('username reverification', () => {
     expect(savedUsername(fapi)).toBe('alicesmith');
     await actor.type(field, 'hunter2{Enter}');
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull(), { timeout: 3000 });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(savedUsername(fapi)).toBe('alicia');
     expect(profile()).toHaveTextContent('alicia');
   });
@@ -338,7 +338,7 @@ describe('username reverification', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('form_identifier_exists', 'That username is taken. Please try another.', 'username');
 
-    const field = await screen.findByLabelText('Username', undefined, { timeout: 3000 });
+    const field = await screen.findByLabelText('Username');
     expect(field).toHaveValue('alicia');
     await waitFor(() => expect(field).toHaveAccessibleDescription(/That username is taken/));
     expect(savedUsername(fapi)).toBe('alicesmith');
@@ -364,7 +364,7 @@ describe('username reverification', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('form_identifier_exists', 'That username is taken. Please try another.', 'username');
 
-    const field = await screen.findByLabelText('Username', undefined, { timeout: 3000 });
+    const field = await screen.findByLabelText('Username');
     await waitFor(() => expect(field).toHaveFocus());
   });
 

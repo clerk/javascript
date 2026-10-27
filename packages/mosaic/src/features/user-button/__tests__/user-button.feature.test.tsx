@@ -371,18 +371,24 @@ describe('UserButton', () => {
 
     it('stays busy until the memberships have reloaded', async () => {
       await renderUserButton();
-      const user = await open();
+      await open();
       await screen.findByRole('button', { name: 'Accept' });
       const reload = holdRequests('get', '/v1/me/organization_memberships');
+      vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      await user.click(screen.getByRole('button', { name: 'Accept' }));
-      await waitFor(() => expect(reload.requests).toHaveLength(1));
+      try {
+        const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+        await user.click(screen.getByRole('button', { name: 'Accept' }));
+        await waitFor(() => expect(reload.requests).toHaveLength(1));
 
-      await new Promise(resolve => setTimeout(resolve, 450));
-      expect(waiting()).toBe(true);
+        await act(() => vi.advanceTimersByTimeAsync(400));
+        expect(waiting()).toBe(true);
 
-      reload.release();
-      await waitFor(() => expect(waiting()).toBe(false));
+        reload.release();
+        await waitFor(() => expect(waiting()).toBe(false));
+      } finally {
+        vi.useRealTimers();
+      }
       expect(popup()).toBeInTheDocument();
     });
 
@@ -727,7 +733,7 @@ describe('UserButton', () => {
 
       touch.fail('session_touch_failed');
 
-      await waitFor(() => expect(waiting()).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(waiting()).toBe(false));
       expect(popup()).toBeInTheDocument();
       expect(signOut()).toBeEnabled();
       expect(log).toHaveBeenCalledWith(
@@ -738,28 +744,34 @@ describe('UserButton', () => {
 
     it('still shows the action when reopened before it settles, and starts no second one', async () => {
       await renderUserButton();
-      const user = await open();
+      await open();
       await screen.findByRole('button', { name: 'Other' });
       const touch = holdRequests('post', '/v1/client/sessions/:id/touch');
+      vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      const menu = await openAccounts(user);
-      await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
-      expect(waiting()).toBe(true);
+      try {
+        const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+        const menu = await openAccounts(user);
+        await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+        expect(waiting()).toBe(true);
 
-      await user.click(trigger());
-      await waitFor(() => expect(popup()).toBeNull());
+        await user.click(trigger());
+        await waitFor(() => expect(popup()).toBeNull());
 
-      await new Promise(resolve => setTimeout(resolve, 450));
-      await user.click(trigger());
+        await act(() => vi.advanceTimersByTimeAsync(400));
+        await user.click(trigger());
 
-      expect(popup()).toBeInTheDocument();
-      expect(waiting()).toBe(true);
+        expect(popup()).toBeInTheDocument();
+        expect(waiting()).toBe(true);
 
-      await user.click(screen.getByRole('button', { name: 'Other' }));
-      expect(touch.requests).toHaveLength(1);
+        await user.click(screen.getByRole('button', { name: 'Other' }));
+        expect(touch.requests).toHaveLength(1);
 
-      touch.release();
-      await waitFor(() => expect(waiting()).toBe(false));
+        touch.release();
+        await waitFor(() => expect(waiting()).toBe(false));
+      } finally {
+        vi.useRealTimers();
+      }
       expect(popup()).toBeInTheDocument();
     });
 
