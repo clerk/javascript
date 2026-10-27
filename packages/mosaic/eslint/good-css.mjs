@@ -175,6 +175,10 @@ function covers(override, target, feature) {
   return overrideParts.filter(part => part !== `@media (${feature})`).every(part => targetParts.includes(part));
 }
 
+function selectorPath(conditions) {
+  return conditions.filter(condition => condition !== 'default' && !condition.startsWith('@media'));
+}
+
 function splitTransitions(text) {
   const parts = [];
   let depth = 0;
@@ -325,6 +329,62 @@ export const reducedMotion = {
   },
 };
 
+function isRemoved(node) {
+  const text = valueText(node);
+  return text !== null && /^(?:none|0(?:px)?(?:\s+.*)?)$/i.test(text.trim());
+}
+
+function visibleOutline(node) {
+  const text = valueText(node);
+  return text !== null && !isRemoved(node) && !/^(?:transparent|hidden|dotted\s+transparent)$/i.test(text.trim());
+}
+
+function isFocusSelector(name) {
+  return /^(?:&)?:(?:focus|focus-visible)(?![\w-])/.test(name);
+}
+
+export const preserveFocusOutline = {
+  meta: {
+    ...transitionMeta,
+    messages: { focus: 'Keep a visible outline for keyboard focus, including forced colors.' },
+  },
+  create(context) {
+    return styleObjects(context, (style, outerConditions) => {
+      for (const property of entries(style)) {
+        const name = propertyName(property);
+        if (name === 'outline') {
+          const leaves = conditionalLeaves(property.value, [], context.sourceCode);
+          for (const leaf of leaves) {
+            const conditions = [...outerConditions, ...leaf.conditions];
+            if (!conditions.some(isFocusSelector) || !isRemoved(leaf.node)) {
+              continue;
+            }
+            const width = entry(style, 'outlineWidth');
+            const outlineStyle = entry(style, 'outlineStyle');
+            if (width && visibleOutline(width.value) && outlineStyle && visibleOutline(outlineStyle.value)) {
+              continue;
+            }
+            const restored = leaves.some(
+              candidate =>
+                visibleOutline(candidate.node) &&
+                covers([...outerConditions, ...candidate.conditions], conditions, 'forced-colors: active') &&
+                selectorPath(candidate.conditions).every(selector => selectorPath(leaf.conditions).includes(selector)),
+            );
+            if (!restored) {
+              context.report({ node: leaf.node, messageId: 'focus' });
+              break;
+            }
+          }
+        }
+      }
+    });
+  },
+};
+
 export default {
-  rules: { 'explicit-transition-properties': explicitTransitionProperties, 'reduced-motion': reducedMotion },
+  rules: {
+    'explicit-transition-properties': explicitTransitionProperties,
+    'reduced-motion': reducedMotion,
+    'preserve-focus-outline': preserveFocusOutline,
+  },
 };

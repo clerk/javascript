@@ -2,7 +2,7 @@ import { RuleTester } from 'eslint';
 import tseslint from 'typescript-eslint';
 import { describe, test } from 'vitest';
 
-import { explicitTransitionProperties, reducedMotion } from './good-css.mjs';
+import { explicitTransitionProperties, preserveFocusOutline, reducedMotion } from './good-css.mjs';
 
 RuleTester.describe = describe;
 
@@ -108,6 +108,39 @@ tester.run('reduced-motion', reducedMotion, {
     },
     {
       code: `${stylex}sx.create({ a: { transitionProperty: { default: 'transform', '@media (prefers-reduced-motion: reduce), (min-width: 10px)': 'none' } } });`,
+      errors: 1,
+    },
+  ],
+});
+
+tester.run('preserve-focus-outline', preserveFocusOutline, {
+  valid: [
+    `${stylex}sx.create({ a: { outline: 'none' } });`,
+    `${stylex}sx.create({ a: { outline: { ':focus-within': 'none', ':not(:focus)': 'none' } } });`,
+    `${stylex}sx.create({ a: { outline: { default: 'none', ':focus-visible': '2px solid blue' } } });`,
+    `${stylex}sx.create({ a: { outline: { default: 'none', ':focus-visible': 'none', '@media (forced-colors: active)': '2px solid CanvasText' } } });`,
+    `${stylex}sx.create({ a: { ':focus-visible': { outline: 'none', outlineWidth: 2, outlineStyle: 'solid' } } });`,
+    `${stylex}sx.create({ a: { outline: { ':focus-visible': '2px solid transparent' } } });`,
+    `${stylex}sx.create({ a: { outline: { ':focus-visible': { default: 'none', '@media (forced-colors: active)': '2px solid CanvasText' } } } });`,
+    'const obj = { outline: { ":focus-visible": "none" } };',
+  ],
+  invalid: [
+    {
+      code: `${stylex}sx.create({ a: { outline: { default: '2px solid blue', ':focus-visible': 'none' } } });`,
+      errors: 1,
+    },
+    { code: `${stylex}sx.create({ a: { ':focus-visible': { outline: 0, boxShadow: '0 0 2px blue' } } });`, errors: 1 },
+    {
+      code: `${stylex}sx.create({ a: { outline: { ':focus-visible': { default: 'none', '@media (forced-colors: active)': 'none' } } } });`,
+      errors: 1,
+    },
+    { code: `${stylex}sx.create({ a: { outline: { ':focus-visible': '0 solid transparent' } } });`, errors: 1 },
+    {
+      code: `${stylex}sx.create({ a: { outline: { ':focus-visible': { default: 'none', '@media (forced-colors: active) and (min-width: 800px)': '2px solid CanvasText' } } } });`,
+      errors: 1,
+    },
+    {
+      code: `${stylex}sx.create({ a: { ':focus-visible': { outline: 'none', outlineWidth: 0, outlineStyle: 'solid' } } });`,
       errors: 1,
     },
   ],
