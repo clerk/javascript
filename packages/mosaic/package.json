@@ -58,6 +58,7 @@
     "lint:attw": "attw --pack . --exclude-entrypoints styles.css --profile esm-only",
     "lint:publint": "publint",
     "test": "vitest run --project primitives --project mosaic",
+    "test:browser": "vitest run --project browser",
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
     "test:feature": "vitest run --project feature",
     "test:webkit": "vitest run --project webkit",

@@ -95,11 +95,16 @@ Existing tests that break these rules move when their folder next changes.
 pnpm --filter @clerk/mosaic test                      # unit tests (jsdom and primitives)
 pnpm --filter @clerk/mosaic test:feature              # feature tests (Chromium)
 pnpm --filter @clerk/mosaic test:feature user-button  # one feature
+pnpm --filter @clerk/mosaic test:browser              # layout tests (Chromium)
 pnpm --filter @clerk/mosaic exec vitest run           # every project
 ```
 
 CI runs feature tests in their own `Mosaic Feature Tests` job, so the repo-wide
 unit test job never needs a browser.
+
+jsdom and happy-dom have no layout engine, so every rect is 0 and a test that
+asserts on position, size or scrolling always passes there. Name such a test
+`*.browser.test.tsx` so it runs in Chromium, in the same CI job.
 
 Feature tests need Chromium: run `pnpm playwright install chromium` once. They
 import the built `@clerk/clerk-js`, so run `pnpm turbo build --filter=@clerk/clerk-js`
