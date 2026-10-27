@@ -194,8 +194,8 @@ describe('useUserProfileAddEmailController', () => {
 
   it('verifies an existing email without creating one, opening once its code is sent', async () => {
     const onCreate = vi.fn(created);
-    const sent = Promise.withResolvers<void>();
-    const email = verifier(() => ({ method: 'code', sent: sent.promise }));
+    const sent = createDeferredPromise();
+    const email = verifier(() => ({ method: 'code', sent: sent.promise.then(() => undefined) }));
     const { result } = renderHook(() =>
       useUserProfileAddEmailController({ reverification: idleReverification, onCreate }),
     );
