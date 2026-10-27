@@ -118,7 +118,7 @@ export default defineConfig({
             expect: {
               toMatchScreenshot: {
                 comparatorName: 'pixelmatch',
-                comparatorOptions: { threshold: 0.1, allowedMismatchedPixelRatio: 0 },
+                comparatorOptions: { threshold: 0, allowedMismatchedPixelRatio: 0 },
               },
             },
           },
