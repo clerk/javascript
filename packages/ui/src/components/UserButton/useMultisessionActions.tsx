@@ -8,12 +8,14 @@ import { sleep } from '@/ui/utils/sleep';
 import { clerkWindowNavigate } from '@/ui/utils/windowNavigate';
 
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
+import { useSignOutWithRedirect } from '../../hooks/useSignOutWithRedirect';
 import { useRouter } from '../../router';
 
 type UseMultisessionActionsParams = {
   user: UserResource | null | undefined;
   actionCompleteCallback?: () => void;
   afterSignOutUrl?: string;
+  navigateAfterSignOut?: () => any;
   navigateAfterMultiSessionSingleSignOut?: () => any;
   afterSwitchSessionUrl?: string;
   userProfileUrl?: string;
@@ -23,6 +25,7 @@ type UseMultisessionActionsParams = {
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const clerk = useClerk();
+  const signOutWithRedirect = useSignOutWithRedirect();
   const { setActive, signOut, openUserProfile } = clerk;
   const card = useCardState();
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
@@ -32,7 +35,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
-      return signOut({ redirectUrl: opts.afterSignOutUrl });
+      return signOutWithRedirect(opts.navigateAfterSignOut, opts.afterSignOutUrl);
     }
     return signOut(opts.navigateAfterMultiSessionSingleSignOut, { sessionId: session.id }).finally(() =>
       card.setIdle(),
@@ -71,7 +74,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleSignOutAllClicked = () => {
-    return signOut({ redirectUrl: opts.afterSignOutUrl });
+    return signOutWithRedirect(opts.navigateAfterSignOut, opts.afterSignOutUrl);
   };
 
   const handleSessionClicked = (session: SignedInSessionResource) => async () => {

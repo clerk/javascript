@@ -201,6 +201,7 @@ export type SignOutCallback = () => void | Promise<any>;
  * Configuration options.
  */
 export type SignOutOptions = {
+  __internal_satelliteSignOutRedirectUrl?: string;
   /**
    * Specify a specific session to sign out. Useful for multi-session applications.
    */

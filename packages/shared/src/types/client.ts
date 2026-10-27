@@ -47,7 +47,6 @@ export interface ClientResource extends ClerkResource {
    * Removes all sessions created on the client.
    */
   removeSessions: () => Promise<ClientResource>;
-  __internal_signOut: (params: { persistClient: boolean; redirectUrl: string }) => Promise<{ signOutUrl?: string }>;
   /**
    * Clears any locally cached session data for the current client.
    */
