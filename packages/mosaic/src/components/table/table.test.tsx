@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MagnifyingGlass } from '../../icons/glyphs/magnifying-glass';
@@ -310,6 +311,71 @@ describe('Mosaic Table', () => {
       expect(selected).toHaveAttribute('data-selected', '');
       expect(unselected).not.toHaveAttribute('aria-selected');
       expect(unselected).not.toHaveAttribute('data-selected');
+    });
+  });
+
+  describe('interactive rows', () => {
+    it('marks rows with a click handler as interactive', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      render(
+        <Table.Root>
+          <Table.Body>
+            <Table.Row onClick={onClick}>
+              <Table.Cell>Alpha</Table.Cell>
+            </Table.Row>
+            <Table.Row>
+              <Table.Cell>Beta</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>,
+      );
+      const [interactive, plain] = screen.getAllByRole('row');
+      expect(interactive).toHaveAttribute('data-interactive', '');
+      expect(plain).not.toHaveAttribute('data-interactive');
+      await user.click(screen.getByText('Alpha'));
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not run the row action when a control inside the row is clicked', async () => {
+      const user = userEvent.setup();
+      const onRowClick = vi.fn();
+      const onButtonClick = vi.fn();
+      render(
+        <Table.Root>
+          <Table.Body>
+            <Table.Row onClick={onRowClick}>
+              <Table.Cell>
+                <button
+                  type='button'
+                  onClick={onButtonClick}
+                >
+                  View
+                </button>
+              </Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>,
+      );
+      await user.click(screen.getByRole('button', { name: 'View' }));
+      expect(onButtonClick).toHaveBeenCalledTimes(1);
+      expect(onRowClick).not.toHaveBeenCalled();
+    });
+
+    it('does not run the row action for clicks inside content portaled out of the row', async () => {
+      const user = userEvent.setup();
+      const onRowClick = vi.fn();
+      render(
+        <Table.Root>
+          <Table.Body>
+            <Table.Row onClick={onRowClick}>
+              <Table.Cell>{createPortal(<p>Menu content</p>, document.body)}</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>,
+      );
+      await user.click(screen.getByText('Menu content'));
+      expect(onRowClick).not.toHaveBeenCalled();
     });
   });
 

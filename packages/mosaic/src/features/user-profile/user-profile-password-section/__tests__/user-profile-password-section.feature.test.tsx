@@ -222,7 +222,7 @@ describe('Changing a password', () => {
     expect(fapi.passwordUpdates).toHaveLength(0);
     await user.type(field, 'hunter2{Enter}');
 
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull(), { timeout: 3000 });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(fapi.passwordUpdates).toHaveLength(1);
   });
 
@@ -271,7 +271,7 @@ describe('Changing a password', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('form_password_pwned', undefined, 'new_password');
 
-    const field = await screen.findByLabelText('New password', undefined, { timeout: 3000 });
+    const field = await screen.findByLabelText('New password');
     expect(field).toHaveValue('new-password-123');
     await waitFor(() => expect(field).toHaveAccessibleDescription(/found as part of a breach/));
     await waitFor(() => expect(field).toHaveFocus());
@@ -535,12 +535,10 @@ describe('Changing a password', () => {
     await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
     await user.type(screen.getByLabelText('New password'), 'longpassword');
 
-    await waitFor(
-      () =>
-        expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
-          'Your password must contain a number and an uppercase letter.',
-        ),
-      { timeout: 2500 },
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain a number and an uppercase letter.',
+      ),
     );
   });
 

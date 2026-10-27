@@ -81,7 +81,7 @@ export function useUserProfileMfaFixture({
     onBack: () => void;
   };
   section: UserProfileMfaSectionViewProps;
-  authenticator: UserProfileMfaSetupViewProps['authenticator'];
+  authenticator: NonNullable<UserProfileMfaSetupViewProps['authenticator']>;
   sms: UserProfileMfaSetupViewProps['sms'];
   backupCodes: UserProfileMfaSetupViewProps['backupCodes'];
 } {
@@ -358,7 +358,6 @@ export function useUserProfileMfaFixture({
     },
     authenticator: {
       setup: authenticatorSetup,
-      onRetry: () => undefined,
       code,
       onCodeChange,
       onSubmit: value => void verifyAuthenticator(value),

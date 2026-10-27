@@ -58,12 +58,11 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddEmailDialogProps, 
 }
 
 describe('UserProfileAddEmailDialog', () => {
-  it.each(['', 'invalid-address'])('uses native email validation for %j', async emailAddress => {
+  it('submits a malformed address instead of stopping on native validation', async () => {
     const user = userEvent.setup();
-    const { props } = renderView({ emailAddress });
+    const { props } = renderView({ emailAddress: 'invalid-address' });
     await user.click(screen.getByRole('button', { name: 'Continue' }));
-    expect(props.onSubmit).not.toHaveBeenCalled();
-    expect(screen.getByRole('textbox', { name: 'Email' })).toBeInvalid();
+    expect(props.onSubmit).toHaveBeenCalledOnce();
   });
 
   it.each(['typing', 'pasting'] as const)('automatically submits a complete code after %s', async method => {
@@ -242,5 +241,10 @@ describe('UserProfileAddEmailDialog', () => {
   it('disables Continue when the email cannot be submitted', () => {
     renderView({ canSubmitEmail: false });
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+  });
+
+  it('disables Verify when the code cannot be submitted', () => {
+    renderView({ step: 'verify', canSubmitCode: false });
+    expect(screen.getByRole('button', { name: 'Verify', exact: true })).toBeDisabled();
   });
 });

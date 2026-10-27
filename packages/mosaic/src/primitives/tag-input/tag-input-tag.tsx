@@ -3,10 +3,10 @@
 import { inertProps } from '@clerk/shared/inert';
 import React, { useCallback, useEffect, useRef } from 'react';
 
+import { readingDirectionKeys, useDirection } from '../direction-provider';
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
 import { TagContext, useTagInputContext } from './tag-input-context';
-import { readingDirectionKeys } from './tag-input-utils';
 
 export interface TagInputTagProps extends ComponentProps<'div'> {
   value: string;
@@ -16,6 +16,7 @@ export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
   function TagInputTag(props, forwardedRef) {
     const { render, value: tagValue, ...otherProps } = props;
     const { value, tags, disabled, remove, focusInput, focusTag, registerTag, onTagExited } = useTagInputContext();
+    const { previousKey, nextKey } = readingDirectionKeys(useDirection());
 
     const present = value.includes(tagValue);
     const invalid = tags.find(tag => tag.value === tagValue)?.invalid ?? false;
@@ -53,7 +54,6 @@ export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
           return;
         }
         const index = value.indexOf(tagValue);
-        const { previousKey, nextKey } = readingDirectionKeys(event.currentTarget);
 
         switch (event.key) {
           case previousKey:

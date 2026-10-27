@@ -124,6 +124,39 @@ const noOffers = (overrides = {}) => signedIn({ invitations: [], suggestions: []
 
 const personalSession = fapiSession({ id: 'sess_1', user: alice });
 
+const terms = { label: 'Terms', path: 'terms', content: <p>Terms body</p> };
+
+function instanceWith({
+  billing = false,
+  apiKeys = false,
+  sso = false,
+  directorySync = false,
+}: {
+  billing?: boolean;
+  apiKeys?: boolean;
+  sso?: boolean;
+  directorySync?: boolean;
+}) {
+  const base = fapiEnvironment({
+    api_keys_settings: { user_api_keys_enabled: apiKeys, orgs_api_keys_enabled: apiKeys },
+  });
+  return {
+    ...base,
+    commerce_settings: {
+      ...base.commerce_settings,
+      billing: {
+        ...base.commerce_settings.billing,
+        user: { enabled: billing, has_paid_plans: false },
+        organization: { enabled: billing, has_paid_plans: false },
+      },
+    },
+    user_settings: {
+      ...base.user_settings,
+      enterprise_sso: { enabled: sso, self_serve_sso: sso, self_serve_directory_sync: directorySync },
+    },
+  };
+}
+
 async function openWithList() {
   const user = await open();
   await waitFor(() => expect(screen.queryByText('Loading organizations…')).toBeNull());
@@ -338,18 +371,24 @@ describe('UserButton', () => {
 
     it('stays busy until the memberships have reloaded', async () => {
       await renderUserButton();
-      const user = await open();
+      await open();
       await screen.findByRole('button', { name: 'Accept' });
       const reload = holdRequests('get', '/v1/me/organization_memberships');
+      vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      await user.click(screen.getByRole('button', { name: 'Accept' }));
-      await waitFor(() => expect(reload.requests).toHaveLength(1));
+      try {
+        const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+        await user.click(screen.getByRole('button', { name: 'Accept' }));
+        await waitFor(() => expect(reload.requests).toHaveLength(1));
 
-      await new Promise(resolve => setTimeout(resolve, 450));
-      expect(waiting()).toBe(true);
+        await act(() => vi.advanceTimersByTimeAsync(400));
+        expect(waiting()).toBe(true);
 
-      reload.release();
-      await waitFor(() => expect(waiting()).toBe(false));
+        reload.release();
+        await waitFor(() => expect(waiting()).toBe(false));
+      } finally {
+        vi.useRealTimers();
+      }
       expect(popup()).toBeInTheDocument();
     });
 
@@ -458,6 +497,77 @@ describe('UserButton', () => {
       const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
       expect(customPages.map((page: CustomPage) => page.label)).toEqual(['account', 'Terms', 'security']);
     });
+
+    it.each([
+      { features: {}, pages: ['Terms', 'account', 'security'] },
+      { features: { billing: true, apiKeys: true }, pages: ['Terms', 'account', 'security', 'billing', 'apiKeys'] },
+    ])('orders the UserProfile pages the instance turns on: $features', async ({ features, pages }) => {
+      const { clerk } = await renderUserButton(
+        { userProfileProps: { customPages: [terms], pageOrder: ['terms'] } },
+        signedIn({ environment: instanceWith(features) }),
+      );
+      const openUserProfile = vi.spyOn(clerk, 'openUserProfile').mockImplementation(() => {});
+      const user = await open();
+
+      await openSettings(user, 'Manage profile');
+      await waitFor(() => expect(popup()).toBeNull());
+
+      const customPages = openUserProfile.mock.calls[0]?.[0]?.customPages ?? [];
+      expect(customPages.map((page: CustomPage) => page.label)).toEqual(pages);
+    });
+
+    it.each([
+      { features: {}, organization: {}, pages: ['Terms', 'general', 'members'] },
+      {
+        features: { billing: true, apiKeys: true },
+        organization: {},
+        pages: ['Terms', 'general', 'members', 'billing', 'apiKeys'],
+      },
+      { features: { sso: true }, organization: {}, pages: ['Terms', 'general', 'members'] },
+      {
+        features: { sso: true },
+        organization: { self_serve_sso_enabled: true },
+        pages: ['Terms', 'general', 'members', 'security'],
+      },
+      {
+        features: { sso: true, directorySync: true },
+        organization: {},
+        pages: ['Terms', 'general', 'members'],
+      },
+      {
+        features: { sso: true, directorySync: true },
+        organization: { self_serve_directory_sync_enabled: true },
+        pages: ['Terms', 'general', 'members', 'security'],
+      },
+    ])(
+      'orders the OrganizationProfile pages the instance and organization turn on: $features $organization',
+      async ({ features, organization, pages }) => {
+        const selfServe = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3, ...organization });
+        const memberships = [fapiMembership(selfServe, { permissions: ['org:sys_memberships:manage'] })];
+        const { clerk } = await renderUserButton(
+          { organizationProfileProps: { customPages: [terms], pageOrder: ['terms'] } },
+          signedIn({
+            environment: instanceWith(features),
+            client: fapiClient([
+              fapiSession({
+                id: 'sess_1',
+                user: { ...alice, organization_memberships: memberships },
+                last_active_organization_id: 'org_1',
+              }),
+            ]),
+            memberships,
+          }),
+        );
+        const openOrganizationProfile = vi.spyOn(clerk, 'openOrganizationProfile').mockImplementation(() => {});
+        const user = await open();
+
+        await openSettings(user, 'Manage organization');
+        await waitFor(() => expect(popup()).toBeNull());
+
+        const customPages = openOrganizationProfile.mock.calls[0]?.[0]?.customPages ?? [];
+        expect(customPages.map((page: CustomPage) => page.label)).toEqual(pages);
+      },
+    );
 
     it('opens the InviteMembers modal and closes', async () => {
       const { clerk, navigate } = await renderUserButton();
@@ -623,7 +733,7 @@ describe('UserButton', () => {
 
       touch.fail('session_touch_failed');
 
-      await waitFor(() => expect(waiting()).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(waiting()).toBe(false));
       expect(popup()).toBeInTheDocument();
       expect(signOut()).toBeEnabled();
       expect(log).toHaveBeenCalledWith(
@@ -634,28 +744,34 @@ describe('UserButton', () => {
 
     it('still shows the action when reopened before it settles, and starts no second one', async () => {
       await renderUserButton();
-      const user = await open();
+      await open();
       await screen.findByRole('button', { name: 'Other' });
       const touch = holdRequests('post', '/v1/client/sessions/:id/touch');
+      vi.useFakeTimers({ shouldAdvanceTime: true });
 
-      const menu = await openAccounts(user);
-      await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
-      expect(waiting()).toBe(true);
+      try {
+        const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+        const menu = await openAccounts(user);
+        await user.click(within(menu).getByRole('menuitem', { name: 'bob@example.com' }));
+        expect(waiting()).toBe(true);
 
-      await user.click(trigger());
-      await waitFor(() => expect(popup()).toBeNull());
+        await user.click(trigger());
+        await waitFor(() => expect(popup()).toBeNull());
 
-      await new Promise(resolve => setTimeout(resolve, 450));
-      await user.click(trigger());
+        await act(() => vi.advanceTimersByTimeAsync(400));
+        await user.click(trigger());
 
-      expect(popup()).toBeInTheDocument();
-      expect(waiting()).toBe(true);
+        expect(popup()).toBeInTheDocument();
+        expect(waiting()).toBe(true);
 
-      await user.click(screen.getByRole('button', { name: 'Other' }));
-      expect(touch.requests).toHaveLength(1);
+        await user.click(screen.getByRole('button', { name: 'Other' }));
+        expect(touch.requests).toHaveLength(1);
 
-      touch.release();
-      await waitFor(() => expect(waiting()).toBe(false));
+        touch.release();
+        await waitFor(() => expect(waiting()).toBe(false));
+      } finally {
+        vi.useRealTimers();
+      }
       expect(popup()).toBeInTheDocument();
     });
 
@@ -1103,7 +1219,7 @@ describe('UserButton', () => {
     });
   });
 
-  describe('while an action is in flight', () => {
+  describe('while an action is in flight, beside the busy row', () => {
     it.each(['Other', 'Personal account', 'Sign out'])(
       'holds "%s" in place, aria-disabled and still focusable',
       async label => {
