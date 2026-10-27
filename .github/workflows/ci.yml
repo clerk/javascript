@@ -379,9 +379,9 @@ jobs:
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
-      - name: Run verify-attach script tests
+      - name: Run verify script tests
         if: matrix.node-version == '24.15.0'
-        run: pnpm vitest run --root scripts verify-attach
+        run: pnpm vitest run --root scripts verify-attach verify-flaky
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4.6.2
@@ -427,6 +427,9 @@ jobs:
 
       - name: Run feature tests
         run: pnpm --filter @clerk/mosaic test:feature
+
+      - name: Run browser tests
+        run: pnpm --filter @clerk/mosaic test:browser
 
       - name: Upload failure artifacts
         if: ${{ cancelled() || failure() }}

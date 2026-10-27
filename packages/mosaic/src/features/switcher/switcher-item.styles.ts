@@ -19,7 +19,9 @@ export const styles = stylex.create({
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    position: 'relative',
     textAlign: 'start',
+    zIndex: { default: null, ':focus-visible': 1 },
     height: space['8'],
     width: '100%',
   },
@@ -36,8 +38,10 @@ export const styles = stylex.create({
         ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-foreground'],
       },
     },
+    borderStyle: 'none',
+    appearance: 'none',
     backgroundColor: {
-      default: null,
+      default: 'transparent',
       ':active:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-200'],
       '@media (hover: hover)': {
         ':hover:not(:disabled, [aria-disabled="true"])': colorVars['--cl-color-neutral-alpha-100'],

@@ -1034,10 +1034,6 @@ describe('createActor — inline transition functions (TransitionFn)', () => {
 });
 
 describe('createActor — unknown states', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('warns when a transition targets a state the machine does not define', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const actor = createActor(createMachine({ initial: 'a', states: { a: { on: { GO: 'ghost' } } } }));

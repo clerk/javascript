@@ -48,6 +48,7 @@ interface Linked {
   readonly babel?: string;
   readonly config?: string;
   readonly clerkIos?: string;
+  readonly secureStore?: string;
   readonly generated?: boolean;
 }
 
@@ -56,6 +57,7 @@ const expoSources = ({
   babel = '7.29.7',
   config = 'portrait',
   clerkIos = 'aa',
+  secureStore = '57.0.3',
   generated = false,
 }: Linked = {}) => {
   const core = `node_modules/.pnpm/expo-modules-core@${modulesCore}_@babel+core@${babel}_react@19.2.8/node_modules/expo-modules-core`;
@@ -64,6 +66,14 @@ const expoSources = ({
     sources: [
       { type: 'dir', filePath: '../../../packages/expo-native-components/ios', reasons: ['expoAutolinkingIos'], hash: clerkIos },
       { type: 'dir', filePath: core, reasons: ['expoAutolinkingIos'], hash: null },
+      {
+        type: 'package',
+        name: 'expo-secure-store',
+        version: secureStore,
+        filePath: `node_modules/.pnpm/expo-secure-store@${secureStore}_@babel+core@${babel}/node_modules/expo-secure-store/package.json`,
+        reasons: ['expoAutolinkingIos'],
+        hash: `${secureStore} ${babel}`,
+      },
       {
         type: 'contents',
         id: 'expoAutolinkingConfig:ios',
@@ -193,6 +203,8 @@ describe('the native build that is kept between builds', () => {
     lock({});
     at.expo = expoSources({ modulesCore: '57.0.20' });
     await moves('another version of a linked native package');
+    at.expo = expoSources({ secureStore: '57.0.4' });
+    await moves('another version of a native package that Expo names by its version');
     at.expo = expoSources({ config: 'landscape' });
     await moves('another app config');
     at.expo = expoSources({ clerkIos: 'bb' });

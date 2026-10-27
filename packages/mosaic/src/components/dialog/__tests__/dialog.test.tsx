@@ -310,7 +310,6 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="profile"'));
-    warn.mockRestore();
   });
 
   it('warns when a fullscreen profile opens inside another dialog', async () => {
@@ -321,7 +320,6 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
-    warn.mockRestore();
   });
 
   // A card over a profile is the delete-account confirmation: a `Card` inside a `card` dialog.
@@ -333,7 +331,6 @@ describe('nested Mosaic Dialogs', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });
 
@@ -463,7 +460,6 @@ describe('Dialog.CloseButton', () => {
     );
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('alert dialog'));
-    warn.mockRestore();
   });
 });
 
@@ -665,7 +661,6 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
-    warn.mockRestore();
   });
 
   it('warns when a fullscreen profile is given a placement', () => {
@@ -673,7 +668,6 @@ describe('compactPlacement', () => {
     renderPlacement('sheet', 'fullscreen');
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="fullscreen"'));
-    warn.mockRestore();
   });
 
   it('keeps a profile centered by default without warning', () => {
@@ -682,7 +676,6 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
-    warn.mockRestore();
   });
 });
 
@@ -764,7 +757,6 @@ describe('accessible name warning', () => {
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining(`<${titlePart}>`));
-    warn.mockRestore();
   });
 
   it('does not warn when the card inside it supplies the name', async () => {
@@ -780,7 +772,6 @@ describe('accessible name warning', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   // The name can come from the consumer instead of from a Title, and an `aria-label` on the popup
@@ -796,6 +787,5 @@ describe('accessible name warning', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });

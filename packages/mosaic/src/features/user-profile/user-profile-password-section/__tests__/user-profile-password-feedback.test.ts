@@ -205,14 +205,13 @@ describe('password error feedback', () => {
   });
 
   it('returns the generic form error for unexpected failures, never their message', () => {
-    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(
       passwordFormError(new Error('Connection interrupted'), true, settings, messages, localization.locale, resolver()),
     ).toMatchObject({ banner: 'Something went wrong. Please try again.' });
     expect(passwordFormError(undefined, true, settings, messages, localization.locale, resolver())).toBeInstanceOf(
       FormSubmitError,
     );
-    log.mockRestore();
   });
 });
 

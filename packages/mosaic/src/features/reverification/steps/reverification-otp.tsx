@@ -1,5 +1,5 @@
 import { useMergeRefs } from '@floating-ui/react';
-import type { FormEvent, Ref } from 'react';
+import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
@@ -7,6 +7,7 @@ import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
+import { Form } from '../../../primitives/form';
 
 export interface ReverificationOtpMessages {
   title: string;
@@ -18,7 +19,8 @@ export interface ReverificationOtpMessages {
 }
 
 export interface ReverificationOtpResend {
-  label: string;
+  text: string;
+  label: ReactNode;
   disabled?: boolean;
   onClick: () => void;
 }
@@ -52,9 +54,11 @@ export function ReverificationOTP({
 }: ReverificationOTPProps) {
   const formId = useId();
 
+  const canSubmit = value.length === length;
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isPending) {
+    if (canSubmit && !isPending) {
       onSubmit();
     }
   };
@@ -66,7 +70,7 @@ export function ReverificationOTP({
         <Card.Description>{messages.description}</Card.Description>
       </Card.Header>
       <Card.Content>
-        <form
+        <Form
           id={formId}
           onSubmit={handleSubmit}
         >
@@ -93,18 +97,21 @@ export function ReverificationOTP({
               <Field.Error>{errorMessage}</Field.Error>
             </Field.Message>
             {resend ? (
-              <Button
-                type='button'
-                size='sm'
-                variant='link'
-                disabled={resend.disabled || isPending}
-                onClick={resend.onClick}
-              >
-                {resend.label}
-              </Button>
+              <Field.Description>
+                {resend.text}{' '}
+                <Button
+                  type='button'
+                  size='sm'
+                  variant='link'
+                  disabled={resend.disabled || isPending}
+                  onClick={resend.onClick}
+                >
+                  {resend.label}
+                </Button>
+              </Field.Description>
             ) : null}
           </Field.Root>
-        </form>
+        </Form>
       </Card.Content>
       <Card.Footer>
         {onCancel ? (
@@ -122,6 +129,7 @@ export function ReverificationOTP({
         <SubmitButton
           form={formId}
           fullWidth
+          disabled={!canSubmit}
           isPending={isPending}
           pendingLabel={messages.pendingLabel}
         >

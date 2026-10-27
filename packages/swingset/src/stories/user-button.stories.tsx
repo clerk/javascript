@@ -1,6 +1,7 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
+import { BadgedAvatar } from '@clerk/mosaic/features/switcher/switcher-avatar.view';
 import type {
   UserProfileModalContentProps,
   UserProfileModalOptions,
@@ -140,6 +141,82 @@ export function CustomTriggerBadge(_args: Record<string, unknown>) {
       triggerVariant='full'
       renderTriggerBadge={() => Promise.resolve({ id: 'enterprise', label: 'Enterprise plan' })}
     />
+  );
+}
+
+const avatarControls = [
+  { key: 'size', label: 'Avatar size', min: 24, max: 96, initial: 42 },
+  { key: 'badgeSize', label: '--cl-avatar-badge-size', min: 8, max: 40, initial: 16 },
+  { key: 'badgeGap', label: '--cl-avatar-badge-gap', min: 0, max: 8, initial: 1 },
+  { key: 'badgeOffset', label: '--cl-avatar-badge-offset', min: -8, max: 16, initial: 4 },
+] as const;
+
+type AvatarControl = (typeof avatarControls)[number]['key'];
+
+export function CustomizedAvatar(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true });
+  const [values, setValues] = useState<Partial<Record<AvatarControl, number>>>({});
+  const { activeOrganization, activeSession } = prototype;
+
+  const declarations = [
+    values.size === undefined ? '' : `width: ${values.size}px !important; height: ${values.size}px !important;`,
+    values.badgeSize === undefined ? '' : `--cl-avatar-badge-size: ${values.badgeSize}px;`,
+    values.badgeGap === undefined ? '' : `--cl-avatar-badge-gap: ${values.badgeGap}px;`,
+    values.badgeOffset === undefined ? '' : `--cl-avatar-badge-offset: ${values.badgeOffset}px;`,
+  ].join(' ');
+
+  return (
+    <div className='flex w-full flex-col gap-6'>
+      <style>{`@scope { .cl-user-button-avatar { ${declarations} } }`}</style>
+      <div className='flex h-28 flex-wrap items-center gap-8'>
+        <SwitcherView
+          {...prototype}
+          mode='combined'
+          triggerVariant='full'
+        />
+        {activeOrganization ? (
+          <BadgedAvatar
+            name={activeOrganization.name}
+            imageUrl={activeOrganization.imageUrl}
+            badge={activeSession}
+            size='md'
+          />
+        ) : null}
+      </div>
+      <div className='grid gap-3 text-sm sm:grid-cols-2'>
+        {avatarControls.map(control => (
+          <div
+            key={control.key}
+            className='flex flex-col gap-1'
+          >
+            <span className='flex justify-between gap-2'>
+              <label htmlFor={`customized-avatar-${control.key}`}>
+                <code dir='ltr'>{control.label}</code>
+              </label>
+              <span className='text-muted-foreground'>
+                {values[control.key] === undefined ? 'default' : `${values[control.key]}px`}
+              </span>
+            </span>
+            <input
+              id={`customized-avatar-${control.key}`}
+              type='range'
+              min={control.min}
+              max={control.max}
+              value={values[control.key] ?? control.initial}
+              onChange={event => setValues({ ...values, [control.key]: Number(event.target.value) })}
+            />
+          </div>
+        ))}
+      </div>
+      <div>
+        <Button
+          variant='outline'
+          onClick={() => setValues({})}
+        >
+          Reset
+        </Button>
+      </div>
+    </div>
   );
 }
 

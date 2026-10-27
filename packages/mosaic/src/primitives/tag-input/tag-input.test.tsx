@@ -4,6 +4,7 @@ import { createRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { DirectionProvider } from '../direction-provider';
 import { axe } from '../test-utils/axe';
 import { TagInput } from './index';
 
@@ -324,9 +325,9 @@ describe('TagInput', () => {
     it('follows reading order in RTL', async () => {
       const user = userEvent.setup();
       render(
-        <div dir='rtl'>
+        <DirectionProvider direction='rtl'>
           <Harness defaultValue={['a', 'b']} />
-        </div>,
+        </DirectionProvider>,
       );
 
       await user.click(input());

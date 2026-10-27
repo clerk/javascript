@@ -449,6 +449,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
   const onCancel = cancelModel;
   const needsStart = active !== null && snapshot.value === 'inactive';
   const needsReset = model.status === 'inactive' && snapshot.value !== 'inactive';
+  /* eslint-disable react-you-might-not-need-an-effect/no-event-handler -- Syncs the machine with the model status, which changes outside this component. */
   useEffect(() => {
     if (needsStart) {
       send({ type: 'START' });
@@ -456,6 +457,7 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
       send({ type: 'RESET' });
     }
   }, [needsStart, needsReset, send]);
+  /* eslint-enable react-you-might-not-need-an-effect/no-event-handler */
 
   const inactive = model.status === 'inactive';
 

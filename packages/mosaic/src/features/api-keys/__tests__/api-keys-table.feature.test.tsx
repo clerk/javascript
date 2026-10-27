@@ -2,7 +2,7 @@ import type { ApiKeyJSON } from '@clerk/shared/types';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { openDialog } from '../../../__tests__/feature/dialog';
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
@@ -359,6 +359,8 @@ describe('APIKeysTable', () => {
       await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
       await waitFor(() => expect(table()).toHaveAttribute('aria-busy', 'true'));
       expect(within(table()).getByText('Key 1')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Previous API keys page' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeDisabled();
       next.release();
       expect(await within(await loadedTable()).findByText('Key 11')).toBeVisible();
       expect(within(table()).queryByText('Key 1')).toBeNull();
@@ -466,13 +468,12 @@ describe('APIKeysTable', () => {
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
       await within(dialog).findByRole('textbox', { name: 'API key' });
       let rejectCopy: (error: Error) => void = () => undefined;
-      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(
+      vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(
         () =>
           new Promise<void>((_, reject) => {
             rejectCopy = reject;
           }),
       );
-      onTestFinished(() => writeText.mockRestore());
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       await user.keyboard('{Escape}');
@@ -489,8 +490,7 @@ describe('APIKeysTable', () => {
       await fillCreate(user, dialog, 'Deploy', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
       await within(dialog).findByRole('textbox', { name: 'API key' });
-      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
-      onTestFinished(() => writeText.mockRestore());
+      vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy'));
@@ -505,8 +505,7 @@ describe('APIKeysTable', () => {
       await fillCreate(user, dialog, 'Deploy', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
       await within(dialog).findByRole('textbox', { name: 'API key' });
-      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
-      onTestFinished(() => writeText.mockRestore());
+      vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('blocked'));
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       await waitFor(() =>
@@ -614,7 +613,6 @@ describe('APIKeysTable', () => {
 
     it('explains a created key that came back without its secret and lists it', async () => {
       const consoleError = vi.spyOn(console, 'error');
-      onTestFinished(() => consoleError.mockRestore());
       const { fapi, user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');

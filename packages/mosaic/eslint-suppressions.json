@@ -30,7 +30,7 @@
     }
   },
   "src/features/user-profile/user-profile-web3-wallets-section/user-profile-solana-wallet.model.ts": {
-    "@typescript-eslint/no-restricted-imports": {
+    "boundaries/dependencies": {
       "count": 1
     }
   },
@@ -116,7 +116,7 @@
   },
   "src/primitives/utils/use-render.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
-      "count": 8
+      "count": 6
     },
     "sonarjs/cognitive-complexity": {
       "count": 1

@@ -58,12 +58,11 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddEmailDialogProps, 
 }
 
 describe('UserProfileAddEmailDialog', () => {
-  it.each(['', 'invalid-address'])('uses native email validation for %j', async emailAddress => {
+  it('submits a malformed address instead of stopping on native validation', async () => {
     const user = userEvent.setup();
-    const { props } = renderView({ emailAddress });
+    const { props } = renderView({ emailAddress: 'invalid-address' });
     await user.click(screen.getByRole('button', { name: 'Continue' }));
-    expect(props.onSubmit).not.toHaveBeenCalled();
-    expect(screen.getByRole('textbox', { name: 'Email' })).toBeInvalid();
+    expect(props.onSubmit).toHaveBeenCalledOnce();
   });
 
   it.each(['typing', 'pasting'] as const)('automatically submits a complete code after %s', async method => {
@@ -147,7 +146,7 @@ describe('UserProfileAddEmailDialog', () => {
     const verify = screen.getByRole('button', { name: 'Verify', exact: true });
     expect(verify).toHaveAttribute('aria-busy', 'true');
     await user.click(verify);
-    await user.click(screen.getByRole('button', { name: 'Didn’t receive a code? Resend' }));
+    await user.click(screen.getByRole('button', { name: 'Resend' }));
 
     expect(props.onSubmit).not.toHaveBeenCalled();
     expect(props.onResend).not.toHaveBeenCalled();
@@ -159,13 +158,15 @@ describe('UserProfileAddEmailDialog', () => {
     const field = screen.getByRole('textbox', { name: step === 'email' ? 'Email' : 'Verification code' });
     expect(field).toHaveAttribute('aria-invalid', 'true');
     const describedControl = step === 'verify' ? screen.getByRole('group', { name: 'Verification code' }) : field;
-    expect(describedControl).toHaveAccessibleDescription('Please try again.');
+    expect(describedControl).toHaveAccessibleDescription(
+      step === 'verify' ? 'Please try again. Didn’t receive a code? Resend' : 'Please try again.',
+    );
   });
 
   it('allows resending only after the countdown and the current request finish', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ step: 'verify', resendSeconds: 12 });
-    await user.click(screen.getByRole('button', { name: 'Didn’t receive a code? Resend (12)' }));
+    await user.click(screen.getByRole('button', { name: 'Resend (12)' }));
     expect(props.onResend).not.toHaveBeenCalled();
 
     rerender(
@@ -176,7 +177,7 @@ describe('UserProfileAddEmailDialog', () => {
         />
       </MosaicProvider>,
     );
-    await user.click(screen.getByRole('button', { name: 'Didn’t receive a code? Resend' }));
+    await user.click(screen.getByRole('button', { name: 'Resend' }));
     expect(props.onResend).toHaveBeenCalledOnce();
 
     rerender(
@@ -240,5 +241,10 @@ describe('UserProfileAddEmailDialog', () => {
   it('disables Continue when the email cannot be submitted', () => {
     renderView({ canSubmitEmail: false });
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+  });
+
+  it('disables Verify when the code cannot be submitted', () => {
+    renderView({ step: 'verify', canSubmitCode: false });
+    expect(screen.getByRole('button', { name: 'Verify', exact: true })).toBeDisabled();
   });
 });

@@ -80,6 +80,7 @@ export function projectWeb3Wallets({
           allowCreation &&
           wallet.verification.strategy !== null &&
           enabledStrategies.includes(wallet.verification.strategy),
+        iconId: provider?.provider,
         iconUrl: provider ? iconImageUrl(provider.provider) : undefined,
         monochromeIcon: provider ? isMonochromeProvider(provider.provider) : false,
         isPrimary: wallet.id === primaryId,
@@ -93,6 +94,7 @@ export function projectWeb3Wallets({
             id: provider.strategy,
             walletPicker: provider.provider === 'solana' ? 'solana' : undefined,
             provider: provider.name,
+            iconId: provider.provider,
             iconUrl: iconImageUrl(provider.provider),
             monochromeIcon: isMonochromeProvider(provider.provider),
           }))

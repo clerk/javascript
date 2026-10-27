@@ -83,7 +83,6 @@ describe('role="alertdialog"', () => {
 
     expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-variant', 'card');
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   // A corner X answers the question by leaving, which is the one thing an alert must not offer.
@@ -276,7 +275,6 @@ describe('dev warnings', () => {
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no description'));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Card.Description>'));
-    warn.mockRestore();
   });
 
   it('does not ask a plain dialog for a description', async () => {
@@ -296,7 +294,6 @@ describe('dev warnings', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 
   // The name warning skipped any role but `dialog` before alert dialogs existed, which would have
@@ -322,7 +319,6 @@ describe('dev warnings', () => {
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('<Card.Title>'));
-    warn.mockRestore();
   });
 
   it('stays quiet when both are supplied', async () => {
@@ -332,7 +328,6 @@ describe('dev warnings', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });
 
@@ -371,7 +366,6 @@ describe('stacked on another dialog', () => {
     expect(popups[0]).toHaveAttribute('data-stack-base', '');
     expect(popups[1]).toHaveAttribute('data-stacked', '');
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });
 
@@ -454,6 +448,5 @@ describe('showCloseButton', () => {
     await settle();
 
     expect(warn).not.toHaveBeenCalled();
-    warn.mockRestore();
   });
 });

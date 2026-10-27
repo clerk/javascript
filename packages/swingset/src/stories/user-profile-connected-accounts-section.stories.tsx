@@ -7,8 +7,7 @@ import { connectedAccount, useConnectedAccountsFixture } from './fixtures/user-p
 export { default as __source } from './user-profile-connected-accounts-section.stories?raw';
 export const meta: StoryMeta = {
   group: 'User Profile',
-  status: 'wip',
-  substatus: 'needs reverification',
+  status: 'stable',
   title: 'UserProfileConnectedAccountsSection',
   label: 'Connected accounts',
   navigation: { category: 'Sections' },
@@ -46,7 +45,9 @@ export function ConnectionError() {
       {
         id: 'apple',
         provider: 'Apple',
+        iconId: 'apple',
         iconUrl: 'https://img.clerk.com/static/apple.svg',
+        monochromeIcon: true,
         connectError: 'Unable to connect. Please try again.',
       },
     ],

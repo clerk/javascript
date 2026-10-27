@@ -10,7 +10,6 @@ import { Icon } from '../../../components/icon';
 import { Pagination } from '../../../components/pagination';
 import { Table } from '../../../components/table';
 import { VisuallyHidden } from '../../../components/visually-hidden';
-import { useServerDataTable } from '../../../hooks/use-server-data-table';
 import { Envelope } from '../../../icons/glyphs/envelope';
 import { ExclamationCircle } from '../../../icons/glyphs/exclamation-circle';
 import { Plus } from '../../../icons/glyphs/plus';
@@ -40,18 +39,7 @@ export function InvitationsTableTabView({
   onRetry,
 }: InvitationsTableTabViewProps) {
   const m = useMessages('invitationsTableTab');
-  const { table, pagination } = useServerDataTable({
-    data: invitations,
-    totalCount,
-    getRowId,
-    sortableColumns: [],
-    page,
-    pageSize,
-    onPageChange,
-    searchValue: '',
-    onSearchChange: () => {},
-  });
-  const columnCount = 3 + Number(Boolean(revoke)) + Number(Boolean(onBulkAction));
+  const showPagination = Math.ceil(totalCount / pageSize) > 1;
   return (
     <>
       <div
@@ -80,37 +68,24 @@ export function InvitationsTableTabView({
           minWidth='35rem'
           aria-label={m.title}
           aria-busy={isFetching}
+          selectionMode={onBulkAction ? 'multiple' : 'none'}
         >
-          <Table.ColumnGroup>
-            {onBulkAction ? <Table.Column /> : null}
-            <Table.Column />
-            <Table.Column width='9rem' />
-            <Table.Column width='8rem' />
-            {revoke ? <Table.Column width='4rem' /> : null}
-          </Table.ColumnGroup>
           <Table.Header>
-            <Table.Row>
-              {onBulkAction ? (
-                <Table.SelectAllCell
-                  aria-label={m.selectAll}
-                  checked={table.getIsAllRowsSelected()}
-                  indeterminate={table.getIsSomeRowsSelected()}
-                  onChange={table.toggleAllRowsSelected}
-                />
-              ) : null}
-              <Table.HeaderCell>{m.email}</Table.HeaderCell>
-              <Table.HeaderCell>{m.invitedAt}</Table.HeaderCell>
-              <Table.HeaderCell>{m.roleLabel}</Table.HeaderCell>
-              {revoke ? (
-                <Table.HeaderCell align='end'>
-                  <VisuallyHidden>{m.actions}</VisuallyHidden>
-                </Table.HeaderCell>
-              ) : null}
-            </Table.Row>
+            {onBulkAction ? <Table.SelectionColumn aria-label={m.selectAll} /> : null}
+            <Table.Column>{m.email}</Table.Column>
+            <Table.Column width='9rem'>{m.invitedAt}</Table.Column>
+            <Table.Column width='8rem'>{m.roleLabel}</Table.Column>
+            {revoke ? (
+              <Table.Column
+                align='end'
+                width='4rem'
+              >
+                <VisuallyHidden>{m.actions}</VisuallyHidden>
+              </Table.Column>
+            ) : null}
           </Table.Header>
           <InvitationsTableBody
-            rows={table.rows}
-            columnCount={columnCount}
+            invitations={isError ? [] : invitations}
             isError={isError}
             onRetry={onRetry}
             hasBulkAction={Boolean(onBulkAction)}
@@ -118,9 +93,13 @@ export function InvitationsTableTabView({
             registerTrigger={registerTrigger}
           />
         </Table.Root>
-        {pagination ? (
+        {showPagination ? (
           <Pagination
-            {...pagination}
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalCount}
+            disabled={isFetching}
+            onChange={onPageChange}
             label={m.pagination}
             pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
@@ -143,21 +122,14 @@ export function InvitationsTableTabView({
 }
 
 function InvitationsTableBody({
-  rows,
-  columnCount,
+  invitations,
   isError,
   onRetry,
   hasBulkAction,
   onRevokeClick,
   registerTrigger,
 }: {
-  rows: Array<{
-    id: string;
-    original: OrganizationProfileInvitation;
-    getIsSelected: () => boolean;
-    toggleSelected: () => void;
-  }>;
-  columnCount: number;
+  invitations: OrganizationProfileInvitation[];
   isError: boolean;
   onRetry?: () => void;
   hasBulkAction: boolean;
@@ -165,10 +137,12 @@ function InvitationsTableBody({
   registerTrigger: (id: string) => Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('invitationsTableTab');
-  if (isError) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
+  return (
+    <Table.Body
+      items={invitations}
+      itemToStringValue={getRowId}
+      renderEmptyState={() =>
+        isError ? (
           <EmptyState.Root role='alert'>
             <EmptyState.Icon glyph={ExclamationCircle} />
             <EmptyState.Label>{m.loadError}</EmptyState.Label>
@@ -178,63 +152,44 @@ function InvitationsTableBody({
               </EmptyState.Actions>
             ) : null}
           </EmptyState.Root>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  if (rows.length === 0) {
-    return (
-      <Table.Body>
-        <Table.Empty colSpan={columnCount}>
+        ) : (
           <EmptyState.Root role='status'>
             <EmptyState.Icon glyph={Envelope} />
             <EmptyState.Label>{m.noInvitations}</EmptyState.Label>
             <EmptyState.Description>{m.noInvitationsDescription}</EmptyState.Description>
           </EmptyState.Root>
-        </Table.Empty>
-      </Table.Body>
-    );
-  }
-  return (
-    <Table.Body>
-      {rows.map(row => (
-        <Table.Row
-          key={row.id}
-          selected={hasBulkAction && row.getIsSelected()}
-        >
-          {hasBulkAction ? (
-            <Table.SelectCell
-              aria-label={fill(m.select, { name: row.original.email })}
-              checked={row.getIsSelected()}
-              onToggleSelected={row.toggleSelected}
-            />
-          ) : null}
+        )
+      }
+    >
+      {invitation => (
+        <Table.Row>
+          {hasBulkAction ? <Table.SelectionCell aria-label={fill(m.select, { name: invitation.email })} /> : null}
           <Table.Cell>
             <Entity.Root>
               <Entity.Content>
-                <Entity.Label>{row.original.email}</Entity.Label>
+                <Entity.Label>{invitation.email}</Entity.Label>
               </Entity.Content>
             </Entity.Root>
           </Table.Cell>
-          <Table.Cell noWrap>{row.original.invitedAtLabel}</Table.Cell>
-          <Table.Cell>{row.original.roleLabel}</Table.Cell>
+          <Table.Cell noWrap>{invitation.invitedAtLabel}</Table.Cell>
+          <Table.Cell>{invitation.roleLabel}</Table.Cell>
           {onRevokeClick ? (
             <Table.Cell align='end'>
               <ActionMenu
-                label={fill(m.manage, { name: row.original.email })}
-                triggerRef={registerTrigger(row.original.id)}
+                label={fill(m.manage, { name: invitation.email })}
+                triggerRef={registerTrigger(invitation.id)}
                 actions={[
                   {
                     label: m.revoke,
                     color: 'negative',
-                    onClick: () => onRevokeClick(row.original),
+                    onClick: () => onRevokeClick(invitation),
                   },
                 ]}
               />
             </Table.Cell>
           ) : null}
         </Table.Row>
-      ))}
+      )}
     </Table.Body>
   );
 }

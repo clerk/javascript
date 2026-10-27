@@ -1,6 +1,6 @@
 {
   "name": "@clerk/mosaic",
-  "version": "0.1.11",
+  "version": "0.1.15",
   "description": "Clerk Mosaic UI components",
   "keywords": [
     "clerk",
@@ -58,6 +58,7 @@
     "lint:attw": "attw --pack . --exclude-entrypoints styles.css --profile esm-only",
     "lint:publint": "publint",
     "test": "vitest run --project primitives --project mosaic",
+    "test:browser": "vitest run --project browser",
     "test:ci": "vitest run --project primitives --project mosaic --maxWorkers=70%",
     "test:feature": "vitest run --project feature",
     "test:webkit": "vitest run --project webkit",
@@ -80,8 +81,11 @@
     "@testing-library/user-event": "^14.6.5",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
+    "@vitest/eslint-plugin": "1.6.28",
     "axe-core": "^4.11.3",
     "bundlewatch": "^0.4.2",
+    "eslint-plugin-boundaries": "7.3.0",
+    "eslint-plugin-react-you-might-not-need-an-effect": "1.0.2",
     "happy-dom": "^20.8.9",
     "msw": "2.15.0",
     "playwright": "1.62.1",

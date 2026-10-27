@@ -5,15 +5,13 @@ import { Card } from '../../../components/card';
 import { Field } from '../../../components/field';
 import { useFlowAutoFocus } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
-import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
+import { Form } from '../../../primitives/form';
 import { styles } from './user-profile-add-authenticator.styles';
 import { UserProfileAuthenticatorSetupView } from './user-profile-authenticator-setup.view';
 
 export interface UserProfileAddAuthenticatorViewProps {
-  setup?: { secret: string; uri: string };
-  setupErrorMessage?: string;
-  onRetry: () => void;
+  setup: { secret: string; uri: string };
   onBack: () => void;
   code: string;
   onCodeChange: (value: string) => void;
@@ -25,8 +23,6 @@ export interface UserProfileAddAuthenticatorViewProps {
 export function UserProfileAddAuthenticatorView({
   onBack,
   setup,
-  setupErrorMessage,
-  onRetry,
   code,
   onCodeChange,
   onSubmit,
@@ -34,76 +30,49 @@ export function UserProfileAddAuthenticatorView({
   errorMessage,
 }: UserProfileAddAuthenticatorViewProps) {
   const m = useMessages('userProfileAddAuthenticator');
-  const setupMessages = useMessages('userProfileAuthenticatorSetup');
   const formId = useId();
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const inputRef = useFlowAutoFocus<HTMLInputElement>();
   const submitCode = (value: string) => {
-    if (setup && !isPending && value.length === 6) {
+    if (!isPending && value.length === 6) {
       onSubmit(value);
     }
   };
 
   return (
     <>
-      {setup ? (
-        <UserProfileAuthenticatorSetupView {...setup} />
-      ) : (
-        <>
-          <Card.Header>
-            <Card.Title>{setupMessages.title}</Card.Title>
-          </Card.Header>
-          <Card.Banner
-            role='alert'
-            color='negative'
-          >
-            {setupErrorMessage}
-          </Card.Banner>
-          {setupErrorMessage ? null : (
-            <Card.Content>
-              <Text
-                role='status'
-                aria-label={m.preparing}
-              >
-                {m.preparing}
-              </Text>
-            </Card.Content>
-          )}
-        </>
-      )}
-      {setup ? (
-        <Card.Content
-          xstyle={styles.verification}
-          render={
-            <form
-              id={formId}
-              onSubmit={event => {
-                event.preventDefault();
-                submitCode(code);
-              }}
-            />
-          }
+      <UserProfileAuthenticatorSetupView {...setup} />
+      <Card.Content
+        xstyle={styles.verification}
+        render={
+          <Form
+            id={formId}
+            onSubmit={event => {
+              event.preventDefault();
+              submitCode(code);
+            }}
+          />
+        }
+      >
+        <Field.Root
+          required
+          disabled={isPending}
+          invalid={Boolean(errorMessage)}
+          xstyle={styles.field}
         >
-          <Field.Root
-            required
-            disabled={isPending}
-            invalid={Boolean(errorMessage)}
-            xstyle={styles.field}
-          >
-            <Field.Label xstyle={styles.label}>{m.codeLabel}</Field.Label>
-            <Otp
-              ref={inputRef}
-              name='code'
-              value={code}
-              onValueChange={onCodeChange}
-              onComplete={submitCode}
-            />
-            <Field.Message>
-              <Field.Error>{errorMessage}</Field.Error>
-            </Field.Message>
-          </Field.Root>
-        </Card.Content>
-      ) : null}
+          <Field.Label xstyle={styles.label}>{m.codeLabel}</Field.Label>
+          <Otp
+            ref={inputRef}
+            name='code'
+            value={code}
+            onValueChange={onCodeChange}
+            onComplete={submitCode}
+          />
+          <Field.Message>
+            <Field.Error>{errorMessage}</Field.Error>
+          </Field.Message>
+        </Field.Root>
+      </Card.Content>
       <Card.Footer>
         <Button
           type='button'
@@ -117,16 +86,15 @@ export function UserProfileAddAuthenticatorView({
         </Button>
         <SubmitButton
           ref={actionRef}
-          type={setup ? 'submit' : 'button'}
-          form={setup ? formId : undefined}
+          type='submit'
+          form={formId}
           fullWidth
-          isPending={setup ? isPending : !setupErrorMessage}
-          disabled={Boolean(setup) && code.length !== 6}
+          isPending={isPending}
+          disabled={code.length !== 6}
           focusableWhenDisabled
-          pendingLabel={setup ? m.pending : m.preparing}
-          onClick={setup ? undefined : onRetry}
+          pendingLabel={m.pending}
         >
-          {setup ? m.verify : setupErrorMessage ? m.retry : m.preparing}
+          {m.verify}
         </SubmitButton>
       </Card.Footer>
     </>

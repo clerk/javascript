@@ -275,3 +275,34 @@ than an error, so one order can cover every mode.
 | `.cl-user-button-item-label`         | `data-variant="default \| interactive"` |
 | `.cl-user-button-item-description`   |                                         |
 | `.cl-user-button-item-trailing`      |                                         |
+
+### Avatar
+
+`.cl-user-button-avatar` holds the account's badge on the organization's avatar. The cutout behind
+the badge follows its size, so resizing either keeps the gap even. Set `width` and `height` on
+`.cl-user-button-avatar` to resize it, and these variables on it to place the badge:
+
+| Variable                   | Default                       | Description                                                     |
+| -------------------------- | ----------------------------- | --------------------------------------------------------------- |
+| `--cl-avatar-badge-size`   | `14px` trigger, `16px` header | The badge's width and height.                                   |
+| `--cl-avatar-badge-gap`    | `1px`                         | The space cut out around the badge.                             |
+| `--cl-avatar-badge-offset` | `2px` trigger, `4px` header   | How far the badge sits past the corner of the avatar it badges. |
+
+```css
+.cl-user-button-avatar {
+  width: 48px;
+  height: 48px;
+  --cl-avatar-badge-size: 20px;
+  --cl-avatar-badge-gap: 2px;
+}
+```
+
+The trigger's avatar and the header's both read the sliders. A slider left at **default** sets
+nothing. Swingset injects its styles at a specificity a plain rule cannot beat, so this example marks
+the size `!important`; an app importing the layered stylesheet does not need to. Turn on **RTL** to
+see the badge move to the other corner.
+
+<Story
+  name='CustomizedAvatar'
+  storyModule={UserButtonStories}
+/>

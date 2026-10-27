@@ -18,7 +18,7 @@ export { default as __source } from './combobox.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Combobox',
   source: 'packages/mosaic/src/components/combobox/combobox.tsx',
 };

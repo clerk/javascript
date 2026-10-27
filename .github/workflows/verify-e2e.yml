@@ -1,19 +1,9 @@
-name: Verify end-to-end tests
+name: Expo E2E
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
-    paths:
-      - 'integration/expo-native/**'
-      - '!integration/expo-native/**/*.md'
-      - '.github/workflows/verify-e2e.yml'
-      - 'integration/templates/expo-native/**'
-      - 'packages/expo/**'
-      - 'packages/expo-biometrics/**'
-      - 'packages/expo-google-signin/**'
-      - 'packages/expo-native-components/**'
   workflow_dispatch:
 
 permissions:
@@ -24,42 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  plan:
-    if: ${{ github.head_ref != 'changeset-release/main' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      run: ${{ steps.plan.outputs.run }}
-    steps:
-      - name: Decide whether the end-to-end tests can run
-        id: plan
-        env:
-          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
-          HAS_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY != '' }}
-          DRAFT: ${{ github.event.pull_request.draft == true }}
-        run: |
-          set -euo pipefail
-
-          skip_reason=""
-          if [ "$DRAFT" = "true" ]; then
-            skip_reason="The end-to-end tests did not run. This pull request is a draft. They run when it is marked ready for review."
-          elif [ "$HEAD_REPOSITORY" != "$GITHUB_REPOSITORY" ]; then
-            skip_reason="The end-to-end tests did not run. They need a repository secret, and this pull request comes from a fork ($HEAD_REPOSITORY)."
-          elif [ "$HAS_PLATFORM_API_KEY" != "true" ]; then
-            skip_reason="The end-to-end tests did not run. The MOBILE_VERIFICATION_PLATFORM_API_KEY secret is not set for this repository."
-          fi
-
-          if [ -n "$skip_reason" ]; then
-            echo "::notice title=End-to-end tests skipped::$skip_reason"
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          fi
-
   e2e-tests:
-    name: Verify E2E (${{ matrix.platform }})
-    needs: plan
-    if: needs.plan.outputs.run == 'true'
+    name: Device tests (${{ matrix.platform }})
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.head_ref == 'changeset-release/main' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 75
     permissions:
@@ -71,9 +28,9 @@ jobs:
       matrix:
         include:
           - platform: ios
-            runner: ${{ vars.VERIFY_CI_RUNNER_IOS || 'macos-26' }}
+            runner: ${{ vars.VERIFY_CI_RUNNER_IOS || 'blacksmith-6vcpu-macos-26' }}
           - platform: android
-            runner: ${{ vars.VERIFY_CI_RUNNER_ANDROID || 'ubuntu-24.04' }}
+            runner: ${{ vars.VERIFY_CI_RUNNER_ANDROID || 'blacksmith-8vcpu-ubuntu-2204' }}
     env:
       PACKAGE: integration/expo-native
       CLI: integration/expo-native/bin/control-clerk-expo
@@ -92,7 +49,7 @@ jobs:
       - uses: actions/setup-node@v4.4.0
         with:
           node-version: 24.15.0
-          cache: ${{ matrix.platform == 'android' && 'pnpm' || '' }}
+          cache: pnpm
 
       - name: Set up JDK 21
         if: matrix.platform == 'android'
@@ -166,10 +123,25 @@ jobs:
       - name: Wait for the device image
         wait: device-image
 
+      - name: Install simslim
+        if: matrix.platform == 'ios'
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/simslim.tar.gz"
+          curl --fail --silent --show-error --location --retry 3 --output "$archive" \
+            https://github.com/MobAI-App/simslim/releases/download/v0.12.2/simslim-v0.12.2-macos-arm64.tar.gz
+          echo "b47302da6fb83b8b4c21f4fdd61507469770c07b0ff07fd1f48207bda4270887  $archive" | shasum -a 256 -c -
+          mkdir -p "$RUNNER_TEMP/bin"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/bin" simslim
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
       - name: Build the fixture and boot a device
         timeout-minutes: 30
         env:
           CLERK_PLATFORM_API_KEY: ${{ secrets.MOBILE_VERIFICATION_PLATFORM_API_KEY }}
+          VERIFY_SIMSLIM: ${{ matrix.platform == 'ios' && '1' || '' }}
+          SIMSLIM_BOOT_TIMEOUT: 15m
+          SIMSLIM_SPAWN_TIMEOUT: 5m
         run: |
           "$CLI" up --platform "$PLATFORM" --backend local
 
@@ -263,3 +235,85 @@ jobs:
             ${{ env.PACKAGE }}/.verify/runs/*/e2e*/artifacts
           retention-days: 3
           if-no-files-found: warn
+
+      - name: Record the flaky tests
+        if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
+        continue-on-error: true
+        run: node scripts/verify-flaky.mjs record "$PACKAGE/.verify/runs" "$RUNNER_TEMP/verify-flaky.json"
+
+      - name: Keep the flaky tests for the Slack post
+        if: ${{ !cancelled() && steps.evidence.outputs.upload == 'true' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: verify-flaky-${{ matrix.platform }}
+          path: ${{ runner.temp }}/verify-flaky.json
+          retention-days: 1
+          overwrite: true
+          if-no-files-found: ignore
+
+  report-flaky:
+    name: Post the flaky tests to Slack
+    needs: e2e-tests
+    if: ${{ !cancelled() && needs.e2e-tests.result != 'skipped' && github.head_ref == 'changeset-release/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.4.0
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/verify-flaky.mjs
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 24.15.0
+
+      - name: Download the flaky tests of both platforms
+        continue-on-error: true
+        uses: actions/download-artifact@v4.3.0
+        with:
+          pattern: verify-flaky-*
+          path: ${{ runner.temp }}/flaky
+
+      - name: Generate notification payload
+        id: notification
+        run: |
+          mkdir -p "$RUNNER_TEMP/flaky"
+          payload="$(node scripts/verify-flaky.mjs payload "$RUNNER_TEMP/flaky")"
+          if [ -z "$payload" ]; then
+            echo "No flaky tests in this run."
+            exit 0
+          fi
+          echo "$payload"
+          {
+            echo 'payload<<__NOTIFY_EOF__'
+            echo "$payload"
+            echo '__NOTIFY_EOF__'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Send the flaky tests to Slack
+        if: ${{ steps.notification.outputs.payload != '' }}
+        uses: slackapi/slack-github-action@v1.27.1
+        with:
+          payload: ${{ steps.notification.outputs.payload }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MOBILE_TEAM_ALERTS_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  verify-e2e:
+    name: Expo E2E
+    needs: e2e-tests
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pass when the end-to-end tests passed or did not need to run
+        env:
+          RESULT: ${{ needs.e2e-tests.result }}
+        run: |
+          echo "The end-to-end tests ended with $RESULT."
+          [ "$RESULT" = "success" ] || [ "$RESULT" = "skipped" ]

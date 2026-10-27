@@ -89,7 +89,6 @@ describe('useUserProfilePictureController', () => {
     await act(async () => result.current.onChange?.(file));
     expect(result.current.error).toBe('Something went wrong. Please try again.');
     expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
-    log.mockRestore();
   });
 
   it('reports a failed removal the same way', async () => {

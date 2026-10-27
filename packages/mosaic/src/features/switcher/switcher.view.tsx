@@ -31,7 +31,7 @@ import { focusOutline } from '../../styles/focus-outline.styles';
 import { rtl } from '../../styles/rtl.styles';
 import { truncationStyles } from '../../styles/typography.styles';
 import { applyOrder } from '../../utils/apply-order';
-import type { SwitcherLayout, SwitcherSlot } from './switcher.layout';
+import type { SwitcherLayout } from './switcher.layout';
 import { resolveSwitcherLayout } from './switcher.layout';
 import { styles } from './switcher.styles';
 import type {
@@ -46,6 +46,7 @@ import type {
   SwitcherSession,
   SwitcherTriggerBadge,
 } from './switcher.types';
+import { switcherBusyKeys } from './switcher.types';
 import { BadgedAvatar, RowAvatar } from './switcher-avatar.view';
 import { SwitcherHeader } from './switcher-header.view';
 import {
@@ -65,19 +66,6 @@ import { useSwitcherTriggerController } from './switcher-trigger.controller';
 // The data contract, the mode flags, and the menu item shapes live in `switcher.types`; they are
 // what the model and the view agree on, so neither file owns them.
 export type * from './switcher.types';
-
-/**
- * Stable keys naming which affordance owns the single in-flight action. Shared by the connected
- * container (which sets `pendingKey`) and the view (which matches against it).
- */
-export const switcherBusyKeys = {
-  selectOrganization: (organizationId: string | null) => `select-org:${organizationId ?? 'personal'}`,
-  switchSession: (sessionId: string) => `switch:${sessionId}`,
-  signOutSession: (sessionId: string, from: SwitcherSlot) => `sign-out:${from}:${sessionId}`,
-  signOutAll: () => 'sign-out-all',
-  acceptSuggestion: (suggestionId: string) => `accept-suggestion:${suggestionId}`,
-  acceptInvitation: (invitationId: string) => `accept-invitation:${invitationId}`,
-} as const;
 
 type SwitcherContextValue = SwitcherData &
   SwitcherCallbacks &

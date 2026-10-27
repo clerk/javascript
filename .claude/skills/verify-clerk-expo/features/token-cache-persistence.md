@@ -1,11 +1,11 @@
 # Token cache persistence
 
-A signed-in user who closes and reopens the app is still signed in, because `@clerk/expo`'s token cache restored the client from secure storage.
+A signed-in user who closes and reopens the app is still signed in, because the client token survived in storage. The test app links `@clerk/expo-native-components`, so `ClerkProvider` reads the client token from the native SDK's device token and mirrors it to `@clerk/expo`'s token cache in secure storage (`packages/expo/src/provider/nativeClientSync.ts`).
 
 ## Sub-features
 
 - `relaunch` restores the same user and the same session after a cold relaunch with no ticket.
-- `kept-token` shows that the JS token cache held the client token when the app started.
+- `kept-token` shows that the token cache in secure storage held the client token when the app started.
 - `new-scope` starts signed out when storage was cleared, which proves the restore came from storage.
 
 ## How to get to it (user POV)
@@ -26,7 +26,7 @@ Preconditions:
 ## Gotchas
 
 - `keepStorage: true` reuses the previous launch's `verifyStorageScope`. Without it, the test app clears Clerk's stored client on launch, so the relaunch would start signed out.
-- When the scope changes, the test app clears more than Clerk's own storage. On iOS it clears every generic-password keychain item the test app owns. On Android it deletes the `clerk_preferences` and `SecureStore` SharedPreferences files, so every `expo-secure-store` item goes.
-- The home alone does not prove the JS token cache. Native storage could restore the session and sync it to JS, and the home would look the same. The `Token cache` screen shows what the JS cache itself held.
+- When the scope changes, the test app clears more than Clerk's own storage. On iOS it clears every generic-password keychain item the test app owns, and the UserDefaults keys in which clerk-ios remembers the last identifier the start screen used. On Android it deletes the `clerk_preferences` and `SecureStore` SharedPreferences files, so every `expo-secure-store` item goes.
+- The home alone does not prove the token cache. The JS client restores from the native device token, so the home would look the same if only native storage kept the token. The `Token cache` screen shows whether the copy in secure storage held the client token at launch.
 - The test app reads the cache once, when the app starts and before Clerk has loaded, and the `Token cache` screen shows that answer whenever the home opens it. Do not read the cache again after Clerk loads. A signed-out client stores a client token of its own by then, so the text would say `yes` on a new scope.
 - A launch with no `signedInAs` that keeps storage needs `landsOn`, because only the spec knows that it expects a signed-in home.

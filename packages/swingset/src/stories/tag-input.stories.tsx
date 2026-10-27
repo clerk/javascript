@@ -7,7 +7,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
-  status: 'wip',
+  status: 'stable',
   title: 'TagInput',
   label: 'Tag Input',
   source: 'packages/mosaic/src/primitives/tag-input/index.ts',
