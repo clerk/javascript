@@ -388,7 +388,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private replayWhenLoadIsFinished(clerk: HeadlessBrowserClerk | BrowserClerk): void {
     // A reload can finish the load before this runs.
     if (clerk.loaded) {
-      this.replayInterceptedInvocations(clerk);
+      this.replayFinishedLoad(clerk);
       return;
     }
     if (typeof clerk.on !== 'function') {
@@ -403,10 +403,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       // Unsubscribing while the event bus dispatches would skip the next listener.
       queueMicrotask(() => {
         clerk.off('status', onStatus);
-        this.replayInterceptedInvocations(clerk);
+        this.replayFinishedLoad(clerk);
       });
     };
     clerk.on('status', onStatus);
+  }
+
+  // Nothing awaits this replay, so a queued call or listener that throws is handled here, as it is when the first load
+  // succeeds.
+  private replayFinishedLoad(clerk: HeadlessBrowserClerk | BrowserClerk): void {
+    try {
+      this.replayInterceptedInvocations(clerk);
+    } catch (err) {
+      if (__DEV__) {
+        console.error('Clerk: Failed to load:', err);
+      }
+      this.#eventBus.emit(clerkEvents.Status, 'error');
+    }
   }
 
   get sdkMetadata() {
