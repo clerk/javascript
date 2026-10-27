@@ -249,6 +249,19 @@ so a consumer's overrides type-check against the real keys, as a dot path
 Renaming or moving a key breaks every override that names it; treat it like renaming
 a prop.
 
+The key tree follows what the user sees, so a key can be found from the screen:
+
+- A root is a public component (`userProfile`) or a shared block (`form`, `errors`).
+  There is no `common` root. The same English in two components is two keys,
+  because a translation may need to differ by context.
+- Below the root, keys nest by section, then by the dialog or step inside it:
+  `userProfile.email.addDialog`, `userProfile.email.removeDialog`.
+- Copy that several views render through one shared component belongs to that
+  component (`userProfile.contact` for the row both email and phone use).
+- Every segment is camelCase. A map keyed by data ids (`errors`, `roles`,
+  `userProfile.mfa.methods`) keeps the ids as its keys;
+  `src/localization/__tests__/registry.test.ts` lists those maps and checks the rest.
+
 ### Composition
 
 Two shapes, chosen by whether the slice fetches its own data.

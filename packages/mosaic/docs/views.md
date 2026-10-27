@@ -48,12 +48,25 @@ Every string a view renders comes from the feature's `*.messages.ts`, shaped the
 way `@clerk/i18n` takes a base definition. A plural message is its forms; a
 parameterized one is its template.
 
-Register the file as a namespace in `src/localization/registry.ts`, then read it
-with `useMessages` in the view or controller that renders it:
+To add copy for a new section, step or dialog:
+
+1. Put the strings in the `*.messages.ts` next to the view that renders them. Name
+   each key for what the string is (`label`, `resend`, `confirm`), not where it
+   sits in the markup.
+2. Mount the object in `src/localization/registry.ts` under the public component
+   the user sees it in: a section of `UserProfile` goes at `userProfile.<section>`,
+   and a dialog inside it at `userProfile.<section>.addDialog` or `.removeDialog`.
+   Copy two views share goes under the component that renders it, never under a
+   new `common` root.
+3. Read it with `useMessages` and the root, in the view or controller that
+   renders it:
 
 ```tsx
-const m = useMessages('userButton');
+const m = useMessages('userProfile').mfa;
 ```
+
+The rules behind these steps are in [ARCHITECTURE.md](../ARCHITECTURE.md), and
+`src/localization/__tests__/registry.test.ts` fails on a key that is not camelCase.
 
 Never import a `*.messages.ts` directly. A direct import skips the customer's
 locale and overrides, so the copy can't be localized.
