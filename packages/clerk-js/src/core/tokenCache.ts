@@ -34,7 +34,7 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
 
 type Seconds = number;
 
-interface CachedToken {
+interface TokenWithExpiry {
   expiresAt: Seconds;
   token: TokenResource;
 }
@@ -52,7 +52,7 @@ interface TokenCacheValue {
    * await its resolver. Folded into resolvedToken when the live entry resolves,
    * which is what keeps a staler resolve from overwriting a fresher token.
    */
-  freshest?: CachedToken;
+  freshestKnown?: TokenWithExpiry;
   cachedAt: Seconds;
   entry: TokenCacheEntry;
   /** Timer for automatic cache cleanup when token expires */
@@ -137,7 +137,7 @@ const generateTabId = (): string => {
   return Math.random().toString(36).slice(2);
 };
 
-const pickFreshestCachedToken = (existing: CachedToken | undefined, incoming: CachedToken): CachedToken => {
+const pickFreshest = (existing: TokenWithExpiry | undefined, incoming: TokenWithExpiry): TokenWithExpiry => {
   if (!existing) {
     return incoming;
   }
@@ -201,7 +201,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
     }
 
     const hasResolvedToken = value.entry.resolvedToken !== undefined;
-    const expiresAt = hasResolvedToken && value.freshest ? value.freshest.expiresAt : Infinity;
+    const expiresAt = hasResolvedToken && value.freshestKnown ? value.freshestKnown.expiresAt : Infinity;
     const remainingTtl = expiresAt - Math.floor(Date.now() / 1000);
 
     // Token expired or dangerously close to expiration - force synchronous refresh
@@ -339,7 +339,7 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
 
     // Chain the freshest known token across replacements. This never touches
     // entry.resolvedToken: a pending entry reads as pending and callers await.
-    value.freshest = existing?.freshest;
+    value.freshestKnown = existing?.freshestKnown;
 
     // Clears both timers and drops the slot, but only if it still holds `target`
     // (a newer set() may have replaced it while a promise/timer was pending).
@@ -380,16 +380,16 @@ const MemoryTokenCache = (prefix?: string): TokenCache => {
         // `exp` is server time, so reading it on the device clock is late by the
         // device's lag. A full lifetime from cache insert is late by the token's age
         // on arrival. The earlier of the two is late only by the smaller error.
-        const candidate: CachedToken = {
+        const candidate: TokenWithExpiry = {
           expiresAt: Math.min(claims.exp, value.cachedAt + claims.exp - claims.iat),
           token: newToken,
         };
 
         // Track the freshest token seen for this key, even when this resolver was
         // replaced by a newer set() while it was pending.
-        const previous = live.freshest;
-        const winner = pickFreshestCachedToken(previous, candidate);
-        live.freshest = winner;
+        const previous = live.freshestKnown;
+        const winner = pickFreshest(previous, candidate);
+        live.freshestKnown = winner;
 
         // resolvedToken is only written once the live slot itself resolves. While
         // the live slot is pending, readers must keep awaiting its resolver, so a
