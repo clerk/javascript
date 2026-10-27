@@ -21,6 +21,12 @@ import { AFTER, ASSIGN, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types
 
 const INIT_EVENT: AnyEventObject = { type: INIT };
 
+interface AfterTimer {
+  id: ReturnType<typeof setTimeout>;
+  delay: number;
+  transitionConfig: unknown;
+}
+
 // Collapse toArray into single helper: returns empty array, original if array, or wrapped value
 const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? v : [v]);
 
@@ -70,14 +76,17 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // A teleported actor is already "started" and inert: start() must not re-run
   // entry/always/invoke for the state it was dropped into.
   let started = teleport !== undefined;
+  let initialized = started;
   let status: Snapshot<TContext>['status'] = stateOf(value).type === 'final' ? 'done' : 'active';
 
-  // Bumped whenever we leave an invoking state (or stop), so a stale promise
-  // resolving after the fact is ignored — no transition, no setState-after-stop.
+  // Bumped whenever we leave an invoking state, so a stale promise resolving
+  // after the fact is ignored — no transition.
   let invocationToken = 0;
+  let receivedWhileStopped: (() => boolean)[] = [];
 
-  // Pending `after` timer IDs — cleared when the state is exited or the actor stops.
-  let afterTimers: ReturnType<typeof setTimeout>[] = [];
+  // Pending `after` timers — cleared when the state is exited, paused while the actor is stopped.
+  let afterTimers: AfterTimer[] = [];
+  let pausedAfterTimers: AfterTimer[] = [];
 
   // The snapshot is cached and only replaced on an actual change, so
   // getSnapshot() is referentially stable for useSyncExternalStore.
@@ -168,44 +177,39 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       return;
     }
     const token = ++invocationToken;
+    const settle = (transitionConfig: unknown, settledEvent: AnyEventObject) => {
+      if (token !== invocationToken) {
+        return;
+      }
+      if (status === 'stopped') {
+        receivedWhileStopped.push(
+          () => token === invocationToken && takeInvokeTransition(transitionConfig, settledEvent),
+        );
+        return;
+      }
+      if (status === 'active' && takeInvokeTransition(transitionConfig, settledEvent)) {
+        commit();
+      }
+    };
     // SAFETY: startInvoke is called with the actor's internal EventObject, but
     // InvokeConfig.src is typed to accept (context, TEvent | DoneInvokeEvent | ErrorInvokeEvent).
     // The cast suppresses that mismatch; src implementations receive the INIT event
     // on state entry and typically ignore it. The runtime views events through an
     // event-agnostic lens (line 57) for this reason.
     Promise.resolve(invoke.src(context, event as never)).then(
-      (output: unknown) => {
-        if (status !== 'active' || token !== invocationToken) {
-          return;
-        }
-        const doneEvent = { type: INVOKE_DONE, output };
-        const transition = pickTransition(normalizeTransition(invoke.onDone, doneEvent), doneEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, doneEvent)) {
-          commit();
-        }
-      },
-      (error: unknown) => {
-        if (status !== 'active' || token !== invocationToken) {
-          return;
-        }
-        const errorEvent = { type: INVOKE_ERROR, error };
-        const transition = pickTransition(normalizeTransition(invoke.onError, errorEvent), errorEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, errorEvent)) {
-          commit();
-        }
-      },
+      (output: unknown) => settle(invoke.onDone, { type: INVOKE_DONE, output }),
+      (error: unknown) => settle(invoke.onError, { type: INVOKE_ERROR, error }),
     );
   }
 
+  function takeInvokeTransition(transitionConfig: unknown, event: EventObject): boolean {
+    const transition = pickTransition(normalizeTransition(transitionConfig, event), event);
+    return transition !== undefined && takeTransition(transition, event);
+  }
+
   function clearAfterTimers(): void {
-    for (const id of afterTimers) {
-      clearTimeout(id);
+    for (const timer of afterTimers) {
+      clearTimeout(timer.id);
     }
     afterTimers = [];
   }
@@ -216,23 +220,51 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       return;
     }
     for (const [delayStr, raw] of Object.entries(afterConfig)) {
-      const delay = Number(delayStr);
-      const id = setTimeout(() => {
-        afterTimers = afterTimers.filter(t => t !== id);
+      scheduleAfterTimer(Number(delayStr), raw);
+    }
+  }
+
+  function scheduleAfterTimer(delay: number, transitionConfig: unknown): void {
+    const timer: AfterTimer = {
+      delay,
+      transitionConfig,
+      id: setTimeout(() => {
+        afterTimers = afterTimers.filter(t => t !== timer);
         if (status !== 'active') {
           return;
         }
         const afterEvent: AfterEvent = { type: AFTER, delay };
-        const transition = pickTransition(normalizeTransition(raw, afterEvent), afterEvent);
+        const transition = pickTransition(normalizeTransition(transitionConfig, afterEvent), afterEvent);
         if (!transition) {
           return;
         }
         if (takeTransition(transition, afterEvent)) {
           commit();
         }
-      }, delay);
-      afterTimers.push(id);
+      }, delay),
+    };
+    afterTimers.push(timer);
+  }
+
+  function resume(): void {
+    status = stateOf(value).type === 'final' ? 'done' : 'active';
+    for (const timer of pausedAfterTimers) {
+      scheduleAfterTimer(timer.delay, timer.transitionConfig);
     }
+    pausedAfterTimers = [];
+    const received = receivedWhileStopped;
+    receivedWhileStopped = [];
+    for (const apply of received) {
+      apply();
+    }
+  }
+
+  function takeEventTransition(event: EventObject): boolean {
+    if (status !== 'active') {
+      return false;
+    }
+    const transition = pickTransition(normalizeTransition(stateOf(value).on?.[event.type], event), event);
+    return transition !== undefined && takeTransition(transition, event);
   }
 
   /** Entry side of a state: entry actions, then immediate/invoke resolution. */
@@ -273,12 +305,16 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         return actor;
       }
       started = true;
-      status = 'active';
-      // Reset state and context so a restart (e.g. after StrictMode stop/start)
-      // begins from idle rather than re-entering and re-invoking a mid-flight state.
-      context = { ...machine.context, ...liveContextPatch };
-      value = resolveInitial();
-      enterState(INIT_EVENT);
+      if (initialized) {
+        resume();
+      } else {
+        initialized = true;
+        status = 'active';
+        // The first start seats on the initial state resolved from the latest injected context.
+        context = { ...machine.context, ...liveContextPatch };
+        value = resolveInitial();
+        enterState(INIT_EVENT);
+      }
       commit();
       return actor;
     },
@@ -289,7 +325,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       }
       started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
       status = 'stopped';
-      invocationToken++; // abandon any in-flight invoke
+      pausedAfterTimers = afterTimers;
       clearAfterTimers();
       snapshot = { value, context, status };
       notifyListeners();
@@ -297,16 +333,13 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     },
 
     send(event) {
-      if (!started || status !== 'active') {
+      if (initialized && status === 'stopped') {
+        receivedWhileStopped.push(() => takeEventTransition(event));
         return;
       }
-      const transition = pickTransition(normalizeTransition(stateOf(value).on?.[event.type], event), event);
-      if (!transition) {
-        return;
-      } // event not handled in this state → ignored
-      if (takeTransition(transition, event)) {
+      if (started && takeEventTransition(event)) {
         commit();
-      } // entry-blocked → no commit, no notify
+      }
     },
 
     getSnapshot() {
