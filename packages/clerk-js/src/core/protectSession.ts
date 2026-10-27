@@ -690,9 +690,7 @@ export class ProtectSession {
         return result as ProtectStatus;
       }
 
-      // The lock was never held. Refused outright, nobody is minting for us and only what is stored
-      // counts; waited out after ~5s, a leader may still be minting, so watch the store until our
-      // deadline, which the timer bounds even when the system clock changes.
+      // Refused: nobody is minting for us. Waited out: a leader may still be, so poll the store until our deadline.
       if (!lockWaitedOut) {
         return this.#freshStoredToken() ? 'ok' : 'timeout';
       }
