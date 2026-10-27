@@ -31,9 +31,11 @@ const INLINE_TOKEN_GLOBAL = '__clerk_specter';
 /** A token this close to expiry is treated as absent, so a fresh run starts before it lapses. */
 const TOKEN_REFRESH_MARGIN_MS = 60 * 1_000;
 /** Acquisition deadline when the instance does not configure one. */
-const DEFAULT_TOKEN_TIMEOUT_MS = 5 * 1_000;
+const DEFAULT_TOKEN_TIMEOUT_MS = 10 * 1_000;
 /** Ceiling on the instance-configured deadline, so no server value can stall a sign-in. */
 const MAX_TOKEN_TIMEOUT_MS = 10 * 1_000;
+const STORE_POLL_INTERVAL_MS = 100;
+const LOCK_REFUSAL_WINDOW_MS = 4_000;
 /** A stored token claiming more remaining life than this was not minted by us. */
 const MAX_TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1_000;
 /** Longest token we will hand back, so a planted store entry cannot bloat a sign-in body. */
@@ -406,16 +408,17 @@ function isRetryableStatus(status: number): boolean {
 }
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) {
+    return Promise.resolve();
+  }
   return new Promise(resolve => {
-    const timer = setTimeout(resolve, ms);
-    signal.addEventListener(
-      'abort',
-      () => {
-        clearTimeout(timer);
-        resolve();
-      },
-      { once: true },
-    );
+    const settle = () => {
+      clearTimeout(timer);
+      signal.removeEventListener('abort', settle);
+      resolve();
+    };
+    const timer = setTimeout(settle, ms);
+    signal.addEventListener('abort', settle, { once: true });
   });
 }
 
@@ -624,7 +627,8 @@ export class ProtectSession {
     if (readStoredToken(this.#tokenStorageKey, TOKEN_SEND_MARGIN_MS, this.#floor)) {
       return;
     }
-    if (Date.now() - this.#lastAttemptAt < this.#backoffMs()) {
+    const elapsed = Date.now() - this.#lastAttemptAt;
+    if (elapsed >= 0 && elapsed < this.#backoffMs()) {
       return;
     }
     this.#startAcquisition();
@@ -668,22 +672,47 @@ export class ProtectSession {
       return 'ok';
     }
 
-    const result = await this.#lock.acquireLockAndRun(async () => {
-      // Double-checked inside the lock. Without this re-read every tab runs the loader in turn,
-      // which is the exact failure this design exists to prevent.
-      if (this.#freshStoredToken()) {
-        return 'ok' satisfies ProtectStatus;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.#timeoutMs);
+    let lockWaitedOut = false;
+    const lockTimer = setTimeout(() => {
+      lockWaitedOut = true;
+    }, LOCK_REFUSAL_WINDOW_MS);
+    try {
+      const result = await this.#lock.acquireLockAndRun(async () => {
+        // Double-checked inside the lock. Without this re-read every tab runs the loader in turn,
+        // which is the exact failure this design exists to prevent.
+        if (this.#freshStoredToken()) {
+          return 'ok' satisfies ProtectStatus;
+        }
+        return await this.#mint();
+      });
+
+      if (typeof result === 'string') {
+        return result as ProtectStatus;
       }
-      return await this.#mint();
-    });
 
-    if (typeof result === 'string') {
-      return result as ProtectStatus;
+      // Refused: nobody is minting for us. Waited out: a leader may still be, so poll the store until our deadline.
+      if (!lockWaitedOut) {
+        return this.#freshStoredToken() ? 'ok' : 'timeout';
+      }
+      return (await this.#awaitStoredToken(controller.signal)) ? 'ok' : 'timeout';
+    } finally {
+      clearTimeout(timer);
+      clearTimeout(lockTimer);
     }
+  }
 
-    // The lock was never held — `SafeLock` gives up waiting after ~5s so a wedged leader delays
-    // nobody. Whatever a leader did manage to write is still ours to use.
-    return this.#freshStoredToken() ? 'ok' : 'timeout';
+  async #awaitStoredToken(signal: AbortSignal): Promise<boolean> {
+    for (;;) {
+      if (this.#freshStoredToken()) {
+        return true;
+      }
+      if (signal.aborted) {
+        return false;
+      }
+      await sleep(STORE_POLL_INTERVAL_MS, signal);
+    }
   }
 
   /** Runs the loader and takes the token it was served with. Never rejects. */
