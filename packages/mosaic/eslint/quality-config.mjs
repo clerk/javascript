@@ -1,7 +1,6 @@
 import e18e from '@e18e/eslint-plugin';
 import tseslint from 'typescript-eslint';
 
-import codeQuality from './code-quality.mjs';
 import goodCss from './good-css.mjs';
 const testFiles = ['**/__tests__/**', '**/*.test.*', '**/*.spec.*', '**/*.test-d.ts'];
 export default [
@@ -14,11 +13,9 @@ export default [
     name: 'packages/mosaic - code quality',
     files: ['packages/mosaic/src/**/*.{ts,tsx}'],
     ignores: testFiles,
-    plugins: { e18e, 'code-quality': codeQuality },
+    plugins: { e18e },
     rules: {
       'e18e/no-spread-in-reduce': 'warn',
-      'code-quality/no-chained-type-assertions': 'warn',
-      'code-quality/no-widen-then-assert': 'warn',
     },
   },
   {

@@ -14,10 +14,11 @@ describe('ported lint policy', () => {
 
     expect(implementation.rules['e18e/no-spread-in-reduce']?.[0]).toBe(1);
     expect(tests.rules['e18e/no-spread-in-reduce']).toBeUndefined();
-    for (const rule of ['no-chained-type-assertions', 'no-widen-then-assert']) {
-      expect(implementation.rules[`code-quality/${rule}`]?.[0]).toBe(1);
-      expect(tests.rules[`code-quality/${rule}`]).toBeUndefined();
-    }
+    expect(implementation.rules['@typescript-eslint/consistent-type-assertions']).toEqual([
+      2,
+      { assertionStyle: 'never' },
+    ]);
+    expect(Object.keys(implementation.rules).filter(rule => rule.startsWith('code-quality/'))).toEqual([]);
   });
 
   test('preserves hook ordering and the React 18 and 19 contract', async () => {
