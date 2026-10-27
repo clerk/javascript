@@ -115,6 +115,12 @@ export default defineConfig({
               },
             }),
             instances: [{ browser: 'chromium' }],
+            expect: {
+              toMatchScreenshot: {
+                comparatorName: 'pixelmatch',
+                comparatorOptions: { threshold: 0.1, allowedMismatchedPixelRatio: 0 },
+              },
+            },
           },
         },
       },

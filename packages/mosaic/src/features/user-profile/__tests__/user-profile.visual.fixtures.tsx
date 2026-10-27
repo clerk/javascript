@@ -22,31 +22,45 @@ import { UserProfileProfileSection } from '../user-profile-profile-section/user-
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section';
 
-export function serveVisualProfile(longContent = false) {
-  const emails = longContent
-    ? [
-        fapiEmailAddress({ id: 'email_primary', email_address: 'alexandria.montgomery@longcompanydomain.example' }),
-        fapiEmailAddress({ id: 'email_secondary', email_address: 'alexandria.montgomery.personal@example.com' }),
-        fapiEmailAddress({ id: 'email_tertiary', email_address: 'alexandria.montgomery.notifications@example.com' }),
-      ]
-    : [
-        fapiEmailAddress({ id: 'email_primary', email_address: 'alex@example.com' }),
-        fapiEmailAddress({ id: 'email_secondary', email_address: 'alex.work@example.com' }),
-      ];
-  const phones = longContent
-    ? [
-        fapiPhoneNumber({ id: 'phone_primary', phone_number: '+14155550123' }),
-        fapiPhoneNumber({ id: 'phone_secondary', phone_number: '+14155550456' }),
-      ]
-    : [fapiPhoneNumber({ id: 'phone_primary', phone_number: '+14155550123' })];
+type VisualProfile = {
+  firstName: string;
+  lastName: string;
+  username: string;
+  emails: string[];
+  phones: string[];
+};
+
+export const shortProfile: VisualProfile = {
+  firstName: 'Alex',
+  lastName: 'Morgan',
+  username: 'alexmorgan',
+  emails: ['alex@example.com', 'alex.work@example.com'],
+  phones: ['+14155550123'],
+};
+
+export const longProfile: VisualProfile = {
+  firstName: 'Alexandria',
+  lastName: 'Montgomery-Wellington',
+  username: 'alexandria.montgomery',
+  emails: [
+    'alexandria.montgomery@longcompanydomain.example',
+    'alexandria.montgomery.personal@example.com',
+    'alexandria.montgomery.notifications@example.com',
+  ],
+  phones: ['+14155550123', '+14155550456'],
+};
+
+export function serveVisualProfile(profile: VisualProfile) {
   const user = fapiUser({
     id: 'user_alex',
-    first_name: longContent ? 'Alexandria' : 'Alex',
-    last_name: longContent ? 'Montgomery-Wellington' : 'Morgan',
-    username: longContent ? 'alexandria.montgomery' : 'alexmorgan',
-    email_addresses: emails,
-    phone_numbers: phones,
-    primary_phone_number_id: 'phone_primary',
+    first_name: profile.firstName,
+    last_name: profile.lastName,
+    username: profile.username,
+    email_addresses: profile.emails.map((email_address, index) =>
+      fapiEmailAddress({ id: `email_${index}`, email_address }),
+    ),
+    phone_numbers: profile.phones.map((phone_number, index) => fapiPhoneNumber({ id: `phone_${index}`, phone_number })),
+    primary_phone_number_id: 'phone_0',
     web3_wallets: [
       fapiWeb3Wallet({
         id: 'wallet_primary',
