@@ -1647,6 +1647,14 @@ export const caES: LocalizationResource = {
       subtitle: 'Utilitza la teva contrasenya per verificar la teva identitat.',
       title: 'Verificació per contrasenya',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Introdueix el codi enviat al teu telèfon.',
       resendButton: 'Reenvia codi',
@@ -1658,6 +1666,25 @@ export const caES: LocalizationResource = {
       resendButton: 'Reenvia codi',
       subtitle: 'Introdueix el codi de verificació de dos factors enviat al teu telèfon.',
       title: 'Verificació per telèfon (2FA)',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Codi TOTP',

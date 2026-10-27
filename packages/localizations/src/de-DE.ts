@@ -1654,6 +1654,14 @@ export const deDE: LocalizationResource = {
       subtitle: 'Geben Sie Ihr Passwort ein, um fortzufahren.',
       title: 'Passwort-Verifizierung',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Geben Sie den Code ein, den wir an Ihre Telefonnummer gesendet haben.',
       resendButton: 'Code erneut senden',
@@ -1665,6 +1673,25 @@ export const deDE: LocalizationResource = {
       resendButton: 'Code erneut senden',
       subtitle: 'Überprüfen Sie Ihre SMS auf den Verifizierungscode.',
       title: 'SMS-Code (MFA) Verifizierung',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Geben Sie den Code aus Ihrer Authentifikator-App ein.',

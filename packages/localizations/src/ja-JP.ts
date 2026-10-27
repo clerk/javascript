@@ -1648,6 +1648,14 @@ export const jaJP: LocalizationResource = {
       subtitle: '続行するには現在のパスワードを入力してください',
       title: '確認が必要です',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '検証コード',
       resendButton: 'コードが届いていませんか？再送信',
@@ -1659,6 +1667,25 @@ export const jaJP: LocalizationResource = {
       resendButton: 'コードが届いていませんか？再送信',
       subtitle: '続行するには、電話に送信されたコードを入力してください',
       title: '確認が必要です',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: '検証コード',

@@ -1642,6 +1642,14 @@ export const beBY: LocalizationResource = {
       subtitle: 'Калі вы памятаеце свой пароль, вы можаце ўвесці яго для завершэння верыфікацыі.',
       title: 'Падцвердзіць праз пароль',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Увядзіце код, які быў адпраўлены на ваш тэлефон.',
       resendButton: 'Пераадправіць код на тэлефон',
@@ -1653,6 +1661,25 @@ export const beBY: LocalizationResource = {
       resendButton: 'Пераадправіць код MFA',
       subtitle: 'Праверце смс-паведамленне для атрымання кода MFA.',
       title: 'Код MFA з тэлефона',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Увядзіце код TOTP з вашага прыкладання.',

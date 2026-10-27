@@ -1650,6 +1650,14 @@ export const nbNO: LocalizationResource = {
       subtitle: 'Skriv inn ditt nåværende passord for å fortsette',
       title: 'Verifisering påkrevd',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifiseringskode',
       resendButton: 'Ikke mottatt kode? Send på nytt',
@@ -1661,6 +1669,25 @@ export const nbNO: LocalizationResource = {
       resendButton: 'Ikke mottatt kode? Send på nytt',
       subtitle: 'Skriv inn koden sendt til telefonen din for å fortsette',
       title: 'Verifisering påkrevd',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Verifiseringskode',

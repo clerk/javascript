@@ -1641,6 +1641,14 @@ export const nlBE: LocalizationResource = {
       subtitle: 'Voer het wachtwoord in dat bij je account hoort',
       title: 'Voer je wachtwoord in',
     },
+    passwordCompromised: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
+    passwordPwned: {
+      subtitle__saveNewPassword: undefined,
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verificatiecode',
       resendButton: 'Niet ontvangen? Opnieuw verzenden',
@@ -1652,6 +1660,25 @@ export const nlBE: LocalizationResource = {
       resendButton: 'Niet ontvangen? Opnieuw verzenden',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Controleer je telefoon',
+    },
+    resetPassword: {
+      formButtonPrimary: undefined,
+      title: undefined,
+    },
+    resetPasswordAlternativeMethods: {
+      blockButton__resetPassword: undefined,
+      label__alternativeMethods: undefined,
+    },
+    resetPasswordCode: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle__saveNewPassword_email: undefined,
+      subtitle__saveNewPassword_phone: undefined,
+      subtitle_email: undefined,
+      subtitle_phone: undefined,
+      title: undefined,
+      title__saveNewPassword_email: undefined,
+      title__saveNewPassword_phone: undefined,
     },
     totpMfa: {
       formTitle: 'Verificatiecode',
